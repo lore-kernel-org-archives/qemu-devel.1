@@ -2,64 +2,91 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DBBAC49ED9
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:53:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47967C49ED7
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:55:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14A1C21479
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:53:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14A1C21479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id C1A5121479
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:55:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B/nSaijh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1A5121479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7mCT-0005Fw-3g
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:53:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33208)
+	id 1i7mEC-0007Mf-PD
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:55:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33093)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sean.j.christopherson@intel.com>) id 1i7m5Y-0005y4-0u
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:46:08 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i7m4q-00055m-Si
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:45:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sean.j.christopherson@intel.com>) id 1i7m5W-000594-Ew
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:46:07 -0400
-Received: from mga09.intel.com ([134.134.136.24]:45239)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sean.j.christopherson@intel.com>)
- id 1i7m5W-00056C-7K
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:46:06 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
- by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 10 Sep 2019 12:45:57 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,490,1559545200"; d="scan'208";a="189448727"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com)
- ([10.54.74.41])
- by orsmga006.jf.intel.com with ESMTP; 10 Sep 2019 12:45:57 -0700
-Date: Tue, 10 Sep 2019 12:45:57 -0700
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-To: Larry Dewey <ldewey@suse.com>
-Message-ID: <20190910194556.GC11151@linux.intel.com>
-References: <20190806185649.2476-1-sean.j.christopherson@intel.com>
- <20190806185649.2476-4-sean.j.christopherson@intel.com>
- <0be06fee919426129b2f379609f76bd260fba49c.camel@suse.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1i7m4p-0004rG-I1
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:45:24 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43058)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i7m4p-0004qi-BU
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:45:23 -0400
+Received: by mail-wr1-x441.google.com with SMTP id q17so17202694wrx.10
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 12:45:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=L3sZdVGe93Oonobk9LL1HKyzZUDu1a8yg31vgo6Uk6Y=;
+ b=B/nSaijhrP9B1QRhTYNY44TiN5BpeXnlEQOnG/7IhSac0i68oDlOQV6lqiRxr2MH/V
+ C4Qm+rCLI9KCq1jTZZJOpR4SOYpNqIkELaOynxo+X+ehTlqozU1i9/QzLD0pl3HBwVS2
+ VnOq2Ke/d0Go1DDwxYpOe98p+GeZmrwHlwY0mfSPP9Jv0+S8U2j7BHa2S2S1Gu713i4I
+ Dp4ycI4KasSB2c4Ay0tM40RiM/Cj4yU+41pOiMCi1sa/PAeAwnlpTlGNUTU8Uw+uZ0Sc
+ QTaQ0ZWPBtzVHaQmDWytxAbzf8WdmzMxLz/YPHVfLodHEZ4WC0U8XthEYCQIx1QZ0mom
+ B0cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=L3sZdVGe93Oonobk9LL1HKyzZUDu1a8yg31vgo6Uk6Y=;
+ b=cmJyMuNKeTgPf57kYuVRvmT6yQr+ot8VSASlatv8ehkrX/ynIquIIrKxiXR6uumcxd
+ PYppOiiBuFk6Fha4sdMBslHhZo5UXlmRsBWgkUpt40MjBBH3DJn/m/YPGlaMUI2yT0eK
+ haqh9zc6DoSd7lSYxj1+2cCVNML1axP/9jTKNXZ5GVDJGMeuokmWsfXeM4aNUFiW2abm
+ 8uliYAqFnDW7/DO/J4h3tjlwXLbOvNcxVA2L5u3np7AhyRA/4Tbk0D38P7ph0NrCHRIn
+ Jw6sDRYNPvo7fpHok9i+mEKPiZwX9L+fAFUWiY5f1djBU2Liy8BO1JS3J0iTBa8ERbLW
+ 3YeA==
+X-Gm-Message-State: APjAAAWiVhKXsr8lU+r58yZ9nlrx4hDRT+ZPMPS6ui3aTd9KLu1c1RfM
+ epOVnzlSq7vT35nRGlTG6QUSjg==
+X-Google-Smtp-Source: APXvYqybEwomVc8pG6BfUE2aHjwNOVwDovA6VkVR09/n2GvyiCK/fd+pNEsxsjFDWjFVV61FcLfSOA==
+X-Received: by 2002:a5d:4382:: with SMTP id i2mr28688299wrq.297.1568144721620; 
+ Tue, 10 Sep 2019 12:45:21 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id q14sm39334451wrc.77.2019.09.10.12.45.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 10 Sep 2019 12:45:21 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 615F41FF87;
+ Tue, 10 Sep 2019 20:45:20 +0100 (BST)
+References: <20190910193408.28917-1-alex.bennee@linaro.org>
+ <20190910193408.28917-2-alex.bennee@linaro.org>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+In-reply-to: <20190910193408.28917-2-alex.bennee@linaro.org>
+Date: Tue, 10 Sep 2019 20:45:20 +0100
+Message-ID: <87blvs0wbz.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0be06fee919426129b2f379609f76bd260fba49c.camel@suse.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.24
-Subject: Re: [Qemu-devel] [RFC PATCH 03/20] vl: Add "sgx-epc" option to
- expose SGX EPC sections to guest
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH v1 1/4] target/ppc: fix signal delivery for
+ ppc64abi32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,22 +98,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 06, 2019 at 09:49:44PM +0000, Larry Dewey wrote:
-> I was playing with the new objects, etc, and found if the user
-> specifies -sgx-epc, and a memory device, but does not specify -cpu
-> host, +sgx, the vm runs without any warnings, while obviously not doing
-> anything to the memory. Perhaps some warnings if not everything which
-> is required is provided?
 
-Yeah, I waffled on what to do in this scenario.  Ditto for the opposite
-scenario of having SGX enabled without EPC.   I agree a warning or error
-would be helpful for EPC-without-SGX.  The SGX-without-EPC case at least
-makes some sense, e.g. to mimic BIOS not partitioning EPC, and doesn't
-waste resources.
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+
+> We were incorrectly setting NIP resulting in a segfault. This fixes
+> linux-test for this ABI.
+
+Oops, that was at the bottom of my tree for fixing ppc64abi32 which
+showed up broken when testing/next enabled the TCG tests for it.
+
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  linux-user/ppc/signal.c             | 4 +++-
+>  tests/tcg/configure.sh              | 1 +
+>  tests/tcg/multiarch/Makefile.target | 5 -----
+>  3 files changed, 4 insertions(+), 6 deletions(-)
+>
+> diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
+> index 619a56950df..5b82af6cb62 100644
+> --- a/linux-user/ppc/signal.c
+> +++ b/linux-user/ppc/signal.c
+> @@ -501,7 +501,9 @@ void setup_rt_frame(int sig, struct target_sigaction =
+*ka,
+>      int i, err =3D 0;
+>  #if defined(TARGET_PPC64)
+>      struct target_sigcontext *sc =3D 0;
+> +#if !defined(TARGET_ABI32)
+>      struct image_info *image =3D ((TaskState *)thread_cpu->opaque)->info;
+> +#endif
+>  #endif
+>
+>      rt_sf_addr =3D get_sigframe(ka, env, sizeof(*rt_sf));
+> @@ -557,7 +559,7 @@ void setup_rt_frame(int sig, struct target_sigaction =
+*ka,
+>      env->gpr[5] =3D (target_ulong) h2g(&rt_sf->uc);
+>      env->gpr[6] =3D (target_ulong) h2g(rt_sf);
+>
+> -#if defined(TARGET_PPC64)
+> +#if defined(TARGET_PPC64) && !defined(TARGET_ABI32)
+>      if (get_ppc64_abi(image) < 2) {
+>          /* ELFv1 PPC64 function pointers are pointers to OPD entries. */
+>          struct target_func_ptr *handler =3D
+> diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
+> index 6c4a471aeae..e8a1a1495fc 100755
+> --- a/tests/tcg/configure.sh
+> +++ b/tests/tcg/configure.sh
+> @@ -54,6 +54,7 @@ fi
+>  : ${cross_cc_cflags_ppc=3D"-m32"}
+>  : ${cross_cc_ppc64=3D"powerpc-linux-gnu-gcc"}
+>  : ${cross_cc_cflags_ppc64=3D"-m64"}
+> +: ${cross_cc_cflags_ppc64abi32=3D"-mcpu=3Dpower8"}
+>  : ${cross_cc_ppc64le=3D"powerpc64le-linux-gnu-gcc"}
+>  : ${cross_cc_cflags_s390x=3D"-m64"}
+>  : ${cross_cc_cflags_sparc=3D"-m32 -mv8plus -mcpu=3Dultrasparc"}
+> diff --git a/tests/tcg/multiarch/Makefile.target b/tests/tcg/multiarch/Ma=
+kefile.target
+> index 6b1e30e2fec..e6893b2e283 100644
+> --- a/tests/tcg/multiarch/Makefile.target
+> +++ b/tests/tcg/multiarch/Makefile.target
+> @@ -12,11 +12,6 @@ VPATH 		+=3D $(MULTIARCH_SRC)
+>  MULTIARCH_SRCS   =3D$(notdir $(wildcard $(MULTIARCH_SRC)/*.c))
+>  MULTIARCH_TESTS  =3D$(MULTIARCH_SRCS:.c=3D)
+>
+> -# FIXME: ppc64abi32 linux-test seems to have issues but the other basic =
+tests work
+> -ifeq ($(TARGET_NAME),ppc64abi32)
+> -BROKEN_TESTS =3D linux-test
+> -endif
+> -
+>  # Update TESTS
+>  TESTS		+=3D $(filter-out $(BROKEN_TESTS), $(MULTIARCH_TESTS))
+
+
+--
+Alex Benn=C3=A9e
 
