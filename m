@@ -2,90 +2,66 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C31C4740A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:29:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C961CC4740A
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:37:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90BCE20863
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:29:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90BCE20863
+	by mail.kernel.org (Postfix) with ESMTPS id 8C92821479
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:37:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C92821479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7h8u-000700-K0
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 10:29:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51033)
+	id 1i7hGj-0001go-JU
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 10:37:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52356)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i7h7V-0006LM-Ny
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:27:50 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i7hFY-0000os-27
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:36:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i7h7T-0005ZO-6U
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:27:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42872)
+ (envelope-from <mlevitsk@redhat.com>) id 1i7hFW-0000yR-3t
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:36:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:31347)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i7h7S-0005YF-Tw
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:27:47 -0400
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1i7hFQ-0000uK-To; Tue, 10 Sep 2019 10:36:01 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1F1009B295;
- Tue, 10 Sep 2019 14:27:45 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C647E100EBDB;
- Tue, 10 Sep 2019 14:27:43 +0000 (UTC)
-To: Lukas Straub <lukasstraub2@web.de>, qemu-devel <qemu-devel@nongnu.org>
-References: <cover.1568110100.git.lukasstraub2@web.de>
- <6d1ae9171a46b633fd03a9f6c520da189372034a.1568110100.git.lukasstraub2@web.de>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <739e63be-d33f-a954-7bb9-d34949e9426d@redhat.com>
-Date: Tue, 10 Sep 2019 09:27:38 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <6d1ae9171a46b633fd03a9f6c520da189372034a.1568110100.git.lukasstraub2@web.de>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="3SR0lWtT0upcV7iI1kcVc9VR1oHoMZyOq"
+ by mx1.redhat.com (Postfix) with ESMTPS id 9395E30A7B8F;
+ Tue, 10 Sep 2019 14:35:59 +0000 (UTC)
+Received: from dhcp-4-67.tlv.redhat.com (dhcp-4-67.tlv.redhat.com [10.35.4.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 09CC9100194E;
+ Tue, 10 Sep 2019 14:35:56 +0000 (UTC)
+Message-ID: <0d1bbda1fccb296746b5df3d5bde3ee9443a07b8.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, 
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Date: Tue, 10 Sep 2019 17:35:55 +0300
+In-Reply-To: <a21dc942-404c-6fc5-08c5-88be1d01508b@virtuozzo.com>
+References: <20190906195750.17651-1-mlevitsk@redhat.com>
+ <20190906195750.17651-2-mlevitsk@redhat.com>
+ <7634baef-f42f-4603-2ec9-3f4aa6cfe278@virtuozzo.com>
+ <dd0b472186f651823a3ba7a74111a8361235109a.camel@redhat.com>
+ <a21dc942-404c-6fc5-08c5-88be1d01508b@virtuozzo.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Tue, 10 Sep 2019 14:27:45 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Tue, 10 Sep 2019 14:35:59 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 4/4] colo: Update Documentation for
- continious replication
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] block/qcow2: refactoring of
+ threaded encryption code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,85 +73,295 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Wen Congyang <wencongyang2@huawei.com>,
- Jason Wang <jasowang@redhat.com>, mreitz@redhat.com,
- Zhang Chen <chen.zhang@intel.com>, Xie Changlong <xiechanglong.d@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Daniel P . =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ qemu-stable <qemu-stable@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3SR0lWtT0upcV7iI1kcVc9VR1oHoMZyOq
-Content-Type: multipart/mixed; boundary="oXkCXQi3fz1PkxbhQQwtUJgHzmc69No29";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Lukas Straub <lukasstraub2@web.de>, qemu-devel <qemu-devel@nongnu.org>
-Cc: kwolf@redhat.com, Wen Congyang <wencongyang2@huawei.com>,
- Jason Wang <jasowang@redhat.com>, mreitz@redhat.com,
- Zhang Chen <chen.zhang@intel.com>, Xie Changlong <xiechanglong.d@gmail.com>
-Message-ID: <739e63be-d33f-a954-7bb9-d34949e9426d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 4/4] colo: Update Documentation for
- continious replication
-References: <cover.1568110100.git.lukasstraub2@web.de>
- <6d1ae9171a46b633fd03a9f6c520da189372034a.1568110100.git.lukasstraub2@web.de>
-In-Reply-To: <6d1ae9171a46b633fd03a9f6c520da189372034a.1568110100.git.lukasstraub2@web.de>
+On Tue, 2019-09-10 at 14:17 +0000, Vladimir Sementsov-Ogievskiy wrote:
+> 10.09.2019 15:31, Maxim Levitsky wrote:
+> > On Sat, 2019-09-07 at 19:08 +0000, Vladimir Sementsov-Ogievskiy wrote:
+> > > 06.09.2019 22:57, Maxim Levitsky wrote:
+> > > > This commit tries to clarify few function arguments,
+> > > > and add comments describing the encrypt/decrypt interface
+> > > > 
+> > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > > ---
+> > > >    block/qcow2-cluster.c | 10 +++----
+> > > >    block/qcow2-threads.c | 61 ++++++++++++++++++++++++++++++++++---------
+> > > >    2 files changed, 53 insertions(+), 18 deletions(-)
+> > > > 
+> > > > diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> > > > index f09cc992af..1989b423da 100644
+> > > > --- a/block/qcow2-cluster.c
+> > > > +++ b/block/qcow2-cluster.c
+> > > > @@ -463,8 +463,8 @@ static int coroutine_fn do_perform_cow_read(BlockDriverState *bs,
+> > > >    }
+> > > >    
+> > > >    static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
+> > > > -                                                uint64_t src_cluster_offset,
+> > > > -                                                uint64_t cluster_offset,
+> > > > +                                                uint64_t guest_cluster_offset,
+> > > > +                                                uint64_t host_cluster_offset,
+> > > >                                                    unsigned offset_in_cluster,
+> > > >                                                    uint8_t *buffer,
+> > > >                                                    unsigned bytes)
+> > > > @@ -474,8 +474,8 @@ static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
+> > > >            assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
+> > > >            assert((bytes & ~BDRV_SECTOR_MASK) == 0);
+> > > >            assert(s->crypto);
+> > > > -        if (qcow2_co_encrypt(bs, cluster_offset,
+> > > > -                             src_cluster_offset + offset_in_cluster,
+> > > > +        if (qcow2_co_encrypt(bs, host_cluster_offset,
+> > > > +                             guest_cluster_offset + offset_in_cluster,
+> > > >                                 buffer, bytes) < 0) {
+> > > >                return false;
+> > > >            }
+> > > > @@ -496,7 +496,7 @@ static int coroutine_fn do_perform_cow_write(BlockDriverState *bs,
+> > > >        }
+> > > >    
+> > > >        ret = qcow2_pre_write_overlap_check(bs, 0,
+> > > > -            cluster_offset + offset_in_cluster, qiov->size, true);
+> > > > +              cluster_offset + offset_in_cluster, qiov->size, true);
+> > > 
+> > > 
+> > > Hmm, unrelated hunk.
+> > 
+> > I was asked to do this to fix coding style, so that wrapped line,
+> > is 4 characters shifted to the right.
+> 
+> AFAIS, Eric asked only about qcow2_co_encdec calls and definition.. It's OK to fix style in code
+> you touch in you patch anyway, but no reason to fix style somewhere else, it dirties patch for
+> no reason, making it more difficult (a bit, but still) to review and more difficult to backport..
+All right, then I'll drop that change. I kind of agree with this, but I also didn't mind doing these fixes
+either.
 
---oXkCXQi3fz1PkxbhQQwtUJgHzmc69No29
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+> 
+> > 
+> > > 
+> > > >        if (ret < 0) {
+> > > >            return ret;
+> > > >        }
+> > > > diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
+> > > > index 3b1e63fe41..c3cda0c6a5 100644
+> > > > --- a/block/qcow2-threads.c
+> > > > +++ b/block/qcow2-threads.c
+> > > > @@ -234,15 +234,19 @@ static int qcow2_encdec_pool_func(void *opaque)
+> > > >    }
+> > > >    
+> > > >    static int coroutine_fn
+> > > > -qcow2_co_encdec(BlockDriverState *bs, uint64_t file_cluster_offset,
+> > > > -                  uint64_t offset, void *buf, size_t len, Qcow2EncDecFunc func)
+> > > > +qcow2_co_encdec(BlockDriverState *bs, uint64_t host_cluster_offset,
+> > > > +                uint64_t guest_offset, void *buf, size_t len,
+> > > > +                Qcow2EncDecFunc func)
+> > > >    {
+> > > >        BDRVQcow2State *s = bs->opaque;
+> > > > +
+> > > > +    uint64_t offset = s->crypt_physical_offset ?
+> > > > +        host_cluster_offset + offset_into_cluster(s, guest_offset) :
+> > > > +        guest_offset;
+> > > > +
+> > > >        Qcow2EncDecData arg = {
+> > > >            .block = s->crypto,
+> > > > -        .offset = s->crypt_physical_offset ?
+> > > > -                      file_cluster_offset + offset_into_cluster(s, offset) :
+> > > > -                      offset,
+> > > > +        .offset = offset,
+> > > >            .buf = buf,
+> > > >            .len = len,
+> > > >            .func = func,
+> > > > @@ -251,18 +255,49 @@ qcow2_co_encdec(BlockDriverState *bs, uint64_t file_cluster_offset,
+> > > >        return qcow2_co_process(bs, qcow2_encdec_pool_func, &arg);
+> > > >    }
+> > > >    
+> > > > +
+> > > > +/*
+> > > > + * qcow2_co_encrypt()
+> > > > + *
+> > > > + * Encrypts one or more contiguous aligned sectors
+> > > > + *
+> > > > + * @host_cluster_offset - on disk offset of the first cluster in which
+> > > > + * the encrypted data will be written
+> > > 
+> > > 
+> > > It's not quite right, it's not on disk, but on .file child of qcow2 node, which
+> > > may be any other format or protocol node.. So, I called it file_cluster_offset.
+> > > But I'm OK with new naming anyway. And it may be better for encryption related
+> > > logic..
+> > 
+> > Yes, the .file is the underlying storage for both qcow2 metadata and the data,
+> > and it is unlikely be another qcow2 file. Usually it will be a raw file,
+> > accessed with some protocol.
+> > I will change the wording to not include the 'disk' word though.
+> > 
+> > 
+> > To be really honest, the best naming here would be one that follows the virtual memory concepts.
+> > A virtual block/cluster address and a physical block/cluster address.
+> > However we talked with Kevin recently and I also studied quite a lot of qcow2 code,
+> > and the usual convention is guest cluster offset and host cluster offset,
+> > and often guest offsets are just called offsets, which is very confusing IMHO.
+> 
+> It don't confuse me, as it's an interface of block-layer. Interface user just writes at some offset.
+> And the fact that internally, we consider interface parameter "offset" as "guest offset" and map it
+> to some physical offset - it's an implementation details. In other words, guest don't know that it
+> writes at "guest offset", it just writes at "offset" and don't care.
+> 
+> > 
+> > 
+> > > 
+> > >   > + * Used as an initialization vector for encryption
+> > > 
+> > > Hmm, is it default now?
+> > 
+> > 
+> > Most of block crypto implementations have IV which derive
+> > some way or another from the sector address.
+> > 
+> >  From what I see, the block address is either used as is,
+> > or encrypted itself with same encryption key,
+> > and the result is used as IV. Even the legacy qcow
+> > encryption uses this, although it uses the virtual block
+> > address, and apparently this is one of its security flaws.
+> > 
+> > If you don't use any IV, you end up with major security
+> > hole - sectors of the same content will be encrypted
+> > to the same cipertext.
+> > 
+> > I added this comment to clarify the usage of offset,
+> > since other that this aspect of IV generation,
+> > the crypto routines only need the data to be encrypted and
+> > the encryption key which is stored in the crypto context.
+> > 
+> > 
+> > > 
+> > > > + *
+> > > > + * @guest_offset - guest (virtual) offset of the first sector of the
+> > > > + * data to be encrypted
+> > > 
+> > > Hmm, stop. It's wrong. Data to be encrypted is in buffer, so, it's not first sector of
+> > > the data to be encrypted, but first sector in which guest writes data (to be encrypted
+> > > in meantime).
+> > 
+> > No no no!
+> > 
+> > guest_offset is literally the guest's disk address of the first sector that is in the buffer.
+> > The qcow2_co_encrypt is called from 2 places:
+> > 
+> > 1. qcow2_co_pwritev_part - here indeed the actually guest written data
+> > is encrypted, and the 'offset' is passed which is the offset on which pwritev was called
+> 
+> I mean, that in this case your comment for me sounds like "data to be encrypted is on disk, at this offset".
+> but it's not actually on disk, data is in buffer. And what is on disk we don't know, we are going to
+> write...
+> 
+> But I don't really care. Hope it's actually obvious for averyone, where is data on write path.
 
-On 9/10/19 5:14 AM, Lukas Straub wrote:
-> Document the qemu command-line and qmp commands for continious replicat=
-ion
+Ah, now I understand. I don't mind adding a word or two explicitly mentioning that the *data* to be
+encrypted is in the given buffer.
 
-Here and in the subject: s/continious/continuous/
+> 
+> > 
+> > 
+> > 2. do_perform_cow_encrypt - here the just read data from before or after actually written guest
+> > data is encrypted, and the guest_offset represents the address of that data.
+> > I changed the do_perform_cow_encrypt, so that it receives from the caller the host and guest offset
+> > of the data to be encrypted. It then aligns the host offset on start of the cluster, and passes
+> > the guest offset as is, so that it does the same as qcow2_co_pwritev_part.
+> > 
+> > 
+> > So what is wrong here?
+> > 
+> > >   
+> > > 
+> > > > + * Used as an initialization vector for older, qcow2 native encryption
+> > > > + *
+> > > > + * @buf - buffer with the data to encrypt
+> > > > + * @len - length of the buffer (in sector size multiplies)
+> > > > + *
+> > > > + * Note that the group of the sectors, don't have to be aligned
+> > > > + * on cluster boundary and can also cross a cluster boundary.
+> > > 
+> > > And I doubt in it now. I'm afraid that if we call qcow2_co_encrypt for a group
+> > > of the sectors crossing a cluster boundary, we will finish up with similar bug: we'll
+> > > use first cluster offset as a vector for all the sectors. We still never do it.. So,
+> > > I think it worth assertion and corresponding comment.
+> > > 
+> > > Or is it correct?
+> > 
+> > Crypto code receives the data to be encrypted and decrypted,
+> > and offset of first sector (512 bytes aligned) of that data (for IV calculation).
+> > If the data spans multiple sectors (this happens already a lot)
+> 
+> Ah, yes, that's OK, sorry.
+> 
+> > then it able to handle this since the code works.
+> > The relevant code is in do_qcrypto_block_cipher_encdec, and
+> > is actually generic for all the crypto modes.
+> > 
+> > So there should not be anything special about crossing the cluster
+> > boundary, other that noting this here, just in case.
+> > 
+> > No only that code can cross a cluster boundary, but it can even be
+> > called for more that one cluster at once. It looks like qcow2 code limits all
+> > the IO in case crypto is used to QCOW_MAX_CRYPT_CLUSTERS, which is 32
+> > currently. I don't know why to be honest.
+> > 
+> > Remember that crypto code has no notion of clusters. It works purely
+> > on sector (512 bytes) level, and each sector will have its own IV calculated,
+> > based on its sector address.
+> > 
+> > > 
+> > > > + *
+> > > > + *
+> > > > + */
+> > > >    int coroutine_fn
+> > > > -qcow2_co_encrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
+> > > > -                 uint64_t offset, void *buf, size_t len)
+> > > > +qcow2_co_encrypt(BlockDriverState *bs, uint64_t host_cluster_offset,
+> > > > +                 uint64_t guest_offset, void *buf, size_t len)
+> > > >    {
+> > > > -    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
+> > > > -                             qcrypto_block_encrypt);
+> > > > +    return qcow2_co_encdec(bs, host_cluster_offset, guest_offset, buf, len,
+> > > > +                           qcrypto_block_encrypt);
+> > > >    }
+> > > >    
+> > > > +
+> > > > +/*
+> > > > + * qcow2_co_decrypt()
+> > > > + *
+> > > > + * Decrypts one or more contiguous aligned sectors
+> > > > + * Same function as qcow2_co_encrypt
+> > > 
+> > > Hmm, not exactly same :)
+> > 
+> > I'll fix that.
+> > 
+> > 
+> > > 
+> > > > + *
+> > > > + */
+> > > > +
+> > > >    int coroutine_fn
+> > > > -qcow2_co_decrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
+> > > > -                 uint64_t offset, void *buf, size_t len)
+> > > > +qcow2_co_decrypt(BlockDriverState *bs, uint64_t host_cluster_offset,
+> > > > +                 uint64_t guest_offset, void *buf, size_t len)
+> > > >    {
+> > > > -    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
+> > > > -                             qcrypto_block_decrypt);
+> > > > +    return qcow2_co_encdec(bs, host_cluster_offset, guest_offset, buf, len,
+> > > > +                           qcrypto_block_decrypt);
+> > > >    }
+> > > > 
 
->=20
-> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-> ---
->  docs/COLO-FT.txt           | 212 +++++++++++++++++++++++++++----------=
 
->  docs/block-replication.txt |  26 +++--
->  2 files changed, 172 insertions(+), 66 deletions(-)
->=20
-
-> @@ -106,6 +106,10 @@ any state that would otherwise be lost by the spec=
-ulative write-through
->  of the NBD server into the secondary disk. So before block replication=
-,
->  the primary disk and secondary disk should contain the same data.
-> =20
-> +7) The secondary also has a quorum node, so after secondary failover i=
-t
-> +can become the new primary and continiue replication.
-
-continue
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Best regards,
+	Maxim Levitsky
 
 
---oXkCXQi3fz1PkxbhQQwtUJgHzmc69No29--
-
---3SR0lWtT0upcV7iI1kcVc9VR1oHoMZyOq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl13st4ACgkQp6FrSiUn
-Q2p/fQf+I4pcDlJTopRr9ZPE03wFU/GTrZB21pbkaSnrYK3cxK/rMS4XF7J6B0NP
-+CCJj27hqjmQCza0/kHOTpCKwGnpWgcR/iwYMEolF+z6XMEpDpWawF78nzfEWm9g
-DyP9xTl7HdD8JHTAhjgVCu+LJp2vbVUmJoejzBMaPfnaEDbn2T2LuCpZ2WaDMqAu
-v4CvEyMqUnQ+7bMTs1SusfM3OOEgqihiyua4jJ92HQPeeTicBOBQ6qN+C+MyM77R
-jOFi4MJDKEB+ybxzOSuyABOx2b1c6aUP1Zq8KnQaVb5YDkPAPxWnBxJe/6E1hVLi
-dcPf7jFKa1ZG/KZLxt+FtF5WeuTFgw==
-=7aGR
------END PGP SIGNATURE-----
-
---3SR0lWtT0upcV7iI1kcVc9VR1oHoMZyOq--
 
