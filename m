@@ -2,90 +2,87 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46062C49ED8
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 15:01:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A31DBC49ED8
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 15:01:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B6862082C
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 15:01:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B6862082C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6DFAC20863
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 15:01:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S1W9+GjI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DFAC20863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7hdf-0005NY-Kb
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 11:01:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55854)
+	id 1i7heL-00062U-U6
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 11:01:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54034)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i7hX1-0007CJ-PT
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:54:12 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i7hNp-0005UH-1a
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i7hX0-0001Rd-8Q
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:54:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:15945)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i7hX0-0001RN-0C
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:54:10 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 40EA230043E1;
- Tue, 10 Sep 2019 14:54:09 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 117865D6B2;
- Tue, 10 Sep 2019 14:54:03 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190910063724.28470-1-armbru@redhat.com>
- <20190910063724.28470-4-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <bc97fbdf-7b12-c315-5247-9102bd6951e7@redhat.com>
-Date: Tue, 10 Sep 2019 09:54:02 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <peter.maydell@linaro.org>) id 1i7hNn-00051t-QD
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:40 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36223)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i7hNn-00051U-Ki
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:39 -0400
+Received: by mail-wr1-x442.google.com with SMTP id y19so20839190wrd.3
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 07:44:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=7yOOhdKlBIYO8WFMmpn39kOmkjcRHpZcI7p0s8duWdE=;
+ b=S1W9+GjIQ6Q1+v2erJ8a8p45+tj3PFe1rle3T4TYKuUvrNPQ7Kw88ydslBiCo08oJS
+ AnFATCxYou1iuoeTX7wauXIkGk5wQ1hT0f7vKK0Ft8VVHUjTi9YSMz4yyspTLPhT1kv2
+ BmVqnCkOpefUdL5WOHjgRVj04HX5GjBuNJPCq23TvsNGBE0+p71t7L37o411Ad0GimlX
+ OFN+SOpA24d92oo5LwlJdKVX0OtQlrbfZb502feAxRpcKkCnJ9ayL8YEslcX+mN1kt2M
+ Lqz21sYS3zCpmNkXLLVB151z2FPn7UZAyTX8O2TgQWgAT0L0/JpYi4hCGakerpNXA/3+
+ iKrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=7yOOhdKlBIYO8WFMmpn39kOmkjcRHpZcI7p0s8duWdE=;
+ b=CvqypKaItjDyBNFbb7iQfuM05QBGKFdN0LhYQK/RxC90L/T6J6wncaaFGYVmNLqkHp
+ JsAoTA/LLILUJV4+kHzwgz+RXQQDSWN454ji0Zzpx8gULkADQuXpY8ykl4tzU7Jp3ue8
+ ULFIhDyJw+66UcIkvc7esFyf4I1WEFXg0kSRYTAVkPegs0GDyC6ZXaJkTSN+W5lMilgC
+ UHYa0aTce+rUgkPDqpV23hAPOgtGuH6xkPF61hQ3gdfUOtbLhkQGuEToqkb1eBXC0TAK
+ 8SzR/1A+FgZH1VIiqCNfBkzQS/sMGpAaKA42oivPvdBg5oI5IGD1jAy1VfBLjUgI6IK2
+ z14w==
+X-Gm-Message-State: APjAAAWei3qBVeTblUSsfQtffxOaK43VjwEGJRBf6Hfky7xFdGVcJjeD
+ WrffOrPrQKjEKv/prRzLBa6IVCM0L2TvdA==
+X-Google-Smtp-Source: APXvYqzH0+2tPkyNL7Q3ztPaK4uYqBJuC6i0Blg1Ihi3fBIF0jLBm/GHXUJ+mp4eEWSEFBRwZqCIMg==
+X-Received: by 2002:a5d:49c7:: with SMTP id t7mr276133wrs.229.1568126678753;
+ Tue, 10 Sep 2019 07:44:38 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id a192sm5703814wma.1.2019.09.10.07.44.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 10 Sep 2019 07:44:38 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Tue, 10 Sep 2019 15:44:22 +0100
+Message-Id: <20190910144428.32597-8-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190910144428.32597-1-peter.maydell@linaro.org>
+References: <20190910144428.32597-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190910063724.28470-4-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="u2qaR4QKqxLbtxWXd7cbnHGRgToEjV5cO"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Tue, 10 Sep 2019 14:54:09 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 03/16] qapi: Drop support for boxed
- alternate arguments
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH 07/13] target/arm/arm-semi: Factor out
+ implementation of SYS_READ
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,82 +94,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---u2qaR4QKqxLbtxWXd7cbnHGRgToEjV5cO
-Content-Type: multipart/mixed; boundary="IVmfUuR27wdSwA3NN9Vyv0SQOTYIDKpG4";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <bc97fbdf-7b12-c315-5247-9102bd6951e7@redhat.com>
-Subject: Re: [PATCH v2 03/16] qapi: Drop support for boxed alternate arguments
-References: <20190910063724.28470-1-armbru@redhat.com>
- <20190910063724.28470-4-armbru@redhat.com>
-In-Reply-To: <20190910063724.28470-4-armbru@redhat.com>
+Factor out the implementation of SYS_READ via the
+new function tables.
 
---IVmfUuR27wdSwA3NN9Vyv0SQOTYIDKpG4
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/arm-semi.c | 57 ++++++++++++++++++++++++++++---------------
+ 1 file changed, 37 insertions(+), 20 deletions(-)
 
-On 9/10/19 1:37 AM, Markus Armbruster wrote:
-> Commands and events can define their argument type inline (default) or
-> by referring to another type ('boxed': true, since commit c818408e44
-> "qapi: Implement boxed types for commands/events", v2.7.0).  The
-> unboxed inline definition is an (anonymous) struct type.  The boxed
-> type may be a struct, union, or alternate type.
->=20
-> The latter is problematic: docs/interop/qemu-spec.txt requires the
-> value of the 'data' key to be a json-object, but any non-degenerate
-> alternate type has at least one branch that isn't.
+diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
+index 0dec4c04e2f..48a10dd3c3a 100644
+--- a/target/arm/arm-semi.c
++++ b/target/arm/arm-semi.c
+@@ -347,6 +347,8 @@ static target_ulong arm_gdb_syscall(ARMCPU *cpu, gdb_syscall_complete_cb cb,
+ typedef uint32_t sys_closefn(TaskState *ts, ARMCPU *cpu, GuestFD *gf);
+ typedef uint32_t sys_writefn(TaskState *ts, ARMCPU *cpu, GuestFD *gf,
+                              target_ulong buf, uint32_t len);
++typedef uint32_t sys_readfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf,
++                            target_ulong buf, uint32_t len);
+ 
+ static uint32_t host_closefn(TaskState *ts, ARMCPU *cpu, GuestFD *gf)
+ {
+@@ -374,6 +376,29 @@ static uint32_t host_writefn(TaskState *ts, ARMCPU *cpu, GuestFD *gf,
+     return len - ret;
+ }
+ 
++static uint32_t host_readfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf,
++                            target_ulong buf, uint32_t len)
++{
++    uint32_t ret;
++#ifndef CONFIG_USER_ONLY
++    CPUARMState *env = &cpu->env;
++#endif
++    char *s = lock_user(VERIFY_WRITE, buf, len, 0);
++    if (!s) {
++        /* return bytes not read */
++        return len;
++    }
++    do {
++        ret = set_swi_errno(ts, read(gf->hostfd, s, len));
++    } while (ret == -1 && errno == EINTR);
++    unlock_user(s, buf, len);
++    if (ret == (uint32_t)-1) {
++        ret = 0;
++    }
++    /* Return bytes not read */
++    return len - ret;
++}
++
+ static uint32_t gdb_closefn(TaskState *ts, ARMCPU *cpu, GuestFD *gf)
+ {
+     return arm_gdb_syscall(cpu, arm_semi_cb, "close,%x", gf->hostfd);
+@@ -387,19 +412,30 @@ static uint32_t gdb_writefn(TaskState *ts, ARMCPU *cpu, GuestFD *gf,
+                            gf->hostfd, buf, len);
+ }
+ 
++static uint32_t gdb_readfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf,
++                           target_ulong buf, uint32_t len)
++{
++    arm_semi_syscall_len = len;
++    return arm_gdb_syscall(cpu, arm_semi_cb, "read,%x,%x,%x",
++                           gf->hostfd, buf, len);
++}
++
+ typedef struct GuestFDFunctions {
+     sys_closefn *closefn;
+     sys_writefn *writefn;
++    sys_readfn *readfn;
+ } GuestFDFunctions;
+ 
+ static const GuestFDFunctions guestfd_fns[] = {
+     [GuestFDHost] = {
+         .closefn = host_closefn,
+         .writefn = host_writefn,
++        .readfn = host_readfn,
+     },
+     [GuestFDGDB] = {
+         .closefn = gdb_closefn,
+         .writefn = gdb_writefn,
++        .readfn = gdb_readfn,
+     },
+ };
+ 
+@@ -551,26 +587,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+             return set_swi_errno(ts, -1);
+         }
+ 
+-        if (use_gdb_syscalls()) {
+-            arm_semi_syscall_len = len;
+-            return arm_gdb_syscall(cpu, arm_semi_cb, "read,%x,%x,%x",
+-                                   gf->hostfd, arg1, len);
+-        } else {
+-            s = lock_user(VERIFY_WRITE, arg1, len, 0);
+-            if (!s) {
+-                /* return bytes not read */
+-                return len;
+-            }
+-            do {
+-                ret = set_swi_errno(ts, read(gf->hostfd, s, len));
+-            } while (ret == -1 && errno == EINTR);
+-            unlock_user(s, arg1, len);
+-            if (ret == (uint32_t)-1) {
+-                ret = 0;
+-            }
+-            /* Return bytes not read */
+-            return len - ret;
+-        }
++        return guestfd_fns[gf->type].readfn(ts, cpu, gf, arg1, len);
+     case TARGET_SYS_READC:
+         qemu_log_mask(LOG_UNIMP, "%s: SYS_READC not implemented", __func__);
+         return 0;
+-- 
+2.20.1
 
-Good catch.
-
->=20
-> Fortunately, we haven't made use of alternates in this context outside
-> tests/.  Drop support for them.
->=20
-> QAPISchemaAlternateType.is_empty() is now unused.  Drop it, too.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  docs/devel/qapi-code-gen.txt            | 12 ++++++------
->  scripts/qapi/common.py                  | 15 ++++-----------
->  tests/qapi-schema/qapi-schema-test.json |  2 +-
->  tests/qapi-schema/qapi-schema-test.out  |  2 +-
->  4 files changed, 12 insertions(+), 19 deletions(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---IVmfUuR27wdSwA3NN9Vyv0SQOTYIDKpG4--
-
---u2qaR4QKqxLbtxWXd7cbnHGRgToEjV5cO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl13uQoACgkQp6FrSiUn
-Q2plQAf+I50CtqeE9UvfMHB4s9stUMZVOWmJp1cS0y7Svv46p+wQCAiZeZEanBQP
-013WdwEW2RBpOro8sA+K0pCES+JnoANR+ypGzHSBWaY1uYS2t9d2OPEmKHwPIIhG
-6g3Ty1kNg/aehAzMgEdneByWhc1JlzwgTwHCSYe3F0/Mzlo/hYXN+omTvcAd7vZ4
-v8OUx20PuXqor325Afz6ADRKw9kxOoNW9l1+n0oZEemTLvggn6DYtgkJfKhHXVFf
-fHkgbAMZwUiD26rT2329UWRgPMfwlU+8mbLwONFLur+3MBFeVg0pgaa0Gkv2IevP
-FBfBSAjb3nTVLCtFhiJpaiy7Z4h41Q==
-=IyGO
------END PGP SIGNATURE-----
-
---u2qaR4QKqxLbtxWXd7cbnHGRgToEjV5cO--
 
