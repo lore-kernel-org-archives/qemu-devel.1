@@ -2,90 +2,65 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-1.8 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17AD9C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:24:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9331EC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:26:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6BC52084D
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:24:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ti3hs7Tl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6BC52084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 67FA320872
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:26:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67FA320872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7cNp-0000N6-PC
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 05:24:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38958)
+	id 1i7cPj-0002N0-5P
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 05:26:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40637)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i7c0Z-0004a1-Nt
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:00:20 -0400
+ (envelope-from <berrange@redhat.com>) id 1i7c7x-00046j-II
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:07:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i7c0Y-0004p1-L4
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:00:19 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:40338)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i7c0Y-0004o8-Bj
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:00:18 -0400
-Received: by mail-wr1-x433.google.com with SMTP id w13so18473145wru.7
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 02:00:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=y2CQYPgfdIziwHG+aXAJVzgAz9y8buKOTbwwFzIZ8YU=;
- b=ti3hs7TlPxkpshkDnKY5agSkhYYGBSJG2gtodAOdpFF9MFdNw0jeopH6g4VQ+pE0BX
- mlv8z2UQ1RtGdLTn5l3UwbhNdqV7Lq1abh7YHaI8u37bEEumA90+1+6jkBk+ncE6sPQ8
- Oba8KRZeGR0TmP5DKZ1PecsPEcQ7SPgz1rvNwqO9sxymuQVtcVpUh8kJPcVRO5t2SRmW
- P4rMi4zEfZ88kQu/Lt9chXLBLkGsEkXnuHVt85t59zlhpu+JivmTJsjE301w8UXP2U5Z
- Uo4zOcqNDiSvh2wj5ZhJMiqY9EPesRxUoYHVqsZJDjFqzjSlQ7HIRSwTRaJ3v5rBFzZW
- A5nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=y2CQYPgfdIziwHG+aXAJVzgAz9y8buKOTbwwFzIZ8YU=;
- b=S3TplXEM5B8lTospJDHr/3FJ7y7IXFHb9la0PcFhLmdqzKvGYMSNucZjlvbwFpFM/w
- Fs0YFtKz0cf3v9jhdJNOH23xKxUBs8x6gP0J8jSAFKDiCVm3WYY0mOPXo4H9FlV6pKhr
- gPa8Zl5DjpAcTm3MsBZzihmQtcduYt6Y6F/zHuvQmxn+58OCwD0yzSpNCy8OjbmElbpb
- t1RJTQzY6eZo3V5EuE6hU2UhR1SHxpCyFzFjBTMtdFWU7e5qMWrF7pB38t/ltYJ5edAr
- pGfiz14e+2wyK+RpncSfbDWIRaXplsqXVCjfzGoOH/dmgwCg5UVQHHcsDZweK910Dodw
- Vuag==
-X-Gm-Message-State: APjAAAXXuqIz674QQ5vnpzAjGnL2+fsvj6P8jY0k/r/XSLRrFx5hU1ND
- Hat8R78ULNmapzX5zGaQBbZIsBNY0rA=
-X-Google-Smtp-Source: APXvYqydaFvNVdfnLGuXlIanbTkWNjbLHTdHYwGRt2jKV6euMy56SjovT9W2N99knpxTGAWb4kzoEg==
-X-Received: by 2002:adf:e992:: with SMTP id h18mr336729wrm.319.1568106016494; 
- Tue, 10 Sep 2019 02:00:16 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id m12sm15013356wro.32.2019.09.10.02.00.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Sep 2019 02:00:14 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 802421FFC4;
- Tue, 10 Sep 2019 09:43:53 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Date: Tue, 10 Sep 2019 09:43:47 +0100
-Message-Id: <20190910084349.28817-44-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190910084349.28817-1-alex.bennee@linaro.org>
+ (envelope-from <berrange@redhat.com>) id 1i7c7v-0001qF-JI
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:07:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46522)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1i7c7v-0001q5-De
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:07:55 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BA99BA3767D;
+ Tue, 10 Sep 2019 09:07:54 +0000 (UTC)
+Received: from redhat.com (ovpn-112-58.ams2.redhat.com [10.36.112.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F22F19C4F;
+ Tue, 10 Sep 2019 09:07:46 +0000 (UTC)
+Date: Tue, 10 Sep 2019 10:07:43 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Message-ID: <20190910090743.GC8583@redhat.com>
 References: <20190910084349.28817-1-alex.bennee@linaro.org>
+ <20190910084349.28817-45-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::433
-Subject: [Qemu-devel] [PULL 43/45] .travis.yml: Cache Linux/Clang jobs
- together
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190910084349.28817-45-alex.bennee@linaro.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Tue, 10 Sep 2019 09:07:54 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL 44/45] Fedora images: use URLs from stable
+ "archives.fedoraproject.org"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,49 +72,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Yash Mankad <ymankad@redhat.com>, peter.maydell@linaro.org,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Tue, Sep 10, 2019 at 09:43:48AM +0100, Alex Benn=C3=A9e wrote:
+> From: Cleber Rosa <crosa@redhat.com>
+>=20
+> The LinuxInitrd.test_with_2gib_file_should_work_with_linux_v4_16 test,
+> from tests/acceptance/linux_initrd.py, is currently failing to fetch
+> the "vmlinuz" file.  The reason for the failure is that the Fedora
+> project retires older versions from the "dl.fedoraproject.org" URL,
+> and keeps them in "archives.fedoraproject.org".  As an added note,
+> that test uses a Fedora 28 image, because of the specific Linux kernel
+> version requirements of the test.
+>=20
+> For the sake of stability, let's use URLs from the archived and
+> supposedely ever stable URLs.  The good news is that the currently
+> supported versions are also hosted on the later.  This change limits
+> itself to change the URLs, while keeping the fetched files the same
+> (as can be evidenced by the unchanged hashes).
 
-These jobs build different components but use the same
-host features. Put them in the same cache bucket.
+FWIW, I commented on the oiriginal patch before seeing this PR.
+I don't think we should be using the archive URL for anything
+which still exists on download.fedoraproject.org as that's placing
+undesirable load on the Fedora master servers, instead of using its
+primary CDN via the mirror services.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/.travis.yml b/.travis.yml
-index 74f10d352fe..1ff26205795 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -173,11 +173,13 @@ matrix:
-     # Test with Clang for compile portability (Travis uses clang-5.0)
-     - env:
-         - CONFIG="--disable-system"
-+        - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-default"
-       compiler: clang
- 
- 
-     - env:
-         - CONFIG="--disable-user --target-list=${MAIN_SOFTMMU_TARGETS}"
-+        - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-default"
-       compiler: clang
- 
- 
-@@ -190,6 +192,7 @@ matrix:
- 
-     - env:
-         - CONFIG="--disable-user --target-list-exclude=${MAIN_SOFTMMU_TARGETS}"
-+        - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-default"
-       compiler: clang
- 
- 
--- 
-2.20.1
-
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
