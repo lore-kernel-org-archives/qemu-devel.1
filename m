@@ -7,69 +7,68 @@ X-Spam-Status: No, score=-9.2 required=3.0 tests=DATE_IN_PAST_12_24,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E59DDECDE27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 08:49:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCF27ECDE27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 08:49:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BADBF21D79
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 08:49:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BADBF21D79
+	by mail.kernel.org (Postfix) with ESMTPS id A2B2E21D79
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 08:49:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2B2E21D79
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7yJW-0008VM-KD
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 04:49:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57281)
+	id 1i7yJs-0000SN-2F
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 04:49:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57583)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1i7xvy-0007o1-UG
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:25:04 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1i7xwE-00089x-W5
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:25:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1i7xvx-0006Z0-Cp
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:25:02 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:38539)
+ (envelope-from <palmer@dabbelt.com>) id 1i7xwD-0006m2-LA
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:25:18 -0400
+Received: from mail-wr1-f50.google.com ([209.85.221.50]:40229)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i7xvx-0006YZ-5w
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:25:01 -0400
-Received: by mail-wr1-f67.google.com with SMTP id l11so23429074wrx.5
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 01:25:01 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i7xwD-0006lV-Ef
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:25:17 -0400
+Received: by mail-wr1-f50.google.com with SMTP id l3so719332wru.7
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 01:25:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=yvcVJnTBt6B5VF9gd6v6mXMT9cabSuA1ouyITUaMgek=;
- b=UQ1L9ElqikY+EncAT7Oa9/sZf32BT4LuglvQLQdmExyiCMRo5FsVLzrAGWLvfcFuRV
- 3RGOZBQD08SyrRnuMRFqBgCJHMzA/o6Xnq/LTxLz2pxu9quZhXgUqWx1vNoB7H2UmJBH
- LLz6GoGGKsRsvVyUyg+Go6VvIEazw4eqqsBv3SDioKtcItaua3CTKgOSCaBex6+lztW2
- 3K/iZodU22cLqGy56u/zrI0rHJ/zc78DH/J8+6NeYvTNX54h6WnFWfGayHsDYHbnjKCc
- BJFJEwDuR/k3Mb7rE+GFosCCQ1GAxNPg4nMadOPP+wC6ctlRRuLYLfZoiPdedzRMxQIe
- gaCg==
-X-Gm-Message-State: APjAAAX7NBplutQQPmAN96ixoY2yM7SVZCGLrrmHnJeR3aDqSkT1wsfo
- skfitrVEyJSwrpBowWdlY8+Mzw==
-X-Google-Smtp-Source: APXvYqz+VplzXbwIM1L0k88wDbf0NSo8t9lSTr/SaxTrmlBN+XbcJpqZ2CHW2BagMVeW5SXJVJlqeA==
-X-Received: by 2002:adf:ffca:: with SMTP id x10mr31653102wrs.190.1568190300036; 
- Wed, 11 Sep 2019 01:25:00 -0700 (PDT)
+ bh=6LjmDeAL87SuuDyQOaR6PZ+xifwSg2XG2OmboMVgOmA=;
+ b=QSL7kIuypFYthmM4HYJtIwi4FFuOA4HPcaZMb5ItGGjTqESonqv5FyYKvr17JlRKfP
+ 2pgTkRhbZqWVq0Yq42vFFQIC60lGRx6SOlxAQ25onENdfEHhxfJWix+h7O1ryn5UE19A
+ daHrsaSwH6KAThdfmsfFcWDDIGaFPBqDANbcTivcgGuOpjlZ9Sd/Amd5ouMvD79zc5AF
+ Ac6I4jHqvhtu6rhn/w7qB+sVOYddn1SZjZIL+KlAWfQAFItZO+kNpgOS5et4ttLlETXM
+ uve4yDw8lT0h6At/pQrzKJTpLkc6rXTEUZEu3bUJYOyr24DLfYWFtNMLCpR0Nd1sFYvQ
+ bQlg==
+X-Gm-Message-State: APjAAAVo/ehjk+nGviL+cN3FzEjzHz0HRXkyY0EWNcylVrYwFBoGVtW1
+ nS8Cojbhj2hAib6m5IXs28Fk0K5lmA8LZQ==
+X-Google-Smtp-Source: APXvYqwSAcKIV2uCiMe0h9HmJm5ElS3T4uW1tcvOg//FCCZ/fyK7onWOhURLE8wWf1Gj30Z/BJDGow==
+X-Received: by 2002:a5d:4d92:: with SMTP id b18mr4086064wru.116.1568190316211; 
+ Wed, 11 Sep 2019 01:25:16 -0700 (PDT)
 Received: from localhost ([148.69.85.38])
- by smtp.gmail.com with ESMTPSA id r20sm26748528wrg.61.2019.09.11.01.24.59
+ by smtp.gmail.com with ESMTPSA id v4sm31601269wrg.56.2019.09.11.01.25.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Sep 2019 01:24:59 -0700 (PDT)
-Date: Tue, 10 Sep 2019 12:04:44 -0700
-Message-Id: <20190910190513.21160-19-palmer@sifive.com>
+ Wed, 11 Sep 2019 01:25:15 -0700 (PDT)
+Date: Tue, 10 Sep 2019 12:04:56 -0700
+Message-Id: <20190910190513.21160-31-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190910190513.21160-1-palmer@sifive.com>
 References: <20190910190513.21160-1-palmer@sifive.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 From: Palmer Dabbelt <palmer@sifive.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: [Qemu-devel] [PULL 18/47] riscv: hw: Change create_fdt() to return
- void
+X-Received-From: 209.85.221.50
+Subject: [Qemu-devel] [PULL 30/47] riscv: sifive_u: Set the minimum number
+ of cpus to 2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,129 +80,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Palmer Dabbelt <palmer@sifive.com>,
- qemu-devel@nongnu.org, Chih-Min Chao <chihmin.chao@sifive.com>,
- Alistair Francis <alistair.francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>,
- ilippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>,
+ qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ Palmer Dabbelt <palmer@sifive.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Bin Meng <bmeng.cn@gmail.com>
 
-There is no need to return fdt at the end of create_fdt() because
-it's already saved in s->fdt.
+It is not useful if we only have one management CPU.
 
 Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
-Reviewed-by: Chih-Min Chao <chihmin.chao@sifive.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- hw/riscv/sifive_u.c | 11 ++++-------
- hw/riscv/virt.c     | 11 ++++-------
- 2 files changed, 8 insertions(+), 14 deletions(-)
+ hw/riscv/sifive_u.c         | 4 +++-
+ include/hw/riscv/sifive_u.h | 2 ++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index e8acdd9b12..32d8cee335 100644
+index 2947e06f71..2023b71d53 100644
 --- a/hw/riscv/sifive_u.c
 +++ b/hw/riscv/sifive_u.c
-@@ -67,7 +67,7 @@ static const struct MemmapEntry {
- 
- #define GEM_REVISION        0x10070109
- 
--static void *create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-+static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-     uint64_t mem_size, const char *cmdline)
- {
-     void *fdt;
-@@ -253,14 +253,11 @@ static void *create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-     qemu_fdt_setprop_string(fdt, "/aliases", "serial0", nodename);
- 
-     g_free(nodename);
--
--    return fdt;
+@@ -10,7 +10,8 @@
+  * 1) CLINT (Core Level Interruptor)
+  * 2) PLIC (Platform Level Interrupt Controller)
+  *
+- * This board currently uses a hardcoded devicetree that indicates one hart.
++ * This board currently generates devicetree dynamically that indicates at least
++ * two harts.
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms and conditions of the GNU General Public License,
+@@ -433,6 +434,7 @@ static void riscv_sifive_u_machine_init(MachineClass *mc)
+      * management CPU.
+      */
+     mc->max_cpus = 4;
++    mc->min_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + 1;
  }
  
- static void riscv_sifive_u_init(MachineState *machine)
- {
-     const struct MemmapEntry *memmap = sifive_u_memmap;
--    void *fdt;
+ DEFINE_MACHINE("sifive_u", riscv_sifive_u_machine_init)
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index f25bad8f13..6d227410f8 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -69,6 +69,8 @@ enum {
+     SIFIVE_U_GEM_CLOCK_FREQ = 125000000
+ };
  
-     SiFiveUState *s = g_new0(SiFiveUState, 1);
-     MemoryRegion *system_memory = get_system_memory();
-@@ -281,7 +278,7 @@ static void riscv_sifive_u_init(MachineState *machine)
-                                 main_mem);
- 
-     /* create device tree */
--    fdt = create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
-+    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
- 
-     riscv_find_and_load_firmware(machine, BIOS_FILENAME,
-                                  memmap[SIFIVE_U_DRAM].base);
-@@ -294,9 +291,9 @@ static void riscv_sifive_u_init(MachineState *machine)
-             hwaddr end = riscv_load_initrd(machine->initrd_filename,
-                                            machine->ram_size, kernel_entry,
-                                            &start);
--            qemu_fdt_setprop_cell(fdt, "/chosen",
-+            qemu_fdt_setprop_cell(s->fdt, "/chosen",
-                                   "linux,initrd-start", start);
--            qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
-+            qemu_fdt_setprop_cell(s->fdt, "/chosen", "linux,initrd-end",
-                                   end);
-         }
-     }
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 090512be13..d36f5625ec 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -112,7 +112,7 @@ static void create_pcie_irq_map(void *fdt, char *nodename,
-                            0x1800, 0, 0, 0x7);
- }
- 
--static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-+static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-     uint64_t mem_size, const char *cmdline)
- {
-     void *fdt;
-@@ -316,8 +316,6 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-         qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
-     }
-     g_free(nodename);
--
--    return fdt;
- }
- 
- 
-@@ -373,7 +371,6 @@ static void riscv_virt_board_init(MachineState *machine)
-     size_t plic_hart_config_len;
-     int i;
-     unsigned int smp_cpus = machine->smp.cpus;
--    void *fdt;
- 
-     /* Initialize SOC */
-     object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
-@@ -392,7 +389,7 @@ static void riscv_virt_board_init(MachineState *machine)
-         main_mem);
- 
-     /* create device tree */
--    fdt = create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
-+    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
- 
-     /* boot rom */
-     memory_region_init_rom(mask_rom, NULL, "riscv_virt_board.mrom",
-@@ -411,9 +408,9 @@ static void riscv_virt_board_init(MachineState *machine)
-             hwaddr end = riscv_load_initrd(machine->initrd_filename,
-                                            machine->ram_size, kernel_entry,
-                                            &start);
--            qemu_fdt_setprop_cell(fdt, "/chosen",
-+            qemu_fdt_setprop_cell(s->fdt, "/chosen",
-                                   "linux,initrd-start", start);
--            qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
-+            qemu_fdt_setprop_cell(s->fdt, "/chosen", "linux,initrd-end",
-                                   end);
-         }
-     }
++#define SIFIVE_U_MANAGEMENT_CPU_COUNT   1
++
+ #define SIFIVE_U_PLIC_HART_CONFIG "MS"
+ #define SIFIVE_U_PLIC_NUM_SOURCES 54
+ #define SIFIVE_U_PLIC_NUM_PRIORITIES 7
 -- 
 2.21.0
 
