@@ -2,60 +2,67 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 327CAC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:15:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E81DC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:33:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECE7E2089F
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:15:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECE7E2089F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3A56D2171F
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:33:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=synology.com header.i=@synology.com header.b="rFs8rN5T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A56D2171F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7ZR3-0000JC-Tg
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 02:15:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35317)
+	id 1i7Zib-0003u5-BY
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 02:33:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38022)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1i7ZPb-0008Bv-DJ
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:14:01 -0400
+ (envelope-from <andychiu@synology.com>) id 1i7Zhl-0003Sb-PN
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:32:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1i7ZPZ-0006eM-By
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:13:58 -0400
-Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:57776)
+ (envelope-from <andychiu@synology.com>) id 1i7Zhf-0005cd-PZ
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:32:45 -0400
+Received: from mail.synology.com ([211.23.38.101]:55787 helo=synology.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i7ZPZ-0006Vu-68
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:13:57 -0400
-Received: from player770.ha.ovh.net (unknown [10.109.160.62])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id 356451403CF
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 08:13:48 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
- (Authenticated sender: clg@kaod.org)
- by player770.ha.ovh.net (Postfix) with ESMTPSA id 159D79A16AA6;
- Tue, 10 Sep 2019 06:13:39 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 10 Sep 2019 08:13:26 +0200
-Message-Id: <20190910061326.25366-1-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
+ (Exim 4.71) (envelope-from <andychiu@synology.com>)
+ id 1i7ZhQ-0005IP-Ls; Tue, 10 Sep 2019 02:32:26 -0400
+Received: from Mail (localhost [127.0.0.1])
+ by synology.com (Postfix) with ESMTPA id 630987E86D71;
+ Tue, 10 Sep 2019 14:32:19 +0800 (CST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=synology.com; s=123;
+ t=1568097139; bh=40tz3Y/HMUfCsH5USENJboAffHYOPSAro2kRnbdKfo4=;
+ h=Date:From:To:Cc:In-Reply-To:References:Subject;
+ b=rFs8rN5TRJC8MdOizCy3X70vmCZK1KkkAuxlOc+dViDxAHIEtZ7XrxkXdoX0g9hv5
+ ihp+6CGHWsXRG+GMCBkDS2vW6tYpDGSa3ZEVO3nB/wPzJJbf8C2ENQXVza/OIOIUOr
+ gro1vOPrml+lz5AR0JTRN7Z3paWfvt+b2H/4WFPM=
+Date: Tue, 10 Sep 2019 14:32:19 +0800
+To: "John Snow" <jsnow@redhat.com>
+Message-ID: <0e4181b5-2e0c-4664-8e1a-be030a258d44@Mail>
+In-Reply-To: <6eb1dbda-85fe-de7c-613c-a6871fc2d28f@redhat.com>
+References: <1568049517-10261-1-git-send-email-andychiu@synology.com>
+ <6eb1dbda-85fe-de7c-613c-a6871fc2d28f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 4547228250926255078
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudekjedguddtudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-Synology-MCP-Status: no
+X-Synology-Spam-Flag: no
+X-Synology-Spam-Status: score=0, required 6, WHITELIST_FROM_ADDRESS 0
+X-Synology-Virus-Status: no
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 211.23.38.101
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.74.219
-Subject: [Qemu-devel] [PATCH] spapr/irq: Only claim VALID interrupts at the
- KVM level
+Content-Disposition: inline
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH] ahci: enable pci bus master MemoryRegion
+ before loading ahci engines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,329 +74,435 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+From: andychiu via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: andychiu <andychiu@synology.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A typical pseries VM with 16 vCPUs, one disk, one network adapater
-uses less than 100 interrupts but the whole IRQ number space of the
-QEMU machine is allocated at reset time and it is 8K wide. This is
-wasting considerably the global IRQ space of the overall system which
-has 1M interrupts per socket on a POWER9.
-
-To optimise the HW resources, only request at the KVM level interrupts
-which have been claimed. This will help up increase the maximum number
-of VMs per system.
-
-To keep migration compatibility, we introduce a machine class
-attribute to adapt the reset behavior on older pseries machines.
-
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- include/hw/ppc/spapr.h      |  1 +
- include/hw/ppc/spapr_xive.h |  1 +
- include/hw/ppc/xics.h       |  6 ++++++
- hw/intc/spapr_xive.c        |  1 +
- hw/intc/spapr_xive_kvm.c    | 34 +++++++++++++++++++++++++++++++---
- hw/intc/xics.c              |  1 +
- hw/intc/xics_kvm.c          | 14 ++++++++++++++
- hw/ppc/spapr.c              |  1 +
- hw/ppc/spapr_irq.c          | 13 +++++++------
- 9 files changed, 63 insertions(+), 9 deletions(-)
-
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 03111fd55bc8..6c622954a60c 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -131,6 +131,7 @@ struct SpaprMachineClass {
-     SpaprResizeHpt resize_hpt_default;
-     SpaprCapabilities default_caps;
-     SpaprIrq *irq;
-+    bool irq_reset_all;
- };
-=20
- /**
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index bfd40f01d882..b33913eb0f28 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -45,6 +45,7 @@ typedef struct SpaprXive {
-     void          *tm_mmap;
-     MemoryRegion  tm_mmio_kvm;
-     VMChangeStateEntry *change;
-+    bool          reset_all;
- } SpaprXive;
-=20
- /*
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index f2a8d6a4b4f9..856815362406 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -117,6 +117,7 @@ struct ICSState {
-     DeviceState parent_obj;
-     /*< public >*/
-     uint32_t nr_irqs;
-+    bool reset_all;
-     uint32_t offset;
-     ICSIRQState *irqs;
-     XICSFabric *xics;
-@@ -179,6 +180,11 @@ void ics_simple_write_xive(ICSState *ics, int nr, in=
-t server,
-                            uint8_t priority, uint8_t saved_priority);
- void ics_simple_set_irq(void *opaque, int srcno, int val);
-=20
-+static inline bool ics_irq_free(ICSState *ics, uint32_t srcno)
-+{
-+    return !(ics->irqs[srcno].flags & XICS_FLAGS_IRQ_MASK);
-+}
-+
- void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
- void icp_pic_print_info(ICPState *icp, Monitor *mon);
- void ics_pic_print_info(ICSState *ics, Monitor *mon);
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index c1c97192a7d2..b717d9e09314 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -492,6 +492,7 @@ static Property spapr_xive_properties[] =3D {
-     DEFINE_PROP_UINT32("nr-ends", SpaprXive, nr_ends, 0),
-     DEFINE_PROP_UINT64("vc-base", SpaprXive, vc_base, SPAPR_XIVE_VC_BASE=
-),
-     DEFINE_PROP_UINT64("tm-base", SpaprXive, tm_base, SPAPR_XIVE_TM_BASE=
-),
-+    DEFINE_PROP_BOOL("reset-all", ICSState, reset_all, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
-diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index 17af4d19f54e..225abce36270 100644
---- a/hw/intc/spapr_xive_kvm.c
-+++ b/hw/intc/spapr_xive_kvm.c
-@@ -253,13 +253,23 @@ void kvmppc_xive_source_reset_one(XiveSource *xsrc,=
- int srcno, Error **errp)
-                       true, errp);
- }
-=20
-+static bool xive_source_skip_reset(SpaprXive *xive, int srcno)
-+{
-+    return !xive->reset_all && !xive_eas_is_valid(&xive->eat[srcno]);
-+}
-+
- static void kvmppc_xive_source_reset(XiveSource *xsrc, Error **errp)
- {
-+    SpaprXive *xive =3D SPAPR_XIVE(xsrc->xive);
-     int i;
-=20
-     for (i =3D 0; i < xsrc->nr_irqs; i++) {
-         Error *local_err =3D NULL;
-=20
-+        if (xive_source_skip_reset(xive, i)) {
-+            continue;
-+        }
-+
-         kvmppc_xive_source_reset_one(xsrc, i, &local_err);
-         if (local_err) {
-             error_propagate(errp, local_err);
-@@ -328,11 +338,18 @@ uint64_t kvmppc_xive_esb_rw(XiveSource *xsrc, int s=
-rcno, uint32_t offset,
-=20
- static void kvmppc_xive_source_get_state(XiveSource *xsrc)
- {
-+    SpaprXive *xive =3D SPAPR_XIVE(xsrc->xive);
-     int i;
-=20
-     for (i =3D 0; i < xsrc->nr_irqs; i++) {
-+        uint8_t pq;
-+
-+        if (xive_source_skip_reset(xive, i)) {
-+            continue;
-+        }
-+
-         /* Perform a load without side effect to retrieve the PQ bits */
--        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
-+        pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
-=20
-         /* and save PQ locally */
-         xive_source_esb_set(xsrc, i, pq);
-@@ -521,9 +538,14 @@ static void kvmppc_xive_change_state_handler(void *o=
-paque, int running,
-      */
-     if (running) {
-         for (i =3D 0; i < xsrc->nr_irqs; i++) {
--            uint8_t pq =3D xive_source_esb_get(xsrc, i);
-+            uint8_t pq;
-             uint8_t old_pq;
-=20
-+            if (xive_source_skip_reset(xive, i)) {
-+                continue;
-+            }
-+
-+            pq =3D xive_source_esb_get(xsrc, i);
-             old_pq =3D xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_00 + (pq <=
-< 8));
-=20
-             /*
-@@ -545,7 +567,13 @@ static void kvmppc_xive_change_state_handler(void *o=
-paque, int running,
-      * migration is in progress.
-      */
-     for (i =3D 0; i < xsrc->nr_irqs; i++) {
--        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
-+        uint8_t pq;
-+
-+        if (xive_source_skip_reset(xive, i)) {
-+            continue;
-+        }
-+
-+        pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
-=20
-         /*
-          * PQ is set to PENDING to possibly catch a triggered
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index b2fca2975cc4..ae3f83cf0aad 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -746,6 +746,7 @@ static const VMStateDescription vmstate_ics_base =3D =
-{
-=20
- static Property ics_base_properties[] =3D {
-     DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
-+    DEFINE_PROP_BOOL("reset-all", ICSState, reset_all, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index a4d2e876cc5f..aa017b99801c 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -177,6 +177,12 @@ void icp_kvm_realize(DeviceState *dev, Error **errp)
- /*
-  * ICS-KVM
-  */
-+
-+static bool ics_irq_skip_reset(ICSState *ics, int srcno)
-+{
-+    return !ics->reset_all && ics_irq_free(ics, srcno);
-+}
-+
- void ics_get_kvm_state(ICSState *ics)
- {
-     uint64_t state;
-@@ -190,6 +196,10 @@ void ics_get_kvm_state(ICSState *ics)
-     for (i =3D 0; i < ics->nr_irqs; i++) {
-         ICSIRQState *irq =3D &ics->irqs[i];
-=20
-+        if (ics_irq_skip_reset(ics, i)) {
-+            continue;
-+        }
-+
-         kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
-                           i + ics->offset, &state, false, &error_fatal);
-=20
-@@ -301,6 +311,10 @@ int ics_set_kvm_state(ICSState *ics, Error **errp)
-         Error *local_err =3D NULL;
-         int ret;
-=20
-+        if (ics_irq_skip_reset(ics, i)) {
-+            continue;
-+        }
-+
-         ret =3D ics_set_kvm_state_one(ics, i, &local_err);
-         if (ret < 0) {
-             error_propagate(errp, local_err);
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7124053b43b7..af89f3b6c698 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4594,6 +4594,7 @@ static void spapr_machine_4_1_class_options(Machine=
-Class *mc)
-     smc->linux_pci_probe =3D false;
-     compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len)=
-;
-     compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-+    smc->irq_reset_all =3D true;
- }
-=20
- DEFINE_SPAPR_MACHINE(4_1, "4.1", false);
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 06fe2432bae5..8c3682613404 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -97,11 +97,13 @@ static void spapr_irq_init_xics(SpaprMachineState *sp=
-apr, int nr_irqs,
- {
-     Object *obj;
-     Error *local_err =3D NULL;
-+    bool reset_all =3D SPAPR_MACHINE_GET_CLASS(spapr)->irq_reset_all;
-=20
-     obj =3D object_new(TYPE_ICS_SIMPLE);
-     object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
-     object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
-                                    &error_fatal);
-+    object_property_set_bool(obj, reset_all, "reset-all",  &error_fatal)=
-;
-     object_property_set_int(obj, nr_irqs, "nr-irqs",  &error_fatal);
-     object_property_set_bool(obj, true, "realized", &local_err);
-     if (local_err) {
-@@ -114,9 +116,6 @@ static void spapr_irq_init_xics(SpaprMachineState *sp=
-apr, int nr_irqs,
-     xics_spapr_init(spapr);
- }
-=20
--#define ICS_IRQ_FREE(ics, srcno)   \
--    (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_MASK)))
--
- static int spapr_irq_claim_xics(SpaprMachineState *spapr, int irq, bool =
-lsi,
-                                 Error **errp)
- {
-@@ -129,7 +128,7 @@ static int spapr_irq_claim_xics(SpaprMachineState *sp=
-apr, int irq, bool lsi,
-         return -1;
-     }
-=20
--    if (!ICS_IRQ_FREE(ics, irq - ics->offset)) {
-+    if (!ics_irq_free(ics, irq - ics->offset)) {
-         error_setg(errp, "IRQ %d is not free", irq);
-         return -1;
-     }
-@@ -147,7 +146,7 @@ static void spapr_irq_free_xics(SpaprMachineState *sp=
-apr, int irq, int num)
-     if (ics_valid_irq(ics, irq)) {
-         trace_spapr_irq_free(0, irq, num);
-         for (i =3D srcno; i < srcno + num; ++i) {
--            if (ICS_IRQ_FREE(ics, i)) {
-+            if (ics_irq_free(ics, i)) {
-                 trace_spapr_irq_free_warn(0, i);
-             }
-             memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
-@@ -270,9 +269,11 @@ static void spapr_irq_init_xive(SpaprMachineState *s=
-papr, int nr_irqs,
- {
-     uint32_t nr_servers =3D spapr_max_server_number(spapr);
-     DeviceState *dev;
-+    bool reset_all =3D SPAPR_MACHINE_GET_CLASS(spapr)->irq_reset_all;
-     int i;
-=20
-     dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
-+    object_property_set_bool(OBJECT(dev), reset_all, "reset-all", &error=
-_fatal);
-     qdev_prop_set_uint32(dev, "nr-irqs", nr_irqs);
-     /*
-      * 8 XIVE END structures per CPU. One for each available priority
-@@ -767,7 +768,7 @@ static int ics_find_free_block(ICSState *ics, int num=
-, int alignnum)
-             return -1;
-         }
-         for (i =3D first; i < first + num; ++i) {
--            if (!ICS_IRQ_FREE(ics, i)) {
-+            if (!ics_irq_free(ics, i)) {
-                 break;
-             }
-         }
---=20
-2.21.0
-
-
+Hi John, This issue can only be reproduced on Windows 10. I've observed a=
+nd compared the behavior of Windows 10 and Windows 7. It seems Windows 7 =
+wouldn't disable the PCI=5FCOMMAND=5FMASTER flag when disabling ahci devi=
+ces. That's why this issue won't happen on Win7. Here's the trace log on =
+both guest OS, on disabling and re-engaging SATA disk: Windows 10, disabl=
+ing SATA disk: ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B0=5D: port writ=
+e =5Breg:PxCI=5D =40 0x38: 0x00040000 handle=5Fcmd=5Ffis=5Fdump ahci(0x7f=
+6da4eb1400)=5B0=5D: =46IS: 0x00: 27 80 ea 00 00 00 00 a0 00 00 00 00 00 0=
+0 00 00 0x10: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x20: 00 00=
+ 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x30: 00 00 00 00 00 00 00 00 =
+00 00 00 00 00 00 00 00 0x40: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
+0 00 0x50: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x60: 00 00 00=
+ 00 00 00 00 00 00 00 00 00 00 00 00 00 0x70: 00 00 00 00 00 00 00 00 00 =
+00 00 00 00 00 00 00 ahci=5Fcmd=5Fdone ahci(0x7f6da4eb1400)=5B0=5D: cmd d=
+one ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B0=5D: port write =5Breg:Px=
+IS=5D =40 0x10: 0x00000001 ahci=5Fmem=5Fwrite=5Fhost ahci(0x7f6da4eb1400)=
+ write4 =5Breg:IS=5D =40 0x8: 0x0000000000000001 ahci=5Fport=5Fwrite ahci=
+(0x7f6da4eb1400)=5B0=5D: port write =5Breg:PxCI=5D =40 0x38: 0x00080000 h=
+andle=5Fcmd=5Ffis=5Fdump ahci(0x7f6da4eb1400)=5B0=5D: =46IS: 0x00: 27 80 =
+e0 00 00 00 00 a0 00 00 00 00 00 00 00 00 0x10: 00 00 00 00 00 00 00 00 0=
+0 00 00 00 00 00 00 00 0x20: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00=
+ 00 0x30: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x40: 00 00 00 =
+00 00 00 00 00 00 00 00 00 00 00 00 00 0x50: 00 00 00 00 00 00 00 00 00 0=
+0 00 00 00 00 00 00 0x60: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00=
+ 0x70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ahci=5Fcmd=5Fdone =
+ahci(0x7f6da4eb1400)=5B0=5D: cmd done ahci=5Fport=5Fwrite ahci(0x7f6da4eb=
+1400)=5B0=5D: port write =5Breg:PxIS=5D =40 0x10: 0x00000001 ahci=5Fmem=5F=
+write=5Fhost ahci(0x7f6da4eb1400) write4 =5Breg:IS=5D =40 0x8: 0x00000000=
+00000001 ahci=5Fmem=5Fwrite=5Fhost ahci(0x7f6da4eb1400) write4 =5Breg:GHC=
+=5D =40 0x4: 0x0000000080000000 pci=5Fcfg=5Fwrite ich9-ahci 26:0 =400x4 <=
+- 0x507 pci=5Fcfg=5Fwrite ich9-ahci 26:0 =400x82 <- 0x80 pci=5Fcfg=5Fwrit=
+e ich9-ahci 26:0 =400x4 <- 0x500 pci=5Fupdate=5Fmappings=5Fdel d=3D0x7f6d=
+a4eb0b20 00:1a.0 4,0xc0a0+0x20 pci=5Fupdate=5Fmappings=5Fdel d=3D0x7f6da4=
+eb0b20 00:1a.0 5,0xfebf1000+0x1000 --------------------------------------=
+--------------------------------------------------- Windows 10, re-engagi=
+ng SATA disk: pci=5Fcfg=5Fwrite ich9-ahci 26:0 =400x14 <- 0x0 pci=5Fcfg=5F=
+write ich9-ahci 26:0 =400x18 <- 0x0 pci=5Fcfg=5Fwrite ich9-ahci 26:0 =400=
+x1c <- 0x0 pci=5Fcfg=5Fwrite ich9-ahci 26:0 =400x20 <- 0xc0a0 pci=5Fcfg=5F=
+write ich9-ahci 26:0 =400x24 <- 0xfebf1000 pci=5Fcfg=5Fwrite ich9-ahci 26=
+:0 =400x30 <- 0x0 pci=5Fcfg=5Fwrite ich9-ahci 26:0 =400x3c <- 0x0 pci=5Fc=
+fg=5Fwrite ich9-ahci 26:0 =400xc <- 0x0 pci=5Fcfg=5Fwrite ich9-ahci 26:0 =
+=400xd <- 0x0 pci=5Fcfg=5Fwrite ich9-ahci 26:0 =400x4 <- 0x500 pci=5Fcfg=5F=
+write ich9-ahci 26:0 =400x4 <- 0x507 pci=5Fupdate=5Fmappings=5Fadd d=3D0x=
+7f6da4eb0b20 00:1a.0 4,0xc0a0+0x20 pci=5Fupdate=5Fmappings=5Fadd d=3D0x7f=
+6da4eb0b20 00:1a.0 5,0xfebf1000+0x1000 pci=5Fcfg=5Fwrite ich9-ahci 26:0 =40=
+0x6 <- 0xf900 pci=5Fcfg=5Fwrite ich9-ahci 26:0 =400x4 <- 0x507 pci=5Fcfg=5F=
+write ich9-ahci 26:0 =400x82 <- 0x80 pci=5Fcfg=5Fwrite ich9-ahci 26:0 =40=
+0x84 <- 0xfee0100c pci=5Fcfg=5Fwrite ich9-ahci 26:0 =400x88 <- 0x0 pci=5F=
+cfg=5Fwrite ich9-ahci 26:0 =400x8c <- 0x49a1 pci=5Fcfg=5Fwrite ich9-ahci =
+26:0 =400x82 <- 0x81 ahci=5Fmem=5Fwrite=5Fhost ahci(0x7f6da4eb1400) write=
+4 =5Breg:GHC=5D =40 0x4: 0x0000000080000002 ahci=5Fport=5Fwrite ahci(0x7f=
+6da4eb1400)=5B1=5D: port write =5Breg:PxCLB=5D =40 0x0: 0x7fe9f000 ahci=5F=
+port=5Fwrite ahci(0x7f6da4eb1400)=5B1=5D: port write =5Breg:PxCLBU=5D =40=
+ 0x4: 0x00000000 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B1=5D: port wr=
+ite =5Breg:Px=46B=5D =40 0x8: 0x7fe9f400 ahci=5Fport=5Fwrite ahci(0x7f6da=
+4eb1400)=5B1=5D: port write =5Breg:Px=46BU=5D =40 0xc: 0x00000000 ahci=5F=
+port=5Fwrite ahci(0x7f6da4eb1400)=5B1=5D: port write =5Breg:PxCMD=5D =40 =
+0x18: 0x00000006 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B2=5D: port wr=
+ite =5Breg:PxCLB=5D =40 0x0: 0x7fea5000 ahci=5Fport=5Fwrite ahci(0x7f6da4=
+eb1400)=5B2=5D: port write =5Breg:PxCLBU=5D =40 0x4: 0x00000000 ahci=5Fpo=
+rt=5Fwrite ahci(0x7f6da4eb1400)=5B2=5D: port write =5Breg:Px=46B=5D =40 0=
+x8: 0x7fea5400 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B2=5D: port writ=
+e =5Breg:Px=46BU=5D =40 0xc: 0x00000000 ahci=5Fport=5Fwrite ahci(0x7f6da4=
+eb1400)=5B2=5D: port write =5Breg:PxCMD=5D =40 0x18: 0x00000006 ahci=5Fpo=
+rt=5Fwrite ahci(0x7f6da4eb1400)=5B3=5D: port write =5Breg:PxCLB=5D =40 0x=
+0: 0x7feab000 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B3=5D: port write=
+ =5Breg:PxCLBU=5D =40 0x4: 0x00000000 ahci=5Fport=5Fwrite ahci(0x7f6da4eb=
+1400)=5B3=5D: port write =5Breg:Px=46B=5D =40 0x8: 0x7feab400 ahci=5Fport=
+=5Fwrite ahci(0x7f6da4eb1400)=5B3=5D: port write =5Breg:Px=46BU=5D =40 0x=
+c: 0x00000000 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B3=5D: port write=
+ =5Breg:PxCMD=5D =40 0x18: 0x00000006 ahci=5Fport=5Fwrite ahci(0x7f6da4eb=
+1400)=5B4=5D: port write =5Breg:PxCLB=5D =40 0x0: 0x7feb1000 ahci=5Fport=5F=
+write ahci(0x7f6da4eb1400)=5B4=5D: port write =5Breg:PxCLBU=5D =40 0x4: 0=
+x00000000 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B4=5D: port write =5B=
+reg:Px=46B=5D =40 0x8: 0x7feb1400 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400=
+)=5B4=5D: port write =5Breg:Px=46BU=5D =40 0xc: 0x00000000 ahci=5Fport=5F=
+write ahci(0x7f6da4eb1400)=5B4=5D: port write =5Breg:PxCMD=5D =40 0x18: 0=
+x00000006 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B5=5D: port write =5B=
+reg:PxCLB=5D =40 0x0: 0x7feb7000 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=
+=5B5=5D: port write =5Breg:PxCLBU=5D =40 0x4: 0x00000000 ahci=5Fport=5Fwr=
+ite ahci(0x7f6da4eb1400)=5B5=5D: port write =5Breg:Px=46B=5D =40 0x8: 0x7=
+feb7400 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B5=5D: port write =5Bre=
+g:Px=46BU=5D =40 0xc: 0x00000000 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=
+=5B5=5D: port write =5Breg:PxCMD=5D =40 0x18: 0x00000006 ahci=5Fport=5Fwr=
+ite ahci(0x7f6da4eb1400)=5B0=5D: port write =5Breg:PxCLB=5D =40 0x0: 0x7f=
+e99000 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B0=5D: port write =5Breg=
+:PxCLBU=5D =40 0x4: 0x00000000 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B=
+0=5D: port write =5Breg:Px=46B=5D =40 0x8: 0x7fe99400 ahci=5Fport=5Fwrite=
+ ahci(0x7f6da4eb1400)=5B0=5D: port write =5Breg:Px=46BU=5D =40 0xc: 0x000=
+00000 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B0=5D: port write =5Breg:=
+PxCMD=5D =40 0x18: 0x0000c016 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B=
+0=5D: port write =5Breg:PxCMD=5D =40 0x18: 0x00004006 ahci=5Fport=5Fwrite=
+ ahci(0x7f6da4eb1400)=5B0=5D: port write =5Breg:PXIE=5D =40 0x14: 0x7d000=
+00f ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B0=5D: port write =5Breg:Px=
+SCTL=5D =40 0x2c: 0x00000001 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B0=
+=5D: port write =5Breg:PxSCTL=5D =40 0x2c: 0x00000000 ahci=5Freset=5Fport=
+ ahci(0x7f6da4eb1400)=5B0=5D: reset port ide=5Freset IDEstate 0x7f6da4eb3=
+9f0 ide=5Freset IDEstate 0x7f6da4eb3dc0 ahci=5Fset=5Fsignature ahci(0x7f6=
+da4eb1400)=5B0=5D: set signature sector:0x01 nsector:0x01 lcyl:0x00 hcyl:=
+0x00 (cumulatively: 0x00000101) ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B=
+0=5D: port write =5Breg:PXIE=5D =40 0x14: 0x7d40004f ahci=5Fport=5Fwrite =
+ahci(0x7f6da4eb1400)=5B0=5D: port write =5Breg:PxSERR=5D =40 0x30: 0xffff=
+ffff ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B0=5D: port write =5Breg:P=
+xCMD=5D =40 0x18: 0x00000006 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B0=
+=5D: port write =5Breg:PxCMD=5D =40 0x18: 0x00000016 ahci=5Fport=5Fwrite =
+ahci(0x7f6da4eb1400)=5B0=5D: port write =5Breg:PxIS=5D =40 0x10: 0x000000=
+01 ahci=5Fmem=5Fwrite=5Fhost ahci(0x7f6da4eb1400) write4 =5Breg:IS=5D =40=
+ 0x8: 0x0000000000000001 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B0=5D:=
+ port write =5Breg:PxSERR=5D =40 0x30: 0xffffffff ahci=5Fport=5Fwrite ahc=
+i(0x7f6da4eb1400)=5B0=5D: port write =5Breg:PxIS=5D =40 0x10: 0xffffffff =
+ahci=5Fmem=5Fwrite=5Fhost ahci(0x7f6da4eb1400) write4 =5Breg:IS=5D =40 0x=
+8: 0x0000000000000001 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B0=5D: po=
+rt write =5Breg:PXIE=5D =40 0x14: 0x7d40004f ahci=5Fport=5Fwrite ahci(0x7=
+f6da4eb1400)=5B0=5D: port write =5Breg:PxCMD=5D =40 0x18: 0x00004017 ahci=
+=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B0=5D: port write =5Breg:PxCI=5D =40=
+ 0x38: 0x00000001 handle=5Fcmd=5Ffis=5Fdump ahci(0x7f6da4eb1400)=5B0=5D: =
+=46IS: 0x00: 27 80 ef 66 00 00 00 a0 00 00 00 00 00 00 00 00 0x10: 00 00 =
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x20: 00 00 00 00 00 00 00 00 0=
+0 00 00 00 00 00 00 00 0x30: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00=
+ 00 0x40: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x50: 00 00 00 =
+00 00 00 00 00 00 00 00 00 00 00 00 00 0x60: 00 00 00 00 00 00 00 00 00 0=
+0 00 00 00 00 00 00 0x70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00=
+ ahci=5Fcmd=5Fdone ahci(0x7f6da4eb1400)=5B0=5D: cmd done ahci=5Fport=5Fwr=
+ite ahci(0x7f6da4eb1400)=5B0=5D: port write =5Breg:PxIS=5D =40 0x10: 0x00=
+000001 ahci=5Fmem=5Fwrite=5Fhost ahci(0x7f6da4eb1400) write4 =5Breg:IS=5D=
+ =40 0x8: 0x0000000000000001 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B0=
+=5D: port write =5Breg:PxCI=5D =40 0x38: 0x00000001 handle=5Fcmd=5Ffis=5F=
+dump ahci(0x7f6da4eb1400)=5B0=5D: =46IS: 0x00: 27 80 ef 66 00 00 00 a0 00=
+ 00 00 00 00 00 00 00 0x10: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 =
+00 0x20: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x30: 00 00 00 0=
+0 00 00 00 00 00 00 00 00 00 00 00 00 0x40: 00 00 00 00 00 00 00 00 00 00=
+ 00 00 00 00 00 00 0x50: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 =
+0x60: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x70: 00 00 00 00 0=
+0 00 00 00 00 00 00 00 00 00 00 00 ahci=5Fcmd=5Fdone ahci(0x7f6da4eb1400)=
+=5B0=5D: cmd done ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B0=5D: port w=
+rite =5Breg:PxIS=5D =40 0x10: 0x00000001 ahci=5Fmem=5Fwrite=5Fhost ahci(0=
+x7f6da4eb1400) write4 =5Breg:IS=5D =40 0x8: 0x0000000000000001 ahci=5Fpor=
+t=5Fwrite ahci(0x7f6da4eb1400)=5B0=5D: port write =5Breg:PxCI=5D =40 0x38=
+: 0x00000001 handle=5Fcmd=5Ffis=5Fdump ahci(0x7f6da4eb1400)=5B0=5D: =46IS=
+: 0x00: 27 80 f5 00 00 00 00 a0 00 00 00 00 00 00 00 00 0x10: 00 00 00 00=
+ 00 00 00 00 00 00 00 00 00 00 00 00 0x20: 00 00 00 00 00 00 00 00 00 00 =
+00 00 00 00 00 00 0x30: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
+x40: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x50: 00 00 00 00 00=
+ 00 00 00 00 00 00 00 00 00 00 00 0x60: 00 00 00 00 00 00 00 00 00 00 00 =
+00 00 00 00 00 0x70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ahci=
+=5Fcmd=5Fdone ahci(0x7f6da4eb1400)=5B0=5D: cmd done ahci=5Fport=5Fwrite a=
+hci(0x7f6da4eb1400)=5B0=5D: port write =5Breg:PxIS=5D =40 0x10: 0x0000000=
+1 ahci=5Fmem=5Fwrite=5Fhost ahci(0x7f6da4eb1400) write4 =5Breg:IS=5D =40 =
+0x8: 0x0000000000000001 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B0=5D: =
+port write =5Breg:PxCI=5D =40 0x38: 0x00000001 handle=5Fcmd=5Ffis=5Fdump =
+ahci(0x7f6da4eb1400)=5B0=5D: =46IS: 0x00: 27 80 ef 02 00 00 00 a0 00 00 0=
+0 00 00 00 00 00 0x10: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x=
+20: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x30: 00 00 00 00 00 =
+00 00 00 00 00 00 00 00 00 00 00 0x40: 00 00 00 00 00 00 00 00 00 00 00 0=
+0 00 00 00 00 0x50: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x60:=
+ 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x70: 00 00 00 00 00 00 =
+00 00 00 00 00 00 00 00 00 00 ahci=5Fcmd=5Fdone ahci(0x7f6da4eb1400)=5B0=5D=
+: cmd done ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B0=5D: port write =5B=
+reg:PxIS=5D =40 0x10: 0x00000001 ahci=5Fmem=5Fwrite=5Fhost ahci(0x7f6da4e=
+b1400) write4 =5Breg:IS=5D =40 0x8: 0x0000000000000001 ahci=5Fport=5Fwrit=
+e ahci(0x7f6da4eb1400)=5B0=5D: port write =5Breg:PxCI=5D =40 0x38: 0x0010=
+0000 handle=5Fcmd=5Ffis=5Fdump ahci(0x7f6da4eb1400)=5B0=5D: =46IS: 0x00: =
+27 80 42 00 00 00 00 e0 00 00 00 00 01 00 00 00 0x10: 00 00 00 00 00 00 0=
+0 00 00 00 00 00 00 00 00 00 0x20: 00 00 00 00 00 00 00 00 00 00 00 00 00=
+ 00 00 00 0x30: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x40: 00 =
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x50: 00 00 00 00 00 00 00 0=
+0 00 00 00 00 00 00 00 00 0x60: 00 00 00 00 00 00 00 00 00 00 00 00 00 00=
+ 00 00 0x70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ahci=5Fcmd=5F=
+done ahci(0x7f6da4eb1400)=5B0=5D: cmd done ahci=5Fport=5Fwrite ahci(0x7f6=
+da4eb1400)=5B0=5D: port write =5Breg:PxIS=5D =40 0x10: 0x00000001 ahci=5F=
+mem=5Fwrite=5Fhost ahci(0x7f6da4eb1400) write4 =5Breg:IS=5D =40 0x8: 0x00=
+00000000000001 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B0=5D: port writ=
+e =5Breg:PxCI=5D =40 0x38: 0x00200000 handle=5Fcmd=5Ffis=5Fdump ahci(0x7f=
+6da4eb1400)=5B0=5D: =46IS: 0x00: 27 80 b0 d8 01 4f c2 a0 00 00 00 00 01 0=
+0 00 00 0x10: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x20: 00 00=
+ 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x30: 00 00 00 00 00 00 00 00 =
+00 00 00 00 00 00 00 00 0x40: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
+0 00 0x50: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x60: 00 00 00=
+ 00 00 00 00 00 00 00 00 00 00 00 00 00 0x70: 00 00 00 00 00 00 00 00 00 =
+00 00 00 00 00 00 00 ahci=5Fcmd=5Fdone ahci(0x7f6da4eb1400)=5B0=5D: cmd d=
+one ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B0=5D: port write =5Breg:Px=
+IS=5D =40 0x10: 0x00000001 ahci=5Fmem=5Fwrite=5Fhost ahci(0x7f6da4eb1400)=
+ write4 =5Breg:IS=5D =40 0x8: 0x0000000000000001 ahci=5Fport=5Fwrite ahci=
+(0x7f6da4eb1400)=5B0=5D: port write =5Breg:PxCI=5D =40 0x38: 0x00400000 h=
+andle=5Fcmd=5Ffis=5Fdump ahci(0x7f6da4eb1400)=5B0=5D: =46IS: 0x00: 27 80 =
+ec 00 00 00 00 a0 00 00 00 00 00 00 00 00 0x10: 00 00 00 00 00 00 00 00 0=
+0 00 00 00 00 00 00 00 0x20: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00=
+ 00 0x30: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x40: 00 00 00 =
+00 00 00 00 00 00 00 00 00 00 00 00 00 0x50: 00 00 00 00 00 00 00 00 00 0=
+0 00 00 00 00 00 00 0x60: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00=
+ 0x70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ahci=5Fpopulate=5F=
+sglist ahci(0x7f6da4eb1400)=5B0=5D ahci=5Fdma=5Fprepare=5Fbuf ahci(0x7f6d=
+a4eb1400)=5B0=5D: prepare buf limit=3D512 prepared=3D512 ahci=5Fstart=5Ft=
+ransfer ahci(0x7f6da4eb1400)=5B0=5D: reading 512 bytes on ata w/ sglist a=
+hci=5Fcmd=5Fdone ahci(0x7f6da4eb1400)=5B0=5D: cmd done ahci=5Fport=5Fwrit=
+e ahci(0x7f6da4eb1400)=5B0=5D: port write =5Breg:PxIS=5D =40 0x10: 0x0000=
+0003 ahci=5Fmem=5Fwrite=5Fhost ahci(0x7f6da4eb1400) write4 =5Breg:IS=5D =40=
+ 0x8: 0x0000000000000001 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B5=5D:=
+ port write =5Breg:PxCMD=5D =40 0x18: 0x00000006 ahci=5Fport=5Fwrite ahci=
+(0x7f6da4eb1400)=5B4=5D: port write =5Breg:PxCMD=5D =40 0x18: 0x00000006 =
+ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B3=5D: port write =5Breg:PxCMD=5D=
+ =40 0x18: 0x00000006 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B2=5D: po=
+rt write =5Breg:PxCMD=5D =40 0x18: 0x00000006 ahci=5Fport=5Fwrite ahci(0x=
+7f6da4eb1400)=5B1=5D: port write =5Breg:PxCMD=5D =40 0x18: 0x00000006 ahc=
+i=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B1=5D: port write =5Breg:PxCMD=5D =
+=40 0x18: 0x00000006 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B2=5D: por=
+t write =5Breg:PxCMD=5D =40 0x18: 0x00000006 ahci=5Fport=5Fwrite ahci(0x7=
+f6da4eb1400)=5B3=5D: port write =5Breg:PxCMD=5D =40 0x18: 0x00000006 ahci=
+=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B4=5D: port write =5Breg:PxCMD=5D =40=
+ 0x18: 0x00000006 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B5=5D: port w=
+rite =5Breg:PxCMD=5D =40 0x18: 0x00000006 ahci=5Fport=5Fwrite ahci(0x7f6d=
+a4eb1400)=5B5=5D: port write =5Breg:PxCMD=5D =40 0x18: 0x00000006 ahci=5F=
+port=5Fwrite ahci(0x7f6da4eb1400)=5B4=5D: port write =5Breg:PxCMD=5D =40 =
+0x18: 0x00000006 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B3=5D: port wr=
+ite =5Breg:PxCMD=5D =40 0x18: 0x00000006 ahci=5Fport=5Fwrite ahci(0x7f6da=
+4eb1400)=5B2=5D: port write =5Breg:PxCMD=5D =40 0x18: 0x00000006 ahci=5Fp=
+ort=5Fwrite ahci(0x7f6da4eb1400)=5B1=5D: port write =5Breg:PxCMD=5D =40 0=
+x18: 0x00000006 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B1=5D: port wri=
+te =5Breg:PxCMD=5D =40 0x18: 0x00000006 ahci=5Fport=5Fwrite ahci(0x7f6da4=
+eb1400)=5B1=5D: port write =5Breg:PxSERR=5D =40 0x30: 0xffffffff ahci=5Fp=
+ort=5Fwrite ahci(0x7f6da4eb1400)=5B1=5D: port write =5Breg:PxIS=5D =40 0x=
+10: 0xffffffff ahci=5Fmem=5Fwrite=5Fhost ahci(0x7f6da4eb1400) write4 =5Br=
+eg:IS=5D =40 0x8: 0x0000000000000002 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1=
+400)=5B1=5D: port write =5Breg:PXIE=5D =40 0x14: 0x7d40004f ahci=5Fport=5F=
+write ahci(0x7f6da4eb1400)=5B2=5D: port write =5Breg:PxCMD=5D =40 0x18: 0=
+x00000006 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B2=5D: port write =5B=
+reg:PxSERR=5D =40 0x30: 0xffffffff ahci=5Fport=5Fwrite ahci(0x7f6da4eb140=
+0)=5B2=5D: port write =5Breg:PxIS=5D =40 0x10: 0xffffffff ahci=5Fmem=5Fwr=
+ite=5Fhost ahci(0x7f6da4eb1400) write4 =5Breg:IS=5D =40 0x8: 0x0000000000=
+000004 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B2=5D: port write =5Breg=
+:PXIE=5D =40 0x14: 0x7d40004f ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B=
+3=5D: port write =5Breg:PxCMD=5D =40 0x18: 0x00000006 ahci=5Fport=5Fwrite=
+ ahci(0x7f6da4eb1400)=5B3=5D: port write =5Breg:PxSERR=5D =40 0x30: 0xfff=
+fffff ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B3=5D: port write =5Breg:=
+PxIS=5D =40 0x10: 0xffffffff ahci=5Fmem=5Fwrite=5Fhost ahci(0x7f6da4eb140=
+0) write4 =5Breg:IS=5D =40 0x8: 0x0000000000000008 ahci=5Fport=5Fwrite ah=
+ci(0x7f6da4eb1400)=5B3=5D: port write =5Breg:PXIE=5D =40 0x14: 0x7d40004f=
+ ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B4=5D: port write =5Breg:PxCMD=
+=5D =40 0x18: 0x00000006 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B4=5D:=
+ port write =5Breg:PxSERR=5D =40 0x30: 0xffffffff ahci=5Fport=5Fwrite ahc=
+i(0x7f6da4eb1400)=5B4=5D: port write =5Breg:PxIS=5D =40 0x10: 0xffffffff =
+ahci=5Fmem=5Fwrite=5Fhost ahci(0x7f6da4eb1400) write4 =5Breg:IS=5D =40 0x=
+8: 0x0000000000000010 ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B4=5D: po=
+rt write =5Breg:PXIE=5D =40 0x14: 0x7d40004f ahci=5Fport=5Fwrite ahci(0x7=
+f6da4eb1400)=5B5=5D: port write =5Breg:PxCMD=5D =40 0x18: 0x00000006 ahci=
+=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B5=5D: port write =5Breg:PxSERR=5D =
+=40 0x30: 0xffffffff ahci=5Fport=5Fwrite ahci(0x7f6da4eb1400)=5B5=5D: por=
+t write =5Breg:PxIS=5D =40 0x10: 0xffffffff ahci=5Fmem=5Fwrite=5Fhost ahc=
+i(0x7f6da4eb1400) write4 =5Breg:IS=5D =40 0x8: 0x0000000000000020 ahci=5F=
+port=5Fwrite ahci(0x7f6da4eb1400)=5B5=5D: port write =5Breg:PXIE=5D =40 0=
+x14: 0x7d40004f ---------------------------------------------------------=
+-------------------------------- Windows 7, disabling SATA disk: ahci=5Fp=
+ort=5Fwrite ahci(0x7fcc4e19b4a0)=5B0=5D: port write =5Breg:PxCI=5D =40 0x=
+38: 0x00020000 handle=5Fcmd=5Ffis=5Fdump ahci(0x7fcc4e19b4a0)=5B0=5D: =46=
+IS: 0x00: 27 80 ea 00 00 00 00 a0 00 00 00 00 00 00 00 00 0x10: 00 00 00 =
+00 00 00 00 00 00 00 00 00 00 00 00 00 0x20: 00 00 00 00 00 00 00 00 00 0=
+0 00 00 00 00 00 00 0x30: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00=
+ 0x40: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x50: 00 00 00 00 =
+00 00 00 00 00 00 00 00 00 00 00 00 0x60: 00 00 00 00 00 00 00 00 00 00 0=
+0 00 00 00 00 00 0x70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ah=
+ci=5Fcmd=5Fdone ahci(0x7fcc4e19b4a0)=5B0=5D: cmd done ahci=5Fport=5Fwrite=
+ ahci(0x7fcc4e19b4a0)=5B0=5D: port write =5Breg:PxSERR=5D =40 0x30: 0xfff=
+fffff ahci=5Fport=5Fwrite ahci(0x7fcc4e19b4a0)=5B0=5D: port write =5Breg:=
+PxIS=5D =40 0x10: 0x00000001 ahci=5Fmem=5Fwrite=5Fhost ahci(0x7fcc4e19b4a=
+0) write4 =5Breg:IS=5D =40 0x8: 0x0000000000000001 ahci=5Fport=5Fwrite ah=
+ci(0x7fcc4e19b4a0)=5B0=5D: port write =5Breg:PxCI=5D =40 0x38: 0x00040000=
+ handle=5Fcmd=5Ffis=5Fdump ahci(0x7fcc4e19b4a0)=5B0=5D: =46IS: 0x00: 27 8=
+0 e0 00 00 00 00 00 00 00 00 00 00 00 00 00 0x10: 00 00 00 00 00 00 00 00=
+ 00 00 00 00 00 00 00 00 0x20: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 =
+00 00 0x30: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x40: 00 00 0=
+0 00 00 00 00 00 00 00 00 00 00 00 00 00 0x50: 00 00 00 00 00 00 00 00 00=
+ 00 00 00 00 00 00 00 0x60: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 =
+00 0x70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ahci=5Fcmd=5Fdon=
+e ahci(0x7fcc4e19b4a0)=5B0=5D: cmd done ahci=5Fport=5Fwrite ahci(0x7fcc4e=
+19b4a0)=5B0=5D: port write =5Breg:PxSERR=5D =40 0x30: 0xffffffff ahci=5Fp=
+ort=5Fwrite ahci(0x7fcc4e19b4a0)=5B0=5D: port write =5Breg:PxIS=5D =40 0x=
+10: 0x00000001 ahci=5Fmem=5Fwrite=5Fhost ahci(0x7fcc4e19b4a0) write4 =5Br=
+eg:IS=5D =40 0x8: 0x0000000000000001 ------------------------------------=
+----------------------------------------------------- Windows 7, re-engag=
+ing SATA disk: ahci=5Fport=5Fwrite ahci(0x7fcc4e19b4a0)=5B0=5D: port writ=
+e =5Breg:PxCI=5D =40 0x38: 0x00002000 handle=5Fcmd=5Ffis=5Fdump ahci(0x7f=
+cc4e19b4a0)=5B0=5D: =46IS: 0x00: 27 80 ef 66 00 00 00 a0 00 00 00 00 00 0=
+0 00 00 0x10: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x20: 00 00=
+ 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x30: 00 00 00 00 00 00 00 00 =
+00 00 00 00 00 00 00 00 0x40: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
+0 00 0x50: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x60: 00 00 00=
+ 00 00 00 00 00 00 00 00 00 00 00 00 00 0x70: 00 00 00 00 00 00 00 00 00 =
+00 00 00 00 00 00 00 ahci=5Fcmd=5Fdone ahci(0x7fcc4e19b4a0)=5B0=5D: cmd d=
+one ahci=5Fport=5Fwrite ahci(0x7fcc4e19b4a0)=5B0=5D: port write =5Breg:Px=
+SERR=5D =40 0x30: 0xffffffff ahci=5Fport=5Fwrite ahci(0x7fcc4e19b4a0)=5B0=
+=5D: port write =5Breg:PxIS=5D =40 0x10: 0x00000001 ahci=5Fmem=5Fwrite=5F=
+host ahci(0x7fcc4e19b4a0) write4 =5Breg:IS=5D =40 0x8: 0x0000000000000001=
+ ahci=5Fport=5Fwrite ahci(0x7fcc4e19b4a0)=5B0=5D: port write =5Breg:PxCI=5D=
+ =40 0x38: 0x00004000 handle=5Fcmd=5Ffis=5Fdump ahci(0x7fcc4e19b4a0)=5B0=5D=
+: =46IS: 0x00: 27 80 f5 00 00 00 00 a0 00 00 00 00 00 00 00 00 0x10: 00 0=
+0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x20: 00 00 00 00 00 00 00 00=
+ 00 00 00 00 00 00 00 00 0x30: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 =
+00 00 0x40: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x50: 00 00 0=
+0 00 00 00 00 00 00 00 00 00 00 00 00 00 0x60: 00 00 00 00 00 00 00 00 00=
+ 00 00 00 00 00 00 00 0x70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 =
+00 ahci=5Fcmd=5Fdone ahci(0x7fcc4e19b4a0)=5B0=5D: cmd done ahci=5Fport=5F=
+write ahci(0x7fcc4e19b4a0)=5B0=5D: port write =5Breg:PxSERR=5D =40 0x30: =
+0xffffffff ahci=5Fport=5Fwrite ahci(0x7fcc4e19b4a0)=5B0=5D: port write =5B=
+reg:PxIS=5D =40 0x10: 0x00000001 ahci=5Fmem=5Fwrite=5Fhost ahci(0x7fcc4e1=
+9b4a0) write4 =5Breg:IS=5D =40 0x8: 0x0000000000000001 ahci=5Fport=5Fwrit=
+e ahci(0x7fcc4e19b4a0)=5B0=5D: port write =5Breg:PxCI=5D =40 0x38: 0x0000=
+8000 handle=5Fcmd=5Ffis=5Fdump ahci(0x7fcc4e19b4a0)=5B0=5D: =46IS: 0x00: =
+27 80 ef 02 00 00 00 a0 00 00 00 00 00 00 00 00 0x10: 00 00 00 00 00 00 0=
+0 00 00 00 00 00 00 00 00 00 0x20: 00 00 00 00 00 00 00 00 00 00 00 00 00=
+ 00 00 00 0x30: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x40: 00 =
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x50: 00 00 00 00 00 00 00 0=
+0 00 00 00 00 00 00 00 00 0x60: 00 00 00 00 00 00 00 00 00 00 00 00 00 00=
+ 00 00 0x70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ahci=5Fcmd=5F=
+done ahci(0x7fcc4e19b4a0)=5B0=5D: cmd done ahci=5Fport=5Fwrite ahci(0x7fc=
+c4e19b4a0)=5B0=5D: port write =5Breg:PxSERR=5D =40 0x30: 0xffffffff ahci=5F=
+port=5Fwrite ahci(0x7fcc4e19b4a0)=5B0=5D: port write =5Breg:PxIS=5D =40 0=
+x10: 0x00000001 ahci=5Fmem=5Fwrite=5Fhost ahci(0x7fcc4e19b4a0) write4 =5B=
+reg:IS=5D =40 0x8: 0x0000000000000001 ahci=5Fport=5Fwrite ahci(0x7fcc4e19=
+b4a0)=5B0=5D: port write =5Breg:PxCI=5D =40 0x38: 0x00010000 handle=5Fcmd=
+=5Ffis=5Fdump ahci(0x7fcc4e19b4a0)=5B0=5D: =46IS: 0x00: 27 80 ec 00 00 00=
+ 00 a0 00 00 00 00 00 00 00 00 0x10: 00 00 00 00 00 00 00 00 00 00 00 00 =
+00 00 00 00 0x20: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x30: 0=
+0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x40: 00 00 00 00 00 00 00=
+ 00 00 00 00 00 00 00 00 00 0x50: 00 00 00 00 00 00 00 00 00 00 00 00 00 =
+00 00 00 0x60: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0x70: 00 0=
+0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ahci=5Fpopulate=5Fsglist ahci=
+(0x7fcc4e19b4a0)=5B0=5D ahci=5Fdma=5Fprepare=5Fbuf ahci(0x7fcc4e19b4a0)=5B=
+0=5D: prepare buf limit=3D512 prepared=3D512 ahci=5Fstart=5Ftransfer ahci=
+(0x7fcc4e19b4a0)=5B0=5D: reading 512 bytes on ata w/ sglist ahci=5Fcmd=5F=
+done ahci(0x7fcc4e19b4a0)=5B0=5D: cmd done ahci=5Fport=5Fwrite ahci(0x7fc=
+c4e19b4a0)=5B0=5D: port write =5Breg:PxSERR=5D =40 0x30: 0xffffffff ahci=5F=
+port=5Fwrite ahci(0x7fcc4e19b4a0)=5B0=5D: port write =5Breg:PxIS=5D =40 0=
+x10: 0x00000001 ahci=5Fport=5Fwrite ahci(0x7fcc4e19b4a0)=5B0=5D: port wri=
+te =5Breg:PxIS=5D =40 0x10: 0x00000002 ahci=5Fmem=5Fwrite=5Fhost ahci(0x7=
+fcc4e19b4a0) write4 =5Breg:IS=5D =40 0x8: 0x0000000000000001 ------------=
+-------------------------------------------------------------------------=
+---- -- Best regards, Andy Chiu John Snow <jsnow=40redhat.com> =E6=96=BC =
+2019-09-10 02:13 =E5=AF=AB=E9=81=93=EF=BC=9A > > > > On 9/9/19 1:18 PM, a=
+ndychiu via Qemu-devel wrote: > > If Windows 10 guests have enabled 'turn=
+ off hard disk after idle' > > option in power settings, and the guest ha=
+s a SATA disk plugged in, > > the SATA disk will be turned off after a sp=
+ecified idle time. > > If the guest is live migrated or saved/loaded with=
+ its SATA disk > > turned off, the following error will occur: > > > > qe=
+mu-system-x86=5F64: AHCI: =46ailed to start =46IS receive engine: bad =46=
+IS receive buffer address > > qemu-system-x86=5F64: =46ailed to load ich9=
+=5Fahci:ahci > > qemu-system-x86=5F64: error while loading state for inst=
+ance 0x0 of device '0000:00:1a.0/ich9=5Fahci' > > qemu-system-x86=5F64: l=
+oad of migration failed: Operation not permitted > > > > Oof. That can't =
+have been fun to discover. > > > Observation from trace logs shows that a=
+ while after Windows 10 turns off > > a SATA disk (IDE disks don't have t=
+he following behavior), > > it will disable the PCI=5FCOMMAND=5FMASTER fl=
+ag of the pci device containing > > the ahci device. When the the disk is=
+ turning back on, > > the PCI=5FCOMMAND=5FMASTER flag will be restored fi=
+rst. > > But if the guest is migrated or saved/loaded while the disk is o=
+ff, > > the post=5Fload callback of ahci device, ahci=5Fstate=5Fpost=5Flo=
+ad(), will fail > > at ahci=5Fcond=5Fstart=5Fengines() if the MemoryRegio=
+n > > pci=5Fdev->bus=5Fmaster=5Fenable=5Fregion is not enabled, with pci=5F=
+dev pointing > > to the PCIDevice struct containing the ahci device. > > =
+> > This patch enables pci=5Fdev->bus=5Fmaster=5Fenable=5Fregion before c=
+alling > > ahci=5Fcond=5Fstart=5Fengines() in ahci=5Fstate=5Fpost=5Fload(=
+), and restore the > > MemoryRegion to its original state afterwards.> > =
+> This looks good to me from an AHCI perspective, but I'm not as clear on=
+ > the implications of toggling the MemoryRegion, so I have some doubts. =
+> > > MST, can you chime in and clear my confusion=3F > > I suppose when =
+the PCI=5FCOMMAND=5FMASTER bit is turned off, we disable the > memory reg=
+ion, as a guest would be unable to establish a new mapping in > this time=
+, so it makes sense that the attempt to map it fails. > > What's less cle=
+ar to me is what happens to existing mappings when a > region is disabled=
+. Are they invalidated=3F If so, does it make sense that > we are trying =
+to establish a mapping here at all=3F Maybe it's absolutely > correct tha=
+t this fails. > > (I suppose, though, that the simple toggling of the reg=
+ion won't be a > guest-visible event, so it's probably safe to do. Right=3F=
+) > > What I find weird for AHCI is this: We try to engage the CLB mappin=
+g > before the =46IS mapping, but we fail at the =46IS mapping. So why is=
+ > PORT=5FCMD=5F=46IS=5FRX set while PORT=5FCMD=5FSTART is unset=3F > > I=
+t kind of looks like we only half-heartedly stopped the AHCI device. > Ma=
+ybe that's just what Windows does, but I wonder if there's a bug where > =
+we're erroneously leaving PORT=5FCMD=5F=46IS=5FRX set when we've been dis=
+abled. > It seems like the guest would need to re-set the mappings anyway=
+, so > maybe trying to restore a stale mapping is not the right thing to =
+do. > > > > Andy, if you have traces left over: What AHCI registers does =
+Windows > touch when it disables the AHCI device=3F What registers does i=
+t touch > when it re-engages it=3F > > I just want to make sure I'm not l=
+eaving something dangling by accident. > > --js > > > Signed-off-by: andy=
+chiu <andychiu=40synology.com> > > --- > > hw/ide/ahci.c =7C 53 +++++++++=
++++++++++++++++++++++++++++----------------- > > 1 file changed, 36 inser=
+tions(+), 17 deletions(-) > > > > diff --git a/hw/ide/ahci.c b/hw/ide/ahc=
+i.c > > index d45393c..83f8c30 100644 > > --- a/hw/ide/ahci.c > > +++ b/h=
+w/ide/ahci.c > > =40=40 -1649,33 +1649,52 =40=40 static const VMStateDesc=
+ription vmstate=5Fahci=5Fdevice =3D =7B > > =7D, > > =7D; > > > > +static=
+ int ahci=5Fstate=5Fload=5Fengines(AHCIState *s, AHCIDevice *ad) > > +=7B=
+ > > + AHCIPortRegs *pr =3D &ad->port=5Fregs; > > + DeviceState *dev=5Fst=
+ate =3D s->container; > > + PCIDevice *pci=5Fdev =3D (PCIDevice *) object=
+=5Fdynamic=5Fcast(OBJECT(dev=5Fstate), > > + TYPE=5FPCI=5FDEVICE); > > + =
+bool pci=5Fbus=5Fmaster=5Fenabled =3D pci=5Fdev->bus=5Fmaster=5Fenable=5F=
+region.enabled; > > + > > + if (=21(pr->cmd & PORT=5FCMD=5FSTART) && (pr-=
+>cmd & PORT=5FCMD=5FLIST=5FON)) =7B > > + error=5Freport(=22AHCI: DMA eng=
+ine should be off, but status bit =22 > > + =22indicates it is still runn=
+ing.=22); > > + return -1; > > + =7D > > + if (=21(pr->cmd & PORT=5FCMD=5F=
+=46IS=5FRX) && (pr->cmd & PORT=5FCMD=5F=46IS=5FON)) =7B > > + error=5Frep=
+ort(=22AHCI: =46IS RX engine should be off, but status bit =22 > > + =22i=
+ndicates it is still running.=22); > > + return -1; > > + =7D > > + > > +=
+ memory=5Fregion=5Fset=5Fenabled(&pci=5Fdev->bus=5Fmaster=5Fenable=5Fregi=
+on, true); > > + > > + /* > > + * After a migrate, the DMA/=46IS engines =
+are =22off=22 and > > + * need to be conditionally restarted > > + */ > >=
+ + pr->cmd &=3D =7E(PORT=5FCMD=5FLIST=5FON =7C PORT=5FCMD=5F=46IS=5FON); =
+> > + if (ahci=5Fcond=5Fstart=5Fengines(ad) =21=3D 0) =7B > > + return -1=
+; > > + =7D > > + memory=5Fregion=5Fset=5Fenabled(&pci=5Fdev->bus=5Fmaste=
+r=5Fenable=5Fregion, > > + pci=5Fbus=5Fmaster=5Fenabled); > > + > > + ret=
+urn 0; > > +=7D > > + > > static int ahci=5Fstate=5Fpost=5Fload(void *opa=
+que, int version=5Fid) > > =7B > > int i, j; > > struct AHCIDevice *ad; >=
+ > NCQTransferState *ncq=5Ftfs; > > - AHCIPortRegs *pr; > > AHCIState *s =
+=3D opaque; > > > > for (i =3D 0; i < s->ports; i++) =7B > > ad =3D &s->d=
+ev=5Bi=5D; > > - pr =3D &ad->port=5Fregs; > > - > > - if (=21(pr->cmd & P=
+ORT=5FCMD=5FSTART) && (pr->cmd & PORT=5FCMD=5FLIST=5FON)) =7B > > - error=
+=5Freport(=22AHCI: DMA engine should be off, but status bit =22 > > - =22=
+indicates it is still running.=22); > > - return -1; > > - =7D > > - if (=
+=21(pr->cmd & PORT=5FCMD=5F=46IS=5FRX) && (pr->cmd & PORT=5FCMD=5F=46IS=5F=
+ON)) =7B > > - error=5Freport(=22AHCI: =46IS RX engine should be off, but=
+ status bit =22 > > - =22indicates it is still running.=22); > > - return=
+ -1; > > - =7D > > > > - /* After a migrate, the DMA/=46IS engines are =22=
+off=22 and > > - * need to be conditionally restarted */ > > - pr->cmd &=3D=
+ =7E(PORT=5FCMD=5FLIST=5FON =7C PORT=5FCMD=5F=46IS=5FON); > > - if (ahci=5F=
+cond=5Fstart=5Fengines(ad) =21=3D 0) =7B > > + if (ahci=5Fstate=5Fload=5F=
+engines(s, ad)) =7B > > return -1; > > =7D > > > >
