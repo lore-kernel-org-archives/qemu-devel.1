@@ -2,90 +2,91 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CC7AC49ED7
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 17:46:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21230C49ED7
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 17:51:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48F522089F
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 17:46:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48F522089F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E55B721479
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 17:51:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b/MI9kfL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E55B721479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7kDa-0004Cs-GV
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 13:46:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38456)
+	id 1i7kIy-0006O1-SC
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 13:51:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39173)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i7kCq-0003ks-75
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 13:45:33 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i7kHo-0005o2-1S
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 13:50:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i7kCo-0008C6-Rv
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 13:45:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39122)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i7kCo-0008Ao-Gn
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 13:45:30 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8314B315C03B;
- Tue, 10 Sep 2019 17:45:29 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 909B760923;
- Tue, 10 Sep 2019 17:45:23 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190910063724.28470-1-armbru@redhat.com>
- <20190910063724.28470-17-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <59e0ab27-32b2-9199-3f79-827a456eb359@redhat.com>
-Date: Tue, 10 Sep 2019 12:45:21 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i7kHm-0001gT-27
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 13:50:39 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46412)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1i7kHk-0001ee-3P
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 13:50:36 -0400
+Received: by mail-oi1-x242.google.com with SMTP id x7so11841546oie.13
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 10:50:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=Y9TLubNb3Ha2bbz66ftc7rERo3hncbx4M1jAgpexu7s=;
+ b=b/MI9kfLg+TqRuBJ5XLCgG4L/9QpHeJSFwRUtHf8qMKmQFeZOpOsVD2Oq5hlDG12nn
+ XrZ/+SljWwl061gg2CfWbCTwJubYVb4/Ao9vXxTTj727ZCPXIRp5qrSEObm5GW4nyvoM
+ ufJLYUjNn/cS3lgVo8hsmjcxPIDELHCZyK42ZmAsrBs78LcwC/CeVSyqzgUet9MhZr81
+ QKkowcz7jjJBYhJe8hmvQtX+DxU4v73q3O7l02G0htZlDAlvoHnV6CWOJBq90358Mi4G
+ r6Vuh4uYwMUxut9opSnMVIKUlL4NnVFlgHkqiWVpYKax1i0SS3zSRAjO8xQYEChOeWs6
+ Xc6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=Y9TLubNb3Ha2bbz66ftc7rERo3hncbx4M1jAgpexu7s=;
+ b=ZR7Z4ANXh2KehAzFJqGzDefI5w4Q5CyzW2W7U89XbkqUXeNgeLv+Z/BTvbn7MQPR46
+ L4iyjea8xEtfteF/WCDrxbcbhzzZJcSPsJuCCKBZVCfP343y6hoWvocaycCbaX3i6Ns9
+ seWydyC/Byd+7sxCjr/nkXBtaL6jkteEXgg8v0n+lSBdv7TSaC/NeiNlsmyX2XGa8Nns
+ 590qpHqgm807dEOFXZj5yJbBbx8RapopdTwhyNAXO+sOEGW5y6iu7dgl81vt88gKMGzQ
+ 5ApAJ0N47AHnrGEb+KMKvie6ZO4UMO7XUqPgzawPeATPdBCHvhwJdxOpkkvpWWyuvX2d
+ 7m1A==
+X-Gm-Message-State: APjAAAWi3YhoZOTUScjlPVlscO++hKZfl6kVdSIJoRnJrBFy2JALVmEr
+ 0YrQw39Udf4H7vPK8ez/m2M04WRvny5RRHd+r4M=
+X-Google-Smtp-Source: APXvYqx8hC9+Y66zA3B9GQwVYVahENCx6IUEQeZYIQN8y/B5svgX3QaJT1fqzPmSl+pLoPzx8/yQP/isYPNXaIiO6Co=
+X-Received: by 2002:a05:6808:7:: with SMTP id u7mr681370oic.136.1568137835051; 
+ Tue, 10 Sep 2019 10:50:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190910063724.28470-17-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="41wTCv5J8ZevfTeHTl4psajujiXTaI6zH"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Tue, 10 Sep 2019 17:45:29 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 16/16] qapi: Tweak code to match
- docs/devel/qapi-code-gen.txt
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Tue, 10 Sep 2019 10:50:33
+ -0700 (PDT)
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Tue, 10 Sep 2019 10:50:33
+ -0700 (PDT)
+In-Reply-To: <CAL1e-=gpYhsrhb1B8UPNhd-uTo-B60jtdxEZSFTauS_+HYee9w@mail.gmail.com>
+References: <tencent_3156C5EA2695B7CD53C6114C@qq.com>
+ <CAL1e-=hWOXgnTbC0Y2v_CMZOMmQLgdToBAsi+XaW7+9uyN55CA@mail.gmail.com>
+ <tencent_23ACCA1A48AFB09124C52E70@qq.com> <87blvy99y9.fsf@linaro.org>
+ <tencent_541F04AB1A100DF25C334D8C@qq.com> <87zhjh7pf0.fsf@linaro.org>
+ <tencent_479D109A5BEC536D64AE43BF@qq.com>
+ <CAL1e-=gpYhsrhb1B8UPNhd-uTo-B60jtdxEZSFTauS_+HYee9w@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 10 Sep 2019 19:50:33 +0200
+Message-ID: <CAL1e-=jb5qrtikifPoqUdc0_rgqXPfnUMMhafmXXw62x+ANu1Q@mail.gmail.com>
+To: Libo Zhou <zhlb29@foxmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,67 +98,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---41wTCv5J8ZevfTeHTl4psajujiXTaI6zH
-Content-Type: multipart/mixed; boundary="jTMNXXDmjQZdAFl9l0rdIJtH1jTP7SZNI";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <59e0ab27-32b2-9199-3f79-827a456eb359@redhat.com>
-Subject: Re: [PATCH v2 16/16] qapi: Tweak code to match
- docs/devel/qapi-code-gen.txt
-References: <20190910063724.28470-1-armbru@redhat.com>
- <20190910063724.28470-17-armbru@redhat.com>
-In-Reply-To: <20190910063724.28470-17-armbru@redhat.com>
+10.09.2019. 19.26, aleksandar.m.mail@gmail.com =D1=98=D0=B5 =D0=BD=D0=B0=D0=
+=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+>
+> 10.09.2019. 11.57, "Libo Zhou" <zhlb29@foxmail.com> =D1=98=D0=B5 =D0=BD=
+=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> >
+> > Hi Alex,
+> >
+> > gdb says remote 'g' packet reply is too long, and then prints out a
+long string of zeros and some other digits sparsely.
+> >
+> > I have tried a lot of combinations of flags but I just can't get it
+running properly. Do you know what is causing this error?
+> >
+>
+> This is a known bug, actually in gdb, but there is a workaround is to
+rollback a commit made  around a year ago in QEMU, about 64-bit FPU Mips
+registers.
 
---jTMNXXDmjQZdAFl9l0rdIJtH1jTP7SZNI
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+More previsely, reverting
+https://github.com/qemu/qemu/commit/8e0b373f8aa4b9feec7b44029455587e2e3d2b0=
+f
+would most likely rrmove your problem.
 
-On 9/10/19 1:37 AM, Markus Armbruster wrote:
-> The previous commit made qapi-code-gen.txt define "(top-level)
-> expression" as either "directive" or "definition".  The code still
-> uses "expression" when it really means "definition".  Tidy up.
->=20
-> The previous commit made qapi-code-gen.txt use "object" rather than
-> "dictionary".  The code still uses "dictionary".  Tidy up.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
+Aleksandar
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---jTMNXXDmjQZdAFl9l0rdIJtH1jTP7SZNI--
-
---41wTCv5J8ZevfTeHTl4psajujiXTaI6zH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl134TEACgkQp6FrSiUn
-Q2pFxAgApzjuJx8llC10OTq6SDywKUgUmisqhmGUEsrakb9YPZbd3Bg5QeLuDF3O
-2YddXjwyDlsyenlkEtc3moq2lgi68RoyHDxs6XN/gYf/06BhUSM8EuQFqHwSRD0b
-NzIt8+C4zPwoxcQ4OxDjezbWL11sOpwx9Gqco/JWhEezGC0ZA2cADkWzFQRd6dTO
-/cUDKc+U1wk2lC3M3WVK2n9BQxNCnq9ACislYSBpnKB1bEg+ALuuRQbkpMPZvUM1
-sCmJcbZNoV1v9qYG2Pub5VhWZtB1ngLRaSGFl6YSc+whWs++itBR8yOLAX9Sep0n
-rUAxT5FOIl287/lH1ykzvnnRLTMg1A==
-=vLD4
------END PGP SIGNATURE-----
-
---41wTCv5J8ZevfTeHTl4psajujiXTaI6zH--
-
+> Or you can fix the buffer size in gdb.
+>
+> Aleksandar
+>
+> > Cheers,
+> > Libo
+> >
+> >
+> > ------------------ Original ------------------
+> > From:  "Alex Benn=C3=A9e";<alex.bennee@linaro.org>;
+> > Send time: Friday, Sep 6, 2019 5:19 PM
+> > To: "Libo Zhou"<zhlb29@foxmail.com>;
+> > Cc: "qemu-devel"<qemu-devel@nongnu.org>; "Aleksandar Markovic"<
+aleksandar.m.mail@gmail.com>;
+> > Subject:  Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
+> >
+> >
+> > Libo Zhou <zhlb29@foxmail.com> writes:
+> >
+> > > Hi Alex,
+> > >
+> > >
+> > > I just need to log the registers and memory after the program finishe=
+s
+> > > its execution. Is it possible to add this functionality myself?
+> >
+> > You'll need to set some sort of breakpoint on the last instruction so
+> > gdb can inspect things before the program is unloaded. I think it's
+> > possible to wire poweroff events to the gdbstub but I haven't looked
+> > into that myself.
+> >
+> > > As for the GDB option, can you tell me the specific steps to do that?
+I've tried it myself but I had no luck getting it running due to me being
+new to all this.
+> > >
+> >
+> > For linux-user:
+> >
+> >   $QEMU -g 1234 $PRG
+> >
+> > for system emulation
+> >
+> >   $QEMU -s -S
+> >
+> > and then on the gdb end:
+> >
+> >   gdb $BIN -ex "target remote localhost:1234"
+> >
+> > and then you can operate as you normally do with a gdb session. GDB has
+> > two scripting interfaces. The command mode is basically a list of gdb
+> > commands but might work for what you want. If you want to be a bit more
+> > programatic you can use python. See the example in
+> > tests/guest-debug/test-gdbstub.py
+> >
+> > >
+> > > Thanks,
+> > > Libo
+> > >
+> > >
+> > >
+> > > ------------------ Original ------------------
+> > > From:  "Alex Benn=C3=A9e";<alex.bennee@linaro.org>;
+> > > Send time: Thursday, Sep 5, 2019 8:58 PM
+> > > To: "qemu-devel"<qemu-devel@nongnu.org>;
+> > > Cc: "Aleksandar Markovic"<aleksandar.m.mail@gmail.com>;
+> > > Subject:  Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
+> > >
+> > >
+> > >
+> > >
+> > > Libo Zhou <zhlb29@foxmail.com> writes:
+> > >
+> > >> Do you know where in the source file I should look into to add my
+custom logging functionality?
+> > >>
+> > >>
+> > >> Or, would you suggest using gdb to look at my target register and
+memory contents? The answer in this link below looks really promising. I'm
+gonna give it a try first.
+> > >>
+> > >>
+https://stackoverflow.com/questions/39503997/how-to-run-a-single-line-of-as=
+sembly-then-see-r1-and-condition-flags
+> > >
+> > > The gdbstub should allow you do full introspection and adding
+> > > additional registers is fairly easy, see FOO_gdb_[set|get]_reg helper=
+s
+> > > in the appropriate target/FOO directories.
+> > >
+> > >> However, if I am able to customize log, it will be super convenient.
+> > >
+> > > So you want something above what -d cpu will show you?
+> > >
+> > >>
+> > >>
+> > >>
+> > >> Cheers,
+> > >>
+> > >> Libo
+> > >>
+> > >>
+> > >>
+> > >> ------------------ Original ------------------
+> > >> From:  "Aleksandar Markovic";<aleksandar.m.mail@gmail.com>;
+> > >> Send time: Thursday, Sep 5, 2019 6:54 PM
+> > >> To: "Libo Zhou"<zhlb29@foxmail.com>;
+> > >> Cc: "qemu-devel"<qemu-devel@nongnu.org>;
+> > >> Subject:  Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
+> > >>
+> > >>
+> > >>
+> > >> 04.09.2019. 05.23, "Libo Zhou" <zhlb29@foxmail.com> ?=D0=B5 =D0=BD=
+=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> > >>>
+> > >>> Hi Aleksandar,
+> > >>>
+> > >>> I have spent some time looking at your MXU ASE patch. It's super
+helpful.
+> > >> I need to do exactly the same thing as you did.
+> > >>>
+> > >>> Now I just need a way to observe the memory and register file
+contents to
+> > >> debug my instruction set simulator. I played with the "-d" switch to
+log a
+> > >> bunch of information, but it seems that none of the items is of my
+> > >> interest. The "-d cpu_reset" option displays all zeros in the GPR
+log.
+> > >>>
+> > >>
+> > >> It looks you need a custom logging tailored to your needs, based on
+> > >> intercepting the instructions you added.
+> > >>
+> > >> Aleksandar
+> > >>
+> > >>> Please take your time, as I fully understand you need to work on
+Qemu
+> > >> while answering all my questions. Again, thank you very much for
+your help!
+> > >>>
+> > >>> Cheers,
+> > >>> Libo
+> > >>>
+> >
+> >
+> > --
+> > Alex Benn=C3=A9e
