@@ -2,65 +2,91 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD856C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:17:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DC8BC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:29:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9203A20872
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:17:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9203A20872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 56CA521019
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:29:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PCeSwCOA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56CA521019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7e9F-0001Gg-If
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 07:17:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43108)
+	id 1i7eLD-0004qs-80
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 07:29:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45027)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1i7e7W-0000QX-WA
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:15:40 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i7eJY-00044O-0d
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:28:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1i7e7V-0002Be-SV
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:15:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56982)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1i7e7S-000293-Ly; Tue, 10 Sep 2019 07:15:34 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 949A2305AB79;
- Tue, 10 Sep 2019 11:15:33 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-217.ams2.redhat.com
- [10.36.116.217])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D01DC10018F9;
- Tue, 10 Sep 2019 11:15:31 +0000 (UTC)
-Date: Tue, 10 Sep 2019 13:15:30 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Peter Lieven <pl@kamp.de>
-Message-ID: <20190910111530.GD4446@localhost.localdomain>
-References: <20190903133524.11755-1-pl@kamp.de>
- <20190904140949.GC21246@localhost.localdomain>
- <e3964790-286f-5e65-01c7-c71c74c23475@kamp.de>
+ (envelope-from <alex.bennee@linaro.org>) id 1i7eJW-0000XP-Jf
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:28:03 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36391)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i7eJW-0000Wu-CT
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:28:02 -0400
+Received: by mail-wr1-x444.google.com with SMTP id y19so19450125wrd.3
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 04:28:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=va2J7d90/68j2HG7sQVQ3Naqfze7q2xKSEznsg8fv8U=;
+ b=PCeSwCOAOXvpf+ot2HWymsZs56AxCDieOfKciz/fyWnW0tUAGdl/x804Y6zNDgFZ8K
+ j80BZJY9caiS18XqVK1tcyG5OkPdPzPh8TtOsdYGMvwJRuTTgwOphf0Wnlq77eyC8TfC
+ TjrQUbxIjYqHuKrcItyL+Gqu10t6Zc9KTAoYXtqhvWBg2uHa9biwlyRfzyJnjLmLV8Mj
+ SGmuPoUcL2H4PZlU4qAE6KFHGOlLVvuMFe+o/00New7y6+Cp5cdP9nvC56K+huX/U6Wj
+ T0ZkWhfeX6CP1rjq69g3Bg074g3G5Pkk6/bMdCSBE06783eergoP0N7JuHBZDlr7aVbs
+ NghA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=va2J7d90/68j2HG7sQVQ3Naqfze7q2xKSEznsg8fv8U=;
+ b=bPeGIkZtKWwn9/CaLsGqt81T7QgnTiM8j5GfdAilftv1Ezn0ADhocU1I02xwBOr1BB
+ HDUmSwBum53xJhog+5bmK9Xi6szUCwl//XeS3z3VZgh2mGGdPcYuanrWiH/s2I5zakSL
+ i8iEhAY/8ItMAtduQlQtw1+Db3fdm+wMx57PdCK1gtTVgpeKNLE0a/8820xNMyeAXnUz
+ z/Md+m6rPXFL0xuZiLkNAUHyN92qLodHIOh+gjte3H7KodP5/sIYDap45XkwC7JTCizd
+ drix7tMnnBRd/YrY72R+jad9m9vNQ8eH4x2TivZdZvZUt0r71p1Yz7dLB+sUmHPdnnN1
+ QjWA==
+X-Gm-Message-State: APjAAAWsQrjvoHnX5/leakzXGyvVHjCNV3cp0cSqBvJv7Ebc2Rrp4IPB
+ /UPjY7qlwAigHI2DQsM724iQ4Q==
+X-Google-Smtp-Source: APXvYqzrpqRMXo0qIC84KzuXGi40hL57KtOiMiHW6UnOu+1zpdQ85LdT4RWLWfe+aFlq2IJIZjsq7g==
+X-Received: by 2002:adf:ed43:: with SMTP id u3mr18563396wro.37.1568114880816; 
+ Tue, 10 Sep 2019 04:28:00 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id y72sm3110242wmc.26.2019.09.10.04.28.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 10 Sep 2019 04:28:00 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 6B3781FF87;
+ Tue, 10 Sep 2019 12:27:59 +0100 (BST)
+References: <20190910084349.28817-1-alex.bennee@linaro.org>
+ <CAFEAcA_rB21=KXr_kJinkeDa0i3=LAhAYDg50YQC_7v07TKXjA@mail.gmail.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+In-reply-to: <CAFEAcA_rB21=KXr_kJinkeDa0i3=LAhAYDg50YQC_7v07TKXjA@mail.gmail.com>
+Date: Tue, 10 Sep 2019 12:27:59 +0100
+Message-ID: <87lfuw1jcw.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e3964790-286f-5e65-01c7-c71c74c23475@kamp.de>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Tue, 10 Sep 2019 11:15:33 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH V3] block/vhdx: add check for truncated
- image files
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PULL 00/45] testing updates (fixes, upgrades,
+ caching)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,83 +98,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: codyprime@gmail.com, mreitz@redhat.com, jhf@kamp.de, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 05.09.2019 um 12:02 hat Peter Lieven geschrieben:
-> Am 04.09.19 um 16:09 schrieb Kevin Wolf:
-> > Am 03.09.2019 um 15:35 hat Peter Lieven geschrieben:
-> > > qemu is currently not able to detect truncated vhdx image files.
-> > > Add a basic check if all allocated blocks are reachable at open and
-> > > report all errors during bdrv_co_check.
-> > > 
-> > > Signed-off-by: Peter Lieven <pl@kamp.de>
-> > > ---
-> > > V3: - check for bdrv_getlength failure [Kevin]
-> > >      - use uint32_t for i [Kevin]
-> > >      - check for BAT entry overflow [Kevin]
-> > >      - break on !errcnt in second check
-> > > 
-> > > V2: - add error reporting [Kevin]
-> > >      - use bdrv_getlength instead of bdrv_get_allocated_file_size [Kevin]
-> > >      - factor out BAT entry check and add error reporting for region
-> > >        overlaps
-> > >      - already check on vhdx_open
-> > Something still seems to be wrong with this patch:
-> > 
-> >      213      fail       [15:50:13] [15:50:14]      (last: 2s)    output mismatch (see 213.out.bad)
-> >      --- /home/kwolf/source/qemu/tests/qemu-iotests/213.out  2019-06-28 14:19:50.065797707 +0200
-> >      +++ /home/kwolf/source/qemu/tests/qemu-iotests/213.out.bad      2019-09-04 15:50:14.582053976 +0200
-> >      @@ -46,10 +46,8 @@
-> >       {"execute": "job-dismiss", "arguments": {"id": "job0"}}
-> >       {"return": {}}
-> > 
-> >      -image: TEST_IMG
-> >      -file format: IMGFMT
-> >      -virtual size: 32 MiB (33554432 bytes)
-> >      -cluster_size: 268435456
-> >      +qemu-img: VHDX BAT entry 0 offset points after end of file. Image has probably been truncated.
-> >      +qemu-img: Could not open 'TEST_IMG': Could not open 'TEST_IMG': Invalid argument
-> > 
-> >       === Invalid BlockdevRef ===
-> > 
-> > I can reproduce this manually with the following qemu-img invocations.
-> > It seems all three options must be given to reproduce the error:
-> > 
-> >      $ ./qemu-img create -f vhdx -o block_size=268435456,subformat=fixed,block_state_zero=off /tmp/test.vhdx 32M
-> >      Formatting '/tmp/test.vhdx', fmt=vhdx size=33554432 log_size=1048576 block_size=268435456 subformat=fixed block_state_zero=off
-> >      $ ./qemu-img info /tmp/test.vhdx
-> >      qemu-img: VHDX BAT entry 0 offset points after end of file. Image has probably been truncated.
-> >      qemu-img: Could not open '/tmp/test.vhdx': Could not open '/tmp/test.vhdx': Invalid argument
-> > 
-> > If I add the offsets to the error message (would probably nice to have),
-> > I get:
-> > 
-> >      qemu-img: VHDX BAT entry 0 offset 8388608 points after end of file (41943040). Image has probably been truncated.
-> > 
-> > So it seems that the file is large enough to hold 32M + metadata, but we
-> > don't increase the file size to hold a full block (256M). Is this a
-> > problem in the way we create images or are partial blocks at the end
-> > expected?
-> > 
-> > Kevin
-> 
-> 
-> A short look into the VHDX spec [1] seems to suggest that a VHDX File
-> can only grow in Block increments.
-> 
-> See page 8 in the definition of blocks: "Allocation of new space for a
-> virtual hard disk that supports dynamic growth of the virtual hard
-> disk file is done in fixes size units defined as blocks."
 
-Then I guess we need to fix the creation of VHDX images before we can
-apply this patch because otherwise qemu-iotests fails.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Hm... And probably ignore the error for a partial final block anyway to
-maintain compatibility with images created by older QEMU versions.
+> On Tue, 10 Sep 2019 at 09:43, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>>
+>> The following changes since commit 89ea03a7dc83ca36b670ba7f787802791fcb0=
+4b1:
+>>
+>>   Merge remote-tracking branch 'remotes/huth-gitlab/tags/m68k-pull-2019-=
+09-07' into staging (2019-09-09 09:48:34 +0100)
+>>
+>> are available in the Git repository at:
+>>
+>>   https://github.com/stsquad/qemu.git tags/pull-testing-next-100919-1
+>>
+>> for you to fetch changes up to 4cf22bac5b22a36adf23dc9ec4628c66bbc6f209:
+>>
+>>   travis.yml: Install libcap-dev for testing virito-9p (2019-09-10 09:39=
+:09 +0100)
+>>
+>> ----------------------------------------------------------------
+>> Testing fixes:
+>>
+>>   - podman cleanups
+>>   - docker.py python3 fixes (encode)
+>>   - DEF_TARGET_LIST applied to cross build images
+>>   - move a bunch to Buster based images
+>>   - enable Travis caching
+>>   - more common objs for faster builds
+>>   - stable URLs for acceptance tests
+>>   - additional travis dependencies
+>
+> Hi; this seems to break 'check-tcg' (for a linux-user static config):
+>
+> [...]
+>   CHECK   debian-ppc64-cross
+>   BUILD   ppc64-linux-user guest-tests with docker qemu:debian-ppc64-cross
+>   RUN     tests for ppc64
+>   TEST    test-mmap (default) on ppc64
+>   TEST    sha1 on ppc64
+>   TEST    linux-test on ppc64
+>   TEST    testthread on ppc64
+>   BUILD   TCG tests for ppc64abi32-linux-user
+>   BUILD   ppc64abi32-linux-user guest-tests with powerpc-linux-gnu-gcc
+>   RUN     TCG tests for ppc64abi32-linux-user
+>   BUILD   ppc64abi32-linux-user guest-tests with powerpc-linux-gnu-gcc
+>   RUN     tests for ppc64abi32
+>   TEST    test-mmap (default) on ppc64abi32
+>   TEST    sha1 on ppc64abi32
+>   TEST    linux-test on ppc64abi32
+> qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+> timeout: the monitored command dumped core
+> Segmentation fault
+> ../Makefile.target:116: recipe for target 'run-linux-test' failed
 
-Kevin
+What host are you running on? Mine doesn't run because it has no way of
+building those tests.
+
+>
+>
+> thanks
+> -- PMM
+
+
+--
+Alex Benn=C3=A9e
 
