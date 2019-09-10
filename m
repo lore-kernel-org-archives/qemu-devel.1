@@ -2,91 +2,117 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB3BBC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 08:21:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E6CC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 08:21:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A65D7206A5
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 08:21:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ahvIxUjQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A65D7206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 016F821D6C
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 08:21:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 016F821D6C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7bOX-00039i-Ry
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 04:21:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58770)
+	id 1i7bOx-0003mt-3c
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 04:21:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58918)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1i7bNW-0002Ea-NV
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:19:59 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i7bO3-0002sQ-TR
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:20:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1i7bNV-0004C6-AL
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:19:58 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36506)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>)
- id 1i7bNV-0004Bu-3R; Tue, 10 Sep 2019 04:19:57 -0400
-Received: by mail-wr1-x443.google.com with SMTP id y19so18230410wrd.3;
- Tue, 10 Sep 2019 01:19:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=/28G+p51mLKZR9gae3F5XQ0gmepee57ZX1/hR4W/fNU=;
- b=ahvIxUjQbTZU1j7V7/IIxSOfNtHpDQEumh4TaUCSjz5B1k4eUya5MQ2OQ6xUX+70Xn
- JLAHK5PUN3cuEkP4pPgvheqi89ckUDwj9gHiGZithmKJ0n7IjRN5DYDOu1aT3LURod+y
- 9J0VPsk3Yd0vDHBGMHvUnl09YBeMZDwupeEB4RP6MkoJGO3M7jNdrN3ZvU4tCbChENIJ
- qS9fAXokltwF0XHQmDUEWQqn+l3WvkxS1+KTNT1uxmD+Wgp4BSyg4HSlRJV320zqntkJ
- rQHZdm7g9UdCc7no5h8vR+DQScPTewazYjCz/44SJ8G3VySDmXp2L54IDwNLSVXz1b1i
- lq+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=/28G+p51mLKZR9gae3F5XQ0gmepee57ZX1/hR4W/fNU=;
- b=Go73LsiS6APGnS9z7w3OzYYIKiZMK8/9hoKNN8ui+dA1y2WngdQYDwVKU5ECPboDCQ
- 6u8kmthdEIhM5urzKHoVkKwOsw1wcrc8N2kiBv2D5pS8H5wawe8WwW0ARMNg6D51iqxh
- 2C1LbcG19XVUQ9e4k1xVw4PjN+tUYF6Mp5KVpfXqxR3H2YAnQIMOcynVdnHZVMO0jPjE
- d1St53iP4V62HWQnsPJQhWlO1UyTngVjMcmXHP5yjIU8b3KfEGo3uBmDJHlYeLrNqUB9
- 5/q/G3g7HNWJTRpy+o4Ark/+gaIYkf7CVb8Iv2vGWGYD/A2Z7j1gUZc5geqzwkSxaUJU
- Ya/g==
-X-Gm-Message-State: APjAAAVzUCrZxPj7zeBISQn47NQ89/6CbgIiBZ7ixbpPZqhQ5Bq2oIcT
- FOD9yFUlrSI31eiFPjtfX7w=
-X-Google-Smtp-Source: APXvYqy9to5FezD/ZvEKG7cwcHlttujeOTLy+0JGHk65JUKwMfauEUQ17NLPv3yE048Q8AEzIWHtwA==
-X-Received: by 2002:adf:ec48:: with SMTP id w8mr23707286wrn.198.1568103595613; 
- Tue, 10 Sep 2019 01:19:55 -0700 (PDT)
-Received: from localhost (178.115.129.86.wireless.dyn.drei.com.
- [178.115.129.86])
- by smtp.gmail.com with ESMTPSA id f197sm1987695wme.22.2019.09.10.01.19.54
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Sep 2019 01:19:54 -0700 (PDT)
-Date: Tue, 10 Sep 2019 10:19:42 +0200
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: John Snow <jsnow@redhat.com>
-Message-ID: <20190910081942.GA23976@stefanha-x1.localdomain>
-References: <20190809201333.29033-1-jsnow@redhat.com>
- <b85698e6-cd79-a9c5-554c-c92487060280@virtuozzo.com>
- <154bc276-d782-443f-3db6-38d87992d609@redhat.com>
+ (envelope-from <laurent@vivier.eu>) id 1i7bO2-0004RB-UA
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:20:31 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:40149)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i7bO2-0004Q9-LZ
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:20:30 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MlfCk-1iXckK3lCM-00ikc4; Tue, 10 Sep 2019 10:20:27 +0200
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>
+References: <20190822185929.16891-1-richard.henderson@linaro.org>
+ <CAFEAcA9=kx70rzbM_o98s-LEMcq2CRH5zwDPq4LForzyCAvoMg@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Openpgp: preference=signencrypt
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <b14721f8-8db1-f537-6d1c-abae7c18d786@vivier.eu>
+Date: Tue, 10 Sep 2019 10:19:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="a8Wt8u1KmwUX3Y2C"
-Content-Disposition: inline
-In-Reply-To: <154bc276-d782-443f-3db6-38d87992d609@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/backup: install
- notifier during creation
+In-Reply-To: <CAFEAcA9=kx70rzbM_o98s-LEMcq2CRH5zwDPq4LForzyCAvoMg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:SLl+yhPZVqkT2ta0Gn/djcFgbdXAVG7DWeJInoX06beTm4G3Sxu
+ 4HAxOH8T3OUmOELLEhpYDmkZ3+h4/SQ8w2XevQcVnFeR+jTQgg+P9d9lgejrUjJgKPsnKkm
+ 93NObHWnuJQ8w9zhUbMCESDOaBIylKv/7CXcd/3+IWs2ISzCumIyU5DFuKF1NFvBcqVyk3M
+ Af+cbIUEE3Nwfayper1Ow==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:zjMcN3PvFwY=:m7Z8I05dy0rYgK4AWjA3jf
+ 7K/zncD/d6ztQ07C5YS7tQ0DvRO8QOsbUJSwZMoUYPDwAosXv4mnzT7LxPPR5bulj0PavTJVr
+ 4XypbVVP1vhf+butKYJ0TtLioPTxp6/1E/RsFpcmIy5rRSv3BB39mKz1uojB2+QzgagkOYrdT
+ iPycfrtkIKv/oDr+IogwEqwnLoEMH+RIyQpPBKTS7YD7igGqo9JOy+JYj71Bz100Zu8+Zt3gX
+ 0CdwNCFBlZV0bWWdIV/EqJ7FJC9sw2HGeaM8GZAOtr+B5tC0/y2fKauSc7D/ky/Nl9+EBR6dM
+ qJgidWv3HKp7gujB1BOOb/18mXJn+/x6NlxqQ8ra0K67lApP/zTiE9xd31wzORMUB+fQ6yR4E
+ atdt8K1U+Y46MqAtgZf9SDXSu6cVX3Tgp+RzvgO7bcf85YGdsNXIcJV3dauW/barnpBqACAap
+ tRt0+f72guWtyD33wllUTALQkNMhi2nydPQRyrn0ymY2U8j6D7q4rTtLKYMynErBHJu3qwTNu
+ fYBzZDShpxAhXchNeacAKc9yKdPRl2SgGWURdQDWK8KOt7BNnVid+y0c7JGjtewa0GX8od+CY
+ j14LWf8YgZtKg/1W4lq1SzJt/vHiVnqcLwYVsLsEA8weA3aKvicieRoSulSKjLdWxCc3sif7C
+ HNPH0fJp5DBNavZxchW2Z5ci2uaSbzfduiiDfoMxwI9pmqk2q+X/h1NmQ6j8ncRh2vJhkXJCe
+ rq/a2Vo479TBpsZdXETvVXXmpOAmQC0B/olDL6aCjEd4JVHe4OH5GnfBvgBPcoBF9sY0Knbrp
+ Y/PEqmi277cc7PhEoxw1ufXRuOXmLkSp7SHxpT7Y2PAMoUiZrE=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.133
+Subject: Re: [Qemu-devel] [PATCH 0/2] linux-user/arm: Adjust MAX_RESERVED_VA
+ for M-profile
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,143 +124,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Le 03/09/2019 à 15:35, Peter Maydell a écrit :
+> On Thu, 22 Aug 2019 at 19:59, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> This is inspired by the discussion in
+>>
+>>    https://bugs.launchpad.net/qemu/+bug/1840922
+>>
+>> Previously I suggested a new CPUClass hook, but when I went
+>> to implement that seemed like overkill.
+>>
+>>
+>> r~
+>>
+>>
+>> Richard Henderson (2):
+>>   linux-user: Pass CPUState to MAX_RESERVED_VA
+>>   linux-user/arm: Adjust MAX_RESERVED_VA for M-profile
+>>
+> 
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
---a8Wt8u1KmwUX3Y2C
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Both applied to my linux-user branch.
 
-On Wed, Aug 21, 2019 at 04:01:52PM -0400, John Snow wrote:
->=20
->=20
-> On 8/21/19 10:41 AM, Vladimir Sementsov-Ogievskiy wrote:
-> > 09.08.2019 23:13, John Snow wrote:
-> >> Backup jobs may yield prior to installing their handler, because of the
-> >> job_co_entry shim which guarantees that a job won't begin work until
-> >> we are ready to start an entire transaction.
-> >>
-> >> Unfortunately, this makes proving correctness about transactional
-> >> points-in-time for backup hard to reason about. Make it explicitly cle=
-ar
-> >> by moving the handler registration to creation time, and changing the
-> >> write notifier to a no-op until the job is started.
-> >>
-> >> Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> >> Signed-off-by: John Snow <jsnow@redhat.com>
-> >> ---
-> >>   block/backup.c     | 32 +++++++++++++++++++++++---------
-> >>   include/qemu/job.h |  5 +++++
-> >>   job.c              |  2 +-
-> >>   3 files changed, 29 insertions(+), 10 deletions(-)
-> >>
-> >> diff --git a/block/backup.c b/block/backup.c
-> >> index 07d751aea4..4df5b95415 100644
-> >> --- a/block/backup.c
-> >> +++ b/block/backup.c
-> >> @@ -344,6 +344,13 @@ static int coroutine_fn backup_before_write_notif=
-y(
-> >>       assert(QEMU_IS_ALIGNED(req->offset, BDRV_SECTOR_SIZE));
-> >>       assert(QEMU_IS_ALIGNED(req->bytes, BDRV_SECTOR_SIZE));
-> >>  =20
-> >> +    /* The handler is installed at creation time; the actual point-in=
--time
-> >> +     * starts at job_start(). Transactions guarantee those two points=
- are
-> >> +     * the same point in time. */
-> >> +    if (!job_started(&job->common.job)) {
-> >> +        return 0;
-> >> +    }
-> >=20
-> > Hmm, sorry if it is a stupid question, I'm not good in multiprocessing =
-and in
-> > Qemu iothreads..
-> >=20
-> > job_started just reads job->co. If bs runs in iothread, and therefore w=
-rite-notifier
-> > is in iothread, when job_start is called from main thread.. Is it guara=
-nteed that
-> > write-notifier will see job->co variable change early enough to not mis=
-s guest write?
-> > Should not job->co be volatile for example or something like this?
-> >=20
-> > If not think about this patch looks good for me.
-> >=20
->=20
-> You know, it's a really good question.
-> So good, in fact, that I have no idea.
->=20
-> =C2=AF\_(=E3=83=84)_/=C2=AF
->=20
-> I'm fairly certain that IO will not come in until the .clean phase of a
-> qmp_transaction, because bdrv_drained_begin(bs) is called during
-> .prepare, and we activate the handler (by starting the job) in .commit.
-> We do not end the drained section until .clean.
->=20
-> I'm not fully clear on what threading guarantees we have otherwise,
-> though; is it possible that "Thread A" would somehow lift the bdrv_drain
-> on an IO thread ("Thread B") and, after that, "Thread B" would somehow
-> still be able to see an outdated version of job->co that was set by
-> "Thread A"?
->=20
-> I doubt it; but I can't prove it.
+Thanks,
+Laurent
 
-In the qmp_backup() case (not qmp_transaction()) there is:
-
-  void qmp_drive_backup(DriveBackup *arg, Error **errp)
-  {
-
-      BlockJob *job;
-      job =3D do_drive_backup(arg, NULL, errp);
-      if (job) {
-          job_start(&job->job);
-      }
-  }
-
-job_start() is called without any thread synchronization, which is
-usually fine because the coroutine doesn't run until job_start() calls
-aio_co_enter().
-
-Now that the before write notifier has been installed early, there is
-indeed a race between job_start() and the write notifier accessing
-job->co from an IOThread.
-
-The write before notifier might see job->co !=3D NULL before job_start()
-has finished.  This could lead to issues if job_*() APIs are invoked by
-the write notifier and access an in-between job state.
-
-A safer approach is to set a BackupBlockJob variable at the beginning of
-backup_run() and check it from the before write notifier.
-
-That said, I don't understand the benefit of this patch and IMO it makes
-the code harder to understand because now we need to think about the
-created but not started state too.
-
-Stefan
-
---a8Wt8u1KmwUX3Y2C
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl13XJ4ACgkQnKSrs4Gr
-c8h8qAf/WcJ2LxH4yw/oZrL87UHNfxFXYtL1mmnYjWUZrCxNJZamEYJ5ziSR7IzH
-Qui8G7If6PbNsyGS5aBevMA9Pftj6BIBiNvXfbSFnKOgVajemboM4u0mV3pNtmAF
-DT/m+JiBY5kpo/BrmBK+A1WDbW/ef39vvMiLUBsRs6NukeUN9Lg8xInXqSBhl5Zr
-Fru19lfuu9iLHkNfgOzKWePLqdLvXL6gmlIv93hoK78nS5jwY2ZQ3nlWnEfUC7If
-rqZZjPUDxjz4qnywylGBsJiUUyM5MRu8a9gN0Ue690pH2D+f+B6VfTrjCmysJwNZ
-frOyQuwZDvvzvDhZkygJ5iRKmHOIiA==
-=haRb
------END PGP SIGNATURE-----
-
---a8Wt8u1KmwUX3Y2C--
 
