@@ -2,66 +2,63 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B5CAC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:04:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EB8FC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:05:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D6AB20692
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:04:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D6AB20692
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4486520692
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:05:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4486520692
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7dwQ-0000XN-Vo
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 07:04:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40813)
+	id 1i7dxG-0001Au-9q
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 07:05:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40896)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1i7dtd-0007vP-0B
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:01:17 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i7dtv-000810-QJ
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:01:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1i7dtb-0004MY-KF
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:01:16 -0400
-Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:43532)
+ (envelope-from <mlevitsk@redhat.com>) id 1i7dtu-0004YB-IH
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:01:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54850)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i7dtX-0004Jq-0J
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:01:15 -0400
-Received: from player774.ha.ovh.net (unknown [10.108.54.72])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id 9E5421ABA05
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 13:01:05 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
- (Authenticated sender: clg@kaod.org)
- by player774.ha.ovh.net (Postfix) with ESMTPSA id D77FA9A20A6C;
- Tue, 10 Sep 2019 11:00:55 +0000 (UTC)
-To: Balamuruhan S <bala24@linux.ibm.com>
-References: <20190910071019.16689-1-bala24@linux.ibm.com>
- <20190910071019.16689-4-bala24@linux.ibm.com>
- <5aace97f-5a34-7e05-9cdc-65e17613033e@kaod.org>
- <20190910103054.GB16391@localhost.localdomain>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <f0a5499f-4a76-85b8-db74-0c83a0587974@kaod.org>
-Date: Tue, 10 Sep 2019 13:00:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190910103054.GB16391@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 9399293900483496786
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrtddtgdduvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1i7dtq-0004X6-1C; Tue, 10 Sep 2019 07:01:30 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B4E883082B40;
+ Tue, 10 Sep 2019 11:01:28 +0000 (UTC)
+Received: from dhcp-4-67.tlv.redhat.com (dhcp-4-67.tlv.redhat.com [10.35.4.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8DEE019C4F;
+ Tue, 10 Sep 2019 11:01:26 +0000 (UTC)
+Message-ID: <04d84d46138e2f7ceee0d65ed49efdc0ca116374.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>
+Date: Tue, 10 Sep 2019 14:01:25 +0300
+In-Reply-To: <20190909103542.GD24509@redhat.com>
+References: <20190906195750.17651-1-mlevitsk@redhat.com>
+ <20190906195750.17651-4-mlevitsk@redhat.com>
+ <20190909103542.GD24509@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Tue, 10 Sep 2019 11:01:28 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 87.98.172.75
-Subject: Re: [Qemu-devel] [PATCH v1 3/3] hw/ppc/pnv_homer: add PowerNV homer
- device model
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] qemu-iotests: Add test for bz
+ #1745922
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,87 +70,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: maddy@linux.vnet.ibm.com, groug@kaod.org, qemu-devel@nongnu.org,
- anju@linux.vnet.ibm.com, qemu-ppc@nongnu.org, hari@linux.vnet.ibm.com,
- david@gibson.dropbear.id.au
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ qemu-stable <qemu-stable@nongnu.org>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
->>> +
->>> +    object_initialize_child(obj, "homer",  &chip9->homer, sizeof(chip9->homer),
->>> +                            TYPE_PNV9_HOMER, &error_abort, NULL);
->>> +    object_property_add_const_link(OBJECT(&chip9->homer), "chip", obj,
->>> +                                   &error_abort);
->>
->> Does HOMER need the chip ? It is not used but we might want to in the 
->> core_max_array() ? 
-> 
-> sorry, no it is not required, I will remove it.
+On Mon, 2019-09-09 at 11:35 +0100, Daniel P. Berrang=C3=A9 wrote:
+> On Fri, Sep 06, 2019 at 10:57:50PM +0300, Maxim Levitsky wrote:
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  tests/qemu-iotests/263     | 75 ++++++++++++++++++++++++++++++++++++=
+++
+> >  tests/qemu-iotests/263.out | 19 ++++++++++
+> >  tests/qemu-iotests/group   |  1 +
+> >  3 files changed, 95 insertions(+)
+> >  create mode 100755 tests/qemu-iotests/263
+> >  create mode 100644 tests/qemu-iotests/263.out
+> >=20
+> > diff --git a/tests/qemu-iotests/263 b/tests/qemu-iotests/263
+> > new file mode 100755
+> > index 0000000000..36951ff7b4
+> > --- /dev/null
+> > +++ b/tests/qemu-iotests/263
+> > @@ -0,0 +1,75 @@
+> > +#!/usr/bin/env bash
+> > +#
+> > +# Test encrypted write that crosses cluster boundary of two unalloca=
+ted clusters
+> > +# Based on 188
+> > +#
+> > +# Copyright (C) 2019 Red Hat, Inc.
+> > +#
+> > +# This program is free software; you can redistribute it and/or modi=
+fy
+> > +# it under the terms of the GNU General Public License as published =
+by
+> > +# the Free Software Foundation; either version 2 of the License, or
+> > +# (at your option) any later version.
+> > +#
+> > +# This program is distributed in the hope that it will be useful,
+> > +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> > +# GNU General Public License for more details.
+> > +#
+> > +# You should have received a copy of the GNU General Public License
+> > +# along with this program.  If not, see <http://www.gnu.org/licenses=
+/>.
+> > +#
+> > +
+> > +# creator
+> > +owner=3Dmlevitsk@redhat.com
+> > +
+> > +seq=3D`basename $0`
+> > +echo "QA output created by $seq"
+> > +
+> > +status=3D1	# failure is the default!
+> > +
+> > +_cleanup()
+> > +{
+> > +	_cleanup_test_img
+> > +}
+> > +trap "_cleanup; exit \$status" 0 1 2 3 15
+> > +
+> > +# get standard environment, filters and checks
+> > +. ./common.rc
+> > +. ./common.filter
+> > +
+> > +_supported_fmt qcow2
+> > +_supported_proto generic
+> > +_supported_os Linux
+> > +
+> > +
+> > +size=3D1M
+> > +
+> > +SECRET=3D"secret,id=3Dsec0,data=3Dastrochicken"
+> > +
+> > +_make_test_img --object $SECRET -o "encrypt.format=3Dluks,encrypt.ke=
+y-secret=3Dsec0,encrypt.iter-time=3D10,cluster_size=3D64K" $size
+> > +
+> > +IMGSPEC=3D"driver=3D$IMGFMT,encrypt.key-secret=3Dsec0,file.filename=3D=
+$TEST_IMG"
+> > +
+> > +QEMU_IO_OPTIONS=3D$QEMU_IO_OPTIONS_NO_FMT
+> > +
+> > +echo
+> > +echo "=3D=3D reading the whole image =3D=3D"
+> > +$QEMU_IO --object $SECRET -c "read -P 0 0 $size" --image-opts $IMGSP=
+EC | _filter_qemu_io | _filter_testdir
+> > +
+> > +echo
+> > +echo "=3D=3D write two 512 byte sectors on a cluster boundary =3D=3D=
+"
+> > +$QEMU_IO --object $SECRET -c "write -P 0xAA 0xFE00 0x400" --image-op=
+ts $IMGSPEC | _filter_qemu_io | _filter_testdir
+> > +
+> > +echo
+> > +echo "=3D=3D verify that the rest of the image is not changed =3D=3D=
+"
+> > +$QEMU_IO --object $SECRET -c "read -P 0x00 0x00000 0xFE00" --image-o=
+pts $IMGSPEC | _filter_qemu_io | _filter_testdir
+> > +$QEMU_IO --object $SECRET -c "read -P 0xAA 0x0FE00 0x400" --image-op=
+ts $IMGSPEC | _filter_qemu_io | _filter_testdir
+> > +$QEMU_IO --object $SECRET -c "read -P 0x00 0x10200 0xEFE00" --image-=
+opts $IMGSPEC | _filter_qemu_io | _filter_testdir
+>=20
+> This tests LUKS encryption, but the code you'r changing/fixing also use=
+d
+> for the traditionl qcow2 encryption. The difference in IV handling for
+> these two methods is what made this code confusing, so I'd like to see
+> that the test also covers traditional qcow2 encryption.
+This is very good idea. Done.
 
-It seems you will need the chip in core_max_array(). I would keep it. 
-See below,
+>=20
+> Also can you confirm that the test succeeds when run on a qemu
+> built against 8c1ecb590497b0349c550607db923972b37f6963  (the change
+> immediately before Vladimir's threading series) ?
+Yes, the test fails with this commit. It also fails on master and works
+with my fix (both encryption case).
 
-[ ... ] 
-
->>> +static bool core_max_array(void *opaque, hwaddr addr)
-
-Please change the 'void *opaque' function parameter in 'PnvHOMER *homer'
-
->>> +{
->>> +    PnvHOMER *homer = PNV_HOMER(opaque);
->>> +    PnvHOMERClass *homer_class = PNV_HOMER_GET_CLASS(homer);
->>> +
->>> +    MachineState *ms = MACHINE(qdev_get_machine());
->>
->> Do you need the whole machine or only the chip ?  
-> 
-> yes, I see it is for active cores in the chip, I can use `nr_cores`
-> defined in PnvChip.
+>=20
+>=20
+> Regards,
+> Daniel
 
 
-If you keep the QOM link above, you can grab it in the realize handler of
-the HOMER model with :  
+Best regards,
+	Maxim Levitsky
 
-    Object *obj;
-    Error *local_err = NULL;
-
-    obj = object_property_get_link(OBJECT(dev), "chip", &local_err);
-    if (!obj) {
-        error_propagate(errp, local_err);
-        error_prepend(errp, "required link 'chip' not found: ");
-        return;
-    }
-
-    homer->chip = PNV_CHIP(obj);
-
-[ ... ] 
-
->>> +
->>> +/* P9 Pstate table */
->>> +
->>
->> no version ? 
-> 
-> PNV9_OCC_PSTATE_MAJOR_VERSION is the P9 pstate version.
-
-why isn't it in the switch statement below ? 
-
-[ ... ] 
- 
->>> +typedef struct PnvHOMER {
->>> +    DeviceState parent;
->>> +
->>> +    MemoryRegion homer_regs;
->>
->> the homer_ prefix is not useful.
-> 
-> okay, I will change it to `hregs`.
-
-I would just remove the prefix
-
-Thanks,
-
-C. 
 
 
