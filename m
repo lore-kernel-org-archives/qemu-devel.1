@@ -7,72 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72174C49ED8
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:55:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E281BC49ED8
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:56:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E5B321479
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:55:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE88721479
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:56:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vJRR4zhM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E5B321479
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FpfoOZur"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE88721479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7hYZ-0000Ie-TN
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 10:55:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54125)
+	id 1i7hZc-0001Uc-3D
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 10:56:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54202)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i7hNs-0005Zb-NJ
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:45 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i7hNv-0005e6-Nf
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i7hNr-00054d-Gn
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:44 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43945)
+ (envelope-from <peter.maydell@linaro.org>) id 1i7hNu-00057E-Je
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:47 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33653)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i7hNr-000544-9I
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:43 -0400
-Received: by mail-wr1-x441.google.com with SMTP id q17so16120609wrx.10
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 07:44:43 -0700 (PDT)
+ id 1i7hNu-00056k-EE
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:46 -0400
+Received: by mail-wr1-x444.google.com with SMTP id u16so20875157wrr.0
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 07:44:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=sq8nSzuTSE3z6TeW22Jb/p8ysGSeKIUIld6DHEj34Ck=;
- b=vJRR4zhMarIJwOEag+GQp1yXeXT+q/UXt9Xtub70Zzd0iBgHFR+zDca6QkL3KyQrFF
- d6jtVtMtoVx0jQhhcNC7jmNK1/5GDty5Rk1Lbt04v/3Qg9d7SNU0govHcBdLEL1mawnW
- /jEdgOl/Fjh/WQ2YyxW8Wvuaus0ak96VghwQvvTVFYD0UUNfdvhFogYqvnXL9ydFz3Dw
- MHnuvpPut6aHKKU7jvwQEn7vihCg15FIrLr4OVkNUkQcAjgy9uMDn877ZPCHsiyOJ9FA
- 0U8/NfbaYmKxarb753GB18++ClK8tHper8pHlhsqg8dPa7hCksO/HE/LdgodaFfjNWjB
- 8Bqw==
+ bh=YNt4rzxDLZvJ3mLelApZg/g3aGU83zBv6U6suQNcbas=;
+ b=FpfoOZur9SeiO5+ovdwDYbHq6hgY6rbpK/dv9x8sQf3BJy2GaAu7MQuZ1a2E3E0XDT
+ YVs0B5uMpkF9uag6dPn7MlYSKCo0zmuLggIJJVhvKllv10u96rc05E5vWgsdlLN4VaHZ
+ sI15QxR7jvaDBR6COKIkQSCcPXZ6QSB2ssG4UvWxNzTLBT5x7GQ+mnRZLv2s0V5YQ3xI
+ hpEvXUl3qo4W5YzjIBteUUC1YjXlUtpNrzrg3lzLyc6htpvPMs4D1YfpiL4sFYc9H4Hz
+ +LUox7B3Sdu084rI+Z7jZqdkeE97Uj6xVJaObKt0+NwX34vUCz+rgQb5NlRVDXbyN38b
+ W2Iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=sq8nSzuTSE3z6TeW22Jb/p8ysGSeKIUIld6DHEj34Ck=;
- b=n229NGgWoTvg7aw28L9CcEycfG/Gk74IoEsHvTfIKnkQeit0TjCYO6uYPKgNsy2tZN
- ji/dFjJWCknxbeVgyewhOFrtjjOozlDbJ80gbFsCFpoA+yCzzPv0GWPfzRg62XHDFXB/
- qEh3LFJq4Ke3oQvoviY3Hjf8Yesk+20su5cUVbB1coMa80HBi3b4YhyIbsL+kqZeHgxW
- RGOUAAhye/i7fL15EZf8vFRehsT8siDVwfCcEx2yGvw5EIX47My3nyhBUZcUyCQbzDmT
- hDOFrLl5TOIaEAqBGSqaedUmO7dvnmxH6mbHdhzUSee96fFLaUHjDKKGszL5gakxP2zc
- oqAw==
-X-Gm-Message-State: APjAAAVJ/3Jg1abbjJtJvFf+jKLSnQcz1IltV5p0kTN3iATn2Bo8IMud
- 5437dHau03iGuLQUxppRBhdnRA==
-X-Google-Smtp-Source: APXvYqycuNOuLYNTE2MIV3o2Pt1YSPVSpDoNIll/5mv4AFS4W99T4R7+XNM9C6WCEJO4SKRziYs1Gw==
-X-Received: by 2002:adf:f812:: with SMTP id s18mr28610093wrp.32.1568126682426; 
- Tue, 10 Sep 2019 07:44:42 -0700 (PDT)
+ bh=YNt4rzxDLZvJ3mLelApZg/g3aGU83zBv6U6suQNcbas=;
+ b=D6bEWIWeM1BtUe1giOFQTMZ00geRL16d/GW7jCeA/OdzNtI2E7OS8mRnWYM59RA2wi
+ 5LpyjfxLd6nfLAeR7Dzfq0+NAXei69DSAwPNjGdJBSiVOgDCbIZsXgzGandkge5iUPCk
+ DKadir44vyYqkD4KWX45MY39L8hthH8PFr4romXW3SSphoB7ZqUjogqwpVHu96xbULXZ
+ 9zPjPv1IHHQK1zBdSY829iAe64be0Q4QBiBnfHvfpPqJz6SKnQrNJM3eviA1cdJYFpwO
+ dGWo7UBy8AQ/F8WrvZbsr+E6Ge7LPSciCPKtpH020ZkP8AWBs0uycElPxqc67RjtHCMO
+ M/bg==
+X-Gm-Message-State: APjAAAUbuAd4RwGYZVdRquUqvqLg0g4AZin9esjP2yYc62P2PAD5D9pJ
+ Ek0PvBPLMVa6gFr4Mr5Uibzw8Q==
+X-Google-Smtp-Source: APXvYqwx169BXXSViKCvBrdjzswbjoKZruNrZlvFksLoy7E9pkzfI/C8dUbG9BwTNzoNOA/Qd5jcmg==
+X-Received: by 2002:a05:6000:1189:: with SMTP id
+ g9mr28272944wrx.117.1568126685607; 
+ Tue, 10 Sep 2019 07:44:45 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id a192sm5703814wma.1.2019.09.10.07.44.41
+ by smtp.gmail.com with ESMTPSA id a192sm5703814wma.1.2019.09.10.07.44.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Sep 2019 07:44:41 -0700 (PDT)
+ Tue, 10 Sep 2019 07:44:45 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Tue, 10 Sep 2019 15:44:25 +0100
-Message-Id: <20190910144428.32597-11-peter.maydell@linaro.org>
+Date: Tue, 10 Sep 2019 15:44:28 +0100
+Message-Id: <20190910144428.32597-14-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190910144428.32597-1-peter.maydell@linaro.org>
 References: <20190910144428.32597-1-peter.maydell@linaro.org>
@@ -80,9 +81,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PATCH 10/13] target/arm/arm-semi: Factor out
- implementation of SYS_FLEN
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH 13/13] target/arm/arm-semi: Implement
+ SH_EXT_EXIT_EXTENDED extension
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,97 +99,69 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Factor out the implementation of SYS_FLEN via the new
-function tables.
+SH_EXT_EXIT_EXTENDED is a v2.0 semihosting extension: it
+indicates that the implementation supports the SYS_EXIT_EXTENDED
+function. This function allows both A64 and A32/T32 guests to
+exit with a specified exit status, unlike the older SYS_EXIT
+function which only allowed this for A64 guests. Implement
+this extension.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/arm-semi.c | 31 +++++++++++++++++++++----------
- 1 file changed, 21 insertions(+), 10 deletions(-)
+ target/arm/arm-semi.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-index c548ce849e7..f9019b00b8d 100644
+index 0df8d4d69d6..3900bd4e1e6 100644
 --- a/target/arm/arm-semi.c
 +++ b/target/arm/arm-semi.c
-@@ -352,6 +352,7 @@ typedef uint32_t sys_readfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf,
- typedef uint32_t sys_isattyfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf);
- typedef uint32_t sys_seekfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf,
-                             target_ulong offset);
-+typedef uint32_t sys_flenfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf);
+@@ -66,6 +66,7 @@ typedef void TaskState;
+ #define TARGET_SYS_HEAPINFO    0x16
+ #define TARGET_SYS_EXIT        0x18
+ #define TARGET_SYS_SYNCCACHE   0x19
++#define TARGET_SYS_EXIT_EXTENDED 0x20
  
- static uint32_t host_closefn(TaskState *ts, ARMCPU *cpu, GuestFD *gf)
- {
-@@ -417,6 +418,16 @@ static uint32_t host_seekfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf,
-     return 0;
- }
- 
-+static uint32_t host_flenfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf)
-+{
-+    struct stat buf;
-+    uint32_t ret = set_swi_errno(ts, fstat(gf->hostfd, &buf));
-+    if (ret == (uint32_t)-1) {
-+        return -1;
-+    }
-+    return buf.st_size;
-+}
-+
- static uint32_t gdb_closefn(TaskState *ts, ARMCPU *cpu, GuestFD *gf)
- {
-     return arm_gdb_syscall(cpu, arm_semi_cb, "close,%x", gf->hostfd);
-@@ -450,12 +461,19 @@ static uint32_t gdb_seekfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf,
-                            gf->hostfd, offset);
- }
- 
-+static uint32_t gdb_flenfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf)
-+{
-+    return arm_gdb_syscall(cpu, arm_semi_flen_cb, "fstat,%x,%x",
-+                           gf->hostfd, arm_flen_buf(cpu));
-+}
-+
- typedef struct GuestFDFunctions {
-     sys_closefn *closefn;
-     sys_writefn *writefn;
-     sys_readfn *readfn;
-     sys_isattyfn *isattyfn;
-     sys_seekfn *seekfn;
-+    sys_flenfn *flenfn;
- } GuestFDFunctions;
- 
- static const GuestFDFunctions guestfd_fns[] = {
-@@ -465,6 +483,7 @@ static const GuestFDFunctions guestfd_fns[] = {
-         .readfn = host_readfn,
-         .isattyfn = host_isattyfn,
-         .seekfn = host_seekfn,
-+        .flenfn = host_flenfn,
-     },
-     [GuestFDGDB] = {
-         .closefn = gdb_closefn,
-@@ -472,6 +491,7 @@ static const GuestFDFunctions guestfd_fns[] = {
-         .readfn = gdb_readfn,
-         .isattyfn = gdb_isattyfn,
-         .seekfn = gdb_seekfn,
-+        .flenfn = gdb_flenfn,
-     },
+ /* ADP_Stopped_ApplicationExit is used for exit(0),
+  * anything else is implemented as exit(1) */
+@@ -485,7 +486,7 @@ static const uint8_t featurefile_data[] = {
+     SHFB_MAGIC_1,
+     SHFB_MAGIC_2,
+     SHFB_MAGIC_3,
+-    SH_EXT_STDOUT_STDERR, /* Feature byte 0 */
++    SH_EXT_EXIT_EXTENDED | SH_EXT_STDOUT_STDERR, /* Feature byte 0 */
  };
  
-@@ -657,16 +677,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
-             return set_swi_errno(ts, -1);
+ static void init_featurefile_guestfd(int guestfd)
+@@ -1026,11 +1027,14 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+             return 0;
          }
- 
--        if (use_gdb_syscalls()) {
--            return arm_gdb_syscall(cpu, arm_semi_flen_cb, "fstat,%x,%x",
--                                   gf->hostfd, arm_flen_buf(cpu));
--        } else {
--            struct stat buf;
--            ret = set_swi_errno(ts, fstat(gf->hostfd, &buf));
--            if (ret == (uint32_t)-1)
--                return -1;
--            return buf.st_size;
--        }
-+        return guestfd_fns[gf->type].flenfn(ts, cpu, gf);
-     case TARGET_SYS_TMPNAM:
-         qemu_log_mask(LOG_UNIMP, "%s: SYS_TMPNAM not implemented", __func__);
-         return -1;
+     case TARGET_SYS_EXIT:
+-        if (is_a64(env)) {
++    case TARGET_SYS_EXIT_EXTENDED:
++        if (nr == TARGET_SYS_EXIT_EXTENDED || is_a64(env)) {
+             /*
+-             * The A64 version of this call takes a parameter block,
++             * The A64 version of SYS_EXIT takes a parameter block,
+              * so the application-exit type can return a subcode which
+              * is the exit status code from the application.
++             * SYS_EXIT_EXTENDED is an a new-in-v2.0 optional function
++             * which allows A32/T32 guests to also provide a status code.
+              */
+             GET_ARG(0);
+             GET_ARG(1);
+@@ -1042,8 +1046,10 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+             }
+         } else {
+             /*
+-             * ARM specifies only Stopped_ApplicationExit as normal
+-             * exit, everything else is considered an error
++             * The A32/T32 version of SYS_EXIT specifies only
++             * Stopped_ApplicationExit as normal exit, but does not
++             * allow the guest to specify the exit status code.
++             * Everything else is considered an error.
+              */
+             ret = (args == ADP_Stopped_ApplicationExit) ? 0 : 1;
+         }
 -- 
 2.20.1
 
