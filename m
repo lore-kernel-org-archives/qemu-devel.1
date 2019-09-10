@@ -2,68 +2,61 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52CB2C49ED7
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:47:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 709DBC49ED9
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:48:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26CBB21479
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:47:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26CBB21479
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 345C521479
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:48:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 345C521479
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7m73-0006yf-PL
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:47:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59102)
+	id 1i7m7j-0007c4-JT
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:48:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59692)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i7luJ-0001E1-CA
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:33 -0400
+ (envelope-from <groug@kaod.org>) id 1i7lwS-0003dr-DP
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:36:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i7luH-0006tv-7W
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:31 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:50077)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1i7luD-0006rI-5c; Tue, 10 Sep 2019 15:34:25 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MXH7g-1hdOfv3Owg-00YlxY; Tue, 10 Sep 2019 21:33:54 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Date: Tue, 10 Sep 2019 21:33:38 +0200
-Message-Id: <20190910193347.16000-1-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <groug@kaod.org>) id 1i7lwQ-00084R-AS
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:36:44 -0400
+Received: from 4.mo68.mail-out.ovh.net ([46.105.59.63]:50116)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1i7lwQ-00080c-4s
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:36:42 -0400
+Received: from player770.ha.ovh.net (unknown [10.108.35.124])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id 4C301142339
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 21:36:33 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player770.ha.ovh.net (Postfix) with ESMTPSA id 250509AC1393;
+ Tue, 10 Sep 2019 19:36:27 +0000 (UTC)
+Date: Tue, 10 Sep 2019 21:36:25 +0200
+From: Greg Kurz <groug@kaod.org>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Message-ID: <20190910213625.14078565@bahia.lan>
+In-Reply-To: <20190910061326.25366-1-clg@kaod.org>
+References: <20190910061326.25366-1-clg@kaod.org>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:WeVpO40vHvCS0F+mrJAkA3AADUrCu11AglsNXQfv/pQdgJLb5R+
- 20vfaJivAPAOUhl/+SUgFqAj63ozZzNF43+anfh0d7+rnSx/V3Jjt5bSR+vWqX2nTI+XAYk
- 48uMgLIQmON2ZhUXpT45N1OEwY1/HBltXuYUA99HOG7/JKRlh8FJ+FXXHsEUEsm5/0W3wvc
- Ch9dEVXuZ4XV8W9p2CetQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:2zQHv2rLRFE=:qvJanMF4R7si+3uUQEIrt2
- TktqrWYZ7s4Gra8MsqJ82+93C1XzaZxHXApesPkvSPiG9uIZk5kTgFUOXJ/xNN5gI9jYlR7so
- UqzBGSXz1+4SJNKv+us2Ivg8zZJk9sYHkCwCQzCfCsgtmAUnNUlF1fkG4SnofkNMYe++eHx5J
- UzETKp0z8WT2quWGGrH7vz7/DJRiM9qx/bQg/E4Oyxhq6WINQyhtVj7KYCRmOAQRgud5Jq5Bq
- kZfm+w/XEfZP+P3WA2Q5SBp6MmfOwlKZbMoOshy2yQNUCQ/wOROgXk3lLhvxtlvBux7DJNUr5
- QlE3YJ/jUHA9wCWY2WrkRVELKvB2tshQ6PRSdTg4NwlyAQlZYFNV3PrcvOsPooZftIRRZiU6C
- CYP3jfznllsbx66qphAjcd/56x1/Q612GGV6zH08c2TltLma8RLX8nDFhOD4NWSiI84MaUVT7
- M0b5TDq6r4ueHkniqgULz3rBLZv56Rq17UWKg63q3DmY/YxaDDIc+Tu3OkC+kBNONCLTZOOQg
- TY+OZFOFlUVmm5jalNNcPfQafuqH4V7ETUiWOtvTk9KOOnjWOkjHO8dEYNgZ5tUjWwSbrtS9y
- 2X5jCUcPaJ5XnwB8legfqBAA78rArCdYDmTFXTTFzPEvRdHaY2bglybGCgvdFkzD5FwY0SPwA
- FfkH7YrW8sVbC9MhbOCdKUTPunHIe8MekFHFRZ9EorN1BXCI2FhdoWQRDOcYhukD8RFNbCkPu
- G7nF2Xet1wopBjUQXh28ry+8C757AkQz1NU4E+wUgNYWE2CEvszbCX7u3+GFYXzXTMRx8xAp2
- RjVQq7TqN1K4Rz4fhqkt0z61btfUyct5LhTkotOkc9LCp9xQ3E=
+Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 18104470503655381387
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrtddtgdduudejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.24
-Subject: [Qemu-devel] [PATCH v11 0/9] hw/m68k: add Apple Machintosh Quadra
- 800 machine
+X-Received-From: 46.105.59.63
+Subject: Re: [Qemu-devel] [PATCH] spapr/irq: Only claim VALID interrupts at
+ the KVM level
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,235 +68,366 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I'm rebasing some of these patches for seven years now,
-too many years...
+On Tue, 10 Sep 2019 08:13:26 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-if you want to test the machine, I'm sorry, it doesn't boot
-a MacROM, but you can boot a linux kernel from the command line.
+> A typical pseries VM with 16 vCPUs, one disk, one network adapater
+> uses less than 100 interrupts but the whole IRQ number space of the
+> QEMU machine is allocated at reset time and it is 8K wide. This is
+> wasting considerably the global IRQ space of the overall system which
+> has 1M interrupts per socket on a POWER9.
+>=20
+> To optimise the HW resources, only request at the KVM level interrupts
+> which have been claimed. This will help up increase the maximum number
+> of VMs per system.
+>=20
+> To keep migration compatibility, we introduce a machine class
+> attribute to adapt the reset behavior on older pseries machines.
+>=20
 
-You can install your own disk using debian-installer, with:
+This can be achieved in a simpler way, see below.
 
-    ...
-    -M q800 \
-    -serial none -serial mon:stdio \
-    -m 1000M \
-    -net nic,model=dp83932,addr=09:00:07:12:34:57 \
-    -append "console=ttyS0 vga=off" \
-    -kernel vmlinux-4.16.0-1-m68k \
-    -initrd initrd.gz \
-    -drive file=debian-10.0-m68k-NETINST-1.iso,media=cdrom \
-    -drive file=m68k.qcow2,format=qcow2 \
-    -nographic
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  include/hw/ppc/spapr.h      |  1 +
+>  include/hw/ppc/spapr_xive.h |  1 +
+>  include/hw/ppc/xics.h       |  6 ++++++
+>  hw/intc/spapr_xive.c        |  1 +
+>  hw/intc/spapr_xive_kvm.c    | 34 +++++++++++++++++++++++++++++++---
+>  hw/intc/xics.c              |  1 +
+>  hw/intc/xics_kvm.c          | 14 ++++++++++++++
+>  hw/ppc/spapr.c              |  1 +
+>  hw/ppc/spapr_irq.c          | 13 +++++++------
+>  9 files changed, 63 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 03111fd55bc8..6c622954a60c 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -131,6 +131,7 @@ struct SpaprMachineClass {
+>      SpaprResizeHpt resize_hpt_default;
+>      SpaprCapabilities default_caps;
+>      SpaprIrq *irq;
+> +    bool irq_reset_all;
+>  };
+> =20
+>  /**
+> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> index bfd40f01d882..b33913eb0f28 100644
+> --- a/include/hw/ppc/spapr_xive.h
+> +++ b/include/hw/ppc/spapr_xive.h
+> @@ -45,6 +45,7 @@ typedef struct SpaprXive {
+>      void          *tm_mmap;
+>      MemoryRegion  tm_mmio_kvm;
+>      VMChangeStateEntry *change;
+> +    bool          reset_all;
+>  } SpaprXive;
+> =20
+>  /*
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index f2a8d6a4b4f9..856815362406 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -117,6 +117,7 @@ struct ICSState {
+>      DeviceState parent_obj;
+>      /*< public >*/
+>      uint32_t nr_irqs;
+> +    bool reset_all;
+>      uint32_t offset;
+>      ICSIRQState *irqs;
+>      XICSFabric *xics;
+> @@ -179,6 +180,11 @@ void ics_simple_write_xive(ICSState *ics, int nr, in=
+t server,
+>                             uint8_t priority, uint8_t saved_priority);
+>  void ics_simple_set_irq(void *opaque, int srcno, int val);
+> =20
+> +static inline bool ics_irq_free(ICSState *ics, uint32_t srcno)
+> +{
+> +    return !(ics->irqs[srcno].flags & XICS_FLAGS_IRQ_MASK);
+> +}
+> +
+>  void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
+>  void icp_pic_print_info(ICPState *icp, Monitor *mon);
+>  void ics_pic_print_info(ICSState *ics, Monitor *mon);
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index c1c97192a7d2..b717d9e09314 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -492,6 +492,7 @@ static Property spapr_xive_properties[] =3D {
+>      DEFINE_PROP_UINT32("nr-ends", SpaprXive, nr_ends, 0),
+>      DEFINE_PROP_UINT64("vc-base", SpaprXive, vc_base, SPAPR_XIVE_VC_BASE=
+),
+>      DEFINE_PROP_UINT64("tm-base", SpaprXive, tm_base, SPAPR_XIVE_TM_BASE=
+),
+> +    DEFINE_PROP_BOOL("reset-all", ICSState, reset_all, false),
 
-If you use a graphic adapter instead of "-nographic", you can use "-g" to set the
-size of the display (I use "-g 1600x800x24").
+s/ICSState/SpaprXive
 
-You can get the ISO from:
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> =20
+> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+> index 17af4d19f54e..225abce36270 100644
+> --- a/hw/intc/spapr_xive_kvm.c
+> +++ b/hw/intc/spapr_xive_kvm.c
+> @@ -253,13 +253,23 @@ void kvmppc_xive_source_reset_one(XiveSource *xsrc,=
+ int srcno, Error **errp)
+>                        true, errp);
+>  }
+> =20
+> +static bool xive_source_skip_reset(SpaprXive *xive, int srcno)
+> +{
+> +    return !xive->reset_all && !xive_eas_is_valid(&xive->eat[srcno]);
+> +}
+> +
+>  static void kvmppc_xive_source_reset(XiveSource *xsrc, Error **errp)
+>  {
+> +    SpaprXive *xive =3D SPAPR_XIVE(xsrc->xive);
+>      int i;
+> =20
+>      for (i =3D 0; i < xsrc->nr_irqs; i++) {
+>          Error *local_err =3D NULL;
+> =20
+> +        if (xive_source_skip_reset(xive, i)) {
+> +            continue;
+> +        }
+> +
+>          kvmppc_xive_source_reset_one(xsrc, i, &local_err);
+>          if (local_err) {
+>              error_propagate(errp, local_err);
+> @@ -328,11 +338,18 @@ uint64_t kvmppc_xive_esb_rw(XiveSource *xsrc, int s=
+rcno, uint32_t offset,
+> =20
+>  static void kvmppc_xive_source_get_state(XiveSource *xsrc)
+>  {
+> +    SpaprXive *xive =3D SPAPR_XIVE(xsrc->xive);
+>      int i;
+> =20
+>      for (i =3D 0; i < xsrc->nr_irqs; i++) {
+> +        uint8_t pq;
+> +
+> +        if (xive_source_skip_reset(xive, i)) {
 
-https://cdimage.debian.org/cdimage/ports/10.0/m68k/iso-cd/debian-10.0-m68k-NETINST-1.iso
+This looks a bit weird to "skip reset" in a function that isn't
+supposed to reset anything... Is it really necessary to check the
+reset_all flag actually ? I guess checking the EAS is valid should
+be enough.
 
-and extract the kernel and initrd.gz:
+> +            continue;
+> +        }
+> +
+>          /* Perform a load without side effect to retrieve the PQ bits */
+> -        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
+> +        pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
+> =20
+>          /* and save PQ locally */
+>          xive_source_esb_set(xsrc, i, pq);
+> @@ -521,9 +538,14 @@ static void kvmppc_xive_change_state_handler(void *o=
+paque, int running,
+>       */
+>      if (running) {
+>          for (i =3D 0; i < xsrc->nr_irqs; i++) {
+> -            uint8_t pq =3D xive_source_esb_get(xsrc, i);
+> +            uint8_t pq;
+>              uint8_t old_pq;
+> =20
+> +            if (xive_source_skip_reset(xive, i)) {
 
-guestfish --add debian-10.0-m68k-NETINST-1.iso --ro \
-          --mount /dev/sda:/ <<_EOF_
-copy-out /install/cdrom/initrd.gz .
-copy-out /install/kernels/vmlinux-4.16.0-1-m68k .
-_EOF_
+Same here ?
 
-The mirror to use is: http://ftp.ports.debian.org/debian-ports/
-when it fails, continue without boot loader.
+> +                continue;
+> +            }
+> +
+> +            pq =3D xive_source_esb_get(xsrc, i);
+>              old_pq =3D xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_00 + (pq <=
+< 8));
+> =20
+>              /*
+> @@ -545,7 +567,13 @@ static void kvmppc_xive_change_state_handler(void *o=
+paque, int running,
+>       * migration is in progress.
+>       */
+>      for (i =3D 0; i < xsrc->nr_irqs; i++) {
+> -        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
+> +        uint8_t pq;
+> +
+> +        if (xive_source_skip_reset(xive, i)) {
 
-In the same way, you can extract the kernel and the initramfs from the qcow2
-image to use it with "-kernel" and "-initrd":
+and here ?
 
-guestfish --add m68k.qcow2 --mount /dev/sda2:/ <<_EOF_
-copy-out /boot/vmlinux-4.16.0-1-m68k .
-copy-out /boot/initrd.img-4.16.0-1-m68k .
-_EOF_
+> +            continue;
+> +        }
+> +
+> +        pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
+> =20
+>          /*
+>           * PQ is set to PENDING to possibly catch a triggered
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index b2fca2975cc4..ae3f83cf0aad 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -746,6 +746,7 @@ static const VMStateDescription vmstate_ics_base =3D {
+> =20
+>  static Property ics_base_properties[] =3D {
+>      DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
+> +    DEFINE_PROP_BOOL("reset-all", ICSState, reset_all, false),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> =20
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index a4d2e876cc5f..aa017b99801c 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -177,6 +177,12 @@ void icp_kvm_realize(DeviceState *dev, Error **errp)
+>  /*
+>   * ICS-KVM
+>   */
+> +
+> +static bool ics_irq_skip_reset(ICSState *ics, int srcno)
+> +{
+> +    return !ics->reset_all && ics_irq_free(ics, srcno);
+> +}
+> +
+>  void ics_get_kvm_state(ICSState *ics)
+>  {
+>      uint64_t state;
+> @@ -190,6 +196,10 @@ void ics_get_kvm_state(ICSState *ics)
+>      for (i =3D 0; i < ics->nr_irqs; i++) {
+>          ICSIRQState *irq =3D &ics->irqs[i];
+> =20
+> +        if (ics_irq_skip_reset(ics, i)) {
 
-and boot with:
+And here ?
 
-   ...
-   -append "root=/dev/sda2 rw console=ttyS0 console=tty \
-   -kernel vmlinux-4.16.0-1-m68k \
-   -initrd initrd.img-4.16.0-1-m68k
+> +            continue;
+> +        }
+> +
+>          kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
+>                            i + ics->offset, &state, false, &error_fatal);
+> =20
+> @@ -301,6 +311,10 @@ int ics_set_kvm_state(ICSState *ics, Error **errp)
+>          Error *local_err =3D NULL;
+>          int ret;
+> =20
+> +        if (ics_irq_skip_reset(ics, i)) {
+> +            continue;
+> +        }
+> +
+>          ret =3D ics_set_kvm_state_one(ics, i, &local_err);
+>          if (ret < 0) {
+>              error_propagate(errp, local_err);
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 7124053b43b7..af89f3b6c698 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -4594,6 +4594,7 @@ static void spapr_machine_4_1_class_options(Machine=
+Class *mc)
+>      smc->linux_pci_probe =3D false;
+>      compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
+>      compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
+> +    smc->irq_reset_all =3D true;
 
-NOTE: DHCP doesn't work but you can assign a static IP address.
-      We need some patches for dp8393x that are not ready to be merged.
-      See http://patchwork.ozlabs.org/patch/927020/
-          http://patchwork.ozlabs.org/patch/927030/
-          http://patchwork.ozlabs.org/patch/927026/
+Drop this property and add two lines in compat static:
 
-v11: Add VMState to migrate ESP PDMA
+    static GlobalProperty compat[] =3D {
+        /* Only allow 4kiB and 64kiB IOMMU pagesizes */
+        { TYPE_SPAPR_PCI_HOST_BRIDGE, "pgsz", "0x11000" },
+        { TYPE_SPAPR_XIVE, "reset-all", "on" },
+        { TYPE_ICS_BASE, "reset-all", "on" },
+    };
 
-     The new VMState structures cannot be tested because m68k is not
-     migratable and then Q800 is not either.
-     I've tested the ESP VMState is not broken by the change
-     with 'migrate "exec:cat > mig"' with qemu-system-sparc and
-     I have compared the result with/without the patch with
-     scripts/analyze-migrate.py: files desc.json are identical.
+This ensures that any instance of SpaprXive or ICSState created by
+a pseries-4.1 machine has reset_all set to true.
 
-v10: Add SWIM VMState and reset function
-     Add MacVIA VMState
-     rework Kconfig
+>  }
+> =20
+>  DEFINE_SPAPR_MACHINE(4_1, "4.1", false);
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 06fe2432bae5..8c3682613404 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -97,11 +97,13 @@ static void spapr_irq_init_xics(SpaprMachineState *sp=
+apr, int nr_irqs,
+>  {
+>      Object *obj;
+>      Error *local_err =3D NULL;
+> +    bool reset_all =3D SPAPR_MACHINE_GET_CLASS(spapr)->irq_reset_all;
+> =20
 
-v9: Fix comments format
-    rebase on top of NeXTcube
+... and you can drop all the propagation code here...
 
-v8: rebase (new blk_new(), add "qemu-common.h")
-    update bootinfo information and license
-    add some braces
-    Rename Q800IRQState to GLUEState:
-    it's more like a Logic Unit than an IRQ controller,
-    and Apple calls it "GLUE" (Mark: I prefer to keep it
-    like this for the moment, in the future this part
-    need to be reworked, we have to review the IRQ levels
-    and to wire NUBUS IRQ. The implementation is really trivial
-    for the moment and we will move it to QOM in the future)
+>      obj =3D object_new(TYPE_ICS_SIMPLE);
+>      object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
+>      object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
+>                                     &error_fatal);
+> +    object_property_set_bool(obj, reset_all, "reset-all",  &error_fatal);
+>      object_property_set_int(obj, nr_irqs, "nr-irqs",  &error_fatal);
+>      object_property_set_bool(obj, true, "realized", &local_err);
+>      if (local_err) {
+> @@ -114,9 +116,6 @@ static void spapr_irq_init_xics(SpaprMachineState *sp=
+apr, int nr_irqs,
+>      xics_spapr_init(spapr);
+>  }
+> =20
+> -#define ICS_IRQ_FREE(ics, srcno)   \
+> -    (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_MASK)))
+> -
+>  static int spapr_irq_claim_xics(SpaprMachineState *spapr, int irq, bool =
+lsi,
+>                                  Error **errp)
+>  {
+> @@ -129,7 +128,7 @@ static int spapr_irq_claim_xics(SpaprMachineState *sp=
+apr, int irq, bool lsi,
+>          return -1;
+>      }
+> =20
+> -    if (!ICS_IRQ_FREE(ics, irq - ics->offset)) {
+> +    if (!ics_irq_free(ics, irq - ics->offset)) {
+>          error_setg(errp, "IRQ %d is not free", irq);
+>          return -1;
+>      }
+> @@ -147,7 +146,7 @@ static void spapr_irq_free_xics(SpaprMachineState *sp=
+apr, int irq, int num)
+>      if (ics_valid_irq(ics, irq)) {
+>          trace_spapr_irq_free(0, irq, num);
+>          for (i =3D srcno; i < srcno + num; ++i) {
+> -            if (ICS_IRQ_FREE(ics, i)) {
+> +            if (ics_irq_free(ics, i)) {
+>                  trace_spapr_irq_free_warn(0, i);
+>              }
+>              memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
+> @@ -270,9 +269,11 @@ static void spapr_irq_init_xive(SpaprMachineState *s=
+papr, int nr_irqs,
+>  {
+>      uint32_t nr_servers =3D spapr_max_server_number(spapr);
+>      DeviceState *dev;
+> +    bool reset_all =3D SPAPR_MACHINE_GET_CLASS(spapr)->irq_reset_all;
 
-v7: rebase and port to Kconfig
-    move IRQ controller back to q800.c (we don't need an object for this)
-    update log message for ESP changes and add some g_assert()
-    re-order patches: put esp, escc and dp8393x first
+... and here.
 
-v6: Rebase onto git master (this now includes the m68k EXCP_ILLEGAL fix required
-      for this patchset to boot)
-    Add Hervé's R-B tags
-    Drop ASC (Apple Sound Chip) device since the Linux driver is broken and
-      it is not required for a successful boot
-    Remove extra esp_raise_irq() from ESP pseudo-DMA patch (Hervé)
-    Remove "return" from unimplemented write functions and instead add a
-      "read only" comment (Hervé)
-    Rename MAX_FD to SWIM_MAX_FD in SWIM floppy controller patch to prevent
-      potential conflicts with other files (Hervé)
-
-v5: Rebase onto git master
-    Add Philippe's R-B to patch 10
-    Include the command line to boot a Linux kernel under the q800 machine in the
-    commit message for patch 11 (Philippe)
-    Fix up comments in hw/misc/mac_via.c (Thomas)
-    Add asserts to VIA ADB support to prevent potential buffer overflows (Thomas)
-    Move macfb surface/resolution checks to realise and remove hw_error (Thomas)
-    Move macfb draw_line functions inline and remove macfb-template.h (Mark)
-    Use guest address rather than source pointer in draw_line functions - this brings
-      macfb in line with the VGA device and can prevent a potential buffer overflow
-    Use g_strdup_printf() for memory region names in NuBus devices instead of
-      hardcoded length char arrays (Thomas)
-    Move NuBus QOM types from patch 7 to patch 8 (spotted by Thomas)
-    Move CONFIG_COLDFIRE sections together in hw/m68k/Makefile.objs (Thomas)
-    Remove obsolete comment from q800.c in patch 11 (Thomas)
-
-v4: Drop RFC from subject prefix as this is getting close to final
-    Rebased onto master (fixing ESP, rom_ptr() conflicts)
-    Reworked q800.c based upon Thomas' comments about cpu_init() and
-      qemu_check_nic_model()
-    Address Thomas' comments on using error_report() instead of hw_error()
-    Change the NuBus memory regions from DEVICE_NATIVE_ENDIAN to
-      DEVICE_BIG_ENDIAN
-    Split macfb Nubus support into separate commit
-    Change VMSTATE_BUFFER_UNSAFE() to VMSTATE_UINT8_ARRAY() in macfb.c as
-      suggested by David
-    Remove dummy Apple Sound Chip migration state as pointed out by David
-    Keep VIA ADB state and buffers in the mac_via device rather than adding
-      to existing ADBState (this matches the pattern used in the PPC CUDA/PMU
-      VIAs)
-    Remove blacklisting for q800 machine from "make check" as requested by
-      Thomas with the following fixes:
-        - Fix incorrect MemoryRegion owner in ASC device
-        - Add qtest_enabled() check in q800_init() to allow testing when no
-          kernel is specified
-        - Move some Mac VIA initialisation from init to realize
-    Remove legacy drive properties from SWIM floppy controller and instead
-      expose separate floppy bus and drive devices as requested by Kevin
-
-v3: fix subject prefix "C" -> "RFC"
-
-v2: remove the dp8393x fixes, because one of the patch breaks something
-    Update "dp8393x: manage big endian bus" with idea from Thomas
-    Mark has reworked most of the patches:
-    - use mos6522
-    - some code move, renamings and cleanup
-
-Laurent Vivier (8):
-  esp: add pseudo-DMA as used by Macintosh
-  dp8393x: manage big endian bus
-  hw/m68k: add via support
-  hw/m68k: implement ADB bus support for via
-  hw/m68k: add macfb video card
-  hw/m68k: add Nubus support
-  hw/m68k: add a dummy SWIM floppy controller
-  hw/m68k: define Macintosh Quadra 800
-
-Mark Cave-Ayland (1):
-  hw/m68k: add Nubus support for macfb video card
-
- MAINTAINERS                         |  14 +
- arch_init.c                         |   4 +
- default-configs/m68k-softmmu.mak    |   1 +
- hw/Kconfig                          |   1 +
- hw/Makefile.objs                    |   1 +
- hw/block/Kconfig                    |   3 +
- hw/block/Makefile.objs              |   1 +
- hw/block/swim.c                     | 487 +++++++++++++++
- hw/display/Kconfig                  |   5 +
- hw/display/Makefile.objs            |   1 +
- hw/display/macfb.c                  | 477 +++++++++++++++
- hw/m68k/Kconfig                     |  10 +
- hw/m68k/Makefile.objs               |   1 +
- hw/m68k/bootinfo.h                  | 114 ++++
- hw/m68k/q800.c                      | 382 ++++++++++++
- hw/misc/Kconfig                     |   5 +
- hw/misc/Makefile.objs               |   1 +
- hw/misc/mac_via.c                   | 918 ++++++++++++++++++++++++++++
- hw/net/dp8393x.c                    |  88 ++-
- hw/nubus/Kconfig                    |   2 +
- hw/nubus/Makefile.objs              |   4 +
- hw/nubus/mac-nubus-bridge.c         |  45 ++
- hw/nubus/nubus-bridge.c             |  34 ++
- hw/nubus/nubus-bus.c                | 111 ++++
- hw/nubus/nubus-device.c             | 215 +++++++
- hw/scsi/esp.c                       | 338 +++++++++-
- include/hw/block/swim.h             |  76 +++
- include/hw/display/macfb.h          |  64 ++
- include/hw/misc/mac_via.h           | 114 ++++
- include/hw/nubus/mac-nubus-bridge.h |  24 +
- include/hw/nubus/nubus.h            |  69 +++
- include/hw/scsi/esp.h               |  15 +
- qemu-options.hx                     |   2 +-
- vl.c                                |   3 +-
- 34 files changed, 3568 insertions(+), 62 deletions(-)
- create mode 100644 hw/block/swim.c
- create mode 100644 hw/display/macfb.c
- create mode 100644 hw/m68k/bootinfo.h
- create mode 100644 hw/m68k/q800.c
- create mode 100644 hw/misc/mac_via.c
- create mode 100644 hw/nubus/Kconfig
- create mode 100644 hw/nubus/Makefile.objs
- create mode 100644 hw/nubus/mac-nubus-bridge.c
- create mode 100644 hw/nubus/nubus-bridge.c
- create mode 100644 hw/nubus/nubus-bus.c
- create mode 100644 hw/nubus/nubus-device.c
- create mode 100644 include/hw/block/swim.h
- create mode 100644 include/hw/display/macfb.h
- create mode 100644 include/hw/misc/mac_via.h
- create mode 100644 include/hw/nubus/mac-nubus-bridge.h
- create mode 100644 include/hw/nubus/nubus.h
-
--- 
-2.21.0
+>      int i;
+> =20
+>      dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
+> +    object_property_set_bool(OBJECT(dev), reset_all, "reset-all", &error=
+_fatal);
+>      qdev_prop_set_uint32(dev, "nr-irqs", nr_irqs);
+>      /*
+>       * 8 XIVE END structures per CPU. One for each available priority
+> @@ -767,7 +768,7 @@ static int ics_find_free_block(ICSState *ics, int num=
+, int alignnum)
+>              return -1;
+>          }
+>          for (i =3D first; i < first + num; ++i) {
+> -            if (!ICS_IRQ_FREE(ics, i)) {
+> +            if (!ics_irq_free(ics, i)) {
+>                  break;
+>              }
+>          }
 
 
