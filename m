@@ -2,90 +2,86 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 362B6C49ED8
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 15:29:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BE52C49ED8
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 15:34:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CE5521479
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 15:29:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CE5521479
+	by mail.kernel.org (Postfix) with ESMTPS id E32A82089F
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 15:34:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E32A82089F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7i52-0005MN-5t
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 11:29:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34048)
+	id 1i7i9d-0006ve-U7
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 11:34:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34806)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i7i4M-0004oY-Ia
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 11:28:39 -0400
+ (envelope-from <mst@redhat.com>) id 1i7i8z-0006UB-QF
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 11:33:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i7i4L-0006Ph-JD
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 11:28:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60358)
+ (envelope-from <mst@redhat.com>) id 1i7i8y-0001OH-Ko
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 11:33:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:11593)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i7i4L-0006PM-B0
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 11:28:37 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1i7i8y-0001Nj-F3
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 11:33:24 -0400
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9270830821BF;
- Tue, 10 Sep 2019 15:28:36 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 73B766012D;
- Tue, 10 Sep 2019 15:28:30 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190910063724.28470-1-armbru@redhat.com>
- <20190910063724.28470-8-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <88fcdceb-85f8-ff7b-97b0-588ed45ba021@redhat.com>
-Date: Tue, 10 Sep 2019 10:28:30 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 5C94B6B
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 15:33:23 +0000 (UTC)
+Received: by mail-qt1-f197.google.com with SMTP id i9so20305693qtj.2
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 08:33:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=mHZ8wNCQffS67q3H8gs6AeaXRC7rq28AUBP9+WBL0QY=;
+ b=q0R//iIvd8R6ljVkl78krPTX/pJl0TF7BVbLR+MmE8ZXJYj9OmUIvhs+cBnTc6zQDT
+ SRDYrXP/e6E33oAHcFtu/NP+MhGr2k2Ytw3G1lUZseK9DRT3QIhMnjhpBtS7TcBKD6aE
+ GWz2Piib3LzOqvUT8oHrLLwBhQs0u9CrHFbH5UsCyUqYMfG3/0PBFYg4RD/j+aVav+0x
+ 4F69ymgOBFr0seQotcnDcbiGW+IG83fRBUNKN36OCqxe8v546yKQiMg7k5EbhqYVJRAx
+ 2+pEXb50SFdATttRrsNwFUAcyVf6ZfQN8gTQ0AuJ0Mgfvf6LbueX/40fd9E3ERGjjgaw
+ R10g==
+X-Gm-Message-State: APjAAAUp+TjomPBrBsEe/zuvmEUQyFhVq54BkJ4I6wenYy3xEcIpgmbU
+ O90jSMk7lW4UwhvkUR4gNDLerw3G6dRK4ZFMRP7/rAoXD/+66CUEf2Vpgl24v2TfBEygSNYTyYL
+ FJSa5dThDt/MvV0c=
+X-Received: by 2002:a37:a411:: with SMTP id n17mr30325697qke.216.1568129602740; 
+ Tue, 10 Sep 2019 08:33:22 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxdzVauc45z3hbnTbIe6f5uJtLSfd3X+K5OCsYPmjg+TpiA15lHk07BisMyIe2zSMN16yWDfw==
+X-Received: by 2002:a37:a411:: with SMTP id n17mr30325687qke.216.1568129602608; 
+ Tue, 10 Sep 2019 08:33:22 -0700 (PDT)
+Received: from redhat.com ([80.74.107.118])
+ by smtp.gmail.com with ESMTPSA id o38sm6132971qtc.39.2019.09.10.08.33.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 10 Sep 2019 08:33:21 -0700 (PDT)
+Date: Tue, 10 Sep 2019 11:33:18 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Message-ID: <20190910112937-mutt-send-email-mst@kernel.org>
+References: <20190902121233.13382-1-johannes@sipsolutions.net>
+ <20190902121233.13382-2-johannes@sipsolutions.net>
+ <fe517ef6c6a8e2df9675388be9454b5863c7fc55.camel@sipsolutions.net>
+ <20190909160039.GC20875@stefanha-x1.localdomain>
+ <d095bafedcd4bcc5d76279785e5bd523aef62b58.camel@sipsolutions.net>
+ <20190910150319.GB31674@stefanha-x1.localdomain>
+ <e114b68dffecd9b4c4666327b15a28098c83f7ec.camel@sipsolutions.net>
 MIME-Version: 1.0
-In-Reply-To: <20190910063724.28470-8-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="bpqU2em9yIKdXkL2zKvzKKE9xdxbYvAvC"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 10 Sep 2019 15:28:36 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e114b68dffecd9b4c4666327b15a28098c83f7ec.camel@sipsolutions.net>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 07/16] qapi: Drop support for escape
- sequences other than \\
+Subject: Re: [Qemu-devel] [RFC] docs: vhost-user: add in-band kick/call
+ messages
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,100 +93,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bpqU2em9yIKdXkL2zKvzKKE9xdxbYvAvC
-Content-Type: multipart/mixed; boundary="LzZvFDsjc4CWW8WA2neOQ4sOlNZPSm06H";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <88fcdceb-85f8-ff7b-97b0-588ed45ba021@redhat.com>
-Subject: Re: [PATCH v2 07/16] qapi: Drop support for escape sequences other
- than \\
-References: <20190910063724.28470-1-armbru@redhat.com>
- <20190910063724.28470-8-armbru@redhat.com>
-In-Reply-To: <20190910063724.28470-8-armbru@redhat.com>
+On Tue, Sep 10, 2019 at 05:14:36PM +0200, Johannes Berg wrote:
+> Is any of you familiar with the process of getting a virtio device ID
+> assigned, and if so, do you think it'd be feasible? Without that, it'd
+> probably be difficult to upstream the patch to support this protocol to
+> user-mode Linux.
 
---LzZvFDsjc4CWW8WA2neOQ4sOlNZPSm06H
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Sure, subscribe then send a patch to virtio-comment@lists.oasis-open.org
 
-On 9/10/19 1:37 AM, Markus Armbruster wrote:
-> Since the previous commit restricted strings to printable ASCII,
-> \uXXXX's only use is obfuscation.  Drop it.
->=20
-> This leaves \\, \/, \', and \".  Since QAPI schema strings are all
-> names, and names are restricted to ASCII letters, digits, hyphen, and
-> underscore, none of them is useful.
->=20
-> The latter three have no test coverage.  Drop them.
->=20
-> Keep \\ to avoid (more) gratuitous incompatibility with JSON.
+We do expect people to eventually get around to documenting the device
+and upstreaming it though. If there's no plan to do it at all, you might
+still be able to reuse the virtio code, in that case let's talk.
 
-We have to parse it (to get a sane error message for someone writing
-"a\b" and thinking they were getting a backspace), but we can still
-reject "a\\b" as being a non-QAPI-name.  An alternative might be to
-reject QAPI strings the moment \ is encountered (as the only possible
-use is to introduce a character that is not valid as a name), to the
-point that we could check for name validity at the time we parse strings
-rather than later on.  Up to you.
-
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
-
-
-> --- a/tests/qapi-schema/escape-outside-string.err
-> +++ /dev/null
-> @@ -1 +0,0 @@
-> -tests/qapi-schema/escape-outside-string.json:3:27: Stray "\"
-
-Do we still want to test that \ is an invalid character outside of
-strings (whether or not \ is also made invalid inside strings)?
-
-> +++ b/tests/qapi-schema/unknown-escape.json
-> @@ -1,3 +1,3 @@
-> -# we only recognize JSON escape sequences, plus our \' extension (no \=
-x)
-> +# we only recognize \\
->  # { 'command': 'foo', 'data': {} }
->  { 'command': 'foo', 'dat\x61':{} }
->=20
-
-At any rate, this change seems reasonable.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---LzZvFDsjc4CWW8WA2neOQ4sOlNZPSm06H--
-
---bpqU2em9yIKdXkL2zKvzKKE9xdxbYvAvC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl13wR4ACgkQp6FrSiUn
-Q2r5SQf/SdWYPCuUVB1ww7VmRYdfoPr6/So7YTgFNSGd/48qlRfQ1X/PHAGN8qNe
-8ThrHbK2Kr4TdEparnkY23j6B4iZxZVXveYXqLjTZFeA1KwFhzrK6IiqM79pMAM/
-8DRV/o53tMvybz4J5vxtbuXvSHcm9k4oFfl927RjhpIPwyJOAL+8hSnd7i7HNXoc
-psY/+fRX0+FyAXCH7WxqDj6Ok0LLWSZwlJldTjHQQq7acGaHtK4GHfDJmmu3nqF2
-oI8XUtKl8rmx6GURYQE2ngZVQ6dUkbLc1Ay0huL6Jwc4tWNZXg4BV5nFTYZQZ5qX
-6vificHxGHnLPbubOw5iMOXGcY4LEg==
-=9eR0
------END PGP SIGNATURE-----
-
---bpqU2em9yIKdXkL2zKvzKKE9xdxbYvAvC--
+-- 
+MST
 
