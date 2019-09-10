@@ -2,83 +2,100 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05356C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:03:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02AAEC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:16:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4CC52067B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:03:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jTgkrQt5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4CC52067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id CBC632081B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:16:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBC632081B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7d05-0006Vk-Rn
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 06:03:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50845)
+	id 1i7dBv-0002bL-QC
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 06:16:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54991)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <beata.michalska@linaro.org>) id 1i7ct4-0008Qx-7d
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:56:39 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i7dAl-0001jb-NG
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:14:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <beata.michalska@linaro.org>) id 1i7ct2-0002aB-NK
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:56:38 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38987)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <beata.michalska@linaro.org>)
- id 1i7ct2-0002ZQ-H0
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:56:36 -0400
-Received: by mail-wr1-x444.google.com with SMTP id t16so18858107wra.6
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 02:56:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=/WkGeJeyqUUlCOczegoffHH2fd/jiOdQ19K334OwQps=;
- b=jTgkrQt59w/pre1I46EQAUjxt8DCKTxmaxlpcf9syvSBT7ompVeqAOzKH0CL6/6YL/
- +5SZnkv0jxVYkEZf5z8vUXGR4Go+4f1h/LYWmnquSM8HLaGL7QClyAmgzbD0w+ODkcUV
- lej1x1+cOCrfqvT7VxAIw/q9E5BgylwNZkckZSvxTPUUkCLxqmROL+eFBTMmAWsTllnm
- wEbfljjujfsNug58Mchqlwf5aGpCSzxe68D80lN658zR7NJG7w9fKu6kfNF9Ck2Pq7fJ
- sEVOhLB292LEldEs+we1forGceN66iAbKkm5I84kDrtPLtXcwjA526is51RM4moyfhcm
- 3xQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=/WkGeJeyqUUlCOczegoffHH2fd/jiOdQ19K334OwQps=;
- b=Zg/FDfbmV4UPlZyKPfsmD7lYHKp/1EaIOzpnzuOFln6Ey3GRs1Zy8uy3BX/ahgRKe2
- lz63kyqxvWNwsB1Jb+m6ta+svvBSITCZw7AdxGH6buyT+NWVTpToN5qPiATuzwd0EmK5
- 1xzL57w8kaslimlGKbBe5F5jxonX24W/qwGzhaLL/Ci3YMTtSTI6jPegGhxNFwhNjdvI
- /WzcE951qv0lSt9KPNZHJw1S0HRPQ99QGxiyBWzXhnPG2L01tF9bp69xBF+X3bQ0ZP+f
- b3s4hN3VoHJwzl4EgX59inbnvIlLU10nfCHedNmb2n3tW2FgSqqAsZVihTSa5V0OAXc6
- RNng==
-X-Gm-Message-State: APjAAAWX/tc1KVpspLPv3dE5oL/CeDu44isY75BylSLAwMnTyJnI6/Pg
- Wa84XaNsICCaUd41WEz76rBJoOZDkCo=
-X-Google-Smtp-Source: APXvYqx2OPSNgpET+wL+51IIk442Ef5L4Pb4tyGh6ETgD0zBrAEjyRSybWCowI1vjcXyTBglPJzS7w==
-X-Received: by 2002:a5d:678a:: with SMTP id v10mr24800537wru.145.1568109395309; 
- Tue, 10 Sep 2019 02:56:35 -0700 (PDT)
-Received: from moi-XPS-13-9350.arm.com
- (host86-144-13-57.range86-144.btcentralplus.com. [86.144.13.57])
- by smtp.gmail.com with ESMTPSA id e30sm32403540wra.48.2019.09.10.02.56.34
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Sep 2019 02:56:34 -0700 (PDT)
-From: Beata Michalska <beata.michalska@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Tue, 10 Sep 2019 11:56:10 +0200
-Message-Id: <20190910095610.4546-5-beata.michalska@linaro.org>
-In-Reply-To: <20190910095610.4546-1-beata.michalska@linaro.org>
-References: <20190910095610.4546-1-beata.michalska@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH 4/4] target/arm: Add support for DC CVAP & DC
- CVADP ins
+ (envelope-from <mreitz@redhat.com>) id 1i7dAk-0005Ij-MX
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:14:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57890)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i7dAf-0005Em-Vj; Tue, 10 Sep 2019 06:14:50 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6547A300BCE9;
+ Tue, 10 Sep 2019 10:14:48 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-90.ams2.redhat.com
+ [10.36.117.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E07E6012D;
+ Tue, 10 Sep 2019 10:14:32 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190830161228.54238-1-vsementsov@virtuozzo.com>
+ <20190830161228.54238-5-vsementsov@virtuozzo.com>
+ <ae856032-2d6f-adb8-939b-410708dea596@redhat.com>
+ <01bc8974-b9a5-8312-fe24-e2fbe87ab13d@virtuozzo.com>
+ <e94365cd-3bdf-4055-10de-abad4f65225b@redhat.com>
+ <d4b6869a-a711-f911-2b29-c7062aa44aa6@virtuozzo.com>
+ <80720d39-b9d6-d693-0f6a-0a078d6056e0@redhat.com>
+ <577ab66d-ea14-a363-0b8a-92932198c284@virtuozzo.com>
+ <310835ca-4aa9-0c4f-5d18-1a89e2e0be74@redhat.com>
+ <c6859d2b-e530-8e5a-375d-87954c974e0d@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <079112b9-7a54-1c10-6f89-145d866115f2@redhat.com>
+Date: Tue, 10 Sep 2019 12:14:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <c6859d2b-e530-8e5a-375d-87954c974e0d@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="O0Sz8lfYHJOs2dTjmizr5PJmIxdipLmbA"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Tue, 10 Sep 2019 10:14:48 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v10 04/14] block/backup: introduce
+ BlockCopyState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,234 +107,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Beata Michalska <beata.michalska@linaro.org>,
- quintela@redhat.com, richard.henderson@linaro.org, dgilbert@redhat.com,
- shameerali.kolothum.thodi@huawei.com, eric.auger@redhat.com,
- qemu-arm@nongnu.org, pbonzini@redhat.com
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ Denis Lunev <den@virtuozzo.com>,
+ "wencongyang2@huawei.com" <wencongyang2@huawei.com>,
+ "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ARMv8.2 introduced support for Data Cache Clean instructions
-to PoP (point-of-persistence) - DC CVAP and PoDP (point-of-deep-persistence)
-- DV CVADP. Both specify conceptual points in a memory system where all writes
-that are to reach them are considered persistent.
-The support provided considers both to be actually the same so there is no
-distinction between the two. If none is available (there is no backing store
-for given memory) both will result in Data Cache Clean up to the point of
-coherency. Otherwise sync for the specified range shall be performed.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--O0Sz8lfYHJOs2dTjmizr5PJmIxdipLmbA
+Content-Type: multipart/mixed; boundary="YK6N2L8jKNq9AhkwQWlfeSIPAsP4egR0w";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eblake@redhat.com" <eblake@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>,
+ "wencongyang2@huawei.com" <wencongyang2@huawei.com>,
+ "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com"
+ <stefanha@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
+ "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
+Message-ID: <079112b9-7a54-1c10-6f89-145d866115f2@redhat.com>
+Subject: Re: [PATCH v10 04/14] block/backup: introduce BlockCopyState
+References: <20190830161228.54238-1-vsementsov@virtuozzo.com>
+ <20190830161228.54238-5-vsementsov@virtuozzo.com>
+ <ae856032-2d6f-adb8-939b-410708dea596@redhat.com>
+ <01bc8974-b9a5-8312-fe24-e2fbe87ab13d@virtuozzo.com>
+ <e94365cd-3bdf-4055-10de-abad4f65225b@redhat.com>
+ <d4b6869a-a711-f911-2b29-c7062aa44aa6@virtuozzo.com>
+ <80720d39-b9d6-d693-0f6a-0a078d6056e0@redhat.com>
+ <577ab66d-ea14-a363-0b8a-92932198c284@virtuozzo.com>
+ <310835ca-4aa9-0c4f-5d18-1a89e2e0be74@redhat.com>
+ <c6859d2b-e530-8e5a-375d-87954c974e0d@virtuozzo.com>
+In-Reply-To: <c6859d2b-e530-8e5a-375d-87954c974e0d@virtuozzo.com>
 
-Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
----
- linux-user/elfload.c       | 18 +++++++++++++++++-
- target/arm/cpu.h           | 13 ++++++++++++-
- target/arm/cpu64.c         |  1 +
- target/arm/helper.c        | 24 ++++++++++++++++++++++++
- target/arm/helper.h        |  1 +
- target/arm/op_helper.c     | 36 ++++++++++++++++++++++++++++++++++++
- target/arm/translate-a64.c |  5 +++++
- 7 files changed, 96 insertions(+), 2 deletions(-)
+--YK6N2L8jKNq9AhkwQWlfeSIPAsP4egR0w
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 3365e192eb..1ec00308d5 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -609,7 +609,12 @@ enum {
-     ARM_HWCAP_A64_PACG          = 1UL << 31,
- };
- 
-+enum {
-+    ARM_HWCAP2_A64_DCPODP   = 1 << 0,
-+};
-+
- #define ELF_HWCAP get_elf_hwcap()
-+#define ELF_HWCAP2 get_elf_hwcap2()
- 
- static uint32_t get_elf_hwcap(void)
- {
-@@ -644,12 +649,23 @@ static uint32_t get_elf_hwcap(void)
-     GET_FEATURE_ID(aa64_jscvt, ARM_HWCAP_A64_JSCVT);
-     GET_FEATURE_ID(aa64_sb, ARM_HWCAP_A64_SB);
-     GET_FEATURE_ID(aa64_condm_4, ARM_HWCAP_A64_FLAGM);
-+    GET_FEATURE_ID(aa64_dcpop, ARM_HWCAP_A64_DCPOP);
- 
--#undef GET_FEATURE_ID
- 
-     return hwcaps;
- }
- 
-+static uint32_t get_elf_hwcap2(void)
-+{
-+    ARMCPU *cpu = ARM_CPU(thread_cpu);
-+    uint32_t hwcaps = 0;
-+
-+    GET_FEATURE_ID(aa64_dcpodp, ARM_HWCAP2_A64_DCPODP);
-+    return hwcaps;
-+}
-+
-+#undef GET_FEATURE_ID
-+
- #endif /* not TARGET_AARCH64 */
- #endif /* TARGET_ARM */
- 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 297ad5e47a..1713d76590 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -2229,7 +2229,8 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
- #define ARM_CP_NZCV              (ARM_CP_SPECIAL | 0x0300)
- #define ARM_CP_CURRENTEL         (ARM_CP_SPECIAL | 0x0400)
- #define ARM_CP_DC_ZVA            (ARM_CP_SPECIAL | 0x0500)
--#define ARM_LAST_SPECIAL         ARM_CP_DC_ZVA
-+#define ARM_CP_DC_CVAP           (ARM_CP_SPECIAL | 0x0600)
-+#define ARM_LAST_SPECIAL         ARM_CP_DC_CVAP
- #define ARM_CP_FPU               0x1000
- #define ARM_CP_SVE               0x2000
- #define ARM_CP_NO_GDB            0x4000
-@@ -3572,6 +3573,16 @@ static inline bool isar_feature_aa64_frint(const ARMISARegisters *id)
-     return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, FRINTTS) != 0;
- }
- 
-+static inline bool isar_feature_aa64_dcpop(const ARMISARegisters *id)
-+{
-+    return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, DPB) != 0;
-+}
-+
-+static inline bool isar_feature_aa64_dcpodp(const ARMISARegisters *id)
-+{
-+    return (FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, DPB) >> 1) != 0;
-+}
-+
- static inline bool isar_feature_aa64_fp16(const ARMISARegisters *id)
- {
-     /* We always set the AdvSIMD and FP fields identically wrt FP16.  */
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index d7f5bf610a..20094f980d 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -331,6 +331,7 @@ static void aarch64_max_initfn(Object *obj)
-         cpu->isar.id_aa64isar0 = t;
- 
-         t = cpu->isar.id_aa64isar1;
-+        t = FIELD_DP64(t, ID_AA64ISAR1, DPB, 2);
-         t = FIELD_DP64(t, ID_AA64ISAR1, JSCVT, 1);
-         t = FIELD_DP64(t, ID_AA64ISAR1, FCMA, 1);
-         t = FIELD_DP64(t, ID_AA64ISAR1, APA, 1); /* PAuth, architected only */
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 507026c915..99ae01b7e7 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -3843,6 +3843,22 @@ static CPAccessResult aa64_cacheop_access(CPUARMState *env,
-     return CP_ACCESS_OK;
- }
- 
-+static CPAccessResult aa64_cacheop_persist_access(CPUARMState *env,
-+                                                  const ARMCPRegInfo *ri,
-+                                                  bool isread)
-+{
-+    ARMCPU *cpu = env_archcpu(env);
-+    /*
-+     * Access is UNDEF if lacking implementation for either DC CVAP or DC CVADP
-+     * DC CVAP ->  CRm: 0xc
-+     * DC CVADP -> CRm: 0xd
-+     */
-+    return (ri->crm == 0xc && !cpu_isar_feature(aa64_dcpop, cpu)) ||
-+           (ri->crm == 0xd && !cpu_isar_feature(aa64_dcpodp, cpu))
-+           ? CP_ACCESS_TRAP_UNCATEGORIZED
-+           : aa64_cacheop_access(env, ri, isread);
-+}
-+
- /* See: D4.7.2 TLB maintenance requirements and the TLB maintenance instructions
-  * Page D4-1736 (DDI0487A.b)
-  */
-@@ -4251,6 +4267,14 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
-       .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 10, .opc2 = 1,
-       .access = PL0_W, .type = ARM_CP_NOP,
-       .accessfn = aa64_cacheop_access },
-+    { .name = "DC_CVAP", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 12, .opc2 = 1,
-+      .access = PL0_W, .type = ARM_CP_DC_CVAP,
-+      .accessfn = aa64_cacheop_persist_access },
-+    { .name = "DC_CVADP", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 13, .opc2 = 1,
-+      .access = PL0_W, .type = ARM_CP_DC_CVAP,
-+      .accessfn = aa64_cacheop_persist_access },
-     { .name = "DC_CSW", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 10, .opc2 = 2,
-       .access = PL1_W, .type = ARM_CP_NOP },
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 1fb2cb5a77..a850364944 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -561,6 +561,7 @@ DEF_HELPER_FLAGS_3(crypto_sm4ekey, TCG_CALL_NO_RWG, void, ptr, ptr, ptr)
- DEF_HELPER_FLAGS_3(crc32, TCG_CALL_NO_RWG_SE, i32, i32, i32, i32)
- DEF_HELPER_FLAGS_3(crc32c, TCG_CALL_NO_RWG_SE, i32, i32, i32, i32)
- DEF_HELPER_2(dc_zva, void, env, i64)
-+DEF_HELPER_2(dc_cvap, void, env, i64)
- 
- DEF_HELPER_FLAGS_2(neon_pmull_64_lo, TCG_CALL_NO_RWG_SE, i64, i64, i64)
- DEF_HELPER_FLAGS_2(neon_pmull_64_hi, TCG_CALL_NO_RWG_SE, i64, i64, i64)
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index 0fd4bd0238..75ebf6afa4 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -987,3 +987,39 @@ void HELPER(dc_zva)(CPUARMState *env, uint64_t vaddr_in)
-     memset(g2h(vaddr), 0, blocklen);
- #endif
- }
-+
-+void HELPER(dc_cvap)(CPUARMState *env, uint64_t vaddr_in)
-+{
-+#ifndef CONFIG_USER_ONLY
-+    ARMCPU *cpu = env_archcpu(env);
-+    /* CTR_EL0 System register -> DminLine, bits [19:16] */
-+    uint64_t dline_size = 4 << ((cpu->ctr >> 16) & 0xF);
-+    uint64_t vaddr = vaddr_in & ~(dline_size - 1);
-+    void *haddr;
-+    int mem_idx = cpu_mmu_index(env, false);
-+
-+    /* This won't be crossing page boundaries */
-+    haddr = probe_read(env, vaddr, dline_size, mem_idx, GETPC());
-+    if (haddr) {
-+
-+        ram_addr_t offset;
-+        MemoryRegion *mr;
-+
-+        /*
-+         * RCU critical section + ref counting,
-+         * so that MR won't disappear behind the scene
-+         */
-+        rcu_read_lock();
-+        mr = memory_region_from_host(haddr, &offset);
-+        if (mr) {
-+            memory_region_ref(mr);
-+        }
-+        rcu_read_unlock();
-+
-+        if (mr) {
-+            memory_region_do_writeback(mr, offset, dline_size);
-+            memory_region_unref(mr);
-+        }
-+    }
-+#endif
-+}
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 2d6cd09634..21ea3631d6 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -1746,6 +1746,11 @@ static void handle_sys(DisasContext *s, uint32_t insn, bool isread,
-         tcg_rt = cpu_reg(s, rt);
-         gen_helper_dc_zva(cpu_env, tcg_rt);
-         return;
-+    case ARM_CP_DC_CVAP:
-+        /* DC CVAP / DC CVADP */
-+        tcg_rt = cpu_reg(s, rt);
-+        gen_helper_dc_cvap(cpu_env, tcg_rt);
-+        return;
-     default:
-         break;
-     }
--- 
-2.17.1
+On 10.09.19 11:22, Vladimir Sementsov-Ogievskiy wrote:
 
+[...]
+
+> Ok, than
+>=20
+> 4. Postpone improvements for a follow-up (anyway, finally, block-copy s=
+hould
+> use block_status to copy by larger chunks, like mirror does), and impro=
+ve the
+> comment like this:
+>=20
+> """
+> Used for job sync=3Dtop mode, which currently works as follows (the siz=
+e of the
+> comment definitely shows unclean design, but this is a TODO to improve =
+it):
+> If job started in sync=3Dtop mode, which means that we want to copy onl=
+y parts
+> allocated in top layer, job should behave like this:
+>=20
+> 1. Create block-copy state with skip_unallocated =3D true.
+> 2. Then, block_copy() will automatically check for allocation in top la=
+yer,
+> and do not copy areas which are not allocated in top layer. So, for exa=
+mple,
+> copy-before-write operations in backup works correctly even before [3.]=
+
+> 3. Sequentially call block_copy_reset_unallocated() to cover the whole =
+source
+> node, copy_bitmap will be updated correspondingly.
+> 4. Unset skip_unallocated variable in block-copy state, to avoid extra =
+(as
+> everything is covered by [3.]) block-status queries in block_copy() cal=
+ls
+> 5. Do sequential copying by loop of block_copy() calls, all needed allo=
+cation
+> information is already in copy_bitmap.
+>=20
+>  From block_copy() side, it behaves like this:
+> If skip_unallocated is set, block_copy() will reset in copy_bitmap area=
+s
+> unallocated in top image (so they will not be copied). Whenever any suc=
+h
+> area is cleared, progress_reset_callback will be invoked. Note, that
+> progress_reset_callback is called from block_copy_reset_unallocated() t=
+oo.
+> """
+
+Can this not be simplified?
+
+"""
+Used by sync=3Dtop jobs, which first scan the source node for unallocated=
+
+areas and clear them in the copy_bitmap.  During this process, the
+bitmap is thus not fully initialized: It may still have bits set for
+areas that are unallocated and should actually not be copied.
+
+This is indicated by skip_unallocated.
+
+In this case, block_copy() will query the source=E2=80=99s allocation sta=
+tus,
+skip unallocated regions, clear them in the copy_bitmap, and invoke
+block_copy_reset_unallocated() every time it does.
+
+Otherwise, block_copy() copies everything that=E2=80=99s dirty in the cop=
+y_bitmap.
+"""
+
+Max
+
+
+--YK6N2L8jKNq9AhkwQWlfeSIPAsP4egR0w--
+
+--O0Sz8lfYHJOs2dTjmizr5PJmIxdipLmbA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl13d4YACgkQ9AfbAGHV
+z0Autwf/WOo1WyxhxN5W/cvHcGlcPDK8dh/66ZPDpHY61NZlxMEpw3c+Ei/pnc0s
+kqNNaTVibjpX4qOe4/L0Emn8EuGpXE1d1oRtK9fGZdYOm1EkfUIdPo+EE/4ytLHm
+xCUk3KFF4u89JXJ6+xZoDEkr6BN4TN703fuc7tkj/4yM7jFf7dicurIjzzYu41qs
+xFt2i4UnlBdh99qBS0+jMAWvn4wGR5jY634wAz2hJWk6cWSCVX6fKCu7p3cFJ9n0
+DWBmus4qGjk5HanZ0ZX/7bV92XHDAUgE99H4iEevXT9Pi2fOJjVSVGgRKghN00OR
+Np22QORjqeVcFBeQmvC7QMXLGzcflA==
+=wn0M
+-----END PGP SIGNATURE-----
+
+--O0Sz8lfYHJOs2dTjmizr5PJmIxdipLmbA--
 
