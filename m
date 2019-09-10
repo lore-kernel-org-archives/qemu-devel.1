@@ -6,66 +6,72 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AA4CC49ED7
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 22:48:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2623FC49ED7
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 23:06:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EB2C216F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 22:48:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EB2C216F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id E9FB32168B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 23:06:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9FB32168B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernelpath.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7ow7-0004J9-GF
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 18:48:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32966)
+	id 1i7pDP-0008TC-2R
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 19:06:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35062)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i7ovA-0003aB-Lc
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 18:47:37 -0400
+ (envelope-from <bounces@canonical.com>) id 1i7pCk-00082K-AK
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 19:05:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i7ov8-000070-VL
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 18:47:36 -0400
-Resent-Date: Tue, 10 Sep 2019 18:47:36 -0400
-Resent-Message-Id: <E1i7ov8-000070-VL@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21489)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i7ov8-00005i-Nm
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 18:47:34 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568154738; cv=none; d=zoho.com; s=zohoarc; 
- b=mkvmSZAoRWf66BeJDtbROleZebf32PeUtE6DcnLwTRpXxRoZHPRmk7nig+Ik3+pBma3bkpe0X+aJGr1azeD94v83jDhw0HEu6HEfhco2Yxop/ykxQPuzqTuoXnHQ+xKIqrdkqfs3AHXYDFrT02Wte6w4xaHO4f7P2LbB6X3DSUA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1568154738;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=Sz943Uff+JMiEezd/gmNCBN5uiCwq+ZhZaLDf36Rfac=; 
- b=aLI28nNTaMaCyFWlDBPhpRtu7R/vdCpukfP72TBiVz3Dh2GFh+l5DVuVlcPm5jOrnA0UrLDBmTKCWZ2G9Qnz+9QG7HGLq3p/LfEOV1SHB2aPJFhJvW26VpTGhUzJjfFrX5sBaepwkbFzRXFqLH6XEfxIJL1rUGJZpoXMMaDx+Gk=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1568154736286786.8955354625843;
- Tue, 10 Sep 2019 15:32:16 -0700 (PDT)
-In-Reply-To: <20190910063724.28470-1-armbru@redhat.com>
-Message-ID: <156815473524.15929.1966362255562245492@5dec9699b7de>
+ (envelope-from <bounces@canonical.com>) id 1i7pCi-00043h-VE
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 19:05:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49854)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1i7pCi-00043J-Q8
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 19:05:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1i7pCh-0004x3-Iz
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 23:05:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8472E2E80C7
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 23:05:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: armbru@redhat.com
-Date: Tue, 10 Sep 2019 15:32:16 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 10 Sep 2019 22:56:25 -0000
+From: Rafael David Tinoco <rafaeldtinoco@kernelpath.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=rafaeldtinoco@kernelpath.com; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=In Progress; importance=Medium; assignee=rafaeldtinoco@kernelpath.com; 
+X-Launchpad-Bug-Tags: qemu-img
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dannf jnsnow lizhengui rafaeldtinoco
+X-Launchpad-Bug-Reporter: dann frazier (dannf)
+X-Launchpad-Bug-Modifier: Rafael David Tinoco (rafaeldtinoco)
+References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
+Message-Id: <156815618548.28851.17824681639308053537.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19044";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 719fd923f2e97334970026e795d638a82c75011e
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.54
-Subject: Re: [Qemu-devel] [PATCH v2 00/16] qapi: Schema language cleanups &
- doc improvements
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1805256] Re: qemu-img hangs on
+ rcu_call_ready_event logic in Aarch64 when converting images
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -74,94 +80,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
- mdroth@linux.vnet.ibm.com
+Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxMDA2MzcyNC4yODQ3
-MC0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzE2XSBxYXBpOiBT
-Y2hlbWEgbGFuZ3VhZ2UgY2xlYW51cHMgJiBkb2MgaW1wcm92ZW1lbnRzCk1lc3NhZ2UtaWQ6IDIw
-MTkwOTEwMDYzNzI0LjI4NDcwLTEtYXJtYnJ1QHJlZGhhdC5jb20KVHlwZTogc2VyaWVzCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9k
-ZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
-IGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
-ICd0ZXN0JwphMTY1M2Q1IHFhcGk6IFR3ZWFrIGNvZGUgdG8gbWF0Y2ggZG9jcy9kZXZlbC9xYXBp
-LWNvZGUtZ2VuLnR4dAowOTlhYTBlIGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogSW1wcm92ZSBR
-QVBJIHNjaGVtYSBsYW5ndWFnZSBkb2MKODMxY2VjYSBkb2NzL2RldmVsL3FhcGktY29kZS1nZW46
-IFJld3JpdGUgaW50cm9kdWN0aW9uIHRvIHNjaGVtYQpiMmQyMTczIGRvY3MvZGV2ZWwvcWFwaS1j
-b2RlLWdlbjogUmV3cml0ZSBjb21wYXRpYmlsaXR5IGNvbnNpZGVyYXRpb25zCmUzZmVlNWYgZG9j
-cy9kZXZlbC9xYXBpLWNvZGUtZ2VuOiBSZW9yZGVyIHNlY3Rpb25zIGZvciByZWFkYWJpbGl0eQo1
-YTMwMjZhIHFhcGk6IEFkanVzdCBmcm9udGVuZCBlcnJvcnMgdG8gc2F5IGVudW0gdmFsdWUsIG5v
-dCBtZW1iZXIKZGEzZTVjZSBxYXBpOiBQZXJtaXQgb21pdHRpbmcgYWxsIGZsYXQgdW5pb24gYnJh
-bmNoZXMKMjlhNzhkYyBxYXBpOiBQZXJtaXQgYWx0ZXJuYXRlcyB3aXRoIGp1c3Qgb25lIGJyYW5j
-aAoxNjkwZjkwIHFhcGk6IFBlcm1pdCAnYm94ZWQnIHdpdGggZW1wdHkgdHlwZQo0ZGIxMDFiIHFh
-cGk6IERyb3Agc3VwcG9ydCBmb3IgZXNjYXBlIHNlcXVlbmNlcyBvdGhlciB0aGFuIFxcCjIyNmEw
-MjEgcWFwaTogUmVzdHJpY3Qgc3RyaW5ncyB0byBwcmludGFibGUgQVNDSUkKYjdiZjM1MSB0ZXN0
-cy9xYXBpLXNjaGVtYTogRGVtb25zdHJhdGUgYmFkIHJlcG9ydGluZyBvZiBmdW5ueSBjaGFyYWN0
-ZXJzCmU0YmJjNTQgZG9jcy9kZXZlbC9xYXBpLWNvZGUtZ2VuOiBNaW5vciBzcGVjaWZpY2F0aW9u
-IGZpeGVzCmFmYmE4ODEgcWFwaTogRHJvcCBzdXBwb3J0IGZvciBib3hlZCBhbHRlcm5hdGUgYXJn
-dW1lbnRzCjE5ODhmZmYgcWFwaTogRHJvcCBjaGVja190eXBlKCkncyByZWR1bmRhbnQgcGFyYW1l
-dGVyIEBhbGxvd19vcHRpb25hbAoyZjRhMjEwIHNjcmlwdHMvZ2l0Lm9yZGVyZmlsZTogTWF0Y2gg
-UUFQSSBzY2hlbWEgbW9yZSBwcmVjaXNlbHkKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTYgQ2hl
-Y2tpbmcgY29tbWl0IDJmNGEyMTA1YzVlMyAoc2NyaXB0cy9naXQub3JkZXJmaWxlOiBNYXRjaCBR
-QVBJIHNjaGVtYSBtb3JlIHByZWNpc2VseSkKMi8xNiBDaGVja2luZyBjb21taXQgMTk4OGZmZjY5
-M2ExIChxYXBpOiBEcm9wIGNoZWNrX3R5cGUoKSdzIHJlZHVuZGFudCBwYXJhbWV0ZXIgQGFsbG93
-X29wdGlvbmFsKQozLzE2IENoZWNraW5nIGNvbW1pdCBhZmJhODgxYjc3ZDQgKHFhcGk6IERyb3Ag
-c3VwcG9ydCBmb3IgYm94ZWQgYWx0ZXJuYXRlIGFyZ3VtZW50cykKNC8xNiBDaGVja2luZyBjb21t
-aXQgZTRiYmM1NDc5ODEwIChkb2NzL2RldmVsL3FhcGktY29kZS1nZW46IE1pbm9yIHNwZWNpZmlj
-YXRpb24gZml4ZXMpCjUvMTYgQ2hlY2tpbmcgY29tbWl0IGI3YmYzNTEyYzllYiAodGVzdHMvcWFw
-aS1zY2hlbWE6IERlbW9uc3RyYXRlIGJhZCByZXBvcnRpbmcgb2YgZnVubnkgY2hhcmFjdGVycykK
-Ni8xNiBDaGVja2luZyBjb21taXQgMjI2YTAyMWU0MzViIChxYXBpOiBSZXN0cmljdCBzdHJpbmdz
-IHRvIHByaW50YWJsZSBBU0NJSSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmls
-ZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojOTg6IApuZXcgZmlsZSBtb2Rl
-IDEwMDY0NAoKRVJST1I6IEludmFsaWQgVVRGLTgsIHBhdGNoIGFuZCBjb21taXQgbWVzc2FnZSBz
-aG91bGQgYmUgZW5jb2RlZCBpbiBVVEYtOAojMTE1OiBGSUxFOiB0ZXN0cy9xYXBpLXNjaGVtYS9z
-dHJpbmctY29kZS1wb2ludC0xMjcuanNvbjoyOgoreyAnY29tbWFuZCc6ICfijKYnIH0KICAgICAg
-ICAgICAgICAgXgoKRVJST1I6IEludmFsaWQgVVRGLTgsIHBhdGNoIGFuZCBjb21taXQgbWVzc2Fn
-ZSBzaG91bGQgYmUgZW5jb2RlZCBpbiBVVEYtOAojMTQxOiBGSUxFOiB0ZXN0cy9xYXBpLXNjaGVt
-YS9zdHJpbmctY29kZS1wb2ludC0zMS5qc29uOjI6Cit7ICdjb21tYW5kJzogJ+KQnycgfQogICAg
-ICAgICAgICAgICBeCgp0b3RhbDogMiBlcnJvcnMsIDEgd2FybmluZ3MsIDY3IGxpbmVzIGNoZWNr
-ZWQKClBhdGNoIDYvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjcvMTYgQ2hlY2tpbmcg
-Y29tbWl0IDRkYjEwMWI2MGRjZSAocWFwaTogRHJvcCBzdXBwb3J0IGZvciBlc2NhcGUgc2VxdWVu
-Y2VzIG90aGVyIHRoYW4gXFwpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUo
-cyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzY5OiAKZGVsZXRlZCBmaWxlIG1v
-ZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQ5IGxpbmVzIGNoZWNrZWQK
-ClBhdGNoIDcvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8xNiBDaGVja2luZyBjb21t
-aXQgMTY5MGY5MDhlOWM5IChxYXBpOiBQZXJtaXQgJ2JveGVkJyB3aXRoIGVtcHR5IHR5cGUpCldB
-Uk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMg
-bmVlZCB1cGRhdGluZz8KIzEyOTogCmRlbGV0ZWQgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAg
-ZXJyb3JzLCAxIHdhcm5pbmdzLCAxMjkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xNiBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgo5LzE2IENoZWNraW5nIGNvbW1pdCAyOWE3OGRjMzU3NGYgKHFh
-cGk6IFBlcm1pdCBhbHRlcm5hdGVzIHdpdGgganVzdCBvbmUgYnJhbmNoKQoxMC8xNiBDaGVja2lu
-ZyBjb21taXQgZGEzZTVjZTg0NDVkIChxYXBpOiBQZXJtaXQgb21pdHRpbmcgYWxsIGZsYXQgdW5p
-b24gYnJhbmNoZXMpCjExLzE2IENoZWNraW5nIGNvbW1pdCA1YTMwMjZhODliNmMgKHFhcGk6IEFk
-anVzdCBmcm9udGVuZCBlcnJvcnMgdG8gc2F5IGVudW0gdmFsdWUsIG5vdCBtZW1iZXIpCjEyLzE2
-IENoZWNraW5nIGNvbW1pdCBlM2ZlZTVmMmFlYmMgKGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjog
-UmVvcmRlciBzZWN0aW9ucyBmb3IgcmVhZGFiaWxpdHkpCjEzLzE2IENoZWNraW5nIGNvbW1pdCBi
-MmQyMTczZjY4MTIgKGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogUmV3cml0ZSBjb21wYXRpYmls
-aXR5IGNvbnNpZGVyYXRpb25zKQoxNC8xNiBDaGVja2luZyBjb21taXQgODMxY2VjYWUyMmIxIChk
-b2NzL2RldmVsL3FhcGktY29kZS1nZW46IFJld3JpdGUgaW50cm9kdWN0aW9uIHRvIHNjaGVtYSkK
-MTUvMTYgQ2hlY2tpbmcgY29tbWl0IDA5OWFhMGUyNjQ5NiAoZG9jcy9kZXZlbC9xYXBpLWNvZGUt
-Z2VuOiBJbXByb3ZlIFFBUEkgc2NoZW1hIGxhbmd1YWdlIGRvYykKMTYvMTYgQ2hlY2tpbmcgY29t
-bWl0IGExNjUzZDVhNzM4OCAocWFwaTogVHdlYWsgY29kZSB0byBtYXRjaCBkb2NzL2RldmVsL3Fh
-cGktY29kZS1nZW4udHh0KQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
-d2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
-dy5vcmcvbG9ncy8yMDE5MDkxMDA2MzcyNC4yODQ3MC0xLWFybWJydUByZWRoYXQuY29tL3Rlc3Rp
-bmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
-IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+QEMU BUG: #1
 
+Alright, one of the issues is (according to comment #14):
+
+"""
+Meaning that code is waiting for a futex inside kernel.
+
+(gdb) print rcu_call_ready_event
+$4 =3D {value =3D 4294967295, initialized =3D true}
+
+The QemuEvent "rcu_call_ready_event->value" is set to INT_MAX and I
+don't know why yet.
+
+rcu_call_ready_event->value is only touched by:
+
+qemu_event_init() -> bool init ? EV_SET : EV_FREE
+qemu_event_reset() -> atomic_or(&ev->value, EV_FREE)
+qemu_event_set() -> atomic_xchg(&ev->value, EV_SET)
+qemu_event_wait() -> atomic_cmpxchg(&ev->value, EV_FREE, EV_BUSY)'
+"""
+
+Now I know why rcu_call_ready_event->value is set to INT_MAX. That is
+because in the following declaration:
+
+struct QemuEvent {
+#ifndef __linux__
+    pthread_mutex_t lock;
+    pthread_cond_t cond;
+#endif
+    unsigned value;
+    bool initialized;
+};
+
+#define EV_SET         0
+#define EV_FREE        1
+#define EV_BUSY       -1
+
+"value" is declared as unsigned, but EV_BUSY sets it to -1, and,
+according to the Two's Complement Operation
+(https://en.wikipedia.org/wiki/Two%27s_complement), it will be INT_MAX
+(4294967295).
+
+So this is the "first bug" found AND it is definitely funny that this
+hasn't been seen in other architectures at all... I can reproduce it at
+will.
+
+With that said, it seems that there is still another issue causing (less
+frequently):
+
+(gdb) thread 2
+[Switching to thread 2 (Thread 0xffffbec5ad90 (LWP 17459))]
+#0  syscall () at ../sysdeps/unix/sysv/linux/aarch64/syscall.S:38
+38      ../sysdeps/unix/sysv/linux/aarch64/syscall.S: No such file or direc=
+tory.
+(gdb) bt
+#0  syscall () at ../sysdeps/unix/sysv/linux/aarch64/syscall.S:38
+#1  0x0000aaaaaabd41cc in qemu_futex_wait (val=3D<optimized out>, f=3D<opti=
+mized out>) at ./util/qemu-thread-posix.c:438
+#2  qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)=
+ at ./util/qemu-thread-posix.c:442
+#3  0x0000aaaaaabed05c in call_rcu_thread (opaque=3Dopaque@entry=3D0x0) at =
+./util/rcu.c:261
+#4  0x0000aaaaaabd34c8 in qemu_thread_start (args=3D<optimized out>) at ./u=
+til/qemu-thread-posix.c:498
+#5  0x0000ffffbf25c880 in start_thread (arg=3D0xfffffffff5bf) at pthread_cr=
+eate.c:486
+#6  0x0000ffffbf1b6b9c in thread_start () at ../sysdeps/unix/sysv/linux/aar=
+ch64/clone.S:78
+
+Thread 2 to be stuck at "futex()" kernel syscall (like the FUTEX_WAKE
+never happened and/or wasn't atomic for this arch/binary). Need to
+investigate this also.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1805256
+
+Title:
+  qemu-img hangs on rcu_call_ready_event logic in Aarch64 when
+  converting images
+
+Status in QEMU:
+  In Progress
+Status in qemu package in Ubuntu:
+  In Progress
+
+Bug description:
+  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
+  frequently hangs (~50% of the time) with this command:
+
+  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
+
+  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
+  qcow2->qcow2 conversion happens to be something uvtool does every time
+  it fetches images.
+
+  Once hung, attaching gdb gives the following backtrace:
+
+  (gdb) bt
+  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
+274213760, =
+
+      timeout=3D<optimized out>, timeout@entry=3D0x0, sigmask=3D0xffffc123b=
+950)
+      at ../sysdeps/unix/sysv/linux/ppoll.c:39
+  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
+ptimized out>, =
+
+      __fds=3D<optimized out>) at /usr/include/aarch64-linux-gnu/bits/poll2=
+.h:77
+  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, =
+
+      timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.c:322
+  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
+      at util/main-loop.c:233
+  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
+  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
+g.c:1980
+  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
+img.c:2456
+  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
+-img.c:4975
+
+  Reproduced w/ latest QEMU git (@ 53744e0a182)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1805256/+subscriptions
 
