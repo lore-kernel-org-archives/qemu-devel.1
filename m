@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C78AC49ED7
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:53:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F217C49ED8
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:54:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 256A421479
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:53:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED07F21479
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:54:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="frJtnUdJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 256A421479
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IX1Bn+L7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED07F21479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7hWi-0006BF-IQ
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 10:53:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54170)
+	id 1i7hX9-0006jn-Hv
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 10:54:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53956)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i7hNu-0005cO-NB
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:47 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i7hNl-0005PV-RP
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i7hNt-00056U-Id
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:46 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38283)
+ (envelope-from <peter.maydell@linaro.org>) id 1i7hNk-0004zj-Gk
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:37 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34246)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i7hNt-00055p-Cc
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:45 -0400
-Received: by mail-wr1-x441.google.com with SMTP id l11so20811753wrx.5
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 07:44:45 -0700 (PDT)
+ id 1i7hNk-0004z7-Am
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:36 -0400
+Received: by mail-wr1-x441.google.com with SMTP id a11so11068229wrx.1
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 07:44:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=LA9MpYwh3mZJWgj+jicjrA5Nt9K2oC0TJFXiZTBybLY=;
- b=frJtnUdJmrWMbeMlSI4ZaC0DUyjKF0jSF2ar0QTkVt4vqGH414/fh6f4cec6hioWgF
- bVubc+ZbCy4Zo3wNxyPpHzUhpokvzCpCmZqwWqCC5mLxtYx/8FULeoW/FY/nU2iQN8Er
- DuGebK8eZNhACwvJFAoB/FGyYGaeS9Mn3OGNcHR9teG34gNKscxSXh8fHKYz46GrYXVX
- 6K2vRrSfWYqDa8BBT3sQlxmaAWLzAX8sS8nSRduDQaD4hoU9zMA8yMV6/Zp1tyewgaZx
- wOUO5rni+XYUAy7LrGmqcDGyquC9yi8NqaQxRq9I3qZPNDbdsqw36Kq1lYIbQmRxFSJD
- UGEA==
+ bh=fZA5qZtHref6EES7glsBu8W4zydJFLjuwr0G2I/qEek=;
+ b=IX1Bn+L75xsE7wR97ujQGTwx7gERV6QZ/5uUFlJkg4cM3TAIGRuAZ2f8MUOuzmaH/l
+ 7p/3UeB5SACUV7ULkrYPZf4l2JC6jj9Ia/1JBrdu/hhdk1juMbf8qBwLTe92d8CIm2NH
+ WqRilXdkGprmhh3ov14IQ7t9hsiz58myU8OUi1MYToYLLjsE8dU5/PPSjzbfSGiJadSs
+ odf3GudeX81c3LIKoUY4DDPGTQ+v4lqfc74WKRh2/Rk+9uigZLmqKWZKFn9C/RpQPWBT
+ H58yH/v9YQlvo4v5LyWy2MbX0gUfHO+LhyDje0OVd5RAKY69sFsgMk0+YMYgWXUZ/p/I
+ WqTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=LA9MpYwh3mZJWgj+jicjrA5Nt9K2oC0TJFXiZTBybLY=;
- b=CcjyoUPpwu+Ut9fbSnMPaKtHsVQew+r3HUdODN6HbGP5X/znwaOoVYiC+xUMA3twNE
- 9HDxKNssh9bLjcJ4Lmom/dD6czrYwmj55eEvEfdbfkirEuUZW21nu9uvMgbkqEVGIeGi
- dVlb0A+iiu6AWFOhpH+O4Co7Gb7KPnw/khN8wXK8G1sJexOmk43GCFJ3Nm54zlyDPjC2
- dxcC+NEf/Cnzk4LlEbZRdjo06PAUc56fJhQyxDi0utIHt6061BLT1Oi+7Yf2rUarQxUz
- NzrqOGwLlWAhPjl0/AZotiGlTumYaS+M8dQ4KBLp23JG16CXc2EO2J780zt3/BtltA9/
- 9B5A==
-X-Gm-Message-State: APjAAAV91vJa1869WdwqGgNt/qpWfiIN5Ntz5gx8BVx+0ISoVCLkdOkZ
- XsLyCJhwgvy2TsALG1y6pjT1wg==
-X-Google-Smtp-Source: APXvYqzEu8Q/xrdaKHc4se1g7ZV8yWQprAf22K23XdhGAuPSd4Tojsw0iUdzXRFk92QuOuXniznGOg==
-X-Received: by 2002:adf:e392:: with SMTP id e18mr28592507wrm.87.1568126684565; 
- Tue, 10 Sep 2019 07:44:44 -0700 (PDT)
+ bh=fZA5qZtHref6EES7glsBu8W4zydJFLjuwr0G2I/qEek=;
+ b=ixugX+z0mqG66vfI4OGO/XOLf+l+SJOHKwsJM8jhWeqmsiUXwvOd8c+Zyba9i1NPiv
+ E5BVJyEjKsgsRm1MO3HAZwBpKAtjr4ItgLjYHd6xf4D18QM4yVGEiSB80k/N+91mzicY
+ wjjLjpcq5nbAtfh237hNR1qIToHMskbl9JEmpkUiaeOdf40iFb4z52Ecs9S8CH30mK2Q
+ SG9vJF079+gudjxizzl2dr6/PW4I5TURjWpG2Yjn/uis2GdkmDZZj+HrisuAl2VOk/xC
+ ATfCB0h2Dc/BwS2jygBzWZP5BVesvtBlNlh5/ISP8nImsQHwAUk85Oi3U9hLl7eT4SeC
+ lSdw==
+X-Gm-Message-State: APjAAAVBNMSEB0jX5944EZh0WBSqN/nEMi1GYPR5ZiSgDqlgPX3SSB5j
+ JXv+F4C+PfCfwmiH5Lk7tSJJEA==
+X-Google-Smtp-Source: APXvYqyjTDUzvzPnMlLUmbXH/biyEgBm1jIvMwQN4NQDq7w/thO6i/dyCQ8UT1ZuDnQfQbIgeCbTqA==
+X-Received: by 2002:adf:ebd0:: with SMTP id v16mr18411913wrn.352.1568126675477; 
+ Tue, 10 Sep 2019 07:44:35 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id a192sm5703814wma.1.2019.09.10.07.44.43
+ by smtp.gmail.com with ESMTPSA id a192sm5703814wma.1.2019.09.10.07.44.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Sep 2019 07:44:43 -0700 (PDT)
+ Tue, 10 Sep 2019 07:44:34 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Tue, 10 Sep 2019 15:44:27 +0100
-Message-Id: <20190910144428.32597-13-peter.maydell@linaro.org>
+Date: Tue, 10 Sep 2019 15:44:19 +0100
+Message-Id: <20190910144428.32597-5-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190910144428.32597-1-peter.maydell@linaro.org>
 References: <20190910144428.32597-1-peter.maydell@linaro.org>
@@ -81,8 +81,8 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PATCH 12/13] target/arm/arm-semi: Implement
- SH_EXT_STDOUT_STDERR extension
+Subject: [Qemu-devel] [PATCH 04/13] target/arm/arm-semi: clean up TaskState*
+ usage in non-user-only code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,62 +98,108 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SH_EXT_STDOUT_STDERR is a v2.0 semihosting extension: the guest
-can open ":tt" with a file mode requesting append access in
-order to open stderr, in addition to the existing "open for
-read for stdin or write for stdout". Implement this and
-report it via the :semihosting-features data.
+The semihosting code has to build for both user-only and softmmu;
+for user-only it needs access to the TaskState struct that holds
+per-thread information. For softmmu we don't need it.
+
+Currently the softmmu set_swi_errno() takes a CPUARMState *,
+which it doesn't use, and the 'ts' variable in do_arm_semihosting()
+is set to either be a TaskState* or a CPUARMState* depending on
+whether CONFIG_USER_ONLY is set, so that the callsite always
+passes 'ts'. Since we don't actually need the CPUARMState *,
+we can instead make set_swi_errno() always take a TaskState*,
+by providing a local-to-this-file dummy typedef for the softmmu
+case and setting ts to NULL for softmmu.
+
+This will make it easier to have other functions which pass
+through the TaskState*, because now they can have the same
+prototype regardless of whether they're CONFIG_USER_ONLY or not.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/arm-semi.c | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+ target/arm/arm-semi.c | 48 ++++++++++++++++++++++++-------------------
+ 1 file changed, 27 insertions(+), 21 deletions(-)
 
 diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-index 531084b7799..0df8d4d69d6 100644
+index 05491bf5248..ce3ba554bef 100644
 --- a/target/arm/arm-semi.c
 +++ b/target/arm/arm-semi.c
-@@ -476,12 +476,16 @@ static uint32_t gdb_flenfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf)
- #define SHFB_MAGIC_2 0x46
- #define SHFB_MAGIC_3 0x42
- 
-+/* Feature bits reportable in feature byte 0 */
-+#define SH_EXT_EXIT_EXTENDED (1 << 0)
-+#define SH_EXT_STDOUT_STDERR (1 << 1)
+@@ -36,6 +36,13 @@
+ #else
+ #include "exec/gdbstub.h"
+ #include "qemu/cutils.h"
 +
- static const uint8_t featurefile_data[] = {
-     SHFB_MAGIC_0,
-     SHFB_MAGIC_1,
-     SHFB_MAGIC_2,
-     SHFB_MAGIC_3,
--    0, /* Feature byte 0 */
-+    SH_EXT_STDOUT_STDERR, /* Feature byte 0 */
- };
++/*
++ * Dummy typedef so that we can have functions that take
++ * a TaskState* even if we're building for softmmu; in that
++ * case the argument will always be NULL.
++ */
++typedef void TaskState;
+ #endif
  
- static void init_featurefile_guestfd(int guestfd)
-@@ -674,7 +678,21 @@ target_ulong do_arm_semihosting(CPUARMState *env)
-         }
+ #define TARGET_SYS_OPEN        0x01
+@@ -213,27 +220,24 @@ static GuestFD *get_guestfd(int guestfd)
+     return gf;
+ }
  
-         if (strcmp(s, ":tt") == 0) {
--            int result_fileno = arg1 < 4 ? STDIN_FILENO : STDOUT_FILENO;
-+            int result_fileno;
+-#ifdef CONFIG_USER_ONLY
+-static inline uint32_t set_swi_errno(TaskState *ts, uint32_t code)
+-{
+-    if (code == (uint32_t)-1)
+-        ts->swi_errno = errno;
+-    return code;
+-}
+-#else
++#ifndef CONFIG_USER_ONLY
+ static target_ulong syscall_err;
+ 
+-static inline uint32_t set_swi_errno(CPUARMState *env, uint32_t code)
+-{
+-    if (code == (uint32_t)-1) {
+-        syscall_err = errno;
+-    }
+-    return code;
+-}
+-
+ #include "exec/softmmu-semi.h"
+ #endif
+ 
++static inline uint32_t set_swi_errno(TaskState *ts, uint32_t code)
++{
++    if (code == (uint32_t)-1) {
++#ifdef CONFIG_USER_ONLY
++        ts->swi_errno = errno;
++#else
++        syscall_err = errno;
++#endif
++    }
++    return code;
++}
 +
-+            /*
-+             * We implement SH_EXT_STDOUT_STDERR, so:
-+             *  open for read == stdin
-+             *  open for write == stdout
-+             *  open for append == stderr
-+             */
-+            if (arg1 < 4) {
-+                result_fileno = STDIN_FILENO;
-+            } else if (arg1 < 8) {
-+                result_fileno = STDOUT_FILENO;
-+            } else {
-+                result_fileno = STDERR_FILENO;
-+            }
-             associate_guestfd(guestfd, result_fileno);
-             unlock_user(s, arg0, 0);
-             return guestfd;
+ static target_ulong arm_semi_syscall_len;
+ 
+ static void arm_semi_cb(CPUState *cs, target_ulong ret, target_ulong err)
+@@ -374,13 +378,15 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+     int nr;
+     uint32_t ret;
+     uint32_t len;
+-#ifdef CONFIG_USER_ONLY
+-    TaskState *ts = cs->opaque;
+-#else
+-    CPUARMState *ts = env;
+-#endif
++    TaskState *ts;
+     GuestFD *gf;
+ 
++#ifdef CONFIG_USER_ONLY
++    ts = cs->opaque;
++#else
++    ts = NULL;
++#endif
++
+     if (is_a64(env)) {
+         /* Note that the syscall number is in W0, not X0 */
+         nr = env->xregs[0] & 0xffffffffU;
 -- 
 2.20.1
 
