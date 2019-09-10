@@ -2,90 +2,58 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E11C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:28:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC37EC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:30:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 531AC20872
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:28:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EbUl0L0k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 531AC20872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A26F320872
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:30:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A26F320872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7cS4-0005o2-EX
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 05:28:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38982)
+	id 1i7cTz-0007wc-KJ
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 05:30:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40700)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i7c0b-0004bv-3z
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:00:22 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1i7c8R-0004fb-3x
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:08:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i7c0V-0004mR-Ac
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:00:20 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:38587)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i7c0V-0004la-3H
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:00:15 -0400
-Received: by mail-wr1-x436.google.com with SMTP id l11so18468741wrx.5
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 02:00:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=mWFw3drxQFdjCgGDCtjzGJodYnXOghm6SEi/8qbmbkA=;
- b=EbUl0L0k1hyhXsEGc45gDxW89zIMcVLmr+7Nxp5nphkEgYDWKjxptelhHGNvGp6HXr
- J5qQ4jEgG3AkkpZGTJ9LzKzS1wV6Mv/FZfMk+Z9BCkD28nAq+yzxdzxn+usgF6jkuTF6
- J2y7FdESmAV8aUa9uJMfb87R8X1noub12ktAjec67pOtxSwp1m5O4JPrpxC0HO5V/p2Y
- a1a+nmnhwom3/eDbKv4fsc7EA2rkSuKjhU8Fa0CcK9GeRHEXfAHsDsT/+e+060e4wrtI
- P2bntidNJgHNOFwC++aygAWIgQ/S+DDP3AVCj6/NxPO31LaiJ5BZoZZHsmMsTfrbKrJk
- G+HA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=mWFw3drxQFdjCgGDCtjzGJodYnXOghm6SEi/8qbmbkA=;
- b=df/W4K8Jf4o7OQCib6qsoOpbNSOjEdaLkRVG5Tv96lSksiWNxECIDkz7aQeOl06XTi
- milwZa1Eenj8EKmh+GsmgHRRsc1HpsWTLEgvOCGWg9RKV8cHL85XTg5eIzqXYS/2J+hJ
- fA3JDIUV0RRhBWAsyfC0h9NZ5v9/ky7+5gWzxQCjikjnKf4JMtThuGng9fGJiOHaK/ye
- Fo4HChVgaehRKc/DifnmGv5IMX5j47G1DLck3Wm609b5QbfWeaBdoCiMCl0fi9xYTuYT
- 3ZjmgZqnfBZKZiXEevT5UIZDHfFxaCHAJxlk6+3a1Q0620ALY9hd6vDVMwog3TdlJSiv
- ay4A==
-X-Gm-Message-State: APjAAAWvTTM+4uNZEd1obymIYfQ80qu5biQt7qubhJc8d0irGhbcnheR
- j3xot79v+peE1lbES+p6JA+LAw==
-X-Google-Smtp-Source: APXvYqwP4Mmxq8o/sARLUG6SLv5mfKo4SNIbOzGzgfUTDAFnP1NYAtWhwn6JVlUqLz5VfyRplnT8Zw==
-X-Received: by 2002:adf:f406:: with SMTP id g6mr11905113wro.325.1568106014033; 
- Tue, 10 Sep 2019 02:00:14 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id v6sm3475371wma.24.2019.09.10.02.00.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Sep 2019 02:00:11 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 433F31FFBF;
- Tue, 10 Sep 2019 09:43:53 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Date: Tue, 10 Sep 2019 09:43:44 +0100
-Message-Id: <20190910084349.28817-41-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190910084349.28817-1-alex.bennee@linaro.org>
-References: <20190910084349.28817-1-alex.bennee@linaro.org>
+ (envelope-from <sgarzare@redhat.com>) id 1i7c8P-00022e-Vh
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:08:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38224)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1i7c8P-00021n-Q4
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:08:25 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 60979300183D;
+ Tue, 10 Sep 2019 09:08:24 +0000 (UTC)
+Received: from steredhat.redhat.com (ovpn-117-150.ams2.redhat.com
+ [10.36.117.150])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B1934100194E;
+ Tue, 10 Sep 2019 09:08:22 +0000 (UTC)
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 10 Sep 2019 11:08:21 +0200
+Message-Id: <20190910090821.28327-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::436
-Subject: [Qemu-devel] [PULL 40/45] .travis.yml: Document how the build
- matrix use caches
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Tue, 10 Sep 2019 09:08:24 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH] elf-ops.h: fix int overflow in load_elf()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,43 +65,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+This patch fixes a possible integer overflow when we calculate
+the total size of ELF segments loaded.
 
-We will set the CACHE_NAME variable to improve the caching
-of various jobs using the same characteristics. Document it
-first.
+Reported-by: Coverity (CID 1405299)
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+Now we are limited to INT_MAX, should load_elf() returns ssize_t
+to support bigger ELFs?
+---
+ include/hw/elf_ops.h | 6 ++++++
+ hw/core/loader.c     | 1 +
+ 2 files changed, 7 insertions(+)
 
-See https://docs.travis-ci.com/user/caching/#caches-and-build-matrices
-
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
-diff --git a/.travis.yml b/.travis.yml
-index 3d1c7f0d7e0..51c7d19c071 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -6,6 +6,12 @@ language: c
- compiler:
-   - gcc
- cache:
-+  # There is one cache per branch and compiler version.
-+  # characteristics of each job are used to identify the cache:
-+  # - OS name (currently, linux, osx, or windows)
-+  # - OS distribution (for Linux, xenial, trusty, or precise)
-+  # - macOS image name (e.g., xcode7.2)
-+  # - Names and values of visible environment variables set in .travis.yml or Settings panel
-   timeout: 1200
-   ccache: true
-   pip: true
--- 
-2.20.1
+diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+index 1496d7e753..46dd3bf413 100644
+--- a/include/hw/elf_ops.h
++++ b/include/hw/elf_ops.h
+@@ -485,6 +485,12 @@ static int glue(load_elf, SZ)(const char *name, int =
+fd,
+                 }
+             }
+=20
++            if (mem_size > INT_MAX - total_size) {
++                error_report("ELF total segments size is too big to load=
+ "
++                             "max is %d)", INT_MAX);
++                goto fail;
++            }
++
+             /* address_offset is hack for kernel images that are
+                linked at the wrong physical address.  */
+             if (translate_fn) {
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index 32f7cc7c33..feda52fa88 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -44,6 +44,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
++#include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "hw/hw.h"
+ #include "disas/disas.h"
+--=20
+2.21.0
 
 
