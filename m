@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-9.2 required=3.0 tests=DATE_IN_PAST_12_24,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCF27ECDE27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 08:49:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7451BECDE20
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 08:49:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2B2E21D79
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 08:49:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2B2E21D79
+	by mail.kernel.org (Postfix) with ESMTPS id 4D23D21D79
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 08:49:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D23D21D79
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7yJs-0000SN-2F
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 04:49:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57583)
+	id 1i7yJu-0000VN-TF
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 04:49:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57373)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1i7xwE-00089x-W5
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:25:19 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1i7xw3-0007uc-Ly
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:25:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1i7xwD-0006m2-LA
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:25:18 -0400
-Received: from mail-wr1-f50.google.com ([209.85.221.50]:40229)
+ (envelope-from <palmer@dabbelt.com>) id 1i7xw2-0006bX-Fk
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:25:07 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:53224)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i7xwD-0006lV-Ef
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:25:17 -0400
-Received: by mail-wr1-f50.google.com with SMTP id l3so719332wru.7
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 01:25:17 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i7xw2-0006bA-A8
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:25:06 -0400
+Received: by mail-wm1-f67.google.com with SMTP id t17so2327385wmi.2
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 01:25:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=6LjmDeAL87SuuDyQOaR6PZ+xifwSg2XG2OmboMVgOmA=;
- b=QSL7kIuypFYthmM4HYJtIwi4FFuOA4HPcaZMb5ItGGjTqESonqv5FyYKvr17JlRKfP
- 2pgTkRhbZqWVq0Yq42vFFQIC60lGRx6SOlxAQ25onENdfEHhxfJWix+h7O1ryn5UE19A
- daHrsaSwH6KAThdfmsfFcWDDIGaFPBqDANbcTivcgGuOpjlZ9Sd/Amd5ouMvD79zc5AF
- Ac6I4jHqvhtu6rhn/w7qB+sVOYddn1SZjZIL+KlAWfQAFItZO+kNpgOS5et4ttLlETXM
- uve4yDw8lT0h6At/pQrzKJTpLkc6rXTEUZEu3bUJYOyr24DLfYWFtNMLCpR0Nd1sFYvQ
- bQlg==
-X-Gm-Message-State: APjAAAVo/ehjk+nGviL+cN3FzEjzHz0HRXkyY0EWNcylVrYwFBoGVtW1
- nS8Cojbhj2hAib6m5IXs28Fk0K5lmA8LZQ==
-X-Google-Smtp-Source: APXvYqwSAcKIV2uCiMe0h9HmJm5ElS3T4uW1tcvOg//FCCZ/fyK7onWOhURLE8wWf1Gj30Z/BJDGow==
-X-Received: by 2002:a5d:4d92:: with SMTP id b18mr4086064wru.116.1568190316211; 
- Wed, 11 Sep 2019 01:25:16 -0700 (PDT)
+ bh=xpkGcRJRYadCT6ocDlVxXul15aD8WH0BAO94YOt7Pqc=;
+ b=ItzxcOZG2KFnG7OFR6kHWOlaivdkoVN3TjBqqCVhDIR17o+N5yJdICjBbDE3Hb8ybL
+ rZU7If2njmU8CH129BcZCrL8iRx/3he2YgZY8zas4C0ZWeybGwunDHeHs2chN2kBu5rc
+ W/cpUvnI6onpC1NPcXPEOD40J7gHzf2Rdbo+aLgCsmgqw6vZpeaTIYSKOmd51ZWp6rbb
+ SwadmiuM7soy7lOVOxonIZgm//yM/4O5xWva9Sy9QojagDNx29dzR4ObsaNF8LN/RnAi
+ FJf/EXvss3Hn4hczOEEJ/0jJLsbI3jQDPubhLfZsD4X1mgDnjHIdsDwH/6KM792paamN
+ ckhA==
+X-Gm-Message-State: APjAAAVyiHta8Uq0xeg0vGsKUG48laUTUEgIF1DTTWcEKK/pKSSzu7vW
+ aDDIausaeOhvaChuhpG9xfSfrg==
+X-Google-Smtp-Source: APXvYqzDhdmOI63MeSG7Zaf8rYsFyJLwfBkokVlm4fpS6B6eKDfzOaKebcOB3ioRvDz1zwUNSWVY3w==
+X-Received: by 2002:a7b:cc8e:: with SMTP id p14mr2802161wma.124.1568190305158; 
+ Wed, 11 Sep 2019 01:25:05 -0700 (PDT)
 Received: from localhost ([148.69.85.38])
- by smtp.gmail.com with ESMTPSA id v4sm31601269wrg.56.2019.09.11.01.25.15
+ by smtp.gmail.com with ESMTPSA id q14sm43929897wrc.77.2019.09.11.01.25.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Sep 2019 01:25:15 -0700 (PDT)
-Date: Tue, 10 Sep 2019 12:04:56 -0700
-Message-Id: <20190910190513.21160-31-palmer@sifive.com>
+ Wed, 11 Sep 2019 01:25:04 -0700 (PDT)
+Date: Tue, 10 Sep 2019 12:04:48 -0700
+Message-Id: <20190910190513.21160-23-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190910190513.21160-1-palmer@sifive.com>
 References: <20190910190513.21160-1-palmer@sifive.com>
@@ -66,9 +66,9 @@ From: Palmer Dabbelt <palmer@sifive.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.50
-Subject: [Qemu-devel] [PULL 30/47] riscv: sifive_u: Set the minimum number
- of cpus to 2
+X-Received-From: 209.85.128.67
+Subject: [Qemu-devel] [PULL 22/47] riscv: sifive_u: Remove the unnecessary
+ include of prci header
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,51 +89,28 @@ Sender: "Qemu-devel"
 
 From: Bin Meng <bmeng.cn@gmail.com>
 
-It is not useful if we only have one management CPU.
+sifive_u machine does not use PRCI as of today. Remove the prci
+header inclusion.
 
 Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- hw/riscv/sifive_u.c         | 4 +++-
- include/hw/riscv/sifive_u.h | 2 ++
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ hw/riscv/sifive_u.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 2947e06f71..2023b71d53 100644
+index 32d8cee335..2947e06f71 100644
 --- a/hw/riscv/sifive_u.c
 +++ b/hw/riscv/sifive_u.c
-@@ -10,7 +10,8 @@
-  * 1) CLINT (Core Level Interruptor)
-  * 2) PLIC (Platform Level Interrupt Controller)
-  *
-- * This board currently uses a hardcoded devicetree that indicates one hart.
-+ * This board currently generates devicetree dynamically that indicates at least
-+ * two harts.
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms and conditions of the GNU General Public License,
-@@ -433,6 +434,7 @@ static void riscv_sifive_u_machine_init(MachineClass *mc)
-      * management CPU.
-      */
-     mc->max_cpus = 4;
-+    mc->min_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + 1;
- }
- 
- DEFINE_MACHINE("sifive_u", riscv_sifive_u_machine_init)
-diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-index f25bad8f13..6d227410f8 100644
---- a/include/hw/riscv/sifive_u.h
-+++ b/include/hw/riscv/sifive_u.h
-@@ -69,6 +69,8 @@ enum {
-     SIFIVE_U_GEM_CLOCK_FREQ = 125000000
- };
- 
-+#define SIFIVE_U_MANAGEMENT_CPU_COUNT   1
-+
- #define SIFIVE_U_PLIC_HART_CONFIG "MS"
- #define SIFIVE_U_PLIC_NUM_SOURCES 54
- #define SIFIVE_U_PLIC_NUM_PRIORITIES 7
+@@ -38,7 +38,6 @@
+ #include "hw/riscv/sifive_plic.h"
+ #include "hw/riscv/sifive_clint.h"
+ #include "hw/riscv/sifive_uart.h"
+-#include "hw/riscv/sifive_prci.h"
+ #include "hw/riscv/sifive_u.h"
+ #include "hw/riscv/boot.h"
+ #include "chardev/char.h"
 -- 
 2.21.0
 
