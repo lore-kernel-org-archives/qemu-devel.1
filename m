@@ -2,83 +2,142 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6829CC49ED7
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:08:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 283FBC4740A
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:09:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4237D21019
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:08:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4237D21019
+	by mail.kernel.org (Postfix) with ESMTPS id F16472081B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:09:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F16472081B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7gpB-0003fQ-Ck
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 10:08:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47097)
+	id 1i7gpp-0004gy-Sy
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 10:09:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47187)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1i7goG-0002uo-TF
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:07:57 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i7gon-0003Vd-F1
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:08:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1i7goF-000429-DH
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:07:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37550)
+ (envelope-from <jsnow@redhat.com>) id 1i7gom-0004DP-0e
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:08:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43062)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1i7goF-00041q-6J
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:07:55 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1i7goj-0004CL-1z; Tue, 10 Sep 2019 10:08:25 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3C45D8830C
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 14:07:54 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id m6so1409863wmf.2
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 07:07:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version;
- bh=fxAs1uhQgsx7471tyDgPIk1p3r7y5AN+xVnLbk7ax+4=;
- b=p0C0h+GSXeTfUuitqi5+qMx6fsfy+QqDYB2SYFcNtXsH3PXZlL0kvahDQOjk+Xu7PE
- LAO0heCg5xDMMIlZ0KPm8YRSUnKropgR73ulotEAVMRTLX5LoHFDiGTmUZD2olafT7i0
- YiKgFQmpCHyC6ZX8V3zVsdIg40t/sdOj1bYLkOT0Z8V7sWJWG8bjGQiTgPe05+g+5Wja
- ffzeLr0+TUsTqiaD9gDW58uMKbfpc7i5h/V7IZCyCQmz5IiGXmz53kKDhqnCiLSL5xcy
- MlNS+0oBCBnc3gv7zR9vgLNt/Lugsb2Nj+BwB46z2IsHkAU95/eBonkDkI2kjRKNU22g
- PLNQ==
-X-Gm-Message-State: APjAAAVftIVwOx3EULoHqpHfEldCPYr/8LcaOxBJ26fj0JbwVR1iJzMp
- Q0/UDzFXWPiEr5bxIJ7BgqhOv802LRgzi7VOj9kExHnrU3mVp6HyxeeVCg9q9gwafY+qeSSjKSt
- TrGsd2MBnxES4cAM=
-X-Received: by 2002:adf:bb8e:: with SMTP id q14mr3871146wrg.74.1568124472868; 
- Tue, 10 Sep 2019 07:07:52 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyVCd2cE1eTDtEHnPqazWaBqxOCDLgX6wA3EiTe3fM0oIXzvMrRRi0mor4hLRGWpmVJb1NJsA==
-X-Received: by 2002:adf:bb8e:: with SMTP id q14mr3871115wrg.74.1568124472594; 
- Tue, 10 Sep 2019 07:07:52 -0700 (PDT)
-Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
- [95.120.215.139])
- by smtp.gmail.com with ESMTPSA id o22sm32440894wra.96.2019.09.10.07.07.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Sep 2019 07:07:51 -0700 (PDT)
-References: <20190910133611.149421-1-slp@redhat.com>
- <aef947c6-b1df-7700-809f-4c9917abb561@redhat.com>
-User-agent: mu4e 1.2.0; emacs 26.2
-From: Sergio Lopez <slp@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-In-reply-to: <aef947c6-b1df-7700-809f-4c9917abb561@redhat.com>
-Date: Tue, 10 Sep 2019 16:07:47 +0200
-Message-ID: <87imq0utvw.fsf@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 61D733D90A;
+ Tue, 10 Sep 2019 14:08:24 +0000 (UTC)
+Received: from [10.10.120.64] (ovpn-120-64.rdu2.redhat.com [10.10.120.64])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B9CDB60167;
+ Tue, 10 Sep 2019 14:08:20 +0000 (UTC)
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <1568049517-10261-1-git-send-email-andychiu@synology.com>
+ <20190910025404-mutt-send-email-mst@kernel.org>
+ <9f402933-7256-75da-af77-2e47b656ab27@redhat.com>
+ <20190910095329-mutt-send-email-mst@kernel.org>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <a4a39c82-e5bc-71e9-28e8-25a0c68e2d6e@redhat.com>
+Date: Tue, 10 Sep 2019 10:08:20 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
+In-Reply-To: <20190910095329-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Tue, 10 Sep 2019 14:08:24 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2] blockjob: update nodes head while
- removing all bdrv
+Subject: Re: [Qemu-devel] [PATCH] ahci: enable pci bus master MemoryRegion
+ before loading ahci engines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,113 +149,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ andychiu <andychiu@synology.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
 
-Max Reitz <mreitz@redhat.com> writes:
+On 9/10/19 9:58 AM, Michael S. Tsirkin wrote:
+> On Tue, Sep 10, 2019 at 09:50:41AM -0400, John Snow wrote:
+>>
+>>
+>> On 9/10/19 3:04 AM, Michael S. Tsirkin wrote:
+>>> On Tue, Sep 10, 2019 at 01:18:37AM +0800, andychiu wrote:
+>>>> If Windows 10 guests have enabled 'turn off hard disk after idle'
+>>>> option in power settings, and the guest has a SATA disk plugged in,
+>>>> the SATA disk will be turned off after a specified idle time.
+>>>> If the guest is live migrated or saved/loaded with its SATA disk
+>>>> turned off, the following error will occur:
+>>>>
+>>>> qemu-system-x86_64: AHCI: Failed to start FIS receive engine: bad FIS receive buffer address
+>>>> qemu-system-x86_64: Failed to load ich9_ahci:ahci
+>>>> qemu-system-x86_64: error while loading state for instance 0x0 of device '0000:00:1a.0/ich9_ahci'
+>>>> qemu-system-x86_64: load of migration failed: Operation not permitted
+>>>>
+>>>> Observation from trace logs shows that a while after Windows 10 turns off
+>>>> a SATA disk (IDE disks don't have the following behavior),
+>>>> it will disable the PCI_COMMAND_MASTER flag of the pci device containing
+>>>> the ahci device. When the the disk is turning back on,
+>>>> the PCI_COMMAND_MASTER flag will be restored first.
+>>>> But if the guest is migrated or saved/loaded while the disk is off,
+>>>> the post_load callback of ahci device, ahci_state_post_load(), will fail
+>>>> at ahci_cond_start_engines() if the MemoryRegion
+>>>> pci_dev->bus_master_enable_region is not enabled, with pci_dev pointing
+>>>> to the PCIDevice struct containing the ahci device.
+>>>>
+>>>> This patch enables pci_dev->bus_master_enable_region before calling
+>>>> ahci_cond_start_engines() in ahci_state_post_load(), and restore the
+>>>> MemoryRegion to its original state afterwards.
+>>>>
+>>>> Signed-off-by: andychiu <andychiu@synology.com>
+>>>
+>>> Poking at PCI device internals like this seems fragile.  And force
+>>> enabling bus master can lead to unpleasantness like corrupting guest
+>>> memory, unhandled interrupts, etc.  E.g. it's quite reasonable,
+>>> spec-wise, for the guest to move thing in memory around while bus
+>>> mastering is off.
+>>>
+>>> Can you teach ahci that region being disabled
+>>> during migration is ok, and recover from it?
+>>
+>> That's what I'm wondering.
+>>
+>> I could try to just disable the FIS RX engine if the mapping fails, but
+>> that will require a change to guest visible state.
+>>
+>> My hunch, though, is that when windows re-enables the device it will
+>> need to re-program the address registers anyway, so it might cope well
+>> with the FIS RX bit getting switched off.
+>>
+>> (I'm wondering if it isn't a mistake that QEMU is trying to re-map this
+>> address in the first place. Is it legal that the PCI device has pci bus
+>> master disabled but we've held on to a mapping?
+> 
+> If you are poking at guest memory when bus master is off, then most likely yes.
+> 
+>> Should there be some
+>> callback where AHCI knows to invalidate mappings at that point...?)
+> 
+> ATM the callback is the config write, you check
+> proxy->pci_dev.config[PCI_COMMAND] & PCI_COMMAND_MASTER
+> and if disabled invalidate the mapping.
+> 
+> virtio at least has code that pokes at
+> proxy->pci_dev.config[PCI_COMMAND] too, I'm quite
+> open to a function along the lines of
+> pci_is_bus_master_enabled()
+> that will do this.
+> 
 
-> On 10.09.19 15:36, Sergio Lopez wrote:
->> block_job_remove_all_bdrv() iterates through job->nodes, calling
->> bdrv_root_unref_child() for each entry. The call to the latter may
->> reach child_job_[can_]set_aio_ctx(), which will also attempt to
->> traverse job->nodes, potentially finding entries that where freed
->> on previous iterations.
->>=20
->> To avoid this situation, update job->nodes head on each iteration to
->> ensure that already freed entries are no longer linked to the list.
->>=20
->> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=3D1746631
->> Signed-off-by: Sergio Lopez <slp@redhat.com>
->> ---
->> Changelog
->>=20
->> v2:
->>  - Avoid leaking job->nodes (thanks Max Reitz)
->> ---
->>  blockjob.c | 12 ++++++++++--
->>  1 file changed, 10 insertions(+), 2 deletions(-)
->> ---
->> diff --git a/blockjob.c b/blockjob.c
->> index 6e32d1a0c0..ffda6dd1e4 100644
->> --- a/blockjob.c
->> +++ b/blockjob.c
->> @@ -187,13 +187,21 @@ static const BdrvChildRole child_job =3D {
->>=20=20
->>  void block_job_remove_all_bdrv(BlockJob *job)
->>  {
->> -    GSList *l;
->> +    GSList *l, *orig_nodes;
->> +
->> +    orig_nodes =3D job->nodes;
->>      for (l =3D job->nodes; l; l =3D l->next) {
->>          BdrvChild *c =3D l->data;
->>          bdrv_op_unblock_all(c->bs, job->blocker);
->>          bdrv_root_unref_child(c);
->> +        /*
->> +         * The call above may reach child_job_[can_]set_aio_ctx(), whic=
-h will
->> +         * also traverse job->nodes, so update the head here to make su=
-re it
->> +         * doesn't attempt to process an already freed BdrvChild.
->> +         */
->> +        job->nodes =3D l->next;
->>      }
->> -    g_slist_free(job->nodes);
->> +    g_slist_free(orig_nodes);
->>      job->nodes =3D NULL;
->
-> Hm, this assignment is now a no-op.
->
-> I think I=E2=80=99d just rewrite the whole function in the following fash=
-ion:
->
-> orig_nodes =3D job->nodes;
-> while (job->nodes) {
->     BdrvChild *c =3D job->nodes->data;
->     [...]
->     job->nodes =3D job->nodes->next;
-> }
-> g_slist_free(orig_nodes);
->
-> What do you think?
->
+Well, that's not a callback. I don't think it's right to check the
+PCI_COMMAND register *every* time AHCI does anything at all to see if
+its mappings are still valid.
 
-As this is the first time I was touching this code, I was trying to keep
-the changes minimal, but I definitely prefer to rewrite the function as
-you suggest.
+AHCI makes a mapping *once* when FIS RX is turned on, and it unmaps it
+when it's turned off. It assumes it remains valid that whole time. When
+we migrate, it checks to see if it was running, and performs the
+mappings again to re-boot the state machine.
 
-Should I send a v3, or do you want to send a patch yourself? I don't
-really mind either, just want to get this fixed ASAP :-)
+What I'm asking is; what are the implications of a guest disabling
+PCI_COMMAND_MASTER? (I don't know PCI as well as you do.)
 
-Thanks Max,
-Sergio.
+What should that mean for the AHCI state machine?
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl13rjMACgkQ9GknjS8M
-AjVAcw//eClZXISHGOHrrlrj34ovRKHDjCPjhFFVVkiyIOhHuiFpj9mGQ4NI7TGi
-5e70v+t/ONY6Vcg/FGPtzbP+u4LGsBVS0UCQt1aUP36yBpVD6ul0YvrZS8uvaQUP
-0+Finyi/ZWjmd2KZaFgXAQePWT/g5/hsCVPpibbBPiFsJ3mL8xDDbt9SJLntV+C7
-m7AIbt+ZETERX51BgoHKcBUjhA1AJgJIU3Y4C3iPZF/IwIFBOhTfjk9na2ubWqYa
-u9H1/6U4Q7ASnCeMuTWbaWg4hoCh5gVlr/GUVKHNevV1rxTKvrxeLX6akdU/ljgZ
-rL8xvAIhussC//BwfyeXV3CLJAGyedX3rWFGP237Bb3LmW1ANMl3csqRGbVDD364
-LzUHZHB/ep++TUA44rbv1AUsgHb6NGDcwtSbXgqbhVXTCrxfbSBpgGunTrmJdSzH
-1S4fFeYqIyGz79K0Ep/vgC7hQgZoAQ+VY4D5Yiyid7r4ThXecQ0Mff9AC8a7aYbC
-ZanYh0rJCGUXXqsicfmFiCnCpup2IN8wN6Sd9Y5/dZjpaAC7kFaE0ZZ6H3erFrh1
-XWoMeYsVuIL/YWdhkouGSzSbZxgRB26s7w+OSk7VClvi4bVy8RqVCz6dHD5Nc3b6
-crk4mv6cW/dPAyFIbz8hrwXfZlbtWF9WUDZa/vbTNPXWllF44w8=
-=plXo
------END PGP SIGNATURE-----
---=-=-=--
+Does this *necessarily* invalidate the mappings?
+(In which case -- it's an error that AHCI held on to them after Windows
+disabled the card, even if AHCI isn't being engaged by the guest
+anymore. Essentially, we were turned off but didn't clean up a dangling
+pointer, but we need the event that tells us to clean the dangling mapping.)
 
