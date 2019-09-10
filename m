@@ -2,142 +2,86 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 283FBC4740A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:09:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 936E9C4740A
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:17:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F16472081B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:09:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F16472081B
+	by mail.kernel.org (Postfix) with ESMTPS id 64D372081B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:17:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64D372081B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7gpp-0004gy-Sy
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 10:09:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47187)
+	id 1i7gxr-0000W2-3o
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 10:17:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48572)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i7gon-0003Vd-F1
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:08:30 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1i7gwN-0008T0-L9
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:16:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i7gom-0004DP-0e
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:08:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43062)
+ (envelope-from <pbonzini@redhat.com>) id 1i7gwK-0007Ql-Iy
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:16:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60530)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i7goj-0004CL-1z; Tue, 10 Sep 2019 10:08:25 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1i7gwK-0007QK-Bt
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:16:16 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 61D733D90A;
- Tue, 10 Sep 2019 14:08:24 +0000 (UTC)
-Received: from [10.10.120.64] (ovpn-120-64.rdu2.redhat.com [10.10.120.64])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B9CDB60167;
- Tue, 10 Sep 2019 14:08:20 +0000 (UTC)
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <1568049517-10261-1-git-send-email-andychiu@synology.com>
- <20190910025404-mutt-send-email-mst@kernel.org>
- <9f402933-7256-75da-af77-2e47b656ab27@redhat.com>
- <20190910095329-mutt-send-email-mst@kernel.org>
-From: John Snow <jsnow@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 6AF698665A
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 14:16:14 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id h6so6583303wrh.6
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 07:16:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=E6Ur5CKhPkRstYRaUUfSmBSOW2LZA54IcN06DaFxPL4=;
+ b=uMopvA7OFCfqNVdKEx7vLoA7+KWHdteoK8FBqRFp6Lw6EsJBzj0f0gXr2c/ZCglNUI
+ SpyBo8afJXlFJIbMQ9ou2VhHqRqWW/Bx+9Wo38X0LeCJuPhlpSKzN0oDxB6nWrOKvOfp
+ 2serNzKkjar3BWViSAbxM0gTqZWUJKC+DZOeMP0myXkMUzAaf4Gud8joYQHxubKQae3X
+ BVwIvF7DX1UGNptjdVQblAQBcsJ40TljyNvyqld3kAP4/7R3SCd3s4uwjp1rPw+tuac9
+ 0GnRH//qq9AVRouyQ8YqVg3RG+82q0G87KxzGNikW416uSRXUs4iB9LJw8dkqDaqNljr
+ sHXw==
+X-Gm-Message-State: APjAAAWhzfR8iWciByx/YHBFd1pegN8FmErXV2YsIdEw2PwJ6/PJpvuc
+ 2EsEpZNQGDyf+0Hppq+7GuqtThNoXo5FxbJoyITDQRx/IiQYmxW7p7lrX5rMFx+1qoS6iT4A3DB
+ eVtrlpSPh+HdAFso=
+X-Received: by 2002:adf:db0f:: with SMTP id s15mr7076815wri.120.1568124973036; 
+ Tue, 10 Sep 2019 07:16:13 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzp7g5C9tf+UnBAlUGxqnvKpck1x2ye+08atzl79/EBAt43WAu2aDE959o3cWLwJTg8qDJM0Q==
+X-Received: by 2002:adf:db0f:: with SMTP id s15mr7076783wri.120.1568124972749; 
+ Tue, 10 Sep 2019 07:16:12 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:102b:3795:6714:7df6?
+ ([2001:b07:6468:f312:102b:3795:6714:7df6])
+ by smtp.gmail.com with ESMTPSA id x5sm25751503wrg.69.2019.09.10.07.16.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 10 Sep 2019 07:16:12 -0700 (PDT)
+To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org
+References: <20190910124828.39794-1-sgarzare@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
- IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
- vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
- rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
- 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
- ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
- 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
- h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
- T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
- LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
- KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
- BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
- qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
- LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
- ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
- J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
- vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
- il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
- 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
- tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
- 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
- 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
- d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
- 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
- MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
- NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
- TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
- L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
- JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
- /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
- nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
- 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
- Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
- e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
- ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
- vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
- C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
- fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
- rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
- TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
- PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
- Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
- E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
- Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
- rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
- cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
- wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
- jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
- vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
- eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
- RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
- CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
- AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
- VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
- XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
- Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
- y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
- sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
- HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
- 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
- 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
- y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
- uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
- YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
- 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
- Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
- TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
- TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
- GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
- rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
- i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
- RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
- glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <a4a39c82-e5bc-71e9-28e8-25a0c68e2d6e@redhat.com>
-Date: Tue, 10 Sep 2019 10:08:20 -0400
+Message-ID: <37258167-33f8-6b42-e290-ba4c9c8e6fa4@redhat.com>
+Date: Tue, 10 Sep 2019 16:16:10 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190910095329-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190910124828.39794-1-sgarzare@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 10 Sep 2019 14:08:24 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] ahci: enable pci bus master MemoryRegion
- before loading ahci engines
+Subject: Re: [Qemu-devel] [PATCH v2] elf-ops.h: fix int overflow in
+ load_elf()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -149,103 +93,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org,
- andychiu <andychiu@synology.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 10/09/19 14:48, Stefano Garzarella wrote:
+> This patch fixes a possible integer overflow when we calculate
+> the total size of ELF segments loaded.
+>=20
+> Reported-by: Coverity (CID 1405299)
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+> v2:
+>  - not use error_report in load_elf() [Peter]
+>  - return ELF_LOAD_TOO_BIG
+>  - add Alex's R-b
+> ---
+>  include/hw/elf_ops.h | 5 +++++
+>  include/hw/loader.h  | 1 +
+>  hw/core/loader.c     | 2 ++
+>  3 files changed, 8 insertions(+)
+>=20
+> diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+> index 1496d7e753..e07d276df7 100644
+> --- a/include/hw/elf_ops.h
+> +++ b/include/hw/elf_ops.h
+> @@ -485,6 +485,11 @@ static int glue(load_elf, SZ)(const char *name, in=
+t fd,
+>                  }
+>              }
+> =20
+> +            if (mem_size > INT_MAX - total_size) {
+> +                ret =3D ELF_LOAD_TOO_BIG;
+> +                goto fail;
+> +            }
+> +
+>              /* address_offset is hack for kernel images that are
+>                 linked at the wrong physical address.  */
+>              if (translate_fn) {
+> diff --git a/include/hw/loader.h b/include/hw/loader.h
+> index 07fd9286e7..48a96cd559 100644
+> --- a/include/hw/loader.h
+> +++ b/include/hw/loader.h
+> @@ -89,6 +89,7 @@ int load_image_gzipped(const char *filename, hwaddr a=
+ddr, uint64_t max_sz);
+>  #define ELF_LOAD_NOT_ELF      -2
+>  #define ELF_LOAD_WRONG_ARCH   -3
+>  #define ELF_LOAD_WRONG_ENDIAN -4
+> +#define ELF_LOAD_TOO_BIG      -5
+>  const char *load_elf_strerror(int error);
+> =20
+>  /** load_elf_ram_sym:
+> diff --git a/hw/core/loader.c b/hw/core/loader.c
+> index 32f7cc7c33..75eb56ddbb 100644
+> --- a/hw/core/loader.c
+> +++ b/hw/core/loader.c
+> @@ -338,6 +338,8 @@ const char *load_elf_strerror(int error)
+>          return "The image is from incompatible architecture";
+>      case ELF_LOAD_WRONG_ENDIAN:
+>          return "The image has incorrect endianness";
+> +    case ELF_LOAD_TOO_BIG:
+> +        return "The image segments are too big to load";
+>      default:
+>          return "Unknown error";
+>      }
+>=20
 
+Queued, thanks.
 
-On 9/10/19 9:58 AM, Michael S. Tsirkin wrote:
-> On Tue, Sep 10, 2019 at 09:50:41AM -0400, John Snow wrote:
->>
->>
->> On 9/10/19 3:04 AM, Michael S. Tsirkin wrote:
->>> On Tue, Sep 10, 2019 at 01:18:37AM +0800, andychiu wrote:
->>>> If Windows 10 guests have enabled 'turn off hard disk after idle'
->>>> option in power settings, and the guest has a SATA disk plugged in,
->>>> the SATA disk will be turned off after a specified idle time.
->>>> If the guest is live migrated or saved/loaded with its SATA disk
->>>> turned off, the following error will occur:
->>>>
->>>> qemu-system-x86_64: AHCI: Failed to start FIS receive engine: bad FIS receive buffer address
->>>> qemu-system-x86_64: Failed to load ich9_ahci:ahci
->>>> qemu-system-x86_64: error while loading state for instance 0x0 of device '0000:00:1a.0/ich9_ahci'
->>>> qemu-system-x86_64: load of migration failed: Operation not permitted
->>>>
->>>> Observation from trace logs shows that a while after Windows 10 turns off
->>>> a SATA disk (IDE disks don't have the following behavior),
->>>> it will disable the PCI_COMMAND_MASTER flag of the pci device containing
->>>> the ahci device. When the the disk is turning back on,
->>>> the PCI_COMMAND_MASTER flag will be restored first.
->>>> But if the guest is migrated or saved/loaded while the disk is off,
->>>> the post_load callback of ahci device, ahci_state_post_load(), will fail
->>>> at ahci_cond_start_engines() if the MemoryRegion
->>>> pci_dev->bus_master_enable_region is not enabled, with pci_dev pointing
->>>> to the PCIDevice struct containing the ahci device.
->>>>
->>>> This patch enables pci_dev->bus_master_enable_region before calling
->>>> ahci_cond_start_engines() in ahci_state_post_load(), and restore the
->>>> MemoryRegion to its original state afterwards.
->>>>
->>>> Signed-off-by: andychiu <andychiu@synology.com>
->>>
->>> Poking at PCI device internals like this seems fragile.  And force
->>> enabling bus master can lead to unpleasantness like corrupting guest
->>> memory, unhandled interrupts, etc.  E.g. it's quite reasonable,
->>> spec-wise, for the guest to move thing in memory around while bus
->>> mastering is off.
->>>
->>> Can you teach ahci that region being disabled
->>> during migration is ok, and recover from it?
->>
->> That's what I'm wondering.
->>
->> I could try to just disable the FIS RX engine if the mapping fails, but
->> that will require a change to guest visible state.
->>
->> My hunch, though, is that when windows re-enables the device it will
->> need to re-program the address registers anyway, so it might cope well
->> with the FIS RX bit getting switched off.
->>
->> (I'm wondering if it isn't a mistake that QEMU is trying to re-map this
->> address in the first place. Is it legal that the PCI device has pci bus
->> master disabled but we've held on to a mapping?
-> 
-> If you are poking at guest memory when bus master is off, then most likely yes.
-> 
->> Should there be some
->> callback where AHCI knows to invalidate mappings at that point...?)
-> 
-> ATM the callback is the config write, you check
-> proxy->pci_dev.config[PCI_COMMAND] & PCI_COMMAND_MASTER
-> and if disabled invalidate the mapping.
-> 
-> virtio at least has code that pokes at
-> proxy->pci_dev.config[PCI_COMMAND] too, I'm quite
-> open to a function along the lines of
-> pci_is_bus_master_enabled()
-> that will do this.
-> 
-
-Well, that's not a callback. I don't think it's right to check the
-PCI_COMMAND register *every* time AHCI does anything at all to see if
-its mappings are still valid.
-
-AHCI makes a mapping *once* when FIS RX is turned on, and it unmaps it
-when it's turned off. It assumes it remains valid that whole time. When
-we migrate, it checks to see if it was running, and performs the
-mappings again to re-boot the state machine.
-
-What I'm asking is; what are the implications of a guest disabling
-PCI_COMMAND_MASTER? (I don't know PCI as well as you do.)
-
-What should that mean for the AHCI state machine?
-
-Does this *necessarily* invalidate the mappings?
-(In which case -- it's an error that AHCI held on to them after Windows
-disabled the card, even if AHCI isn't being engaged by the guest
-anymore. Essentially, we were turned off but didn't clean up a dangling
-pointer, but we need the event that tells us to clean the dangling mapping.)
+Paolo
 
