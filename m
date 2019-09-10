@@ -2,91 +2,88 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47967C49ED7
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:55:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A7E7C49ED7
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 20:03:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1A5121479
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:55:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B/nSaijh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1A5121479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2F2ED21019
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 20:03:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F2ED21019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7mEC-0007Mf-PD
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:55:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33093)
+	id 1i7mLv-0001u9-74
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 16:03:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36278)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i7m4q-00055m-Si
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:45:25 -0400
+ (envelope-from <philmd@redhat.com>) id 1i7mLF-0001VH-E7
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 16:02:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i7m4p-0004rG-I1
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:45:24 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43058)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i7m4p-0004qi-BU
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:45:23 -0400
-Received: by mail-wr1-x441.google.com with SMTP id q17so17202694wrx.10
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 12:45:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=L3sZdVGe93Oonobk9LL1HKyzZUDu1a8yg31vgo6Uk6Y=;
- b=B/nSaijhrP9B1QRhTYNY44TiN5BpeXnlEQOnG/7IhSac0i68oDlOQV6lqiRxr2MH/V
- C4Qm+rCLI9KCq1jTZZJOpR4SOYpNqIkELaOynxo+X+ehTlqozU1i9/QzLD0pl3HBwVS2
- VnOq2Ke/d0Go1DDwxYpOe98p+GeZmrwHlwY0mfSPP9Jv0+S8U2j7BHa2S2S1Gu713i4I
- Dp4ycI4KasSB2c4Ay0tM40RiM/Cj4yU+41pOiMCi1sa/PAeAwnlpTlGNUTU8Uw+uZ0Sc
- QTaQ0ZWPBtzVHaQmDWytxAbzf8WdmzMxLz/YPHVfLodHEZ4WC0U8XthEYCQIx1QZ0mom
- B0cw==
+ (envelope-from <philmd@redhat.com>) id 1i7mLB-0003Gv-TQ
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 16:02:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50868)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i7mLB-0003GY-Lv
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 16:02:17 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3DB8D859FE
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 20:02:15 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id f10so291892wmh.8
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 13:02:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=L3sZdVGe93Oonobk9LL1HKyzZUDu1a8yg31vgo6Uk6Y=;
- b=cmJyMuNKeTgPf57kYuVRvmT6yQr+ot8VSASlatv8ehkrX/ynIquIIrKxiXR6uumcxd
- PYppOiiBuFk6Fha4sdMBslHhZo5UXlmRsBWgkUpt40MjBBH3DJn/m/YPGlaMUI2yT0eK
- haqh9zc6DoSd7lSYxj1+2cCVNML1axP/9jTKNXZ5GVDJGMeuokmWsfXeM4aNUFiW2abm
- 8uliYAqFnDW7/DO/J4h3tjlwXLbOvNcxVA2L5u3np7AhyRA/4Tbk0D38P7ph0NrCHRIn
- Jw6sDRYNPvo7fpHok9i+mEKPiZwX9L+fAFUWiY5f1djBU2Liy8BO1JS3J0iTBa8ERbLW
- 3YeA==
-X-Gm-Message-State: APjAAAWiVhKXsr8lU+r58yZ9nlrx4hDRT+ZPMPS6ui3aTd9KLu1c1RfM
- epOVnzlSq7vT35nRGlTG6QUSjg==
-X-Google-Smtp-Source: APXvYqybEwomVc8pG6BfUE2aHjwNOVwDovA6VkVR09/n2GvyiCK/fd+pNEsxsjFDWjFVV61FcLfSOA==
-X-Received: by 2002:a5d:4382:: with SMTP id i2mr28688299wrq.297.1568144721620; 
- Tue, 10 Sep 2019 12:45:21 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q14sm39334451wrc.77.2019.09.10.12.45.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Sep 2019 12:45:21 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 615F41FF87;
- Tue, 10 Sep 2019 20:45:20 +0100 (BST)
-References: <20190910193408.28917-1-alex.bennee@linaro.org>
- <20190910193408.28917-2-alex.bennee@linaro.org>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-In-reply-to: <20190910193408.28917-2-alex.bennee@linaro.org>
-Date: Tue, 10 Sep 2019 20:45:20 +0100
-Message-ID: <87blvs0wbz.fsf@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=BviTQ3Qj/BsqP7pADTWVUBfn1nIItMLyxrE0GePPGLk=;
+ b=NHE7yI1Day2LypXNJgKVf2KWZY3+Dx79AXmXISg90T6Ez4x62sao4fOxvoGqDtFCM4
+ TgFSRFT2xu/6j5AHTNGJQWD3+6+Eh+CvRjT8qIspuDOembOT/KZQfDyAg77bVO5E6FOB
+ knczeaK0PGCq0PeR8bZli3fZpvFZ/js0dIKdDFTgNsoLZTnrVSOiDwBsgR2YHovl/CCc
+ JoB8tSW6C4Z/WncTr7F3zT42Ln0nrBGMmTDPI5jPK61l4t2kixDVcY7EWGHXr1DpTnUh
+ P9zVgnnMMlC558C1Xj9Bx+d9bV8zQRobvzOjjViFkCadMKYhWzt5SIqKvWL8q6wt67Xj
+ CuoQ==
+X-Gm-Message-State: APjAAAXxmsJqluoHPvrzung+cWe11xUQn17U9fGWvM5u7qcNQGBuxaFY
+ aGRrp+tCql2B7McaW6lZVeNqEkAiy+S5uZWDViTY1Z671jyRME/TYOJgTBo0JgDUz7Qoa9IDDMu
+ PWiUP08IwjWaO9Mk=
+X-Received: by 2002:adf:fd41:: with SMTP id h1mr8894654wrs.315.1568145733495; 
+ Tue, 10 Sep 2019 13:02:13 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwQZadBnaVhV5LN+l//HnU3xv/Ay3fXwBe5THApkqDTlqTX7rCUndMLBC9lUdYF1Reuu17Oyg==
+X-Received: by 2002:adf:fd41:: with SMTP id h1mr8894639wrs.315.1568145733273; 
+ Tue, 10 Sep 2019 13:02:13 -0700 (PDT)
+Received: from [192.168.1.41] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id u22sm35907563wru.72.2019.09.10.13.02.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 10 Sep 2019 13:02:12 -0700 (PDT)
+To: Cleber Rosa <crosa@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ Eduardo Habkost <ehabkost@redhat.com>
+References: <20190910163430.11326-1-f4bug@amsat.org>
+ <20190910170745.GA26663@localhost.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <f65c9b9f-97a7-8c6c-2a09-37a4de98d67c@redhat.com>
+Date: Tue, 10 Sep 2019 22:02:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <20190910170745.GA26663@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH v1 1/4] target/ppc: fix signal delivery for
- ppc64abi32
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] BootLinuxConsoleTest: Test the Quadra 800
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,85 +95,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
+Cc: Thomas Huth <huth@tuxfamily.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 9/10/19 7:07 PM, Cleber Rosa wrote:
+> On Tue, Sep 10, 2019 at 06:34:30PM +0200, Philippe Mathieu-Daud=C3=A9 w=
+rote:
+>> This test boots a Linux kernel on a Quadra 800 board
+>> and verify the serial is working.
+>>
+>> Example:
+>>
+>>   $ avocado --show=3Dapp,console run -t machine:q800 tests/acceptance/=
+boot_linux_console.py
+>>   console: ABCFGHIJK
+>>   console: Linux version 5.2.0-2-m68k (debian-kernel@lists.debian.org)=
+ (gcc version 8.3.0 (Debian 8.3.0-21)) #1 Debian 5.2.9-2 (2019-08-21)
+>>   console: Detected Macintosh model: 35
+>>   console: Apple Macintosh Quadra 800
+>>   console: Built 1 zonelists, mobility grouping on.  Total pages: 3244=
+8
+>>   console: Kernel command line: printk.time=3D0 console=3DttyS0 vga=3D=
+off
+>>   [...]
+>>   console: Calibrating delay loop... 1236.99 BogoMIPS (lpj=3D6184960)
+>>   [...]
+>>   console: NuBus: Scanning NuBus slots.
+>>   console: Slot 9: Board resource not found!
+>>   console: SCSI subsystem initialized
+>>   console: clocksource: Switched to clocksource via1
+>>   [...]
+>>   console: macfb: framebuffer at 0xf9001000, mapped to 0x(ptrval), siz=
+e 468k
+>>   console: macfb: mode is 800x600x8, linelength=3D800
+>>   console: Console: switching to colour frame buffer device 100x37
+>>   console: fb0: DAFB frame buffer device
+>>   console: pmac_zilog: 0.6 (Benjamin Herrenschmidt <benh@kernel.crashi=
+ng.org>)
+>>   console: scc.0: ttyS0 at MMIO 0x50f0c022 (irq =3D 4, base_baud =3D 2=
+30400) is a Z85c30 ESCC - Serial port
+>>   console: scc.1: ttyS1 at MMIO 0x50f0c020 (irq =3D 4, base_baud =3D 2=
+30400) is a Z85c30 ESCC - Serial port
+>>   console: Non-volatile memory driver v1.3
+>>   console: adb: Mac II ADB Driver v1.0 for Unified ADB
+>>   console: mousedev: PS/2 mouse device common for all mice
+>>   console: random: fast init done
+>>   console: Detected ADB keyboard, type <unknown>.
+>>   console: input: ADB keyboard as /devices/virtual/input/input0
+>>   console: input: ADB mouse as /devices/virtual/input/input1
+>>   console: rtc-generic rtc-generic: registered as rtc0
+>>   console: ledtrig-cpu: registered to indicate activity on CPUs
+>>   [...]
+>>   console: rtc-generic rtc-generic: setting system clock to 2019-09-10=
+T16:20:25 UTC (1568132425)
+>>   console: List of all partitions:
+>>   console: No filesystem could mount root, tried:
+>>   JOB TIME   : 2.91 s
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> ---
+>> Based-on: <20190910113323.17324-1-laurent@vivier.eu>
+>> "hw/m68k: add Apple Machintosh Quadra 800 machine"
+>> https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg01775.html
+>> ---
+>>  tests/acceptance/boot_linux_console.py | 24 ++++++++++++++++++++++++
+>>  1 file changed, 24 insertions(+)
+>>
+>> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance=
+/boot_linux_console.py
+>> index 2504ef0150..8e346bb0f4 100644
+>> --- a/tests/acceptance/boot_linux_console.py
+>> +++ b/tests/acceptance/boot_linux_console.py
+>> @@ -373,3 +373,27 @@ class BootLinuxConsole(Test):
+>>          self.vm.launch()
+>>          console_pattern =3D 'Kernel command line: %s' % kernel_comman=
+d_line
+>>          self.wait_for_console_pattern(console_pattern)
+>> +
+>> +    def test_m68k_q800(self):
+>> +        """
+>> +        :avocado: tags=3Darch:m68k
+>> +        :avocado: tags=3Dmachine:q800
+>> +        """
+>> +        deb_url =3D ('http://ftp.ports.debian.org/debian-ports/pool-m=
+68k/main'
+>> +                   '/l/linux/kernel-image-5.2.0-2-m68k-di_5.2.9-2_m68=
+k.udeb')
+>> +        deb_hash =3D '0797e05129595f22f3c0142db5e199769a723bf9'
+>> +        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
+>> +        kernel_path =3D self.extract_from_deb(deb_path,
+>> +                                            '/boot/vmlinux-5.2.0-2-m6=
+8k')
+>> +
+>> +        self.vm.set_machine('q800')
+>> +        self.vm.set_console()
+>> +        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
+>> +                               'console=3DttyS0 vga=3Doff')
+>> +        self.vm.add_args('-kernel', kernel_path,
+>> +                         '-append', kernel_command_line)
+>> +        self.vm.launch()
+>> +        console_pattern =3D 'Kernel command line: %s' % kernel_comman=
+d_line
+>> +        self.wait_for_console_pattern(console_pattern)
+>> +        console_pattern =3D 'No filesystem could mount root'
+>> +        self.wait_for_console_pattern(console_pattern)
+>> --=20
+>> 2.20.1
+>>
+>=20
+> LGTM.
+>=20
+> Of course it needs to wait for the series adding the machine type.
+> If there's a new version of the series, shouldn't this be included
+> there?
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+At some point I'd like we enforce the rule "each new machine is added
+with an integration test".
+So far we are still trying to figure out what is the best use of Avocado
+for QEMU, and what are good/cheap tests, how easy it is to add/use them,
+and so on. We are improving :)
+So, with this idea, indeed machine tests should go with the the series
+that introduce it.
+Meanwhile (there is no enforcement) I'm following new machines and
+trying to catch them, ask the developer how to test them if there is no
+guidelines, and add tests.
 
-> We were incorrectly setting NIP resulting in a segfault. This fixes
-> linux-test for this ABI.
+Laurent, do you agree to queue this patch to your series?
 
-Oops, that was at the bottom of my tree for fixing ppc64abi32 which
-showed up broken when testing/next enabled the TCG tests for it.
+>  Either way:
+>=20
+> Tested-by: Cleber Rosa <crosa@redhat.com>
+> Reviewed-by: Cleber Rosa <crosa@redhat.com>
 
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  linux-user/ppc/signal.c             | 4 +++-
->  tests/tcg/configure.sh              | 1 +
->  tests/tcg/multiarch/Makefile.target | 5 -----
->  3 files changed, 4 insertions(+), 6 deletions(-)
->
-> diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
-> index 619a56950df..5b82af6cb62 100644
-> --- a/linux-user/ppc/signal.c
-> +++ b/linux-user/ppc/signal.c
-> @@ -501,7 +501,9 @@ void setup_rt_frame(int sig, struct target_sigaction =
-*ka,
->      int i, err =3D 0;
->  #if defined(TARGET_PPC64)
->      struct target_sigcontext *sc =3D 0;
-> +#if !defined(TARGET_ABI32)
->      struct image_info *image =3D ((TaskState *)thread_cpu->opaque)->info;
-> +#endif
->  #endif
->
->      rt_sf_addr =3D get_sigframe(ka, env, sizeof(*rt_sf));
-> @@ -557,7 +559,7 @@ void setup_rt_frame(int sig, struct target_sigaction =
-*ka,
->      env->gpr[5] =3D (target_ulong) h2g(&rt_sf->uc);
->      env->gpr[6] =3D (target_ulong) h2g(rt_sf);
->
-> -#if defined(TARGET_PPC64)
-> +#if defined(TARGET_PPC64) && !defined(TARGET_ABI32)
->      if (get_ppc64_abi(image) < 2) {
->          /* ELFv1 PPC64 function pointers are pointers to OPD entries. */
->          struct target_func_ptr *handler =3D
-> diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
-> index 6c4a471aeae..e8a1a1495fc 100755
-> --- a/tests/tcg/configure.sh
-> +++ b/tests/tcg/configure.sh
-> @@ -54,6 +54,7 @@ fi
->  : ${cross_cc_cflags_ppc=3D"-m32"}
->  : ${cross_cc_ppc64=3D"powerpc-linux-gnu-gcc"}
->  : ${cross_cc_cflags_ppc64=3D"-m64"}
-> +: ${cross_cc_cflags_ppc64abi32=3D"-mcpu=3Dpower8"}
->  : ${cross_cc_ppc64le=3D"powerpc64le-linux-gnu-gcc"}
->  : ${cross_cc_cflags_s390x=3D"-m64"}
->  : ${cross_cc_cflags_sparc=3D"-m32 -mv8plus -mcpu=3Dultrasparc"}
-> diff --git a/tests/tcg/multiarch/Makefile.target b/tests/tcg/multiarch/Ma=
-kefile.target
-> index 6b1e30e2fec..e6893b2e283 100644
-> --- a/tests/tcg/multiarch/Makefile.target
-> +++ b/tests/tcg/multiarch/Makefile.target
-> @@ -12,11 +12,6 @@ VPATH 		+=3D $(MULTIARCH_SRC)
->  MULTIARCH_SRCS   =3D$(notdir $(wildcard $(MULTIARCH_SRC)/*.c))
->  MULTIARCH_TESTS  =3D$(MULTIARCH_SRCS:.c=3D)
->
-> -# FIXME: ppc64abi32 linux-test seems to have issues but the other basic =
-tests work
-> -ifeq ($(TARGET_NAME),ppc64abi32)
-> -BROKEN_TESTS =3D linux-test
-> -endif
-> -
->  # Update TESTS
->  TESTS		+=3D $(filter-out $(BROKEN_TESTS), $(MULTIARCH_TESTS))
+Thanks!
 
+Regards,
 
---
-Alex Benn=C3=A9e
+Phil.
 
