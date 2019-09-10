@@ -2,69 +2,90 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40BA0C49ED7
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:40:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 259FAC49ED9
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:40:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 029BD2084D
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:40:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 029BD2084D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id D30A42084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:40:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ONaqj+CT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D30A42084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7lzw-0007Zx-Cs
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:40:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59184)
+	id 1i7m0K-0007tl-AV
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:40:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58996)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i7luO-0001Ks-RJ
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:39 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i7lu8-00011y-Rq
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i7luL-0006wY-OB
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:36 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:34297)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1i7luL-0006vp-CK; Tue, 10 Sep 2019 15:34:33 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MmCyE-1iXztm2CQq-00iBGQ; Tue, 10 Sep 2019 21:34:07 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Date: Tue, 10 Sep 2019 21:33:47 +0200
-Message-Id: <20190910193347.16000-10-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190910193347.16000-1-laurent@vivier.eu>
-References: <20190910193347.16000-1-laurent@vivier.eu>
+ (envelope-from <alex.bennee@linaro.org>) id 1i7lu2-0006mA-HM
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:20 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37267)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i7lu2-0006kU-1p
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:14 -0400
+Received: by mail-wr1-x444.google.com with SMTP id i1so21292514wro.4
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 12:34:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=JsFRcEl2DcaLcclzT+IneVbnyOOq8rTFO8lmcuTBMe4=;
+ b=ONaqj+CTn8G/i9Wqg/GAlSrM6b5cEGQJ4mOkSayNCso6uG+jEBpjjIl7udMbVkrnvB
+ m+vuDQWalK0ekS1bf6DokDDiN+I2tH8uc1q7PP501nMiDbNrvl4tjjuyqSFZ4z3HmUce
+ IsEpHQER17KsAtzm2gaM6poRNSL+aF/qxEOtdNyX1wyctkhn3jBM9zWM+vNgrdnu2+uf
+ KNPNIchpw4Qrq3uQdjQjdqrhebhUK4fw2AEKvQh31IHGXG+ESKxhmG4vwNuOF6+Q0Crg
+ 3QB5Yvs885z5/UBD6QtksZK1oVtE1SU3BPMHzsAM0SUQCsxP3wy5F29ItDJ8KpmgkwKP
+ l9KQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=JsFRcEl2DcaLcclzT+IneVbnyOOq8rTFO8lmcuTBMe4=;
+ b=KmqZRWU/yKsCwd0VlBLw/gzgetktxR5rWPa5tOqxPy/05uhZRkQLlJHsQbbz9mo5in
+ sry1/c7pECCgFMewaQJDly/iCc+8wK8Qvm1zD54mLNxtjEziPVho7zfx9o7/B/YXxe5I
+ 2YTfYHaPxgjLvrLMGz9ga21MIotuQv/YmBPyiKOXWGp0/A/69gakMZuF4q1ukumHvNtd
+ XfUuBNJTKBrbCaDRXMhCaMkca0CIcQjgfCPboaPVGT68aAu2aV3RLckDv91V45BC+Gew
+ VlzzuGCHf69pRN1DwVF2i58QAzDx69EHb6vNBzGRaLCxwexYPaxPsSazQePEBca192iS
+ iQ/w==
+X-Gm-Message-State: APjAAAUa0x3GehkSVg7RdVDXpNSnaOCOQmyLvFc3QYkDsnAgLsqSQw7J
+ Nf/ENNLCjBoJXn0yS8z149D7UA==
+X-Google-Smtp-Source: APXvYqzXRGV/EoI/8ddatC6iRcUwwBxRDVwmDX8VH+TU784R4+XXm4estppoH+KeFR4TaoUscX6SYQ==
+X-Received: by 2002:adf:e4cd:: with SMTP id v13mr9918723wrm.165.1568144052158; 
+ Tue, 10 Sep 2019 12:34:12 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id m17sm21089285wrs.9.2019.09.10.12.34.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 10 Sep 2019 12:34:11 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 3CB221FF8F;
+ Tue, 10 Sep 2019 20:34:09 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Date: Tue, 10 Sep 2019 20:34:06 +0100
+Message-Id: <20190910193408.28917-3-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190910193408.28917-1-alex.bennee@linaro.org>
+References: <20190910193408.28917-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:L3LsjZVinwpla54CKK57stMv5gbDYce0khyVzrSZMF/Aw3wZjWI
- 9zu705zQ4kqROjovDXlpBNg2EO8OLbPMCymZ/GvhyR0VlF0yXcXBeT8R72JqyKtpBp8YkQl
- HMhg7zDdmFfTvLokDIs0WWy77ycJpHwsU3KaUxMKwNQWDLd+ztUkEQWq6o7cIBgha8vp0lS
- hkUOaFrJR4sYoB/GC/w8g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:9ncD0PDmOkY=:IViFua/LR/V8sdDz3Y7Dao
- 5MUCc60AYbKs7Zx8ondyv6zsSrCpLNIDs6y+caEuthmqMehdmC7OiZrppXN/x5dhAGCDEhspy
- Taxh36CyRuSNw56WKeBdgPfKSgNxtfjl3prfwts+hlosZsBQlQn/KPEAJhyxhGc2LMbLGX8/4
- xWkjUaEK3Gw3qnM0LSCKH8MN37JORVtjJQyKoJFUO3yJ+TR/ntkLPqabkTcof1Dv3uluUDQhh
- nAndpEGhxT0FI23BqGYTEKbO6LXE4s3e+F6F7yFKq5NcMQaOqdSBWzlijAbbGeq80nUSXI7su
- VCcGOP40euq17wZJqQgtKdAx1AIJSdmAd7xprwZQxGxvh3JErHHxyGL+hIyBUV2KFDq2Lz1gt
- 6DaWLiyx+YluK13x1shsehqEKyuLSucWEb27hY3fZOT/Y68nJ1/kGkxDdSvU2TZ9LVizpLJR9
- T/Yk9kttR2elESAy6qoPmQg1NHMd8Jm4oqRViA/j+bbcbji2QK3T2VPkwcIe6sw/DxB9KkGki
- aoypVL3tlaNJoU702cVwDcI4ndj62YDSBcuuGnjl1nNxR+3W8xr1lmPVqrOQvdiHatKabE2IJ
- tEU95ZzcSLVWdizb4/XTQBdrhIjThVFa0REDiQYvH8NC8ZntuhXedSFZDFPXB+TxHK5wV7TP3
- 4Np9g7vwGFdIOGTlarUI/6COxLFyj9wca9EQ1cJ5kL/49wZTdB7wcQmapG0+UICK6hBVmzluf
- qbyE/hQ26fMaNFSD4vj6asixVrwWFaYpksdwvqNsoUQCzH8NOH21vJzHkMoRyUpUGgZ0Bjnzp
- ZvuoUbS+nINuQ922RqovXTZ27f4Ue7L1SuUdM7J3NBaigqUHOU=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
-Subject: [Qemu-devel] [PATCH v11 9/9] hw/m68k: define Macintosh Quadra 800
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH v1 2/4] elf: move elf.h to elf/elf.h and split
+ out types
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,599 +97,1056 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+Cc: Cornelia Huck <cohuck@redhat.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Anthony Green <green@moxielogic.com>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Max Filippov <jcmvbkbc@gmail.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Marek Vasut <marex@denx.de>,
+ Jia Liu <proljc@gmail.com>, Aleksandar Rikalo <arikalo@wavecomp.com>,
+ Helge Deller <deller@gmx.de>, David Hildenbrand <david@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Laurent Vivier <laurent@vivier.eu>
+ David Gibson <david@gibson.dropbear.id.au>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Riku Voipio <riku.voipio@iki.fi>, Fabien Chouteau <chouteau@adacore.com>,
+ "open list:S390-ccw boot" <qemu-s390x@nongnu.org>, qemu-arm@nongnu.org,
+ Stafford Horne <shorne@gmail.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>,
+ "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
+ Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
+ Thomas Huth <huth@tuxfamily.org>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Chris Wulff <crwulff@gmail.com>, Laurent Vivier <laurent@vivier.eu>,
+ Michael Walle <michael@walle.cc>, "open list:PReP" <qemu-ppc@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If you want to test the machine, it doesn't yet boot a MacROM, but you can
-boot a linux kernel from the command line.
+Most of the users of elf.h just want the standard Elf definitions. The
+couple that want more than that want an expansion based on ELF_CLASS
+which can be used for size agnostic code. The later is moved into
+elf/elf-types.inc.h to make it clearer what it is for. While doing
+that I also removed the whitespace damage.
 
-You can install your own disk using debian-installer with:
-
-    ./qemu-system-m68k \
-    -M q800 \
-    -serial none -serial mon:stdio \
-    -m 1000M -drive file=m68k.qcow2,format=qcow2 \
-    -net nic,model=dp83932,addr=09:00:07:12:34:57 \
-    -append "console=ttyS0 vga=off" \
-    -kernel vmlinux-4.15.0-2-m68k \
-    -initrd initrd.gz \
-    -drive file=debian-9.0-m68k-NETINST-1.iso \
-    -drive file=m68k.qcow2,format=qcow2 \
-    -nographic
-
-If you use a graphic adapter instead of "-nographic", you can use "-g" to set the
-size of the display (I use "-g 1600x800x24").
-
-Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- MAINTAINERS           |   2 +
- hw/m68k/Kconfig       |   3 +
- hw/m68k/Makefile.objs |   1 +
- hw/m68k/bootinfo.h    | 114 +++++++++++++
- hw/m68k/q800.c        | 382 ++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 502 insertions(+)
- create mode 100644 hw/m68k/bootinfo.h
- create mode 100644 hw/m68k/q800.c
+ bsd-user/elfload.c               |  2 +-
+ contrib/elf2dmp/qemu_elf.h       |  2 +-
+ disas.c                          |  2 +-
+ dump/dump.c                      |  2 +-
+ dump/win_dump.c                  |  2 +-
+ hw/alpha/dp264.c                 |  2 +-
+ hw/arm/armv7m.c                  |  2 +-
+ hw/arm/boot.c                    |  2 +-
+ hw/core/loader.c                 |  3 +-
+ hw/cris/axis_dev88.c             |  2 +-
+ hw/cris/boot.c                   |  2 +-
+ hw/hppa/machine.c                |  2 +-
+ hw/i386/multiboot.c              |  2 +-
+ hw/i386/pc.c                     |  2 +-
+ hw/lm32/lm32_boards.c            |  2 +-
+ hw/lm32/milkymist.c              |  2 +-
+ hw/m68k/an5206.c                 |  2 +-
+ hw/m68k/mcf5208.c                |  2 +-
+ hw/microblaze/boot.c             |  2 +-
+ hw/mips/mips_fulong2e.c          |  2 +-
+ hw/mips/mips_malta.c             |  2 +-
+ hw/mips/mips_mipssim.c           |  2 +-
+ hw/mips/mips_r4k.c               |  2 +-
+ hw/moxie/moxiesim.c              |  2 +-
+ hw/nios2/boot.c                  |  2 +-
+ hw/openrisc/openrisc_sim.c       |  2 +-
+ hw/pci-host/prep.c               |  2 +-
+ hw/ppc/e500.c                    |  2 +-
+ hw/ppc/mac_newworld.c            |  2 +-
+ hw/ppc/mac_oldworld.c            |  2 +-
+ hw/ppc/ppc440_bamboo.c           |  2 +-
+ hw/ppc/prep.c                    |  2 +-
+ hw/ppc/sam460ex.c                |  2 +-
+ hw/ppc/spapr.c                   |  2 +-
+ hw/ppc/spapr_vio.c               |  2 +-
+ hw/ppc/virtex_ml507.c            |  2 +-
+ hw/riscv/boot.c                  |  2 +-
+ hw/s390x/ipl.c                   |  2 +-
+ hw/sparc/leon3.c                 |  2 +-
+ hw/sparc/sun4m.c                 |  2 +-
+ hw/sparc64/sun4u.c               |  2 +-
+ hw/tricore/tricore_testboard.c   |  2 +-
+ hw/xtensa/sim.c                  |  2 +-
+ hw/xtensa/xtfpga.c               |  2 +-
+ include/elf/elf-types.inc.h      | 63 ++++++++++++++++++++++++++++++++
+ include/{ => elf}/elf.h          | 42 ---------------------
+ include/hw/core/generic-loader.h |  2 +-
+ linux-user/arm/cpu_loop.c        |  2 +-
+ linux-user/elfload.c             |  5 +--
+ linux-user/main.c                |  2 +-
+ linux-user/mips/cpu_loop.c       |  2 +-
+ linux-user/riscv/cpu_loop.c      |  2 +-
+ target/arm/arch_dump.c           |  2 +-
+ target/i386/arch_dump.c          |  2 +-
+ target/ppc/arch_dump.c           |  2 +-
+ target/ppc/kvm.c                 |  2 +-
+ target/s390x/arch_dump.c         |  2 +-
+ tcg/arm/tcg-target.inc.c         |  2 +-
+ tcg/ppc/tcg-target.inc.c         |  2 +-
+ tcg/s390/tcg-target.inc.c        |  2 +-
+ tcg/tcg.c                        |  5 ++-
+ util/getauxval.c                 |  2 +-
+ 62 files changed, 128 insertions(+), 104 deletions(-)
+ create mode 100644 include/elf/elf-types.inc.h
+ rename include/{ => elf}/elf.h (98%)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f85f11d83c..e6d37acb84 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -920,10 +920,12 @@ F: include/hw/m68k/next-cube.h
- q800
- M: Laurent Vivier <laurent@vivier.eu>
- S: Maintained
-+F: hw/m68k/q800.c
- F: hw/misc/mac_via.c
- F: hw/display/macfb.c
- F: hw/nubus/*
- F: hw/block/swim.c
-+F: hw/m68k/bootinfo.h
- F: include/hw/misc/mac_via.h
- F: include/hw/display/macfb.h
- F: include/hw/nubus/*
-diff --git a/hw/m68k/Kconfig b/hw/m68k/Kconfig
-index 7aa830327c..c663920f8f 100644
---- a/hw/m68k/Kconfig
-+++ b/hw/m68k/Kconfig
-@@ -19,3 +19,6 @@ config Q800
-     select MACFB
-     select NUBUS
-     select SWIM
-+    select ESCC
-+    select ESP
-+    select DP8393X
-diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
-index f25854730d..b2c9e5ab12 100644
---- a/hw/m68k/Makefile.objs
-+++ b/hw/m68k/Makefile.objs
-@@ -1,3 +1,4 @@
- obj-$(CONFIG_AN5206) += an5206.o mcf5206.o
- obj-$(CONFIG_MCF5208) += mcf5208.o mcf_intc.o
- obj-$(CONFIG_NEXTCUBE) += next-kbd.o next-cube.o
-+obj-$(CONFIG_Q800) += q800.o
-diff --git a/hw/m68k/bootinfo.h b/hw/m68k/bootinfo.h
+diff --git a/bsd-user/elfload.c b/bsd-user/elfload.c
+index 32378af7b2e..321ee98b86b 100644
+--- a/bsd-user/elfload.c
++++ b/bsd-user/elfload.c
+@@ -509,7 +509,7 @@ static inline void init_thread(struct target_pt_regs *regs, struct image_info *i
+ #define bswaptls(ptr) bswap32s(ptr)
+ #endif
+ 
+-#include "elf.h"
++#include "elf/elf.h"
+ 
+ struct exec
+ {
+diff --git a/contrib/elf2dmp/qemu_elf.h b/contrib/elf2dmp/qemu_elf.h
+index b2f0d9cbc9b..060d148d7f0 100644
+--- a/contrib/elf2dmp/qemu_elf.h
++++ b/contrib/elf2dmp/qemu_elf.h
+@@ -7,7 +7,7 @@
+ #ifndef ELF2DMP_QEMU_ELF_H
+ #define ELF2DMP_QEMU_ELF_H
+ 
+-#include "elf.h"
++#include "elf/elf.h"
+ 
+ typedef struct QEMUCPUSegment {
+     uint32_t selector;
+diff --git a/disas.c b/disas.c
+index 3e2bfa572b1..6f2370cfda7 100644
+--- a/disas.c
++++ b/disas.c
+@@ -1,7 +1,7 @@
+ /* General "disassemble this chunk" code.  Used for debugging. */
+ #include "qemu/osdep.h"
+ #include "disas/dis-asm.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "qemu/qemu-print.h"
+ 
+ #include "cpu.h"
+diff --git a/dump/dump.c b/dump/dump.c
+index 6fb6e1245ad..6b084a21a2a 100644
+--- a/dump/dump.c
++++ b/dump/dump.c
+@@ -14,7 +14,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "qemu/cutils.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "cpu.h"
+ #include "exec/hwaddr.h"
+ #include "monitor/monitor.h"
+diff --git a/dump/win_dump.c b/dump/win_dump.c
+index eda2a489742..8232c3cb6b3 100644
+--- a/dump/win_dump.c
++++ b/dump/win_dump.c
+@@ -11,7 +11,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "qemu/cutils.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "cpu.h"
+ #include "exec/hwaddr.h"
+ #include "monitor/monitor.h"
+diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+index 51feee85581..87e5c77c69c 100644
+--- a/hw/alpha/dp264.c
++++ b/hw/alpha/dp264.c
+@@ -9,7 +9,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "hw/loader.h"
+ #include "alpha_sys.h"
+ #include "qemu/error-report.h"
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index 7a3c48f0026..559586fa527 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -15,7 +15,7 @@
+ #include "hw/arm/boot.h"
+ #include "hw/loader.h"
+ #include "hw/qdev-properties.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "sysemu/qtest.h"
+ #include "sysemu/reset.h"
+ #include "qemu/error-report.h"
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index bf97ef3e339..7818e5b5518 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -20,7 +20,7 @@
+ #include "hw/boards.h"
+ #include "sysemu/reset.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "sysemu/device_tree.h"
+ #include "qemu/config-file.h"
+ #include "qemu/option.h"
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index 32f7cc7c33c..e0c6563e643 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -59,6 +59,7 @@
+ #include "hw/boards.h"
+ #include "qemu/cutils.h"
+ #include "sysemu/runstate.h"
++#include "elf/elf.h"
+ 
+ #include <zlib.h>
+ 
+@@ -295,7 +296,7 @@ static void *load_at(int fd, off_t offset, size_t size)
+ #endif
+ 
+ #define ELF_CLASS   ELFCLASS32
+-#include "elf.h"
++#include "elf/elf-types.inc.h"
+ 
+ #define SZ		32
+ #define elf_word        uint32_t
+diff --git a/hw/cris/axis_dev88.c b/hw/cris/axis_dev88.c
+index 940c7dd1226..31dc391a637 100644
+--- a/hw/cris/axis_dev88.c
++++ b/hw/cris/axis_dev88.c
+@@ -32,7 +32,7 @@
+ #include "hw/boards.h"
+ #include "hw/cris/etraxfs.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "boot.h"
+ #include "exec/address-spaces.h"
+ #include "sysemu/qtest.h"
+diff --git a/hw/cris/boot.c b/hw/cris/boot.c
+index 2d2cc0c7a53..0b8008ca0b2 100644
+--- a/hw/cris/boot.c
++++ b/hw/cris/boot.c
+@@ -25,7 +25,7 @@
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "boot.h"
+ #include "qemu/cutils.h"
+ #include "sysemu/reset.h"
+diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+index 2736ce835ee..3c121f1a645 100644
+--- a/hw/hppa/machine.c
++++ b/hw/hppa/machine.c
+@@ -6,7 +6,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "hw/loader.h"
+ #include "hw/boards.h"
+ #include "qemu/error-report.h"
+diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
+index 9a59f954972..54a7e5f048e 100644
+--- a/hw/i386/multiboot.c
++++ b/hw/i386/multiboot.c
+@@ -28,7 +28,7 @@
+ #include "hw/nvram/fw_cfg.h"
+ #include "multiboot.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "sysemu/sysemu.h"
+ #include "qemu/error-report.h"
+ 
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index bad866fe44f..e84710a944a 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -39,7 +39,7 @@
+ #include "hw/timer/hpet.h"
+ #include "hw/firmware/smbios.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "migration/vmstate.h"
+ #include "multiboot.h"
+ #include "hw/timer/mc146818rtc.h"
+diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
+index 5ae308bfcfb..12c60ad9b74 100644
+--- a/hw/lm32/lm32_boards.c
++++ b/hw/lm32/lm32_boards.c
+@@ -26,7 +26,7 @@
+ #include "hw/block/flash.h"
+ #include "hw/boards.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "lm32_hwsetup.h"
+ #include "lm32.h"
+ #include "exec/address-spaces.h"
+diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
+index 460d322de57..9f3a2f2ff5f 100644
+--- a/hw/lm32/milkymist.c
++++ b/hw/lm32/milkymist.c
+@@ -31,7 +31,7 @@
+ #include "hw/boards.h"
+ #include "hw/loader.h"
+ #include "hw/qdev-properties.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "milkymist-hw.h"
+ #include "hw/display/milkymist_tmu2.h"
+ #include "lm32.h"
+diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
+index 54ccbe1a822..12664b872bc 100644
+--- a/hw/m68k/an5206.c
++++ b/hw/m68k/an5206.c
+@@ -12,7 +12,7 @@
+ #include "hw/m68k/mcf.h"
+ #include "hw/boards.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "exec/address-spaces.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/qtest.h"
+diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
+index 012710d057d..42d79bd2f03 100644
+--- a/hw/m68k/mcf5208.c
++++ b/hw/m68k/mcf5208.c
+@@ -25,7 +25,7 @@
+ #include "hw/boards.h"
+ #include "hw/loader.h"
+ #include "hw/sysbus.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "exec/address-spaces.h"
+ 
+ #define SYS_FREQ 166666666
+diff --git a/hw/microblaze/boot.c b/hw/microblaze/boot.c
+index bade4d22c00..0c1020cd373 100644
+--- a/hw/microblaze/boot.c
++++ b/hw/microblaze/boot.c
+@@ -34,7 +34,7 @@
+ #include "sysemu/reset.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "qemu/cutils.h"
+ 
+ #include "boot.h"
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index cf537dd7e63..4ba670cc909 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -37,7 +37,7 @@
+ #include "qemu/log.h"
+ #include "hw/loader.h"
+ #include "hw/ide.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "hw/isa/vt82c686.h"
+ #include "hw/timer/mc146818rtc.h"
+ #include "hw/timer/i8254.h"
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 4d9c64b36ab..1c841298363 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -44,7 +44,7 @@
+ #include "hw/ide.h"
+ #include "hw/irq.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "hw/timer/mc146818rtc.h"
+ #include "hw/timer/i8254.h"
+ #include "exec/address-spaces.h"
+diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
+index 282bbecb24e..d6acd53b3e3 100644
+--- a/hw/mips/mips_mipssim.c
++++ b/hw/mips/mips_mipssim.c
+@@ -38,7 +38,7 @@
+ #include "hw/boards.h"
+ #include "hw/mips/bios.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "hw/sysbus.h"
+ #include "exec/address-spaces.h"
+ #include "qemu/error-report.h"
+diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+index bc0be265441..7fc2fc51fee 100644
+--- a/hw/mips/mips_r4k.c
++++ b/hw/mips/mips_r4k.c
+@@ -27,7 +27,7 @@
+ #include "hw/mips/bios.h"
+ #include "hw/ide.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "hw/timer/mc146818rtc.h"
+ #include "hw/input/i8042.h"
+ #include "hw/timer/i8254.h"
+diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
+index 57af1b48912..bc1cc8b0bf8 100644
+--- a/hw/moxie/moxiesim.c
++++ b/hw/moxie/moxiesim.c
+@@ -37,7 +37,7 @@
+ #include "hw/loader.h"
+ #include "hw/char/serial.h"
+ #include "exec/address-spaces.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ 
+ #define PHYS_MEM_BASE 0x80000000
+ #define FIRMWARE_BASE 0x1000
+diff --git a/hw/nios2/boot.c b/hw/nios2/boot.c
+index d78bc9ed0e2..ec1eb15bcaa 100644
+--- a/hw/nios2/boot.c
++++ b/hw/nios2/boot.c
+@@ -39,7 +39,7 @@
+ #include "sysemu/reset.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ 
+ #include "boot.h"
+ 
+diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
+index 79e70493fc7..f21a2962a90 100644
+--- a/hw/openrisc/openrisc_sim.c
++++ b/hw/openrisc/openrisc_sim.c
+@@ -24,7 +24,7 @@
+ #include "cpu.h"
+ #include "hw/irq.h"
+ #include "hw/boards.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "hw/char/serial.h"
+ #include "net/net.h"
+ #include "hw/loader.h"
+diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
+index 85d7ba90374..9568746d8e2 100644
+--- a/hw/pci-host/prep.c
++++ b/hw/pci-host/prep.c
+@@ -37,7 +37,7 @@
+ #include "hw/loader.h"
+ #include "hw/or-irq.h"
+ #include "exec/address-spaces.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ 
+ #define TYPE_RAVEN_PCI_DEVICE "raven"
+ #define TYPE_RAVEN_PCI_HOST_BRIDGE "raven-pcihost"
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index 91cd4c26f91..add6277ad6c 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -36,7 +36,7 @@
+ #include "hw/ppc/ppc.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "hw/sysbus.h"
+ #include "exec/address-spaces.h"
+ #include "qemu/host-utils.h"
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index c5bbcc74335..50babbb7a67 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -65,7 +65,7 @@
+ #include "hw/ide.h"
+ #include "hw/loader.h"
+ #include "hw/fw-path-provider.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/reset.h"
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 0fa680b7499..64fe33cd1f3 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -44,7 +44,7 @@
+ #include "hw/ide.h"
+ #include "hw/loader.h"
+ #include "hw/fw-path-provider.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/reset.h"
+diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+index 4d95c0f8a88..15f39b332a8 100644
+--- a/hw/ppc/ppc440_bamboo.c
++++ b/hw/ppc/ppc440_bamboo.c
+@@ -23,7 +23,7 @@
+ #include "kvm_ppc.h"
+ #include "sysemu/device_tree.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "exec/address-spaces.h"
+ #include "hw/char/serial.h"
+ #include "hw/ppc/ppc.h"
+diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+index 4f3c6bf1901..8bd3209dec7 100644
+--- a/hw/ppc/prep.c
++++ b/hw/ppc/prep.c
+@@ -49,7 +49,7 @@
+ #include "sysemu/reset.h"
+ #include "exec/address-spaces.h"
+ #include "trace.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "qemu/units.h"
+ #include "kvm_ppc.h"
+ 
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index 437e214210b..982b80e5bad 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -22,7 +22,7 @@
+ #include "sysemu/device_tree.h"
+ #include "sysemu/block-backend.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "exec/address-spaces.h"
+ #include "exec/memory.h"
+ #include "ppc440.h"
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 222a325056c..57f8041ec81 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -36,7 +36,7 @@
+ #include "sysemu/runstate.h"
+ #include "qemu/log.h"
+ #include "hw/fw-path-provider.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "net/net.h"
+ #include "sysemu/device_tree.h"
+ #include "sysemu/cpus.h"
+diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+index 0803649658f..6d90322db0b 100644
+--- a/hw/ppc/spapr_vio.c
++++ b/hw/ppc/spapr_vio.c
+@@ -26,7 +26,7 @@
+ #include "hw/irq.h"
+ #include "qemu/log.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "hw/sysbus.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/device_tree.h"
+diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+index 68625522d8a..ede7da4bbc2 100644
+--- a/hw/ppc/virtex_ml507.c
++++ b/hw/ppc/virtex_ml507.c
+@@ -35,7 +35,7 @@
+ #include "hw/boards.h"
+ #include "sysemu/device_tree.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "qemu/error-report.h"
+ #include "qemu/log.h"
+ #include "qemu/option.h"
+diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+index 4c63b5cf8a8..9a7b4a5ca87 100644
+--- a/hw/riscv/boot.c
++++ b/hw/riscv/boot.c
+@@ -25,7 +25,7 @@
+ #include "hw/boards.h"
+ #include "hw/loader.h"
+ #include "hw/riscv/boot.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "sysemu/qtest.h"
+ 
+ #if defined(TARGET_RISCV32)
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index ca544d64c5e..cf4e06b633e 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -19,7 +19,7 @@
+ #include "sysemu/sysemu.h"
+ #include "sysemu/tcg.h"
+ #include "cpu.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "hw/loader.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/boards.h"
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index c5f1b1ee72e..735a823fd56 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -37,7 +37,7 @@
+ #include "sysemu/reset.h"
+ #include "hw/boards.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "trace.h"
+ #include "exec/address-spaces.h"
+ 
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 6c5a17a0205..d542a6c203c 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -49,7 +49,7 @@
+ #include "hw/empty_slot.h"
+ #include "hw/irq.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "trace.h"
+ 
+ /*
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 1ded2a4c9ab..79b15c8aec3 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -54,7 +54,7 @@
+ #include "hw/ide/pci.h"
+ #include "hw/loader.h"
+ #include "hw/fw-path-provider.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "trace.h"
+ 
+ #define KERNEL_LOAD_ADDR     0x00404000
+diff --git a/hw/tricore/tricore_testboard.c b/hw/tricore/tricore_testboard.c
+index aef3289f8c3..84e8d7b429f 100644
+--- a/hw/tricore/tricore_testboard.c
++++ b/hw/tricore/tricore_testboard.c
+@@ -26,7 +26,7 @@
+ #include "hw/boards.h"
+ #include "hw/loader.h"
+ #include "exec/address-spaces.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "hw/tricore/tricore.h"
+ #include "qemu/error-report.h"
+ 
+diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
+index 981dbb7bbeb..f8d96fc452c 100644
+--- a/hw/xtensa/sim.c
++++ b/hw/xtensa/sim.c
+@@ -32,7 +32,7 @@
+ #include "sysemu/sysemu.h"
+ #include "hw/boards.h"
+ #include "hw/loader.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "exec/memory.h"
+ #include "exec/address-spaces.h"
+ #include "qemu/error-report.h"
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index 8220c7a3794..5e3ed738fa8 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -33,7 +33,7 @@
+ #include "hw/boards.h"
+ #include "hw/loader.h"
+ #include "hw/qdev-properties.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "exec/memory.h"
+ #include "exec/address-spaces.h"
+ #include "hw/char/serial.h"
+diff --git a/include/elf/elf-types.inc.h b/include/elf/elf-types.inc.h
 new file mode 100644
-index 0000000000..5f8ded2686
+index 00000000000..35163adb2b5
 --- /dev/null
-+++ b/hw/m68k/bootinfo.h
-@@ -0,0 +1,114 @@
++++ b/include/elf/elf-types.inc.h
+@@ -0,0 +1,63 @@
 +/*
-+ * SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note
++ * Elf Type Specialisation
 + *
-+ * Bootinfo tags from linux bootinfo.h and bootinfo-mac.h:
-+ * This is an easily parsable and extendable structure containing all
-+ * information to be passed from the bootstrap to the kernel
++ * Copyright (c) 2019
++ * Written by Alex Bennée <alex.bennee@linaro.org>
 + *
-+ * This structure is copied right after the kernel by the bootstrap
-+ * routine.
++ * This code is licensed under the GNU .
 + */
 +
-+#ifndef HW_M68K_BOOTINFO_H
-+#define HW_M68K_BOOTINFO_H
-+struct bi_record {
-+    uint16_t tag;        /* tag ID */
-+    uint16_t size;       /* size of record */
-+    uint32_t data[0];    /* data */
-+};
++#ifndef _ELF_TYPES_INC_H_
++#define _ELF_TYPES_INC_H_
 +
-+/* machine independent tags */
++#ifndef ELF_CLASS
++#error you must define ELF_CLASS before including elf-types.inc.h
++#else
 +
-+#define BI_LAST         0x0000 /* last record */
-+#define BI_MACHTYPE     0x0001 /* machine type (u_long) */
-+#define BI_CPUTYPE      0x0002 /* cpu type (u_long) */
-+#define BI_FPUTYPE      0x0003 /* fpu type (u_long) */
-+#define BI_MMUTYPE      0x0004 /* mmu type (u_long) */
-+#define BI_MEMCHUNK     0x0005 /* memory chunk address and size */
-+                               /* (struct mem_info) */
-+#define BI_RAMDISK      0x0006 /* ramdisk address and size */
-+                               /* (struct mem_info) */
-+#define BI_COMMAND_LINE 0x0007 /* kernel command line parameters */
-+                               /* (string) */
++#if ELF_CLASS == ELFCLASS32
 +
-+/*  Macintosh-specific tags (all u_long) */
++#define elfhdr      elf32_hdr
++#define elf_phdr    elf32_phdr
++#define elf_note    elf32_note
++#define elf_shdr    elf32_shdr
++#define elf_sym     elf32_sym
++#define elf_addr_t  Elf32_Off
++#define elf_rela    elf32_rela
 +
-+#define BI_MAC_MODEL    0x8000  /* Mac Gestalt ID (model type) */
-+#define BI_MAC_VADDR    0x8001  /* Mac video base address */
-+#define BI_MAC_VDEPTH   0x8002  /* Mac video depth */
-+#define BI_MAC_VROW     0x8003  /* Mac video rowbytes */
-+#define BI_MAC_VDIM     0x8004  /* Mac video dimensions */
-+#define BI_MAC_VLOGICAL 0x8005  /* Mac video logical base */
-+#define BI_MAC_SCCBASE  0x8006  /* Mac SCC base address */
-+#define BI_MAC_BTIME    0x8007  /* Mac boot time */
-+#define BI_MAC_GMTBIAS  0x8008  /* Mac GMT timezone offset */
-+#define BI_MAC_MEMSIZE  0x8009  /* Mac RAM size (sanity check) */
-+#define BI_MAC_CPUID    0x800a  /* Mac CPU type (sanity check) */
-+#define BI_MAC_ROMBASE  0x800b  /* Mac system ROM base address */
-+
-+/*  Macintosh hardware profile data */
-+
-+#define BI_MAC_VIA1BASE 0x8010  /* Mac VIA1 base address (always present) */
-+#define BI_MAC_VIA2BASE 0x8011  /* Mac VIA2 base address (type varies) */
-+#define BI_MAC_VIA2TYPE 0x8012  /* Mac VIA2 type (VIA, RBV, OSS) */
-+#define BI_MAC_ADBTYPE  0x8013  /* Mac ADB interface type */
-+#define BI_MAC_ASCBASE  0x8014  /* Mac Apple Sound Chip base address */
-+#define BI_MAC_SCSI5380 0x8015  /* Mac NCR 5380 SCSI (base address, multi) */
-+#define BI_MAC_SCSIDMA  0x8016  /* Mac SCSI DMA (base address) */
-+#define BI_MAC_SCSI5396 0x8017  /* Mac NCR 53C96 SCSI (base address, multi) */
-+#define BI_MAC_IDETYPE  0x8018  /* Mac IDE interface type */
-+#define BI_MAC_IDEBASE  0x8019  /* Mac IDE interface base address */
-+#define BI_MAC_NUBUS    0x801a  /* Mac Nubus type (none, regular, pseudo) */
-+#define BI_MAC_SLOTMASK 0x801b  /* Mac Nubus slots present */
-+#define BI_MAC_SCCTYPE  0x801c  /* Mac SCC serial type (normal, IOP) */
-+#define BI_MAC_ETHTYPE  0x801d  /* Mac builtin ethernet type (Sonic, MACE */
-+#define BI_MAC_ETHBASE  0x801e  /* Mac builtin ethernet base address */
-+#define BI_MAC_PMU      0x801f  /* Mac power management / poweroff hardware */
-+#define BI_MAC_IOP_SWIM 0x8020  /* Mac SWIM floppy IOP */
-+#define BI_MAC_IOP_ADB  0x8021  /* Mac ADB IOP */
-+
-+#define BOOTINFO0(as, base, id) \
-+    do { \
-+        stw_phys(as, base, id); \
-+        base += 2; \
-+        stw_phys(as, base, sizeof(struct bi_record)); \
-+        base += 2; \
-+    } while (0)
-+
-+#define BOOTINFO1(as, base, id, value) \
-+    do { \
-+        stw_phys(as, base, id); \
-+        base += 2; \
-+        stw_phys(as, base, sizeof(struct bi_record) + 4); \
-+        base += 2; \
-+        stl_phys(as, base, value); \
-+        base += 4; \
-+    } while (0)
-+
-+#define BOOTINFO2(as, base, id, value1, value2) \
-+    do { \
-+        stw_phys(as, base, id); \
-+        base += 2; \
-+        stw_phys(as, base, sizeof(struct bi_record) + 8); \
-+        base += 2; \
-+        stl_phys(as, base, value1); \
-+        base += 4; \
-+        stl_phys(as, base, value2); \
-+        base += 4; \
-+    } while (0)
-+
-+#define BOOTINFOSTR(as, base, id, string) \
-+    do { \
-+        int i; \
-+        stw_phys(as, base, id); \
-+        base += 2; \
-+        stw_phys(as, base, \
-+                 (sizeof(struct bi_record) + strlen(string) + 2) & ~1); \
-+        base += 2; \
-+        for (i = 0; string[i]; i++) { \
-+            stb_phys(as, base++, string[i]); \
-+        } \
-+        stb_phys(as, base++, 0); \
-+        base = (parameters_base + 1) & ~1; \
-+    } while (0)
++#ifdef ELF_USES_RELOCA
++# define ELF_RELOC  Elf32_Rela
++#else
++# define ELF_RELOC  Elf32_Rel
 +#endif
-diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
-new file mode 100644
-index 0000000000..8e0389e050
---- /dev/null
-+++ b/hw/m68k/q800.c
-@@ -0,0 +1,382 @@
-+/*
-+ * QEMU Motorla 680x0 Macintosh hardware System Emulator
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
 +
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "sysemu/sysemu.h"
-+#include "cpu.h"
-+#include "hw/hw.h"
-+#include "hw/boards.h"
-+#include "hw/irq.h"
-+#include "elf.h"
-+#include "hw/loader.h"
-+#include "ui/console.h"
-+#include "exec/address-spaces.h"
-+#include "hw/char/escc.h"
-+#include "hw/sysbus.h"
-+#include "hw/scsi/esp.h"
-+#include "bootinfo.h"
-+#include "hw/misc/mac_via.h"
-+#include "hw/input/adb.h"
-+#include "hw/nubus/mac-nubus-bridge.h"
-+#include "hw/display/macfb.h"
-+#include "hw/block/swim.h"
-+#include "net/net.h"
-+#include "qapi/error.h"
-+#include "sysemu/qtest.h"
-+#include "sysemu/runstate.h"
-+#include "sysemu/reset.h"
++#ifndef ElfW
++#  define ElfW(x)   Elf32_ ## x
++#  define ELFW(x)   ELF32_ ## x
++#endif
 +
-+#define MACROM_ADDR     0x40000000
-+#define MACROM_SIZE     0x00100000
++#else /* ELF_CLASS == ELFCLASS64 */
 +
-+#define MACROM_FILENAME "MacROM.bin"
++#define elfhdr      elf64_hdr
++#define elf_phdr    elf64_phdr
++#define elf_note    elf64_note
++#define elf_shdr    elf64_shdr
++#define elf_sym     elf64_sym
++#define elf_addr_t  Elf64_Off
++#define elf_rela    elf64_rela
 +
-+#define Q800_MACHINE_ID 35
-+#define Q800_CPU_ID (1 << 2)
-+#define Q800_FPU_ID (1 << 2)
-+#define Q800_MMU_ID (1 << 2)
++#ifdef ELF_USES_RELOCA
++# define ELF_RELOC  Elf64_Rela
++#else
++# define ELF_RELOC  Elf64_Rel
++#endif
 +
-+#define MACH_MAC        3
-+#define Q800_MAC_CPU_ID 2
++#ifndef ElfW
++#  define ElfW(x)   Elf64_ ## x
++#  define ELFW(x)   ELF64_ ## x
++#endif
 +
-+#define VIA_BASE              0x50f00000
-+#define SONIC_PROM_BASE       0x50f08000
-+#define SONIC_BASE            0x50f0a000
-+#define SCC_BASE              0x50f0c020
-+#define ESP_BASE              0x50f10000
-+#define ESP_PDMA              0x50f10100
-+#define ASC_BASE              0x50F14000
-+#define SWIM_BASE             0x50F1E000
-+#define NUBUS_SUPER_SLOT_BASE 0x60000000
-+#define NUBUS_SLOT_BASE       0xf0000000
++#endif /* ELF_CLASS == ELFCLASS64 */
++#endif /* ELF_CLASS */
++#else
++#error elf-types.inc.h should not be included twice in one compilation unit
++#endif /* _ELF_TYPES_INC_H_ */
+diff --git a/include/elf.h b/include/elf/elf.h
+similarity index 98%
+rename from include/elf.h
+rename to include/elf/elf.h
+index 3501e0c8d03..2e264c1a7a0 100644
+--- a/include/elf.h
++++ b/include/elf/elf.h
+@@ -1696,49 +1696,7 @@ struct elf32_fdpic_loadmap {
+ };
+ 
+ #ifdef ELF_CLASS
+-#if ELF_CLASS == ELFCLASS32
+-
+-#define elfhdr		elf32_hdr
+-#define elf_phdr	elf32_phdr
+-#define elf_note	elf32_note
+-#define elf_shdr	elf32_shdr
+-#define elf_sym		elf32_sym
+-#define elf_addr_t	Elf32_Off
+-#define elf_rela  elf32_rela
+-
+-#ifdef ELF_USES_RELOCA
+-# define ELF_RELOC      Elf32_Rela
+-#else
+-# define ELF_RELOC      Elf32_Rel
+-#endif
+-
+-#else
+-
+-#define elfhdr		elf64_hdr
+-#define elf_phdr	elf64_phdr
+-#define elf_note	elf64_note
+-#define elf_shdr	elf64_shdr
+-#define elf_sym		elf64_sym
+-#define elf_addr_t	Elf64_Off
+-#define elf_rela  elf64_rela
+-
+-#ifdef ELF_USES_RELOCA
+-# define ELF_RELOC      Elf64_Rela
+-#else
+-# define ELF_RELOC      Elf64_Rel
+-#endif
+-
+-#endif /* ELF_CLASS */
+ 
+-#ifndef ElfW
+-# if ELF_CLASS == ELFCLASS32
+-#  define ElfW(x)  Elf32_ ## x
+-#  define ELFW(x)  ELF32_ ## x
+-# else
+-#  define ElfW(x)  Elf64_ ## x
+-#  define ELFW(x)  ELF64_ ## x
+-# endif
+-#endif
+ 
+ #endif /* ELF_CLASS */
+ 
+diff --git a/include/hw/core/generic-loader.h b/include/hw/core/generic-loader.h
+index 9ffce1c5a30..ca97affd8e1 100644
+--- a/include/hw/core/generic-loader.h
++++ b/include/hw/core/generic-loader.h
+@@ -18,7 +18,7 @@
+ #ifndef GENERIC_LOADER_H
+ #define GENERIC_LOADER_H
+ 
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "hw/qdev-core.h"
+ 
+ typedef struct GenericLoaderState {
+diff --git a/linux-user/arm/cpu_loop.c b/linux-user/arm/cpu_loop.c
+index 8d65de5b9f4..970fff8b1bc 100644
+--- a/linux-user/arm/cpu_loop.c
++++ b/linux-user/arm/cpu_loop.c
+@@ -20,7 +20,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "qemu.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "cpu_loop-common.h"
+ 
+ #define get_user_code_u32(x, gaddr, env)                \
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 3365e192eb3..59a0d21c6f1 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -7,6 +7,7 @@
+ 
+ #include "qemu.h"
+ #include "disas/disas.h"
++#include "elf/elf.h"
+ #include "qemu/path.h"
+ #include "qemu/queue.h"
+ #include "qemu/guest-random.h"
+@@ -1317,8 +1318,6 @@ static inline void init_thread(struct target_pt_regs *regs,
+ #define ELF_DATA	ELFDATA2MSB
+ #define ELF_ARCH	EM_S390
+ 
+-#include "elf.h"
+-
+ #define ELF_HWCAP get_elf_hwcap()
+ 
+ #define GET_FEATURE(_feat, _hwcap) \
+@@ -1512,7 +1511,7 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs,
+ #define bswaptls(ptr) bswap32s(ptr)
+ #endif
+ 
+-#include "elf.h"
++#include "elf/elf-types.inc.h"
+ 
+ struct exec
+ {
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 47917bbb20f..c796a15700d 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -40,7 +40,7 @@
+ #include "qemu/timer.h"
+ #include "qemu/envlist.h"
+ #include "qemu/guest-random.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "trace/control.h"
+ #include "target_elf.h"
+ #include "cpu_loop-common.h"
+diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
+index 39915b3fde2..0d3f0738b58 100644
+--- a/linux-user/mips/cpu_loop.c
++++ b/linux-user/mips/cpu_loop.c
+@@ -21,7 +21,7 @@
+ #include "qemu-common.h"
+ #include "qemu.h"
+ #include "cpu_loop-common.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "internal.h"
+ 
+ # ifdef TARGET_ABI_MIPSO32
+diff --git a/linux-user/riscv/cpu_loop.c b/linux-user/riscv/cpu_loop.c
+index 12aa3c0f16e..f9f5beef431 100644
+--- a/linux-user/riscv/cpu_loop.c
++++ b/linux-user/riscv/cpu_loop.c
+@@ -22,7 +22,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu.h"
+ #include "cpu_loop-common.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ 
+ void cpu_loop(CPURISCVState *env)
+ {
+diff --git a/target/arm/arch_dump.c b/target/arm/arch_dump.c
+index 26a2c098687..c05a2845883 100644
+--- a/target/arm/arch_dump.c
++++ b/target/arm/arch_dump.c
+@@ -20,7 +20,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "sysemu/dump.h"
+ 
+ /* struct user_pt_regs from arch/arm64/include/uapi/asm/ptrace.h */
+diff --git a/target/i386/arch_dump.c b/target/i386/arch_dump.c
+index 004141fc042..9eb1e2a8bcf 100644
+--- a/target/i386/arch_dump.c
++++ b/target/i386/arch_dump.c
+@@ -14,7 +14,7 @@
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+ #include "sysemu/dump.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "sysemu/memory_mapping.h"
+ 
+ #define ELF_NOTE_SIZE(hdr_size, name_size, desc_size)   \
+diff --git a/target/ppc/arch_dump.c b/target/ppc/arch_dump.c
+index 9ab04b2c38f..0e102be1ed5 100644
+--- a/target/ppc/arch_dump.c
++++ b/target/ppc/arch_dump.c
+@@ -14,7 +14,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "sysemu/dump.h"
+ #include "sysemu/kvm.h"
+ #include "exec/helper-proto.h"
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 8c5b1f25cc9..c2e5f72ab0d 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -48,7 +48,7 @@
+ #include "qemu/cutils.h"
+ #include "qemu/main-loop.h"
+ #include "qemu/mmap-alloc.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "sysemu/kvm_int.h"
+ 
+ #define PROC_DEVTREE_CPU      "/proc/device-tree/cpus/"
+diff --git a/target/s390x/arch_dump.c b/target/s390x/arch_dump.c
+index 50fa0ae4b67..5fe9519d26c 100644
+--- a/target/s390x/arch_dump.c
++++ b/target/s390x/arch_dump.c
+@@ -14,7 +14,7 @@
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+ #include "internal.h"
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "sysemu/dump.h"
+ 
+ 
+diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+index 94d80d79d1f..e04f726e4a6 100644
+--- a/tcg/arm/tcg-target.inc.c
++++ b/tcg/arm/tcg-target.inc.c
+@@ -22,7 +22,7 @@
+  * THE SOFTWARE.
+  */
+ 
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "tcg-pool.inc.c"
+ 
+ int arm_arch = __ARM_ARCH;
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index 815edac077f..4886f8c0d39 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -22,7 +22,7 @@
+  * THE SOFTWARE.
+  */
+ 
+-#include "elf.h"
++#include "elf/elf.h"
+ #include "tcg-pool.inc.c"
+ 
+ #if defined _CALL_DARWIN || defined __APPLE__
+diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
+index 8aaa4cebe8d..82a81d2d94d 100644
+--- a/tcg/s390/tcg-target.inc.c
++++ b/tcg/s390/tcg-target.inc.c
+@@ -30,7 +30,7 @@
+ #endif
+ 
+ #include "tcg-pool.inc.c"
+-#include "elf.h"
++#include "elf/elf.h"
+ 
+ /* ??? The translation blocks produced by TCG are generally small enough to
+    be entirely reachable with a 16-bit displacement.  Leaving the option for
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 16b2d0e0ece..b8e2c7956b7 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -50,6 +50,8 @@
+ 
+ #include "tcg-op.h"
+ 
++#include "elf/elf.h"
 +
-+/*
-+ * the video base, whereas it a Nubus address,
-+ * is needed by the kernel to have early display and
-+ * thus provided by the bootloader
-+ */
-+#define VIDEO_BASE            0xf9001000
+ #if UINTPTR_MAX == UINT32_MAX
+ # define ELF_CLASS  ELFCLASS32
+ #else
+@@ -61,7 +63,8 @@
+ # define ELF_DATA   ELFDATA2LSB
+ #endif
+ 
+-#include "elf.h"
++#include "elf/elf-types.inc.h"
 +
-+#define MAC_CLOCK  3686418
-+
-+/*
-+ * The GLUE (General Logic Unit) is an Apple custom integrated circuit chip
-+ * that performs a variety of functions (RAM management, clock generation, ...).
-+ * The GLUE chip receives interrupt requests from various devices,
-+ * assign priority to each, and asserts one or more interrupt line to the
-+ * CPU.
-+ */
-+
-+typedef struct {
-+    M68kCPU *cpu;
-+    uint8_t ipr;
-+} GLUEState;
-+
-+static void GLUE_set_irq(void *opaque, int irq, int level)
-+{
-+    GLUEState *s = opaque;
-+    int i;
-+
-+    if (level) {
-+        s->ipr |= 1 << irq;
-+    } else {
-+        s->ipr &= ~(1 << irq);
-+    }
-+
-+    for (i = 7; i >= 0; i--) {
-+        if ((s->ipr >> i) & 1) {
-+            m68k_set_irq_level(s->cpu, i + 1, i + 25);
-+            return;
-+        }
-+    }
-+    m68k_set_irq_level(s->cpu, 0, 0);
-+}
-+
-+static void main_cpu_reset(void *opaque)
-+{
-+    M68kCPU *cpu = opaque;
-+    CPUState *cs = CPU(cpu);
-+
-+    cpu_reset(cs);
-+    cpu->env.aregs[7] = ldl_phys(cs->as, 0);
-+    cpu->env.pc = ldl_phys(cs->as, 4);
-+}
-+
-+static void q800_init(MachineState *machine)
-+{
-+    M68kCPU *cpu = NULL;
-+    int linux_boot;
-+    int32_t kernel_size;
-+    uint64_t elf_entry;
-+    char *filename;
-+    int bios_size;
-+    ram_addr_t initrd_base;
-+    int32_t initrd_size;
-+    MemoryRegion *rom;
-+    MemoryRegion *ram;
-+    ram_addr_t ram_size = machine->ram_size;
-+    const char *kernel_filename = machine->kernel_filename;
-+    const char *initrd_filename = machine->initrd_filename;
-+    const char *kernel_cmdline = machine->kernel_cmdline;
-+    hwaddr parameters_base;
-+    CPUState *cs;
-+    DeviceState *dev;
-+    DeviceState *via_dev;
-+    SysBusESPState *sysbus_esp;
-+    ESPState *esp;
-+    SysBusDevice *sysbus;
-+    BusState *adb_bus;
-+    NubusBus *nubus;
-+    GLUEState *irq;
-+    qemu_irq *pic;
-+
-+    linux_boot = (kernel_filename != NULL);
-+
-+    /* init CPUs */
-+    cpu = M68K_CPU(cpu_create(machine->cpu_type));
-+    qemu_register_reset(main_cpu_reset, cpu);
-+
-+    ram = g_malloc(sizeof(*ram));
-+    memory_region_init_ram(ram, NULL, "m68k_mac.ram", ram_size, &error_abort);
-+    memory_region_add_subregion(get_system_memory(), 0, ram);
-+
-+    /* IRQ Glue */
-+
-+    irq = g_new0(GLUEState, 1);
-+    irq->cpu = cpu;
-+    pic = qemu_allocate_irqs(GLUE_set_irq, irq, 8);
-+
-+    /* VIA */
-+
-+    via_dev = qdev_create(NULL, TYPE_MAC_VIA);
-+    qdev_init_nofail(via_dev);
-+    sysbus = SYS_BUS_DEVICE(via_dev);
-+    sysbus_mmio_map(sysbus, 0, VIA_BASE);
-+    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 0, pic[0]);
-+    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 1, pic[1]);
-+
-+
-+    adb_bus = qdev_get_child_bus(via_dev, "adb.0");
-+    dev = qdev_create(adb_bus, TYPE_ADB_KEYBOARD);
-+    qdev_init_nofail(dev);
-+    dev = qdev_create(adb_bus, TYPE_ADB_MOUSE);
-+    qdev_init_nofail(dev);
-+
-+    /* MACSONIC */
-+
-+    if (nb_nics > 1) {
-+        error_report("q800 can only have one ethernet interface");
-+        exit(1);
-+    }
-+
-+    qemu_check_nic_model(&nd_table[0], "dp83932");
-+
-+    /*
-+     * MacSonic driver needs an Apple MAC address
-+     * Valid prefix are:
-+     * 00:05:02 Apple
-+     * 00:80:19 Dayna Communications, Inc.
-+     * 00:A0:40 Apple
-+     * 08:00:07 Apple
-+     * (Q800 use the last one)
-+     */
-+    nd_table[0].macaddr.a[0] = 0x08;
-+    nd_table[0].macaddr.a[1] = 0x00;
-+    nd_table[0].macaddr.a[2] = 0x07;
-+
-+    dev = qdev_create(NULL, "dp8393x");
-+    qdev_set_nic_properties(dev, &nd_table[0]);
-+    qdev_prop_set_uint8(dev, "it_shift", 2);
-+    qdev_prop_set_bit(dev, "big_endian", true);
-+    qdev_prop_set_ptr(dev, "dma_mr", get_system_memory());
-+    qdev_init_nofail(dev);
-+    sysbus = SYS_BUS_DEVICE(dev);
-+    sysbus_mmio_map(sysbus, 0, SONIC_BASE);
-+    sysbus_mmio_map(sysbus, 1, SONIC_PROM_BASE);
-+    sysbus_connect_irq(sysbus, 0, pic[2]);
-+
-+    /* SCC */
-+
-+    dev = qdev_create(NULL, TYPE_ESCC);
-+    qdev_prop_set_uint32(dev, "disabled", 0);
-+    qdev_prop_set_uint32(dev, "frequency", MAC_CLOCK);
-+    qdev_prop_set_uint32(dev, "it_shift", 1);
-+    qdev_prop_set_bit(dev, "bit_swap", true);
-+    qdev_prop_set_chr(dev, "chrA", serial_hd(0));
-+    qdev_prop_set_chr(dev, "chrB", serial_hd(1));
-+    qdev_prop_set_uint32(dev, "chnBtype", 0);
-+    qdev_prop_set_uint32(dev, "chnAtype", 0);
-+    qdev_init_nofail(dev);
-+    sysbus = SYS_BUS_DEVICE(dev);
-+    sysbus_connect_irq(sysbus, 0, pic[3]);
-+    sysbus_connect_irq(sysbus, 1, pic[3]);
-+    sysbus_mmio_map(sysbus, 0, SCC_BASE);
-+
-+    /* SCSI */
-+
-+    dev = qdev_create(NULL, TYPE_ESP);
-+    sysbus_esp = ESP_STATE(dev);
-+    esp = &sysbus_esp->esp;
-+    esp->dma_memory_read = NULL;
-+    esp->dma_memory_write = NULL;
-+    esp->dma_opaque = NULL;
-+    sysbus_esp->it_shift = 4;
-+    esp->dma_enabled = 1;
-+    qdev_init_nofail(dev);
-+
-+    sysbus = SYS_BUS_DEVICE(dev);
-+    sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in_named(via_dev,
-+                                                         "via2-irq",
-+                                                         VIA2_IRQ_SCSI_BIT));
-+    sysbus_connect_irq(sysbus, 1,
-+                       qdev_get_gpio_in_named(via_dev, "via2-irq",
-+                                              VIA2_IRQ_SCSI_DATA_BIT));
-+    sysbus_mmio_map(sysbus, 0, ESP_BASE);
-+    sysbus_mmio_map(sysbus, 1, ESP_PDMA);
-+
-+    scsi_bus_legacy_handle_cmdline(&esp->bus);
-+
-+    /* SWIM floppy controller */
-+
-+    dev = qdev_create(NULL, TYPE_SWIM);
-+    qdev_init_nofail(dev);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, SWIM_BASE);
-+
-+    /* NuBus */
-+
-+    dev = qdev_create(NULL, TYPE_MAC_NUBUS_BRIDGE);
-+    qdev_init_nofail(dev);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, NUBUS_SUPER_SLOT_BASE);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 1, NUBUS_SLOT_BASE);
-+
-+    nubus = MAC_NUBUS_BRIDGE(dev)->bus;
-+
-+    /* framebuffer in nubus slot #9 */
-+
-+    dev = qdev_create(BUS(nubus), TYPE_NUBUS_MACFB);
-+    qdev_prop_set_uint32(dev, "width", graphic_width);
-+    qdev_prop_set_uint32(dev, "height", graphic_height);
-+    qdev_prop_set_uint8(dev, "depth", graphic_depth);
-+    qdev_init_nofail(dev);
-+
-+    cs = CPU(cpu);
-+    if (linux_boot) {
-+        uint64_t high;
-+        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
-+                               &elf_entry, NULL, &high, 1,
-+                               EM_68K, 0, 0);
-+        if (kernel_size < 0) {
-+            error_report("could not load kernel '%s'", kernel_filename);
-+            exit(1);
-+        }
-+        stl_phys(cs->as, 4, elf_entry); /* reset initial PC */
-+        parameters_base = (high + 1) & ~1;
-+
-+        BOOTINFO1(cs->as, parameters_base, BI_MACHTYPE, MACH_MAC);
-+        BOOTINFO1(cs->as, parameters_base, BI_FPUTYPE, Q800_FPU_ID);
-+        BOOTINFO1(cs->as, parameters_base, BI_MMUTYPE, Q800_MMU_ID);
-+        BOOTINFO1(cs->as, parameters_base, BI_CPUTYPE, Q800_CPU_ID);
-+        BOOTINFO1(cs->as, parameters_base, BI_MAC_CPUID, Q800_MAC_CPU_ID);
-+        BOOTINFO1(cs->as, parameters_base, BI_MAC_MODEL, Q800_MACHINE_ID);
-+        BOOTINFO1(cs->as, parameters_base,
-+                  BI_MAC_MEMSIZE, ram_size >> 20); /* in MB */
-+        BOOTINFO2(cs->as, parameters_base, BI_MEMCHUNK, 0, ram_size);
-+        BOOTINFO1(cs->as, parameters_base, BI_MAC_VADDR, VIDEO_BASE);
-+        BOOTINFO1(cs->as, parameters_base, BI_MAC_VDEPTH, graphic_depth);
-+        BOOTINFO1(cs->as, parameters_base, BI_MAC_VDIM,
-+                  (graphic_height << 16) | graphic_width);
-+        BOOTINFO1(cs->as, parameters_base, BI_MAC_VROW,
-+                  (graphic_width * graphic_depth + 7) / 8);
-+        BOOTINFO1(cs->as, parameters_base, BI_MAC_SCCBASE, SCC_BASE);
-+
-+        if (kernel_cmdline) {
-+            BOOTINFOSTR(cs->as, parameters_base, BI_COMMAND_LINE,
-+                        kernel_cmdline);
-+        }
-+
-+        /* load initrd */
-+        if (initrd_filename) {
-+            initrd_size = get_image_size(initrd_filename);
-+            if (initrd_size < 0) {
-+                error_report("could not load initial ram disk '%s'",
-+                             initrd_filename);
-+                exit(1);
-+            }
-+
-+            initrd_base = (ram_size - initrd_size) & TARGET_PAGE_MASK;
-+            load_image_targphys(initrd_filename, initrd_base,
-+                                ram_size - initrd_base);
-+            BOOTINFO2(cs->as, parameters_base, BI_RAMDISK, initrd_base,
-+                      initrd_size);
-+        } else {
-+            initrd_base = 0;
-+            initrd_size = 0;
-+        }
-+        BOOTINFO0(cs->as, parameters_base, BI_LAST);
-+    } else {
-+        uint8_t *ptr;
-+        /* allocate and load BIOS */
-+        rom = g_malloc(sizeof(*rom));
-+        memory_region_init_ram(rom, NULL, "m68k_mac.rom", MACROM_SIZE,
-+                               &error_abort);
-+        if (bios_name == NULL) {
-+            bios_name = MACROM_FILENAME;
-+        }
-+        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
-+        memory_region_set_readonly(rom, true);
-+        memory_region_add_subregion(get_system_memory(), MACROM_ADDR, rom);
-+
-+        /* Load MacROM binary */
-+        if (filename) {
-+            bios_size = load_image_targphys(filename, MACROM_ADDR, MACROM_SIZE);
-+            g_free(filename);
-+        } else {
-+            bios_size = -1;
-+        }
-+
-+        /* Remove qtest_enabled() check once firmware files are in the tree */
-+        if (!qtest_enabled()) {
-+            if (bios_size < 0 || bios_size > MACROM_SIZE) {
-+                error_report("could not load MacROM '%s'", bios_name);
-+                exit(1);
-+            }
-+
-+            ptr = rom_ptr(MACROM_ADDR, MACROM_SIZE);
-+            stl_phys(cs->as, 0, ldl_p(ptr));    /* reset initial SP */
-+            stl_phys(cs->as, 4,
-+                     MACROM_ADDR + ldl_p(ptr + 4)); /* reset initial PC */
-+        }
-+    }
-+}
-+
-+static void q800_machine_init(MachineClass *mc)
-+{
-+    mc->desc = "Macintosh Quadra 800";
-+    mc->init = q800_init;
-+    mc->default_cpu_type = M68K_CPU_TYPE_NAME("m68040");
-+    mc->max_cpus = 1;
-+    mc->is_default = 0;
-+    mc->block_default_type = IF_SCSI;
-+}
-+
-+DEFINE_MACHINE("q800", q800_machine_init)
+ #include "exec/log.h"
+ #include "sysemu/sysemu.h"
+ 
+diff --git a/util/getauxval.c b/util/getauxval.c
+index 36afdfb9e62..ee216c81c0b 100644
+--- a/util/getauxval.c
++++ b/util/getauxval.c
+@@ -36,7 +36,7 @@ unsigned long qemu_getauxval(unsigned long key)
+     return getauxval(key);
+ }
+ #elif defined(__linux__)
+-#include "elf.h"
++#include "elf/elf.h"
+ 
+ /* Our elf.h doesn't contain Elf32_auxv_t and Elf64_auxv_t, which is ok because
+    that just makes it easier to define it properly for the host here.  */
 -- 
-2.21.0
+2.20.1
 
 
