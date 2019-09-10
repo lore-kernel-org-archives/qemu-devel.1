@@ -2,94 +2,65 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 624EEC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 07:13:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59ED0C49ED6
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 07:17:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F2B52084D
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 07:13:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F2B52084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3482E20872
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 07:17:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3482E20872
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7aLe-0006L4-6s
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 03:13:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46016)
+	id 1i7aP2-0007ch-Cc
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 03:17:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47484)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bala24@linux.ibm.com>) id 1i7aJD-0003HI-Qr
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:11:30 -0400
+ (envelope-from <clg@kaod.org>) id 1i7aO9-00072e-RG
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:16:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bala24@linux.ibm.com>) id 1i7aJB-0005SB-3X
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:11:27 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:64874)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <bala24@linux.ibm.com>)
- id 1i7aJA-0005Rs-Ry
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:11:25 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8A77Z3b092612
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 03:11:24 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ux6ybghbd-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 03:11:23 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <bala24@linux.ibm.com>;
- Tue, 10 Sep 2019 08:11:21 +0100
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 10 Sep 2019 08:11:17 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id x8A7Apbm36569420
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Sep 2019 07:10:52 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5D98D4C04E;
- Tue, 10 Sep 2019 07:11:16 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B1BAC4C040;
- Tue, 10 Sep 2019 07:11:14 +0000 (GMT)
-Received: from localhost.in.ibm.com (unknown [9.124.35.221])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 10 Sep 2019 07:11:14 +0000 (GMT)
-From: Balamuruhan S <bala24@linux.ibm.com>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Date: Tue, 10 Sep 2019 12:40:19 +0530
-X-Mailer: git-send-email 2.14.5
-In-Reply-To: <20190910071019.16689-1-bala24@linux.ibm.com>
+ (envelope-from <clg@kaod.org>) id 1i7aO8-0000FX-A9
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:16:33 -0400
+Received: from 2.mo3.mail-out.ovh.net ([46.105.75.36]:46608)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i7aO8-0000Ei-3o
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:16:32 -0400
+Received: from player728.ha.ovh.net (unknown [10.108.57.18])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id DA66E226D02
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 09:16:29 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+ (Authenticated sender: clg@kaod.org)
+ by player728.ha.ovh.net (Postfix) with ESMTPSA id 55AE198B7F24;
+ Tue, 10 Sep 2019 07:16:20 +0000 (UTC)
+To: Balamuruhan S <bala24@linux.ibm.com>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org
 References: <20190910071019.16689-1-bala24@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19091007-0016-0000-0000-000002A961D0
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19091007-0017-0000-0000-00003309E6CD
-Message-Id: <20190910071019.16689-4-bala24@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-09-10_06:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1909100071
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: [Qemu-devel] [PATCH v1 3/3] hw/ppc/pnv_homer: add PowerNV homer
- device model
+ <20190910071019.16689-2-bala24@linux.ibm.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <3733cbe3-41dc-2748-0b1a-80453c26582b@kaod.org>
+Date: Tue, 10 Sep 2019 09:16:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190910071019.16689-2-bala24@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 5606137113925356370
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudekjedguddufecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.75.36
+Subject: Re: [Qemu-devel] [PATCH v1 1/3] hw/ppc/pnv_xscom: retrieve
+ homer/occ base address from PBA BARs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,582 +72,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: maddy@linux.vnet.ibm.com, groug@kaod.org,
- Balamuruhan S <bala24@linux.ibm.com>, anju@linux.vnet.ibm.com, clg@kaod.org,
+Cc: maddy@linux.vnet.ibm.com, anju@linux.vnet.ibm.com, groug@kaod.org,
  hari@linux.vnet.ibm.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-add PnvHOMER device model to emulate homer memory access
-for pstate table, occ-sensors, slw, occ static and dynamic
-values for Power8 and Power9 chips. Fix few coding style
-warnings given by checkpatch.pl.
+On 10/09/2019 09:10, Balamuruhan S wrote:
+> During PowerNV boot skiboot populates the device tree by
+> retrieving base address of homer/occ common area from
+> PBA BARs and prd ipoll mask by accessing xscom read/write
+> accesses.
+>=20
+> Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
 
-Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
----
- hw/ppc/Makefile.objs       |   1 +
- hw/ppc/pnv.c               |  79 +++++++++++---
- hw/ppc/pnv_homer.c         | 258 +++++++++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/pnv.h       |   3 +
- include/hw/ppc/pnv_homer.h |  52 +++++++++
- 5 files changed, 376 insertions(+), 17 deletions(-)
- create mode 100644 hw/ppc/pnv_homer.c
- create mode 100644 include/hw/ppc/pnv_homer.h
+LGTM,
 
-diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-index 2c4e1c8de0..580bb4f0dd 100644
---- a/hw/ppc/Makefile.objs
-+++ b/hw/ppc/Makefile.objs
-@@ -9,6 +9,7 @@ obj-$(CONFIG_PSERIES) += spapr_tpm_proxy.o
- obj-$(CONFIG_SPAPR_RNG) +=  spapr_rng.o
- # IBM PowerNV
- obj-$(CONFIG_POWERNV) += pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_psi.o pnv_occ.o pnv_bmc.o
-+obj-$(CONFIG_POWERNV) += pnv_homer.o
- ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
- obj-y += spapr_pci_vfio.o spapr_pci_nvlink2.o
- endif
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 80338ffe87..ddddcc9bb6 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -187,7 +187,8 @@ static void pnv_dt_core(PnvChip *chip, PnvCore *pc, void *fdt)
- 
-     _FDT((fdt_setprop_cell(fdt, offset, "timebase-frequency", tbfreq)));
-     _FDT((fdt_setprop_cell(fdt, offset, "clock-frequency", cpufreq)));
--    _FDT((fdt_setprop_cell(fdt, offset, "ibm,slb-size", cpu->hash64_opts->slb_size)));
-+    _FDT((fdt_setprop_cell(fdt, offset, "ibm,slb-size",
-+                           cpu->hash64_opts->slb_size)));
-     _FDT((fdt_setprop_string(fdt, offset, "status", "okay")));
-     _FDT((fdt_setprop(fdt, offset, "64-bit", NULL, 0)));
- 
-@@ -200,19 +201,23 @@ static void pnv_dt_core(PnvChip *chip, PnvCore *pc, void *fdt)
-                            segs, sizeof(segs))));
-     }
- 
--    /* Advertise VMX/VSX (vector extensions) if available
-+    /*
-+     * Advertise VMX/VSX (vector extensions) if available
-      *   0 / no property == no vector extensions
-      *   1               == VMX / Altivec available
--     *   2               == VSX available */
-+     *   2               == VSX available
-+     */
-     if (env->insns_flags & PPC_ALTIVEC) {
-         uint32_t vmx = (env->insns_flags2 & PPC2_VSX) ? 2 : 1;
- 
-         _FDT((fdt_setprop_cell(fdt, offset, "ibm,vmx", vmx)));
-     }
- 
--    /* Advertise DFP (Decimal Floating Point) if available
-+    /*
-+     * Advertise DFP (Decimal Floating Point) if available
-      *   0 / no property == no DFP
--     *   1               == DFP available */
-+     *   1               == DFP available
-+     */
-     if (env->insns_flags2 & PPC2_DFP) {
-         _FDT((fdt_setprop_cell(fdt, offset, "ibm,dfp", 1)));
-     }
-@@ -424,7 +429,8 @@ static int pnv_dt_isa_device(DeviceState *dev, void *opaque)
-     return 0;
- }
- 
--/* The default LPC bus of a multichip system is on chip 0. It's
-+/*
-+ * The default LPC bus of a multichip system is on chip 0. It's
-  * recognized by the firmware (skiboot) using a "primary" property.
-  */
- static void pnv_dt_isa(PnvMachineState *pnv, void *fdt)
-@@ -442,8 +448,10 @@ static void pnv_dt_isa(PnvMachineState *pnv, void *fdt)
-     assert(phandle > 0);
-     _FDT((fdt_setprop_cell(fdt, isa_offset, "phandle", phandle)));
- 
--    /* ISA devices are not necessarily parented to the ISA bus so we
--     * can not use object_child_foreach() */
-+    /*
-+     * ISA devices are not necessarily parented to the ISA bus so we
-+     * can not use object_child_foreach()
-+     */
-     qbus_walk_children(BUS(pnv->isa_bus), pnv_dt_isa_device, NULL, NULL, NULL,
-                        &args);
- }
-@@ -545,7 +553,8 @@ static void pnv_reset(MachineState *machine)
- 
-     qemu_devices_reset();
- 
--    /* OpenPOWER systems have a BMC, which can be defined on the
-+    /*
-+     * OpenPOWER systems have a BMC, which can be defined on the
-      * command line with:
-      *
-      *   -device ipmi-bmc-sim,id=bmc0
-@@ -705,7 +714,8 @@ static void pnv_init(MachineState *machine)
- 
-         pnv->chips[i] = PNV_CHIP(chip);
- 
--        /* TODO: put all the memory in one node on chip 0 until we find a
-+        /*
-+         * TODO: put all the memory in one node on chip 0 until we find a
-          * way to specify different ranges for each chip
-          */
-         if (i == 0) {
-@@ -732,8 +742,10 @@ static void pnv_init(MachineState *machine)
-     /* Create an RTC ISA device too */
-     mc146818_rtc_init(pnv->isa_bus, 2000, NULL);
- 
--    /* OpenPOWER systems use a IPMI SEL Event message to notify the
--     * host to powerdown */
-+    /*
-+     * OpenPOWER systems use a IPMI SEL Event message to notify the
-+     * host to powerdown
-+     */
-     pnv->powerdown_notifier.notify = pnv_powerdown_notify;
-     qemu_register_powerdown_notifier(&pnv->powerdown_notifier);
- }
-@@ -803,7 +815,8 @@ static void pnv_chip_power9_intc_create(PnvChip *chip, PowerPCCPU *cpu,
-     pnv_cpu->intc = obj;
- }
- 
--/* Allowed core identifiers on a POWER8 Processor Chip :
-+/*
-+ * Allowed core identifiers on a POWER8 Processor Chip :
-  *
-  * <EX0 reserved>
-  *  EX1  - Venice only
-@@ -847,6 +860,11 @@ static void pnv_chip_power8_instance_init(Object *obj)
-                             TYPE_PNV8_OCC, &error_abort, NULL);
-     object_property_add_const_link(OBJECT(&chip8->occ), "psi",
-                                    OBJECT(&chip8->psi), &error_abort);
-+
-+    object_initialize_child(obj, "homer",  &chip8->homer, sizeof(chip8->homer),
-+                            TYPE_PNV8_HOMER, &error_abort, NULL);
-+    object_property_add_const_link(OBJECT(&chip8->homer), "xics",
-+                                   OBJECT(qdev_get_machine()), &error_abort);
- }
- 
- static void pnv_chip_icp_realize(Pnv8Chip *chip8, Error **errp)
-@@ -923,8 +941,10 @@ static void pnv_chip_power8_realize(DeviceState *dev, Error **errp)
-                                             (uint64_t) PNV_XSCOM_BASE(chip),
-                                             PNV_XSCOM_LPC_BASE);
- 
--    /* Interrupt Management Area. This is the memory region holding
--     * all the Interrupt Control Presenter (ICP) registers */
-+    /*
-+     * Interrupt Management Area. This is the memory region holding
-+     * all the Interrupt Control Presenter (ICP) registers
-+     */
-     pnv_chip_icp_realize(chip8, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-@@ -942,6 +962,16 @@ static void pnv_chip_power8_realize(DeviceState *dev, Error **errp)
-     /* OCC SRAM model */
-     memory_region_add_subregion(get_system_memory(), PNV_OCC_COMMON_AREA(chip),
-                                 &chip8->occ.sram_regs);
-+
-+    /* HOMER */
-+    object_property_set_bool(OBJECT(&chip8->homer), true, "realized",
-+                             &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+    memory_region_add_subregion(get_system_memory(), PNV_HOMER_BASE(chip),
-+                                &chip8->homer.homer_regs);
- }
- 
- static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data)
-@@ -1024,6 +1054,11 @@ static void pnv_chip_power9_instance_init(Object *obj)
-                             TYPE_PNV9_OCC, &error_abort, NULL);
-     object_property_add_const_link(OBJECT(&chip9->occ), "psi",
-                                    OBJECT(&chip9->psi), &error_abort);
-+
-+    object_initialize_child(obj, "homer",  &chip9->homer, sizeof(chip9->homer),
-+                            TYPE_PNV9_HOMER, &error_abort, NULL);
-+    object_property_add_const_link(OBJECT(&chip9->homer), "chip", obj,
-+                                   &error_abort);
- }
- 
- static void pnv_chip_quad_realize(Pnv9Chip *chip9, Error **errp)
-@@ -1134,6 +1169,16 @@ static void pnv_chip_power9_realize(DeviceState *dev, Error **errp)
-     /* OCC SRAM model */
-     memory_region_add_subregion(get_system_memory(), PNV9_OCC_COMMON_AREA(chip),
-                                 &chip9->occ.sram_regs);
-+
-+    /* HOMER */
-+    object_property_set_bool(OBJECT(&chip9->homer), true, "realized",
-+                             &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+    memory_region_add_subregion(get_system_memory(), PNV9_HOMER_BASE(chip),
-+                                &chip9->homer.homer_regs);
- }
- 
- static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
-@@ -1412,8 +1457,8 @@ static void pnv_machine_class_init(ObjectClass *oc, void *data)
-     mc->init = pnv_init;
-     mc->reset = pnv_reset;
-     mc->max_cpus = MAX_CPUS;
--    mc->block_default_type = IF_IDE; /* Pnv provides a AHCI device for
--                                      * storage */
-+    /* Pnv provides a AHCI device for storage */
-+    mc->block_default_type = IF_IDE;
-     mc->no_parallel = 1;
-     mc->default_boot_order = NULL;
-     /*
-diff --git a/hw/ppc/pnv_homer.c b/hw/ppc/pnv_homer.c
-new file mode 100644
-index 0000000000..2886e27176
---- /dev/null
-+++ b/hw/ppc/pnv_homer.c
-@@ -0,0 +1,258 @@
-+/*
-+ * QEMU PowerPC PowerNV Emulation of a few HOMER related registers
-+ *
-+ * Copyright (c) 2019, IBM Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License, version 2, as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "sysemu/cpus.h"
-+#include "hw/ppc/pnv.h"
-+#include "hw/qdev-core.h"
-+#include "hw/ppc/pnv_homer.h"
-+
-+
-+static bool core_max_array(void *opaque, hwaddr addr)
-+{
-+    PnvHOMER *homer = PNV_HOMER(opaque);
-+    PnvHOMERClass *homer_class = PNV_HOMER_GET_CLASS(homer);
-+
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+
-+    for (int i = 0; i <= ms->smp.cores; i++) {
-+        if (addr == (homer_class->core_max_base + i)) {
-+            return true;
-+       }
-+    }
-+    return false;
-+}
-+
-+/* P8 Pstate table */
-+
-+#define PNV8_OCC_PSTATE_VERSION          0x1f8001
-+#define PNV8_OCC_PSTATE_MIN              0x1f8003
-+#define PNV8_OCC_PSTATE_VALID            0x1f8000
-+#define PNV8_OCC_PSTATE_THROTTLE         0x1f8002
-+#define PNV8_OCC_PSTATE_NOM              0x1f8004
-+#define PNV8_OCC_PSTATE_TURBO            0x1f8005
-+#define PNV8_OCC_PSTATE_ULTRA_TURBO      0x1f8006
-+#define PNV8_OCC_PSTATE_DATA             0x1f8008
-+#define PNV8_OCC_PSTATE_ID_ZERO          0x1f8010
-+#define PNV8_OCC_PSTATE_ID_ONE           0x1f8018
-+#define PNV8_OCC_PSTATE_ID_TWO           0x1f8020
-+#define PNV8_OCC_VDD_VOLTAGE_IDENTIFIER  0x1f8012
-+#define PNV8_OCC_VCS_VOLTAGE_IDENTIFIER  0x1f8013
-+#define PNV8_OCC_PSTATE_ZERO_FREQUENCY   0x1f8014
-+#define PNV8_OCC_PSTATE_ONE_FREQUENCY    0x1f801c
-+#define PNV8_OCC_PSTATE_TWO_FREQUENCY    0x1f8024
-+#define PNV8_CORE_MAX_BASE               0x1f8810
-+
-+
-+static uint64_t pnv_power8_homer_read(void *opaque, hwaddr addr,
-+                                      unsigned size)
-+{
-+    switch (addr) {
-+    case PNV8_OCC_PSTATE_VERSION:
-+    case PNV8_OCC_PSTATE_MIN:
-+    case PNV8_OCC_PSTATE_ID_ZERO:
-+        return 0;
-+    case PNV8_OCC_PSTATE_VALID:
-+    case PNV8_OCC_PSTATE_THROTTLE:
-+    case PNV8_OCC_PSTATE_NOM:
-+    case PNV8_OCC_PSTATE_TURBO:
-+    case PNV8_OCC_PSTATE_ID_ONE:
-+    case PNV8_OCC_VDD_VOLTAGE_IDENTIFIER:
-+    case PNV8_OCC_VCS_VOLTAGE_IDENTIFIER:
-+        return 1;
-+    case PNV8_OCC_PSTATE_ULTRA_TURBO:
-+    case PNV8_OCC_PSTATE_ID_TWO:
-+        return 2;
-+    case PNV8_OCC_PSTATE_DATA:
-+        return 0x1000000000000000;
-+    /* P8 frequency for 0, 1, and 2 pstates */
-+    case PNV8_OCC_PSTATE_ZERO_FREQUENCY:
-+    case PNV8_OCC_PSTATE_ONE_FREQUENCY:
-+    case PNV8_OCC_PSTATE_TWO_FREQUENCY:
-+        return 3000;
-+    }
-+    /* pstate table core max array */
-+    if (core_max_array(opaque, addr)) {
-+        return 1;
-+    }
-+    return 0;
-+}
-+
-+static void pnv_power8_homer_write(void *opaque, hwaddr addr,
-+                                   uint64_t val, unsigned size)
-+{
-+    /* callback function defined to homer write */
-+    return;
-+}
-+
-+static const MemoryRegionOps pnv_power8_homer_ops = {
-+    .read = pnv_power8_homer_read,
-+    .write = pnv_power8_homer_write,
-+    .valid.min_access_size = 1,
-+    .valid.max_access_size = 8,
-+    .impl.min_access_size = 1,
-+    .impl.max_access_size = 8,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+};
-+
-+static void pnv_homer_power8_class_init(ObjectClass *klass, void *data)
-+{
-+    PnvHOMERClass *homer = PNV_HOMER_CLASS(klass);
-+
-+    homer->homer_size = PNV_HOMER_SIZE;
-+    homer->homer_ops = &pnv_power8_homer_ops;
-+    homer->core_max_base = PNV8_CORE_MAX_BASE;
-+}
-+
-+static const TypeInfo pnv_homer_power8_type_info = {
-+    .name          = TYPE_PNV8_HOMER,
-+    .parent        = TYPE_PNV_HOMER,
-+    .instance_size = sizeof(PnvHOMER),
-+    .class_init    = pnv_homer_power8_class_init,
-+};
-+
-+/* P9 Pstate table */
-+
-+#define PNV9_OCC_PSTATE_ID_ZERO          0xe2018
-+#define PNV9_OCC_PSTATE_ID_ONE           0xe2020
-+#define PNV9_OCC_PSTATE_ID_TWO           0xe2028
-+#define PNV9_OCC_PSTATE_DATA             0xe2000
-+#define PNV9_OCC_PSTATE_DATA_AREA        0xe2008
-+#define PNV9_OCC_PSTATE_MIN              0xe2003
-+#define PNV9_OCC_PSTATE_NOM              0xe2004
-+#define PNV9_OCC_PSTATE_TURBO            0xe2005
-+#define PNV9_OCC_PSTATE_ULTRA_TURBO      0xe2818
-+#define PNV9_OCC_MAX_PSTATE_ULTRA_TURBO  0xe2006
-+#define PNV9_OCC_PSTATE_MAJOR_VERSION    0xe2001
-+#define PNV9_OCC_OPAL_RUNTIME_DATA       0xe2b85
-+#define PNV9_CHIP_HOMER_IMAGE_POINTER    0x200008
-+#define PNV9_CHIP_HOMER_BASE             0x0
-+#define PNV9_OCC_PSTATE_ZERO_FREQUENCY   0xe201c
-+#define PNV9_OCC_PSTATE_ONE_FREQUENCY    0xe2024
-+#define PNV9_OCC_PSTATE_TWO_FREQUENCY    0xe202c
-+#define PNV9_OCC_ROLE_MASTER_OR_SLAVE    0xe2002
-+#define PNV9_CORE_MAX_BASE               0xe2819
-+
-+
-+static uint64_t pnv_power9_homer_read(void *opaque, hwaddr addr,
-+                                      unsigned size)
-+{
-+    switch (addr) {
-+    case PNV9_OCC_MAX_PSTATE_ULTRA_TURBO:
-+    case PNV9_OCC_PSTATE_ID_ZERO:
-+        return 0;
-+    case PNV9_OCC_PSTATE_DATA:
-+    case PNV9_OCC_ROLE_MASTER_OR_SLAVE:
-+    case PNV9_OCC_PSTATE_NOM:
-+    case PNV9_OCC_PSTATE_TURBO:
-+    case PNV9_OCC_PSTATE_ID_ONE:
-+    case PNV9_OCC_PSTATE_ULTRA_TURBO:
-+    case PNV9_OCC_OPAL_RUNTIME_DATA:
-+        return 1;
-+    case PNV9_OCC_PSTATE_MIN:
-+    case PNV9_OCC_PSTATE_ID_TWO:
-+        return 2;
-+
-+    /* 3000 khz frequency for 0, 1, and 2 pstates */
-+    case PNV9_OCC_PSTATE_ZERO_FREQUENCY:
-+    case PNV9_OCC_PSTATE_ONE_FREQUENCY:
-+    case PNV9_OCC_PSTATE_TWO_FREQUENCY:
-+        return 3000;
-+    case PNV9_OCC_PSTATE_MAJOR_VERSION:
-+        return 0x90;
-+    case PNV9_CHIP_HOMER_BASE:
-+    case PNV9_OCC_PSTATE_DATA_AREA:
-+    case PNV9_CHIP_HOMER_IMAGE_POINTER:
-+        return 0x1000000000000000;
-+    }
-+    /* pstate table core max array */
-+    if (core_max_array(opaque, addr)) {
-+        return 1;
-+    }
-+    return 0;
-+}
-+
-+static void pnv_power9_homer_write(void *opaque, hwaddr addr,
-+                                   uint64_t val, unsigned size)
-+{
-+    /* callback function defined to homer write */
-+    return;
-+}
-+
-+static const MemoryRegionOps pnv_power9_homer_ops = {
-+    .read = pnv_power9_homer_read,
-+    .write = pnv_power9_homer_write,
-+    .valid.min_access_size = 1,
-+    .valid.max_access_size = 8,
-+    .impl.min_access_size = 1,
-+    .impl.max_access_size = 8,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+};
-+
-+static void pnv_homer_power9_class_init(ObjectClass *klass, void *data)
-+{
-+    PnvHOMERClass *homer = PNV_HOMER_CLASS(klass);
-+
-+    homer->homer_size = PNV9_HOMER_SIZE;
-+    homer->homer_ops = &pnv_power9_homer_ops;
-+    homer->core_max_base = PNV9_CORE_MAX_BASE;
-+}
-+
-+static const TypeInfo pnv_homer_power9_type_info = {
-+    .name          = TYPE_PNV9_HOMER,
-+    .parent        = TYPE_PNV_HOMER,
-+    .instance_size = sizeof(PnvHOMER),
-+    .class_init    = pnv_homer_power9_class_init,
-+};
-+
-+static void pnv_homer_realize(DeviceState *dev, Error **errp)
-+{
-+    PnvHOMER *homer = PNV_HOMER(dev);
-+    PnvHOMERClass *homer_class = PNV_HOMER_GET_CLASS(homer);
-+
-+    /* homer region */
-+    memory_region_init_io(&homer->homer_regs, OBJECT(dev),
-+                          homer_class->homer_ops, homer, "homer-main-memory",
-+                          homer_class->homer_size);
-+}
-+
-+static void pnv_homer_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = pnv_homer_realize;
-+    dc->desc = "PowerNV HOMER Memory";
-+}
-+
-+static const TypeInfo pnv_homer_type_info = {
-+    .name          = TYPE_PNV_HOMER,
-+    .parent        = TYPE_DEVICE,
-+    .instance_size = sizeof(PnvHOMER),
-+    .class_init    = pnv_homer_class_init,
-+    .class_size    = sizeof(PnvHOMERClass),
-+    .abstract      = true,
-+};
-+
-+static void pnv_homer_register_types(void)
-+{
-+    type_register_static(&pnv_homer_type_info);
-+    type_register_static(&pnv_homer_power8_type_info);
-+    type_register_static(&pnv_homer_power9_type_info);
-+}
-+
-+type_init(pnv_homer_register_types);
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 63a4b7b6a7..321d4ca967 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -26,6 +26,7 @@
- #include "hw/ppc/pnv_lpc.h"
- #include "hw/ppc/pnv_psi.h"
- #include "hw/ppc/pnv_occ.h"
-+#include "hw/ppc/pnv_homer.h"
- #include "hw/ppc/pnv_xive.h"
- #include "hw/ppc/pnv_core.h"
- 
-@@ -76,6 +77,7 @@ typedef struct Pnv8Chip {
-     PnvLpcController lpc;
-     Pnv8Psi      psi;
-     PnvOCC       occ;
-+    PnvHOMER     homer;
- } Pnv8Chip;
- 
- #define TYPE_PNV9_CHIP "pnv9-chip"
-@@ -90,6 +92,7 @@ typedef struct Pnv9Chip {
-     Pnv9Psi      psi;
-     PnvLpcController lpc;
-     PnvOCC       occ;
-+    PnvHOMER     homer;
- 
-     uint32_t     nr_quads;
-     PnvQuad      *quads;
-diff --git a/include/hw/ppc/pnv_homer.h b/include/hw/ppc/pnv_homer.h
-new file mode 100644
-index 0000000000..3b666a6245
---- /dev/null
-+++ b/include/hw/ppc/pnv_homer.h
-@@ -0,0 +1,52 @@
-+/*
-+ * QEMU PowerPC PowerNV Emulation of a few HOMER related registers
-+ *
-+ * Copyright (c) 2019, IBM Corporation.
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef PPC_PNV_HOMER_H
-+#define PPC_PNV_HOMER_H
-+
-+#define TYPE_PNV_HOMER "pnv-homer"
-+#define PNV_HOMER(obj) OBJECT_CHECK(PnvHOMER, (obj), TYPE_PNV_HOMER)
-+#define TYPE_PNV8_HOMER TYPE_PNV_HOMER "-POWER8"
-+#define PNV8_HOMER(obj) OBJECT_CHECK(PnvHOMER, (obj), TYPE_PNV8_HOMER)
-+#define TYPE_PNV9_HOMER TYPE_PNV_HOMER "-POWER9"
-+#define PNV9_HOMER(obj) OBJECT_CHECK(PnvHOMER, (obj), TYPE_PNV9_HOMER)
-+
-+typedef struct PnvHOMER {
-+    DeviceState parent;
-+
-+    MemoryRegion homer_regs;
-+} PnvHOMER;
-+
-+#define PNV_HOMER_CLASS(klass)   \
-+     OBJECT_CLASS_CHECK(PnvHOMERClass, (klass), TYPE_PNV_HOMER)
-+#define PNV_HOMER_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(PnvHOMERClass, (obj), TYPE_PNV_HOMER)
-+
-+typedef struct PnvHOMERClass {
-+    DeviceClass parent_class;
-+
-+    int homer_size;
-+    const MemoryRegionOps *homer_ops;
-+
-+    hwaddr core_max_base;
-+} PnvHOMERClass;
-+
-+
-+
-+#endif /* PPC_PNV_HOMER_H */
--- 
-2.14.5
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+Thanks,
+
+C.
+
+> ---
+>  hw/ppc/pnv_xscom.c   | 34 ++++++++++++++++++++++++++++++----
+>  include/hw/ppc/pnv.h | 18 ++++++++++++++++++
+>  2 files changed, 48 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+> index 67aab98fef..f01d788a65 100644
+> --- a/hw/ppc/pnv_xscom.c
+> +++ b/hw/ppc/pnv_xscom.c
+> @@ -36,6 +36,16 @@
+>  #define PRD_P9_IPOLL_REG_MASK           0x000F0033
+>  #define PRD_P9_IPOLL_REG_STATUS         0x000F0034
+> =20
+> +/* PBA BARs */
+> +#define P8_PBA_BAR0                     0x2013f00
+> +#define P8_PBA_BAR2                     0x2013f02
+> +#define P8_PBA_BARMASK0                 0x2013f04
+> +#define P8_PBA_BARMASK2                 0x2013f06
+> +#define P9_PBA_BAR0                     0x5012b00
+> +#define P9_PBA_BAR2                     0x5012b02
+> +#define P9_PBA_BARMASK0                 0x5012b04
+> +#define P9_PBA_BARMASK2                 0x5012b06
+> +
+>  static void xscom_complete(CPUState *cs, uint64_t hmer_bits)
+>  {
+>      /*
+> @@ -74,6 +84,26 @@ static uint64_t xscom_read_default(PnvChip *chip, ui=
+nt32_t pcba)
+>      case 0x18002:       /* ECID2 */
+>          return 0;
+> =20
+> +    case P9_PBA_BAR0:
+> +        return PNV9_HOMER_BASE(chip);
+> +    case P8_PBA_BAR0:
+> +        return PNV_HOMER_BASE(chip);
+> +
+> +    case P9_PBA_BARMASK0: /* P9 homer region size */
+> +        return PNV9_HOMER_SIZE;
+> +    case P8_PBA_BARMASK0: /* P8 homer region size */
+> +        return PNV_HOMER_SIZE;
+> +
+> +    case P9_PBA_BAR2: /* P9 occ common area */
+> +        return PNV9_OCC_COMMON_AREA(chip);
+> +    case P8_PBA_BAR2: /* P8 occ common area */
+> +        return PNV_OCC_COMMON_AREA(chip);
+> +
+> +    case P9_PBA_BARMASK2: /* P9 occ common area size */
+> +        return PNV9_OCC_COMMON_AREA_SIZE;
+> +    case P8_PBA_BARMASK2: /* P8 occ common area size */
+> +        return PNV_OCC_COMMON_AREA_SIZE;
+> +
+>      case 0x1010c00:     /* PIBAM FIR */
+>      case 0x1010c03:     /* PIBAM FIR MASK */
+> =20
+> @@ -93,13 +123,9 @@ static uint64_t xscom_read_default(PnvChip *chip, u=
+int32_t pcba)
+>      case 0x2020009:     /* ADU stuff, error register */
+>      case 0x202000f:     /* ADU stuff, receive status register*/
+>          return 0;
+> -    case 0x2013f00:     /* PBA stuff */
+>      case 0x2013f01:     /* PBA stuff */
+> -    case 0x2013f02:     /* PBA stuff */
+>      case 0x2013f03:     /* PBA stuff */
+> -    case 0x2013f04:     /* PBA stuff */
+>      case 0x2013f05:     /* PBA stuff */
+> -    case 0x2013f06:     /* PBA stuff */
+>      case 0x2013f07:     /* PBA stuff */
+>          return 0;
+>      case 0x2013028:     /* CAPP stuff */
+> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+> index fb123edc4e..63a4b7b6a7 100644
+> --- a/include/hw/ppc/pnv.h
+> +++ b/include/hw/ppc/pnv.h
+> @@ -198,6 +198,16 @@ void pnv_bmc_powerdown(IPMIBmc *bmc);
+>  #define PNV_XSCOM_BASE(chip)                                          =
+  \
+>      (0x0003fc0000000000ull + ((uint64_t)(chip)->chip_id) * PNV_XSCOM_S=
+IZE)
+> =20
+> +#define PNV_OCC_COMMON_AREA_SIZE    0x0000000000700000ull
+> +#define PNV_OCC_COMMON_AREA(chip)                                     =
+  \
+> +    (0x7fff800000ull + ((uint64_t)PNV_CHIP_INDEX(chip) * \
+> +                         PNV_OCC_COMMON_AREA_SIZE))
+> +
+> +#define PNV_HOMER_SIZE              0x0000000000300000ull
+> +#define PNV_HOMER_BASE(chip)                                          =
+  \
+> +    (0x7ffd800000ull + ((uint64_t)PNV_CHIP_INDEX(chip)) * PNV_HOMER_SI=
+ZE)
+> +
+> +
+>  /*
+>   * XSCOM 0x20109CA defines the ICP BAR:
+>   *
+> @@ -256,4 +266,12 @@ void pnv_bmc_powerdown(IPMIBmc *bmc);
+>  #define PNV9_XSCOM_SIZE              0x0000000400000000ull
+>  #define PNV9_XSCOM_BASE(chip)        PNV9_CHIP_BASE(chip, 0x00603fc000=
+00000ull)
+> =20
+> +#define PNV9_OCC_COMMON_AREA_SIZE    0x0000000000700000ull
+> +#define PNV9_OCC_COMMON_AREA(chip)                                    =
+  \
+> +    (0x203fff800000ull + ((uint64_t)PNV_CHIP_INDEX(chip) * \
+> +                           PNV9_OCC_COMMON_AREA_SIZE))
+> +
+> +#define PNV9_HOMER_SIZE              0x0000000000300000ull
+> +#define PNV9_HOMER_BASE(chip)                                         =
+  \
+> +    (0x203ffd800000ull + ((uint64_t)PNV_CHIP_INDEX(chip)) * PNV9_HOMER=
+_SIZE)
+>  #endif /* PPC_PNV_H */
+>=20
 
 
