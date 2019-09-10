@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C23C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:49:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67D9FC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:50:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF5DE208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:49:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF5DE208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 3DBE9208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:50:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DBE9208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7Zy4-00086k-Kc
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 02:49:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38674)
+	id 1i7Zyv-0000sI-GE
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 02:50:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38575)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1i7ZmS-0004mk-37
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:37 -0400
+ (envelope-from <armbru@redhat.com>) id 1i7ZmO-0004kH-7M
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1i7ZmQ-0007lB-2A
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:29800)
+ (envelope-from <armbru@redhat.com>) id 1i7ZmM-0007iE-Qb
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32996)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i7ZmP-0007kF-NG
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:33 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i7ZmM-0007hZ-IA
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:30 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BAAAA9B286;
- Tue, 10 Sep 2019 06:37:32 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id CF68A30BEBE5;
+ Tue, 10 Sep 2019 06:37:29 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C4B011001956;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7729E6092F;
  Tue, 10 Sep 2019 06:37:29 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 4BE8C1165603; Tue, 10 Sep 2019 08:37:24 +0200 (CEST)
+ id 3E2AE11655FB; Tue, 10 Sep 2019 08:37:24 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 10 Sep 2019 08:37:21 +0200
-Message-Id: <20190910063724.28470-14-armbru@redhat.com>
+Date: Tue, 10 Sep 2019 08:37:17 +0200
+Message-Id: <20190910063724.28470-10-armbru@redhat.com>
 In-Reply-To: <20190910063724.28470-1-armbru@redhat.com>
 References: <20190910063724.28470-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Tue, 10 Sep 2019 06:37:32 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Tue, 10 Sep 2019 06:37:29 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 13/16] docs/devel/qapi-code-gen: Rewrite
- compatibility considerations
+Subject: [Qemu-devel] [PATCH v2 09/16] qapi: Permit alternates with just one
+ branch
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,153 +75,119 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We have some compatibility advice buried in sections "Enumeration
-types" and "Struct types".  Compatibility is actually about commands
-and events.  It devolves to the types used there.  All kinds of types,
-not just enumerations and structs.
+A union or alternate without branches makes no sense and doesn't work:
+it can't be instantiated.  A union or alternate with just one branch
+works, but is degenerate.  We accept the former, but reject the
+latter.  Weird.  docs/devel/qapi-code-gen.txt doesn't mention the
+difference.  It claims an alternate definition is "is similar to a
+simple union type".
 
-Replace the existing advice by a new section "Compatibility
-considerations".
+Permit degenerate alternates to make them consistent with unions.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- docs/devel/qapi-code-gen.txt | 95 +++++++++++++++++++++++-------------
- 1 file changed, 60 insertions(+), 35 deletions(-)
+ scripts/qapi/common.py                  | 6 ++----
+ tests/qapi-schema/alternate-empty.err   | 2 +-
+ tests/qapi-schema/alternate-empty.json  | 4 ++--
+ tests/qapi-schema/qapi-schema-test.json | 4 +++-
+ tests/qapi-schema/qapi-schema-test.out  | 6 ++++--
+ 5 files changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 663ef10a56..d09232009e 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -178,14 +178,11 @@ While the C code starts numbering at 0, it is bette=
-r to use explicit
- comparisons to enum values than implicit comparisons to 0; the C code
- will also include a generated enum member ending in _MAX for tracking
- the size of the enum, useful when using common functions for
--converting between strings and enum values.  Since the wire format
--always passes by name, it is acceptable to reorder or add new
--enumeration members in any location without breaking clients of Client
--JSON Protocol; however, removing enum values would break
--compatibility.  For any struct that has a member that will only contain
--a finite set of string values, using an enum type for that member is
--better than open-coding the member to be type 'str'.
-+converting between strings and enum values.
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 6e25479939..46a4b07a04 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -917,11 +917,9 @@ def check_alternate(expr, info):
+     members =3D expr['data']
+     types_seen =3D {}
 =20
-+For any struct that has a member that will only contain a finite set
-+of string values, using an enum type for that member is better than
-+open-coding the member to be type 'str'.
+-    # Check every branch; require at least two branches
+-    if len(members) < 2:
++    if len(members) =3D=3D 0:
+         raise QAPISemError(info,
+-                           "Alternate '%s' should have at least two bran=
+ches "
+-                           "in 'data'" % name)
++                           "Alternate '%s' cannot have empty 'data'" % n=
+ame)
+     for (key, value) in members.items():
+         check_name(info, "Member of alternate '%s'" % name, key)
+         check_known_keys(info,
+diff --git a/tests/qapi-schema/alternate-empty.err b/tests/qapi-schema/al=
+ternate-empty.err
+index bb06c5bfec..86dbc666eb 100644
+--- a/tests/qapi-schema/alternate-empty.err
++++ b/tests/qapi-schema/alternate-empty.err
+@@ -1 +1 @@
+-tests/qapi-schema/alternate-empty.json:2: Alternate 'Alt' should have at=
+ least two branches in 'data'
++tests/qapi-schema/alternate-empty.json:2: Alternate 'Alt' cannot have em=
+pty 'data'
+diff --git a/tests/qapi-schema/alternate-empty.json b/tests/qapi-schema/a=
+lternate-empty.json
+index fff15baf16..9f445474e6 100644
+--- a/tests/qapi-schema/alternate-empty.json
++++ b/tests/qapi-schema/alternate-empty.json
+@@ -1,2 +1,2 @@
+-# alternates must list at least two types to be useful
+-{ 'alternate': 'Alt', 'data': { 'i': 'int' } }
++# alternates cannot be empty
++{ 'alternate': 'Alt', 'data': { } }
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
+qapi-schema-test.json
+index e6dbbbd328..8b0d47c4ab 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -186,19 +186,21 @@
 =20
- =3D=3D=3D Struct types =3D=3D=3D
-=20
-@@ -203,34 +200,6 @@ name.  An example of a struct is:
- The use of '*' as a prefix to the name means the member is optional in
- the corresponding JSON protocol usage.
-=20
--The default initialization value of an optional argument should not be c=
-hanged
--between versions of QEMU unless the new default maintains backward
--compatibility to the user-visible behavior of the old default.
--
--With proper documentation, this policy still allows some flexibility; fo=
-r
--example, documenting that a default of 0 picks an optimal buffer size al=
-lows
--one release to declare the optimal size at 512 while another release dec=
-lares
--the optimal size at 4096 - the user-visible behavior is not the bytes us=
-ed by
--the buffer, but the fact that the buffer was optimal size.
--
--On input structures (only mentioned in the 'data' side of a command), ch=
-anging
--from mandatory to optional is safe (older clients will supply the option=
-, and
--newer clients can benefit from the default); changing from optional to
--mandatory is backwards incompatible (older clients may be omitting the o=
-ption,
--and must continue to work).
--
--On output structures (only mentioned in the 'returns' side of a command)=
-,
--changing from mandatory to optional is in general unsafe (older clients =
-may be
--expecting the member, and could crash if it is missing), although it
--can be done if the only way that the optional argument will be omitted
--is when it is triggered by the presence of a new input flag to the
--command that older clients don't know to send.  Changing from optional
--to mandatory is safe.
--
--A structure that is used in both input and output of various commands
--must consider the backwards compatibility constraints of both directions
--of use.
--
- A struct definition can specify another struct as its base.
- In this case, the members of the base type are included as top-level mem=
-bers
- of the new struct's dictionary in the Client JSON Protocol wire
-@@ -1037,6 +1006,62 @@ the names of built-in types.  Clients should exami=
-ne member
- "json-type" instead of hard-coding names of built-in types.
-=20
-=20
-+=3D=3D Compatibility considerations =3D=3D
-+
-+Maintaining backward compatibility at the Client JSON Protocol level
-+while evolving the schema requires some care.  This section is about
-+syntactic compatibility.  Necessary, but not sufficient for actual
-+compatibility.
-+
-+Clients send commands with argument data, and receive command
-+responses with return data and events with event data.
-+
-+Adding opt-in functionality to the send direction is backwards
-+compatible: adding commands, optional arguments, enumeration values,
-+union and alternate branches; turning an argument type into an
-+alternate of that type; making mandatory arguments optional.  Clients
-+oblivious of the new functionality continue to work.
-+
-+Incompatible changes include removing commands, command arguments,
-+enumeration values, union and alternate branches, adding mandatory
-+command arguments, and making optional arguments mandatory.
-+
-+The specified behavior of an absent optional argument should remain
-+the same.  With proper documentation, this policy still allows some
-+flexibility; for example, when an optional 'buffer-size' argument is
-+specified to default to a sensible buffer size, the actual default
-+value can still be changed.  The specified default behavior is not the
-+exact size of the buffer, only that the default size is sensible.
-+
-+Adding functionality to the receive direction is generally backwards
-+compatible: adding events, adding return and event data members.
-+Clients are expected to ignore the ones they don't know.
-+
-+Removing "unreachable" stuff like events that can't be triggered
-+anymore, optional return or event data members that can't be sent
-+anymore, and return or event data member (enumeration) values that
-+can't be sent anymore makes no difference to clients, except for
-+introspection.  The latter can conceivably confuse clients, so tread
-+carefully.
-+
-+Incompatible changes include removing return and event data members.
-+
-+Any change to a command definition's 'data' or one of the types used
-+there (recursively) needs to consider send direction compatibility.
-+
-+Any change to a command definition's 'return', an event definition's
-+'data', or one of the types used there (recursively) needs to consider
-+receive direction compatibility.
-+
-+Any change to types used in both contexts need to consider both.
-+
-+Members of enumeration types, complex types and alternate types may be
-+reordered freely.  For enumerations and alternate types, this doesn't
-+affect the wire encoding.  For complex types, this might make the
-+implementation emit JSON object members in a different order, which
-+the Client JSON Protocol permits.
-+
-+
- =3D=3D Code generation =3D=3D
-=20
- The QAPI code generator qapi-gen.py generates code and documentation
+ # test that we correctly compile downstream extensions, as well as munge
+ # ticklish names
++# also test union and alternate with just one branch
+ { 'enum': '__org.qemu_x-Enum', 'data': [ '__org.qemu_x-value' ] }
+ { 'struct': '__org.qemu_x-Base',
+   'data': { '__org.qemu_x-member1': '__org.qemu_x-Enum' } }
+ { 'struct': '__org.qemu_x-Struct', 'base': '__org.qemu_x-Base',
+   'data': { '__org.qemu_x-member2': 'str', '*wchar-t': 'int' } }
+ { 'union': '__org.qemu_x-Union1', 'data': { '__org.qemu_x-branch': 'str'=
+ } }
++{ 'alternate': '__org.qemu_x-Alt1', 'data': { '__org.qemu_x-branch': 'st=
+r' } }
+ { 'struct': '__org.qemu_x-Struct2',
+   'data': { 'array': ['__org.qemu_x-Union1'] } }
+ { 'union': '__org.qemu_x-Union2', 'base': '__org.qemu_x-Base',
+   'discriminator': '__org.qemu_x-member1',
+   'data': { '__org.qemu_x-value': '__org.qemu_x-Struct2' } }
+ { 'alternate': '__org.qemu_x-Alt',
+-  'data': { '__org.qemu_x-branch': 'str', 'b': '__org.qemu_x-Base' } }
++  'data': { '__org.qemu_x-branch': '__org.qemu_x-Base' } }
+ { 'event': '__ORG.QEMU_X-EVENT', 'data': '__org.qemu_x-Struct' }
+ { 'command': '__org.qemu_x-command',
+   'data': { 'a': ['__org.qemu_x-Enum'], 'b': ['__org.qemu_x-Struct'],
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
+api-schema-test.out
+index fb00a21996..bea7976bbb 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -274,6 +274,9 @@ object __org.qemu_x-Union1
+     member type: __org.qemu_x-Union1Kind optional=3DFalse
+     tag type
+     case __org.qemu_x-branch: q_obj_str-wrapper
++alternate __org.qemu_x-Alt1
++    tag type
++    case __org.qemu_x-branch: str
+ array __org.qemu_x-Union1List __org.qemu_x-Union1
+ object __org.qemu_x-Struct2
+     member array: __org.qemu_x-Union1List optional=3DFalse
+@@ -283,8 +286,7 @@ object __org.qemu_x-Union2
+     case __org.qemu_x-value: __org.qemu_x-Struct2
+ alternate __org.qemu_x-Alt
+     tag type
+-    case __org.qemu_x-branch: str
+-    case b: __org.qemu_x-Base
++    case __org.qemu_x-branch: __org.qemu_x-Base
+ event __ORG.QEMU_X-EVENT __org.qemu_x-Struct
+    boxed=3DFalse
+ array __org.qemu_x-EnumList __org.qemu_x-Enum
 --=20
 2.21.0
 
