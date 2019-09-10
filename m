@@ -3,47 +3,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2285DC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:58:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94BC3C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:00:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D55DD20692
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:58:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D55DD20692
+	by mail.kernel.org (Postfix) with ESMTPS id 690C021019
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:00:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 690C021019
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7dqu-0005V7-0F
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 06:58:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39975)
+	id 1i7dsj-0007EF-ID
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 07:00:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40254)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i7dpC-0004Qs-49
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:56:43 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i7dqS-0005PN-Du
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:58:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i7dpA-0002zJ-99
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:56:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51282)
+ (envelope-from <mreitz@redhat.com>) id 1i7dqR-0003Tj-81
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:58:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52350)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i7dp4-0002wM-Fi; Tue, 10 Sep 2019 06:56:35 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1i7dqP-0003Su-1f; Tue, 10 Sep 2019 06:57:57 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 80BA230A698E;
- Tue, 10 Sep 2019 10:56:33 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2DFA33172D96;
+ Tue, 10 Sep 2019 10:57:56 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-117-90.ams2.redhat.com
  [10.36.117.90])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4535660852;
- Tue, 10 Sep 2019 10:56:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B02160BE2;
+ Tue, 10 Sep 2019 10:57:54 +0000 (UTC)
 To: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
-References: <20190906113920.11271-1-thuth@redhat.com>
+References: <20190906113534.10907-1-thuth@redhat.com>
+ <54cd1dd0-6e23-92d1-ff86-0eccddcb3da8@redhat.com>
+ <6627619f-e0e2-f8fd-14b0-d675d5931ed0@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -70,22 +72,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7a620068-171f-b985-4c62-af6332e30b0f@redhat.com>
-Date: Tue, 10 Sep 2019 12:56:30 +0200
+Message-ID: <42a0d9dc-fd96-637f-abb0-1879b7ff0ad3@redhat.com>
+Date: Tue, 10 Sep 2019 12:57:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190906113920.11271-1-thuth@redhat.com>
+In-Reply-To: <6627619f-e0e2-f8fd-14b0-d675d5931ed0@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="UJpcCY2fO61L8YoZDKSECf6yzLhaN6py1"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+ boundary="boMD4TU1Cre6ZOENRYUKqtiBhOp21WxPp"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Tue, 10 Sep 2019 10:56:33 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Tue, 10 Sep 2019 10:57:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] tests/qemu-iotests/check: Replace "tests"
- with "iotests" in final status text
+Subject: Re: [Qemu-devel] [PATCH] tests/Makefile: Do not print the name of
+ the check-block.sh shell script
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,62 +106,67 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---UJpcCY2fO61L8YoZDKSECf6yzLhaN6py1
-Content-Type: multipart/mixed; boundary="ulHZkTYIqtJM2gECncnUusFnwdFzBAaPK";
+--boMD4TU1Cre6ZOENRYUKqtiBhOp21WxPp
+Content-Type: multipart/mixed; boundary="rluP4xSb5QDt4rHIqcvd0kK9gSQ13fr4P";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
  qemu-trivial@nongnu.org
-Message-ID: <7a620068-171f-b985-4c62-af6332e30b0f@redhat.com>
-Subject: Re: [PATCH] tests/qemu-iotests/check: Replace "tests" with "iotests"
- in final status text
-References: <20190906113920.11271-1-thuth@redhat.com>
-In-Reply-To: <20190906113920.11271-1-thuth@redhat.com>
+Message-ID: <42a0d9dc-fd96-637f-abb0-1879b7ff0ad3@redhat.com>
+Subject: Re: [PATCH] tests/Makefile: Do not print the name of the
+ check-block.sh shell script
+References: <20190906113534.10907-1-thuth@redhat.com>
+ <54cd1dd0-6e23-92d1-ff86-0eccddcb3da8@redhat.com>
+ <6627619f-e0e2-f8fd-14b0-d675d5931ed0@redhat.com>
+In-Reply-To: <6627619f-e0e2-f8fd-14b0-d675d5931ed0@redhat.com>
 
---ulHZkTYIqtJM2gECncnUusFnwdFzBAaPK
+--rluP4xSb5QDt4rHIqcvd0kK9gSQ13fr4P
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 06.09.19 13:39, Thomas Huth wrote:
-> When running "make check -j8" or something similar, the iotests are
-> running in parallel with the other tests. So when they are printing
-> out "Passed all xx tests" or a similar status message at the end,
-> it might not be quite clear that this message belongs to the iotests,
-> since the output might be mixed with the other tests. Thus change the
-> word "tests" here to "iotests" instead to avoid confusion.
+On 10.09.19 12:55, Thomas Huth wrote:
+> On 10/09/2019 12.53, Max Reitz wrote:
+>> On 06.09.19 13:35, Thomas Huth wrote:
+>>> The check script is already printing out which iotest is currently
+>>> running, so printing out the name of the check-block.sh shell script
+>>> looks superfluous here.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  tests/Makefile.include | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>
+>> (Not sure which tree you=E2=80=99d like this to go through...)
 >=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/qemu-iotests/check | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+> I think either your block tree or trivial would be appropriate?
 
-Thanks, applied to my block branch:
-
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+OK then, I=E2=80=99ve taken it. :-)
 
 Max
 
 
---ulHZkTYIqtJM2gECncnUusFnwdFzBAaPK--
+--rluP4xSb5QDt4rHIqcvd0kK9gSQ13fr4P--
 
---UJpcCY2fO61L8YoZDKSECf6yzLhaN6py1
+--boMD4TU1Cre6ZOENRYUKqtiBhOp21WxPp
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl13gV4ACgkQ9AfbAGHV
-z0By3wf/bo7h0xHZKHSrn0AWeK+Qu0Bi9d6RjpooZCgnLsQNTwrhIzxcoh6iMS2U
-KvJC+nSZVtMWN2GYIZWnDZ+g9JKdj4Huk1OC7BtwZ7TwSOH+V/7nECUVZSBJf0cq
-VcFiZr9ETFTCxjdngPUlzE/3izHB4PDWYrG6ZAWF8447of6ruVeLJbpmLNRiav0A
-mWxz7UH944sCYmxKxLttn5KYf/sUtIwe+y7u60oCtpu8kGKTw4aw0QGK2pZQskcw
-OoEWdYLMCAlRwCvIo4B9qLfCw7cQA0JVnQytQAARmhfz+loj4+B4M2XPvOx02Nv1
-b39AkZ3R83nS9lYFOF+fKpRfl9KoXw==
-=xNRk
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl13gbAACgkQ9AfbAGHV
+z0BecAf+K43GfZ5xUPjw4HHb2jXnHHFNkr2JSSMsr8KWcmn5mxq+RkvJTqKuUwWy
+ulByjOq6WDMbVbvgFVDhPr/fEAW1EILRXNLGTkxDGPxtIgcWY7JEXIQb9aImgJLT
+DhleDe7zil2pCx1CDMDi6bPuvzzthEv2k7GdcKCaLACxsPtFXxuCDbt9b8tKs/Gp
+SVQMqScvMWnVuNnBtI/btU/u9ubUux9V4E13s5evQPtX+u+sOim5h2sJTBt8DBaq
+xjAVtdGNEXL1UrTcnSB9viOzd0UvOu27wwwA6Ohj6xMlR7ZjxkCKWy3ZDzwHxHf1
+v/5LeRnijGeY1rfT0EG7XujWjiKGQw==
+=K9Uh
 -----END PGP SIGNATURE-----
 
---UJpcCY2fO61L8YoZDKSECf6yzLhaN6py1--
+--boMD4TU1Cre6ZOENRYUKqtiBhOp21WxPp--
 
