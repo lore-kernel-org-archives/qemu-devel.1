@@ -2,72 +2,87 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ACEEC49ED8
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:55:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72174C49ED8
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:55:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE6EE21479
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:55:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE6EE21479
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3E5B321479
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 14:55:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vJRR4zhM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E5B321479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7hY0-00082i-V5
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 10:55:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54757)
+	id 1i7hYZ-0000Ie-TN
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 10:55:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54125)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1i7hR9-0000Ip-1s
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:48:08 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i7hNs-0005Zb-NJ
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1i7hR8-0006NV-2a
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:48:06 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:43478)
+ (envelope-from <peter.maydell@linaro.org>) id 1i7hNr-00054d-Gn
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:44 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43945)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i7hR7-0006N4-SJ
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:48:05 -0400
-Received: by mail-wr1-f65.google.com with SMTP id q17so16145742wrx.10
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 07:48:05 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i7hNr-000544-9I
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:44:43 -0400
+Received: by mail-wr1-x441.google.com with SMTP id q17so16120609wrx.10
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 07:44:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=sq8nSzuTSE3z6TeW22Jb/p8ysGSeKIUIld6DHEj34Ck=;
+ b=vJRR4zhMarIJwOEag+GQp1yXeXT+q/UXt9Xtub70Zzd0iBgHFR+zDca6QkL3KyQrFF
+ d6jtVtMtoVx0jQhhcNC7jmNK1/5GDty5Rk1Lbt04v/3Qg9d7SNU0govHcBdLEL1mawnW
+ /jEdgOl/Fjh/WQ2YyxW8Wvuaus0ak96VghwQvvTVFYD0UUNfdvhFogYqvnXL9ydFz3Dw
+ MHnuvpPut6aHKKU7jvwQEn7vihCg15FIrLr4OVkNUkQcAjgy9uMDn877ZPCHsiyOJ9FA
+ 0U8/NfbaYmKxarb753GB18++ClK8tHper8pHlhsqg8dPa7hCksO/HE/LdgodaFfjNWjB
+ 8Bqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=9r/tsin+WnzvHfmEc7iVPUi/buDct7somnXFCcxsN4M=;
- b=E0eKKq+C9H+NL0TCPGFKqjBp16BbBZe+cBtJbOMVMDzrMbe0LmrkppQQ6i6deuHBUe
- xgraZNtlcvD1+2/mjKNRTkdxp0AZob2LxV4KqUeKbF/ndVSwa05L7EibMSASScnJEIVv
- 5kyWDPvn1bNC0+p3OdUSJYtegseyYF7E0pZjza5/x9FP8ldXN7MbQrmPlWaxxLYvjHam
- YpVC7ffXPtyYdtFRGluD0dyfMnlOscJy5CzGSf+K8tG9mg/sYn+IQWJaPOzWzbXbgoxt
- M+W9L6kq0hp+69rHCHht/rWNT2t/hSvf/l0q6lPhOIFYwJODKwS3g9aCtAbaZxDpoD9w
- QUAg==
-X-Gm-Message-State: APjAAAULX0K2Y/MW0rWsja/3WRTGuZru49giAEhu1mtJnzhYLrwQ6JQG
- Jrd7tqvSR3b95vJYrvxBVTa4HYiL5Bu8zQ==
-X-Google-Smtp-Source: APXvYqx+MMVn21LPEsYVh4ZdCTqfuyQUbh76195ywvIFJ5C3yTWkYyr5hoeGjchAictUvs1bD59zqA==
-X-Received: by 2002:a5d:4ac5:: with SMTP id y5mr21240676wrs.179.1568126884538; 
- Tue, 10 Sep 2019 07:48:04 -0700 (PDT)
-Received: from localhost ([148.69.85.38])
- by smtp.gmail.com with ESMTPSA id a144sm5175207wme.13.2019.09.10.07.48.03
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=sq8nSzuTSE3z6TeW22Jb/p8ysGSeKIUIld6DHEj34Ck=;
+ b=n229NGgWoTvg7aw28L9CcEycfG/Gk74IoEsHvTfIKnkQeit0TjCYO6uYPKgNsy2tZN
+ ji/dFjJWCknxbeVgyewhOFrtjjOozlDbJ80gbFsCFpoA+yCzzPv0GWPfzRg62XHDFXB/
+ qEh3LFJq4Ke3oQvoviY3Hjf8Yesk+20su5cUVbB1coMa80HBi3b4YhyIbsL+kqZeHgxW
+ RGOUAAhye/i7fL15EZf8vFRehsT8siDVwfCcEx2yGvw5EIX47My3nyhBUZcUyCQbzDmT
+ hDOFrLl5TOIaEAqBGSqaedUmO7dvnmxH6mbHdhzUSee96fFLaUHjDKKGszL5gakxP2zc
+ oqAw==
+X-Gm-Message-State: APjAAAVJ/3Jg1abbjJtJvFf+jKLSnQcz1IltV5p0kTN3iATn2Bo8IMud
+ 5437dHau03iGuLQUxppRBhdnRA==
+X-Google-Smtp-Source: APXvYqycuNOuLYNTE2MIV3o2Pt1YSPVSpDoNIll/5mv4AFS4W99T4R7+XNM9C6WCEJO4SKRziYs1Gw==
+X-Received: by 2002:adf:f812:: with SMTP id s18mr28610093wrp.32.1568126682426; 
+ Tue, 10 Sep 2019 07:44:42 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id a192sm5703814wma.1.2019.09.10.07.44.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Sep 2019 07:48:04 -0700 (PDT)
-Date: Tue, 10 Sep 2019 07:48:04 -0700 (PDT)
-X-Google-Original-Date: Tue, 10 Sep 2019 07:40:13 PDT (-0700)
-In-Reply-To: <a090bc437bf412c279b1254d05eae5c2d67225db.1566603412.git.alistair.francis@wdc.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: Alistair Francis <Alistair.Francis@wdc.com>
-Message-ID: <mhng-afa69c9b-17b7-4043-b204-512c92cf618a@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
+ Tue, 10 Sep 2019 07:44:41 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Tue, 10 Sep 2019 15:44:25 +0100
+Message-Id: <20190910144428.32597-11-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190910144428.32597-1-peter.maydell@linaro.org>
+References: <20190910144428.32597-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH v1 04/28] target/riscv: Fix CSR perm
- checking for HS mode
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PATCH 10/13] target/arm/arm-semi: Factor out
+ implementation of SYS_FLEN
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,66 +94,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Anup Patel <Anup.Patel@wdc.com>,
- qemu-devel@nongnu.org, Atish Patra <Atish.Patra@wdc.com>,
- Alistair Francis <Alistair.Francis@wdc.com>, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 23 Aug 2019 16:38:00 PDT (-0700), Alistair Francis wrote:
-> Update the CSR permission checking to work correctly when we are in
-> HS-mode.
->
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  target/riscv/csr.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-> index f767ad24be..471f23a1d0 100644
-> --- a/target/riscv/csr.c
-> +++ b/target/riscv/csr.c
-> @@ -799,9 +799,15 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
->
->      /* check privileges and return -1 if check fails */
->  #if !defined(CONFIG_USER_ONLY)
-> -    int csr_priv = get_field(csrno, 0x300);
-> +    int csr_priv = env->priv;
+Factor out the implementation of SYS_FLEN via the new
+function tables.
 
-This isn't really "csr_priv" (ie, the priv needed to access the CSR) any more, 
-it's really the effective priv of the machine.  Leaving the variable with the 
-same name makes this hard to read, but I think it is correct.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/arm-semi.c | 31 +++++++++++++++++++++----------
+ 1 file changed, 21 insertions(+), 10 deletions(-)
 
->      int read_only = get_field(csrno, 0xC00) == 3;
-> -    if ((write_mask && read_only) || (env->priv < csr_priv)) {
-> +
-> +    if (riscv_has_ext(env, RVH) && !riscv_cpu_virt_enabled(env)) {
-> +        /* Plus 1 as we are in HS mode */
+diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
+index c548ce849e7..f9019b00b8d 100644
+--- a/target/arm/arm-semi.c
++++ b/target/arm/arm-semi.c
+@@ -352,6 +352,7 @@ typedef uint32_t sys_readfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf,
+ typedef uint32_t sys_isattyfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf);
+ typedef uint32_t sys_seekfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf,
+                             target_ulong offset);
++typedef uint32_t sys_flenfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf);
+ 
+ static uint32_t host_closefn(TaskState *ts, ARMCPU *cpu, GuestFD *gf)
+ {
+@@ -417,6 +418,16 @@ static uint32_t host_seekfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf,
+     return 0;
+ }
+ 
++static uint32_t host_flenfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf)
++{
++    struct stat buf;
++    uint32_t ret = set_swi_errno(ts, fstat(gf->hostfd, &buf));
++    if (ret == (uint32_t)-1) {
++        return -1;
++    }
++    return buf.st_size;
++}
++
+ static uint32_t gdb_closefn(TaskState *ts, ARMCPU *cpu, GuestFD *gf)
+ {
+     return arm_gdb_syscall(cpu, arm_semi_cb, "close,%x", gf->hostfd);
+@@ -450,12 +461,19 @@ static uint32_t gdb_seekfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf,
+                            gf->hostfd, offset);
+ }
+ 
++static uint32_t gdb_flenfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf)
++{
++    return arm_gdb_syscall(cpu, arm_semi_flen_cb, "fstat,%x,%x",
++                           gf->hostfd, arm_flen_buf(cpu));
++}
++
+ typedef struct GuestFDFunctions {
+     sys_closefn *closefn;
+     sys_writefn *writefn;
+     sys_readfn *readfn;
+     sys_isattyfn *isattyfn;
+     sys_seekfn *seekfn;
++    sys_flenfn *flenfn;
+ } GuestFDFunctions;
+ 
+ static const GuestFDFunctions guestfd_fns[] = {
+@@ -465,6 +483,7 @@ static const GuestFDFunctions guestfd_fns[] = {
+         .readfn = host_readfn,
+         .isattyfn = host_isattyfn,
+         .seekfn = host_seekfn,
++        .flenfn = host_flenfn,
+     },
+     [GuestFDGDB] = {
+         .closefn = gdb_closefn,
+@@ -472,6 +491,7 @@ static const GuestFDFunctions guestfd_fns[] = {
+         .readfn = gdb_readfn,
+         .isattyfn = gdb_isattyfn,
+         .seekfn = gdb_seekfn,
++        .flenfn = gdb_flenfn,
+     },
+ };
+ 
+@@ -657,16 +677,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+             return set_swi_errno(ts, -1);
+         }
+ 
+-        if (use_gdb_syscalls()) {
+-            return arm_gdb_syscall(cpu, arm_semi_flen_cb, "fstat,%x,%x",
+-                                   gf->hostfd, arm_flen_buf(cpu));
+-        } else {
+-            struct stat buf;
+-            ret = set_swi_errno(ts, fstat(gf->hostfd, &buf));
+-            if (ret == (uint32_t)-1)
+-                return -1;
+-            return buf.st_size;
+-        }
++        return guestfd_fns[gf->type].flenfn(ts, cpu, gf);
+     case TARGET_SYS_TMPNAM:
+         qemu_log_mask(LOG_UNIMP, "%s: SYS_TMPNAM not implemented", __func__);
+         return -1;
+-- 
+2.20.1
 
-The comment is useless, it doesn't say why we increment it.  Also, I don't 
-think this is correct: doesn't it allow U mode to access S CSRs when H is 
-present and V is disabled?
-
-Something like
-
-    riscv_effective_priv(CPURISCVState *env)
-    {
-        if (riscv_has_ext(env, RVH) && env->priv == PRIV_S && !riscv_cpu_virt_enabled(env)) {
-            return PRIV_HS;
-        }
-    
-        return env->priv;
-    }
-
-would probably be used in a handful of places, and would be a drop in for
-env->priv here.
-
-> +        csr_priv++;
-> +    }
-> +
-> +    if ((write_mask && read_only) || (csr_priv < get_field(csrno, 0x300))) {
->          return -1;
->      }
->  #endif
 
