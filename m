@@ -6,37 +6,37 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FDC8C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 08:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11A74C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 08:26:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03F7F206A5
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 08:24:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03F7F206A5
+	by mail.kernel.org (Postfix) with ESMTPS id D7E51206A5
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 08:26:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7E51206A5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7bRk-00056I-7V
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 04:24:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59521)
+	id 1i7bTW-0006RF-Vx
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 04:26:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59783)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i7bQl-0004YA-7F
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:23:20 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i7bSQ-0005oU-3L
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:25:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i7bQk-0005Fm-2Y
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:23:19 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:38841)
+ (envelope-from <laurent@vivier.eu>) id 1i7bSO-0005ei-T8
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:25:02 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:50285)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1i7bQj-0005FL-OZ; Tue, 10 Sep 2019 04:23:17 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i7bSO-0005eY-KK
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:25:00 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
  (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MJFpj-1hrInP2cqh-00Kdd1; Tue, 10 Sep 2019 10:23:08 +0200
-To: Josh Kunz <jkz@google.com>, qemu-devel@nongnu.org
-References: <20190816233422.16715-1-jkz@google.com>
+ 1MzkK9-1iKZpY3cQ5-00vdAr; Tue, 10 Sep 2019 10:24:58 +0200
+To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
+References: <20190906165713.5558-1-jcmvbkbc@gmail.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -81,36 +81,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <0286498e-bb23-914a-39e2-66701f0b5885@vivier.eu>
-Date: Tue, 10 Sep 2019 10:23:04 +0200
+Message-ID: <7e4d0c43-e9f8-a231-0d21-4e05415cfec1@vivier.eu>
+Date: Tue, 10 Sep 2019 10:24:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190816233422.16715-1-jkz@google.com>
+In-Reply-To: <20190906165713.5558-1-jcmvbkbc@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:uqucYJ5hqcCMH28w9wQvZ9Fqhg4amLWQe9fbxeGhY6Nev30B4Hq
- /Rae2nbAl9r7LDCNZzMe//7LClVWnD6bKjuxkhKiWCoG2mERIwJvbGA/+03mJRGxuOPloPG
- eFtv2W+cT684g5iNThhDTJfZemskN3UUSBGMKM6TxhB09ND+tEsFO5UXFGTv4kynClPIpId
- drteFj0aNUXfJ+0Mbmr/w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:6r343B1eIuo=:AXNX+k5NXI2szYJxS6v0BF
- J+OBylO03IqjZCCDiUAX79CXf0rEu96Yj0/A6O14qC/qMRYSMQIy4k9Gs4SK8DBxAgtGDZjSY
- pTliUbEcyT1q8QZWBb8uLYv32s/EkG//JORF+mOxZPuZsSkmTTAPx8WxNxz96XHlkp1HKdNN5
- 0/f0XKO3pAjdJhey+vhXxv+5xgmsE9A/jjVQvWJQZFrPUex5igjx2hM5iCKXOr2TWuirS34gG
- IwbAkD214EVYC7QbA4TOBnEzR1cBuUBqjFj9WH6ubLTKAyJMmxh4mu/50xITLz/Yg0/SJGsFo
- dClhvEFRU3GpwUMkJRqjk0mrDCYtz6t3X1LxMnKe3JGlkUgVW9mrQAKlXIGa/Xbsj3pqkN1E+
- +kC3R/QVFVpoGAP/Q+bHkYHZ1BSczx+0q/FdkCI374kJ7HggIRf7sKDZlDOmB4Qd4pk4ZnL8X
- bnjLBKooH1Sm5rEDt7AA3qUgWAofBFBU1n6RJTtgvyLCg3UiIEoiImtrkRiMFCaI9jzQ4cywK
- GzZWhO7UfTRHVIIONYykVw3oavj0X0oadEUXE1NyznegCOdfm+jaRGKKcSn/hQwIk2nfd2cK+
- 6+PqtRoaCBIbRd5ym4MYSxZ9nlnfKQprIBmCuZ3/cKu5M/2ZLikfRxaWt263Y/c/cKj3zOyp+
- 2Qcbe6ITCXMnSJ/1jksooXgSZUdg/aagcUZIkmDQWGUy/vM/LSdYQ4uBdz1418Cyj5D5aZ0vL
- 8ZhSf8KZ3pZJU/wMFGkzAxSjE9UOMOPJiD85lmgMbOOu+rXapWLSLNL6pUJoo8ZfbpQk+5o1o
- 3G0HXc+cptso9pPFphCghQdQbTtcw==
+X-Provags-ID: V03:K1:IXeHdKL1dXTJdnm0RLL9fXch7+F3USVFm1Ml6ZqHJSVEwiA9bUf
+ aWAdjsL278lAXpiiQ5oaq8E8YfFfjvZ7rUK1Y+Tj8Gvzu/MgEV3RM56LYxUJObau+fZwWiu
+ z7NSEyEEqRkgEBKALCah2DC15FT3RcOidFHXBTDfTaguvxWGVtWMQqzEkPpsG3vktUZHTOs
+ S1cN1v2b/aWJFuDnAR70g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:7CSG/XxiU0E=:6cFP+W4EkxPxVVtXBAcjEG
+ wjL4HI4rcAH7bJ97BdmWRjYbKA+pYgzuKo2s08qdYhvfHtfd/ArkX7q4tUECpdT5yckVagESH
+ LZdqk2d+tNgFcPyBuazvE/eJD98L1OGpYlx7tr8HaPdcyBwSWr1Xk4COVJnmx3wvsOd5qLcmB
+ DO+1M/6Q/57jYNIGuFjBLdYIDrPCIeWYPcVcAe/3DBLb1hfAbo8IrQpPH00aOdNMPo2kMc/H1
+ ANHy9SijwQOmAZn335FPsVpbgJUZFzAirZpgZnl4tSv0vbq+TNv6D96UIhPEh+F3xYVXpdrGd
+ YrAP94XLNAiZRgCLsUvnL6FfdQd8OqMml/hqZimRhMAlXohrvI5/ogd8hVhNDCdJCnl4NDlcJ
+ UYGCxtHKwHa1Q9byNs2uQHQzIcruaE0rQfdZvJA9PkG6P3D/l9CAdHTW7N1E8jiDa9d9GirCa
+ xJmxr/t5Bv3Glm4kTMirpzGK8OAIOrQt8NPs1XHSVNtkwpZkd8eQ77HUxIjP/XLtjVD320LYG
+ U+0pF4h/AaNeivIPZbzWOQdVQ3F/V19gsWUT9mtc1OCQ4CLy6Kd/Coh+AuXzvFPz0zuJCPxD5
+ /SaMTCrXJTnt+9Qm7k2Vh7YMe/AMAP+ox9Tt4NFZoE2hvma9GgLljrLLRf60iSdyyLivDJOpY
+ E5O4sHrE2U0dqQFSV3cpOjovdFIdwssYlFfUpMdLQSx/KAUzIJlh8hVSFPlZ0LOZeJ835jeuD
+ 1IYjME4xsdKX8CtXrf7ipTQr/yq/r+zsqe6Ws5GEUkRFL+31InopMLj19FjOts5MLbgeBWc8y
+ KZdqf8h6zc3FQc57nVANbVvbEexYo8j0dSfDKRIwLc4So1os8U=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.134
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Support gdb 'qOffsets' query
- for ELF
+X-Received-From: 212.227.126.133
+Subject: Re: [Qemu-devel] [PATCH v4] target/xtensa: linux-user: add call0
+ ABI support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,42 +122,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 17/08/2019 à 01:34, Josh Kunz via Qemu-devel a écrit :
-> This is needed to support debugging PIE ELF binaries running under QEMU
-> user mode. Currently, `code_offset` and `data_offset` remain unset for
-> all ELF binaries, so GDB is unable to correctly locate the position of
-> the binary's text and data.
+Le 06/09/2019 à 18:57, Max Filippov a écrit :
+> Xtensa binaries built for call0 ABI don't rotate register window on
+> function calls and returns. Invocation of signal handlers from the
+> kernel is therefore different in windowed and call0 ABIs.
+> There's currently no way to determine xtensa ELF binary ABI from the
+> binary itself. Add handler for the -xtensa-abi-call0 command line
+> parameter/QEMU_XTENSA_ABI_CALL0 envitonment variable to the qemu-user
+> and record ABI choice. Use it to initialize PS.WOE in xtensa_cpu_reset.
+> Check PS.WOE in setup_rt_frame to determine how a signal should be
+> delivered.
 > 
-> The fields `code_offset`, and `data_offset` were originally added way
-> back in 2006 to support debugging of bFMT executables (978efd6aac6),
-> and support was just never added for ELF. Since non-PIE binaries are
-> loaded at exactly the address specified in the binary, GDB does not need
-> to relocate any symbols, so the buggy behavior is not normally observed.
-> 
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1528239
-> Signed-off-by: Josh Kunz <jkz@google.com>
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 > ---
->  linux-user/elfload.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  linux-user/main.c          | 11 +++++++++++
+>  linux-user/xtensa/signal.c | 25 +++++++++++++++++--------
+>  target/xtensa/cpu.c        | 24 ++++++++++++++++++++----
+>  target/xtensa/cpu.h        |  3 +++
+>  4 files changed, 51 insertions(+), 12 deletions(-)
 > 
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index 3365e192eb..ceac035208 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -2380,6 +2380,8 @@ static void load_elf_image(const char *image_name, int image_fd,
->      }
+> diff --git a/linux-user/main.c b/linux-user/main.c
+> index 47917bbb20fc..c9d97d2b1fc6 100644
+> --- a/linux-user/main.c
+> +++ b/linux-user/main.c
+> @@ -393,6 +393,13 @@ static void handle_arg_trace(const char *arg)
+>      trace_file = trace_opt_parse(arg);
+>  }
 >  
->      info->load_bias = load_bias;
-> +    info->code_offset = load_bias;
-> +    info->data_offset = load_bias;
->      info->load_addr = load_addr;
->      info->entry = ehdr->e_entry + load_bias;
->      info->start_code = -1;
+> +#if defined(TARGET_XTENSA)
+> +static void handle_arg_abi_call0(const char *arg)
+> +{
+> +    xtensa_set_abi_call0();
+> +}
+> +#endif
+> +
+>  struct qemu_argument {
+>      const char *argv;
+>      const char *env;
+> @@ -446,6 +453,10 @@ static const struct qemu_argument arg_table[] = {
+>       "",           "[[enable=]<pattern>][,events=<file>][,file=<file>]"},
+>      {"version",    "QEMU_VERSION",     false, handle_arg_version,
+>       "",           "display version information and exit"},
+> +#if defined(TARGET_XTENSA)
+> +    {"xtensa-abi-call0", "QEMU_XTENSA_ABI_CALL0", false, handle_arg_abi_call0,
+> +     "",           "assume CALL0 Xtensa ABI"},
+> +#endif
+>      {NULL, NULL, false, NULL, NULL, NULL}
+>  };
+>  
+> diff --git a/linux-user/xtensa/signal.c b/linux-user/xtensa/signal.c
+> index 8d54ef3ae34b..590f0313ffe9 100644
+> --- a/linux-user/xtensa/signal.c
+> +++ b/linux-user/xtensa/signal.c
+> @@ -134,6 +134,8 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
+>      abi_ulong frame_addr;
+>      struct target_rt_sigframe *frame;
+>      uint32_t ra;
+> +    bool abi_call0;
+> +    unsigned base;
+>      int i;
+>  
+>      frame_addr = get_sigframe(ka, env, sizeof(*frame));
+> @@ -182,20 +184,27 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
+>          __put_user(0x00, &frame->retcode[5]);
+>  #endif
+>      }
+> -    env->sregs[PS] = PS_UM | (3 << PS_RING_SHIFT);
+> -    if (xtensa_option_enabled(env->config, XTENSA_OPTION_WINDOWED_REGISTER)) {
+> -        env->sregs[PS] |= PS_WOE | (1 << PS_CALLINC_SHIFT);
+> -    }
+>      memset(env->regs, 0, sizeof(env->regs));
+>      env->pc = ka->_sa_handler;
+>      env->regs[1] = frame_addr;
+>      env->sregs[WINDOW_BASE] = 0;
+>      env->sregs[WINDOW_START] = 1;
+>  
+> -    env->regs[4] = (ra & 0x3fffffff) | 0x40000000;
+> -    env->regs[6] = sig;
+> -    env->regs[7] = frame_addr + offsetof(struct target_rt_sigframe, info);
+> -    env->regs[8] = frame_addr + offsetof(struct target_rt_sigframe, uc);
+> +    abi_call0 = (env->sregs[PS] & PS_WOE) == 0;
+> +    env->sregs[PS] = PS_UM | (3 << PS_RING_SHIFT);
+> +
+> +    if (abi_call0) {
+> +        base = 0;
+> +        env->regs[base] = ra;
+> +    } else {
+> +        env->sregs[PS] |= PS_WOE | (1 << PS_CALLINC_SHIFT);
+> +        base = 4;
+> +        env->regs[base] = (ra & 0x3fffffff) | 0x40000000;
+> +    }
+> +    env->regs[base + 2] = sig;
+> +    env->regs[base + 3] = frame_addr + offsetof(struct target_rt_sigframe,
+> +                                                info);
+> +    env->regs[base + 4] = frame_addr + offsetof(struct target_rt_sigframe, uc);
+>      unlock_user_struct(frame, frame_addr, 1);
+>      return;
+>  
+> diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
+> index 76db1741a796..c65dcf9dd782 100644
+> --- a/target/xtensa/cpu.c
+> +++ b/target/xtensa/cpu.c
+> @@ -53,6 +53,20 @@ static bool xtensa_cpu_has_work(CPUState *cs)
+>  #endif
+>  }
+>  
+> +#ifdef CONFIG_USER_ONLY
+> +static bool abi_call0;
+> +
+> +void xtensa_set_abi_call0(void)
+> +{
+> +    abi_call0 = true;
+> +}
+> +
+> +bool xtensa_abi_call0(void)
+> +{
+> +    return abi_call0;
+> +}
+> +#endif
+> +
+>  /* CPUClass::reset() */
+>  static void xtensa_cpu_reset(CPUState *s)
+>  {
+> @@ -70,10 +84,12 @@ static void xtensa_cpu_reset(CPUState *s)
+>              XTENSA_OPTION_INTERRUPT) ? 0x1f : 0x10;
+>      env->pending_irq_level = 0;
+>  #else
+> -    env->sregs[PS] =
+> -        (xtensa_option_enabled(env->config,
+> -                               XTENSA_OPTION_WINDOWED_REGISTER) ? PS_WOE : 0) |
+> -        PS_UM | (3 << PS_RING_SHIFT);
+> +    env->sregs[PS] = PS_UM | (3 << PS_RING_SHIFT);
+> +    if (xtensa_option_enabled(env->config,
+> +                              XTENSA_OPTION_WINDOWED_REGISTER) &&
+> +        !xtensa_abi_call0()) {
+> +        env->sregs[PS] |= PS_WOE;
+> +    }
+>  #endif
+>      env->sregs[VECBASE] = env->config->vecbase;
+>      env->sregs[IBREAKENABLE] = 0;
+> diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+> index 0459243e6bb1..b363ffcf1066 100644
+> --- a/target/xtensa/cpu.h
+> +++ b/target/xtensa/cpu.h
+> @@ -673,6 +673,9 @@ static inline MemoryRegion *xtensa_get_er_region(CPUXtensaState *env)
+>  {
+>      return env->system_er;
+>  }
+> +#else
+> +void xtensa_set_abi_call0(void);
+> +bool xtensa_abi_call0(void);
+>  #endif
+>  
+>  static inline uint32_t xtensa_replicate_windowstart(CPUXtensaState *env)
 > 
 
 Applied to my linux-user branch.
