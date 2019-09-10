@@ -2,93 +2,72 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55FFBC4740A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:07:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 850E8C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:12:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CE1820872
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:07:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CE1820872
+	by mail.kernel.org (Postfix) with ESMTPS id 5812921019
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:12:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5812921019
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7frc-0005dj-8q
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 09:07:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35892)
+	id 1i7fwH-00079q-EL
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 09:12:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36675)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i7fqn-000587-PO
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:06:30 -0400
+ (envelope-from <kwolf@redhat.com>) id 1i7fv6-0006VK-T1
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:10:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i7fqm-00024I-J9
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:06:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45148)
+ (envelope-from <kwolf@redhat.com>) id 1i7fv5-0004bp-TU
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:10:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47630)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i7fqj-0001yg-TX; Tue, 10 Sep 2019 09:06:26 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1i7fuz-0004Rg-N7; Tue, 10 Sep 2019 09:10:49 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2A0613023080;
- Tue, 10 Sep 2019 13:06:25 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-90.ams2.redhat.com
- [10.36.117.90])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A53AE100194E;
- Tue, 10 Sep 2019 13:06:23 +0000 (UTC)
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-21-mreitz@redhat.com>
- <20190910115620.GE4446@localhost.localdomain>
- <4fd84192-0078-07e9-b972-2f10030fb15f@redhat.com>
- <20190910124949.GG4446@localhost.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <1bf4b123-9157-bc94-4d74-c335f0c5e841@redhat.com>
-Date: Tue, 10 Sep 2019 15:06:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id CF5FE883D7;
+ Tue, 10 Sep 2019 13:10:48 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-217.ams2.redhat.com
+ [10.36.116.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C65D85D9DC;
+ Tue, 10 Sep 2019 13:10:47 +0000 (UTC)
+Date: Tue, 10 Sep 2019 15:10:46 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190910131046.GH4446@localhost.localdomain>
+References: <20190904161658.GD21246@localhost.localdomain>
+ <b1c56a8b-b4e4-c32a-f577-89a5e2da743e@redhat.com>
+ <20190909093604.GB13841@localhost.localdomain>
+ <38c0ff7e-dfd3-189e-6026-3642d78e5029@redhat.com>
+ <20190909161314.GJ17606@localhost.localdomain>
+ <89984d52-881f-a1e4-c14a-2bf05fc789d0@redhat.com>
+ <20190910104748.GC4446@localhost.localdomain>
+ <00aa6729-5fa0-31e0-8af5-1a91ae034f28@redhat.com>
+ <20190910124805.GF4446@localhost.localdomain>
+ <fa2bf3a5-a440-bc89-1896-87f0802e974d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190910124949.GG4446@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="2jrjhvgV2zXsNzygY23x3oYviEKAoQ9vI"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature"; boundary="Rgf3q3z9SdmXC6oT"
+Content-Disposition: inline
+In-Reply-To: <fa2bf3a5-a440-bc89-1896-87f0802e974d@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Tue, 10 Sep 2019 13:06:25 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Tue, 10 Sep 2019 13:10:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 20/42] block/snapshot: Fix fallback
+Subject: Re: [Qemu-devel] [PATCH v6 04/42] block: Add child access functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,143 +85,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2jrjhvgV2zXsNzygY23x3oYviEKAoQ9vI
-Content-Type: multipart/mixed; boundary="QC7tqKkPal4CQY4IzxdYqbA0CkqzAbURZ";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <1bf4b123-9157-bc94-4d74-c335f0c5e841@redhat.com>
-Subject: Re: [PATCH v6 20/42] block/snapshot: Fix fallback
-References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-21-mreitz@redhat.com>
- <20190910115620.GE4446@localhost.localdomain>
- <4fd84192-0078-07e9-b972-2f10030fb15f@redhat.com>
- <20190910124949.GG4446@localhost.localdomain>
-In-Reply-To: <20190910124949.GG4446@localhost.localdomain>
 
---QC7tqKkPal4CQY4IzxdYqbA0CkqzAbURZ
+--Rgf3q3z9SdmXC6oT
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 10.09.19 14:49, Kevin Wolf wrote:
-> Am 10.09.2019 um 14:04 hat Max Reitz geschrieben:
->> On 10.09.19 13:56, Kevin Wolf wrote:
->>> Am 09.08.2019 um 18:13 hat Max Reitz geschrieben:
->>>> If the top node's driver does not provide snapshot functionality and=
- we
->>>> want to fall back to a node down the chain, we need to snapshot all
->>>> non-COW children.  For simplicity's sake, just do not fall back if t=
-here
->>>> is more than one such child.
->>>>
->>>> bdrv_snapshot_goto() becomes a bit weird because we may have to redi=
-rect
->>>> the actual child pointer, so it only works if the fallback child is
->>>> bs->file or bs->backing (and then we have to find out which it is).
->>>>
->>>> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
->
->>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>>> ---
->>>>  block/snapshot.c | 100 +++++++++++++++++++++++++++++++++++++-------=
----
->>>>  1 file changed, 79 insertions(+), 21 deletions(-)
->>>>
->>>> diff --git a/block/snapshot.c b/block/snapshot.c
->>>> index f2f48f926a..35403c167f 100644
->>>> --- a/block/snapshot.c
->>>> +++ b/block/snapshot.c
->>>> @@ -146,6 +146,32 @@ bool bdrv_snapshot_find_by_id_and_name(BlockDri=
-verState *bs,
->>>>      return ret;
->>>>  }
->>>> =20
->>>> +/**
->>>> + * Return the child BDS to which we can fall back if the given BDS
->>>> + * does not support snapshots.
->>>> + * Return NULL if there is no BDS to (safely) fall back to.
->>>> + */
->>>> +static BlockDriverState *bdrv_snapshot_fallback(BlockDriverState *b=
-s)
->>>> +{
->>>> +    BlockDriverState *child_bs =3D NULL;
->>>> +    BdrvChild *child;
->>>> +
->>>> +    QLIST_FOREACH(child, &bs->children, next) {
->>>> +        if (child =3D=3D bdrv_filtered_cow_child(bs)) {
->>>> +            /* Ignore: COW children need not be included in snapsho=
-ts */
->>>> +            continue;
->>>> +        }
->>>> +
->>>> +        if (child_bs) {
->>>> +            /* Cannot fall back to a single child if there are mult=
-iple */
->>>> +            return NULL;
->>>> +        }
->>>> +        child_bs =3D child->bs;
->>>> +    }
->>>> +
->>>> +    return child_bs;
->>>> +}
->>>
->>> Why do we return child->bs here when bdrv_snapshot_goto() then needs =
-to
->>> reconstruct what the associated BdrvChild was? Wouldn't it make more
->>> sense to return BdrvChild** from here and maybe have a small wrapper =
-for
->>> the other functions that only need a BDS?
->>
->> What would you return instead?  &child doesn=E2=80=99t work.
+Am 10.09.2019 um 14:59 hat Max Reitz geschrieben:
+> On 10.09.19 14:48, Kevin Wolf wrote:
+> > Am 10.09.2019 um 13:36 hat Max Reitz geschrieben:
+> >> On 10.09.19 12:47, Kevin Wolf wrote:
+> >>> Am 10.09.2019 um 11:14 hat Max Reitz geschrieben:
+> >>>> Maybe we should stop declaring Quorum a filter and then rename the
+> >>>> bdrv_recurse_is_first_non_filter() to, I don=E2=80=99t know,
+> >>>> bdrv_recurse_can_be_replaced_by_mirror()?
+> >>>
+> >>> Why not.
+> >>
+> >> It feels difficult to do in this series because this is a whole new can
+> >> of worms.
+> >>
+> >> In patch 35, I actually replace the mirror use case by
+> >> is_filtered_child().  So it looks to me as if that should not be done,
+> >> because I should instead fix bdrv_recurse_is_first_non_filter() (and
+> >> rename it), because quorum does allow replacing its children by mirror,
+> >> even if it does not act as a filter for them.
+> >>
+> >> OTOH, there are other users of bdrv_is_first_non_filter().  Those are
+> >> qmp_block_resize() and external_snapshot_prepare(), who throw an error
+> >> if that returns false.
+> >>
+> >> I think that=E2=80=99s just wrong.  First of all, I don=E2=80=99t even=
+ know why we have
+> >> that restriction anymore (I can imagine why it used to make sense befo=
+re
+> >> the permission system).  qmp_block_resize() should always work as long
+> >> as it can get BLK_PERM_RESIZE; and I don=E2=80=99t know why the parent=
+s of some
+> >> node would care if you take a snapshot of their child.
+> >=20
+> > Hm, doesn't it make sense in a way for qmp_block_resize() at least? It
+> > means that you can't resize just a filter, but you need to resize the
+> > image that actually provides the data for the filter.
 >=20
-> Oops, brain fart. :-)
->=20
->> We could limit ourselves to bs->file and bs->backing.  It just seemed
->> like a bit of an artificial limit to me, because we only really have i=
-t
->> for bdrv_snapshot_goto().
->=20
-> Hm, but then, what use is supporting other children for creating a
-> snapshot when you can't load it any more afterwards?
+> Filters generally implement .bdrv_truncate() by passing it through, so
+> it should be fine.
 
-Well, the snapshot is still there, it=E2=80=99s just on a different node.=
-  So in
-theory, you could take a snapshot in a live VM (where the snapshotting
-node is not at the top), and then later revert to it with qemu-img (by
-accessing the file with the snapshot directly).
+Good point.
 
-Though in practice this is just a fallback anyway, and I don=E2=80=99t th=
-ink we
-currently have anything where it would make sense to fall through some
-node to any child but .file or .backing.  So why not.  It would be
-shorter, too.  (Well, plus the short comment why looking at .file and
-=2Ebacking is sufficient.)
+Then checking bdrv_is_first_non_filter() probably just forbids the only
+command that would actually work correctly (resizing the top-level
+filter).
 
-Max
+Kevin
 
-
---QC7tqKkPal4CQY4IzxdYqbA0CkqzAbURZ--
-
---2jrjhvgV2zXsNzygY23x3oYviEKAoQ9vI
+--Rgf3q3z9SdmXC6oT
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl13n80ACgkQ9AfbAGHV
-z0D0Ngf8DPVXn4XRbyUPZJjYg/Gq/cLlJYZalpSCa+Kh4GgqPvKgeNyJL3/0vvAR
-uzHkfBFUx45DQ8kUt0cwO3NGZEMDSN2xiW0IjoxvCqN9cd0iOwwFUZhRHZ6lWBW8
-2TWrUpl2e9JvUZLfkBmy11ZGrxfpE9CRMcmtgjNH6WpAH9l0vxRJK81BcctBz2ok
-veinw70G+WnfqoT6c/D9tCPJJSBBNQnQKL6ByUAwBZLLuvipcFoQodb8/uFRypvA
-S2wKS6HQwwhKml5XGgmzyO2jore8HkpKUEGDePYq5XgDjINg8gpl+LXzGLvY/Ln+
-X5d/gQiNere7thpPvhcOmV4ZUF4GTA==
-=/FYm
+iQIcBAEBAgAGBQJdd6DWAAoJEH8JsnLIjy/Wo5MQAKzSo3w+C+sCp+dzVDOjDxNn
+uh7QiHaDE9lelI5gnjO7F40zDMqFjGjMylyZvDs5TrapGySdjMK3R8KeZS2lJbBl
+gxiL+XuqxMH+IDv01vIABEpMH/mGNEDwicrNPNUaRw2Sub/X+W5o7k9o92LqEPIA
+nS1FGEfwWjpLdEUom1vIScW/xOfwWuPW/46l0cSg8m9xgeSw+6nBNYFkpGpD0ipa
+orxCeN2+UFzSnSmw1P+URiSBe3rQXnL2qsFDWD1+tfaydIruOYsWGhTkFAxP9u6P
+ISRomEZYhiF0s6YFe7bl70dt22plwqf/Sl8d2j5XRkSrEVubbCN1Lgmf/Dc8CCGj
+ZWZTbc0+6onyfIxcKDdUlsAL6l99U9RISt0lyKphw32HIgZx6MLqIimz8BWDS3Yb
+OTMj5A9YOF4xY0Ecpq6c35apLzCNxrjpl5t2kqOKhOcCDaZHJhK4amsbbimT+Cso
+LHXt5weOYpeOA5T4QodQkCLPZ/kACuMO73RuVMC9ydOprkSVqGX0ZYUlU5s/sVr0
+xNzHLzFGFLxxvxBLToX6U3hBivZ2C3aKeBO+g6HawmjWV3b8+sBaSeTuYL1xGFAH
+97Y6iPrKMg0UvpPgcCkg6lnVP7kXuKcH1itzgLwuc07Zar/QejtHRFafpXR3sXJB
+Z4Iy2iCHwAA7ufRnOO8L
+=zMJI
 -----END PGP SIGNATURE-----
 
---2jrjhvgV2zXsNzygY23x3oYviEKAoQ9vI--
+--Rgf3q3z9SdmXC6oT--
 
