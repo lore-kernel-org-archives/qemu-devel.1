@@ -2,90 +2,64 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B7C1C49ED7
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 15:14:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3914C49ED7
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 15:14:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DE82206A5
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 15:14:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DE82206A5
+	by mail.kernel.org (Postfix) with ESMTPS id CB418206A5
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 15:14:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB418206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7hqG-0003sD-AJ
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 11:14:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59526)
+	id 1i7hqm-00049x-Mk
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 11:14:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55618)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i7hp5-0002zE-0I
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 11:12:52 -0400
+ (envelope-from <kwolf@redhat.com>) id 1i7hVT-0004sr-OA
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:52:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i7hp3-0004bO-Tz
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 11:12:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48214)
+ (envelope-from <kwolf@redhat.com>) id 1i7hVS-0000kY-K9
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 10:52:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53806)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i7hp3-0004ac-Lk
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 11:12:49 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1i7hVQ-0000jg-7I; Tue, 10 Sep 2019 10:52:32 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E5E411108;
- Tue, 10 Sep 2019 15:12:48 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CCFE7194B2;
- Tue, 10 Sep 2019 15:12:43 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190910063724.28470-1-armbru@redhat.com>
- <20190910063724.28470-6-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <16792fc8-b513-e934-7ca6-41a5cc10aac0@redhat.com>
-Date: Tue, 10 Sep 2019 10:12:42 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 8C4B93082B40;
+ Tue, 10 Sep 2019 14:52:31 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-217.ams2.redhat.com
+ [10.36.116.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 822A960BF3;
+ Tue, 10 Sep 2019 14:52:30 +0000 (UTC)
+Date: Tue, 10 Sep 2019 16:52:29 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190910145229.GI4446@localhost.localdomain>
+References: <20190809161407.11920-1-mreitz@redhat.com>
+ <20190809161407.11920-23-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190910063724.28470-6-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Sv0KKxejvCo5hixLmC8PTxi0tFjROmkfB"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190809161407.11920-23-mreitz@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Tue, 10 Sep 2019 15:12:48 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Tue, 10 Sep 2019 14:52:31 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 05/16] tests/qapi-schema: Demonstrate
- bad reporting of funny characters
+Subject: Re: [Qemu-devel] [PATCH v6 22/42] block: Fix
+ bdrv_get_allocated_file_size's fallback
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,96 +71,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Sv0KKxejvCo5hixLmC8PTxi0tFjROmkfB
-Content-Type: multipart/mixed; boundary="zIV2NwHws6D0dawA6TtZHfjDns7PtyWxS";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <16792fc8-b513-e934-7ca6-41a5cc10aac0@redhat.com>
-Subject: Re: [PATCH v2 05/16] tests/qapi-schema: Demonstrate bad reporting of
- funny characters
-References: <20190910063724.28470-1-armbru@redhat.com>
- <20190910063724.28470-6-armbru@redhat.com>
-In-Reply-To: <20190910063724.28470-6-armbru@redhat.com>
+Am 09.08.2019 um 18:13 hat Max Reitz geschrieben:
+> If the driver does not implement bdrv_get_allocated_file_size(), we
+> should fall back to cumulating the allocated size of all non-COW
+> children instead of just bs->file.
+> 
+> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
---zIV2NwHws6D0dawA6TtZHfjDns7PtyWxS
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+This smells like an overgeneralisation, but if we want to count all vmdk
+extents, the qcow2 external data file, etc. it's an improvement anyway.
+A driver that has a child that should not be counted must just remember
+to implement the callback.
 
-On 9/10/19 1:37 AM, Markus Armbruster wrote:
-> Invalid name 'not\\possible' is reported as 'not\possible'.  Control
-> characters (quoted or not) are even more confusing.  Mark FIXME.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  tests/qapi-schema/enum-bad-name.err  | 2 +-
->  tests/qapi-schema/enum-bad-name.json | 3 ++-
->  2 files changed, 3 insertions(+), 2 deletions(-)
->=20
-> diff --git a/tests/qapi-schema/enum-bad-name.err b/tests/qapi-schema/en=
-um-bad-name.err
-> index 9c3c1002b7..26a09f84ad 100644
-> --- a/tests/qapi-schema/enum-bad-name.err
-> +++ b/tests/qapi-schema/enum-bad-name.err
-> @@ -1 +1 @@
-> -tests/qapi-schema/enum-bad-name.json:2: Member of enum 'MyEnum' uses i=
-nvalid name 'not^possible'
-> +tests/qapi-schema/enum-bad-name.json:3: Member of enum 'MyEnum' uses i=
-nvalid name 'not\possible'
-> diff --git a/tests/qapi-schema/enum-bad-name.json b/tests/qapi-schema/e=
-num-bad-name.json
-> index 8506562b31..b233fdc825 100644
-> --- a/tests/qapi-schema/enum-bad-name.json
-> +++ b/tests/qapi-schema/enum-bad-name.json
-> @@ -1,2 +1,3 @@
->  # we ensure all enum names can map to C
-> -{ 'enum': 'MyEnum', 'data': [ 'not^possible' ] }
-> +# FIXME reports 'not\posible' instead of 'not\\possible'
+Let me think of an example... How about quorum, for a change? :-)
+Or the second blkverify child.
 
-s/posible/possible/
+Or eventually the block job filter nodes.
 
-(Is it bad when you have a typo in demonstrating that the code has a typo=
-?)
+Ehm... Maybe I should just take back what I said first. It almost feels
+like it would be better if qcow2 and vmdk explicitly used a handler that
+counts all children (could still be a generic one in block.c) rather
+than having to remember to disable the functionality everywhere where we
+don't want to have it.
 
-With that fixed,
+And please adjust the comment for bdrv_get_allocated_file_size(), it
+only talks about a single file as if trees didn't exist. Actually, it
+doesn't even seem so easy to define. Maybe primary node + storage nodes?
+Then vmdk needs to expose its extents as storage nodes (plural!), but
+in the long run that might be needed anyway.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-> +{ 'enum': 'MyEnum', 'data': [ 'not\\possible' ] }
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---zIV2NwHws6D0dawA6TtZHfjDns7PtyWxS--
-
---Sv0KKxejvCo5hixLmC8PTxi0tFjROmkfB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl13vWoACgkQp6FrSiUn
-Q2rR+ggAhCQFJ9pQ0qq/czzBIQ504ZAt4BP4sO1NYFrM4YpjcTM51XDdLAB6l4vg
-T0qHt8euO+jteQ5qqMHklQts92qatBuqabfQEvr2k+F5FkhGg0eBISVSzdU9u2nZ
-sa1AGK5BwU5buqshkJwUFFp3ZDT3owAO980dwibeBKcgB8IhicYN1r6MvxMZFA8S
-6X2N9WAT4mGMpeEnPYVoGp/4UJcvsjMzBeWJ5Z7gyGlSWdF0EnLZZ0LZYYjioUH1
-byaQ/5bOu+8dPfxOW+ybgLTy642uxWe1oKME19RMf9Et4TPVQXVG/HuuEWWGoQxI
-o/EsB+ImLHcvSPlk7uhsue/2uZd3gw==
-=1cv5
------END PGP SIGNATURE-----
-
---Sv0KKxejvCo5hixLmC8PTxi0tFjROmkfB--
+Kevin
 
