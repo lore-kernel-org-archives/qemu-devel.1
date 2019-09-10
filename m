@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27E60C49ED9
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 16:35:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD771C49ED7
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 16:37:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC65F208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 16:35:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC65F208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 9000B208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 16:37:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9000B208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7j7O-0003GO-Sp
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 12:35:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47512)
+	id 1i7j8s-00057o-C2
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 12:37:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46040)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i7j3x-00011i-Ty
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 12:32:19 -0400
+ (envelope-from <eblake@redhat.com>) id 1i7j0U-0006Ll-4M
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 12:28:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i7j3w-0006Ks-Hk
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 12:32:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49936)
+ (envelope-from <eblake@redhat.com>) id 1i7j0N-00048x-5u
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 12:28:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39782)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i7j3v-0006JP-U0
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 12:32:16 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i7j0K-00046z-Uq
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 12:28:34 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F406B3082B40;
- Tue, 10 Sep 2019 16:32:14 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C457CC0885FA;
+ Tue, 10 Sep 2019 16:28:30 +0000 (UTC)
 Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8BCD561140;
- Tue, 10 Sep 2019 16:32:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 08B2D6C8FC;
+ Tue, 10 Sep 2019 16:28:24 +0000 (UTC)
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20190910063724.28470-1-armbru@redhat.com>
- <20190910063724.28470-11-armbru@redhat.com>
+ <20190910063724.28470-9-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,22 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <90b7b3d0-7b25-ff1e-983e-2750d555f861@redhat.com>
-Date: Tue, 10 Sep 2019 11:32:13 -0500
+Message-ID: <6f758f7d-3b98-5cbe-af4b-64218fecf994@redhat.com>
+Date: Tue, 10 Sep 2019 11:28:18 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190910063724.28470-11-armbru@redhat.com>
+In-Reply-To: <20190910063724.28470-9-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="gXT2bg1okaPYVhBbWtyju9Bv3VqZpQgiv"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+ boundary="IslWt3fuQiXUA2dg1NlZ12ockuJgoVN1P"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Tue, 10 Sep 2019 16:32:15 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Tue, 10 Sep 2019 16:28:31 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 10/16] qapi: Permit omitting all flat
- union branches
+Subject: Re: [Qemu-devel] [PATCH v2 08/16] qapi: Permit 'boxed' with empty
+ type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,31 +103,35 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gXT2bg1okaPYVhBbWtyju9Bv3VqZpQgiv
-Content-Type: multipart/mixed; boundary="LSOqvfiwmeM4ylnVhXib05XRgmdbecXRI";
+--IslWt3fuQiXUA2dg1NlZ12ockuJgoVN1P
+Content-Type: multipart/mixed; boundary="zlQe4oyKwi0OSbit12eiSVyvMxBa3HTz8";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <90b7b3d0-7b25-ff1e-983e-2750d555f861@redhat.com>
-Subject: Re: [PATCH v2 10/16] qapi: Permit omitting all flat union branches
+Message-ID: <6f758f7d-3b98-5cbe-af4b-64218fecf994@redhat.com>
+Subject: Re: [PATCH v2 08/16] qapi: Permit 'boxed' with empty type
 References: <20190910063724.28470-1-armbru@redhat.com>
- <20190910063724.28470-11-armbru@redhat.com>
-In-Reply-To: <20190910063724.28470-11-armbru@redhat.com>
+ <20190910063724.28470-9-armbru@redhat.com>
+In-Reply-To: <20190910063724.28470-9-armbru@redhat.com>
 
---LSOqvfiwmeM4ylnVhXib05XRgmdbecXRI
+--zlQe4oyKwi0OSbit12eiSVyvMxBa3HTz8
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 9/10/19 1:37 AM, Markus Armbruster wrote:
-> Absent flat union branches default to the empty struct (since commit
-> 800877bb16 "qapi: allow empty branches in flat unions").  But am
-> attempt to omit all of them is rejected with "Union 'FOO' has no
-> branches".  Harmless oddity, but it's easy to avoid, so do that.
+> We reject empty types with 'boxed': true.  We don't really need that
+> to work, but making it work is actually simpler than rejecting it, so
+> do that.
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
+
+>  11 files changed, 19 insertions(+), 25 deletions(-)
+
+Diffstat agrees with your assessment.
+
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
@@ -136,24 +140,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---LSOqvfiwmeM4ylnVhXib05XRgmdbecXRI--
+--zlQe4oyKwi0OSbit12eiSVyvMxBa3HTz8--
 
---gXT2bg1okaPYVhBbWtyju9Bv3VqZpQgiv
+--IslWt3fuQiXUA2dg1NlZ12ockuJgoVN1P
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl130A0ACgkQp6FrSiUn
-Q2oeLgf9HnH9T8zoJ/0OehPvLfR3DB1NkuirlQpAcCJmluUOqlSDwz3/IRHollu+
-t/tq83R+JgJJxLvrhI1OsW6i97xqBtsbZbRseWqYJ3GxnrsI1vSZJo6ZjHt53tF/
-s2QPqiVC71q2sci8znyV1DVmpvmFYH16NthEq1WNmfreGpmR5SwJKXMF7QTzSCsD
-yK63apuMwVdyLdvvixvpf79vqHxdfH1Xd6Ecp7MygjzmGeE36s46H8iXD+Vwr0yS
-iMRd2Affw6f7QJTvc2uphNs9YKezhmvw48kJTOkuR9b7OeQ+F7EL+nryQgWuXLl8
-UvKJ6N20qvJdUqHtJJVulQeuTwaNlw==
-=9z+5
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl13zyMACgkQp6FrSiUn
+Q2qCtQf/Z1fe3ij4/V6IdP6qZ/9WSAuxLQdMb2f5ZRjheOwh7YdOmY2BxPQKCQFJ
+lDVSsLhJPC6NXq8HaF4FADovWnfk+EOSxU1LKMSQHJX+Nd795WqfJJk33ZQke6lJ
+8gtGM+P1i5vLgqSVdrivKJUQF92/rOvdC/2rk3kQAUgG/hlHlcWgaSNnfFtk5KFA
+kLjK1LEzWGjz8XH3j7Q4v0EcVYp0uQNJIMdCXdVNDnzhN39+NiFe+UbOtHL4Ep9S
+HYqIjpYlZULHNSW7pXN8tHWjyv/y9NbdRE1sWUuhY1UxKYXzeZ46s9uaF5lY59YO
+AW8xAU2mpL4Ep5RRnDK3roxBuzxO2g==
+=CKiV
 -----END PGP SIGNATURE-----
 
---gXT2bg1okaPYVhBbWtyju9Bv3VqZpQgiv--
+--IslWt3fuQiXUA2dg1NlZ12ockuJgoVN1P--
 
