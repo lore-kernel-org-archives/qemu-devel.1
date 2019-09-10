@@ -7,65 +7,64 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB0AEC49ED9
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:40:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40BA0C49ED7
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:40:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A01C52084D
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:40:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A01C52084D
+	by mail.kernel.org (Postfix) with ESMTPS id 029BD2084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:40:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 029BD2084D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7lzd-0007ET-1e
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:40:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59036)
+	id 1i7lzw-0007Zx-Cs
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:40:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59184)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i7luD-00016v-VC
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:27 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i7luO-0001Ks-RJ
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i7luC-0006rA-14
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:25 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:43045)
+ (envelope-from <laurent@vivier.eu>) id 1i7luL-0006wY-OB
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:36 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:34297)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1i7luB-0006q7-Nc; Tue, 10 Sep 2019 15:34:23 -0400
+ id 1i7luL-0006vp-CK; Tue, 10 Sep 2019 15:34:33 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1N4Q4m-1iEgMM3Rpu-011V44; Tue, 10 Sep 2019 21:33:57 +0200
+ id 1MmCyE-1iXztm2CQq-00iBGQ; Tue, 10 Sep 2019 21:34:07 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Tue, 10 Sep 2019 21:33:40 +0200
-Message-Id: <20190910193347.16000-3-laurent@vivier.eu>
+Date: Tue, 10 Sep 2019 21:33:47 +0200
+Message-Id: <20190910193347.16000-10-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190910193347.16000-1-laurent@vivier.eu>
 References: <20190910193347.16000-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ZZ4C/mI7kQkq3xE19vjLV953vMPVxl3YESZKkWlYZC2DMU/IL8B
- Bl3R9H7dcocqTv8x5SPrEvhF3qc9Np5ULIQ4+3tHZxaYisi2P6mi++QfKK6lLQcaX3CRTj8
- Vqltd7ZIK9hXcCGnVg1DeKwCOjGfowbrziqMcJGKtlTavGNVDKH0mriaC1gOlUYOiHiGl57
- SS2+fieNJ5VXfWr5e82Sw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ksesfBY84q4=:GSKB9cshzy7uoeh131rOdM
- lLJ1ZlAF4SC1NSN+JLg2fJbR/dScM2duBLClCrBeyJOpvmmlqAmiLfmnX8dKgMi/ZNcAiuRkS
- fZZ1Hy3aCSgdOG3wRrXyhjGFKuLZ45QRGxHPfWkfPzkP1CHQ/JpaM/ULU04TvFZd2udlVvQkm
- IJXhOe6tSI3vp2H8gFGTb20t1GXw63EDZrqP+B1QeEDtxFqL42TymesDIq36vrJm3lh47wqyR
- eJehz5qAFWEsU+kIZtJmmcuIU8YNOTQDok0idNPpSFUfsx6cqaPPfLejfDFbV1S88KGUEZtgg
- IdQMXK+Oif3IRkodeGpfqBlyZuEpR/aIZAFnFA82BiuraG0ColDeUHG8hDwafXSzh5hw8QF/y
- 2gxbh2CSlBU3TikyENVp0EF7/2+EC6HAX80u72nb5dR7xRXIS9PNirzGo4//v9BMBOyDp/pdp
- ZxVhoqmD5FpHuMnSfCEDLewM/gTFgLQu/R/SXIbPtaEinwa9fC0bK+ecXIQ9CMmei1aIP/lZg
- BRpE883JgaVvYUBdNF2l7+AIRm5NH39P7G7zMrH5bCptJ6L3rnTqhqj7VkBk6jn+JgtGtKDVa
- oGuaaaIMRGfILImIgHUgUaCj6Z2m/PsXaIhWR6vXdoyqh6E70ZjRkFuhtOmzoFo36myhpXf+L
- CkcnVepUGh1IpVZLZSuMpjalwNSJ2BypDgRnXQygDKDhJjF2zWLuet44/gQ/MqWesjAOHnTIP
- 24PGV2Rs2kQtOevhfQgAuWJ9nCVvtcLjRCV/QCGzUr3kPvl9RBM35HujzRV0AOOlVU8hUOBbA
- bsOxYJxhhQOHPszDYhORx5dkmxkIb/Mfkkq77GwX5NLkrw9AIQ=
+X-Provags-ID: V03:K1:L3LsjZVinwpla54CKK57stMv5gbDYce0khyVzrSZMF/Aw3wZjWI
+ 9zu705zQ4kqROjovDXlpBNg2EO8OLbPMCymZ/GvhyR0VlF0yXcXBeT8R72JqyKtpBp8YkQl
+ HMhg7zDdmFfTvLokDIs0WWy77ycJpHwsU3KaUxMKwNQWDLd+ztUkEQWq6o7cIBgha8vp0lS
+ hkUOaFrJR4sYoB/GC/w8g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:9ncD0PDmOkY=:IViFua/LR/V8sdDz3Y7Dao
+ 5MUCc60AYbKs7Zx8ondyv6zsSrCpLNIDs6y+caEuthmqMehdmC7OiZrppXN/x5dhAGCDEhspy
+ Taxh36CyRuSNw56WKeBdgPfKSgNxtfjl3prfwts+hlosZsBQlQn/KPEAJhyxhGc2LMbLGX8/4
+ xWkjUaEK3Gw3qnM0LSCKH8MN37JORVtjJQyKoJFUO3yJ+TR/ntkLPqabkTcof1Dv3uluUDQhh
+ nAndpEGhxT0FI23BqGYTEKbO6LXE4s3e+F6F7yFKq5NcMQaOqdSBWzlijAbbGeq80nUSXI7su
+ VCcGOP40euq17wZJqQgtKdAx1AIJSdmAd7xprwZQxGxvh3JErHHxyGL+hIyBUV2KFDq2Lz1gt
+ 6DaWLiyx+YluK13x1shsehqEKyuLSucWEb27hY3fZOT/Y68nJ1/kGkxDdSvU2TZ9LVizpLJR9
+ T/Yk9kttR2elESAy6qoPmQg1NHMd8Jm4oqRViA/j+bbcbji2QK3T2VPkwcIe6sw/DxB9KkGki
+ aoypVL3tlaNJoU702cVwDcI4ndj62YDSBcuuGnjl1nNxR+3W8xr1lmPVqrOQvdiHatKabE2IJ
+ tEU95ZzcSLVWdizb4/XTQBdrhIjThVFa0REDiQYvH8NC8ZntuhXedSFZDFPXB+TxHK5wV7TP3
+ 4Np9g7vwGFdIOGTlarUI/6COxLFyj9wca9EQ1cJ5kL/49wZTdB7wcQmapG0+UICK6hBVmzluf
+ qbyE/hQ26fMaNFSD4vj6asixVrwWFaYpksdwvqNsoUQCzH8NOH21vJzHkMoRyUpUGgZ0Bjnzp
+ ZvuoUbS+nINuQ922RqovXTZ27f4Ue7L1SuUdM7J3NBaigqUHOU=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
-Subject: [Qemu-devel] [PATCH v11 2/9] dp8393x: manage big endian bus
+X-Received-From: 217.72.192.73
+Subject: [Qemu-devel] [PATCH v11 9/9] hw/m68k: define Macintosh Quadra 800
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,7 +77,6 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  qemu-block@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
  Jason Wang <jasowang@redhat.com>,
  Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
@@ -92,204 +90,584 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is needed by Quadra 800, this card can run on little-endian
-or big-endian bus.
+If you want to test the machine, it doesn't yet boot a MacROM, but you can
+boot a linux kernel from the command line.
 
+You can install your own disk using debian-installer with:
+
+    ./qemu-system-m68k \
+    -M q800 \
+    -serial none -serial mon:stdio \
+    -m 1000M -drive file=m68k.qcow2,format=qcow2 \
+    -net nic,model=dp83932,addr=09:00:07:12:34:57 \
+    -append "console=ttyS0 vga=off" \
+    -kernel vmlinux-4.15.0-2-m68k \
+    -initrd initrd.gz \
+    -drive file=debian-9.0-m68k-NETINST-1.iso \
+    -drive file=m68k.qcow2,format=qcow2 \
+    -nographic
+
+If you use a graphic adapter instead of "-nographic", you can use "-g" to set the
+size of the display (I use "-g 1600x800x24").
+
+Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Tested-by: Hervé Poussineau <hpoussin@reactos.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 ---
- hw/net/dp8393x.c | 88 +++++++++++++++++++++++++++++++-----------------
- 1 file changed, 57 insertions(+), 31 deletions(-)
+ MAINTAINERS           |   2 +
+ hw/m68k/Kconfig       |   3 +
+ hw/m68k/Makefile.objs |   1 +
+ hw/m68k/bootinfo.h    | 114 +++++++++++++
+ hw/m68k/q800.c        | 382 ++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 502 insertions(+)
+ create mode 100644 hw/m68k/bootinfo.h
+ create mode 100644 hw/m68k/q800.c
 
-diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index a5678e11fa..693e244ce6 100644
---- a/hw/net/dp8393x.c
-+++ b/hw/net/dp8393x.c
-@@ -153,6 +153,7 @@ typedef struct dp8393xState {
- 
-     /* Hardware */
-     uint8_t it_shift;
-+    bool big_endian;
-     qemu_irq irq;
- #ifdef DEBUG_SONIC
-     int irq_level;
-@@ -223,6 +224,29 @@ static uint32_t dp8393x_wt(dp8393xState *s)
-     return s->regs[SONIC_WT1] << 16 | s->regs[SONIC_WT0];
- }
- 
-+static uint16_t dp8393x_get(dp8393xState *s, int width, uint16_t *base,
-+                            int offset)
-+{
-+    uint16_t val;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f85f11d83c..e6d37acb84 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -920,10 +920,12 @@ F: include/hw/m68k/next-cube.h
+ q800
+ M: Laurent Vivier <laurent@vivier.eu>
+ S: Maintained
++F: hw/m68k/q800.c
+ F: hw/misc/mac_via.c
+ F: hw/display/macfb.c
+ F: hw/nubus/*
+ F: hw/block/swim.c
++F: hw/m68k/bootinfo.h
+ F: include/hw/misc/mac_via.h
+ F: include/hw/display/macfb.h
+ F: include/hw/nubus/*
+diff --git a/hw/m68k/Kconfig b/hw/m68k/Kconfig
+index 7aa830327c..c663920f8f 100644
+--- a/hw/m68k/Kconfig
++++ b/hw/m68k/Kconfig
+@@ -19,3 +19,6 @@ config Q800
+     select MACFB
+     select NUBUS
+     select SWIM
++    select ESCC
++    select ESP
++    select DP8393X
+diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
+index f25854730d..b2c9e5ab12 100644
+--- a/hw/m68k/Makefile.objs
++++ b/hw/m68k/Makefile.objs
+@@ -1,3 +1,4 @@
+ obj-$(CONFIG_AN5206) += an5206.o mcf5206.o
+ obj-$(CONFIG_MCF5208) += mcf5208.o mcf_intc.o
+ obj-$(CONFIG_NEXTCUBE) += next-kbd.o next-cube.o
++obj-$(CONFIG_Q800) += q800.o
+diff --git a/hw/m68k/bootinfo.h b/hw/m68k/bootinfo.h
+new file mode 100644
+index 0000000000..5f8ded2686
+--- /dev/null
++++ b/hw/m68k/bootinfo.h
+@@ -0,0 +1,114 @@
++/*
++ * SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note
++ *
++ * Bootinfo tags from linux bootinfo.h and bootinfo-mac.h:
++ * This is an easily parsable and extendable structure containing all
++ * information to be passed from the bootstrap to the kernel
++ *
++ * This structure is copied right after the kernel by the bootstrap
++ * routine.
++ */
 +
-+    if (s->big_endian) {
-+        val = be16_to_cpu(base[offset * width + width - 1]);
++#ifndef HW_M68K_BOOTINFO_H
++#define HW_M68K_BOOTINFO_H
++struct bi_record {
++    uint16_t tag;        /* tag ID */
++    uint16_t size;       /* size of record */
++    uint32_t data[0];    /* data */
++};
++
++/* machine independent tags */
++
++#define BI_LAST         0x0000 /* last record */
++#define BI_MACHTYPE     0x0001 /* machine type (u_long) */
++#define BI_CPUTYPE      0x0002 /* cpu type (u_long) */
++#define BI_FPUTYPE      0x0003 /* fpu type (u_long) */
++#define BI_MMUTYPE      0x0004 /* mmu type (u_long) */
++#define BI_MEMCHUNK     0x0005 /* memory chunk address and size */
++                               /* (struct mem_info) */
++#define BI_RAMDISK      0x0006 /* ramdisk address and size */
++                               /* (struct mem_info) */
++#define BI_COMMAND_LINE 0x0007 /* kernel command line parameters */
++                               /* (string) */
++
++/*  Macintosh-specific tags (all u_long) */
++
++#define BI_MAC_MODEL    0x8000  /* Mac Gestalt ID (model type) */
++#define BI_MAC_VADDR    0x8001  /* Mac video base address */
++#define BI_MAC_VDEPTH   0x8002  /* Mac video depth */
++#define BI_MAC_VROW     0x8003  /* Mac video rowbytes */
++#define BI_MAC_VDIM     0x8004  /* Mac video dimensions */
++#define BI_MAC_VLOGICAL 0x8005  /* Mac video logical base */
++#define BI_MAC_SCCBASE  0x8006  /* Mac SCC base address */
++#define BI_MAC_BTIME    0x8007  /* Mac boot time */
++#define BI_MAC_GMTBIAS  0x8008  /* Mac GMT timezone offset */
++#define BI_MAC_MEMSIZE  0x8009  /* Mac RAM size (sanity check) */
++#define BI_MAC_CPUID    0x800a  /* Mac CPU type (sanity check) */
++#define BI_MAC_ROMBASE  0x800b  /* Mac system ROM base address */
++
++/*  Macintosh hardware profile data */
++
++#define BI_MAC_VIA1BASE 0x8010  /* Mac VIA1 base address (always present) */
++#define BI_MAC_VIA2BASE 0x8011  /* Mac VIA2 base address (type varies) */
++#define BI_MAC_VIA2TYPE 0x8012  /* Mac VIA2 type (VIA, RBV, OSS) */
++#define BI_MAC_ADBTYPE  0x8013  /* Mac ADB interface type */
++#define BI_MAC_ASCBASE  0x8014  /* Mac Apple Sound Chip base address */
++#define BI_MAC_SCSI5380 0x8015  /* Mac NCR 5380 SCSI (base address, multi) */
++#define BI_MAC_SCSIDMA  0x8016  /* Mac SCSI DMA (base address) */
++#define BI_MAC_SCSI5396 0x8017  /* Mac NCR 53C96 SCSI (base address, multi) */
++#define BI_MAC_IDETYPE  0x8018  /* Mac IDE interface type */
++#define BI_MAC_IDEBASE  0x8019  /* Mac IDE interface base address */
++#define BI_MAC_NUBUS    0x801a  /* Mac Nubus type (none, regular, pseudo) */
++#define BI_MAC_SLOTMASK 0x801b  /* Mac Nubus slots present */
++#define BI_MAC_SCCTYPE  0x801c  /* Mac SCC serial type (normal, IOP) */
++#define BI_MAC_ETHTYPE  0x801d  /* Mac builtin ethernet type (Sonic, MACE */
++#define BI_MAC_ETHBASE  0x801e  /* Mac builtin ethernet base address */
++#define BI_MAC_PMU      0x801f  /* Mac power management / poweroff hardware */
++#define BI_MAC_IOP_SWIM 0x8020  /* Mac SWIM floppy IOP */
++#define BI_MAC_IOP_ADB  0x8021  /* Mac ADB IOP */
++
++#define BOOTINFO0(as, base, id) \
++    do { \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, sizeof(struct bi_record)); \
++        base += 2; \
++    } while (0)
++
++#define BOOTINFO1(as, base, id, value) \
++    do { \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, sizeof(struct bi_record) + 4); \
++        base += 2; \
++        stl_phys(as, base, value); \
++        base += 4; \
++    } while (0)
++
++#define BOOTINFO2(as, base, id, value1, value2) \
++    do { \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, sizeof(struct bi_record) + 8); \
++        base += 2; \
++        stl_phys(as, base, value1); \
++        base += 4; \
++        stl_phys(as, base, value2); \
++        base += 4; \
++    } while (0)
++
++#define BOOTINFOSTR(as, base, id, string) \
++    do { \
++        int i; \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, \
++                 (sizeof(struct bi_record) + strlen(string) + 2) & ~1); \
++        base += 2; \
++        for (i = 0; string[i]; i++) { \
++            stb_phys(as, base++, string[i]); \
++        } \
++        stb_phys(as, base++, 0); \
++        base = (parameters_base + 1) & ~1; \
++    } while (0)
++#endif
+diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
+new file mode 100644
+index 0000000000..8e0389e050
+--- /dev/null
++++ b/hw/m68k/q800.c
+@@ -0,0 +1,382 @@
++/*
++ * QEMU Motorla 680x0 Macintosh hardware System Emulator
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "sysemu/sysemu.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "hw/boards.h"
++#include "hw/irq.h"
++#include "elf.h"
++#include "hw/loader.h"
++#include "ui/console.h"
++#include "exec/address-spaces.h"
++#include "hw/char/escc.h"
++#include "hw/sysbus.h"
++#include "hw/scsi/esp.h"
++#include "bootinfo.h"
++#include "hw/misc/mac_via.h"
++#include "hw/input/adb.h"
++#include "hw/nubus/mac-nubus-bridge.h"
++#include "hw/display/macfb.h"
++#include "hw/block/swim.h"
++#include "net/net.h"
++#include "qapi/error.h"
++#include "sysemu/qtest.h"
++#include "sysemu/runstate.h"
++#include "sysemu/reset.h"
++
++#define MACROM_ADDR     0x40000000
++#define MACROM_SIZE     0x00100000
++
++#define MACROM_FILENAME "MacROM.bin"
++
++#define Q800_MACHINE_ID 35
++#define Q800_CPU_ID (1 << 2)
++#define Q800_FPU_ID (1 << 2)
++#define Q800_MMU_ID (1 << 2)
++
++#define MACH_MAC        3
++#define Q800_MAC_CPU_ID 2
++
++#define VIA_BASE              0x50f00000
++#define SONIC_PROM_BASE       0x50f08000
++#define SONIC_BASE            0x50f0a000
++#define SCC_BASE              0x50f0c020
++#define ESP_BASE              0x50f10000
++#define ESP_PDMA              0x50f10100
++#define ASC_BASE              0x50F14000
++#define SWIM_BASE             0x50F1E000
++#define NUBUS_SUPER_SLOT_BASE 0x60000000
++#define NUBUS_SLOT_BASE       0xf0000000
++
++/*
++ * the video base, whereas it a Nubus address,
++ * is needed by the kernel to have early display and
++ * thus provided by the bootloader
++ */
++#define VIDEO_BASE            0xf9001000
++
++#define MAC_CLOCK  3686418
++
++/*
++ * The GLUE (General Logic Unit) is an Apple custom integrated circuit chip
++ * that performs a variety of functions (RAM management, clock generation, ...).
++ * The GLUE chip receives interrupt requests from various devices,
++ * assign priority to each, and asserts one or more interrupt line to the
++ * CPU.
++ */
++
++typedef struct {
++    M68kCPU *cpu;
++    uint8_t ipr;
++} GLUEState;
++
++static void GLUE_set_irq(void *opaque, int irq, int level)
++{
++    GLUEState *s = opaque;
++    int i;
++
++    if (level) {
++        s->ipr |= 1 << irq;
 +    } else {
-+        val = le16_to_cpu(base[offset * width]);
++        s->ipr &= ~(1 << irq);
 +    }
-+    return val;
++
++    for (i = 7; i >= 0; i--) {
++        if ((s->ipr >> i) & 1) {
++            m68k_set_irq_level(s->cpu, i + 1, i + 25);
++            return;
++        }
++    }
++    m68k_set_irq_level(s->cpu, 0, 0);
 +}
 +
-+static void dp8393x_put(dp8393xState *s, int width, uint16_t *base, int offset,
-+                        uint16_t val)
++static void main_cpu_reset(void *opaque)
 +{
-+    if (s->big_endian) {
-+        base[offset * width + width - 1] = cpu_to_be16(val);
++    M68kCPU *cpu = opaque;
++    CPUState *cs = CPU(cpu);
++
++    cpu_reset(cs);
++    cpu->env.aregs[7] = ldl_phys(cs->as, 0);
++    cpu->env.pc = ldl_phys(cs->as, 4);
++}
++
++static void q800_init(MachineState *machine)
++{
++    M68kCPU *cpu = NULL;
++    int linux_boot;
++    int32_t kernel_size;
++    uint64_t elf_entry;
++    char *filename;
++    int bios_size;
++    ram_addr_t initrd_base;
++    int32_t initrd_size;
++    MemoryRegion *rom;
++    MemoryRegion *ram;
++    ram_addr_t ram_size = machine->ram_size;
++    const char *kernel_filename = machine->kernel_filename;
++    const char *initrd_filename = machine->initrd_filename;
++    const char *kernel_cmdline = machine->kernel_cmdline;
++    hwaddr parameters_base;
++    CPUState *cs;
++    DeviceState *dev;
++    DeviceState *via_dev;
++    SysBusESPState *sysbus_esp;
++    ESPState *esp;
++    SysBusDevice *sysbus;
++    BusState *adb_bus;
++    NubusBus *nubus;
++    GLUEState *irq;
++    qemu_irq *pic;
++
++    linux_boot = (kernel_filename != NULL);
++
++    /* init CPUs */
++    cpu = M68K_CPU(cpu_create(machine->cpu_type));
++    qemu_register_reset(main_cpu_reset, cpu);
++
++    ram = g_malloc(sizeof(*ram));
++    memory_region_init_ram(ram, NULL, "m68k_mac.ram", ram_size, &error_abort);
++    memory_region_add_subregion(get_system_memory(), 0, ram);
++
++    /* IRQ Glue */
++
++    irq = g_new0(GLUEState, 1);
++    irq->cpu = cpu;
++    pic = qemu_allocate_irqs(GLUE_set_irq, irq, 8);
++
++    /* VIA */
++
++    via_dev = qdev_create(NULL, TYPE_MAC_VIA);
++    qdev_init_nofail(via_dev);
++    sysbus = SYS_BUS_DEVICE(via_dev);
++    sysbus_mmio_map(sysbus, 0, VIA_BASE);
++    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 0, pic[0]);
++    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 1, pic[1]);
++
++
++    adb_bus = qdev_get_child_bus(via_dev, "adb.0");
++    dev = qdev_create(adb_bus, TYPE_ADB_KEYBOARD);
++    qdev_init_nofail(dev);
++    dev = qdev_create(adb_bus, TYPE_ADB_MOUSE);
++    qdev_init_nofail(dev);
++
++    /* MACSONIC */
++
++    if (nb_nics > 1) {
++        error_report("q800 can only have one ethernet interface");
++        exit(1);
++    }
++
++    qemu_check_nic_model(&nd_table[0], "dp83932");
++
++    /*
++     * MacSonic driver needs an Apple MAC address
++     * Valid prefix are:
++     * 00:05:02 Apple
++     * 00:80:19 Dayna Communications, Inc.
++     * 00:A0:40 Apple
++     * 08:00:07 Apple
++     * (Q800 use the last one)
++     */
++    nd_table[0].macaddr.a[0] = 0x08;
++    nd_table[0].macaddr.a[1] = 0x00;
++    nd_table[0].macaddr.a[2] = 0x07;
++
++    dev = qdev_create(NULL, "dp8393x");
++    qdev_set_nic_properties(dev, &nd_table[0]);
++    qdev_prop_set_uint8(dev, "it_shift", 2);
++    qdev_prop_set_bit(dev, "big_endian", true);
++    qdev_prop_set_ptr(dev, "dma_mr", get_system_memory());
++    qdev_init_nofail(dev);
++    sysbus = SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(sysbus, 0, SONIC_BASE);
++    sysbus_mmio_map(sysbus, 1, SONIC_PROM_BASE);
++    sysbus_connect_irq(sysbus, 0, pic[2]);
++
++    /* SCC */
++
++    dev = qdev_create(NULL, TYPE_ESCC);
++    qdev_prop_set_uint32(dev, "disabled", 0);
++    qdev_prop_set_uint32(dev, "frequency", MAC_CLOCK);
++    qdev_prop_set_uint32(dev, "it_shift", 1);
++    qdev_prop_set_bit(dev, "bit_swap", true);
++    qdev_prop_set_chr(dev, "chrA", serial_hd(0));
++    qdev_prop_set_chr(dev, "chrB", serial_hd(1));
++    qdev_prop_set_uint32(dev, "chnBtype", 0);
++    qdev_prop_set_uint32(dev, "chnAtype", 0);
++    qdev_init_nofail(dev);
++    sysbus = SYS_BUS_DEVICE(dev);
++    sysbus_connect_irq(sysbus, 0, pic[3]);
++    sysbus_connect_irq(sysbus, 1, pic[3]);
++    sysbus_mmio_map(sysbus, 0, SCC_BASE);
++
++    /* SCSI */
++
++    dev = qdev_create(NULL, TYPE_ESP);
++    sysbus_esp = ESP_STATE(dev);
++    esp = &sysbus_esp->esp;
++    esp->dma_memory_read = NULL;
++    esp->dma_memory_write = NULL;
++    esp->dma_opaque = NULL;
++    sysbus_esp->it_shift = 4;
++    esp->dma_enabled = 1;
++    qdev_init_nofail(dev);
++
++    sysbus = SYS_BUS_DEVICE(dev);
++    sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in_named(via_dev,
++                                                         "via2-irq",
++                                                         VIA2_IRQ_SCSI_BIT));
++    sysbus_connect_irq(sysbus, 1,
++                       qdev_get_gpio_in_named(via_dev, "via2-irq",
++                                              VIA2_IRQ_SCSI_DATA_BIT));
++    sysbus_mmio_map(sysbus, 0, ESP_BASE);
++    sysbus_mmio_map(sysbus, 1, ESP_PDMA);
++
++    scsi_bus_legacy_handle_cmdline(&esp->bus);
++
++    /* SWIM floppy controller */
++
++    dev = qdev_create(NULL, TYPE_SWIM);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, SWIM_BASE);
++
++    /* NuBus */
++
++    dev = qdev_create(NULL, TYPE_MAC_NUBUS_BRIDGE);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, NUBUS_SUPER_SLOT_BASE);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 1, NUBUS_SLOT_BASE);
++
++    nubus = MAC_NUBUS_BRIDGE(dev)->bus;
++
++    /* framebuffer in nubus slot #9 */
++
++    dev = qdev_create(BUS(nubus), TYPE_NUBUS_MACFB);
++    qdev_prop_set_uint32(dev, "width", graphic_width);
++    qdev_prop_set_uint32(dev, "height", graphic_height);
++    qdev_prop_set_uint8(dev, "depth", graphic_depth);
++    qdev_init_nofail(dev);
++
++    cs = CPU(cpu);
++    if (linux_boot) {
++        uint64_t high;
++        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
++                               &elf_entry, NULL, &high, 1,
++                               EM_68K, 0, 0);
++        if (kernel_size < 0) {
++            error_report("could not load kernel '%s'", kernel_filename);
++            exit(1);
++        }
++        stl_phys(cs->as, 4, elf_entry); /* reset initial PC */
++        parameters_base = (high + 1) & ~1;
++
++        BOOTINFO1(cs->as, parameters_base, BI_MACHTYPE, MACH_MAC);
++        BOOTINFO1(cs->as, parameters_base, BI_FPUTYPE, Q800_FPU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_MMUTYPE, Q800_MMU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_CPUTYPE, Q800_CPU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_CPUID, Q800_MAC_CPU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_MODEL, Q800_MACHINE_ID);
++        BOOTINFO1(cs->as, parameters_base,
++                  BI_MAC_MEMSIZE, ram_size >> 20); /* in MB */
++        BOOTINFO2(cs->as, parameters_base, BI_MEMCHUNK, 0, ram_size);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VADDR, VIDEO_BASE);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VDEPTH, graphic_depth);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VDIM,
++                  (graphic_height << 16) | graphic_width);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VROW,
++                  (graphic_width * graphic_depth + 7) / 8);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_SCCBASE, SCC_BASE);
++
++        if (kernel_cmdline) {
++            BOOTINFOSTR(cs->as, parameters_base, BI_COMMAND_LINE,
++                        kernel_cmdline);
++        }
++
++        /* load initrd */
++        if (initrd_filename) {
++            initrd_size = get_image_size(initrd_filename);
++            if (initrd_size < 0) {
++                error_report("could not load initial ram disk '%s'",
++                             initrd_filename);
++                exit(1);
++            }
++
++            initrd_base = (ram_size - initrd_size) & TARGET_PAGE_MASK;
++            load_image_targphys(initrd_filename, initrd_base,
++                                ram_size - initrd_base);
++            BOOTINFO2(cs->as, parameters_base, BI_RAMDISK, initrd_base,
++                      initrd_size);
++        } else {
++            initrd_base = 0;
++            initrd_size = 0;
++        }
++        BOOTINFO0(cs->as, parameters_base, BI_LAST);
 +    } else {
-+        base[offset * width] = cpu_to_le16(val);
++        uint8_t *ptr;
++        /* allocate and load BIOS */
++        rom = g_malloc(sizeof(*rom));
++        memory_region_init_ram(rom, NULL, "m68k_mac.rom", MACROM_SIZE,
++                               &error_abort);
++        if (bios_name == NULL) {
++            bios_name = MACROM_FILENAME;
++        }
++        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
++        memory_region_set_readonly(rom, true);
++        memory_region_add_subregion(get_system_memory(), MACROM_ADDR, rom);
++
++        /* Load MacROM binary */
++        if (filename) {
++            bios_size = load_image_targphys(filename, MACROM_ADDR, MACROM_SIZE);
++            g_free(filename);
++        } else {
++            bios_size = -1;
++        }
++
++        /* Remove qtest_enabled() check once firmware files are in the tree */
++        if (!qtest_enabled()) {
++            if (bios_size < 0 || bios_size > MACROM_SIZE) {
++                error_report("could not load MacROM '%s'", bios_name);
++                exit(1);
++            }
++
++            ptr = rom_ptr(MACROM_ADDR, MACROM_SIZE);
++            stl_phys(cs->as, 0, ldl_p(ptr));    /* reset initial SP */
++            stl_phys(cs->as, 4,
++                     MACROM_ADDR + ldl_p(ptr + 4)); /* reset initial PC */
++        }
 +    }
 +}
 +
- static void dp8393x_update_irq(dp8393xState *s)
- {
-     int level = (s->regs[SONIC_IMR] & s->regs[SONIC_ISR]) ? 1 : 0;
-@@ -254,12 +278,12 @@ static void dp8393x_do_load_cam(dp8393xState *s)
-         /* Fill current entry */
-         address_space_rw(&s->as, dp8393x_cdp(s),
-             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--        s->cam[index][0] = data[1 * width] & 0xff;
--        s->cam[index][1] = data[1 * width] >> 8;
--        s->cam[index][2] = data[2 * width] & 0xff;
--        s->cam[index][3] = data[2 * width] >> 8;
--        s->cam[index][4] = data[3 * width] & 0xff;
--        s->cam[index][5] = data[3 * width] >> 8;
-+        s->cam[index][0] = dp8393x_get(s, width, data, 1) & 0xff;
-+        s->cam[index][1] = dp8393x_get(s, width, data, 1) >> 8;
-+        s->cam[index][2] = dp8393x_get(s, width, data, 2) & 0xff;
-+        s->cam[index][3] = dp8393x_get(s, width, data, 2) >> 8;
-+        s->cam[index][4] = dp8393x_get(s, width, data, 3) & 0xff;
-+        s->cam[index][5] = dp8393x_get(s, width, data, 3) >> 8;
-         DPRINTF("load cam[%d] with %02x%02x%02x%02x%02x%02x\n", index,
-             s->cam[index][0], s->cam[index][1], s->cam[index][2],
-             s->cam[index][3], s->cam[index][4], s->cam[index][5]);
-@@ -272,7 +296,7 @@ static void dp8393x_do_load_cam(dp8393xState *s)
-     /* Read CAM enable */
-     address_space_rw(&s->as, dp8393x_cdp(s),
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--    s->regs[SONIC_CE] = data[0 * width];
-+    s->regs[SONIC_CE] = dp8393x_get(s, width, data, 0);
-     DPRINTF("load cam done. cam enable mask 0x%04x\n", s->regs[SONIC_CE]);
- 
-     /* Done */
-@@ -293,10 +317,10 @@ static void dp8393x_do_read_rra(dp8393xState *s)
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
- 
-     /* Update SONIC registers */
--    s->regs[SONIC_CRBA0] = data[0 * width];
--    s->regs[SONIC_CRBA1] = data[1 * width];
--    s->regs[SONIC_RBWC0] = data[2 * width];
--    s->regs[SONIC_RBWC1] = data[3 * width];
-+    s->regs[SONIC_CRBA0] = dp8393x_get(s, width, data, 0);
-+    s->regs[SONIC_CRBA1] = dp8393x_get(s, width, data, 1);
-+    s->regs[SONIC_RBWC0] = dp8393x_get(s, width, data, 2);
-+    s->regs[SONIC_RBWC1] = dp8393x_get(s, width, data, 3);
-     DPRINTF("CRBA0/1: 0x%04x/0x%04x, RBWC0/1: 0x%04x/0x%04x\n",
-         s->regs[SONIC_CRBA0], s->regs[SONIC_CRBA1],
-         s->regs[SONIC_RBWC0], s->regs[SONIC_RBWC1]);
-@@ -411,12 +435,12 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-         tx_len = 0;
- 
-         /* Update registers */
--        s->regs[SONIC_TCR] = data[0 * width] & 0xf000;
--        s->regs[SONIC_TPS] = data[1 * width];
--        s->regs[SONIC_TFC] = data[2 * width];
--        s->regs[SONIC_TSA0] = data[3 * width];
--        s->regs[SONIC_TSA1] = data[4 * width];
--        s->regs[SONIC_TFS] = data[5 * width];
-+        s->regs[SONIC_TCR] = dp8393x_get(s, width, data, 0) & 0xf000;
-+        s->regs[SONIC_TPS] = dp8393x_get(s, width, data, 1);
-+        s->regs[SONIC_TFC] = dp8393x_get(s, width, data, 2);
-+        s->regs[SONIC_TSA0] = dp8393x_get(s, width, data, 3);
-+        s->regs[SONIC_TSA1] = dp8393x_get(s, width, data, 4);
-+        s->regs[SONIC_TFS] = dp8393x_get(s, width, data, 5);
- 
-         /* Handle programmable interrupt */
-         if (s->regs[SONIC_TCR] & SONIC_TCR_PINT) {
-@@ -442,9 +466,9 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-                 address_space_rw(&s->as,
-                     dp8393x_ttda(s) + sizeof(uint16_t) * (4 + 3 * i) * width,
-                     MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--                s->regs[SONIC_TSA0] = data[0 * width];
--                s->regs[SONIC_TSA1] = data[1 * width];
--                s->regs[SONIC_TFS] = data[2 * width];
-+                s->regs[SONIC_TSA0] = dp8393x_get(s, width, data, 0);
-+                s->regs[SONIC_TSA1] = dp8393x_get(s, width, data, 1);
-+                s->regs[SONIC_TFS] = dp8393x_get(s, width, data, 2);
-             }
-         }
- 
-@@ -471,7 +495,8 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-         s->regs[SONIC_TCR] |= SONIC_TCR_PTX;
- 
-         /* Write status */
--        data[0 * width] = s->regs[SONIC_TCR] & 0x0fff; /* status */
-+        dp8393x_put(s, width, data, 0,
-+                    s->regs[SONIC_TCR] & 0x0fff); /* status */
-         size = sizeof(uint16_t) * width;
-         address_space_rw(&s->as,
-             dp8393x_ttda(s),
-@@ -485,8 +510,8 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-                              sizeof(uint16_t) *
-                              (4 + 3 * s->regs[SONIC_TFC]) * width,
-                 MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--            s->regs[SONIC_CTDA] = data[0 * width] & ~0x1;
--            if (data[0 * width] & 0x1) {
-+            s->regs[SONIC_CTDA] = dp8393x_get(s, width, data, 0) & ~0x1;
-+            if (dp8393x_get(s, width, data, 0) & 0x1) {
-                 /* EOL detected */
-                 break;
-             }
-@@ -749,7 +774,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-         address = dp8393x_crda(s) + sizeof(uint16_t) * 5 * width;
-         address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
-                          (uint8_t *)data, size, 0);
--        if (data[0 * width] & 0x1) {
-+        if (dp8393x_get(s, width, data, 0) & 0x1) {
-             /* Still EOL ; stop reception */
-             return -1;
-         } else {
-@@ -793,11 +818,11 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
- 
-     /* Write status to memory */
-     DPRINTF("Write status at %08x\n", dp8393x_crda(s));
--    data[0 * width] = s->regs[SONIC_RCR]; /* status */
--    data[1 * width] = rx_len; /* byte count */
--    data[2 * width] = s->regs[SONIC_TRBA0]; /* pkt_ptr0 */
--    data[3 * width] = s->regs[SONIC_TRBA1]; /* pkt_ptr1 */
--    data[4 * width] = s->regs[SONIC_RSC]; /* seq_no */
-+    dp8393x_put(s, width, data, 0, s->regs[SONIC_RCR]); /* status */
-+    dp8393x_put(s, width, data, 1, rx_len); /* byte count */
-+    dp8393x_put(s, width, data, 2, s->regs[SONIC_TRBA0]); /* pkt_ptr0 */
-+    dp8393x_put(s, width, data, 3, s->regs[SONIC_TRBA1]); /* pkt_ptr1 */
-+    dp8393x_put(s, width, data, 4, s->regs[SONIC_RSC]); /* seq_no */
-     size = sizeof(uint16_t) * 5 * width;
-     address_space_rw(&s->as, dp8393x_crda(s),
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 1);
-@@ -806,12 +831,12 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-     size = sizeof(uint16_t) * width;
-     address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 5 * width,
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--    s->regs[SONIC_LLFA] = data[0 * width];
-+    s->regs[SONIC_LLFA] = dp8393x_get(s, width, data, 0);
-     if (s->regs[SONIC_LLFA] & 0x1) {
-         /* EOL detected */
-         s->regs[SONIC_ISR] |= SONIC_ISR_RDE;
-     } else {
--        data[0 * width] = 0; /* in_use */
-+        dp8393x_put(s, width, data, 0, 0); /* in_use */
-         address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 6 * width,
-             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, sizeof(uint16_t), 1);
-         s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
-@@ -924,6 +949,7 @@ static Property dp8393x_properties[] = {
-     DEFINE_NIC_PROPERTIES(dp8393xState, conf),
-     DEFINE_PROP_PTR("dma_mr", dp8393xState, dma_mr),
-     DEFINE_PROP_UINT8("it_shift", dp8393xState, it_shift, 0),
-+    DEFINE_PROP_BOOL("big_endian", dp8393xState, big_endian, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
++static void q800_machine_init(MachineClass *mc)
++{
++    mc->desc = "Macintosh Quadra 800";
++    mc->init = q800_init;
++    mc->default_cpu_type = M68K_CPU_TYPE_NAME("m68040");
++    mc->max_cpus = 1;
++    mc->is_default = 0;
++    mc->block_default_type = IF_SCSI;
++}
++
++DEFINE_MACHINE("q800", q800_machine_init)
 -- 
 2.21.0
 
