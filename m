@@ -2,142 +2,88 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9CBCC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:24:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78BC3C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:26:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E2812067B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:24:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E2812067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 34F742067B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:26:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YntOMk+n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34F742067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7g8X-0004SN-Kc
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 09:24:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39330)
+	id 1i7g9n-0005an-9f
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 09:26:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39591)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i7g7h-0003eV-0q
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:23:58 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i7g8k-0004ot-I1
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:25:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i7g7f-0000sB-K9
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:23:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36110)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i7g7Y-0000oD-O6; Tue, 10 Sep 2019 09:23:48 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D112A18CB901;
- Tue, 10 Sep 2019 13:23:47 +0000 (UTC)
-Received: from [10.10.120.64] (ovpn-120-64.rdu2.redhat.com [10.10.120.64])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D63945C258;
- Tue, 10 Sep 2019 13:23:45 +0000 (UTC)
-To: Stefan Hajnoczi <stefanha@gmail.com>
-References: <20190809201333.29033-1-jsnow@redhat.com>
- <b85698e6-cd79-a9c5-554c-c92487060280@virtuozzo.com>
- <154bc276-d782-443f-3db6-38d87992d609@redhat.com>
- <20190910081942.GA23976@stefanha-x1.localdomain>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <9bf835d7-8bfa-feba-c2f7-acd6cda4a81e@redhat.com>
-Date: Tue, 10 Sep 2019 09:23:44 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <alex.bennee@linaro.org>) id 1i7g8i-0001NA-Ls
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:25:02 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:37050)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i7g8i-0001MV-De
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 09:25:00 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id i1so19641833wro.4
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 06:25:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=BZ2rS/k3ba9v52aMpOLGscrWBPgLIF2nr2uDDFMJe4M=;
+ b=YntOMk+n/5KkZTJkjBo3U5CitgyIzfYXt5qHrovc923SmHALGt9MHAnkQa+kEtKbA+
+ +zjYQVYhR6sYZVsKw7egu/6+LBMoUTohuEMKdWnb/te2Z00+2i31otaPUgpOxKGVap7/
+ kUUMZESUHENOS6JW2HbG0zG7oyMpPtvQzPcOYAX+c1OCWJMtDyiY6Ad5TPcX560rcqE2
+ rXBDyELdOFcDRLlRzu+cWBJin5XgSolieZi7obBrP3n7MNS5YPryj8FiPgaCcvgd4x8x
+ L/HKdR5U7v4UyMsTnI6sMfGeZIULPovi3PUBKuBCq4G/6VQuYFZCLpOz4E9d7IRVtRD+
+ Sxrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=BZ2rS/k3ba9v52aMpOLGscrWBPgLIF2nr2uDDFMJe4M=;
+ b=cQNNup5KbVV3vwgpbqEogvOY0TlDB8YRDCp6cfKT6ww5ygwKO7NMV65/DHdO3gCAVa
+ WhAZP8tOlXMaIduo1HFmn82zSQdgASay7QyHK0IzAhDxBufSn1Rqp+TJ00/Gl2/z/D/2
+ ELwkRIx6eeJrT77pzF9uOusPSy3MrrjtZuKsioHoXQtcfCoFPrkWzVd1LqLbCKPt+yyQ
+ gd3j09ghnop5uzx0M/T1tgub5FxVPOn0mmg+3a+272OQwC8exLd6D62qEPFx5VJBMPRO
+ +j+uM3l72ePFZWkVHMHHv7QIb84BSc0dvb7ZVg7482kOinaI3FXX9doZtc6QXoVEEEnZ
+ WQGQ==
+X-Gm-Message-State: APjAAAUU+tr3qYHtzIF06SYUJLghGMj956E8GBldEeHbMmlDEvOKCYx9
+ koV6QsW7Q+nCKuyegkRfDQ29eQ==
+X-Google-Smtp-Source: APXvYqxDzP1yqHEGm0WoEAlZH2gJlsG7U1W488ti9Hnf8qzhT05fj3WzjhCAsTXpi6DzD/hXZ226nw==
+X-Received: by 2002:a5d:5642:: with SMTP id j2mr17434776wrw.345.1568121897703; 
+ Tue, 10 Sep 2019 06:24:57 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f143sm3452261wme.40.2019.09.10.06.24.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 10 Sep 2019 06:24:56 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 27E6C1FF87;
+ Tue, 10 Sep 2019 14:24:56 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Date: Tue, 10 Sep 2019 14:24:56 +0100
+Message-Id: <20190910132456.26023-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190910081942.GA23976@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Tue, 10 Sep 2019 13:23:47 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/backup: install
- notifier during creation
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42c
+Subject: [Qemu-devel] [PULL v2 00/46] testing updates (fixes, upgrades,
+ caching)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -149,159 +95,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The following changes since commit 89ea03a7dc83ca36b670ba7f787802791fcb04b1:
 
+  Merge remote-tracking branch 'remotes/huth-gitlab/tags/m68k-pull-2019-09-07' into staging (2019-09-09 09:48:34 +0100)
 
-On 9/10/19 4:19 AM, Stefan Hajnoczi wrote:
-> On Wed, Aug 21, 2019 at 04:01:52PM -0400, John Snow wrote:
->>
->>
->> On 8/21/19 10:41 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> 09.08.2019 23:13, John Snow wrote:
->>>> Backup jobs may yield prior to installing their handler, because of =
-the
->>>> job_co_entry shim which guarantees that a job won't begin work until
->>>> we are ready to start an entire transaction.
->>>>
->>>> Unfortunately, this makes proving correctness about transactional
->>>> points-in-time for backup hard to reason about. Make it explicitly c=
-lear
->>>> by moving the handler registration to creation time, and changing th=
-e
->>>> write notifier to a no-op until the job is started.
->>>>
->>>> Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>> ---
->>>>   block/backup.c     | 32 +++++++++++++++++++++++---------
->>>>   include/qemu/job.h |  5 +++++
->>>>   job.c              |  2 +-
->>>>   3 files changed, 29 insertions(+), 10 deletions(-)
->>>>
->>>> diff --git a/block/backup.c b/block/backup.c
->>>> index 07d751aea4..4df5b95415 100644
->>>> --- a/block/backup.c
->>>> +++ b/block/backup.c
->>>> @@ -344,6 +344,13 @@ static int coroutine_fn backup_before_write_not=
-ify(
->>>>       assert(QEMU_IS_ALIGNED(req->offset, BDRV_SECTOR_SIZE));
->>>>       assert(QEMU_IS_ALIGNED(req->bytes, BDRV_SECTOR_SIZE));
->>>>  =20
->>>> +    /* The handler is installed at creation time; the actual point-=
-in-time
->>>> +     * starts at job_start(). Transactions guarantee those two poin=
-ts are
->>>> +     * the same point in time. */
->>>> +    if (!job_started(&job->common.job)) {
->>>> +        return 0;
->>>> +    }
->>>
->>> Hmm, sorry if it is a stupid question, I'm not good in multiprocessin=
-g and in
->>> Qemu iothreads..
->>>
->>> job_started just reads job->co. If bs runs in iothread, and therefore=
- write-notifier
->>> is in iothread, when job_start is called from main thread.. Is it gua=
-ranteed that
->>> write-notifier will see job->co variable change early enough to not m=
-iss guest write?
->>> Should not job->co be volatile for example or something like this?
->>>
->>> If not think about this patch looks good for me.
->>>
->>
->> You know, it's a really good question.
->> So good, in fact, that I have no idea.
->>
->> =C2=AF\_(=E3=83=84)_/=C2=AF
->>
->> I'm fairly certain that IO will not come in until the .clean phase of =
-a
->> qmp_transaction, because bdrv_drained_begin(bs) is called during
->> .prepare, and we activate the handler (by starting the job) in .commit=
-.
->> We do not end the drained section until .clean.
->>
->> I'm not fully clear on what threading guarantees we have otherwise,
->> though; is it possible that "Thread A" would somehow lift the bdrv_dra=
-in
->> on an IO thread ("Thread B") and, after that, "Thread B" would somehow
->> still be able to see an outdated version of job->co that was set by
->> "Thread A"?
->>
->> I doubt it; but I can't prove it.
->=20
-> In the qmp_backup() case (not qmp_transaction()) there is:
->=20
->   void qmp_drive_backup(DriveBackup *arg, Error **errp)
->   {
->=20
->       BlockJob *job;
->       job =3D do_drive_backup(arg, NULL, errp);
->       if (job) {
->           job_start(&job->job);
->       }
->   }
->=20
-> job_start() is called without any thread synchronization, which is
-> usually fine because the coroutine doesn't run until job_start() calls
-> aio_co_enter().
->=20
-> Now that the before write notifier has been installed early, there is
-> indeed a race between job_start() and the write notifier accessing
-> job->co from an IOThread.
->=20
-> The write before notifier might see job->co !=3D NULL before job_start(=
-)
-> has finished.  This could lead to issues if job_*() APIs are invoked by
-> the write notifier and access an in-between job state.
->=20
+are available in the Git repository at:
 
-I see. I think in this case, as long as it sees !=3D NULL, that the
-notifier is actually safe to run. I agree that this might be confusing
-to verify and could bite us in the future. The worry we had, too, is
-more the opposite: will it see NULL for too long? We want to make sure
-that it is registering as true *before the first yield*.
+  https://github.com/stsquad/qemu.git tags/pull-testing-next-100919-2
 
-> A safer approach is to set a BackupBlockJob variable at the beginning o=
-f
-> backup_run() and check it from the before write notifier.
->=20
+for you to fetch changes up to dda60da384ddbe4fc75182dd23db7e9aa4a88f46:
 
-That's too late, for reasons below.
+  tests/tcg: fix typo when calling clean-tcg (2019-09-10 14:14:32 +0100)
 
-> That said, I don't understand the benefit of this patch and IMO it make=
-s
-> the code harder to understand because now we need to think about the
-> created but not started state too.
->=20
-> Stefan
->=20
+----------------------------------------------------------------
+Testing fixes:
 
-It's always possible I've hyped myself up into believing there's a
-problem where there isn't one, but the fear is this:
+  - podman cleanups
+  - docker.py python3 fixes (encode)
+  - DEF_TARGET_LIST applied to cross build images
+  - move a bunch to Buster based images
+  - enable Travis caching
+  - more common objs for faster builds
+  - stable URLs for acceptance tests
+  - additional travis dependencies
+  - work around ppc64abi32 linux-test breakage [v2]
 
-The point in time from a QMP transaction covers the job creation and the
-job start, but when we start the job it will actually yield before we
-get to backup_run -- and there is no guarantee that the handler will get
-installed synchronously, so the point in time ends before the handler
-activates.
+----------------------------------------------------------------
+Alex Bennée (29):
+      configure: clean-up container cross compile detect
+      tests/docker: fix "cc" command to work with podman
+      tests/docker: handle missing encoding keyword for subprocess.check_output
+      tests/docker: fix final missing .encode when parsing solibs
+      tests/tcg: add .gitignore for in source builds
+      tests/docker: move DEF_TARGET_LIST setting to common.rc
+      tests/docker: set DEF_TARGET_LIST for some containers
+      tests/docker: add Buster to DOCKER_PARTIAL_IMAGES
+      tests/docker: move our arm64 cross compile to Buster
+      tests/docker: move our powerpc cross compile to Buster
+      tests/docker: move our Alpha cross compile to Buster
+      tests/docker: move our HPPA cross compile to Buster
+      tests/docker: move our m68k cross compile to Buster
+      tests/docker: move our sparc64 cross compile to Buster
+      tests/docker: move our sh4 cross compile to Buster
+      tests/docker: move our mips64 cross compile to Buster
+      tests/docker: move our riscv64 cross compile to Buster
+      tests/docker: move our ppc64 cross compile to Buster
+      tests/docker: update Debian Sid image
+      tests/docker: pin powerpc-user-cross to a snapshot
+      tests/docker: add debian-xtensa-cross to DEBIAN_PARTIAL_IMAGES
+      tests/docker: add debian9-mxe to DEBIAN_PARTIAL_IMAGES
+      tests/docker: avoid $SHELL invoke bash directly
+      tests/docker: add debian-amd64-cross for non-x86 hosts
+      tests/docker: use --arch-only for installing deps
+      tests/docker: add more images to PARTIAL_IMAGES when not on x86_64
+      tests/docker: --disable-libssh on ubuntu1804 builds
+      configure: check if --no-pie is supported first
+      tests/tcg: fix typo when calling clean-tcg
 
-The yield occurs in job_co_entry as an intentional feature of forcing a
-yield and pause point at run time -- so it's harder to write a job that
-accidentally hogs the thread during initialization.
+Cleber Rosa (1):
+      Fedora images: use URLs from stable "archives.fedoraproject.org"
 
-This is an attempt to get the handler installed earlier to ensure the
-point of time stays synchronized with creation time to provide a
-stronger transactional guarantee.
+John Snow (1):
+      tests/docker: Use --userns=keep-id for podman
+
+Paolo Bonzini (3):
+      tests/tcg: use EXTRA_CFLAGS everywhere
+      tests/tcg: cleanup Makefile inclusions
+      tests/tcg: move configuration to a sub-shell script
+
+Philippe Mathieu-Daudé (10):
+      .travis.yml: Enable multiple caching features
+      .travis.yml: Increase cache timeout from 3min to 20min
+      .travis.yml: Cache Python PIP packages
+      .travis.yml: Cache Avocado cache
+      .travis.yml: Improve ccache use
+      .travis.yml: Enable ccache on OSX
+      .travis.yml: Document how the build matrix use caches
+      .travis.yml: Cache Linux/GCC 'debug profile' jobs together
+      .travis.yml: Cache Linux/GCC 'non-debug profile' jobs together
+      .travis.yml: Cache Linux/Clang jobs together
+
+Thomas Huth (2):
+      hw/misc: Mark most objects as "common" code to speed up compilation a litte bit
+      travis.yml: Install libcap-dev for testing virito-9p
+
+ .shippable.yml                                     |   2 +
+ .travis.yml                                        |  40 +++-
+ Makefile                                           |   1 +
+ Makefile.target                                    |   3 -
+ configure                                          | 168 ++-------------
+ hw/misc/Makefile.objs                              |  90 ++++----
+ qemu-doc.texi                                      |   6 +-
+ tests/Makefile.include                             |  25 ++-
+ tests/acceptance/boot_linux_console.py             |  25 ++-
+ tests/acceptance/linux_initrd.py                   |   5 +-
+ tests/docker/Makefile.include                      |  58 +++--
+ tests/docker/common.rc                             |   4 +
+ tests/docker/docker.py                             |  51 +++--
+ tests/docker/dockerfiles/debian-alpha-cross.docker |   7 +-
+ tests/docker/dockerfiles/debian-amd64-cross.docker |  22 ++
+ tests/docker/dockerfiles/debian-arm64-cross.docker |   7 +-
+ tests/docker/dockerfiles/debian-armel-cross.docker |   3 +-
+ tests/docker/dockerfiles/debian-armhf-cross.docker |   3 +-
+ .../dockerfiles/debian-buster-arm64-cross.docker   |  16 --
+ tests/docker/dockerfiles/debian-hppa-cross.docker  |   5 +-
+ tests/docker/dockerfiles/debian-m68k-cross.docker  |   5 +-
+ tests/docker/dockerfiles/debian-mips-cross.docker  |   7 +-
+ .../docker/dockerfiles/debian-mips64-cross.docker  |   5 +-
+ .../dockerfiles/debian-mips64el-cross.docker       |   3 +-
+ .../docker/dockerfiles/debian-mipsel-cross.docker  |   2 +-
+ .../docker/dockerfiles/debian-powerpc-cross.docker |   8 +-
+ .../dockerfiles/debian-powerpc-user-cross.docker   |   8 +-
+ tests/docker/dockerfiles/debian-ppc64-cross.docker |   7 +-
+ .../docker/dockerfiles/debian-ppc64el-cross.docker |   3 +-
+ .../docker/dockerfiles/debian-riscv64-cross.docker |   5 +-
+ tests/docker/dockerfiles/debian-s390x-cross.docker |   3 +-
+ tests/docker/dockerfiles/debian-sh4-cross.docker   |   5 +-
+ tests/docker/dockerfiles/debian-sid.docker         |  24 +--
+ .../docker/dockerfiles/debian-sparc64-cross.docker |   5 +-
+ tests/docker/dockerfiles/ubuntu1804.docker         |   3 +
+ tests/docker/run                                   |   4 +-
+ tests/docker/test-build                            |   1 -
+ tests/docker/test-mingw                            |   1 -
+ tests/docker/test-quick                            |   1 -
+ tests/tcg/.gitignore                               |   5 +
+ tests/tcg/Makefile.include                         |  88 --------
+ tests/tcg/Makefile.prereqs                         |  18 ++
+ tests/tcg/Makefile.probe                           |  31 ---
+ tests/tcg/Makefile.qemu                            |  95 +++++++++
+ tests/tcg/{Makefile => Makefile.target}            |  15 +-
+ tests/tcg/aarch64/Makefile.include                 |   8 -
+ tests/tcg/aarch64/Makefile.softmmu-target          |   4 +-
+ tests/tcg/aarch64/Makefile.target                  |  12 +-
+ tests/tcg/alpha/Makefile.include                   |   2 -
+ tests/tcg/alpha/Makefile.softmmu-target            |   4 +-
+ tests/tcg/arm/Makefile.include                     |   8 -
+ tests/tcg/arm/Makefile.softmmu-target              |   6 +-
+ tests/tcg/configure.sh                             | 234 +++++++++++++++++++++
+ tests/tcg/cris/Makefile.include                    |   6 -
+ tests/tcg/hppa/Makefile.include                    |   2 -
+ tests/tcg/i386/Makefile.include                    |   9 -
+ tests/tcg/i386/Makefile.softmmu-target             |  12 +-
+ tests/tcg/i386/Makefile.target                     |  13 +-
+ tests/tcg/m68k/Makefile.include                    |   2 -
+ tests/tcg/minilib/Makefile.target                  |   2 +-
+ tests/tcg/mips/Makefile.include                    |  20 --
+ tests/tcg/multiarch/Makefile.target                |   7 +-
+ tests/tcg/ppc/Makefile.include                     |  10 -
+ tests/tcg/riscv/Makefile.include                   |  10 -
+ tests/tcg/s390x/Makefile.include                   |   2 -
+ tests/tcg/sh4/Makefile.include                     |   4 -
+ tests/tcg/sparc64/Makefile.include                 |   2 -
+ tests/tcg/x86_64/Makefile.softmmu-target           |  36 ++++
+ tests/tcg/x86_64/Makefile.target                   |   7 +-
+ tests/tcg/xtensa/Makefile.include                  |  11 -
+ tests/tcg/xtensa/Makefile.softmmu-target           |   4 +-
+ tests/vm/fedora                                    |   2 +-
+ 72 files changed, 721 insertions(+), 611 deletions(-)
+ create mode 100644 tests/docker/dockerfiles/debian-amd64-cross.docker
+ delete mode 100644 tests/docker/dockerfiles/debian-buster-arm64-cross.docker
+ create mode 100644 tests/tcg/.gitignore
+ delete mode 100644 tests/tcg/Makefile.include
+ create mode 100644 tests/tcg/Makefile.prereqs
+ delete mode 100644 tests/tcg/Makefile.probe
+ create mode 100644 tests/tcg/Makefile.qemu
+ rename tests/tcg/{Makefile => Makefile.target} (90%)
+ delete mode 100644 tests/tcg/aarch64/Makefile.include
+ delete mode 100644 tests/tcg/alpha/Makefile.include
+ delete mode 100644 tests/tcg/arm/Makefile.include
+ create mode 100755 tests/tcg/configure.sh
+ delete mode 100644 tests/tcg/cris/Makefile.include
+ delete mode 100644 tests/tcg/hppa/Makefile.include
+ delete mode 100644 tests/tcg/i386/Makefile.include
+ delete mode 100644 tests/tcg/m68k/Makefile.include
+ delete mode 100644 tests/tcg/mips/Makefile.include
+ delete mode 100644 tests/tcg/ppc/Makefile.include
+ delete mode 100644 tests/tcg/riscv/Makefile.include
+ delete mode 100644 tests/tcg/s390x/Makefile.include
+ delete mode 100644 tests/tcg/sh4/Makefile.include
+ delete mode 100644 tests/tcg/sparc64/Makefile.include
+ create mode 100644 tests/tcg/x86_64/Makefile.softmmu-target
+ delete mode 100644 tests/tcg/xtensa/Makefile.include
+
+--
+2.20.1
+
 
