@@ -2,66 +2,90 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 461FDC49ED9
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 23:08:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E119C49ED7
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 23:27:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1946F2168B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 23:08:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1946F2168B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 38C0821A4C
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 23:27:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="opmrWUwe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38C0821A4C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7pFg-0001CH-AO
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 19:08:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35271)
+	id 1i7pXe-0005qp-65
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 19:27:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37421)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i7pEU-0000WD-RY
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 19:07:35 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i7pWk-00052Q-9d
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 19:26:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i7pET-0004pr-BM
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 19:07:34 -0400
-Resent-Date: Tue, 10 Sep 2019 19:07:34 -0400
-Resent-Message-Id: <E1i7pET-0004pr-BM@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21512)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i7pET-0004ow-2o
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 19:07:33 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568156834; cv=none; d=zoho.com; s=zohoarc; 
- b=dF0NeD/o1wXoB02ZFZB/9oqcUarViQ2ERv7pQf6U7GxbrvXxPh4OBakzv+YfD4srm2lxfHtYsAzKvdY9U/IqcIb+BcgGciuV9vygLiHQ/cOjI/qIeQvP0KDmtDiirLh5guVIMjLCFsF+dUY/IzTPDoCXPoEKXm6oBp8r/issPKk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1568156834;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=z0WhTug2KCrxluQchMvvIFOGWXOQlBQQaLZgFtzhEQ8=; 
- b=lth7exdXLzE9cppJRqJzFapiMjNm4PrE1EcnDK73/IFEOH7jkYN/IrbJdiAR3HgSoSMR1LlSmDGYR0lVPcFk0wgPGbBZU8EGxL3d45+vDjLf6vuuJFEon1HivX9xFWfaG+x/4tFgGWuF4rDIsMs0OBxlSoIT+rb+dZ9HW+Zlj50=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1568156834087753.4861730579565;
- Tue, 10 Sep 2019 16:07:14 -0700 (PDT)
-In-Reply-To: <20190910120927.1669283-1-maozhongyi@cmss.chinamobile.com>
-Message-ID: <156815683288.15929.12759685314475360301@5dec9699b7de>
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i7pWj-00050J-7h
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 19:26:26 -0400
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:40070)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
+ id 1i7pWj-0004zd-26
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 19:26:25 -0400
+Received: by mail-qt1-x842.google.com with SMTP id g4so22976284qtq.7
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 16:26:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=umw90SX6/0hl/jRPXA5jQ4v+5K4DOeoQiu6PCv5G0w8=;
+ b=opmrWUwegx2vQMGxOUA3Le0I/5GLZQ6aQYqih9YxR/uP2IDjNn28srWUQ33E9g8+rA
+ fhS4EFzIRxeu7PAruAgGWZwztmfIUZx1ms/iZawqraCIBdMUSlueuLNi0G4RKs5Pk8tL
+ IkKXJKLM7BYajfFsS9NB70xUpxGWfFqc6rjOysdELV1tNCt9qC3XYWJt6zwEY7f/Fh75
+ /0Y6ZWnQ2zSAo9X+9I6B4+ccueOIHCvT2J8C7tUfAQKWrK9n79kN19txwx+WbtDYd2fw
+ yRdAC49O6676/OTjlp5LZqmZumeQeKEJcjX/fkj9H6xuGSilXhpkCzkxSNjaZE6K+1f0
+ t1hg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=umw90SX6/0hl/jRPXA5jQ4v+5K4DOeoQiu6PCv5G0w8=;
+ b=O6htYhSuHWoOEJVQZpU2ADsWixgvqUxQrhYJgBALuHHZJJga7Ynpl85uQ1guVa2pSu
+ KwNWbj76Zx/WhGjd7Pkx12Zt6m/qtjKmTjmFEYZj3UwE1Rz+TZHv87TzJoD/686XYRXU
+ sdPTvzUhg04apYfSjj94WwQx+Z2m7dywBRhwAtKkr9VvdV+NG6lcZUT4UePEIE+ZgP20
+ 6aniXJxGv3xfCyJX9AnEHpO6DJ+UyIoHqK6VvvYS4SBYkxM4qQ0Z0vgIu834+XSuaUx/
+ FngiNz70HWgXWy7WPyBr0gunBBM0PoJjIEkK8mWc+KliKzHLaP2ZjHRLhO4I5x196WUS
+ TppA==
+X-Gm-Message-State: APjAAAXFNs7M7W4vWVO/5KhI1PzOzZo2n3qZeGmuuP4WxHN5kNap3att
+ 5BSRRDezKksBrf8xQX2+FACnJL5M
+X-Google-Smtp-Source: APXvYqzjLSP90qR5tfm8a7hddEfNo4qaRvseGGrujAxaS9mRoQiP9e0zGaHXJOxS6Af8+Q699n4mlQ==
+X-Received: by 2002:ac8:7558:: with SMTP id b24mr31906989qtr.260.1568157983868; 
+ Tue, 10 Sep 2019 16:26:23 -0700 (PDT)
+Received: from decltype.home.dirty-ice.org
+ (2a01-036c-0113-6ea8-0001-0000-0000-00d3.pool6.digikabel.hu.
+ [2a01:36c:113:6ea8:1::d3])
+ by smtp.gmail.com with ESMTPSA id z5sm8804535qki.55.2019.09.10.16.26.22
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 10 Sep 2019 16:26:23 -0700 (PDT)
+From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
+ <dirty.ice.hu@gmail.com>
+X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
+ <DirtY.iCE.hu@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 11 Sep 2019 01:26:17 +0200
+Message-Id: <cover.1568157545.git.DirtY.iCE.hu@gmail.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: maozhongyi@cmss.chinamobile.com
-Date: Tue, 10 Sep 2019 16:07:14 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH 0/3] some fix in tests/migration
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::842
+Subject: [Qemu-devel] [PATCH 0/3] Audio: misc fixes for "Audio 20190821
+ patches", part two
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,43 +97,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: tony.nguyen@bt.com, laurent@vivier.eu, qemu-devel@nongnu.org,
- maozhongyi@cmss.chinamobile.com, armbru@redhat.com
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxMDEyMDkyNy4xNjY5
-MjgzLTEtbWFvemhvbmd5aUBjbXNzLmNoaW5hbW9iaWxlLmNvbS8KCgoKSGksCgpUaGlzIHNlcmll
-cyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJl
-bG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAw
-LzNdIHNvbWUgZml4IGluIHRlc3RzL21pZ3JhdGlvbgpNZXNzYWdlLWlkOiAyMDE5MDkxMDEyMDky
-Ny4xNjY5MjgzLTEtbWFvemhvbmd5aUBjbXNzLmNoaW5hbW9iaWxlLmNvbQpUeXBlOiBzZXJpZXMK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNl
-ID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
-bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
-MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
-dGVzdCcKMWExZDdiMSB0ZXN0cy9taWdyYXRpb27vvJpmaXggdW5yZWFjaGFibGUgcGF0aCBpbiBz
-dHJlc3MgdGVzdAo1YTE5YjllIHRlc3RzL21pZ3JhdGlvbjogZml4IGEgdHlwbyBpbiBjb21tZW50
-CjNiMWE4YjcgdGVzdHMvbWlncmF0aW9uOiBtZW0gbGVhayBmaXgKCj09PSBPVVRQVVQgQkVHSU4g
-PT09CjEvMyBDaGVja2luZyBjb21taXQgM2IxYThiN2E2MTdlICh0ZXN0cy9taWdyYXRpb246IG1l
-bSBsZWFrIGZpeCkKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBv
-ZiB0aGlzIHN0YXRlbWVudAojMjI6IEZJTEU6IHRlc3RzL21pZ3JhdGlvbi9zdHJlc3MuYzoxODQ6
-CisgICAgICAgIGlmIChkYXRhKQpbLi4uXQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA4
-IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMi8z
-IENoZWNraW5nIGNvbW1pdCA1YTE5YjllYjU3ZDkgKHRlc3RzL21pZ3JhdGlvbjogZml4IGEgdHlw
-byBpbiBjb21tZW50KQozLzMgQ2hlY2tpbmcgY29tbWl0IDFhMWQ3YjEwOTdiNCAodGVzdHMvbWln
-cmF0aW9u77yaZml4IHVucmVhY2hhYmxlIHBhdGggaW4gc3RyZXNzIHRlc3QpCj09PSBPVVRQVVQg
-RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cg
-aXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwOTEwMTIwOTI3LjE2
-NjkyODMtMS1tYW96aG9uZ3lpQGNtc3MuY2hpbmFtb2JpbGUuY29tL3Rlc3RpbmcuY2hlY2twYXRj
-aC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
-IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Hi,
+
+This series contains some random fixes for the "Audio 20190821 patches":
+a coverity bugfix and pulseaudio connection/stream names fix.
+
+Since there wasn't a clear consensus about naming the pa streams, I've
+split it into two commits: the first time just uses the audiodev id
+unconditionally, while the last commit adds a new option to qapi to
+override it.  This way we can easily drop the last commit if it turns
+out to be unnecessary.
+
+Regards,
+Zoltan
+
+
+Kővágó, Zoltán (3):
+  audio: fix parameter dereference before NULL check
+  audio: paaudio: fix connection and stream name
+  audio: paaudio: ability to specify stream name
+
+ audio/audio_template.h | 7 +++++--
+ audio/paaudio.c        | 9 ++++++---
+ qapi/audio.json        | 6 ++++++
+ 3 files changed, 17 insertions(+), 5 deletions(-)
+
+-- 
+2.23.0
 
 
