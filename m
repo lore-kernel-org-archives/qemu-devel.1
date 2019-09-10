@@ -2,66 +2,92 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C705C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 07:20:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1C83C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 07:21:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A38920872
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 07:20:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A38920872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9793820872
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 07:21:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9793820872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7aRc-0000QI-W8
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 03:20:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47859)
+	id 1i7aT0-0001dy-Ji
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 03:21:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48051)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1i7aQv-0008Jn-Bt
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:19:26 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i7aRa-0000YP-77
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:20:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1i7aQu-00023w-1J
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:19:25 -0400
-Received: from 2.mo2.mail-out.ovh.net ([188.165.53.149]:54266)
+ (envelope-from <mreitz@redhat.com>) id 1i7aRZ-0002M7-1m
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:20:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:6741)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i7aQt-000234-Rp
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 03:19:23 -0400
-Received: from player699.ha.ovh.net (unknown [10.109.160.93])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id A0C8A1A9261
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 09:19:21 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
- (Authenticated sender: clg@kaod.org)
- by player699.ha.ovh.net (Postfix) with ESMTPSA id AD75199E331C;
- Tue, 10 Sep 2019 07:19:12 +0000 (UTC)
-To: Balamuruhan S <bala24@linux.ibm.com>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org
-References: <20190910071019.16689-1-bala24@linux.ibm.com>
- <20190910071019.16689-3-bala24@linux.ibm.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <e311a420-f780-10e4-99fa-53f14599a518@kaod.org>
-Date: Tue, 10 Sep 2019 09:19:11 +0200
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i7aRV-0002Ko-JQ; Tue, 10 Sep 2019 03:20:01 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id CA4D1307D925;
+ Tue, 10 Sep 2019 07:20:00 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-90.ams2.redhat.com
+ [10.36.117.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B388E19C78;
+ Tue, 10 Sep 2019 07:19:59 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190903133553.6500-1-mreitz@redhat.com>
+ <20190903133553.6500-2-mreitz@redhat.com>
+ <CAFEAcA_Gpw14Hjr7rW0Z-9Ngj5Udbxv0ZEMZAo0W0PT0nCwe2g@mail.gmail.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <3311e590-d2c1-2388-27cf-981c917881ab@redhat.com>
+Date: Tue, 10 Sep 2019 09:19:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190910071019.16689-3-bala24@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 5654550807211051858
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudekjedguddufecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+In-Reply-To: <CAFEAcA_Gpw14Hjr7rW0Z-9Ngj5Udbxv0ZEMZAo0W0PT0nCwe2g@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="tTnX1J5qwIbG6BPojvtiRdHMT5IADGYTG"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Tue, 10 Sep 2019 07:20:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 188.165.53.149
-Subject: Re: [Qemu-devel] [PATCH v1 2/3] hw/ppc/pnv_occ: add sram device
- model for occ common area
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL v2 01/16] qemu-io: add pattern file for
+ write command
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,201 +99,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: maddy@linux.vnet.ibm.com, anju@linux.vnet.ibm.com, groug@kaod.org,
- hari@linux.vnet.ibm.com, david@gibson.dropbear.id.au
+Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/09/2019 09:10, Balamuruhan S wrote:
-> emulate occ common area region with occ sram device model which
-> occ and skiboot uses it to communicate regarding sensors, slw
-> and HWMON in PowerNV emulated host.
-> 
-> Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
-> ---
->  hw/ppc/pnv.c             |  8 +++++
->  hw/ppc/pnv_occ.c         | 78 ++++++++++++++++++++++++++++++++++++++++++++++++
->  include/hw/ppc/pnv_occ.h |  3 ++
->  3 files changed, 89 insertions(+)
-> 
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 3f08db7b9e..80338ffe87 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -938,6 +938,10 @@ static void pnv_chip_power8_realize(DeviceState *dev, Error **errp)
->          return;
->      }
->      pnv_xscom_add_subregion(chip, PNV_XSCOM_OCC_BASE, &chip8->occ.xscom_regs);
-> +
-> +    /* OCC SRAM model */
-> +    memory_region_add_subregion(get_system_memory(), PNV_OCC_COMMON_AREA(chip),
-> +                                &chip8->occ.sram_regs);
->  }
->  
->  static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data)
-> @@ -1126,6 +1130,10 @@ static void pnv_chip_power9_realize(DeviceState *dev, Error **errp)
->          return;
->      }
->      pnv_xscom_add_subregion(chip, PNV9_XSCOM_OCC_BASE, &chip9->occ.xscom_regs);
-> +
-> +    /* OCC SRAM model */
-> +    memory_region_add_subregion(get_system_memory(), PNV9_OCC_COMMON_AREA(chip),
-> +                                &chip9->occ.sram_regs);
->  }
->  
->  static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
-> diff --git a/hw/ppc/pnv_occ.c b/hw/ppc/pnv_occ.c
-> index 8bead2c930..785653bb67 100644
-> --- a/hw/ppc/pnv_occ.c
-> +++ b/hw/ppc/pnv_occ.c
-> @@ -30,6 +30,24 @@
->  #define OCB_OCI_OCCMISC_AND     0x4021
->  #define OCB_OCI_OCCMISC_OR      0x4022
->  
-> +/* OCC sensors */
-> +#define OCC_SENSOR_DATA_BLOCK_OFFSET          0x580000
-> +#define OCC_SENSOR_DATA_VALID                 0x580001
-> +#define OCC_SENSOR_DATA_VERSION               0x580002
-> +#define OCC_SENSOR_DATA_READING_VERSION       0x580004
-> +#define OCC_SENSOR_DATA_NR_SENSORS            0x580008
-> +#define OCC_SENSOR_DATA_NAMES_OFFSET          0x580010
-> +#define OCC_SENSOR_DATA_READING_PING_OFFSET   0x580014
-> +#define OCC_SENSOR_DATA_READING_PONG_OFFSET   0x58000c
-> +#define OCC_SENSOR_DATA_NAME_LENGTH           0x58000d
-> +#define OCC_SENSOR_NAME_STRUCTURE_TYPE        0x580023
-> +#define OCC_SENSOR_LOC_CORE                   0x580022
-> +#define OCC_SENSOR_LOC_GPU                    0x580020
-> +#define OCC_SENSOR_TYPE_POWER                 0x580003
-> +#define OCC_SENSOR_NAME                       0x580005
-> +#define HWMON_SENSORS_MASK                    0x58001e
-> +#define SLW_IMAGE_BASE                        0x0
-> +
->  static void pnv_occ_set_misc(PnvOCC *occ, uint64_t val)
->  {
->      bool irq_state;
-> @@ -82,6 +100,48 @@ static void pnv_occ_power8_xscom_write(void *opaque, hwaddr addr,
->      }
->  }
->  
-> +static uint64_t pnv_occ_common_area_read(void *opaque, hwaddr addr,
-> +                                         unsigned width)
-> +{
-> +    switch (addr) {
-> +    /*
-> +     * occ-sensor sanity check that asserts the sensor
-> +     * header block
-> +     */
-> +    case OCC_SENSOR_DATA_BLOCK_OFFSET:
-> +    case OCC_SENSOR_DATA_VALID:
-> +    case OCC_SENSOR_DATA_VERSION:
-> +    case OCC_SENSOR_DATA_READING_VERSION:
-> +    case OCC_SENSOR_DATA_NR_SENSORS:
-> +    case OCC_SENSOR_DATA_NAMES_OFFSET:
-> +    case OCC_SENSOR_DATA_READING_PING_OFFSET:
-> +    case OCC_SENSOR_DATA_READING_PONG_OFFSET:
-> +    case OCC_SENSOR_NAME_STRUCTURE_TYPE:
-> +        return 1;
-> +    case OCC_SENSOR_DATA_NAME_LENGTH:
-> +        return 0x30;
-> +    case OCC_SENSOR_LOC_CORE:
-> +        return 0x0040;
-> +    case OCC_SENSOR_TYPE_POWER:
-> +        return 0x0080;
-> +    case OCC_SENSOR_NAME:
-> +        return 0x1000;
-> +    case HWMON_SENSORS_MASK:
-> +    case OCC_SENSOR_LOC_GPU:
-> +        return 0x8e00;
-> +    case SLW_IMAGE_BASE:
-> +        return 0x1000000000000000;
-> +    }
-> +    return 0;
-> +}
-> +
-> +static void pnv_occ_common_area_write(void *opaque, hwaddr addr,
-> +                                             uint64_t val, unsigned width)
-> +{
-> +    /* callback function defined to occ common area write */
-> +    return;
-> +}
-> +
->  static const MemoryRegionOps pnv_occ_power8_xscom_ops = {
->      .read = pnv_occ_power8_xscom_read,
->      .write = pnv_occ_power8_xscom_write,
-> @@ -92,12 +152,24 @@ static const MemoryRegionOps pnv_occ_power8_xscom_ops = {
->      .endianness = DEVICE_BIG_ENDIAN,
->  };
->  
-> +const MemoryRegionOps pnv_occ_sram_ops = {
-> +    .read = pnv_occ_common_area_read,
-> +    .write = pnv_occ_common_area_write,
-> +    .valid.min_access_size = 1,
-> +    .valid.max_access_size = 8,
-> +    .impl.min_access_size = 1,
-> +    .impl.max_access_size = 8,
-> +    .endianness = DEVICE_BIG_ENDIAN,
-> +};
-> +
->  static void pnv_occ_power8_class_init(ObjectClass *klass, void *data)
->  {
->      PnvOCCClass *poc = PNV_OCC_CLASS(klass);
->  
->      poc->xscom_size = PNV_XSCOM_OCC_SIZE;
-> +    poc->sram_size = PNV_OCC_COMMON_AREA_SIZE;
->      poc->xscom_ops = &pnv_occ_power8_xscom_ops;
-> +    poc->sram_ops = &pnv_occ_sram_ops;
->      poc->psi_irq = PSIHB_IRQ_OCC;
->  }
->  
-> @@ -168,7 +240,9 @@ static void pnv_occ_power9_class_init(ObjectClass *klass, void *data)
->      PnvOCCClass *poc = PNV_OCC_CLASS(klass);
->  
->      poc->xscom_size = PNV9_XSCOM_OCC_SIZE;
-> +    poc->sram_size = PNV9_OCC_COMMON_AREA_SIZE;
->      poc->xscom_ops = &pnv_occ_power9_xscom_ops;
-> +    poc->sram_ops = &pnv_occ_sram_ops;
->      poc->psi_irq = PSIHB9_IRQ_OCC;
->  }
->  
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--tTnX1J5qwIbG6BPojvtiRdHMT5IADGYTG
+Content-Type: multipart/mixed; boundary="cmVWEzpepzzet2RUJHex68u5Swz3vl5Nd";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Qemu-block <qemu-block@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-ID: <3311e590-d2c1-2388-27cf-981c917881ab@redhat.com>
+Subject: Re: [PULL v2 01/16] qemu-io: add pattern file for write command
+References: <20190903133553.6500-1-mreitz@redhat.com>
+ <20190903133553.6500-2-mreitz@redhat.com>
+ <CAFEAcA_Gpw14Hjr7rW0Z-9Ngj5Udbxv0ZEMZAo0W0PT0nCwe2g@mail.gmail.com>
+In-Reply-To: <CAFEAcA_Gpw14Hjr7rW0Z-9Ngj5Udbxv0ZEMZAo0W0PT0nCwe2g@mail.gmail.com>
 
-do we plan to have different OCC SRAM operation per chip model ? 
+--cmVWEzpepzzet2RUJHex68u5Swz3vl5Nd
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-C.  
+On 09.09.19 19:26, Peter Maydell wrote:
+> On Tue, 3 Sep 2019 at 14:35, Max Reitz <mreitz@redhat.com> wrote:
+>>
+>> From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+>>
+>> The patch allows to provide a pattern file for write
+>> command. There was no similar ability before.
+>>
+>> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+>> Message-id: 20190820164616.4072-1-dplotnikov@virtuozzo.com
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> [mreitz: Keep optstring in alphabetical order]
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>=20
+> Hi; Coverity finds a FILE* leak in this code (CID 1405303):
 
-> @@ -199,6 +273,10 @@ static void pnv_occ_realize(DeviceState *dev, Error **errp)
->      /* XScom region for OCC registers */
->      pnv_xscom_region_init(&occ->xscom_regs, OBJECT(dev), poc->xscom_ops,
->                            occ, "xscom-occ", poc->xscom_size);
-> +
-> +    /* XScom region for OCC SRAM registers */
-> +    pnv_xscom_region_init(&occ->sram_regs, OBJECT(dev), poc->sram_ops,
-> +                          occ, "occ-common-area", poc->sram_size);
->  }
->  
->  static void pnv_occ_class_init(ObjectClass *klass, void *data)
-> diff --git a/include/hw/ppc/pnv_occ.h b/include/hw/ppc/pnv_occ.h
-> index ed0709bfc0..66b0989be6 100644
-> --- a/include/hw/ppc/pnv_occ.h
-> +++ b/include/hw/ppc/pnv_occ.h
-> @@ -38,6 +38,7 @@ typedef struct PnvOCC {
->      PnvPsi *psi;
->  
->      MemoryRegion xscom_regs;
-> +    MemoryRegion sram_regs;
->  } PnvOCC;
->  
->  #define PNV_OCC_CLASS(klass) \
-> @@ -49,7 +50,9 @@ typedef struct PnvOCCClass {
->      DeviceClass parent_class;
->  
->      int xscom_size;
-> +    int sram_size;
->      const MemoryRegionOps *xscom_ops;
-> +    const MemoryRegionOps *sram_ops;
->      int psi_irq;
->  } PnvOCCClass;
->  
-> 
+Thanks for the heads-up.  Denis, do you want to write a patch?
 
+Max
+
+>> +/*
+>> + * qemu_io_alloc_from_file()
+>> + *
+>> + * Allocates the buffer and populates it with the content of the give=
+n file
+>> + * up to @len bytes. If the file length is less than @len, then the b=
+uffer
+>> + * is populated with the file content cyclically.
+>> + *
+>> + * @blk - the block backend where the buffer content is going to be w=
+ritten to
+>> + * @len - the buffer length
+>> + * @file_name - the file to read the content from
+>> + *
+>> + * Returns: the buffer pointer on success
+>> + *          NULL on error
+>> + */
+>> +static void *qemu_io_alloc_from_file(BlockBackend *blk, size_t len,
+>> +                                     const char *file_name)
+>> +{
+>> +    char *buf, *buf_origin;
+>> +    FILE *f =3D fopen(file_name, "r");
+>=20
+> Here we allocate the FILE*...
+>=20
+>> +    int pattern_len;
+>> +
+>> +    if (!f) {
+>> +        perror(file_name);
+>> +        return NULL;
+>> +    }
+>> +
+>> +    if (qemuio_misalign) {
+>> +        len +=3D MISALIGN_OFFSET;
+>> +    }
+>> +
+>> +    buf_origin =3D buf =3D blk_blockalign(blk, len);
+>> +
+>> +    if (qemuio_misalign) {
+>> +        buf_origin +=3D MISALIGN_OFFSET;
+>> +        buf +=3D MISALIGN_OFFSET;
+>> +        len -=3D MISALIGN_OFFSET;
+>> +    }
+>> +
+>> +    pattern_len =3D fread(buf_origin, 1, len, f);
+>> +
+>> +    if (ferror(f)) {
+>> +        perror(file_name);
+>> +        goto error;
+>=20
+> ...but in this error-exit path...
+>=20
+>> +    }
+>> +
+>> +    if (pattern_len =3D=3D 0) {
+>> +        fprintf(stderr, "%s: file is empty\n", file_name);
+>> +        goto error;
+>=20
+> ...and this one...
+>=20
+>> +    }
+>> +
+>> +    fclose(f);
+>> +
+>> +    if (len > pattern_len) {
+>> +        len -=3D pattern_len;
+>> +        buf +=3D pattern_len;
+>> +
+>> +        while (len > 0) {
+>> +            size_t len_to_copy =3D MIN(pattern_len, len);
+>> +
+>> +            memcpy(buf, buf_origin, len_to_copy);
+>> +
+>> +            len -=3D len_to_copy;
+>> +            buf +=3D len_to_copy;
+>> +        }
+>> +    }
+>> +
+>> +    return buf_origin;
+>> +
+>> +error:
+>> +    qemu_io_free(buf_origin);
+>> +    return NULL;
+>=20
+> ...we go to the 'error' label and leave the function without
+> ever calling fclose(f).
+>=20
+>> +}
+>=20
+> thanks
+> -- PMM
+>=20
+
+
+
+--cmVWEzpepzzet2RUJHex68u5Swz3vl5Nd--
+
+--tTnX1J5qwIbG6BPojvtiRdHMT5IADGYTG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl13Tp0ACgkQ9AfbAGHV
+z0CMMAf+NwYpNzz5Cfb3aCEsDAwQPW3FXra5wJxKUo4VOtLd94NLtwxtSt6uQA5G
+zShdIi4Aj/afU4s+KH1QsnTyKIUNe0XWxZ5OStMqTd5ws/i1AYtE9/PXJifzOVBP
+YdrN2aM0XrV1AyVvT1kIN9//5SoDMnOaOyZBFhoAOCR0Tr1FRiLb7dteHQa8eiMi
+lU1vqOuYNpk7nhAW7Y4sFLnOUBUqBiq1R02vepuZpVWyBeHhAns8BA68b3QxyfHx
+Z+ZHOAHzsSnKcj0dRaFiZIVsRjIakkFEjf8WmaUwMq3qQYoIY2JimX0pnQUylcbX
+3znMIiO8Z6FDeFv8W7kCvNV6tWvB0Q==
+=qwRZ
+-----END PGP SIGNATURE-----
+
+--tTnX1J5qwIbG6BPojvtiRdHMT5IADGYTG--
 
