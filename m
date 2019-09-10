@@ -2,66 +2,52 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63D73C49ED9
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 16:29:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D84DDC49ED7
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 16:29:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28E4620872
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 16:29:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28E4620872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id ACC7E20872
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 16:29:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACC7E20872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7j0s-0006Bv-Vn
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 12:29:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45656)
+	id 1i7j1R-0006mS-Pj
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 12:29:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45790)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i7izC-0004kk-Si
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 12:27:23 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i7izL-0004qr-FE
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 12:27:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i7izB-0003MM-6F
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 12:27:22 -0400
-Resent-Date: Tue, 10 Sep 2019 12:27:22 -0400
-Resent-Message-Id: <E1i7izB-0003MM-6F@eggs.gnu.org>
-Received: from sender4-of-o58.zoho.com ([136.143.188.58]:21846)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i7izA-0003Lh-V4
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 12:27:21 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568131907; cv=none; d=zoho.com; s=zohoarc; 
- b=WTeTUSNaauabvmDYo/tVpszVI5Jbov0nP7O5l9VCBSgBhK58AlSG0sDTZC7Ddvom33DXuxzoiQaVfyLVTnxkVDLE0GZpldgJ64ApnPuFggOdCFCRNl/Cz+RF/gtCix2dHeveekNDrz4WRiUyE5XuU+ELtRzMcKJKjXmWYoFyfbs=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1568131907;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=WqzfyOiOlvAR9D4g3msTB3uPeRQQI+KgjRUqIJyVf7I=; 
- b=kCJX6dwPpKa+ObAiPFURDmPDcwirAAzGnIA1ZLcWFyS032rThvi1u7ScOefMpkSk5r+Y7BLqzrTNETfq1EdHZ3Cipf26YtlRMRgPdn06FjwyrsCSExYWlIloXFSSCVK3y0/atpPpeOo1j8nbqC1UtryjbLZHfD4GlFyQy9L4NxY=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1568131899687832.9717186304171;
- Tue, 10 Sep 2019 09:11:39 -0700 (PDT)
-In-Reply-To: <20190910120927.1669283-1-maozhongyi@cmss.chinamobile.com>
-Message-ID: <156813189852.15929.16513196627287571049@5dec9699b7de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: maozhongyi@cmss.chinamobile.com
-Date: Tue, 10 Sep 2019 09:11:39 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.58
-Subject: Re: [Qemu-devel] [PATCH 0/3] some fix in tests/migration
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i7izK-0003UC-3w
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 12:27:31 -0400
+Received: from relay.sw.ru ([185.231.240.75]:44320)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1i7izH-0003Q6-C1; Tue, 10 Sep 2019 12:27:27 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1i7izE-0001NT-9d; Tue, 10 Sep 2019 19:27:24 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Date: Tue, 10 Sep 2019 19:27:22 +0300
+Message-Id: <20190910162724.79574-2-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20190910162724.79574-1-vsementsov@virtuozzo.com>
+References: <20190910162724.79574-1-vsementsov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH 1/3] block: move
+ bdrv_can_store_new_dirty_bitmap to block/dirty-bitmap.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,43 +59,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: tony.nguyen@bt.com, laurent@vivier.eu, qemu-devel@nongnu.org,
- maozhongyi@cmss.chinamobile.com, armbru@redhat.com
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxMDEyMDkyNy4xNjY5
-MjgzLTEtbWFvemhvbmd5aUBjbXNzLmNoaW5hbW9iaWxlLmNvbS8KCgoKSGksCgpUaGlzIHNlcmll
-cyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJl
-bG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAw
-LzNdIHNvbWUgZml4IGluIHRlc3RzL21pZ3JhdGlvbgpNZXNzYWdlLWlkOiAyMDE5MDkxMDEyMDky
-Ny4xNjY5MjgzLTEtbWFvemhvbmd5aUBjbXNzLmNoaW5hbW9iaWxlLmNvbQpUeXBlOiBzZXJpZXMK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNl
-ID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
-bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
-MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
-dGVzdCcKZTRjNWRlMiB0ZXN0cy9taWdyYXRpb27vvJpmaXggdW5yZWFjaGFibGUgcGF0aCBpbiBz
-dHJlc3MgdGVzdAo5YTNiNzdmIHRlc3RzL21pZ3JhdGlvbjogZml4IGEgdHlwbyBpbiBjb21tZW50
-CmIyNzdkNTYgdGVzdHMvbWlncmF0aW9uOiBtZW0gbGVhayBmaXgKCj09PSBPVVRQVVQgQkVHSU4g
-PT09CjEvMyBDaGVja2luZyBjb21taXQgYjI3N2Q1NjkyNmI2ICh0ZXN0cy9taWdyYXRpb246IG1l
-bSBsZWFrIGZpeCkKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBv
-ZiB0aGlzIHN0YXRlbWVudAojMjI6IEZJTEU6IHRlc3RzL21pZ3JhdGlvbi9zdHJlc3MuYzoxODQ6
-CisgICAgICAgIGlmIChkYXRhKQpbLi4uXQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA4
-IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMi8z
-IENoZWNraW5nIGNvbW1pdCA5YTNiNzdmMTAwMTUgKHRlc3RzL21pZ3JhdGlvbjogZml4IGEgdHlw
-byBpbiBjb21tZW50KQozLzMgQ2hlY2tpbmcgY29tbWl0IGU0YzVkZTI3NTliOCAodGVzdHMvbWln
-cmF0aW9u77yaZml4IHVucmVhY2hhYmxlIHBhdGggaW4gc3RyZXNzIHRlc3QpCj09PSBPVVRQVVQg
-RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cg
-aXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwOTEwMTIwOTI3LjE2
-NjkyODMtMS1tYW96aG9uZ3lpQGNtc3MuY2hpbmFtb2JpbGUuY29tL3Rlc3RpbmcuY2hlY2twYXRj
-aC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
-IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+block/dirty-bitmap.c seems to be more appropriate for it and
+bdrv_remove_persistent_dirty_bitmap already in it.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block.c              | 22 ----------------------
+ block/dirty-bitmap.c | 22 ++++++++++++++++++++++
+ 2 files changed, 22 insertions(+), 22 deletions(-)
+
+diff --git a/block.c b/block.c
+index 5944124845..bea03cfcc9 100644
+--- a/block.c
++++ b/block.c
+@@ -6555,25 +6555,3 @@ void bdrv_del_child(BlockDriverState *parent_bs, BdrvChild *child, Error **errp)
+ 
+     parent_bs->drv->bdrv_del_child(parent_bs, child, errp);
+ }
+-
+-bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
+-                                     uint32_t granularity, Error **errp)
+-{
+-    BlockDriver *drv = bs->drv;
+-
+-    if (!drv) {
+-        error_setg_errno(errp, ENOMEDIUM,
+-                         "Can't store persistent bitmaps to %s",
+-                         bdrv_get_device_or_node_name(bs));
+-        return false;
+-    }
+-
+-    if (!drv->bdrv_can_store_new_dirty_bitmap) {
+-        error_setg_errno(errp, ENOTSUP,
+-                         "Can't store persistent bitmaps to %s",
+-                         bdrv_get_device_or_node_name(bs));
+-        return false;
+-    }
+-
+-    return drv->bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp);
+-}
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 134e0c9a0c..8f42015db9 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -464,6 +464,28 @@ void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+     }
+ }
+ 
++bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
++                                     uint32_t granularity, Error **errp)
++{
++    BlockDriver *drv = bs->drv;
++
++    if (!drv) {
++        error_setg_errno(errp, ENOMEDIUM,
++                         "Can't store persistent bitmaps to %s",
++                         bdrv_get_device_or_node_name(bs));
++        return false;
++    }
++
++    if (!drv->bdrv_can_store_new_dirty_bitmap) {
++        error_setg_errno(errp, ENOTSUP,
++                         "Can't store persistent bitmaps to %s",
++                         bdrv_get_device_or_node_name(bs));
++        return false;
++    }
++
++    return drv->bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp);
++}
++
+ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+ {
+     bdrv_dirty_bitmap_lock(bitmap);
+-- 
+2.18.0
 
 
