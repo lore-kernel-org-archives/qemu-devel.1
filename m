@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFEE3C4740A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:48:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C23C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:49:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89F8F208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:48:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89F8F208E4
+	by mail.kernel.org (Postfix) with ESMTPS id BF5DE208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:49:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF5DE208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7Zwn-00070r-5y
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 02:48:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38669)
+	id 1i7Zy4-00086k-Kc
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 02:49:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38674)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1i7ZmR-0004mO-SG
+ (envelope-from <armbru@redhat.com>) id 1i7ZmS-0004mk-37
  for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1i7ZmP-0007kZ-B2
+ (envelope-from <armbru@redhat.com>) id 1i7ZmQ-0007lB-2A
  for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45710)
+Received: from mx1.redhat.com ([209.132.183.28]:29800)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i7ZmO-0007jP-T7
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i7ZmP-0007kF-NG
  for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:33 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0ED5E308449F;
+ by mx1.redhat.com (Postfix) with ESMTPS id BAAAA9B286;
  Tue, 10 Sep 2019 06:37:32 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EB1E26012E;
- Tue, 10 Sep 2019 06:37:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C4B011001956;
+ Tue, 10 Sep 2019 06:37:29 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 561C01165609; Tue, 10 Sep 2019 08:37:24 +0200 (CEST)
+ id 4BE8C1165603; Tue, 10 Sep 2019 08:37:24 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 10 Sep 2019 08:37:24 +0200
-Message-Id: <20190910063724.28470-17-armbru@redhat.com>
+Date: Tue, 10 Sep 2019 08:37:21 +0200
+Message-Id: <20190910063724.28470-14-armbru@redhat.com>
 In-Reply-To: <20190910063724.28470-1-armbru@redhat.com>
 References: <20190910063724.28470-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 10 Sep 2019 06:37:32 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Tue, 10 Sep 2019 06:37:32 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 16/16] qapi: Tweak code to match
- docs/devel/qapi-code-gen.txt
+Subject: [Qemu-devel] [PATCH v2 13/16] docs/devel/qapi-code-gen: Rewrite
+ compatibility considerations
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,179 +75,153 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The previous commit made qapi-code-gen.txt define "(top-level)
-expression" as either "directive" or "definition".  The code still
-uses "expression" when it really means "definition".  Tidy up.
+We have some compatibility advice buried in sections "Enumeration
+types" and "Struct types".  Compatibility is actually about commands
+and events.  It devolves to the types used there.  All kinds of types,
+not just enumerations and structs.
 
-The previous commit made qapi-code-gen.txt use "object" rather than
-"dictionary".  The code still uses "dictionary".  Tidy up.
+Replace the existing advice by a new section "Compatibility
+considerations".
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/common.py                        | 24 +++++++++----------
- tests/qapi-schema/args-invalid.err            |  2 +-
- tests/qapi-schema/doc-missing.err             |  2 +-
- tests/qapi-schema/doc-no-symbol.err           |  2 +-
- .../qapi-schema/enum-dict-member-unknown.err  |  2 +-
- tests/qapi-schema/pragma-non-dict.err         |  2 +-
- tests/qapi-schema/struct-data-invalid.err     |  2 +-
- 7 files changed, 18 insertions(+), 18 deletions(-)
+ docs/devel/qapi-code-gen.txt | 95 +++++++++++++++++++++++-------------
+ 1 file changed, 60 insertions(+), 35 deletions(-)
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index f4630a5dd3..e86d196e5f 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -103,11 +103,11 @@ class QAPISemError(QAPIError):
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 663ef10a56..d09232009e 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -178,14 +178,11 @@ While the C code starts numbering at 0, it is bette=
+r to use explicit
+ comparisons to enum values than implicit comparisons to 0; the C code
+ will also include a generated enum member ending in _MAX for tracking
+ the size of the enum, useful when using common functions for
+-converting between strings and enum values.  Since the wire format
+-always passes by name, it is acceptable to reorder or add new
+-enumeration members in any location without breaking clients of Client
+-JSON Protocol; however, removing enum values would break
+-compatibility.  For any struct that has a member that will only contain
+-a finite set of string values, using an enum type for that member is
+-better than open-coding the member to be type 'str'.
++converting between strings and enum values.
 =20
- class QAPIDoc(object):
-     """
--    A documentation comment block, either expression or free-form
-+    A documentation comment block, either definition or free-form
++For any struct that has a member that will only contain a finite set
++of string values, using an enum type for that member is better than
++open-coding the member to be type 'str'.
 =20
--    Expression documentation blocks consist of
-+    Definition documentation blocks consist of
+ =3D=3D=3D Struct types =3D=3D=3D
 =20
--    * a body section: one line naming the expression, followed by an
-+    * a body section: one line naming the definition, followed by an
-       overview (any number of lines)
+@@ -203,34 +200,6 @@ name.  An example of a struct is:
+ The use of '*' as a prefix to the name means the member is optional in
+ the corresponding JSON protocol usage.
 =20
-     * argument sections: a description of each argument (for commands
-@@ -200,9 +200,9 @@ class QAPIDoc(object):
-         Process a line of documentation text in the body section.
+-The default initialization value of an optional argument should not be c=
+hanged
+-between versions of QEMU unless the new default maintains backward
+-compatibility to the user-visible behavior of the old default.
+-
+-With proper documentation, this policy still allows some flexibility; fo=
+r
+-example, documenting that a default of 0 picks an optimal buffer size al=
+lows
+-one release to declare the optimal size at 512 while another release dec=
+lares
+-the optimal size at 4096 - the user-visible behavior is not the bytes us=
+ed by
+-the buffer, but the fact that the buffer was optimal size.
+-
+-On input structures (only mentioned in the 'data' side of a command), ch=
+anging
+-from mandatory to optional is safe (older clients will supply the option=
+, and
+-newer clients can benefit from the default); changing from optional to
+-mandatory is backwards incompatible (older clients may be omitting the o=
+ption,
+-and must continue to work).
+-
+-On output structures (only mentioned in the 'returns' side of a command)=
+,
+-changing from mandatory to optional is in general unsafe (older clients =
+may be
+-expecting the member, and could crash if it is missing), although it
+-can be done if the only way that the optional argument will be omitted
+-is when it is triggered by the presence of a new input flag to the
+-command that older clients don't know to send.  Changing from optional
+-to mandatory is safe.
+-
+-A structure that is used in both input and output of various commands
+-must consider the backwards compatibility constraints of both directions
+-of use.
+-
+ A struct definition can specify another struct as its base.
+ In this case, the members of the base type are included as top-level mem=
+bers
+ of the new struct's dictionary in the Client JSON Protocol wire
+@@ -1037,6 +1006,62 @@ the names of built-in types.  Clients should exami=
+ne member
+ "json-type" instead of hard-coding names of built-in types.
 =20
-         If this a symbol line and it is the section's first line, this
--        is an expression documentation block for that symbol.
-+        is a definition documentation block for that symbol.
 =20
--        If it's an expression documentation block, another symbol line
-+        If it's a definition documentation block, another symbol line
-         begins the argument section for the argument named by it, and
-         a section tag begins an additional section.  Start that
-         section and append the line to it.
-@@ -220,7 +220,7 @@ class QAPIDoc(object):
-             if not self.symbol:
-                 raise QAPIParseError(self._parser, "Invalid name")
-         elif self.symbol:
--            # This is an expression documentation block
-+            # This is a definition documentation block
-             if name.startswith('@') and name.endswith(':'):
-                 self._append_line =3D self._append_args_line
-                 self._append_args_line(line)
-@@ -428,7 +428,7 @@ class QAPISchemaParser(object):
-                 pragma =3D expr['pragma']
-                 if not isinstance(pragma, dict):
-                     raise QAPISemError(
--                        info, "Value of 'pragma' must be a dictionary")
-+                        info, "Value of 'pragma' must be an object")
-                 for name, value in pragma.items():
-                     self._pragma(name, value, info)
-             else:
-@@ -437,7 +437,7 @@ class QAPISchemaParser(object):
-                 if cur_doc:
-                     if not cur_doc.symbol:
-                         raise QAPISemError(
--                            cur_doc.info, "Expression documentation requ=
-ired")
-+                            cur_doc.info, "Definition documentation requ=
-ired")
-                     expr_elem['doc'] =3D cur_doc
-                 self.exprs.append(expr_elem)
-             cur_doc =3D None
-@@ -786,7 +786,7 @@ def check_type(info, source, value,
++=3D=3D Compatibility considerations =3D=3D
++
++Maintaining backward compatibility at the Client JSON Protocol level
++while evolving the schema requires some care.  This section is about
++syntactic compatibility.  Necessary, but not sufficient for actual
++compatibility.
++
++Clients send commands with argument data, and receive command
++responses with return data and events with event data.
++
++Adding opt-in functionality to the send direction is backwards
++compatible: adding commands, optional arguments, enumeration values,
++union and alternate branches; turning an argument type into an
++alternate of that type; making mandatory arguments optional.  Clients
++oblivious of the new functionality continue to work.
++
++Incompatible changes include removing commands, command arguments,
++enumeration values, union and alternate branches, adding mandatory
++command arguments, and making optional arguments mandatory.
++
++The specified behavior of an absent optional argument should remain
++the same.  With proper documentation, this policy still allows some
++flexibility; for example, when an optional 'buffer-size' argument is
++specified to default to a sensible buffer size, the actual default
++value can still be changed.  The specified default behavior is not the
++exact size of the buffer, only that the default size is sensible.
++
++Adding functionality to the receive direction is generally backwards
++compatible: adding events, adding return and event data members.
++Clients are expected to ignore the ones they don't know.
++
++Removing "unreachable" stuff like events that can't be triggered
++anymore, optional return or event data members that can't be sent
++anymore, and return or event data member (enumeration) values that
++can't be sent anymore makes no difference to clients, except for
++introspection.  The latter can conceivably confuse clients, so tread
++carefully.
++
++Incompatible changes include removing return and event data members.
++
++Any change to a command definition's 'data' or one of the types used
++there (recursively) needs to consider send direction compatibility.
++
++Any change to a command definition's 'return', an event definition's
++'data', or one of the types used there (recursively) needs to consider
++receive direction compatibility.
++
++Any change to types used in both contexts need to consider both.
++
++Members of enumeration types, complex types and alternate types may be
++reordered freely.  For enumerations and alternate types, this doesn't
++affect the wire encoding.  For complex types, this might make the
++implementation emit JSON object members in a different order, which
++the Client JSON Protocol permits.
++
++
+ =3D=3D Code generation =3D=3D
 =20
-     if not isinstance(value, OrderedDict):
-         raise QAPISemError(info,
--                           "%s should be a dictionary or type name" % so=
-urce)
-+                           "%s should be an object or type name" % sourc=
-e)
-=20
-     # value is a dictionary, check that each member is okay
-     for (key, arg) in value.items():
-@@ -968,8 +968,8 @@ def check_enum(expr, info):
-                            "Enum '%s' requires a string for 'prefix'" % =
-name)
-=20
-     for member in members:
--        source =3D "dictionary member of enum '%s'" % name
--        check_known_keys(info, source, member, ['name'], ['if'])
-+        check_known_keys(info, "member of enum '%s'" % name, member,
-+                         ['name'], ['if'])
-         check_if(member, info)
-         check_name(info, "Member of enum '%s'" % name, member['name'],
-                    enum_member=3DTrue)
-@@ -1078,7 +1078,7 @@ def check_exprs(exprs):
-=20
-         if not doc and doc_required:
-             raise QAPISemError(info,
--                               "Expression missing documentation comment=
-")
-+                               "Definition missing documentation comment=
-")
-=20
-         if 'enum' in expr:
-             meta =3D 'enum'
-diff --git a/tests/qapi-schema/args-invalid.err b/tests/qapi-schema/args-=
-invalid.err
-index fe1e94975b..bfb2e4133e 100644
---- a/tests/qapi-schema/args-invalid.err
-+++ b/tests/qapi-schema/args-invalid.err
-@@ -1 +1 @@
--tests/qapi-schema/args-invalid.json:1: 'data' for command 'foo' should b=
-e a dictionary or type name
-+tests/qapi-schema/args-invalid.json:1: 'data' for command 'foo' should b=
-e an object or type name
-diff --git a/tests/qapi-schema/doc-missing.err b/tests/qapi-schema/doc-mi=
-ssing.err
-index 7f2f326b30..3a377ddc57 100644
---- a/tests/qapi-schema/doc-missing.err
-+++ b/tests/qapi-schema/doc-missing.err
-@@ -1 +1 @@
--tests/qapi-schema/doc-missing.json:5: Expression missing documentation c=
-omment
-+tests/qapi-schema/doc-missing.json:5: Definition missing documentation c=
-omment
-diff --git a/tests/qapi-schema/doc-no-symbol.err b/tests/qapi-schema/doc-=
-no-symbol.err
-index 75f032a942..212984ff20 100644
---- a/tests/qapi-schema/doc-no-symbol.err
-+++ b/tests/qapi-schema/doc-no-symbol.err
-@@ -1 +1 @@
--tests/qapi-schema/doc-no-symbol.json:3: Expression documentation require=
-d
-+tests/qapi-schema/doc-no-symbol.json:3: Definition documentation require=
-d
-diff --git a/tests/qapi-schema/enum-dict-member-unknown.err b/tests/qapi-=
-schema/enum-dict-member-unknown.err
-index 2aae618be0..7fd9c032bf 100644
---- a/tests/qapi-schema/enum-dict-member-unknown.err
-+++ b/tests/qapi-schema/enum-dict-member-unknown.err
-@@ -1,2 +1,2 @@
--tests/qapi-schema/enum-dict-member-unknown.json:2: Unknown key 'bad-key'=
- in dictionary member of enum 'MyEnum'
-+tests/qapi-schema/enum-dict-member-unknown.json:2: Unknown key 'bad-key'=
- in member of enum 'MyEnum'
- Valid keys are 'if', 'name'.
-diff --git a/tests/qapi-schema/pragma-non-dict.err b/tests/qapi-schema/pr=
-agma-non-dict.err
-index 75bc335aea..b358261050 100644
---- a/tests/qapi-schema/pragma-non-dict.err
-+++ b/tests/qapi-schema/pragma-non-dict.err
-@@ -1 +1 @@
--tests/qapi-schema/pragma-non-dict.json:3: Value of 'pragma' must be a di=
-ctionary
-+tests/qapi-schema/pragma-non-dict.json:3: Value of 'pragma' must be an o=
-bject
-diff --git a/tests/qapi-schema/struct-data-invalid.err b/tests/qapi-schem=
-a/struct-data-invalid.err
-index 6644f4c2ad..4bf5bcc255 100644
---- a/tests/qapi-schema/struct-data-invalid.err
-+++ b/tests/qapi-schema/struct-data-invalid.err
-@@ -1 +1 @@
--tests/qapi-schema/struct-data-invalid.json:1: 'data' for struct 'foo' sh=
-ould be a dictionary or type name
-+tests/qapi-schema/struct-data-invalid.json:1: 'data' for struct 'foo' sh=
-ould be an object or type name
+ The QAPI code generator qapi-gen.py generates code and documentation
 --=20
 2.21.0
 
