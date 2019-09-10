@@ -2,78 +2,84 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2741C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:39:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F0AAC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:40:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F01E2081B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:39:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69F9A2081B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:40:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VNWEKzyb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F01E2081B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T1WG8R/R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69F9A2081B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7ccM-0000gG-K3
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 05:39:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47495)
+	id 1i7cdk-0002Yq-Lj
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 05:40:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48147)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i7caj-0007Q4-O7
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:37:42 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i7cd2-0001ni-Gj
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:40:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i7cai-00016w-KG
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:37:41 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:38915)
+ (envelope-from <peter.maydell@linaro.org>) id 1i7cd1-0002kL-Gl
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:40:04 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:44627)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i7cai-00016S-D7
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:37:40 -0400
-Received: by mail-ot1-x343.google.com with SMTP id n7so17493575otk.6
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 02:37:40 -0700 (PDT)
+ id 1i7cd1-0002jz-C4
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:40:03 -0400
+Received: by mail-ot1-x341.google.com with SMTP id 21so17469696otj.11
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 02:40:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=IQlmv4Fm0/2xbdCR9cFvvIB+nuOZ+HtDl18JGwG/mhY=;
- b=VNWEKzybiwWiYfL6JHg4n5toS1BCqueZ0AsBx6Y/Lapp3VBs+EtuRY8+IJ0QnvxpT2
- dkBYB6mgH3AsbsI5E6MPf9iJ7hYgyHhcaX0S5aQ1FNt39NTcbZtRl6aePGL8ugcYQnom
- UZFfY9Snt1JMi5SJOuRvf+ahHrHG07gnkvRE+az5AUKmEneKUiuNTZmX/5jeRSw1eMHA
- NAbTjbFlGxyTOBY8dSNGiDYHkUH53Y+ZW9McuG+0GgH99LGrAgGEH8JsOjNSx4sXaKt3
- 7qsnnye4Hmae6XuMIdnyn3NnGj+7q/IvNY0LwJKqT18xCS6HgricrEHmV4PU78SqAkTz
- zmjA==
+ :cc:content-transfer-encoding;
+ bh=enQKB4GqL9YIVEVeQ9X2NaqchWzgWAJS+1qQ0+Vxhiw=;
+ b=T1WG8R/RTqH25btaY3SEZ0ePCz2Z5zxBAKuD4KWz1vapwbZh1QbZUxNJBzx2jZQkPg
+ N904ez+0WOYX+j8vSAHw8DR9RndM2zcnpIWIIjtpiQUxxZUDXHDEexbwl1NBWpAgm0mz
+ 8l3GRVHcI5zzORnuOwGMcI9KHmm0lXc+ZfZN2m+MCJ81UKNqBOl57mNLCY5YbpidLWb5
+ XdGUvKSX6orPMAgMbYWC4sllvPm6zxcwdtrHjMXUpWGKqjMQbRHXGMgtujnS3b00IOHc
+ 5nDNZ3Pu7CCppaiR+ohqtBwwrn+v2nbiP+p47KbUcDWzdfzw/RGNMS/zEYCNId1224IU
+ 6V1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=IQlmv4Fm0/2xbdCR9cFvvIB+nuOZ+HtDl18JGwG/mhY=;
- b=C3FUx7lRRFypx/8CX14KHjH3n0yAtFRzmYaYV3YddU/sxXucR6/IFWug1C4FU+QgrV
- L5LriHVeJ0hLGOW7m5HTm1LXZbwsRFWq1bfaOIIt3T2WYxmdHaRS+0xOZl5Hb8znIvTR
- aj0VAO2FQFAtv/D7LncrzFqZezP7cKcep2fwrWJpm2obatar7zZrJVlPmYn+32KVBH29
- r0H1iZreGJkvKRYP4uoWCdsiKwrv6HSw82QQXtVfEP82MhuGlaqFzCZHlJ+I/wSILS3t
- mpDqpOesjeGPV33QtVONJZEU0RD3XIkw4WQDRXzmYLkLJVX5vim8492emruquROtqLrk
- Ov+A==
-X-Gm-Message-State: APjAAAUydRVibu1M1Zq8yTJW+wbyVPZmKLWHQcWJzQpLe4WIrDdnKZHI
- zoFkfsYngb7K6+aa8lQENf522PoNhxbRsjgWMKSRkw==
-X-Google-Smtp-Source: APXvYqwFjcus5f2fxScfXB9nLzJuMyyK25fDImfzDhOn0n3WS9tf09+js0TxpC374U1d7YQWygHuX5gyq5k2x9fGAQQ=
-X-Received: by 2002:a9d:5e10:: with SMTP id d16mr25493214oti.91.1568108259223; 
- Tue, 10 Sep 2019 02:37:39 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=enQKB4GqL9YIVEVeQ9X2NaqchWzgWAJS+1qQ0+Vxhiw=;
+ b=EjxMZEgqY8zycdrjrqE/E2ucqDFpx0I36TKvANByZVMSg8g+lggNkqAt9L/OSsEGRo
+ HaB+/Kze05VYSqiiRjJWl1uzXyWZPbHl11NDRHPLt/2Sz+/RTvpqsPlWX6+BQ3JVIRKe
+ rCSxwoVgKcCG+zEwBrG9zG2OLVJsrMr3HzCDdqxSnkfpOLEBmWORFLl7OLVVw3nNJ1Oe
+ VsqktWzcdbxxCXSV/MvutPj4+kbqwi0encIcXQXJnGMcypGb9ADt+9wAkXTZz1kpyjLC
+ WRS/tG2zOiftAPX9+eyvy/UUVyFVSJtv1x/In0IWOgDklXFiSqSLFphJsw/ZftXvUrSh
+ whjw==
+X-Gm-Message-State: APjAAAXDc0l4xWwed+TNcSz2nZPt9EhmrjV8r3HxcmPpBu4sY+XvQk1M
+ PyUhJWeGGIO3fDs++QZ2BMJNT8UpE/Z5Xuzl0OfkKw==
+X-Google-Smtp-Source: APXvYqw4RWXH7h/Tahvl5Pzt4ZhsX7v4MYSGvsLx0sTUGL5Sh92dMQ8cgnD2jC9ckFRzymijBISZ59UqBHINm7YkNE8=
+X-Received: by 2002:a9d:6a8a:: with SMTP id l10mr21024724otq.97.1568108402610; 
+ Tue, 10 Sep 2019 02:40:02 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190910090821.28327-1-sgarzare@redhat.com>
-In-Reply-To: <20190910090821.28327-1-sgarzare@redhat.com>
+References: <20190910084349.28817-1-alex.bennee@linaro.org>
+ <20190910084349.28817-45-alex.bennee@linaro.org>
+ <20190910090743.GC8583@redhat.com>
+In-Reply-To: <20190910090743.GC8583@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Sep 2019 10:37:28 +0100
-Message-ID: <CAFEAcA8tZgoC=U5-K7m=Lq-vhb65-jPadjV6_mKAD7Z4_fXs8g@mail.gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
+Date: Tue, 10 Sep 2019 10:39:51 +0100
+Message-ID: <CAFEAcA_h2xdq=kk3-CScBj=V0j8FYZpLzDGE5eoH=Zkex=Reew@mail.gmail.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH] elf-ops.h: fix int overflow in load_elf()
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PULL 44/45] Fedora images: use URLs from stable
+ "archives.fedoraproject.org"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,50 +91,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Yash Mankad <ymankad@redhat.com>, Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 10 Sep 2019 at 10:08, Stefano Garzarella <sgarzare@redhat.com> wrote:
+On Tue, 10 Sep 2019 at 10:07, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
 >
-> This patch fixes a possible integer overflow when we calculate
-> the total size of ELF segments loaded.
+> On Tue, Sep 10, 2019 at 09:43:48AM +0100, Alex Benn=C3=A9e wrote:
+> > From: Cleber Rosa <crosa@redhat.com>
+> >
+> > The LinuxInitrd.test_with_2gib_file_should_work_with_linux_v4_16 test,
+> > from tests/acceptance/linux_initrd.py, is currently failing to fetch
+> > the "vmlinuz" file.  The reason for the failure is that the Fedora
+> > project retires older versions from the "dl.fedoraproject.org" URL,
+> > and keeps them in "archives.fedoraproject.org".  As an added note,
+> > that test uses a Fedora 28 image, because of the specific Linux kernel
+> > version requirements of the test.
+> >
+> > For the sake of stability, let's use URLs from the archived and
+> > supposedely ever stable URLs.  The good news is that the currently
+> > supported versions are also hosted on the later.  This change limits
+> > itself to change the URLs, while keeping the fetched files the same
+> > (as can be evidenced by the unchanged hashes).
 >
-> Reported-by: Coverity (CID 1405299)
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
-> Now we are limited to INT_MAX, should load_elf() returns ssize_t
-> to support bigger ELFs?
-> ---
->  include/hw/elf_ops.h | 6 ++++++
->  hw/core/loader.c     | 1 +
->  2 files changed, 7 insertions(+)
->
-> diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
-> index 1496d7e753..46dd3bf413 100644
-> --- a/include/hw/elf_ops.h
-> +++ b/include/hw/elf_ops.h
-> @@ -485,6 +485,12 @@ static int glue(load_elf, SZ)(const char *name, int fd,
->                  }
->              }
->
-> +            if (mem_size > INT_MAX - total_size) {
-> +                error_report("ELF total segments size is too big to load "
-> +                             "max is %d)", INT_MAX);
-> +                goto fail;
-> +            }
+> FWIW, I commented on the oiriginal patch before seeing this PR.
+> I don't think we should be using the archive URL for anything
+> which still exists on download.fedoraproject.org as that's placing
+> undesirable load on the Fedora master servers, instead of using its
+> primary CDN via the mirror services.
 
-This function doesn't report issues via error_report()
-(some callers intentionally have fallback options for
-what they try to do with the file), but by returning
-a suitable error value in 'ret', so I think we should
-continue that approach rather than adding an error_report()
-call here.
-
-I agree that accumulating the size in an 'int' is a bit
-dubious these days.
+Mmm; I think we should take this patch for the moment to fix
+the Travis CI failures, though -- we can look at a more
+careful choice of examples/URLs as a followup.
 
 thanks
 -- PMM
