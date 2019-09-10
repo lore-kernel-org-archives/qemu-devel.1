@@ -2,43 +2,41 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E6CC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 08:21:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FDC8C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 08:24:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 016F821D6C
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 08:21:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 016F821D6C
+	by mail.kernel.org (Postfix) with ESMTPS id 03F7F206A5
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 08:24:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03F7F206A5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7bOx-0003mt-3c
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 04:21:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58918)
+	id 1i7bRk-00056I-7V
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 04:24:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59521)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i7bO3-0002sQ-TR
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:20:32 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i7bQl-0004YA-7F
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:23:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i7bO2-0004RB-UA
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:20:31 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:40149)
+ (envelope-from <laurent@vivier.eu>) id 1i7bQk-0005Fm-2Y
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:23:19 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:38841)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i7bO2-0004Q9-LZ
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:20:30 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1i7bQj-0005FL-OZ; Tue, 10 Sep 2019 04:23:17 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MlfCk-1iXckK3lCM-00ikc4; Tue, 10 Sep 2019 10:20:27 +0200
-To: Peter Maydell <peter.maydell@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>
-References: <20190822185929.16891-1-richard.henderson@linaro.org>
- <CAFEAcA9=kx70rzbM_o98s-LEMcq2CRH5zwDPq4LForzyCAvoMg@mail.gmail.com>
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MJFpj-1hrInP2cqh-00Kdd1; Tue, 10 Sep 2019 10:23:08 +0200
+To: Josh Kunz <jkz@google.com>, qemu-devel@nongnu.org
+References: <20190816233422.16715-1-jkz@google.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -83,36 +81,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <b14721f8-8db1-f537-6d1c-abae7c18d786@vivier.eu>
-Date: Tue, 10 Sep 2019 10:19:37 +0200
+Message-ID: <0286498e-bb23-914a-39e2-66701f0b5885@vivier.eu>
+Date: Tue, 10 Sep 2019 10:23:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9=kx70rzbM_o98s-LEMcq2CRH5zwDPq4LForzyCAvoMg@mail.gmail.com>
+In-Reply-To: <20190816233422.16715-1-jkz@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:SLl+yhPZVqkT2ta0Gn/djcFgbdXAVG7DWeJInoX06beTm4G3Sxu
- 4HAxOH8T3OUmOELLEhpYDmkZ3+h4/SQ8w2XevQcVnFeR+jTQgg+P9d9lgejrUjJgKPsnKkm
- 93NObHWnuJQ8w9zhUbMCESDOaBIylKv/7CXcd/3+IWs2ISzCumIyU5DFuKF1NFvBcqVyk3M
- Af+cbIUEE3Nwfayper1Ow==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zjMcN3PvFwY=:m7Z8I05dy0rYgK4AWjA3jf
- 7K/zncD/d6ztQ07C5YS7tQ0DvRO8QOsbUJSwZMoUYPDwAosXv4mnzT7LxPPR5bulj0PavTJVr
- 4XypbVVP1vhf+butKYJ0TtLioPTxp6/1E/RsFpcmIy5rRSv3BB39mKz1uojB2+QzgagkOYrdT
- iPycfrtkIKv/oDr+IogwEqwnLoEMH+RIyQpPBKTS7YD7igGqo9JOy+JYj71Bz100Zu8+Zt3gX
- 0CdwNCFBlZV0bWWdIV/EqJ7FJC9sw2HGeaM8GZAOtr+B5tC0/y2fKauSc7D/ky/Nl9+EBR6dM
- qJgidWv3HKp7gujB1BOOb/18mXJn+/x6NlxqQ8ra0K67lApP/zTiE9xd31wzORMUB+fQ6yR4E
- atdt8K1U+Y46MqAtgZf9SDXSu6cVX3Tgp+RzvgO7bcf85YGdsNXIcJV3dauW/barnpBqACAap
- tRt0+f72guWtyD33wllUTALQkNMhi2nydPQRyrn0ymY2U8j6D7q4rTtLKYMynErBHJu3qwTNu
- fYBzZDShpxAhXchNeacAKc9yKdPRl2SgGWURdQDWK8KOt7BNnVid+y0c7JGjtewa0GX8od+CY
- j14LWf8YgZtKg/1W4lq1SzJt/vHiVnqcLwYVsLsEA8weA3aKvicieRoSulSKjLdWxCc3sif7C
- HNPH0fJp5DBNavZxchW2Z5ci2uaSbzfduiiDfoMxwI9pmqk2q+X/h1NmQ6j8ncRh2vJhkXJCe
- rq/a2Vo479TBpsZdXETvVXXmpOAmQC0B/olDL6aCjEd4JVHe4OH5GnfBvgBPcoBF9sY0Knbrp
- Y/PEqmi277cc7PhEoxw1ufXRuOXmLkSp7SHxpT7Y2PAMoUiZrE=
+X-Provags-ID: V03:K1:uqucYJ5hqcCMH28w9wQvZ9Fqhg4amLWQe9fbxeGhY6Nev30B4Hq
+ /Rae2nbAl9r7LDCNZzMe//7LClVWnD6bKjuxkhKiWCoG2mERIwJvbGA/+03mJRGxuOPloPG
+ eFtv2W+cT684g5iNThhDTJfZemskN3UUSBGMKM6TxhB09ND+tEsFO5UXFGTv4kynClPIpId
+ drteFj0aNUXfJ+0Mbmr/w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:6r343B1eIuo=:AXNX+k5NXI2szYJxS6v0BF
+ J+OBylO03IqjZCCDiUAX79CXf0rEu96Yj0/A6O14qC/qMRYSMQIy4k9Gs4SK8DBxAgtGDZjSY
+ pTliUbEcyT1q8QZWBb8uLYv32s/EkG//JORF+mOxZPuZsSkmTTAPx8WxNxz96XHlkp1HKdNN5
+ 0/f0XKO3pAjdJhey+vhXxv+5xgmsE9A/jjVQvWJQZFrPUex5igjx2hM5iCKXOr2TWuirS34gG
+ IwbAkD214EVYC7QbA4TOBnEzR1cBuUBqjFj9WH6ubLTKAyJMmxh4mu/50xITLz/Yg0/SJGsFo
+ dClhvEFRU3GpwUMkJRqjk0mrDCYtz6t3X1LxMnKe3JGlkUgVW9mrQAKlXIGa/Xbsj3pqkN1E+
+ +kC3R/QVFVpoGAP/Q+bHkYHZ1BSczx+0q/FdkCI374kJ7HggIRf7sKDZlDOmB4Qd4pk4ZnL8X
+ bnjLBKooH1Sm5rEDt7AA3qUgWAofBFBU1n6RJTtgvyLCg3UiIEoiImtrkRiMFCaI9jzQ4cywK
+ GzZWhO7UfTRHVIIONYykVw3oavj0X0oadEUXE1NyznegCOdfm+jaRGKKcSn/hQwIk2nfd2cK+
+ 6+PqtRoaCBIbRd5ym4MYSxZ9nlnfKQprIBmCuZ3/cKu5M/2ZLikfRxaWt263Y/c/cKj3zOyp+
+ 2Qcbe6ITCXMnSJ/1jksooXgSZUdg/aagcUZIkmDQWGUy/vM/LSdYQ4uBdz1418Cyj5D5aZ0vL
+ 8ZhSf8KZ3pZJU/wMFGkzAxSjE9UOMOPJiD85lmgMbOOu+rXapWLSLNL6pUJoo8ZfbpQk+5o1o
+ 3G0HXc+cptso9pPFphCghQdQbTtcw==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.133
-Subject: Re: [Qemu-devel] [PATCH 0/2] linux-user/arm: Adjust MAX_RESERVED_VA
- for M-profile
+X-Received-From: 212.227.126.134
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Support gdb 'qOffsets' query
+ for ELF
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,36 +122,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 03/09/2019 à 15:35, Peter Maydell a écrit :
-> On Thu, 22 Aug 2019 at 19:59, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> This is inspired by the discussion in
->>
->>    https://bugs.launchpad.net/qemu/+bug/1840922
->>
->> Previously I suggested a new CPUClass hook, but when I went
->> to implement that seemed like overkill.
->>
->>
->> r~
->>
->>
->> Richard Henderson (2):
->>   linux-user: Pass CPUState to MAX_RESERVED_VA
->>   linux-user/arm: Adjust MAX_RESERVED_VA for M-profile
->>
+Le 17/08/2019 à 01:34, Josh Kunz via Qemu-devel a écrit :
+> This is needed to support debugging PIE ELF binaries running under QEMU
+> user mode. Currently, `code_offset` and `data_offset` remain unset for
+> all ELF binaries, so GDB is unable to correctly locate the position of
+> the binary's text and data.
 > 
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> The fields `code_offset`, and `data_offset` were originally added way
+> back in 2006 to support debugging of bFMT executables (978efd6aac6),
+> and support was just never added for ELF. Since non-PIE binaries are
+> loaded at exactly the address specified in the binary, GDB does not need
+> to relocate any symbols, so the buggy behavior is not normally observed.
+> 
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1528239
+> Signed-off-by: Josh Kunz <jkz@google.com>
+> ---
+>  linux-user/elfload.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index 3365e192eb..ceac035208 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -2380,6 +2380,8 @@ static void load_elf_image(const char *image_name, int image_fd,
+>      }
+>  
+>      info->load_bias = load_bias;
+> +    info->code_offset = load_bias;
+> +    info->data_offset = load_bias;
+>      info->load_addr = load_addr;
+>      info->entry = ehdr->e_entry + load_bias;
+>      info->start_code = -1;
+> 
 
-Both applied to my linux-user branch.
+Applied to my linux-user branch.
 
 Thanks,
 Laurent
-
 
