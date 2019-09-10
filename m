@@ -2,66 +2,92 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D88C8C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:00:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CEBEC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:03:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7DC620872
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:00:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7DC620872
+	by mail.kernel.org (Postfix) with ESMTPS id 3F91D20872
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 13:03:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F91D20872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7flJ-00012E-TF
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 09:00:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32939)
+	id 1i7fnV-00021w-0K
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 09:03:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34528)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1i7fam-0000ff-HO
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 08:49:57 -0400
+ (envelope-from <philmd@redhat.com>) id 1i7fip-0008TD-Gv
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 08:58:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1i7fal-0000ue-CD
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 08:49:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56070)
+ (envelope-from <philmd@redhat.com>) id 1i7fim-0005pT-Ab
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 08:58:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54420)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1i7fai-0000t5-Oo; Tue, 10 Sep 2019 08:49:52 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i7fim-0005mu-30
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 08:58:12 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 182DE3084025;
- Tue, 10 Sep 2019 12:49:52 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-217.ams2.redhat.com
- [10.36.116.217])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0A4F160852;
- Tue, 10 Sep 2019 12:49:50 +0000 (UTC)
-Date: Tue, 10 Sep 2019 14:49:49 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190910124949.GG4446@localhost.localdomain>
-References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-21-mreitz@redhat.com>
- <20190910115620.GE4446@localhost.localdomain>
- <4fd84192-0078-07e9-b972-2f10030fb15f@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 37FC777342
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 12:58:09 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id r21so1319435wme.5
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 05:58:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=K6wtmp1BYHhxcd43QNkip5vQTnFqFsq9MvbW1f6s8iM=;
+ b=VriJYGejirclPUbOnqZ1D7uwVsW2yXCHVN7es/+/PZx+lafypFkkFgUQTK6+KxVL9F
+ hsB0z+QKk5t/NjZnJKQ21VT5cvlYbSK4w1DZba8T3ADweZUu6E7pFa/e8VSjg6gftiE4
+ jdH19oz1fO7i07JikTJkZ1Mw6lRx7T5EkzHdAtZ39ewL3kcdHjpdrjh/vwQKl2AGPyJi
+ poT81XZ3tVe+CVUc9R0YIfa2NShIT7OeOQMFiLkz9b5KSCDErw1VCdsLmrbtCikM4Pyd
+ nrmGlddnBe+PmWkS/RCWtsYVUw9Y0ubCFfOu3VMon2nxQw0JKvzoVHe0oSG5ttPFv5rs
+ zUWA==
+X-Gm-Message-State: APjAAAWhVKTi9umeCc6quMSG0tyxp0jQoQpqXoQwi1a/zy91uKrcTi9E
+ I0ZxBWRyfA1dBG4jWofOXFRdEDRSjE9GsD9Ggmicr6wHBgI4uhWhBWkegjRoLF9CwCnz3D1HIrf
+ ZSDxW/ZqKAjRlFdg=
+X-Received: by 2002:a05:6000:1632:: with SMTP id
+ v18mr28353675wrb.61.1568120287556; 
+ Tue, 10 Sep 2019 05:58:07 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzkwdammfRpWsKXXS+2cMgz5YvIgUG8K1oP3ht6ff8kAXocK1ChGOd3Gdl8LoMlvFBE8ranYQ==
+X-Received: by 2002:a05:6000:1632:: with SMTP id
+ v18mr28353646wrb.61.1568120287354; 
+ Tue, 10 Sep 2019 05:58:07 -0700 (PDT)
+Received: from [192.168.1.41] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id t203sm4264601wmf.42.2019.09.10.05.58.06
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 10 Sep 2019 05:58:06 -0700 (PDT)
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+References: <20190907154744.4136-1-huth@tuxfamily.org>
+ <20190907154744.4136-8-huth@tuxfamily.org>
+ <CAFEAcA_NHnNNC8jdVc7CGEQ=PDhDjQfiRb++=ZgdjKUPqi2f=w@mail.gmail.com>
+ <a4de8c0c-5758-13a4-0f74-3e7a0208ad34@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <456eb793-dac0-618a-bf55-01848e6263ab@redhat.com>
+Date: Tue, 10 Sep 2019 14:58:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="C1iGAkRnbeBonpVg"
-Content-Disposition: inline
-In-Reply-To: <4fd84192-0078-07e9-b972-2f10030fb15f@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 10 Sep 2019 12:49:52 +0000 (UTC)
+In-Reply-To: <a4de8c0c-5758-13a4-0f74-3e7a0208ad34@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 20/42] block/snapshot: Fix fallback
+Subject: Re: [Qemu-devel] [PULL 7/8] tests/acceptance: Add test of NeXTcube
+ framebuffer using OCR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,112 +99,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 9/10/19 2:07 PM, Thomas Huth wrote:
+> On 10/09/2019 14.02, Peter Maydell wrote:
+>> On Sat, 7 Sep 2019 at 16:47, Thomas Huth <huth@tuxfamily.org> wrote:
+>>>
+>>> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>>
+>>> Add a test of the NeXTcube framebuffer using the Tesseract OCR
+>>> engine on a screenshot of the framebuffer device.
+>>>
+>>> The test is very quick:
+>>>
+>>>   $ avocado --show=3Dapp,console run tests/acceptance/machine_m68k_ne=
+xtcube.py
+>>>   JOB ID     : 78844a92424cc495bd068c3874d542d1e20f24bc
+>>>   JOB LOG    : /home/phil/avocado/job-results/job-2019-08-13T13.16-78=
+844a9/job.log
+>>>    (1/3) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.te=
+st_bootrom_framebuffer_size: PASS (2.16 s)
+>>>    (2/3) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.te=
+st_bootrom_framebuffer_ocr_with_tesseract_v3: -
+>>>   ue r pun Honl'=EF=AC=82x ; 5=E2=80=98 55=E2=80=98
+>>>   avg ncaaaaa 25 MHZ, memary jag m
+>>>   Backplane slat =C2=ABa
+>>>   Ethernet address a a r a r3 2
+>>>   Memgry sackets aea canflqured far 16MB Darlly page made stMs but ha=
+ve 16MB page made stMs )nstalled
+>>
+>> By the way, do we know why the output from this test case is
+>> garbled like this ? It suggests that something's not right
+>> somewhere...
 
---C1iGAkRnbeBonpVg
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I got better result using few options to tune, but later noticed they
+differ on Fedora/Ubuntu.
+Tesseract v4 has better result but it is alpha and we need to install
+train data. Not that big, 15MiB:
+https://github.com/tesseract-ocr/tessdata_best/blob/master/eng.traineddat=
+a
+I preferred to keep the simplest tests with acceptable result, we are
+not interested in fully understandable text output: we only want to know
+the framebuffer model works. Reading "Ethernet address" is good and
+quick enough.
 
-Am 10.09.2019 um 14:04 hat Max Reitz geschrieben:
-> On 10.09.19 13:56, Kevin Wolf wrote:
-> > Am 09.08.2019 um 18:13 hat Max Reitz geschrieben:
-> >> If the top node's driver does not provide snapshot functionality and we
-> >> want to fall back to a node down the chain, we need to snapshot all
-> >> non-COW children.  For simplicity's sake, just do not fall back if the=
-re
-> >> is more than one such child.
-> >>
-> >> bdrv_snapshot_goto() becomes a bit weird because we may have to redire=
-ct
-> >> the actual child pointer, so it only works if the fallback child is
-> >> bs->file or bs->backing (and then we have to find out which it is).
-> >>
-> >> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> >> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> >> ---
-> >>  block/snapshot.c | 100 +++++++++++++++++++++++++++++++++++++----------
-> >>  1 file changed, 79 insertions(+), 21 deletions(-)
-> >>
-> >> diff --git a/block/snapshot.c b/block/snapshot.c
-> >> index f2f48f926a..35403c167f 100644
-> >> --- a/block/snapshot.c
-> >> +++ b/block/snapshot.c
-> >> @@ -146,6 +146,32 @@ bool bdrv_snapshot_find_by_id_and_name(BlockDrive=
-rState *bs,
-> >>      return ret;
-> >>  }
-> >> =20
-> >> +/**
-> >> + * Return the child BDS to which we can fall back if the given BDS
-> >> + * does not support snapshots.
-> >> + * Return NULL if there is no BDS to (safely) fall back to.
-> >> + */
-> >> +static BlockDriverState *bdrv_snapshot_fallback(BlockDriverState *bs)
-> >> +{
-> >> +    BlockDriverState *child_bs =3D NULL;
-> >> +    BdrvChild *child;
-> >> +
-> >> +    QLIST_FOREACH(child, &bs->children, next) {
-> >> +        if (child =3D=3D bdrv_filtered_cow_child(bs)) {
-> >> +            /* Ignore: COW children need not be included in snapshots=
- */
-> >> +            continue;
-> >> +        }
-> >> +
-> >> +        if (child_bs) {
-> >> +            /* Cannot fall back to a single child if there are multip=
-le */
-> >> +            return NULL;
-> >> +        }
-> >> +        child_bs =3D child->bs;
-> >> +    }
-> >> +
-> >> +    return child_bs;
-> >> +}
-> >=20
-> > Why do we return child->bs here when bdrv_snapshot_goto() then needs to
-> > reconstruct what the associated BdrvChild was? Wouldn't it make more
-> > sense to return BdrvChild** from here and maybe have a small wrapper for
-> > the other functions that only need a BDS?
+> The text is created from the framebuffer with the OCR-tool Tesseract -
+> which is just not good enough to recognize all words properly here.
 >=20
-> What would you return instead?  &child doesn=E2=80=99t work.
-
-Oops, brain fart. :-)
-
-> We could limit ourselves to bs->file and bs->backing.  It just seemed
-> like a bit of an artificial limit to me, because we only really have it
-> for bdrv_snapshot_goto().
-
-Hm, but then, what use is supporting other children for creating a
-snapshot when you can't load it any more afterwards?
-
-Kevin
-
---C1iGAkRnbeBonpVg
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJdd5vtAAoJEH8JsnLIjy/WxOcQALuNNHha3Cz3eRjzT2Gt3xXv
-ncGK5MiVeTA1wLZSDws4I3WgP7ymZaDjl/hBdRHh5BatY9/FnMJa7gcB9jZiRrHw
-IGGDw+493AdoWBhLm2bumMHSJ1sjQwcc8W9l7mLM9I7JIA2BArnEmW/wl3XNDFzE
-59y13dwKiv7Dt3EsfHYcvkjneopO9683SMHcQ7Pz8UHLZFGvCLn7M5XLIPeet6s8
-y87dgoOzPF6TKPkNIDrNur1LBqZdvlArxwXokWQ97ipsFJuzQHC2ONO7j6bkCBKH
-77Qc857mrQSc9eurj9vxtfo9PxbnJ1kr4186cTENnS49MvO67eKdnlCUNvT1kx16
-BnJ20eP5kFQwLWXkpVF8ycA9BhINGyIFxCrOXG2b5+dNlK7pkTK9+lI/Y1fKUPrK
-vQHb7HvLjlcVp4jCqJiDqfLAAh/F+YuWxNxTWGnG1p+t4NVwegvDw3lcJqCxeTEm
-kQ1p/RcMaY76bWWD4MkRv5qV9akGb16aijB1vssey5gra/wyXzoB77jXiBNeoYq5
-4OQEIVPumEt9J0YyrTX1HyXmao/43gO1cqcVGJUDah4k7LM+XBKMDeeNcS+XSinG
-0vv0cgF9TfTb18rDjutLnEg2kwGIWSHYICi4++ahL5lLxXBPkpCMWq+dTVUMPhND
-3JT+EIm1k6YmQqndkNIm
-=xP7G
------END PGP SIGNATURE-----
-
---C1iGAkRnbeBonpVg--
+>  Thomas
+>=20
 
