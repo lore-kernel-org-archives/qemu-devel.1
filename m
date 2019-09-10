@@ -7,65 +7,66 @@ X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70645C49ED9
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:43:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 053F5C49ED9
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:43:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 310D0206A1
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:43:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 310D0206A1
+	by mail.kernel.org (Postfix) with ESMTPS id C96162084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:43:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C96162084D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7m2i-0002HF-3u
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:43:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59197)
+	id 1i7m3R-00036C-Dd
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:43:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59054)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i7luP-0001M5-No
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:39 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i7luF-00018u-Gx
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i7luN-0006xR-8l
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:37 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:46865)
+ (envelope-from <laurent@vivier.eu>) id 1i7luD-0006s8-TL
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:27 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:60953)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1i7luH-0006tq-Ss; Tue, 10 Sep 2019 15:34:30 -0400
+ id 1i7luD-0006rW-L0; Tue, 10 Sep 2019 15:34:25 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MGR3r-1hvLIS050f-00GpbP; Tue, 10 Sep 2019 21:34:01 +0200
+ id 1N4hBx-1iEPNQ3MF5-011m2z; Tue, 10 Sep 2019 21:34:00 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Tue, 10 Sep 2019 21:33:43 +0200
-Message-Id: <20190910193347.16000-6-laurent@vivier.eu>
+Date: Tue, 10 Sep 2019 21:33:42 +0200
+Message-Id: <20190910193347.16000-5-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190910193347.16000-1-laurent@vivier.eu>
 References: <20190910193347.16000-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Uu3VYQOdj6X+D4DrDIrTgPGdarbKfRuCHtZP2D87uFfd6Iuucr4
- 8PJwVBsIWzg2vy56qT7Zi/yP9FsQ/i5kicqNkX6DRI4mPPYqQthx236n5M+JEazPq7FNSk4
- EyAePaTZuhhfCbRUUZUeuSpDsyG5qXGyIB29ZT7XQtlIVfFj+sy1wC14wwxUs0XshOVrsMk
- 0G20SDDl8uGSxqO+kbCTA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:W1cuGcvTxmU=:0MwoUy2Cq5rOL3SiNkiSQQ
- 9H2snBL+ZteooS5+5pd9hZYg31AzRrgLYfYdKa0vEJngVBQq0UmjZ9rO9SdUnFCRiaMNUzOuU
- rrAJbA396ufBhmfhzzpVGJ5DQFh259/sgg8Em8AzBahg2q0QqT6r3MNrFE0ne+G5FkrjR2rQc
- VZsTlo6HXyQtQpIO7QsT2+1tzvROYkZFU/dOP8DUvdzRyBX4ILQQiplzWmTgDi31nS5HlkB5E
- aXXch1uV+vX6VDVqDhpMvs/VJgILTb6F00/eH7OATAs5ssgo/SwYlXO53C/ZPVrV2+TI59qR+
- Wc0ExqOkuqCM8YnM/GPlJFhHxIUezC9iuCBfyw0BGzGWT/vKnPp4enm044a+UGcVSFVsFrpX1
- xym8lDpJa3Ul8OUx0sx5votev5SecN2hau+dA9TVBzRoRZDlIhkZCZAQRDIbgARaxck57XCiW
- ULqzH10GJ+H0WG8F5ZwK/QDjT/kLBngzR/vwYGq4hGg/C1+We6J9Z4PV1vTG4aniNBIQTkLAG
- 3F1VgmlvMGU8AhHXAVVK12OnUURCQywDB/HzmMfLRzmfBQj4tFcBnqI4WNFmSuysAalxgKWCm
- Q/7i9PkeehAvvQT3xb15yb+hROGAr3ua+Z9vZOauHfnN6kGkaj2eD02u1Jb0aOboZu4k5KqKT
- B3bTwnzlibF7Txp6auSNSq6j5Wvq7uQ8wo2X1wn2BNDGcNHImhO6yXHv9NTpGTClkxXFKUnSb
- 3IHlCsvlIQDf7LEUqsohYOKq6ygLxnIGOEE3PhUd7p4UTCEE8quZ1HurwLkYjLF9jyQc3VcRV
- wkg1sWTHbDFgfMQ+iDo1PE42w+5hr/37SYxZw33DRcnTV4Hu2k=
+X-Provags-ID: V03:K1:CjZK8pBebTML4bYFbE8l6j1MxC2jkehwW9+d/pnGbmmtkUY1Gmv
+ X8EbVg/wPFRfPLiAUjuboblYLsRm8cI1VYugsqElmvzrRkclW2KeB2BXI0U5HDNH+kZMifU
+ Q58/nZKNvocLgBji2mrnmzCwn1+6UuyO8Cx0KZfpUz3ZYJdeD0jkF3YdAgZmvIe4Ayp49r5
+ b1R4BsnOYOMheV1Cjq/Cw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:hXaq7b6hubI=:B7/tONJMx1iSiBD4n2clSf
+ 3sSjC49/Lv7xqs2er09Cp/CxCD+ket0adMdOfJLXhlshFMUhPaBpFvu+GFgoC3tcJi/u3941J
+ l24UeoAQtuGtxCsZ349ZVBe3BJElOdrCR0O7ETCq9hhBTMtZDjb3f1z2QwWSx6EC2kKFyUIz+
+ VfKR+G2ia/zUcKVFwuMQBGyBlO4mGd8FDlfP6aOK1whadqfUfkU3X6JotxjqYJJZRZcO4uwFF
+ L4GGelDcBhzqyR7FdJiiixgLLLjygV76WTxAnC086WTH0dtyhf4OnpB1t7xqUipQqeM+GCos1
+ bGDhP2uNuM82vQ0SElvWN6TMpGd3Rq8vIUWxtPr6WJapC68kI6v13vpbvrj7Yynw9t561qtfc
+ AQk3FBOkIQS/W1yINkRLmOsSwSDPlHlvWSyL/aQCh4yD6ke2uy45iqg6mBR3rWw4MWFmZvbQl
+ HdvFac+aL90PZ4o+RGheUWJI3ZDnrE2uLzqW0W191E+gXY8ZUFf5sUIqTr0XRU02Mz1M3JdQ6
+ ekxI/n83ABzeHzB3FpAQRj+Ij3ypP1qjFIkhI04RUup6EOA4LQO0ztY1Xrwe0nxGmu9a5yfOE
+ TQZQY7LpCfTOsq5SOVhTL78MxEpaEpKWtSGC77IxhVkVuSI9zIa5Pcck+7DHF8lwt5NdKp/Eb
+ vdjpMB+8D4vKDyK+aHv+jzOLv4mB5+QtPtL47Fx+t4M7qVwEb1k7F5tFhj07Nt0wS27jrchdX
+ ALu2X6c6wHhIUhLLepiCGd2/V+TEBWZWAd+WpscUoswtqwOyvO7mKppK3VRRwnFDlq5fuO2ON
+ FpwIm7V/kMPLkvo3EaW6nvG/pZ0R315pVofDJtncEDF3z4FIao=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
-Subject: [Qemu-devel] [PATCH v11 5/9] hw/m68k: add macfb video card
+X-Received-From: 212.227.17.10
+Subject: [Qemu-devel] [PATCH v11 4/9] hw/m68k: implement ADB bus support for
+ via
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,584 +98,288 @@ Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 Reviewed-by: Thomas Huth <huth@tuxfamily.org>
 ---
- MAINTAINERS                |   2 +
- arch_init.c                |   4 +
- hw/display/Kconfig         |   4 +
- hw/display/Makefile.objs   |   1 +
- hw/display/macfb.c         | 421 +++++++++++++++++++++++++++++++++++++
- hw/m68k/Kconfig            |   1 +
- include/hw/display/macfb.h |  43 ++++
- qemu-options.hx            |   2 +-
- vl.c                       |   3 +-
- 9 files changed, 479 insertions(+), 2 deletions(-)
- create mode 100644 hw/display/macfb.c
- create mode 100644 include/hw/display/macfb.h
+ hw/misc/Kconfig           |   1 +
+ hw/misc/mac_via.c         | 198 +++++++++++++++++++++++++++++++++++++-
+ include/hw/misc/mac_via.h |   7 ++
+ 3 files changed, 205 insertions(+), 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b01826ba39..6b5fc50aef 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -921,7 +921,9 @@ q800
- M: Laurent Vivier <laurent@vivier.eu>
- S: Maintained
- F: hw/misc/mac_via.c
-+F: hw/display/macfb.c
- F: include/hw/misc/mac_via.h
-+F: include/hw/display/macfb.h
- 
- MicroBlaze Machines
- -------------------
-diff --git a/arch_init.c b/arch_init.c
-index 0a1531124c..705d0b94ad 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -38,6 +38,10 @@
- int graphic_width = 1024;
- int graphic_height = 768;
- int graphic_depth = 8;
-+#elif defined(TARGET_M68K)
-+int graphic_width = 800;
-+int graphic_height = 600;
-+int graphic_depth = 8;
- #else
- int graphic_width = 800;
- int graphic_height = 600;
-diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-index cbdf7b1a67..32e8d29003 100644
---- a/hw/display/Kconfig
-+++ b/hw/display/Kconfig
-@@ -132,3 +132,7 @@ config ATI_VGA
-     select VGA
-     select BITBANG_I2C
-     select DDC
-+
-+config MACFB
-+    bool
-+    select FRAMEBUFFER
-diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index 5a4066383b..f2182e3bef 100644
---- a/hw/display/Makefile.objs
-+++ b/hw/display/Makefile.objs
-@@ -26,6 +26,7 @@ common-obj-$(CONFIG_EXYNOS4) += exynos4210_fimd.o
- common-obj-$(CONFIG_FRAMEBUFFER) += framebuffer.o
- obj-$(CONFIG_MILKYMIST) += milkymist-vgafb.o
- common-obj-$(CONFIG_ZAURUS) += tc6393xb.o
-+common-obj-$(CONFIG_MACFB) += macfb.o
- 
- obj-$(CONFIG_MILKYMIST_TMU2) += milkymist-tmu2.o
- milkymist-tmu2.o-cflags := $(X11_CFLAGS) $(OPENGL_CFLAGS)
-diff --git a/hw/display/macfb.c b/hw/display/macfb.c
-new file mode 100644
-index 0000000000..d7c5ef296e
---- /dev/null
-+++ b/hw/display/macfb.c
-@@ -0,0 +1,421 @@
-+/*
-+ * QEMU Motorola 680x0 Macintosh Video Card Emulation
-+ *                 Copyright (c) 2012-2018 Laurent Vivier
-+ *
-+ * some parts from QEMU G364 framebuffer Emulator.
-+ *                 Copyright (c) 2007-2011 Herve Poussineau
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/units.h"
-+#include "hw/sysbus.h"
-+#include "ui/console.h"
-+#include "ui/pixel_ops.h"
-+#include "hw/display/macfb.h"
-+#include "qapi/error.h"
-+#include "hw/qdev-properties.h"
-+#include "migration/vmstate.h"
-+
-+#define VIDEO_BASE 0x00001000
-+#define DAFB_BASE  0x00800000
-+
-+#define MACFB_PAGE_SIZE 4096
-+#define MACFB_VRAM_SIZE (4 * MiB)
-+
-+#define DAFB_RESET      0x200
-+#define DAFB_LUT        0x213
-+
-+
-+typedef void macfb_draw_line_func(MacfbState *s, uint8_t *d, uint32_t addr,
-+                                  int width);
-+
-+static inline uint8_t macfb_read_byte(MacfbState *s, uint32_t addr)
-+{
-+    return s->vram[addr & s->vram_bit_mask];
-+}
-+
-+/* 1-bit color */
-+static void macfb_draw_line1(MacfbState *s, uint8_t *d, uint32_t addr,
-+                             int width)
-+{
-+    uint8_t r, g, b;
-+    int x;
-+
-+    for (x = 0; x < width; x++) {
-+        int bit = x & 7;
-+        int idx = (macfb_read_byte(s, addr) >> (7 - bit)) & 1;
-+        r = g = b  = ((1 - idx) << 7);
-+        addr += (bit == 7);
-+
-+        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
-+        d += 4;
-+    }
-+}
-+
-+/* 2-bit color */
-+static void macfb_draw_line2(MacfbState *s, uint8_t *d, uint32_t addr,
-+                             int width)
-+{
-+    uint8_t r, g, b;
-+    int x;
-+
-+    for (x = 0; x < width; x++) {
-+        int bit = (x & 3);
-+        int idx = (macfb_read_byte(s, addr) >> ((3 - bit) << 1)) & 3;
-+        r = s->color_palette[idx * 3];
-+        g = s->color_palette[idx * 3 + 1];
-+        b = s->color_palette[idx * 3 + 2];
-+        addr += (bit == 3);
-+
-+        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
-+        d += 4;
-+    }
-+}
-+
-+/* 4-bit color */
-+static void macfb_draw_line4(MacfbState *s, uint8_t *d, uint32_t addr,
-+                             int width)
-+{
-+    uint8_t r, g, b;
-+    int x;
-+
-+    for (x = 0; x < width; x++) {
-+        int bit = x & 1;
-+        int idx = (macfb_read_byte(s, addr) >> ((1 - bit) << 2)) & 15;
-+        r = s->color_palette[idx * 3];
-+        g = s->color_palette[idx * 3 + 1];
-+        b = s->color_palette[idx * 3 + 2];
-+        addr += (bit == 1);
-+
-+        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
-+        d += 4;
-+    }
-+}
-+
-+/* 8-bit color */
-+static void macfb_draw_line8(MacfbState *s, uint8_t *d, uint32_t addr,
-+                             int width)
-+{
-+    uint8_t r, g, b;
-+    int x;
-+
-+    for (x = 0; x < width; x++) {
-+        r = s->color_palette[macfb_read_byte(s, addr) * 3];
-+        g = s->color_palette[macfb_read_byte(s, addr) * 3 + 1];
-+        b = s->color_palette[macfb_read_byte(s, addr) * 3 + 2];
-+        addr++;
-+
-+        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
-+        d += 4;
-+    }
-+}
-+
-+/* 16-bit color */
-+static void macfb_draw_line16(MacfbState *s, uint8_t *d, uint32_t addr,
-+                              int width)
-+{
-+    uint8_t r, g, b;
-+    int x;
-+
-+    for (x = 0; x < width; x++) {
-+        uint16_t pixel;
-+        pixel = (macfb_read_byte(s, addr) << 8) | macfb_read_byte(s, addr + 1);
-+        r = ((pixel >> 10) & 0x1f) << 3;
-+        g = ((pixel >> 5) & 0x1f) << 3;
-+        b = (pixel & 0x1f) << 3;
-+        addr += 2;
-+
-+        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
-+        d += 4;
-+    }
-+}
-+
-+/* 24-bit color */
-+static void macfb_draw_line24(MacfbState *s, uint8_t *d, uint32_t addr,
-+                              int width)
-+{
-+    uint8_t r, g, b;
-+    int x;
-+
-+    for (x = 0; x < width; x++) {
-+        r = macfb_read_byte(s, addr);
-+        g = macfb_read_byte(s, addr + 1);
-+        b = macfb_read_byte(s, addr + 2);
-+        addr += 3;
-+
-+        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
-+        d += 4;
-+    }
-+}
-+
-+
-+enum {
-+    MACFB_DRAW_LINE1,
-+    MACFB_DRAW_LINE2,
-+    MACFB_DRAW_LINE4,
-+    MACFB_DRAW_LINE8,
-+    MACFB_DRAW_LINE16,
-+    MACFB_DRAW_LINE24,
-+    MACFB_DRAW_LINE_NB,
-+};
-+
-+static macfb_draw_line_func * const
-+                              macfb_draw_line_table[MACFB_DRAW_LINE_NB] = {
-+    macfb_draw_line1,
-+    macfb_draw_line2,
-+    macfb_draw_line4,
-+    macfb_draw_line8,
-+    macfb_draw_line16,
-+    macfb_draw_line24,
-+};
-+
-+static int macfb_check_dirty(MacfbState *s, DirtyBitmapSnapshot *snap,
-+                             ram_addr_t addr, int len)
-+{
-+    return memory_region_snapshot_get_dirty(&s->mem_vram, snap, addr, len);
-+}
-+
-+static void macfb_draw_graphic(MacfbState *s)
-+{
-+    DisplaySurface *surface = qemu_console_surface(s->con);
-+    DirtyBitmapSnapshot *snap = NULL;
-+    ram_addr_t page;
-+    uint32_t v = 0;
-+    int y, ymin;
-+    int macfb_stride = (s->depth * s->width + 7) / 8;
-+    macfb_draw_line_func *macfb_draw_line;
-+
-+    switch (s->depth) {
-+    case 1:
-+        v = MACFB_DRAW_LINE1;
-+        break;
-+    case 2:
-+        v = MACFB_DRAW_LINE2;
-+        break;
-+    case 4:
-+        v = MACFB_DRAW_LINE4;
-+        break;
-+    case 8:
-+        v = MACFB_DRAW_LINE8;
-+        break;
-+    case 16:
-+        v = MACFB_DRAW_LINE16;
-+        break;
-+    case 24:
-+        v = MACFB_DRAW_LINE24;
-+        break;
-+    }
-+
-+    macfb_draw_line = macfb_draw_line_table[v];
-+    assert(macfb_draw_line != NULL);
-+
-+    snap = memory_region_snapshot_and_clear_dirty(&s->mem_vram, 0x0,
-+                                             memory_region_size(&s->mem_vram),
-+                                             DIRTY_MEMORY_VGA);
-+
-+    ymin = -1;
-+    page = 0;
-+    for (y = 0; y < s->height; y++, page += macfb_stride) {
-+        if (macfb_check_dirty(s, snap, page, macfb_stride)) {
-+            uint8_t *data_display;
-+
-+            data_display = surface_data(surface) + y * surface_stride(surface);
-+            macfb_draw_line(s, data_display, page, s->width);
-+
-+            if (ymin < 0) {
-+                ymin = y;
-+            }
-+        } else {
-+            if (ymin >= 0) {
-+                dpy_gfx_update(s->con, 0, ymin, s->width, y - ymin);
-+                ymin = -1;
-+            }
-+        }
-+    }
-+
-+    if (ymin >= 0) {
-+        dpy_gfx_update(s->con, 0, ymin, s->width, y - ymin);
-+    }
-+
-+    g_free(snap);
-+}
-+
-+static void macfb_invalidate_display(void *opaque)
-+{
-+    MacfbState *s = opaque;
-+
-+    memory_region_set_dirty(&s->mem_vram, 0, MACFB_VRAM_SIZE);
-+}
-+
-+static void macfb_update_display(void *opaque)
-+{
-+    MacfbState *s = opaque;
-+    DisplaySurface *surface = qemu_console_surface(s->con);
-+
-+    qemu_flush_coalesced_mmio_buffer();
-+
-+    if (s->width == 0 || s->height == 0) {
-+        return;
-+    }
-+
-+    if (s->width != surface_width(surface) ||
-+        s->height != surface_height(surface)) {
-+        qemu_console_resize(s->con, s->width, s->height);
-+    }
-+
-+    macfb_draw_graphic(s);
-+}
-+
-+static void macfb_reset(MacfbState *s)
-+{
-+    int i;
-+
-+    s->palette_current = 0;
-+    for (i = 0; i < 256; i++) {
-+        s->color_palette[i * 3] = 255 - i;
-+        s->color_palette[i * 3 + 1] = 255 - i;
-+        s->color_palette[i * 3 + 2] = 255 - i;
-+    }
-+    memset(s->vram, 0, MACFB_VRAM_SIZE);
-+    macfb_invalidate_display(s);
-+}
-+
-+static uint64_t macfb_ctrl_read(void *opaque,
-+                                hwaddr addr,
-+                                unsigned int size)
-+{
-+    return 0;
-+}
-+
-+static void macfb_ctrl_write(void *opaque,
-+                             hwaddr addr,
-+                             uint64_t val,
-+                             unsigned int size)
-+{
-+    MacfbState *s = opaque;
-+    switch (addr) {
-+    case DAFB_RESET:
-+        s->palette_current = 0;
-+        break;
-+    case DAFB_LUT:
-+        s->color_palette[s->palette_current++] = val;
-+        if (s->palette_current % 3) {
-+            macfb_invalidate_display(s);
-+        }
-+        break;
-+    }
-+}
-+
-+static const MemoryRegionOps macfb_ctrl_ops = {
-+    .read = macfb_ctrl_read,
-+    .write = macfb_ctrl_write,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+    .impl.min_access_size = 1,
-+    .impl.max_access_size = 4,
-+};
-+
-+static int macfb_post_load(void *opaque, int version_id)
-+{
-+    macfb_invalidate_display(opaque);
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_macfb = {
-+    .name = "macfb",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .minimum_version_id_old = 1,
-+    .post_load = macfb_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8_ARRAY(color_palette, MacfbState, 256 * 3),
-+        VMSTATE_UINT32(palette_current, MacfbState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const GraphicHwOps macfb_ops = {
-+    .invalidate = macfb_invalidate_display,
-+    .gfx_update = macfb_update_display,
-+};
-+
-+static void macfb_common_realize(DeviceState *dev, MacfbState *s, Error **errp)
-+{
-+    DisplaySurface *surface;
-+
-+    if (s->depth != 1 && s->depth != 2 && s->depth != 4 && s->depth != 8 &&
-+        s->depth != 16 && s->depth != 24) {
-+        error_setg(errp, "unknown guest depth %d", s->depth);
-+        return;
-+    }
-+
-+    s->con = graphic_console_init(dev, 0, &macfb_ops, s);
-+    surface = qemu_console_surface(s->con);
-+
-+    if (surface_bits_per_pixel(surface) != 32) {
-+        error_setg(errp, "unknown host depth %d",
-+                   surface_bits_per_pixel(surface));
-+        return;
-+    }
-+
-+    memory_region_init_io(&s->mem_ctrl, NULL, &macfb_ctrl_ops, s, "macfb-ctrl",
-+                          0x1000);
-+
-+    memory_region_init_ram_nomigrate(&s->mem_vram, OBJECT(s), "macfb-vram",
-+                                     MACFB_VRAM_SIZE, errp);
-+    s->vram = memory_region_get_ram_ptr(&s->mem_vram);
-+    s->vram_bit_mask = MACFB_VRAM_SIZE - 1;
-+    vmstate_register_ram(&s->mem_vram, dev);
-+    memory_region_set_coalescing(&s->mem_vram);
-+}
-+
-+static void macfb_sysbus_realize(DeviceState *dev, Error **errp)
-+{
-+    MacfbSysBusState *s = MACFB(dev);
-+    MacfbState *ms = &s->macfb;
-+
-+    macfb_common_realize(dev, ms, errp);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(s), &ms->mem_ctrl);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(s), &ms->mem_vram);
-+}
-+
-+static void macfb_sysbus_reset(DeviceState *d)
-+{
-+    MacfbSysBusState *s = MACFB(d);
-+    macfb_reset(&s->macfb);
-+}
-+
-+static Property macfb_sysbus_properties[] = {
-+    DEFINE_PROP_UINT32("width", MacfbSysBusState, macfb.width, 640),
-+    DEFINE_PROP_UINT32("height", MacfbSysBusState, macfb.height, 480),
-+    DEFINE_PROP_UINT8("depth", MacfbSysBusState, macfb.depth, 8),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void macfb_sysbus_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = macfb_sysbus_realize;
-+    dc->desc = "SysBus Macintosh framebuffer";
-+    dc->reset = macfb_sysbus_reset;
-+    dc->vmsd = &vmstate_macfb;
-+    dc->props = macfb_sysbus_properties;
-+}
-+
-+static TypeInfo macfb_sysbus_info = {
-+    .name          = TYPE_MACFB,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(MacfbSysBusState),
-+    .class_init    = macfb_sysbus_class_init,
-+};
-+
-+static void macfb_register_types(void)
-+{
-+    type_register_static(&macfb_sysbus_info);
-+}
-+
-+type_init(macfb_register_types)
-diff --git a/hw/m68k/Kconfig b/hw/m68k/Kconfig
-index 22a357609c..58c39ec1a9 100644
---- a/hw/m68k/Kconfig
-+++ b/hw/m68k/Kconfig
-@@ -16,3 +16,4 @@ config NEXTCUBE
- config Q800
+diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+index 18a5dc9c09..2164646553 100644
+--- a/hw/misc/Kconfig
++++ b/hw/misc/Kconfig
+@@ -123,5 +123,6 @@ config UNIMP
+ config MAC_VIA
      bool
-     select MAC_VIA
-+    select MACFB
-diff --git a/include/hw/display/macfb.h b/include/hw/display/macfb.h
-new file mode 100644
-index 0000000000..3fe2592735
---- /dev/null
-+++ b/include/hw/display/macfb.h
-@@ -0,0 +1,43 @@
-+/*
-+ * QEMU Motorola 680x0 Macintosh Video Card Emulation
-+ *                 Copyright (c) 2012-2018 Laurent Vivier
-+ *
-+ * some parts from QEMU G364 framebuffer Emulator.
-+ *                 Copyright (c) 2007-2011 Herve Poussineau
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef MACFB_H
-+#define MACFB_H
-+
-+#include "qemu/osdep.h"
-+#include "exec/memory.h"
-+#include "ui/console.h"
-+
-+typedef struct MacfbState {
-+    MemoryRegion mem_vram;
-+    MemoryRegion mem_ctrl;
-+    QemuConsole *con;
-+
-+    uint8_t *vram;
-+    uint32_t vram_bit_mask;
-+    uint32_t palette_current;
-+    uint8_t color_palette[256 * 3];
-+    uint32_t width, height; /* in pixels */
-+    uint8_t depth;
-+} MacfbState;
-+
-+#define TYPE_MACFB "sysbus-macfb"
-+#define MACFB(obj) \
-+    OBJECT_CHECK(MacfbSysBusState, (obj), TYPE_MACFB)
-+
-+typedef struct {
-+    SysBusDevice busdev;
-+
-+    MacfbState macfb;
-+} MacfbSysBusState;
-+
-+#endif
-diff --git a/qemu-options.hx b/qemu-options.hx
-index bbfd936d29..e14b0b2beb 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1798,7 +1798,7 @@ ETEXI
+     select MOS6522
++    select ADB
  
- DEF("g", 1, QEMU_OPTION_g ,
-     "-g WxH[xDEPTH]  Set the initial graphical resolution and depth\n",
--    QEMU_ARCH_PPC | QEMU_ARCH_SPARC)
-+    QEMU_ARCH_PPC | QEMU_ARCH_SPARC | QEMU_ARCH_M68K)
- STEXI
- @item -g @var{width}x@var{height}[x@var{depth}]
- @findex -g
-diff --git a/vl.c b/vl.c
-index 630f5c5e9c..aa02e5b735 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3270,7 +3270,8 @@ int main(int argc, char **argv, char **envp)
-                     if (*p == 'x') {
-                         p++;
-                         depth = strtol(p, (char **)&p, 10);
--                        if (depth != 8 && depth != 15 && depth != 16 &&
-+                        if (depth != 1 && depth != 2 && depth != 4 &&
-+                            depth != 8 && depth != 15 && depth != 16 &&
-                             depth != 24 && depth != 32)
-                             goto graphic_error;
-                     } else if (*p == '\0') {
+ source macio/Kconfig
+diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
+index a052259613..2f54db9e1e 100644
+--- a/hw/misc/mac_via.c
++++ b/hw/misc/mac_via.c
+@@ -264,10 +264,16 @@
+  * Table 19-10 ADB transaction states
+  */
+ 
++#define ADB_STATE_NEW       0
++#define ADB_STATE_EVEN      1
++#define ADB_STATE_ODD       2
++#define ADB_STATE_IDLE      3
++
+ #define VIA1B_vADB_StateMask    (VIA1B_vADBS1 | VIA1B_vADBS2)
+ #define VIA1B_vADB_StateShift   4
+ 
+ #define VIA_TIMER_FREQ (783360)
++#define VIA_ADB_POLL_FREQ 50 /* XXX: not real */
+ 
+ /* VIA returns time offset from Jan 1, 1904, not 1970 */
+ #define RTC_OFFSET 2082844800
+@@ -449,6 +455,181 @@ static void via1_rtc_update(MacVIAState *m)
+     }
+ }
+ 
++static int adb_via_poll(MacVIAState *s, int state, uint8_t *data)
++{
++    if (state != ADB_STATE_IDLE) {
++        return 0;
++    }
++
++    if (s->adb_data_in_size < s->adb_data_in_index) {
++        return 0;
++    }
++
++    if (s->adb_data_out_index != 0) {
++        return 0;
++    }
++
++    s->adb_data_in_index = 0;
++    s->adb_data_out_index = 0;
++    s->adb_data_in_size = adb_poll(&s->adb_bus, s->adb_data_in, 0xffff);
++
++    if (s->adb_data_in_size) {
++        *data = s->adb_data_in[s->adb_data_in_index++];
++        qemu_irq_raise(s->adb_data_ready);
++    }
++
++    return s->adb_data_in_size;
++}
++
++static int adb_via_send(MacVIAState *s, int state, uint8_t data)
++{
++    switch (state) {
++    case ADB_STATE_NEW:
++        s->adb_data_out_index = 0;
++        break;
++    case ADB_STATE_EVEN:
++        if ((s->adb_data_out_index & 1) == 0) {
++            return 0;
++        }
++        break;
++    case ADB_STATE_ODD:
++        if (s->adb_data_out_index & 1) {
++            return 0;
++        }
++        break;
++    case ADB_STATE_IDLE:
++        return 0;
++    }
++
++    assert(s->adb_data_out_index < sizeof(s->adb_data_out) - 1);
++
++    s->adb_data_out[s->adb_data_out_index++] = data;
++    qemu_irq_raise(s->adb_data_ready);
++    return 1;
++}
++
++static int adb_via_receive(MacVIAState *s, int state, uint8_t *data)
++{
++    switch (state) {
++    case ADB_STATE_NEW:
++        return 0;
++
++    case ADB_STATE_EVEN:
++        if (s->adb_data_in_size <= 0) {
++            qemu_irq_raise(s->adb_data_ready);
++            return 0;
++        }
++
++        if (s->adb_data_in_index >= s->adb_data_in_size) {
++            *data = 0;
++            qemu_irq_raise(s->adb_data_ready);
++            return 1;
++        }
++
++        if ((s->adb_data_in_index & 1) == 0) {
++            return 0;
++        }
++
++        break;
++
++    case ADB_STATE_ODD:
++        if (s->adb_data_in_size <= 0) {
++            qemu_irq_raise(s->adb_data_ready);
++            return 0;
++        }
++
++        if (s->adb_data_in_index >= s->adb_data_in_size) {
++            *data = 0;
++            qemu_irq_raise(s->adb_data_ready);
++            return 1;
++        }
++
++        if (s->adb_data_in_index & 1) {
++            return 0;
++        }
++
++        break;
++
++    case ADB_STATE_IDLE:
++        if (s->adb_data_out_index == 0) {
++            return 0;
++        }
++
++        s->adb_data_in_size = adb_request(&s->adb_bus, s->adb_data_in,
++                                          s->adb_data_out,
++                                          s->adb_data_out_index);
++        s->adb_data_out_index = 0;
++        s->adb_data_in_index = 0;
++        if (s->adb_data_in_size < 0) {
++            *data = 0xff;
++            qemu_irq_raise(s->adb_data_ready);
++            return -1;
++        }
++
++        if (s->adb_data_in_size == 0) {
++            return 0;
++        }
++
++        break;
++    }
++
++    assert(s->adb_data_in_index < sizeof(s->adb_data_in) - 1);
++
++    *data = s->adb_data_in[s->adb_data_in_index++];
++    qemu_irq_raise(s->adb_data_ready);
++    if (*data == 0xff || *data == 0) {
++        return 0;
++    }
++    return 1;
++}
++
++static void via1_adb_update(MacVIAState *m)
++{
++    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
++    MOS6522State *s = MOS6522(v1s);
++    int state;
++    int ret;
++
++    state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
++
++    if (s->acr & VIA1ACR_vShiftOut) {
++        /* output mode */
++        ret = adb_via_send(m, state, s->sr);
++        if (ret > 0) {
++            s->b &= ~VIA1B_vADBInt;
++        } else {
++            s->b |= VIA1B_vADBInt;
++        }
++    } else {
++        /* input mode */
++        ret = adb_via_receive(m, state, &s->sr);
++        if (ret > 0 && s->sr != 0xff) {
++            s->b &= ~VIA1B_vADBInt;
++        } else {
++            s->b |= VIA1B_vADBInt;
++        }
++    }
++}
++
++static void via_adb_poll(void *opaque)
++{
++    MacVIAState *m = opaque;
++    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
++    MOS6522State *s = MOS6522(v1s);
++    int state;
++
++    if (s->b & VIA1B_vADBInt) {
++        state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
++        if (adb_via_poll(m, state, &s->sr)) {
++            s->b &= ~VIA1B_vADBInt;
++        }
++    }
++
++    timer_mod(m->adb_poll_timer,
++              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
++              (NANOSECONDS_PER_SECOND / VIA_ADB_POLL_FREQ));
++}
++
+ static uint64_t mos6522_q800_via1_read(void *opaque, hwaddr addr, unsigned size)
+ {
+     MOS6522Q800VIA1State *s = MOS6522_Q800_VIA1(opaque);
+@@ -511,6 +692,10 @@ static void mac_via_reset(DeviceState *dev)
+ {
+     MacVIAState *m = MAC_VIA(dev);
+ 
++    timer_mod(m->adb_poll_timer,
++              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
++              (NANOSECONDS_PER_SECOND / VIA_ADB_POLL_FREQ));
++
+     timer_mod(m->VBL_timer, (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 16630)
+               / 16630 * 16630);
+ 
+@@ -549,6 +734,10 @@ static void mac_via_realize(DeviceState *dev, Error **errp)
+ 
+     qemu_get_timedate(&tm, 0);
+     m->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
++
++    m->adb_poll_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, via_adb_poll, m);
++    m->adb_data_ready = qdev_get_gpio_in_named(dev, "via1-irq",
++                                               VIA1_IRQ_ADB_READY_BIT);
+ }
+ 
+ static void mac_via_init(Object *obj)
+@@ -594,7 +783,13 @@ static const VMStateDescription vmstate_mac_via = {
+         VMSTATE_UINT8(cmd, MacVIAState),
+         VMSTATE_INT32(wprotect, MacVIAState),
+         VMSTATE_INT32(alt, MacVIAState),
+-        /* external timers */
++        /* ADB */
++        VMSTATE_TIMER_PTR(adb_poll_timer, MacVIAState),
++        VMSTATE_INT32(adb_data_in_size, MacVIAState),
++        VMSTATE_INT32(adb_data_in_index, MacVIAState),
++        VMSTATE_INT32(adb_data_out_index, MacVIAState),
++        VMSTATE_BUFFER(adb_data_in, MacVIAState),
++        VMSTATE_BUFFER(adb_data_out, MacVIAState),
+         VMSTATE_TIMER_PTR(one_second_timer, MacVIAState),
+         VMSTATE_TIMER_PTR(VBL_timer, MacVIAState),
+         VMSTATE_END_OF_LIST()
+@@ -626,6 +821,7 @@ static void mos6522_q800_via1_portB_write(MOS6522State *s)
+     MacVIAState *m = container_of(v1s, MacVIAState, mos6522_via1);
+ 
+     via1_rtc_update(m);
++    via1_adb_update(m);
+ 
+     v1s->last_b = s->b;
+ }
+diff --git a/include/hw/misc/mac_via.h b/include/hw/misc/mac_via.h
+index 69bdecabb0..2181140293 100644
+--- a/include/hw/misc/mac_via.h
++++ b/include/hw/misc/mac_via.h
+@@ -97,6 +97,13 @@ typedef struct MacVIAState {
+ 
+     /* ADB */
+     ADBBusState adb_bus;
++    QEMUTimer *adb_poll_timer;
++    qemu_irq adb_data_ready;
++    int adb_data_in_size;
++    int adb_data_in_index;
++    int adb_data_out_index;
++    uint8_t adb_data_in[128];
++    uint8_t adb_data_out[16];
+ 
+     /* external timers */
+     QEMUTimer *one_second_timer;
 -- 
 2.21.0
 
