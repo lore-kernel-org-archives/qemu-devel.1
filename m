@@ -6,59 +6,60 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A097C4740A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:43:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99056C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:43:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2373020872
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:43:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2373020872
+	by mail.kernel.org (Postfix) with ESMTPS id 7223A20872
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 06:43:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7223A20872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7Zrf-0001dX-Va
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 02:43:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38555)
+	id 1i7Zri-0001hN-Bg
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 02:43:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38589)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1i7ZmN-0004kF-Sx
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:33 -0400
+ (envelope-from <armbru@redhat.com>) id 1i7ZmO-0004kJ-Ig
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1i7ZmL-0007h7-J7
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41832)
+ (envelope-from <armbru@redhat.com>) id 1i7ZmM-0007hw-LE
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53786)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i7ZmL-0007gh-AI
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:29 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i7ZmM-0007hU-Du
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 02:37:30 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7E92F191866D;
- Tue, 10 Sep 2019 06:37:28 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id AAA58309BF1C;
+ Tue, 10 Sep 2019 06:37:29 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 979205D6D0;
- Tue, 10 Sep 2019 06:37:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C4405C226;
+ Tue, 10 Sep 2019 06:37:29 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 2894711655EE; Tue, 10 Sep 2019 08:37:24 +0200 (CEST)
+ id 3418611655F4; Tue, 10 Sep 2019 08:37:24 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 10 Sep 2019 08:37:11 +0200
-Message-Id: <20190910063724.28470-4-armbru@redhat.com>
+Date: Tue, 10 Sep 2019 08:37:14 +0200
+Message-Id: <20190910063724.28470-7-armbru@redhat.com>
 In-Reply-To: <20190910063724.28470-1-armbru@redhat.com>
 References: <20190910063724.28470-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Tue, 10 Sep 2019 06:37:28 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Tue, 10 Sep 2019 06:37:29 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 03/16] qapi: Drop support for boxed
- alternate arguments
+Subject: [Qemu-devel] [PATCH v2 06/16] qapi: Restrict strings to printable
+ ASCII
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,162 +76,202 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commands and events can define their argument type inline (default) or
-by referring to another type ('boxed': true, since commit c818408e44
-"qapi: Implement boxed types for commands/events", v2.7.0).  The
-unboxed inline definition is an (anonymous) struct type.  The boxed
-type may be a struct, union, or alternate type.
+RFC 8259 on string contents:
 
-The latter is problematic: docs/interop/qemu-spec.txt requires the
-value of the 'data' key to be a json-object, but any non-degenerate
-alternate type has at least one branch that isn't.
+   All Unicode characters may be placed within the quotation marks,
+   except for the characters that MUST be escaped: quotation mark,
+   reverse solidus, and the control characters (U+0000 through
+   U+001F).
 
-Fortunately, we haven't made use of alternates in this context outside
-tests/.  Drop support for them.
+The QAPI schema parser accepts both less and more than JSON: it
+accepts only ASCII with \u (less), and accepts control characters
+other than LF (new line) unescaped.  How it treats unescaped non-ASCII
+input differs between Python 2 and Python 3.
 
-QAPISchemaAlternateType.is_empty() is now unused.  Drop it, too.
+Make it accept strictly less: require printable ASCII.  Drop support
+for \b, \f, \n, \r, \t.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- docs/devel/qapi-code-gen.txt            | 12 ++++++------
- scripts/qapi/common.py                  | 15 ++++-----------
- tests/qapi-schema/qapi-schema-test.json |  2 +-
- tests/qapi-schema/qapi-schema-test.out  |  2 +-
- 4 files changed, 12 insertions(+), 19 deletions(-)
+ scripts/qapi/common.py                        | 25 ++++++-------------
+ tests/Makefile.include                        |  3 ++-
+ tests/qapi-schema/string-code-point-127.err   |  1 +
+ ...de-str.exit =3D> string-code-point-127.exit} |  0
+ tests/qapi-schema/string-code-point-127.json  |  2 ++
+ ...code-str.out =3D> string-code-point-127.out} |  0
+ tests/qapi-schema/string-code-point-31.err    |  1 +
+ tests/qapi-schema/string-code-point-31.exit   |  1 +
+ tests/qapi-schema/string-code-point-31.json   |  2 ++
+ tests/qapi-schema/string-code-point-31.out    |  0
+ tests/qapi-schema/unicode-str.err             |  1 -
+ tests/qapi-schema/unicode-str.json            |  2 --
+ 12 files changed, 17 insertions(+), 21 deletions(-)
+ create mode 100644 tests/qapi-schema/string-code-point-127.err
+ rename tests/qapi-schema/{unicode-str.exit =3D> string-code-point-127.ex=
+it} (100%)
+ create mode 100644 tests/qapi-schema/string-code-point-127.json
+ rename tests/qapi-schema/{unicode-str.out =3D> string-code-point-127.out=
+} (100%)
+ create mode 100644 tests/qapi-schema/string-code-point-31.err
+ create mode 100644 tests/qapi-schema/string-code-point-31.exit
+ create mode 100644 tests/qapi-schema/string-code-point-31.json
+ create mode 100644 tests/qapi-schema/string-code-point-31.out
+ delete mode 100644 tests/qapi-schema/unicode-str.err
+ delete mode 100644 tests/qapi-schema/unicode-str.json
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index e8ec8ac1de..3d3931fb7a 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -612,9 +612,9 @@ the command.  Normally, 'data' is a dictionary for an=
- anonymous type,
- or names a struct type (possibly empty, but not a union), and its
- members are passed as separate arguments to this function.  If the
- command definition includes a key 'boxed' with the boolean value true,
--then 'data' is instead the name of any non-empty complex type
--(struct, union, or alternate), and a pointer to that QAPI type is
--passed as a single argument.
-+then 'data' is instead the name of any non-empty complex type (struct
-+or union), and a pointer to that QAPI type is passed as a single
-+argument.
-=20
- The generator also emits a marshalling function that extracts
- arguments for the user's function out of an input QDict, calls the
-@@ -714,9 +714,9 @@ The generator emits a function to send the event.  No=
-rmally, 'data' is
- a dictionary for an anonymous type, or names a struct type (possibly
- empty, but not a union), and its members are passed as separate
- arguments to this function.  If the event definition includes a key
--'boxed' with the boolean value true, then 'data' is instead the name of
--any non-empty complex type (struct, union, or alternate), and a
--pointer to that QAPI type is passed as a single argument.
-+'boxed' with the boolean value true, then 'data' is instead the name
-+of any non-empty complex type (struct or union), and a pointer to that
-+QAPI type is passed as a single argument.
-=20
-=20
- =3D=3D=3D Features =3D=3D=3D
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 9aefcfe015..54d02458b5 100644
+index 54d02458b5..c3dfad024f 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -840,7 +840,7 @@ def check_command(expr, info):
-=20
-     args_meta =3D ['struct']
-     if boxed:
--        args_meta +=3D ['union', 'alternate']
-+        args_meta +=3D ['union']
-     check_type(info, "'data' for command '%s'" % name,
-                expr.get('data'), allow_dict=3Dnot boxed,
-                allow_metas=3Dargs_meta)
-@@ -858,7 +858,7 @@ def check_event(expr, info):
-=20
-     meta =3D ['struct']
-     if boxed:
--        meta +=3D ['union', 'alternate']
-+        meta +=3D ['union']
-     check_type(info, "'data' for event '%s'" % name,
-                expr.get('data'), allow_dict=3Dnot boxed,
-                allow_metas=3Dmeta)
-@@ -1690,9 +1690,6 @@ class QAPISchemaAlternateType(QAPISchemaType):
-         visitor.visit_alternate_type(self.name, self.info, self.ifcond,
-                                      self.variants)
-=20
--    def is_empty(self):
--        return False
--
-=20
- class QAPISchemaCommand(QAPISchemaEntity):
-     def __init__(self, name, info, doc, ifcond, arg_type, ret_type,
-@@ -1714,15 +1711,13 @@ class QAPISchemaCommand(QAPISchemaEntity):
-         QAPISchemaEntity.check(self, schema)
-         if self._arg_type_name:
-             self.arg_type =3D schema.lookup_type(self._arg_type_name)
--            assert (isinstance(self.arg_type, QAPISchemaObjectType) or
--                    isinstance(self.arg_type, QAPISchemaAlternateType))
-+            assert isinstance(self.arg_type, QAPISchemaObjectType)
-             self.arg_type.check(schema)
-             if self.boxed:
-                 if self.arg_type.is_empty():
-                     raise QAPISemError(self.info,
-                                        "Cannot use 'boxed' with empty ty=
-pe")
-             else:
--                assert not isinstance(self.arg_type, QAPISchemaAlternate=
-Type)
-                 assert not self.arg_type.variants
-         elif self.boxed:
-             raise QAPISemError(self.info, "Use of 'boxed' requires 'data=
-'")
-@@ -1750,15 +1745,13 @@ class QAPISchemaEvent(QAPISchemaEntity):
-         QAPISchemaEntity.check(self, schema)
-         if self._arg_type_name:
-             self.arg_type =3D schema.lookup_type(self._arg_type_name)
--            assert (isinstance(self.arg_type, QAPISchemaObjectType) or
--                    isinstance(self.arg_type, QAPISchemaAlternateType))
-+            assert isinstance(self.arg_type, QAPISchemaObjectType)
-             self.arg_type.check(schema)
-             if self.boxed:
-                 if self.arg_type.is_empty():
-                     raise QAPISemError(self.info,
-                                        "Cannot use 'boxed' with empty ty=
-pe")
-             else:
--                assert not isinstance(self.arg_type, QAPISchemaAlternate=
-Type)
-                 assert not self.arg_type.variants
-         elif self.boxed:
-             raise QAPISemError(self.info, "Use of 'boxed' requires 'data=
-'")
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
-qapi-schema-test.json
-index c6d59acc3e..0fadb4ddd7 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -180,7 +180,7 @@
- { 'event': 'EVENT_D',
-   'data': { 'a' : 'EventStructOne', 'b' : 'str', '*c': 'str', '*enum3': =
-'EnumOne' } }
- { 'event': 'EVENT_E', 'boxed': true, 'data': 'UserDefZero' }
--{ 'event': 'EVENT_F', 'boxed': true, 'data': 'UserDefAlternate' }
-+{ 'event': 'EVENT_F', 'boxed': true, 'data': 'UserDefFlatUnion' }
-=20
- # test that we correctly compile downstream extensions, as well as munge
- # ticklish names
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-index 85d510bc00..5470a525f5 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -252,7 +252,7 @@ event EVENT_D q_obj_EVENT_D-arg
-    boxed=3DFalse
- event EVENT_E UserDefZero
-    boxed=3DTrue
--event EVENT_F UserDefAlternate
-+event EVENT_F UserDefFlatUnion
-    boxed=3DTrue
- enum __org.qemu_x-Enum
-     member __org.qemu_x-value
+@@ -523,17 +523,7 @@ class QAPISchemaParser(object):
+                     if ch =3D=3D '\n':
+                         raise QAPIParseError(self, 'Missing terminating =
+"\'"')
+                     if esc:
+-                        if ch =3D=3D 'b':
+-                            string +=3D '\b'
+-                        elif ch =3D=3D 'f':
+-                            string +=3D '\f'
+-                        elif ch =3D=3D 'n':
+-                            string +=3D '\n'
+-                        elif ch =3D=3D 'r':
+-                            string +=3D '\r'
+-                        elif ch =3D=3D 't':
+-                            string +=3D '\t'
+-                        elif ch =3D=3D 'u':
++                        if ch =3D=3D 'u':
+                             value =3D 0
+                             for _ in range(0, 4):
+                                 ch =3D self.src[self.cursor]
+@@ -552,20 +542,21 @@ class QAPISchemaParser(object):
+                                                      'For now, \\u escap=
+e '
+                                                      'only supports non-=
+zero '
+                                                      'values up to \\u00=
+7f')
+-                            string +=3D chr(value)
+-                        elif ch in '\\/\'"':
+-                            string +=3D ch
+-                        else:
++                            ch =3D chr(value)
++                        elif ch not in '\\/\'"':
+                             raise QAPIParseError(self,
+                                                  "Unknown escape \\%s" %=
+ ch)
+                         esc =3D False
+                     elif ch =3D=3D '\\':
+                         esc =3D True
++                        continue
+                     elif ch =3D=3D "'":
+                         self.val =3D string
+                         return
+-                    else:
+-                        string +=3D ch
++                    if ord(ch) < 32 or ord(ch) >=3D 127:
++                        raise QAPIParseError(
++                            self, "Funny character in string")
++                    string +=3D ch
+             elif self.src.startswith('true', self.pos):
+                 self.val =3D True
+                 self.cursor +=3D 3
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f5ac09549c..403748579f 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -452,6 +452,8 @@ qapi-schema +=3D returns-array-bad.json
+ qapi-schema +=3D returns-dict.json
+ qapi-schema +=3D returns-unknown.json
+ qapi-schema +=3D returns-whitelist.json
++qapi-schema +=3D string-code-point-31.json
++qapi-schema +=3D string-code-point-127.json
+ qapi-schema +=3D struct-base-clash-deep.json
+ qapi-schema +=3D struct-base-clash.json
+ qapi-schema +=3D struct-data-invalid.json
+@@ -463,7 +465,6 @@ qapi-schema +=3D type-bypass-bad-gen.json
+ qapi-schema +=3D unclosed-list.json
+ qapi-schema +=3D unclosed-object.json
+ qapi-schema +=3D unclosed-string.json
+-qapi-schema +=3D unicode-str.json
+ qapi-schema +=3D union-base-empty.json
+ qapi-schema +=3D union-base-no-discriminator.json
+ qapi-schema +=3D union-branch-case.json
+diff --git a/tests/qapi-schema/string-code-point-127.err b/tests/qapi-sch=
+ema/string-code-point-127.err
+new file mode 100644
+index 0000000000..c310910c23
+--- /dev/null
++++ b/tests/qapi-schema/string-code-point-127.err
+@@ -0,0 +1 @@
++tests/qapi-schema/string-code-point-127.json:2:14: Funny character in st=
+ring
+diff --git a/tests/qapi-schema/unicode-str.exit b/tests/qapi-schema/strin=
+g-code-point-127.exit
+similarity index 100%
+rename from tests/qapi-schema/unicode-str.exit
+rename to tests/qapi-schema/string-code-point-127.exit
+diff --git a/tests/qapi-schema/string-code-point-127.json b/tests/qapi-sc=
+hema/string-code-point-127.json
+new file mode 100644
+index 0000000000..480318a69f
+--- /dev/null
++++ b/tests/qapi-schema/string-code-point-127.json
+@@ -0,0 +1,2 @@
++# We accept printable ASCII: code points 32..126.  Test code point 127:
++{ 'command': '=7F' }
+diff --git a/tests/qapi-schema/unicode-str.out b/tests/qapi-schema/string=
+-code-point-127.out
+similarity index 100%
+rename from tests/qapi-schema/unicode-str.out
+rename to tests/qapi-schema/string-code-point-127.out
+diff --git a/tests/qapi-schema/string-code-point-31.err b/tests/qapi-sche=
+ma/string-code-point-31.err
+new file mode 100644
+index 0000000000..45797928d9
+--- /dev/null
++++ b/tests/qapi-schema/string-code-point-31.err
+@@ -0,0 +1 @@
++tests/qapi-schema/string-code-point-31.json:2:14: Funny character in str=
+ing
+diff --git a/tests/qapi-schema/string-code-point-31.exit b/tests/qapi-sch=
+ema/string-code-point-31.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/string-code-point-31.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/string-code-point-31.json b/tests/qapi-sch=
+ema/string-code-point-31.json
+new file mode 100644
+index 0000000000..f186cbd720
+--- /dev/null
++++ b/tests/qapi-schema/string-code-point-31.json
+@@ -0,0 +1,2 @@
++# We accept printable ASCII: code points 32..126.  Test code point 127:
++{ 'command': '=1F' }
+diff --git a/tests/qapi-schema/string-code-point-31.out b/tests/qapi-sche=
+ma/string-code-point-31.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/unicode-str.err b/tests/qapi-schema/unicod=
+e-str.err
+deleted file mode 100644
+index f621cd6448..0000000000
+--- a/tests/qapi-schema/unicode-str.err
++++ /dev/null
+@@ -1 +0,0 @@
+-tests/qapi-schema/unicode-str.json:2: 'command' uses invalid name '=C3=A9=
+'
+diff --git a/tests/qapi-schema/unicode-str.json b/tests/qapi-schema/unico=
+de-str.json
+deleted file mode 100644
+index 5253a1b9f3..0000000000
+--- a/tests/qapi-schema/unicode-str.json
++++ /dev/null
+@@ -1,2 +0,0 @@
+-# we don't support full Unicode strings, yet
+-{ 'command': '=C3=A9' }
 --=20
 2.21.0
 
