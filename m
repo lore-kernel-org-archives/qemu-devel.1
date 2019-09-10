@@ -2,88 +2,83 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A7E7C49ED7
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 20:03:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D1DCC49ED7
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 20:13:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F2ED21019
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 20:03:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F2ED21019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1D39721019
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 20:13:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D39721019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7mLv-0001u9-74
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 16:03:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36278)
+	id 1i7mWN-0004gZ-85
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 16:13:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37721)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i7mLF-0001VH-E7
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 16:02:22 -0400
+ (envelope-from <chen.zhang@intel.com>) id 1i7mVU-0004Ho-2T
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 16:12:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i7mLB-0003Gv-TQ
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 16:02:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50868)
+ (envelope-from <chen.zhang@intel.com>) id 1i7mVR-0000Pp-7y
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 16:12:55 -0400
+Received: from mga17.intel.com ([192.55.52.151]:13749)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i7mLB-0003GY-Lv
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 16:02:17 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3DB8D859FE
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 20:02:15 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id f10so291892wmh.8
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 13:02:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=BviTQ3Qj/BsqP7pADTWVUBfn1nIItMLyxrE0GePPGLk=;
- b=NHE7yI1Day2LypXNJgKVf2KWZY3+Dx79AXmXISg90T6Ez4x62sao4fOxvoGqDtFCM4
- TgFSRFT2xu/6j5AHTNGJQWD3+6+Eh+CvRjT8qIspuDOembOT/KZQfDyAg77bVO5E6FOB
- knczeaK0PGCq0PeR8bZli3fZpvFZ/js0dIKdDFTgNsoLZTnrVSOiDwBsgR2YHovl/CCc
- JoB8tSW6C4Z/WncTr7F3zT42Ln0nrBGMmTDPI5jPK61l4t2kixDVcY7EWGHXr1DpTnUh
- P9zVgnnMMlC558C1Xj9Bx+d9bV8zQRobvzOjjViFkCadMKYhWzt5SIqKvWL8q6wt67Xj
- CuoQ==
-X-Gm-Message-State: APjAAAXxmsJqluoHPvrzung+cWe11xUQn17U9fGWvM5u7qcNQGBuxaFY
- aGRrp+tCql2B7McaW6lZVeNqEkAiy+S5uZWDViTY1Z671jyRME/TYOJgTBo0JgDUz7Qoa9IDDMu
- PWiUP08IwjWaO9Mk=
-X-Received: by 2002:adf:fd41:: with SMTP id h1mr8894654wrs.315.1568145733495; 
- Tue, 10 Sep 2019 13:02:13 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwQZadBnaVhV5LN+l//HnU3xv/Ay3fXwBe5THApkqDTlqTX7rCUndMLBC9lUdYF1Reuu17Oyg==
-X-Received: by 2002:adf:fd41:: with SMTP id h1mr8894639wrs.315.1568145733273; 
- Tue, 10 Sep 2019 13:02:13 -0700 (PDT)
-Received: from [192.168.1.41] (251.red-88-10-102.dynamicip.rima-tde.net.
- [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id u22sm35907563wru.72.2019.09.10.13.02.12
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 10 Sep 2019 13:02:12 -0700 (PDT)
-To: Cleber Rosa <crosa@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Eduardo Habkost <ehabkost@redhat.com>
-References: <20190910163430.11326-1-f4bug@amsat.org>
- <20190910170745.GA26663@localhost.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <f65c9b9f-97a7-8c6c-2a09-37a4de98d67c@redhat.com>
-Date: Tue, 10 Sep 2019 22:02:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20190910170745.GA26663@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
+ id 1i7mVQ-0000Ic-Ub
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 16:12:53 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 10 Sep 2019 13:12:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,490,1559545200"; d="scan'208";a="209441766"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+ by fmsmga004.fm.intel.com with ESMTP; 10 Sep 2019 13:12:48 -0700
+Received: from fmsmsx155.amr.corp.intel.com (10.18.116.71) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 10 Sep 2019 13:12:48 -0700
+Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
+ FMSMSX155.amr.corp.intel.com (10.18.116.71) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 10 Sep 2019 13:12:48 -0700
+Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.113]) by
+ SHSMSX151.ccr.corp.intel.com ([169.254.3.53]) with mapi id 14.03.0439.000;
+ Wed, 11 Sep 2019 04:12:46 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Lukas Straub <lukasstraub2@web.de>, qemu-devel <qemu-devel@nongnu.org>
+Thread-Topic: [PATCH v4 3/4] net/filter.c: Add Options to insert filters
+ anywhere in the filter list
+Thread-Index: AQHVZ8CaT0gcOKe01kmL9/Hq7puDHKclVlVw
+Date: Tue, 10 Sep 2019 20:12:45 +0000
+Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D7806264100@shsmsx102.ccr.corp.intel.com>
+References: <cover.1568110100.git.lukasstraub2@web.de>
+ <77d2eb7d0ce8a1887a575119e21ce0a06d4af533.1568110100.git.lukasstraub2@web.de>
+In-Reply-To: <77d2eb7d0ce8a1887a575119e21ce0a06d4af533.1568110100.git.lukasstraub2@web.de>
+Accept-Language: en-US
 Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMDAzNzFkMjktYTc2YS00ZjE0LWIyYzgtNmM5YThiNTNiYjY2IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiSWVGTmQyWVJvTlI5MnFcLytJVEtheDArMWl5Z011N1pCWG1jWFdvZ2lhMW5RakZcL1AxYlBxMTdLUmtBTWNtK0h5In0=
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] BootLinuxConsoleTest: Test the Quadra 800
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.151
+Subject: Re: [Qemu-devel] [PATCH v4 3/4] net/filter.c: Add Options to insert
+ filters anywhere in the filter list
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,146 +90,300 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <huth@tuxfamily.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>, Jason Wang <jasowang@redhat.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/10/19 7:07 PM, Cleber Rosa wrote:
-> On Tue, Sep 10, 2019 at 06:34:30PM +0200, Philippe Mathieu-Daud=C3=A9 w=
-rote:
->> This test boots a Linux kernel on a Quadra 800 board
->> and verify the serial is working.
->>
->> Example:
->>
->>   $ avocado --show=3Dapp,console run -t machine:q800 tests/acceptance/=
-boot_linux_console.py
->>   console: ABCFGHIJK
->>   console: Linux version 5.2.0-2-m68k (debian-kernel@lists.debian.org)=
- (gcc version 8.3.0 (Debian 8.3.0-21)) #1 Debian 5.2.9-2 (2019-08-21)
->>   console: Detected Macintosh model: 35
->>   console: Apple Macintosh Quadra 800
->>   console: Built 1 zonelists, mobility grouping on.  Total pages: 3244=
-8
->>   console: Kernel command line: printk.time=3D0 console=3DttyS0 vga=3D=
-off
->>   [...]
->>   console: Calibrating delay loop... 1236.99 BogoMIPS (lpj=3D6184960)
->>   [...]
->>   console: NuBus: Scanning NuBus slots.
->>   console: Slot 9: Board resource not found!
->>   console: SCSI subsystem initialized
->>   console: clocksource: Switched to clocksource via1
->>   [...]
->>   console: macfb: framebuffer at 0xf9001000, mapped to 0x(ptrval), siz=
-e 468k
->>   console: macfb: mode is 800x600x8, linelength=3D800
->>   console: Console: switching to colour frame buffer device 100x37
->>   console: fb0: DAFB frame buffer device
->>   console: pmac_zilog: 0.6 (Benjamin Herrenschmidt <benh@kernel.crashi=
-ng.org>)
->>   console: scc.0: ttyS0 at MMIO 0x50f0c022 (irq =3D 4, base_baud =3D 2=
-30400) is a Z85c30 ESCC - Serial port
->>   console: scc.1: ttyS1 at MMIO 0x50f0c020 (irq =3D 4, base_baud =3D 2=
-30400) is a Z85c30 ESCC - Serial port
->>   console: Non-volatile memory driver v1.3
->>   console: adb: Mac II ADB Driver v1.0 for Unified ADB
->>   console: mousedev: PS/2 mouse device common for all mice
->>   console: random: fast init done
->>   console: Detected ADB keyboard, type <unknown>.
->>   console: input: ADB keyboard as /devices/virtual/input/input0
->>   console: input: ADB mouse as /devices/virtual/input/input1
->>   console: rtc-generic rtc-generic: registered as rtc0
->>   console: ledtrig-cpu: registered to indicate activity on CPUs
->>   [...]
->>   console: rtc-generic rtc-generic: setting system clock to 2019-09-10=
-T16:20:25 UTC (1568132425)
->>   console: List of all partitions:
->>   console: No filesystem could mount root, tried:
->>   JOB TIME   : 2.91 s
->>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->> Based-on: <20190910113323.17324-1-laurent@vivier.eu>
->> "hw/m68k: add Apple Machintosh Quadra 800 machine"
->> https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg01775.html
->> ---
->>  tests/acceptance/boot_linux_console.py | 24 ++++++++++++++++++++++++
->>  1 file changed, 24 insertions(+)
->>
->> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance=
-/boot_linux_console.py
->> index 2504ef0150..8e346bb0f4 100644
->> --- a/tests/acceptance/boot_linux_console.py
->> +++ b/tests/acceptance/boot_linux_console.py
->> @@ -373,3 +373,27 @@ class BootLinuxConsole(Test):
->>          self.vm.launch()
->>          console_pattern =3D 'Kernel command line: %s' % kernel_comman=
-d_line
->>          self.wait_for_console_pattern(console_pattern)
->> +
->> +    def test_m68k_q800(self):
->> +        """
->> +        :avocado: tags=3Darch:m68k
->> +        :avocado: tags=3Dmachine:q800
->> +        """
->> +        deb_url =3D ('http://ftp.ports.debian.org/debian-ports/pool-m=
-68k/main'
->> +                   '/l/linux/kernel-image-5.2.0-2-m68k-di_5.2.9-2_m68=
-k.udeb')
->> +        deb_hash =3D '0797e05129595f22f3c0142db5e199769a723bf9'
->> +        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
->> +        kernel_path =3D self.extract_from_deb(deb_path,
->> +                                            '/boot/vmlinux-5.2.0-2-m6=
-8k')
->> +
->> +        self.vm.set_machine('q800')
->> +        self.vm.set_console()
->> +        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
->> +                               'console=3DttyS0 vga=3Doff')
->> +        self.vm.add_args('-kernel', kernel_path,
->> +                         '-append', kernel_command_line)
->> +        self.vm.launch()
->> +        console_pattern =3D 'Kernel command line: %s' % kernel_comman=
-d_line
->> +        self.wait_for_console_pattern(console_pattern)
->> +        console_pattern =3D 'No filesystem could mount root'
->> +        self.wait_for_console_pattern(console_pattern)
->> --=20
->> 2.20.1
->>
+
+> -----Original Message-----
+> From: Lukas Straub <lukasstraub2@web.de>
+> Sent: Tuesday, September 10, 2019 6:15 PM
+> To: qemu-devel <qemu-devel@nongnu.org>
+> Cc: Zhang, Chen <chen.zhang@intel.com>; Jason Wang
+> <jasowang@redhat.com>; Wen Congyang <wencongyang2@huawei.com>;
+> Xie Changlong <xiechanglong.d@gmail.com>; kwolf@redhat.com;
+> mreitz@redhat.com
+> Subject: [PATCH v4 3/4] net/filter.c: Add Options to insert filters anywh=
+ere in
+> the filter list
 >=20
-> LGTM.
+> To switch the Secondary to Primary, we need to insert new filters before =
+the
+> filter-rewriter.
 >=20
-> Of course it needs to wait for the series adding the machine type.
-> If there's a new version of the series, shouldn't this be included
-> there?
-
-At some point I'd like we enforce the rule "each new machine is added
-with an integration test".
-So far we are still trying to figure out what is the best use of Avocado
-for QEMU, and what are good/cheap tests, how easy it is to add/use them,
-and so on. We are improving :)
-So, with this idea, indeed machine tests should go with the the series
-that introduce it.
-Meanwhile (there is no enforcement) I'm following new machines and
-trying to catch them, ask the developer how to test them if there is no
-guidelines, and add tests.
-
-Laurent, do you agree to queue this patch to your series?
-
->  Either way:
+> Add the options insert=3D and position=3D to be able to insert filters an=
+ywhere in
+> the filter list.
 >=20
-> Tested-by: Cleber Rosa <crosa@redhat.com>
-> Reviewed-by: Cleber Rosa <crosa@redhat.com>
+> position should be either "head", "tail" or the id of another filter.
 
-Thanks!
+In current patch, we cannot distinguish the real "head/tail" or the ID =3D =
+"head/tail".
+And in real environment we can't order users reserve the "head/tail" as key=
+words.
+So, I think we can use position=3DID-xxxx/head/tail to solve this issue, or=
+ do you have any other idea?
 
-Regards,
+Thanks
+Zhang Chen
 
-Phil.
+> insert should be either "before" or "behind" to specify where to insert t=
+he
+> new filter relative to the one specified with position.
+>=20
+> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+> ---
+>  include/net/filter.h |  2 ++
+>  net/filter.c         | 78
+> +++++++++++++++++++++++++++++++++++++++++++-
+>  qemu-options.hx      | 10 +++---
+>  3 files changed, 84 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/include/net/filter.h b/include/net/filter.h index
+> 49da666ac0..22a723305b 100644
+> --- a/include/net/filter.h
+> +++ b/include/net/filter.h
+> @@ -62,6 +62,8 @@ struct NetFilterState {
+>      NetClientState *netdev;
+>      NetFilterDirection direction;
+>      bool on;
+> +    char *position;
+> +    bool insert_before_flag;
+>      QTAILQ_ENTRY(NetFilterState) next;
+>  };
+>=20
+> diff --git a/net/filter.c b/net/filter.c index 28d1930db7..eb0e9849a5 100=
+644
+> --- a/net/filter.c
+> +++ b/net/filter.c
+> @@ -171,11 +171,47 @@ static void netfilter_set_status(Object *obj, const
+> char *str, Error **errp)
+>      }
+>  }
+>=20
+> +static char *netfilter_get_position(Object *obj, Error **errp) {
+> +    NetFilterState *nf =3D NETFILTER(obj);
+> +
+> +    return g_strdup(nf->position);
+> +}
+> +
+> +static void netfilter_set_position(Object *obj, const char *str, Error
+> +**errp) {
+> +    NetFilterState *nf =3D NETFILTER(obj);
+> +
+> +    nf->position =3D g_strdup(str);
+> +}
+> +
+> +static char *netfilter_get_insert(Object *obj, Error **errp) {
+> +    NetFilterState *nf =3D NETFILTER(obj);
+> +
+> +    return nf->insert_before_flag ? g_strdup("before") :
+> +g_strdup("behind"); }
+> +
+> +static void netfilter_set_insert(Object *obj, const char *str, Error
+> +**errp) {
+> +    NetFilterState *nf =3D NETFILTER(obj);
+> +
+> +    if (strcmp(str, "before") && strcmp(str, "behind")) {
+> +        error_setg(errp, "Invalid value for netfilter insert, "
+> +                         "should be 'before' or 'behind'");
+> +        return;
+> +    }
+> +
+> +    nf->insert_before_flag =3D !strcmp(str, "before"); }
+> +
+>  static void netfilter_init(Object *obj)  {
+>      NetFilterState *nf =3D NETFILTER(obj);
+>=20
+>      nf->on =3D true;
+> +    nf->insert_before_flag =3D false;
+> +    nf->position =3D g_strdup("tail");
+>=20
+>      object_property_add_str(obj, "netdev",
+>                              netfilter_get_netdev_id, netfilter_set_netde=
+v_id, @@ -
+> 187,11 +223,18 @@ static void netfilter_init(Object *obj)
+>      object_property_add_str(obj, "status",
+>                              netfilter_get_status, netfilter_set_status,
+>                              NULL);
+> +    object_property_add_str(obj, "position",
+> +                            netfilter_get_position, netfilter_set_positi=
+on,
+> +                            NULL);
+> +    object_property_add_str(obj, "insert",
+> +                            netfilter_get_insert, netfilter_set_insert,
+> +                            NULL);
+>  }
+>=20
+>  static void netfilter_complete(UserCreatable *uc, Error **errp)  {
+>      NetFilterState *nf =3D NETFILTER(uc);
+> +    NetFilterState *position =3D NULL;
+>      NetClientState *ncs[MAX_QUEUE_NUM];
+>      NetFilterClass *nfc =3D NETFILTER_GET_CLASS(uc);
+>      int queues;
+> @@ -219,6 +262,27 @@ static void netfilter_complete(UserCreatable *uc,
+> Error **errp)
+>          return;
+>      }
+>=20
+> +    if (strcmp(nf->position, "head") && strcmp(nf->position, "tail")) {
+> +        /* Search for the position to insert before/behind */
+> +        Object *container;
+> +        Object *obj;
+> +
+> +        container =3D object_get_objects_root();
+> +        obj =3D object_resolve_path_component(container, nf->position);
+> +        if (!obj) {
+> +            error_setg(errp, "filter '%s' not found", nf->position);
+> +            return;
+> +        }
+> +
+> +        position =3D NETFILTER(obj);
+> +
+> +        if (position->netdev !=3D ncs[0]) {
+> +            error_setg(errp, "filter '%s' belongs to a different netdev"=
+,
+> +                        nf->position);
+> +            return;
+> +        }
+> +    }
+> +
+>      nf->netdev =3D ncs[0];
+>=20
+>      if (nfc->setup) {
+> @@ -228,7 +292,18 @@ static void netfilter_complete(UserCreatable *uc,
+> Error **errp)
+>              return;
+>          }
+>      }
+> -    QTAILQ_INSERT_TAIL(&nf->netdev->filters, nf, next);
+> +
+> +    if (position) {
+> +        if (nf->insert_before_flag) {
+> +            QTAILQ_INSERT_BEFORE(position, nf, next);
+> +        } else {
+> +            QTAILQ_INSERT_AFTER(&nf->netdev->filters, position, nf, next=
+);
+> +        }
+> +    } else if (!strcmp(nf->position, "head")) {
+> +        QTAILQ_INSERT_HEAD(&nf->netdev->filters, nf, next);
+> +    } else if (!strcmp(nf->position, "tail")) {
+> +        QTAILQ_INSERT_TAIL(&nf->netdev->filters, nf, next);
+> +    }
+>  }
+>=20
+>  static void netfilter_finalize(Object *obj) @@ -245,6 +320,7 @@ static v=
+oid
+> netfilter_finalize(Object *obj)
+>          QTAILQ_REMOVE(&nf->netdev->filters, nf, next);
+>      }
+>      g_free(nf->netdev_id);
+> +    g_free(nf->position);
+>  }
+>=20
+>  static void default_handle_event(NetFilterState *nf, int event, Error **=
+errp)
+> diff --git a/qemu-options.hx b/qemu-options.hx index
+> 08749a3391..1fd294a10f 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -4368,7 +4368,7 @@ applications, they can do this through this
+> parameter. Its format is  a gnutls priority string as described at
+> @url{https://gnutls.org/manual/html_node/Priority-Strings.html}.
+>=20
+> -@item -object filter-
+> buffer,id=3D@var{id},netdev=3D@var{netdevid},interval=3D@var{t}[,queue=3D=
+@var{
+> all|rx|tx}][,status=3D@var{on|off}]
+> +@item -object
+> +filter-buffer,id=3D@var{id},netdev=3D@var{netdevid},interval=3D@var{t}[,=
+queue
+> +=3D@var{all|rx|tx}][,status=3D@var{on|off}][,position=3D@var{head|tail|i=
+d}][,
+> +insert=3D@var{behind|before}]
+>=20
+>  Interval @var{t} can't be 0, this filter batches the packet delivery: al=
+l  packets
+> arriving in a given interval on netdev @var{netdevid} are delayed @@ -
+> 4387,11 +4387,11 @@ queue @var{all|rx|tx} is an option that can be applie=
+d
+> to any netfilter.
+>  @option{tx}: the filter is attached to the transmit queue of the netdev,
+>               where it will receive packets sent by the netdev.
+>=20
+> -@item -object filter-
+> mirror,id=3D@var{id},netdev=3D@var{netdevid},outdev=3D@var{chardevid},que=
+ue
+> =3D@var{all|rx|tx}[,vnet_hdr_support]
+> +@item -object
+> +filter-mirror,id=3D@var{id},netdev=3D@var{netdevid},outdev=3D@var{charde=
+vid},
+> +queue=3D@var{all|rx|tx}[,vnet_hdr_support][,position=3D@var{head|tail|id=
+}][
+> +,insert=3D@var{behind|before}]
+>=20
+>  filter-mirror on netdev @var{netdevid},mirror net packet to
+> chardev@var{chardevid}, if it has the vnet_hdr_support flag, filter-mirro=
+r will
+> mirror packet with vnet_hdr_len.
+>=20
+> -@item -object filter-
+> redirector,id=3D@var{id},netdev=3D@var{netdevid},indev=3D@var{chardevid},=
+out
+> dev=3D@var{chardevid},queue=3D@var{all|rx|tx}[,vnet_hdr_support]
+> +@item -object
+> +filter-redirector,id=3D@var{id},netdev=3D@var{netdevid},indev=3D@var{cha=
+rdevi
+> +d},outdev=3D@var{chardevid},queue=3D@var{all|rx|tx}[,vnet_hdr_support][,=
+p
+> os
+> +ition=3D@var{head|tail|id}][,insert=3D@var{behind|before}]
+>=20
+>  filter-redirector on netdev @var{netdevid},redirect filter's net packet =
+to
+> chardev  @var{chardevid},and redirect indev's packet to filter.if it has =
+the
+> vnet_hdr_support flag, @@ -4400,7 +4400,7 @@ Create a filter-redirector
+> we need to differ outdev id from indev id, id can not  be the same. we ca=
+n
+> just use indev or outdev, but at least one of indev or outdev  need to be
+> specified.
+>=20
+> -@item -object filter-
+> rewriter,id=3D@var{id},netdev=3D@var{netdevid},queue=3D@var{all|rx|tx},[v=
+net_
+> hdr_support]
+> +@item -object
+> +filter-rewriter,id=3D@var{id},netdev=3D@var{netdevid},queue=3D@var{all|r=
+x|tx}
+> +,[vnet_hdr_support][,position=3D@var{head|tail|id}][,insert=3D@var{behin=
+d|b
+> +efore}]
+>=20
+>  Filter-rewriter is a part of COLO project.It will rewrite tcp packet to
+> secondary from primary to keep secondary tcp connection,and rewrite @@ -
+> 4413,7 +4413,7 @@ colo secondary:
+>  -object filter-redirector,id=3Df2,netdev=3Dhn0,queue=3Drx,outdev=3Dred1
+>  -object filter-rewriter,id=3Drew0,netdev=3Dhn0,queue=3Dall
+>=20
+> -@item -object filter-
+> dump,id=3D@var{id},netdev=3D@var{dev}[,file=3D@var{filename}][,maxlen=3D@=
+var{
+> len}]
+> +@item -object
+> +filter-
+> dump,id=3D@var{id},netdev=3D@var{dev}[,file=3D@var{filename}][,maxlen=3D
+> +@var{len}][,position=3D@var{head|tail|id}][,insert=3D@var{behind|before}=
+]
+>=20
+>  Dump the network traffic on netdev @var{dev} to the file specified by
+> @var{filename}. At most @var{len} bytes (64k by default) per packet are
+> stored.
+> --
+> 2.20.1
+
 
