@@ -6,37 +6,39 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 728CEC4740A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 08:30:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24686C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 08:32:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B2A0206A5
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 08:30:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B2A0206A5
+	by mail.kernel.org (Postfix) with ESMTPS id EE4E220872
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 08:32:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE4E220872
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7bXt-0000y5-BP
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 04:30:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32944)
+	id 1i7bZU-0001sj-UM
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 04:32:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33213)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i7bWq-0000QP-4b
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:29:37 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i7bY1-0001Dy-IT
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:30:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i7bWp-0007wq-1l
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:29:36 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:60199)
+ (envelope-from <laurent@vivier.eu>) id 1i7bY0-0008Kh-FJ
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:30:49 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:54725)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i7bWo-0007vw-Pb
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:29:35 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i7bY0-0008K0-6p
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:30:48 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1N3bjH-1iFgDK0bcR-010btG; Tue, 10 Sep 2019 10:29:29 +0200
-To: qemu-devel@nongnu.org
-References: <20190908104816.20713-1-laurent@vivier.eu>
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MyK9U-1iLwXN4AaS-00yhws; Tue, 10 Sep 2019 10:30:34 +0200
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20190908061543.25136-1-f4bug@amsat.org>
+ <20190908061543.25136-4-f4bug@amsat.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -81,35 +83,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <428dadfa-9cf3-6a5f-0a4b-bc1beedcd324@vivier.eu>
-Date: Tue, 10 Sep 2019 10:29:27 +0200
+Message-ID: <696b8e27-f383-c7bf-20ee-1f596949cbf4@vivier.eu>
+Date: Tue, 10 Sep 2019 10:30:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190908104816.20713-1-laurent@vivier.eu>
+In-Reply-To: <20190908061543.25136-4-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Sk2bzkR7R/qIU28+H68T/D7wl/Fc5RY0HtXixdjPhVTPgPRN0/t
- ACD2+TwdA+uYSHgN6FUohCm7wsHZpL2Ik4ZGzXoEmq7WKTXitAvRZdLq5/QP/LCJZwfeob7
- mXReJH11Fj2ehqKJ3IKSJw31FtKvjtu5YIwmvYFTJWp/pqI+j7YHUc11uivjjccCCzEimxs
- mo8ojxKBOWZTNZZCGGF5Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:fPaP2HcUlJQ=:3N61doNwViFGECRky45Td3
- S//tNB5FSic7tP04ItIIafeklIBjq75mk4uSdoHs9cU2OSBqbkxZG4ja59N8mjxsxqwSRnXOf
- ujYcdaiNyeqPEW20RC+jUal7/5YDt+KI7e6c/NHe9ceej3ptRuCQ5z7DuuqnZNYXyu4aGIQHs
- nNE6K4SMGvrbPtsgVCXhYZgkVIupxLbT2y308sDj4m+rvrXdi0T1HPOyShauP5mZZ7oiadps7
- 0L6LWAQCKRvRHBBNkdXTzpFecvwK2WQjOrDy3SbwkigFwmmrk00UHM6CfGEvQrFkmGYb5Xoc2
- cO462BssuFMcw3qEU05nE9gh+eEJpvcwpUddH1KQvtBWZtqAKuU6B3+lwMrj5aAQK+C2eT287
- seVPqlY/tjBsscykcklxg9JbwCamWxOTJFYxTItt5fEpAh0Ce/Im6XCnOLmQxwOf7l8xTD+kO
- 40rpJ+p72SNydv9VDqQ8mcQ9EAqaAG/uJXF6KLtmqzUfWBJ/cOBSEgJTbyG+SJVapll6W/tQr
- 9v6SADY9cCZ6135HneZ9j5nfBShiCs9VYSO94TZ5BC8TG+i7tnOgo5l1P9j7yUtMUtaezjIcC
- aX3Po8fZGjjCF+numswwXE6w69f9a1+t6kQkS7bLiqoxa6MJ+fA/6FO7OV84Z1ikPGK1y2XPh
- vzsxFu9V85u6aTXrp9dOZ/UXn9yMYTaSJ/vVzPUoXAUfw0/cdspkw3eYl6rky3/XqoSNtHKYn
- HYfqjQxZLJuVK12WKyHOQMJQOMcRa50SBD3mDfUHB/6wfTjKNMWb92dKbXRS5ToC+Kg0xh/MQ
- wufBj2hVIqGxkCe8Z69eZGutL+TGajYo8Y/0YzfmwHifLt7xGA=
+X-Provags-ID: V03:K1:6zGDqMeYApvd4jVwK5ged3ocSBAH+8JBw0XErqw9hCKf1qN56j5
+ ICUvSC55YhlqAXVDG8UlBL0U8pfYKyZHoIEVczy792WaCN/Lhxgly14O0sMiOULfJTJw2GQ
+ aQo73sTY8n9hfzrZgViX2NXMfIh97gLXUf6A+dm1B7y1wT40Px3M1faPLcjOuXmnOfHrkzj
+ 2cMRDoKN3OvxB5wR828LA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:pu0qqQH9qQQ=:y9XnkZiclzx/B2eeOkO1zH
+ ZC9Y7h3SUqUhO3K6tGRIIjChG82W1QjndbRU77ED7Ul+Ps9/4UJjGCVoh0GOJ0sl0oiKr2hKC
+ S11HeHm9pFU8bZBJKJSjBsXEM2rkNAxpVKM0eh61I4EUgDJNVQEaustSo9IZNwsG/V9xQJAVj
+ d05osRSnCatuy+wf1NuYS+gkCAHNYcMQybHELe7kK4BATZ0vYHubfuu+eYlJWlNzh9OB1ZD4o
+ nbfl4a0aT+sRCeHq22EqZoKvQXbN7FjxMRN4ejEn+MzcStihv/XrJWWNT9VhKb0X/FSWGmX2U
+ Ybbk3NMisNuPAu9qeEMg27jm6CZSZhsfx3SOaA8k5D/mQ+4l3hlSoI7NzQ4GkKUCOSQH2xSx0
+ t8IntwYKgGD42cq7vrv8UJPQCzO29pOdCSHYmkn7nPxXAOs9qF4+eRd1y/any4SBysHrO8qvq
+ EnY2km3+f0uCUB3oTdaCj404qG8TDQicDHnfQGIcPVuFmQOwCfwldLgyYOlJy42SYZ3JLxLUu
+ wFNQgCJzmkN1A6IStPJGtbYc7KUmvCOOfj1StWsPiPidOYdMniRqmilvqWB9R1Y5DLrBEDgyk
+ OR2uEERIM4XHI4sUdaedX2Ra3xSi1zFwYvDGlcqJ03sDktxZVC3qnCyKG/sxz+uyO6EpSwhwN
+ MYaOtbub+S0ddC8xcdFSOczEzMjKsIZ245gotcjl7MuUjHSdd0xBJ2P+AQ6nw5wYA/m2I8JsK
+ InUSRM+VnlkMEwLenpIyj5BXiVSmnIYM0l9XRn/nh0IKLlHbVZMAljYnNhx8IhI5OuLvh4lUt
+ lLVu4mLMXHPKtJwbSGvwMbsVWW70ZNSesj84g1zKSepNJ1FbIs=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.130
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] linux-user: remove useless variable
+X-Received-From: 212.227.126.135
+Subject: Re: [Qemu-devel] [PATCH v6 3/8] linux-user/strace: Improve
+ settimeofday()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,69 +124,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>,
- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Cc: =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>,
+ Riku Voipio <riku.voipio@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 08/09/2019 à 12:48, Laurent Vivier a écrit :
-> filename is only used to open the file if AT_EXECFD is not provided.
-> But exec_path already contains the path of the file to open.
-> Remove filename as it is only used in main.c whereas exec_path is
-> also used in syscall.c.
-> 
-> Fixes: d088d664f201 ("linux-user: identify running binary in /proc/self/exe")
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Le 08/09/2019 à 08:15, Philippe Mathieu-Daudé a écrit :
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Tested-By: Guido Günther <agx@sigxcpu.org>
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  linux-user/main.c | 10 ++++------
->  1 file changed, 4 insertions(+), 6 deletions(-)
+>  linux-user/strace.c    | 13 +++++++++++++
+>  linux-user/strace.list |  2 +-
+>  2 files changed, 14 insertions(+), 1 deletion(-)
 > 
-> diff --git a/linux-user/main.c b/linux-user/main.c
-> index 47917bbb20fc..28f0065b6ddf 100644
-> --- a/linux-user/main.c
-> +++ b/linux-user/main.c
-> @@ -49,7 +49,6 @@
->  char *exec_path;
+> diff --git a/linux-user/strace.c b/linux-user/strace.c
+> index 5ee9d62c25..dcf843b360 100644
+> --- a/linux-user/strace.c
+> +++ b/linux-user/strace.c
+> @@ -1584,6 +1584,19 @@ print_futimesat(const struct syscallname *name,
+>  }
+>  #endif
 >  
->  int singlestep;
-> -static const char *filename;
->  static const char *argv0;
->  static int gdbstub_port;
->  static envlist_t *envlist;
-> @@ -586,7 +585,6 @@ static int parse_args(int argc, char **argv)
->          exit(EXIT_FAILURE);
->      }
->  
-> -    filename = argv[optind];
->      exec_path = argv[optind];
->  
->      return optind;
-> @@ -657,9 +655,9 @@ int main(int argc, char **argv, char **envp)
->  
->      execfd = qemu_getauxval(AT_EXECFD);
->      if (execfd == 0) {
-> -        execfd = open(filename, O_RDONLY);
-> +        execfd = open(exec_path, O_RDONLY);
->          if (execfd < 0) {
-> -            printf("Error while loading %s: %s\n", filename, strerror(errno));
-> +            printf("Error while loading %s: %s\n", exec_path, strerror(errno));
->              _exit(EXIT_FAILURE);
->          }
->      }
-> @@ -784,10 +782,10 @@ int main(int argc, char **argv, char **envp)
->      cpu->opaque = ts;
->      task_settid(ts);
->  
-> -    ret = loader_exec(execfd, filename, target_argv, target_environ, regs,
-> +    ret = loader_exec(execfd, exec_path, target_argv, target_environ, regs,
->          info, &bprm);
->      if (ret != 0) {
-> -        printf("Error while loading %s: %s\n", filename, strerror(-ret));
-> +        printf("Error while loading %s: %s\n", exec_path, strerror(-ret));
->          _exit(EXIT_FAILURE);
->      }
->  
+> +#ifdef TARGET_NR_settimeofday
+> +static void
+> +print_settimeofday(const struct syscallname *name,
+> +                abi_long arg0, abi_long arg1, abi_long arg2,
+> +                abi_long arg3, abi_long arg4, abi_long arg5)
+> +{
+> +    print_syscall_prologue(name);
+> +    print_timeval(arg0, 0);
+> +    print_timezone(arg1, 1);
+> +    print_syscall_epilogue(name);
+> +}
+> +#endif
+> +
+>  #ifdef TARGET_NR_link
+>  static void
+>  print_link(const struct syscallname *name,
+> diff --git a/linux-user/strace.list b/linux-user/strace.list
+> index 63a946642d..1ff9168369 100644
+> --- a/linux-user/strace.list
+> +++ b/linux-user/strace.list
+> @@ -1345,7 +1345,7 @@
+>  { TARGET_NR_set_tid_address, "set_tid_address" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_settimeofday
+> -{ TARGET_NR_settimeofday, "settimeofday" , NULL, NULL, NULL },
+> +{ TARGET_NR_settimeofday, "settimeofday" , NULL, print_settimeofday, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setuid
+>  { TARGET_NR_setuid, "setuid" , NULL, NULL, NULL },
 > 
 
 Applied to my linux-user branch.
