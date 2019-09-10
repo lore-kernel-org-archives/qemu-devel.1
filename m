@@ -2,52 +2,63 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32529C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:38:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56061C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:39:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0868120872
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:38:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0868120872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2E08220872
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 10:39:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E08220872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7dXI-0006du-HH
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 06:38:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56596)
+	id 1i7dYE-0007zY-2x
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 06:39:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57488)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i7dJK-0000S5-Hs
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:23:51 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i7dLh-0002iR-NB
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:26:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i7dJI-0001uf-AG
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:23:45 -0400
-Received: from relay.sw.ru ([185.231.240.75]:60072)
+ (envelope-from <dgilbert@redhat.com>) id 1i7dLg-0003LY-OW
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 06:26:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60644)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1i7dJB-0001oM-Ds; Tue, 10 Sep 2019 06:23:38 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1i7dJ7-0007it-HE; Tue, 10 Sep 2019 13:23:33 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Date: Tue, 10 Sep 2019 13:23:25 +0300
-Message-Id: <20190910102332.20560-8-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190910102332.20560-1-vsementsov@virtuozzo.com>
-References: <20190910102332.20560-1-vsementsov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v11 07/14] block: teach bdrv_debug_breakpoint
- skip filters with backing
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>)
+ id 1i7dLd-0003KV-Q0; Tue, 10 Sep 2019 06:26:09 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8A1BD18C8933;
+ Tue, 10 Sep 2019 10:26:08 +0000 (UTC)
+Received: from work-vm (ovpn-117-238.ams2.redhat.com [10.36.117.238])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 177E66061E;
+ Tue, 10 Sep 2019 10:26:03 +0000 (UTC)
+Date: Tue, 10 Sep 2019 11:26:01 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Beata Michalska <beata.michalska@linaro.org>
+Message-ID: <20190910102601.GA2797@work-vm>
+References: <20190910095610.4546-1-beata.michalska@linaro.org>
+ <20190910095610.4546-4-beata.michalska@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190910095610.4546-4-beata.michalska@linaro.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Tue, 10 Sep 2019 10:26:08 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/4] migration: ram: Switch to ram block
+ writeback
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,84 +70,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
- wencongyang2@huawei.com, xiechanglong.d@gmail.com, qemu-devel@nongnu.org,
- armbru@redhat.com, jsnow@redhat.com, stefanha@redhat.com, den@openvz.org,
- mreitz@redhat.com
+Cc: peter.maydell@linaro.org, quintela@redhat.com, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, shameerali.kolothum.thodi@huawei.com,
+ eric.auger@redhat.com, qemu-arm@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Teach bdrv_debug_breakpoint and bdrv_debug_remove_breakpoint skip
-filters with backing. This is needed to implement and use in backup job
-it's own backup_top filter driver (like mirror already has one), and
-without this improvement, breakpoint removal will fail at least in 55
-iotest.
+* Beata Michalska (beata.michalska@linaro.org) wrote:
+> Switch to ram block writeback for pmem migration.
+> 
+> Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
+> ---
+>  migration/ram.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index b01a37e7ca..8ea0bd63fc 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -33,7 +33,6 @@
+>  #include "qemu/bitops.h"
+>  #include "qemu/bitmap.h"
+>  #include "qemu/main-loop.h"
+> -#include "qemu/pmem.h"
+>  #include "xbzrle.h"
+>  #include "ram.h"
+>  #include "migration.h"
+> @@ -4064,9 +4063,7 @@ static int ram_load_cleanup(void *opaque)
+>      RAMBlock *rb;
+>  
+>      RAMBLOCK_FOREACH_NOT_IGNORED(rb) {
+> -        if (ramblock_is_pmem(rb)) {
+> -            pmem_persist(rb->host, rb->used_length);
+> -        }
+> +        qemu_ram_block_writeback(rb);
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- block.c | 34 ++++++++++++++++++++++++++--------
- 1 file changed, 26 insertions(+), 8 deletions(-)
+ACK for migration
 
-diff --git a/block.c b/block.c
-index 874a29a983..e11dd60402 100644
---- a/block.c
-+++ b/block.c
-@@ -5165,14 +5165,35 @@ void bdrv_debug_event(BlockDriverState *bs, BlkdebugEvent event)
-     bs->drv->bdrv_debug_event(bs, event);
- }
- 
--int bdrv_debug_breakpoint(BlockDriverState *bs, const char *event,
--                          const char *tag)
-+static BlockDriverState *bdrv_find_debug_node(BlockDriverState *bs)
- {
-     while (bs && bs->drv && !bs->drv->bdrv_debug_breakpoint) {
--        bs = bs->file ? bs->file->bs : NULL;
-+        if (bs->file) {
-+            bs = bs->file->bs;
-+            continue;
-+        }
-+
-+        if (bs->drv->is_filter && bs->backing) {
-+            bs = bs->backing->bs;
-+            continue;
-+        }
-+
-+        break;
-     }
- 
-     if (bs && bs->drv && bs->drv->bdrv_debug_breakpoint) {
-+        assert(bs->drv->bdrv_debug_remove_breakpoint);
-+        return bs;
-+    }
-+
-+    return NULL;
-+}
-+
-+int bdrv_debug_breakpoint(BlockDriverState *bs, const char *event,
-+                          const char *tag)
-+{
-+    bs = bdrv_find_debug_node(bs);
-+    if (bs) {
-         return bs->drv->bdrv_debug_breakpoint(bs, event, tag);
-     }
- 
-@@ -5181,11 +5202,8 @@ int bdrv_debug_breakpoint(BlockDriverState *bs, const char *event,
- 
- int bdrv_debug_remove_breakpoint(BlockDriverState *bs, const char *tag)
- {
--    while (bs && bs->drv && !bs->drv->bdrv_debug_remove_breakpoint) {
--        bs = bs->file ? bs->file->bs : NULL;
--    }
--
--    if (bs && bs->drv && bs->drv->bdrv_debug_remove_breakpoint) {
-+    bs = bdrv_find_debug_node(bs);
-+    if (bs) {
-         return bs->drv->bdrv_debug_remove_breakpoint(bs, tag);
-     }
- 
--- 
-2.18.0
+Although I do worry that if you really have pmem hardware, is it better
+to fail the migration if you don't have libpmem available?
 
+Dave
+
+>      }
+>  
+>      xbzrle_load_cleanup();
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
