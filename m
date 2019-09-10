@@ -2,60 +2,85 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B9F5C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:55:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8162FC49ED9
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:56:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71FE02084D
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:55:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71FE02084D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kamp.de
+	by mail.kernel.org (Postfix) with ESMTPS id 59667208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:56:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59667208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7eje-0006sJ-Ik
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 07:55:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49269)
+	id 1i7elK-0007yy-AB
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 07:56:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50101)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pl@kamp.de>) id 1i7eeT-0003SV-OR
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:49:42 -0400
+ (envelope-from <slp@redhat.com>) id 1i7eia-0006M6-OA
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:53:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pl@kamp.de>) id 1i7eeS-0002TZ-3D
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:49:41 -0400
-Received: from kerio.kamp.de ([195.62.97.192]:58080)
+ (envelope-from <slp@redhat.com>) id 1i7eiY-0004vr-31
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:53:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45536)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pl@kamp.de>)
- id 1i7eeR-0002Pm-Op; Tue, 10 Sep 2019 07:49:40 -0400
-X-Footer: a2FtcC5kZQ==
-Received: from [172.21.12.60] ([172.21.12.60]) (authenticated user pl@kamp.de)
- by kerio.kamp.de with ESMTPSA
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits));
- Tue, 10 Sep 2019 13:49:27 +0200
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190903133524.11755-1-pl@kamp.de>
- <20190904140949.GC21246@localhost.localdomain>
- <e3964790-286f-5e65-01c7-c71c74c23475@kamp.de>
- <20190910111530.GD4446@localhost.localdomain>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <76ee7dcb-56ea-ec5a-8b1a-5625d304ce59@kamp.de>
-Date: Tue, 10 Sep 2019 13:49:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1i7eiX-0004vD-R4
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:53:54 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 944BEC056808
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 11:53:52 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id f18so8932720wro.19
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 04:53:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=1BN0LdRXtiNRZ8TGCJ9lprfFa5Qk53t9WZQ8HxpXauo=;
+ b=cbLXpxPZE53uFr8n/Ocl5y6tvQJ4V4pfYu/4iaEByqqaKoeDXVBxG81uFEGIZfQDer
+ J1BX9QsvimvWV3QIqfDpyII/DSO98gZwLlmhLOtMwJasK6Fl2My4GBL71jTrXlqBu2t6
+ XMZHXts85YtrG7ArM0Rb9UTGpChrCYodIiU+6AECPoCmru6zm6bsakuz+aBRj6fSoscV
+ YXPchd0FmlVJKtUNS8YNWsqHIkzLPyDM6VqABfgM2UkMjif0Hdk9Ktrblu6z8VBawg9J
+ cjG1tnET86za+66deEnIt2YWy7fvuDRksmjHPQ70KCIqdoGuFlUixfJ/UELqBWlr2lPg
+ F+tg==
+X-Gm-Message-State: APjAAAUhjqB/WBKI7slNw9UcmHl8vuNIDTzc8NI7x7foDYZ3sW1WJOnm
+ xD1EP6zhruWhR+rB+gGkaB4HTd3A/jyTEWb1LgqmNLN6qO0J2OgHQfpLwdAfwc2qma62LB4b6SP
+ M5raHwV6FBDHoQYg=
+X-Received: by 2002:a05:6000:12c9:: with SMTP id
+ l9mr25749901wrx.163.1568116431383; 
+ Tue, 10 Sep 2019 04:53:51 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzV641KgbEcsJ0/ocXWaifIoo4SxF0l6WsCFSWGUPpQ9PDtO+HHJ8VANyfSA/pydDgDTHbK3w==
+X-Received: by 2002:a05:6000:12c9:: with SMTP id
+ l9mr25749877wrx.163.1568116431211; 
+ Tue, 10 Sep 2019 04:53:51 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id g15sm2569741wmk.17.2019.09.10.04.53.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 10 Sep 2019 04:53:50 -0700 (PDT)
+References: <20190910110725.141014-1-slp@redhat.com>
+ <ff88a19b-ce70-4d31-4495-82ef0bcbbbd6@redhat.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+In-reply-to: <ff88a19b-ce70-4d31-4495-82ef0bcbbbd6@redhat.com>
+Date: Tue, 10 Sep 2019 13:53:48 +0200
+Message-ID: <87k1agv037.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190910111530.GD4446@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 195.62.97.192
-Subject: Re: [Qemu-devel] [PATCH V3] block/vhdx: add check for truncated
- image files
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] blockjob: update nodes head while removing
+ all bdrv
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,94 +92,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: codyprime@gmail.com, mreitz@redhat.com, jhf@kamp.de, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 10.09.19 um 13:15 schrieb Kevin Wolf:
-> Am 05.09.2019 um 12:02 hat Peter Lieven geschrieben:
->> Am 04.09.19 um 16:09 schrieb Kevin Wolf:
->>> Am 03.09.2019 um 15:35 hat Peter Lieven geschrieben:
->>>> qemu is currently not able to detect truncated vhdx image files.
->>>> Add a basic check if all allocated blocks are reachable at open and
->>>> report all errors during bdrv_co_check.
->>>>
->>>> Signed-off-by: Peter Lieven <pl@kamp.de>
->>>> ---
->>>> V3: - check for bdrv_getlength failure [Kevin]
->>>>       - use uint32_t for i [Kevin]
->>>>       - check for BAT entry overflow [Kevin]
->>>>       - break on !errcnt in second check
->>>>
->>>> V2: - add error reporting [Kevin]
->>>>       - use bdrv_getlength instead of bdrv_get_allocated_file_size [Kevin]
->>>>       - factor out BAT entry check and add error reporting for region
->>>>         overlaps
->>>>       - already check on vhdx_open
->>> Something still seems to be wrong with this patch:
->>>
->>>       213      fail       [15:50:13] [15:50:14]      (last: 2s)    output mismatch (see 213.out.bad)
->>>       --- /home/kwolf/source/qemu/tests/qemu-iotests/213.out  2019-06-28 14:19:50.065797707 +0200
->>>       +++ /home/kwolf/source/qemu/tests/qemu-iotests/213.out.bad      2019-09-04 15:50:14.582053976 +0200
->>>       @@ -46,10 +46,8 @@
->>>        {"execute": "job-dismiss", "arguments": {"id": "job0"}}
->>>        {"return": {}}
->>>
->>>       -image: TEST_IMG
->>>       -file format: IMGFMT
->>>       -virtual size: 32 MiB (33554432 bytes)
->>>       -cluster_size: 268435456
->>>       +qemu-img: VHDX BAT entry 0 offset points after end of file. Image has probably been truncated.
->>>       +qemu-img: Could not open 'TEST_IMG': Could not open 'TEST_IMG': Invalid argument
->>>
->>>        === Invalid BlockdevRef ===
->>>
->>> I can reproduce this manually with the following qemu-img invocations.
->>> It seems all three options must be given to reproduce the error:
->>>
->>>       $ ./qemu-img create -f vhdx -o block_size=268435456,subformat=fixed,block_state_zero=off /tmp/test.vhdx 32M
->>>       Formatting '/tmp/test.vhdx', fmt=vhdx size=33554432 log_size=1048576 block_size=268435456 subformat=fixed block_state_zero=off
->>>       $ ./qemu-img info /tmp/test.vhdx
->>>       qemu-img: VHDX BAT entry 0 offset points after end of file. Image has probably been truncated.
->>>       qemu-img: Could not open '/tmp/test.vhdx': Could not open '/tmp/test.vhdx': Invalid argument
->>>
->>> If I add the offsets to the error message (would probably nice to have),
->>> I get:
->>>
->>>       qemu-img: VHDX BAT entry 0 offset 8388608 points after end of file (41943040). Image has probably been truncated.
->>>
->>> So it seems that the file is large enough to hold 32M + metadata, but we
->>> don't increase the file size to hold a full block (256M). Is this a
->>> problem in the way we create images or are partial blocks at the end
->>> expected?
->>>
->>> Kevin
->>
->> A short look into the VHDX spec [1] seems to suggest that a VHDX File
->> can only grow in Block increments.
->>
->> See page 8 in the definition of blocks: "Allocation of new space for a
->> virtual hard disk that supports dynamic growth of the virtual hard
->> disk file is done in fixes size units defined as blocks."
-> Then I guess we need to fix the creation of VHDX images before we can
-> apply this patch because otherwise qemu-iotests fails.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+
+Max Reitz <mreitz@redhat.com> writes:
+
+> On 10.09.19 13:07, Sergio Lopez wrote:
+>> block_job_remove_all_bdrv() iterates through job->nodes, calling
+>> bdrv_root_unref_child() for each entry. The call to the latter may
+>> reach child_job_[can_]set_aio_ctx(), which will also attempt to
+>> traverse job->nodes, potentially finding entries that where freed
+>> on previous iterations.
+>>=20
+>> To avoid this situation, update job->nodes head on each iteration to
+>> ensure that already freed entries are no longer linked to the list.
+>>=20
+>> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=3D1746631
+>> Signed-off-by: Sergio Lopez <slp@redhat.com>
+>> ---
+>>  blockjob.c | 6 ++++++
+>>  1 file changed, 6 insertions(+)
+>>=20
+>> diff --git a/blockjob.c b/blockjob.c
+>> index 6e32d1a0c0..7b1551d981 100644
+>> --- a/blockjob.c
+>> +++ b/blockjob.c
+>> @@ -192,6 +192,12 @@ void block_job_remove_all_bdrv(BlockJob *job)
+>>          BdrvChild *c =3D l->data;
+>>          bdrv_op_unblock_all(c->bs, job->blocker);
+>>          bdrv_root_unref_child(c);
+>> +        /*
+>> +         * The call above may reach child_job_[can_]set_aio_ctx(), whic=
+h will
+>> +         * also traverse job->nodes, so update the head here to make su=
+re it
+>> +         * doesn't attempt to process an already freed BdrvChild.
+>> +         */
+>> +        job->nodes =3D l->next;
+>>      }
+>>      g_slist_free(job->nodes);
 >
-> Hm... And probably ignore the error for a partial final block anyway to
-> maintain compatibility with images created by older QEMU versions.
+> But this will leak the whole list.
 
+Ouch. This is what happens when you rush up things. I'll send a v2 ASAP.
 
-I would change the check to not fail for partial blocks at the end
+Thanks,
+Sergio.
 
-of the image if the available bytes match the filesize.
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
-I will send an update.
-
-
-Peter
-
-
-
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl13jswACgkQ9GknjS8M
+AjXzNg/+MGsEFhPjpBR9fMUGnwMbkJd80oxj5bCby08+Sz61shlIZlmRs+PU9fVv
+rKFg8J5RiPgLZmEIQYUFF6GD6GA+IG/RfHPABhqNrGEFk1HEsBDcEvvbPoGSIVwI
+TO10Ub9ghEZsT2wjwyXbnIj5zSIhuv2C34QLbT07x503QzzgzYKmsyLy6ICaVTBU
+vD/EvQadF3M6KeWfM052vvHcAlrDYlbUPdNKJsaXg9/rSRQXehKHIIiYKR3DXwLb
+gIAMuJnoRpPkllhM0Afju5ZuugFq/8vSJnWnbCbRrX3tkUxIO6Eq4nfzmAzkh/b3
+Q/1IIqMLddS/E9iFf3Q5zJtKSz8UzqcBTNszEPY8VLDIu+QDzb7HBLVvi/PuBinZ
+wLW/f5yR93uWUfuFilmv7NOSMRHYbCqp4cAppcwbwQ7hkZzDQpkr2AjtTaqwO/rz
+WQE2ynQPFnkvzhMrtmY1BIqDjI6uGcaXypuS+Tr/AjRb7WOFJrx00mbLeez6flQ7
+BdeEq92YOuDEbNNdhw2edm6Nxf+xjYrd7lida70oBzBFcqKoK7ztxTI3ZVfzyBYr
+3udbUE2jXZR8sa2fTtTXZIObqJ9sWnYqQSIA01TDEO9rttuftjz8k1RAMOeyTzeJ
+D9424xdjeW3TPQLU8AV4gfimSCQbPceK6jFiwSw/T31uHGL6evA=
+=B1Ve
+-----END PGP SIGNATURE-----
+--=-=-=--
 
