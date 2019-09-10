@@ -2,65 +2,90 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9331EC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:26:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 137B9C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:26:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67FA320872
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:26:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67FA320872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CDA7C20872
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:26:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vfmlnHjE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDA7C20872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7cPj-0002N0-5P
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 05:26:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40637)
+	id 1i7cPo-0002TN-Pr
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 05:26:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38974)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1i7c7x-00046j-II
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:07:58 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i7c0a-0004b9-GO
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:00:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1i7c7v-0001qF-JI
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:07:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46522)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1i7c7v-0001q5-De
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:07:55 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BA99BA3767D;
- Tue, 10 Sep 2019 09:07:54 +0000 (UTC)
-Received: from redhat.com (ovpn-112-58.ams2.redhat.com [10.36.112.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F22F19C4F;
- Tue, 10 Sep 2019 09:07:46 +0000 (UTC)
-Date: Tue, 10 Sep 2019 10:07:43 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Message-ID: <20190910090743.GC8583@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1i7c0Z-0004pO-5h
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:00:20 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:41475)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i7c0Y-0004oi-W1
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 05:00:19 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id h7so17457978wrw.8
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 02:00:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=w4GW8O3X3F3KkRkiz9wz/TX8TfH1LO9RjHL0INlIqjs=;
+ b=vfmlnHjE649K/P0jJHtY0/ri3vPVyO7swcvNatznW8G9KdIkriZCDHF9ogVGoIRxAM
+ ZMAjUC7GozgfgNAqUVu1ZSgr4mcgrC8VteF5E9xCl3Mj+sXYF2sE/heNTanNHURLrW8x
+ 2b4p7P8+8e+0FsyiQd3zKY9t2g8IR1pOFacXjls0vAcBUSmCbXCui2v0tmzGFgcyRDw9
+ p/RltCZ+eZR3OJ6zp3DvOhoCHB7fpddJ53YdCnp/J93vPJfIm7wjLhD9xBjyR5/zzEY9
+ CbKF/NQh06NUzj44/eARJ1eJnE5O+WUu+4ijk2PQIZWhnA0CRzI9TxDNpumqPMnBtdI0
+ +AfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=w4GW8O3X3F3KkRkiz9wz/TX8TfH1LO9RjHL0INlIqjs=;
+ b=riw7XSVG4lf778y8kgc0yekpzE2q4pYJaRbpVACFB0HCC3bpbRIrxoY4tSH8IS2fDb
+ vahSSH+wKqEKqPbm14eHk7yaddyukqS0pH8Wrl04aKhFxtPAD7N/IxfBrRkKZ/aVOiQ7
+ dFnOUcFtUaSCf+oYS0SzDO4e/5Xi5yyt5e+QjhghIdorU7cw1Gpmp9lnnrpNXwg2U9Gy
+ LDydtfXUwX2ZstQyRTAcevl7+Cc1ddRhuMSQqPSI3lM22rm8gO8nqdLVw4KWmtTLR9yI
+ n7Kdjd4OCewBeHEWhtlKb7PKoKmSCxjkgG4pj07V2k0WC3NxPwHv7vfXJEWXR2WvoDGq
+ +saQ==
+X-Gm-Message-State: APjAAAXXtVyVEwXKjCa/TSTX55nxc3PYktdihsbFA8Tl90ma4EFfjl4+
+ CiiseBAPxvymmH4LGn0+jfiD9g==
+X-Google-Smtp-Source: APXvYqx/DM5YajX763bkew1umA6Y+7197nyVLpFgdoZdhfgwjCL2eOO1xlPm4U3gci98s9WJRhkkLQ==
+X-Received: by 2002:a05:6000:a:: with SMTP id
+ h10mr2971441wrx.226.1568106017896; 
+ Tue, 10 Sep 2019 02:00:17 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 189sm2677059wmz.19.2019.09.10.02.00.13
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 10 Sep 2019 02:00:14 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 2E0FE1FFBE;
+ Tue, 10 Sep 2019 09:43:53 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Date: Tue, 10 Sep 2019 09:43:43 +0100
+Message-Id: <20190910084349.28817-40-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190910084349.28817-1-alex.bennee@linaro.org>
 References: <20190910084349.28817-1-alex.bennee@linaro.org>
- <20190910084349.28817-45-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190910084349.28817-45-alex.bennee@linaro.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Tue, 10 Sep 2019 09:07:54 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 44/45] Fedora images: use URLs from stable
- "archives.fedoraproject.org"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42b
+Subject: [Qemu-devel] [PULL 39/45] .travis.yml: Enable ccache on OSX
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,46 +97,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Yash Mankad <ymankad@redhat.com>, peter.maydell@linaro.org,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Fam Zheng <fam@euphon.net>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 10, 2019 at 09:43:48AM +0100, Alex Benn=C3=A9e wrote:
-> From: Cleber Rosa <crosa@redhat.com>
->=20
-> The LinuxInitrd.test_with_2gib_file_should_work_with_linux_v4_16 test,
-> from tests/acceptance/linux_initrd.py, is currently failing to fetch
-> the "vmlinuz" file.  The reason for the failure is that the Fedora
-> project retires older versions from the "dl.fedoraproject.org" URL,
-> and keeps them in "archives.fedoraproject.org".  As an added note,
-> that test uses a Fedora 28 image, because of the specific Linux kernel
-> version requirements of the test.
->=20
-> For the sake of stability, let's use URLs from the archived and
-> supposedely ever stable URLs.  The good news is that the currently
-> supported versions are also hosted on the later.  This change limits
-> itself to change the URLs, while keeping the fetched files the same
-> (as can be evidenced by the unchanged hashes).
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-FWIW, I commented on the oiriginal patch before seeing this PR.
-I don't think we should be using the archive URL for anything
-which still exists on download.fedoraproject.org as that's placing
-undesirable load on the Fedora master servers, instead of using its
-primary CDN via the mirror services.
+By default, ccache is not installed on macOS environments.
 
+See https://docs.travis-ci.com/user/caching/#ccache-on-macos
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+
+diff --git a/.travis.yml b/.travis.yml
+index 7d6c63a2803..3d1c7f0d7e0 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -45,6 +45,7 @@ addons:
+       - gcovr
+   homebrew:
+     packages:
++      - ccache
+       - glib
+       - pixman
+       - gnu-sed
+@@ -80,6 +81,7 @@ git:
+ 
+ 
+ before_script:
++  - if [ "$TRAVIS_OS_NAME" == "osx" ] ; then export PATH="/usr/local/opt/ccache/libexec:$PATH" ; fi
+   - command -v ccache && ccache --zero-stats
+   - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
+   - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exit 1; }
+-- 
+2.20.1
+
 
