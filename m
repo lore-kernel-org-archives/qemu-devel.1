@@ -2,45 +2,45 @@ Return-Path: <SRS0=PbUj=XF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 966FDC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:16:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE4CC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:16:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B425207FC
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:16:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B425207FC
+	by mail.kernel.org (Postfix) with ESMTPS id 118B520872
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 09:16:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 118B520872
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7cFt-00060v-Tm
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 05:16:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37774)
+	id 1i7cGR-0006iU-KB
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 05:16:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37660)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i7bsk-0002ns-PT
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:52:16 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i7bsK-0002ER-3N
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:51:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i7bsj-0001V5-JQ
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:52:14 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:35385)
+ (envelope-from <laurent@vivier.eu>) id 1i7bsJ-0001GF-0z
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:51:47 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:34129)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i7bsj-0001UY-8w
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:52:13 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i7bsI-0001FX-Oq
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 04:51:46 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MIxFi-1hrbSt1yYc-00KO17; Tue, 10 Sep 2019 10:52:01 +0200
-From: Laurent Vivier <laurent@vivier.eu>
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MPK73-1hmOFz1oyL-00Pb9n; Tue, 10 Sep 2019 10:51:30 +0200
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20190908061543.25136-1-f4bug@amsat.org>
- <20190908061543.25136-4-f4bug@amsat.org>
- <696b8e27-f383-c7bf-20ee-1f596949cbf4@vivier.eu>
+ <20190908061543.25136-3-f4bug@amsat.org>
+From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -84,36 +84,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <fead7d1b-024f-0459-496d-da3ebc203c4d@vivier.eu>
-Date: Tue, 10 Sep 2019 10:52:00 +0200
+Message-ID: <46d65df5-b947-8e65-fd02-22da9c763b1a@vivier.eu>
+Date: Tue, 10 Sep 2019 10:51:25 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <696b8e27-f383-c7bf-20ee-1f596949cbf4@vivier.eu>
+In-Reply-To: <20190908061543.25136-3-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:wCV9LnBecZUh/gUzNLEC85NnZzKvnek9ae04LAS2t6hu9eJp9Kx
- VHSQMi3kTDbKbxTdoUZFSv5r7CGQlwmAJ3v2O/8vZKHi6R08ZhAvSkhZvCmp08P8YZVv5Yz
- yQhzCut4ycBRyhWw1jY/QT0q4DTFuTlH5L1EmbsdM7SkUnxoa3tWLxIQBa6HKx/EeBnOJTL
- bz+GI00GxqS3m492Nob4A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:SFch8L14uh0=:q8WInwdsUfJYgiauUBFnYG
- 6vIQOYMS+4k2XKQCtZ5uM/djfMmO3P3casRDCOEt2wZnZ29miVR3Hl7np3gDCGAKuhkV/282I
- wOV6r9g92xEgTbNkPWRkmMBbHx/06smOF4iE7s4tQMOSjz8F4ueO2udibca37qIPqFihHIoNH
- a71AO2lRVKF59SJqTqOPYamjcGSgN9lD86iXFktefA4W4odXPc+U+Ue2AeOFTpvsYg0QJMhMD
- FEikP/csnsimW84JAnLpkZ3ZAxDudKFDIywca2m6dBb7lJo3s2sfeyFetoOZRpW1LWXdyoxiz
- YYTzf4SKvIbY44zxgvye48JczHMFh4sjgAr7oY9PQGNQR60lac43h/n42Y+goLEIHmLpt+n6X
- dPDgefnJERzM6klYL5CKDIF8yC+z6CrmT1papAAjrk48e1BhrOK+R7AES6L0+fYc5f85SSUVc
- v70z17XJI6cdhy0esudEL31aPwEQYprhp8uqsujbrqZq21r7lIQExsbZxI/wbU6QoyRmcmJCU
- cMP19visQiJy3JaA2Q9D/1tdKxnQaImCzg9BssyjdiarVBmh6b5xZA5OnxR5DhUuC7GN3QKjw
- pNxcF4x0Le/baelJ0Dln8/r7f4rOwOmnUJ0XOKW+QJ455z+afckEAJfL97aVkiqOuW6G6QVHB
- dv5lUnwnwnjT/3NC5vw1K5G1+yUn/OnPy22sPCxyCzmiwNqhPFqQavSkte1tRFsBxOJZMKzwW
- 7lqIWC/CtZteykw7446ymIDXSVlCgXhbu/cEogLooMLP+rbBPs/D8j+r61UdifePZbNAEgH9r
- /0AckrIxGBO3+qUaYZFWsDZjyJ7Ug==
+X-Provags-ID: V03:K1:r+n20bXl2VC0wwGQBzK55YFA/xBrTJeuf/qwGLHSxbnJSsZuOgv
+ HCeo0BHRzICZnHSd8YGZY/kNB635Vvk1L/+VaIqm4HQrGLxW9JcvfTO5S3FczjXGUAppr65
+ Jm49VLeCZegXAgQi+IibxCWi1LpUmQ30bENLWlLlZfjOiSIa1PYIcBIeXfL48POxv37nQDY
+ bcUiGZDmCV6DUDcnmlVsA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:l0atQ13zvkE=:9HAjx9V3HUFPiT8kQymYjX
+ shGYJrPd80nL2DXGbgc3b6NRD9IMRGl/sY6cPqi5t1hKo3vxBGojB6eqBo0yDGNyO0JfG8oX8
+ uWPh2bqtOqG3P1mwouxnuY4NbbN15H7EJCFSIIjukTDM1agcviOn+6mboOXFRcJOq4k2jOdfa
+ ef6oFJP/jgWYmhjZqfkzr15+rveujgVR39z6h5arDhiBb8TX1akoLOMCPxX3r+Ds0VC25Fhma
+ LPjC//82D4fF5GiOE9QIe0UxyaRKHNsyKSBQWNOlikR1a7reOssdJwPN0qshMQAGGWBQ5kAZ4
+ xJF4VDhFdGVZhBczKTrfEaH+C6CGUmUgQtw2E5swwMQ6J1/crpT2Tv5GbyZ8z0JAOyYxfAfkS
+ gmKhZn/wiqleYY/aEY+bOzXFaozyezoJLvf3CKNu/6dffVoUQQZK/i24t14eRFYyBkvf1PnV5
+ UEpLONDUchjElS03ShZIHeqFllq1zpRv2097GloIxRKC0plIE70RR3TXvVSBmOnXsG0lRuLgc
+ arIdBfD8nhqrydMdHjmGlvnUWJmUC8XXFu84HFKbnM3+xnVEa/q7ARY7YvP2OZB+1j/Qddmuo
+ QV/qoLTclSZQ0ezkY3wgM37RLR7XAbyFe/ujXOv8orNMxlKRnPEiw1+viedp2GOgk4SQthbdU
+ YlDZfsHbmwaTWMWkMFFmL5NzdPC36lqbzVFI7CTWoce6RfR4Su/2n3dAXzZ2GsTtGAydTzoTa
+ jpfeDfSF8Jb7podtA74IJbZxfVtFwFPHpvR3q0Kqhg4DzfdVCJtXSuUSh8UFe9skZxSz49X/E
+ o9BX3HmlRPMuZULaxrlIw4WqPhiCcoblKEosMvD0xSHn8xlUGA=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.134
-Subject: Re: [Qemu-devel] [PATCH v6 3/8] linux-user/strace: Improve
- settimeofday()
+X-Received-From: 212.227.126.133
+Subject: Re: [Qemu-devel] [PATCH v6 2/8] linux-user/strace: Add
+ print_timezone()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,59 +131,59 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 10/09/2019 à 10:30, Laurent Vivier a écrit :
-> Le 08/09/2019 à 08:15, Philippe Mathieu-Daudé a écrit :
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> Tested-By: Guido Günther <agx@sigxcpu.org>
->> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
->> ---
->>  linux-user/strace.c    | 13 +++++++++++++
->>  linux-user/strace.list |  2 +-
->>  2 files changed, 14 insertions(+), 1 deletion(-)
->>
->> diff --git a/linux-user/strace.c b/linux-user/strace.c
->> index 5ee9d62c25..dcf843b360 100644
->> --- a/linux-user/strace.c
->> +++ b/linux-user/strace.c
->> @@ -1584,6 +1584,19 @@ print_futimesat(const struct syscallname *name,
->>  }
->>  #endif
->>  
->> +#ifdef TARGET_NR_settimeofday
->> +static void
->> +print_settimeofday(const struct syscallname *name,
->> +                abi_long arg0, abi_long arg1, abi_long arg2,
->> +                abi_long arg3, abi_long arg4, abi_long arg5)
->> +{
->> +    print_syscall_prologue(name);
->> +    print_timeval(arg0, 0);
->> +    print_timezone(arg1, 1);
->> +    print_syscall_epilogue(name);
->> +}
->> +#endif
->> +
->>  #ifdef TARGET_NR_link
->>  static void
->>  print_link(const struct syscallname *name,
->> diff --git a/linux-user/strace.list b/linux-user/strace.list
->> index 63a946642d..1ff9168369 100644
->> --- a/linux-user/strace.list
->> +++ b/linux-user/strace.list
->> @@ -1345,7 +1345,7 @@
->>  { TARGET_NR_set_tid_address, "set_tid_address" , NULL, NULL, NULL },
->>  #endif
->>  #ifdef TARGET_NR_settimeofday
->> -{ TARGET_NR_settimeofday, "settimeofday" , NULL, NULL, NULL },
->> +{ TARGET_NR_settimeofday, "settimeofday" , NULL, print_settimeofday, NULL },
->>  #endif
->>  #ifdef TARGET_NR_setuid
->>  { TARGET_NR_setuid, "setuid" , NULL, NULL, NULL },
->>
+Le 08/09/2019 à 08:15, Philippe Mathieu-Daudé a écrit :
+> Suggested-by: Laurent Vivier <laurent@vivier.eu>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+> checkpatch error:
+> ERROR: storage class should be at the beginning of the declaration
+> ---
+>  linux-user/strace.c | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
 > 
-> Applied to my linux-user branch.
+> diff --git a/linux-user/strace.c b/linux-user/strace.c
+> index f326c357a2..5ee9d62c25 100644
+> --- a/linux-user/strace.c
+> +++ b/linux-user/strace.c
+> @@ -63,6 +63,7 @@ UNUSED static void print_string(abi_long, int);
+>  UNUSED static void print_buf(abi_long addr, abi_long len, int last);
+>  UNUSED static void print_raw_param(const char *, abi_long, int);
+>  UNUSED static void print_timeval(abi_ulong, int);
+> +UNUSED static void print_timezone(abi_ulong, int);
+>  UNUSED static void print_number(abi_long, int);
+>  UNUSED static void print_signal(abi_ulong, int);
+>  UNUSED static void print_sockaddr(abi_ulong addr, abi_long addrlen);
+> @@ -1254,6 +1255,26 @@ print_timeval(abi_ulong tv_addr, int last)
+>          gemu_log("NULL%s", get_comma(last));
+>  }
+>  
+> +static void
+> +print_timezone(abi_ulong tz_addr, int last)
+> +{
+> +    if (tz_addr) {
+> +        struct target_timezone *tz;
+> +
+> +        tz = lock_user(VERIFY_READ, tz_addr, sizeof(*tz), 1);
+> +        if (!tz) {
+> +            print_pointer(tz_addr, last);
+> +            return;
+> +        }
+> +        gemu_log("{" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "}%s",
+> +                 tswapal(tz->tz_minuteswest), tswapal(tz->tz_dsttime),
 
-Unapplied as it depends on the previous one.
+tz_minuteswest and tz_dsttime are abi_int, so it should be "%d" and
+tswap32().
 
-Thanks,
-Laurent
+> +                 get_comma(last));
+> +        unlock_user(tz, tz_addr, 0);
+> +    } else {
+> +        gemu_log("NULL%s", get_comma(last));
+> +    }
+> +}
+> +
+>  #undef UNUSED
+>  
+>  #ifdef TARGET_NR_accept
+> 
+
 
