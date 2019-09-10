@@ -3,84 +3,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F9FBC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:05:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EF8EC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:07:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71C1920692
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:05:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71C1920692
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2D7A0207FC
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 11:07:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D7A0207FC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7dxd-0001XO-67
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 07:05:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41206)
+	id 1i7dzq-0003kk-7g
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 07:07:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40965)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1i7dv5-0000Ad-Dc
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:02:48 -0400
+ (envelope-from <guoheyi@huawei.com>) id 1i7duB-000858-Ps
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:01:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1i7dv4-0004w2-DX
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:02:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41256)
+ (envelope-from <guoheyi@huawei.com>) id 1i7duA-0004eU-M9
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:01:51 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:51524 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1i7dv4-0004vp-8L
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:02:46 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7410389C42
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 11:02:45 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id j3so8823810wrn.7
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 04:02:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=Xf73poPe98buWtHqrTIYRJm4oYzJUPHAnrA3xBG172s=;
- b=dJ3HqkJ28xM/AjU5RWPSorEYvWdbYpMqJG5T7KaVeX47ZbkonCsXru0rEg7yppb2jJ
- O3AD9N5sqmDQRAMidV2zlOKcjY0aJMQeOmXBh8rjxQnN5Eev5AwtpZV3J0sh2511o7+3
- wrjqbxMLOW4nymlSVwaa73Xbubijbb4uePlq/2k2WVflWeDs0UJJvbsIsJs5z8meuNEq
- gWFiqpwNYl02ZN/hvSLYBXgH3C8l1W0RK+cORq92KatKmF6CzPGenT0/iPFQkti4yCaI
- 59sYKRzWJoIbSjO2C7rn4fKxdSQqx+xkMvm1XyL7z6u/kZCCzhp5g3TyZYV113jVwDCV
- 5CQA==
-X-Gm-Message-State: APjAAAU6zYvxOXGxZo8AGIKqgEjhi+wFyJ6WUdrnudOsHcF1CE0OoDJd
- cvINHcq4puirSQGz9Qst9ikWhPoYpTQb9pHQ35jiLtYFOHDDZdanTc74xKWx5RvdYbb3wpix7xN
- cYaHoE9vs/+xKIaw=
-X-Received: by 2002:adf:dc81:: with SMTP id r1mr25041328wrj.52.1568113364211; 
- Tue, 10 Sep 2019 04:02:44 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxEzWsD8HbnwZGxVAGcX+SzYChM2k9A+gJ0DIri7NEKFlEsrhIhq5PSB8ngdidzUAoY+bpseg==
-X-Received: by 2002:adf:dc81:: with SMTP id r1mr25041306wrj.52.1568113363967; 
- Tue, 10 Sep 2019 04:02:43 -0700 (PDT)
-Received: from steredhat (host170-61-dynamic.36-79-r.retail.telecomitalia.it.
- [79.36.61.170])
- by smtp.gmail.com with ESMTPSA id w125sm4913562wmg.32.2019.09.10.04.02.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Sep 2019 04:02:43 -0700 (PDT)
-Date: Tue, 10 Sep 2019 13:02:41 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190910110241.c6siknuc4uq33mlr@steredhat>
-References: <20190910090821.28327-1-sgarzare@redhat.com>
- <87mufc1nvd.fsf@linaro.org>
- <CAFEAcA9GMtuDCZVLFECnT0uF377_T0T_-Bn_9-RvC-zHRihqSA@mail.gmail.com>
+ (Exim 4.71) (envelope-from <guoheyi@huawei.com>) id 1i7du9-0004cl-1L
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 07:01:49 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 2EFE53F170FA29A0E8BB;
+ Tue, 10 Sep 2019 19:01:41 +0800 (CST)
+Received: from [127.0.0.1] (10.133.216.73) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Tue, 10 Sep 2019
+ 19:01:23 +0800
+To: <qemu-devel@nongnu.org>
+From: Guoheyi <guoheyi@huawei.com>
+Message-ID: <95584103-950c-2870-b0a1-1108d54190f2@huawei.com>
+Date: Tue, 10 Sep 2019 19:01:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9GMtuDCZVLFECnT0uF377_T0T_-Bn_9-RvC-zHRihqSA@mail.gmail.com>
-User-Agent: NeoMutt/20180716
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.216.73]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] elf-ops.h: fix int overflow in load_elf()
+X-Received-From: 45.249.212.35
+Subject: [Qemu-devel] hw/vfio/pci: duplicated invocation of
+ vfio_msix_vector_release() in vfio_msix_disable()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,33 +64,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: wanghaibin 00208455 <wanghaibin.wang@huawei.com>,
+ Alex Williamson <alex.williamson@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 10, 2019 at 10:54:25AM +0100, Peter Maydell wrote:
-> On Tue, 10 Sep 2019 at 10:50, Alex Benn=E9e <alex.bennee@linaro.org> wr=
-ote:
-> > Seem sensible enough (although gah, I hate these glue bits). Would th=
-e
-> > large amount of goto fail logic be something that could be cleaned up
-> > with the automatic cleanup functions we recently mentioned in
-> > CODING_STYLE.rst?
->=20
-> Probably not, because one bit of cleanup we *should* be doing
-> in the fail-exit codepaths but currently don't is to delete
-> any rom blobs we created for earlier segments in the ELF file
-> before we gave up, so we need to have an error-exit path anyway...
+Hi folks,
 
-Mmm right, I should add a new API (e.g. rom_remove()) to do this better
-cleanup.
+Recently we found there are 2 invocations of vfio_msix_vector_release() 
+in vfio_msix_disable(). The 1st one is in msix_unset_vector_notifiers(), 
+for we set device's msix_vector_release_notifier to 
+vfio_msix_vector_release() in vfio_msix_enable(), while the 2nd is the 
+explicit one in vfio_msix_disable(). Both invocations switch VFIO to use 
+the non-bypass eventfd.
 
->=20
-> thanks
-> -- PMM
->=20
+Is there any special reason for doing this? Or can we remove one of them?
+
+Thanks,
+
+Heyi
+
+
 
