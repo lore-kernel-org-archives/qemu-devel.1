@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 269E1C49ED9
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:36:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 998E8C49ED7
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:36:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E881D2084D
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:36:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 659742084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Sep 2019 19:36:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vTpQxAdJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E881D2084D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nZjJ9G1i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 659742084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7lwJ-0002o3-KW
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:36:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58855)
+	id 1i7lwL-0002pn-Qg
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 15:36:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58916)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i7lu1-0000vG-Kn
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:14 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i7lu3-0000vi-H1
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i7lu0-0006jh-9Q
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:13 -0400
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:33750)
+ (envelope-from <alex.bennee@linaro.org>) id 1i7lu2-0006lW-1m
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:15 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40022)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i7lu0-0006j7-1X
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:12 -0400
-Received: by mail-wr1-x42f.google.com with SMTP id u16so21922418wrr.0
- for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 12:34:11 -0700 (PDT)
+ id 1i7lu1-0006kO-Ov
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 15:34:13 -0400
+Received: by mail-wm1-x344.google.com with SMTP id t9so833197wmi.5
+ for <qemu-devel@nongnu.org>; Tue, 10 Sep 2019 12:34:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=5XyzKPTEVeMZHoyBnFttJunUqWTPcDprpKPpXz8/JuA=;
- b=vTpQxAdJ9xknXNw4aCUYvm+cIC5kA4DL2Qc14EeUWTGi+OAlGOtBRh95WXWVH94Jg3
- z28cpsdaComFtDOjngozTVfzXRtK2mFlUskHi+4aRV+z0PIozhy9SEBtjjmDJC8fksVv
- kFAxNjyTlNTrrcp5n1vL/RAAqRyEpPLJf+OW3jWdDBTyFADBwHXpDi6u0iQNEM3kDom0
- joq2XD/LHtZveyctgCqqWX258ApFKG7vY9rLaOVAeBqKmiJwVcuKk6UcyNIogbkHF4N1
- B2xcuQglqulqMic/nGsTKQYdCmUMa1UrjcPbUd1xZYu7Dwp2jSCG8bPssL2xkILzlPea
- /CZQ==
+ bh=05vMXPIxoWx34Tv2XwUiZnuEHt704CpxHZvOBau6J1M=;
+ b=nZjJ9G1iqf2I/2iNeYJ8qtRThltUGZ4lmb+YPY9enONu1JgNvbIj0ME5o8R7rS7w2p
+ uH3eCdGKUAg9DbG5ikgC45/WV4PbyErnNG9iSabL+p1uqGoUATYFZPmfVwZB9JIkBDS4
+ P0U8cRO3WdWxOXS5R58I8S2lSI6OybmTltRaUnIPDHHGme+V6toCFaz5QVz8VL1Aktqj
+ GMJ0iDg8JfuFWACyFiuVWaUqL7+Rfn8H457CiVDcs/o+PghTpp1HGoyJ30UIPQpGEqNC
+ FjXXvzPHL95dyHjg3IjVgNq2aBS0EUoRlg3p0/ncVLkYJZHRkjHQCanGMB4EMssiD/wR
+ WB0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=5XyzKPTEVeMZHoyBnFttJunUqWTPcDprpKPpXz8/JuA=;
- b=QgAmif/8OhwaRfKj6sXF5q7Jy6Rvb94AACgs8YG56zKGS8f6Zt3kF8UsjB36IGwzYJ
- F95cf/1gZJ15OeL21Jv7S431zVYa/8KljVvudipxfElr1hmx8E39ZGx1p60aq1xjQj8D
- WrlzH1sxPOxJOsNUBzQgsJnSasT9mb6TyBncsKQ1LUrGDhJoRo4Wqyw/RlOz6aQpjmfL
- 2oBgkUdLl2hQ7U8DRENPqHr0J885OShMyZk7jVRTGAwsLcSrw2PD8t4CizO8+nOuyzu3
- l0aXN0xvDmMM59njiDYZ78pC4XKrJk2tBDCVT/ZyJjGuoTBjuEhGJxWSc8w+KczfxAwl
- otUw==
-X-Gm-Message-State: APjAAAVGBbx6jirXqGjUkLWkLErqDjCiS6c9/9NHyOkRZ1y2pGiDaWev
- SIG4NMUDBqlNczd44Vj96k12Mw==
-X-Google-Smtp-Source: APXvYqyCEDBd91xxb7wScgd6BO98tutxGsl8NiCoFSUi+jkVtPIhQG/gFY/KPz5APtxc3I94ACew/Q==
-X-Received: by 2002:adf:dc43:: with SMTP id m3mr28062078wrj.118.1568144050368; 
- Tue, 10 Sep 2019 12:34:10 -0700 (PDT)
+ bh=05vMXPIxoWx34Tv2XwUiZnuEHt704CpxHZvOBau6J1M=;
+ b=QlBvSNGxu6LNF8Kb+TvJi3h7JK5pSaGrkdAMfitUI+0vR0n/+pS0laXgPgYvIFF9YV
+ 2KWp0HG3GFMInOHi9Ix8QdACrxfNnPOKN+AHqT+mFhC+JITYA3udLB28jmTOtjGRElX7
+ fGWwRlMWsXF49sAIJkf6+n3+ZmM4nsI2SmpuEgY4adVs9ZWF7a0iiCWAW3BveT8MhOWD
+ fGwYKHE3phPAqAWRn9RrT4yx+hgGd20R+je+XXpvkIUiSXi7rvJQQBJ3IUUKYyMaS+lM
+ qPxM4I8aJaP5G+Lpb9mVc91LKzWEx45aVKs0HGmYKZZ6+YF/5cjrCBkP+KEheVKJ5BCp
+ LrsQ==
+X-Gm-Message-State: APjAAAUsHfH9jmYQuDlQ7ADxFMwJvY8JMOd+AlpuzTvQmJEDlm7hNVjj
+ 0OCIbU4mW+nJk+bx1ZnPeD4phA==
+X-Google-Smtp-Source: APXvYqyvT6FPzQBOrvV/uRW0YpzWW30ZUKWojq0ARBHCwdqzWttTsBZcE6BMfu5A/ictS88DnZ2qkg==
+X-Received: by 2002:a1c:c911:: with SMTP id f17mr876238wmb.73.1568144052633;
+ Tue, 10 Sep 2019 12:34:12 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id l5sm491162wmj.4.2019.09.10.12.34.09
+ by smtp.gmail.com with ESMTPSA id l1sm22205092wrb.1.2019.09.10.12.34.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Sep 2019 12:34:09 -0700 (PDT)
+ Tue, 10 Sep 2019 12:34:11 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id BC91C1FF8C;
- Tue, 10 Sep 2019 20:34:08 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 544321FF90;
+ Tue, 10 Sep 2019 20:34:09 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Date: Tue, 10 Sep 2019 20:34:05 +0100
-Message-Id: <20190910193408.28917-2-alex.bennee@linaro.org>
+Date: Tue, 10 Sep 2019 20:34:07 +0100
+Message-Id: <20190910193408.28917-4-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190910193408.28917-1-alex.bennee@linaro.org>
 References: <20190910193408.28917-1-alex.bennee@linaro.org>
@@ -83,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42f
-Subject: [Qemu-devel] [PATCH v1 1/4] target/ppc: fix signal delivery for
- ppc64abi32
+X-Received-From: 2a00:1450:4864:20::344
+Subject: [Qemu-devel] [PATCH v1 3/4] elf: move elf_ops.h into include/elf/
+ and rename
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,74 +97,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-arm@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-arm@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We were incorrectly setting NIP resulting in a segfault. This fixes
-linux-test for this ABI.
+Lets keep all the Elf manipulation bits together. Also rename the file
+to better reflect how it is used and add a little header to the file.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- linux-user/ppc/signal.c             | 4 +++-
- tests/tcg/configure.sh              | 1 +
- tests/tcg/multiarch/Makefile.target | 5 -----
- 3 files changed, 4 insertions(+), 6 deletions(-)
+ hw/core/loader.c                            | 4 ++--
+ include/{hw/elf_ops.h => elf/elf_ops.inc.h} | 9 +++++++++
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+ rename include/{hw/elf_ops.h => elf/elf_ops.inc.h} (98%)
 
-diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
-index 619a56950df..5b82af6cb62 100644
---- a/linux-user/ppc/signal.c
-+++ b/linux-user/ppc/signal.c
-@@ -501,7 +501,9 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
-     int i, err = 0;
- #if defined(TARGET_PPC64)
-     struct target_sigcontext *sc = 0;
-+#if !defined(TARGET_ABI32)
-     struct image_info *image = ((TaskState *)thread_cpu->opaque)->info;
-+#endif
- #endif
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index e0c6563e643..886179a4947 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -302,7 +302,7 @@ static void *load_at(int fd, off_t offset, size_t size)
+ #define elf_word        uint32_t
+ #define elf_sword        int32_t
+ #define bswapSZs	bswap32s
+-#include "hw/elf_ops.h"
++#include "elf/elf_ops.inc.h"
  
-     rt_sf_addr = get_sigframe(ka, env, sizeof(*rt_sf));
-@@ -557,7 +559,7 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
-     env->gpr[5] = (target_ulong) h2g(&rt_sf->uc);
-     env->gpr[6] = (target_ulong) h2g(rt_sf);
+ #undef elfhdr
+ #undef elf_phdr
+@@ -324,7 +324,7 @@ static void *load_at(int fd, off_t offset, size_t size)
+ #define elf_sword        int64_t
+ #define bswapSZs	bswap64s
+ #define SZ		64
+-#include "hw/elf_ops.h"
++#include "elf/elf_ops.inc.h"
  
--#if defined(TARGET_PPC64)
-+#if defined(TARGET_PPC64) && !defined(TARGET_ABI32)
-     if (get_ppc64_abi(image) < 2) {
-         /* ELFv1 PPC64 function pointers are pointers to OPD entries. */
-         struct target_func_ptr *handler =
-diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
-index 6c4a471aeae..e8a1a1495fc 100755
---- a/tests/tcg/configure.sh
-+++ b/tests/tcg/configure.sh
-@@ -54,6 +54,7 @@ fi
- : ${cross_cc_cflags_ppc="-m32"}
- : ${cross_cc_ppc64="powerpc-linux-gnu-gcc"}
- : ${cross_cc_cflags_ppc64="-m64"}
-+: ${cross_cc_cflags_ppc64abi32="-mcpu=power8"}
- : ${cross_cc_ppc64le="powerpc64le-linux-gnu-gcc"}
- : ${cross_cc_cflags_s390x="-m64"}
- : ${cross_cc_cflags_sparc="-m32 -mv8plus -mcpu=ultrasparc"}
-diff --git a/tests/tcg/multiarch/Makefile.target b/tests/tcg/multiarch/Makefile.target
-index 6b1e30e2fec..e6893b2e283 100644
---- a/tests/tcg/multiarch/Makefile.target
-+++ b/tests/tcg/multiarch/Makefile.target
-@@ -12,11 +12,6 @@ VPATH 		+= $(MULTIARCH_SRC)
- MULTIARCH_SRCS   =$(notdir $(wildcard $(MULTIARCH_SRC)/*.c))
- MULTIARCH_TESTS  =$(MULTIARCH_SRCS:.c=)
- 
--# FIXME: ppc64abi32 linux-test seems to have issues but the other basic tests work
--ifeq ($(TARGET_NAME),ppc64abi32)
--BROKEN_TESTS = linux-test
--endif
--
- # Update TESTS
- TESTS		+= $(filter-out $(BROKEN_TESTS), $(MULTIARCH_TESTS))
- 
+ const char *load_elf_strerror(int error)
+ {
+diff --git a/include/hw/elf_ops.h b/include/elf/elf_ops.inc.h
+similarity index 98%
+rename from include/hw/elf_ops.h
+rename to include/elf/elf_ops.inc.h
+index 1496d7e7536..a820bd821d5 100644
+--- a/include/hw/elf_ops.h
++++ b/include/elf/elf_ops.inc.h
+@@ -1,3 +1,12 @@
++/*
++ * Macro expansions for Elf operations. This is included in a
++ * compilation unit with appropriate definitions for SZ and elf
++ * headers to generate utility functions for reading 32 and 64 bit elf
++ * headers.
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
+ static void glue(bswap_ehdr, SZ)(struct elfhdr *ehdr)
+ {
+     bswap16s(&ehdr->e_type);			/* Object file type */
 -- 
 2.20.1
 
