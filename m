@@ -2,69 +2,61 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D839ECDE27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:36:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C33ECDE27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:37:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6F3C208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:36:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6F3C208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D1689208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:37:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1689208E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7xAd-0006dF-3G
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:36:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48048)
+	id 1i7xC1-00080p-VE
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:37:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48284)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1i7x9v-0005yv-J4
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:35:24 -0400
+ (envelope-from <groug@kaod.org>) id 1i7xBL-0007Tj-56
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:36:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1i7x9r-0001L6-Kt
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:35:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59998)
+ (envelope-from <groug@kaod.org>) id 1i7xBJ-00027a-Vh
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:36:50 -0400
+Received: from 10.mo178.mail-out.ovh.net ([46.105.76.150]:50642)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1i7x9r-0001Kd-CB
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:35:19 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 19DE610C0939;
- Wed, 11 Sep 2019 07:35:18 +0000 (UTC)
-Received: from localhost (ovpn-116-185.ams2.redhat.com [10.36.116.185])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1A1F8601B6;
- Wed, 11 Sep 2019 07:35:10 +0000 (UTC)
-Date: Wed, 11 Sep 2019 09:35:03 +0200
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Johannes Berg <johannes@sipsolutions.net>
-Message-ID: <20190911073503.GB4181@stefanha-x1.localdomain>
-References: <20190902121233.13382-1-johannes@sipsolutions.net>
- <20190902121233.13382-2-johannes@sipsolutions.net>
- <fe517ef6c6a8e2df9675388be9454b5863c7fc55.camel@sipsolutions.net>
- <20190909160039.GC20875@stefanha-x1.localdomain>
- <d095bafedcd4bcc5d76279785e5bd523aef62b58.camel@sipsolutions.net>
- <20190910150319.GB31674@stefanha-x1.localdomain>
- <e114b68dffecd9b4c4666327b15a28098c83f7ec.camel@sipsolutions.net>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1i7xBJ-00025s-Pr
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:36:49 -0400
+Received: from player718.ha.ovh.net (unknown [10.109.160.106])
+ by mo178.mail-out.ovh.net (Postfix) with ESMTP id EFD0978617
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 09:36:47 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player718.ha.ovh.net (Postfix) with ESMTPSA id 3EACB99A0F45;
+ Wed, 11 Sep 2019 07:36:39 +0000 (UTC)
+Date: Wed, 11 Sep 2019 09:36:38 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190911093638.6e829814@bahia.lan>
+In-Reply-To: <20190911040452.8341-4-david@gibson.dropbear.id.au>
+References: <20190911040452.8341-1-david@gibson.dropbear.id.au>
+ <20190911040452.8341-4-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="XF85m9dhOBO43t/C"
-Content-Disposition: inline
-In-Reply-To: <e114b68dffecd9b4c4666327b15a28098c83f7ec.camel@sipsolutions.net>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Wed, 11 Sep 2019 07:35:18 +0000 (UTC)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 11821667547947833830
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrtddugdduvddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC] docs: vhost-user: add in-band kick/call
- messages
+X-Received-From: 46.105.76.150
+Subject: Re: [Qemu-devel] [PATCH 3/7] spapr: Fixes a leak in CAS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,108 +68,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org, mst@redhat.com
+Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org, clg@kaod.org, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 11 Sep 2019 14:04:48 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
---XF85m9dhOBO43t/C
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> From: Alexey Kardashevskiy <aik@ozlabs.ru>
+> 
+> Add a missing g_free(fdt) if the resulting tree is bigger
+> than the space allocated by SLOF.
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-On Tue, Sep 10, 2019 at 05:14:36PM +0200, Johannes Berg wrote:
-> On Tue, 2019-09-10 at 17:03 +0200, Stefan Hajnoczi wrote:
-> >=20
-> > > Now, this means that the CPU (that's part of the simulation) has to
-> > > *wait* for the device to add an entry to the simulation calendar in
-> > > response to the kick... That means that it really has to look like
-> > >=20
-> > > CPU               device                   calendar
-> > >      ---[kick]-->
-> > >                          ---[add entry]-->
-> > >                          <---[return]-----
-> >=20
-> > What are the semantics of returning from the calendar?  Does it mean
-> > "it's now your turn to run?", "your entry has been added and you'll be
-> > notified later when it's time to run?", or something else?
->=20
-> The latter - the entry was added, and you'll be notified when it's time
-> to run; but we need to have that state on the calendar so the CPU won't
-> converse with the calendar before that state is committed.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Is the device only adding a calendar entry and not doing any actual
-device emulation at this stage?
+>  hw/ppc/spapr.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index e03e874d94..d93dacd483 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1024,6 +1024,7 @@ int spapr_h_cas_compose_response(SpaprMachineState *spapr,
+>      _FDT((fdt_pack(fdt)));
+>  
+>      if (fdt_totalsize(fdt) + sizeof(hdr) > size) {
+> +        g_free(fdt);
+>          trace_spapr_cas_failed(size);
+>          return -1;
+>      }
 
-If yes, then this suggests the system could be structured more cleanly.
-The vhost-user device process should focus on device emulation.  It
-should not be aware of the calendar.  The vhost-user protocol also
-shouldn't require modifications.
-
-Instead, Linux arch/um code would add the entry to the calendar when the
-CPU wants to kick a vhost-user device.  I assume the CPU is suspended
-until arch/um code completes adding the entry to the calendar.
-
-When the calendar decides to run the device entry it signals the
-vhost-user kick eventfd.  The vhost-user device processes the virtqueue
-as if it had been directly signalled by the CPU, totally unaware that
-it's running within a simulation system.
-
-The irq path is similar: the device signals the callfd and the calendar
-adds an entry to notify UML that the request has completed.
-
-Some pseudo-code:
-
-arch/um/drivers/.../vhost-user.c:
-
-  void um_vu_kick(struct um_vu_vq *vq)
-  {
-      if (simulation_mode) {
-          calendar_add_entry({
-              .type =3D CAL_ENTRY_TYPE_VHOST_USER_KICK,
-              .device =3D vq->dev,
-              .vq_idx =3D vq->idx,
-          });
-          return;
-      }
-
-      /* The normal code path: signal the kickfd */
-      uint64_t val =3D 1;
-      write(vq->kickfd, &val, sizeof(val));
-  }
-
-I'm suggesting this because it seems like a cleaner approach than
-exposing the calendar concept to the vhost-user devices.  I'm not 100%
-sure it offers the semantics you need to make everything deterministic
-though.
-
-A different topic: vhost-user does not have a 1:1 vq buffer:kick
-relationship.  It's possible to add multiple buffers and kick only once.
-It is also possible for the device to complete multiple buffers and only
-call once.
-
-This could pose a problem for simulation because it allows a degree of
-non-determinism.  But as long as the both the CPU and the I/O completion
-of the device happen on a strict schedule this isn't a problem.
-
-Stefan
-
---XF85m9dhOBO43t/C
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl14o6cACgkQnKSrs4Gr
-c8gu3Af/eN/zEjjXJKe+qgkRMZJRpXKJJBa0ey0VAO+xOsC6xqy0e7NXxxUZMIZY
-IPYGdFs7FMIgfFMua2+k98TtqNfWMbcLa69t0bREYNltPDTeIl32pxklc93pQ1b4
-+x4oR6hiIBBUJ391Xc8CIYHbqdVrT2JFLQOa+aZ/d1QAd5vXOgwcRuK+CFSIk2ZO
-PCItMNYYc+zK3+QSewRdiIe7lEa2DpIdW765GgbPac29U1S3ru4iCzBp2vxcp1r4
-XVcbN8R6kSyO4gI0PSOKvoPC/JASq4s4ZYJzgou9e7WPcRlzp9vyHU6zxRJOw+6O
-Xljf/dhBMDyHErX8ikkjPojeHwTlSQ==
-=hT0q
------END PGP SIGNATURE-----
-
---XF85m9dhOBO43t/C--
 
