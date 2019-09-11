@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BE0DECDE20
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 06:44:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97837ECDE20
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 06:47:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41D142089F
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 06:44:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41D142089F
+	by mail.kernel.org (Postfix) with ESMTPS id 3269F21928
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 06:47:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3269F21928
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7wMW-0000NN-Ut
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 02:44:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38517)
+	id 1i7wPM-0002xl-Oh
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 02:47:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38712)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1i7wDg-0007AW-79
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:35:20 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1i7wE8-0007q0-CL
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:35:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1i7wDW-0007pK-5M
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:35:12 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:56549)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1i7wDy-00089O-2R
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:35:40 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:48981)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1i7wDU-0007lQ-E2; Wed, 11 Sep 2019 02:35:02 -0400
+ id 1i7wDw-0007qw-5g; Wed, 11 Sep 2019 02:35:30 -0400
 X-Alimail-AntiSpam: AC=CONTINUE; BC=0.03883426|-1; CH=green;
- DM=CONTINUE|CONTINUE|true|0.259867-0.00419391-0.735939; FP=0|0|0|0|0|-1|-1|-1;
- HT=e02c03276; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=11; RT=11; SR=0;
- TI=SMTPD_---.FSRSzSU_1568183695; 
+ DM=CONTINUE|CONTINUE|true|0.275989-0.00415687-0.719854; FP=0|0|0|0|0|-1|-1|-1;
+ HT=e02c03300; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=11; RT=11; SR=0;
+ TI=SMTPD_---.FSRQiS-_1568183703; 
 Received: from localhost(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.FSRSzSU_1568183695)
- by smtp.aliyun-inc.com(10.147.41.178);
- Wed, 11 Sep 2019 14:34:55 +0800
+ fp:SMTPD_---.FSRQiS-_1568183703)
+ by smtp.aliyun-inc.com(10.147.41.137);
+ Wed, 11 Sep 2019 14:35:03 +0800
 From: liuzhiwei <zhiwei_liu@c-sky.com>
 To: Alistair.Francis@wdc.com, palmer@sifive.com, sagark@eecs.berkeley.edu,
  kbastian@mail.uni-paderborn.de, riku.voipio@iki.fi, laurent@vivier.eu,
  wenmeng_zhang@c-sky.com
-Date: Wed, 11 Sep 2019 14:25:32 +0800
-Message-Id: <1568183141-67641-9-git-send-email-zhiwei_liu@c-sky.com>
+Date: Wed, 11 Sep 2019 14:25:38 +0800
+Message-Id: <1568183141-67641-15-git-send-email-zhiwei_liu@c-sky.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1568183141-67641-1-git-send-email-zhiwei_liu@c-sky.com>
 References: <1568183141-67641-1-git-send-email-zhiwei_liu@c-sky.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 121.197.200.217
-Subject: [Qemu-devel] [PATCH v2 08/17] RISC-V: add vector extension integer
- instructions part1, add/sub/adc/sbc
+Subject: [Qemu-devel] [PATCH v2 14/17] RISC-V: add vector extension float
+ instructions part2, sqrt/cmp/cvt/others
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,268 +75,267 @@ From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 ---
- target/riscv/helper.h                   |   36 +
- target/riscv/insn32.decode              |   35 +
- target/riscv/insn_trans/trans_rvv.inc.c |   49 +
- target/riscv/vector_helper.c            | 2335 +++++++++++++++++++++++++++++++
- 4 files changed, 2455 insertions(+)
+ target/riscv/helper.h                   |   40 +
+ target/riscv/insn32.decode              |   40 +
+ target/riscv/insn_trans/trans_rvv.inc.c |   54 +
+ target/riscv/vector_helper.c            | 2962 +++++++++++++++++++++++++++++++
+ 4 files changed, 3096 insertions(+)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index c107925..31e20dc 100644
+index d2c8684..e2384eb 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -121,6 +121,7 @@ DEF_HELPER_6(vector_vsuxb_v, void, env, i32, i32, i32, i32, i32)
- DEF_HELPER_6(vector_vsuxh_v, void, env, i32, i32, i32, i32, i32)
- DEF_HELPER_6(vector_vsuxw_v, void, env, i32, i32, i32, i32, i32)
- DEF_HELPER_6(vector_vsuxe_v, void, env, i32, i32, i32, i32, i32)
-+
- DEF_HELPER_6(vector_vamoswapw_v, void, env, i32, i32, i32, i32, i32)
- DEF_HELPER_6(vector_vamoswapd_v, void, env, i32, i32, i32, i32, i32)
- DEF_HELPER_6(vector_vamoaddw_v, void, env, i32, i32, i32, i32, i32)
-@@ -139,5 +140,40 @@ DEF_HELPER_6(vector_vamominuw_v, void, env, i32, i32, i32, i32, i32)
- DEF_HELPER_6(vector_vamominud_v, void, env, i32, i32, i32, i32, i32)
- DEF_HELPER_6(vector_vamomaxuw_v, void, env, i32, i32, i32, i32, i32)
- DEF_HELPER_6(vector_vamomaxud_v, void, env, i32, i32, i32, i32, i32)
-+
-+DEF_HELPER_4(vector_vadc_vvm, void, env, i32, i32, i32)
-+DEF_HELPER_4(vector_vadc_vxm, void, env, i32, i32, i32)
-+DEF_HELPER_4(vector_vadc_vim, void, env, i32, i32, i32)
-+DEF_HELPER_4(vector_vmadc_vvm, void, env, i32, i32, i32)
-+DEF_HELPER_4(vector_vmadc_vxm, void, env, i32, i32, i32)
-+DEF_HELPER_4(vector_vmadc_vim, void, env, i32, i32, i32)
-+DEF_HELPER_4(vector_vsbc_vvm, void, env, i32, i32, i32)
-+DEF_HELPER_4(vector_vsbc_vxm, void, env, i32, i32, i32)
-+DEF_HELPER_4(vector_vmsbc_vvm, void, env, i32, i32, i32)
-+DEF_HELPER_4(vector_vmsbc_vxm, void, env, i32, i32, i32)
-+DEF_HELPER_5(vector_vadd_vv, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vadd_vx, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vadd_vi, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vsub_vv, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vsub_vx, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vrsub_vx, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vrsub_vi, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vwaddu_vv, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vwaddu_vx, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vwadd_vv, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vwadd_vx, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vwsubu_vv, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vwsubu_vx, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vwsub_vv, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vwsub_vx, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vwaddu_wv, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vwaddu_wx, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vwadd_wv, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vwadd_wx, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vwsubu_wv, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vwsubu_wx, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vwsub_wv, void, env, i32, i32, i32, i32)
-+DEF_HELPER_5(vector_vwsub_wx, void, env, i32, i32, i32, i32)
+@@ -344,5 +344,45 @@ DEF_HELPER_5(vector_vfmsub_vf, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(vector_vfnmsub_vv, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(vector_vfnmsub_vf, void, env, i32, i32, i32, i32)
+ 
++DEF_HELPER_4(vector_vfsqrt_v, void, env, i32, i32, i32)
++DEF_HELPER_5(vector_vfmin_vv, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vfmin_vf, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vfmax_vv, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vfmax_vf, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vfsgnj_vv, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vfsgnj_vf, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vfsgnjn_vv, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vfsgnjn_vf, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vfsgnjx_vv, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vfsgnjx_vf, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vmfeq_vv, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vmfeq_vf, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vmfne_vv, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vmfne_vf, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vmfle_vv, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vmfle_vf, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vmflt_vv, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vmflt_vf, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vmfgt_vf, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vmfge_vf, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vmford_vv, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vmford_vf, void, env, i32, i32, i32, i32)
++DEF_HELPER_5(vector_vfmerge_vfm, void, env, i32, i32, i32, i32)
++DEF_HELPER_4(vector_vfclass_v, void, env, i32, i32, i32)
++DEF_HELPER_4(vector_vfcvt_xu_f_v, void, env, i32, i32, i32)
++DEF_HELPER_4(vector_vfcvt_x_f_v, void, env, i32, i32, i32)
++DEF_HELPER_4(vector_vfcvt_f_xu_v, void, env, i32, i32, i32)
++DEF_HELPER_4(vector_vfcvt_f_x_v, void, env, i32, i32, i32)
++DEF_HELPER_4(vector_vfwcvt_xu_f_v, void, env, i32, i32, i32)
++DEF_HELPER_4(vector_vfwcvt_x_f_v, void, env, i32, i32, i32)
++DEF_HELPER_4(vector_vfwcvt_f_xu_v, void, env, i32, i32, i32)
++DEF_HELPER_4(vector_vfwcvt_f_x_v, void, env, i32, i32, i32)
++DEF_HELPER_4(vector_vfwcvt_f_f_v, void, env, i32, i32, i32)
++DEF_HELPER_4(vector_vfncvt_xu_f_v, void, env, i32, i32, i32)
++DEF_HELPER_4(vector_vfncvt_x_f_v, void, env, i32, i32, i32)
++DEF_HELPER_4(vector_vfncvt_f_xu_v, void, env, i32, i32, i32)
++DEF_HELPER_4(vector_vfncvt_f_x_v, void, env, i32, i32, i32)
++DEF_HELPER_4(vector_vfncvt_f_f_v, void, env, i32, i32, i32)
 +
  DEF_HELPER_4(vector_vsetvli, void, env, i32, i32, i32)
  DEF_HELPER_4(vector_vsetvl, void, env, i32, i32, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 48e7661..fc7e498 100644
+index 31868ab..256d8ea 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -63,6 +63,7 @@
- @r_rm    .......   ..... ..... ... ..... ....... %rs2 %rs1 %rm %rd
- @r2_rm   .......   ..... ..... ... ..... ....... %rs1 %rm %rd
- @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
-+@r_vm    ...... vm:1 ..... ..... ... ..... ....... %rs2 %rs1 %rd
+@@ -67,6 +67,7 @@
  @r_wdvm  ..... wd:1 vm:1 ..... ..... ... ..... ....... %rs2 %rs1 %rd
  @r_nfvm  nf:3 ... vm:1 ..... ..... ... ..... ....... %rs2 %rs1 %rd
  @r2_nfvm nf:3 ... vm:1 ..... ..... ... ..... ....... %rs1 %rd
-@@ -280,5 +281,39 @@ vamomaxuw_v     11100 . . ..... ..... 110 ..... 0101111 @r_wdvm
- vamomaxud_v     11100 . . ..... ..... 111 ..... 0101111 @r_wdvm
++@r2_vm   ...... vm:1 ..... ..... ... ..... ....... %rs2 %rd
+ @r2_zimm . zimm:11  ..... ... ..... ....... %rs1 %rd
  
- #*** new major opcode OP-V ***
-+vadd_vv         000000 . ..... ..... 000 ..... 1010111 @r_vm
-+vadd_vx         000000 . ..... ..... 100 ..... 1010111 @r_vm
-+vadd_vi         000000 . ..... ..... 011 ..... 1010111 @r_vm
-+vsub_vv         000010 . ..... ..... 000 ..... 1010111 @r_vm
-+vsub_vx         000010 . ..... ..... 100 ..... 1010111 @r_vm
-+vrsub_vx        000011 . ..... ..... 100 ..... 1010111 @r_vm
-+vrsub_vi        000011 . ..... ..... 011 ..... 1010111 @r_vm
-+vwaddu_vv       110000 . ..... ..... 010 ..... 1010111 @r_vm
-+vwaddu_vx       110000 . ..... ..... 110 ..... 1010111 @r_vm
-+vwadd_vv        110001 . ..... ..... 010 ..... 1010111 @r_vm
-+vwadd_vx        110001 . ..... ..... 110 ..... 1010111 @r_vm
-+vwsubu_vv       110010 . ..... ..... 010 ..... 1010111 @r_vm
-+vwsubu_vx       110010 . ..... ..... 110 ..... 1010111 @r_vm
-+vwsub_vv        110011 . ..... ..... 010 ..... 1010111 @r_vm
-+vwsub_vx        110011 . ..... ..... 110 ..... 1010111 @r_vm
-+vwaddu_wv       110100 . ..... ..... 010 ..... 1010111 @r_vm
-+vwaddu_wx       110100 . ..... ..... 110 ..... 1010111 @r_vm
-+vwadd_wv        110101 . ..... ..... 010 ..... 1010111 @r_vm
-+vwadd_wx        110101 . ..... ..... 110 ..... 1010111 @r_vm
-+vwsubu_wv       110110 . ..... ..... 010 ..... 1010111 @r_vm
-+vwsubu_wx       110110 . ..... ..... 110 ..... 1010111 @r_vm
-+vwsub_wv        110111 . ..... ..... 010 ..... 1010111 @r_vm
-+vwsub_wx        110111 . ..... ..... 110 ..... 1010111 @r_vm
-+vadc_vvm        010000 1 ..... ..... 000 ..... 1010111 @r
-+vadc_vxm        010000 1 ..... ..... 100 ..... 1010111 @r
-+vadc_vim        010000 1 ..... ..... 011 ..... 1010111 @r
-+vmadc_vvm       010001 1 ..... ..... 000 ..... 1010111 @r
-+vmadc_vxm       010001 1 ..... ..... 100 ..... 1010111 @r
-+vmadc_vim       010001 1 ..... ..... 011 ..... 1010111 @r
-+vsbc_vvm        010010 1 ..... ..... 000 ..... 1010111 @r
-+vsbc_vxm        010010 1 ..... ..... 100 ..... 1010111 @r
-+vmsbc_vvm       010011 1 ..... ..... 000 ..... 1010111 @r
-+vmsbc_vxm       010011 1 ..... ..... 100 ..... 1010111 @r
-+
+ @sfence_vma ....... ..... .....   ... ..... ....... %rs2 %rs1
+@@ -483,6 +484,45 @@ vfmsub_vv       101010 . ..... ..... 001 ..... 1010111 @r_vm
+ vfmsub_vf       101010 . ..... ..... 101 ..... 1010111 @r_vm
+ vfnmsub_vv      101011 . ..... ..... 001 ..... 1010111 @r_vm
+ vfnmsub_vf      101011 . ..... ..... 101 ..... 1010111 @r_vm
++vfsqrt_v        100011 . ..... 00000 001 ..... 1010111 @r2_vm
++vfmin_vv        000100 . ..... ..... 001 ..... 1010111 @r_vm
++vfmin_vf        000100 . ..... ..... 101 ..... 1010111 @r_vm
++vfmax_vv        000110 . ..... ..... 001 ..... 1010111 @r_vm
++vfmax_vf        000110 . ..... ..... 101 ..... 1010111 @r_vm
++vfsgnj_vv       001000 . ..... ..... 001 ..... 1010111 @r_vm
++vfsgnj_vf       001000 . ..... ..... 101 ..... 1010111 @r_vm
++vfsgnjn_vv      001001 . ..... ..... 001 ..... 1010111 @r_vm
++vfsgnjn_vf      001001 . ..... ..... 101 ..... 1010111 @r_vm
++vfsgnjx_vv      001010 . ..... ..... 001 ..... 1010111 @r_vm
++vfsgnjx_vf      001010 . ..... ..... 101 ..... 1010111 @r_vm
++vmfeq_vv        011000 . ..... ..... 001 ..... 1010111 @r_vm
++vmfeq_vf        011000 . ..... ..... 101 ..... 1010111 @r_vm
++vmfne_vv        011100 . ..... ..... 001 ..... 1010111 @r_vm
++vmfne_vf        011100 . ..... ..... 101 ..... 1010111 @r_vm
++vmflt_vv        011011 . ..... ..... 001 ..... 1010111 @r_vm
++vmflt_vf        011011 . ..... ..... 101 ..... 1010111 @r_vm
++vmfle_vv        011001 . ..... ..... 001 ..... 1010111 @r_vm
++vmfle_vf        011001 . ..... ..... 101 ..... 1010111 @r_vm
++vmfgt_vf        011101 . ..... ..... 101 ..... 1010111 @r_vm
++vmfge_vf        011111 . ..... ..... 101 ..... 1010111 @r_vm
++vmford_vv       011010 . ..... ..... 001 ..... 1010111 @r_vm
++vmford_vf       011010 . ..... ..... 101 ..... 1010111 @r_vm
++vfclass_v       100011 . ..... 10000 001 ..... 1010111 @r2_vm
++vfmerge_vfm     010111 . ..... ..... 101 ..... 1010111 @r_vm
++vfcvt_xu_f_v    100010 . ..... 00000 001 ..... 1010111 @r2_vm
++vfcvt_x_f_v     100010 . ..... 00001 001 ..... 1010111 @r2_vm
++vfcvt_f_xu_v    100010 . ..... 00010 001 ..... 1010111 @r2_vm
++vfcvt_f_x_v     100010 . ..... 00011 001 ..... 1010111 @r2_vm
++vfwcvt_xu_f_v   100010 . ..... 01000 001 ..... 1010111 @r2_vm
++vfwcvt_x_f_v    100010 . ..... 01001 001 ..... 1010111 @r2_vm
++vfwcvt_f_xu_v   100010 . ..... 01010 001 ..... 1010111 @r2_vm
++vfwcvt_f_x_v    100010 . ..... 01011 001 ..... 1010111 @r2_vm
++vfwcvt_f_f_v    100010 . ..... 01100 001 ..... 1010111 @r2_vm
++vfncvt_xu_f_v   100010 . ..... 10000 001 ..... 1010111 @r2_vm
++vfncvt_x_f_v    100010 . ..... 10001 001 ..... 1010111 @r2_vm
++vfncvt_f_xu_v   100010 . ..... 10010 001 ..... 1010111 @r2_vm
++vfncvt_f_x_v    100010 . ..... 10011 001 ..... 1010111 @r2_vm
++vfncvt_f_f_v    100010 . ..... 10100 001 ..... 1010111 @r2_vm
+ 
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 7bda378..a1c1960 100644
+index ff23bc2..e4d4576 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -77,6 +77,21 @@ static bool trans_##INSN(DisasContext *ctx, arg_##INSN * a) \
+@@ -92,6 +92,20 @@ static bool trans_##INSN(DisasContext *ctx, arg_##INSN * a) \
      return true;                                       \
  }
  
-+#define GEN_VECTOR_R_VM(INSN) \
++#define GEN_VECTOR_R2_VM(INSN) \
 +static bool trans_##INSN(DisasContext *ctx, arg_##INSN * a) \
 +{                                                      \
-+    TCGv_i32 s1 = tcg_const_i32(a->rs1);               \
 +    TCGv_i32 s2 = tcg_const_i32(a->rs2);               \
 +    TCGv_i32 d  = tcg_const_i32(a->rd);                \
 +    TCGv_i32 vm = tcg_const_i32(a->vm);                \
-+    gen_helper_vector_##INSN(cpu_env, vm, s1, s2, d);    \
-+    tcg_temp_free_i32(s1);                             \
++    gen_helper_vector_##INSN(cpu_env, vm, s2, d);        \
 +    tcg_temp_free_i32(s2);                             \
 +    tcg_temp_free_i32(d);                              \
 +    tcg_temp_free_i32(vm);                             \
 +    return true;                                       \
 +}
 +
++
  #define GEN_VECTOR_R2_ZIMM(INSN) \
  static bool trans_##INSN(DisasContext *ctx, arg_##INSN * a) \
  {                                                      \
-@@ -155,5 +170,39 @@ GEN_VECTOR_R_WDVM(vamominud_v)
- GEN_VECTOR_R_WDVM(vamomaxuw_v)
- GEN_VECTOR_R_WDVM(vamomaxud_v)
+@@ -373,5 +387,45 @@ GEN_VECTOR_R_VM(vfmsub_vf)
+ GEN_VECTOR_R_VM(vfnmsub_vv)
+ GEN_VECTOR_R_VM(vfnmsub_vf)
  
-+GEN_VECTOR_R(vadc_vvm)
-+GEN_VECTOR_R(vadc_vxm)
-+GEN_VECTOR_R(vadc_vim)
-+GEN_VECTOR_R(vmadc_vvm)
-+GEN_VECTOR_R(vmadc_vxm)
-+GEN_VECTOR_R(vmadc_vim)
-+GEN_VECTOR_R(vsbc_vvm)
-+GEN_VECTOR_R(vsbc_vxm)
-+GEN_VECTOR_R(vmsbc_vvm)
-+GEN_VECTOR_R(vmsbc_vxm)
-+GEN_VECTOR_R_VM(vadd_vv)
-+GEN_VECTOR_R_VM(vadd_vx)
-+GEN_VECTOR_R_VM(vadd_vi)
-+GEN_VECTOR_R_VM(vsub_vv)
-+GEN_VECTOR_R_VM(vsub_vx)
-+GEN_VECTOR_R_VM(vrsub_vx)
-+GEN_VECTOR_R_VM(vrsub_vi)
-+GEN_VECTOR_R_VM(vwaddu_vv)
-+GEN_VECTOR_R_VM(vwaddu_vx)
-+GEN_VECTOR_R_VM(vwadd_vv)
-+GEN_VECTOR_R_VM(vwadd_vx)
-+GEN_VECTOR_R_VM(vwsubu_vv)
-+GEN_VECTOR_R_VM(vwsubu_vx)
-+GEN_VECTOR_R_VM(vwsub_vv)
-+GEN_VECTOR_R_VM(vwsub_vx)
-+GEN_VECTOR_R_VM(vwaddu_wv)
-+GEN_VECTOR_R_VM(vwaddu_wx)
-+GEN_VECTOR_R_VM(vwadd_wv)
-+GEN_VECTOR_R_VM(vwadd_wx)
-+GEN_VECTOR_R_VM(vwsubu_wv)
-+GEN_VECTOR_R_VM(vwsubu_wx)
-+GEN_VECTOR_R_VM(vwsub_wv)
-+GEN_VECTOR_R_VM(vwsub_wx)
++GEN_VECTOR_R2_VM(vfsqrt_v)
++GEN_VECTOR_R_VM(vfmin_vv)
++GEN_VECTOR_R_VM(vfmin_vf)
++GEN_VECTOR_R_VM(vfmax_vv)
++GEN_VECTOR_R_VM(vfmax_vf)
++GEN_VECTOR_R_VM(vfsgnj_vv)
++GEN_VECTOR_R_VM(vfsgnj_vf)
++GEN_VECTOR_R_VM(vfsgnjn_vv)
++GEN_VECTOR_R_VM(vfsgnjn_vf)
++GEN_VECTOR_R_VM(vfsgnjx_vv)
++GEN_VECTOR_R_VM(vfsgnjx_vf)
++GEN_VECTOR_R_VM(vmfeq_vv)
++GEN_VECTOR_R_VM(vmfeq_vf)
++GEN_VECTOR_R_VM(vmfne_vv)
++GEN_VECTOR_R_VM(vmfne_vf)
++GEN_VECTOR_R_VM(vmfle_vv)
++GEN_VECTOR_R_VM(vmfle_vf)
++GEN_VECTOR_R_VM(vmflt_vv)
++GEN_VECTOR_R_VM(vmflt_vf)
++GEN_VECTOR_R_VM(vmfgt_vf)
++GEN_VECTOR_R_VM(vmfge_vf)
++GEN_VECTOR_R_VM(vmford_vv)
++GEN_VECTOR_R_VM(vmford_vf)
++GEN_VECTOR_R2_VM(vfclass_v)
++GEN_VECTOR_R_VM(vfmerge_vfm)
++GEN_VECTOR_R2_VM(vfcvt_xu_f_v)
++GEN_VECTOR_R2_VM(vfcvt_x_f_v)
++GEN_VECTOR_R2_VM(vfcvt_f_xu_v)
++GEN_VECTOR_R2_VM(vfcvt_f_x_v)
++GEN_VECTOR_R2_VM(vfwcvt_xu_f_v)
++GEN_VECTOR_R2_VM(vfwcvt_x_f_v)
++GEN_VECTOR_R2_VM(vfwcvt_f_xu_v)
++GEN_VECTOR_R2_VM(vfwcvt_f_x_v)
++GEN_VECTOR_R2_VM(vfwcvt_f_f_v)
++GEN_VECTOR_R2_VM(vfncvt_xu_f_v)
++GEN_VECTOR_R2_VM(vfncvt_x_f_v)
++GEN_VECTOR_R2_VM(vfncvt_f_xu_v)
++GEN_VECTOR_R2_VM(vfncvt_f_x_v)
++GEN_VECTOR_R2_VM(vfncvt_f_f_v)
 +
  GEN_VECTOR_R2_ZIMM(vsetvli)
  GEN_VECTOR_R(vsetvl)
 diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 9ebf70d..95336c9 100644
+index e16543b..fd2ecb7 100644
 --- a/target/riscv/vector_helper.c
 +++ b/target/riscv/vector_helper.c
-@@ -24,12 +24,21 @@
- #include <math.h>
- 
- #define VECTOR_HELPER(name) HELPER(glue(vector_, name))
-+#define SIGNBIT8    (1 << 7)
-+#define SIGNBIT16   (1 << 15)
-+#define SIGNBIT32   (1 << 31)
-+#define SIGNBIT64   ((uint64_t)1 << 63)
- 
- static int64_t sign_extend(int64_t a, int8_t width)
- {
-     return a << (64 - width) >> (64 - width);
+@@ -914,6 +914,25 @@ static inline int64_t avg_round_s64(CPURISCVState *env, int64_t a, int64_t b)
+     return res;
  }
  
-+static int64_t extend_gpr(target_ulong reg)
++static target_ulong helper_fclass_h(uint64_t frs1)
 +{
-+    return sign_extend(reg, sizeof(target_ulong) * 8);
++    float16 f = frs1;
++    bool sign = float16_is_neg(f);
++
++    if (float16_is_infinity(f)) {
++        return sign ? 1 << 0 : 1 << 7;
++    } else if (float16_is_zero(f)) {
++        return sign ? 1 << 3 : 1 << 4;
++    } else if (float16_is_zero_or_denormal(f)) {
++        return sign ? 1 << 2 : 1 << 5;
++    } else if (float16_is_any_nan(f)) {
++        float_status s = { }; /* for snan_bit_is_one */
++        return float16_is_quiet_nan(f, &s) ? 1 << 9 : 1 << 8;
++    } else {
++        return sign ? 1 << 1 : 1 << 6;
++    }
 +}
 +
- static target_ulong vector_get_index(CPURISCVState *env, int rs1, int rs2,
-     int index, int mem, int width, int nf)
+ static inline bool vector_vtype_ill(CPURISCVState *env)
  {
-@@ -118,6 +127,39 @@ static inline bool vector_overlap_vm_common(int lmul, int vm, int rd)
-     return false;
+     if ((env->vfp.vtype >> (sizeof(target_ulong) - 1)) & 0x1) {
+@@ -1017,6 +1036,32 @@ static bool  vector_lmul_check_reg(CPURISCVState *env, uint32_t lmul,
+     return true;
  }
  
-+static inline bool vector_overlap_vm_force(int vm, int rd)
++/**
++ * deposit16:
++ * @value: initial value to insert bit field into
++ * @start: the lowest bit in the bit field (numbered from 0)
++ * @length: the length of the bit field
++ * @fieldval: the value to insert into the bit field
++ *
++ * Deposit @fieldval into the 16 bit @value at the bit field specified
++ * by the @start and @length parameters, and return the modified
++ * @value. Bits of @value outside the bit field are not modified.
++ * Bits of @fieldval above the least significant @length bits are
++ * ignored. The bit field must lie entirely within the 16 bit word.
++ * It is valid to request that all 16 bits are modified (ie @length
++ * 16 and @start 0).
++ *
++ * Returns: the modified @value.
++ */
++static  inline uint16_t deposit16(uint16_t value, int start, int length,
++        uint16_t fieldval)
 +{
-+    if (vm == 0 && rd == 0) {
-+        return true;
-+    }
-+    return false;
++    uint16_t mask;
++    assert(start >= 0 && length > 0 && length <= 16 - start);
++    mask = (~0U >> (16 - length)) << start;
++    return (value & ~mask) | ((fieldval << start) & mask);
 +}
 +
-+static inline bool vector_overlap_carry(int lmul, int rd)
-+{
-+    if (lmul > 1 && rd == 0) {
-+        return true;
-+    }
-+    return false;
-+}
-+
-+static inline bool vector_overlap_dstgp_srcgp(int rd, int dlen, int rs,
-+    int slen)
-+{
-+    if ((rd >= rs && rd < rs + slen) || (rs >= rd && rs < rd + dlen)) {
-+        return true;
-+    }
-+    return false;
-+}
-+
-+static inline void vector_get_layout(CPURISCVState *env, int width, int lmul,
-+    int index, int *idx, int *pos)
-+{
-+    int mlen = width / lmul;
-+    *idx = (index * mlen) / 8;
-+    *pos = (index * mlen) % 8;
-+}
-+
- static bool  vector_lmul_check_reg(CPURISCVState *env, uint32_t lmul,
-         uint32_t reg, bool widen)
+ static void vector_tail_amo(CPURISCVState *env, int vreg, int index, int width)
  {
-@@ -185,6 +227,173 @@ static void vector_tail_segment(CPURISCVState *env, int vreg, int index,
+     switch (width) {
+@@ -1161,6 +1206,22 @@ static void vector_tail_fwiden(CPURISCVState *env, int vreg, int index,
      }
  }
  
-+static void vector_tail_common(CPURISCVState *env, int vreg, int index,
++static void vector_tail_fnarrow(CPURISCVState *env, int vreg, int index,
 +    int width)
 +{
 +    switch (width) {
-+    case 8:
-+        env->vfp.vreg[vreg].u8[index] = 0;
-+        break;
 +    case 16:
 +        env->vfp.vreg[vreg].u16[index] = 0;
 +        break;
 +    case 32:
 +        env->vfp.vreg[vreg].u32[index] = 0;
-+        break;
-+    case 64:
-+        env->vfp.vreg[vreg].u64[index] = 0;
 +        break;
 +    default:
 +        helper_raise_exception(env, RISCV_EXCP_ILLEGAL_INST);
@@ -344,2284 +343,2915 @@ index 9ebf70d..95336c9 100644
 +    }
 +}
 +
-+static void vector_tail_widen(CPURISCVState *env, int vreg, int index,
-+    int width)
+ static inline int vector_get_carry(CPURISCVState *env, int width, int lmul,
+     int index)
+ {
+@@ -19758,4 +19819,2905 @@ void VECTOR_HELPER(vfnmsub_vf)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
+     return;
+ }
+ 
++/* vfsqrt.v vd, vs2, vm # Vector-vector square root */
++void VECTOR_HELPER(vfsqrt_v)(CPURISCVState *env, uint32_t vm, uint32_t rs2,
++    uint32_t rd)
 +{
-+    switch (width) {
-+    case 8:
-+        env->vfp.vreg[vreg].u16[index] = 0;
-+        break;
-+    case 16:
-+        env->vfp.vreg[vreg].u32[index] = 0;
-+        break;
-+    case 32:
-+        env->vfp.vreg[vreg].u64[index] = 0;
-+        break;
-+    default:
-+        helper_raise_exception(env, RISCV_EXCP_ILLEGAL_INST);
++    int width, lmul, vl, vlmax;
++    int i, j, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
 +        return;
 +    }
-+}
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, false);
 +
-+static inline int vector_get_carry(CPURISCVState *env, int width, int lmul,
-+    int index)
-+{
-+    int mlen = width / lmul;
-+    int idx = (index * mlen) / 8;
-+    int pos = (index * mlen) % 8;
-+
-+    return (env->vfp.vreg[0].u8[idx] >> pos) & 0x1;
-+}
-+
-+static inline void vector_mask_result(CPURISCVState *env, uint32_t reg,
-+        int width, int lmul, int index, uint32_t result)
-+{
-+    int mlen = width / lmul;
-+    int idx  = (index * mlen) / width;
-+    int pos  = (index * mlen) % width;
-+    uint64_t mask = ~((((uint64_t)1 << mlen) - 1) << pos);
-+
-+    switch (width) {
-+    case 8:
-+        env->vfp.vreg[reg].u8[idx] = (env->vfp.vreg[reg].u8[idx] & mask)
-+                                                | (result << pos);
-+    break;
-+    case 16:
-+        env->vfp.vreg[reg].u16[idx] = (env->vfp.vreg[reg].u16[idx] & mask)
-+                                                | (result << pos);
-+    break;
-+    case 32:
-+        env->vfp.vreg[reg].u32[idx] = (env->vfp.vreg[reg].u32[idx] & mask)
-+                                                | (result << pos);
-+    break;
-+    case 64:
-+        env->vfp.vreg[reg].u64[idx] = (env->vfp.vreg[reg].u64[idx] & mask)
-+                                                | ((uint64_t)result << pos);
-+    break;
-+    default:
-+        helper_raise_exception(env, RISCV_EXCP_ILLEGAL_INST);
-+    break;
++    if (env->vfp.vstart >= vl) {
++        return;
 +    }
 +
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f16[j] = float16_sqrt(
++                                                    env->vfp.vreg[src2].f16[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[j] = float32_sqrt(
++                                                    env->vfp.vreg[src2].f32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f64[j] = float64_sqrt(
++                                                    env->vfp.vreg[src2].f64[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++                env->vfp.vreg[dest].f16[j] = 0;
++            case 32:
++                env->vfp.vreg[dest].f32[j] = 0;
++            case 64:
++                env->vfp.vreg[dest].f64[j] = 0;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
 +    return;
 +}
 +
-+static inline uint64_t u64xu64_lh(uint64_t a, uint64_t b)
++/* vfmin.vv vd, vs2, vs1, vm # Vector-vector */
++void VECTOR_HELPER(vfmin_vv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
 +{
-+    uint64_t hi_64, carry;
++    int width, lmul, vl, vlmax;
++    int i, j, dest, src1, src2;
 +
-+    /* first get the whole product in {hi_64, lo_64} */
-+    uint64_t a_hi = a >> 32;
-+    uint64_t a_lo = (uint32_t)a;
-+    uint64_t b_hi = b >> 32;
-+    uint64_t b_lo = (uint32_t)b;
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
 +
-+    /*
-+     * a * b = (a_hi << 32 + a_lo) * (b_hi << 32 + b_lo)
-+     *               = (a_hi * b_hi) << 64 + (a_hi * b_lo) << 32 +
-+     *                 (a_lo * b_hi) << 32 + a_lo * b_lo
-+     *               = {hi_64, lo_64}
-+     * hi_64 = ((a_hi * b_lo) << 32 + (a_lo * b_hi) << 32 + (a_lo * b_lo)) >> 64
-+     *       = (a_hi * b_lo) >> 32 + (a_lo * b_hi) >> 32 + carry
-+     * carry = ((uint64_t)(uint32_t)(a_hi * b_lo) +
-+     *           (uint64_t)(uint32_t)(a_lo * b_hi) + (a_lo * b_lo) >> 32) >> 32
-+     */
-+
-+    carry =  ((uint64_t)(uint32_t)(a_hi * b_lo) +
-+              (uint64_t)(uint32_t)(a_lo * b_hi) +
-+              ((a_lo * b_lo) >> 32)) >> 32;
-+
-+    hi_64 = a_hi * b_hi +
-+            ((a_hi * b_lo) >> 32) + ((a_lo * b_hi) >> 32) +
-+            carry;
-+
-+    return hi_64;
-+}
-+
-+static inline int64_t s64xu64_lh(int64_t a, uint64_t b)
-+{
-+    uint64_t abs_a = a;
-+    uint64_t lo_64, hi_64;
-+
-+    if (a < 0) {
-+        abs_a =  ~a + 1;
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
 +    }
-+    lo_64 = abs_a * b;
-+    hi_64 = u64xu64_lh(abs_a, b);
++    vector_lmul_check_reg(env, lmul, rs1, false);
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, false);
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
 +
-+    if ((a ^ b) & SIGNBIT64) {
-+        lo_64 = ~lo_64;
-+        hi_64 = ~hi_64;
-+        if (lo_64 == UINT64_MAX) {
-+            lo_64 = 0;
-+            hi_64 += 1;
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / width));
++        src1 = rs1 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f16[j] = float16_minnum(
++                                                    env->vfp.vreg[src1].f16[j],
++                                                    env->vfp.vreg[src2].f16[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[j] = float32_minnum(
++                                                    env->vfp.vreg[src1].f32[j],
++                                                    env->vfp.vreg[src2].f32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f64[j] = float64_minnum(
++                                                    env->vfp.vreg[src1].f64[j],
++                                                    env->vfp.vreg[src2].f64[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
 +        } else {
-+            lo_64 += 1;
++            switch (width) {
++            case 16:
++                env->vfp.vreg[dest].f16[j] = 0;
++            case 32:
++                env->vfp.vreg[dest].f32[j] = 0;
++            case 64:
++                env->vfp.vreg[dest].f64[j] = 0;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
 +        }
 +    }
-+    return hi_64;
++    env->vfp.vstart = 0;
++    return;
 +}
 +
-+static inline int64_t s64xs64_lh(int64_t a, int64_t b)
++/* vfmin.vf vd, vs2, rs1, vm # vector-scalar */
++void VECTOR_HELPER(vfmin_vf)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
 +{
-+    uint64_t abs_a = a, abs_b = b;
-+    uint64_t lo_64, hi_64;
++    int width, lmul, vl, vlmax;
++    int i, j, dest, src2;
 +
-+    if (a < 0) {
-+        abs_a =  ~a + 1;
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
 +    }
-+    if (b < 0) {
-+        abs_b = ~b + 1;
-+    }
-+    lo_64 = abs_a * abs_b;
-+    hi_64 = u64xu64_lh(abs_a, abs_b);
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, false);
 +
-+    if ((a ^ b) & SIGNBIT64) {
-+        lo_64 = ~lo_64;
-+        hi_64 = ~hi_64;
-+        if (lo_64 == UINT64_MAX) {
-+            lo_64 = 0;
-+            hi_64 += 1;
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f16[j] = float16_minnum(
++                                                    env->fpr[rs1],
++                                                    env->vfp.vreg[src2].f16[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[j] = float32_minnum(
++                                                    env->fpr[rs1],
++                                                    env->vfp.vreg[src2].f32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f64[j] = float64_minnum(
++                                                    env->fpr[rs1],
++                                                    env->vfp.vreg[src2].f64[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
 +        } else {
-+            lo_64 += 1;
++            switch (width) {
++            case 16:
++                env->vfp.vreg[dest].f16[j] = 0;
++            case 32:
++                env->vfp.vreg[dest].f32[j] = 0;
++            case 64:
++                env->vfp.vreg[dest].f64[j] = 0;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
 +        }
 +    }
-+    return hi_64;
++    return;
++
++    env->vfp.vstart = 0;
 +}
 +
- void VECTOR_HELPER(vsetvl)(CPURISCVState *env, uint32_t rs1, uint32_t rs2,
-     uint32_t rd)
- {
-@@ -4796,3 +5005,2129 @@ void VECTOR_HELPER(vamomaxud_v)(CPURISCVState *env, uint32_t wd, uint32_t vm,
-     env->vfp.vstart = 0;
- }
++/*vfmax.vv vd, vs2, vs1, vm # Vector-vector */
++void VECTOR_HELPER(vfmax_vv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, dest, src1, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    vector_lmul_check_reg(env, lmul, rs1, false);
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, false);
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / width));
++        src1 = rs1 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f16[j] = float16_maxnum(
++                                                    env->vfp.vreg[src1].f16[j],
++                                                    env->vfp.vreg[src2].f16[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[j] = float32_maxnum(
++                                                    env->vfp.vreg[src1].f32[j],
++                                                    env->vfp.vreg[src2].f32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f64[j] = float64_maxnum(
++                                                    env->vfp.vreg[src1].f64[j],
++                                                    env->vfp.vreg[src2].f64[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++                env->vfp.vreg[dest].f16[j] = 0;
++            case 32:
++                env->vfp.vreg[dest].f32[j] = 0;
++            case 64:
++                env->vfp.vreg[dest].f64[j] = 0;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfmax.vf vd, vs2, rs1, vm  # vector-scalar */
++void VECTOR_HELPER(vfmax_vf)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, false);
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f16[j] = float16_maxnum(
++                                                    env->fpr[rs1],
++                                                    env->vfp.vreg[src2].f16[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[j] = float32_maxnum(
++                                                    env->fpr[rs1],
++                                                    env->vfp.vreg[src2].f32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f64[j] = float64_maxnum(
++                                                    env->fpr[rs1],
++                                                    env->vfp.vreg[src2].f64[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++                env->vfp.vreg[dest].f16[j] = 0;
++            case 32:
++                env->vfp.vreg[dest].f32[j] = 0;
++            case 64:
++                env->vfp.vreg[dest].f64[j] = 0;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    return;
++
++    env->vfp.vstart = 0;
++}
++
++/* vfsgnj.vv vd, vs2, vs1, vm # Vector-vector */
++void VECTOR_HELPER(vfsgnj_vv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, dest, src1, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    vector_lmul_check_reg(env, lmul, rs1, false);
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, false);
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / width));
++        src1 = rs1 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f16[j] = deposit16(
++                                                    env->vfp.vreg[src1].f16[j],
++                                                    0,
++                                                    15,
++                                                    env->vfp.vreg[src2].f16[j]);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[j] = deposit32(
++                                                    env->vfp.vreg[src1].f32[j],
++                                                    0,
++                                                    31,
++                                                    env->vfp.vreg[src2].f32[j]);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f64[j] = deposit64(
++                                                    env->vfp.vreg[src1].f64[j],
++                                                    0,
++                                                    63,
++                                                    env->vfp.vreg[src2].f64[j]);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++                env->vfp.vreg[dest].f16[j] = 0;
++            case 32:
++                env->vfp.vreg[dest].f32[j] = 0;
++            case 64:
++                env->vfp.vreg[dest].f64[j] = 0;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfsgnj.vf vd, vs2, rs1, vm # vector-scalar */
++void VECTOR_HELPER(vfsgnj_vf)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f16[j] = deposit16(
++                                                    env->fpr[rs1],
++                                                    0,
++                                                    15,
++                                                    env->vfp.vreg[src2].f16[j]);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[j] = deposit32(
++                                                    env->fpr[rs1],
++                                                    0,
++                                                    31,
++                                                    env->vfp.vreg[src2].f32[j]);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f64[j] = deposit64(
++                                                    env->fpr[rs1],
++                                                    0,
++                                                    63,
++                                                    env->vfp.vreg[src2].f64[j]);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++                env->vfp.vreg[dest].f16[j] = 0;
++            case 32:
++                env->vfp.vreg[dest].f32[j] = 0;
++            case 64:
++                env->vfp.vreg[dest].f64[j] = 0;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfsgnjn.vv vd, vs2, vs1, vm # Vector-vector */
++void VECTOR_HELPER(vfsgnjn_vv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, dest, src1, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    vector_lmul_check_reg(env, lmul, rs1, false);
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / width));
++        src1 = rs1 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f16[j] = deposit16(
++                                                    ~env->vfp.vreg[src1].f16[j],
++                                                    0,
++                                                    15,
++                                                    env->vfp.vreg[src2].f16[j]);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[j] = deposit32(
++                                                    ~env->vfp.vreg[src1].f32[j],
++                                                    0,
++                                                    31,
++                                                    env->vfp.vreg[src2].f32[j]);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f64[j] = deposit64(
++                                                    ~env->vfp.vreg[src1].f64[j],
++                                                    0,
++                                                    63,
++                                                    env->vfp.vreg[src2].f64[j]);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++                env->vfp.vreg[dest].f16[j] = 0;
++            case 32:
++                env->vfp.vreg[dest].f32[j] = 0;
++            case 64:
++                env->vfp.vreg[dest].f64[j] = 0;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++/* vfsgnjn.vf vd, vs2, rs1, vm # vector-scalar */
++void VECTOR_HELPER(vfsgnjn_vf)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f16[j] = deposit16(
++                                                    ~env->fpr[rs1],
++                                                    0,
++                                                    15,
++                                                    env->vfp.vreg[src2].f16[j]);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[j] = deposit32(
++                                                    ~env->fpr[rs1],
++                                                    0,
++                                                    31,
++                                                    env->vfp.vreg[src2].f32[j]);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f64[j] = deposit64(
++                                                    ~env->fpr[rs1],
++                                                    0,
++                                                    63,
++                                                    env->vfp.vreg[src2].f64[j]);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++                env->vfp.vreg[dest].f16[j] = 0;
++            case 32:
++                env->vfp.vreg[dest].f32[j] = 0;
++            case 64:
++                env->vfp.vreg[dest].f64[j] = 0;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfsgnjx.vv vd, vs2, vs1, vm # Vector-vector */
++void VECTOR_HELPER(vfsgnjx_vv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, dest, src1, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    vector_lmul_check_reg(env, lmul, rs1, false);
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, false);
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / width));
++        src1 = rs1 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f16[j] = deposit16(
++                                                    env->vfp.vreg[src1].f16[j] ^
++                                                    env->vfp.vreg[src2].f16[j],
++                                                    0,
++                                                    15,
++                                                    env->vfp.vreg[src2].f16[j]);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[j] = deposit32(
++                                                    env->vfp.vreg[src1].f32[j] ^
++                                                    env->vfp.vreg[src2].f32[j],
++                                                    0,
++                                                    31,
++                                                    env->vfp.vreg[src2].f32[j]);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f64[j] = deposit64(
++                                                    env->vfp.vreg[src1].f64[j] ^
++                                                    env->vfp.vreg[src2].f64[j],
++                                                    0,
++                                                    63,
++                                                    env->vfp.vreg[src2].f64[j]);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++                env->vfp.vreg[dest].f16[j] = 0;
++            case 32:
++                env->vfp.vreg[dest].f32[j] = 0;
++            case 64:
++                env->vfp.vreg[dest].f64[j] = 0;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    return;
++
++    env->vfp.vstart = 0;
++}
++
++/* vfsgnjx.vf vd, vs2, rs1, vm # vector-scalar */
++void VECTOR_HELPER(vfsgnjx_vf)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, false);
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f16[j] = deposit16(
++                                                    env->fpr[rs1] ^
++                                                    env->vfp.vreg[src2].f16[j],
++                                                    0,
++                                                    15,
++                                                    env->vfp.vreg[src2].f16[j]);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[j] = deposit32(
++                                                    env->fpr[rs1] ^
++                                                    env->vfp.vreg[src2].f32[j],
++                                                    0,
++                                                    31,
++                                                    env->vfp.vreg[src2].f32[j]);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f64[j] = deposit64(
++                                                    env->fpr[rs1] ^
++                                                    env->vfp.vreg[src2].f64[j],
++                                                    0,
++                                                    63,
++                                                    env->vfp.vreg[src2].f64[j]);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++                env->vfp.vreg[dest].f16[j] = 0;
++            case 32:
++                env->vfp.vreg[dest].f32[j] = 0;
++            case 64:
++                env->vfp.vreg[dest].f64[j] = 0;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    return;
++
++    env->vfp.vstart = 0;
++}
++
++/* vfmerge.vfm vd, vs2, rs1, v0 # vd[i] = v0[i].LSB ? f[rs1] : vs2[i] */
++void VECTOR_HELPER(vfmerge_vfm)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    /* vfmv.v.f vd, rs1 # vd[i] = f[rs1]; */
++    if (vm && (rs2 != 0)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f16[j] = env->fpr[rs1];
++                } else {
++                    env->vfp.vreg[dest].f16[j] = env->vfp.vreg[src2].f16[j];
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[j] = env->fpr[rs1];
++                } else {
++                    env->vfp.vreg[dest].f32[j] = env->vfp.vreg[src2].f32[j];
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f64[j] = env->fpr[rs1];
++                } else {
++                    env->vfp.vreg[dest].f64[j] = env->vfp.vreg[src2].f64[j];
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            vector_tail_fcommon(env, dest, j, width);
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vmfeq.vv vd, vs2, vs1, vm # Vector-vector */
++void VECTOR_HELPER(vmfeq_vv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, src1, src2, result, r;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs1, false);
++    vector_lmul_check_reg(env, lmul, rs2, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        src2 = rs2 + (i / (VLEN / width));
++        src1 = rs1 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    r = float16_compare_quiet(env->vfp.vreg[src1].f16[j],
++                                              env->vfp.vreg[src2].f16[j],
++                                              &env->fp_status);
++                    if (r == float_relation_equal) {
++                        result = 1;
++                    } else {
++                        result = 0;
++                    }
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float32_eq_quiet(env->vfp.vreg[src1].f32[j],
++                                              env->vfp.vreg[src2].f32[j],
++                                              &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float64_eq_quiet(env->vfp.vreg[src1].f64[j],
++                                              env->vfp.vreg[src2].f64[j],
++                                              &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++            case 32:
++            case 64:
++                vector_mask_result(env, rd, width, lmul, i, 0);
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vmfeq.vf vd, vs2, rs1, vm # vector-scalar */
++void VECTOR_HELPER(vmfeq_vf)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, src2, result, r;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    r = float16_compare_quiet(env->fpr[rs1],
++                                              env->vfp.vreg[src2].f16[j],
++                                              &env->fp_status);
++                    if (r == float_relation_equal) {
++                        result = 1;
++                    } else {
++                        result = 0;
++                    }
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float32_eq_quiet(env->fpr[rs1],
++                                              env->vfp.vreg[src2].f32[j],
++                                              &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float64_eq_quiet(env->fpr[rs1],
++                                              env->vfp.vreg[src2].f64[j],
++                                              &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++            case 32:
++            case 64:
++                vector_mask_result(env, rd, width, lmul, i, 0);
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vmfne.vv vd, vs2, vs1, vm # Vector-vector */
++void VECTOR_HELPER(vmfne_vv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, src1, src2, result, r;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs1, false);
++    vector_lmul_check_reg(env, lmul, rs2, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        src2 = rs2 + (i / (VLEN / width));
++        src1 = rs1 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    r = float16_compare_quiet(env->vfp.vreg[src1].f16[j],
++                                              env->vfp.vreg[src2].f16[j],
++                                              &env->fp_status);
++                    if (r != float_relation_equal) {
++                        result = 1;
++                    } else {
++                        result = 0;
++                    }
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float32_eq_quiet(env->vfp.vreg[src1].f32[j],
++                                              env->vfp.vreg[src2].f32[j],
++                                              &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, !result);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float64_eq_quiet(env->vfp.vreg[src1].f64[j],
++                                              env->vfp.vreg[src2].f64[j],
++                                              &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, !result);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++            case 32:
++            case 64:
++                vector_mask_result(env, rd, width, lmul, i, 0);
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vmfne.vf vd, vs2, rs1, vm # vector-scalar */
++void VECTOR_HELPER(vmfne_vf)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, src2, result, r;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    r = float16_compare_quiet(env->fpr[rs1],
++                                              env->vfp.vreg[src2].f16[j],
++                                              &env->fp_status);
++                    if (r != float_relation_equal) {
++                        result = 1;
++                    } else {
++                        result = 0;
++                    }
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float32_eq_quiet(env->fpr[rs1],
++                                              env->vfp.vreg[src2].f32[j],
++                                              &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, !result);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float64_eq_quiet(env->fpr[rs1],
++                                              env->vfp.vreg[src2].f64[j],
++                                              &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, !result);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++            case 32:
++            case 64:
++                vector_mask_result(env, rd, width, lmul, i, 0);
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vmflt.vv vd, vs2, vs1, vm # Vector-vector */
++void VECTOR_HELPER(vmflt_vv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, src1, src2, result, r;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    vector_lmul_check_reg(env, lmul, rs1, false);
++    vector_lmul_check_reg(env, lmul, rs2, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        src2 = rs2 + (i / (VLEN / width));
++        src1 = rs1 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    r = float16_compare(env->vfp.vreg[src2].f16[j],
++                                        env->vfp.vreg[src1].f16[j],
++                                        &env->fp_status);
++                    if (r == float_relation_less) {
++                        result = 1;
++                    } else {
++                        result = 0;
++                    }
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float32_lt(env->vfp.vreg[src2].f32[j],
++                                        env->vfp.vreg[src1].f32[j],
++                                        &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float64_lt(env->vfp.vreg[src2].f64[j],
++                                        env->vfp.vreg[src1].f64[j],
++                                        &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++            case 32:
++            case 64:
++                vector_mask_result(env, rd, width, lmul, i, 0);
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vmflt.vf vd, vs2, rs1, vm # vector-scalar */
++void VECTOR_HELPER(vmflt_vf)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, src2, result, r;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    r = float16_compare(env->vfp.vreg[src2].f16[j],
++                                        env->fpr[rs1],
++                                        &env->fp_status);
++                    if (r == float_relation_less) {
++                        result = 1;
++                    } else {
++                        result = 0;
++                    }
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float32_lt(env->vfp.vreg[src2].f32[j],
++                                        env->fpr[rs1],
++                                        &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float64_lt(env->vfp.vreg[src2].f64[j],
++                                        env->fpr[rs1],
++                                        &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++            case 32:
++            case 64:
++                vector_mask_result(env, rd, width, lmul, i, 0);
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vmfle.vv vd, vs2, vs1, vm # Vector-vector */
++void VECTOR_HELPER(vmfle_vv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, src1, src2, result, r;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    vector_lmul_check_reg(env, lmul, rs1, false);
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        src2 = rs2 + (i / (VLEN / width));
++        src1 = rs1 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    r = float16_compare(env->vfp.vreg[src2].f16[j],
++                                        env->vfp.vreg[src1].f16[j],
++                                        &env->fp_status);
++                    if ((r == float_relation_less) ||
++                        (r == float_relation_equal)) {
++                        result = 1;
++                    } else {
++                        result = 0;
++                    }
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float32_le(env->vfp.vreg[src2].f32[j],
++                                        env->vfp.vreg[src1].f32[j],
++                                        &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float64_le(env->vfp.vreg[src2].f64[j],
++                                        env->vfp.vreg[src1].f64[j],
++                                        &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++            case 32:
++            case 64:
++                vector_mask_result(env, rd, width, lmul, i, 0);
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vmfle.vf vd, vs2, rs1, vm # vector-scalar */
++void VECTOR_HELPER(vmfle_vf)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, src2, result, r;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    r = float16_compare(env->vfp.vreg[src2].f16[j],
++                                        env->fpr[rs1],
++                                        &env->fp_status);
++                    if ((r == float_relation_less) ||
++                        (r == float_relation_equal)) {
++                        result = 1;
++                    } else {
++                        result = 0;
++                    }
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float32_le(env->vfp.vreg[src2].f32[j],
++                                        env->fpr[rs1],
++                                        &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float64_le(env->vfp.vreg[src2].f64[j],
++                                        env->fpr[rs1],
++                                        &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, result);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++            case 32:
++            case 64:
++                vector_mask_result(env, rd, width, lmul, i, 0);
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vmfgt.vf vd, vs2, rs1, vm # vector-scalar */
++void VECTOR_HELPER(vmfgt_vf)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, src2, result, r;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            if (vector_elem_mask(env, vm, width, lmul, i)) {
++                switch (width) {
++                case 16:
++                    r = float16_compare(env->vfp.vreg[src2].f16[j],
++                                        env->fpr[rs1],
++                                        &env->fp_status);
++                    break;
++                case 32:
++                    r = float32_compare(env->vfp.vreg[src2].f32[j],
++                                        env->fpr[rs1],
++                                        &env->fp_status);
++                    break;
++                case 64:
++                    r = float64_compare(env->vfp.vreg[src2].f64[j],
++                                        env->fpr[rs1],
++                                        &env->fp_status);
++                    break;
++                default:
++                    riscv_raise_exception(env,
++                        RISCV_EXCP_ILLEGAL_INST, GETPC());
++                    return;
++                }
++                if (r == float_relation_greater) {
++                    result = 1;
++                } else {
++                    result = 0;
++                }
++                vector_mask_result(env, rd, width, lmul, i, result);
++            }
++        } else {
++            switch (width) {
++            case 16:
++            case 32:
++            case 64:
++                vector_mask_result(env, rd, width, lmul, i, 0);
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vmfge.vf vd, vs2, rs1, vm # vector-scalar */
++void VECTOR_HELPER(vmfge_vf)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, src2, result, r;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            if (vector_elem_mask(env, vm, width, lmul, i)) {
++                switch (width) {
++                case 16:
++                    r = float16_compare(env->vfp.vreg[src2].f16[j],
++                                        env->fpr[rs1],
++                                        &env->fp_status);
++                    break;
++                case 32:
++                    r = float32_compare(env->vfp.vreg[src2].f32[j],
++                                        env->fpr[rs1],
++                                        &env->fp_status);
++                    break;
++                case 64:
++                    r = float64_compare(env->vfp.vreg[src2].f64[j],
++                                        env->fpr[rs1],
++                                        &env->fp_status);
++                    break;
++                default:
++                    riscv_raise_exception(env,
++                        RISCV_EXCP_ILLEGAL_INST, GETPC());
++                    return;
++                }
++                if ((r == float_relation_greater) ||
++                    (r == float_relation_equal)) {
++                    result = 1;
++                } else {
++                    result = 0;
++                }
++                vector_mask_result(env, rd, width, lmul, i, result);
++            }
++        } else {
++            switch (width) {
++            case 16:
++            case 32:
++            case 64:
++                vector_mask_result(env, rd, width, lmul, i, 0);
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vmford.vv vd, vs2, vs1, vm # Vector-vector */
++void VECTOR_HELPER(vmford_vv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, src1, src2, result, r;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs1, false);
++    vector_lmul_check_reg(env, lmul, rs2, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        src2 = rs2 + (i / (VLEN / width));
++        src1 = rs1 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    r = float16_compare_quiet(env->vfp.vreg[src1].f16[j],
++                                              env->vfp.vreg[src2].f16[j],
++                                              &env->fp_status);
++                    if (r == float_relation_unordered) {
++                        result = 1;
++                    } else {
++                        result = 0;
++                    }
++                    vector_mask_result(env, rd, width, lmul, i, !result);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float32_unordered_quiet(env->vfp.vreg[src1].f32[j],
++                                                     env->vfp.vreg[src2].f32[j],
++                                                     &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, !result);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float64_unordered_quiet(env->vfp.vreg[src1].f64[j],
++                                                     env->vfp.vreg[src2].f64[j],
++                                                     &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, !result);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++            case 32:
++            case 64:
++                vector_mask_result(env, rd, width, lmul, i, 0);
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vmford.vf vd, vs2, rs1, vm # Vector-scalar */
++void VECTOR_HELPER(vmford_vf)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, src2, result, r;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    r = float16_compare_quiet(env->vfp.vreg[src2].f16[j],
++                                              env->fpr[rs1],
++                                              &env->fp_status);
++                    if (r == float_relation_unordered) {
++                        result = 1;
++                    } else {
++                        result = 0;
++                    }
++                    vector_mask_result(env, rd, width, lmul, i, !result);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float32_unordered_quiet(env->vfp.vreg[src2].f32[j],
++                                                     env->fpr[rs1],
++                                                     &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, !result);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    result = float64_unordered_quiet(env->vfp.vreg[src2].f64[j],
++                                                     env->fpr[rs1],
++                                                     &env->fp_status);
++                    vector_mask_result(env, rd, width, lmul, i, !result);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            switch (width) {
++            case 16:
++            case 32:
++            case 64:
++                vector_mask_result(env, rd, width, lmul, i, 0);
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfclass.v vd, vs2, vm # Vector-vector */
++void VECTOR_HELPER(vfclass_v)(CPURISCVState *env, uint32_t vm, uint32_t rs2,
++    uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].u16[j] = helper_fclass_h(
++                                                    env->vfp.vreg[src2].f16[j]);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].u32[j] = helper_fclass_s(
++                                                    env->vfp.vreg[src2].f32[j]);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].u64[j] = helper_fclass_d(
++                                                    env->vfp.vreg[src2].f64[j]);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            vector_tail_fcommon(env, dest, j, width);
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfcvt.xu.f.v vd, vs2, vm # Convert float to unsigned integer. */
++void VECTOR_HELPER(vfcvt_xu_f_v)(CPURISCVState *env, uint32_t vm,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, dest, src2;
++    if (vector_vtype_ill(env)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].u16[j] = float16_to_uint16(
++                                                    env->vfp.vreg[src2].f16[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].u32[j] = float32_to_uint32(
++                                                    env->vfp.vreg[src2].f32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].u64[j] = float64_to_uint64(
++                                                    env->vfp.vreg[src2].f64[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            vector_tail_fcommon(env, dest, j, width);
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfcvt.x.f.v vd, vs2, vm # Convert float to signed integer. */
++void VECTOR_HELPER(vfcvt_x_f_v)(CPURISCVState *env, uint32_t vm,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].s16[j] = float16_to_int16(
++                                                    env->vfp.vreg[src2].f16[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].s32[j] = float32_to_int32(
++                                                    env->vfp.vreg[src2].f32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].s64[j] = float64_to_int64(
++                                                    env->vfp.vreg[src2].f64[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            vector_tail_fcommon(env, dest, j, width);
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfcvt.f.xu.v vd, vs2, vm # Convert unsigned integer to float. */
++void VECTOR_HELPER(vfcvt_f_xu_v)(CPURISCVState *env, uint32_t vm,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f16[j] = uint16_to_float16(
++                                                    env->vfp.vreg[src2].u16[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[j] = uint32_to_float32(
++                                                    env->vfp.vreg[src2].u32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f64[j] = uint64_to_float64(
++                                                    env->vfp.vreg[src2].u64[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            vector_tail_fcommon(env, dest, j, width);
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfcvt.f.x.v vd, vs2, vm # Convert integer to float. */
++void VECTOR_HELPER(vfcvt_f_x_v)(CPURISCVState *env, uint32_t vm,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, false);
++
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f16[j] = int16_to_float16(
++                                                    env->vfp.vreg[src2].s16[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[j] = int32_to_float32(
++                                                    env->vfp.vreg[src2].s32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 64:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f64[j] = int64_to_float64(
++                                                    env->vfp.vreg[src2].s64[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            vector_tail_fcommon(env, dest, j, width);
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfwcvt.xu.f.v vd, vs2, vm # Convert float to double-width unsigned integer.*/
++void VECTOR_HELPER(vfwcvt_xu_f_v)(CPURISCVState *env, uint32_t vm,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, k, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env)
++        || vector_overlap_vm_force(vm, rd)
++        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs2, lmul)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, true);
++
++    if (lmul > 4) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / (2 * width)));
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        k = i % (VLEN / (2 * width));
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].u32[k] = float16_to_uint32(
++                                                    env->vfp.vreg[src2].f16[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].u64[k] = float32_to_uint64(
++                                                    env->vfp.vreg[src2].f32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++            }
++        } else {
++            vector_tail_fwiden(env, dest, j, width);
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfwcvt.x.f.v vd, vs2, vm # Convert float to double-width signed integer. */
++void VECTOR_HELPER(vfwcvt_x_f_v)(CPURISCVState *env, uint32_t vm,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, k, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env)
++        || vector_overlap_vm_force(vm, rd)
++        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs2, lmul)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, true);
++
++    if (lmul > 4) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / (2 * width)));
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        k = i % (VLEN / (2 * width));
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].s32[k] = float16_to_int32(
++                                                    env->vfp.vreg[src2].f16[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].s64[k] = float32_to_int64(
++                                                    env->vfp.vreg[src2].f32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            vector_tail_fwiden(env, dest, k, width);
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfwcvt.f.xu.v vd, vs2, vm # Convert unsigned integer to double-width float */
++void VECTOR_HELPER(vfwcvt_f_xu_v)(CPURISCVState *env, uint32_t vm,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, k, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env)
++        || vector_overlap_vm_force(vm, rd)
++        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs2, lmul)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, true);
++
++    if (lmul > 4) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / (2 * width)));
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        k = i % (VLEN / (2 * width));
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[k] = uint16_to_float32(
++                                                    env->vfp.vreg[src2].u16[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f64[k] = uint32_to_float64(
++                                                    env->vfp.vreg[src2].u32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            vector_tail_fwiden(env, dest, k, width);
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfwcvt.f.x.v vd, vs2, vm # Convert integer to double-width float. */
++void VECTOR_HELPER(vfwcvt_f_x_v)(CPURISCVState *env, uint32_t vm,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, k, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++    if (vector_vtype_ill(env)
++        || vector_overlap_vm_force(vm, rd)
++        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs2, lmul)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, true);
++
++    if (lmul > 4) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / (2 * width)));
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        k = i % (VLEN / (2 * width));
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[k] = int16_to_float32(
++                                                    env->vfp.vreg[src2].s16[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f64[k] = int32_to_float64(
++                                                    env->vfp.vreg[src2].s32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            vector_tail_fwiden(env, dest, k, width);
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/*
++ * vfwcvt.f.f.v vd, vs2, vm #
++ * Convert single-width float to double-width float.
++ */
++void VECTOR_HELPER(vfwcvt_f_f_v)(CPURISCVState *env, uint32_t vm,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, k, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++    if (vector_vtype_ill(env)
++        || vector_overlap_vm_force(vm, rd)
++        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs2, lmul)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, false);
++    vector_lmul_check_reg(env, lmul, rd, true);
++
++    if (lmul > 4) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / (2 * width)));
++        src2 = rs2 + (i / (VLEN / width));
++        j = i % (VLEN / width);
++        k = i % (VLEN / (2 * width));
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[k] = float16_to_float32(
++                                                    env->vfp.vreg[src2].f16[j],
++                                                    true,
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f64[k] = float32_to_float64(
++                                                    env->vfp.vreg[src2].f32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            vector_tail_fwiden(env, dest, k, width);
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfncvt.xu.f.v vd, vs2, vm # Convert float to unsigned integer. */
++void VECTOR_HELPER(vfncvt_xu_f_v)(CPURISCVState *env, uint32_t vm,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, k, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++    if (vector_vtype_ill(env) ||
++        vector_overlap_vm_common(lmul, vm, rd) ||
++        vector_overlap_dstgp_srcgp(rd, lmul, rs2, 2 * lmul)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, true);
++    vector_lmul_check_reg(env, lmul, rd, false);
++
++    if (lmul > 4) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / (2 * width)));
++        k = i % (VLEN / width);
++        j = i % (VLEN / (2 * width));
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].u16[k] = float32_to_uint16(
++                                                    env->vfp.vreg[src2].f32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].u32[k] = float64_to_uint32(
++                                                    env->vfp.vreg[src2].f64[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            vector_tail_fnarrow(env, dest, k, width);
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfncvt.x.f.v vd, vs2, vm # Convert double-width float to signed integer. */
++void VECTOR_HELPER(vfncvt_x_f_v)(CPURISCVState *env, uint32_t vm,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, k, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++     if (vector_vtype_ill(env) ||
++        vector_overlap_vm_common(lmul, vm, rd) ||
++        vector_overlap_dstgp_srcgp(rd, lmul, rs2, 2 * lmul)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, true);
++    vector_lmul_check_reg(env, lmul, rd, false);
++
++    if (lmul > 4) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / (2 * width)));
++        k = i % (VLEN / width);
++        j = i % (VLEN / (2 * width));
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].s16[k] = float32_to_int16(
++                                                    env->vfp.vreg[src2].f32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].s32[k] = float64_to_int32(
++                                                    env->vfp.vreg[src2].f64[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            vector_tail_fnarrow(env, dest, k, width);
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfncvt.f.xu.v vd, vs2, vm # Convert double-width unsigned integer to float */
++void VECTOR_HELPER(vfncvt_f_xu_v)(CPURISCVState *env, uint32_t vm,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, k, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++
++    if (vector_vtype_ill(env) ||
++        vector_overlap_vm_common(lmul, vm, rd) ||
++        vector_overlap_dstgp_srcgp(rd, lmul, rs2, 2 * lmul)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    vector_lmul_check_reg(env, lmul, rs2, true);
++    vector_lmul_check_reg(env, lmul, rd, false);
++
++    if (lmul > 4) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / (2 * width)));
++        k = i % (VLEN / width);
++        j = i % (VLEN / (2 * width));
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f16[k] = uint32_to_float16(
++                                                    env->vfp.vreg[src2].u32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[k] = uint64_to_float32(
++                                                    env->vfp.vreg[src2].u64[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            vector_tail_fnarrow(env, dest, k, width);
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfncvt.f.x.v vd, vs2, vm # Convert double-width integer to float. */
++void VECTOR_HELPER(vfncvt_f_x_v)(CPURISCVState *env, uint32_t vm,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, k, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++    if (vector_vtype_ill(env) ||
++        vector_overlap_vm_common(lmul, vm, rd) ||
++        vector_overlap_dstgp_srcgp(rd, lmul, rs2, 2 * lmul)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, true);
++    vector_lmul_check_reg(env, lmul, rd, false);
++
++    if (lmul > 4) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / (2 * width)));
++        k = i % (VLEN / width);
++        j = i % (VLEN / (2 * width));
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f16[k] = int32_to_float16(
++                                                    env->vfp.vreg[src2].s32[j],
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[k] = int64_to_float32(
++                                                    env->vfp.vreg[src2].s64[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            vector_tail_fnarrow(env, dest, k, width);
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
++/* vfncvt.f.f.v vd, vs2, vm # Convert double float to single-width float. */
++void VECTOR_HELPER(vfncvt_f_f_v)(CPURISCVState *env, uint32_t vm,
++    uint32_t rs2, uint32_t rd)
++{
++    int width, lmul, vl, vlmax;
++    int i, j, k, dest, src2;
++
++    lmul = vector_get_lmul(env);
++    vl = env->vfp.vl;
++    if (vector_vtype_ill(env) ||
++        vector_overlap_vm_common(lmul, vm, rd) ||
++        vector_overlap_dstgp_srcgp(rd, lmul, rs2, 2 * lmul)) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++
++    vector_lmul_check_reg(env, lmul, rs2, true);
++    vector_lmul_check_reg(env, lmul, rd, false);
++
++    if (lmul > 4) {
++        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++        return;
++    }
++    if (env->vfp.vstart >= vl) {
++        return;
++    }
++
++    width = vector_get_width(env);
++    vlmax = vector_get_vlmax(env);
++
++    for (i = 0; i < vlmax; i++) {
++        dest = rd + (i / (VLEN / width));
++        src2 = rs2 + (i / (VLEN / (2 * width)));
++        k = i % (VLEN / width);
++        j = i % (VLEN / (2 * width));
++        if (i < env->vfp.vstart) {
++            continue;
++        } else if (i < vl) {
++            switch (width) {
++            case 16:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f16[k] = float32_to_float16(
++                                                    env->vfp.vreg[src2].f32[j],
++                                                    true,
++                                                    &env->fp_status);
++                }
++                break;
++            case 32:
++                if (vector_elem_mask(env, vm, width, lmul, i)) {
++                    env->vfp.vreg[dest].f32[k] = float64_to_float32(
++                                                    env->vfp.vreg[src2].f64[j],
++                                                    &env->fp_status);
++                }
++                break;
++            default:
++                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++                return;
++            }
++        } else {
++            vector_tail_fnarrow(env, dest, k, width);
++        }
++    }
++    env->vfp.vstart = 0;
++    return;
++}
++
  
-+void VECTOR_HELPER(vadc_vvm)(CPURISCVState *env, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, vl;
-+    uint32_t lmul, width, src1, src2, dest, vlmax, carry;
-+
-+    vl    = env->vfp.vl;
-+    lmul  = vector_get_lmul(env);
-+    width   = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env) || vector_overlap_carry(lmul, rd)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs1, false);
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, false);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src1 = rs1 + (i / (VLEN / width));
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / width));
-+        j = i % (VLEN / width);
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u8[j] = env->vfp.vreg[src1].u8[j]
-+                    + env->vfp.vreg[src2].u8[j] + carry;
-+                break;
-+            case 16:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u16[j] = env->vfp.vreg[src1].u16[j]
-+                    + env->vfp.vreg[src2].u16[j] + carry;
-+                break;
-+            case 32:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u32[j] = env->vfp.vreg[src1].u32[j]
-+                    + env->vfp.vreg[src2].u32[j] + carry;
-+                break;
-+            case 64:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u64[j] = env->vfp.vreg[src1].u64[j]
-+                    + env->vfp.vreg[src2].u64[j] + carry;
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_common(env, dest, j, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+void VECTOR_HELPER(vadc_vxm)(CPURISCVState *env, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, vl;
-+    uint32_t lmul, width, src2, dest, vlmax, carry;
-+    vl    = env->vfp.vl;
-+    lmul  = vector_get_lmul(env);
-+    width   = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env) || vector_overlap_carry(lmul, rd)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, false);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / width));
-+        j = i % (VLEN / width);
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u8[j] = env->gpr[rs1]
-+                    + env->vfp.vreg[src2].u8[j] + carry;
-+                break;
-+            case 16:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u16[j] = env->gpr[rs1]
-+                    + env->vfp.vreg[src2].u16[j] + carry;
-+                break;
-+            case 32:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u32[j] = env->gpr[rs1]
-+                    + env->vfp.vreg[src2].u32[j] + carry;
-+                break;
-+            case 64:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u64[j] = (uint64_t)extend_gpr(env->gpr[rs1])
-+                    + env->vfp.vreg[src2].u64[j] + carry;
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_common(env, dest, j, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vadc_vim)(CPURISCVState *env, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, vl;
-+    uint32_t lmul, width, src2, dest, vlmax, carry;
-+
-+    vl    = env->vfp.vl;
-+    lmul  = vector_get_lmul(env);
-+    width   = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env) || vector_overlap_carry(lmul, rd)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, false);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / width));
-+        j = i % (VLEN / width);
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u8[j] = sign_extend(rs1, 5)
-+                    + env->vfp.vreg[src2].u8[j] + carry;
-+                break;
-+            case 16:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u16[j] = sign_extend(rs1, 5)
-+                    + env->vfp.vreg[src2].u16[j] + carry;
-+                break;
-+            case 32:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u32[j] = sign_extend(rs1, 5)
-+                    + env->vfp.vreg[src2].u32[j] + carry;
-+                break;
-+            case 64:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u64[j] = sign_extend(rs1, 5)
-+                    + env->vfp.vreg[src2].u64[j] + carry;
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_common(env, dest, j, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vmadc_vvm)(CPURISCVState *env, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, vl;
-+    uint32_t lmul, width, src1, src2, vlmax, carry;
-+    uint64_t tmp;
-+
-+    vl    = env->vfp.vl;
-+    lmul  = vector_get_lmul(env);
-+    width   = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_dstgp_srcgp(rd, 1, rs1, lmul)
-+        || vector_overlap_dstgp_srcgp(rd, 1, rs2, lmul)
-+        || (rd == 0)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs1, false);
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src1 = rs1 + (i / (VLEN / width));
-+        src2 = rs2 + (i / (VLEN / width));
-+        j      = i % (VLEN / width);
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = env->vfp.vreg[src1].u8[j]
-+                    + env->vfp.vreg[src2].u8[j] + carry;
-+                tmp   = tmp >> width;
-+
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            case 16:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = env->vfp.vreg[src1].u16[j]
-+                    + env->vfp.vreg[src2].u16[j] + carry;
-+                tmp   = tmp >> width;
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            case 32:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = (uint64_t)env->vfp.vreg[src1].u32[j]
-+                    + (uint64_t)env->vfp.vreg[src2].u32[j] + carry;
-+                tmp   = tmp >> width;
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            case 64:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = env->vfp.vreg[src1].u64[j]
-+                    + env->vfp.vreg[src2].u64[j] + carry;
-+
-+                if ((tmp < env->vfp.vreg[src1].u64[j] ||
-+                        tmp < env->vfp.vreg[src2].u64[j])
-+                    || (env->vfp.vreg[src1].u64[j] == UINT64_MAX &&
-+                        env->vfp.vreg[src2].u64[j] == UINT64_MAX)) {
-+                    tmp = 1;
-+                } else {
-+                    tmp = 0;
-+                }
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            if (width <= 64) {
-+                vector_mask_result(env, rd, width, lmul, i, 0);
-+            } else {
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                return;
-+            }
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+void VECTOR_HELPER(vmadc_vxm)(CPURISCVState *env, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, vl;
-+    uint32_t lmul, width, src2, vlmax, carry;
-+    uint64_t tmp, extend_rs1;
-+
-+    vl    = env->vfp.vl;
-+    lmul  = vector_get_lmul(env);
-+    width   = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_dstgp_srcgp(rd, 1, rs2, lmul)
-+        || (rd == 0)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / width));
-+        j      = i % (VLEN / width);
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = (uint8_t)env->gpr[rs1]
-+                    + env->vfp.vreg[src2].u8[j] + carry;
-+                tmp   = tmp >> width;
-+
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            case 16:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = (uint16_t)env->gpr[rs1]
-+                    + env->vfp.vreg[src2].u16[j] + carry;
-+                tmp   = tmp >> width;
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            case 32:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = (uint64_t)((uint32_t)env->gpr[rs1])
-+                    + (uint64_t)env->vfp.vreg[src2].u32[j] + carry;
-+                tmp   = tmp >> width;
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            case 64:
-+                carry = vector_get_carry(env, width, lmul, i);
-+
-+                extend_rs1 = (uint64_t)extend_gpr(env->gpr[rs1]);
-+                tmp = extend_rs1 + env->vfp.vreg[src2].u64[j] + carry;
-+                if ((tmp < extend_rs1) ||
-+                    (carry && (env->vfp.vreg[src2].u64[j] == UINT64_MAX))) {
-+                    tmp = 1;
-+                } else {
-+                    tmp = 0;
-+                }
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            if (width <= 64) {
-+                vector_mask_result(env, rd, width, lmul, i, 0);
-+            } else {
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                return;
-+            }
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vmadc_vim)(CPURISCVState *env, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, vl;
-+    uint32_t lmul, width, src2, vlmax, carry;
-+    uint64_t tmp;
-+
-+    vl    = env->vfp.vl;
-+    lmul  = vector_get_lmul(env);
-+    width   = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_dstgp_srcgp(rd, 1, rs2, lmul)
-+        || (rd == 0)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / width));
-+        j      = i % (VLEN / width);
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = (uint8_t)sign_extend(rs1, 5)
-+                    + env->vfp.vreg[src2].u8[j] + carry;
-+                tmp   = tmp >> width;
-+
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            case 16:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = (uint16_t)sign_extend(rs1, 5)
-+                    + env->vfp.vreg[src2].u16[j] + carry;
-+                tmp   = tmp >> width;
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            case 32:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = (uint64_t)((uint32_t)sign_extend(rs1, 5))
-+                    + (uint64_t)env->vfp.vreg[src2].u32[j] + carry;
-+                tmp   = tmp >> width;
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            case 64:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = (uint64_t)sign_extend(rs1, 5)
-+                    + env->vfp.vreg[src2].u64[j] + carry;
-+
-+                if ((tmp < (uint64_t)sign_extend(rs1, 5) ||
-+                        tmp < env->vfp.vreg[src2].u64[j])
-+                    || ((uint64_t)sign_extend(rs1, 5) == UINT64_MAX &&
-+                        env->vfp.vreg[src2].u64[j] == UINT64_MAX)) {
-+                    tmp = 1;
-+                } else {
-+                    tmp = 0;
-+                }
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            if (width <= 64) {
-+                vector_mask_result(env, rd, width, lmul, i, 0);
-+            } else {
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                return;
-+            }
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vsbc_vvm)(CPURISCVState *env, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, vl;
-+    uint32_t lmul, width, src1, src2, dest, vlmax, carry;
-+
-+    vl    = env->vfp.vl;
-+    lmul  = vector_get_lmul(env);
-+    width   = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env) || vector_overlap_carry(lmul, rd)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs1, false);
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, false);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src1 = rs1 + (i / (VLEN / width));
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / width));
-+        j = i % (VLEN / width);
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u8[j] = env->vfp.vreg[src2].u8[j]
-+                    - env->vfp.vreg[src1].u8[j] - carry;
-+                break;
-+            case 16:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u16[j] = env->vfp.vreg[src2].u16[j]
-+                    - env->vfp.vreg[src1].u16[j] - carry;
-+                break;
-+            case 32:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u32[j] = env->vfp.vreg[src2].u32[j]
-+                    - env->vfp.vreg[src1].u32[j] - carry;
-+                break;
-+            case 64:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u64[j] = env->vfp.vreg[src2].u64[j]
-+                    - env->vfp.vreg[src1].u64[j] - carry;
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_common(env, dest, j, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+void VECTOR_HELPER(vsbc_vxm)(CPURISCVState *env, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, vl;
-+    uint32_t lmul, width, src2, dest, vlmax, carry;
-+
-+    vl    = env->vfp.vl;
-+    lmul  = vector_get_lmul(env);
-+    width   = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env) || vector_overlap_carry(lmul, rd)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, false);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / width));
-+        j = i % (VLEN / width);
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u8[j] = env->vfp.vreg[src2].u8[j]
-+                    - env->gpr[rs1] - carry;
-+                break;
-+            case 16:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u16[j] = env->vfp.vreg[src2].u16[j]
-+                    - env->gpr[rs1] - carry;
-+                break;
-+            case 32:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u32[j] = env->vfp.vreg[src2].u32[j]
-+                    - env->gpr[rs1] - carry;
-+                break;
-+            case 64:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                env->vfp.vreg[dest].u64[j] = env->vfp.vreg[src2].u64[j]
-+                    - (uint64_t)extend_gpr(env->gpr[rs1]) - carry;
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_common(env, dest, j, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+void VECTOR_HELPER(vmsbc_vvm)(CPURISCVState *env, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, vl;
-+    uint32_t lmul, width, src1, src2, vlmax, carry;
-+    uint64_t tmp;
-+
-+    vl    = env->vfp.vl;
-+    lmul  = vector_get_lmul(env);
-+    width   = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_dstgp_srcgp(rd, 1, rs1, lmul)
-+        || vector_overlap_dstgp_srcgp(rd, 1, rs2, lmul)
-+        || (rd == 0)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs1, false);
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src1 = rs1 + (i / (VLEN / width));
-+        src2 = rs2 + (i / (VLEN / width));
-+        j      = i % (VLEN / width);
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = env->vfp.vreg[src2].u8[j]
-+                    - env->vfp.vreg[src1].u8[j] - carry;
-+                tmp   = (tmp >> width) & 0x1;
-+
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            case 16:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = env->vfp.vreg[src2].u16[j]
-+                    - env->vfp.vreg[src1].u16[j] - carry;
-+                tmp   = (tmp >> width) & 0x1;
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            case 32:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = (uint64_t)env->vfp.vreg[src2].u32[j]
-+                    - (uint64_t)env->vfp.vreg[src1].u32[j] - carry;
-+                tmp   = (tmp >> width) & 0x1;
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            case 64:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = env->vfp.vreg[src2].u64[j]
-+                    - env->vfp.vreg[src1].u64[j] - carry;
-+
-+                if (((env->vfp.vreg[src1].u64[j] == UINT64_MAX) && carry) ||
-+                    env->vfp.vreg[src2].u64[j] <
-+                        (env->vfp.vreg[src1].u64[j] + carry)) {
-+                    tmp = 1;
-+                } else {
-+                    tmp = 0;
-+                }
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            if (width <= 64) {
-+                vector_mask_result(env, rd, width, lmul, i, 0);
-+            } else {
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                return;
-+            }
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+void VECTOR_HELPER(vmsbc_vxm)(CPURISCVState *env, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, vl;
-+    uint32_t lmul, width, src2, vlmax, carry;
-+    uint64_t tmp, extend_rs1;
-+
-+    vl    = env->vfp.vl;
-+    lmul  = vector_get_lmul(env);
-+    width   = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_dstgp_srcgp(rd, 1, rs2, lmul)
-+        || (rd == 0)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / width));
-+        j      = i % (VLEN / width);
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = env->vfp.vreg[src2].u8[j]
-+                    - (uint8_t)env->gpr[rs1] - carry;
-+                tmp   = (tmp >> width) & 0x1;
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            case 16:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = env->vfp.vreg[src2].u16[j]
-+                    - (uint16_t)env->gpr[rs1] - carry;
-+                tmp   = (tmp >> width) & 0x1;
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            case 32:
-+                carry = vector_get_carry(env, width, lmul, i);
-+                tmp   = (uint64_t)env->vfp.vreg[src2].u32[j]
-+                    - (uint64_t)((uint32_t)env->gpr[rs1]) - carry;
-+                tmp   = (tmp >> width) & 0x1;
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+            case 64:
-+                carry = vector_get_carry(env, width, lmul, i);
-+
-+                extend_rs1 = (uint64_t)extend_gpr(env->gpr[rs1]);
-+                tmp = env->vfp.vreg[src2].u64[j] - extend_rs1 - carry;
-+
-+                if ((tmp > env->vfp.vreg[src2].u64[j]) ||
-+                    ((extend_rs1 == UINT64_MAX) && carry)) {
-+                    tmp = 1;
-+                } else {
-+                    tmp = 0;
-+                }
-+                vector_mask_result(env, rd, width, lmul, i, tmp);
-+                break;
-+
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            if (width <= 64) {
-+                vector_mask_result(env, rd, width, lmul, i, 0);
-+            } else {
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                return;
-+            }
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vadd_vv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, vl;
-+    uint32_t lmul, width, src1, src2, dest, vlmax;
-+
-+    vl = env->vfp.vl;
-+    lmul  = vector_get_lmul(env);
-+    width   = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs1, false);
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, false);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src1 = rs1 + (i / (VLEN / width));
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / width));
-+        j = i % (VLEN / width);
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u8[j] = env->vfp.vreg[src1].u8[j]
-+                        + env->vfp.vreg[src2].u8[j];
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u16[j] = env->vfp.vreg[src1].u16[j]
-+                        + env->vfp.vreg[src2].u16[j];
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u32[j] = env->vfp.vreg[src1].u32[j]
-+                        + env->vfp.vreg[src2].u32[j];
-+                }
-+                break;
-+            case 64:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u64[j] = env->vfp.vreg[src1].u64[j]
-+                        + env->vfp.vreg[src2].u64[j];
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_common(env, dest, j, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vadd_vx)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, vl;
-+    uint32_t lmul, width, src2, dest, vlmax;
-+
-+    vl = env->vfp.vl;
-+    lmul  = vector_get_lmul(env);
-+    width   = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, false);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / width));
-+        j = i % (VLEN / width);
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u8[j] = env->gpr[rs1]
-+                        + env->vfp.vreg[src2].u8[j];
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u16[j] = env->gpr[rs1]
-+                        + env->vfp.vreg[src2].u16[j];
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u32[j] = env->gpr[rs1]
-+                        + env->vfp.vreg[src2].u32[j];
-+                }
-+                break;
-+            case 64:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u64[j] =
-+                        (uint64_t)extend_gpr(env->gpr[rs1])
-+                        + env->vfp.vreg[src2].u64[j];
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_common(env, dest, j, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vadd_vi)(CPURISCVState *env, uint32_t vm,  uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, vl;
-+    uint32_t lmul, width, src2, dest, vlmax;
-+
-+    vl = env->vfp.vl;
-+    lmul  = vector_get_lmul(env);
-+    width   = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, false);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / width));
-+        j = i % (VLEN / width);
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s8[j] = sign_extend(rs1, 5)
-+                        + env->vfp.vreg[src2].s8[j];
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s16[j] = sign_extend(rs1, 5)
-+                        + env->vfp.vreg[src2].s16[j];
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s32[j] = sign_extend(rs1, 5)
-+                        + env->vfp.vreg[src2].s32[j];
-+                }
-+                break;
-+            case 64:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s64[j] = sign_extend(rs1, 5)
-+                        + env->vfp.vreg[src2].s64[j];
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_common(env, dest, j, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vsub_vv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, vl;
-+    uint32_t lmul, width, src1, src2, dest, vlmax;
-+
-+    vl = env->vfp.vl;
-+    lmul  = vector_get_lmul(env);
-+    width   = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs1, false);
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, false);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src1 = rs1 + (i / (VLEN / width));
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / width));
-+        j = i % (VLEN / width);
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u8[j] = env->vfp.vreg[src2].u8[j]
-+                        - env->vfp.vreg[src1].u8[j];
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u16[j] = env->vfp.vreg[src2].u16[j]
-+                        - env->vfp.vreg[src1].u16[j];
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u32[j] = env->vfp.vreg[src2].u32[j]
-+                        - env->vfp.vreg[src1].u32[j];
-+                }
-+                break;
-+            case 64:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u64[j] = env->vfp.vreg[src2].u64[j]
-+                        - env->vfp.vreg[src1].u64[j];
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_common(env, dest, j, width);
-+        }
-+    }
-+
-+    env->vfp.vstart = 0;
-+}
-+void VECTOR_HELPER(vsub_vx)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, vl;
-+    uint32_t lmul, width, src2, dest, vlmax;
-+
-+    vl = env->vfp.vl;
-+    lmul  = vector_get_lmul(env);
-+    width   = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, false);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / width));
-+        j = i % (VLEN / width);
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u8[j] = env->vfp.vreg[src2].u8[j]
-+                        - env->gpr[rs1];
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u16[j] = env->vfp.vreg[src2].u16[j]
-+                        - env->gpr[rs1];
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u32[j] = env->vfp.vreg[src2].u32[j]
-+                        - env->gpr[rs1];
-+                }
-+                break;
-+            case 64:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u64[j] = env->vfp.vreg[src2].u64[j]
-+                        - (uint64_t)extend_gpr(env->gpr[rs1]);
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_common(env, dest, j, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vrsub_vx)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, vl;
-+    uint32_t lmul, width, src2, dest, vlmax;
-+
-+    vl = env->vfp.vl;
-+    lmul  = vector_get_lmul(env);
-+    width   = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, false);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / width));
-+        j = i % (VLEN / width);
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u8[j] = env->gpr[rs1]
-+                        - env->vfp.vreg[src2].u8[j];
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u16[j] = env->gpr[rs1]
-+                        - env->vfp.vreg[src2].u16[j];
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u32[j] = env->gpr[rs1]
-+                        - env->vfp.vreg[src2].u32[j];
-+                }
-+                break;
-+            case 64:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u64[j] =
-+                        (uint64_t)extend_gpr(env->gpr[rs1])
-+                        - env->vfp.vreg[src2].u64[j];
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_common(env, dest, j, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vrsub_vi)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, vl;
-+    uint32_t lmul, width, src2, dest, vlmax;
-+
-+    vl = env->vfp.vl;
-+    lmul  = vector_get_lmul(env);
-+    width   = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, false);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / width));
-+        j = i % (VLEN / width);
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s8[j] = sign_extend(rs1, 5)
-+                        - env->vfp.vreg[src2].s8[j];
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s16[j] = sign_extend(rs1, 5)
-+                        - env->vfp.vreg[src2].s16[j];
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s32[j] = sign_extend(rs1, 5)
-+                        - env->vfp.vreg[src2].s32[j];
-+                }
-+                break;
-+            case 64:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s64[j] = sign_extend(rs1, 5)
-+                        - env->vfp.vreg[src2].s64[j];
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_common(env, dest, j, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vwaddu_vv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, k, vl;
-+    uint32_t lmul, width, src1, src2, dest, vlmax;
-+
-+    vl    = env->vfp.vl;
-+
-+    lmul  = vector_get_lmul(env);
-+    width = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_vm_force(vm, rd)
-+        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs1, lmul)
-+        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs2, lmul)
-+        ) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs1, false);
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, true);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src1 = rs1 + (i / (VLEN / width));
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / (2 * width)));
-+        j = i % (VLEN / width);
-+        k = i % (VLEN / (2 * width));
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u16[k] =
-+                        (uint16_t)env->vfp.vreg[src1].u8[j] +
-+                        (uint16_t)env->vfp.vreg[src2].u8[j];
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u32[k] =
-+                        (uint32_t)env->vfp.vreg[src1].u16[j] +
-+                        (uint32_t)env->vfp.vreg[src2].u16[j];
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u64[k] =
-+                        (uint64_t)env->vfp.vreg[src1].u32[j] +
-+                        (uint64_t)env->vfp.vreg[src2].u32[j];
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_widen(env, dest, k, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vwaddu_vx)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, k, vl;
-+    uint32_t lmul, width, src2, dest, vlmax;
-+
-+    vl    = env->vfp.vl;
-+
-+    lmul  = vector_get_lmul(env);
-+    width = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_vm_force(vm, rd)
-+        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs2, lmul)
-+        ) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, true);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / (2 * width)));
-+        j = i % (VLEN / width);
-+        k = i % (VLEN / (2 * width));
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u16[k] =
-+                        (uint16_t)env->vfp.vreg[src2].u8[j] +
-+                        (uint16_t)((uint8_t)env->gpr[rs1]);
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u32[k] =
-+                        (uint32_t)env->vfp.vreg[src2].u16[j] +
-+                        (uint32_t)((uint16_t)env->gpr[rs1]);
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u64[k] =
-+                        (uint64_t)env->vfp.vreg[src2].u32[j] +
-+                        (uint64_t)((uint32_t)env->gpr[rs1]);
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_widen(env, dest, k, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vwadd_vv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, k, vl;
-+    uint32_t lmul, width, src1, src2, dest, vlmax;
-+
-+    vl    = env->vfp.vl;
-+
-+    lmul  = vector_get_lmul(env);
-+    width = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_vm_force(vm, rd)
-+        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs1, lmul)
-+        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs2, lmul)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs1, false);
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, true);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src1 = rs1 + (i / (VLEN / width));
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / (2 * width)));
-+        j = i % (VLEN / width);
-+        k = i % (VLEN / (2 * width));
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s16[k] =
-+                        (int16_t)env->vfp.vreg[src1].s8[j] +
-+                        (int16_t)env->vfp.vreg[src2].s8[j];
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s32[k] =
-+                        (int32_t)env->vfp.vreg[src1].s16[j] +
-+                        (int32_t)env->vfp.vreg[src2].s16[j];
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s64[k] =
-+                        (int64_t)env->vfp.vreg[src1].s32[j] +
-+                        (int64_t)env->vfp.vreg[src2].s32[j];
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_widen(env, dest, k, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vwadd_vx)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, k, vl;
-+    uint32_t lmul, width, src2, dest, vlmax;
-+
-+    vl    = env->vfp.vl;
-+
-+    lmul  = vector_get_lmul(env);
-+    width = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_vm_force(vm, rd)
-+        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs2, lmul)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, true);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / (2 * width)));
-+        j = i % (VLEN / width);
-+        k = i % (VLEN / (2 * width));
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s16[k] =
-+                        (int16_t)((int8_t)env->vfp.vreg[src2].s8[j]) +
-+                        (int16_t)((int8_t)env->gpr[rs1]);
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s32[k] =
-+                        (int32_t)((int16_t)env->vfp.vreg[src2].s16[j]) +
-+                        (int32_t)((int16_t)env->gpr[rs1]);
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s64[k] =
-+                        (int64_t)((int32_t)env->vfp.vreg[src2].s32[j]) +
-+                        (int64_t)((int32_t)env->gpr[rs1]);
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_widen(env, dest, k, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vwsubu_vv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, k, vl;
-+    uint32_t lmul, width, src1, src2, dest, vlmax;
-+
-+    vl    = env->vfp.vl;
-+
-+    lmul  = vector_get_lmul(env);
-+    width = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_vm_force(vm, rd)
-+        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs1, lmul)
-+        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs2, lmul)
-+        ) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs1, false);
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, true);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src1 = rs1 + (i / (VLEN / width));
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / (2 * width)));
-+        j = i % (VLEN / width);
-+        k = i % (VLEN / (2 * width));
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u16[k] =
-+                        (uint16_t)env->vfp.vreg[src2].u8[j] -
-+                        (uint16_t)env->vfp.vreg[src1].u8[j];
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u32[k] =
-+                        (uint32_t)env->vfp.vreg[src2].u16[j] -
-+                        (uint32_t)env->vfp.vreg[src1].u16[j];
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u64[k] =
-+                        (uint64_t)env->vfp.vreg[src2].u32[j] -
-+                        (uint64_t)env->vfp.vreg[src1].u32[j];
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_widen(env, dest, k, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vwsubu_vx)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, k, vl;
-+    uint32_t lmul, width, src2, dest, vlmax;
-+
-+    vl    = env->vfp.vl;
-+
-+    lmul  = vector_get_lmul(env);
-+    width = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_vm_force(vm, rd)
-+        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs2, lmul)
-+        ) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, true);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / (2 * width)));
-+        j = i % (VLEN / width);
-+        k = i % (VLEN / (2 * width));
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u16[k] =
-+                        (uint16_t)env->vfp.vreg[src2].u8[j] -
-+                        (uint16_t)((uint8_t)env->gpr[rs1]);
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u32[k] =
-+                        (uint32_t)env->vfp.vreg[src2].u16[j] -
-+                        (uint32_t)((uint16_t)env->gpr[rs1]);
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u64[k] =
-+                        (uint64_t)env->vfp.vreg[src2].u32[j] -
-+                        (uint64_t)((uint32_t)env->gpr[rs1]);
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_widen(env, dest, k, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vwsub_vv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, k, vl;
-+    uint32_t lmul, width, src1, src2, dest, vlmax;
-+
-+    vl    = env->vfp.vl;
-+
-+    lmul  = vector_get_lmul(env);
-+    width = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_vm_force(vm, rd)
-+        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs1, lmul)
-+        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs2, lmul)
-+        ) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs1, false);
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, true);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src1 = rs1 + (i / (VLEN / width));
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / (2 * width)));
-+        j = i % (VLEN / width);
-+        k = i % (VLEN / (2 * width));
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s16[k] =
-+                        (int16_t)env->vfp.vreg[src2].s8[j] -
-+                        (int16_t)env->vfp.vreg[src1].s8[j];
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s32[k] =
-+                        (int32_t)env->vfp.vreg[src2].s16[j] -
-+                        (int32_t)env->vfp.vreg[src1].s16[j];
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s64[k] =
-+                        (int64_t)env->vfp.vreg[src2].s32[j] -
-+                        (int64_t)env->vfp.vreg[src1].s32[j];
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_widen(env, dest, k, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+void VECTOR_HELPER(vwsub_vx)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, k, vl;
-+    uint32_t lmul, width, src2, dest, vlmax;
-+
-+    vl    = env->vfp.vl;
-+
-+    lmul  = vector_get_lmul(env);
-+    width = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_vm_force(vm, rd)
-+        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs2, lmul)
-+        ) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, false);
-+    vector_lmul_check_reg(env, lmul, rd, true);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / width));
-+        dest = rd + (i / (VLEN / (2 * width)));
-+        j = i % (VLEN / width);
-+        k = i % (VLEN / (2 * width));
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s16[k] =
-+                        (int16_t)((int8_t)env->vfp.vreg[src2].s8[j]) -
-+                        (int16_t)((int8_t)env->gpr[rs1]);
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s32[k] =
-+                        (int32_t)((int16_t)env->vfp.vreg[src2].s16[j]) -
-+                        (int32_t)((int16_t)env->gpr[rs1]);
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s64[k] =
-+                        (int64_t)((int32_t)env->vfp.vreg[src2].s32[j]) -
-+                        (int64_t)((int32_t)env->gpr[rs1]);
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_widen(env, dest, k, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vwaddu_wv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, k, vl;
-+    uint32_t lmul, width, src1, src2, dest, vlmax;
-+
-+    vl    = env->vfp.vl;
-+
-+    lmul  = vector_get_lmul(env);
-+    width = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_vm_force(vm, rd)
-+        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs1, lmul)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs1, false);
-+    vector_lmul_check_reg(env, lmul, rs2, true);
-+    vector_lmul_check_reg(env, lmul, rd, true);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src1 = rs1 + (i / (VLEN / width));
-+        src2 = rs2 + (i / (VLEN / (2 * width)));
-+        dest = rd + (i / (VLEN / (2 * width)));
-+        j = i % (VLEN / width);
-+        k = i % (VLEN / (2 * width));
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u16[k] =
-+                        (uint16_t)env->vfp.vreg[src1].u8[j] +
-+                        (uint16_t)env->vfp.vreg[src2].u16[k];
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u32[k] =
-+                        (uint32_t)env->vfp.vreg[src1].u16[j] +
-+                        (uint32_t)env->vfp.vreg[src2].u32[k];
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u64[k] =
-+                        (uint64_t)env->vfp.vreg[src1].u32[j] +
-+                        (uint64_t)env->vfp.vreg[src2].u64[k];
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_widen(env, dest, k, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vwaddu_wx)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, k, vl;
-+    uint32_t lmul, width, src2, dest, vlmax;
-+
-+    vl    = env->vfp.vl;
-+
-+    lmul  = vector_get_lmul(env);
-+    width = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_vm_force(vm, rd)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, true);
-+    vector_lmul_check_reg(env, lmul, rd, true);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / (2 * width)));
-+        dest = rd + (i / (VLEN / (2 * width)));
-+        k = i % (VLEN / (2 * width));
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u16[k] =
-+                        (uint16_t)env->vfp.vreg[src2].u16[k] +
-+                        (uint16_t)((uint8_t)env->gpr[rs1]);
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u32[k] =
-+                        (uint32_t)env->vfp.vreg[src2].u32[k] +
-+                        (uint32_t)((uint16_t)env->gpr[rs1]);
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u64[k] =
-+                        (uint64_t)env->vfp.vreg[src2].u64[k] +
-+                        (uint64_t)((uint32_t)env->gpr[rs1]);
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_widen(env, dest, k, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vwadd_wv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, k, vl;
-+    uint32_t lmul, width, src1, src2, dest, vlmax;
-+
-+    vl    = env->vfp.vl;
-+
-+    lmul  = vector_get_lmul(env);
-+    width = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_vm_force(vm, rd)
-+        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs1, lmul)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs1, false);
-+    vector_lmul_check_reg(env, lmul, rs2, true);
-+    vector_lmul_check_reg(env, lmul, rd, true);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src1 = rs1 + (i / (VLEN / width));
-+        src2 = rs2 + (i / (VLEN / (2 * width)));
-+        dest = rd + (i / (VLEN / (2 * width)));
-+        j = i % (VLEN / width);
-+        k = i % (VLEN / (2 * width));
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s16[k] =
-+                        (int16_t)((int8_t)env->vfp.vreg[src1].s8[j]) +
-+                        (int16_t)env->vfp.vreg[src2].s16[k];
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s32[k] =
-+                        (int32_t)((int16_t)env->vfp.vreg[src1].s16[j]) +
-+                        (int32_t)env->vfp.vreg[src2].s32[k];
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s64[k] =
-+                        (int64_t)((int32_t)env->vfp.vreg[src1].s32[j]) +
-+                        (int64_t)env->vfp.vreg[src2].s64[k];
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_widen(env, dest, k, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vwadd_wx)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, k, vl;
-+    uint32_t lmul, width, src2, dest, vlmax;
-+
-+    vl    = env->vfp.vl;
-+
-+    lmul  = vector_get_lmul(env);
-+    width = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_vm_force(vm, rd)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, true);
-+    vector_lmul_check_reg(env, lmul, rd, true);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / (2 * width)));
-+        dest = rd + (i / (VLEN / (2 * width)));
-+        k = i % (VLEN / (2 * width));
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s16[k] =
-+                        (int16_t)env->vfp.vreg[src2].s16[k] +
-+                        (int16_t)((int8_t)env->gpr[rs1]);
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s32[k] =
-+                        (int32_t)env->vfp.vreg[src2].s32[k] +
-+                        (int32_t)((int16_t)env->gpr[rs1]);
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s64[k] =
-+                        (int64_t)env->vfp.vreg[src2].s64[k] +
-+                        (int64_t)((int32_t)env->gpr[rs1]);
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_widen(env, dest, k, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vwsubu_wv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, k, vl;
-+    uint32_t lmul, width, src1, src2, dest, vlmax;
-+
-+    vl    = env->vfp.vl;
-+
-+    lmul  = vector_get_lmul(env);
-+    width = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_vm_force(vm, rd)
-+        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs1, lmul)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs1, false);
-+    vector_lmul_check_reg(env, lmul, rs2, true);
-+    vector_lmul_check_reg(env, lmul, rd, true);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src1 = rs1 + (i / (VLEN / width));
-+        src2 = rs2 + (i / (VLEN / (2 * width)));
-+        dest = rd + (i / (VLEN / (2 * width)));
-+        j = i % (VLEN / width);
-+        k = i % (VLEN / (2 * width));
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u16[k] =
-+                        (uint16_t)env->vfp.vreg[src2].u16[k] -
-+                        (uint16_t)env->vfp.vreg[src1].u8[j];
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u32[k] =
-+                        (uint32_t)env->vfp.vreg[src2].u32[k] -
-+                        (uint32_t)env->vfp.vreg[src1].u16[j];
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u64[k] =
-+                        (uint64_t)env->vfp.vreg[src2].u64[k] -
-+                        (uint64_t)env->vfp.vreg[src1].u32[j];
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_widen(env, dest, k, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vwsubu_wx)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, k, vl;
-+    uint32_t lmul, width, src2, dest, vlmax;
-+
-+    vl    = env->vfp.vl;
-+
-+    lmul  = vector_get_lmul(env);
-+    width = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_vm_force(vm, rd)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, true);
-+    vector_lmul_check_reg(env, lmul, rd, true);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / (2 * width)));
-+        dest = rd + (i / (VLEN / (2 * width)));
-+        k = i % (VLEN / (2 * width));
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u16[k] =
-+                        (uint16_t)env->vfp.vreg[src2].u16[k] -
-+                        (uint16_t)((uint8_t)env->gpr[rs1]);
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u32[k] =
-+                        (uint32_t)env->vfp.vreg[src2].u32[k] -
-+                        (uint32_t)((uint16_t)env->gpr[rs1]);
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].u64[k] =
-+                        (uint64_t)env->vfp.vreg[src2].u64[k] -
-+                        (uint64_t)((uint32_t)env->gpr[rs1]);
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_widen(env, dest, k, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vwsub_wv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, j, k, vl;
-+    uint32_t lmul, width, src1, src2, dest, vlmax;
-+
-+    vl    = env->vfp.vl;
-+
-+    lmul  = vector_get_lmul(env);
-+    width = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_vm_force(vm, rd)
-+        || vector_overlap_dstgp_srcgp(rd, 2 * lmul, rs1, lmul)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs1, false);
-+    vector_lmul_check_reg(env, lmul, rs2, true);
-+    vector_lmul_check_reg(env, lmul, rd, true);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src1 = rs1 + (i / (VLEN / width));
-+        src2 = rs2 + (i / (VLEN / (2 * width)));
-+        dest = rd + (i / (VLEN / (2 * width)));
-+        j = i % (VLEN / width);
-+        k = i % (VLEN / (2 * width));
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s16[k] =
-+                        (int16_t)env->vfp.vreg[src2].s16[k] -
-+                        (int16_t)((int8_t)env->vfp.vreg[src1].s8[j]);
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s32[k] =
-+                        (int32_t)env->vfp.vreg[src2].s32[k] -
-+                        (int32_t)((int16_t)env->vfp.vreg[src1].s16[j]);
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s64[k] =
-+                        (int64_t)env->vfp.vreg[src2].s64[k] -
-+                        (int64_t)((int32_t)env->vfp.vreg[src1].s32[j]);
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_widen(env, dest, k, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
-+
-+void VECTOR_HELPER(vwsub_wx)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-+    uint32_t rs2, uint32_t rd)
-+{
-+    int i, k, vl;
-+    uint32_t lmul, width, src2, dest, vlmax;
-+
-+    vl    = env->vfp.vl;
-+
-+    lmul  = vector_get_lmul(env);
-+    width = vector_get_width(env);
-+    vlmax = vector_get_vlmax(env);
-+
-+    if (vector_vtype_ill(env)
-+        || vector_overlap_vm_force(vm, rd)) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+        return;
-+    }
-+    vector_lmul_check_reg(env, lmul, rs2, true);
-+    vector_lmul_check_reg(env, lmul, rd, true);
-+
-+    for (i = 0; i < vlmax; i++) {
-+        src2 = rs2 + (i / (VLEN / (2 * width)));
-+        dest = rd + (i / (VLEN / (2 * width)));
-+        k = i % (VLEN / (2 * width));
-+        if (i < env->vfp.vstart) {
-+            continue;
-+        } else if (i < vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s16[k] =
-+                        (int16_t)env->vfp.vreg[src2].s16[k] -
-+                        (int16_t)((int8_t)env->gpr[rs1]);
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s32[k] =
-+                        (int32_t)env->vfp.vreg[src2].s32[k] -
-+                        (int32_t)((int16_t)env->gpr[rs1]);
-+                }
-+                break;
-+            case 32:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    env->vfp.vreg[dest].s64[k] =
-+                        (int64_t)env->vfp.vreg[src2].s64[k] -
-+                        (int64_t)((int32_t)env->gpr[rs1]);
-+                }
-+                break;
-+            default:
-+                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+                break;
-+            }
-+        } else {
-+            vector_tail_widen(env, dest, k, width);
-+        }
-+    }
-+    env->vfp.vstart = 0;
-+}
 -- 
 2.7.4
 
