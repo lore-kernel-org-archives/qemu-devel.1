@@ -2,91 +2,104 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4E66ECDE27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:21:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA313ECDE27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:22:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DFF920872
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:21:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74A8E2089F
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:22:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B3+bchj2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DFF920872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="Yw6xq+uu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74A8E2089F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7yoM-0005HG-Dw
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 05:21:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40619)
+	id 1i7ypb-00070Y-DC
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 05:22:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37464)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i7ymj-0003RJ-Rf
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:19:35 -0400
+ (envelope-from <anthony.perard@citrix.com>) id 1i7yYd-0002Qv-Nb
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:05:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i7ymh-0006vZ-TI
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:19:33 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46610)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i7ymh-0006sy-M8
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:19:31 -0400
-Received: by mail-wr1-x444.google.com with SMTP id d17so10870281wrq.13
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 02:19:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=pF62HMpZmO2GC18uvn7ta+ZUSLM8vfweqMpRGxrF/lI=;
- b=B3+bchj2G4FTEtlxFYX8D3lsFnr2MnxixJU5t2DctMQ3NcxRzCE5Cg6Q/+sgP+gYm7
- LmRlnXwS+8wbh1PHBqe53kpkZ2ODSzlbU8EtiZ1JQi2djiu6xGsG6gMGmRR7GqQwapi8
- Ruif994nU6/AIfJgvU4MRSJctDkjSu1VUbfiEWmaoYln88pa01AMIv3oJZ9WrHIgNWLY
- 30FoK09BufnTV3JoWL6Gzoq92dP4legoDJc6OOsJQoUaG/0FNvyCF1YcpmuWUot1ee6v
- TbILj8it5Gan77srfc7091zvdaQHPDHwmdo+BPCqK1/YzNzjCvnazpAae6JZ1+M3NOR8
- ZWMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=pF62HMpZmO2GC18uvn7ta+ZUSLM8vfweqMpRGxrF/lI=;
- b=OulzWGXDz4Z5VwUxvvLsIme54w+neEHUNk1BzBuEJs/oE8mNgPM6rCJy5VPb71SkW7
- XSj09wovmOW+bnARxfDJiPsDcBLpQYDeOVyThKLcCHcyFoM2OvZhJFkVDLHtgiBW/JOx
- C91sL7bYID5PQhn9ctLKeCoA31n7UDnqT7VfmEKnmOf1xocsyPJo+8lpIgY876YV0QgC
- kPt8EijWmqtnWXy7T/tXMPzJopoRT51RqeFTU0Cg6zkOWsu+se//yuskjyI/lFeqSqzY
- fqV2E6MXVvrGlPEryxcorld3/qYLPYDK3Ms9NKCm8eWanl+xhJcsGLtDcQB7OLHJb2GT
- 0/vw==
-X-Gm-Message-State: APjAAAW25L83/P+VOoE6XZ30ts2q18GCaHpG6Bt/txCCOttrylS8vE2H
- J/VJN0yWyTXFJHtblfCzR2Ov6Q==
-X-Google-Smtp-Source: APXvYqzTbsdsWmuo/+wIno+QXDyuGOaxoFjgRpv0I1GlP2v2tMUS4xIv10I7WUT4E4x5jL3ucKKwYA==
-X-Received: by 2002:a5d:5045:: with SMTP id h5mr829682wrt.312.1568193569995;
- Wed, 11 Sep 2019 02:19:29 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z25sm2405620wmk.0.2019.09.11.02.19.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Sep 2019 02:19:29 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 834631FF87;
- Wed, 11 Sep 2019 10:19:28 +0100 (BST)
-References: <20190910193408.28917-1-alex.bennee@linaro.org>
- <20190910193408.28917-3-alex.bennee@linaro.org>
- <alpine.BSF.2.21.9999.1909111015260.4726@zero.eik.bme.hu>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-In-reply-to: <alpine.BSF.2.21.9999.1909111015260.4726@zero.eik.bme.hu>
-Date: Wed, 11 Sep 2019 10:19:28 +0100
-Message-ID: <875zlz197j.fsf@linaro.org>
+ (envelope-from <anthony.perard@citrix.com>) id 1i7yYc-0002pO-Hv
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:04:59 -0400
+Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:44370)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
+ id 1i7yYc-0002k7-9S
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:04:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1568192698;
+ h=date:from:to:cc:subject:message-id:references:
+ mime-version:in-reply-to;
+ bh=5sbN3TEEay/RoYhYb2OignsfGcfyMckBkDNAdIZGzCQ=;
+ b=Yw6xq+uudwfsbXJlg5W46Jctt8j+8rCIEaqb0pLas/kBxc01gWemB1sC
+ 16TAUf26tpbhyG4DHBkNqwFpUrzEsUuq12GuUaTxoQ1mTzfyT1m6eqa0i
+ KDnvGu7acLQq3CdUk+Hv1h3KG5lu5szr9QV5f1YCirA8/VN2802/5Sp/p s=;
+Authentication-Results: esa5.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=anthony.perard@citrix.com;
+ spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ anthony.perard@citrix.com) identity=pra;
+ client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible
+Received-SPF: Pass (esa5.hc3370-68.iphmx.com: domain of
+ anthony.perard@citrix.com designates 162.221.158.21 as
+ permitted sender) identity=mailfrom;
+ client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
+Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: pD/GeX/iOziE3cVDhqMlAKUQ9MN8NEPeibEMXMW2Yu8qLJzYwxPukkFSuf/cP6aXPKKldejt4W
+ gWhukrvSw6jo9WEzUeDlxSwbh9S+eVjU9iylC84n2alL9zO/pNZX9PGGCevNANamEMtwriFgeu
+ /qYkd5ezRX/Fcvq67frz7swvNYgKFbnKCchrhP6bbjHDv12MxF5dfsUvIGlLpP9Ape0+ESvFpH
+ wXBp++FBUWVrqdBm17ugMFZZVACpumWN93tsRJqCVSlhZfHLMXLMQqY+Hnk5id7StQ6Vr7atxB
+ rJI=
+X-SBRS: 2.7
+X-MesageID: 5611795
+X-Ironport-Server: esa5.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.64,492,1559534400"; 
+   d="scan'208";a="5611795"
+Date: Wed, 11 Sep 2019 10:04:51 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+To: Paul Durrant <paul.durrant@citrix.com>
+Message-ID: <20190911090451.GA1308@perard.uk.xensource.com>
+References: <20190910171753.3775-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH v1 2/4] elf: move elf.h to elf/elf.h and
- split out types
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20190910171753.3775-1-paul.durrant@citrix.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 216.71.155.168
+Subject: Re: [Qemu-devel] [PATCH] xen-bus: check whether the frontend is
+ active during device reset...
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,165 +111,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>, qemu-devel@nongnu.org,
- "open list:S390-ccw boot" <qemu-s390x@nongnu.org>, qemu-arm@nongnu.org,
- "open list:PReP" <qemu-ppc@nongnu.org>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, Sep 10, 2019 at 06:17:53PM +0100, Paul Durrant wrote:
+> ...not the backend
+> 
+> Commit cb323146 "xen-bus: Fix backend state transition on device reset"
+> contained a subtle mistake. The hunk
+> 
+> @@ -539,11 +556,11 @@ static void xen_device_backend_changed(void *opaque)
+> 
+>      /*
+>       * If the toolstack (or unplug request callback) has set the backend
+> -     * state to Closing, but there is no active frontend (i.e. the
+> -     * state is not Connected) then set the backend state to Closed.
+> +     * state to Closing, but there is no active frontend then set the
+> +     * backend state to Closed.
+>       */
+>      if (xendev->backend_state == XenbusStateClosing &&
+> -        xendev->frontend_state != XenbusStateConnected) {
+> +        !xen_device_state_is_active(state)) {
+>          xen_device_backend_set_state(xendev, XenbusStateClosed);
+>      }
+> 
+> mistakenly replaced the check of 'xendev->frontend_state' with a check
+> (now in a helper function) of 'state', which actually equates to
+> 'xendev->backend_state'.
+> 
+> This patch fixes the mistake.
+> 
+> Fixes: cb3231460747552d70af9d546dc53d8195bcb796
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 
-BALATON Zoltan <balaton@eik.bme.hu> writes:
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 
-> On Tue, 10 Sep 2019, Alex Benn=C3=A9e wrote:
->> diff --git a/include/elf/elf-types.inc.h b/include/elf/elf-types.inc.h
->> new file mode 100644
->> index 00000000000..35163adb2b5
->> --- /dev/null
->> +++ b/include/elf/elf-types.inc.h
->> @@ -0,0 +1,63 @@
->> +/*
->> + * Elf Type Specialisation
->> + *
->> + * Copyright (c) 2019
->> + * Written by Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> + *
->> + * This code is licensed under the GNU .
->
-> You're missing end of licence sentence here. Also original file did
-> not have copyright and licence header so you may want to fix that too
-> or leave it out here as well for consistency,
+Thanks,
 
-The fault of my header macro - I'll try and fix it up when it's
-expanding on the QEMU tree.
-
-I'm going to assume that is should be the whole project license (GPL
-v2). Most of the original file dates from 2003 and is Frabrice's commit
-with the occasional commit mentioning be copied from Linux.
-
->
->> + */
->> +
->> +#ifndef _ELF_TYPES_INC_H_
->> +#define _ELF_TYPES_INC_H_
->> +
->> +#ifndef ELF_CLASS
->> +#error you must define ELF_CLASS before including elf-types.inc.h
->> +#else
->> +
->> +#if ELF_CLASS =3D=3D ELFCLASS32
->> +
->> +#define elfhdr      elf32_hdr
->> +#define elf_phdr    elf32_phdr
->> +#define elf_note    elf32_note
->> +#define elf_shdr    elf32_shdr
->> +#define elf_sym     elf32_sym
->> +#define elf_addr_t  Elf32_Off
->> +#define elf_rela    elf32_rela
->> +
->> +#ifdef ELF_USES_RELOCA
->> +# define ELF_RELOC  Elf32_Rela
->> +#else
->> +# define ELF_RELOC  Elf32_Rel
->> +#endif
->> +
->> +#ifndef ElfW
->> +#  define ElfW(x)   Elf32_ ## x
->> +#  define ELFW(x)   ELF32_ ## x
->> +#endif
->> +
->> +#else /* ELF_CLASS =3D=3D ELFCLASS64 */
->> +
->> +#define elfhdr      elf64_hdr
->> +#define elf_phdr    elf64_phdr
->> +#define elf_note    elf64_note
->> +#define elf_shdr    elf64_shdr
->> +#define elf_sym     elf64_sym
->> +#define elf_addr_t  Elf64_Off
->> +#define elf_rela    elf64_rela
->> +
->> +#ifdef ELF_USES_RELOCA
->> +# define ELF_RELOC  Elf64_Rela
->> +#else
->> +# define ELF_RELOC  Elf64_Rel
->> +#endif
->> +
->> +#ifndef ElfW
->> +#  define ElfW(x)   Elf64_ ## x
->> +#  define ELFW(x)   ELF64_ ## x
->> +#endif
->> +
->> +#endif /* ELF_CLASS =3D=3D ELFCLASS64 */
->> +#endif /* ELF_CLASS */
->> +#else
->> +#error elf-types.inc.h should not be included twice in one compilation =
-unit
->> +#endif /* _ELF_TYPES_INC_H_ */
->> diff --git a/include/elf.h b/include/elf/elf.h
->> similarity index 98%
->> rename from include/elf.h
->> rename to include/elf/elf.h
->> index 3501e0c8d03..2e264c1a7a0 100644
->> --- a/include/elf.h
->> +++ b/include/elf/elf.h
->> @@ -1696,49 +1696,7 @@ struct elf32_fdpic_loadmap {
->> };
->>
->> #ifdef ELF_CLASS
->> -#if ELF_CLASS =3D=3D ELFCLASS32
->> -
->> -#define elfhdr		elf32_hdr
->> -#define elf_phdr	elf32_phdr
->> -#define elf_note	elf32_note
->> -#define elf_shdr	elf32_shdr
->> -#define elf_sym		elf32_sym
->> -#define elf_addr_t	Elf32_Off
->> -#define elf_rela  elf32_rela
->> -
->> -#ifdef ELF_USES_RELOCA
->> -# define ELF_RELOC      Elf32_Rela
->> -#else
->> -# define ELF_RELOC      Elf32_Rel
->> -#endif
->> -
->> -#else
->> -
->> -#define elfhdr		elf64_hdr
->> -#define elf_phdr	elf64_phdr
->> -#define elf_note	elf64_note
->> -#define elf_shdr	elf64_shdr
->> -#define elf_sym		elf64_sym
->> -#define elf_addr_t	Elf64_Off
->> -#define elf_rela  elf64_rela
->> -
->> -#ifdef ELF_USES_RELOCA
->> -# define ELF_RELOC      Elf64_Rela
->> -#else
->> -# define ELF_RELOC      Elf64_Rel
->> -#endif
->> -
->> -#endif /* ELF_CLASS */
->>
->> -#ifndef ElfW
->> -# if ELF_CLASS =3D=3D ELFCLASS32
->> -#  define ElfW(x)  Elf32_ ## x
->> -#  define ELFW(x)  ELF32_ ## x
->> -# else
->> -#  define ElfW(x)  Elf64_ ## x
->> -#  define ELFW(x)  ELF64_ ## x
->> -# endif
->> -#endif
->>
->> #endif /* ELF_CLASS */
->
-> Is there anything remaining in this #ifdef ELF_CLASS after this patch?
-> If not why do you keep it?
->
-> Regards,
-> BALATON Zoltan
-
-
---
-Alex Benn=C3=A9e
+-- 
+Anthony PERARD
 
