@@ -2,80 +2,62 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6792FECDE27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:14:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 976DAECDE20
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:17:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EAF7206A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:14:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lDchVrXy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EAF7206A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6C1142067B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:17:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C1142067B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7yhs-0006NF-2f
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 05:14:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59682)
+	id 1i7ykE-0000D6-4U
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 05:16:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33899)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i7y5H-0001F8-RX
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:34:41 -0400
+ (envelope-from <groug@kaod.org>) id 1i7yHJ-0006x2-RX
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:47:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i7y5G-00043E-Jr
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:34:39 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42032)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i7y5G-00042n-Db
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:34:38 -0400
-Received: by mail-ot1-x344.google.com with SMTP id c10so21744014otd.9
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 01:34:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=CFx8UhCqLcFh5o7ugB22vWUJFtnolgoCeCiFTYWurOU=;
- b=lDchVrXyjhUsnEeS5L874g3nfcyEXRMij9qCKd2xbyPajf/XsGKObd6erYxaPUPKYP
- Q4C9RepNA4DJMXCdddfamzW/lvQ/OuQs4OiD1URX7lgHUMNnj6pT/S/Hv/j3VNzkD/Ls
- 2wLYGrpQ3VSvTrk28HooQAJua3ABQ2kdYttXS2W+CSrGRwZ3AZBHoHS/8/pofNeHB3t/
- GyhqgplFadBKsHPeuOaqjK5ZdbNoYlrTYNMGfbLin+G2WGwggxAfYBOLJQDFVNaAItVv
- 5Sd/xXu/x41vtxLyDibVrCrRcHaiip2qOei6EygtYEiEM61V+sArDwyaLfv3/VCcULj1
- bIVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=CFx8UhCqLcFh5o7ugB22vWUJFtnolgoCeCiFTYWurOU=;
- b=S3wASOuKwJu8+F0b98xB92peLTN2JRdAGZTedBvlZoMbAviPXdL8uX/2PnuFEWqs8A
- 7xAW0EDGS/7D6emdasVwvLgMYNAOg6W3rprdyLiKLutGPqcNnZ3/G/trlV2eu+VMCnWj
- M75x9+CZ8t4Ejgt+KgpEoeWwO4gFh2k58oqdznnGwJh0tQaXYHg4pglfIQOKvIqvVlLR
- +chif6xATjd+VKkOdPczYr616a4fUzDWSbg0RjKxmPaneaB6mfzm94kbakGJ+QHcgANj
- /P8MvIFRrb7SHDpIsgs0GuHCRwdj8nO+eW+U8XfXUuzvOrokZK4x0LpjXQA5Z+eHD521
- TLWQ==
-X-Gm-Message-State: APjAAAVx96BMCKWxhtqpMBVfnq+BGPQ2ph7CyDrFZuSCPl4Q1Jz9Zq5U
- PbESCLwl/+ckS74b50uGYcYJAife+NgIR8DZEmFkaQ==
-X-Google-Smtp-Source: APXvYqxbfNh7X/VBvvfmlg9/rKsLiLFKDQ+b+MHwEhYQ6tMFrx+BOrsFH3+W6gK7ho/zYIuUUdJqcW6ITWEZ3Jm02JA=
-X-Received: by 2002:a9d:5e11:: with SMTP id d17mr7017076oti.135.1568190877452; 
- Wed, 11 Sep 2019 01:34:37 -0700 (PDT)
+ (envelope-from <groug@kaod.org>) id 1i7yHI-0003V1-9N
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:47:05 -0400
+Received: from 16.mo7.mail-out.ovh.net ([46.105.72.216]:33221)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1i7yHI-0003Te-4F
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:47:04 -0400
+Received: from player693.ha.ovh.net (unknown [10.109.159.159])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id 84D34132209
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 10:47:00 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player693.ha.ovh.net (Postfix) with ESMTPSA id 1BD869A7FAE3;
+ Wed, 11 Sep 2019 08:46:52 +0000 (UTC)
+Date: Wed, 11 Sep 2019 10:46:50 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190911104650.7c64009f@bahia.lan>
+In-Reply-To: <20190911040452.8341-6-david@gibson.dropbear.id.au>
+References: <20190911040452.8341-1-david@gibson.dropbear.id.au>
+ <20190911040452.8341-6-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20190911014353.5926-1-richard.henderson@linaro.org>
- <20190911014353.5926-2-richard.henderson@linaro.org>
-In-Reply-To: <20190911014353.5926-2-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 11 Sep 2019 09:34:26 +0100
-Message-ID: <CAFEAcA8qyyNV=L6-2N4ucESDP3vX4DG6ieuPG3v7UpvVwQuXVA@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH 1/3] cputlb: Disable __always_inline__
- without optimization
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 13007521626308844006
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrtddvgddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.72.216
+Subject: Re: [Qemu-devel] [PATCH 5/7] spapr: Do not put empty properties for
+ -kernel/-initrd/-append
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,76 +69,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tony Nguyen <tony.nguyen@bt.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org, clg@kaod.org, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 11 Sep 2019 at 02:43, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> This forced inlining can result in missing symbols,
-> which makes a debugging build harder to follow.
->
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On Wed, 11 Sep 2019 14:04:50 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> From: Alexey Kardashevskiy <aik@ozlabs.ru>
+>=20
+> We are going to use spapr_build_fdt() for the boot time FDT and as an
+> update for SLOF during handling of H_CAS. SLOF will apply all properties
+> from the QEMU's FDT which is usually ok unless there are properties
+> changed by grub or guest kernel. The properties are:
+> bootargs, linux,initrd-start, linux,initrd-end, linux,stdout-path,
+> linux,rtas-base, linux,rtas-entry. Resetting those during CAS will most
+> likely cause grub failure.
+>=20
+
+s/Resetting/Clearing ? They still get reset to the initial setup if "-kerne=
+l"
+and "-initrd" were passed, but it is okay since neither grub, nor the guest
+kernel is supposed to change them in this case, correct ?
+
+> This only creates such properties if we are booting with "-kernel" and
+> "-initrd" so they won't get included into the DT update blob and
+
+so they won't get included {if we're not booting with "-kernel" ...}
+
+> therefore the guest is more likely to boot successfully.
+>=20
+
+Maybe rephrase like:
+
+Don't create such properties if we're booting without "-kernel" and
+"-initrd" ...
+
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  accel/tcg/cputlb.c | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
->
-> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index abae79650c..909f01ebcc 100644
-> --- a/accel/tcg/cputlb.c
-> +++ b/accel/tcg/cputlb.c
-> @@ -1269,6 +1269,18 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
->      cpu_loop_exit_atomic(env_cpu(env), retaddr);
->  }
->
-> +/*
-> + * In order for the expected constant folding to happen,
-> + * we require that some functions be inlined.
-> + * However, this inlining can make debugging harder for a
-> + * non-optimizing build.
-> + */
-> +#ifdef __OPTIMIZE__
-> +#define ALWAYS_INLINE  __attribute__((always_inline))
-> +#else
-> +#define ALWAYS_INLINE
-> +#endif
-> +
+>  hw/ppc/spapr.c | 15 ++++++++++-----
+>  1 file changed, 10 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index d072c2aa3d..d18744268f 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1177,11 +1177,16 @@ static void spapr_dt_chosen(SpaprMachineState *sp=
+apr, void *fdt)
+> =20
+>      _FDT(chosen =3D fdt_add_subnode(fdt, 0, "chosen"));
+> =20
+> -    _FDT(fdt_setprop_string(fdt, chosen, "bootargs", machine->kernel_cmd=
+line));
+> -    _FDT(fdt_setprop_cell(fdt, chosen, "linux,initrd-start",
+> -                          spapr->initrd_base));
+> -    _FDT(fdt_setprop_cell(fdt, chosen, "linux,initrd-end",
+> -                          spapr->initrd_base + spapr->initrd_size));
+> +    if (machine->kernel_cmdline && machine->kernel_cmdline[0]) {
 
-Maybe this should go in compiler.h ?
+machine->kernel_cmdline cannot be NULL.
 
->  /*
->   * Load Helpers
->   *
-> @@ -1281,7 +1293,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
->  typedef uint64_t FullLoadHelper(CPUArchState *env, target_ulong addr,
->                                  TCGMemOpIdx oi, uintptr_t retaddr);
->
-> -static inline uint64_t __attribute__((always_inline))
-> +static inline uint64_t ALWAYS_INLINE
->  load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
->              uintptr_t retaddr, MemOp op, bool code_read,
->              FullLoadHelper *full_load)
-> @@ -1530,7 +1542,7 @@ tcg_target_ulong helper_be_ldsl_mmu(CPUArchState *env, target_ulong addr,
->   * Store Helpers
->   */
->
-> -static inline void __attribute__((always_inline))
-> +static inline void ALWAYS_INLINE
->  store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
->               TCGMemOpIdx oi, uintptr_t retaddr, MemOp op)
->  {
-> --
-> 2.17.1
+=46rom vl.c:
 
-Either way
+    if (!kernel_cmdline) {
+        kernel_cmdline =3D "";
+        current_machine->kernel_cmdline =3D (char *)kernel_cmdline;
+    }
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Also this doesn't check if we're booting with -kernel but rather
+that we're booting with -append ${some_not_empty_string}... what
+about checking spapr->kernel_size, pretty much like you do for
+the initrd ?
 
-thanks
--- PMM
+> +        _FDT(fdt_setprop_string(fdt, chosen, "bootargs",
+> +                                machine->kernel_cmdline));
+> +    }
+> +    if (spapr->initrd_size) {
+> +        _FDT(fdt_setprop_cell(fdt, chosen, "linux,initrd-start",
+> +                              spapr->initrd_base));
+> +        _FDT(fdt_setprop_cell(fdt, chosen, "linux,initrd-end",
+> +                              spapr->initrd_base + spapr->initrd_size));
+> +    }
+> =20
+>      if (spapr->kernel_size) {
+>          uint64_t kprop[2] =3D { cpu_to_be64(KERNEL_LOAD_ADDR),
+
 
