@@ -2,66 +2,87 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A2DFECDE27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:21:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54ACDECDE20
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:23:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3A90222BD
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:21:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3A90222BD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 21BE4206CD
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:23:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q0RYwMe3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21BE4206CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7wwC-0006Xk-Va
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:21:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45905)
+	id 1i7wxx-000052-BI
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:23:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46392)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i7wui-0004qd-8k
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:19:41 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i7wx2-0007qV-1m
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:22:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i7wuf-0002Wm-FB
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:19:39 -0400
-Resent-Date: Wed, 11 Sep 2019 03:19:39 -0400
-Resent-Message-Id: <E1i7wuf-0002Wm-FB@eggs.gnu.org>
-Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21948)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i7wuf-0002WN-7p; Wed, 11 Sep 2019 03:19:37 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568186345; cv=none; d=zoho.com; s=zohoarc; 
- b=OwWiJaA1+UHhzwNJskYkGJ7/u9Y2UwN8fpd/OaulfgrUZpRdpo1kxjy4pq5La/LGZwBSZKQ/P+u0jCA7HAm52u4n6BCADxC3H7XCOEbLdZHmWjMUwSRl56ZY6mqQscLc6MpkCo/17dPfYkHL4oVR2ZuaoA20hxd0GDROVOIMzT0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1568186345;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=OAn9I9VjyNh97C1ys2Of7HLiKimnls570BpGvsfO2Cc=; 
- b=SX1wnEJuXxvXEym+W5UKAYOzO7xc4KFz+h3XIklACaXzhms0I9UEiA9KjuhQWnGyJHQ1uh4AElvyQCWdyu780OIFpnO+nsq8IkJS/kiRfUkq2KadJv/ButiLxZIBN+3ZqtEQM7I6chks/NU4/TuYH/ECqEuDFK1xKHWIp2dbWKE=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1568186343631514.9762499248346;
- Wed, 11 Sep 2019 00:19:03 -0700 (PDT)
-In-Reply-To: <20190910193347.16000-1-laurent@vivier.eu>
-Message-ID: <156818634156.18674.15414115686141395397@5dec9699b7de>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1i7wwz-0003tE-Ql
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:22:03 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37142)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1i7wwz-0003so-LY
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:22:01 -0400
+Received: by mail-oi1-x244.google.com with SMTP id v7so13327537oib.4
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 00:22:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=XK8vtOXPgLtzd+3B76eR332u9q2SrO4oMqLV7RFTmoY=;
+ b=Q0RYwMe3+9OWLnlqo3kI9Sw9hMhmYe4f60GoAdQUpOO9vfZI9w4DKGXbJUnDOgH9h1
+ dvoJUiJAWd0keF89uFRZcgNz/W/W5rCotbc1MD66sMdxDJz7VtwlDREUs54FP8xrbW/v
+ o1xl2F1E71qXXxJP+YUMxFw2Nml6rdoobl3sZZ6s3YBMqJoj8X4kR+WmuR9U4ImoDFFb
+ /imV/Um7y9RlJ4YLYte344l+pr8gqhjeepAJbE2vrHxDLeW/KJ3IBsAJHDEDpncf+nkA
+ cFYKUGrcPufdaKDHJfWbQtuUpuuZlS5DIG5fjKWyKV7H/xJpGgBI1/zA4MOqQULHFTvr
+ QKPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=XK8vtOXPgLtzd+3B76eR332u9q2SrO4oMqLV7RFTmoY=;
+ b=b8AIM517RZBkWNIAJOvwD3kJlcGWKqwJbZTMpP2qZ9im8VV4IMaMF0MNP5xTH/fwgE
+ 2qpyzoHNT++tuSBtzhhG6iN3EekFtC5aTgUbiyBenJBPvt3bZGHDceB03egGzZUo9wSg
+ +KCzNBLVyQMGwIbG33TK4A64eOJwOtbkoUJoUSslnGoItQ99KSktjTOcge6qdiiQsTEx
+ ZL9eMMucu6MeaL93hppsDZPxXtwgWqiM0BrKAvfGRdrkiGrA8NAA42R+p+BBfFLsXjUd
+ NbIswL+iqqHhnjGF/+bnAHEueF8gHOmJniGtem6VKSlRg8GK4mezSIUGOpJgyvbFZxih
+ i3hw==
+X-Gm-Message-State: APjAAAWEvakB4hPrP+rUvXAh41Fii8VzLxJZPbp9QlJWK+9xrpKJFVqv
+ E7qyx6KZy+E2VSlWQVE+C+RBTR7TDPG4yyRGZRw=
+X-Google-Smtp-Source: APXvYqwEufYESHKpg/Z/68DdL946OPxmx7dRwbW9UpyBm1/t7+7AWe8gp1HMr4MkydcfFNEJKzAa29sL425N6wCwMqc=
+X-Received: by 2002:aca:c505:: with SMTP id v5mr2722035oif.79.1568186520611;
+ Wed, 11 Sep 2019 00:22:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: laurent@vivier.eu
-Date: Wed, 11 Sep 2019 00:19:03 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.59
-Subject: Re: [Qemu-devel] [PATCH v11 0/9] hw/m68k: add Apple Machintosh
- Quadra 800 machine
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Wed, 11 Sep 2019 00:22:00
+ -0700 (PDT)
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Wed, 11 Sep 2019 00:22:00
+ -0700 (PDT)
+In-Reply-To: <565ed74a-5c6b-c1eb-035e-3eb981487de5@redhat.com>
+References: <20190802160458.25681-1-peter.maydell@linaro.org>
+ <565ed74a-5c6b-c1eb-035e-3eb981487de5@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 11 Sep 2019 09:22:00 +0200
+Message-ID: <CAL1e-=h95f0ozY1AqEUX0rPKBjrcWARB=KtX8xO-nm6f6fYRsQ@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::244
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH 0/3] target/mips: Convert to
+ do_transaction_failed hook
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,84 +94,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org, huth@tuxfamily.org,
- jasowang@redhat.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
- dgilbert@redhat.com, hpoussin@reactos.org, kraxel@redhat.com,
- pbonzini@redhat.com, marcandre.lureau@redhat.com, mreitz@redhat.com,
- aurelien@aurel32.net, laurent@vivier.eu
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paul Burton <pburton@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>,
+ James Hogan <jhogan@kernel.org>,
+ "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+ qemu-devel@nongnu.org,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ "Maciej W. Rozycki" <macro@linux-mips.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxMDE5MzM0Ny4xNjAw
-MC0xLWxhdXJlbnRAdml2aWVyLmV1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYxMSAwLzldIGh3L202OGs6
-IGFkZCBBcHBsZSBNYWNoaW50b3NoIFF1YWRyYSA4MDAgbWFjaGluZQpNZXNzYWdlLWlkOiAyMDE5
-MDkxMDE5MzM0Ny4xNjAwMC0xLWxhdXJlbnRAdml2aWVyLmV1ClR5cGU6IHNlcmllcwoKPT09IFRF
-U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2
-L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBi
-YXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
-MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1w
-cm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE5MDkxMTA2NDkyMC4x
-NzE4LTEtbGF1cmVudEB2aXZpZXIuZXUgLT4gcGF0Y2hldy8yMDE5MDkxMTA2NDkyMC4xNzE4LTEt
-bGF1cmVudEB2aXZpZXIuZXUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyNWNhYTJj
-IGh3L202OGs6IGRlZmluZSBNYWNpbnRvc2ggUXVhZHJhIDgwMApjZDA5NTM0IGh3L202OGs6IGFk
-ZCBhIGR1bW15IFNXSU0gZmxvcHB5IGNvbnRyb2xsZXIKYzJkMTE0YSBody9tNjhrOiBhZGQgTnVi
-dXMgc3VwcG9ydCBmb3IgbWFjZmIgdmlkZW8gY2FyZAozMjJiYzVkIGh3L202OGs6IGFkZCBOdWJ1
-cyBzdXBwb3J0CmU4OWNiNGYgaHcvbTY4azogYWRkIG1hY2ZiIHZpZGVvIGNhcmQKMDcxMzFiYyBo
-dy9tNjhrOiBpbXBsZW1lbnQgQURCIGJ1cyBzdXBwb3J0IGZvciB2aWEKNTA5YjQ0NyBody9tNjhr
-OiBhZGQgdmlhIHN1cHBvcnQKNTIyMzg4ZCBkcDgzOTN4OiBtYW5hZ2UgYmlnIGVuZGlhbiBidXMK
-ZDk2N2JkNCBlc3A6IGFkZCBwc2V1ZG8tRE1BIGFzIHVzZWQgYnkgTWFjaW50b3NoCgo9PT0gT1VU
-UFVUIEJFR0lOID09PQoxLzkgQ2hlY2tpbmcgY29tbWl0IGQ5NjdiZDQ3YmQ1YiAoZXNwOiBhZGQg
-cHNldWRvLURNQSBhcyB1c2VkIGJ5IE1hY2ludG9zaCkKMi85IENoZWNraW5nIGNvbW1pdCA1MjIz
-ODhkNjBmNWYgKGRwODM5M3g6IG1hbmFnZSBiaWcgZW5kaWFuIGJ1cykKMy85IENoZWNraW5nIGNv
-bW1pdCA1MDliNDQ3ZmI2OTUgKGh3L202OGs6IGFkZCB2aWEgc3VwcG9ydCkKV0FSTklORzogYWRk
-ZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0
-aW5nPwojNzc6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQg
-YWZ0ZXIgdGhhdCAnJiYnIChjdHg6V3hXKQojNDI2OiBGSUxFOiBody9taXNjL21hY192aWEuYzoz
-NDU6CisgICAgICAgIGlmICghKHYxcy0+bGFzdF9iICYgVklBMUJfdlJUQ0NsaykgJiYgKHMtPmIg
-JiBWSUExQl92UlRDQ2xrKSkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgODY3IGxpbmVzIGNoZWNrZWQK
-ClBhdGNoIDMvOSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNC85IENoZWNraW5nIGNvbW1p
-dCAwNzEzMWJjYjNmOTUgKGh3L202OGs6IGltcGxlbWVudCBBREIgYnVzIHN1cHBvcnQgZm9yIHZp
-YSkKNS85IENoZWNraW5nIGNvbW1pdCBlODljYjRmODhkYmMgKGh3L202OGs6IGFkZCBtYWNmYiB2
-aWRlbyBjYXJkKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
-IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM2ODogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0
-b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDUxOCBsaW5lcyBjaGVja2VkCgpQYXRjaCA1Lzkg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNi85IENoZWNraW5nIGNvbW1pdCAzMjJiYzVkYjZk
-OTYgKGh3L202OGs6IGFkZCBOdWJ1cyBzdXBwb3J0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3Ig
-ZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM2MjogCm5l
-dyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDUzMiBsaW5l
-cyBjaGVja2VkCgpQYXRjaCA2LzkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNy85IENoZWNr
-aW5nIGNvbW1pdCBjMmQxMTRhODViOTMgKGh3L202OGs6IGFkZCBOdWJ1cyBzdXBwb3J0IGZvciBt
-YWNmYiB2aWRlbyBjYXJkKQo4LzkgQ2hlY2tpbmcgY29tbWl0IGNkMDk1MzQxNjExMCAoaHcvbTY4
-azogYWRkIGEgZHVtbXkgU1dJTSBmbG9wcHkgY29udHJvbGxlcikKV0FSTklORzogYWRkZWQsIG1v
-dmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwoj
-NTM6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1
-OTEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC85IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjkv
-OSBDaGVja2luZyBjb21taXQgMjVjYWEyYzA3MTZmIChody9tNjhrOiBkZWZpbmUgTWFjaW50b3No
-IFF1YWRyYSA4MDApCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
-ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzcwOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
-CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNTE4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkv
-OSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
-dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDkxMDE5MzM0Ny4xNjAwMC0xLWxhdXJlbnRAdml2
-aWVyLmV1L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+02.08.2019. 18.29, "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com> =D1=98=
+=D0=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> Cc'ing broader MIPS audience.
+>
+> On 8/2/19 6:04 PM, Peter Maydell wrote:
+> > This patchset converts the MIPS target away from the
+> > old broken do_unassigned_access hook to the new (added in
+> > 2017...) do_transaction_failed hook.
+> >
 
+Since Herve now tested this series, unless somebody objects, I am going to
+include it in the next Mips queue, scheduled in next few days.
 
+Thanks to all involved!
+
+Aleksandar
+
+> > The motivation here is:
+> >  * do_unassigned_access is broken because:
+> >     + it will be called for any kind of access to physical addresses
+> >       where there is no assigned device, whether that access is by the
+> >       CPU or by something else (like a DMA controller!), so it can
+> >       result in spurious guest CPU exceptions.
+> >     + It will also get called even when using KVM, when there's nothing
+> >       useful it can do.
+> >     + It isn't passed in the return-address within the TCG generated
+> >       code, so it isn't able to correctly restore the CPU state
+> >       before generating the exception, and so the exception will
+> >       often be generated with the wrong faulting guest PC value
+> >  * there are now only a few targets still using the old hook,
+> >    so if we can convert them we can delete all the old code
+> >    and complete this API transation. (Patches for SPARC are on
+> >    the list; the other user is RISCV, which accidentally
+> >    implemented the old hook rather than the new one recently.)
+> >
+> > The general approach to the conversion is to check the target for
+> > load/store-by-physical-address operations which were previously
+> > implicitly causing exceptions, to see if they now need to explicitly
+> > check for and handle memory access failures. (The 'git grep' regexes
+> > in docs/devel/loads-stores.rst are useful here: the API families to
+> > look for are ld*_phys/st*_phys, address_space_ld/st*, and
+> > cpu_physical_memory*.)
+> >
+> > For MIPS, there are none of these (the usual place where targets do
+> > this is hardware page table walks where the page table entries are
+> > loaded by physical address, and MIPS doesn't seem to have those).
+> >
+> > Code audit out of the way, the actual hook changeover is pretty
+> > simple.
+> >
+> > The complication here is the MIPS Jazz board, which has some rather
+> > dubious code that intercepts the do_unassigned_access hook to suppress
+> > generation of exceptions for invalid accesses due to data accesses,
+> > while leaving exceptions for invalid instruction fetches in place. I'm
+> > a bit dubious about whether the behaviour we have implemented here is
+> > really what the hardware does -- it seems pretty odd to me to not
+> > generate exceptions for d-side accesses but to generate them for
+> > i-side accesses, and looking back through git and mailing list history
+> > this code is here mainly as "put back the behaviour we had before a
+> > previous commit broke it", and that older behaviour in turn I think is
+> > more historical-accident than because anybody deliberately checked the
+> > hardware behaviour and made QEMU work that way. However, I don't have
+> > any real hardware to do comparative tests on, so this series retains
+> > the same behaviour we had before on this board, by making it intercept
+> > the new hook in the same way it did the old one. I've beefed up the
+> > comment somewhat to indicate what we're doing, why, and why it might
+> > not be right.
+> >
+> > The patch series is structured in three parts:
+> >  * make the Jazz board code support CPUs regardless of which
+> >    of the two hooks they implement
+> >  * switch the MIPS CPUs over to implementing the new hook
+> >  * remove the no-longer-needed Jazz board code for the old
+> >    hook
+> > (This seemed cleaner to me than squashing the whole thing into
+> > a single patch that touched core mips code and the jazz board
+> > at the same time.)
+> >
+> > I have tested this with:
+> >  * the ARC Multiboot BIOS linked to from the bug
+> >    https://bugs.launchpad.net/qemu/+bug/1245924 (and which
+> >    was the test case for needing the hook intercept)
+> >  * a Linux kernel for the 'mips' mips r4k machine
+> >  * 'make check'
+> > Obviously more extensive testing would be useful, but I
+> > don't have any other test images. I also don't have
+> > a KVM MIPS host, which would be worth testing to confirm
+> > that it also still works.
+> >
+> > If anybody happens by some chance to still have a working
+> > real-hardware Magnum or PICA61 board, we could perhaps test
+> > how it handles accesses to invalid memory, but I suspect that
+> > nobody does any more :-)
+> >
+> > thanks
+> > -- PMM
+> >
+> >
+> > Peter Maydell (3):
+> >   hw/mips/mips_jazz: Override do_transaction_failed hook
+> >   target/mips: Switch to do_transaction_failed() hook
+> >   hw/mips/mips_jazz: Remove no-longer-necessary override of
+> >     do_unassigned_access
+> >
+> >  target/mips/internal.h  |  8 ++++---
+> >  hw/mips/mips_jazz.c     | 47 +++++++++++++++++++++++++++++------------
+> >  target/mips/cpu.c       |  2 +-
+> >  target/mips/op_helper.c | 24 +++++++--------------
+> >  4 files changed, 47 insertions(+), 34 deletions(-)
+> >
+>
