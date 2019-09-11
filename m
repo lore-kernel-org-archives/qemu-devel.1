@@ -2,54 +2,47 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2E7DC49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 18:01:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D4DC49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 18:17:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9931B206A1
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 18:01:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9931B206A1
+	by mail.kernel.org (Postfix) with ESMTPS id 5C7932085B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 18:17:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C7932085B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i86vV-0007JR-MI
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 14:01:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57266)
+	id 1i87Bg-0003u6-G4
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 14:17:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34523)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i86ta-00066X-Nz
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 13:59:11 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i87Ay-0003MP-DY
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 14:17:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i86tZ-0004PW-CN
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 13:59:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41420)
+ (envelope-from <jsnow@redhat.com>) id 1i87Av-0005Zy-L1
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 14:17:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41018)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i86tW-0004Nr-GN; Wed, 11 Sep 2019 13:59:06 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1i87At-0005Y6-Jc; Wed, 11 Sep 2019 14:17:04 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A164C18C4271;
- Wed, 11 Sep 2019 17:59:05 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B381781DE0;
+ Wed, 11 Sep 2019 18:17:01 +0000 (UTC)
 Received: from [10.18.17.203] (dhcp-17-203.bos.redhat.com [10.18.17.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D722119C6A;
- Wed, 11 Sep 2019 17:59:04 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-References: <20190806152611.280389-1-vsementsov@virtuozzo.com>
- <fa5f14a1-e05d-24e7-a51e-ad7737d5f4a1@redhat.com>
- <c0f0831f-851b-a76d-208c-22d97e4392d8@virtuozzo.com>
- <57111ad3-6acc-1027-2e5a-f203929e48b6@redhat.com>
- <c773ab2c-368c-825e-dd51-5ff8b5060c2b@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CD5F960852;
+ Wed, 11 Sep 2019 18:17:00 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20190911162900.8498-1-thuth@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -126,21 +119,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <f125fc22-98ae-3146-4fba-524da959bf17@redhat.com>
-Date: Wed, 11 Sep 2019 13:59:04 -0400
+Message-ID: <6c01ea97-a706-91ba-6e1b-42fb64e9306a@redhat.com>
+Date: Wed, 11 Sep 2019 14:17:00 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <c773ab2c-368c-825e-dd51-5ff8b5060c2b@virtuozzo.com>
+In-Reply-To: <20190911162900.8498-1-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Wed, 11 Sep 2019 17:59:05 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Wed, 11 Sep 2019 18:17:01 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2] util/hbitmap: strict hbitmap_reset
+Subject: Re: [Qemu-devel] [PATCH] Makefile: Remove generated files when
+ doing 'distclean'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -152,96 +146,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Denis Lunev <den@virtuozzo.com>
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/11/19 11:13 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 07.08.2019 19:27, John Snow wrote:
->>
->>
->> On 8/6/19 12:19 PM, Vladimir Sementsov-Ogievskiy wrote:
->>> 06.08.2019 19:09, Max Reitz wrote:
->>>> On 06.08.19 17:26, Vladimir Sementsov-Ogievskiy wrote:
->>>>> hbitmap_reset has an unobvious property: it rounds requested region up.
->>>>> It may provoke bugs, like in recently fixed write-blocking mode of
->>>>> mirror: user calls reset on unaligned region, not keeping in mind that
->>>>> there are possible unrelated dirty bytes, covered by rounded-up region
->>>>> and information of this unrelated "dirtiness" will be lost.
->>>>>
->>>>> Make hbitmap_reset strict: assert that arguments are aligned, allowing
->>>>> only one exception when @start + @count == hb->orig_size. It's needed
->>>>> to comfort users of hbitmap_next_dirty_area, which cares about
->>>>> hb->orig_size.
->>>>>
->>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>>> ---
->>>>>
->>>>> v2 based on Max's https://github.com/XanClic/qemu.git block
->>>>> which will be merged soon to 4.1, and this patch goes to 4.2
->>>>> Based-on: https://github.com/XanClic/qemu.git block
->>>>>
->>>>> v1 was "[PATCH] util/hbitmap: fix unaligned reset", and as I understand
->>>>> we all agreed to just assert alignment instead of aligning down
->>>>> automatically.
->>>>>
->>>>>    include/qemu/hbitmap.h | 5 +++++
->>>>>    tests/test-hbitmap.c   | 2 +-
->>>>>    util/hbitmap.c         | 4 ++++
->>>>>    3 files changed, 10 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
->>>>> index 4afbe6292e..7865e819ca 100644
->>>>> --- a/include/qemu/hbitmap.h
->>>>> +++ b/include/qemu/hbitmap.h
->>>>> @@ -132,6 +132,11 @@ void hbitmap_set(HBitmap *hb, uint64_t start, uint64_t count);
->>>>>     * @count: Number of bits to reset.
->>>>>     *
->>>>>     * Reset a consecutive range of bits in an HBitmap.
->>>>> + * @start and @count must be aligned to bitmap granularity. The only exception
->>>>> + * is resetting the tail of the bitmap: @count may be equal to @start +
->>>>> + * hb->orig_size,
->>>>
->>>> s/@start + hb->orig_size/hb->orig_size - @start/, I think.
->>>
->>> Ha, I wanted to say start + count equal to orig_size. Yours is OK too of course.
->>>
->>>>
->>>>>       in this case @count may be not aligned. @start + @count
->>>>
->>>> +are
->>>>
->>>> With those fixed:
->>>>
->>>> Reviewed-by: Max Reitz <mreitz@redhat.com>
->>>
->>> Thanks!
->>>
->>
->> I'll add this to the pile for 4.2, after I fix the rebase conflicts that
->> arose from 4.1-rc4.
->>
-> 
-> Hi!
-> 
-> Didn't you forget, or should I resend?
-> 
-> 
+On 9/11/19 12:29 PM, Thomas Huth wrote:
+> When running "make distclean" we currently leave a lot of generated
+> files in the build directory. Fix that.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-I must have dropped the patch by accident during the rebasing. As an
-apology, I squashed in Max's suggestions from the list. Check that they
-look OK, please?
+Nice,
 
-Thanks, applied to my bitmaps tree:
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-https://github.com/jnsnow/qemu/commits/bitmaps
-https://github.com/jnsnow/qemu.git
+> ---
+>  Makefile               |  6 +++---
+>  tests/Makefile.include | 12 +++++++++++-
+>  2 files changed, 14 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/Makefile b/Makefile
+> index ae17a83067..67e7e40e8c 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -681,14 +681,14 @@ clean: recurse-clean
+>  		-exec rm {} +
+>  	rm -f $(edk2-decompressed)
+>  	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) TAGS cscope.* *.pod *=
+~ */*~
+> -	rm -f fsdev/*.pod scsi/*.pod
+> +	rm -f fsdev/*.pod scsi/*.pod docs/*.pod docs/*/*.pod docs/*/.buildinf=
+o
+>  	rm -f qemu-img-cmds.h
+>  	rm -f ui/shader/*-vert.h ui/shader/*-frag.h
+>  	@# May not be present in generated-files-y
+>  	rm -f trace/generated-tracers-dtrace.dtrace*
+>  	rm -f trace/generated-tracers-dtrace.h*
+>  	rm -f $(foreach f,$(generated-files-y),$(f) $(f)-timestamp)
+> -	rm -f qapi-gen-timestamp
+> +	rm -f qapi-gen-timestamp vhost-user-input
+>  	rm -rf qga/qapi-generated
+>  	rm -f config-all-devices.mak
+> =20
+> @@ -719,7 +719,7 @@ distclean: clean
+>  	rm -f config-host.mak config-host.h* config-host.ld $(DOCS) qemu-opti=
+ons.texi qemu-img-cmds.texi qemu-monitor.texi qemu-monitor-info.texi
+>  	rm -f config-all-devices.mak config-all-disas.mak config.status
+>  	rm -f $(SUBDIR_DEVICES_MAK)
+> -	rm -f po/*.mo tests/qemu-iotests/common.env
+> +	rm -f po/*.mo
+>  	rm -f roms/seabios/config.mak roms/vgabios/config.mak
+>  	rm -f qemu-doc.info qemu-doc.aux qemu-doc.cp qemu-doc.cps
+>  	rm -f qemu-doc.fn qemu-doc.fns qemu-doc.info qemu-doc.ky qemu-doc.kys
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index f5ac09549c..07f794b01f 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -1174,11 +1174,21 @@ check: check-block check-qapi-schema check-unit=
+ check-softfloat check-qtest chec
+>  check-clean:
+>  	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+>  	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$=
+(target)-y)) $(check-qtest-generic-y))
+> -	rm -f tests/test-qapi-gen-timestamp
+>  	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
+> +	rm -f tests/qemu-iotests/common.env tests/qemu-iotests/check.*
+> +	rm -f tests/test-qapi-gen-timestamp tests/qht-bench$(EXESUF) \
+> +		tests/fp/fp-test tests/fp/*.out tests/qapi-schema/*.test.*
+> =20
+>  clean: check-clean
+> =20
+> +check-distclean:
+> +	rm -f tests/test-qapi-types*.c tests/test-qapi-visit*.c \
+> +		tests/test-qapi-commands*.c tests/test-qapi-events*.c \
+> +		tests/test-qapi-emit-events.[ch] tests/test-qapi-introspect.c \
+> +		tests/include/test-qapi-*.c
+> +
+> +distclean: check-distclean
+> +
+>  # Build the help program automatically
+> =20
+>  all: $(QEMU_IOTESTS_HELPERS-y)
+>=20
 
---js
-
+--=20
+=E2=80=94js
 
