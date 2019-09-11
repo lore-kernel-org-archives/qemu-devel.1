@@ -2,93 +2,139 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13401C49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 23:09:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A15FC49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 23:16:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D28FB20838
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 23:09:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BbuXgeq2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D28FB20838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id BBCA22085B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 23:16:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBCA22085B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8BkD-0004KJ-2T
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 19:09:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47867)
+	id 1i8Bql-00062X-S9
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 19:16:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48869)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i8BjY-0003vQ-OB
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 19:09:09 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i8Bq1-0005bQ-OC
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 19:15:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i8BjX-00032q-Dk
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 19:09:08 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:46884)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i8BjX-00032K-7K
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 19:09:07 -0400
-Received: by mail-qk1-x742.google.com with SMTP id 201so22567351qkd.13
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 16:09:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=6GeOuoT4NUUckbkLq+q7UKa/IYbDjNS2DJaWJZtf664=;
- b=BbuXgeq2v1Q5QM3k+idlg96OzXe9GEEtTzUzQVhHVTbtc5/caz9Z8pBvytgBiSGyIy
- IPVHIIj7PaJ/4e1ffAgBvT+twf5FxHRa5Xtiagrzwd1cktahBR1dclogRDCzMhTrQx+i
- V8DFtJVOqpXDxKlhD19Xk+iFDC8SxeDHpv1rZha1hDI0F0EecmKEvjPy9+9qJzOZqQpP
- MfmFEu/Mne+5z16UcuxjRjlY9xjdcwjxeTxOmV5BYcRbteCRpMiHO7Ew0ksqIZyw/beD
- nIVQ3AQZGBFuF1/BPtwZYnEtkIKtlkgRhQ87i4aB0Bi4OkMs052mIJBvSGpiFgl6qh3i
- OCNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6GeOuoT4NUUckbkLq+q7UKa/IYbDjNS2DJaWJZtf664=;
- b=GKZD0mT8nLi5qo52omg/jTlYbPUc0WZNjp7gwB3gHyMzIwk71XXTT7NXFMI986fWbi
- dEYGelCiLcOznoyPFztXLaVq6pYkfmb7fbLficNduDESxtxzuYQfmh0BNyMtkF+VGwI7
- IKx1xZaiKPosjT26vHDsZEYA0ohZbsHNX2noQlW07AhLyhKMLWGLEo0bOVpzHZjRzaWG
- MpZCM5UHbaJCCpGeiqH5kcxu2KUEE89OkjMoW76bV4qapL4XPSqtHh6qg5ZN3Do8eTnh
- zSPQZP9qdi35TlTZrXS/NzV2roJc1nlJf2eMZsjLhwgJkWXa9xXeyjs/7pG9RiUiXurP
- 3iow==
-X-Gm-Message-State: APjAAAVJ4n9pY9qPXSUiO4uFPeAQTTVdRKda9JDsJCru4YrbpUd1zj5p
- 2F88RSg5hT1xD7jU32cVWfuKsA==
-X-Google-Smtp-Source: APXvYqyu8QsAoU9xT4FO2hwZUhf4rhiOZviRfaRrNo3SyPw4GVpqZu9QDaNFNJdm4RIfxqs7JCfuzQ==
-X-Received: by 2002:a37:ab1e:: with SMTP id u30mr37316705qke.84.1568243346322; 
- Wed, 11 Sep 2019 16:09:06 -0700 (PDT)
-Received: from [172.20.5.51] ([67.69.50.154])
- by smtp.gmail.com with ESMTPSA id t17sm14959937qtt.57.2019.09.11.16.09.03
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 11 Sep 2019 16:09:05 -0700 (PDT)
-To: liuzhiwei <zhiwei_liu@c-sky.com>, Alistair.Francis@wdc.com,
- palmer@sifive.com, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de,
- riku.voipio@iki.fi, laurent@vivier.eu, wenmeng_zhang@c-sky.com
-References: <1568183141-67641-1-git-send-email-zhiwei_liu@c-sky.com>
- <1568183141-67641-5-git-send-email-zhiwei_liu@c-sky.com>
-From: Richard Henderson <richard.henderson@linaro.org>
+ (envelope-from <jsnow@redhat.com>) id 1i8Bpy-0005FH-Ob
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 19:15:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53940)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1i8Bpy-0005EG-G9
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 19:15:46 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A81FA308212F;
+ Wed, 11 Sep 2019 23:15:43 +0000 (UTC)
+Received: from [10.18.17.203] (dhcp-17-203.bos.redhat.com [10.18.17.203])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C9E7F5D6A5;
+ Wed, 11 Sep 2019 23:15:42 +0000 (UTC)
+To: Mark Syms <Mark.Syms@citrix.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <e2cce2353aa44e2481f01b96ee1e6028@AMSPEX02CL01.citrite.net>
+From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <1b1e6e6e-9ddc-b45d-cf5f-af93ac49c1f0@linaro.org>
-Date: Wed, 11 Sep 2019 19:09:02 -0400
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <5c016081-6ba6-5ae1-524a-6e45c92e9822@redhat.com>
+Date: Wed, 11 Sep 2019 19:15:42 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1568183141-67641-5-git-send-email-zhiwei_liu@c-sky.com>
+In-Reply-To: <e2cce2353aa44e2481f01b96ee1e6028@AMSPEX02CL01.citrite.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::742
-Subject: Re: [Qemu-devel] [PATCH v2 04/17] RISC-V: add vector extension
- configure instruction
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Wed, 11 Sep 2019 23:15:43 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Valgrind confused by queue macros
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,78 +146,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> +void VECTOR_HELPER(vsetvl)(CPURISCVState *env, uint32_t rs1, uint32_t rs2,
-> +    uint32_t rd)
-> +{
-> +    int sew, max_sew, vlmax, vl;
-> +
-> +    if (rs2 == 0) {
-> +        vector_vtype_set_ill(env);
-> +        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-> +        return;
-> +    }
-
-I don't see that vsetvl, rs2 == r0 should raise SIGILL.
-Is that requirement new, after the 0.7.1 specification?
-If so, this should happen in the translator and not here.
-You should *not* change cpu state (setting vill here) before raising SIGILL.
-
-As far as I can see "vsetvl rd, rs1, r0" == "vsetvli rd, rs1, e8".
-
-> +    env->vfp.vtype = env->gpr[rs2];
-
-You should pass the rs2 register by value, not by index.
-
-> +    sew = 1 << vector_get_width(env) / 8;
-> +    max_sew = sizeof(target_ulong);
-> +
-> +    if (env->misa & RVD) {
-> +        max_sew = max_sew > 8 ? max_sew : 8;
-> +    } else if (env->misa & RVF) {
-> +        max_sew = max_sew > 4 ? max_sew : 4;
-> +    }
-> +    if (sew > max_sew) {
-> +        vector_vtype_set_ill(env);
-> +        return;
-> +    }
-> +
-> +    vlmax = vector_get_vlmax(env);
-> +    if (rs1 == 0) {
-> +        vl = vlmax;
-> +    } else if (env->gpr[rs1] <= vlmax) {
-> +        vl = env->gpr[rs1];
-> +    } else if (env->gpr[rs1] < 2 * vlmax) {
-> +        vl = ceil(env->gpr[rs1] / 2);
-> +    } else {
-> +        vl = vlmax;
-> +    }
-
-You should pass rs1 register by value, not by index.
-The special case of rs1 == r0 can be handled by passing the value
-(target_ulong)-1, which will match the final case above.
-
-> +    env->vfp.vl = vl;
-> +    env->gpr[rd] = vl;
-> +    env->vfp.vstart = 0;
-> +    return;
-> +}
-
-You should return vl and have it assigned to rd by the translator code, and not
-assign it here.
-
-> +void VECTOR_HELPER(vsetvli)(CPURISCVState *env, uint32_t rs1, uint32_t zimm,
-> +    uint32_t rd)
-
-You should not require a separate helper function for this.
-
-Passing the zimm constant as the value for rs2 above is the correct mapping
-between the two instructions.
 
 
-r~
+On 9/10/19 9:27 AM, Mark Syms wrote:
+> Hi,
+> 
+> While trying to track down an issue in using qemu 4.1 with some development features we needed/wanted to run valgrind on it to find a memory error. Unfortunately the form of the queue macros seems to really confuse valgrind and cause it to report many " Use of uninitialised value " errors.
+> 
+> As an example, in qemu_aio_coroutine_enter - 
+> 
+> Use of uninitialised value of size 8
+>    at 0x69E7E5: qemu_aio_coroutine_enter (qemu-coroutine.c:109)
+> 
+> Conditional jump or move depends on uninitialised value(s)
+>    at 0x69E7FA: qemu_aio_coroutine_enter (qemu-coroutine.c:112)
+> 
+> Use of uninitialised value of size 8
+>    at 0x69E800: qemu_aio_coroutine_enter (qemu-coroutine.c:118)
+> 
+> Use of uninitialised value of size 8
+>    at 0x69E809: qemu_aio_coroutine_enter (qemu-coroutine.c:120)
+> 
+> Use of uninitialised value of size 8
+>    at 0x69E822: qemu_aio_coroutine_enter (qemu-coroutine.c:122)
+> 
+> Use of uninitialised value of size 8
+>    at 0x69E83A: qemu_aio_coroutine_enter (qemu-coroutine.c:134)
+> 
+> Use of uninitialised value of size 8
+>    at 0x69E845: qemu_aio_coroutine_enter (qemu-coroutine.c:139)
+> 
+> This seems to ultimately result from it thinking that pending is not initialised by this line
+> 
+>     QSIMPLEQ_HEAD(, Coroutine) pending = QSIMPLEQ_HEAD_INITIALIZER(pending);
+> 
+> As this issue in itself accounts for 7 errors every time that qemu_aio_coroutine_enter is called (which is frequently) valgrind very soon gives up and says the code is too broken to report errors on - unless that is you disable the error-limit which is what we've done but then you still have to identify the real errors in the middle of these ones.
+> 
+> Not sure what it is about the macros in the initialisation line that cause valgrind to think it isn't initialised, whilst there is a small amount of macro magic in there it looks like it does actually result in things being correctly initialised.
+> 
+> This is using valgrind 3.13.0-13.el7 on a CentOS 7 system.
+> 
+> Any clues about how to resolve this? Or is it just a fact of life that valgrind is never going to be happy with this code?
+> 
+> Thanks,
+> 
+> Mark.
+> 
+
+I haven't used valgrind on a "real" run of QEMU in some time, usually
+using it for the test suite instead.
+
+In this case, are you sure it's choking on the macro and not getting
+confused about all of the stack swaps that QEMU is doing in the
+coroutine module?
+
+CCing some folks who have worked on valgrind support in the past, they
+might have a more targeted idea.
+
+--js
 
