@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63965ECDE27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:42:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19D83ECDE20
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:43:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C600208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:42:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB0CE208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:43:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="FEmjz2VQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C600208E4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="OxbaPx5Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB0CE208E4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7xGZ-00056I-Bn
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:42:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49032)
+	id 1i7xHs-0005zM-TU
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:43:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49112)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1i7xFS-0004Aq-1I
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:41:07 -0400
+ (envelope-from <aik@ozlabs.ru>) id 1i7xFs-0004ZT-69
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:41:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1i7xFP-0003eI-SO
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:41:04 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:35626)
+ (envelope-from <aik@ozlabs.ru>) id 1i7xFr-0003pg-3p
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:41:32 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:38485)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1i7xFP-0003dx-Kd
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:41:03 -0400
-Received: by mail-pl1-x644.google.com with SMTP id s17so4887459plp.2
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 00:41:03 -0700 (PDT)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1i7xFq-0003p6-TU
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:41:31 -0400
+Received: by mail-pl1-x641.google.com with SMTP id p9so5083701plk.5
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 00:41:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
  h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=cNl/OCNav1gH8iQK1IZwVu0MCRT7BuxvZSYBEdjgv+w=;
- b=FEmjz2VQWbtsSY0Wc8POl/wGXqMrKfevjiOqaq0kYoUZV2GRbNeVCh6kZ3GV34aeDk
- MuEcwe/5X9O+ydH9hbbPClSfyuR873E13N4GR76WOF/NPnK8Bzu0xk2Lege5wcLqPmRn
- bSCOHXjylvnkhj8/u0Har4+UtZoYdaYcqGcjsC5GLmf49WPj5AMREKuV3Xfih+StKnly
- aMgaveb25DX5wNs2UCGUiZPMf5wAxYcMuxScp57wThzNCKA67ysSEQkXsy+MCNqitg2g
- RbZji+47k30zHqATiSdHOJmWxK/nsfrAdeiOzj/KLDSIiBrjuQTvtknc3oO78Cz2S9l2
- n+2w==
+ bh=zeAlzTqiAcpVz77AOrpa2LnnMZpR42Oj94xB+NVB4w4=;
+ b=OxbaPx5Y2d0uGUo690LNvLTanj7dQwrER37R7OPgjHl8VSxu5bdOfzhRcMwxhO13eC
+ vIgWmuKV8bd0nCy2JotJRvsA+kTrW4iJImWAAsVPOBO8+/xCyuLY46lPQavc2whh/W+5
+ gPP0FLJd8JMfCuhnD2ZL/lzWGlBpQ5hzQCv+X7Rk7BSvKKzChmV8finoKpqMA1ih4ij7
+ YSg6E97AvRyg4NwBbtN3XzItM39Bd3D4cCX1rh9C3H6/1ecWB84d8r8evl+//Gjuwf2m
+ HRHCcqbXISLg+OlHL63PB1H/jyhBHTORpAmJSdgObALSnYztbhSsyYZPfJ4RgJHVdTvy
+ 7hvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=cNl/OCNav1gH8iQK1IZwVu0MCRT7BuxvZSYBEdjgv+w=;
- b=TNK2rAVeVG5kfBe6wBoZKCMaQ7Klmbw9+PqdnE5xtUQhChcch7zXCCG/4K1UZV68pD
- i6SFG1eT2wSwe9V8YL3sC1wgk0uhlWS5/MXyu45PcCbLkGAH4X5w5k8T/BGaRzvfEFCJ
- B5PjCGdzHI8Fj+A+7kgOibppLBR1MlpBBy9LRwkyrNEXQ/X32GkNqRcVWU0zxtpIibQ9
- x/PWFO7T5gNoWdObzbEyOUX09FsrOvywc7oQqX4H+P2zzUBIroLk203LupHpR2DKB5Ts
- 52a/2jHcCL598UQYkvtF2teZbuj896gNdNxDvYtqDqVupkNQVYbQnMfK5DZ3WCUPrLPF
- pc3A==
-X-Gm-Message-State: APjAAAXfKEiQfwP3uisdnjFmTFB8G3CYL+t2bXeeW25EK/ihFdwgtqoU
- iNaWJ0mw5iraJUoVMVxgP/YWzw==
-X-Google-Smtp-Source: APXvYqyYKa4+f7XX0fkWCQDRHkA2OpkcoJDaw/qbUVyun4Lo3a872Wgt8YHMPsQ+w7cTA0HqYIKraQ==
-X-Received: by 2002:a17:902:6e17:: with SMTP id
- u23mr13200052plk.205.1568187662452; 
- Wed, 11 Sep 2019 00:41:02 -0700 (PDT)
+ bh=zeAlzTqiAcpVz77AOrpa2LnnMZpR42Oj94xB+NVB4w4=;
+ b=H+2uCwW+Ciur4Eyg9++3NwYmd2fhMEeiI4JL+lPqo5RRoucYxP+M20o7z5zFgofndc
+ 9AckNywEi3pZht3pYZGE/NkXIRj0IhYgcg7z8m/d1uSXgNueDE9FUKHVT2LFVs5SNTO4
+ 62X+XduFVNFFh2budG7MLyVwobhd4QOPfkvfwJELSqjiUD7y1n+B2xKAagfV0ecBHUDU
+ Nwby1M8avG8OvbxrBElTrTLpnHYWOBPSC3mCovSs0K14MzXZNJIeQrI+8EhTLR0ko9SO
+ bc/COmb8MEj+cVaXa1KFpg6R1i2ITYh+UdNMD8mD+6fraj2ElYUREgNEKVBsboz5icqO
+ gthQ==
+X-Gm-Message-State: APjAAAUwpVzcHvQWZqyw8ppdGPHj1XxXvrKpEfU/9Vzi3kay3c7rM0Da
+ QdCFf82GpVLIXFpYo1zRBTQ9+w==
+X-Google-Smtp-Source: APXvYqx7j7lV4tOQMnhr0DtNGNhTZfnyqKiPYkCU8zLbudqyFBWvOmuwSelNLlQXRauUykDv/L9xvQ==
+X-Received: by 2002:a17:902:a606:: with SMTP id
+ u6mr22468997plq.224.1568187690032; 
+ Wed, 11 Sep 2019 00:41:30 -0700 (PDT)
 Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id z29sm30922817pff.23.2019.09.11.00.40.59
+ by smtp.gmail.com with ESMTPSA id p11sm22605640pff.136.2019.09.11.00.41.27
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 11 Sep 2019 00:41:01 -0700 (PDT)
+ Wed, 11 Sep 2019 00:41:29 -0700 (PDT)
 To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
  qemu-ppc@nongnu.org
 References: <20190911040452.8341-1-david@gibson.dropbear.id.au>
- <20190911040452.8341-8-david@gibson.dropbear.id.au>
+ <20190911040452.8341-3-david@gibson.dropbear.id.au>
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
 Autocrypt: addr=aik@ozlabs.ru; keydata=
  mQINBE+rT0sBEADFEI2UtPRsLLvnRf+tI9nA8T91+jDK3NLkqV+2DKHkTGPP5qzDZpRSH6mD
@@ -148,20 +148,20 @@ Autocrypt: addr=aik@ozlabs.ru; keydata=
  c7E5M+/NpslPCmYnDjs5qg0/3ihh6XuOGggZQOqrYPC3PnsNs3NxirwOkVPQgO6mXxpuifvJ
  DG9EMkK8IBXnLulqVk54kf7fE0jT/d8RTtJIA92GzsgdK2rpT1MBKKVffjRFGwN7nQVOzi4T
  XrB5p+6ML7Bd84xOEGsj/vdaXmz1esuH7BOZAGEZfLRCHJ0GVCSssg==
-Message-ID: <b727dcb2-3cdd-77f9-b772-3253e52f2133@ozlabs.ru>
-Date: Wed, 11 Sep 2019 17:40:58 +1000
+Message-ID: <ef614953-6548-b6ad-4169-7698f91af6c7@ozlabs.ru>
+Date: Wed, 11 Sep 2019 17:41:25 +1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.0
 MIME-Version: 1.0
-In-Reply-To: <20190911040452.8341-8-david@gibson.dropbear.id.au>
+In-Reply-To: <20190911040452.8341-3-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: Re: [Qemu-devel] [PATCH 7/7] spapr: Perform machine reset in a more
- sensible order
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: Re: [Qemu-devel] [PATCH 2/7] spapr: Move handling of special NVLink
+ numa node from reset to init
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -181,98 +181,64 @@ Sender: "Qemu-devel"
 
 
 On 11/09/2019 14:04, David Gibson wrote:
-> We've made several changes in the past to the machine reset order to fix
-> specific problems.  However, we've ended up with an order that doesn't make
-> a lot of logical sense.  This is an attempt to rectify this.
+> The number of NUMA nodes in the system is fixed from the command line.
+> Therefore, there's no need to recalculate it at reset time, and we can
+> determine the special gpu_numa_id value used for NVLink2 devices at init
+> time.
 > 
-> First we reset global CAS options, since that should depend on nothing
-> else.  Then we reset the CPUs, which shouldn't depend on external devices.
-> Then the irq subsystem, then the bulk of devices (which might rely on
-> irqs).  Finally we set up the entry state ready for boot, which could
-> potentially rely on a bunch of other things.
+> This simplifies the reset path a bit which will make further improvements
+> easier.
 > 
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
 
-Breaks console on P8 and asserts on rebooting a P9 guest.
-
+Tested-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
 
 > ---
->  hw/ppc/spapr.c | 47 +++++++++++++++++++++++++----------------------
->  1 file changed, 25 insertions(+), 22 deletions(-)
+>  hw/ppc/spapr.c | 21 +++++++++++----------
+>  1 file changed, 11 insertions(+), 10 deletions(-)
 > 
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 5a919a6cc1..1560a11738 100644
+> index c551001f86..e03e874d94 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -1724,6 +1724,28 @@ static void spapr_machine_reset(MachineState *machine)
->      void *fdt;
->      int rc;
->  
-> +    /*
-> +     * If this reset wasn't generated by CAS, we should reset our
-> +     * negotiated options and start from scratch
-> +     */
-> +    if (!spapr->cas_reboot) {
-> +        spapr_ovec_cleanup(spapr->ov5_cas);
-> +        spapr->ov5_cas = spapr_ovec_new();
-> +
-> +        ppc_set_compat_all(spapr->max_compat_pvr, &error_fatal);
-> +    }
-> +
-> +    /*
-> +     * There is no CAS under qtest. Simulate one to please the code that
-> +     * depends on spapr->ov5_cas. This is especially needed to test device
-> +     * unplug, so we do that before resetting the DRCs.
-> +     */
-> +    if (qtest_enabled()) {
-> +        spapr_ovec_cleanup(spapr->ov5_cas);
-> +        spapr->ov5_cas = spapr_ovec_clone(spapr->ov5);
-> +    }
-> +
-> +    /* Reset the CPUs */
->      spapr_caps_apply(spapr);
->  
->      first_ppc_cpu = POWERPC_CPU(first_cpu);
-> @@ -1741,34 +1763,15 @@ static void spapr_machine_reset(MachineState *machine)
+> @@ -1737,16 +1737,6 @@ static void spapr_machine_reset(MachineState *machine)
 >          spapr_setup_hpt_and_vrma(spapr);
 >      }
 >  
-> -    qemu_devices_reset();
-> -
 > -    /*
-> -     * If this reset wasn't generated by CAS, we should reset our
-> -     * negotiated options and start from scratch
+> -     * NVLink2-connected GPU RAM needs to be placed on a separate NUMA node.
+> -     * We assign a new numa ID per GPU in spapr_pci_collect_nvgpu() which is
+> -     * called from vPHB reset handler so we initialize the counter here.
+> -     * If no NUMA is configured from the QEMU side, we start from 1 as GPU RAM
+> -     * must be equally distant from any other node.
+> -     * The final value of spapr->gpu_numa_id is going to be written to
+> -     * max-associativity-domains in spapr_build_fdt().
 > -     */
-> -    if (!spapr->cas_reboot) {
-> -        spapr_ovec_cleanup(spapr->ov5_cas);
-> -        spapr->ov5_cas = spapr_ovec_new();
-> -
-> -        ppc_set_compat_all(spapr->max_compat_pvr, &error_fatal);
-> -    }
-> -
-> +    /* Reset IRQ subsystem */
+> -    spapr->gpu_numa_id = MAX(1, machine->numa_state->num_nodes);
+>      qemu_devices_reset();
+>  
 >      /*
->       * This is fixing some of the default configuration of the XIVE
->       * devices. To be called after the reset of the machine devices.
->       */
->      spapr_irq_reset(spapr, &error_fatal);
+> @@ -2885,6 +2875,17 @@ static void spapr_machine_init(MachineState *machine)
 >  
-> -    /*
-> -     * There is no CAS under qtest. Simulate one to please the code that
-> -     * depends on spapr->ov5_cas. This is especially needed to test device
-> -     * unplug, so we do that before resetting the DRCs.
-> -     */
-> -    if (qtest_enabled()) {
-> -        spapr_ovec_cleanup(spapr->ov5_cas);
-> -        spapr->ov5_cas = spapr_ovec_clone(spapr->ov5);
-> -    }
-> +    /* Reset other devices */
-> +    qemu_devices_reset();
+>      }
 >  
->      /* DRC reset may cause a device to be unplugged. This will cause troubles
->       * if this device is used by another device (eg, a running vhost backend
+> +    /*
+> +     * NVLink2-connected GPU RAM needs to be placed on a separate NUMA node.
+> +     * We assign a new numa ID per GPU in spapr_pci_collect_nvgpu() which is
+> +     * called from vPHB reset handler so we initialize the counter here.
+> +     * If no NUMA is configured from the QEMU side, we start from 1 as GPU RAM
+> +     * must be equally distant from any other node.
+> +     * The final value of spapr->gpu_numa_id is going to be written to
+> +     * max-associativity-domains in spapr_build_fdt().
+> +     */
+> +    spapr->gpu_numa_id = MAX(1, machine->numa_state->num_nodes);
+> +
+>      if ((!kvm_enabled() || kvmppc_has_cap_mmu_radix()) &&
+>          ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3_00, 0,
+>                                spapr->max_compat_pvr)) {
 > 
 
 -- 
