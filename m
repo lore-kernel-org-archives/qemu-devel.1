@@ -2,50 +2,50 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B8A9ECDE27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 06:21:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 724BEECDE27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 06:22:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7284A21A4C
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 06:21:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7284A21A4C
+	by mail.kernel.org (Postfix) with ESMTPS id 4434B21A4C
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 06:22:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4434B21A4C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7w07-00026l-AM
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 02:21:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36365)
+	id 1i7w1n-0003VC-FU
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 02:22:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36638)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i7vzL-0001HE-2P
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:20:24 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i7w0r-0002jX-5a
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:21:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i7vzJ-0001l6-US
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:20:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51227)
+ (envelope-from <mreitz@redhat.com>) id 1i7w0q-0002fa-3u
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:21:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42560)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i7vzG-0001ip-B3; Wed, 11 Sep 2019 02:20:18 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1i7w0n-0002cG-T4; Wed, 11 Sep 2019 02:21:54 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 90E01335E8;
- Wed, 11 Sep 2019 06:20:17 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2A64F3082B02;
+ Wed, 11 Sep 2019 06:21:51 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-116-94.ams2.redhat.com
  [10.36.116.94])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A7CC96D09D;
- Wed, 11 Sep 2019 06:20:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A67E65C21E;
+ Wed, 11 Sep 2019 06:21:49 +0000 (UTC)
 To: Kevin Wolf <kwolf@redhat.com>
 References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-23-mreitz@redhat.com>
- <20190910145229.GI4446@localhost.localdomain>
+ <20190809161407.11920-24-mreitz@redhat.com>
+ <20190910150241.GJ4446@localhost.localdomain>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -72,22 +72,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d7226d81-b89f-5c24-9dd4-39ae832bf61b@redhat.com>
-Date: Wed, 11 Sep 2019 08:20:12 +0200
+Message-ID: <bff21e00-96ea-47bd-3411-ac5d71b8e513@redhat.com>
+Date: Wed, 11 Sep 2019 08:21:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190910145229.GI4446@localhost.localdomain>
+In-Reply-To: <20190910150241.GJ4446@localhost.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="h6Cg2PiRHvuxyoljmZihl55mvH3mkFln9"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="myHKyDAxXlc4PcvsFb4SFoMxmtGn4Aud7"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Wed, 11 Sep 2019 06:20:17 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Wed, 11 Sep 2019 06:21:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 22/42] block: Fix
- bdrv_get_allocated_file_size's fallback
+Subject: Re: [Qemu-devel] [PATCH v6 23/42] blockdev: Use CAF in
+ external_snapshot_prepare()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,99 +106,96 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---h6Cg2PiRHvuxyoljmZihl55mvH3mkFln9
-Content-Type: multipart/mixed; boundary="QVBiOXBN90Bdr6eYcpsqeb750ckiB4irE";
+--myHKyDAxXlc4PcvsFb4SFoMxmtGn4Aud7
+Content-Type: multipart/mixed; boundary="p9PtTpMyHYC89agw1KAShYkZ4YPpKE9lX";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <d7226d81-b89f-5c24-9dd4-39ae832bf61b@redhat.com>
-Subject: Re: [PATCH v6 22/42] block: Fix bdrv_get_allocated_file_size's
- fallback
+Message-ID: <bff21e00-96ea-47bd-3411-ac5d71b8e513@redhat.com>
+Subject: Re: [PATCH v6 23/42] blockdev: Use CAF in external_snapshot_prepare()
 References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-23-mreitz@redhat.com>
- <20190910145229.GI4446@localhost.localdomain>
-In-Reply-To: <20190910145229.GI4446@localhost.localdomain>
+ <20190809161407.11920-24-mreitz@redhat.com>
+ <20190910150241.GJ4446@localhost.localdomain>
+In-Reply-To: <20190910150241.GJ4446@localhost.localdomain>
 
---QVBiOXBN90Bdr6eYcpsqeb750ckiB4irE
+--p9PtTpMyHYC89agw1KAShYkZ4YPpKE9lX
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 10.09.19 16:52, Kevin Wolf wrote:
+On 10.09.19 17:02, Kevin Wolf wrote:
 > Am 09.08.2019 um 18:13 hat Max Reitz geschrieben:
->> If the driver does not implement bdrv_get_allocated_file_size(), we
->> should fall back to cumulating the allocated size of all non-COW
->> children instead of just bs->file.
+>> This allows us to differentiate between filters and nodes with COW
+>> backing files: Filters cannot be used as overlays at all (for this
+>> function).
 >>
->> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 >=20
-> This smells like an overgeneralisation, but if we want to count all vmd=
-k
-> extents, the qcow2 external data file, etc. it's an improvement anyway.=
+> Didn't we occasionally advertise blockdev-snapshot as the way to insert=
 
-> A driver that has a child that should not be counted must just remember=
+> filters on top at runtime?
 
-> to implement the callback.
->=20
-> Let me think of an example... How about quorum, for a change? :-)
-> Or the second blkverify child.
->=20
-> Or eventually the block job filter nodes.
-
-I actually think it makes sense for all of these nodes to report the sum
-of all of their children=E2=80=99s allocated sizes.
-
-If a quorum node has three children with allocated sizes of 3 MB, 1 MB,
-and 2 MB, respectively (totally possible if some have explicit zeroes
-and others don=E2=80=99t; it may also depend on the protocol, the filesys=
-tem,
-etc.), then I think it makes most sense to report indeed 6 MB for the
-quorum subtree as a whole.  What would you report?  3 MB?
-
-> Ehm... Maybe I should just take back what I said first. It almost feels=
-
-> like it would be better if qcow2 and vmdk explicitly used a handler tha=
-t
-> counts all children (could still be a generic one in block.c) rather
-> than having to remember to disable the functionality everywhere where w=
-e
-> don't want to have it.
-
-I don=E2=80=99t, because everywhere we don=E2=80=99t want this functional=
-ity, we still
-need to choose a child.  This has to be done by the driver anyway.
+I can only remember advertising for it as the only graph manipulation
+tool we had, and maybe saying =E2=80=9CWe=E2=80=99d want something like
+blockdev-snapshot for filters, too=E2=80=9D.
 
 Max
 
-> And please adjust the comment for bdrv_get_allocated_file_size(), it
-> only talks about a single file as if trees didn't exist. Actually, it
-> doesn't even seem so easy to define. Maybe primary node + storage nodes=
-?
-> Then vmdk needs to expose its extents as storage nodes (plural!), but
-> in the long run that might be needed anyway.
+> Though it seems it has always only worked for
+> filters that use bs->backing, among which I think there aren't any
+> user-creatable ones. So we're probably good.
+>=20
+> Kevin
+>=20
+>>  blockdev.c | 7 ++++++-
+>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/blockdev.c b/blockdev.c
+>> index 29c6c6044a..c540802127 100644
+>> --- a/blockdev.c
+>> +++ b/blockdev.c
+>> @@ -1664,7 +1664,12 @@ static void external_snapshot_prepare(BlkAction=
+State *common,
+>>          goto out;
+>>      }
+>> =20
+>> -    if (state->new_bs->backing !=3D NULL) {
+>> +    if (state->new_bs->drv->is_filter) {
+>> +        error_setg(errp, "Filters cannot be used as overlays");
+>> +        goto out;
+>> +    }
+>> +
+>> +    if (bdrv_filtered_cow_child(state->new_bs)) {
+>>          error_setg(errp, "The overlay already has a backing image");
+>>          goto out;
+>>      }
+>> --=20
+>> 2.21.0
+>>
 
 
---QVBiOXBN90Bdr6eYcpsqeb750ckiB4irE--
 
---h6Cg2PiRHvuxyoljmZihl55mvH3mkFln9
+--p9PtTpMyHYC89agw1KAShYkZ4YPpKE9lX--
+
+--myHKyDAxXlc4PcvsFb4SFoMxmtGn4Aud7
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl14khwACgkQ9AfbAGHV
-z0BTfAf/Zla4c9NyVFVVam5urY2CLHxakvImsM+mHC4JhlXHmKPVWfBkQE22o2C7
-oWAu6eKx2eOwCVEk92SVCMoDNmPvG9Kg709qpRYZrvFaIE32fEkKAjSqWz6MgtcY
-lui6IiWobU0s/QqohJrv7MNtb00W/dX/1rBE6Tz57h/1dD8/do5d7lD5/TNQyPwO
-U28YsrwqR0Kh3KBiwDXAmurVl9wYombisDhRLXwzZWVvJWzaN7axlN8fwlXLeEe9
-zaGb2tztdtY5y/O0EF4+0f9Tov+h2qDrd5VWu9NQtqXc9dXkBaozYK9abvUFM58l
-qzpVbaF4zxLvPBKq2TaFanbIy5TpFQ==
-=5k+8
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl14knsACgkQ9AfbAGHV
+z0DJ/wgAj/B3q2kDwaM72wGdtSLE2FWURyQ482/hODFJQglq9IqiXXy/AWKtKqoR
+/bylE8EyxR1bv180klhOLwDmp2+QT+fkxnqPBQkxT6xCNVZuyJ8XT2gRk7hovtGL
+Stj4elBG+CvedeuAkzRgU/RMwcw0VzZltUWiv028nSfVACddhkJ40+x8WXglf4w8
+dGtQHuBXjhsBp1rieGuOpzIV9l6q24lT6S63sBF3qIQf1wCuAVn6ESKD9zX7S8TQ
+Rv2IXEW21dKRxyzdZD+eYRKBgE2on2sl4rAHXy9vgS7XVU679AvcQvRJ/5SndOXM
+NCERc5TJLdlNGgw0HwLEdM50t896fA==
+=/qrC
 -----END PGP SIGNATURE-----
 
---h6Cg2PiRHvuxyoljmZihl55mvH3mkFln9--
+--myHKyDAxXlc4PcvsFb4SFoMxmtGn4Aud7--
 
