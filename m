@@ -2,62 +2,62 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URG_BIZ autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11396C5ACAE
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 19:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60A06C5ACAE
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 19:11:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEB2F2075C
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 19:11:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEB2F2075C
+	by mail.kernel.org (Postfix) with ESMTPS id 350632075C
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 19:11:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 350632075C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i881I-0000Hq-0e
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 15:11:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54091)
+	id 1i881e-0000VO-8t
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 15:11:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54167)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i87wk-0003yy-Pq
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 15:06:31 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i87wq-000475-IH
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 15:06:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i87wj-0006bH-Kz
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 15:06:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35462)
+ (envelope-from <dgilbert@redhat.com>) id 1i87wo-0006eR-Sy
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 15:06:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34208)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i87wj-0006an-C9
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 15:06:29 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i87wo-0006dr-JV
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 15:06:34 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B3A015AFE3
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 19:06:28 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id EB7963084242
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 19:06:33 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-117-243.ams2.redhat.com
  [10.36.117.243])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 874F860167;
- Wed, 11 Sep 2019 19:06:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BD0746013A;
+ Wed, 11 Sep 2019 19:06:32 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, pbonzini@redhat.com, ehabkost@redhat.com,
  berrange@redhat.com, quintela@redhat.com
-Date: Wed, 11 Sep 2019 20:06:19 +0100
-Message-Id: <20190911190622.7629-3-dgilbert@redhat.com>
+Date: Wed, 11 Sep 2019 20:06:21 +0100
+Message-Id: <20190911190622.7629-5-dgilbert@redhat.com>
 In-Reply-To: <20190911190622.7629-1-dgilbert@redhat.com>
 References: <20190911190622.7629-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Wed, 11 Sep 2019 19:06:28 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Wed, 11 Sep 2019 19:06:33 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 2/5] migration: Use automatic rcu_read
- unlock in ram.c
+Subject: [Qemu-devel] [PATCH v2 4/5] rcu: Use automatic rc_read unlock in
+ core memory/exec code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,27 +75,257 @@ Sender: "Qemu-devel"
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Use the automatic read unlocker in migration/ram.c;
-only for the cases where the unlock is at the end of the function.
+Only in the cases where nothing else interesting happens
+after the unlock.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/ram.c | 25 +++++++++----------------
- 1 file changed, 9 insertions(+), 16 deletions(-)
+ exec.c                  | 46 +++++++++++++----------------------------
+ include/exec/ram_addr.h |  8 ++-----
+ memory.c                | 15 +++++---------
+ 3 files changed, 21 insertions(+), 48 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index b2bd618a89..1bb82acfe0 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -181,14 +181,14 @@ int foreach_not_ignored_block(RAMBlockIterFunc func=
-, void *opaque)
+diff --git a/exec.c b/exec.c
+index 235d6bc883..ac3d933e1a 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1034,16 +1034,14 @@ void tb_invalidate_phys_addr(AddressSpace *as, hw=
+addr addr, MemTxAttrs attrs)
+         return;
+     }
+=20
+-    rcu_read_lock();
++    RCU_READ_LOCK_AUTO;
+     mr =3D address_space_translate(as, addr, &addr, &l, false, attrs);
+     if (!(memory_region_is_ram(mr)
+           || memory_region_is_romd(mr))) {
+-        rcu_read_unlock();
+         return;
+     }
+     ram_addr =3D memory_region_get_ram_addr(mr) + addr;
+     tb_invalidate_phys_page_range(ram_addr, ram_addr + 1, 0);
+-    rcu_read_unlock();
+ }
+=20
+ static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
+@@ -1329,14 +1327,13 @@ static void tlb_reset_dirty_range_all(ram_addr_t =
+start, ram_addr_t length)
+     end =3D TARGET_PAGE_ALIGN(start + length);
+     start &=3D TARGET_PAGE_MASK;
+=20
+-    rcu_read_lock();
++    RCU_READ_LOCK_AUTO;
+     block =3D qemu_get_ram_block(start);
+     assert(block =3D=3D qemu_get_ram_block(end - 1));
+     start1 =3D (uintptr_t)ramblock_ptr(block, start - block->offset);
+     CPU_FOREACH(cpu) {
+         tlb_reset_dirty(cpu, start1, length);
+     }
+-    rcu_read_unlock();
+ }
+=20
+ /* Note: start and end must be within the same ram block.  */
+@@ -1661,7 +1658,7 @@ void ram_block_dump(Monitor *mon)
+     RAMBlock *block;
+     char *psize;
+=20
+-    rcu_read_lock();
++    RCU_READ_LOCK_AUTO;
+     monitor_printf(mon, "%24s %8s  %18s %18s %18s\n",
+                    "Block Name", "PSize", "Offset", "Used", "Total");
+     RAMBLOCK_FOREACH(block) {
+@@ -1673,7 +1670,6 @@ void ram_block_dump(Monitor *mon)
+                        (uint64_t)block->max_length);
+         g_free(psize);
+     }
+-    rcu_read_unlock();
+ }
+=20
+ #ifdef __linux__
+@@ -1995,11 +1991,10 @@ static unsigned long last_ram_page(void)
+     RAMBlock *block;
+     ram_addr_t last =3D 0;
+=20
+-    rcu_read_lock();
++    RCU_READ_LOCK_AUTO;
+     RAMBLOCK_FOREACH(block) {
+         last =3D MAX(last, block->offset + block->max_length);
+     }
+-    rcu_read_unlock();
+     return last >> TARGET_PAGE_BITS;
+ }
+=20
+@@ -2086,7 +2081,7 @@ void qemu_ram_set_idstr(RAMBlock *new_block, const =
+char *name, DeviceState *dev)
+     }
+     pstrcat(new_block->idstr, sizeof(new_block->idstr), name);
+=20
+-    rcu_read_lock();
++    RCU_READ_LOCK_AUTO;
+     RAMBLOCK_FOREACH(block) {
+         if (block !=3D new_block &&
+             !strcmp(block->idstr, new_block->idstr)) {
+@@ -2095,7 +2090,6 @@ void qemu_ram_set_idstr(RAMBlock *new_block, const =
+char *name, DeviceState *dev)
+             abort();
+         }
+     }
+-    rcu_read_unlock();
+ }
+=20
+ /* Called with iothread lock held.  */
+@@ -2637,17 +2631,16 @@ RAMBlock *qemu_ram_block_from_host(void *ptr, boo=
+l round_offset,
+=20
+     if (xen_enabled()) {
+         ram_addr_t ram_addr;
+-        rcu_read_lock();
++        RCU_READ_LOCK_AUTO;
+         ram_addr =3D xen_ram_addr_from_mapcache(ptr);
+         block =3D qemu_get_ram_block(ram_addr);
+         if (block) {
+             *offset =3D ram_addr - block->offset;
+         }
+-        rcu_read_unlock();
+         return block;
+     }
+=20
+-    rcu_read_lock();
++    RCU_READ_LOCK_AUTO;
+     block =3D atomic_rcu_read(&ram_list.mru_block);
+     if (block && block->host && host - block->host < block->max_length) =
+{
+         goto found;
+@@ -2663,7 +2656,6 @@ RAMBlock *qemu_ram_block_from_host(void *ptr, bool =
+round_offset,
+         }
+     }
+=20
+-    rcu_read_unlock();
+     return NULL;
+=20
+ found:
+@@ -2671,7 +2663,6 @@ found:
+     if (round_offset) {
+         *offset &=3D TARGET_PAGE_MASK;
+     }
+-    rcu_read_unlock();
+     return block;
+ }
+=20
+@@ -3380,10 +3371,9 @@ MemTxResult address_space_read_full(AddressSpace *=
+as, hwaddr addr,
+     FlatView *fv;
+=20
+     if (len > 0) {
+-        rcu_read_lock();
++        RCU_READ_LOCK_AUTO;
+         fv =3D address_space_to_flatview(as);
+         result =3D flatview_read(fv, addr, attrs, buf, len);
+-        rcu_read_unlock();
+     }
+=20
+     return result;
+@@ -3397,10 +3387,9 @@ MemTxResult address_space_write(AddressSpace *as, =
+hwaddr addr,
+     FlatView *fv;
+=20
+     if (len > 0) {
+-        rcu_read_lock();
++        RCU_READ_LOCK_AUTO;
+         fv =3D address_space_to_flatview(as);
+         result =3D flatview_write(fv, addr, attrs, buf, len);
+-        rcu_read_unlock();
+     }
+=20
+     return result;
+@@ -3440,7 +3429,7 @@ static inline MemTxResult address_space_write_rom_i=
+nternal(AddressSpace *as,
+     hwaddr addr1;
+     MemoryRegion *mr;
+=20
+-    rcu_read_lock();
++    RCU_READ_LOCK_AUTO;
+     while (len > 0) {
+         l =3D len;
+         mr =3D address_space_translate(as, addr, &addr1, &l, true, attrs=
+);
+@@ -3465,7 +3454,6 @@ static inline MemTxResult address_space_write_rom_i=
+nternal(AddressSpace *as,
+         buf +=3D l;
+         addr +=3D l;
+     }
+-    rcu_read_unlock();
+     return MEMTX_OK;
+ }
+=20
+@@ -3610,10 +3598,9 @@ bool address_space_access_valid(AddressSpace *as, =
+hwaddr addr,
+     FlatView *fv;
+     bool result;
+=20
+-    rcu_read_lock();
++    RCU_READ_LOCK_AUTO;
+     fv =3D address_space_to_flatview(as);
+     result =3D flatview_access_valid(fv, addr, len, is_write, attrs);
+-    rcu_read_unlock();
+     return result;
+ }
+=20
+@@ -3668,13 +3655,12 @@ void *address_space_map(AddressSpace *as,
+     }
+=20
+     l =3D len;
+-    rcu_read_lock();
++    RCU_READ_LOCK_AUTO;
+     fv =3D address_space_to_flatview(as);
+     mr =3D flatview_translate(fv, addr, &xlat, &l, is_write, attrs);
+=20
+     if (!memory_access_is_direct(mr, is_write)) {
+         if (atomic_xchg(&bounce.in_use, true)) {
+-            rcu_read_unlock();
+             return NULL;
+         }
+         /* Avoid unbounded allocations */
+@@ -3690,7 +3676,6 @@ void *address_space_map(AddressSpace *as,
+                                bounce.buffer, l);
+         }
+=20
+-        rcu_read_unlock();
+         *plen =3D l;
+         return bounce.buffer;
+     }
+@@ -3700,7 +3685,6 @@ void *address_space_map(AddressSpace *as,
+     *plen =3D flatview_extend_translation(fv, addr, len, mr, xlat,
+                                         l, is_write, attrs);
+     ptr =3D qemu_ram_ptr_length(mr->ram_block, xlat, plen, true);
+-    rcu_read_unlock();
+=20
+     return ptr;
+ }
+@@ -3968,13 +3952,12 @@ bool cpu_physical_memory_is_io(hwaddr phys_addr)
+     hwaddr l =3D 1;
+     bool res;
+=20
+-    rcu_read_lock();
++    RCU_READ_LOCK_AUTO;
+     mr =3D address_space_translate(&address_space_memory,
+                                  phys_addr, &phys_addr, &l, false,
+                                  MEMTXATTRS_UNSPECIFIED);
+=20
+     res =3D !(memory_region_is_ram(mr) || memory_region_is_romd(mr));
+-    rcu_read_unlock();
+     return res;
+ }
+=20
+@@ -3983,14 +3966,13 @@ int qemu_ram_foreach_block(RAMBlockIterFunc func,=
+ void *opaque)
      RAMBlock *block;
      int ret =3D 0;
 =20
 -    rcu_read_lock();
 +    RCU_READ_LOCK_AUTO;
-+
-     RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+     RAMBLOCK_FOREACH(block) {
          ret =3D func(block, opaque);
          if (ret) {
              break;
@@ -105,121 +335,122 @@ index b2bd618a89..1bb82acfe0 100644
      return ret;
  }
 =20
-@@ -2398,13 +2398,12 @@ static void migration_page_queue_free(RAMState *r=
-s)
-     /* This queue generally should be empty - but in the case of a faile=
-d
-      * migration might have some droppings in.
-      */
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index a327a80cfe..38f3aaffbd 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -240,7 +240,7 @@ static inline bool cpu_physical_memory_all_dirty(ram_=
+addr_t start,
+     end =3D TARGET_PAGE_ALIGN(start + length) >> TARGET_PAGE_BITS;
+     page =3D start >> TARGET_PAGE_BITS;
+=20
 -    rcu_read_lock();
 +    RCU_READ_LOCK_AUTO;
-     QSIMPLEQ_FOREACH_SAFE(mspr, &rs->src_page_requests, next_req, next_m=
-spr) {
-         memory_region_unref(mspr->rb->mr);
-         QSIMPLEQ_REMOVE_HEAD(&rs->src_page_requests, next_req);
-         g_free(mspr);
+=20
+     blocks =3D atomic_rcu_read(&ram_list.dirty_memory[client]);
+=20
+@@ -262,8 +262,6 @@ static inline bool cpu_physical_memory_all_dirty(ram_=
+addr_t start,
+         base +=3D DIRTY_MEMORY_BLOCK_SIZE;
      }
--    rcu_read_unlock();
- }
 =20
- /**
-@@ -2425,7 +2424,8 @@ int ram_save_queue_pages(const char *rbname, ram_ad=
-dr_t start, ram_addr_t len)
-     RAMState *rs =3D ram_state;
-=20
-     ram_counters.postcopy_requests++;
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-+
-     if (!rbname) {
-         /* Reuse last RAMBlock */
-         ramblock =3D rs->last_req_rb;
-@@ -2467,12 +2467,10 @@ int ram_save_queue_pages(const char *rbname, ram_=
-addr_t start, ram_addr_t len)
-     QSIMPLEQ_INSERT_TAIL(&rs->src_page_requests, new_entry, next_req);
-     migration_make_urgent_request();
-     qemu_mutex_unlock(&rs->src_page_req_mutex);
--    rcu_read_unlock();
-=20
-     return 0;
-=20
- err:
--    rcu_read_unlock();
-     return -1;
- }
-=20
-@@ -2712,7 +2710,8 @@ static uint64_t ram_bytes_total_common(bool count_i=
-gnored)
-     RAMBlock *block;
-     uint64_t total =3D 0;
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-+
-     if (count_ignored) {
-         RAMBLOCK_FOREACH_MIGRATABLE(block) {
-             total +=3D block->used_length;
-@@ -2722,7 +2721,6 @@ static uint64_t ram_bytes_total_common(bool count_i=
-gnored)
-             total +=3D block->used_length;
-         }
-     }
--    rcu_read_unlock();
-     return total;
- }
-=20
-@@ -3086,7 +3084,7 @@ int ram_postcopy_send_discard_bitmap(MigrationState=
- *ms)
-     RAMBlock *block;
-     int ret;
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-=20
-     /* This should be our last sync, the src is now paused */
-     migration_bitmap_sync(rs);
-@@ -3107,13 +3105,11 @@ int ram_postcopy_send_discard_bitmap(MigrationSta=
-te *ms)
-              * point.
-              */
-             error_report("migration ram resized during precopy phase");
--            rcu_read_unlock();
-             return -EINVAL;
-         }
-         /* Deal with TPS !=3D HPS and huge pages */
-         ret =3D postcopy_chunk_hostpages(ms, block);
-         if (ret) {
--            rcu_read_unlock();
-             return ret;
-         }
-=20
-@@ -3128,7 +3124,6 @@ int ram_postcopy_send_discard_bitmap(MigrationState=
- *ms)
-     trace_ram_postcopy_send_discard_bitmap();
-=20
-     ret =3D postcopy_each_ram_send_discard(ms);
--    rcu_read_unlock();
-=20
-     return ret;
- }
-@@ -3149,7 +3144,7 @@ int ram_discard_range(const char *rbname, uint64_t =
-start, size_t length)
-=20
-     trace_ram_discard_range(rbname, start, length);
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-     RAMBlock *rb =3D qemu_ram_block_by_name(rbname);
-=20
-     if (!rb) {
-@@ -3169,8 +3164,6 @@ int ram_discard_range(const char *rbname, uint64_t =
-start, size_t length)
-     ret =3D ram_block_discard_range(rb, start, length);
-=20
- err:
 -    rcu_read_unlock();
 -
+     return dirty;
+ }
+=20
+@@ -315,13 +313,11 @@ static inline void cpu_physical_memory_set_dirty_fl=
+ag(ram_addr_t addr,
+     idx =3D page / DIRTY_MEMORY_BLOCK_SIZE;
+     offset =3D page % DIRTY_MEMORY_BLOCK_SIZE;
+=20
+-    rcu_read_lock();
++    RCU_READ_LOCK_AUTO;
+=20
+     blocks =3D atomic_rcu_read(&ram_list.dirty_memory[client]);
+=20
+     set_bit_atomic(offset, blocks->blocks[idx]);
+-
+-    rcu_read_unlock();
+ }
+=20
+ static inline void cpu_physical_memory_set_dirty_range(ram_addr_t start,
+diff --git a/memory.c b/memory.c
+index 61a254c3f9..5bdde7cebb 100644
+--- a/memory.c
++++ b/memory.c
+@@ -799,14 +799,13 @@ FlatView *address_space_get_flatview(AddressSpace *=
+as)
+ {
+     FlatView *view;
+=20
+-    rcu_read_lock();
++    RCU_READ_LOCK_AUTO;
+     do {
+         view =3D address_space_to_flatview(as);
+         /* If somebody has replaced as->current_map concurrently,
+          * flatview_ref returns false.
+          */
+     } while (!flatview_ref(view));
+-    rcu_read_unlock();
+     return view;
+ }
+=20
+@@ -2177,12 +2176,11 @@ int memory_region_get_fd(MemoryRegion *mr)
+ {
+     int fd;
+=20
+-    rcu_read_lock();
++    RCU_READ_LOCK_AUTO;
+     while (mr->alias) {
+         mr =3D mr->alias;
+     }
+     fd =3D mr->ram_block->fd;
+-    rcu_read_unlock();
+=20
+     return fd;
+ }
+@@ -2192,14 +2190,13 @@ void *memory_region_get_ram_ptr(MemoryRegion *mr)
+     void *ptr;
+     uint64_t offset =3D 0;
+=20
+-    rcu_read_lock();
++    RCU_READ_LOCK_AUTO;
+     while (mr->alias) {
+         offset +=3D mr->alias_offset;
+         mr =3D mr->alias;
+     }
+     assert(mr->ram_block);
+     ptr =3D qemu_map_ram_ptr(mr->ram_block, offset);
+-    rcu_read_unlock();
+=20
+     return ptr;
+ }
+@@ -2589,12 +2586,11 @@ MemoryRegionSection memory_region_find(MemoryRegi=
+on *mr,
+                                        hwaddr addr, uint64_t size)
+ {
+     MemoryRegionSection ret;
+-    rcu_read_lock();
++    RCU_READ_LOCK_AUTO;
+     ret =3D memory_region_find_rcu(mr, addr, size);
+     if (ret.mr) {
+         memory_region_ref(ret.mr);
+     }
+-    rcu_read_unlock();
      return ret;
+ }
+=20
+@@ -2602,9 +2598,8 @@ bool memory_region_present(MemoryRegion *container,=
+ hwaddr addr)
+ {
+     MemoryRegion *mr;
+=20
+-    rcu_read_lock();
++    RCU_READ_LOCK_AUTO;
+     mr =3D memory_region_find_rcu(container, addr, 1).mr;
+-    rcu_read_unlock();
+     return mr && mr !=3D container;
  }
 =20
 --=20
