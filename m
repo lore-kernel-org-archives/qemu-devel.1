@@ -2,92 +2,70 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3FD0C49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:35:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E08DC49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:35:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8913F207FC
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:35:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WbCb0yjP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8913F207FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 44D742053B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:35:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44D742053B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i83iO-0006nl-3f
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:35:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43027)
+	id 1i83iv-0007WQ-6V
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:35:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43221)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i83gs-0005da-91
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:33:51 -0400
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1i83hM-0006A4-M7
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:34:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i83gr-00083U-2S
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:33:49 -0400
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:41874)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i83gq-000834-T5
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:33:49 -0400
-Received: by mail-qk1-x741.google.com with SMTP id p10so2996234qkg.8
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 07:33:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=x3iyPwle4tJSzlcqPqOvcVP9WBz+Qjb7i4mIGZc9glQ=;
- b=WbCb0yjPRrFaDn6ixON9zexQQdWK8o73RcVHXGKkY58b/zUGHI9SsD9rRg2533IaOf
- Kn445AiGUSGFY+Fvo3wdolW2NpRW1UAmThQLn4yHooiqxBfw0jjqkvqctvs4pVoHfKOs
- VBIKJSYvtO0OXtOT24KmX44Nd0qkuudPXPokIiV17DjjNu7oKTLJNg3CpsASV9+Scdcm
- GhtIChy+LPxIt2t1cM3TLcwOT31oQDa4vbFGxB9ncJRHEEfwwWzBdir//teckkfMEgBs
- L6YSYD493hF9v1wnwQ2FUJHmET/CJXITR+zM/C+nc6Pceeyox/A6uIRkUmQII3yYBTPl
- zDVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=x3iyPwle4tJSzlcqPqOvcVP9WBz+Qjb7i4mIGZc9glQ=;
- b=CGHX4HoTeThAIhs+a/GA9zB/u1lRHK6ZUGMLyJPlSrnaLLn258IqPQIPcIJhqGo/jn
- JeTZK2DGznxG4b/BKQdEiLKwF3lzjgjW15nd5uEdWmOUNeDjWLRSvI6Bbgif71ROqBAg
- KQstoY3WTezKVq4B+D375znAPycq4C8DscoELKaRJFYKTZJv50DqlGY/Sjsc/d4HGs4Q
- +cgYAvMCVbq1zJsq++q3QADv766sQGDzTF2n1yoF9SSUVL8p/1WwVdzP2NHpzOHxQzzt
- 0Rn+jTlFl3gXUpOdA7OpexKZPK8XFLVjuoG5HK2rGTJvV6ILLMuFj/KvZF3l+ZtkMrcO
- v/7A==
-X-Gm-Message-State: APjAAAUb10eVFP5sQdpTmWUIPEi51dEUDoLLNtoWwRYY4f9LNpGnzyDN
- 0GQCIJsazGH126x4rNX3Dtnwkw==
-X-Google-Smtp-Source: APXvYqzrH7uUhX4Mrr4YVzlaOyqasX0QedSD0PvIbWbQqnWkcp4xdje7BqmgTXN4YrOBpNvWzsXGtA==
-X-Received: by 2002:a37:ef16:: with SMTP id j22mr31050565qkk.198.1568212428056; 
- Wed, 11 Sep 2019 07:33:48 -0700 (PDT)
-Received: from [192.168.5.185] (otwaon236nw-grc-01-64-229-69-35.dsl.bell.ca.
- [64.229.69.35])
- by smtp.gmail.com with ESMTPSA id v2sm6762158qtv.22.2019.09.11.07.33.46
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 11 Sep 2019 07:33:47 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20190911093951.6244-1-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <8f76ef47-0cf8-c662-0100-d416f5f2e0c1@linaro.org>
-Date: Wed, 11 Sep 2019 10:33:45 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190911093951.6244-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1i83hK-0008Gu-UH
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:34:20 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:45439 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1i83hH-0008Cc-WE; Wed, 11 Sep 2019 10:34:16 -0400
+Received: from lhreml704-cah.china.huawei.com (unknown [172.18.7.106])
+ by Forcepoint Email with ESMTP id F0AADDF8E75B0C40E743;
+ Wed, 11 Sep 2019 15:34:07 +0100 (IST)
+Received: from LHREML524-MBS.china.huawei.com ([169.254.2.65]) by
+ lhreml704-cah.china.huawei.com ([10.201.108.45]) with mapi id 14.03.0415.000; 
+ Wed, 11 Sep 2019 15:33:58 +0100
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Thread-Topic: [Qemu-devel] [PATCH-for-4.2 v10 10/11] tests: add dummy ACPI
+ tables for arm/virt board
+Thread-Index: AQHVaKCGzbvsHHTXD0ChWK1EWAGw9qcmbamAgAABfACAABQOkA==
+Date: Wed, 11 Sep 2019 14:33:57 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA83F3EAF63@lhreml524-mbs.china.huawei.com>
+References: <20190904085629.13872-1-shameerali.kolothum.thodi@huawei.com>
+ <20190904085629.13872-11-shameerali.kolothum.thodi@huawei.com>
+ <CAFEAcA8sEhgOXnj-DGo04pSnpTObO+EeC94yrdGEikKq0=2QeA@mail.gmail.com>
+ <20190911155015.3627b072@redhat.com>
+ <20190911095332-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190911095332-mutt-send-email-mst@kernel.org>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::741
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: fix signal delivery for
- ppc64abi32
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.237]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 185.176.76.210
+Subject: Re: [Qemu-devel] [PATCH-for-4.2 v10 10/11] tests: add dummy ACPI
+ tables for arm/virt board
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,28 +77,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-ppc@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>, rth@twiddle.net
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Samuel Ortiz <sameo@linux.intel.com>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU
+ Developers <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ "xuwei \(O\)" <xuwei5@huawei.com>,
+ "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>,
+ Laszlo Ersek <lersek@redhat.com>, Eric Auger <eric.auger@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/11/19 5:39 AM, Alex Bennée wrote:
-> We were incorrectly setting NIP resulting in a segfault. This fixes
-> linux-test for this ABI.
 
-Perhaps better:
-We were incorrectly using the 64-bit AIX ABI instead of the 32-bit SYSV ABI for
-setting NIP for the signal handler.
 
-?
+> -----Original Message-----
+> From: Qemu-devel
+> [mailto:qemu-devel-bounces+shameerali.kolothum.thodi=3Dhuawei.com@nongn
+> u.org] On Behalf Of Michael S. Tsirkin
+> Sent: 11 September 2019 14:56
+> To: Igor Mammedov <imammedo@redhat.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>; Samuel Ortiz
+> <sameo@linux.intel.com>; Ard Biesheuvel <ard.biesheuvel@linaro.org>;
+> QEMU Developers <qemu-devel@nongnu.org>; Shameerali Kolothum Thodi
+> <shameerali.kolothum.thodi@huawei.com>; Linuxarm
+> <linuxarm@huawei.com>; Shannon Zhao <shannon.zhaosl@gmail.com>;
+> qemu-arm <qemu-arm@nongnu.org>; xuwei (O) <xuwei5@huawei.com>; Eric
+> Auger <eric.auger@redhat.com>; sebastien.boeuf@intel.com; Laszlo Ersek
+> <lersek@redhat.com>
+> Subject: Re: [Qemu-devel] [PATCH-for-4.2 v10 10/11] tests: add dummy ACPI
+> tables for arm/virt board
+>=20
+> On Wed, Sep 11, 2019 at 03:50:15PM +0200, Igor Mammedov wrote:
+> > On Wed, 11 Sep 2019 13:57:06 +0100
+> > Peter Maydell <peter.maydell@linaro.org> wrote:
+> >
+> > > On Wed, 4 Sep 2019 at 09:58, Shameer Kolothum
+> > > <shameerali.kolothum.thodi@huawei.com> wrote:
+> > > >
+> > > > This patch is in preparation for adding numamem and memhp tests
+> > > > to arm/virt board so that 'make check' is happy. This may not
+> > > > be required once the scripts are run and new tables are
+> > > > generated with ".numamem" and ".memhp" extensions.
+> > > >
+> > > > Signed-off-by: Shameer Kolothum
+> <shameerali.kolothum.thodi@huawei.com>
+> > > > ---
+> > > > I am not sure this is the right way to do this. But without this, w=
+hen
+> > > > the numamem and memhp tests are added, you will get,
+> > > >
+> > > > Looking for expected file 'tests/data/acpi/virt/SRAT.numamem'
+> > > > Looking for expected file 'tests/data/acpi/virt/SRAT'
+> > > > **
+> > > > ERROR:tests/bios-tables-test.c:327:load_expected_aml: assertion fai=
+led:
+> (exp_sdt.aml_file)
+> > > >
+> > > > ---
+> > > >  tests/data/acpi/virt/SLIT | Bin 0 -> 48 bytes
+> > > >  tests/data/acpi/virt/SRAT | Bin 0 -> 224 bytes
+> > > >  2 files changed, 0 insertions(+), 0 deletions(-)
+> > > >  create mode 100644 tests/data/acpi/virt/SLIT
+> > > >  create mode 100644 tests/data/acpi/virt/SRAT
+> > >
+> > > Do the tests pass with this patch and without the
+> > > patch that adds the tests? (That is, can we keep the
+> > > two patches separate without breaking bisection, or
+> > > do we need to squash them together?)
+> > >
+> > > I'll leave it to somebody who understands the ACPI
+> > > tests stuff to answer whether there's a better way to
+> > I'd squash this patch into 11/11 test case,
+>=20
+>=20
+> Pls don't - the way to add this is to add the files in question to
+> tests/bios-tables-test-allowed-diff.h.
 
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  linux-user/ppc/signal.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+IIRC, I have tried that but didn't work. I think the reason being, these
+are new test cases for arm/virt and both SRAT and SLIT tables are not
+present in the tests/data/acpi/virt folder.
 
-Anyway,
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+As you can see the error is different,
+
+> > > > Looking for expected file 'tests/data/acpi/virt/SRAT.numamem'
+> > > > Looking for expected file 'tests/data/acpi/virt/SRAT'
+> > > > **
+> > > > ERROR:tests/bios-tables-test.c:327:load_expected_aml: assertion fai=
+led:
+
+Not sure I missed anything though.
+
+Thanks,
+Shameer
+
+> Maintainer will create a separate commit updating
+> the binaries and removing them from the whitelist.
+>=20
+> This way things like rebase work seemlessly.
+>=20
+>=20
+> > CCing Michael (since he's the one who applies ACPI patches)
+> >
+> > > do this.
+> > >
+> > > thanks
+> > > -- PMM
+> > >
+
 
