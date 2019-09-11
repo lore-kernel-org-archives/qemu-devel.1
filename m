@@ -2,66 +2,62 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29822C5ACAE
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 13:09:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4E4EC49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 13:11:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F409D206A5
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 13:09:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F409D206A5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 803582075C
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 13:11:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 803582075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i82N7-0004L2-Ni
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 09:09:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55985)
+	id 1i82Ov-0006iP-IT
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 09:11:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56235)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i82LO-0002tv-JT
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 09:07:35 -0400
+ (envelope-from <imammedo@redhat.com>) id 1i82Mn-0004NN-HK
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 09:09:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i82LN-00006F-2J
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 09:07:34 -0400
-Resent-Date: Wed, 11 Sep 2019 09:07:34 -0400
-Resent-Message-Id: <E1i82LN-00006F-2J@eggs.gnu.org>
-Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21935)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i82LM-00005V-R0
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 09:07:33 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568207229; cv=none; d=zoho.com; s=zohoarc; 
- b=ZuKD6TArSXxTLoR3Dx9ftF9d9kZ//iE7eXPolM8grZuKni0gCSHAETx8a8fLV1hLcWn/KGnxzWaXh0wiyWq40UmMTQFMewR2JOCmfQXZBOqhqsWoV+MNbpXA8qljpjTuhahkScIcDxXDOJAZnw0p4PHgPKYzKr7P4aofzgjCd1U=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1568207229;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=DOrUUlmPJ0I8lwm9ZG7nAT5Z9PndFeubSspQ7IbnNWk=; 
- b=HOs40hz5bIR3TMaaDvpMiDuum73x9TPjXotGhQ1QYFHG/8OHE5YBCOWQuDzRy3Ij8kQ4DNoEAkfHIQVWduOXoLwVJQuiQRPyVym1vpFAWhhqJjQYXluOUmFkpwrFK+0agJUjrj01MqChlAgl+s4COu3AGdXEhBvnuETJ+ZV3fvY=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1568207227336193.1637134517805;
- Wed, 11 Sep 2019 06:07:07 -0700 (PDT)
-In-Reply-To: <20190911014353.5926-1-richard.henderson@linaro.org>
-Message-ID: <156820722618.19232.2414632091908077912@5dec9699b7de>
+ (envelope-from <imammedo@redhat.com>) id 1i82Mm-0000mX-DA
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 09:09:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58004)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1i82Mk-0000kO-0Z; Wed, 11 Sep 2019 09:08:58 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 187502A09B0;
+ Wed, 11 Sep 2019 13:08:57 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7D58860852;
+ Wed, 11 Sep 2019 13:08:52 +0000 (UTC)
+Date: Wed, 11 Sep 2019 15:08:51 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Message-ID: <20190911150851.7635b9de@redhat.com>
+In-Reply-To: <20190904085629.13872-8-shameerali.kolothum.thodi@huawei.com>
+References: <20190904085629.13872-1-shameerali.kolothum.thodi@huawei.com>
+ <20190904085629.13872-8-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: richard.henderson@linaro.org
-Date: Wed, 11 Sep 2019 06:07:07 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Wed, 11 Sep 2019 13:08:57 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.59
-Subject: Re: [Qemu-devel] [PATCH 0/3] cputlb: Adjust tlb bswap implementation
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH-for-4.2 v10 07/11] hw/arm: Factor out
+ powerdown notifier from GPIO
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,47 +69,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, mark.cave-ayland@ilande.co.uk,
- qemu-devel@nongnu.org, tony.nguyen@bt.com
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, shannon.zhaosl@gmail.com,
+ ard.biesheuvel@linaro.org, qemu-devel@nongnu.org, xuwei5@hisilicon.com,
+ linuxarm@huawei.com, eric.auger@redhat.com, qemu-arm@nongnu.org,
+ sebastien.boeuf@intel.com, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxMTAxNDM1My41OTI2
-LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWls
-ZWQgdGhlIGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0
-ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tl
-ciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRv
-czcgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9X
-X0VOVj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpsaWJ1ZGV2ICAg
-ICAgICAgICBubwpkZWZhdWx0IGRldmljZXMgICB5ZXMKCndhcm5pbmc6IFB5dGhvbiAyIHN1cHBv
-cnQgaXMgZGVwcmVjYXRlZAp3YXJuaW5nOiBQeXRob24gMyB3aWxsIGJlIHJlcXVpcmVkIGZvciBi
-dWlsZGluZyBmdXR1cmUgdmVyc2lvbnMgb2YgUUVNVQoKTk9URTogY3Jvc3MtY29tcGlsZXJzIGVu
-YWJsZWQ6ICAnY2MnCiAgR0VOICAgICB4ODZfNjQtc29mdG1tdS9jb25maWctZGV2aWNlcy5tYWsu
-dG1wCi0tLQpNZW1vcnkgY29udGVudCBpbmNvbnNpc3RlbmN5IGF0IDQwMWFhMDAwIGZpcnN0X2J5
-dGUgPSBlNCBsYXN0X2J5dGUgPSBlNCBjdXJyZW50ID0gZTUgaGl0X2VkZ2UgPSAwCiAgVEVTVCAg
-ICBjaGVjay1xdGVzdC14ODZfNjQ6IHRlc3RzL2FoY2ktdGVzdAphbmQgaW4gYW5vdGhlciAyNTE3
-MyBwYWdlcyoqCkVSUk9SOi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9taWdyYXRpb24tdGVzdC5j
-OjM0MjpjaGVja19ndWVzdHNfcmFtOiBhc3NlcnRpb24gZmFpbGVkOiAoYmFkID09IDApCkVSUk9S
-IC0gQmFpbCBvdXQhIEVSUk9SOi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9taWdyYXRpb24tdGVz
-dC5jOjM0MjpjaGVja19ndWVzdHNfcmFtOiBhc3NlcnRpb24gZmFpbGVkOiAoYmFkID09IDApCm1h
-a2U6ICoqKiBbY2hlY2stcXRlc3QtYWFyY2g2NF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBm
-b3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIFRFU1QgICAgY2hlY2stdW5pdDogdGVzdHMvdGVzdC1h
-aW8tbXVsdGl0aHJlYWQKLS0tCiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDI1MgpQYXNzZWQgYWxs
-IDEwNiB0ZXN0cwoqKgpFUlJPUjovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvYm9vdC1zZWN0b3Iu
-YzoxNjE6Ym9vdF9zZWN0b3JfdGVzdDogYXNzZXJ0aW9uIGZhaWxlZCAoc2lnbmF0dXJlID09IFNJ
-R05BVFVSRSk6ICgweDAwMDAwMDAwID09IDB4MDAwMGRlYWQpCkVSUk9SIC0gQmFpbCBvdXQhIEVS
-Uk9SOi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9ib290LXNlY3Rvci5jOjE2MTpib290X3NlY3Rv
-cl90ZXN0OiBhc3NlcnRpb24gZmFpbGVkIChzaWduYXR1cmUgPT0gU0lHTkFUVVJFKTogKDB4MDAw
-MDAwMDAgPT0gMHgwMDAwZGVhZCkKbWFrZTogKioqIFtjaGVjay1xdGVzdC14ODZfNjRdIEVycm9y
-IDEKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9j
-a2VyL2RvY2tlci5weSIsIGxpbmUgNjU5LCBpbiA8bW9kdWxlPgoKClRoZSBmdWxsIGxvZyBpcyBh
-dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA5MTEwMTQzNTMuNTkyNi0x
-LXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9z
-Ny8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
-IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Wed, 4 Sep 2019 09:56:25 +0100
+Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+
+> This is in preparation of using GED device for
+> system_powerdown event. Make the powerdown notifier
+> registration independent of create_gpio() fn.
+> 
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  hw/arm/virt.c         | 12 ++++--------
+>  include/hw/arm/virt.h |  1 +
+>  2 files changed, 5 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 95accc28f1..89ee37d7de 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -791,10 +791,6 @@ static void virt_powerdown_req(Notifier *n, void *opaque)
+>      qemu_set_irq(qdev_get_gpio_in(gpio_key_dev, 0), 1);
+>  }
+>  
+> -static Notifier virt_system_powerdown_notifier = {
+> -    .notify = virt_powerdown_req
+> -};
+> -
+>  static void create_gpio(const VirtMachineState *vms, qemu_irq *pic)
+>  {
+>      char *nodename;
+> @@ -835,10 +831,6 @@ static void create_gpio(const VirtMachineState *vms, qemu_irq *pic)
+>                            KEY_POWER);
+>      qemu_fdt_setprop_cells(vms->fdt, "/gpio-keys/poweroff",
+>                             "gpios", phandle, 3, 0);
+> -
+> -    /* connect powerdown request */
+> -    qemu_register_powerdown_notifier(&virt_system_powerdown_notifier);
+> -
+>      g_free(nodename);
+>  }
+>  
+> @@ -1730,6 +1722,10 @@ static void machvirt_init(MachineState *machine)
+>          vms->acpi_dev = create_acpi_ged(vms, pic);
+>      }
+>  
+> +     /* connect powerdown request */
+> +     vms->powerdown_notifier.notify = virt_powerdown_req;
+> +     qemu_register_powerdown_notifier(&vms->powerdown_notifier);
+> +
+>      /* Create mmio transports, so the user can create virtio backends
+>       * (which will be automatically plugged in to the transports). If
+>       * no backend is created the transport will just sit harmlessly idle.
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index 577ee49b4b..0b41083e9d 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -137,6 +137,7 @@ typedef struct {
+>      int psci_conduit;
+>      hwaddr highest_gpa;
+>      DeviceState *acpi_dev;
+> +    Notifier powerdown_notifier;
+>  } VirtMachineState;
+>  
+>  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
 
 
