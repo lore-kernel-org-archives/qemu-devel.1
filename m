@@ -2,67 +2,79 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E58CFC5ACAE
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 10:37:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 282FEC49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 10:50:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF0F12087E
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 10:37:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF0F12087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E4D732087E
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 10:50:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fyhucoPV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4D732087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i800L-0001A1-Vi
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 06:37:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54831)
+	id 1i80D0-0004fK-2Y
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 06:50:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57313)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i7zze-0000cg-8D
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 06:36:59 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i80CC-00048i-Ay
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 06:49:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i7zzd-0001g9-1G
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 06:36:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:62184)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>)
- id 1i7zza-0001f1-7S; Wed, 11 Sep 2019 06:36:54 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2336F30A5408;
- Wed, 11 Sep 2019 10:36:53 +0000 (UTC)
-Received: from work-vm (ovpn-117-243.ams2.redhat.com [10.36.117.243])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 25BAF6017E;
- Wed, 11 Sep 2019 10:36:47 +0000 (UTC)
-Date: Wed, 11 Sep 2019 11:36:45 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Beata Michalska <beata.michalska@linaro.org>
-Message-ID: <20190911103645.GF2894@work-vm>
-References: <20190910095610.4546-1-beata.michalska@linaro.org>
- <20190910095610.4546-4-beata.michalska@linaro.org>
- <20190910102601.GA2797@work-vm>
- <CADSWDzs_Cof-L8dGBeYVEY1dNx4Ot6sNcAKtCrvcxZW-3+KUvA@mail.gmail.com>
- <20190910131617.GC2797@work-vm>
- <CADSWDzuuWqBF9rP57Zv7jFPKUhFdVLq-O_uqs29i4dAFz+CgUA@mail.gmail.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1i80CA-0007im-Te
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 06:49:55 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41450)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i80CA-0007if-Oi
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 06:49:54 -0400
+Received: by mail-ot1-x344.google.com with SMTP id g16so6910638otp.8
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 03:49:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ogSBpD6x036yqydDtTC8Bkfrmdu9ILAAteHtymvhnIU=;
+ b=fyhucoPVi0Boo6kyFewyc26ZmNAfB3brpoRyOQNEmCdldYjfVnx59PJVi7oHa1Ivhs
+ hvEuKcm1Z6MleloSBNrbx6P3jLah2M+c3DQ7nJrevA4oOFyDRHYFLSZgsDC2OP3pXUBu
+ mT7/Wpd2mNs7FE3yvwA+OuLZVK0YqBaxKHJhsBwBWiHbeWP9x2h+9aXHns/sCN7DFzgv
+ WJVKFjbmjgNR3NUvxT9Lv6urVVY8oyZyi9trTC90Wj3Zc7iQjDKW04Hj59rZNexQciJb
+ 3gRMtUXSNfVZINrF4bz/46lQe6nlcNpd0tkWBZ4geYXBGwxvkHHutg6+h0Z4LfMYUMwW
+ WaIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ogSBpD6x036yqydDtTC8Bkfrmdu9ILAAteHtymvhnIU=;
+ b=H6RbShpXgliLKojaKTtqQbzBOIFastdE9mtcvklv7gDwLFcct9rG+mGeo3dOOQeIWE
+ oFgmAsNFG+VNhIcu7ch2+hPVJgHaxErxAcKQvzKp0shbtZftuhpxpRVK4wEAivokeVWN
+ mBx+LQfnGFR1fb3rAOr3qWKMb1OMSgqSgx8ZfzIl03iikmFKIT+WfoQqapt05Xoaprro
+ en6nmw49ffKBzhCUBlr6kfPehnlfNFA/lthmSRoLYx7voudwZp9DM2VXtxH6a5OHv1wr
+ 3fyYQT4yzcP4LOWFE+I7wg9KV9ssT3lJTCfYoT8u20tFuuCoNQe6fpJ+gEcQQQWS1d22
+ zZ9g==
+X-Gm-Message-State: APjAAAUsPH/3z/YSXoFPGskVX6nf7Jix8EH9Wt/ZghCpXVhtA5IJNjtn
+ f+YMfmM36x2/Uy/F6H+srtwiXJFlylgdKM4uR0qeOA==
+X-Google-Smtp-Source: APXvYqwnZx51p6gaNJJzjiYUrRDEHH2TYYEHqwMGVw4toJAyvmbsFaa2DjWq0C4wBfwJPBgrzB5AdmKlhx42rn/QX+c=
+X-Received: by 2002:a9d:5e10:: with SMTP id d16mr31174212oti.91.1568198993771; 
+ Wed, 11 Sep 2019 03:49:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CADSWDzuuWqBF9rP57Zv7jFPKUhFdVLq-O_uqs29i4dAFz+CgUA@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Wed, 11 Sep 2019 10:36:53 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/4] migration: ram: Switch to ram block
- writeback
+References: <cover.1567750222.git.alistair@alistair23.me>
+In-Reply-To: <cover.1567750222.git.alistair@alistair23.me>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 11 Sep 2019 11:49:43 +0100
+Message-ID: <CAFEAcA8gLzitZ8OKU+Ht79fsU1BOguxEu9FvafD0vjR9cJKx7A@mail.gmail.com>
+To: Alistair Francis <alistair@alistair23.me>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH v4 0/6] Add the STM32F405 and Netduino Plus
+ 2 machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,113 +86,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, quintela@redhat.com,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- shameerali.kolothum.thodi@huawei.com, eric.auger@redhat.com,
- qemu-arm@nongnu.org, pbonzini@redhat.com
+Cc: Alistair Francis <alistair23@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Beata Michalska (beata.michalska@linaro.org) wrote:
-> On Tue, 10 Sep 2019 at 14:16, Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
-> >
-> > * Beata Michalska (beata.michalska@linaro.org) wrote:
-> > > On Tue, 10 Sep 2019 at 12:26, Dr. David Alan Gilbert
-> > > <dgilbert@redhat.com> wrote:
-> > > >
-> > > > * Beata Michalska (beata.michalska@linaro.org) wrote:
-> > > > > Switch to ram block writeback for pmem migration.
-> > > > >
-> > > > > Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
-> > > > > ---
-> > > > >  migration/ram.c | 5 +----
-> > > > >  1 file changed, 1 insertion(+), 4 deletions(-)
-> > > > >
-> > > > > diff --git a/migration/ram.c b/migration/ram.c
-> > > > > index b01a37e7ca..8ea0bd63fc 100644
-> > > > > --- a/migration/ram.c
-> > > > > +++ b/migration/ram.c
-> > > > > @@ -33,7 +33,6 @@
-> > > > >  #include "qemu/bitops.h"
-> > > > >  #include "qemu/bitmap.h"
-> > > > >  #include "qemu/main-loop.h"
-> > > > > -#include "qemu/pmem.h"
-> > > > >  #include "xbzrle.h"
-> > > > >  #include "ram.h"
-> > > > >  #include "migration.h"
-> > > > > @@ -4064,9 +4063,7 @@ static int ram_load_cleanup(void *opaque)
-> > > > >      RAMBlock *rb;
-> > > > >
-> > > > >      RAMBLOCK_FOREACH_NOT_IGNORED(rb) {
-> > > > > -        if (ramblock_is_pmem(rb)) {
-> > > > > -            pmem_persist(rb->host, rb->used_length);
-> > > > > -        }
-> > > > > +        qemu_ram_block_writeback(rb);
-> > > >
-> > > > ACK for migration
-> > > >
-> > > > Although I do worry that if you really have pmem hardware, is it better
-> > > > to fail the migration if you don't have libpmem available?
-> > >
-> > > According to the PMDG man page, pmem_persist is supposed to be
-> > > equivalent for the msync.
-> >
-> > OK, but you do define qemu_ram_block_writeback to fall back to fdatasync;
-> > so that would be too little?
-> 
-> Actually it shouldn't. All will end-up in vfs_fsync_range; msync will
-> narrow the range.
-> fdatasync will trigger the same call just that with a wider range. At
-> least for Linux.
-> fdatasync will also fallback to fsync if it is not available.
-> So it's going from the best case scenario (as of performance and range of mem
-> to be synced) towards the worst case one.
-> 
-> I should probably double-check earlier versions of Linux.
-> I'll also try to verify that for other host variants.
+On Fri, 6 Sep 2019 at 07:10, Alistair Francis <alistair@alistair23.me> wrote:
+>
+>
+> Now that the Arm-M4 CPU has been added to QEMU we can add the Netduino
+> Plus 2 machine. This is very similar to the STM32F205 and Netduino 2 SoC
+> and machine.
+>
+> v4:
+>  - Rebase on master
+> v3:
+>  - Remove custom reset handler
+>  - Add init-entry and init-sp properties
+>  - Rebase on master (including Kconfig changes)
+> v2:
+>  - Reorder patchset
+>  - Return the kernel entry point instead of using a pointer
+>  - Address Peter's comments
+>
+>
+> Alistair Francis (6):
+>   armv7m: Allow entry information to be returned
+>   target/arm: Allow setting M mode entry and sp
+>   hw/misc: Add the STM32F4xx Sysconfig device
+>   hw/misc: Add the STM32F4xx EXTI device
+>   hw/arm: Add the STM32F4xx SoC
+>   hw/arm: Add the Netduino Plus 2
 
-Well I guess it should probably follow whatever Posix says;  it's OK to
-make Linux specific assumptions for Linux specific bits - but you can't
-do it by code examination to guarantee it'll be right for other
-platforms, especially if this is in code ifdef'd for portability.
-Also it needs commenting to explain why it's safe to avoid someone else
-asking this question.
+What are the changes for setting initial SP and PC for?
+Why is this SoC special? Is it different from the
+stm32f205 SoC we model already?
 
-> BTW: Thank you for having a look at the changes.
+I'm not in general a fan of individual board models having
+their own custom behaviour for -kernel. The inconsistencies
+between architectures and between A- and M- profile are
+awkward enough as it is...
 
-No problem.
-
-Dave
-
-> BR
-> Beata
-> 
-> >
-> > > It's just more performant. So in case of real pmem hardware it should
-> > > be all good.
-> > >
-> > > [http://pmem.io/pmdk/manpages/linux/v1.2/libpmem.3.html]
-> >
-> > Dave
-> >
-> > >
-> > > BR
-> > > Beata
-> > > >
-> > > > Dave
-> > > >
-> > > > >      }
-> > > > >
-> > > > >      xbzrle_load_cleanup();
-> > > > > --
-> > > > > 2.17.1
-> > > > >
-> > > > --
-> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
 
