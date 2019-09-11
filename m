@@ -2,61 +2,88 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E5FBECDE20
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:33:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27ED9ECDE20
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:40:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E991F2089F
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:33:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E991F2089F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EB1BD2067B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:40:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KcKpCX6A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB1BD2067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7z0D-0004uA-Ow
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 05:33:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42947)
+	id 1i7z7F-0007nE-3p
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 05:40:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44198)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1i7yyY-0003sd-W1
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:31:50 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i7z6W-0007DD-Ho
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:40:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1i7yyX-0005k1-2f
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:31:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:28376)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1i7yyV-0005j1-MN
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:31:44 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BCA3D3D966;
- Wed, 11 Sep 2019 09:31:40 +0000 (UTC)
-Received: from dhcp-17-64.lcy.redhat.com (unknown [10.42.17.64])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0B1EA5D6C8;
- Wed, 11 Sep 2019 09:31:36 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1i7z6V-0002Fg-F4
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:40:00 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33580)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i7z6V-0002DH-7u
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:39:59 -0400
+Received: by mail-wm1-x342.google.com with SMTP id r17so1768294wme.0
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 02:39:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=+8d2MvAAXsyWEC9Rv0xA5bQQYYz6ijsyBtgTcHChhLI=;
+ b=KcKpCX6AcaOQdOucKd8XCuP8eCnM5tcWD6r7lWvr0qqNiDUc3OTIxes/Rf4rmEhvBV
+ FZChUI2BWxrIm1/7ruhLu2fGavEV+qeqR+l+UosVQ+P1rkoxxWqYpyTVwVOKZPQYS/Eg
+ izeINX0wHnwo26ECvUMeaxpmT7LMGufosgtjO18XIgoR8lmFBSCDJn7qekvBxxuVLljZ
+ P2uqcIeMATyuEp88IGFxdWKXmwELNWzTYwuYpOR7fnNYPf0EAWpXOQDHCIklCZEzaz+u
+ nKvll+8hUVlzMuScrIwdFeTBFjblCgyFTkW6jyOo5s1kKD411o/UbEJjvYVc/4C19XF8
+ xriw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=+8d2MvAAXsyWEC9Rv0xA5bQQYYz6ijsyBtgTcHChhLI=;
+ b=GH11ULxCoIvr4hAjmfnSVJ9TCZaobYVszJC6aV4KScDNLR7acxDpOP4VMM0alk2Vyi
+ PTYRnZbiGz8XuBqr7PiTI3ruwiNx8bCe/7puR3cm/EcQaKkQDcqImEkDlQGSerk3APvR
+ kQC85pevbLLeNk1jo20pR/26etBhOFqbx4V91a180uDl+lfBYLYDbpnJG6qIzparP41I
+ zQOvMoOxfcGLi9LiiB2EWyEJB5xXeOTC8tnYwKJ2wJQ3aJ5SbN/F+7Yrzcj7J+0nj/v6
+ ju0xa+ENFmItEWNJETxscwj+Gav8HlQWSe3It8p239PANAsA/JP7fc8AYDceRMWjnwLB
+ 6dmQ==
+X-Gm-Message-State: APjAAAX3TIPJjvZJ2542GSE1ORukjw8OzbG4Yl/c13+bLyHfoonft7XJ
+ fEsT5cGCpoJy9ZzHqMcnDRV22w==
+X-Google-Smtp-Source: APXvYqwDrqROyfKZtP6LKyIILGv6T5TsFMHj9B1QiIfI7TvcYIto0SqvxGE/IKGbQ5uQ06BEKtds8A==
+X-Received: by 2002:a05:600c:2152:: with SMTP id
+ v18mr3218988wml.177.1568194797787; 
+ Wed, 11 Sep 2019 02:39:57 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id h7sm2377246wmb.34.2019.09.11.02.39.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 11 Sep 2019 02:39:57 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 5E8B81FF87;
+ Wed, 11 Sep 2019 10:39:56 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 11 Sep 2019 10:31:35 +0100
-Message-Id: <20190911093135.27010-2-berrange@redhat.com>
-In-Reply-To: <20190911093135.27010-1-berrange@redhat.com>
-References: <20190911093135.27010-1-berrange@redhat.com>
+Date: Wed, 11 Sep 2019 10:39:51 +0100
+Message-Id: <20190911093951.6244-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Wed, 11 Sep 2019 09:31:40 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 1/1] tests: make filemonitor test more robust to
- event ordering
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PATCH] target/ppc: fix signal delivery for ppc64abi32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,147 +95,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Wei Yang <richardw.yang@linux.intel.com>, Peter Xu <peterx@redhat.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>, richard.henderson@linaro.org,
+ Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ordering of events that are emitted during the rmdir
-test have changed with kernel >=3D 5.3. Semantically both
-new & old orderings are correct, so we must be able to
-cope with either.
+We were incorrectly setting NIP resulting in a segfault. This fixes
+linux-test for this ABI.
 
-To cope with this, when we see an unexpected event, we
-push it back onto the queue and look and the subsequent
-event to see if that matches instead.
-
-Tested-by: Peter Xu <peterx@redhat.com>
-Tested-by: Wei Yang <richardw.yang@linux.intel.com>
-Tested-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/test-util-filemonitor.c | 43 +++++++++++++++++++++++++++--------
- 1 file changed, 34 insertions(+), 9 deletions(-)
+ linux-user/ppc/signal.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/tests/test-util-filemonitor.c b/tests/test-util-filemonitor.=
-c
-index 46e781c022..301cd2db61 100644
---- a/tests/test-util-filemonitor.c
-+++ b/tests/test-util-filemonitor.c
-@@ -45,6 +45,11 @@ typedef struct {
-     const char *filedst;
-     int64_t *watchid;
-     int eventid;
-+    /*
-+     * Only valid with OP_EVENT - this event might be
-+     * swapped with the next OP_EVENT
-+     */
-+    bool swapnext;
- } QFileMonitorTestOp;
-=20
- typedef struct {
-@@ -98,6 +103,10 @@ qemu_file_monitor_test_handler(int64_t id,
-     QFileMonitorTestData *data =3D opaque;
-     QFileMonitorTestRecord *rec =3D g_new0(QFileMonitorTestRecord, 1);
-=20
-+    if (debug) {
-+        g_printerr("Queue event id %" PRIx64 " event %d file %s\n",
-+                   id, event, filename);
-+    }
-     rec->id =3D id;
-     rec->event =3D event;
-     rec->filename =3D g_strdup(filename);
-@@ -125,7 +134,8 @@ qemu_file_monitor_test_record_free(QFileMonitorTestRe=
-cord *rec)
-  * to wait for the event to be queued for us.
-  */
- static QFileMonitorTestRecord *
--qemu_file_monitor_test_next_record(QFileMonitorTestData *data)
-+qemu_file_monitor_test_next_record(QFileMonitorTestData *data,
-+                                   QFileMonitorTestRecord *pushback)
- {
-     GTimer *timer =3D g_timer_new();
-     QFileMonitorTestRecord *record =3D NULL;
-@@ -139,9 +149,15 @@ qemu_file_monitor_test_next_record(QFileMonitorTestD=
-ata *data)
-     }
-     if (data->records) {
-         record =3D data->records->data;
--        tmp =3D data->records;
--        data->records =3D g_list_remove_link(data->records, tmp);
--        g_list_free(tmp);
-+        if (pushback) {
-+            data->records->data =3D pushback;
-+        } else {
-+            tmp =3D data->records;
-+            data->records =3D g_list_remove_link(data->records, tmp);
-+            g_list_free(tmp);
-+        }
-+    } else if (pushback) {
-+        qemu_file_monitor_test_record_free(pushback);
-     }
-     qemu_mutex_unlock(&data->lock);
-=20
-@@ -158,13 +174,15 @@ static bool
- qemu_file_monitor_test_expect(QFileMonitorTestData *data,
-                               int64_t id,
-                               QFileMonitorEvent event,
--                              const char *filename)
-+                              const char *filename,
-+                              bool swapnext)
- {
-     QFileMonitorTestRecord *rec;
-     bool ret =3D false;
-=20
--    rec =3D qemu_file_monitor_test_next_record(data);
-+    rec =3D qemu_file_monitor_test_next_record(data, NULL);
-=20
-+ retry:
-     if (!rec) {
-         g_printerr("Missing event watch id %" PRIx64 " event %d file %s\=
-n",
-                    id, event, filename);
-@@ -172,6 +190,11 @@ qemu_file_monitor_test_expect(QFileMonitorTestData *=
-data,
-     }
-=20
-     if (id !=3D rec->id) {
-+        if (swapnext) {
-+            rec =3D qemu_file_monitor_test_next_record(data, rec);
-+            swapnext =3D false;
-+            goto retry;
-+        }
-         g_printerr("Expected watch id %" PRIx64 " but got %" PRIx64 "\n"=
-,
-                    id, rec->id);
-         goto cleanup;
-@@ -347,7 +370,8 @@ test_file_monitor_events(void)
-           .filesrc =3D "fish", },
-         { .type =3D QFILE_MONITOR_TEST_OP_EVENT,
-           .filesrc =3D "", .watchid =3D &watch4,
--          .eventid =3D QFILE_MONITOR_EVENT_IGNORED },
-+          .eventid =3D QFILE_MONITOR_EVENT_IGNORED,
-+          .swapnext =3D true },
-         { .type =3D QFILE_MONITOR_TEST_OP_EVENT,
-           .filesrc =3D "fish", .watchid =3D &watch0,
-           .eventid =3D QFILE_MONITOR_EVENT_DELETED },
-@@ -493,8 +517,9 @@ test_file_monitor_events(void)
-                 g_printerr("Event id=3D%" PRIx64 " event=3D%d file=3D%s\=
-n",
-                            *op->watchid, op->eventid, op->filesrc);
-             }
--            if (!qemu_file_monitor_test_expect(
--                    &data, *op->watchid, op->eventid, op->filesrc))
-+            if (!qemu_file_monitor_test_expect(&data, *op->watchid,
-+                                               op->eventid, op->filesrc,
-+                                               op->swapnext))
-                 goto cleanup;
-             break;
-         case QFILE_MONITOR_TEST_OP_CREATE:
---=20
-2.21.0
+diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
+index 619a56950df..5b82af6cb62 100644
+--- a/linux-user/ppc/signal.c
++++ b/linux-user/ppc/signal.c
+@@ -501,7 +501,9 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
+     int i, err = 0;
+ #if defined(TARGET_PPC64)
+     struct target_sigcontext *sc = 0;
++#if !defined(TARGET_ABI32)
+     struct image_info *image = ((TaskState *)thread_cpu->opaque)->info;
++#endif
+ #endif
+ 
+     rt_sf_addr = get_sigframe(ka, env, sizeof(*rt_sf));
+@@ -557,7 +559,7 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
+     env->gpr[5] = (target_ulong) h2g(&rt_sf->uc);
+     env->gpr[6] = (target_ulong) h2g(rt_sf);
+ 
+-#if defined(TARGET_PPC64)
++#if defined(TARGET_PPC64) && !defined(TARGET_ABI32)
+     if (get_ppc64_abi(image) < 2) {
+         /* ELFv1 PPC64 function pointers are pointers to OPD entries. */
+         struct target_func_ptr *handler =
+-- 
+2.20.1
 
 
