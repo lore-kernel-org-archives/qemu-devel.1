@@ -4,90 +4,91 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54F5BC49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 21:12:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0AEEC49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 21:14:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E00A20838
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 21:12:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F46920838
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 21:14:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EkjlKNzd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E00A20838
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KbLrnJOU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F46920838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i89uO-0000vI-95
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 17:12:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54190)
+	id 1i89wB-0002OU-M8
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 17:14:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54508)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i89tj-0000TV-9H
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 17:11:32 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i89vK-0001jE-Rn
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 17:13:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i89ti-0000pL-3e
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 17:11:31 -0400
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:39437)
+ (envelope-from <richard.henderson@linaro.org>) id 1i89vJ-000279-Sl
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 17:13:10 -0400
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:41397)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i89th-0000oh-Uk
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 17:11:30 -0400
-Received: by mail-qk1-x741.google.com with SMTP id 4so22303265qki.6
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 14:11:29 -0700 (PDT)
+ id 1i89vJ-00026q-OC
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 17:13:09 -0400
+Received: by mail-qt1-x844.google.com with SMTP id j10so27057674qtp.8
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 14:13:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=OEaBTf2V0hI83wp0Q8rsw3rpzqVce8iYnEk3vLOEqik=;
- b=EkjlKNzdFnofr0c0JtZ+RpzH8Upg4rZ63LOj8HXPMWDzU/PvS5erNJr/dTtaT+yw54
- xN7UtaxVuPzmCRHvQknPRNH/AUXxarb+JMW1GeUwlUpVXpksATwg7e8cDTMPKbhu8jMf
- zvuUU/6Q4hQF+3pHpl2sTHlK3JpUs0CrHXbKuiOz+esOtzoPB2hx9s07mBKAbFyDAYdn
- xHdMbvZ3TlOVwxxuIfCRR7ppyPRDxipbTT/xlsfla8sAFAEbqi8l43Zf+w1KyizvA9s9
- eN3aCASIz9RniGeRqctr6wqhljO52JAddyR0W4ukDjopLzOobbx9+EvgsEmigId13MPB
- Fc3A==
+ bh=IgkUXb1HqMYBQaZuS+voYnGcYN7P+J1UlbpK846YPFA=;
+ b=KbLrnJOUmA7BLoMAU/ir5MDZWt9lR0DWiqxGWIKQyRnHkmBnIZj+E5rmrYIpGdY11Y
+ kBBpni3Cvl4xJygWLK8+lWoOU3G/4iOdzDIIKJNS69IzoFt+OGthSZwOp4+coikZ6TBL
+ yVxFVSALg2kFyi++aPEhIcXAPg8P/pfbwxPudnQ1bWiC8hjwlklQEDB2LzDRblIJuOoh
+ duINbMC7Uy9ePczfAQ7jF0XjxQHbQ0gx30HAVg7qCxJcE426Jkh8rWnughKOen981Oqc
+ 89oeVxSnPENS2XdEvYG6oQ1WG3pvHX6kMNpS4E1A5vl1QrmRRcfR/vf7JGsMoSO/X4ed
+ YsXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=OEaBTf2V0hI83wp0Q8rsw3rpzqVce8iYnEk3vLOEqik=;
- b=IrVD6CXohBOnXgcLdOjW3XTUmn6hWtD5OtHDJZu/wrrk8OnMH+M5XLypU0F3NKA9ON
- ySfpnxNHeUJsCQV670RDO0ITsTHRYbn/iaLpoXhhSpD/x+qVrQpXxLxm5w8p1Nxvhhax
- Mo1e1Crno5otVe0CYU5IAuBMfxk3g1nIznMQ+CgauBvDOz3qAJSYsHYUzXfR0StdMRko
- OxNMOQIROffo27OeRvQIRgYfCy7MeZS20dIyuCfsp/N3ljWHKg84WmccaUSjD/Qf/dTH
- sl8m85Z6uDNoP3+9DtUw7hBSuSSjmgB6LVR0YwgusDAVOJusvl4qSK5fx0I6ViWyqu58
- hhCQ==
-X-Gm-Message-State: APjAAAVg0t5Cv3XJpdCa7OP9MdRQv8YkFFvKhlH7yPoLi5RNiHz4CKzx
- 7WQcjGxuhtTtHkhe+L4pQ2lVRw==
-X-Google-Smtp-Source: APXvYqzVTq40iS9pZPCrXgxwCsG5w0gdeb7nlVVYJ7qYHTJxDxIXLGOo05GyUJW53duspAz9E7y/Yw==
-X-Received: by 2002:a37:a182:: with SMTP id
- k124mr37851212qke.354.1568236288629; 
- Wed, 11 Sep 2019 14:11:28 -0700 (PDT)
+ bh=IgkUXb1HqMYBQaZuS+voYnGcYN7P+J1UlbpK846YPFA=;
+ b=cAoxtADHMVjjnsN7BW10FcMTGlkegn85RnrS5ZX50CU6RGxhMK1oElwFJyjnkW+JQ9
+ q+03zX35/bN6eQjGD9kojjUoTH0v4g/EYxkxAPwLZWNke6a5gsN9SV6iEFn66C2xUkKh
+ zHX53v8JMHYhcZQNRZRmxUrfO8lRfrfSVO1T+SGIoWN6x57I3laW2deUKorQXHfqHxEt
+ M98U+q1g47gEgnDgsMAUFK5OWH1DUt04/Vj+LLBtXbIUp3Cw9xoTqMu0yPZ1gdKkSgyj
+ M4ZXg5/vDHhySP3DCHdmV7DQ1R/iEMvai/spdg+QG3RNymOqcIa+wnd7kaHgG3/IE6ye
+ GHCw==
+X-Gm-Message-State: APjAAAXVKaa143w0jJMVBXKCkLc28sy9hRWTh+16E5Mqv/y1rL6oKxo6
+ DHIyvCJjuXlHntsWQIihC0ZsyA==
+X-Google-Smtp-Source: APXvYqwCbn63ZAXtaBilfd34W3qajMWtOLHs5u7n6plztuzm8fky99xIOcrx0ZepaA/pk2cD/LlSCA==
+X-Received: by 2002:a05:6214:16cb:: with SMTP id
+ d11mr24033893qvz.241.1568236389031; 
+ Wed, 11 Sep 2019 14:13:09 -0700 (PDT)
 Received: from [172.20.5.51] ([67.69.50.154])
- by smtp.gmail.com with ESMTPSA id l22sm8795252qtp.8.2019.09.11.14.11.26
+ by smtp.gmail.com with ESMTPSA id c11sm9075387qtq.41.2019.09.11.14.13.07
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 11 Sep 2019 14:11:27 -0700 (PDT)
+ Wed, 11 Sep 2019 14:13:08 -0700 (PDT)
 To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 References: <20190906075750.14791-1-david@redhat.com>
- <20190906075750.14791-17-david@redhat.com>
+ <20190906075750.14791-18-david@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <2536ca8e-414e-980b-6a00-b097c07aa5d8@linaro.org>
-Date: Wed, 11 Sep 2019 17:11:24 -0400
+Message-ID: <eddf9cff-9e43-b8f4-f8cf-7beb845a27ba@linaro.org>
+Date: Wed, 11 Sep 2019 17:13:06 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190906075750.14791-17-david@redhat.com>
+In-Reply-To: <20190906075750.14791-18-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::741
-Subject: Re: [Qemu-devel] [PATCH v2 16/28] s390x/tcg: Fault-safe memmove
+X-Received-From: 2607:f8b0:4864:20::844
+Subject: Re: [Qemu-devel] [PATCH v2 17/28] s390x/tcg: MVCS/MVCP: Use
+ access_memmove_idx()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,18 +108,19 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/6/19 3:57 AM, David Hildenbrand wrote:
-> Replace fast_memmove() variants by access_memmove() variants, that
-> first try to probe access to all affected pages (maximum is two pages).
-> 
-> In MVCOS, simply always call access_memmove_as() and drop the TODO
-> about LAP. LAP is already handled in the MMU.
-> 
-> Get rid of adj_len_to_page(), which is now unused.
+> As we are moving between address spaces, we can use access_memmove_idx()
+> without checking for destructive overlaps (especially of real storage
+> locations):
+>     "Each storage operand is processed left to right. The
+>     storage-operand-consistency rules are the same as
+>     for MOVE (MVC), except that when the operands
+>     overlap in real storage, the use of the common real-
+>     storage locations is not necessarily recognized."
 > 
 > Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  target/s390x/mem_helper.c | 204 +++++++++++++++++++++-----------------
->  1 file changed, 115 insertions(+), 89 deletions(-)
+>  target/s390x/mem_helper.c | 20 ++++++--------------
+>  1 file changed, 6 insertions(+), 14 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
