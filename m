@@ -2,63 +2,91 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D8BAC5ACAE
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:47:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3B89C5ACAE
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:55:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 064BC2082C
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:47:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 064BC2082C
+	by mail.kernel.org (Postfix) with ESMTPS id B8502206A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:55:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8502206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7zE1-0001ML-6a
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 05:47:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45199)
+	id 1i7zLd-0003Op-Pj
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 05:55:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47043)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i7zDA-0000tI-D2
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:46:53 -0400
+ (envelope-from <mst@redhat.com>) id 1i7zKj-0002ss-Rz
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:54:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i7zD8-0005UC-J3
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:46:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56720)
+ (envelope-from <mst@redhat.com>) id 1i7zKi-0000YP-R8
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:54:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49422)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i7zD8-0005TJ-BT
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:46:50 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1i7zKi-0000Xn-JV
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 05:54:40 -0400
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 502BA30A00CF;
- Wed, 11 Sep 2019 09:46:49 +0000 (UTC)
-Received: from work-vm (ovpn-117-243.ams2.redhat.com [10.36.117.243])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0846360852;
- Wed, 11 Sep 2019 09:46:46 +0000 (UTC)
-Date: Wed, 11 Sep 2019 10:46:44 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Yury Kotov <yury-kotov@yandex-team.ru>
-Message-ID: <20190911094644.GD2894@work-vm>
-References: <20190903162246.18524-1-yury-kotov@yandex-team.ru>
- <20190903162246.18524-3-yury-kotov@yandex-team.ru>
+ by mx1.redhat.com (Postfix) with ESMTPS id B579FC08EC15
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 09:54:39 +0000 (UTC)
+Received: by mail-qk1-f197.google.com with SMTP id o133so24413179qke.4
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 02:54:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=SR/G5tKbZIpvJt8thzLY5S6w1XtsYDyI3Ldn6UVG8g8=;
+ b=Fbi7V/xg2Tm1MWyBhxVzvya6Dvd8/H/irwzPNBxvA03pmfqrEY9yFhktq2VAD3bWty
+ 9OP3eqr8znPrdZsYBdDS8UdotDaltl9syfA339ygL1zfovUCbTq3Gv8an5dd0H2xf3sw
+ ROaR5AMsWg9vLu4Mvt3l8Ysrg1Mnr2wXr8cddBoHH03lswln4SoAUOaivB7mkafAlaUC
+ UQz9tIUwlw9L6i30ekHKrR/o4lXSTrufD1kh21U3lPJ5hPXukCp4wZ0q7gdqiLF/PknV
+ hNzzlBk+WTB8fb4GEYYvnPli9YsFfdZAt7Dc+zxsqRxs7Iek/aNuBLdCFG1fELHqpx7U
+ NjPw==
+X-Gm-Message-State: APjAAAX668/e6yzuUpb+8wJFdHbTspcXqT3wwFyvuc3yoDaZLm0IR8ik
+ agYU0qWS7/sKKXkkaaTrwu9PEAc6dXAWGGXcHwAPSqvO7DRad8UyranozYPKJx/4VwWXAVTfyFL
+ GowKmqaQyRS0+O7M=
+X-Received: by 2002:a05:620a:12b1:: with SMTP id
+ x17mr12681078qki.223.1568195679063; 
+ Wed, 11 Sep 2019 02:54:39 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxJyE6BoJAC5Es8pA8wae2nZ6q7iu6kkFz6hc7yHfg07kDH+f9822uIYhi1Gekv+scAT24/ZQ==
+X-Received: by 2002:a05:620a:12b1:: with SMTP id
+ x17mr12681072qki.223.1568195678918; 
+ Wed, 11 Sep 2019 02:54:38 -0700 (PDT)
+Received: from redhat.com ([80.74.107.118])
+ by smtp.gmail.com with ESMTPSA id a28sm7411368qkl.42.2019.09.11.02.54.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 11 Sep 2019 02:54:38 -0700 (PDT)
+Date: Wed, 11 Sep 2019 05:54:33 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Message-ID: <20190911055058-mutt-send-email-mst@kernel.org>
+References: <fe0f3f7bfa730088454790dc2d863285c4461134.camel@sipsolutions.net>
+ <20190908091207-mutt-send-email-mst@kernel.org>
+ <8a9cf8a1726afce7fed8992a4f19fc808004ef88.camel@sipsolutions.net>
+ <20190909083902-mutt-send-email-mst@kernel.org>
+ <89f25546ffa71c799c533e50658a3a58e066f436.camel@sipsolutions.net>
+ <20190909094609-mutt-send-email-mst@kernel.org>
+ <d2e750aaec396bd0aa7ea8c05ef5705567d16595.camel@sipsolutions.net>
+ <1f28c61e5caf6fc2a2125664043d1f7b9b769149.camel@sipsolutions.net>
+ <20190911051236-mutt-send-email-mst@kernel.org>
+ <b8c7ffb8dee0f7d8bb7c1a67cafbc478f8246afa.camel@sipsolutions.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190903162246.18524-3-yury-kotov@yandex-team.ru>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Wed, 11 Sep 2019 09:46:49 +0000 (UTC)
+In-Reply-To: <b8c7ffb8dee0f7d8bb7c1a67cafbc478f8246afa.camel@sipsolutions.net>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] tests/libqtest: Allow setting
- expected exit status
+Subject: Re: [Qemu-devel] [RFC] libvhost-user: implement
+ VHOST_USER_PROTOCOL_F_KICK_CALL_MSGS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,120 +98,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, yc-core@yandex-team.ru,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Yury Kotov (yury-kotov@yandex-team.ru) wrote:
-> Add qtest_set_expected_status function to set expected exit status of
-> child process. By default expected exit status is 0.
+On Wed, Sep 11, 2019 at 11:20:40AM +0200, Johannes Berg wrote:
 > 
-> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+> > Each feature is documented near the description of the functionality it
+> > enables, that can work for this. 
+> 
+> Hmm, so you mean I should add a section on in-band notifications, and
+> document things there?
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Like other messages - look at e.g. inflight description as an example.
 
-> ---
->  tests/libqtest.c | 36 +++++++++++++++++++++---------------
->  tests/libqtest.h |  9 +++++++++
->  2 files changed, 30 insertions(+), 15 deletions(-)
+
+There's also a bunch of work finding all places that
+deal with kick/call FDs and updating that they
+only make sense without the new feature flag.
+
+> > I don't much like F_KICK_CALL_MSGS as
+> > not generic enough but it's not simulation as such:
+> > IN_BAND_NOTIFICATIONS?
 > 
-> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> index 2713b86cf7..a79d4887ae 100644
-> --- a/tests/libqtest.c
-> +++ b/tests/libqtest.c
-> @@ -43,6 +43,7 @@ struct QTestState
->      int qmp_fd;
->      pid_t qemu_pid;  /* our child QEMU process */
->      int wstatus;
-> +    int expected_status;
->      bool big_endian;
->      bool irq_level[MAX_IRQ];
->      GString *rx;
-> @@ -113,6 +114,11 @@ bool qtest_probe_child(QTestState *s)
->      return false;
->  }
->  
-> +void qtest_set_expected_status(QTestState *s, int status)
-> +{
-> +    s->expected_status = status;
-> +}
-> +
->  static void kill_qemu(QTestState *s)
->  {
->      pid_t pid = s->qemu_pid;
-> @@ -126,24 +132,23 @@ static void kill_qemu(QTestState *s)
->      }
->  
->      /*
-> -     * We expect qemu to exit with status 0; anything else is
-> +     * Check whether qemu exited with expected exit status; anything else is
->       * fishy and should be logged with as much detail as possible.
->       */
->      wstatus = s->wstatus;
-> -    if (wstatus) {
-> -        if (WIFEXITED(wstatus)) {
-> -            fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEMU "
-> -                    "process but encountered exit status %d\n",
-> -                    __FILE__, __LINE__, WEXITSTATUS(wstatus));
-> -        } else if (WIFSIGNALED(wstatus)) {
-> -            int sig = WTERMSIG(wstatus);
-> -            const char *signame = strsignal(sig) ?: "unknown ???";
-> -            const char *dump = WCOREDUMP(wstatus) ? " (core dumped)" : "";
-> -
-> -            fprintf(stderr, "%s:%d: kill_qemu() detected QEMU death "
-> -                    "from signal %d (%s)%s\n",
-> -                    __FILE__, __LINE__, sig, signame, dump);
-> -        }
-> +    if (WIFEXITED(wstatus) && WEXITSTATUS(wstatus) != s->expected_status) {
-> +        fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEMU "
-> +                "process but encountered exit status %d (expected %d)\n",
-> +                __FILE__, __LINE__, WEXITSTATUS(wstatus), s->expected_status);
-> +        abort();
-> +    } else if (WIFSIGNALED(wstatus)) {
-> +        int sig = WTERMSIG(wstatus);
-> +        const char *signame = strsignal(sig) ?: "unknown ???";
-> +        const char *dump = WCOREDUMP(wstatus) ? " (core dumped)" : "";
-> +
-> +        fprintf(stderr, "%s:%d: kill_qemu() detected QEMU death "
-> +                "from signal %d (%s)%s\n",
-> +                __FILE__, __LINE__, sig, signame, dump);
->          abort();
->      }
->  }
-> @@ -248,6 +253,7 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
->      g_test_message("starting QEMU: %s", command);
->  
->      s->wstatus = 0;
-> +    s->expected_status = 0;
->      s->qemu_pid = fork();
->      if (s->qemu_pid == 0) {
->          setenv("QEMU_AUDIO_DRV", "none", true);
-> diff --git a/tests/libqtest.h b/tests/libqtest.h
-> index 07ea35867c..c00bca94af 100644
-> --- a/tests/libqtest.h
-> +++ b/tests/libqtest.h
-> @@ -997,4 +997,13 @@ void qmp_assert_error_class(QDict *rsp, const char *class);
->   */
->  bool qtest_probe_child(QTestState *s);
->  
-> +/**
-> + * qtest_set_expected_status:
-> + * @s: QTestState instance to operate on.
-> + * @status: an expected exit status.
-> + *
-> + * Set expected exit status of the child.
-> + */
-> +void qtest_set_expected_status(QTestState *s, int status);
-> +
->  #endif
-> -- 
-> 2.17.1
+> Sure, sounds good to me, I guess I'm not good at naming things :)
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > As for how to handle errors, that probably belongs near
+> > "Communication".
+> > 
+> > Or maybe add a new "Error handling" section.
+> 
+> OK.
+> 
+> Btw, I tried this yesterday in libvhost-user, but if I just do
+> vu_panic() it just aborts that message handling and hangs, if I
+> forcefully close the FD then it ends up crashing later ...
+> 
+> I'm tempted to go with vu_panic() only for now as that seems to be the
+> normal way to handle unexpected protocol errors there, many such other
+> errors probably should also close the FD?
+> 
+> johannes
+
+I'm fine with a TODO for now.
+
+-- 
+MST
 
