@@ -7,65 +7,68 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3E6DECDE27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C88F6ECDE20
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:05:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96117222BF
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:05:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96117222BF
+	by mail.kernel.org (Postfix) with ESMTPS id A2EEC222BF
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:05:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2EEC222BF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7wh5-00059v-QF
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:05:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40899)
+	id 1i7whA-0005H0-5U
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:05:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40819)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i7wRk-00068g-Ad
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:49:45 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i7wRf-00061x-8n
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:49:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i7wRj-0004Qj-8g
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:49:44 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:58021)
+ (envelope-from <laurent@vivier.eu>) id 1i7wRe-0004Mz-7K
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:49:39 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:55867)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i7wRj-0004Py-0H
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:49:43 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i7wRd-0004MP-Va
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:49:38 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1Mzhzd-1iLKWS2rw1-00vbu6; Wed, 11 Sep 2019 08:49:25 +0200
+ id 1M433w-1i7wRV0koi-0005Zb; Wed, 11 Sep 2019 08:49:29 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Wed, 11 Sep 2019 08:49:06 +0200
-Message-Id: <20190911064920.1718-2-laurent@vivier.eu>
+Date: Wed, 11 Sep 2019 08:49:12 +0200
+Message-Id: <20190911064920.1718-8-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190911064920.1718-1-laurent@vivier.eu>
 References: <20190911064920.1718-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:XRNaDVW/Z6FFauGWDmfsEwdbmHLOp9czIYg/b7ZfJNy9qHKSfGE
- H29vtQwz34phoQeBvDFaul7IhkYM7kkgeblbhRyuVReX6iH2xZ0HQbw6cNuQAmyNWe/5v9h
- OM+/n4WMocQe/9ZzRR1wVkMA2ZYxKhwMYPs//Eu+fxr8fnwqbEpH1nunhTqRVJ+HjaqObim
- Kiy5vJZZvdnyG+1Fc2NRg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:g+4deSDCMqQ=:5LDGnoSHT9zYaHZq4eChyl
- wkBSEG1Lm965AykirnABv66GwVBtdb3be0NMI80huF3vxDRXl+YgcYjL2zYeuyGmP2buUFjyg
- E++sGDaBdgxa0HUW0Bp7Ju+iXXJM3sXM3SYJ+1JthrI32ZJ16q9q4vZvvQbtdpRDF8J8iy10V
- /txQccNthfJWCX0ZkJQAfXCw31es6yCNuVM1BQ3NEQ2KfY3RG9kyWQUG+QD0DwRF8wL6kZqEx
- vIqr1ZLkcYh8Wx41QoyA7l+wLjOVjxrARUUfEUXjYdO+PA3swHavAeIWOzi7uG+nqP7bqFvgX
- o1dQqTysDZzEJ45/CgBaYBhORKNYPQFaRfcwXDsqHRK+U8JSkVpMYWVJhoqMmKATPyHiSs6ov
- IV4+oxiQyJfht6sznBDER3qbhGsZI+g/d8gZekuJNgBB1p5C2aKtQjmjlYlKbwPjH6cmiFfI/
- Q1W2gs9nDRybBGek2RTrID+241hYXC3JFFSZOhAbuBybDxfDVek2ZV+iYSv+BjDBeRDETXDzh
- dqIcJr0x56rz3lgsCg3cCDDIxUiNBcWJu7ZKxIpch00cio61JPjlqk9MnUQ9MdC6GHt4dhGbx
- 2PWk8c+UNCeX2/2qoamLvKIWWO0lpzTC2I03bujsu6i6C+5x46XJxqFty2tbxFL0X4gQ4NCSF
- UTkngEnueaR/ipcBBjqpvYcmXlFUgqe0b0eM+EpRF1A0KZhE1Kp9EMsUBHaQXFwRUTrpCq4G/
- VxkuZJmn0FoH1gAn7pLBwMPleEr1gFZzeIk0w+zT2KM9PAGydc7KxzbzA+sKIzXbwxLYsx7ls
- mg9TTswo+e/RjTV3sN2GxCOO9m/JR09NOng4Zpe5Nw7JSW4DHY=
+X-Provags-ID: V03:K1:j1F0yFaoMBQbhDzxmPD/ys5XuuMgxXp2xefCRwWzaxgBAq1Qh3Y
+ XnXREZG434/svVgJWbJFkhZWP2mZgf+nj1Wd+MNGLW54VD0DuihYSGH9mjuYsFyBAvdvfb3
+ DSfavkSh/rrOerPWH9p1PIO7ZFOQE8vWQ/IB1i5Mcdt83cPdFQ6LnUDJ0yHOr0iXYXDtQbo
+ 5sW5mhIBET57KsWKgLUHg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:KvlJrzyYUls=:nUrra4ZjROo/bXiDf4TkaG
+ DpJTcZ3KbUbA/oB5W1FAlyOYtcwt373QGxC9h/7fUTdc/amveaIpeuEcx9hiYsbHpcS+PnGNp
+ 1ggUaT3/L7ThyUGweeBC8PhvSGiqL899UFVIQ6kH4RcsbIGMSBOezIAGokE4dQx0pQSdw3Ot9
+ kUICto5xq+46r2uvKHk6Doje2Vsr8UJTKTWXVUmWrpgxt+A0qFPq0GVb/3MJOrVS6gtCfXt96
+ JQ5YbvoaXxBzh2iK/+7/tT37ETZWPEB+73M8b0fLzZ61HyCXrVlX9F0MbTRxYWT7/wydno5Gl
+ unvrJIbLnVlageGdJ2BxjOxlAsWwhiD4Lrb5A0RQQG28Y/qw5bYkyKAJMxMcBj2tHwrkt9H6Z
+ SpHA+bSYz53KVsGGCCtiA0hAPi3qBvQMQl65e+WZ/Pg9AtVUNis4T2aoH3t2bfsmefrpYFUqi
+ QyUsG10PqwM3Q7OsI/NDFGNmq4vWJHJ/wmSvRa6pCCXzs1rzBXsSu7gIAr+8RHBpD9k1uOAqg
+ uTSOsSLmS1MaSG7z+gO0XIzG1uVGhkD/k6tCdfy+rEJC/sjzz3KZwPAHvJQjYTDI/8gjs1uQC
+ JZZ5WG/v025B9zj+7FJirH5oY0FqRt5b8jwWNSvw7nEuq+wTSPzFUNwNKcfHAR4kqOe7Ac2I1
+ qzEtQ9LLjpTMsCNsJ+JqseZG7vkuCz5dHE87Ni4rgnEThrCgxoyN6YRa/ENdsAL3UmgGCdxKm
+ hv8/Icf8qlrWSNQKYJoqmD9/d0j3hiB3+GP25MS/GYZiQqMEsY3ZQBRxncda4FXZ3Bbnda6Lx
+ bCDKTgldaPP/DqpHC1kfcf26DWuq5KoOOKTrNzGoqMdmnVk5ZnyLTmY5HhbHXsNSwIsdWybAR
+ W+dMya93idaAwZAZ8Gmo3SDOR/fAN3XIdQyEdqkx3jtsvEvjv4ZT30NnpDISMzxOcEwJoyhqq
+ Dwj8xb8D619mtdNdgsbWgH3bmEo3UjU5vDrjVHSyeso7XqyVe2cX7vCnU+QDrMlYmer45+Zm5
+ xWw56EaQ7WW0DhBDxU62KX0bmc7GVgdKFEaBJTK2QV72
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
-Subject: [Qemu-devel] [PULL v2 01/15] linux-user: remove useless variable
+X-Received-From: 212.227.126.130
+Subject: [Qemu-devel] [PULL v2 07/15] linux-user/arm: Adjust MAX_RESERVED_VA
+ for M-profile
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,72 +81,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Max Filippov <jcmvbkbc@gmail.com>, Riku Voipio <riku.voipio@iki.fi>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>, Stefano Garzarella <sgarzare@redhat.com>
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-filename is only used to open the file if AT_EXECFD is not provided.
-But exec_path already contains the path of the file to open.
-Remove filename as it is only used in main.c whereas exec_path is
-also used in syscall.c.
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Fixes: d088d664f201 ("linux-user: identify running binary in /proc/self/exe")
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Message-Id: <20190714134028.315-1-laurent@vivier.eu>
+Limit the virtual address space for M-profile cpus to 2GB,
+so that we avoid all of the magic addresses in the top half
+of the M-profile system map.
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-Id: <20190822185929.16891-3-richard.henderson@linaro.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/main.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ linux-user/arm/target_cpu.h | 24 +++++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 47917bbb20fc..28f0065b6ddf 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -49,7 +49,6 @@
- char *exec_path;
+diff --git a/linux-user/arm/target_cpu.h b/linux-user/arm/target_cpu.h
+index 279ea532d5b7..3f79356a07fc 100644
+--- a/linux-user/arm/target_cpu.h
++++ b/linux-user/arm/target_cpu.h
+@@ -19,9 +19,27 @@
+ #ifndef ARM_TARGET_CPU_H
+ #define ARM_TARGET_CPU_H
  
- int singlestep;
--static const char *filename;
- static const char *argv0;
- static int gdbstub_port;
- static envlist_t *envlist;
-@@ -586,7 +585,6 @@ static int parse_args(int argc, char **argv)
-         exit(EXIT_FAILURE);
-     }
+-/* We need to be able to map the commpage.
+-   See validate_guest_space in linux-user/elfload.c.  */
+-#define MAX_RESERVED_VA(CPU)  0xffff0000ul
++static inline unsigned long arm_max_reserved_va(CPUState *cs)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++
++    if (arm_feature(&cpu->env, ARM_FEATURE_M)) {
++        /*
++         * There are magic return addresses above 0xfe000000,
++         * and in general a lot of M-profile system stuff in
++         * the high addresses.  Restrict linux-user to the
++         * cached write-back RAM in the system map.
++         */
++        return 0x80000000ul;
++    } else {
++        /*
++         * We need to be able to map the commpage.
++         * See validate_guest_space in linux-user/elfload.c.
++         */
++        return 0xffff0000ul;
++    }
++}
++#define MAX_RESERVED_VA  arm_max_reserved_va
  
--    filename = argv[optind];
-     exec_path = argv[optind];
- 
-     return optind;
-@@ -657,9 +655,9 @@ int main(int argc, char **argv, char **envp)
- 
-     execfd = qemu_getauxval(AT_EXECFD);
-     if (execfd == 0) {
--        execfd = open(filename, O_RDONLY);
-+        execfd = open(exec_path, O_RDONLY);
-         if (execfd < 0) {
--            printf("Error while loading %s: %s\n", filename, strerror(errno));
-+            printf("Error while loading %s: %s\n", exec_path, strerror(errno));
-             _exit(EXIT_FAILURE);
-         }
-     }
-@@ -784,10 +782,10 @@ int main(int argc, char **argv, char **envp)
-     cpu->opaque = ts;
-     task_settid(ts);
- 
--    ret = loader_exec(execfd, filename, target_argv, target_environ, regs,
-+    ret = loader_exec(execfd, exec_path, target_argv, target_environ, regs,
-         info, &bprm);
-     if (ret != 0) {
--        printf("Error while loading %s: %s\n", filename, strerror(-ret));
-+        printf("Error while loading %s: %s\n", exec_path, strerror(-ret));
-         _exit(EXIT_FAILURE);
-     }
- 
+ static inline void cpu_clone_regs(CPUARMState *env, target_ulong newsp)
+ {
 -- 
 2.21.0
 
