@@ -2,91 +2,90 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A071BC49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 21:33:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A536C49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 21:35:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B4BA2085B
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 21:33:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cUUomj7H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B4BA2085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 454B12085B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 21:35:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 454B12085B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8AFN-0003s0-0U
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 17:33:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58857)
+	id 1i8AGZ-0004ro-H6
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 17:35:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59033)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i8AEL-00035J-Ad
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 17:32:50 -0400
+ (envelope-from <eblake@redhat.com>) id 1i8AFM-00041L-4t
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 17:33:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i8AEI-0001KO-OP
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 17:32:49 -0400
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:35316)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i8AEI-0001Jz-9M
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 17:32:46 -0400
-Received: by mail-qt1-x841.google.com with SMTP id u9so1177168qtq.2
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 14:32:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=VjoGAPkzI76OHMq+wI3WO8RY7RMfm9D74OTV0WL6Z3Y=;
- b=cUUomj7HVdWaU4x606IQciKsyIHz5cS82S3iOZsrLVqOn5wA//ZIDPhqqKHpSMu4aW
- svBfspvznKhO0YbVX5woz/ixLxXbi9rITPoLPgbzyI84SlYxYMX3qny1arMgYl68+1/U
- TgfYmq9Dqb516Ofbnfow+eQKPt9t9wsGeLedjliWz6HUlwZUDnKUQEUNs6TLscD3GjJO
- g5b3DpjNzwyGecdV4jJzwBOF8G+QAjODxp2EpqhmMvoow1m9NsCG4ST/Nwto1IZSLfoY
- 9qf1c5CEsZ+LUwCPAkiTFdqTsdecMOwk2a6ZqVyyNc/GWdSnvoEUFhvRDeiDWnLcQ7nH
- RiLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=VjoGAPkzI76OHMq+wI3WO8RY7RMfm9D74OTV0WL6Z3Y=;
- b=D9CjwrSOT1KffhAiG89HKqvjheAoci0/C2AWCLqDaiM5uDFiPevkariGajmnTmGMVi
- Dk0DzRatsZDcqSe8R+n/PX1X9HPx4mfKcQ7X1R3XFBksIJc0lG2SLrRZaV0DPL03eHNT
- hwvDHP5UAKDhcPPheo7qiTg2R+853XSeG3wGEjmzj08RY1yxnzwnD2MbcY6OMw5q5FSb
- eLn68cmPJgRGo3bUHIji+8B5LLXoQ312PtS0OL3LEV9jCVLHNLwHob9oI4ylrO9XvbYS
- 8/S0rraWSuvNZBng6rEPGny5EqkHiF2xITiUf+tMwMMdM0VdTi18HIQuZ2+kCp56mdSD
- 2Dkw==
-X-Gm-Message-State: APjAAAXx5d1zaT1IZLuI7gR4ue042nkSann6NbJGRQRIvNu9JpAre5G7
- y+v3qNY5hzHL5tdlQcULBzmY/A==
-X-Google-Smtp-Source: APXvYqwn2iESU/HgS2P5YY6WRVDopWO43rtBViAOxU/ATu1XDjduI+8+yK0xCjjb7eCH6FkR43VsGw==
-X-Received: by 2002:ac8:7088:: with SMTP id y8mr37574357qto.184.1568237565543; 
- Wed, 11 Sep 2019 14:32:45 -0700 (PDT)
-Received: from [172.20.5.51] ([67.69.50.154])
- by smtp.gmail.com with ESMTPSA id l185sm5798719qkd.20.2019.09.11.14.32.44
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 11 Sep 2019 14:32:44 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190906075750.14791-1-david@redhat.com>
- <20190906075750.14791-23-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
+ (envelope-from <eblake@redhat.com>) id 1i8AFK-0001of-U5
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 17:33:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51030)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1i8AFH-0001nc-1C; Wed, 11 Sep 2019 17:33:47 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E85DE10DCC80;
+ Wed, 11 Sep 2019 21:33:45 +0000 (UTC)
+Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B3E51600C4;
+ Wed, 11 Sep 2019 21:33:39 +0000 (UTC)
+To: Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org
+References: <20190911161521.59261-1-slp@redhat.com>
+ <d47f7e67-2f6a-0dd6-3ab5-93626bfbb02d@redhat.com>
+From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <6921c8bd-0d47-424c-24e2-6869e396fe19@linaro.org>
-Date: Wed, 11 Sep 2019 17:32:42 -0400
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <6755b34b-b412-9e63-8d25-b7662d0d3860@redhat.com>
+Date: Wed, 11 Sep 2019 16:33:38 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190906075750.14791-23-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::841
-Subject: Re: [Qemu-devel] [PATCH v2 22/28] s390x/tcg: NC: Fault-safe handling
+In-Reply-To: <d47f7e67-2f6a-0dd6-3ab5-93626bfbb02d@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="2LYBmfEEC9fYTT9hm8jEra4ouk43idU9G"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Wed, 11 Sep 2019 21:33:45 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] nbd/server: attach client channel to the
+ export's AioContext
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,22 +97,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Florian Weimer <fweimer@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Stefano Brivio <sbrivio@redhat.com>,
- qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/6/19 3:57 AM, David Hildenbrand wrote:
-> We can process a maximum of 256 bytes, crossing two pages.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/mem_helper.c | 16 ++++++++++++----
->  1 file changed, 12 insertions(+), 4 deletions(-)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2LYBmfEEC9fYTT9hm8jEra4ouk43idU9G
+Content-Type: multipart/mixed; boundary="9suUMltNTlOcv0nESmwBbjJuNAz3YFV9q";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+Message-ID: <6755b34b-b412-9e63-8d25-b7662d0d3860@redhat.com>
+Subject: Re: [PATCH] nbd/server: attach client channel to the export's
+ AioContext
+References: <20190911161521.59261-1-slp@redhat.com>
+ <d47f7e67-2f6a-0dd6-3ab5-93626bfbb02d@redhat.com>
+In-Reply-To: <d47f7e67-2f6a-0dd6-3ab5-93626bfbb02d@redhat.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+--9suUMltNTlOcv0nESmwBbjJuNAz3YFV9q
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-r~
+On 9/11/19 12:21 PM, Eric Blake wrote:
+> On 9/11/19 11:15 AM, Sergio Lopez wrote:
+>> On creation, the export's AioContext is set to the same one as the
+>> BlockBackend, while the AioContext in the client QIOChannel is left
+>> untouched.
+>>
+>> As a result, when using data-plane, nbd_client_receive_next_request()
+>> schedules coroutines in the IOThread AioContext, while the client's
+>> QIOChannel is serviced from the main_loop, potentially triggering the
+>> assertion at qio_channel_restart_[read|write].
+>>
+>> To fix this, as soon we have the export corresponding to the client,
+>> we call qio_channel_attach_aio_context() to attach the QIOChannel
+>> context to the export's AioContext. This matches with the logic in
+>> blk_aio_attached().
+>>
+>> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=3D1748253
+>> Signed-off-by: Sergio Lopez <slp@redhat.com>
+>> ---
+>>  nbd/server.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>=20
+> I'd like a second opinion from Kevin, but the description makes sense t=
+o
+> me.  I'm happy to queue this through my NBD tree.
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+I tried to test this patch, but even with it applied, I still got an
+aio-context crasher by attempting an nbd-server-start, nbd-server-add,
+nbd-server-stop (intentionally skipping the nbd-server-remove step) on a
+domain using iothreads, with a backtrace of:
+
+#0  0x00007ff09d070e35 in raise () from target:/lib64/libc.so.6
+#1  0x00007ff09d05b895 in abort () from target:/lib64/libc.so.6
+#2  0x000055dd03b9ab86 in error_exit (err=3D1, msg=3D0x55dd03d59fb0
+<__func__.15769> "qemu_mutex_unlock_impl")
+    at util/qemu-thread-posix.c:36
+#3  0x000055dd03b9adcf in qemu_mutex_unlock_impl (mutex=3D0x55dd062d5090,=
+
+file=3D0x55dd03d59041 "util/async.c",
+    line=3D523) at util/qemu-thread-posix.c:96
+#4  0x000055dd03b93433 in aio_context_release (ctx=3D0x55dd062d5030) at
+util/async.c:523
+#5  0x000055dd03ac421b in bdrv_do_drained_begin (bs=3D0x55dd0673a2d0,
+recursive=3Dfalse, parent=3D0x0,
+    ignore_bds_parents=3Dfalse, poll=3Dtrue) at block/io.c:428
+#6  0x000055dd03ac4299 in bdrv_drained_begin (bs=3D0x55dd0673a2d0) at
+block/io.c:434
+#7  0x000055dd03aafb54 in blk_drain (blk=3D0x55dd06a3ec40) at
+block/block-backend.c:1605
+#8  0x000055dd03aae054 in blk_remove_bs (blk=3D0x55dd06a3ec40) at
+block/block-backend.c:800
+#9  0x000055dd03aad54a in blk_delete (blk=3D0x55dd06a3ec40) at
+block/block-backend.c:420
+#10 0x000055dd03aad7d6 in blk_unref (blk=3D0x55dd06a3ec40) at
+block/block-backend.c:475
+#11 0x000055dd03aecb68 in nbd_export_put (exp=3D0x55dd0726f920) at
+nbd/server.c:1666
+#12 0x000055dd03aec8fe in nbd_export_close (exp=3D0x55dd0726f920) at
+nbd/server.c:1616
+#13 0x000055dd03aecbf1 in nbd_export_close_all () at nbd/server.c:1689
+#14 0x000055dd03748845 in qmp_nbd_server_stop (errp=3D0x7ffcdf3cb4e8) at
+blockdev-nbd.c:233
+=2E..
+
+Does that sound familiar to what you were seeing?  Does it mean we
+missed another spot where the context is set incorrectly?
+
+I'm happy to work with you on IRC for more real-time debugging of this
+(I'm woefully behind on understanding how aio contexts are supposed to
+work).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--9suUMltNTlOcv0nESmwBbjJuNAz3YFV9q--
+
+--2LYBmfEEC9fYTT9hm8jEra4ouk43idU9G
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl15aDMACgkQp6FrSiUn
+Q2pVeAf/W6NSag8rmWa9oUtGX3Q9e/+1sLk94R0l9dacTr+ByTghvojDkaNCEJK+
++StYOSZ8CVV1Ez8sntjS8altQwBaglS9QvAN0/i/uDXAZ2YeiMFohLIWGE+sFYjA
+pi4blpRWZl743aC+jzbkvM3FvX+fRmaii/LXrWhGW5bteuybiVoF7AfsuqmfgFxY
+jATuGNO+UG5Xm8bgIziTRlAcomLuuwTssJVx1JA7LitCn+Pi3zhmJdyGSc5FAS7a
+KiY4paf6FosIjSpVNYrwmXqTtOZXUA8v4VMz8oM2S4moIaJZL3E0dUN2PKL07DcB
+3+vLv0TCERZUCSYHvn79IqAs5G5OGg==
+=YmU1
+-----END PGP SIGNATURE-----
+
+--2LYBmfEEC9fYTT9hm8jEra4ouk43idU9G--
 
