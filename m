@@ -2,64 +2,81 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5E3AC5ACAE
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:57:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 109C9C5ACAE
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:58:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACF3320863
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:57:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACF3320863
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id BFB942075C
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:58:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MErwksRx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFB942075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i844C-0005zA-65
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:57:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47935)
+	id 1i844W-0006aJ-J9
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:58:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48346)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1i840I-0002OR-1V
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:53:56 -0400
+ (envelope-from <fintelia@gmail.com>) id 1i8420-0004SW-LQ
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:55:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1i840F-00017X-Et
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:53:53 -0400
-Received: from 12.mo5.mail-out.ovh.net ([46.105.39.65]:56926)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i840F-00016b-5l
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:53:51 -0400
-Received: from player699.ha.ovh.net (unknown [10.109.159.20])
- by mo5.mail-out.ovh.net (Postfix) with ESMTP id 9732B24ACE7
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 16:53:48 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
- (Authenticated sender: clg@kaod.org)
- by player699.ha.ovh.net (Postfix) with ESMTPSA id C01CA9B196BE;
- Wed, 11 Sep 2019 14:53:39 +0000 (UTC)
-To: Balamuruhan S <bala24@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20190911142925.19197-1-bala24@linux.ibm.com>
- <20190911142925.19197-4-bala24@linux.ibm.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <3befce98-636f-4c8b-3993-5e595126d968@kaod.org>
-Date: Wed, 11 Sep 2019 16:53:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <fintelia@gmail.com>) id 1i841w-0001vK-Gx
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:55:40 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:43472)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <fintelia@gmail.com>)
+ id 1i841o-0001sN-05; Wed, 11 Sep 2019 10:55:28 -0400
+Received: by mail-lj1-x243.google.com with SMTP id d5so20300353lja.10;
+ Wed, 11 Sep 2019 07:55:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=T29gtJaVOWH6YzRi/mrTnR2giX2oo06OJvogqB33264=;
+ b=MErwksRxDAoVcdwTEQzuTa9zo3l8uQamZAbpFIatFfUsMGvVALfYzF9UpUwYf2X3gP
+ BuGuUB0muzBL44UXBXi9742eCvhHdSyOAVgffsHQkz4kuCBmtxKlET21B6Sov4XY1EuM
+ OknMT62XJ7UsDFcjzAu6Mnog2oCATD5/NLgxzFPYiNhux45F3uMtEl3wH6FfhY0RhEsR
+ FcU3FUGy7esdA8dcus6z7Vu/bzVcY6hGIgkSVVhoYcmdZQ91Yr1mEXN3w/D9XwwilqwS
+ 89qlDvlsAKniOTOb/jlK2RmCRtjmvtTa8KXTsXQKaE9iywdAyVfF6BAf1XYslHGPHY4u
+ f9UA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=T29gtJaVOWH6YzRi/mrTnR2giX2oo06OJvogqB33264=;
+ b=VOwrjKlMSZDH8jTAiAPg8QasKfnHf57gst4GzYkst+vi1bokAIhlG6Iezy5r77lFtE
+ vQ2QMMPcSD/NPZXO1D0IaXlgpvyhNI/JXXxuKGh+jhFaNAsya23zxYrSWA2l0U3xtqVR
+ WKrNH/b3c/3jfLO8j0es1qdae3bOKJfkMlwQetgf5TTG6ymK0RGScRCTY8oYoq+9gSDq
+ zewB9OMsSRkaLF9L4fmYhvlE3F0owymyE6usFgFjEXki1ZlrxoGj8iEMgAZZpkOTw8Nj
+ vJmxfRVKJsNTMmWI+7sTOSR1ILoQHXIuYTWtYOSE8Lkzc+Uoj9o+PHsm8e6W+1WywR6m
+ 7Mxg==
+X-Gm-Message-State: APjAAAWqRNFPp9RSquaZwWtBvwwkVKa9B2dDcDnENtpQzIEApng5llz8
+ EtYICxm2tXXXJTiWql9Mzc8CJq7YVOo7Gl5UiQM=
+X-Google-Smtp-Source: APXvYqzkdRsGsX5FZC77qL9x9Wf3pitg1UJJZkPIs/ZGoPkbQj9AeM9PtsY/3YDAteoYxXQ3A8vgHtwiQti/Vw1aEG8=
+X-Received: by 2002:a2e:b0f3:: with SMTP id h19mr6296569ljl.51.1568213726094; 
+ Wed, 11 Sep 2019 07:55:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190911142925.19197-4-bala24@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 755478839592782674
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrtdefgdehgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.39.65
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] hw/ppc/pnv_homer: add PowerNV homer
- device model
+References: <850360df8fc15a3671bf2237f972ebaf09110015.1566603412.git.alistair.francis@wdc.com>
+ <mhng-b813f03d-c23e-405a-8213-c4c9b22a6831@palmer-si-x1e>
+In-Reply-To: <mhng-b813f03d-c23e-405a-8213-c4c9b22a6831@palmer-si-x1e>
+From: Jonathan Behrens <fintelia@gmail.com>
+Date: Wed, 11 Sep 2019 10:54:29 -0400
+Message-ID: <CANnJOVFNqXEg9KkJC4CHkt0KTt2_6HjyhU2CvMROW+e79mDncA@mail.gmail.com>
+To: Palmer Dabbelt <palmer@sifive.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::243
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH v1 10/28] target/riscv:
+ Convert mie and mstatus to pointers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,498 +88,484 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: maddy@linux.vnet.ibm.com, groug@kaod.org, anju@linux.vnet.ibm.com,
- qemu-ppc@nongnu.org, hari@linux.vnet.ibm.com, david@gibson.dropbear.id.au
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>, Anup Patel <Anup.Patel@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Atish Patra <Atish.Patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ Alistair Francis <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/09/2019 16:29, Balamuruhan S wrote:
-> add PnvHomer device model to emulate homer memory access
-> for pstate table, occ-sensors, slw, occ static and dynamic
-> values for Power8 and Power9 chips.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Version 0.4 of the hypervisor spec no longer talks about swapping
+registers. Instead when running in VS-mode some of the supervisor registers
+are "aliased" and actually refer to alternate versions. Implementations are
+of course still allowed to do swapping internally if desired, but it adds
+complexity compared to a more straightforward implementation and isn't
+obvious to me whether QEMU would get any benefit from it. At least, it is
+probably worth fleshing out the rest of the v0.4 implementation before
+deciding on this patch.
 
-I don't remember this "Signed-off-by". Please remove it.
+Jonathan
 
-A part from that, it looks good. One minor comment below,
+On Wed, Sep 11, 2019 at 4:24 AM Palmer Dabbelt <palmer@sifive.com> wrote:
 
-> Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
-> ---
->  hw/ppc/Makefile.objs       |   1 +
->  hw/ppc/pnv.c               |  30 +++++
->  hw/ppc/pnv_homer.c         | 269 +++++++++++++++++++++++++++++++++++++=
-++++++++
->  include/hw/ppc/pnv.h       |   3 +
->  include/hw/ppc/pnv_homer.h |  53 +++++++++
->  5 files changed, 356 insertions(+)
->  create mode 100644 hw/ppc/pnv_homer.c
->  create mode 100644 include/hw/ppc/pnv_homer.h
->=20
-> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-> index 2c4e1c8de0..580bb4f0dd 100644
-> --- a/hw/ppc/Makefile.objs
-> +++ b/hw/ppc/Makefile.objs
-> @@ -9,6 +9,7 @@ obj-$(CONFIG_PSERIES) +=3D spapr_tpm_proxy.o
->  obj-$(CONFIG_SPAPR_RNG) +=3D  spapr_rng.o
->  # IBM PowerNV
->  obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_=
-psi.o pnv_occ.o pnv_bmc.o
-> +obj-$(CONFIG_POWERNV) +=3D pnv_homer.o
->  ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
->  obj-y +=3D spapr_pci_vfio.o spapr_pci_nvlink2.o
->  endif
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 80338ffe87..f249e72356 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -847,6 +847,11 @@ static void pnv_chip_power8_instance_init(Object *=
-obj)
->                              TYPE_PNV8_OCC, &error_abort, NULL);
->      object_property_add_const_link(OBJECT(&chip8->occ), "psi",
->                                     OBJECT(&chip8->psi), &error_abort);
-> +
-> +    object_initialize_child(obj, "homer",  &chip8->homer, sizeof(chip8=
-->homer),
-> +                            TYPE_PNV8_HOMER, &error_abort, NULL);
-> +    object_property_add_const_link(OBJECT(&chip8->homer), "chip", obj,
-> +                                   &error_abort);
->  }
-> =20
->  static void pnv_chip_icp_realize(Pnv8Chip *chip8, Error **errp)
-> @@ -942,6 +947,16 @@ static void pnv_chip_power8_realize(DeviceState *d=
-ev, Error **errp)
->      /* OCC SRAM model */
->      memory_region_add_subregion(get_system_memory(), PNV_OCC_COMMON_AR=
-EA(chip),
->                                  &chip8->occ.sram_regs);
-> +
-> +    /* HOMER */
-> +    object_property_set_bool(OBJECT(&chip8->homer), true, "realized",
-> +                             &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +    memory_region_add_subregion(get_system_memory(), PNV_HOMER_BASE(ch=
-ip),
-> +                                &chip8->homer.regs);
->  }
-> =20
->  static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data=
-)
-> @@ -1024,6 +1039,11 @@ static void pnv_chip_power9_instance_init(Object=
- *obj)
->                              TYPE_PNV9_OCC, &error_abort, NULL);
->      object_property_add_const_link(OBJECT(&chip9->occ), "psi",
->                                     OBJECT(&chip9->psi), &error_abort);
-> +
-> +    object_initialize_child(obj, "homer",  &chip9->homer, sizeof(chip9=
-->homer),
-> +                            TYPE_PNV9_HOMER, &error_abort, NULL);
-> +    object_property_add_const_link(OBJECT(&chip9->homer), "chip", obj,
-> +                                   &error_abort);
->  }
-> =20
->  static void pnv_chip_quad_realize(Pnv9Chip *chip9, Error **errp)
-> @@ -1134,6 +1154,16 @@ static void pnv_chip_power9_realize(DeviceState =
-*dev, Error **errp)
->      /* OCC SRAM model */
->      memory_region_add_subregion(get_system_memory(), PNV9_OCC_COMMON_A=
-REA(chip),
->                                  &chip9->occ.sram_regs);
-> +
-> +    /* HOMER */
-> +    object_property_set_bool(OBJECT(&chip9->homer), true, "realized",
-> +                             &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +    memory_region_add_subregion(get_system_memory(), PNV9_HOMER_BASE(c=
-hip),
-> +                                &chip9->homer.regs);
->  }
-> =20
->  static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
-> diff --git a/hw/ppc/pnv_homer.c b/hw/ppc/pnv_homer.c
-> new file mode 100644
-> index 0000000000..707219c73c
-> --- /dev/null
-> +++ b/hw/ppc/pnv_homer.c
-> @@ -0,0 +1,269 @@
-> +/*
-> + * QEMU PowerPC PowerNV Emulation of a few HOMER related registers
-> + *
-> + * Copyright (c) 2019, IBM Corporation.
-> + *
-> + * This program is free software; you can redistribute it and/or modif=
-y
-> + * it under the terms of the GNU General Public License, version 2, as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>=
-.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "exec/hwaddr.h"
-> +#include "exec/memory.h"
-> +#include "sysemu/cpus.h"
-> +#include "hw/qdev-core.h"
-> +#include "hw/ppc/pnv.h"
-> +#include "hw/ppc/pnv_homer.h"
-> +
-> +
-> +static bool core_max_array(void *opaque, hwaddr addr)
-
-you can pass directly 'PnvHomer *homer' here.
-
-
-> +{
-> +    int i;
-> +    PnvHomer *homer =3D PNV_HOMER(opaque);
-> +    PnvHomerClass *hmrc =3D PNV_HOMER_GET_CLASS(homer);
-> +
-> +    for (i =3D 0; i <=3D homer->chip->nr_cores; i++) {
-> +        if (addr =3D=3D (hmrc->core_max_base + i)) {
-> +            return true;
-> +       }
-> +    }
-> +    return false;
-> +}
-> +
-> +/* P8 Pstate table */
-> +
-> +#define PNV8_OCC_PSTATE_VERSION          0x1f8001
-> +#define PNV8_OCC_PSTATE_MIN              0x1f8003
-> +#define PNV8_OCC_PSTATE_VALID            0x1f8000
-> +#define PNV8_OCC_PSTATE_THROTTLE         0x1f8002
-> +#define PNV8_OCC_PSTATE_NOM              0x1f8004
-> +#define PNV8_OCC_PSTATE_TURBO            0x1f8005
-> +#define PNV8_OCC_PSTATE_ULTRA_TURBO      0x1f8006
-> +#define PNV8_OCC_PSTATE_DATA             0x1f8008
-> +#define PNV8_OCC_PSTATE_ID_ZERO          0x1f8010
-> +#define PNV8_OCC_PSTATE_ID_ONE           0x1f8018
-> +#define PNV8_OCC_PSTATE_ID_TWO           0x1f8020
-> +#define PNV8_OCC_VDD_VOLTAGE_IDENTIFIER  0x1f8012
-> +#define PNV8_OCC_VCS_VOLTAGE_IDENTIFIER  0x1f8013
-> +#define PNV8_OCC_PSTATE_ZERO_FREQUENCY   0x1f8014
-> +#define PNV8_OCC_PSTATE_ONE_FREQUENCY    0x1f801c
-> +#define PNV8_OCC_PSTATE_TWO_FREQUENCY    0x1f8024
-> +#define PNV8_CORE_MAX_BASE               0x1f8810
-> +
-> +
-> +static uint64_t pnv_power8_homer_read(void *opaque, hwaddr addr,
-> +                                      unsigned size)
-> +{
-
-PnvHomer *homer =3D PNV_HOMER(opaque);
-
-> +    switch (addr) {
-> +    case PNV8_OCC_PSTATE_VERSION:
-> +    case PNV8_OCC_PSTATE_MIN:
-> +    case PNV8_OCC_PSTATE_ID_ZERO:
-> +        return 0;
-> +    case PNV8_OCC_PSTATE_VALID:
-> +    case PNV8_OCC_PSTATE_THROTTLE:
-> +    case PNV8_OCC_PSTATE_NOM:
-> +    case PNV8_OCC_PSTATE_TURBO:
-> +    case PNV8_OCC_PSTATE_ID_ONE:
-> +    case PNV8_OCC_VDD_VOLTAGE_IDENTIFIER:
-> +    case PNV8_OCC_VCS_VOLTAGE_IDENTIFIER:
-> +        return 1;
-> +    case PNV8_OCC_PSTATE_ULTRA_TURBO:
-> +    case PNV8_OCC_PSTATE_ID_TWO:
-> +        return 2;
-> +    case PNV8_OCC_PSTATE_DATA:
-> +        return 0x1000000000000000;
-> +    /* P8 frequency for 0, 1, and 2 pstates */
-> +    case PNV8_OCC_PSTATE_ZERO_FREQUENCY:
-> +    case PNV8_OCC_PSTATE_ONE_FREQUENCY:
-> +    case PNV8_OCC_PSTATE_TWO_FREQUENCY:
-> +        return 3000;
-> +    }
-> +    /* pstate table core max array */
-> +    if (core_max_array(opaque, addr)) {
-
-        if (core_max_array(homer, addr)) {
-
-> +        return 1;
-> +    }
-> +    return 0;
-> +}
-> +
-> +static void pnv_power8_homer_write(void *opaque, hwaddr addr,
-> +                                   uint64_t val, unsigned size)
-> +{
-> +    /* callback function defined to homer write */
-> +    return;
-> +}
-> +
-> +static const MemoryRegionOps pnv_power8_homer_ops =3D {
-> +    .read =3D pnv_power8_homer_read,
-> +    .write =3D pnv_power8_homer_write,
-> +    .valid.min_access_size =3D 1,
-> +    .valid.max_access_size =3D 8,
-> +    .impl.min_access_size =3D 1,
-> +    .impl.max_access_size =3D 8,
-> +    .endianness =3D DEVICE_BIG_ENDIAN,
-> +};
-> +
-> +static void pnv_homer_power8_class_init(ObjectClass *klass, void *data=
-)
-> +{
-> +    PnvHomerClass *homer =3D PNV_HOMER_CLASS(klass);
-> +
-> +    homer->homer_size =3D PNV_HOMER_SIZE;
-> +    homer->homer_ops =3D &pnv_power8_homer_ops;
-> +    homer->core_max_base =3D PNV8_CORE_MAX_BASE;
-> +}
-> +
-> +static const TypeInfo pnv_homer_power8_type_info =3D {
-> +    .name          =3D TYPE_PNV8_HOMER,
-> +    .parent        =3D TYPE_PNV_HOMER,
-> +    .instance_size =3D sizeof(PnvHomer),
-> +    .class_init    =3D pnv_homer_power8_class_init,
-> +};
-> +
-> +/* P9 Pstate table */
-> +
-> +#define PNV9_OCC_PSTATE_ID_ZERO          0xe2018
-> +#define PNV9_OCC_PSTATE_ID_ONE           0xe2020
-> +#define PNV9_OCC_PSTATE_ID_TWO           0xe2028
-> +#define PNV9_OCC_PSTATE_DATA             0xe2000
-> +#define PNV9_OCC_PSTATE_DATA_AREA        0xe2008
-> +#define PNV9_OCC_PSTATE_MIN              0xe2003
-> +#define PNV9_OCC_PSTATE_NOM              0xe2004
-> +#define PNV9_OCC_PSTATE_TURBO            0xe2005
-> +#define PNV9_OCC_PSTATE_ULTRA_TURBO      0xe2818
-> +#define PNV9_OCC_MAX_PSTATE_ULTRA_TURBO  0xe2006
-> +#define PNV9_OCC_PSTATE_MAJOR_VERSION    0xe2001
-> +#define PNV9_OCC_OPAL_RUNTIME_DATA       0xe2b85
-> +#define PNV9_CHIP_HOMER_IMAGE_POINTER    0x200008
-> +#define PNV9_CHIP_HOMER_BASE             0x0
-> +#define PNV9_OCC_PSTATE_ZERO_FREQUENCY   0xe201c
-> +#define PNV9_OCC_PSTATE_ONE_FREQUENCY    0xe2024
-> +#define PNV9_OCC_PSTATE_TWO_FREQUENCY    0xe202c
-> +#define PNV9_OCC_ROLE_MASTER_OR_SLAVE    0xe2002
-> +#define PNV9_CORE_MAX_BASE               0xe2819
-> +
-> +
-> +static uint64_t pnv_power9_homer_read(void *opaque, hwaddr addr,
-> +                                      unsigned size)
-> +{
-> +    switch (addr) {
-> +    case PNV9_OCC_MAX_PSTATE_ULTRA_TURBO:
-> +    case PNV9_OCC_PSTATE_ID_ZERO:
-> +        return 0;
-> +    case PNV9_OCC_PSTATE_DATA:
-> +    case PNV9_OCC_ROLE_MASTER_OR_SLAVE:
-> +    case PNV9_OCC_PSTATE_NOM:
-> +    case PNV9_OCC_PSTATE_TURBO:
-> +    case PNV9_OCC_PSTATE_ID_ONE:
-> +    case PNV9_OCC_PSTATE_ULTRA_TURBO:
-> +    case PNV9_OCC_OPAL_RUNTIME_DATA:
-> +        return 1;
-> +    case PNV9_OCC_PSTATE_MIN:
-> +    case PNV9_OCC_PSTATE_ID_TWO:
-> +        return 2;
-> +
-> +    /* 3000 khz frequency for 0, 1, and 2 pstates */
-> +    case PNV9_OCC_PSTATE_ZERO_FREQUENCY:
-> +    case PNV9_OCC_PSTATE_ONE_FREQUENCY:
-> +    case PNV9_OCC_PSTATE_TWO_FREQUENCY:
-> +        return 3000;
-> +    case PNV9_OCC_PSTATE_MAJOR_VERSION:
-> +        return 0x90;
-> +    case PNV9_CHIP_HOMER_BASE:
-> +    case PNV9_OCC_PSTATE_DATA_AREA:
-> +    case PNV9_CHIP_HOMER_IMAGE_POINTER:
-> +        return 0x1000000000000000;
-> +    }
-> +    /* pstate table core max array */
-> +    if (core_max_array(opaque, addr)) {
-> +        return 1;
-> +    }
-> +    return 0;
-> +}
-> +
-> +static void pnv_power9_homer_write(void *opaque, hwaddr addr,
-> +                                   uint64_t val, unsigned size)
-> +{
-> +    /* callback function defined to homer write */
-> +    return;
-> +}
-> +
-> +static const MemoryRegionOps pnv_power9_homer_ops =3D {
-> +    .read =3D pnv_power9_homer_read,
-> +    .write =3D pnv_power9_homer_write,
-> +    .valid.min_access_size =3D 1,
-> +    .valid.max_access_size =3D 8,
-> +    .impl.min_access_size =3D 1,
-> +    .impl.max_access_size =3D 8,
-> +    .endianness =3D DEVICE_BIG_ENDIAN,
-> +};
-> +
-> +static void pnv_homer_power9_class_init(ObjectClass *klass, void *data=
-)
-> +{
-> +    PnvHomerClass *homer =3D PNV_HOMER_CLASS(klass);
-> +
-> +    homer->homer_size =3D PNV9_HOMER_SIZE;
-> +    homer->homer_ops =3D &pnv_power9_homer_ops;
-> +    homer->core_max_base =3D PNV9_CORE_MAX_BASE;
-> +}
-> +
-> +static const TypeInfo pnv_homer_power9_type_info =3D {
-> +    .name          =3D TYPE_PNV9_HOMER,
-> +    .parent        =3D TYPE_PNV_HOMER,
-> +    .instance_size =3D sizeof(PnvHomer),
-> +    .class_init    =3D pnv_homer_power9_class_init,
-> +};
-> +
-> +static void pnv_homer_realize(DeviceState *dev, Error **errp)
-> +{
-> +    PnvHomer *homer =3D PNV_HOMER(dev);
-> +    PnvHomerClass *hmrc =3D PNV_HOMER_GET_CLASS(homer);
-> +    Object *obj;
-> +    Error *local_err =3D NULL;
-> +
-> +    obj =3D object_property_get_link(OBJECT(dev), "chip", &local_err);
-> +    if (!obj) {
-> +        error_propagate(errp, local_err);
-> +        error_prepend(errp, "required link 'chip' not found: ");
-> +        return;
-> +    }
-> +    homer->chip =3D PNV_CHIP(obj);
-> +    /* homer region */
-> +    memory_region_init_io(&homer->regs, OBJECT(dev),
-> +                          hmrc->homer_ops, homer, "homer-main-memory",
-> +                          hmrc->homer_size);
-> +}
-> +
-> +static void pnv_homer_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +
-> +    dc->realize =3D pnv_homer_realize;
-> +    dc->desc =3D "PowerNV HOMER Memory";
-> +}
-> +
-> +static const TypeInfo pnv_homer_type_info =3D {
-> +    .name          =3D TYPE_PNV_HOMER,
-> +    .parent        =3D TYPE_DEVICE,
-> +    .instance_size =3D sizeof(PnvHomer),
-> +    .class_init    =3D pnv_homer_class_init,
-> +    .class_size    =3D sizeof(PnvHomerClass),
-> +    .abstract      =3D true,
-> +};
-> +
-> +static void pnv_homer_register_types(void)
-> +{
-> +    type_register_static(&pnv_homer_type_info);
-> +    type_register_static(&pnv_homer_power8_type_info);
-> +    type_register_static(&pnv_homer_power9_type_info);
-> +}
-> +
-> +type_init(pnv_homer_register_types);
-> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index 63a4b7b6a7..1cdbe55bf8 100644
-> --- a/include/hw/ppc/pnv.h
-> +++ b/include/hw/ppc/pnv.h
-> @@ -26,6 +26,7 @@
->  #include "hw/ppc/pnv_lpc.h"
->  #include "hw/ppc/pnv_psi.h"
->  #include "hw/ppc/pnv_occ.h"
-> +#include "hw/ppc/pnv_homer.h"
->  #include "hw/ppc/pnv_xive.h"
->  #include "hw/ppc/pnv_core.h"
-> =20
-> @@ -76,6 +77,7 @@ typedef struct Pnv8Chip {
->      PnvLpcController lpc;
->      Pnv8Psi      psi;
->      PnvOCC       occ;
-> +    PnvHomer     homer;
->  } Pnv8Chip;
-> =20
->  #define TYPE_PNV9_CHIP "pnv9-chip"
-> @@ -90,6 +92,7 @@ typedef struct Pnv9Chip {
->      Pnv9Psi      psi;
->      PnvLpcController lpc;
->      PnvOCC       occ;
-> +    PnvHomer     homer;
-> =20
->      uint32_t     nr_quads;
->      PnvQuad      *quads;
-> diff --git a/include/hw/ppc/pnv_homer.h b/include/hw/ppc/pnv_homer.h
-> new file mode 100644
-> index 0000000000..abaec43c2d
-> --- /dev/null
-> +++ b/include/hw/ppc/pnv_homer.h
-> @@ -0,0 +1,53 @@
-> +/*
-> + * QEMU PowerPC PowerNV Emulation of a few HOMER related registers
-> + *
-> + * Copyright (c) 2019, IBM Corporation.
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/li=
-censes/>.
-> + */
-> +
-> +#ifndef PPC_PNV_HOMER_H
-> +#define PPC_PNV_HOMER_H
-> +
-> +#include "hw/ppc/pnv.h"
-> +
-> +#define TYPE_PNV_HOMER "pnv-homer"
-> +#define PNV_HOMER(obj) OBJECT_CHECK(PnvHomer, (obj), TYPE_PNV_HOMER)
-> +#define TYPE_PNV8_HOMER TYPE_PNV_HOMER "-POWER8"
-> +#define PNV8_HOMER(obj) OBJECT_CHECK(PnvHomer, (obj), TYPE_PNV8_HOMER)
-> +#define TYPE_PNV9_HOMER TYPE_PNV_HOMER "-POWER9"
-> +#define PNV9_HOMER(obj) OBJECT_CHECK(PnvHomer, (obj), TYPE_PNV9_HOMER)
-> +
-> +typedef struct PnvHomer {
-> +    DeviceState parent;
-> +
-> +    struct PnvChip *chip;
-> +    MemoryRegion regs;
-> +} PnvHomer;
-> +
-> +#define PNV_HOMER_CLASS(klass)   \
-> +     OBJECT_CLASS_CHECK(PnvHomerClass, (klass), TYPE_PNV_HOMER)
-> +#define PNV_HOMER_GET_CLASS(obj) \
-> +     OBJECT_GET_CLASS(PnvHomerClass, (obj), TYPE_PNV_HOMER)
-> +
-> +typedef struct PnvHomerClass {
-> +    DeviceClass parent_class;
-> +
-> +    int homer_size;
-> +    const MemoryRegionOps *homer_ops;
-> +
-> +    hwaddr core_max_base;
-> +} PnvHomerClass;
-> +
-> +#endif /* PPC_PNV_HOMER_H */
->=20
-
-
+> On Fri, 23 Aug 2019 16:38:15 PDT (-0700), Alistair Francis wrote:
+> > To handle the new Hypervisor CSR register swapping let's use pointers.
+> >
+> > We only need to convert the MIE and MSTATUS CSRs. With the exception of
+> > MIP all of the other CSRs that swap with virtulsation changes are S-Mode
+> > only, so we can just do a lazy switch. This because more challenging for
+> > the M-Mode registers so it ends up being easier to use pointers.
+> >
+> > As the MIP CSR is always accessed atomicly the pointer swap doesn't work
+> > so we leave that as is.
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> >  target/riscv/cpu.c        | 16 ++++++++++++----
+> >  target/riscv/cpu.h        | 12 ++++++++++--
+> >  target/riscv/cpu_helper.c | 32 ++++++++++++++++----------------
+> >  target/riscv/csr.c        | 28 ++++++++++++++--------------
+> >  target/riscv/op_helper.c  | 14 +++++++-------
+> >  5 files changed, 59 insertions(+), 43 deletions(-)
+> >
+> > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> > index be8f643fc2..371d5845af 100644
+> > --- a/target/riscv/cpu.c
+> > +++ b/target/riscv/cpu.c
+> > @@ -228,7 +228,7 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE
+> *f, int flags)
+> >      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "pc      ", env->pc);
+> >  #ifndef CONFIG_USER_ONLY
+> >      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mhartid ",
+> env->mhartid);
+> > -    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ",
+> env->mstatus);
+> > +    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ",
+> *env->mstatus);
+> >      if (riscv_has_ext(env, RVH)) {
+> >          qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "hstatus ",
+> env->hstatus);
+> >          qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "bstatus ",
+> env->vsstatus);
+> > @@ -239,7 +239,7 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE
+> *f, int flags)
+> >          qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vsip    ",
+> >                       (target_ulong)atomic_read(&env->vsip));
+> >      }
+> > -    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mie     ", env->mie);
+> > +    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mie     ", *env->mie);
+> >      if (riscv_has_ext(env, RVH)) {
+> >          qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vsie    ",
+> env->vsie);
+> >      }
+> > @@ -309,7 +309,7 @@ static bool riscv_cpu_has_work(CPUState *cs)
+> >       * Definition of the WFI instruction requires it to ignore the
+> privilege
+> >       * mode and delegation registers, but respect individual enables
+> >       */
+> > -    return (atomic_read(&env->mip) & env->mie) != 0;
+> > +    return (atomic_read(&env->mip) & *env->mie) != 0;
+> >  #else
+> >      return true;
+> >  #endif
+> > @@ -330,7 +330,7 @@ static void riscv_cpu_reset(CPUState *cs)
+> >      mcc->parent_reset(cs);
+> >  #ifndef CONFIG_USER_ONLY
+> >      env->priv = PRV_M;
+> > -    env->mstatus &= ~(MSTATUS_MIE | MSTATUS_MPRV);
+> > +    *env->mstatus &= ~(MSTATUS_MIE | MSTATUS_MPRV);
+> >      env->mcause = 0;
+> >      env->pc = env->resetvec;
+> >  #endif
+> > @@ -459,8 +459,16 @@ static void riscv_cpu_realize(DeviceState *dev,
+> Error **errp)
+> >  static void riscv_cpu_init(Object *obj)
+> >  {
+> >      RISCVCPU *cpu = RISCV_CPU(obj);
+> > +#ifndef CONFIG_USER_ONLY
+> > +    CPURISCVState *env = &cpu->env;
+> > +#endif
+> >
+> >      cpu_set_cpustate_pointers(cpu);
+> > +
+> > +#ifndef CONFIG_USER_ONLY
+> > +    env->mie = &env->mie_novirt;
+> > +    env->mstatus = &env->mstatus_novirt;
+> > +#endif
+> >  }
+> >
+> >  static const VMStateDescription vmstate_riscv_cpu = {
+> > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> > index 4c342e7a79..680592cb60 100644
+> > --- a/target/riscv/cpu.h
+> > +++ b/target/riscv/cpu.h
+> > @@ -122,7 +122,7 @@ struct CPURISCVState {
+> >      target_ulong resetvec;
+> >
+> >      target_ulong mhartid;
+> > -    target_ulong mstatus;
+> > +    target_ulong *mstatus;
+> >
+> >      /*
+> >       * CAUTION! Unlike the rest of this struct, mip is accessed
+> asynchonously
+> > @@ -136,7 +136,7 @@ struct CPURISCVState {
+> >      uint32_t mip;
+> >      uint32_t miclaim;
+> >
+> > -    target_ulong mie;
+> > +    target_ulong *mie;
+> >      target_ulong mideleg;
+> >
+> >      target_ulong sptbr;  /* until: priv-1.9.1 */
+> > @@ -154,6 +154,14 @@ struct CPURISCVState {
+> >      target_ulong mcause;
+> >      target_ulong mtval;  /* since: priv-1.10.0 */
+> >
+> > +    /* The following registers are the "real" versions that the pointer
+> > +     * versions point to. These should never be used unless you know
+> what you
+> > +     * are doing. To access these use the pointer versions instead.
+> This is
+> > +     * required to handle the Hypervisor register swapping.
+> > +     */
+> > +    target_ulong mie_novirt;
+> > +    target_ulong mstatus_novirt;
+> > +
+> >      /* Hypervisor CSRs */
+> >      target_ulong hstatus;
+> >      target_ulong hedeleg;
+> > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+> > index 5bcfc2e090..c597523d74 100644
+> > --- a/target/riscv/cpu_helper.c
+> > +++ b/target/riscv/cpu_helper.c
+> > @@ -36,9 +36,9 @@ int riscv_cpu_mmu_index(CPURISCVState *env, bool
+> ifetch)
+> >  #ifndef CONFIG_USER_ONLY
+> >  static int riscv_cpu_local_irq_pending(CPURISCVState *env)
+> >  {
+> > -    target_ulong mstatus_mie = get_field(env->mstatus, MSTATUS_MIE);
+> > -    target_ulong mstatus_sie = get_field(env->mstatus, MSTATUS_SIE);
+> > -    target_ulong pending = atomic_read(&env->mip) & env->mie;
+> > +    target_ulong mstatus_mie = get_field(*env->mstatus, MSTATUS_MIE);
+> > +    target_ulong mstatus_sie = get_field(*env->mstatus, MSTATUS_SIE);
+> > +    target_ulong pending = atomic_read(env->mip) & *env->mie;
+> >      target_ulong mie = env->priv < PRV_M || (env->priv == PRV_M &&
+> mstatus_mie);
+> >      target_ulong sie = env->priv < PRV_S || (env->priv == PRV_S &&
+> mstatus_sie);
+> >      target_ulong irqs = (pending & ~env->mideleg & -mie) |
+> > @@ -74,7 +74,7 @@ bool riscv_cpu_exec_interrupt(CPUState *cs, int
+> interrupt_request)
+> >  /* Return true is floating point support is currently enabled */
+> >  bool riscv_cpu_fp_enabled(CPURISCVState *env)
+> >  {
+> > -    if (env->mstatus & MSTATUS_FS) {
+> > +    if (*env->mstatus & MSTATUS_FS) {
+> >          return true;
+> >      }
+> >
+> > @@ -219,8 +219,8 @@ static int get_physical_address(CPURISCVState *env,
+> hwaddr *physical,
+> >      int mode = mmu_idx;
+> >
+> >      if (mode == PRV_M && access_type != MMU_INST_FETCH) {
+> > -        if (get_field(env->mstatus, MSTATUS_MPRV)) {
+> > -            mode = get_field(env->mstatus, MSTATUS_MPP);
+> > +        if (get_field(*env->mstatus, MSTATUS_MPRV)) {
+> > +            mode = get_field(*env->mstatus, MSTATUS_MPP);
+> >          }
+> >      }
+> >
+> > @@ -234,11 +234,11 @@ static int get_physical_address(CPURISCVState
+> *env, hwaddr *physical,
+> >
+> >      target_ulong base;
+> >      int levels, ptidxbits, ptesize, vm, sum;
+> > -    int mxr = get_field(env->mstatus, MSTATUS_MXR);
+> > +    int mxr = get_field(*env->mstatus, MSTATUS_MXR);
+> >
+> >      if (env->priv_ver >= PRIV_VERSION_1_10_0) {
+> >          base = get_field(env->satp, SATP_PPN) << PGSHIFT;
+> > -        sum = get_field(env->mstatus, MSTATUS_SUM);
+> > +        sum = get_field(*env->mstatus, MSTATUS_SUM);
+> >          vm = get_field(env->satp, SATP_MODE);
+> >          switch (vm) {
+> >          case VM_1_10_SV32:
+> > @@ -258,8 +258,8 @@ static int get_physical_address(CPURISCVState *env,
+> hwaddr *physical,
+> >          }
+> >      } else {
+> >          base = env->sptbr << PGSHIFT;
+> > -        sum = !get_field(env->mstatus, MSTATUS_PUM);
+> > -        vm = get_field(env->mstatus, MSTATUS_VM);
+> > +        sum = !get_field(*env->mstatus, MSTATUS_PUM);
+> > +        vm = get_field(*env->mstatus, MSTATUS_VM);
+> >          switch (vm) {
+> >          case VM_1_09_SV32:
+> >            levels = 2; ptidxbits = 10; ptesize = 4; break;
+> > @@ -505,8 +505,8 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address,
+> int size,
+> >      ret = get_physical_address(env, &pa, &prot, address, access_type,
+> mmu_idx);
+> >
+> >      if (mode == PRV_M && access_type != MMU_INST_FETCH) {
+> > -        if (get_field(env->mstatus, MSTATUS_MPRV)) {
+> > -            mode = get_field(env->mstatus, MSTATUS_MPP);
+> > +        if (get_field(*env->mstatus, MSTATUS_MPRV)) {
+> > +            mode = get_field(*env->mstatus, MSTATUS_MPP);
+> >          }
+> >      }
+> >
+> > @@ -606,12 +606,12 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+> >      if (env->priv <= PRV_S &&
+> >              cause < TARGET_LONG_BITS && ((deleg >> cause) & 1)) {
+> >          /* handle the trap in S-mode */
+> > -        target_ulong s = env->mstatus;
+> > +        target_ulong s = *env->mstatus;
+> >          s = set_field(s, MSTATUS_SPIE, env->priv_ver >=
+> PRIV_VERSION_1_10_0 ?
+> >              get_field(s, MSTATUS_SIE) : get_field(s, MSTATUS_UIE <<
+> env->priv));
+> >          s = set_field(s, MSTATUS_SPP, env->priv);
+> >          s = set_field(s, MSTATUS_SIE, 0);
+> > -        env->mstatus = s;
+> > +        *env->mstatus = s;
+> >          env->scause = cause | ((target_ulong)async << (TARGET_LONG_BITS
+> - 1));
+> >          env->sepc = env->pc;
+> >          env->sbadaddr = tval;
+> > @@ -620,12 +620,12 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+> >          riscv_cpu_set_mode(env, PRV_S);
+> >      } else {
+> >          /* handle the trap in M-mode */
+> > -        target_ulong s = env->mstatus;
+> > +        target_ulong s = *env->mstatus;
+> >          s = set_field(s, MSTATUS_MPIE, env->priv_ver >=
+> PRIV_VERSION_1_10_0 ?
+> >              get_field(s, MSTATUS_MIE) : get_field(s, MSTATUS_UIE <<
+> env->priv));
+> >          s = set_field(s, MSTATUS_MPP, env->priv);
+> >          s = set_field(s, MSTATUS_MIE, 0);
+> > -        env->mstatus = s;
+> > +        *env->mstatus = s;
+> >          env->mcause = cause | ~(((target_ulong)-1) >> async);
+> >          env->mepc = env->pc;
+> >          env->mbadaddr = tval;
+> > diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> > index e2e908fbc0..30ec8c0a8e 100644
+> > --- a/target/riscv/csr.c
+> > +++ b/target/riscv/csr.c
+> > @@ -136,7 +136,7 @@ static int write_fflags(CPURISCVState *env, int
+> csrno, target_ulong val)
+> >      if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+> >          return -1;
+> >      }
+> > -    env->mstatus |= MSTATUS_FS;
+> > +    *env->mstatus |= MSTATUS_FS;
+> >  #endif
+> >      riscv_cpu_set_fflags(env, val & (FSR_AEXC >> FSR_AEXC_SHIFT));
+> >      return 0;
+> > @@ -159,7 +159,7 @@ static int write_frm(CPURISCVState *env, int csrno,
+> target_ulong val)
+> >      if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+> >          return -1;
+> >      }
+> > -    env->mstatus |= MSTATUS_FS;
+> > +    *env->mstatus |= MSTATUS_FS;
+> >  #endif
+> >      env->frm = val & (FSR_RD >> FSR_RD_SHIFT);
+> >      return 0;
+> > @@ -183,7 +183,7 @@ static int write_fcsr(CPURISCVState *env, int csrno,
+> target_ulong val)
+> >      if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+> >          return -1;
+> >      }
+> > -    env->mstatus |= MSTATUS_FS;
+> > +    *env->mstatus |= MSTATUS_FS;
+> >  #endif
+> >      env->frm = (val & FSR_RD) >> FSR_RD_SHIFT;
+> >      riscv_cpu_set_fflags(env, (val & FSR_AEXC) >> FSR_AEXC_SHIFT);
+> > @@ -307,7 +307,7 @@ static int read_mhartid(CPURISCVState *env, int
+> csrno, target_ulong *val)
+> >  /* Machine Trap Setup */
+> >  static int read_mstatus(CPURISCVState *env, int csrno, target_ulong
+> *val)
+> >  {
+> > -    *val = env->mstatus;
+> > +    *val = *env->mstatus;
+> >      return 0;
+> >  }
+> >
+> > @@ -319,7 +319,7 @@ static int validate_vm(CPURISCVState *env,
+> target_ulong vm)
+> >
+> >  static int write_mstatus(CPURISCVState *env, int csrno, target_ulong
+> val)
+> >  {
+> > -    target_ulong mstatus = env->mstatus;
+> > +    target_ulong mstatus = *env->mstatus;
+> >      target_ulong mask = 0;
+> >      int dirty;
+> >
+> > @@ -359,7 +359,7 @@ static int write_mstatus(CPURISCVState *env, int
+> csrno, target_ulong val)
+> >               ((mstatus & MSTATUS_FS) == MSTATUS_FS)) |
+> >              ((mstatus & MSTATUS_XS) == MSTATUS_XS);
+> >      mstatus = set_field(mstatus, MSTATUS_SD, dirty);
+> > -    env->mstatus = mstatus;
+> > +    *env->mstatus = mstatus;
+> >
+> >      return 0;
+> >  }
+> > @@ -448,13 +448,13 @@ static int write_mideleg(CPURISCVState *env, int
+> csrno, target_ulong val)
+> >
+> >  static int read_mie(CPURISCVState *env, int csrno, target_ulong *val)
+> >  {
+> > -    *val = env->mie;
+> > +    *val = *env->mie;
+> >      return 0;
+> >  }
+> >
+> >  static int write_mie(CPURISCVState *env, int csrno, target_ulong val)
+> >  {
+> > -    env->mie = (env->mie & ~all_ints) | (val & all_ints);
+> > +    *env->mie = (*env->mie & ~all_ints) | (val & all_ints);
+> >      return 0;
+> >  }
+> >
+> > @@ -608,7 +608,7 @@ static int read_sstatus(CPURISCVState *env, int
+> csrno, target_ulong *val)
+> >  {
+> >      target_ulong mask = ((env->priv_ver >= PRIV_VERSION_1_10_0) ?
+> >                           sstatus_v1_10_mask : sstatus_v1_9_mask);
+> > -    *val = env->mstatus & mask;
+> > +    *val = *env->mstatus & mask;
+> >      return 0;
+> >  }
+> >
+> > @@ -616,19 +616,19 @@ static int write_sstatus(CPURISCVState *env, int
+> csrno, target_ulong val)
+> >  {
+> >      target_ulong mask = ((env->priv_ver >= PRIV_VERSION_1_10_0) ?
+> >                           sstatus_v1_10_mask : sstatus_v1_9_mask);
+> > -    target_ulong newval = (env->mstatus & ~mask) | (val & mask);
+> > +    target_ulong newval = (*env->mstatus & ~mask) | (val & mask);
+> >      return write_mstatus(env, CSR_MSTATUS, newval);
+> >  }
+> >
+> >  static int read_sie(CPURISCVState *env, int csrno, target_ulong *val)
+> >  {
+> > -    *val = env->mie & env->mideleg;
+> > +    *val = *env->mie & env->mideleg;
+> >      return 0;
+> >  }
+> >
+> >  static int write_sie(CPURISCVState *env, int csrno, target_ulong val)
+> >  {
+> > -    target_ulong newval = (env->mie & ~env->mideleg) | (val &
+> env->mideleg);
+> > +    target_ulong newval = (*env->mie & ~env->mideleg) | (val &
+> env->mideleg);
+> >      return write_mie(env, CSR_MIE, newval);
+> >  }
+> >
+> > @@ -731,7 +731,7 @@ static int read_satp(CPURISCVState *env, int csrno,
+> target_ulong *val)
+> >      if (!riscv_feature(env, RISCV_FEATURE_MMU)) {
+> >          *val = 0;
+> >      } else if (env->priv_ver >= PRIV_VERSION_1_10_0) {
+> > -        if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM))
+> {
+> > +        if (env->priv == PRV_S && get_field(*env->mstatus,
+> MSTATUS_TVM)) {
+> >              return -1;
+> >          } else {
+> >              *val = env->satp;
+> > @@ -756,7 +756,7 @@ static int write_satp(CPURISCVState *env, int csrno,
+> target_ulong val)
+> >          validate_vm(env, get_field(val, SATP_MODE)) &&
+> >          ((val ^ env->satp) & (SATP_MODE | SATP_ASID | SATP_PPN)))
+> >      {
+> > -        if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM))
+> {
+> > +        if (env->priv == PRV_S && get_field(*env->mstatus,
+> MSTATUS_TVM)) {
+> >              return -1;
+> >          } else {
+> >              if((val ^ env->satp) & SATP_ASID) {
+> > diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+> > index 331cc36232..d150551bc9 100644
+> > --- a/target/riscv/op_helper.c
+> > +++ b/target/riscv/op_helper.c
+> > @@ -83,11 +83,11 @@ target_ulong helper_sret(CPURISCVState *env,
+> target_ulong cpu_pc_deb)
+> >      }
+> >
+> >      if (env->priv_ver >= PRIV_VERSION_1_10_0 &&
+> > -        get_field(env->mstatus, MSTATUS_TSR)) {
+> > +        get_field(*env->mstatus, MSTATUS_TSR)) {
+> >          riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+> >      }
+> >
+> > -    target_ulong mstatus = env->mstatus;
+> > +    target_ulong mstatus = *env->mstatus;
+> >      target_ulong prev_priv = get_field(mstatus, MSTATUS_SPP);
+> >      mstatus = set_field(mstatus,
+> >          env->priv_ver >= PRIV_VERSION_1_10_0 ?
+> > @@ -96,7 +96,7 @@ target_ulong helper_sret(CPURISCVState *env,
+> target_ulong cpu_pc_deb)
+> >      mstatus = set_field(mstatus, MSTATUS_SPIE, 0);
+> >      mstatus = set_field(mstatus, MSTATUS_SPP, PRV_U);
+> >      riscv_cpu_set_mode(env, prev_priv);
+> > -    env->mstatus = mstatus;
+> > +    *env->mstatus = mstatus;
+> >
+> >      return retpc;
+> >  }
+> > @@ -112,7 +112,7 @@ target_ulong helper_mret(CPURISCVState *env,
+> target_ulong cpu_pc_deb)
+> >          riscv_raise_exception(env, RISCV_EXCP_INST_ADDR_MIS, GETPC());
+> >      }
+> >
+> > -    target_ulong mstatus = env->mstatus;
+> > +    target_ulong mstatus = *env->mstatus;
+> >      target_ulong prev_priv = get_field(mstatus, MSTATUS_MPP);
+> >      mstatus = set_field(mstatus,
+> >          env->priv_ver >= PRIV_VERSION_1_10_0 ?
+> > @@ -121,7 +121,7 @@ target_ulong helper_mret(CPURISCVState *env,
+> target_ulong cpu_pc_deb)
+> >      mstatus = set_field(mstatus, MSTATUS_MPIE, 0);
+> >      mstatus = set_field(mstatus, MSTATUS_MPP, PRV_U);
+> >      riscv_cpu_set_mode(env, prev_priv);
+> > -    env->mstatus = mstatus;
+> > +    *env->mstatus = mstatus;
+> >
+> >      return retpc;
+> >  }
+> > @@ -132,7 +132,7 @@ void helper_wfi(CPURISCVState *env)
+> >
+> >      if (env->priv == PRV_S &&
+> >          env->priv_ver >= PRIV_VERSION_1_10_0 &&
+> > -        get_field(env->mstatus, MSTATUS_TW)) {
+> > +        get_field(*env->mstatus, MSTATUS_TW)) {
+> >          riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+> >      } else {
+> >          cs->halted = 1;
+> > @@ -147,7 +147,7 @@ void helper_tlb_flush(CPURISCVState *env)
+> >      if (!(env->priv >= PRV_S) ||
+> >          (env->priv == PRV_S &&
+> >           env->priv_ver >= PRIV_VERSION_1_10_0 &&
+> > -         get_field(env->mstatus, MSTATUS_TVM))) {
+> > +         get_field(*env->mstatus, MSTATUS_TVM))) {
+> >          riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+> >      } else {
+> >          tlb_flush(cs);
+>
+> I don't think this is that bad.
+>
+> Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+>
+>
