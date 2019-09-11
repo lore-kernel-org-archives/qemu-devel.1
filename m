@@ -2,54 +2,93 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52966C5ACAE
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 13:22:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5242BC5ACAE
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 13:23:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C06F206A5
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 13:22:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C06F206A5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1861720838
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 13:23:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fF10owJh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1861720838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i82Zl-00083b-5X
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 09:22:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58705)
+	id 1i82bB-0001QG-3z
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 09:23:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59164)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i82YA-0006ij-Q9
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 09:20:48 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i82a4-0000JA-9S
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 09:22:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1i82Y7-0006iA-Qp
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 09:20:45 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:35393 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1i82Y7-00062C-Ki
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 09:20:43 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 8FAFB1A1E97;
- Wed, 11 Sep 2019 15:19:38 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 77BA01A1E2D;
- Wed, 11 Sep 2019 15:19:38 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 11 Sep 2019 15:19:26 +0200
-Message-Id: <1568207966-25202-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH] target/mips: gdbstub: Revert commit 8e0b373
+ (envelope-from <richard.henderson@linaro.org>) id 1i82a3-0007Vz-D5
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 09:22:44 -0400
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:34810)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i82a3-0007Vp-8v
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 09:22:43 -0400
+Received: by mail-qt1-x844.google.com with SMTP id j1so12447432qth.1
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 06:22:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=jIGvF0CI7Rp5e2phsHIiY96IXF8wmOU+APeY7QYDXEM=;
+ b=fF10owJh5TMv0ZZgxHn1zJA+C7XPHjVMPUFo9+RssT8aEVymZIhs19telHf4dOEE0w
+ B3VLFLD6soaDC31K4dd7W2tWJmdRicZQ+rKZ3o16uZMQj/0ZISm6SurTU6IIasJXHK9k
+ WG+ElORhOm6BA9teUUURFmwLk7FRfLSo0RGwmSH5BfesDixMl9jFFz7HeNj/jR/tMdiS
+ Bu9KDuuO0QajIujrA77I3AfR4h/F0hpx8ac5s32+EeN/tC2HfJaXsX0W/v1b389nLVaz
+ At7l7/h3ASFJzn+psYhIx3Rlu3po6PdtrsvDd537dR0dGRJEHdPmScXTrzauOunDyt50
+ PMBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=jIGvF0CI7Rp5e2phsHIiY96IXF8wmOU+APeY7QYDXEM=;
+ b=D1RRVXZBQbxfh2mC6eHnIHFGSozjiZqEAG6+G19TCSzcml0L+oSwDtvQ+f4Zsnn9mA
+ eqWW+KW707ssA5KpE5XwUvePyFhZlGy7weabagmXvRtUJeYu1FDGGH4FfkAVgQfaZQAV
+ Eyk5RPH6VTh2MlKSk3m+8MyLZG5XcNYFD+fKc/rrVVFqU7F3mfQbvXr4D/hlzkQwQzQA
+ Y7jMiHcEW+LsVg5dG2L4JeZrFCfL8W8ZjXP9gyiGsm2JwK2I5OvIyDJMUvx7JJAuJ0DT
+ MlCAs4gBONQ2hphszY1NbKFbi6ncHlfRGNkJVEQ+yADJk0Xj87dhDAYaE+S3GY/K3eDY
+ 6Y1Q==
+X-Gm-Message-State: APjAAAVpKxVvCtH+hwjJFTp38anYgOrTpCRy58XvTKHn8s/Nv3pMQNzp
+ EQLgL7iyX337QZwNFV3+nZ0UPWIYJG2/CQ==
+X-Google-Smtp-Source: APXvYqzdb9PQ5lCsr+x4hKfTKgd+rZdzamvs9akaA7ytSdZLp3ken+h1lKY53iBYU/ubbRxczpeWsQ==
+X-Received: by 2002:ac8:198b:: with SMTP id u11mr2391070qtj.108.1568208162428; 
+ Wed, 11 Sep 2019 06:22:42 -0700 (PDT)
+Received: from [192.168.5.185] (otwaon236nw-grc-01-64-229-69-35.dsl.bell.ca.
+ [64.229.69.35])
+ by smtp.gmail.com with ESMTPSA id k199sm11010074qke.45.2019.09.11.06.22.41
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 11 Sep 2019 06:22:41 -0700 (PDT)
+To: Tony Nguyen <tony.nguyen@bt.com>
+References: <20190911014353.5926-1-richard.henderson@linaro.org>
+ <20190911014353.5926-3-richard.henderson@linaro.org>
+ <20190911105509.GA42643@imac.local>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <299a576c-0264-95d2-e2fe-4dee41d87039@linaro.org>
+Date: Wed, 11 Sep 2019 09:22:39 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190911105509.GA42643@imac.local>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::844
+Subject: Re: [Qemu-devel] [PATCH 2/3] cputlb: Replace switches in
+ load/store_helper with callback
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,47 +100,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com, Libo Zhou <zhlb29@foxmail.com>,
- amarkovic@wavecomp.com
+Cc: peter.maydell@linaro.org, mark.cave-ayland@ilande.co.uk,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Libo Zhou <zhlb29@foxmail.com>
+On 9/11/19 6:55 AM, Tony Nguyen wrote:
+>>  typedef uint64_t FullLoadHelper(CPUArchState *env, target_ulong addr,
+>>                                  TCGMemOpIdx oi, uintptr_t retaddr);
+>> +typedef uint64_t DirectLoadHelper(const void *);
+> 
+> Would 'Load' instead of 'DirectLoadHelper' have enough clarity?
 
-Multiple report from users were received regarding failures
-of "packet g" comminucation with gdb. Revert this commit until
-a better solution is developed.
+I suppose so, yes.
 
-Suggested-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Libo Zhou <zhlb29@foxmail.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- target/mips/gdbstub.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+> If so, consider also dropping the 'direct_' prefix in the functions below.
+> 
+>> +
+>> +static inline uint64_t direct_ldub(const void *haddr)
+>> +{
+>> +    return *(uint8_t *)haddr;
+>> +}
+>> +
+>> +static inline uint64_t direct_lduw_be(const void *haddr)
+>> +{
+>> +    return lduw_be_p(haddr);
+>> +}
 
-diff --git a/target/mips/gdbstub.c b/target/mips/gdbstub.c
-index ebcc98b..bbb2544 100644
---- a/target/mips/gdbstub.c
-+++ b/target/mips/gdbstub.c
-@@ -38,7 +38,7 @@ int mips_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
-             return gdb_get_regl(mem_buf, (int32_t)env->active_fpu.fcr0);
-         default:
-             if (env->CP0_Status & (1 << CP0St_FR)) {
--                return gdb_get_reg64(mem_buf,
-+                return gdb_get_regl(mem_buf,
-                     env->active_fpu.fpr[n - 38].d);
-             } else {
-                 return gdb_get_regl(mem_buf,
-@@ -99,7 +99,6 @@ int mips_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
-             break;
-         default:
-             if (env->CP0_Status & (1 << CP0St_FR)) {
--                uint64_t tmp = ldq_p(mem_buf);
-                 env->active_fpu.fpr[n - 38].d = tmp;
-             } else {
-                 env->active_fpu.fpr[n - 38].w[FP_ENDIAN_IDX] = tmp;
--- 
-2.7.4
+I would be hesitant to call this just "lduw_be"; I think that's confusing when
+it's calling lduw_be_p.  But perhaps "wrap_*" or "wide_*"?
 
+
+r~
 
