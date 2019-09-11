@@ -2,87 +2,93 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAABEC49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 15:32:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B75EBC5ACAE
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 15:34:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0701206CD
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 15:32:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8306C2084D
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 15:34:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VWqd0yo2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0701206CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kbb6vkNo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8306C2084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i84c4-0001kF-6T
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 11:32:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52545)
+	id 1i84dQ-0002MB-B3
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 11:34:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50777)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1i84NH-0006P0-Lu
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 11:17:40 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i84EV-0007Gq-GV
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 11:08:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1i84NA-0003U6-Ef
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 11:17:39 -0400
-Received: from mail-qt1-x835.google.com ([2607:f8b0:4864:20::835]:33669)
+ (envelope-from <richard.henderson@linaro.org>) id 1i84EU-0007bf-68
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 11:08:35 -0400
+Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:41222)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1i84N5-0003Qp-MV
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 11:17:28 -0400
-Received: by mail-qt1-x835.google.com with SMTP id r5so25717638qtd.0
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 08:17:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ynD14thOR9g6jAfylfDW/JweKGG1XGPTbwbsdfT+g+w=;
- b=VWqd0yo2CcJmPcJDB/lSumJGCrpRVKABOVy/U1TdLz+37OXK0IxIfNVLlbfvonGhfy
- mPkCItYUp3k2aVyfqSu2zxm0xYiLJOy/mgh8TLsR5Klg7QWJZbKR1/edpRXtF9irRcYS
- U6F+ZwqEMUN9S1TzLOiez4o6KSRnCVM6ADHjaixCWFw3UG0t4j0uWXxSOsWKyybtME9c
- /66dQ1lHEUio2EBp02lepnuGyKZ/3KiVNzf25UNInwcE0fI528JTwxf5BdRfTfydb4+F
- 97C5MVz+Qic/rIXwy19pahdFHIYgRwHNA1Nh6uaXSPHOr/EVqL3tdM3CliKwnK43MFww
- hTAw==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i84EI-0007Y1-Dt
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 11:08:22 -0400
+Received: by mail-qk1-x742.google.com with SMTP id p10so3120565qkg.8
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 08:08:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=V0wS7vDOtwQ0JAEDg5cRNhWhvCAfAAPTKn6GNzVSIok=;
+ b=Kbb6vkNox1jabB++/XN9knaTci9j9D0viNK+opJYVa7eCtKT+oXaemwANDdKFpwmQD
+ Ea2/uPtShFBzDP8LxFRHhXTsTFAd+4DDlUmdUArNf1tN3rBVvs7XRSYIHXbeR8UmKhJN
+ L0Madn6/SlMaVARmEGx+H2RNrfUuy9xFytF3avUENpVhFCi6nkjpPxZWp8T+54SOgmYU
+ +YFGHiyHyv2k4PsVjSsz9m6FAwh2cmFCp/BcWSU2NvGSL4n7nv76cuhRI51ip/EPyhw8
+ icIAMagw0F+XAOtf696OVCvZDFytUJt0oZHQkK0QMQ36GtCp9c6D8PVoKx6XKR0IVgIf
+ O+7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ynD14thOR9g6jAfylfDW/JweKGG1XGPTbwbsdfT+g+w=;
- b=VwjH8yYQ/xKgJMy8YjADLfo14nY7uj5JOJ3d2QaQfTyxS6d5Q1APR4H8UxZdLsANoM
- 7MT8TEMEExmlS2yfBuLYrFZAt2Mt0X8aB3pkkldsBJV2/nj8+bkWUy70AHttOKurTzIP
- NUjOiQ2kzcPP+5UnYlR2oEpprI02AC+PL9xllEC7H3pbvnsyn3CBx2xssT+8hYMi8n1e
- 5JsAbPBbrYXt1/jDR5XlGhUA/LF217OYHbFRtEyt7kwktVJ+0cX21urvmFA1/bMa53ck
- lXIdawtpNSPj2QF6ZX4IPUvVLIZbc8gSrYTWeGJGb+aE/uWpmEC5uGRx7xICqKWqGFoJ
- LtGg==
-X-Gm-Message-State: APjAAAXtVTnsCRCd/8f0HGXG1+Ld4CYs1cF9j+IAnwlXDcXtISzGncr0
- qG7kWjI/QWCFxWju3It9XmYV5+bPGWaGfTlNY42/mA==
-X-Google-Smtp-Source: APXvYqySFgDZlBvEMacfDXq/NRi7dmzO/Cn/kvUDEU93UNPcpa+EpQ1f/DXb6Jx/r7dwhnzdOBeZeD+KKGLKvIuW6FU=
-X-Received: by 2002:ac8:38ef:: with SMTP id g44mr36089137qtc.277.1568215042621; 
- Wed, 11 Sep 2019 08:17:22 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=V0wS7vDOtwQ0JAEDg5cRNhWhvCAfAAPTKn6GNzVSIok=;
+ b=N/1oqGU5IOxnnIjboLusdymQfKgLKgOhaqOqhydPSvklg3QeuiB9FPiGHsftnw0j4w
+ M+rlVtrvwaGi2Vz/lI/TNkM0BDzhQnKX25Olb//sYX7Ae27EmqLP5O+jhztbAwmzupk4
+ bwDsLQWgK7f4+t3XuNIh5JqIS6tHnT0uW/Bj4WVmjhAj/kd/LdPxNrn32NAoDAfFO206
+ VwnPfMionPz5JOnLyShBxDFGmXpunyPanAUQk3seu6H6YQkTHN6Hdv/9fBK+ScTAflaA
+ Z2I+H41QEhbg/iyBv+fsaCiW9YWwHSu9BSzzZe464wYU2KSM/ivVr77PbIPZoNOvJtKX
+ U3GQ==
+X-Gm-Message-State: APjAAAXpu8j1tbxJ5Zy+dLtfkvqkIpUVKBgOM1OHubebT2an1Xor+JJd
+ YGgYjX2o95qk2Md/sEU1aAJXJA==
+X-Google-Smtp-Source: APXvYqwlBax0NrvaYR5eoiH4YRnsackPTw9d5FvUD4qSzhWJXS81hNM1P0QnRDAXkBZgrm90wLvZKQ==
+X-Received: by 2002:ae9:f305:: with SMTP id p5mr34192873qkg.439.1568214500792; 
+ Wed, 11 Sep 2019 08:08:20 -0700 (PDT)
+Received: from [192.168.5.185] (otwaon236nw-grc-01-64-229-69-35.dsl.bell.ca.
+ [64.229.69.35])
+ by smtp.gmail.com with ESMTPSA id a11sm10747107qkc.123.2019.09.11.08.08.19
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 11 Sep 2019 08:08:20 -0700 (PDT)
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190906075750.14791-1-david@redhat.com>
+ <20190906075750.14791-11-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <de1d26a8-0d4b-cfa9-bb6e-3f6c3ae03a05@linaro.org>
+Date: Wed, 11 Sep 2019 11:08:18 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190902121233.13382-1-johannes@sipsolutions.net>
- <20190902121233.13382-2-johannes@sipsolutions.net>
- <fe517ef6c6a8e2df9675388be9454b5863c7fc55.camel@sipsolutions.net>
- <20190909160039.GC20875@stefanha-x1.localdomain>
- <d095bafedcd4bcc5d76279785e5bd523aef62b58.camel@sipsolutions.net>
- <20190910150319.GB31674@stefanha-x1.localdomain>
- <e114b68dffecd9b4c4666327b15a28098c83f7ec.camel@sipsolutions.net>
- <20190911073503.GB4181@stefanha-x1.localdomain>
- <bc3409f2f0df110ff0d795ad72b5bb5b29e2b5a6.camel@sipsolutions.net>
-In-Reply-To: <bc3409f2f0df110ff0d795ad72b5bb5b29e2b5a6.camel@sipsolutions.net>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 11 Sep 2019 17:17:11 +0200
-Message-ID: <CAJSP0QWwL3-XiB4jFKLxXjeDwpyaDj4NS6j2FQ3Rg_k6YVC=3Q@mail.gmail.com>
-To: Johannes Berg <johannes@sipsolutions.net>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190906075750.14791-11-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::835
-Subject: Re: [Qemu-devel] [RFC] docs: vhost-user: add in-band kick/call
- messages
+X-Received-From: 2607:f8b0:4864:20::742
+Subject: Re: [Qemu-devel] [PATCH v2 10/28] s390x/tcg: MVCS/MVCP: Check for
+ special operation exceptions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,27 +100,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Florian Weimer <fweimer@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Stefano Brivio <sbrivio@redhat.com>,
+ qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 11, 2019 at 11:13 AM Johannes Berg
-<johannes@sipsolutions.net> wrote:
-> On Wed, 2019-09-11 at 09:35 +0200, Stefan Hajnoczi wrote:
-> > On Tue, Sep 10, 2019 at 05:14:36PM +0200, Johannes Berg wrote:
-> > > On Tue, 2019-09-10 at 17:03 +0200, Stefan Hajnoczi wrote:
-> > I'm suggesting this because it seems like a cleaner approach than
-> > exposing the calendar concept to the vhost-user devices.
->
-> As I argue above, for all intents and purposes that only works for
-> extremely trivial devices, to the extent that I'd rather exclude them
-> than risk unexpected behaviour.
+On 9/6/19 3:57 AM, David Hildenbrand wrote:
+> Let's perform the documented checks.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/mem_helper.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 
-That makes sense, I think a vhost-user protocol extension is necessary
-here.  Thanks for explaining.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Stefan
+r~
+
 
