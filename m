@@ -2,103 +2,58 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F607C49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:42:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9802BC5ACAE
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:45:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B6A42053B
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:42:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="HXVSKJzl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B6A42053B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6C4FE2053B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:45:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C4FE2053B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i83pY-0007Ua-MB
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:42:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43839)
+	id 1i83ri-00014c-VZ
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:45:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44719)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Paul.Durrant@citrix.com>) id 1i83jS-00007A-9V
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:36:31 -0400
+ (envelope-from <geert@linux-m68k.org>) id 1i83m7-000396-Ix
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:39:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Paul.Durrant@citrix.com>) id 1i83jQ-0000pb-Hm
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:36:30 -0400
-Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:52991)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Paul.Durrant@citrix.com>)
- id 1i83jQ-0000p2-9T
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:36:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=citrix.com; s=securemail; t=1568212587;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=T/OmK8cgnAMqLNIMN+DLYnXrAoH6k7umb04+WKRlLRk=;
- b=HXVSKJzlcPlBoszkzoHXVsEHsnz2cPzQ1YMeARi1/XIz7F5f5E9HbZpO
- RTTxGMeRHkv7fLr4iB2fRg/5qr6HERiOJYuRPtvury09iHI2hNC94JGRM
- huKBCWLJ9CNqWzHktyjgzDfzrpfu7b2jQ4XWWH5dcKhT0Kt2M1Q9MaRrC c=;
-Authentication-Results: esa5.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none;
- spf=None smtp.pra=paul.durrant@citrix.com;
- spf=Pass smtp.mailfrom=Paul.Durrant@citrix.com;
- spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- paul.durrant@citrix.com) identity=pra;
- client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="paul.durrant@citrix.com"; x-conformance=sidf_compatible
-Received-SPF: Pass (esa5.hc3370-68.iphmx.com: domain of
- Paul.Durrant@citrix.com designates 162.221.158.21 as
- permitted sender) identity=mailfrom;
- client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="Paul.Durrant@citrix.com";
- x-conformance=sidf_compatible; x-record-type="v=spf1";
- x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
- ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
- ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
- ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
-Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- postmaster@mail.citrix.com) identity=helo;
- client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="postmaster@mail.citrix.com";
- x-conformance=sidf_compatible
-IronPort-SDR: 3OTi9wDh9RvHxeWOvIZ+kuuiSVACKGsvJuBW87nQbgOKhCBN8w1rfnphQ+EqsfdvoQXgzdLgc6
- VzqS81TPCqqr638s9x+LVZ21/MqMNnfQIJg6hcauTE1qRcoBPnStUdcDls89rIziPlHhKf3wtl
- ppZx8lU67Ekstn1vFbVLk0yEn/kYkiSFlJlz1xlPyKxHEc4vVzOfhwfX6Bb9w7LzeRFTJl8t8a
- UAp+sCrKt1z+0woBeXjdfA7d5keHJ5rlrNEAnGyUPETpFpkMOLQTVKUgH6mGoLF8esgUmxHsFH
- 3nU=
-X-SBRS: 2.7
-X-MesageID: 5629854
-X-Ironport-Server: esa5.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.64,493,1559534400"; 
-   d="scan'208";a="5629854"
-From: Paul Durrant <paul.durrant@citrix.com>
-To: <qemu-devel@nongnu.org>, <xen-devel@lists.xenproject.org>
-Date: Wed, 11 Sep 2019 15:36:18 +0100
-Message-ID: <20190911143618.23477-4-paul.durrant@citrix.com>
-X-Mailer: git-send-email 2.20.1.2.gb21ebb6
-In-Reply-To: <20190911143618.23477-1-paul.durrant@citrix.com>
-References: <20190911143618.23477-1-paul.durrant@citrix.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.155.168
-Subject: [Qemu-devel] [PATCH 3/3] xen: perform XenDevice clean-up in XenBus
- watch handler
+ (envelope-from <geert@linux-m68k.org>) id 1i83m6-0001xB-Ck
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:39:15 -0400
+Received: from laurent.telenet-ops.be ([2a02:1800:110:4::f00:19]:53992)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <geert@linux-m68k.org>)
+ id 1i83m6-0001vO-6I
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:39:14 -0400
+Received: from ramsan ([84.194.98.4]) by laurent.telenet-ops.be with bizsmtp
+ id 0Ef42100205gfCL01Ef4Ro; Wed, 11 Sep 2019 16:39:10 +0200
+Received: from rox.of.borg ([192.168.97.57]) by ramsan with esmtp (Exim 4.90_1)
+ (envelope-from <geert@linux-m68k.org>)
+ id 1i83lv-0006T7-V5; Wed, 11 Sep 2019 16:39:03 +0200
+Received: from geert by rox.of.borg with local (Exim 4.90_1)
+ (envelope-from <geert@linux-m68k.org>)
+ id 1i83lv-0003PC-Tp; Wed, 11 Sep 2019 16:39:03 +0200
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+To: Linus Walleij <linus.walleij@linaro.org>,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>
+Date: Wed, 11 Sep 2019 16:38:56 +0200
+Message-Id: <20190911143858.13024-4-geert+renesas@glider.be>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190911143858.13024-1-geert+renesas@glider.be>
+References: <20190911143858.13024-1-geert+renesas@glider.be>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 2a02:1800:110:4::f00:19
+Subject: [Qemu-devel] [PATCH/RFC v2 3/5] gpio: Export gpio_name_to_desc() to
+ modular GPIO code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,238 +65,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anthony Perard <anthony.perard@citrix.com>,
- Paul Durrant <paul.durrant@citrix.com>,
- Stefano Stabellini <sstabellini@kernel.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Marc Zyngier <marc.zyngier@arm.com>, Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-gpio@vger.kernel.org,
+ Alexander Graf <graf@amazon.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Harish Jenny K N <harish_kandiga@mentor.com>,
+ Phil Reid <preid@electromag.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cleaning up offine XenDevice objects directly in
-xen_device_backend_changed() is dangerous as xen_device_unrealize() will
-modify the watch list that is being walked. Even the QLIST_FOREACH_SAFE()
-used in notifier_list_notify() is insufficient as *two* notifiers (for
-the frontend and backend watches) are removed, thus potentially rendering
-the 'next' pointer unsafe.
+Make gpio_name_to_desc() global, and export its symbol, so modular GPIO
+driver can make use of this function.
 
-The solution is to use the XenBus backend_watch handler to do the clean-up
-instead, as it is invoked whilst walking a separate watch list.
+This will be used by the GPIO Aggregator.
 
-This patch therefore adds a new 'offline_devices' list to XenBus, to which
-offline devices are added by xen_device_backend_changed(). The XenBus
-backend_watch registration is also changed to not only invoke
-xen_bus_enumerate() but also a new xen_bus_cleanup() function, which will
-walk 'offline_devices' and perform the necessary actions.
-For safety a an extra 'online' check is also added to
-xen_bus_type_enumerate() to make sure that no attempt is made to create a
-new XenDevice object for a backend that is offline.
-
-NOTE: This patch also include some cosmetic changes:
-      - substitute the local variable name 'backend_state'
-        in xen_bus_type_enumerate() with 'state', since there
-        is no ambiguity with any other state in that context.
-      - change xen_device_state_is_active() to
-        xen_device_frontend_is_active() (and pass a XenDevice directly)
-        since the state tests contained therein only apply to a frontend.
-      - use 'state' rather then 'xendev->backend_state' in
-        xen_device_backend_changed() to shorten the code.
-
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
----
- hw/xen/trace-events      |  2 +
- hw/xen/xen-bus.c         | 91 +++++++++++++++++++++++++++++-----------
- include/hw/xen/xen-bus.h |  2 +
- 3 files changed, 70 insertions(+), 25 deletions(-)
+ drivers/gpio/gpiolib.c | 3 ++-
+ drivers/gpio/gpiolib.h | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/xen/trace-events b/hw/xen/trace-events
-index 80ce3dafad..e6885bc751 100644
---- a/hw/xen/trace-events
-+++ b/hw/xen/trace-events
-@@ -17,8 +17,10 @@ xen_domid_restrict(int err) "err: %u"
- xen_bus_realize(void) ""
- xen_bus_unrealize(void) ""
- xen_bus_enumerate(void) ""
-+xen_bus_cleanup(void) ""
- xen_bus_type_enumerate(const char *type) "type: %s"
- xen_bus_backend_create(const char *type, const char *path) "type: %s path: %s"
-+xen_bus_device_cleanup(const char *type, char *name) "type: %s name: %s"
- xen_bus_add_watch(const char *node, const char *key) "node: %s key: %s"
- xen_bus_remove_watch(const char *node, const char *key) "node: %s key: %s"
- xen_device_realize(const char *type, char *name) "type: %s name: %s"
-diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index 810a4e2df3..055beb7260 100644
---- a/hw/xen/xen-bus.c
-+++ b/hw/xen/xen-bus.c
-@@ -340,13 +340,18 @@ static void xen_bus_type_enumerate(XenBus *xenbus, const char *type)
-     for (i = 0; i < n; i++) {
-         char *backend_path = g_strdup_printf("%s/%s", domain_path,
-                                              backend[i]);
--        enum xenbus_state backend_state;
-+        enum xenbus_state state;
-+        unsigned int online;
- 
-         if (xs_node_scanf(xenbus->xsh, XBT_NULL, backend_path, "state",
--                          NULL, "%u", &backend_state) != 1)
--            backend_state = XenbusStateUnknown;
-+                          NULL, "%u", &state) != 1)
-+            state = XenbusStateUnknown;
- 
--        if (backend_state == XenbusStateInitialising) {
-+        if (xs_node_scanf(xenbus->xsh, XBT_NULL, backend_path, "online",
-+                          NULL, "%u", &online) != 1)
-+            online = 0;
-+
-+        if (online && state == XenbusStateInitialising) {
-             Error *local_err = NULL;
- 
-             xen_bus_backend_create(xenbus, type, backend[i], backend_path,
-@@ -365,9 +370,8 @@ out:
-     g_free(domain_path);
- }
- 
--static void xen_bus_enumerate(void *opaque)
-+static void xen_bus_enumerate(XenBus *xenbus)
- {
--    XenBus *xenbus = opaque;
-     char **type;
-     unsigned int i, n;
- 
-@@ -385,6 +389,44 @@ static void xen_bus_enumerate(void *opaque)
-     free(type);
- }
- 
-+static void xen_bus_device_cleanup(XenDevice *xendev)
-+{
-+    const char *type = object_get_typename(OBJECT(xendev));
-+    Error *local_err = NULL;
-+
-+    trace_xen_bus_device_cleanup(type, xendev->name);
-+
-+    g_assert(!xendev->backend_online);
-+
-+    if (!xen_backend_try_device_destroy(xendev, &local_err)) {
-+        object_unparent(OBJECT(xendev));
-+    }
-+
-+    if (local_err) {
-+        error_report_err(local_err);
-+    }
-+}
-+
-+static void xen_bus_cleanup(XenBus *xenbus)
-+{
-+    XenDevice *xendev, *next;
-+
-+    trace_xen_bus_cleanup();
-+
-+    QLIST_FOREACH_SAFE(xendev, &xenbus->offline_devices, list, next) {
-+        QLIST_REMOVE(xendev, list);
-+        xen_bus_device_cleanup(xendev);
-+    }
-+}
-+
-+static void xen_bus_backend_changed(void *opaque)
-+{
-+    XenBus *xenbus = opaque;
-+
-+    xen_bus_enumerate(xenbus);
-+    xen_bus_cleanup(xenbus);
-+}
-+
- static void xen_bus_unrealize(BusState *bus, Error **errp)
- {
-     XenBus *xenbus = XEN_BUS(bus);
-@@ -433,7 +475,7 @@ static void xen_bus_realize(BusState *bus, Error **errp)
- 
-     xenbus->backend_watch =
-         xen_bus_add_watch(xenbus, "", /* domain root node */
--                          "backend", xen_bus_enumerate, &local_err);
-+                          "backend", xen_bus_backend_changed, &local_err);
-     if (local_err) {
-         /* This need not be treated as a hard error so don't propagate */
-         error_reportf_err(local_err,
-@@ -555,9 +597,9 @@ static void xen_device_backend_set_online(XenDevice *xendev, bool online)
-  * Tell from the state whether the frontend is likely alive,
-  * i.e. it will react to a change of state of the backend.
+diff --git a/drivers/gpio/gpiolib.c b/drivers/gpio/gpiolib.c
+index c2cf01fb72a9de87..c0caafd111e6ff51 100644
+--- a/drivers/gpio/gpiolib.c
++++ b/drivers/gpio/gpiolib.c
+@@ -288,7 +288,7 @@ static int gpiodev_add_to_list(struct gpio_device *gdev)
+ /*
+  * Convert a GPIO name to its descriptor
   */
--static bool xen_device_state_is_active(enum xenbus_state state)
-+static bool xen_device_frontend_is_active(XenDevice *xendev)
+-static struct gpio_desc *gpio_name_to_desc(const char * const name)
++struct gpio_desc *gpio_name_to_desc(const char * const name)
  {
--    switch (state) {
-+    switch (xendev->frontend_state) {
-     case XenbusStateInitWait:
-     case XenbusStateInitialised:
-     case XenbusStateConnected:
-@@ -594,30 +636,29 @@ static void xen_device_backend_changed(void *opaque)
-      * state to Closing, but there is no active frontend then set the
-      * backend state to Closed.
-      */
--    if (xendev->backend_state == XenbusStateClosing &&
--        !xen_device_state_is_active(xendev->frontend_state)) {
-+    if (state == XenbusStateClosing &&
-+        !xen_device_frontend_is_active(xendev)) {
-         xen_device_backend_set_state(xendev, XenbusStateClosed);
-     }
+ 	struct gpio_device *gdev;
+ 	unsigned long flags;
+@@ -315,6 +315,7 @@ static struct gpio_desc *gpio_name_to_desc(const char * const name)
  
-     /*
-      * If a backend is still 'online' then we should leave it alone but,
--     * if a backend is not 'online', then the device should be destroyed
--     * once the state is Closed.
-+     * if a backend is not 'online', then the device is a candidate
-+     * for destruction. Hence add it to the 'offline' list to be cleaned
-+     * by xen_bus_cleanup().
-      */
--    if (!xendev->backend_online &&
--        (xendev->backend_state == XenbusStateClosed ||
--         xendev->backend_state == XenbusStateInitialising ||
--         xendev->backend_state == XenbusStateInitWait ||
--         xendev->backend_state == XenbusStateUnknown)) {
--        Error *local_err = NULL;
-+    if (!online &&
-+        (state == XenbusStateClosed ||  state == XenbusStateInitialising ||
-+         state == XenbusStateInitWait || state == XenbusStateUnknown)) {
-+        XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
- 
--        if (!xen_backend_try_device_destroy(xendev, &local_err)) {
--            object_unparent(OBJECT(xendev));
--        }
-+        QLIST_INSERT_HEAD(&xenbus->offline_devices, xendev, list);
- 
--        if (local_err) {
--            error_report_err(local_err);
--        }
-+        /*
-+         * Re-write the state to cause a XenBus backend_watch notification,
-+         * resulting in a call to xen_bus_cleanup().
-+         */
-+        xen_device_backend_printf(xendev, "state", "%u", state);
-     }
+ 	return NULL;
  }
++EXPORT_SYMBOL_GPL(gpio_name_to_desc);
  
-diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index 0d198148f6..15d71aff70 100644
---- a/include/hw/xen/xen-bus.h
-+++ b/include/hw/xen/xen-bus.h
-@@ -33,6 +33,7 @@ typedef struct XenDevice {
-     xengnttab_handle *xgth;
-     bool feature_grant_copy;
-     QLIST_HEAD(, XenEventChannel) event_channels;
-+    QLIST_ENTRY(XenDevice) list;
- } XenDevice;
+ /*
+  * Takes the names from gc->names and checks if they are all unique. If they
+diff --git a/drivers/gpio/gpiolib.h b/drivers/gpio/gpiolib.h
+index b8b10a409c7b9c65..240d2868a3024b52 100644
+--- a/drivers/gpio/gpiolib.h
++++ b/drivers/gpio/gpiolib.h
+@@ -117,6 +117,7 @@ struct gpio_desc {
+ 	const char		*name;
+ };
  
- typedef char *(*XenDeviceGetName)(XenDevice *xendev, Error **errp);
-@@ -68,6 +69,7 @@ typedef struct XenBus {
-     struct xs_handle *xsh;
-     XenWatchList *watch_list;
-     XenWatch *backend_watch;
-+    QLIST_HEAD(, XenDevice) offline_devices;
- } XenBus;
- 
- typedef struct XenBusClass {
++struct gpio_desc *gpio_name_to_desc(const char * const name);
+ int gpiod_request(struct gpio_desc *desc, const char *label);
+ void gpiod_free(struct gpio_desc *desc);
+ int gpiod_configure_flags(struct gpio_desc *desc, const char *con_id,
 -- 
-2.20.1.2.gb21ebb6
+2.17.1
 
 
