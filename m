@@ -2,59 +2,62 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F78C49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 19:08:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D047FC49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 19:08:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C6E72075C
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 19:08:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C6E72075C
+	by mail.kernel.org (Postfix) with ESMTPS id AB3AF2075C
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 19:08:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB3AF2075C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i87yG-0005PW-To
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 15:08:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54049)
+	id 1i87yL-0005WV-Um
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 15:08:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54070)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i87wh-0003xT-Vj
+ (envelope-from <dgilbert@redhat.com>) id 1i87wj-0003xX-50
  for qemu-devel@nongnu.org; Wed, 11 Sep 2019 15:06:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i87wg-0006Ze-Rq
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 15:06:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52844)
+ (envelope-from <dgilbert@redhat.com>) id 1i87wi-0006aO-23
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 15:06:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42322)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i87wg-0006ZO-MF
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 15:06:26 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i87wh-0006Zq-Sy
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 15:06:28 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BC16D8980EA
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 19:06:25 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3DCD57EB88
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 19:06:27 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-117-243.ams2.redhat.com
  [10.36.117.243])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 907DF60167;
- Wed, 11 Sep 2019 19:06:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 11B7160167;
+ Wed, 11 Sep 2019 19:06:25 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, pbonzini@redhat.com, ehabkost@redhat.com,
  berrange@redhat.com, quintela@redhat.com
-Date: Wed, 11 Sep 2019 20:06:17 +0100
-Message-Id: <20190911190622.7629-1-dgilbert@redhat.com>
+Date: Wed, 11 Sep 2019 20:06:18 +0100
+Message-Id: <20190911190622.7629-2-dgilbert@redhat.com>
+In-Reply-To: <20190911190622.7629-1-dgilbert@redhat.com>
+References: <20190911190622.7629-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Wed, 11 Sep 2019 19:06:25 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.71]); Wed, 11 Sep 2019 19:06:27 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 0/5] Automatic RCU read unlock
+Subject: [Qemu-devel] [PATCH v2 1/5] rcu: Add automatically released
+ rcu_read_lock variant
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,35 +75,46 @@ Sender: "Qemu-devel"
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
+RCU_READ_LOCK_AUTO takes the rcu_read_lock and then uses glib's
+g_auto infrastructure (and thus whatever the compiler's hooks are) to
+release it on all exits of the block.
 
-This patch uses glib's g_auto mechanism to automatically free
-rcu_read_lock's at the end of the block.  Given that humans
-have a habit of forgetting an error path somewhere it's
-best to leave it to the compiler.
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ include/qemu/rcu.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-(Note I've found the actual cause of my deadlock actually
-isn't a misisng unlock; it's a lock ordering thing)
-
-v2
-  Rework auto mechanism based on Dan and Eduardo's comments
-  Add some more uses in memory/exec
-  Add a missing unlock in a function I've not used the macro in
-
-Dr. David Alan Gilbert (5):
-  rcu: Add automatically released rcu_read_lock variant
-  migration: Use automatic rcu_read unlock in ram.c
-  migration: Use automatic rcu_read unlock in rdma.c
-  rcu: Use automatic rc_read unlock in core memory/exec code
-  migration: Missing rcu_read_unlock
-
- exec.c                  | 46 ++++++++++-----------------------
- include/exec/ram_addr.h |  8 ++----
- include/qemu/rcu.h      | 18 +++++++++++++
- memory.c                | 15 ++++-------
- migration/ram.c         | 26 ++++++++-----------
- migration/rdma.c        | 57 ++++++++---------------------------------
- 6 files changed, 60 insertions(+), 110 deletions(-)
-
+diff --git a/include/qemu/rcu.h b/include/qemu/rcu.h
+index 22876d1428..8768a7b60a 100644
+--- a/include/qemu/rcu.h
++++ b/include/qemu/rcu.h
+@@ -154,6 +154,24 @@ extern void call_rcu1(struct rcu_head *head, RCUCBFu=
+nc *func);
+       }),                                                               =
+ \
+       (RCUCBFunc *)g_free);
+=20
++typedef void RCUReadAuto;
++static inline RCUReadAuto *rcu_read_auto_lock(void)
++{
++    rcu_read_lock();
++    /* Anything non-NULL causes the cleanup function to be called */
++    return (void *)0x1;
++}
++
++static inline void rcu_read_auto_unlock(RCUReadAuto *r)
++{
++    rcu_read_unlock();
++}
++
++G_DEFINE_AUTOPTR_CLEANUP_FUNC(RCUReadAuto, rcu_read_auto_unlock)
++
++#define RCU_READ_LOCK_AUTO \
++    g_autoptr(RCUReadAuto) _rcu_read_auto =3D rcu_read_auto_lock()
++
+ #ifdef __cplusplus
+ }
+ #endif
 --=20
 2.21.0
 
