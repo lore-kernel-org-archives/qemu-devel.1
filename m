@@ -2,54 +2,82 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F264C49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:54:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EF92C5ACAE
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:54:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6180F2075C
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:54:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6180F2075C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
+	by mail.kernel.org (Postfix) with ESMTPS id 2B88E2075C
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:54:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="frtVqm70"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B88E2075C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i840N-00021u-8u
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:53:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44741)
+	id 1i840b-0002Cx-Jg
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:54:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47034)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>) id 1i83m8-0003Bn-Ce
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:39:17 -0400
+ (envelope-from <chihmin.chao@sifive.com>) id 1i83xu-0007kw-Pb
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:51:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <geert@linux-m68k.org>) id 1i83m6-0001xe-R2
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:39:16 -0400
-Received: from xavier.telenet-ops.be ([2a02:1800:120:4::f00:14]:49472)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <geert@linux-m68k.org>)
- id 1i83m6-0001vI-GQ
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:39:14 -0400
-Received: from ramsan ([84.194.98.4]) by xavier.telenet-ops.be with bizsmtp
- id 0Ef42100105gfCL01Ef4Mu; Wed, 11 Sep 2019 16:39:10 +0200
-Received: from rox.of.borg ([192.168.97.57]) by ramsan with esmtp (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>)
- id 1i83lv-0006T2-Tj; Wed, 11 Sep 2019 16:39:03 +0200
-Received: from geert by rox.of.borg with local (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>)
- id 1i83lv-0003Ou-Qz; Wed, 11 Sep 2019 16:39:03 +0200
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-To: Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <bgolaszewski@baylibre.com>
-Date: Wed, 11 Sep 2019 16:38:53 +0200
-Message-Id: <20190911143858.13024-1-geert+renesas@glider.be>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 2a02:1800:120:4::f00:14
-Subject: [Qemu-devel] [PATCH/RFC v2 0/5] gpio: Add GPIO Aggregator Driver
+ (envelope-from <chihmin.chao@sifive.com>) id 1i83xt-00087u-3M
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:51:26 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:45153)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <chihmin.chao@sifive.com>)
+ id 1i83xs-00087C-Uv
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:51:25 -0400
+Received: by mail-io1-xd44.google.com with SMTP id f12so46361038iog.12
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 07:51:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=DKg/pSa5KC6awsuIG5WpCszhbi2ykvLdh1jfm7RlOCU=;
+ b=frtVqm702iDRzV8joEeyIpQ9Pi1rDX+RygW3q+YfAQuJFhRn1nNM3JAZeJyaswBki1
+ aMAU3Q+jUeM+FQf1Nk90G2M5hjUlH88tZDjT/XuJYUdjRLpipXJJQRbCdw4aWXfr/e9f
+ AeNiKgY+8vIeVf20AT7zwXLK0U6vITabDzzdDDPLj0C+UJ8PNnVkrwP2ILrZieAHjEGH
+ xKW3kGJ3A9h7vIlLUyhsXuUYF/iqIdRFYpoGTj++Qm1/m9bgEeCnNTfJJ+G+9R1XeVPm
+ PZ9nxFXQ/kWIz6VtDFvzhSYGKffMl3nD/vRRlqJeKlmPSbLrMMh37AhIiNWiEHLBND9Q
+ e9Hg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=DKg/pSa5KC6awsuIG5WpCszhbi2ykvLdh1jfm7RlOCU=;
+ b=Jki/9Lhp+zEf4ErD8MlE8U+1XHxKRcuWS1T2S9bFfURtbd2bPuKMmnlS5PsgKDGLoV
+ xGFAXaj+UV/yJa3cjK+us8R49o+dxI0NE4lQ2a3w9Xj9Vo/QpyuJOD7It/cM9sbiKQnB
+ e0fmFvR3jbjiMr00NHkcg66in0RQT//F8gkS4sRh4utZVkg0U1jAB8IuGe6ydxKdFkQP
+ Bcn4K2dEShKAhukLMcOoq6siLp+JfZQMPkxWAcrY6P8SGW3R1f32eERbdrJM1nRZ4emB
+ txxXI8PIiDBW4traMGkvTrXBqpuYTSZmUpd2LI/2PGpyx188xQWfH5ReDHsQBe58JCCY
+ bd0A==
+X-Gm-Message-State: APjAAAVwOWdp94+ZGyZcxGdSF1Q9AwjlMgEgQ6f27BrYczA4xiDtb3Zz
+ BA/HPimDfKpAvVj0Z2LhMsj89UiZZCP3V7/+9aRypEVbUoc=
+X-Google-Smtp-Source: APXvYqwri+DYLseY2oPTtom1S3OAAdSW6dcHn0TjPIFLGUqPSESwd9knfGxQAXag8H3drs2ZDdzwiAFuoVSYEjv8u9A=
+X-Received: by 2002:a05:6602:2516:: with SMTP id
+ i22mr2906275ioe.129.1568213483487; 
+ Wed, 11 Sep 2019 07:51:23 -0700 (PDT)
+MIME-Version: 1.0
+References: <1568183141-67641-1-git-send-email-zhiwei_liu@c-sky.com>
+ <1568183141-67641-2-git-send-email-zhiwei_liu@c-sky.com>
+In-Reply-To: <1568183141-67641-2-git-send-email-zhiwei_liu@c-sky.com>
+From: Chih-Min Chao <chihmin.chao@sifive.com>
+Date: Wed, 11 Sep 2019 22:51:12 +0800
+Message-ID: <CAEiOBXUveMJGpavU7_zK0UTdNniQvnXnw5MvE-hu7yHCSw8MPQ@mail.gmail.com>
+To: liuzhiwei <zhiwei_liu@c-sky.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d44
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v2 01/17] RISC-V: add vfp field in
+ CPURISCVState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,134 +89,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Marc Zyngier <marc.zyngier@arm.com>, Magnus Damm <magnus.damm@gmail.com>,
- Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-gpio@vger.kernel.org,
- Alexander Graf <graf@amazon.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Harish Jenny K N <harish_kandiga@mentor.com>,
- Phil Reid <preid@electromag.com.au>
+Cc: Palmer Dabbelt <palmer@sifive.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, riku.voipio@iki.fi,
+ laurent@vivier.eu, wxy194768@alibaba-inc.com,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ wenmeng_zhang@c-sky.com, Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-	Hi all,
+On Wed, Sep 11, 2019 at 2:35 PM liuzhiwei <zhiwei_liu@c-sky.com> wrote:
 
-GPIO controllers are exported to userspace using /dev/gpiochip*
-character devices.  Access control to these devices is provided by
-standard UNIX file system permissions, on an all-or-nothing basis:
-either a GPIO controller is accessible for a user, or it is not.
-Currently no mechanism exists to control access to individual GPIOs.
+> From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+>
+> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> ---
+>  target/riscv/cpu.h | 28 ++++++++++++++++++++++++++++
+>  1 file changed, 28 insertions(+)
+>
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index 0adb307..c992b1d 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -93,9 +93,37 @@ typedef struct CPURISCVState CPURISCVState;
+>
+>  #include "pmp.h"
+>
+> +#define VLEN 128
+> +#define VUNIT(x) (VLEN / x)
+> +
+>  struct CPURISCVState {
+>      target_ulong gpr[32];
+>      uint64_t fpr[32]; /* assume both F and D extensions */
+> +
+> +    /* vector coprocessor state.  */
+> +    struct {
+> +        union VECTOR {
+> +            float64  f64[VUNIT(64)];
+> +            float32  f32[VUNIT(32)];
+> +            float16  f16[VUNIT(16)];
+> +            uint64_t u64[VUNIT(64)];
+> +            int64_t  s64[VUNIT(64)];
+> +            uint32_t u32[VUNIT(32)];
+> +            int32_t  s32[VUNIT(32)];
+> +            uint16_t u16[VUNIT(16)];
+> +            int16_t  s16[VUNIT(16)];
+> +            uint8_t  u8[VUNIT(8)];
+> +            int8_t   s8[VUNIT(8)];
+> +        } vreg[32];
+> +        target_ulong vxrm;
+> +        target_ulong vxsat;
+> +        target_ulong vl;
+> +        target_ulong vstart;
+> +        target_ulong vtype;
+> +        float_status fp_status;
+> +    } vfp;
+> +
+> +    bool         foflag;
+>      target_ulong pc;
+>      target_ulong load_res;
+>      target_ulong load_val;
+> --
+> 2.7.4
+>
+>
+Could  the VLEN be configurable in cpu initialization but not fixed in
+compilation phase ?
+Take the integer element as example  and the difference should be the
+stride of vfp.vreg[x] isn't continuous
 
-Hence this second RFC adds a GPIO driver to aggregate existing GPIOs,
-and expose them as a new gpiochip.  This is useful for implementing
-access control, and assigning a set of GPIOs to a specific user.
-Furthermore, this simplifies and hardens exporting GPIOs to a virtual
-machine, as the VM can just grab the full GPIO controller, and no longer
-needs to care about which GPIOs to grab and which not, reducing the
-attack surface.
+    struct {
+        union VECTOR {
+            uint64_t *u64;
+            uint16_t *u16;
+            uint8_t  *u8;
+        } vreg[32];
+    } vfp;
 
-Changes compared to v1[1]:
-  - Drop "virtual", rename to gpio-aggregator,
-  - Create and use new GPIO Forwarder Helper, to allow sharing code with
-    the GPIO inverter,
-  - Lift limit on the maximum number of GPIOs,
-  - Improve parsing of GPIO specifiers,
-  - Fix modular build.
+   initialization
 
-To do:
-  - Write proper documentation.
+    int vlen = 256;  //parameter from cpu command line option
+    int elem = vlen / 8;
+    int size = elem * 32;
 
-Aggregating GPIOs and exposing them as a new gpiochip was suggested in
-response to my proof-of-concept for GPIO virtualization with QEMU[2][3].
+    uint8_t *mem = malloc(size)
+    for (int idx = 0; idx < 32; ++idx) {
+        vfp.vreg[idx].u64 = (void *)&mem[idx * elem];
+        vfp.vreg[idx].u32 = (void *)&mem[idx * elem];
+        vfp.vreg[idx].u16 = (void *)&mem[idx * elem];
+   }
 
-Aggregated GPIO controllers are instantiated and destroyed by writing to
-atribute files in sysfs.  Sample session on r8a7791/koelsch:
-
-  - Unbind LEDs from leds-gpio driver:
-
-	echo leds > /sys/bus/platform/drivers/leds-gpio/unbind
-
-  - Create aggregators:
-
-    $ echo e6052000.gpio 19,20 \
-	> /sys/bus/platform/drivers/gpio-aggregator/new_device
-
-    gpio-aggregator.0: gpio 0 => gpio-953 (?)
-    gpio-aggregator.0: gpio 1 => gpio-954 (?)
-    gpiochip_find_base: found new base at 778
-    gpio gpiochip8: (gpio-aggregator.0): added GPIO chardev (254:8)
-    gpiochip_setup_dev: registered GPIOs 778 to 779 on device: gpiochip8 (gpio-aggregator.0)
-
-    $ echo e6052000.gpio 21 e6050000.gpio 20-22 \
-	> /sys/bus/platform/drivers/gpio-aggregator/new_device
-
-    gpio-aggregator.1: gpio 0 => gpio-955 (?)
-    gpio-aggregator.1: gpio 1 => gpio-1012 (?)
-    gpio-aggregator.1: gpio 2 => gpio-1013 (?)
-    gpio-aggregator.1: gpio 3 => gpio-1014 (?)
-    gpiochip_find_base: found new base at 774
-    gpio gpiochip9: (gpio-aggregator.1): added GPIO chardev (254:9)
-    gpiochip_setup_dev: registered GPIOs 774 to 777 on device: gpiochip9 (gpio-aggregator.1)
-
-  - Adjust permissions on /dev/gpiochip[89] (optional)
-
-  - Control LEDs:
-
-    $ gpioset gpiochip8 0=0 1=1	# LED6 OFF, LED7 ON
-    $ gpioset gpiochip8 0=1 1=0	# LED6 ON, LED7 OFF
-    $ gpioset gpiochip9 0=0	# LED8 OFF
-    $ gpioset gpiochip9 0=1	# LED8 ON
-
-  - Destroy aggregators:
-
-    $ echo gpio-aggregator.0 \
-            > /sys/bus/platform/drivers/gpio-aggregator/delete_device
-    $ echo gpio-aggregator.1 \
-            > /sys/bus/platform/drivers/gpio-aggregator/delete_device
-
-Thanks for your comments!
-
-References:
-  - [1] "[PATCH RFC] gpio: Add Virtual Aggregator GPIO Driver"
-        (https://lore.kernel.org/lkml/20190705160536.12047-1-geert+renesas@glider.be/)
-  - [2] "[PATCH QEMU POC] Add a GPIO backend"
-	(https://lore.kernel.org/linux-renesas-soc/20181003152521.23144-1-geert+renesas@glider.be/)
-  - [3] "Getting To Blinky: Virt Edition / Making device pass-through
-	 work on embedded ARM"
-	(https://fosdem.org/2019/schedule/event/vai_getting_to_blinky/)
-
-Geert Uytterhoeven (5):
-  gpio: Export gpiod_{request,free}() to modular GPIO code
-  gpio: Export gpiochip_get_desc() to modular GPIO code
-  gpio: Export gpio_name_to_desc() to modular GPIO code
-  gpio: Add GPIO Forwarder Helper
-  gpio: Add GPIO Aggregator Driver
-
- drivers/gpio/Kconfig           |  12 ++
- drivers/gpio/Makefile          |   2 +
- drivers/gpio/gpio-aggregator.c | 333 +++++++++++++++++++++++++++++++++
- drivers/gpio/gpiolib-fwd.c     | 272 +++++++++++++++++++++++++++
- drivers/gpio/gpiolib-fwd.h     |  16 ++
- drivers/gpio/gpiolib.c         |   6 +-
- drivers/gpio/gpiolib.h         |   1 +
- 7 files changed, 641 insertions(+), 1 deletion(-)
- create mode 100644 drivers/gpio/gpio-aggregator.c
- create mode 100644 drivers/gpio/gpiolib-fwd.c
- create mode 100644 drivers/gpio/gpiolib-fwd.h
-
--- 
-2.17.1
-
-Gr{oetje,eeting}s,
-
-						Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-							    -- Linus Torvalds
-
+  chihmin
