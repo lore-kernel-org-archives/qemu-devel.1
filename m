@@ -2,81 +2,119 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F53C49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:08:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 830C8C5ACAE
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:12:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5884D2081B
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:08:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5884D2081B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4E2E520863
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:12:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="nmDQHwxF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E2E520863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i83IN-00080t-HV
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:08:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38755)
+	id 1i83Ly-0001fc-4J
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:12:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39061)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1i83He-0007Xe-CY
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:07:48 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i83Jx-0000GY-8d
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:10:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1i83Hb-0002ja-Bz
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:07:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34676)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1i83Hb-0002jB-3S
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:07:43 -0400
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1E30B50F45
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 14:07:41 +0000 (UTC)
-Received: by mail-qk1-f199.google.com with SMTP id t26so25204627qkt.0
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 07:07:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=dYhVxqcCbCcbyYZmt8TR2bRddaTTMVOZuzcBDIYyNGk=;
- b=oWECWI3QxN4G+A4n95hRDAzibzMZlyMTP+/vw3W+RT7FfjndrhGpIhYtM9CcJRAex7
- edffvu/OkM1EXQzp4E+MWXF5mKG/kRAXgVVqJTMjzykYJyLGiCmHJnmfjiclU3uaOFeq
- zkePtYlJn0Ilh0ONyOr0BYuRpnatrWGnxLesLDZ8Zf5ZyIEBWkzCJ89WxlCkJy0KuGX1
- mOGcyjX8VPLx4CZEi3Qzkhz18kxICoNEOQ+X1tCRzysE2AF1YYHJb8/9lY7mFyhrSfLj
- 0sCkjNCgbo4RDlHR3YDnWXRG4G1/PZJzyzH43PCQaJXGaFQnvpnvE15TYGjRwrBYBuuy
- C0Zw==
-X-Gm-Message-State: APjAAAXT8ogZ6evMvLngzbah3SC2IbNjV4qEfd3q874z2LnF57srlSit
- jMOGkd2FLF/Riam3iauWhjQjD4zoXaXxpbdFyx6uepfbnid6jbOT4uc+KUyjV/sKMjhZbU5rZxU
- u9q7Hv6Ind5VPe+M=
-X-Received: by 2002:ac8:51d2:: with SMTP id d18mr36362251qtn.377.1568210860359; 
- Wed, 11 Sep 2019 07:07:40 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxm7o0rL7qrze78GGauL7QlcUTk6JnkD56x0syc/77o+AbMivb9/mzU+7xIHXts/gXVvy0vmg==
-X-Received: by 2002:ac8:51d2:: with SMTP id d18mr36362225qtn.377.1568210860132; 
- Wed, 11 Sep 2019 07:07:40 -0700 (PDT)
-Received: from redhat.com ([80.74.107.118])
- by smtp.gmail.com with ESMTPSA id k11sm9272415qtp.26.2019.09.11.07.07.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Sep 2019 07:07:39 -0700 (PDT)
-Date: Wed, 11 Sep 2019 10:07:34 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Johannes Berg <johannes@sipsolutions.net>
-Message-ID: <20190911095650-mutt-send-email-mst@kernel.org>
-References: <20190911134539.25650-1-johannes@sipsolutions.net>
- <20190911134539.25650-2-johannes@sipsolutions.net>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i83Jw-0003sE-1L
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:10:09 -0400
+Received: from mail-eopbgr130124.outbound.protection.outlook.com
+ ([40.107.13.124]:62470 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1i83Jn-0003ki-US; Wed, 11 Sep 2019 10:10:00 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bda8gxkm4Sw2kJuZTiWTOv6I10pimxOvC4zqZDlhrW6DBLth+/WzE2hymRqj1nJ5LDOGobypEN73Fbc42tQwGh1Dyby+v5djFVLaEtY/JEC1bIrv+pPopvFtuRyKndulmRhc8BPqojcKCUx31fw+TeyBJGyuXisIPKYToOxGkVGhgRTnZnYR1e9eApSSDJBKOodsBFF0IdsYDghQT/POGry/leT/lcOHIWOexEfYvJlazn9yEVpWtWzWHvJ8c2JAprwfSRBCTCGLksYEcce1dszlF0MfygsvZW5trs3hDQzjOwUXJxynRrwOWCCYGrY+kby0lyMQXSChNKv7U0XFtA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=w8C00f56fUW1sta4nrRTwCPmRnOCEsISsX7Rb+PWpr8=;
+ b=nJ/ZPGQ9CgzEersDNgM9JRJIEHP2qJ6VExc2k831gSeJAVDg/sVVRDFd+OF6uS2KI0/eFZ1sNO42m+UNhQELmLSxpvlqGuP+VG3rcsL/rxFITLC5/QVJNIAsFikJyQGz5+x5YktnaKvUpotcwSPLhjjCwDllnmBS/UdJ8qs4xKBygvWtuxlcNRb9gs08APUCgFatASse61CdygVtsVcPuxHVAWyJMkCKyQAUTNIrum90i7LiawtgF8ppAcPm/PElzEt4jVmLrrzU6CWkMJerp8R7dDNTJmtGL3eYBWvOGOya37BObMBmiyxPcnriMHbarvyPrWxBtjxiw5j/cKn/PA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=w8C00f56fUW1sta4nrRTwCPmRnOCEsISsX7Rb+PWpr8=;
+ b=nmDQHwxF9w3YYmFyTICdTbbZTXI3tE2tJnA2JRmlT4aTpMCx7XLMeW2jfZy8hCyvi8ssE1+SRZI1Tsf4GAjTEr2KxFafksZRLvXZsV7rZFUkqfYuQJj2evtOgzmmhw3qVSx71OGBFn5ZdaumeY8zHy+295ChKfBDnooqEMFQjQ8=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB4139.eurprd08.prod.outlook.com (20.179.11.93) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2263.14; Wed, 11 Sep 2019 14:09:57 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2241.018; Wed, 11 Sep 2019
+ 14:09:57 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Thread-Topic: [Qemu-devel] [PATCH 0/3] proper locking on bitmap add/remove
+ paths
+Thread-Index: AQHVZ/Sl8JlDvEflUE+vmp1j2//H2aclX1kAgAEl6YA=
+Date: Wed, 11 Sep 2019 14:09:57 +0000
+Message-ID: <cb8fd02c-4fe7-0594-3a89-1d91d02940fc@virtuozzo.com>
+References: <156814787725.15929.11693446479791530766@5dec9699b7de>
+In-Reply-To: <156814787725.15929.11693446479791530766@5dec9699b7de>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0502CA0024.eurprd05.prod.outlook.com
+ (2603:10a6:3:e3::34) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190911170955019
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 52ccb6c8-af26-4ed7-c54c-08d736c1b9ec
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(5600166)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
+ SRVR:DB8PR08MB4139; 
+x-ms-traffictypediagnostic: DB8PR08MB4139:
+x-ms-exchange-purlcount: 3
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DB8PR08MB41398958D68320316458C8B0C1B10@DB8PR08MB4139.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:499;
+x-forefront-prvs: 0157DEB61B
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(346002)(366004)(136003)(376002)(39850400004)(396003)(189003)(199004)(6116002)(386003)(3846002)(25786009)(86362001)(476003)(486006)(66946007)(6246003)(2616005)(186003)(52116002)(2501003)(99286004)(31696002)(76176011)(36756003)(6436002)(256004)(71190400001)(71200400001)(14444005)(66476007)(5660300002)(66446008)(64756008)(229853002)(26005)(2906002)(8936002)(6916009)(6512007)(478600001)(66066001)(6306002)(81156014)(81166006)(66556008)(102836004)(53936002)(6506007)(2351001)(53376002)(966005)(7736002)(8676002)(305945005)(11346002)(54906003)(446003)(6486002)(5640700003)(316002)(4326008)(31686004)(14454004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4139;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 1tOSyFWxeMr581HIEJbLvIW6ELMa5skMPZV/ALTZQiRfUyMgtSAMzhOviKweGtos0LMyuaT5QVl8G3CjCyGI8wn6/iOoK3JQo7FGOwt/4tMiw1B1Wx6LVaff97uCQJQ6dBYLBIdEjlooxlRJM89zaepvDsqTscu63ZzzWGUEVVmNEICT7Nusq416XKFvKWbHUgYIkN391Y8+pZCgBeJB2RSxGepmNG7s3/Kdwz5v4DMtOFrv59+cQISxlVkFWchH+jhlVdvc+Hv4NuOk+PdsKbn5/BH9fcrqHfblPJDykXdOUQxvMq6rqdnKa1a27uFNrxoP9TcyCHQJ45yzn/Guv1dOpyzwEqTcrHWERVhBDRkOKqKmJbgEHEGel53I3atAz3ct+V/5L2ZqYZqrhZ66Ftq/TucB9vX8Ynv1mBUrJLc=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4BFAD18C1FDC9B4687C0885CDDED7918@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190911134539.25650-2-johannes@sipsolutions.net>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC v2 1/2] docs: vhost-user: add in-band
- kick/call messages
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52ccb6c8-af26-4ed7-c54c-08d736c1b9ec
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Sep 2019 14:09:57.3445 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: NRR9DKs1CWwbml9cr5+BQ9PEe58CxUpNw16AX7lmJAO5PrRZIgYDi9n6X0wEf+vf7o+Klc8Jfxzv5DL5MsWQL30p555HfrzECatKw15qnjI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4139
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.13.124
+Subject: Re: [Qemu-devel] [PATCH 0/3] proper locking on bitmap add/remove
+ paths
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,258 +126,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Johannes Berg <johannes.berg@intel.com>
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ Denis Lunev <den@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 11, 2019 at 03:45:38PM +0200, Johannes Berg wrote:
-> From: Johannes Berg <johannes.berg@intel.com>
-> 
-> For good reason, vhost-user is currently built asynchronously, that
-> way better performance can be obtained. However, for certain use
-> cases such as simulation, this is problematic.
-> 
-> Consider an event-based simulation in which both the device and CPU
-> have scheduled according to a simulation "calendar". Now, consider
-> the CPU sending I/O to the device, over a vring in the vhost-user
-> protocol. In this case, the CPU must wait for the vring interrupt
-> to have been processed by the device, so that the device is able to
-> put an entry onto the simulation calendar to obtain time to handle
-> the interrupt. Note that this doesn't mean the I/O is actually done
-> at this time, it just means that the handling of it is scheduled
-> before the CPU can continue running.
-> 
-> This cannot be done with the asynchronous eventfd based vring kick
-> and call design.
-> 
-> Extend the protocol slightly, so that a message can be used for kick
-> and call instead, if VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS is
-> negotiated. This in itself doesn't guarantee synchronisation, but both
-> sides can also negotiate VHOST_USER_PROTOCOL_F_REPLY_ACK and thus get
-> a reply to this message by setting the need_reply flag, and ensure
-> synchronisation this way.
-> 
-> To really use it in both directions, VHOST_USER_PROTOCOL_F_SLAVE_REQ
-> is also needed.
-> 
-> Since it is used for simulation purposes and too many messages on
-> the socket can lock up the virtual machine, document that this should
-> only be used together with the mentioned features.
-> 
-> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-> ---
->  docs/interop/vhost-user.rst | 113 ++++++++++++++++++++++++++++++------
->  1 file changed, 96 insertions(+), 17 deletions(-)
-> 
-> diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
-> index 7827b710aa0a..c4396eabf9e9 100644
-> --- a/docs/interop/vhost-user.rst
-> +++ b/docs/interop/vhost-user.rst
-> @@ -2,6 +2,7 @@
->  Vhost-user Protocol
->  ===================
->  :Copyright: 2014 Virtual Open Systems Sarl.
-> +:Copyright: 2019 Intel Corporation
->  :Licence: This work is licensed under the terms of the GNU GPL,
->            version 2 or later. See the COPYING file in the top-level
->            directory.
-> @@ -279,6 +280,9 @@ If *master* is unable to send the full message or receives a wrong
->  reply it will close the connection. An optional reconnection mechanism
->  can be implemented.
->  
-> +If *slave* detects some error such as incompatible features, it may also
-> +close the connection. This should only happen in exceptional circumstances.
-> +
->  Any protocol extensions are gated by protocol feature bits, which
->  allows full backwards compatibility on both master and slave.  As
->  older slaves don't support negotiating protocol features, a feature
-> @@ -315,7 +319,8 @@ it until ring is started, or after it has been stopped.
->  
->  Client must start ring upon receiving a kick (that is, detecting that
->  file descriptor is readable) on the descriptor specified by
-> -``VHOST_USER_SET_VRING_KICK``, and stop ring upon receiving
-> +``VHOST_USER_SET_VRING_KICK`` (or receiving the in-band message
-> +``VHOST_USER_VRING_KICK`` if negotiated) and stop ring upon receiving
->  ``VHOST_USER_GET_VRING_BASE``.
->  
->  While processing the rings (whether they are enabled or not), client
-> @@ -767,24 +772,48 @@ When reconnecting:
->  #. Resubmit inflight ``DescStatePacked`` entries in order of their
->     counter value
->  
-> +In-band notifications
-> +---------------------
-> +
-> +In some limited situations (e.g. for simulation) it is desirable to
-> +have the kick, call and error (if used) signals done via in-band
-> +messages instead of asynchronous eventfd notifications. This can be
-> +done by negotiating the ``VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS``
-> +protocol feature.
-> +
-> +Note that due to the fact that too many messages on the sockets can
-> +cause the sending application(s) to block, it is not advised to use
-> +this feature unless absolutely necessary. It is also considered an
-> +error to negotiate this feature without also negotiating
-> +``VHOST_USER_PROTOCOL_F_SLAVE_REQ`` and ``VHOST_USER_PROTOCOL_F_REPLY_ACK``,
-> +the former is necessary for getting a message channel from the slave
-> +to the master, while the latter needs to be used with the in-band
-> +notification messages to block until they are processed, both to avoid
-> +blocking later and for proper processing (at least in the simulation
-> +use case.) As it has no other way of signalling this error, the slave
-> +should close the connection as a response to a
-> +``VHOST_USER_SET_PROTOCOL_FEATURES`` message that sets the in-band
-> +notifications feature flag without the other two.
-> +
->  Protocol features
->  -----------------
->  
->  .. code:: c
->  
-> -  #define VHOST_USER_PROTOCOL_F_MQ             0
-> -  #define VHOST_USER_PROTOCOL_F_LOG_SHMFD      1
-> -  #define VHOST_USER_PROTOCOL_F_RARP           2
-> -  #define VHOST_USER_PROTOCOL_F_REPLY_ACK      3
-> -  #define VHOST_USER_PROTOCOL_F_MTU            4
-> -  #define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
-> -  #define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN   6
-> -  #define VHOST_USER_PROTOCOL_F_CRYPTO_SESSION 7
-> -  #define VHOST_USER_PROTOCOL_F_PAGEFAULT      8
-> -  #define VHOST_USER_PROTOCOL_F_CONFIG         9
-> -  #define VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD  10
-> -  #define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER  11
-> -  #define VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD 12
-> +  #define VHOST_USER_PROTOCOL_F_MQ                     0
-> +  #define VHOST_USER_PROTOCOL_F_LOG_SHMFD              1
-> +  #define VHOST_USER_PROTOCOL_F_RARP                   2
-> +  #define VHOST_USER_PROTOCOL_F_REPLY_ACK              3
-> +  #define VHOST_USER_PROTOCOL_F_MTU                    4
-> +  #define VHOST_USER_PROTOCOL_F_SLAVE_REQ              5
-> +  #define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN           6
-> +  #define VHOST_USER_PROTOCOL_F_CRYPTO_SESSION         7
-> +  #define VHOST_USER_PROTOCOL_F_PAGEFAULT              8
-> +  #define VHOST_USER_PROTOCOL_F_CONFIG                 9
-> +  #define VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD         10
-> +  #define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER         11
-> +  #define VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD        12
-> +  #define VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS 13
-
-INFLIGHT so INBAND?
-
->  
->  Master message types
->  --------------------
-> @@ -946,7 +975,9 @@ Master message types
->    Bits (0-7) of the payload contain the vring index. Bit 8 is the
->    invalid FD flag. This flag is set when there is no file descriptor
->    in the ancillary data. This signals that polling should be used
-> -  instead of waiting for a kick.
-> +  instead of waiting for the call. however, if the protocol feature
-> +  ``VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS`` has been negotiated
-> +  it instead means the updates should be done using the messages.
->  
->  ``VHOST_USER_SET_VRING_CALL``
->    :id: 13
-> @@ -959,7 +990,9 @@ Master message types
->    Bits (0-7) of the payload contain the vring index. Bit 8 is the
->    invalid FD flag. This flag is set when there is no file descriptor
->    in the ancillary data. This signals that polling will be used
-> -  instead of waiting for the call.
-> +  instead of waiting for the call; however, if the protocol feature
-> +  ``VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS`` has been negotiated
-> +  it instead means the updates should be done using the messages.
-
-Hmm I don't like this. I propose that with VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS
-we just don't allow VHOST_USER_SET_VRING_CALL (if you think it's
-important to allow them, we can say that we do not require them).
-
-But it's important for performance to be able to enable polling.
-
-
->  
->  ``VHOST_USER_SET_VRING_ERR``
->    :id: 14
-> @@ -971,7 +1004,11 @@ Master message types
->  
->    Bits (0-7) of the payload contain the vring index. Bit 8 is the
->    invalid FD flag. This flag is set when there is no file descriptor
-> -  in the ancillary data.
-> +  in the ancillary data. If the protocol features
-> +  ``VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS`` and
-> +  ``VHOST_USER_PROTOCOL_F_SLAVE_REQ`` have been negotiated the invalid
-> +  FD flag will be used to indicate that updates should be done using
-> +  the ``VHOST_USER_SLAVE_ message.
->  
->  ``VHOST_USER_GET_QUEUE_NUM``
->    :id: 17
-> @@ -1190,6 +1227,20 @@ Master message types
->    ancillary data. The GPU protocol is used to inform the master of
->    rendering state and updates. See vhost-user-gpu.rst for details.
->  
-> +``VHOST_USER_VRING_KICK``
-> +  :id: 34
-> +  :equivalent ioctl: N/A
-> +  :slave payload: vring state description
-> +  :master payload: N/A
-> +
-> +  When the ``VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS`` protocol
-> +  feature has been successfully negotiated, this message may be
-> +  submitted by the master to indicate that a buffer was added to
-> +  the vring instead of signalling it using the vring's event FD or
-
-event -> kick?
-fd -> file descriptor
-
-> +  having the slave rely on polling.
-
-i think polling is a separate option and should be there with inband
-kicks.
-
-> +
-> +  The state.num field is currently reserved and must be set to 0.
-> +
->  Slave message types
->  -------------------
->  
-> @@ -1246,6 +1297,34 @@ Slave message types
->    ``VHOST_USER_PROTOCOL_F_HOST_NOTIFIER`` protocol feature has been
->    successfully negotiated.
->  
-> +``VHOST_USER_SLAVE_VRING_CALL``
-> +  :id: 4
-> +  :equivalent ioctl: N/A
-> +  :slave payload: vring state description
-> +  :master payload: N/A
-> +
-> +  When the ``VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS`` protocol
-> +  feature has been successfully negotiated, this message may be
-> +  submitted by the slave to indicate that a buffer was used from
-> +  the vring instead of signalling this using the vring's kick FD or
-> +  having the master relying on polling.
-
-
-call FD?
-
-> +
-> +  The state.num field is currently reserved and must be set to 0.
-> +
-> +``VHOST_USER_SLAVE_VRING_ERR``
-> +  :id: 5
-> +  :equivalent ioctl: N/A
-> +  :slave payload: vring state description
-> +  :master payload: N/A
-> +
-> +  When the ``VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS`` protocol
-> +  feature has been successfully negotiated, this message may be
-> +  submitted by the slave to indicate that an error occurred on the
-> +  specific vring, instead of signalling the error FD set by the
-> +  master via ``VHOST_USER_SET_VRING_ERR``.
-> +
-> +  The state.num field is currently reserved and must be set to 0.
-> +
->  .. _reply_ack:
->  
->  VHOST_USER_PROTOCOL_F_REPLY_ACK
-> -- 
-> 2.20.1
+MTAuMDkuMjAxOSAyMzozNywgbm8tcmVwbHlAcGF0Y2hldy5vcmcgd3JvdGU6DQo+IFBhdGNoZXcg
+VVJMOiBodHRwczovL3BhdGNoZXcub3JnL1FFTVUvMjAxOTA5MTAxNjI3MjQuNzk1NzQtMS12c2Vt
+ZW50c292QHZpcnR1b3p6by5jb20vDQo+IA0KPiANCj4gDQo+IEhpLA0KPiANCj4gVGhpcyBzZXJp
+ZXMgZmFpbGVkIHRoZSBkb2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmlu
+ZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQNCj4gdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3Ug
+aGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdA0KPiBs
+b2NhbGx5Lg0KPiANCj4gPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQ0KPiAjIS9iaW4vYmFzaA0K
+PiBtYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRXT1JLPTENCj4gdGltZSBtYWtlIGRv
+Y2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0IE5FVFdPUks9MQ0KPiA9PT0g
+VEVTVCBTQ1JJUFQgRU5EID09PQ0KPiANCj4gbGlidWRldiAgICAgICAgICAgbm8NCj4gZGVmYXVs
+dCBkZXZpY2VzICAgeWVzDQo+IA0KPiB3YXJuaW5nOiBQeXRob24gMiBzdXBwb3J0IGlzIGRlcHJl
+Y2F0ZWQNCj4gd2FybmluZzogUHl0aG9uIDMgd2lsbCBiZSByZXF1aXJlZCBmb3IgYnVpbGRpbmcg
+ZnV0dXJlIHZlcnNpb25zIG9mIFFFTVUNCj4gDQo+IE5PVEU6IGNyb3NzLWNvbXBpbGVycyBlbmFi
+bGVkOiAgJ2NjJw0KPiAgICBHRU4gICAgIHg4Nl82NC1zb2Z0bW11L2NvbmZpZy1kZXZpY2VzLm1h
+ay50bXANCj4gLS0tDQo+ICAgIENDICAgICAgYmxvY2svcWVkLWNsdXN0ZXIubw0KPiAgICBDQyAg
+ICAgIGJsb2NrL3FlZC1jaGVjay5vDQo+IC90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9xY293Mi1i
+aXRtYXAuYzogSW4gZnVuY3Rpb24gJ3Fjb3cyX2NvX3JlbW92ZV9wZXJzaXN0ZW50X2RpcnR5X2Jp
+dG1hcCc6DQo+IC90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9xY293Mi1iaXRtYXAuYzo1MDI6ODog
+ZXJyb3I6ICdibScgbWF5IGJlIHVzZWQgdW5pbml0aWFsaXplZCBpbiB0aGlzIGZ1bmN0aW9uIFst
+V2Vycm9yPW1heWJlLXVuaW5pdGlhbGl6ZWRdDQo+ICAgICAgIGlmIChibSA9PSBOVUxMKSB7DQo+
+ICAgICAgICAgIF4NCj4gL3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL3Fjb3cyLWJpdG1hcC5jOjE0
+MTM6MTg6IG5vdGU6ICdibScgd2FzIGRlY2xhcmVkIGhlcmUNCj4gDQo+IA0KPiBUaGUgZnVsbCBs
+b2cgaXMgYXZhaWxhYmxlIGF0DQo+IGh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwOTEwMTYy
+NzI0Ljc5NTc0LTEtdnNlbWVudHNvdkB2aXJ0dW96em8uY29tL3Rlc3RpbmcuZG9ja2VyLXF1aWNr
+QGNlbnRvczcvP3R5cGU9bWVzc2FnZS4NCj4gLS0tDQo+IEVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
+aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4NCj4gUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20NCj4gDQoNCldobyBrbm93
+cywgaG93IHRvIGNsYW5nIFFlbXU/DQoNCkkgdHJ5IHdpdGgNCi4vY29uZmlndXJlIC0tdGFyZ2V0
+LWxpc3Q9eDg2XzY0LXNvZnRtbXUgLS1lbmFibGUtZGVidWcgLS1kaXNhYmxlLXZpcnRmcyAtLWVu
+YWJsZS13ZXJyb3IgLS1hdWRpby1kcnYtbGlzdD1vc3MgLS1leHRyYS1jZmxhZ3M9LVdhbGwgLS1l
+bmFibGUtc2FuaXRpemVycyAtLWNjPWNsYW5nIC0tY3h4PWNsYW5nKysNCm1ha2UgLWo5DQoNCmJ1
+dCBnZXQgdGhlIGZvbGxvd2luZyBlcnJvcjoNCg0KL3RtcC9saW51eGJvb3RfZG1hLTY3MTJjMC5z
+OiBBc3NlbWJsZXIgbWVzc2FnZXM6DQovdG1wL2xpbnV4Ym9vdF9kbWEtNjcxMmMwLnM6NDczOiBF
+cnJvcjogaW5jb25zaXN0ZW50IHVzZXMgb2YgLmNmaV9zZWN0aW9ucw0KY2xhbmc6IGVycm9yOiBh
+c3NlbWJsZXIgY29tbWFuZCBmYWlsZWQgd2l0aCBleGl0IGNvZGUgMSAodXNlIC12IHRvIHNlZSBp
+bnZvY2F0aW9uKQ0KbWFrZVsxXTogKioqIFtsaW51eGJvb3RfZG1hLm9dIEVycm9yIDENCm1ha2Vb
+MV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uDQogICBTSUdOICAgIHBjLWJp
+b3Mvb3B0aW9ucm9tL2xpbnV4Ym9vdC5iaW4NCiAgIExJTksgICAgaXZzaG1lbS1jbGllbnQNCi90
+bXAvcHZoX21haW4tM2JiYzc1LnM6IEFzc2VtYmxlciBtZXNzYWdlczoNCi90bXAvcHZoX21haW4t
+M2JiYzc1LnM6NjUxOiBFcnJvcjogaW5jb25zaXN0ZW50IHVzZXMgb2YgLmNmaV9zZWN0aW9ucw0K
+Y2xhbmc6IGVycm9yOiBhc3NlbWJsZXIgY29tbWFuZCBmYWlsZWQgd2l0aCBleGl0IGNvZGUgMSAo
+dXNlIC12IHRvIHNlZSBpbnZvY2F0aW9uKQ0KbWFrZVsxXTogKioqIFtwdmhfbWFpbi5vXSBFcnJv
+ciAxDQptYWtlOiAqKiogW3BjLWJpb3Mvb3B0aW9ucm9tL2FsbF0gRXJyb3IgMg0KbWFrZTogKioq
+IFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4NCm1ha2U6ICoqKiB3YWl0OiBObyBjaGls
+ZCBwcm9jZXNzZXMuICBTdG9wLg0KDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
 
