@@ -2,66 +2,92 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9190C49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 20:33:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54F5BC49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 21:12:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A770D2082C
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 20:33:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A770D2082C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1E00A20838
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 21:12:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EkjlKNzd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E00A20838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i89Ig-0003xy-OX
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 16:33:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45411)
+	id 1i89uO-0000vI-95
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 17:12:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54190)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i89GM-0002ct-CM
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 16:30:51 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i89tj-0000TV-9H
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 17:11:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i89GK-0002ut-QO
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 16:30:50 -0400
-Resent-Date: Wed, 11 Sep 2019 16:30:50 -0400
-Resent-Message-Id: <E1i89GK-0002ut-QO@eggs.gnu.org>
-Received: from sender4-of-o58.zoho.com ([136.143.188.58]:21858)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i89GK-0002tR-HB
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 16:30:48 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568233838; cv=none; d=zoho.com; s=zohoarc; 
- b=DHSA9zDsoEBd3SlIu1wYWXUk0/3Sox9Djx6oqosccyS5RpV50C5Iilhe+2Nu7mT4N9D+b7nZodumtAdtQmUVLP9XfmFBG3+H4VDyzmUfiDyL41NbeZAJ0uffqUqUNY7nzs8HMN1Awv0W5gwug/Mrv2+blVSZXce+5Mh38dHbmj8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1568233838;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=Nxz2R59YhsSslgFSRxJesZCg+OPlTwix7VuAUKvAu4g=; 
- b=E7Rp7sfy/sqdYupxXO2Jtc+TWy9qlhY4fOGc8ALg6zvcBr63hmgsSIgXPKKFF4xBw+HXDLQxeL85vrOV5biggN9QCAlbatQZk5DmTgmIGTt7p0spBPa33Ilv2N4/mGcFwe4bJrceg5dQKtxYQBhkKxEdfhHjvMdN3bcA5ucW00s=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1568233836150511.626194386296;
- Wed, 11 Sep 2019 13:30:36 -0700 (PDT)
-In-Reply-To: <20190911164202.31136-1-dgilbert@redhat.com>
-Message-ID: <156823383488.20553.1335158513492542230@5dec9699b7de>
+ (envelope-from <richard.henderson@linaro.org>) id 1i89ti-0000pL-3e
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 17:11:31 -0400
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:39437)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i89th-0000oh-Uk
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 17:11:30 -0400
+Received: by mail-qk1-x741.google.com with SMTP id 4so22303265qki.6
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 14:11:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=OEaBTf2V0hI83wp0Q8rsw3rpzqVce8iYnEk3vLOEqik=;
+ b=EkjlKNzdFnofr0c0JtZ+RpzH8Upg4rZ63LOj8HXPMWDzU/PvS5erNJr/dTtaT+yw54
+ xN7UtaxVuPzmCRHvQknPRNH/AUXxarb+JMW1GeUwlUpVXpksATwg7e8cDTMPKbhu8jMf
+ zvuUU/6Q4hQF+3pHpl2sTHlK3JpUs0CrHXbKuiOz+esOtzoPB2hx9s07mBKAbFyDAYdn
+ xHdMbvZ3TlOVwxxuIfCRR7ppyPRDxipbTT/xlsfla8sAFAEbqi8l43Zf+w1KyizvA9s9
+ eN3aCASIz9RniGeRqctr6wqhljO52JAddyR0W4ukDjopLzOobbx9+EvgsEmigId13MPB
+ Fc3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=OEaBTf2V0hI83wp0Q8rsw3rpzqVce8iYnEk3vLOEqik=;
+ b=IrVD6CXohBOnXgcLdOjW3XTUmn6hWtD5OtHDJZu/wrrk8OnMH+M5XLypU0F3NKA9ON
+ ySfpnxNHeUJsCQV670RDO0ITsTHRYbn/iaLpoXhhSpD/x+qVrQpXxLxm5w8p1Nxvhhax
+ Mo1e1Crno5otVe0CYU5IAuBMfxk3g1nIznMQ+CgauBvDOz3qAJSYsHYUzXfR0StdMRko
+ OxNMOQIROffo27OeRvQIRgYfCy7MeZS20dIyuCfsp/N3ljWHKg84WmccaUSjD/Qf/dTH
+ sl8m85Z6uDNoP3+9DtUw7hBSuSSjmgB6LVR0YwgusDAVOJusvl4qSK5fx0I6ViWyqu58
+ hhCQ==
+X-Gm-Message-State: APjAAAVg0t5Cv3XJpdCa7OP9MdRQv8YkFFvKhlH7yPoLi5RNiHz4CKzx
+ 7WQcjGxuhtTtHkhe+L4pQ2lVRw==
+X-Google-Smtp-Source: APXvYqzVTq40iS9pZPCrXgxwCsG5w0gdeb7nlVVYJ7qYHTJxDxIXLGOo05GyUJW53duspAz9E7y/Yw==
+X-Received: by 2002:a37:a182:: with SMTP id
+ k124mr37851212qke.354.1568236288629; 
+ Wed, 11 Sep 2019 14:11:28 -0700 (PDT)
+Received: from [172.20.5.51] ([67.69.50.154])
+ by smtp.gmail.com with ESMTPSA id l22sm8795252qtp.8.2019.09.11.14.11.26
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 11 Sep 2019 14:11:27 -0700 (PDT)
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190906075750.14791-1-david@redhat.com>
+ <20190906075750.14791-17-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <2536ca8e-414e-980b-6a00-b097c07aa5d8@linaro.org>
+Date: Wed, 11 Sep 2019 17:11:24 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: dgilbert@redhat.com
-Date: Wed, 11 Sep 2019 13:30:36 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.58
-Subject: Re: [Qemu-devel] [PATCH 0/3] Automatic RCU read unlock
+In-Reply-To: <20190906075750.14791-17-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::741
+Subject: Re: [Qemu-devel] [PATCH v2 16/28] s390x/tcg: Fault-safe memmove
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,45 +99,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org,
- quintela@redhat.com
+Cc: Florian Weimer <fweimer@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Stefano Brivio <sbrivio@redhat.com>,
+ qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxMTE2NDIwMi4zMTEz
-Ni0xLWRnaWxiZXJ0QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
-ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
-bmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8zXSBBdXRvbWF0aWMg
-UkNVIHJlYWQgdW5sb2NrCk1lc3NhZ2UtaWQ6IDIwMTkwOTExMTY0MjAyLjMxMTM2LTEtZGdpbGJl
-cnRAcmVkaGF0LmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
-YmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4v
-c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
-ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYmYzM2JlOSBtaWdyYXRpb246IFVzZSBh
-dXRvbWF0aWMgcmN1X3JlYWQgdW5sb2NrIGluIHJkbWEuYwpjNjRmMmY0IG1pZ3JhdGlvbjogVXNl
-IGF1dG9tYXRpYyByY3VfcmVhZCB1bmxvY2sgaW4gcmFtLmMKYWY2YTYwOCByY3U6IEFkZCBhdXRv
-bWF0aWNhbGx5IHJlbGVhc2VkIHJjdV9yZWFkX2xvY2sgdmFyaWFudAoKPT09IE9VVFBVVCBCRUdJ
-TiA9PT0KMS8zIENoZWNraW5nIGNvbW1pdCBhZjZhNjA4YjkwOGQgKHJjdTogQWRkIGF1dG9tYXRp
-Y2FsbHkgcmVsZWFzZWQgcmN1X3JlYWRfbG9jayB2YXJpYW50KQpFUlJPUjogTWFjcm9zIHdpdGgg
-bXVsdGlwbGUgc3RhdGVtZW50cyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gYSBkbyAtIHdoaWxlIGxv
-b3AKIzMzOiBGSUxFOiBpbmNsdWRlL3FlbXUvcmN1Lmg6MTY1OgorI2RlZmluZSBSQ1VfUkVBRF9M
-T0NLX0FVVE8gZ19hdXRvKHJjdV9yZWFkX2F1dG9fdCkgXAorICAgIF9yY3VfcmVhZF9hdXRvID0g
-J3gnOyBcCisgICAgcmN1X3JlYWRfbG9jaygpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdz
-LCAxOCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxLzMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-CjIvMyBDaGVja2luZyBjb21taXQgYzY0ZjJmNGM5MjNmIChtaWdyYXRpb246IFVzZSBhdXRvbWF0
-aWMgcmN1X3JlYWQgdW5sb2NrIGluIHJhbS5jKQozLzMgQ2hlY2tpbmcgY29tbWl0IGJmMzNiZTk1
-OWMyYiAobWlncmF0aW9uOiBVc2UgYXV0b21hdGljIHJjdV9yZWFkIHVubG9jayBpbiByZG1hLmMp
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpU
-aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkw
-OTExMTY0MjAyLjMxMTM2LTEtZGdpbGJlcnRAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gv
-P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 9/6/19 3:57 AM, David Hildenbrand wrote:
+> Replace fast_memmove() variants by access_memmove() variants, that
+> first try to probe access to all affected pages (maximum is two pages).
+> 
+> In MVCOS, simply always call access_memmove_as() and drop the TODO
+> about LAP. LAP is already handled in the MMU.
+> 
+> Get rid of adj_len_to_page(), which is now unused.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/mem_helper.c | 204 +++++++++++++++++++++-----------------
+>  1 file changed, 115 insertions(+), 89 deletions(-)
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+r~
 
