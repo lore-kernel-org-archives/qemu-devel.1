@@ -4,60 +4,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1404DECDE27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:26:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E062CECDE27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:29:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5B8D2089F
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:26:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5B8D2089F
+	by mail.kernel.org (Postfix) with ESMTPS id B6E7F208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:29:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6E7F208E4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7x1m-0001Nb-1o
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:26:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46812)
+	id 1i7x48-00037G-Se
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:29:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47041)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1i7x15-0000pV-Qq
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:26:17 -0400
+ (envelope-from <clg@kaod.org>) id 1i7x3F-0002J4-Ky
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:28:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1i7x14-00061M-BM
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:26:15 -0400
-Received: from 4.mo1.mail-out.ovh.net ([46.105.76.26]:38349)
+ (envelope-from <clg@kaod.org>) id 1i7x3E-0007ED-3s
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:28:29 -0400
+Received: from 8.mo5.mail-out.ovh.net ([178.32.116.78]:51165)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1i7x14-00060n-4l
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:26:14 -0400
-Received: from player714.ha.ovh.net (unknown [10.109.159.191])
- by mo1.mail-out.ovh.net (Postfix) with ESMTP id CD59418EA9B
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 09:26:11 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player714.ha.ovh.net (Postfix) with ESMTPSA id C7CE499C7DD8;
- Wed, 11 Sep 2019 07:26:04 +0000 (UTC)
-Date: Wed, 11 Sep 2019 09:26:03 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190911092603.0a3a4d7a@bahia.lan>
-In-Reply-To: <20190911040452.8341-2-david@gibson.dropbear.id.au>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i7x3D-0007DH-Ui
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:28:28 -0400
+Received: from player716.ha.ovh.net (unknown [10.109.159.69])
+ by mo5.mail-out.ovh.net (Postfix) with ESMTP id E99CD24D73D
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 09:28:24 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+ (Authenticated sender: clg@kaod.org)
+ by player716.ha.ovh.net (Postfix) with ESMTPSA id 6834E99CB25B;
+ Wed, 11 Sep 2019 07:28:17 +0000 (UTC)
+To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org
 References: <20190911040452.8341-1-david@gibson.dropbear.id.au>
- <20190911040452.8341-2-david@gibson.dropbear.id.au>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ <20190911040452.8341-4-david@gibson.dropbear.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <5cef1668-c20f-03aa-eab9-ba305891bad0@kaod.org>
+Date: Wed, 11 Sep 2019 09:28:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 11642649465367140838
+In-Reply-To: <20190911040452.8341-4-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 11680085637292264230
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrtddugdduvdduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.76.26
-Subject: Re: [Qemu-devel] [PATCH 1/7] spapr: Simplify handling of pre ISA
- 3.0 guest workaround handling
+X-Received-From: 178.32.116.78
+Subject: Re: [Qemu-devel] [PATCH 3/7] spapr: Fixes a leak in CAS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,108 +71,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, clg@kaod.org, philmd@redhat.com
+Cc: aik@ozlabs.ru, lvivier@redhat.com, philmd@redhat.com, groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 11 Sep 2019 14:04:46 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> Certain old guest versions don't understand the radix MMU introduced with
-> POWER ISA 3.0, but incorrectly select it if presented with the option at
-> CAS time.  We workaround this in qemu by explicitly excluding the radix
-> (and other ISA 3.0 linked) options if the guest doesn't explicitly note
-> support for ISA 3.0.
-> 
-> This is handled by the 'cas_legacy_guest_workaround' flag, which is pretty
-> vague.  Rename it to 'cas_pre_isa3_guest' to be clearer about what it's for.
-> 
-> In addition, we unnecessarily call spapr_populate_pa_features() with
-> different options when initially constructing the device tree and when
-> adjusting it at CAS time.  At the initial construct time cas_pre_isa3_guest
-> is already false, so we can still use the flag, rather than explicitly
-> overriding it to be false at the callsite.
-> 
+On 11/09/2019 06:04, David Gibson wrote:
+> From: Alexey Kardashevskiy <aik@ozlabs.ru>
+>=20
+> Add a missing g_free(fdt) if the resulting tree is bigger
+> than the space allocated by SLOF.
+>=20
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+
+
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+Thanks,
+
+C.
+
 > ---
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  hw/ppc/spapr.c         | 10 ++++------
->  hw/ppc/spapr_hcall.c   |  3 +--
->  include/hw/ppc/spapr.h |  2 +-
->  3 files changed, 6 insertions(+), 9 deletions(-)
-> 
+>  hw/ppc/spapr.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 7124053b43..c551001f86 100644
+> index e03e874d94..d93dacd483 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -218,8 +218,7 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, PowerPCCPU *cpu)
->  /* Populate the "ibm,pa-features" property */
->  static void spapr_populate_pa_features(SpaprMachineState *spapr,
->                                         PowerPCCPU *cpu,
-> -                                       void *fdt, int offset,
-> -                                       bool legacy_guest)
-> +                                       void *fdt, int offset)
->  {
->      uint8_t pa_features_206[] = { 6, 0,
->          0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
-> @@ -285,7 +284,7 @@ static void spapr_populate_pa_features(SpaprMachineState *spapr,
->      if ((spapr_get_cap(spapr, SPAPR_CAP_HTM) != 0) && pa_size > 24) {
->          pa_features[24] |= 0x80;    /* Transactional memory support */
+> @@ -1024,6 +1024,7 @@ int spapr_h_cas_compose_response(SpaprMachineStat=
+e *spapr,
+>      _FDT((fdt_pack(fdt)));
+> =20
+>      if (fdt_totalsize(fdt) + sizeof(hdr) > size) {
+> +        g_free(fdt);
+>          trace_spapr_cas_failed(size);
+>          return -1;
 >      }
-> -    if (legacy_guest && pa_size > 40) {
-> +    if (spapr->cas_pre_isa3_guest && pa_size > 40) {
->          /* Workaround for broken kernels that attempt (guest) radix
->           * mode when they can't handle it, if they see the radix bit set
->           * in pa-features. So hide it from them. */
-> @@ -348,8 +347,7 @@ static int spapr_fixup_cpu_dt(void *fdt, SpaprMachineState *spapr)
->              return ret;
->          }
->  
-> -        spapr_populate_pa_features(spapr, cpu, fdt, offset,
-> -                                   spapr->cas_legacy_guest_workaround);
-> +        spapr_populate_pa_features(spapr, cpu, fdt, offset);
->      }
->      return ret;
->  }
-> @@ -551,7 +549,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
->                            page_sizes_prop, page_sizes_prop_size)));
->      }
->  
-> -    spapr_populate_pa_features(spapr, cpu, fdt, offset, false);
-> +    spapr_populate_pa_features(spapr, cpu, fdt, offset);
->  
->      _FDT((fdt_setprop_cell(fdt, offset, "ibm,chip-id",
->                             cs->cpu_index / vcpus_per_socket)));
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 23e4bdb829..3d3a67149a 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1765,8 +1765,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
->              exit(EXIT_FAILURE);
->          }
->      }
-> -    spapr->cas_legacy_guest_workaround = !spapr_ovec_test(ov1_guest,
-> -                                                          OV1_PPC_3_00);
-> +    spapr->cas_pre_isa3_guest = !spapr_ovec_test(ov1_guest, OV1_PPC_3_00);
->      spapr_ovec_cleanup(ov1_guest);
->      if (!spapr->cas_reboot) {
->          /* If spapr_machine_reset() did not set up a HPT but one is necessary
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 03111fd55b..dfec8e8e76 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -175,7 +175,7 @@ struct SpaprMachineState {
->  
->      /* ibm,client-architecture-support option negotiation */
->      bool cas_reboot;
-> -    bool cas_legacy_guest_workaround;
-> +    bool cas_pre_isa3_guest;
->      SpaprOptionVector *ov5;         /* QEMU-supported option vectors */
->      SpaprOptionVector *ov5_cas;     /* negotiated (via CAS) option vectors */
->      uint32_t max_compat_pvr;
+>=20
 
 
