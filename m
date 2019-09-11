@@ -2,103 +2,59 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F379CC49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:45:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 704A7C49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:46:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCF7D2053B
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:45:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="ZOntlX4Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCF7D2053B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTPS id F2ABA20644
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:46:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2ABA20644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i83ro-00016D-1i
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:45:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43802)
+	id 1i83ss-0002p9-0B
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:46:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43889)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Paul.Durrant@citrix.com>) id 1i83jO-0008Sv-01
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:36:27 -0400
+ (envelope-from <stefanha@redhat.com>) id 1i83jW-0000D1-MQ
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:36:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Paul.Durrant@citrix.com>) id 1i83jM-0000nk-EZ
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:36:25 -0400
-Received: from esa1.hc3370-68.iphmx.com ([216.71.145.142]:4361)
+ (envelope-from <stefanha@redhat.com>) id 1i83jV-0000rn-HS
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:36:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37008)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Paul.Durrant@citrix.com>)
- id 1i83jM-0000mX-7K
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:36:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=citrix.com; s=securemail; t=1568212584;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=2eLRyJRvHEIZADs9TRMEGf4YwasJRDQ8z8KRoRRuZjg=;
- b=ZOntlX4QxKx9DGfIflcFM3WbZon0JwrhwmYsbS+w+Eje0rc4IVdYGged
- jpmnMgVtoQ5g86UhDYpN9orlWMbBqpmGpynoGVjrM9w1Am7IXI7u/3IH/
- FSbTHvGW5b9l6llWWOridyHGbVUn1P5+nyYKoYK50auzv0N1BTsEkFzUa g=;
-Authentication-Results: esa1.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none;
- spf=None smtp.pra=paul.durrant@citrix.com;
- spf=Pass smtp.mailfrom=Paul.Durrant@citrix.com;
- spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- paul.durrant@citrix.com) identity=pra;
- client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="paul.durrant@citrix.com"; x-conformance=sidf_compatible
-Received-SPF: Pass (esa1.hc3370-68.iphmx.com: domain of
- Paul.Durrant@citrix.com designates 162.221.158.21 as
- permitted sender) identity=mailfrom;
- client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="Paul.Durrant@citrix.com";
- x-conformance=sidf_compatible; x-record-type="v=spf1";
- x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
- ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
- ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
- ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
-Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- postmaster@mail.citrix.com) identity=helo;
- client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="postmaster@mail.citrix.com";
- x-conformance=sidf_compatible
-IronPort-SDR: Q1ViSHd8WY124JeLUl9SVBPzBTGF2Vj6GHFsbXCijqRrz6NrS7WHL0rpuAVRKE0L2qovWOnAW9
- pzsiTa3LEVV8cTpmOcEH78mH0G8fi5kbyaFv6HrdOlvks01vpxZs1Odr2i6Y23b/r2dgsHvRuz
- nckf5f5YZl/XTHpO8d/S1YFNkSjAjSWmbffP4hx9hfYQ/tcgu00Dbxp8gONWZFfJsUIhJ+zgVO
- Jfi/iUzPwCMefxI5ZIBuL4eaCG8FDMpbYKBjdxRmkMsWVt3sUKbAb6ptt/XZyKUE8oD5JAKlJq
- vQc=
-X-SBRS: 2.7
-X-MesageID: 5488463
-X-Ironport-Server: esa1.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.64,493,1559534400"; 
-   d="scan'208";a="5488463"
-From: Paul Durrant <paul.durrant@citrix.com>
-To: <qemu-devel@nongnu.org>, <xen-devel@lists.xenproject.org>
-Date: Wed, 11 Sep 2019 15:36:17 +0100
-Message-ID: <20190911143618.23477-3-paul.durrant@citrix.com>
-X-Mailer: git-send-email 2.20.1.2.gb21ebb6
-In-Reply-To: <20190911143618.23477-1-paul.durrant@citrix.com>
-References: <20190911143618.23477-1-paul.durrant@citrix.com>
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>)
+ id 1i83jR-0000ph-GE; Wed, 11 Sep 2019 10:36:29 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 623BD3098433;
+ Wed, 11 Sep 2019 14:36:28 +0000 (UTC)
+Received: from localhost (ovpn-116-185.ams2.redhat.com [10.36.116.185])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2577460852;
+ Wed, 11 Sep 2019 14:36:21 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 11 Sep 2019 16:36:11 +0200
+Message-Id: <20190911143612.17881-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.145.142
-Subject: [Qemu-devel] [PATCH 2/3] xen: introduce separate XenWatchList for
- XenDevice objects
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Wed, 11 Sep 2019 14:36:28 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 0/1] Block patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,208 +66,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anthony Perard <anthony.perard@citrix.com>,
- Paul Durrant <paul.durrant@citrix.com>,
- Stefano Stabellini <sstabellini@kernel.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch uses the XenWatchList abstraction to add a separate watch list
-for each device. This is more scalable than walking a single notifier
-list for all watches and is also necessary to implement a bug-fix in a
-subsequent patch.
+The following changes since commit cc6613e244e86c66f83467eab5284825d7057c=
+ea:
 
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
----
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
----
- hw/xen/trace-events      |  2 ++
- hw/xen/xen-bus.c         | 72 ++++++++++++++++++++++++++++++++--------
- include/hw/xen/xen-bus.h |  2 ++
- 3 files changed, 62 insertions(+), 14 deletions(-)
+  Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-reques=
+t' into staging (2019-09-03 11:06:09 +0100)
 
-diff --git a/hw/xen/trace-events b/hw/xen/trace-events
-index ac8d9c20d2..80ce3dafad 100644
---- a/hw/xen/trace-events
-+++ b/hw/xen/trace-events
-@@ -29,6 +29,8 @@ xen_device_backend_changed(const char *type, char *name) "type: %s name: %s"
- xen_device_frontend_state(const char *type, char *name, const char *state) "type: %s name: %s -> %s"
- xen_device_frontend_changed(const char *type, char *name) "type: %s name: %s"
- xen_device_unplug(const char *type, char *name) "type: %s name: %s"
-+xen_device_add_watch(const char *type, char *name, const char *node, const char *key) "type: %s name: %s node: %s key: %s"
-+xen_device_remove_watch(const char *type, char *name, const char *node, const char *key) "type: %s name: %s node: %s key: %s"
- 
- # xen-bus-helper.c
- xs_node_create(const char *node) "%s"
-diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index 28efaccff2..810a4e2df3 100644
---- a/hw/xen/xen-bus.c
-+++ b/hw/xen/xen-bus.c
-@@ -235,11 +235,11 @@ static void watch_list_remove(XenWatchList *watch_list, XenWatch *watch,
- 
- static XenWatch *xen_bus_add_watch(XenBus *xenbus, const char *node,
-                                    const char *key, XenWatchHandler handler,
--                                   void *opaque, Error **errp)
-+                                   Error **errp)
- {
-     trace_xen_bus_add_watch(node, key);
- 
--    return watch_list_add(xenbus->watch_list, node, key, handler, opaque,
-+    return watch_list_add(xenbus->watch_list, node, key, handler, xenbus,
-                           errp);
- }
- 
-@@ -433,7 +433,7 @@ static void xen_bus_realize(BusState *bus, Error **errp)
- 
-     xenbus->backend_watch =
-         xen_bus_add_watch(xenbus, "", /* domain root node */
--                          "backend", xen_bus_enumerate, xenbus, &local_err);
-+                          "backend", xen_bus_enumerate, &local_err);
-     if (local_err) {
-         /* This need not be treated as a hard error so don't propagate */
-         error_reportf_err(local_err,
-@@ -621,6 +621,31 @@ static void xen_device_backend_changed(void *opaque)
-     }
- }
- 
-+static XenWatch *xen_device_add_watch(XenDevice *xendev, const char *node,
-+                                      const char *key,
-+                                      XenWatchHandler handler,
-+                                      Error **errp)
-+{
-+    const char *type = object_get_typename(OBJECT(xendev));
-+
-+    trace_xen_device_add_watch(type, xendev->name, node, key);
-+
-+    return watch_list_add(xendev->watch_list, node, key, handler, xendev,
-+                          errp);
-+}
-+
-+static void xen_device_remove_watch(XenDevice *xendev, XenWatch *watch,
-+                                    Error **errp)
-+{
-+    const char *type = object_get_typename(OBJECT(xendev));
-+
-+    trace_xen_device_remove_watch(type, xendev->name, watch->node,
-+                                  watch->key);
-+
-+    watch_list_remove(xendev->watch_list, watch, errp);
-+}
-+
-+
- static void xen_device_backend_create(XenDevice *xendev, Error **errp)
- {
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-@@ -645,9 +670,9 @@ static void xen_device_backend_create(XenDevice *xendev, Error **errp)
-     }
- 
-     xendev->backend_state_watch =
--        xen_bus_add_watch(xenbus, xendev->backend_path,
--                          "state", xen_device_backend_changed,
--                          xendev, &local_err);
-+        xen_device_add_watch(xendev, xendev->backend_path,
-+                             "state", xen_device_backend_changed,
-+                             &local_err);
-     if (local_err) {
-         error_propagate_prepend(errp, local_err,
-                                 "failed to watch backend state: ");
-@@ -655,9 +680,9 @@ static void xen_device_backend_create(XenDevice *xendev, Error **errp)
-     }
- 
-     xendev->backend_online_watch =
--        xen_bus_add_watch(xenbus, xendev->backend_path,
--                          "online", xen_device_backend_changed,
--                          xendev, &local_err);
-+        xen_device_add_watch(xendev, xendev->backend_path,
-+                             "online", xen_device_backend_changed,
-+                             &local_err);
-     if (local_err) {
-         error_propagate_prepend(errp, local_err,
-                                 "failed to watch backend online: ");
-@@ -671,12 +696,12 @@ static void xen_device_backend_destroy(XenDevice *xendev)
-     Error *local_err = NULL;
- 
-     if (xendev->backend_online_watch) {
--        xen_bus_remove_watch(xenbus, xendev->backend_online_watch, NULL);
-+        xen_device_remove_watch(xendev, xendev->backend_online_watch, NULL);
-         xendev->backend_online_watch = NULL;
-     }
- 
-     if (xendev->backend_state_watch) {
--        xen_bus_remove_watch(xenbus, xendev->backend_state_watch, NULL);
-+        xen_device_remove_watch(xendev, xendev->backend_state_watch, NULL);
-         xendev->backend_state_watch = NULL;
-     }
- 
-@@ -812,8 +837,8 @@ static void xen_device_frontend_create(XenDevice *xendev, Error **errp)
-     }
- 
-     xendev->frontend_state_watch =
--        xen_bus_add_watch(xenbus, xendev->frontend_path, "state",
--                          xen_device_frontend_changed, xendev, &local_err);
-+        xen_device_add_watch(xendev, xendev->frontend_path, "state",
-+                             xen_device_frontend_changed, &local_err);
-     if (local_err) {
-         error_propagate_prepend(errp, local_err,
-                                 "failed to watch frontend state: ");
-@@ -826,7 +851,8 @@ static void xen_device_frontend_destroy(XenDevice *xendev)
-     Error *local_err = NULL;
- 
-     if (xendev->frontend_state_watch) {
--        xen_bus_remove_watch(xenbus, xendev->frontend_state_watch, NULL);
-+        xen_device_remove_watch(xendev, xendev->frontend_state_watch,
-+                                NULL);
-         xendev->frontend_state_watch = NULL;
-     }
- 
-@@ -1122,6 +1148,16 @@ static void xen_device_unrealize(DeviceState *dev, Error **errp)
-         xendev->xgth = NULL;
-     }
- 
-+    if (xendev->watch_list) {
-+        watch_list_destroy(xendev->watch_list);
-+        xendev->watch_list = NULL;
-+    }
-+
-+    if (xendev->xsh) {
-+        xs_close(xendev->xsh);
-+        xendev->xsh = NULL;
-+    }
-+
-     g_free(xendev->name);
-     xendev->name = NULL;
- }
-@@ -1164,6 +1200,14 @@ static void xen_device_realize(DeviceState *dev, Error **errp)
- 
-     trace_xen_device_realize(type, xendev->name);
- 
-+    xendev->xsh = xs_open(0);
-+    if (!xendev->xsh) {
-+        error_setg_errno(errp, errno, "failed xs_open");
-+        goto unrealize;
-+    }
-+
-+    xendev->watch_list = watch_list_create(xendev->xsh);
-+
-     xendev->xgth = xengnttab_open(NULL, 0);
-     if (!xendev->xgth) {
-         error_setg_errno(errp, errno, "failed xengnttab_open");
-diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index 88b84e29bb..0d198148f6 100644
---- a/include/hw/xen/xen-bus.h
-+++ b/include/hw/xen/xen-bus.h
-@@ -22,6 +22,8 @@ typedef struct XenDevice {
-     DeviceState qdev;
-     domid_t frontend_id;
-     char *name;
-+    struct xs_handle *xsh;
-+    XenWatchList *watch_list;
-     char *backend_path, *frontend_path;
-     enum xenbus_state backend_state, frontend_state;
-     Notifier exit;
--- 
-2.20.1.2.gb21ebb6
+are available in the Git repository at:
+
+  https://github.com/stefanha/qemu.git tags/block-pull-request
+
+for you to fetch changes up to ebb6ff25cd888a52a64a9adc3692541c6d1d9a42:
+
+  virtio-blk: Cancel the pending BH when the dataplane is reset (2019-09-=
+03 16:11:18 +0100)
+
+----------------------------------------------------------------
+Pull request
+
+----------------------------------------------------------------
+
+Philippe Mathieu-Daud=C3=A9 (1):
+  virtio-blk: Cancel the pending BH when the dataplane is reset
+
+ hw/block/dataplane/virtio-blk.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+--=20
+2.21.0
 
 
