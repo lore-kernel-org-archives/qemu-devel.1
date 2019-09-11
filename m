@@ -2,94 +2,81 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1E07C49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:07:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F53C49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:08:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7AA53206CD
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:07:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=alistair23.me header.i=@alistair23.me header.b="OyLJimhM";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="EoGjEkMi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AA53206CD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=alistair23.me
+	by mail.kernel.org (Postfix) with ESMTPS id 5884D2081B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:08:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5884D2081B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i83HG-0006rm-FU
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:07:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38639)
+	id 1i83IN-00080t-HV
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:08:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38755)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair@alistair23.me>) id 1i83GU-0006QD-Aj
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:06:35 -0400
+ (envelope-from <mst@redhat.com>) id 1i83He-0007Xe-CY
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:07:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair@alistair23.me>) id 1i83GP-0002KH-Ee
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:06:34 -0400
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:34173)
+ (envelope-from <mst@redhat.com>) id 1i83Hb-0002ja-Bz
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:07:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34676)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alistair@alistair23.me>)
- id 1i83GP-0002Jh-2t
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:06:29 -0400
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailout.nyi.internal (Postfix) with ESMTP id 503FF22465
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 10:06:27 -0400 (EDT)
-Received: from imap26 ([10.202.2.76])
- by compute7.internal (MEProxy); Wed, 11 Sep 2019 10:06:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alistair23.me;
- h=mime-version:message-id:in-reply-to:references:date:from:to
- :subject:content-type; s=fm2; bh=4QKbP+09nKZR2u7hCBAACXsSE8Iby1v
- O9DtA0ITK+k0=; b=OyLJimhMoJ1dDLwoGroqivzByU9/GHI+f3p1Jyq0oFiUP+U
- vtGVDA7Kdc8egngaIunopUS0+deaMpOmE8r9qEo+LIel8VqJHFycXc29f6Pp2UV0
- GTIBanrBWc5WeriqLVHBakGMlXlxvKXzPb0ZzJi/xKLrjozEQCnZFcsDe6RrO0pP
- +VWlVoPZnnThH9E+3DSPij3L8riW8YZgV9kO7Qiy2QYz4rn2U38h2jK8sylU+JV9
- UJ0ujAITSwTbRKmbCBxiwF+grUJQd6QPU0gOp7ASNn/hwSZtDDMcicD1IZtxM2ad
- /UVS3bC+fvNtPl0TArs+w4QLFO4lNWq/TMYA3VA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=4QKbP+
- 09nKZR2u7hCBAACXsSE8Iby1vO9DtA0ITK+k0=; b=EoGjEkMizHlQidkXOePPws
- 983bJryrqGl4wjPt6gnEENFlBao3yXvmlkqTLvp1wrZuvBb5Yv25PpOKb7TDSP1G
- 8rJhe1sr/qL1x3yHxtv3DyxzoBKHl6ub3gzVUtvpi35f1+dZbyHzFn7+EjjgZFTU
- oDzrV3jlRHJr1QXMNuSFh2WS+/5GbtpKJR/WbBSfZL0n9cJuSePsfz3/CW0klELN
- hxDfcfsnAJJtBPc7YNosWf5jfMWx0frIFi2c4VBZ1luDe50pUHeuSP8tAILpHBIg
- /pG7FyPJxDECRijS4YseFlp/R/WjFCvQUf8xP1Djf2XWFkDC7RnswxAX+9SFvntg
- ==
-X-ME-Sender: <xms:Yv94XU8wMWlpf6c3yzvDynGfUbXlPNDbkjJ5ikLJsq17Uio7dba54w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrtdefgdeghecutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecunecujfgurhepofgfggfkjghffffhvffutgesthdtre
- dtreerjeenucfhrhhomheptehlihhsthgrihhruceorghlihhsthgrihhrsegrlhhishht
- rghirhdvfedrmhgvqeenucfrrghrrghmpehmrghilhhfrhhomheprghlihhsthgrihhrse
- grlhhishhtrghirhdvfedrmhgvnecuvehluhhsthgvrhfuihiivgeptd
-X-ME-Proxy: <xmx:Yv94XZlgSo12hujj3FWN_UR7LxsBNUhzF9Q8Tn2Gzf9S8ntSc6qwzw>
- <xmx:Yv94XZxMDcRvvSYtodLuxSZw4e64wN7gugrAiop0i50gUgRVXK5uQQ>
- <xmx:Yv94XT72zdWTagLFozPRE4zsvqM02EdhqdzECqZ6a_bfFXWu6eNPtA>
- <xmx:Y_94XbvV92kjuf8oA6qHoeJW14rIioEbnDannOU9AgT5i_7MHEp8kg>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
- id D21A314200A1; Wed, 11 Sep 2019 10:06:26 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.1.7-227-g18586b54-fmstable-20190911v1
-Mime-Version: 1.0
-Message-Id: <acd9fbba-71af-47b1-911c-f8b88e806cac@www.fastmail.com>
-In-Reply-To: <CAFEAcA8gLzitZ8OKU+Ht79fsU1BOguxEu9FvafD0vjR9cJKx7A@mail.gmail.com>
-References: <cover.1567750222.git.alistair@alistair23.me>
- <CAFEAcA8gLzitZ8OKU+Ht79fsU1BOguxEu9FvafD0vjR9cJKx7A@mail.gmail.com>
-Date: Wed, 11 Sep 2019 15:05:29 +0100
-From: Alistair <alistair@alistair23.me>
-To: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
-Content-Type: text/plain
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1i83Hb-0002jB-3S
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:07:43 -0400
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1E30B50F45
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 14:07:41 +0000 (UTC)
+Received: by mail-qk1-f199.google.com with SMTP id t26so25204627qkt.0
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 07:07:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=dYhVxqcCbCcbyYZmt8TR2bRddaTTMVOZuzcBDIYyNGk=;
+ b=oWECWI3QxN4G+A4n95hRDAzibzMZlyMTP+/vw3W+RT7FfjndrhGpIhYtM9CcJRAex7
+ edffvu/OkM1EXQzp4E+MWXF5mKG/kRAXgVVqJTMjzykYJyLGiCmHJnmfjiclU3uaOFeq
+ zkePtYlJn0Ilh0ONyOr0BYuRpnatrWGnxLesLDZ8Zf5ZyIEBWkzCJ89WxlCkJy0KuGX1
+ mOGcyjX8VPLx4CZEi3Qzkhz18kxICoNEOQ+X1tCRzysE2AF1YYHJb8/9lY7mFyhrSfLj
+ 0sCkjNCgbo4RDlHR3YDnWXRG4G1/PZJzyzH43PCQaJXGaFQnvpnvE15TYGjRwrBYBuuy
+ C0Zw==
+X-Gm-Message-State: APjAAAXT8ogZ6evMvLngzbah3SC2IbNjV4qEfd3q874z2LnF57srlSit
+ jMOGkd2FLF/Riam3iauWhjQjD4zoXaXxpbdFyx6uepfbnid6jbOT4uc+KUyjV/sKMjhZbU5rZxU
+ u9q7Hv6Ind5VPe+M=
+X-Received: by 2002:ac8:51d2:: with SMTP id d18mr36362251qtn.377.1568210860359; 
+ Wed, 11 Sep 2019 07:07:40 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxm7o0rL7qrze78GGauL7QlcUTk6JnkD56x0syc/77o+AbMivb9/mzU+7xIHXts/gXVvy0vmg==
+X-Received: by 2002:ac8:51d2:: with SMTP id d18mr36362225qtn.377.1568210860132; 
+ Wed, 11 Sep 2019 07:07:40 -0700 (PDT)
+Received: from redhat.com ([80.74.107.118])
+ by smtp.gmail.com with ESMTPSA id k11sm9272415qtp.26.2019.09.11.07.07.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 11 Sep 2019 07:07:39 -0700 (PDT)
+Date: Wed, 11 Sep 2019 10:07:34 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Message-ID: <20190911095650-mutt-send-email-mst@kernel.org>
+References: <20190911134539.25650-1-johannes@sipsolutions.net>
+ <20190911134539.25650-2-johannes@sipsolutions.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190911134539.25650-2-johannes@sipsolutions.net>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 66.111.4.26
-Subject: Re: [Qemu-devel] 
- =?utf-8?q?=5BPATCH_v4_0/6=5D_Add_the_STM32F405_and_?=
- =?utf-8?q?Netduino_Plus_2_machine?=
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC v2 1/2] docs: vhost-user: add in-band
+ kick/call messages
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,60 +88,258 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org, Johannes Berg <johannes.berg@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 11, 2019, at 11:49 AM, Peter Maydell wrote:
-> On Fri, 6 Sep 2019 at 07:10, Alistair Francis <alistair@alistair23.me> wrote:
-> >
-> >
-> > Now that the Arm-M4 CPU has been added to QEMU we can add the Netduino
-> > Plus 2 machine. This is very similar to the STM32F205 and Netduino 2 SoC
-> > and machine.
-> >
-> > v4:
-> > - Rebase on master
-> > v3:
-> > - Remove custom reset handler
-> > - Add init-entry and init-sp properties
-> > - Rebase on master (including Kconfig changes)
-> > v2:
-> > - Reorder patchset
-> > - Return the kernel entry point instead of using a pointer
-> > - Address Peter's comments
-> >
-> >
-> > Alistair Francis (6):
-> > armv7m: Allow entry information to be returned
-> > target/arm: Allow setting M mode entry and sp
-> > hw/misc: Add the STM32F4xx Sysconfig device
-> > hw/misc: Add the STM32F4xx EXTI device
-> > hw/arm: Add the STM32F4xx SoC
-> > hw/arm: Add the Netduino Plus 2
+On Wed, Sep 11, 2019 at 03:45:38PM +0200, Johannes Berg wrote:
+> From: Johannes Berg <johannes.berg@intel.com>
 > 
-> What are the changes for setting initial SP and PC for?
-
-If it's not set the the guest code jumps into some broken address and crashes at boot.
-
-> Why is this SoC special? Is it different from the
-> stm32f205 SoC we model already?
-
-From memory the STM32F205 might have the same issue. It just wasn't a big problem as my STM32F2xx tests were targeting QEMU while the STM32F4xx isn't.
-
+> For good reason, vhost-user is currently built asynchronously, that
+> way better performance can be obtained. However, for certain use
+> cases such as simulation, this is problematic.
 > 
-> I'm not in general a fan of individual board models having
-> their own custom behaviour for -kernel. The inconsistencies
-> between architectures and between A- and M- profile are
-> awkward enough as it is...
-
-I do see it as a pain as well, but I'm not sure what else to do to fix it.
-
-Alistair
-
+> Consider an event-based simulation in which both the device and CPU
+> have scheduled according to a simulation "calendar". Now, consider
+> the CPU sending I/O to the device, over a vring in the vhost-user
+> protocol. In this case, the CPU must wait for the vring interrupt
+> to have been processed by the device, so that the device is able to
+> put an entry onto the simulation calendar to obtain time to handle
+> the interrupt. Note that this doesn't mean the I/O is actually done
+> at this time, it just means that the handling of it is scheduled
+> before the CPU can continue running.
 > 
-> thanks
-> -- PMM
+> This cannot be done with the asynchronous eventfd based vring kick
+> and call design.
 > 
+> Extend the protocol slightly, so that a message can be used for kick
+> and call instead, if VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS is
+> negotiated. This in itself doesn't guarantee synchronisation, but both
+> sides can also negotiate VHOST_USER_PROTOCOL_F_REPLY_ACK and thus get
+> a reply to this message by setting the need_reply flag, and ensure
+> synchronisation this way.
 > 
+> To really use it in both directions, VHOST_USER_PROTOCOL_F_SLAVE_REQ
+> is also needed.
+> 
+> Since it is used for simulation purposes and too many messages on
+> the socket can lock up the virtual machine, document that this should
+> only be used together with the mentioned features.
+> 
+> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+> ---
+>  docs/interop/vhost-user.rst | 113 ++++++++++++++++++++++++++++++------
+>  1 file changed, 96 insertions(+), 17 deletions(-)
+> 
+> diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
+> index 7827b710aa0a..c4396eabf9e9 100644
+> --- a/docs/interop/vhost-user.rst
+> +++ b/docs/interop/vhost-user.rst
+> @@ -2,6 +2,7 @@
+>  Vhost-user Protocol
+>  ===================
+>  :Copyright: 2014 Virtual Open Systems Sarl.
+> +:Copyright: 2019 Intel Corporation
+>  :Licence: This work is licensed under the terms of the GNU GPL,
+>            version 2 or later. See the COPYING file in the top-level
+>            directory.
+> @@ -279,6 +280,9 @@ If *master* is unable to send the full message or receives a wrong
+>  reply it will close the connection. An optional reconnection mechanism
+>  can be implemented.
+>  
+> +If *slave* detects some error such as incompatible features, it may also
+> +close the connection. This should only happen in exceptional circumstances.
+> +
+>  Any protocol extensions are gated by protocol feature bits, which
+>  allows full backwards compatibility on both master and slave.  As
+>  older slaves don't support negotiating protocol features, a feature
+> @@ -315,7 +319,8 @@ it until ring is started, or after it has been stopped.
+>  
+>  Client must start ring upon receiving a kick (that is, detecting that
+>  file descriptor is readable) on the descriptor specified by
+> -``VHOST_USER_SET_VRING_KICK``, and stop ring upon receiving
+> +``VHOST_USER_SET_VRING_KICK`` (or receiving the in-band message
+> +``VHOST_USER_VRING_KICK`` if negotiated) and stop ring upon receiving
+>  ``VHOST_USER_GET_VRING_BASE``.
+>  
+>  While processing the rings (whether they are enabled or not), client
+> @@ -767,24 +772,48 @@ When reconnecting:
+>  #. Resubmit inflight ``DescStatePacked`` entries in order of their
+>     counter value
+>  
+> +In-band notifications
+> +---------------------
+> +
+> +In some limited situations (e.g. for simulation) it is desirable to
+> +have the kick, call and error (if used) signals done via in-band
+> +messages instead of asynchronous eventfd notifications. This can be
+> +done by negotiating the ``VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS``
+> +protocol feature.
+> +
+> +Note that due to the fact that too many messages on the sockets can
+> +cause the sending application(s) to block, it is not advised to use
+> +this feature unless absolutely necessary. It is also considered an
+> +error to negotiate this feature without also negotiating
+> +``VHOST_USER_PROTOCOL_F_SLAVE_REQ`` and ``VHOST_USER_PROTOCOL_F_REPLY_ACK``,
+> +the former is necessary for getting a message channel from the slave
+> +to the master, while the latter needs to be used with the in-band
+> +notification messages to block until they are processed, both to avoid
+> +blocking later and for proper processing (at least in the simulation
+> +use case.) As it has no other way of signalling this error, the slave
+> +should close the connection as a response to a
+> +``VHOST_USER_SET_PROTOCOL_FEATURES`` message that sets the in-band
+> +notifications feature flag without the other two.
+> +
+>  Protocol features
+>  -----------------
+>  
+>  .. code:: c
+>  
+> -  #define VHOST_USER_PROTOCOL_F_MQ             0
+> -  #define VHOST_USER_PROTOCOL_F_LOG_SHMFD      1
+> -  #define VHOST_USER_PROTOCOL_F_RARP           2
+> -  #define VHOST_USER_PROTOCOL_F_REPLY_ACK      3
+> -  #define VHOST_USER_PROTOCOL_F_MTU            4
+> -  #define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
+> -  #define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN   6
+> -  #define VHOST_USER_PROTOCOL_F_CRYPTO_SESSION 7
+> -  #define VHOST_USER_PROTOCOL_F_PAGEFAULT      8
+> -  #define VHOST_USER_PROTOCOL_F_CONFIG         9
+> -  #define VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD  10
+> -  #define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER  11
+> -  #define VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD 12
+> +  #define VHOST_USER_PROTOCOL_F_MQ                     0
+> +  #define VHOST_USER_PROTOCOL_F_LOG_SHMFD              1
+> +  #define VHOST_USER_PROTOCOL_F_RARP                   2
+> +  #define VHOST_USER_PROTOCOL_F_REPLY_ACK              3
+> +  #define VHOST_USER_PROTOCOL_F_MTU                    4
+> +  #define VHOST_USER_PROTOCOL_F_SLAVE_REQ              5
+> +  #define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN           6
+> +  #define VHOST_USER_PROTOCOL_F_CRYPTO_SESSION         7
+> +  #define VHOST_USER_PROTOCOL_F_PAGEFAULT              8
+> +  #define VHOST_USER_PROTOCOL_F_CONFIG                 9
+> +  #define VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD         10
+> +  #define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER         11
+> +  #define VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD        12
+> +  #define VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS 13
+
+INFLIGHT so INBAND?
+
+>  
+>  Master message types
+>  --------------------
+> @@ -946,7 +975,9 @@ Master message types
+>    Bits (0-7) of the payload contain the vring index. Bit 8 is the
+>    invalid FD flag. This flag is set when there is no file descriptor
+>    in the ancillary data. This signals that polling should be used
+> -  instead of waiting for a kick.
+> +  instead of waiting for the call. however, if the protocol feature
+> +  ``VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS`` has been negotiated
+> +  it instead means the updates should be done using the messages.
+>  
+>  ``VHOST_USER_SET_VRING_CALL``
+>    :id: 13
+> @@ -959,7 +990,9 @@ Master message types
+>    Bits (0-7) of the payload contain the vring index. Bit 8 is the
+>    invalid FD flag. This flag is set when there is no file descriptor
+>    in the ancillary data. This signals that polling will be used
+> -  instead of waiting for the call.
+> +  instead of waiting for the call; however, if the protocol feature
+> +  ``VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS`` has been negotiated
+> +  it instead means the updates should be done using the messages.
+
+Hmm I don't like this. I propose that with VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS
+we just don't allow VHOST_USER_SET_VRING_CALL (if you think it's
+important to allow them, we can say that we do not require them).
+
+But it's important for performance to be able to enable polling.
+
+
+>  
+>  ``VHOST_USER_SET_VRING_ERR``
+>    :id: 14
+> @@ -971,7 +1004,11 @@ Master message types
+>  
+>    Bits (0-7) of the payload contain the vring index. Bit 8 is the
+>    invalid FD flag. This flag is set when there is no file descriptor
+> -  in the ancillary data.
+> +  in the ancillary data. If the protocol features
+> +  ``VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS`` and
+> +  ``VHOST_USER_PROTOCOL_F_SLAVE_REQ`` have been negotiated the invalid
+> +  FD flag will be used to indicate that updates should be done using
+> +  the ``VHOST_USER_SLAVE_ message.
+>  
+>  ``VHOST_USER_GET_QUEUE_NUM``
+>    :id: 17
+> @@ -1190,6 +1227,20 @@ Master message types
+>    ancillary data. The GPU protocol is used to inform the master of
+>    rendering state and updates. See vhost-user-gpu.rst for details.
+>  
+> +``VHOST_USER_VRING_KICK``
+> +  :id: 34
+> +  :equivalent ioctl: N/A
+> +  :slave payload: vring state description
+> +  :master payload: N/A
+> +
+> +  When the ``VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS`` protocol
+> +  feature has been successfully negotiated, this message may be
+> +  submitted by the master to indicate that a buffer was added to
+> +  the vring instead of signalling it using the vring's event FD or
+
+event -> kick?
+fd -> file descriptor
+
+> +  having the slave rely on polling.
+
+i think polling is a separate option and should be there with inband
+kicks.
+
+> +
+> +  The state.num field is currently reserved and must be set to 0.
+> +
+>  Slave message types
+>  -------------------
+>  
+> @@ -1246,6 +1297,34 @@ Slave message types
+>    ``VHOST_USER_PROTOCOL_F_HOST_NOTIFIER`` protocol feature has been
+>    successfully negotiated.
+>  
+> +``VHOST_USER_SLAVE_VRING_CALL``
+> +  :id: 4
+> +  :equivalent ioctl: N/A
+> +  :slave payload: vring state description
+> +  :master payload: N/A
+> +
+> +  When the ``VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS`` protocol
+> +  feature has been successfully negotiated, this message may be
+> +  submitted by the slave to indicate that a buffer was used from
+> +  the vring instead of signalling this using the vring's kick FD or
+> +  having the master relying on polling.
+
+
+call FD?
+
+> +
+> +  The state.num field is currently reserved and must be set to 0.
+> +
+> +``VHOST_USER_SLAVE_VRING_ERR``
+> +  :id: 5
+> +  :equivalent ioctl: N/A
+> +  :slave payload: vring state description
+> +  :master payload: N/A
+> +
+> +  When the ``VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS`` protocol
+> +  feature has been successfully negotiated, this message may be
+> +  submitted by the slave to indicate that an error occurred on the
+> +  specific vring, instead of signalling the error FD set by the
+> +  master via ``VHOST_USER_SET_VRING_ERR``.
+> +
+> +  The state.num field is currently reserved and must be set to 0.
+> +
+>  .. _reply_ack:
+>  
+>  VHOST_USER_PROTOCOL_F_REPLY_ACK
+> -- 
+> 2.20.1
 
