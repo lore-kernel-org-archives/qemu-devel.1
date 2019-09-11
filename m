@@ -2,166 +2,94 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19D83ECDE20
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:43:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3EEDECDE20
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:47:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB0CE208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:43:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="OxbaPx5Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB0CE208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 7432D20CC7
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:47:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7432D20CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7xHs-0005zM-TU
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:43:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49112)
+	id 1i7xLs-0007Gz-KW
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:47:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49948)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1i7xFs-0004ZT-69
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:41:33 -0400
+ (envelope-from <aravinda@linux.vnet.ibm.com>) id 1i7xL6-0006j2-QE
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:46:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1i7xFr-0003pg-3p
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:41:32 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:38485)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1i7xFq-0003p6-TU
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:41:31 -0400
-Received: by mail-pl1-x641.google.com with SMTP id p9so5083701plk.5
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 00:41:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=zeAlzTqiAcpVz77AOrpa2LnnMZpR42Oj94xB+NVB4w4=;
- b=OxbaPx5Y2d0uGUo690LNvLTanj7dQwrER37R7OPgjHl8VSxu5bdOfzhRcMwxhO13eC
- vIgWmuKV8bd0nCy2JotJRvsA+kTrW4iJImWAAsVPOBO8+/xCyuLY46lPQavc2whh/W+5
- gPP0FLJd8JMfCuhnD2ZL/lzWGlBpQ5hzQCv+X7Rk7BSvKKzChmV8finoKpqMA1ih4ij7
- YSg6E97AvRyg4NwBbtN3XzItM39Bd3D4cCX1rh9C3H6/1ecWB84d8r8evl+//Gjuwf2m
- HRHCcqbXISLg+OlHL63PB1H/jyhBHTORpAmJSdgObALSnYztbhSsyYZPfJ4RgJHVdTvy
- 7hvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=zeAlzTqiAcpVz77AOrpa2LnnMZpR42Oj94xB+NVB4w4=;
- b=H+2uCwW+Ciur4Eyg9++3NwYmd2fhMEeiI4JL+lPqo5RRoucYxP+M20o7z5zFgofndc
- 9AckNywEi3pZht3pYZGE/NkXIRj0IhYgcg7z8m/d1uSXgNueDE9FUKHVT2LFVs5SNTO4
- 62X+XduFVNFFh2budG7MLyVwobhd4QOPfkvfwJELSqjiUD7y1n+B2xKAagfV0ecBHUDU
- Nwby1M8avG8OvbxrBElTrTLpnHYWOBPSC3mCovSs0K14MzXZNJIeQrI+8EhTLR0ko9SO
- bc/COmb8MEj+cVaXa1KFpg6R1i2ITYh+UdNMD8mD+6fraj2ElYUREgNEKVBsboz5icqO
- gthQ==
-X-Gm-Message-State: APjAAAUwpVzcHvQWZqyw8ppdGPHj1XxXvrKpEfU/9Vzi3kay3c7rM0Da
- QdCFf82GpVLIXFpYo1zRBTQ9+w==
-X-Google-Smtp-Source: APXvYqx7j7lV4tOQMnhr0DtNGNhTZfnyqKiPYkCU8zLbudqyFBWvOmuwSelNLlQXRauUykDv/L9xvQ==
-X-Received: by 2002:a17:902:a606:: with SMTP id
- u6mr22468997plq.224.1568187690032; 
- Wed, 11 Sep 2019 00:41:30 -0700 (PDT)
-Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id p11sm22605640pff.136.2019.09.11.00.41.27
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 11 Sep 2019 00:41:29 -0700 (PDT)
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org
-References: <20190911040452.8341-1-david@gibson.dropbear.id.au>
- <20190911040452.8341-3-david@gibson.dropbear.id.au>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <ef614953-6548-b6ad-4169-7698f91af6c7@ozlabs.ru>
-Date: Wed, 11 Sep 2019 17:41:25 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.0
+ (envelope-from <aravinda@linux.vnet.ibm.com>) id 1i7xL5-0006UK-8r
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:46:56 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50512)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+ id 1i7xL1-0006Sn-Ir; Wed, 11 Sep 2019 03:46:51 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x8B7gcxO010358; Wed, 11 Sep 2019 03:46:36 -0400
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
+ [169.63.121.186])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2uxc00cvpt-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 11 Sep 2019 03:46:35 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+ by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x8B7jY1R005628;
+ Wed, 11 Sep 2019 07:46:33 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma03wdc.us.ibm.com with ESMTP id 2uv4679cke-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 11 Sep 2019 07:46:33 +0000
+Received: from b03ledav006.gho.boulder.ibm.com
+ (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x8B7kWP247382944
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 11 Sep 2019 07:46:32 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 9851BC605A;
+ Wed, 11 Sep 2019 07:46:32 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 74320C6059;
+ Wed, 11 Sep 2019 07:46:30 +0000 (GMT)
+Received: from [9.102.2.149] (unknown [9.102.2.149])
+ by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Wed, 11 Sep 2019 07:46:30 +0000 (GMT)
+To: Greg Kurz <groug@kaod.org>
+References: <156801373576.24362.1904051970114447107.stgit@aravinda>
+ <156801390267.24362.17017161761742932333.stgit@aravinda>
+ <20190910104814.6bd89cec@bahia.lan>
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Message-ID: <7760e81b-94c8-b257-f43a-e643425a3229@linux.vnet.ibm.com>
+Date: Wed, 11 Sep 2019 13:16:29 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.6.0
 MIME-Version: 1.0
-In-Reply-To: <20190911040452.8341-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20190910104814.6bd89cec@bahia.lan>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::641
-Subject: Re: [Qemu-devel] [PATCH 2/7] spapr: Move handling of special NVLink
- numa node from reset to init
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-11_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1909110071
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [PATCH v13 6/6] migration: Include migration
+ support for machine check handling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -173,74 +101,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, philmd@redhat.com, groug@kaod.org, clg@kaod.org
+Cc: aik@ozlabs.ru, qemu-devel@nongnu.org, paulus@ozlabs.org,
+ qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 11/09/2019 14:04, David Gibson wrote:
-> The number of NUMA nodes in the system is fixed from the command line.
-> Therefore, there's no need to recalculate it at reset time, and we can
-> determine the special gpu_numa_id value used for NVLink2 devices at init
-> time.
+On Tuesday 10 September 2019 02:18 PM, Greg Kurz wrote:
+> Hi Aravinda,
 > 
-> This simplifies the reset path a bit which will make further improvements
-> easier.
+> Sorry for not being able to review the whole series in one pass,
+> and thus forcing you to poste more versions... but I have some
+> more remarks about migration.
+
+That's fine. In fact I have to thank you for your time for reviewing my
+patches.
+
 > 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-
-
-Tested-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-
-
-> ---
->  hw/ppc/spapr.c | 21 +++++++++++----------
->  1 file changed, 11 insertions(+), 10 deletions(-)
+> On Mon, 09 Sep 2019 12:55:02 +0530
+> Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
 > 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index c551001f86..e03e874d94 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1737,16 +1737,6 @@ static void spapr_machine_reset(MachineState *machine)
->          spapr_setup_hpt_and_vrma(spapr);
->      }
->  
-> -    /*
-> -     * NVLink2-connected GPU RAM needs to be placed on a separate NUMA node.
-> -     * We assign a new numa ID per GPU in spapr_pci_collect_nvgpu() which is
-> -     * called from vPHB reset handler so we initialize the counter here.
-> -     * If no NUMA is configured from the QEMU side, we start from 1 as GPU RAM
-> -     * must be equally distant from any other node.
-> -     * The final value of spapr->gpu_numa_id is going to be written to
-> -     * max-associativity-domains in spapr_build_fdt().
-> -     */
-> -    spapr->gpu_numa_id = MAX(1, machine->numa_state->num_nodes);
->      qemu_devices_reset();
->  
->      /*
-> @@ -2885,6 +2875,17 @@ static void spapr_machine_init(MachineState *machine)
->  
->      }
->  
-> +    /*
-> +     * NVLink2-connected GPU RAM needs to be placed on a separate NUMA node.
-> +     * We assign a new numa ID per GPU in spapr_pci_collect_nvgpu() which is
-> +     * called from vPHB reset handler so we initialize the counter here.
-> +     * If no NUMA is configured from the QEMU side, we start from 1 as GPU RAM
-> +     * must be equally distant from any other node.
-> +     * The final value of spapr->gpu_numa_id is going to be written to
-> +     * max-associativity-domains in spapr_build_fdt().
-> +     */
-> +    spapr->gpu_numa_id = MAX(1, machine->numa_state->num_nodes);
-> +
->      if ((!kvm_enabled() || kvmppc_has_cap_mmu_radix()) &&
->          ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3_00, 0,
->                                spapr->max_compat_pvr)) {
+>> This patch includes migration support for machine check
+>> handling. Especially this patch blocks VM migration
+>> requests until the machine check error handling is
+>> complete as (i) these errors are specific to the source
+>> hardware and is irrelevant on the target hardware,
+>> (ii) these errors cause data corruption and should
+>> be handled before migration.
+>>
+>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+>> ---
+>>  hw/ppc/spapr.c         |   44 ++++++++++++++++++++++++++++++++++++++++++++
+>>  hw/ppc/spapr_events.c  |   14 ++++++++++++++
+>>  hw/ppc/spapr_rtas.c    |    2 ++
+>>  include/hw/ppc/spapr.h |    2 ++
+>>  4 files changed, 62 insertions(+)
+>>
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 1c0908e..f6262f0 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -46,6 +46,7 @@
+>>  #include "migration/qemu-file-types.h"
+>>  #include "migration/global_state.h"
+>>  #include "migration/register.h"
+>> +#include "migration/blocker.h"
+>>  #include "mmu-hash64.h"
+>>  #include "mmu-book3s-v3.h"
+>>  #include "cpu-models.h"
+>> @@ -1829,6 +1830,8 @@ static void spapr_machine_reset(MachineState *machine)
+>>  
+>>      /* Signal all vCPUs waiting on this condition */
+>>      qemu_cond_broadcast(&spapr->mc_delivery_cond);
+>> +
+>> +    migrate_del_blocker(spapr->fwnmi_migration_blocker);
+>>  }
+>>  
+>>  static void spapr_create_nvram(SpaprMachineState *spapr)
+>> @@ -2119,6 +2122,42 @@ static const VMStateDescription vmstate_spapr_dtb = {
+>>      },
+>>  };
+>>  
+>> +static bool spapr_fwnmi_needed(void *opaque)
+>> +{
+>> +    SpaprMachineState *spapr = (SpaprMachineState *)opaque;
+>> +
+>> +    return spapr->guest_machine_check_addr != -1;
+>> +}
+>> +
+>> +static int spapr_fwnmi_post_load(void *opaque, int version_id)
+>> +{
+>> +    SpaprMachineState *spapr = (SpaprMachineState *)opaque;
+>> +
+>> +    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) == SPAPR_CAP_ON) {
+>> +
+>> +        if (kvmppc_has_cap_ppc_fwnmi()) {
+>> +            return 0;
+>> +        }
+>> +
+>> +        return kvmppc_set_fwnmi();
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +static const VMStateDescription vmstate_spapr_machine_check = {
+>> +    .name = "spapr_machine_check",
+>> +    .version_id = 1,
+>> +    .minimum_version_id = 1,
+>> +    .needed = spapr_fwnmi_needed,
+>> +    .post_load = spapr_fwnmi_post_load,
+>> +    .fields = (VMStateField[]) {
+>> +        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
+>> +        VMSTATE_INT32(mc_status, SpaprMachineState),
+>> +        VMSTATE_END_OF_LIST()
+>> +    },
+>> +};
+>> +
+>>  static const VMStateDescription vmstate_spapr = {
+>>      .name = "spapr",
+>>      .version_id = 3,
+>> @@ -2152,6 +2191,7 @@ static const VMStateDescription vmstate_spapr = {
+>>          &vmstate_spapr_dtb,
+>>          &vmstate_spapr_cap_large_decr,
+>>          &vmstate_spapr_cap_ccf_assist,
+>> +        &vmstate_spapr_machine_check,
+>>          NULL
+>>      }
+>>  };
+>> @@ -2948,6 +2988,10 @@ static void spapr_machine_init(MachineState *machine)
+>>              exit(1);
+>>          }
+>>  
+>> +        /* Create the error string for live migration blocker */
+>> +        error_setg(&spapr->fwnmi_migration_blocker,
+>> +            "Live migration not supported during machine check handling");
+>> +
+>>          /* Register ibm,nmi-register and ibm,nmi-interlock RTAS calls */
+>>          spapr_fwnmi_register();
+>>      }
+>> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+>> index ecc3d68..83f0a22 100644
+>> --- a/hw/ppc/spapr_events.c
+>> +++ b/hw/ppc/spapr_events.c
+>> @@ -43,6 +43,7 @@
+>>  #include "qemu/main-loop.h"
+>>  #include "hw/ppc/spapr_ovec.h"
+>>  #include <libfdt.h>
+>> +#include "migration/blocker.h"
+>>  
+>>  #define RTAS_LOG_VERSION_MASK                   0xff000000
+>>  #define   RTAS_LOG_VERSION_6                    0x06000000
+>> @@ -844,6 +845,8 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+>>  {
+>>      SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+>>      CPUState *cs = CPU(cpu);
+>> +    int ret;
+>> +    Error *local_err = NULL;
+>>  
+>>      if (spapr->guest_machine_check_addr == -1) {
+>>          /*
+>> @@ -857,6 +860,17 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+>>          return;
+>>      }
+>>  
+>> +    ret = migrate_add_blocker(spapr->fwnmi_migration_blocker, &local_err);
+> 
+> If an MCE is already being handled, this adds yet another blocker. IIUC only
+> the vCPU handling the previous MCE is supposed to call "ibm,nmi-interlock"
+> and clear the blocker. This might cause a blocker to be leaked. I think
+> migrate_add_blocker() should only be called when we know that the vCPU
+> does handle the MCE, ie, after the loop.
+
+I think so.
+
+> 
+> Also, please note that migrate_add_blocker() can fail for two reasons:
+> (1) migration is already in progress (-EBUSY)
+> (2) QEMU was started with -only-migratable (-EACCES)
+> 
+>> +    if (ret < 0) {
+>> +        /*
+>> +         * We don't want to abort and let the migration to continue. In a
+>> +         * rare case, the machine check handler will run on the target
+>> +         * hardware. Though this is not preferable, it is better than aborting
+>> +         * the migration or killing the VM.
+>> +         */
+> 
+> This seems correct for case (1).
+> 
+>> +        warn_report_err(local_err);
+> 
+> The warning would be:
+> 
+> disallowing migration blocker (migration in progress) for:
+>  Live migration not supported during machine check handling
+> 
+> This rather looks rather cryptic for the average user. Maybe
+> better to ignore the generic message, ie, pass NULL to
+> migrate_add_blocker, and output a more meaningul warning
+> with warn_report() directly. Something like:
+> 
+> "A machine check is being handled during migration. This may
+> cause data corruption or abusive poisoning of some of the
+> guest memory on the destination"
+
+As data could be already corrupt when we get a machine check, I will use
+a slightly modified version of the above error msg.
+
+> 
+> Case (2) is different. There isn't any migration in progress: the idea
+> behind the -only-migratable QEMU option is to avoid configurations that
+> can block migration. If migration doesn't happen while the MCE is being
+> handled, I don't think we should output a warning at all. But a warning
+> (same as above?) should be printed if migration happens before the vCPU
+> did call "ibm,nmi-interlock", by checking mc_status in spapr_pre_save()
+> for example.
+
+I was not aware of case (2). I agree that we should not print any
+warning as there is no migration in progress. Further, as you suggested,
+if migration happens before "ibm,nmi-interlock" is called, we can check
+mc_status and print the warning in spapr_pre_save().
+
+Regards,
+Aravinda
+
+> 
+>> +    }
+>> +
+>>      while (spapr->mc_status != -1) {
+>>          /*
+>>           * Check whether the same CPU got machine check error
+>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+>> index d892583..b682cc2 100644
+>> --- a/hw/ppc/spapr_rtas.c
+>> +++ b/hw/ppc/spapr_rtas.c
+>> @@ -50,6 +50,7 @@
+>>  #include "hw/ppc/fdt.h"
+>>  #include "target/ppc/mmu-hash64.h"
+>>  #include "target/ppc/mmu-book3s-v3.h"
+>> +#include "migration/blocker.h"
+>>  
+>>  static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>>                                     uint32_t token, uint32_t nargs,
+>> @@ -438,6 +439,7 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+>>           */
+>>          spapr->mc_status = -1;
+>>          qemu_cond_signal(&spapr->mc_delivery_cond);
+>> +        migrate_del_blocker(spapr->fwnmi_migration_blocker);
+>>          rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>>      }
+>>  }
+>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>> index dada821..ea7625e 100644
+>> --- a/include/hw/ppc/spapr.h
+>> +++ b/include/hw/ppc/spapr.h
+>> @@ -217,6 +217,8 @@ struct SpaprMachineState {
+>>  
+>>      unsigned gpu_numa_id;
+>>      SpaprTpmProxy *tpm_proxy;
+>> +
+>> +    Error *fwnmi_migration_blocker;
+>>  };
+>>  
+>>  #define H_SUCCESS         0
+>>
 > 
 
 -- 
-Alexey
+Regards,
+Aravinda
 
