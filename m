@@ -7,86 +7,85 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 146C4ECDE20
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 08:21:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 719BFECDE20
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 08:23:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D38472085B
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 08:21:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3CAAF2085B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 08:23:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wiwXBIsE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D38472085B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lCS2vIt5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CAAF2085B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47799 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7xsP-0005Na-1p
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 04:21:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55924)
+	id 1i7xu4-0006ND-EN
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 04:23:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56199)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i7xrX-0004K6-SW
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:20:29 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i7xsk-0005jF-KC
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:21:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i7xrV-0004yO-P4
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:20:27 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39162)
+ (envelope-from <alex.bennee@linaro.org>) id 1i7xsi-0005Su-Bl
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:21:42 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37255)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i7xrS-0004xK-GV
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:20:23 -0400
-Received: by mail-wr1-x441.google.com with SMTP id t16so23435702wra.6
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 01:20:20 -0700 (PDT)
+ id 1i7xsh-0005SL-5N
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:21:39 -0400
+Received: by mail-wr1-x443.google.com with SMTP id i1so22852924wro.4
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 01:21:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=JO4c1BD4HgWjkDwdSldjPGwHAT1BaLDoDUuWEl6h8wk=;
- b=wiwXBIsEfRtCToGDXgo7xIcJOMPnOPenkvviNE/wdT9VyU7UA4IIXxNC+Oukjqig9n
- vX4JE6m383qY/h4YPz6zJI5KLEWCGRfEfvtEqshoao5kAPAFd5qw2qglhB3nVse/XKJJ
- bYIXOGTebFQ3e1fn74xmK0mi3iLFO4oltnApCbbf1uDIRqARzYwfzgEUm+WZTKMsT7h7
- mUZS/f23ULMXEyDQhGARveqpddJEREoDkER+QmYI7184ZVaLZJnWtoaZfBFjc1XmwkCF
- a0iqJGmQ+RXeZyizLoPWTTRhPQmUTgbLsIl+WAEgPD5m/Qd9T8YqCCz9Y6+KN4LMm555
- x8mg==
+ bh=ABj6REDl+eM7rq9wdnf/XUjTWkAy1e45wCDFx1DSgmo=;
+ b=lCS2vIt5tbbulCE9PQzSd0IyAPa1/RgOFcmNBfWyj22RGZBvsqfEXvahZm1FUc8ypC
+ cE3u310I8PR33qYzIAfqHNCGfjoPyVfnN6QfQaMo480qpZwgteihyASbb6AvrOFZsDBn
+ 9TMvqSDWPIz+Rw/T+E6QCFFgMw83khl/t9bPcW4AFLGb1c2MovPI06bkbIGRN5o+RhNO
+ yUVqBnNPNE1XBsJ0BMel5XUZITtV5kd8T4hdQxXawZmKTz32RbLlfNZcPe7X4beXsVI4
+ oQhc7IsQNpFLOcmqyxJvMiMdJNjcxY0CGxBk/7mxCWdDp36QChap1QF8aZyQPsbEZGo8
+ +m3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=JO4c1BD4HgWjkDwdSldjPGwHAT1BaLDoDUuWEl6h8wk=;
- b=gClur7+UQ7JOs3ll5B8srVGoZH//d4wHMCyYzQWK5imCgSKiobO/+dsf11Q5Vew167
- w3hivQ0Kw8yU1DpDnJBaWmvt3RN2S3pyLchMH8Z49FUhLObJdBpc0lJO3iKaycWyKBEk
- 3z+syeF0g+3rSo1ioboMQCTHVrp2Ze3t7KQsbz7ZY9f9/ceYzDAk7UOjXxLa92FX5RIe
- A2ymDHtWMmx5cLtMKlZOMCVazKyMU/lSkcloAuZJZz8ZhM/fusGhbynyJiQmbn7aOTf7
- SaC/2foInXpbtZ3uMMHfYSN8OgXqFrTE9p1R2f3FaP26zXuZl7LhIOeLekUw0VEDHYwR
- ewqA==
-X-Gm-Message-State: APjAAAXEdS9QxkwxCJnl9RZBytbLPI0ltRqs0pCO4jA1EWkA3XKVwax9
- IXykxbfJ35H26qsyOFa8sr5+og==
-X-Google-Smtp-Source: APXvYqysSIy0xKTb4g6fK/Z/pc6DF5rumZhG5OvWQ/NQuomIMn4P042PlNTd1XMm3ewladkgNGGM+w==
-X-Received: by 2002:adf:dd4d:: with SMTP id u13mr9527010wrm.112.1568190018931; 
- Wed, 11 Sep 2019 01:20:18 -0700 (PDT)
+ bh=ABj6REDl+eM7rq9wdnf/XUjTWkAy1e45wCDFx1DSgmo=;
+ b=fipmXMR7sOtkapQZf9aZuh/fjtR6ThJIzRw3hHzj5pYJBbsnj/lOSUp/i0OpcGQ7SN
+ AJ8E6MVXzcQQvCePwqxFZ5pd7bbVFt55jOL/VZjLiFsGg1O+YdgoWWo3WjrYk1GSevVd
+ xbRrZ0IdyFFa+GHWg5EaRAtkRJd9qk3QJIbGeO8hXhxxXxPvl+47FOPF4v3+cwSfB3to
+ w/toPITGAlu2EUk6STkvBJOJyPiCDZrbqLi+8z3Y73ZPMAHZ/0tn+hKMYJic7ByKWGCv
+ XSZUPnRf6nSALI6K0J//QKwWbCyRqGAxi4maWS0z+GuONCQgTpM/2ICNL8kqOkJPJAm+
+ gHUQ==
+X-Gm-Message-State: APjAAAWFz6XjgdUHY3X8LvAcTfycztUb5+NCdBFm8FIvC6hhju4MgRGM
+ PvIfO5eKL0uWxHND9MZZDYLVOck8vBw=
+X-Google-Smtp-Source: APXvYqz/ZQMXcd6+HxuT82iRLdBwMYwczeAllM2o5MzbzdCMFbCzXnACfGuJ1VwDgaWfuJA+XG2PmA==
+X-Received: by 2002:adf:a357:: with SMTP id d23mr1391952wrb.18.1568190094284; 
+ Wed, 11 Sep 2019 01:21:34 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c8sm7551068wrr.49.2019.09.11.01.20.18
+ by smtp.gmail.com with ESMTPSA id e20sm2243421wme.3.2019.09.11.01.21.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Sep 2019 01:20:18 -0700 (PDT)
+ Wed, 11 Sep 2019 01:21:33 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C015E1FF87;
- Wed, 11 Sep 2019 09:20:17 +0100 (BST)
-References: <20190910193408.28917-1-alex.bennee@linaro.org>
- <20190910193408.28917-4-alex.bennee@linaro.org>
+ by zen.linaroharston (Postfix) with ESMTP id 2519D1FF87;
+ Wed, 11 Sep 2019 09:21:33 +0100 (BST)
+References: <cover.1568170994.git.maozhongyi@cmss.chinamobile.com>
+ <9b8662b94d89030b1f33193246c645baac2eedd7.1568170994.git.maozhongyi@cmss.chinamobile.com>
 User-agent: mu4e 1.3.4; emacs 27.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-In-reply-to: <20190910193408.28917-4-alex.bennee@linaro.org>
-Date: Wed, 11 Sep 2019 09:20:17 +0100
-Message-ID: <878sqv1by6.fsf@linaro.org>
+To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+In-reply-to: <9b8662b94d89030b1f33193246c645baac2eedd7.1568170994.git.maozhongyi@cmss.chinamobile.com>
+Date: Wed, 11 Sep 2019 09:21:33 +0100
+Message-ID: <877e6f1bw2.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH v1 3/4] elf: move elf_ops.h into
- include/elf/ and rename
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] tests/migration: mem leak fix
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,72 +97,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, tony.nguyen@bt.com, qemu-devel@nongnu.org,
+ armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+Mao Zhongyi <maozhongyi@cmss.chinamobile.com> writes:
 
-> Lets keep all the Elf manipulation bits together. Also rename the file
-> to better reflect how it is used and add a little header to the file.
+> =E2=80=98data=E2=80=99 has the possibility of memory leaks=EF=BC=8C so us=
+e the
+> glic macros g_autofree recommended by CODING_STYLE.rst
+
+nit: glib
+
+> to automatically release the memory that returned from
+> g_malloc().
 >
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Cc: armbru@redhat.com
+> Cc: laurent@vivier.eu
+> Cc: tony.nguyen@bt.com
+> Cc: alex.bennee@linaro.org
+>
+> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  hw/core/loader.c                            | 4 ++--
-
-It is arguable this could be a private header in hw/core as it is only
-included in one place.
-
->  include/{hw/elf_ops.h =3D> elf/elf_ops.inc.h} | 9 +++++++++
->  2 files changed, 11 insertions(+), 2 deletions(-)
->  rename include/{hw/elf_ops.h =3D> elf/elf_ops.inc.h} (98%)
+>  tests/migration/stress.c | 10 ++--------
+>  1 file changed, 2 insertions(+), 8 deletions(-)
 >
-> diff --git a/hw/core/loader.c b/hw/core/loader.c
-> index e0c6563e643..886179a4947 100644
-> --- a/hw/core/loader.c
-> +++ b/hw/core/loader.c
-> @@ -302,7 +302,7 @@ static void *load_at(int fd, off_t offset, size_t siz=
-e)
->  #define elf_word        uint32_t
->  #define elf_sword        int32_t
->  #define bswapSZs	bswap32s
-> -#include "hw/elf_ops.h"
-> +#include "elf/elf_ops.inc.h"
->
->  #undef elfhdr
->  #undef elf_phdr
-> @@ -324,7 +324,7 @@ static void *load_at(int fd, off_t offset, size_t siz=
-e)
->  #define elf_sword        int64_t
->  #define bswapSZs	bswap64s
->  #define SZ		64
-> -#include "hw/elf_ops.h"
-> +#include "elf/elf_ops.inc.h"
->
->  const char *load_elf_strerror(int error)
+> diff --git a/tests/migration/stress.c b/tests/migration/stress.c
+> index d9aa4afe92..6cbb2d49d3 100644
+> --- a/tests/migration/stress.c
+> +++ b/tests/migration/stress.c
+> @@ -170,10 +170,10 @@ static unsigned long long now(void)
+>  static int stressone(unsigned long long ramsizeMB)
 >  {
-> diff --git a/include/hw/elf_ops.h b/include/elf/elf_ops.inc.h
-> similarity index 98%
-> rename from include/hw/elf_ops.h
-> rename to include/elf/elf_ops.inc.h
-> index 1496d7e7536..a820bd821d5 100644
-> --- a/include/hw/elf_ops.h
-> +++ b/include/elf/elf_ops.inc.h
-> @@ -1,3 +1,12 @@
-> +/*
-> + * Macro expansions for Elf operations. This is included in a
-> + * compilation unit with appropriate definitions for SZ and elf
-> + * headers to generate utility functions for reading 32 and 64 bit elf
-> + * headers.
-> + *
-> + * SPDX-License-Identifier: GPL-2.0-or-later
-> + */
-> +
->  static void glue(bswap_ehdr, SZ)(struct elfhdr *ehdr)
->  {
->      bswap16s(&ehdr->e_type);			/* Object file type */
+>      size_t pagesPerMB =3D 1024 * 1024 / PAGE_SIZE;
+> -    char *ram =3D malloc(ramsizeMB * 1024 * 1024);
+> +    g_autofree char *ram =3D malloc(ramsizeMB * 1024 * 1024);
+>      char *ramptr;
+>      size_t i, j, k;
+> -    char *data =3D malloc(PAGE_SIZE);
+> +    g_autofree char *data =3D malloc(PAGE_SIZE);
+>      char *dataptr;
+>      size_t nMB =3D 0;
+>      unsigned long long before, after;
+> @@ -186,7 +186,6 @@ static int stressone(unsigned long long ramsizeMB)
+>      if (!data) {
+>          fprintf(stderr, "%s (%d): ERROR: cannot allocate %d bytes of RAM=
+: %s\n",
+>                  argv0, gettid(), PAGE_SIZE, strerror(errno));
+> -        free(ram);
+>          return -1;
+>      }
+>
+> @@ -198,8 +197,6 @@ static int stressone(unsigned long long ramsizeMB)
+>      memset(ram, 0xfe, ramsizeMB * 1024 * 1024);
+>
+>      if (random_bytes(data, PAGE_SIZE) < 0) {
+> -        free(ram);
+> -        free(data);
+>          return -1;
+>      }
+>
+> @@ -227,9 +224,6 @@ static int stressone(unsigned long long ramsizeMB)
+>              }
+>          }
+>      }
+> -
+> -    free(data);
+> -    free(ram);
+>  }
 
 
 --
