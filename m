@@ -6,58 +6,78 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD45EC49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 12:36:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 342EAC49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 12:41:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BF002075C
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 12:36:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BF002075C
+	by mail.kernel.org (Postfix) with ESMTPS id 0A131207FC
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 12:41:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A131207FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i81rK-0008UX-Po
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 08:36:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49853)
+	id 1i81vx-0001nh-7N
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 08:41:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50945)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1i81q0-0007s9-Sc
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 08:35:11 -0400
+ (envelope-from <slp@redhat.com>) id 1i81uu-0001CQ-S9
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 08:40:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1i81py-0000YP-KZ
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 08:35:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55178)
+ (envelope-from <slp@redhat.com>) id 1i81ut-0003ee-NJ
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 08:40:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58158)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>)
- id 1i81ps-0000UE-Dh; Wed, 11 Sep 2019 08:35:00 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1i81ut-0003cA-EN
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 08:40:11 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CE5DD30A00C5;
- Wed, 11 Sep 2019 12:34:58 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8FC2F60852;
- Wed, 11 Sep 2019 12:34:49 +0000 (UTC)
-Date: Wed, 11 Sep 2019 14:34:48 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Message-ID: <20190911143448.269c65ac@redhat.com>
-In-Reply-To: <20190904085629.13872-4-shameerali.kolothum.thodi@huawei.com>
-References: <20190904085629.13872-1-shameerali.kolothum.thodi@huawei.com>
- <20190904085629.13872-4-shameerali.kolothum.thodi@huawei.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id B0D7C3CA1B
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 12:40:09 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id k67so1202031wmf.3
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 05:40:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=pMXroBgw8/mA3rbKB9oPJfuzsrNoR7Ckyy9TQc1yuII=;
+ b=pWKjYQnUvQ+UOZlGJxwkopwySzHCFSnwitNgIgTIq3sjt5iPVbzvffITNy4J+UEDT4
+ /lWJyD8gAcHKzijwLixkRACoe7nwbzYvTnKIeFvUBxm9TVb1l8fCCtqGUZOYiWevwUCI
+ 3NePhxiCHHovy5wCk2MIqbbDExp7plUpWdALGWHalvJ+vFnf9TZhYXB+CTfV1IOOxAA0
+ uW53ztDBeTB4iUvxNx5QEyicN7o0hWbQErQfQ3Hu8s0watlHhYqyccQKgkvObufuQ4NY
+ Y529KOFR5kIQIdUkMkPyCwv3qCoNzjcIhdGJpgM+H9Id3SsxufPe06RaRE30xbPBJYCu
+ 6+qA==
+X-Gm-Message-State: APjAAAVDm+8L4luoAHla/Nosu1+Xrk7d+o5FSliHLaPQF45DYS9QvFgl
+ R1bgHzRmxo9pNqe6J4KUf5gUCv1QL07QL71gkK2Xg5o1utL7tf7tV3Fg92+nFcgWpSkLN8itC9J
+ qHMxpFYCs5cX+sf0=
+X-Received: by 2002:a1c:4384:: with SMTP id q126mr4191122wma.153.1568205608472; 
+ Wed, 11 Sep 2019 05:40:08 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyMRS9pWx+iQXVzibWE/U3in8ZE1SP4s0bqL6AWdWJ3m0v7vEkA3x9CgW4KQV86sE/0MwardQ==
+X-Received: by 2002:a1c:4384:: with SMTP id q126mr4191106wma.153.1568205608280; 
+ Wed, 11 Sep 2019 05:40:08 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id c74sm2602341wme.46.2019.09.11.05.40.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 11 Sep 2019 05:40:07 -0700 (PDT)
+References: <20190911100316.32282-1-mreitz@redhat.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+In-reply-to: <20190911100316.32282-1-mreitz@redhat.com>
+Date: Wed, 11 Sep 2019 14:40:05 +0200
+Message-ID: <87ftl3atwa.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Wed, 11 Sep 2019 12:34:58 +0000 (UTC)
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH-for-4.2 v10 03/11] hw/acpi: Add ACPI
- Generic Event Device Support
+Subject: Re: [Qemu-devel] [PATCH v3] blockjob: update nodes head while
+ removing all bdrv
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,530 +89,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, shannon.zhaosl@gmail.com,
- ard.biesheuvel@linaro.org, qemu-devel@nongnu.org, xuwei5@hisilicon.com,
- linuxarm@huawei.com, eric.auger@redhat.com, qemu-arm@nongnu.org,
- sebastien.boeuf@intel.com, lersek@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 4 Sep 2019 09:56:21 +0100
-Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-> From: Samuel Ortiz <sameo@linux.intel.com>
-> 
-> The ACPI Generic Event Device (GED) is a hardware-reduced specific
-> device[ACPI v6.1 Section 5.6.9] that handles all platform events,
-> including the hotplug ones. This patch generates the AML code that
-> defines GEDs.
-> 
-> Platforms need to specify their own GED Event bitmap to describe
-> what kind of events they want to support through GED.  Also this
-> uses a a single interrupt for the  GED device, relying on IO
-> memory region to communicate the type of device affected by the
-> interrupt. This way, we can support up to 32 events with a unique
-> interrupt.
-> 
-> This supports only memory hotplug for now.
-> 
-> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Max Reitz <mreitz@redhat.com> writes:
+
+> From: Sergio Lopez <slp@redhat.com>
+>
+> block_job_remove_all_bdrv() iterates through job->nodes, calling
+> bdrv_root_unref_child() for each entry. The call to the latter may
+> reach child_job_[can_]set_aio_ctx(), which will also attempt to
+> traverse job->nodes, potentially finding entries that where freed
+> on previous iterations.
+>
+> To avoid this situation, update job->nodes head on each iteration to
+> ensure that already freed entries are no longer linked to the list.
+>
+> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=3D1746631
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
-> v9 --> v10
->    -Added few required headers.
->    -Added Eric's R-by
-> 
-> v8 --> v9
->  -Changes related to GED being a TYPE_SYS_BUS_DEVICE now.
->  -Removed Eric's R-by tag for now.
-> 
-> v7 --> v8.
->  -Removed qemu_mutex_lock() across the ged state selector access.
->  -Rephrased comments section in acpi_ged_send_event().
->  -Moved acpi_ged_event() code into acpi_ged_send_event().
->  -Added check for memhp_base and ged_base in realize().
+> v3:
+> - Rewrote the loop to make the whole function a bit simpler
+>   (Also, remove the node from the job->nodes list before unref'ing it,
+>   just to be extra-safe)
 > ---
->  hw/acpi/Kconfig                        |   4 +
->  hw/acpi/Makefile.objs                  |   1 +
->  hw/acpi/generic_event_device.c         | 317 +++++++++++++++++++++++++
->  include/hw/acpi/generic_event_device.h | 100 ++++++++
->  4 files changed, 422 insertions(+)
->  create mode 100644 hw/acpi/generic_event_device.c
->  create mode 100644 include/hw/acpi/generic_event_device.h
-> 
-> diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
-> index 7c59cf900b..12e3f1e86e 100644
-> --- a/hw/acpi/Kconfig
-> +++ b/hw/acpi/Kconfig
-> @@ -31,3 +31,7 @@ config ACPI_VMGENID
->      bool
->      default y
->      depends on PC
-> +
-> +config ACPI_HW_REDUCED
-> +    bool
-> +    depends on ACPI
-> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-> index 9bb2101e3b..655a9c1973 100644
-> --- a/hw/acpi/Makefile.objs
-> +++ b/hw/acpi/Makefile.objs
-> @@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
->  common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
->  common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
->  common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
-> +common-obj-$(CONFIG_ACPI_HW_REDUCED) += generic_event_device.o
->  common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
->  
->  common-obj-y += acpi_interface.o
-> diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
-> new file mode 100644
-> index 0000000000..f81d966058
-> --- /dev/null
-> +++ b/hw/acpi/generic_event_device.c
-> @@ -0,0 +1,317 @@
-> +/*
-> + *
-> + * Copyright (c) 2018 Intel Corporation
-> + * Copyright (c) 2019 Huawei Technologies R & D (UK) Ltd
-> + * Written by Samuel Ortiz, Shameer Kolothum
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "exec/address-spaces.h"
-> +#include "hw/acpi/acpi.h"
-> +#include "hw/acpi/generic_event_device.h"
-> +#include "hw/irq.h"
-> +#include "hw/mem/pc-dimm.h"
-> +#include "hw/qdev-properties.h"
-> +#include "migration/vmstate.h"
-> +#include "qemu/error-report.h"
-> +
-> +static const uint32_t ged_supported_events[] = {
-> +    ACPI_GED_MEM_HOTPLUG_EVT,
-> +};
-> +
-> +/*
-> + * The ACPI Generic Event Device (GED) is a hardware-reduced specific
-> + * device[ACPI v6.1 Section 5.6.9] that handles all platform events,
-> + * including the hotplug ones. Platforms need to specify their own
-> + * GED Event bitmap to describe what kind of events they want to support
-> + * through GED. This routine uses a single interrupt for the GED device,
-> + * relying on IO memory region to communicate the type of device
-> + * affected by the interrupt. This way, we can support up to 32 events
-> + * with a unique interrupt.
-> + */
-> +void build_ged_aml(Aml *table, const char *name, HotplugHandler *hotplug_dev,
-> +                   uint32_t ged_irq, AmlRegionSpace rs, hwaddr ged_base)
-> +{
-> +    AcpiGedState *s = ACPI_GED(hotplug_dev);
-> +    Aml *crs = aml_resource_template();
-> +    Aml *evt, *field;
-> +    Aml *dev = aml_device("%s", name);
-> +    Aml *evt_sel = aml_local(0);
-> +    Aml *esel = aml_name(AML_GED_EVT_SEL);
-> +
-> +    /* _CRS interrupt */
-> +    aml_append(crs, aml_interrupt(AML_CONSUMER, AML_EDGE, AML_ACTIVE_HIGH,
-> +                                  AML_EXCLUSIVE, &ged_irq, 1));
-> +
-> +    aml_append(dev, aml_name_decl("_HID", aml_string("ACPI0013")));
-> +    aml_append(dev, aml_name_decl("_UID", aml_string(GED_DEVICE)));
-> +    aml_append(dev, aml_name_decl("_CRS", crs));
-> +
-> +    /* Append IO region */
-> +    aml_append(dev, aml_operation_region(AML_GED_EVT_REG, rs,
-> +               aml_int(ged_base + ACPI_GED_EVT_SEL_OFFSET),
-> +               ACPI_GED_EVT_SEL_LEN));
-> +    field = aml_field(AML_GED_EVT_REG, AML_DWORD_ACC, AML_NOLOCK,
-> +                      AML_WRITE_AS_ZEROS);
-> +    aml_append(field, aml_named_field(AML_GED_EVT_SEL,
-> +                                      ACPI_GED_EVT_SEL_LEN * BITS_PER_BYTE));
-> +    aml_append(dev, field);
-> +
+>  blockjob.c | 17 +++++++++++++----
+>  1 file changed, 13 insertions(+), 4 deletions(-)
+>
+> diff --git a/blockjob.c b/blockjob.c
+> index 2abed0f551..c6e20e2fcd 100644
+> --- a/blockjob.c
+> +++ b/blockjob.c
+> @@ -175,14 +175,23 @@ static const BdrvChildRole child_job =3D {
+>=20=20
+>  void block_job_remove_all_bdrv(BlockJob *job)
+>  {
+> -    GSList *l;
+> -    for (l =3D job->nodes; l; l =3D l->next) {
 > +    /*
-> +     * For each GED event we:
-> +     * - Add a conditional block for each event, inside a loop.
-> +     * - Call a method for each supported GED event type.
-> +     *
-> +     * The resulting ASL code looks like:
-> +     *
-> +     * Local0 = ESEL
-> +     * If ((Local0 & One) == One)
-> +     * {
-> +     *     MethodEvent0()
-> +     * }
-> +     *
-> +     * If ((Local0 & 0x2) == 0x2)
-> +     * {
-> +     *     MethodEvent1()
-> +     * }
-> +     * ...
+> +     * bdrv_root_unref_child() may reach child_job_[can_]set_aio_ctx(),
+> +     * which will also traverse job->nodes, so consume the list one by
+> +     * one to make sure that such a concurrent access does not attempt
+> +     * to process an already freed BdrvChild.
 > +     */
-> +    evt = aml_method("_EVT", 1, AML_SERIALIZED);
-> +    {
-> +        Aml *if_ctx;
-> +        uint32_t i;
-> +        uint32_t ged_events = ctpop32(s->ged_event_bitmap);
+> +    while (job->nodes) {
+> +        GSList *l =3D job->nodes;
+>          BdrvChild *c =3D l->data;
 > +
-> +        /* Local0 = ESEL */
-> +        aml_append(evt, aml_store(esel, evt_sel));
+> +        job->nodes =3D l->next;
 > +
-> +        for (i = 0; i < ARRAY_SIZE(ged_supported_events) && ged_events; i++) {
-> +            uint32_t event = s->ged_event_bitmap & ged_supported_events[i];
+>          bdrv_op_unblock_all(c->bs, job->blocker);
+>          bdrv_root_unref_child(c);
 > +
-> +            if (!event) {
-> +                continue;
-> +            }
-> +
-> +            if_ctx = aml_if(aml_equal(aml_and(evt_sel, aml_int(event), NULL),
-> +                                      aml_int(event)));
-> +            switch (event) {
-> +            case ACPI_GED_MEM_HOTPLUG_EVT:
-> +                aml_append(if_ctx, aml_call0(MEMORY_DEVICES_CONTAINER "."
-> +                                             MEMORY_SLOT_SCAN_METHOD));
-> +                break;
-> +            default:
-> +                /*
-> +                 * Please make sure all the events in ged_supported_events[]
-> +                 * are handled above.
-> +                 */
-> +                g_assert_not_reached();
-> +            }
-> +
-> +            aml_append(evt, if_ctx);
-> +            ged_events--;
-> +        }
-> +
-> +        if (ged_events) {
-> +            error_report("Unsupported events specified");
-> +            abort();
-> +        }
-> +    }
-> +
-> +    /* Append _EVT method */
-> +    aml_append(dev, evt);
-> +
-> +    aml_append(table, dev);
-> +}
-> +
-> +/* Memory read by the GED _EVT AML dynamic method */
-> +static uint64_t ged_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    uint64_t val = 0;
-> +    GEDState *ged_st = opaque;
-> +
-> +    switch (addr) {
-> +    case ACPI_GED_EVT_SEL_OFFSET:
-> +        /* Read the selector value and reset it */
-> +        val = ged_st->sel;
-> +        ged_st->sel = 0;
-> +        break;
-> +    default:
-> +        break;
-> +    }
-> +
-> +    return val;
-> +}
-> +
-> +/* Nothing is expected to be written to the GED memory region */
-> +static void ged_write(void *opaque, hwaddr addr, uint64_t data,
-> +                      unsigned int size)
-> +{
-> +}
-> +
-> +static const MemoryRegionOps ged_ops = {
-> +    .read = ged_read,
-> +    .write = ged_write,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +    .valid = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4,
-> +    },
-> +};
-> +
-> +static void acpi_ged_device_plug_cb(HotplugHandler *hotplug_dev,
-> +                                    DeviceState *dev, Error **errp)
-> +{
-> +    AcpiGedState *s = ACPI_GED(hotplug_dev);
-> +
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> +        if (s->memhp_state.is_enabled) {
-> +            acpi_memory_plug_cb(hotplug_dev, &s->memhp_state, dev, errp);
-> +        } else {
-> +            error_setg(errp,
-> +                 "memory hotplug is not enabled: %s.memory-hotplug-support "
-> +                 "is not set", object_get_typename(OBJECT(s)));
-> +        }
-> +    } else {
-> +        error_setg(errp, "virt: device plug request for unsupported device"
-> +                   " type: %s", object_get_typename(OBJECT(dev)));
-> +    }
-> +}
-> +
-> +static void acpi_ged_send_event(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
-> +{
-> +    AcpiGedState *s = ACPI_GED(adev);
-> +    GEDState *ged_st = &s->ged_state;
-> +    uint32_t sel;
-> +
-> +    if (ev & ACPI_MEMORY_HOTPLUG_STATUS) {
-> +        sel = ACPI_GED_MEM_HOTPLUG_EVT;
-> +    } else {
-> +        /* Unknown event. Return without generating interrupt. */
-> +        warn_report("GED: Unsupported event %d. No irq injected", ev);
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * Set the GED selector field to communicate the event type.
-> +     * This will be read by GED aml code to select the appropriate
-> +     * event method.
-> +     */
-> +    ged_st->sel |= sel;
-> +
-> +    /* Trigger the event by sending an interrupt to the guest. */
-> +    qemu_irq_pulse(s->irq);
-> +}
-> +
-> +static void acpi_ged_device_realize(DeviceState *dev, Error **errp)
-> +{
-> +    AcpiGedState *s = ACPI_GED(dev);
-> +    GEDState *ged_st = &s->ged_state;
-> +
-> +    memory_region_init_io(&ged_st->io, OBJECT(dev), &ged_ops, ged_st,
-> +                          TYPE_ACPI_GED, ACPI_GED_EVT_SEL_LEN);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &ged_st->io);
-> +
-> +    sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->irq);
-> +
-> +    if (s->memhp_state.is_enabled) {
-> +        /*
-> +         * GED handles memory hotplug event and acpi-mem-hotplug
-> +         * memory region gets initialized here. Create an exclusive
-> +         * container for memory hotplug IO and expose it as GED sysbus
-> +         * MMIO so that boards can map it separately.
-> +         */
-> +        memory_region_init(&s->container_memhp, OBJECT(dev), "container",
-s/container/memhp container/
-so it would be more descriptive in "info mtree"
+> +        g_slist_free_1(l);
+>      }
+> -    g_slist_free(job->nodes);
+> -    job->nodes =3D NULL;
+>  }
+>=20=20
+>  bool block_job_has_bdrv(BlockJob *job, BlockDriverState *bs)
 
-> +                           MEMORY_HOTPLUG_IO_LEN);
-> +        sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->container_memhp);
-> +
-> +        acpi_memory_hotplug_init(&s->container_memhp, OBJECT(dev),
-> +                                 &s->memhp_state, 0);
-> +    }
+Reviewed-by: Sergio Lopez <slp@redhat.com>
 
-I suggest to move all of above code to instance_init() and drop 
-if (s->memhp_state.is_enabled) condition
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-(for x86 GPE usecase we use condition to make sure that old
-machines won't be affected, but it's not the case here since in 5/11
-you create GED only since 4.2 machine type
-)
+-----BEGIN PGP SIGNATURE-----
 
-> +}
-> +
-> +static Property acpi_ged_properties[] = {
-> +    DEFINE_PROP_BOOL("memory-hotplug-support", AcpiGedState,
-> +                     memhp_state.is_enabled, true),
-same goes here, it's not like it would be used as compat property nor by user
-and be set to False. Suggest to initialize it to true in initfn() and drop property
-
-> +    DEFINE_PROP_UINT32("ged-event", AcpiGedState, ged_event_bitmap, 0),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static bool vmstate_test_use_memhp(void *opaque)
-> +{
-> +    AcpiGedState *s = opaque;
-> +    return s->memhp_state.is_enabled;
-> +}
-> +
-> +static const VMStateDescription vmstate_memhp_state = {
-> +    .name = "acpi-ged/memhp",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = vmstate_test_use_memhp,
-this section could be make unconditional  as well
-
-> +    .fields      = (VMStateField[]) {
-> +        VMSTATE_MEMORY_HOTPLUG(memhp_state, AcpiGedState),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static const VMStateDescription vmstate_ged_state = {
-> +    .name = "acpi-ged-state",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields      = (VMStateField[]) {
-> +        VMSTATE_UINT32(sel, GEDState),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static const VMStateDescription vmstate_acpi_ged = {
-> +    .name = "acpi-ged",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_STRUCT(ged_state, AcpiGedState, 1, vmstate_ged_state, GEDState),
-> +        VMSTATE_END_OF_LIST(),
-> +    },
-> +    .subsections = (const VMStateDescription * []) {
-> +        &vmstate_memhp_state,
-> +        NULL
-> +    }
-> +};
-> +
-> +static void acpi_ged_class_init(ObjectClass *class, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(class);
-> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(class);
-> +    AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_CLASS(class);
-> +
-> +    dc->desc = "ACPI Generic Event Device";
-> +    dc->props = acpi_ged_properties;
-> +    dc->realize = acpi_ged_device_realize;
-> +    dc->vmsd = &vmstate_acpi_ged;
-> +
-> +    hc->plug = acpi_ged_device_plug_cb;
-> +
-> +    adevc->send_event = acpi_ged_send_event;
-> +}
-> +
-> +static const TypeInfo acpi_ged_info = {
-> +    .name          = TYPE_ACPI_GED,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(AcpiGedState),
-> +    .class_init    = acpi_ged_class_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { TYPE_HOTPLUG_HANDLER },
-> +        { TYPE_ACPI_DEVICE_IF },
-> +        { }
-> +    }
-> +};
-> +
-> +static void acpi_ged_register_types(void)
-> +{
-> +    type_register_static(&acpi_ged_info);
-> +}
-> +
-> +type_init(acpi_ged_register_types)
-> diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
-> new file mode 100644
-> index 0000000000..2049e8d873
-> --- /dev/null
-> +++ b/include/hw/acpi/generic_event_device.h
-> @@ -0,0 +1,100 @@
-> +/*
-> + *
-> + * Copyright (c) 2018 Intel Corporation
-> + * Copyright (c) 2019 Huawei Technologies R & D (UK) Ltd
-> + * Written by Samuel Ortiz, Shameer Kolothum
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * The ACPI Generic Event Device (GED) is a hardware-reduced specific
-> + * device[ACPI v6.1 Section 5.6.9] that handles all platform events,
-> + * including the hotplug ones. Generic Event Device allows platforms
-> + * to handle interrupts in ACPI ASL statements. It follows a very
-> + * similar approach like the _EVT method from GPIO events. All
-> + * interrupts are listed in  _CRS and the handler is written in _EVT
-> + * method. Here, we use a single interrupt for the GED device, relying
-> + * on IO memory region to communicate the type of device affected by
-> + * the interrupt. This way, we can support up to 32 events with a
-> + * unique interrupt.
-> + *
-> + * Here is an example.
-> + *
-> + * Device (\_SB.GED)
-> + * {
-> + *     Name (_HID, "ACPI0013")
-> + *     Name (_UID, Zero)
-> + *     Name (_CRS, ResourceTemplate ()
-> + *     {
-> + *         Interrupt (ResourceConsumer, Edge, ActiveHigh, Exclusive, ,, )
-> + *         {
-> + *              0x00000029,
-> + *         }
-> + *     })
-> + *     OperationRegion (EREG, SystemMemory, 0x09080000, 0x04)
-> + *     Field (EREG, DWordAcc, NoLock, WriteAsZeros)
-> + *     {
-> + *         ESEL,   32
-> + *     }
-> + *
-> + *     Method (_EVT, 1, Serialized)  // _EVT: Event
-> + *     {
-> + *         Local0 = ESEL // ESEL = IO memory region which specifies the
-> + *                       // device type.
-> + *         If (((Local0 & One) == One))
-> + *         {
-> + *             MethodEvent1()
-> + *         }
-> + *         If ((Local0 & 0x2) == 0x2)
-> + *         {
-> + *             MethodEvent2()
-> + *         }
-> + *         ...
-> + *     }
-> + * }
-> + *
-> + */
-> +
-> +#ifndef HW_ACPI_GED_H
-> +#define HW_ACPI_GED_H
-> +
-> +#include "hw/sysbus.h"
-> +#include "hw/acpi/memory_hotplug.h"
-> +
-> +#define TYPE_ACPI_GED "acpi-ged"
-> +#define ACPI_GED(obj) \
-> +    OBJECT_CHECK(AcpiGedState, (obj), TYPE_ACPI_GED)
-> +
-> +#define ACPI_GED_EVT_SEL_OFFSET    0x0
-> +#define ACPI_GED_EVT_SEL_LEN       0x4
-> +
-> +#define GED_DEVICE      "GED"
-> +#define AML_GED_EVT_REG "EREG"
-> +#define AML_GED_EVT_SEL "ESEL"
-> +
-> +/*
-> + * Platforms need to specify the GED event bitmap
-> + * to describe what kind of events they want to support
-> + * through GED.
-> + */
-> +#define ACPI_GED_MEM_HOTPLUG_EVT   0x1
-> +
-> +typedef struct GEDState {
-> +    MemoryRegion io;
-> +    uint32_t     sel;
-> +} GEDState;
-> +
-> +typedef struct AcpiGedState {
-> +    SysBusDevice parent_obj;
-> +    MemHotplugState memhp_state;
-> +    MemoryRegion container_memhp;
-> +    GEDState ged_state;
-> +    uint32_t ged_event_bitmap;
-> +    qemu_irq irq;
-> +} AcpiGedState;
-> +
-> +void build_ged_aml(Aml *table, const char* name, HotplugHandler *hotplug_dev,
-> +                   uint32_t ged_irq, AmlRegionSpace rs, hwaddr ged_base);
-> +
-> +#endif
-
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl146yUACgkQ9GknjS8M
+AjXLYw/+KbiRtRNnDVsyims/xFBmnvo3owl0AWoCTvGDZdZXan0kLHyMBxkwdsop
+cgvjgYqN+6ob4sCOAXBMB3XzdpuBRcbEkxC+jUXNpfA7mqCkinlXzqZa8J5brRUY
+jPpLNLdViyEYwKDWPtpv64mcI062qyYPv2wgY+wiwgAiCk1AN07z+uO/dbdFAatr
+zQQnpU1kPyCp2sQV1xJVHqo+KYVfm61zqlKEx3ZWpzdc6FAGT9BG16G6W8lXh2v0
+c9GIhmR1yEEqb3pVic4IBp+OUjwVskWVIgyh651DDoQUifl5Ywg4++nlQd5ufWGV
+FijPa6t24j5mG4VHsVwlec4mSmCA69TOb3U16+9KHSOD9O3FrbZ0f9ZEZh+gsAeG
+eO8/Gz7hMH1SGRuxCtm+u0a/ToOMUWTOrezx+9bcrkxVbmyWJ4+eaMBPXy51xvOK
+Yr94CmtVRd1yuo/SsaLwuPi1sMtwIjvTsNPy2WBxymP79joSpki3RYkCWRTBs/0i
+QH5y+3GmbIK98AdsLbeaELV8/5BbR/riNSFG0jn77fxAZ4QFG8rV9IdeqMVKM3h8
+e9goTaZmqqhCoayKYhd2VD9BJjjEMUKjoT7kC9SyORLTHntw/3O9uEi3wNVS78dq
+LA6mbc4YKkPC2P3toozlVHKk3Dah88N6j54AHTjbKUcRlZZZ2fY=
+=h50E
+-----END PGP SIGNATURE-----
+--=-=-=--
 
