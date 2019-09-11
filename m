@@ -2,68 +2,92 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 230E7C5ACAE
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 17:32:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01785C49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 17:41:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E72F42084F
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 17:32:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E72F42084F
+	by mail.kernel.org (Postfix) with ESMTPS id CE0032081B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 17:41:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE0032081B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i86Tg-0006HS-10
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 13:32:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51003)
+	id 1i86cj-0000Vb-RL
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 13:41:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52498)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1i86SV-0005oM-5b
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 13:31:12 -0400
+ (envelope-from <eblake@redhat.com>) id 1i86bw-0008VF-8p
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 13:40:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1i86ST-0006d8-UH
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 13:31:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58601)
+ (envelope-from <eblake@redhat.com>) id 1i86bv-0002rs-0c
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 13:40:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44810)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1i86ST-0006c1-Mq
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 13:31:09 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i86bu-0002qt-P6
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 13:40:54 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B45CE10CC1EC;
- Wed, 11 Sep 2019 17:31:06 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-127.ams2.redhat.com
- [10.36.116.127])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AE9B019C6A;
- Wed, 11 Sep 2019 17:30:50 +0000 (UTC)
-To: Igor Mammedov <imammedo@redhat.com>
-References: <add488d0-df13-830f-28c5-c7232ccb741f@redhat.com>
- <20190905154925.30478-1-imammedo@redhat.com>
- <dbe8cc44-ef30-3104-2bd3-6a6fe4438ada@redhat.com>
- <20190910175841.176b26e4@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <8ed1ab55-d5ee-9703-dd28-cf50fbda5408@redhat.com>
-Date: Wed, 11 Sep 2019 19:30:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ by mx1.redhat.com (Postfix) with ESMTPS id B40B3190C102
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 17:40:53 +0000 (UTC)
+Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D0EE45D9E2;
+ Wed, 11 Sep 2019 17:40:52 +0000 (UTC)
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
+ qemu-devel@nongnu.org, pbonzini@redhat.com, berrange@redhat.com,
+ quintela@redhat.com
+References: <20190911164202.31136-1-dgilbert@redhat.com>
+ <20190911164202.31136-2-dgilbert@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <1a03f787-5cf8-6b8e-7489-3f90c3311032@redhat.com>
+Date: Wed, 11 Sep 2019 12:40:51 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190910175841.176b26e4@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20190911164202.31136-2-dgilbert@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="p71Il7lcb5yFZZddKSgj4mF1gpRtmyIcR"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Wed, 11 Sep 2019 17:31:06 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.70]); Wed, 11 Sep 2019 17:40:53 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] q35: lpc: allow to lock down 128K RAM at
- default SMBASE address
+Subject: Re: [Qemu-devel] [PATCH 1/3] rcu: Add automatically released
+ rcu_read_lock variant
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,95 +99,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yingwen.chen@intel.com, devel@edk2.groups.io, phillip.goerl@oracle.com,
- qemu-devel@nongnu.org, alex.williamson@redhat.com, jiewen.yao@intel.com,
- jun.nakajima@intel.com, michael.d.kinney@intel.com, pbonzini@redhat.com,
- boris.ostrovsky@oracle.com, rfc@edk2.groups.io, joao.m.martins@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/10/19 17:58, Igor Mammedov wrote:
-> On Mon, 9 Sep 2019 21:15:44 +0200
-> Laszlo Ersek <lersek@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--p71Il7lcb5yFZZddKSgj4mF1gpRtmyIcR
+Content-Type: multipart/mixed; boundary="e5sPTJgMgEVwCS1SqBvaHOWCF1uM73jYm";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
+ qemu-devel@nongnu.org, pbonzini@redhat.com, berrange@redhat.com,
+ quintela@redhat.com
+Message-ID: <1a03f787-5cf8-6b8e-7489-3f90c3311032@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] rcu: Add automatically released
+ rcu_read_lock variant
+References: <20190911164202.31136-1-dgilbert@redhat.com>
+ <20190911164202.31136-2-dgilbert@redhat.com>
+In-Reply-To: <20190911164202.31136-2-dgilbert@redhat.com>
 
-[...]
+--e5sPTJgMgEVwCS1SqBvaHOWCF1uM73jYm
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> It looks like fwcfg smi feature negotiation isn't reusable in this case.
-> I'd prefer not to add another device just for another SMI feature
-> negotiation/activation.
+On 9/11/19 11:42 AM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>=20
+> RCU_READ_LOCK_AUTO takes the rcu_read_lock  and then uses glib's
+> g_auto infrastrcture (and thus whatever the compilers hooks are) to
+> release it on all exits of the block.
+>=20
+> Note this macro has a variable declaration in, and hence is not in
+> a while loop.
+>=20
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  include/qemu/rcu.h | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+>=20
+> diff --git a/include/qemu/rcu.h b/include/qemu/rcu.h
+> index 22876d1428..6a25b27d28 100644
+> --- a/include/qemu/rcu.h
+> +++ b/include/qemu/rcu.h
+> @@ -154,6 +154,18 @@ extern void call_rcu1(struct rcu_head *head, RCUCB=
+Func *func);
+>        }),                                                             =
+   \
+>        (RCUCBFunc *)g_free);
+> =20
+> +typedef char rcu_read_auto_t;
 
-I thought it could be a register on the new CPU hotplug controller that
-we're going to need anyway (if I understand correctly, at least).
+Declaring new types ending in _t collides with the namespace reserved by
+POSIX.  While I don't think it will bite us, it's still worth
+considering if a different name is better.
 
-But:
+> +static inline void rcu_read_auto_unlock(rcu_read_auto_t *r)
+> +{
+> +  rcu_read_unlock();
+> +}
+> +
+> +G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(rcu_read_auto_t, rcu_read_auto_unlock=
+)
+> +
+> +#define RCU_READ_LOCK_AUTO g_auto(rcu_read_auto_t) \
+> +    _rcu_read_auto =3D 'x'; \
 
-> How about stealing reserved register from pci-host similar to your
-> extended TSEG commit (2f295167 q35/mch: implement extended TSEG sizes)?
-> (Looking into spec can (ab)use 0x58 or 0x59 register)
+I'm a bit lost at where _rcu_read_auto is declared.  (I could understand
+if an earlier macro had created that typedef via concatenating _ with
+rcu_read_auto_t, but making the preprocessor drop _t is not possible. Is
+this a typo, and if so, why did the compiler not complain?)
 
-Yes, that should work.
+> +    rcu_read_lock();
+> +
+>  #ifdef __cplusplus
+>  }
+>  #endif
+>=20
 
-In fact, I had considered 0x58 / 0x59 when looking for unused registers
-for extended TSEG configuration:
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-http://mid.mail-archive.com/d8802612-0b11-776f-b209-53bbdaf67515@redhat.com
 
-So I'm OK with this, thank you.
+--e5sPTJgMgEVwCS1SqBvaHOWCF1uM73jYm--
 
-More below:
+--p71Il7lcb5yFZZddKSgj4mF1gpRtmyIcR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
->> ... I've done some testing too. Applying the QEMU patch on top of
->> 89ea03a7dc83, my plan was:
->>
->> - do not change OVMF, just see if it continues booting with the QEMU
->> patch
->>
->> - then negotiate bit#1 too, in step (1a) -- this is when I'd expect (3a)
->> to break.
->>
->> Unfortunately, the result is worse than that; even without negotiating
->> bit#1 (i.e. in the baseline test), the firmware crashes (reboots) in
->> step (3a). I've checked "info mtree", and all occurences of
->> "smbase-blackhole" and "smbase-blackhole" are marked [disabled]. I'm not
->> sure what's wrong with the baseline test (i.e. without negotiating
->> bit#1). If I drop the patch (build QEMU at 89ea03a7dc83), then things
->> work fine.
-> 
-> that was a bug in my code, which always made lock down effective on
-> feature_ok selection, which breaks relocation for reasons you've
-> explained above.
-> 
-> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-> index 17a8cd1b51..32ddf54fc2 100644
-> --- a/hw/isa/lpc_ich9.c
-> +++ b/hw/isa/lpc_ich9.c
-> @@ -383,7 +383,7 @@ static const MemoryRegionOps smbase_blackhole_ops = {
->  
->  static void ich9_lpc_smbase_locked_update(ICH9LPCState *lpc)
->  {
-> -    bool en = lpc->smi_negotiated_features & ICH9_LPC_SMI_F_LOCKED_SMBASE_BIT;
-> +    bool en = lpc->smi_negotiated_features & (UINT64_C(1) << ICH9_LPC_SMI_F_LOCKED_SMBASE_BIT);
->  
->      memory_region_transaction_begin();
->      memory_region_set_enabled(&lpc->smbase_blackhole, en);
+-----BEGIN PGP SIGNATURE-----
 
-I see.
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl15MaMACgkQp6FrSiUn
+Q2qvhAf/Ql2ladoOrIk8Oi5qcUes+na3dGmbSPTf6gO2kd9Lbk6up/hj+JP6QUlU
+WBW5RHcGFNUQP3pghMvg93U2yS6PZRr5SHvOkqoea7pWU/5SWEFNM579UrI508FW
+Gvgca4bSm3ypNF90HcWMR0Ct+B5WaKmiSS1IG2/2ymYN0Afn7svUmKJ7naIVW92c
+AgZ+0gc976jZ0cSo3bv+ZMHekamjQrAXnYnUA9CVWzf2pjEI0ELcToWnYtcqRf7J
+eNtcqL3m2YFDSFTF1yNa2lHTv6amKLFsmFK0OnLYOuXZmiBEfUSkdOTIIM5FoaPu
+slong0hv4yI13puM10pnyVPkinwOsA==
+=VHl9
+-----END PGP SIGNATURE-----
 
-ICH9_LPC_SMI_F_LOCKED_SMBASE_BIT is 1, with the intended value for
-bitmask checkin) being 1LLU<<1 == 2LLU.
-
-Due to the bug, the function would check value 1 in the bitmask -- which
-in fact corresponds to bit#0. Bit#0 happens to be
-ICH9_LPC_SMI_F_BROADCAST_BIT.
-
-And because OVMF would negotiate that feature (= broadcast SMI) even in
-the baseline test, it ended up enabling the "locked smbase" feature too.
-
-So ultimately I think we can consider this a valid test (= with
-meaningful result); the result is that we can't reuse these fw_cfg files
-for "locked smbase", as discussed above.
-
-Thanks!
-Laszlo
+--p71Il7lcb5yFZZddKSgj4mF1gpRtmyIcR--
 
