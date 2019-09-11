@@ -2,93 +2,57 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FA10C49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:56:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA7AC49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:57:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB9912089F
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:56:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mksa4JkG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB9912089F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9EAB22085B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:57:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EAB22085B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i842L-0004HM-RC
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:56:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44859)
+	id 1i843p-0005WD-8A
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:57:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44745)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i83mz-0004PL-8R
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:40:10 -0400
+ (envelope-from <geert@linux-m68k.org>) id 1i83m8-0003CV-Kg
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:39:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i83my-0002GY-63
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:40:09 -0400
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:42201)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i83my-0002GQ-28
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:40:08 -0400
-Received: by mail-qk1-x741.google.com with SMTP id f13so21007755qkm.9
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 07:40:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=6UA0w3xHwOhEXiwC/FmcE57kDH+qNBvckyCZerQii6c=;
- b=mksa4JkGnTB4p4BwvIY4k4jsCI3B/lBcGGy8fNXmKMgorgV6ShzJ8MBTBl7OhuBs97
- 2z2oUfUYudAanLjk/HN/ubKtejFcN+kIW1L6RWwMb3TYB/VMOak56rZ0FniuePwCdYbh
- tu0I1kiejCOdZhVJDyJeu+d03i2wvQZu9ihqBKexYGLBtgZH7f2zwGldgHeSrQfQNkJe
- cNx9AseBB4FjKlBEfwm3Tjs9pvC/3+XxDlsAcBTBOb1C5xZD2lCOQkT+la0HLAKyCy9c
- LMetwUXjqWNQIMPLCbCsSJa2GIBTYqhmIJ2zQzfi7Aa6YFknLCnNCZupqtrBz1QvZJac
- /iGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6UA0w3xHwOhEXiwC/FmcE57kDH+qNBvckyCZerQii6c=;
- b=D/eJHoqyU/TFbMI/zrlD0Zb92+jvcbnqhInvWKvXICTjtgCxQkeTLLG40A/AkWflYw
- 4d2HWr/WyOTwtgj8U8toLvglYG8rH9V8W6WX/pwA3/moE90rnCCHrAc/tDe52o1mZyr8
- /NrIH5NwlR4GwTWSuRu1TIQ7YJmiiPWdfwhTLTk+MZpM5VRMYvnt713Ta75oafNtyFD0
- JBDavp/TpNQrGW1YntG3p151Se4N2fn16JOoNMKXNJwDfAx8k15B9JCcuh+yW/s8UOy3
- HV6PwZY+71Bhp+2batEZMJQOgP9PZInJF5po2w2ZOwQdawaPkw2QqvpJKYJ+nmgv16wE
- zjiQ==
-X-Gm-Message-State: APjAAAXQyv7Xd+UZT4Ye2hbsixl6J1k8GTKKpl7BXD/tzZ7yXUVFooAh
- ich2TZ3wgRORnU2OHEEn0EGj4Q==
-X-Google-Smtp-Source: APXvYqwBrUrOD/UC6Og+jPvuv7L2AybF7aVVopUwrPFa2stHS6diuUG4kjGt++0cDAmW0yiqQjfTPw==
-X-Received: by 2002:a37:dc04:: with SMTP id v4mr29947392qki.51.1568212807500; 
- Wed, 11 Sep 2019 07:40:07 -0700 (PDT)
-Received: from [192.168.5.185] (otwaon236nw-grc-01-64-229-69-35.dsl.bell.ca.
- [64.229.69.35])
- by smtp.gmail.com with ESMTPSA id c204sm596790qkb.90.2019.09.11.07.40.05
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 11 Sep 2019 07:40:06 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190906075750.14791-1-david@redhat.com>
- <20190906075750.14791-3-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <28507e0d-f7b3-74e6-43df-95a53a162e12@linaro.org>
-Date: Wed, 11 Sep 2019 10:40:04 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190906075750.14791-3-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::741
-Subject: Re: [Qemu-devel] [PATCH v2 02/28] s390x/tcg: MVCL: Zero out unused
- bits of address
+ (envelope-from <geert@linux-m68k.org>) id 1i83m6-0001xW-PO
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:39:16 -0400
+Received: from michel.telenet-ops.be ([2a02:1800:110:4::f00:18]:46362)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <geert@linux-m68k.org>)
+ id 1i83m6-0001vF-G9
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:39:14 -0400
+Received: from ramsan ([84.194.98.4]) by michel.telenet-ops.be with bizsmtp
+ id 0Ef42100305gfCL06Ef4Rm; Wed, 11 Sep 2019 16:39:10 +0200
+Received: from rox.of.borg ([192.168.97.57]) by ramsan with esmtp (Exim 4.90_1)
+ (envelope-from <geert@linux-m68k.org>)
+ id 1i83lv-0006TA-Vs; Wed, 11 Sep 2019 16:39:03 +0200
+Received: from geert by rox.of.borg with local (Exim 4.90_1)
+ (envelope-from <geert@linux-m68k.org>)
+ id 1i83lv-0003PF-UY; Wed, 11 Sep 2019 16:39:03 +0200
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+To: Linus Walleij <linus.walleij@linaro.org>,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>
+Date: Wed, 11 Sep 2019 16:38:57 +0200
+Message-Id: <20190911143858.13024-5-geert+renesas@glider.be>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190911143858.13024-1-geert+renesas@glider.be>
+References: <20190911143858.13024-1-geert+renesas@glider.be>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 2a02:1800:110:4::f00:18
+Subject: [Qemu-devel] [PATCH/RFC v2 4/5] gpio: Add GPIO Forwarder Helper
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,53 +64,364 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Florian Weimer <fweimer@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Stefano Brivio <sbrivio@redhat.com>,
- qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Marc Zyngier <marc.zyngier@arm.com>, Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-gpio@vger.kernel.org,
+ Alexander Graf <graf@amazon.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Harish Jenny K N <harish_kandiga@mentor.com>,
+ Phil Reid <preid@electromag.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/6/19 3:57 AM, David Hildenbrand wrote:
-> We have to zero out unused bits in 24 and 31-bit addressing mode.
-> Provide a new helper.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/mem_helper.c | 24 ++++++++++++++++++++++--
->  1 file changed, 22 insertions(+), 2 deletions(-)
+Add a helper for creating GPIO chips that merely forward all operations
+to other GPIOs.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This will be used by the GPIO Aggregator.
 
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+---
+I expect this can be used by the GPIO inverter, too, after adding an
+"invert" flag, or a filter function that checks which offsets need
+inversion.
+---
+ drivers/gpio/Kconfig       |   3 +
+ drivers/gpio/Makefile      |   1 +
+ drivers/gpio/gpiolib-fwd.c | 272 +++++++++++++++++++++++++++++++++++++
+ drivers/gpio/gpiolib-fwd.h |  16 +++
+ 4 files changed, 292 insertions(+)
+ create mode 100644 drivers/gpio/gpiolib-fwd.c
+ create mode 100644 drivers/gpio/gpiolib-fwd.h
 
-> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> index 39ee9b3175..3152bdafe2 100644
-> --- a/target/s390x/mem_helper.c
-> +++ b/target/s390x/mem_helper.c
-> @@ -469,6 +469,26 @@ static inline uint64_t get_address(CPUS390XState *env, int reg)
->      return wrap_address(env, env->regs[reg]);
->  }
->  
-> +/*
-> + * Store the address to the given register, zeroing out unused leftmost
-> + * bits in bit positions 32-63 (24-bit and 31-bit mode only).
-> + */
-> +static inline void set_address_zero(CPUS390XState *env, int reg,
-> +                                    uint64_t address)
-> +{
-> +    if (env->psw.mask & PSW_MASK_64) {
-> +        env->regs[reg] = address;
-> +    } else {
-> +        if (!(env->psw.mask & PSW_MASK_32)) {
-> +            address &= 0x00ffffff;
-> +            env->regs[reg] = deposit64(env->regs[reg], 0, 32, address);
-> +        } else {
-> +            address &= 0x7fffffff;
-> +            env->regs[reg] = deposit64(env->regs[reg], 0, 32, address);
-> +        }
+diff --git a/drivers/gpio/Kconfig b/drivers/gpio/Kconfig
+index 38e096e6925fa65d..29d3ce8debcca1f6 100644
+--- a/drivers/gpio/Kconfig
++++ b/drivers/gpio/Kconfig
+@@ -47,6 +47,9 @@ config GPIOLIB_IRQCHIP
+ 	select IRQ_DOMAIN
+ 	bool
+ 
++config GPIOLIB_FWD
++	tristate
++
+ config DEBUG_GPIO
+ 	bool "Debug GPIO calls"
+ 	depends on DEBUG_KERNEL
+diff --git a/drivers/gpio/Makefile b/drivers/gpio/Makefile
+index d2fd19c15bae3fba..8a0e685c92b69855 100644
+--- a/drivers/gpio/Makefile
++++ b/drivers/gpio/Makefile
+@@ -10,6 +10,7 @@ obj-$(CONFIG_GPIOLIB)		+= gpiolib-devprop.o
+ obj-$(CONFIG_OF_GPIO)		+= gpiolib-of.o
+ obj-$(CONFIG_GPIO_SYSFS)	+= gpiolib-sysfs.o
+ obj-$(CONFIG_GPIO_ACPI)		+= gpiolib-acpi.o
++obj-$(CONFIG_GPIOLIB_FWD)	+= gpiolib-fwd.o
+ 
+ # Device drivers. Generally keep list sorted alphabetically
+ obj-$(CONFIG_GPIO_GENERIC)	+= gpio-generic.o
+diff --git a/drivers/gpio/gpiolib-fwd.c b/drivers/gpio/gpiolib-fwd.c
+new file mode 100644
+index 0000000000000000..28dac8c60a981337
+--- /dev/null
++++ b/drivers/gpio/gpiolib-fwd.c
+@@ -0,0 +1,272 @@
++// SPDX-License-Identifier: GPL-2.0-only
++//
++// GPIO Forwarder Helper
++//
++// Copyright (C) 2019 Glider bvba
++
++#include <linux/bitmap.h>
++#include <linux/bitops.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/mutex.h>
++#include <linux/overflow.h>
++#include <linux/spinlock.h>
++
++#include "gpiolib.h"
++#include "gpiolib-fwd.h"
++
++struct gpiochip_fwd {
++	struct gpio_chip chip;
++	struct gpio_desc **descs;
++	union {
++		struct mutex mlock;	/* protects tmp[] if can_sleep */
++		spinlock_t slock;	/* protects tmp[] if !can_sleep */
++	};
++	unsigned long tmp[];		/* values and descs for multiple ops */
++};
++
++static int gpio_fwd_get_direction(struct gpio_chip *chip, unsigned int offset)
++{
++	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
++
++	return gpiod_get_direction(fwd->descs[offset]);
++}
++
++static int gpio_fwd_direction_input(struct gpio_chip *chip, unsigned int offset)
++{
++	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
++
++	return gpiod_direction_input(fwd->descs[offset]);
++}
++
++static int gpio_fwd_direction_output(struct gpio_chip *chip,
++				     unsigned int offset, int value)
++{
++	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
++
++	return gpiod_direction_output(fwd->descs[offset], value);
++}
++
++static int gpio_fwd_get(struct gpio_chip *chip, unsigned int offset)
++{
++	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
++
++	return gpiod_get_value(fwd->descs[offset]);
++}
++
++static int gpio_fwd_get_multiple(struct gpio_chip *chip, unsigned long *mask,
++				 unsigned long *bits)
++{
++	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
++	unsigned long *values, flags;
++	struct gpio_desc **descs;
++	unsigned int i, j = 0;
++	int error;
++
++	if (chip->can_sleep)
++		mutex_lock(&fwd->mlock);
++	else
++		spin_lock_irqsave(&fwd->slock, flags);
++
++	values = &fwd->tmp[0];
++	bitmap_clear(values, 0, fwd->chip.ngpio);
++	descs = (void *)&fwd->tmp[BITS_TO_LONGS(fwd->chip.ngpio)];
++
++	for_each_set_bit(i, mask, fwd->chip.ngpio)
++		descs[j++] = fwd->descs[i];
++
++	error = gpiod_get_array_value(j, descs, NULL, values);
++	if (!error) {
++		j = 0;
++		for_each_set_bit(i, mask, fwd->chip.ngpio)
++			__assign_bit(i, bits, test_bit(j++, values));
++	}
++
++	if (chip->can_sleep)
++		mutex_unlock(&fwd->mlock);
++	else
++		spin_unlock_irqrestore(&fwd->slock, flags);
++
++	return error;
++}
++
++static void gpio_fwd_set(struct gpio_chip *chip, unsigned int offset, int value)
++{
++	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
++
++	gpiod_set_value(fwd->descs[offset], value);
++}
++
++static void gpio_fwd_set_multiple(struct gpio_chip *chip, unsigned long *mask,
++				  unsigned long *bits)
++{
++	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
++	unsigned long *values, flags;
++	struct gpio_desc **descs;
++	unsigned int i, j = 0;
++
++	if (chip->can_sleep)
++		mutex_lock(&fwd->mlock);
++	else
++		spin_lock_irqsave(&fwd->slock, flags);
++
++	values = &fwd->tmp[0];
++	descs = (void *)&fwd->tmp[BITS_TO_LONGS(fwd->chip.ngpio)];
++
++	for_each_set_bit(i, mask, fwd->chip.ngpio) {
++		__assign_bit(j, values, test_bit(i, bits));
++		descs[j++] = fwd->descs[i];
++	}
++
++	gpiod_set_array_value(j, descs, NULL, values);
++
++	if (chip->can_sleep)
++		mutex_unlock(&fwd->mlock);
++	else
++		spin_unlock_irqrestore(&fwd->slock, flags);
++}
++
++static int gpio_fwd_set_config(struct gpio_chip *chip, unsigned int offset,
++			       unsigned long config)
++{
++	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
++
++	chip = fwd->descs[offset]->gdev->chip;
++	if (chip->set_config)
++		return chip->set_config(chip, offset, config);
++
++	return -ENOTSUPP;
++}
++
++static int gpio_fwd_init_valid_mask(struct gpio_chip *chip,
++				    unsigned long *valid_mask,
++				    unsigned int ngpios)
++{
++	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
++	unsigned int i;
++
++	for (i = 0; i < ngpios; i++) {
++		if (!gpiochip_line_is_valid(fwd->descs[i]->gdev->chip,
++					    gpio_chip_hwgpio(fwd->descs[i])))
++			clear_bit(i, valid_mask);
++	}
++
++	return 0;
++}
++
++/**
++ * gpiochip_fwd_create() - Create a new GPIO forwarder
++ * @label: Name of the forwarder
++ * @parent: Optional parent device pointer
++ * @ngpios: Number of GPIOs in the forwarder.
++ * @descs: Array containing the GPIO descriptors to forward to.
++ *         This array must contain @ngpios entries, and must not be deallocated
++ *         before the forwarder has been destroyed again.
++ *
++ * This function creates a new gpiochip, which forwards all GPIO operations to
++ * the passed GPIO descriptors.
++ *
++ * Return: An opaque object pointer, or an ERR_PTR()-encoded negative error
++ *         code on failure.
++ */
++struct gpiochip_fwd *gpiochip_fwd_create(const char *label,
++					 struct device *parent,
++					 unsigned int ngpios,
++					 struct gpio_desc *descs[])
++{
++	struct gpiochip_fwd *fwd;
++	struct gpio_chip *chip;
++	unsigned int i;
++	int error;
++
++	fwd = kzalloc(struct_size(fwd, tmp, BITS_TO_LONGS(ngpios) + ngpios),
++		      GFP_KERNEL);
++	if (!fwd)
++		return ERR_PTR(-ENOMEM);
++
++	chip = &fwd->chip;
++
++	for (i = 0; i < ngpios; i++) {
++		pr_debug("%s: gpio %u => gpio-%d (%s)\n", label, i,
++			 desc_to_gpio(descs[i]), descs[i]->label ? : "?");
++
++		error = gpiod_request(descs[i], label);
++		if (error) {
++			gpiod_err(descs[i], "%s: Cannot request GPIO: %d\n",
++				  label, error);
++			goto free;
++		}
++
++		if (gpiod_cansleep(descs[i]))
++			chip->can_sleep = true;
++		if (descs[i]->gdev->chip->set_config)
++			chip->set_config = gpio_fwd_set_config;
++		if (descs[i]->gdev->chip->init_valid_mask)
++			chip->init_valid_mask = gpio_fwd_init_valid_mask;
++	}
++
++	chip->label = label;
++	chip->parent = parent;
++	chip->owner = THIS_MODULE;
++	chip->get_direction = gpio_fwd_get_direction;
++	chip->direction_input = gpio_fwd_direction_input;
++	chip->direction_output = gpio_fwd_direction_output;
++	chip->get = gpio_fwd_get;
++	chip->get_multiple = gpio_fwd_get_multiple;
++	chip->set = gpio_fwd_set;
++	chip->set_multiple = gpio_fwd_set_multiple;
++	chip->base = -1;
++	chip->ngpio = ngpios;
++	fwd->descs = descs;
++
++	if (chip->can_sleep)
++		mutex_init(&fwd->mlock);
++	else
++		spin_lock_init(&fwd->slock);
++
++	error = gpiochip_add_data(chip, fwd);
++	if (error)
++		goto free;
++
++	return fwd;
++
++free:
++	while (i-- > 0)
++		gpiod_free(descs[i]);
++
++	kfree(fwd);
++
++	return ERR_PTR(error);
++}
++EXPORT_SYMBOL_GPL(gpiochip_fwd_create);
++
++/**
++ * gpiochip_fwd_destroy() - Destroy a new GPIO forwarder
++ * @fwd: Opaque object pointer, as returned by gpiochip_fwd_create()
++ *
++ * This function destroys GPIO forwarder gpiochip, previously created by
++ * gpiochip_fwd_create().
++
++ * Return: Zero.
++ */
++int gpiochip_fwd_destroy(struct gpiochip_fwd *fwd)
++{
++	unsigned int i;
++
++	if (IS_ERR_OR_NULL(fwd))
++		return 0;
++
++	gpiochip_remove(&fwd->chip);
++
++	for (i = 0; i < fwd->chip.ngpio; i++)
++		gpiod_free(fwd->descs[i]);
++
++	kfree(fwd);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(gpiochip_fwd_destroy);
++
++MODULE_AUTHOR("Geert Uytterhoeven <geert+renesas@glider.be>");
++MODULE_DESCRIPTION("GPIO Forwarder Helper");
++MODULE_LICENSE("GPL v2");
+diff --git a/drivers/gpio/gpiolib-fwd.h b/drivers/gpio/gpiolib-fwd.h
+new file mode 100644
+index 0000000000000000..68d299afc6883a9c
+--- /dev/null
++++ b/drivers/gpio/gpiolib-fwd.h
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * GPIO Forwarder Helper
++ *
++ * Copyright (C) 2019 Glider bvba
++ */
++
++struct device;
++struct gpio_desc;
++struct gpiochip_fwd;
++
++struct gpiochip_fwd *gpiochip_fwd_create(const char *label,
++					 struct device *parent,
++					 unsigned int ngpios,
++					 struct gpio_desc *descs[]);
++int gpiochip_fwd_destroy(struct gpiochip_fwd *fwd);
+-- 
+2.17.1
 
-You could perhaps sink the deposit and store line into the outer else.
-
-
-r~
 
