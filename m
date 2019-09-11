@@ -2,93 +2,61 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CF08C49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:48:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9795CC5ACAE
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:49:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F03120644
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:48:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PNOF4pyl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F03120644
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6BA31207FC
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:49:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BA31207FC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i83vL-0004OS-MX
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:48:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45291)
+	id 1i83vf-0004ZR-VA
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:49:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44149)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i83p1-0007ei-Fk
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:42:16 -0400
+ (envelope-from <stefanha@redhat.com>) id 1i83kA-0000tc-Me
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:37:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i83p0-0003Ai-En
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:42:15 -0400
-Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:41511)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i83p0-0003AR-9P
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:42:14 -0400
-Received: by mail-qt1-x844.google.com with SMTP id j10so25473564qtp.8
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 07:42:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=OrqciU6SzLz+CiWco+/E8F545d1oKr5ISM5XzIw2qcE=;
- b=PNOF4pylPjXX32D+7xa6NV/2d5H/6JoNgHZnnBgyDFREt2da1uoaoHOis0YtlCN12s
- VQVJWxBMA3YPGlbG9ACFHw0uq2pEA7qyzvfhAfkXi3aiv8rg9oS3tYzVpq2nauXmIdUd
- EYDgBHLVaHaeJWVW+EKutB/ZyWyjAkJRf8YW49JRcax1xRlIizlKSgPep8qTWStup50I
- I4akt780xAbg7ha3Xx3wY1QHxeIWO04RmtCCTO6J8RSArW8nyyDbj1AcMmcs0zcn/V4D
- i7lPBOPg8+wWBMQ8w5F+0isYIrwVn/0StDprzMIevG9GWNrTehwkCosayjhvOrIwF3lr
- bfdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=OrqciU6SzLz+CiWco+/E8F545d1oKr5ISM5XzIw2qcE=;
- b=djjmW+MmNZtSH9N42+rZYI2swMmN3F7Ra7Sg1sFV5EElto4Zw4GjvsuftKX6AXyYeR
- iSQnf7dCGcofkAfSh4oG2TJ1U+5HkDW463rRlmAjy+yyP9YOpm/5GT1SY13AHLqMPlXh
- /8hTLmeuppI20nmhqC69vUxEMi6v7EN8NzcW8uxGMhxMdo4/rTnD9zpmSoPFx4ssZLWc
- 7OOfztWhsupm4iLO58dxNCHKo9T5FI/wGVaOy7e5lVWqpJ8t6DFUHk5/5W46YmABNGYg
- kidfKkfsGs+hc5pASJNR9bg/XajElxZfXv0VlRW3TRTzHdIr25RF8/z41qFCQsfS0gFo
- Tz+w==
-X-Gm-Message-State: APjAAAVw3gQsEhwLBIuxKw3xOOz0AJypiC/MWIw5px6RyKFarrh+g/Ig
- MBkYucvbw0UzrUQn4216hI3Giw==
-X-Google-Smtp-Source: APXvYqwLOJNcb7HgBhuz6C55KrF8PzyPsruSf4KkAVsEAV/9kQGmzuyFntMbb08bHiteL1uC7xNnHA==
-X-Received: by 2002:ac8:7b2a:: with SMTP id l10mr911192qtu.115.1568212933760; 
- Wed, 11 Sep 2019 07:42:13 -0700 (PDT)
-Received: from [192.168.5.185] (otwaon236nw-grc-01-64-229-69-35.dsl.bell.ca.
- [64.229.69.35])
- by smtp.gmail.com with ESMTPSA id f14sm2646452qtq.54.2019.09.11.07.42.12
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 11 Sep 2019 07:42:13 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190906075750.14791-1-david@redhat.com>
- <20190906075750.14791-4-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <2fedb734-2af5-bff0-f458-c36aa6bd5812@linaro.org>
-Date: Wed, 11 Sep 2019 10:42:10 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <stefanha@redhat.com>) id 1i83k8-0001Cn-FF
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:37:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41016)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>)
+ id 1i83k3-00019g-7n; Wed, 11 Sep 2019 10:37:08 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 283A830A7BB5;
+ Wed, 11 Sep 2019 14:37:06 +0000 (UTC)
+Received: from localhost (ovpn-116-185.ams2.redhat.com [10.36.116.185])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7676C60A9F;
+ Wed, 11 Sep 2019 14:36:49 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 11 Sep 2019 16:36:12 +0200
+Message-Id: <20190911143612.17881-2-stefanha@redhat.com>
+In-Reply-To: <20190911143612.17881-1-stefanha@redhat.com>
+References: <20190911143612.17881-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190906075750.14791-4-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::844
-Subject: Re: [Qemu-devel] [PATCH v2 03/28] s390x/tcg: MVCL: Detect
- destructive overlaps
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Wed, 11 Sep 2019 14:37:06 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 1/1] virtio-blk: Cancel the pending BH when the
+ dataplane is reset
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,25 +68,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Florian Weimer <fweimer@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Stefano Brivio <sbrivio@redhat.com>,
- qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Yihuang Yu <yihyu@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/6/19 3:57 AM, David Hildenbrand wrote:
-> We'll have to zero-out unused bit positions, so amke sure to write the
-> addresses back.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/mem_helper.c | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
-> 
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+When 'system_reset' is called, the main loop clear the memory
+region cache before the BH has a chance to execute. Later when
+the deferred function is called, some assumptions that were
+made when scheduling them are no longer true when they actually
+execute.
 
-r~
+This is what happens using a virtio-blk device (fresh RHEL7.8 install):
+
+ $ (sleep 12.3; echo system_reset; sleep 12.3; echo system_reset; sleep 1=
+; echo q) \
+   | qemu-system-x86_64 -m 4G -smp 8 -boot menu=3Don \
+     -device virtio-blk-pci,id=3Dimage1,drive=3Ddrive_image1 \
+     -drive file=3D/var/lib/libvirt/images/rhel78.qcow2,if=3Dnone,id=3Ddr=
+ive_image1,format=3Dqcow2,cache=3Dnone \
+     -device virtio-net-pci,netdev=3Dnet0,id=3Dnic0,mac=3D52:54:00:c4:e7:=
+84 \
+     -netdev tap,id=3Dnet0,script=3D/bin/true,downscript=3D/bin/true,vhos=
+t=3Don \
+     -monitor stdio -serial null -nographic
+  (qemu) system_reset
+  (qemu) system_reset
+  (qemu) qemu-system-x86_64: hw/virtio/virtio.c:225: vring_get_region_cac=
+hes: Assertion `caches !=3D NULL' failed.
+  Aborted
+
+  (gdb) bt
+  Thread 1 (Thread 0x7f109c17b680 (LWP 10939)):
+  #0  0x00005604083296d1 in vring_get_region_caches (vq=3D0x56040a24bdd0)=
+ at hw/virtio/virtio.c:227
+  #1  0x000056040832972b in vring_avail_flags (vq=3D0x56040a24bdd0) at hw=
+/virtio/virtio.c:235
+  #2  0x000056040832d13d in virtio_should_notify (vdev=3D0x56040a240630, =
+vq=3D0x56040a24bdd0) at hw/virtio/virtio.c:1648
+  #3  0x000056040832d1f8 in virtio_notify_irqfd (vdev=3D0x56040a240630, v=
+q=3D0x56040a24bdd0) at hw/virtio/virtio.c:1662
+  #4  0x00005604082d213d in notify_guest_bh (opaque=3D0x56040a243ec0) at =
+hw/block/dataplane/virtio-blk.c:75
+  #5  0x000056040883dc35 in aio_bh_call (bh=3D0x56040a243f10) at util/asy=
+nc.c:90
+  #6  0x000056040883dccd in aio_bh_poll (ctx=3D0x560409161980) at util/as=
+ync.c:118
+  #7  0x0000560408842af7 in aio_dispatch (ctx=3D0x560409161980) at util/a=
+io-posix.c:460
+  #8  0x000056040883e068 in aio_ctx_dispatch (source=3D0x560409161980, ca=
+llback=3D0x0, user_data=3D0x0) at util/async.c:261
+  #9  0x00007f10a8fca06d in g_main_context_dispatch () at /lib64/libglib-=
+2.0.so.0
+  #10 0x0000560408841445 in glib_pollfds_poll () at util/main-loop.c:215
+  #11 0x00005604088414bf in os_host_main_loop_wait (timeout=3D0) at util/=
+main-loop.c:238
+  #12 0x00005604088415c4 in main_loop_wait (nonblocking=3D0) at util/main=
+-loop.c:514
+  #13 0x0000560408416b1e in main_loop () at vl.c:1923
+  #14 0x000056040841e0e8 in main (argc=3D20, argv=3D0x7ffc2c3f9c58, envp=3D=
+0x7ffc2c3f9d00) at vl.c:4578
+
+Fix this by cancelling the BH when the virtio dataplane is stopped.
+
+[This is version of the patch was modified as discussed with Philippe on
+the mailing list thread.
+--Stefan]
+
+Reported-by: Yihuang Yu <yihyu@redhat.com>
+Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+Fixes: https://bugs.launchpad.net/qemu/+bug/1839428
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20190816171503.24761-1-philmd@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ hw/block/dataplane/virtio-blk.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-=
+blk.c
+index 9299a1a7c2..119906a5fe 100644
+--- a/hw/block/dataplane/virtio-blk.c
++++ b/hw/block/dataplane/virtio-blk.c
+@@ -298,6 +298,9 @@ void virtio_blk_data_plane_stop(VirtIODevice *vdev)
+         virtio_bus_cleanup_host_notifier(VIRTIO_BUS(qbus), i);
+     }
+=20
++    qemu_bh_cancel(s->bh);
++    notify_guest_bh(s); /* final chance to notify guest */
++
+     /* Clean up guest notifier (irq) */
+     k->set_guest_notifiers(qbus->parent, nvqs, false);
+=20
+--=20
+2.21.0
 
 
