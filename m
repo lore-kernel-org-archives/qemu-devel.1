@@ -2,82 +2,93 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EF92C5ACAE
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:54:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FA10C49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:56:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B88E2075C
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:54:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB9912089F
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:56:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="frtVqm70"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B88E2075C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mksa4JkG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB9912089F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i840b-0002Cx-Jg
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:54:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47034)
+	id 1i842L-0004HM-RC
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:56:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44859)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chihmin.chao@sifive.com>) id 1i83xu-0007kw-Pb
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:51:28 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i83mz-0004PL-8R
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:40:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chihmin.chao@sifive.com>) id 1i83xt-00087u-3M
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:51:26 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:45153)
+ (envelope-from <richard.henderson@linaro.org>) id 1i83my-0002GY-63
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:40:09 -0400
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:42201)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <chihmin.chao@sifive.com>)
- id 1i83xs-00087C-Uv
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:51:25 -0400
-Received: by mail-io1-xd44.google.com with SMTP id f12so46361038iog.12
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 07:51:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=DKg/pSa5KC6awsuIG5WpCszhbi2ykvLdh1jfm7RlOCU=;
- b=frtVqm702iDRzV8joEeyIpQ9Pi1rDX+RygW3q+YfAQuJFhRn1nNM3JAZeJyaswBki1
- aMAU3Q+jUeM+FQf1Nk90G2M5hjUlH88tZDjT/XuJYUdjRLpipXJJQRbCdw4aWXfr/e9f
- AeNiKgY+8vIeVf20AT7zwXLK0U6vITabDzzdDDPLj0C+UJ8PNnVkrwP2ILrZieAHjEGH
- xKW3kGJ3A9h7vIlLUyhsXuUYF/iqIdRFYpoGTj++Qm1/m9bgEeCnNTfJJ+G+9R1XeVPm
- PZ9nxFXQ/kWIz6VtDFvzhSYGKffMl3nD/vRRlqJeKlmPSbLrMMh37AhIiNWiEHLBND9Q
- e9Hg==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i83my-0002GQ-28
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:40:08 -0400
+Received: by mail-qk1-x741.google.com with SMTP id f13so21007755qkm.9
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 07:40:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=6UA0w3xHwOhEXiwC/FmcE57kDH+qNBvckyCZerQii6c=;
+ b=mksa4JkGnTB4p4BwvIY4k4jsCI3B/lBcGGy8fNXmKMgorgV6ShzJ8MBTBl7OhuBs97
+ 2z2oUfUYudAanLjk/HN/ubKtejFcN+kIW1L6RWwMb3TYB/VMOak56rZ0FniuePwCdYbh
+ tu0I1kiejCOdZhVJDyJeu+d03i2wvQZu9ihqBKexYGLBtgZH7f2zwGldgHeSrQfQNkJe
+ cNx9AseBB4FjKlBEfwm3Tjs9pvC/3+XxDlsAcBTBOb1C5xZD2lCOQkT+la0HLAKyCy9c
+ LMetwUXjqWNQIMPLCbCsSJa2GIBTYqhmIJ2zQzfi7Aa6YFknLCnNCZupqtrBz1QvZJac
+ /iGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=DKg/pSa5KC6awsuIG5WpCszhbi2ykvLdh1jfm7RlOCU=;
- b=Jki/9Lhp+zEf4ErD8MlE8U+1XHxKRcuWS1T2S9bFfURtbd2bPuKMmnlS5PsgKDGLoV
- xGFAXaj+UV/yJa3cjK+us8R49o+dxI0NE4lQ2a3w9Xj9Vo/QpyuJOD7It/cM9sbiKQnB
- e0fmFvR3jbjiMr00NHkcg66in0RQT//F8gkS4sRh4utZVkg0U1jAB8IuGe6ydxKdFkQP
- Bcn4K2dEShKAhukLMcOoq6siLp+JfZQMPkxWAcrY6P8SGW3R1f32eERbdrJM1nRZ4emB
- txxXI8PIiDBW4traMGkvTrXBqpuYTSZmUpd2LI/2PGpyx188xQWfH5ReDHsQBe58JCCY
- bd0A==
-X-Gm-Message-State: APjAAAVwOWdp94+ZGyZcxGdSF1Q9AwjlMgEgQ6f27BrYczA4xiDtb3Zz
- BA/HPimDfKpAvVj0Z2LhMsj89UiZZCP3V7/+9aRypEVbUoc=
-X-Google-Smtp-Source: APXvYqwri+DYLseY2oPTtom1S3OAAdSW6dcHn0TjPIFLGUqPSESwd9knfGxQAXag8H3drs2ZDdzwiAFuoVSYEjv8u9A=
-X-Received: by 2002:a05:6602:2516:: with SMTP id
- i22mr2906275ioe.129.1568213483487; 
- Wed, 11 Sep 2019 07:51:23 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=6UA0w3xHwOhEXiwC/FmcE57kDH+qNBvckyCZerQii6c=;
+ b=D/eJHoqyU/TFbMI/zrlD0Zb92+jvcbnqhInvWKvXICTjtgCxQkeTLLG40A/AkWflYw
+ 4d2HWr/WyOTwtgj8U8toLvglYG8rH9V8W6WX/pwA3/moE90rnCCHrAc/tDe52o1mZyr8
+ /NrIH5NwlR4GwTWSuRu1TIQ7YJmiiPWdfwhTLTk+MZpM5VRMYvnt713Ta75oafNtyFD0
+ JBDavp/TpNQrGW1YntG3p151Se4N2fn16JOoNMKXNJwDfAx8k15B9JCcuh+yW/s8UOy3
+ HV6PwZY+71Bhp+2batEZMJQOgP9PZInJF5po2w2ZOwQdawaPkw2QqvpJKYJ+nmgv16wE
+ zjiQ==
+X-Gm-Message-State: APjAAAXQyv7Xd+UZT4Ye2hbsixl6J1k8GTKKpl7BXD/tzZ7yXUVFooAh
+ ich2TZ3wgRORnU2OHEEn0EGj4Q==
+X-Google-Smtp-Source: APXvYqwBrUrOD/UC6Og+jPvuv7L2AybF7aVVopUwrPFa2stHS6diuUG4kjGt++0cDAmW0yiqQjfTPw==
+X-Received: by 2002:a37:dc04:: with SMTP id v4mr29947392qki.51.1568212807500; 
+ Wed, 11 Sep 2019 07:40:07 -0700 (PDT)
+Received: from [192.168.5.185] (otwaon236nw-grc-01-64-229-69-35.dsl.bell.ca.
+ [64.229.69.35])
+ by smtp.gmail.com with ESMTPSA id c204sm596790qkb.90.2019.09.11.07.40.05
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 11 Sep 2019 07:40:06 -0700 (PDT)
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190906075750.14791-1-david@redhat.com>
+ <20190906075750.14791-3-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <28507e0d-f7b3-74e6-43df-95a53a162e12@linaro.org>
+Date: Wed, 11 Sep 2019 10:40:04 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <1568183141-67641-1-git-send-email-zhiwei_liu@c-sky.com>
- <1568183141-67641-2-git-send-email-zhiwei_liu@c-sky.com>
-In-Reply-To: <1568183141-67641-2-git-send-email-zhiwei_liu@c-sky.com>
-From: Chih-Min Chao <chihmin.chao@sifive.com>
-Date: Wed, 11 Sep 2019 22:51:12 +0800
-Message-ID: <CAEiOBXUveMJGpavU7_zK0UTdNniQvnXnw5MvE-hu7yHCSw8MPQ@mail.gmail.com>
-To: liuzhiwei <zhiwei_liu@c-sky.com>
+In-Reply-To: <20190906075750.14791-3-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d44
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v2 01/17] RISC-V: add vfp field in
- CPURISCVState
+X-Received-From: 2607:f8b0:4864:20::741
+Subject: Re: [Qemu-devel] [PATCH v2 02/28] s390x/tcg: MVCL: Zero out unused
+ bits of address
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,96 +100,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmer@sifive.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, riku.voipio@iki.fi,
- laurent@vivier.eu, wxy194768@alibaba-inc.com,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- wenmeng_zhang@c-sky.com, Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Florian Weimer <fweimer@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Stefano Brivio <sbrivio@redhat.com>,
+ qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 11, 2019 at 2:35 PM liuzhiwei <zhiwei_liu@c-sky.com> wrote:
-
-> From: LIU Zhiwei <zhiwei_liu@c-sky.com>
->
-> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+On 9/6/19 3:57 AM, David Hildenbrand wrote:
+> We have to zero out unused bits in 24 and 31-bit addressing mode.
+> Provide a new helper.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  target/riscv/cpu.h | 28 ++++++++++++++++++++++++++++
->  1 file changed, 28 insertions(+)
->
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index 0adb307..c992b1d 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -93,9 +93,37 @@ typedef struct CPURISCVState CPURISCVState;
->
->  #include "pmp.h"
->
-> +#define VLEN 128
-> +#define VUNIT(x) (VLEN / x)
-> +
->  struct CPURISCVState {
->      target_ulong gpr[32];
->      uint64_t fpr[32]; /* assume both F and D extensions */
-> +
-> +    /* vector coprocessor state.  */
-> +    struct {
-> +        union VECTOR {
-> +            float64  f64[VUNIT(64)];
-> +            float32  f32[VUNIT(32)];
-> +            float16  f16[VUNIT(16)];
-> +            uint64_t u64[VUNIT(64)];
-> +            int64_t  s64[VUNIT(64)];
-> +            uint32_t u32[VUNIT(32)];
-> +            int32_t  s32[VUNIT(32)];
-> +            uint16_t u16[VUNIT(16)];
-> +            int16_t  s16[VUNIT(16)];
-> +            uint8_t  u8[VUNIT(8)];
-> +            int8_t   s8[VUNIT(8)];
-> +        } vreg[32];
-> +        target_ulong vxrm;
-> +        target_ulong vxsat;
-> +        target_ulong vl;
-> +        target_ulong vstart;
-> +        target_ulong vtype;
-> +        float_status fp_status;
-> +    } vfp;
-> +
-> +    bool         foflag;
->      target_ulong pc;
->      target_ulong load_res;
->      target_ulong load_val;
-> --
-> 2.7.4
->
->
-Could  the VLEN be configurable in cpu initialization but not fixed in
-compilation phase ?
-Take the integer element as example  and the difference should be the
-stride of vfp.vreg[x] isn't continuous
+>  target/s390x/mem_helper.c | 24 ++++++++++++++++++++++--
+>  1 file changed, 22 insertions(+), 2 deletions(-)
 
-    struct {
-        union VECTOR {
-            uint64_t *u64;
-            uint16_t *u16;
-            uint8_t  *u8;
-        } vreg[32];
-    } vfp;
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-   initialization
 
-    int vlen = 256;  //parameter from cpu command line option
-    int elem = vlen / 8;
-    int size = elem * 32;
+> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+> index 39ee9b3175..3152bdafe2 100644
+> --- a/target/s390x/mem_helper.c
+> +++ b/target/s390x/mem_helper.c
+> @@ -469,6 +469,26 @@ static inline uint64_t get_address(CPUS390XState *env, int reg)
+>      return wrap_address(env, env->regs[reg]);
+>  }
+>  
+> +/*
+> + * Store the address to the given register, zeroing out unused leftmost
+> + * bits in bit positions 32-63 (24-bit and 31-bit mode only).
+> + */
+> +static inline void set_address_zero(CPUS390XState *env, int reg,
+> +                                    uint64_t address)
+> +{
+> +    if (env->psw.mask & PSW_MASK_64) {
+> +        env->regs[reg] = address;
+> +    } else {
+> +        if (!(env->psw.mask & PSW_MASK_32)) {
+> +            address &= 0x00ffffff;
+> +            env->regs[reg] = deposit64(env->regs[reg], 0, 32, address);
+> +        } else {
+> +            address &= 0x7fffffff;
+> +            env->regs[reg] = deposit64(env->regs[reg], 0, 32, address);
+> +        }
 
-    uint8_t *mem = malloc(size)
-    for (int idx = 0; idx < 32; ++idx) {
-        vfp.vreg[idx].u64 = (void *)&mem[idx * elem];
-        vfp.vreg[idx].u32 = (void *)&mem[idx * elem];
-        vfp.vreg[idx].u16 = (void *)&mem[idx * elem];
-   }
+You could perhaps sink the deposit and store line into the outer else.
 
-  chihmin
+
+r~
+
