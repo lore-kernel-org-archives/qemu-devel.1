@@ -2,62 +2,123 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60A06C5ACAE
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 19:11:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44FBBC5ACAE
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 19:12:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 350632075C
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 19:11:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 350632075C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2262D20838
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 19:12:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2262D20838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ubuntu.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i881e-0000VO-8t
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 15:11:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54167)
+	id 1i882o-00023o-8G
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 15:12:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54695)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i87wq-000475-IH
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 15:06:38 -0400
+ (envelope-from <rafaeldtinoco@kernelpath.com>) id 1i87zg-0007ad-P6
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 15:09:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i87wo-0006eR-Sy
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 15:06:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34208)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i87wo-0006dr-JV
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 15:06:34 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EB7963084242
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 19:06:33 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-117-243.ams2.redhat.com
- [10.36.117.243])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BD0746013A;
- Wed, 11 Sep 2019 19:06:32 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, pbonzini@redhat.com, ehabkost@redhat.com,
- berrange@redhat.com, quintela@redhat.com
-Date: Wed, 11 Sep 2019 20:06:21 +0100
-Message-Id: <20190911190622.7629-5-dgilbert@redhat.com>
-In-Reply-To: <20190911190622.7629-1-dgilbert@redhat.com>
-References: <20190911190622.7629-1-dgilbert@redhat.com>
+ (envelope-from <rafaeldtinoco@kernelpath.com>) id 1i87zf-00087b-FD
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 15:09:32 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:35693)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <rafaeldtinoco@kernelpath.com>)
+ id 1i87zf-000873-AJ
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 15:09:31 -0400
+Received: by mail-qk1-f193.google.com with SMTP id d26so22028730qkk.2
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 12:09:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=KfuwWigjPRZem6JotdzFJTTZJTNKqoFUake8sG+uIL0=;
+ b=Ieb/y5NVLggcEY0nBBm1nC320sFG0/GLEEDaqYZp8uzBsNOydUi++KARIQXFZxwqZi
+ bO6p1GPAELrMZtsG1wUhOm62lRYRi/snhpgrD+b1Go4TI63v10F13XrP5A3nCXoAfK0v
+ 3j9e3nlfzOe6QJTKGkLtRJSwXlmezjq7N63FtoshBrleVflv5hJFr7g34mDQ2N25nRu1
+ YR/JlfTpI3nWKt2qrov69MnfjYrUGpkt6tg6IdpH8H8Rvbh9t1CVXXjtDvgtGIkc6hOK
+ ae1yJ1tuXm+3hbHZ+CLe13yLB4G6fiOjXRGqu5ty2xdALAIiaz821LfS+dUJnGaJNTus
+ sq+Q==
+X-Gm-Message-State: APjAAAUqoWI0Xr0H6yxmPJtbAATRgXEH12r8pSwqViwZRFjcF7GD72Gd
+ diW11lviD9jS/lVchC4DvBQBhQ==
+X-Google-Smtp-Source: APXvYqw4nTSBPc8VSOJfXPTxkb27PEP/lCwlF2bEsvmS3yw+PZGTPwyGj0U5WLKOQkaoQWJO1cwAlg==
+X-Received: by 2002:a37:f517:: with SMTP id l23mr5017301qkk.287.1568228969904; 
+ Wed, 11 Sep 2019 12:09:29 -0700 (PDT)
+Received: from [192.168.100.24] ([191.177.180.119])
+ by smtp.gmail.com with ESMTPSA id v68sm10736413qkd.109.2019.09.11.12.09.28
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 11 Sep 2019 12:09:29 -0700 (PDT)
+To: Paolo Bonzini <pbonzini@redhat.com>
+References: <cbe46ad6-ef6c-d155-e79a-672182c725ad@ubuntu.com>
+ <d94f18f1-986f-ec19-02c0-e83e5e7af3d0@redhat.com>
+From: Rafael David Tinoco <rafaeldtinoco@ubuntu.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=rafaeldtinoco@ubuntu.com; keydata=
+ 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
+ m+Bc0IpWoGZLnE2VPg==
+Message-ID: <1864070a-2f84-1d98-341e-f01ddf74ec4b@ubuntu.com>
+Date: Wed, 11 Sep 2019 16:09:25 -0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Wed, 11 Sep 2019 19:06:33 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <d94f18f1-986f-ec19-02c0-e83e5e7af3d0@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 4/5] rcu: Use automatic rc_read unlock in
- core memory/exec code
+ [fuzzy]
+X-Received-From: 209.85.222.193
+Subject: Re: [Qemu-devel] qemu_futex_wait() lockups in ARM64: 2 possible
+ issues
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,391 +130,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Bug 1805256 <1805256@bugs.launchpad.net>,
+ QEMU Developers - ARM <qemu-arm@nongnu.org>, lizhengui <lizhengui@huawei.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Zhengui's theory that notify_me doesn't work properly on ARM is more
+> promising, but he couldn't provide a clear explanation of why he thought
+> notify_me is involved.  In particular, I would have expected notify_me to
+> be wrong if the qemu_poll_ns call came from aio_ctx_dispatch, for example:
+> 
+> 
+>     glib_pollfds_fill
+>       g_main_context_prepare
+>         aio_ctx_prepare
+>           atomic_or(&ctx->notify_me, 1)
+>     qemu_poll_ns
+>     glib_pollfds_poll
+>       g_main_context_check
+>         aio_ctx_check
+>           atomic_and(&ctx->notify_me, ~1)
+>       g_main_context_dispatch
+>         aio_ctx_dispatch
+>           /* do something for event */
+>             qemu_poll_ns 
+> 
 
-Only in the cases where nothing else interesting happens
-after the unlock.
+Paolo,
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- exec.c                  | 46 +++++++++++++----------------------------
- include/exec/ram_addr.h |  8 ++-----
- memory.c                | 15 +++++---------
- 3 files changed, 21 insertions(+), 48 deletions(-)
+I tried confining execution in a single NUMA domain (cpu & mem) and
+still faced the issue, then, I added a mutex "ctx->notify_me_lcktest"
+into context to protect "ctx->notify_me", like showed bellow, and it
+seems to have either fixed or mitigated it.
 
-diff --git a/exec.c b/exec.c
-index 235d6bc883..ac3d933e1a 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1034,16 +1034,14 @@ void tb_invalidate_phys_addr(AddressSpace *as, hw=
-addr addr, MemTxAttrs attrs)
-         return;
-     }
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-     mr =3D address_space_translate(as, addr, &addr, &l, false, attrs);
-     if (!(memory_region_is_ram(mr)
-           || memory_region_is_romd(mr))) {
--        rcu_read_unlock();
-         return;
-     }
-     ram_addr =3D memory_region_get_ram_addr(mr) + addr;
-     tb_invalidate_phys_page_range(ram_addr, ram_addr + 1, 0);
--    rcu_read_unlock();
- }
-=20
- static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
-@@ -1329,14 +1327,13 @@ static void tlb_reset_dirty_range_all(ram_addr_t =
-start, ram_addr_t length)
-     end =3D TARGET_PAGE_ALIGN(start + length);
-     start &=3D TARGET_PAGE_MASK;
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-     block =3D qemu_get_ram_block(start);
-     assert(block =3D=3D qemu_get_ram_block(end - 1));
-     start1 =3D (uintptr_t)ramblock_ptr(block, start - block->offset);
-     CPU_FOREACH(cpu) {
-         tlb_reset_dirty(cpu, start1, length);
-     }
--    rcu_read_unlock();
- }
-=20
- /* Note: start and end must be within the same ram block.  */
-@@ -1661,7 +1658,7 @@ void ram_block_dump(Monitor *mon)
-     RAMBlock *block;
-     char *psize;
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-     monitor_printf(mon, "%24s %8s  %18s %18s %18s\n",
-                    "Block Name", "PSize", "Offset", "Used", "Total");
-     RAMBLOCK_FOREACH(block) {
-@@ -1673,7 +1670,6 @@ void ram_block_dump(Monitor *mon)
-                        (uint64_t)block->max_length);
-         g_free(psize);
-     }
--    rcu_read_unlock();
- }
-=20
- #ifdef __linux__
-@@ -1995,11 +1991,10 @@ static unsigned long last_ram_page(void)
-     RAMBlock *block;
-     ram_addr_t last =3D 0;
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-     RAMBLOCK_FOREACH(block) {
-         last =3D MAX(last, block->offset + block->max_length);
-     }
--    rcu_read_unlock();
-     return last >> TARGET_PAGE_BITS;
- }
-=20
-@@ -2086,7 +2081,7 @@ void qemu_ram_set_idstr(RAMBlock *new_block, const =
-char *name, DeviceState *dev)
-     }
-     pstrcat(new_block->idstr, sizeof(new_block->idstr), name);
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-     RAMBLOCK_FOREACH(block) {
-         if (block !=3D new_block &&
-             !strcmp(block->idstr, new_block->idstr)) {
-@@ -2095,7 +2090,6 @@ void qemu_ram_set_idstr(RAMBlock *new_block, const =
-char *name, DeviceState *dev)
-             abort();
-         }
-     }
--    rcu_read_unlock();
- }
-=20
- /* Called with iothread lock held.  */
-@@ -2637,17 +2631,16 @@ RAMBlock *qemu_ram_block_from_host(void *ptr, boo=
-l round_offset,
-=20
-     if (xen_enabled()) {
-         ram_addr_t ram_addr;
--        rcu_read_lock();
-+        RCU_READ_LOCK_AUTO;
-         ram_addr =3D xen_ram_addr_from_mapcache(ptr);
-         block =3D qemu_get_ram_block(ram_addr);
-         if (block) {
-             *offset =3D ram_addr - block->offset;
-         }
--        rcu_read_unlock();
-         return block;
-     }
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-     block =3D atomic_rcu_read(&ram_list.mru_block);
-     if (block && block->host && host - block->host < block->max_length) =
-{
-         goto found;
-@@ -2663,7 +2656,6 @@ RAMBlock *qemu_ram_block_from_host(void *ptr, bool =
-round_offset,
-         }
-     }
-=20
--    rcu_read_unlock();
-     return NULL;
-=20
- found:
-@@ -2671,7 +2663,6 @@ found:
-     if (round_offset) {
-         *offset &=3D TARGET_PAGE_MASK;
-     }
--    rcu_read_unlock();
-     return block;
- }
-=20
-@@ -3380,10 +3371,9 @@ MemTxResult address_space_read_full(AddressSpace *=
-as, hwaddr addr,
-     FlatView *fv;
-=20
-     if (len > 0) {
--        rcu_read_lock();
-+        RCU_READ_LOCK_AUTO;
-         fv =3D address_space_to_flatview(as);
-         result =3D flatview_read(fv, addr, attrs, buf, len);
--        rcu_read_unlock();
-     }
-=20
-     return result;
-@@ -3397,10 +3387,9 @@ MemTxResult address_space_write(AddressSpace *as, =
-hwaddr addr,
-     FlatView *fv;
-=20
-     if (len > 0) {
--        rcu_read_lock();
-+        RCU_READ_LOCK_AUTO;
-         fv =3D address_space_to_flatview(as);
-         result =3D flatview_write(fv, addr, attrs, buf, len);
--        rcu_read_unlock();
-     }
-=20
-     return result;
-@@ -3440,7 +3429,7 @@ static inline MemTxResult address_space_write_rom_i=
-nternal(AddressSpace *as,
-     hwaddr addr1;
-     MemoryRegion *mr;
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-     while (len > 0) {
-         l =3D len;
-         mr =3D address_space_translate(as, addr, &addr1, &l, true, attrs=
-);
-@@ -3465,7 +3454,6 @@ static inline MemTxResult address_space_write_rom_i=
-nternal(AddressSpace *as,
-         buf +=3D l;
-         addr +=3D l;
-     }
--    rcu_read_unlock();
-     return MEMTX_OK;
- }
-=20
-@@ -3610,10 +3598,9 @@ bool address_space_access_valid(AddressSpace *as, =
-hwaddr addr,
-     FlatView *fv;
-     bool result;
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-     fv =3D address_space_to_flatview(as);
-     result =3D flatview_access_valid(fv, addr, len, is_write, attrs);
--    rcu_read_unlock();
-     return result;
- }
-=20
-@@ -3668,13 +3655,12 @@ void *address_space_map(AddressSpace *as,
-     }
-=20
-     l =3D len;
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-     fv =3D address_space_to_flatview(as);
-     mr =3D flatview_translate(fv, addr, &xlat, &l, is_write, attrs);
-=20
-     if (!memory_access_is_direct(mr, is_write)) {
-         if (atomic_xchg(&bounce.in_use, true)) {
--            rcu_read_unlock();
-             return NULL;
-         }
-         /* Avoid unbounded allocations */
-@@ -3690,7 +3676,6 @@ void *address_space_map(AddressSpace *as,
-                                bounce.buffer, l);
-         }
-=20
--        rcu_read_unlock();
-         *plen =3D l;
-         return bounce.buffer;
-     }
-@@ -3700,7 +3685,6 @@ void *address_space_map(AddressSpace *as,
-     *plen =3D flatview_extend_translation(fv, addr, len, mr, xlat,
-                                         l, is_write, attrs);
-     ptr =3D qemu_ram_ptr_length(mr->ram_block, xlat, plen, true);
--    rcu_read_unlock();
-=20
-     return ptr;
- }
-@@ -3968,13 +3952,12 @@ bool cpu_physical_memory_is_io(hwaddr phys_addr)
-     hwaddr l =3D 1;
-     bool res;
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-     mr =3D address_space_translate(&address_space_memory,
-                                  phys_addr, &phys_addr, &l, false,
-                                  MEMTXATTRS_UNSPECIFIED);
-=20
-     res =3D !(memory_region_is_ram(mr) || memory_region_is_romd(mr));
--    rcu_read_unlock();
-     return res;
- }
-=20
-@@ -3983,14 +3966,13 @@ int qemu_ram_foreach_block(RAMBlockIterFunc func,=
- void *opaque)
-     RAMBlock *block;
-     int ret =3D 0;
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-     RAMBLOCK_FOREACH(block) {
-         ret =3D func(block, opaque);
-         if (ret) {
-             break;
-         }
-     }
--    rcu_read_unlock();
-     return ret;
- }
-=20
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index a327a80cfe..38f3aaffbd 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -240,7 +240,7 @@ static inline bool cpu_physical_memory_all_dirty(ram_=
-addr_t start,
-     end =3D TARGET_PAGE_ALIGN(start + length) >> TARGET_PAGE_BITS;
-     page =3D start >> TARGET_PAGE_BITS;
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-=20
-     blocks =3D atomic_rcu_read(&ram_list.dirty_memory[client]);
-=20
-@@ -262,8 +262,6 @@ static inline bool cpu_physical_memory_all_dirty(ram_=
-addr_t start,
-         base +=3D DIRTY_MEMORY_BLOCK_SIZE;
-     }
-=20
--    rcu_read_unlock();
--
-     return dirty;
- }
-=20
-@@ -315,13 +313,11 @@ static inline void cpu_physical_memory_set_dirty_fl=
-ag(ram_addr_t addr,
-     idx =3D page / DIRTY_MEMORY_BLOCK_SIZE;
-     offset =3D page % DIRTY_MEMORY_BLOCK_SIZE;
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-=20
-     blocks =3D atomic_rcu_read(&ram_list.dirty_memory[client]);
-=20
-     set_bit_atomic(offset, blocks->blocks[idx]);
--
--    rcu_read_unlock();
- }
-=20
- static inline void cpu_physical_memory_set_dirty_range(ram_addr_t start,
-diff --git a/memory.c b/memory.c
-index 61a254c3f9..5bdde7cebb 100644
---- a/memory.c
-+++ b/memory.c
-@@ -799,14 +799,13 @@ FlatView *address_space_get_flatview(AddressSpace *=
-as)
- {
-     FlatView *view;
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-     do {
-         view =3D address_space_to_flatview(as);
-         /* If somebody has replaced as->current_map concurrently,
-          * flatview_ref returns false.
-          */
-     } while (!flatview_ref(view));
--    rcu_read_unlock();
-     return view;
- }
-=20
-@@ -2177,12 +2176,11 @@ int memory_region_get_fd(MemoryRegion *mr)
- {
-     int fd;
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-     while (mr->alias) {
-         mr =3D mr->alias;
-     }
-     fd =3D mr->ram_block->fd;
--    rcu_read_unlock();
-=20
-     return fd;
- }
-@@ -2192,14 +2190,13 @@ void *memory_region_get_ram_ptr(MemoryRegion *mr)
-     void *ptr;
-     uint64_t offset =3D 0;
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-     while (mr->alias) {
-         offset +=3D mr->alias_offset;
-         mr =3D mr->alias;
-     }
-     assert(mr->ram_block);
-     ptr =3D qemu_map_ram_ptr(mr->ram_block, offset);
--    rcu_read_unlock();
-=20
-     return ptr;
- }
-@@ -2589,12 +2586,11 @@ MemoryRegionSection memory_region_find(MemoryRegi=
-on *mr,
-                                        hwaddr addr, uint64_t size)
- {
-     MemoryRegionSection ret;
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-     ret =3D memory_region_find_rcu(mr, addr, size);
-     if (ret.mr) {
-         memory_region_ref(ret.mr);
-     }
--    rcu_read_unlock();
-     return ret;
- }
-=20
-@@ -2602,9 +2598,8 @@ bool memory_region_present(MemoryRegion *container,=
- hwaddr addr)
- {
-     MemoryRegion *mr;
-=20
--    rcu_read_lock();
-+    RCU_READ_LOCK_AUTO;
-     mr =3D memory_region_find_rcu(container, addr, 1).mr;
--    rcu_read_unlock();
-     return mr && mr !=3D container;
- }
-=20
---=20
-2.21.0
+I was able to cause the hung once every 3 or 4 runs. I have already ran
+qemu-img convert more than 30 times now and couldn't reproduce it again.
 
+Next step is to play with the barriers and check why existing ones
+aren't enough for ordering access to ctx->notify_me ... or should I
+try/do something else in your opinion ?
+
+This arch/machine (Huawei D06):
+
+$ lscpu
+Architecture:        aarch64
+Byte Order:          Little Endian
+CPU(s):              96
+On-line CPU(s) list: 0-95
+Thread(s) per core:  1
+Core(s) per socket:  48
+Socket(s):           2
+NUMA node(s):        4
+Vendor ID:           0x48
+Model:               0
+Stepping:            0x0
+CPU max MHz:         2000.0000
+CPU min MHz:         200.0000
+BogoMIPS:            200.00
+L1d cache:           64K
+L1i cache:           64K
+L2 cache:            512K
+L3 cache:            32768K
+NUMA node0 CPU(s):   0-23
+NUMA node1 CPU(s):   24-47
+NUMA node2 CPU(s):   48-71
+NUMA node3 CPU(s):   72-95
+Flags:               fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics
+cpuid asimdrdm dcpop
+
+----
+
+diff --git a/include/block/aio.h b/include/block/aio.h
+index 0ca25dfec6..0724086d91 100644
+--- a/include/block/aio.h
++++ b/include/block/aio.h
+@@ -84,6 +84,7 @@ struct AioContext {
+      * dispatch phase, hence a simple counter is enough for them.
+      */
+     uint32_t notify_me;
++    QemuMutex notify_me_lcktest;
+
+     /* A lock to protect between QEMUBH and AioHandler adders and deleter,
+      * and to ensure that no callbacks are removed while we're walking and
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 51c41ed3c9..031d6e2997 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -529,7 +529,9 @@ static bool run_poll_handlers(AioContext *ctx,
+int64_t max_ns, int64_t *timeout)
+     bool progress;
+     int64_t start_time, elapsed_time;
+
++    qemu_mutex_lock(&ctx->notify_me_lcktest);
+     assert(ctx->notify_me);
++    qemu_mutex_unlock(&ctx->notify_me_lcktest);
+     assert(qemu_lockcnt_count(&ctx->list_lock) > 0);
+
+     trace_run_poll_handlers_begin(ctx, max_ns, *timeout);
+@@ -601,8 +603,10 @@ bool aio_poll(AioContext *ctx, bool blocking)
+      * so disable the optimization now.
+      */
+     if (blocking) {
++        qemu_mutex_lock(&ctx->notify_me_lcktest);
+         assert(in_aio_context_home_thread(ctx));
+         atomic_add(&ctx->notify_me, 2);
++        qemu_mutex_unlock(&ctx->notify_me_lcktest);
+     }
+
+     qemu_lockcnt_inc(&ctx->list_lock);
+@@ -647,8 +651,10 @@ bool aio_poll(AioContext *ctx, bool blocking)
+     }
+
+     if (blocking) {
++        qemu_mutex_lock(&ctx->notify_me_lcktest);
+         atomic_sub(&ctx->notify_me, 2);
+         aio_notify_accept(ctx);
++        qemu_mutex_unlock(&ctx->notify_me_lcktest);
+     }
+
+     /* Adjust polling time */
+diff --git a/util/async.c b/util/async.c
+index c10642a385..140e1e86f5 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -221,7 +221,9 @@ aio_ctx_prepare(GSource *source, gint    *timeout)
+ {
+     AioContext *ctx = (AioContext *) source;
+
++    qemu_mutex_lock(&ctx->notify_me_lcktest);
+     atomic_or(&ctx->notify_me, 1);
++    qemu_mutex_unlock(&ctx->notify_me_lcktest);
+
+     /* We assume there is no timeout already supplied */
+     *timeout = qemu_timeout_ns_to_ms(aio_compute_timeout(ctx));
+@@ -239,8 +241,10 @@ aio_ctx_check(GSource *source)
+     AioContext *ctx = (AioContext *) source;
+     QEMUBH *bh;
+
++    qemu_mutex_lock(&ctx->notify_me_lcktest);
+     atomic_and(&ctx->notify_me, ~1);
+     aio_notify_accept(ctx);
++    qemu_mutex_unlock(&ctx->notify_me_lcktest);
+
+     for (bh = ctx->first_bh; bh; bh = bh->next) {
+         if (bh->scheduled) {
+@@ -346,11 +350,13 @@ void aio_notify(AioContext *ctx)
+     /* Write e.g. bh->scheduled before reading ctx->notify_me.  Pairs
+      * with atomic_or in aio_ctx_prepare or atomic_add in aio_poll.
+      */
+-    smp_mb();
++    //smp_mb();
++    qemu_mutex_lock(&ctx->notify_me_lcktest);
+     if (ctx->notify_me) {
+         event_notifier_set(&ctx->notifier);
+         atomic_mb_set(&ctx->notified, true);
+     }
++    qemu_mutex_unlock(&ctx->notify_me_lcktest);
+ }
+
+ void aio_notify_accept(AioContext *ctx)
+@@ -424,6 +430,8 @@ AioContext *aio_context_new(Error **errp)
+     ctx->co_schedule_bh = aio_bh_new(ctx, co_schedule_bh_cb, ctx);
+     QSLIST_INIT(&ctx->scheduled_coroutines);
+
++    qemu_rec_mutex_init(&ctx->notify_me_lcktest);
++
+     aio_set_event_notifier(ctx, &ctx->notifier,
+                            false,
+                            (EventNotifierHandler *)
 
