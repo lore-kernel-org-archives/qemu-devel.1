@@ -4,76 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6040ECDE20
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:40:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63965ECDE27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:42:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FF08208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:40:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C600208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:42:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="Ey6ws2p5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FF08208E4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="FEmjz2VQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C600208E4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7xEt-0003C6-Kl
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:40:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48417)
+	id 1i7xGZ-00056I-Bn
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:42:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49032)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1i7xBz-00087a-6p
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:37:32 -0400
+ (envelope-from <aik@ozlabs.ru>) id 1i7xFS-0004Aq-1I
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:41:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1i7xBw-0002Na-SD
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:37:30 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:40937)
+ (envelope-from <aik@ozlabs.ru>) id 1i7xFP-0003eI-SO
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:41:04 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:35626)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1i7xBw-0002Mk-AX
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:37:28 -0400
-Received: by mail-pf1-x442.google.com with SMTP id x127so13116675pfb.7
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 00:37:27 -0700 (PDT)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1i7xFP-0003dx-Kd
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:41:03 -0400
+Received: by mail-pl1-x644.google.com with SMTP id s17so4887459plp.2
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 00:41:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
  h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=RqzwvCDKWHB9wabOiS4DteFPIFeeSFV4KEfUxJp5l9A=;
- b=Ey6ws2p5+r0T6jEBxmjRr8aGvFimQd6ApTujnXqLwf6KfzQiRjXP6KOc9z2Ec+kFF6
- 8y6qPvoy5u+MdZXBvEFeKI5VIZBydeufediNvo/xco4ptcBJ3X0B1UiMmL+7N7t/mC2C
- zJWBqbPPu5WiGTLpeIRBAjtk71/Tj5p/P5cBuzf1JypKm8nQC5OjTx9hFPEmJdJAihYf
- pxt/tFBh8eF87r4wswDImjWS6S70UGU+0buNyMQQp8M2JmXSVAosVV57ZOwtV6auiJEs
- M7nYjusYo9xyT4duoz8CO4DuhAwkc9XLhv8OTaXCQ6xZm5yuSK6hEJ1O7KpClWs+owL3
- fQ1Q==
+ bh=cNl/OCNav1gH8iQK1IZwVu0MCRT7BuxvZSYBEdjgv+w=;
+ b=FEmjz2VQWbtsSY0Wc8POl/wGXqMrKfevjiOqaq0kYoUZV2GRbNeVCh6kZ3GV34aeDk
+ MuEcwe/5X9O+ydH9hbbPClSfyuR873E13N4GR76WOF/NPnK8Bzu0xk2Lege5wcLqPmRn
+ bSCOHXjylvnkhj8/u0Har4+UtZoYdaYcqGcjsC5GLmf49WPj5AMREKuV3Xfih+StKnly
+ aMgaveb25DX5wNs2UCGUiZPMf5wAxYcMuxScp57wThzNCKA67ysSEQkXsy+MCNqitg2g
+ RbZji+47k30zHqATiSdHOJmWxK/nsfrAdeiOzj/KLDSIiBrjuQTvtknc3oO78Cz2S9l2
+ n+2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=RqzwvCDKWHB9wabOiS4DteFPIFeeSFV4KEfUxJp5l9A=;
- b=Vp0FRczPy9BZGdVuRrjqgISHGTDS7GQ5Hy43ZOL4VmwPcSRgePZH49UqFk3hDtA3z+
- Xcql1QVX2xClAsQHXKnfcO8Hb2xuCYqpjA+DWgF2vr0/aOcLHm2zl6iuH1szxmyfCzc1
- VMXfTqRSz21yOoeDzNMdAruv+QtSlvD0x9ycDjHmYFjVML1iD+S97UL2OV+6DbAl0a1X
- 22+VUw1vo9Fg65z5quD76z7xKMcHxmTGjSqovm+xh0SYApzUpA+mzj1/VW7ggLUV+Ehd
- vvxSXjeSLefI3qXhRpkn+Bcp+SdaRBI1L0DQmxCIOpFAmPX2RtyIVNF0RzR14M/ss4m8
- AORA==
-X-Gm-Message-State: APjAAAUagIQb+0evDZdDxelL3wrA5zhdK8pvfChiIj7GwImImXV8garg
- VSC78dCzi5LHlbOUMmAchSjJ0g==
-X-Google-Smtp-Source: APXvYqye/QwVkPIGZydNIwfgHjFnj+eFfGgWvkITofnotXpGnJUdR4H1gTVQl9GbCZHaBv52ebfDyg==
-X-Received: by 2002:a62:3083:: with SMTP id
- w125mr41099037pfw.102.1568187446676; 
- Wed, 11 Sep 2019 00:37:26 -0700 (PDT)
+ bh=cNl/OCNav1gH8iQK1IZwVu0MCRT7BuxvZSYBEdjgv+w=;
+ b=TNK2rAVeVG5kfBe6wBoZKCMaQ7Klmbw9+PqdnE5xtUQhChcch7zXCCG/4K1UZV68pD
+ i6SFG1eT2wSwe9V8YL3sC1wgk0uhlWS5/MXyu45PcCbLkGAH4X5w5k8T/BGaRzvfEFCJ
+ B5PjCGdzHI8Fj+A+7kgOibppLBR1MlpBBy9LRwkyrNEXQ/X32GkNqRcVWU0zxtpIibQ9
+ x/PWFO7T5gNoWdObzbEyOUX09FsrOvywc7oQqX4H+P2zzUBIroLk203LupHpR2DKB5Ts
+ 52a/2jHcCL598UQYkvtF2teZbuj896gNdNxDvYtqDqVupkNQVYbQnMfK5DZ3WCUPrLPF
+ pc3A==
+X-Gm-Message-State: APjAAAXfKEiQfwP3uisdnjFmTFB8G3CYL+t2bXeeW25EK/ihFdwgtqoU
+ iNaWJ0mw5iraJUoVMVxgP/YWzw==
+X-Google-Smtp-Source: APXvYqyYKa4+f7XX0fkWCQDRHkA2OpkcoJDaw/qbUVyun4Lo3a872Wgt8YHMPsQ+w7cTA0HqYIKraQ==
+X-Received: by 2002:a17:902:6e17:: with SMTP id
+ u23mr13200052plk.205.1568187662452; 
+ Wed, 11 Sep 2019 00:41:02 -0700 (PDT)
 Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id y17sm8184884pfo.171.2019.09.11.00.37.23
+ by smtp.gmail.com with ESMTPSA id z29sm30922817pff.23.2019.09.11.00.40.59
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 11 Sep 2019 00:37:26 -0700 (PDT)
+ Wed, 11 Sep 2019 00:41:01 -0700 (PDT)
 To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
  qemu-ppc@nongnu.org
 References: <20190911040452.8341-1-david@gibson.dropbear.id.au>
- <20190911040452.8341-2-david@gibson.dropbear.id.au>
+ <20190911040452.8341-8-david@gibson.dropbear.id.au>
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
 Autocrypt: addr=aik@ozlabs.ru; keydata=
  mQINBE+rT0sBEADFEI2UtPRsLLvnRf+tI9nA8T91+jDK3NLkqV+2DKHkTGPP5qzDZpRSH6mD
@@ -148,20 +148,20 @@ Autocrypt: addr=aik@ozlabs.ru; keydata=
  c7E5M+/NpslPCmYnDjs5qg0/3ihh6XuOGggZQOqrYPC3PnsNs3NxirwOkVPQgO6mXxpuifvJ
  DG9EMkK8IBXnLulqVk54kf7fE0jT/d8RTtJIA92GzsgdK2rpT1MBKKVffjRFGwN7nQVOzi4T
  XrB5p+6ML7Bd84xOEGsj/vdaXmz1esuH7BOZAGEZfLRCHJ0GVCSssg==
-Message-ID: <2b44fdd2-a3d6-0973-7c4b-977fdcd1e936@ozlabs.ru>
-Date: Wed, 11 Sep 2019 17:37:20 +1000
+Message-ID: <b727dcb2-3cdd-77f9-b772-3253e52f2133@ozlabs.ru>
+Date: Wed, 11 Sep 2019 17:40:58 +1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.0
 MIME-Version: 1.0
-In-Reply-To: <20190911040452.8341-2-david@gibson.dropbear.id.au>
+In-Reply-To: <20190911040452.8341-8-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH 1/7] spapr: Simplify handling of pre ISA
- 3.0 guest workaround handling
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: Re: [Qemu-devel] [PATCH 7/7] spapr: Perform machine reset in a more
+ sensible order
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -181,105 +181,98 @@ Sender: "Qemu-devel"
 
 
 On 11/09/2019 14:04, David Gibson wrote:
-> Certain old guest versions don't understand the radix MMU introduced with
-> POWER ISA 3.0, but incorrectly select it if presented with the option at
-> CAS time.  We workaround this in qemu by explicitly excluding the radix
-> (and other ISA 3.0 linked) options if the guest doesn't explicitly note
-> support for ISA 3.0.
+> We've made several changes in the past to the machine reset order to fix
+> specific problems.  However, we've ended up with an order that doesn't make
+> a lot of logical sense.  This is an attempt to rectify this.
 > 
-> This is handled by the 'cas_legacy_guest_workaround' flag, which is pretty
-> vague.  Rename it to 'cas_pre_isa3_guest' to be clearer about what it's for.
-> 
-> In addition, we unnecessarily call spapr_populate_pa_features() with
-> different options when initially constructing the device tree and when
-> adjusting it at CAS time.  At the initial construct time cas_pre_isa3_guest
-> is already false, so we can still use the flag, rather than explicitly
-> overriding it to be false at the callsite.
+> First we reset global CAS options, since that should depend on nothing
+> else.  Then we reset the CPUs, which shouldn't depend on external devices.
+> Then the irq subsystem, then the bulk of devices (which might rely on
+> irqs).  Finally we set up the entry state ready for boot, which could
+> potentially rely on a bunch of other things.
 > 
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
 
-
-Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-
+Breaks console on P8 and asserts on rebooting a P9 guest.
 
 
 
 > ---
->  hw/ppc/spapr.c         | 10 ++++------
->  hw/ppc/spapr_hcall.c   |  3 +--
->  include/hw/ppc/spapr.h |  2 +-
->  3 files changed, 6 insertions(+), 9 deletions(-)
+>  hw/ppc/spapr.c | 47 +++++++++++++++++++++++++----------------------
+>  1 file changed, 25 insertions(+), 22 deletions(-)
 > 
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 7124053b43..c551001f86 100644
+> index 5a919a6cc1..1560a11738 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -218,8 +218,7 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, PowerPCCPU *cpu)
->  /* Populate the "ibm,pa-features" property */
->  static void spapr_populate_pa_features(SpaprMachineState *spapr,
->                                         PowerPCCPU *cpu,
-> -                                       void *fdt, int offset,
-> -                                       bool legacy_guest)
-> +                                       void *fdt, int offset)
->  {
->      uint8_t pa_features_206[] = { 6, 0,
->          0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
-> @@ -285,7 +284,7 @@ static void spapr_populate_pa_features(SpaprMachineState *spapr,
->      if ((spapr_get_cap(spapr, SPAPR_CAP_HTM) != 0) && pa_size > 24) {
->          pa_features[24] |= 0x80;    /* Transactional memory support */
->      }
-> -    if (legacy_guest && pa_size > 40) {
-> +    if (spapr->cas_pre_isa3_guest && pa_size > 40) {
->          /* Workaround for broken kernels that attempt (guest) radix
->           * mode when they can't handle it, if they see the radix bit set
->           * in pa-features. So hide it from them. */
-> @@ -348,8 +347,7 @@ static int spapr_fixup_cpu_dt(void *fdt, SpaprMachineState *spapr)
->              return ret;
->          }
+> @@ -1724,6 +1724,28 @@ static void spapr_machine_reset(MachineState *machine)
+>      void *fdt;
+>      int rc;
 >  
-> -        spapr_populate_pa_features(spapr, cpu, fdt, offset,
-> -                                   spapr->cas_legacy_guest_workaround);
-> +        spapr_populate_pa_features(spapr, cpu, fdt, offset);
->      }
->      return ret;
->  }
-> @@ -551,7 +549,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
->                            page_sizes_prop, page_sizes_prop_size)));
+> +    /*
+> +     * If this reset wasn't generated by CAS, we should reset our
+> +     * negotiated options and start from scratch
+> +     */
+> +    if (!spapr->cas_reboot) {
+> +        spapr_ovec_cleanup(spapr->ov5_cas);
+> +        spapr->ov5_cas = spapr_ovec_new();
+> +
+> +        ppc_set_compat_all(spapr->max_compat_pvr, &error_fatal);
+> +    }
+> +
+> +    /*
+> +     * There is no CAS under qtest. Simulate one to please the code that
+> +     * depends on spapr->ov5_cas. This is especially needed to test device
+> +     * unplug, so we do that before resetting the DRCs.
+> +     */
+> +    if (qtest_enabled()) {
+> +        spapr_ovec_cleanup(spapr->ov5_cas);
+> +        spapr->ov5_cas = spapr_ovec_clone(spapr->ov5);
+> +    }
+> +
+> +    /* Reset the CPUs */
+>      spapr_caps_apply(spapr);
+>  
+>      first_ppc_cpu = POWERPC_CPU(first_cpu);
+> @@ -1741,34 +1763,15 @@ static void spapr_machine_reset(MachineState *machine)
+>          spapr_setup_hpt_and_vrma(spapr);
 >      }
 >  
-> -    spapr_populate_pa_features(spapr, cpu, fdt, offset, false);
-> +    spapr_populate_pa_features(spapr, cpu, fdt, offset);
+> -    qemu_devices_reset();
+> -
+> -    /*
+> -     * If this reset wasn't generated by CAS, we should reset our
+> -     * negotiated options and start from scratch
+> -     */
+> -    if (!spapr->cas_reboot) {
+> -        spapr_ovec_cleanup(spapr->ov5_cas);
+> -        spapr->ov5_cas = spapr_ovec_new();
+> -
+> -        ppc_set_compat_all(spapr->max_compat_pvr, &error_fatal);
+> -    }
+> -
+> +    /* Reset IRQ subsystem */
+>      /*
+>       * This is fixing some of the default configuration of the XIVE
+>       * devices. To be called after the reset of the machine devices.
+>       */
+>      spapr_irq_reset(spapr, &error_fatal);
 >  
->      _FDT((fdt_setprop_cell(fdt, offset, "ibm,chip-id",
->                             cs->cpu_index / vcpus_per_socket)));
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 23e4bdb829..3d3a67149a 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1765,8 +1765,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
->              exit(EXIT_FAILURE);
->          }
->      }
-> -    spapr->cas_legacy_guest_workaround = !spapr_ovec_test(ov1_guest,
-> -                                                          OV1_PPC_3_00);
-> +    spapr->cas_pre_isa3_guest = !spapr_ovec_test(ov1_guest, OV1_PPC_3_00);
->      spapr_ovec_cleanup(ov1_guest);
->      if (!spapr->cas_reboot) {
->          /* If spapr_machine_reset() did not set up a HPT but one is necessary
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 03111fd55b..dfec8e8e76 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -175,7 +175,7 @@ struct SpaprMachineState {
+> -    /*
+> -     * There is no CAS under qtest. Simulate one to please the code that
+> -     * depends on spapr->ov5_cas. This is especially needed to test device
+> -     * unplug, so we do that before resetting the DRCs.
+> -     */
+> -    if (qtest_enabled()) {
+> -        spapr_ovec_cleanup(spapr->ov5_cas);
+> -        spapr->ov5_cas = spapr_ovec_clone(spapr->ov5);
+> -    }
+> +    /* Reset other devices */
+> +    qemu_devices_reset();
 >  
->      /* ibm,client-architecture-support option negotiation */
->      bool cas_reboot;
-> -    bool cas_legacy_guest_workaround;
-> +    bool cas_pre_isa3_guest;
->      SpaprOptionVector *ov5;         /* QEMU-supported option vectors */
->      SpaprOptionVector *ov5_cas;     /* negotiated (via CAS) option vectors */
->      uint32_t max_compat_pvr;
+>      /* DRC reset may cause a device to be unplugged. This will cause troubles
+>       * if this device is used by another device (eg, a running vhost backend
 > 
 
 -- 
