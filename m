@@ -6,72 +6,65 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44C90C49ED7
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 02:26:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57FC3C49ED7
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 02:33:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D4C32168B
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 02:26:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D4C32168B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernelpath.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2D20A2171F
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 02:33:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D20A2171F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7sLH-00073l-U2
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 22:26:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60668)
+	id 1i7sRg-0000fb-Am
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 22:33:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33240)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i7sKE-0006CK-JY
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 22:25:43 -0400
+ (envelope-from <no-reply@patchew.org>) id 1i7sR1-0000Cw-MJ
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 22:32:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i7sKD-0000SK-G4
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 22:25:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40416)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i7sKD-0000S3-Aj
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 22:25:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i7sKB-0001Lp-Vz
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 02:25:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id EBEF82E80C3
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 02:25:39 +0000 (UTC)
+ (envelope-from <no-reply@patchew.org>) id 1i7sR0-0003DK-2O
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 22:32:43 -0400
+Resent-Date: Tue, 10 Sep 2019 22:32:43 -0400
+Resent-Message-Id: <E1i7sR0-0003DK-2O@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21592)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1i7sQz-0003Cz-PN
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 22:32:42 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1568169126; cv=none; d=zoho.com; s=zohoarc; 
+ b=eY1gbvoC4ipWcxlJU6rAX5anBcPmjplpCQZOB8suX+Vuui3DmqbzBLxByvpZ1+VzK7pteOhMPLao9l+8T3C9BL6xmtDSfuC6WlNVFkSbl5FbEtQ762eLPD9St+DzDKfJ2h9PCoJ+Eyq2tf9yOzCRc+54VsQahyHNsGhOLTl5zZA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1568169126;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=7ELa0FLrcNwSkkvRsxrPh2rM3WfUj2gQmb1F4d5/TWo=; 
+ b=W1vXIJws+NgrLTzUrKtWDlCMY2yjmCg7XR+lpJTE0s+WtZ73XUQ/qeX0IuPPSyP3q8EiVxxwVyUokRKI9xgeqVXaVVpQwRb19w/QtYyuMX1G5I2Q8FNgdZs8TS5u6diUbjYSBLSM4xM5tStLs6vChm4/gKBRNs311ZudCBXSGSc=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1568169124842309.21555455516784;
+ Tue, 10 Sep 2019 19:32:04 -0700 (PDT)
+In-Reply-To: <20190910163600.19971-1-laurent@vivier.eu>
+Message-ID: <156816912377.15929.16112039786234048821@5dec9699b7de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Sep 2019 02:17:15 -0000
-From: Rafael David Tinoco <rafaeldtinoco@kernelpath.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=rafaeldtinoco@kernelpath.com; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=In Progress; importance=Medium; assignee=rafaeldtinoco@kernelpath.com; 
-X-Launchpad-Bug-Tags: qemu-img
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dannf jnsnow lizhengui rafaeldtinoco
-X-Launchpad-Bug-Reporter: dann frazier (dannf)
-X-Launchpad-Bug-Modifier: Rafael David Tinoco (rafaeldtinoco)
-References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <156816823555.17577.4600671535268246931.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19044";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0a797ab9171171923743e91aa22ae0204c88d3df
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: laurent@vivier.eu
+Date: Tue, 10 Sep 2019 19:32:04 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1805256] Re: qemu-img hangs on
- rcu_call_ready_event logic in Aarch64 when converting images
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PULL 00/15] Linux user for 4.2 patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,79 +73,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: jcmvbkbc@gmail.com, riku.voipio@iki.fi, qemu-devel@nongnu.org,
+ laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In comment #14, please disregard the second half of the issue, related
-to:
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxMDE2MzYwMC4xOTk3
+MS0xLWxhdXJlbnRAdml2aWVyLmV1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvMTVdIExpbnV4IHVzZXIg
+Zm9yIDQuMiBwYXRjaGVzCk1lc3NhZ2UtaWQ6IDIwMTkwOTEwMTYzNjAwLjE5OTcxLTEtbGF1cmVu
+dEB2aXZpZXIuZXUKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
+bi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Nj
+cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2ZWM0ZjY3IGxpbnV4LXVzZXI6
+IEFkZCBzdXBwb3J0IGZvciBGRFJFU0VULCBGRFJBV0NNRCwgRkRUV0FERExFLCBhbmQgRkRFSkVD
+VCBpb2N0bHMKZDZhY2Q1OSBsaW51eC11c2VyOiBBZGQgc3VwcG9ydCBmb3IgRkRNU0dPTiBhbmQg
+RkRNU0dPRkYgaW9jdGxzCjQ0ZWM3MWMgbGludXgtdXNlcjogQWRkIHN1cHBvcnQgZm9yIEZERkxV
+U0ggaW9jdGwKOWY2NWY4NiBsaW51eC11c2VyOiBBZGQgc3VwcG9ydCBmb3IgRklPR0VUT1dOIGFu
+ZCBGSU9TRVRPV04gaW9jdGxzCmI5NzMxNTYgbGludXgtdXNlcjogQWRkIHN1cHBvcnQgZm9yIFJO
+RFJFU0VFRENSTkcgaW9jdGwKNTZiZTA3NSBsaW51eC11c2VyOiBkcm9wIHJlZHVuZGFudCBoYW5k
+bGluZyBvZiBlbnZpcm9ubWVudCB2YXJpYWJsZXMKZDcyMzc3NiB0YXJnZXQveHRlbnNhOiBsaW51
+eC11c2VyOiBhZGQgY2FsbDAgQUJJIHN1cHBvcnQKYTJlNDllMiBsaW51eC11c2VyOiBTdXBwb3J0
+IGdkYiAncU9mZnNldHMnIHF1ZXJ5IGZvciBFTEYKNTM0MzU4NyBsaW51eC11c2VyL2FybTogQWRq
+dXN0IE1BWF9SRVNFUlZFRF9WQSBmb3IgTS1wcm9maWxlCjlmNWRlOWUgbGludXgtdXNlcjogUGFz
+cyBDUFVTdGF0ZSB0byBNQVhfUkVTRVJWRURfVkEKYWRmM2Y4ZSBsaW51eC11c2VyOiBhZGQgbWVt
+ZmRfY3JlYXRlCjc1NmE3ZTYgbGludXgtdXNlcjogZmFpbCBhbmQgcmVwb3J0IG9uIGJhZCBkZmls
+dGVyIHNwZWNzCjI4OTM5MTAgbGludXgtdXNlcjogZXJyb25lb3VzIGZkX3RyYW5zX3VucmVnaXN0
+ZXIgY2FsbAphOGM4YjIwIGxpbnV4LXVzZXI6IEFkZCBBVF9IV0NBUDIgZm9yIGFhcmNoNjQtbGlu
+dXgtdXNlcgozNjI3ZjBlIGxpbnV4LXVzZXI6IHJlbW92ZSB1c2VsZXNzIHZhcmlhYmxlCgo9PT0g
+T1VUUFVUIEJFR0lOID09PQoxLzE1IENoZWNraW5nIGNvbW1pdCAzNjI3ZjBlY2YyOWIgKGxpbnV4
+LXVzZXI6IHJlbW92ZSB1c2VsZXNzIHZhcmlhYmxlKQoyLzE1IENoZWNraW5nIGNvbW1pdCBhOGM4
+YjIwNTM3YjUgKGxpbnV4LXVzZXI6IEFkZCBBVF9IV0NBUDIgZm9yIGFhcmNoNjQtbGludXgtdXNl
+cikKMy8xNSBDaGVja2luZyBjb21taXQgMjg5MzkxMGYwNGQyIChsaW51eC11c2VyOiBlcnJvbmVv
+dXMgZmRfdHJhbnNfdW5yZWdpc3RlciBjYWxsKQpFUlJPUjogQXV0aG9yIGVtYWlsIGFkZHJlc3Mg
+aXMgbWFuZ2xlZCBieSB0aGUgbWFpbGluZyBsaXN0CiMyOiAKQXV0aG9yOiBTaHUtQ2h1biBXZW5n
+IHZpYSBRZW11LWRldmVsIDxxZW11LWRldmVsQG5vbmdudS5vcmc+Cgp0b3RhbDogMSBlcnJvcnMs
+IDAgd2FybmluZ3MsIDcgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy8xNSBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoKNC8xNSBDaGVja2luZyBjb21taXQgNzU2YTdlNmU5MjM3IChsaW51eC11c2Vy
+OiBmYWlsIGFuZCByZXBvcnQgb24gYmFkIGRmaWx0ZXIgc3BlY3MpCjUvMTUgQ2hlY2tpbmcgY29t
+bWl0IGFkZjNmOGVkMjBkYyAobGludXgtdXNlcjogYWRkIG1lbWZkX2NyZWF0ZSkKRVJST1I6IEF1
+dGhvciBlbWFpbCBhZGRyZXNzIGlzIG1hbmdsZWQgYnkgdGhlIG1haWxpbmcgbGlzdAojMjogCkF1
+dGhvcjogU2h1LUNodW4gV2VuZyB2aWEgUWVtdS1kZXZlbCA8cWVtdS1kZXZlbEBub25nbnUub3Jn
+PgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MiBsaW5lcyBjaGVja2VkCgpQYXRjaCA1
+LzE1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo2LzE1IENoZWNraW5nIGNvbW1pdCA5ZjVk
+ZTllNWMwOWUgKGxpbnV4LXVzZXI6IFBhc3MgQ1BVU3RhdGUgdG8gTUFYX1JFU0VSVkVEX1ZBKQo3
+LzE1IENoZWNraW5nIGNvbW1pdCA1MzQzNTg3NWFkMjIgKGxpbnV4LXVzZXIvYXJtOiBBZGp1c3Qg
+TUFYX1JFU0VSVkVEX1ZBIGZvciBNLXByb2ZpbGUpCjgvMTUgQ2hlY2tpbmcgY29tbWl0IGEyZTQ5
+ZTI2NzEwNiAobGludXgtdXNlcjogU3VwcG9ydCBnZGIgJ3FPZmZzZXRzJyBxdWVyeSBmb3IgRUxG
+KQpFUlJPUjogQXV0aG9yIGVtYWlsIGFkZHJlc3MgaXMgbWFuZ2xlZCBieSB0aGUgbWFpbGluZyBs
+aXN0CiMyOiAKQXV0aG9yOiBKb3NoIEt1bnogdmlhIFFlbXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9u
+Z251Lm9yZz4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgOCBsaW5lcyBjaGVja2VkCgpQ
+YXRjaCA4LzE1IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo5LzE1IENoZWNraW5nIGNvbW1p
+dCBkNzIzNzc2ZTAxYzEgKHRhcmdldC94dGVuc2E6IGxpbnV4LXVzZXI6IGFkZCBjYWxsMCBBQkkg
+c3VwcG9ydCkKMTAvMTUgQ2hlY2tpbmcgY29tbWl0IDU2YmUwNzVjNDM5MCAobGludXgtdXNlcjog
+ZHJvcCByZWR1bmRhbnQgaGFuZGxpbmcgb2YgZW52aXJvbm1lbnQgdmFyaWFibGVzKQoxMS8xNSBD
+aGVja2luZyBjb21taXQgYjk3MzE1NmE2NjU2IChsaW51eC11c2VyOiBBZGQgc3VwcG9ydCBmb3Ig
+Uk5EUkVTRUVEQ1JORyBpb2N0bCkKMTIvMTUgQ2hlY2tpbmcgY29tbWl0IDlmNjVmODY1ZGE1NCAo
+bGludXgtdXNlcjogQWRkIHN1cHBvcnQgZm9yIEZJT0dFVE9XTiBhbmQgRklPU0VUT1dOIGlvY3Rs
+cykKMTMvMTUgQ2hlY2tpbmcgY29tbWl0IDQ0ZWM3MWMyYjJhOCAobGludXgtdXNlcjogQWRkIHN1
+cHBvcnQgZm9yIEZERkxVU0ggaW9jdGwpCjE0LzE1IENoZWNraW5nIGNvbW1pdCBkNmFjZDU5ODE1
+MDQgKGxpbnV4LXVzZXI6IEFkZCBzdXBwb3J0IGZvciBGRE1TR09OIGFuZCBGRE1TR09GRiBpb2N0
+bHMpCjE1LzE1IENoZWNraW5nIGNvbW1pdCA2ZWM0ZjY3MTRhYzUgKGxpbnV4LXVzZXI6IEFkZCBz
+dXBwb3J0IGZvciBGRFJFU0VULCBGRFJBV0NNRCwgRkRUV0FERExFLCBhbmQgRkRFSkVDVCBpb2N0
+bHMpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
+CgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIw
+MTkwOTEwMTYzNjAwLjE5OTcxLTEtbGF1cmVudEB2aXZpZXIuZXUvdGVzdGluZy5jaGVja3BhdGNo
+Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
+aGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
+cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-       0x0000aaaaaabd4100 <+16>: cbz w1, 0xaaaaaabd4108 <qemu_event_reset+2=
-4>
-       0x0000aaaaaabd4104 <+20>: ret
-       0x0000aaaaaabd4108 <+24>: ldaxr w1, [x0]
-       0x0000aaaaaabd410c <+28>: orr w1, w1, #0x1
-    =3D> 0x0000aaaaaabd4110 <+32>: stlxr w2, w1, [x0]
-       0x0000aaaaaabd4114 <+36>: cbnz w2, 0xaaaaaabd4108
-
-Duh! This is just a regular load/xor/store logic for atomic_or() inside
-qemu_event_reset().
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805256
-
-Title:
-  qemu-img hangs on rcu_call_ready_event logic in Aarch64 when
-  converting images
-
-Status in QEMU:
-  In Progress
-Status in qemu package in Ubuntu:
-  In Progress
-
-Bug description:
-  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
-  frequently hangs (~50% of the time) with this command:
-
-  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
-
-  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
-  qcow2->qcow2 conversion happens to be something uvtool does every time
-  it fetches images.
-
-  Once hung, attaching gdb gives the following backtrace:
-
-  (gdb) bt
-  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
-274213760, =
-
-      timeout=3D<optimized out>, timeout@entry=3D0x0, sigmask=3D0xffffc123b=
-950)
-      at ../sysdeps/unix/sysv/linux/ppoll.c:39
-  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>, =
-
-      __fds=3D<optimized out>) at /usr/include/aarch64-linux-gnu/bits/poll2=
-.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, =
-
-      timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.c:322
-  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
-      at util/main-loop.c:233
-  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
-  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
-g.c:1980
-  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
-img.c:2456
-  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:4975
-
-  Reproduced w/ latest QEMU git (@ 53744e0a182)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805256/+subscriptions
 
