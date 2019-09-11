@@ -3,49 +3,46 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E21BDC49ED7
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 01:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18C5FC49ED7
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 01:24:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA18420872
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 01:18:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA18420872
+	by mail.kernel.org (Postfix) with ESMTPS id E152720872
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 01:24:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E152720872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7rGi-0003Zc-PJ
-	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 21:18:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50549)
+	id 1i7rN9-0005MQ-2j
+	for qemu-devel@archiver.kernel.org; Tue, 10 Sep 2019 21:24:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51318)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i7rFq-0002zU-OM
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 21:17:07 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i7rLu-0004gQ-Cx
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 21:23:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i7rFp-000460-PJ
- for qemu-devel@nongnu.org; Tue, 10 Sep 2019 21:17:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55710)
+ (envelope-from <jsnow@redhat.com>) id 1i7rLt-000884-5s
+ for qemu-devel@nongnu.org; Tue, 10 Sep 2019 21:23:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56080)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i7rFm-00041u-10; Tue, 10 Sep 2019 21:17:02 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1i7rLq-00086q-DX; Tue, 10 Sep 2019 21:23:18 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 425A310C6971;
- Wed, 11 Sep 2019 01:17:01 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 647BB1918655;
+ Wed, 11 Sep 2019 01:23:17 +0000 (UTC)
 Received: from [10.18.17.203] (dhcp-17-203.bos.redhat.com [10.18.17.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7000D19C6A;
- Wed, 11 Sep 2019 01:17:00 +0000 (UTC)
-To: Maxim Levitsky <mlevitsk@redhat.com>, Max Reitz <mreitz@redhat.com>,
- qemu-block@nongnu.org
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AE6D060606;
+ Wed, 11 Sep 2019 01:23:16 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20190910124136.10565-1-mreitz@redhat.com>
- <20190910124136.10565-4-mreitz@redhat.com>
- <781db018f83aa375b9a7476028c7ef8c4c24d848.camel@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -122,22 +119,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <8df6a60c-1930-c538-de88-20ffac45a127@redhat.com>
-Date: Tue, 10 Sep 2019 21:16:59 -0400
+Message-ID: <6be4f0c2-79e8-3fa9-9710-6d777534608a@redhat.com>
+Date: Tue, 10 Sep 2019 21:23:16 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <781db018f83aa375b9a7476028c7ef8c4c24d848.camel@redhat.com>
+In-Reply-To: <20190910124136.10565-1-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Wed, 11 Sep 2019 01:17:01 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.70]); Wed, 11 Sep 2019 01:23:17 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 3/7] curl: Check completion
- in curl_multi_do()
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] block/curl: Fix hang and potential
+ crash
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -157,43 +154,101 @@ Sender: "Qemu-devel"
 
 
 
-On 9/10/19 12:11 PM, Maxim Levitsky wrote:
-> On Tue, 2019-09-10 at 14:41 +0200, Max Reitz wrote:
->> While it is more likely that transfers complete after some file
->> descriptor has data ready to read, we probably should not rely on it.
->> Better be safe than sorry and call curl_multi_check_completion() in
->> curl_multi_do(), too, just like it is done in curl_multi_read().
->>
->> With this change, curl_multi_do() and curl_multi_read() are actually the
->> same, so drop curl_multi_read() and use curl_multi_do() as the sole FD
->> handler.
-> 
-> I understand the reasoning, but I still a bit worry that this
-> could paper over some bug/race in the future.
-> If curl asks us only to deal with write, that would mean
-> that it doesn't expect any data to be received.
-> 
-> Do you by a chance have an example, of this patch
-> affecting the code? Maybe when a unexpected error reply
-> is received from the server?
-> 
-> I don't really know the CURL library, so I probably missed
-> something important.
-> 
-> Other than that,
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> 
+On 9/10/19 8:41 AM, Max Reitz wrote:
+> Hi,
+>=20
+> As reported in https://bugzilla.redhat.com/show_bug.cgi?id=3D1740193, o=
+ur
+> curl block driver can spontaneously hang.  This becomes visible e.g.
+> when reading compressed qcow2 images:
+>=20
+> $ qemu-img convert -p -O raw -n \
+>   https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img =
+\
+>   null-co://
+>=20
+> (Hangs at 74.21 %, usually.)
+>=20
+> A more direct way is:
+>=20
+> $ qemu-img bench -f raw http://download.qemu.org/qemu-4.1.0.tar.xz \
+>     -d 1 -S 524288 -c 2
+>=20
+> (Which simply performs two requests, and the second one hangs.  You can
+> use any HTTP resource (probably FTP, too) you=E2=80=99d like that is at=
+ least
+> 1 MB in size.)
+>=20
+> It turns out that this is because cURL 7.59.0 has added a protective
+> feature against some misuse we had in our code: curl_multi_add_handle()
+> must not be called from within a cURL callback, but in some cases we
+> did.  As of 7.59.0, this fails, our new request is not registered and
+> the I/O request stalls.  This is fixed by patch 6.
+>=20
+> Patch 7 makes us check for curl_multi_add_handle()=E2=80=99s return cod=
+e,
+> because if we had done that before, debugging would have been much
+> simpler.
+>=20
+>=20
+> On the way to fixing it, I had a look over the whole cURL code and foun=
+d
+> a suspicious QLIST_FOREACH_SAFE() loop that actually does not seem very
+> safe at all.  I think this may lead to crashes, although I have never
+> seen any myself.  https://bugzilla.redhat.com/show_bug.cgi?id=3D1744602=
+#c5
+> shows one in exactly the function in question, so I think it actually i=
+s
+> a problem.
+>=20
+> This is fixed by patch 5, patches 1, 2, and 4 prepare for it.
+>=20
+> (Patch 3 is kind of a misc patch that should ensure that we always end
+> up calling curl_multi_check_completion() whenever a request might have
+> been completed.)
+>=20
+>=20
+> v2:
+> - Patch 2: Remove the socket from the list only add the end of the
+>            function (yielding a nicer 5+/5- diff stat)
+> - Patch 3: Added
+> - Patch 4: Rebased on patch 3, and s/socket/ready_socket/ in one place
+> - Patch 5: Rebased on the changed patch 4
+>=20
+>=20
+> git-backport-diff against v1:
+>=20
+> Key:
+> [----] : patches are identical
+> [####] : number of functional differences between upstream/downstream p=
+atch
+> [down] : patch is downstream-only
+> The flags [FC] indicate (F)unctional and (C)ontextual differences, resp=
+ectively
+>=20
+> 001/7:[----] [--] 'curl: Keep pointer to the CURLState in CURLSocket'
+> 002/7:[0007] [FC] 'curl: Keep *socket until the end of curl_sock_cb()'
+> 003/7:[down] 'curl: Check completion in curl_multi_do()'
+> 004/7:[0019] [FC] 'curl: Pass CURLSocket to curl_multi_{do,read}()'
+> 005/7:[0002] [FC] 'curl: Report only ready sockets'
+> 006/7:[----] [--] 'curl: Handle success in multi_check_completion'
+> 007/7:[----] [--] 'curl: Check curl_multi_add_handle()'s return code'
+>=20
+>=20
+> Max Reitz (7):
+>   curl: Keep pointer to the CURLState in CURLSocket
+>   curl: Keep *socket until the end of curl_sock_cb()
+>   curl: Check completion in curl_multi_do()
+>   curl: Pass CURLSocket to curl_multi_do()
+>   curl: Report only ready sockets
+>   curl: Handle success in multi_check_completion
+>   curl: Check curl_multi_add_handle()'s return code
+>=20
+>  block/curl.c | 133 +++++++++++++++++++++++----------------------------
+>  1 file changed, 59 insertions(+), 74 deletions(-)
+>=20
 
-In this case, it's because I had some doubts in V1 about when we call
-the post-completion cleanup code. It didn't look obvious at a glance.
-
-This just makes it simpler.
-
-I don't think that by checking *more* things we're going to paper over
-some race condition -- it's the opposite. If anything, this will explode
-sooner rather than later.
-
-So I think it's OK, naturally.
+And for 4-7:
 
 Reviewed-by: John Snow <jsnow@redhat.com>
 
