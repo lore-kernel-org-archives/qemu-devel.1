@@ -2,66 +2,69 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C48ECDE20
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:09:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9D9EECDE27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:09:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 687B82168B
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:09:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 687B82168B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id B5CDF2168B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 09:09:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5CDF2168B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7yd8-0008UD-16
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 05:09:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32772)
+	id 1i7ydL-0000Lo-D3
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 05:09:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58379)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i7yBO-0000pj-U9
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:41:00 -0400
+ (envelope-from <kwolf@redhat.com>) id 1i7xyj-00031e-IN
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:27:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i7yBN-0008FP-35
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:40:58 -0400
-Resent-Date: Wed, 11 Sep 2019 04:40:58 -0400
-Resent-Message-Id: <E1i7yBN-0008FP-35@eggs.gnu.org>
-Received: from sender4-of-o58.zoho.com ([136.143.188.58]:21862)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i7yBM-0008Ef-TH
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:40:57 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568191234; cv=none; d=zoho.com; s=zohoarc; 
- b=WGoNoMZe/nxNTWmVS5yEDI9MNSaGv10A0dHXw4zZHnM3MX1AQ/gqdeHeXJr57nBFB7FAMHgMKQEFeTZlRASicwZ7JyxAoIRHuWGSs3XzjZ3ph+SHlZ5eNz9pFd0r9s10qnun0oNbalIboGbhxYrOyK3tTNvydc9Rvxqzd39R6j8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1568191234;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=aTYaFs4wgiziJTG0ji8GTrz9u/fG7XFglHIlsglRMEw=; 
- b=YG3Ll+CDSDFIsRwq2oCO1oVWGKdjbiskvfVuQmkw2qYz0PgwfeJoOWbk+ccwpMMHI7JzEOKfNwRph0boreNJC6cKLbp7ad7hV4HAiCG3s0X+sn5coWas37vkGB1DHi8ZVtV3ZLTWaGfLfY9jKSYGjgkrpwnV28L4+Avh7FJX5DQ=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1568191233000908.0023094851477;
- Wed, 11 Sep 2019 01:40:33 -0700 (PDT)
-In-Reply-To: <20190910163600.19971-1-laurent@vivier.eu>
-Message-ID: <156819123182.18674.16345102059641214447@5dec9699b7de>
+ (envelope-from <kwolf@redhat.com>) id 1i7xyi-0007cr-1T
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 04:27:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52572)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1i7xyd-0007Z3-6Z; Wed, 11 Sep 2019 04:27:47 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 30BF818CCEE8;
+ Wed, 11 Sep 2019 08:27:46 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-182.ams2.redhat.com
+ [10.36.116.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F30F860BEC;
+ Wed, 11 Sep 2019 08:27:44 +0000 (UTC)
+Date: Wed, 11 Sep 2019 10:27:43 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190911082743.GC4907@localhost.localdomain>
+References: <20190809161407.11920-1-mreitz@redhat.com>
+ <20190809161407.11920-23-mreitz@redhat.com>
+ <20190910145229.GI4446@localhost.localdomain>
+ <d7226d81-b89f-5c24-9dd4-39ae832bf61b@redhat.com>
+ <20190911065517.GA4907@localhost.localdomain>
+ <f082931e-154f-5393-f5b0-ff82f43eff31@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: laurent@vivier.eu
-Date: Wed, 11 Sep 2019 01:40:33 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature"; boundary="L6iaP+gRLNZHKoI4"
+Content-Disposition: inline
+In-Reply-To: <f082931e-154f-5393-f5b0-ff82f43eff31@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Wed, 11 Sep 2019 08:27:46 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.58
-Subject: Re: [Qemu-devel] [PULL 00/15] Linux user for 4.2 patches
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v6 22/42] block: Fix
+ bdrv_get_allocated_file_size's fallback
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,90 +76,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: jcmvbkbc@gmail.com, riku.voipio@iki.fi, qemu-devel@nongnu.org,
- laurent@vivier.eu
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxMDE2MzYwMC4xOTk3
-MS0xLWxhdXJlbnRAdml2aWVyLmV1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvMTVdIExpbnV4IHVzZXIg
-Zm9yIDQuMiBwYXRjaGVzCk1lc3NhZ2UtaWQ6IDIwMTkwOTEwMTYzNjAwLjE5OTcxLTEtbGF1cmVu
-dEB2aXZpZXIuZXUKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
-bi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Nj
-cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5E
-ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApG
-cm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0
-ZV0gICAgICBwYXRjaGV3L2NvdmVyLjE1NjY2MDM0MTIuZ2l0LmFsaXN0YWlyLmZyYW5jaXNAd2Rj
-LmNvbSAtPiBwYXRjaGV3L2NvdmVyLjE1NjY2MDM0MTIuZ2l0LmFsaXN0YWlyLmZyYW5jaXNAd2Rj
-LmNvbQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3L2NvdmVyLjE1NjgxNzA5OTQuZ2l0Lm1h
-b3pob25neWlAY21zcy5jaGluYW1vYmlsZS5jb20gLT4gcGF0Y2hldy9jb3Zlci4xNTY4MTcwOTk0
-LmdpdC5tYW96aG9uZ3lpQGNtc3MuY2hpbmFtb2JpbGUuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJy
-YW5jaCAndGVzdCcKYmUyMmI5NSBsaW51eC11c2VyOiBBZGQgc3VwcG9ydCBmb3IgRkRSRVNFVCwg
-RkRSQVdDTUQsIEZEVFdBRERMRSwgYW5kIEZERUpFQ1QgaW9jdGxzCjE4MTIxNjYgbGludXgtdXNl
-cjogQWRkIHN1cHBvcnQgZm9yIEZETVNHT04gYW5kIEZETVNHT0ZGIGlvY3Rscwo0MDg4NGVkIGxp
-bnV4LXVzZXI6IEFkZCBzdXBwb3J0IGZvciBGREZMVVNIIGlvY3RsCmQ1NzRiM2EgbGludXgtdXNl
-cjogQWRkIHN1cHBvcnQgZm9yIEZJT0dFVE9XTiBhbmQgRklPU0VUT1dOIGlvY3RscwplMTZiOGRk
-IGxpbnV4LXVzZXI6IEFkZCBzdXBwb3J0IGZvciBSTkRSRVNFRURDUk5HIGlvY3RsCjkyMjY2OWQg
-bGludXgtdXNlcjogZHJvcCByZWR1bmRhbnQgaGFuZGxpbmcgb2YgZW52aXJvbm1lbnQgdmFyaWFi
-bGVzCmRlYjE4ZGIgdGFyZ2V0L3h0ZW5zYTogbGludXgtdXNlcjogYWRkIGNhbGwwIEFCSSBzdXBw
-b3J0CmE3MGRmOGEgbGludXgtdXNlcjogU3VwcG9ydCBnZGIgJ3FPZmZzZXRzJyBxdWVyeSBmb3Ig
-RUxGCjJhZDNjNjggbGludXgtdXNlci9hcm06IEFkanVzdCBNQVhfUkVTRVJWRURfVkEgZm9yIE0t
-cHJvZmlsZQpiNGFiNGFjIGxpbnV4LXVzZXI6IFBhc3MgQ1BVU3RhdGUgdG8gTUFYX1JFU0VSVkVE
-X1ZBCmE1OWQ3ODggbGludXgtdXNlcjogYWRkIG1lbWZkX2NyZWF0ZQphNjg5MjEwIGxpbnV4LXVz
-ZXI6IGZhaWwgYW5kIHJlcG9ydCBvbiBiYWQgZGZpbHRlciBzcGVjcwphNTAxOGRlIGxpbnV4LXVz
-ZXI6IGVycm9uZW91cyBmZF90cmFuc191bnJlZ2lzdGVyIGNhbGwKZDNkY2Y5OSBsaW51eC11c2Vy
-OiBBZGQgQVRfSFdDQVAyIGZvciBhYXJjaDY0LWxpbnV4LXVzZXIKMzM3OGE0MyBsaW51eC11c2Vy
-OiByZW1vdmUgdXNlbGVzcyB2YXJpYWJsZQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xNSBDaGVj
-a2luZyBjb21taXQgMzM3OGE0MzJhNGZjIChsaW51eC11c2VyOiByZW1vdmUgdXNlbGVzcyB2YXJp
-YWJsZSkKMi8xNSBDaGVja2luZyBjb21taXQgZDNkY2Y5OTkzZjkwIChsaW51eC11c2VyOiBBZGQg
-QVRfSFdDQVAyIGZvciBhYXJjaDY0LWxpbnV4LXVzZXIpCjMvMTUgQ2hlY2tpbmcgY29tbWl0IGE1
-MDE4ZGU4YzYxMiAobGludXgtdXNlcjogZXJyb25lb3VzIGZkX3RyYW5zX3VucmVnaXN0ZXIgY2Fs
-bCkKRVJST1I6IEF1dGhvciBlbWFpbCBhZGRyZXNzIGlzIG1hbmdsZWQgYnkgdGhlIG1haWxpbmcg
-bGlzdAojMjogCkF1dGhvcjogU2h1LUNodW4gV2VuZyB2aWEgUWVtdS1kZXZlbCA8cWVtdS1kZXZl
-bEBub25nbnUub3JnPgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA3IGxpbmVzIGNoZWNr
-ZWQKClBhdGNoIDMvMTUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQvMTUgQ2hlY2tpbmcg
-Y29tbWl0IGE2ODkyMTA3NjdkMiAobGludXgtdXNlcjogZmFpbCBhbmQgcmVwb3J0IG9uIGJhZCBk
-ZmlsdGVyIHNwZWNzKQo1LzE1IENoZWNraW5nIGNvbW1pdCBhNTlkNzg4NjMyMjcgKGxpbnV4LXVz
-ZXI6IGFkZCBtZW1mZF9jcmVhdGUpCkVSUk9SOiBBdXRob3IgZW1haWwgYWRkcmVzcyBpcyBtYW5n
-bGVkIGJ5IHRoZSBtYWlsaW5nIGxpc3QKIzI6IApBdXRob3I6IFNodS1DaHVuIFdlbmcgdmlhIFFl
-bXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
-aW5ncywgNDIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS8xNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoKNi8xNSBDaGVja2luZyBjb21taXQgYjRhYjRhY2VjNjViIChsaW51eC11c2VyOiBQYXNz
-IENQVVN0YXRlIHRvIE1BWF9SRVNFUlZFRF9WQSkKNy8xNSBDaGVja2luZyBjb21taXQgMmFkM2M2
-ODAwM2QzIChsaW51eC11c2VyL2FybTogQWRqdXN0IE1BWF9SRVNFUlZFRF9WQSBmb3IgTS1wcm9m
-aWxlKQo4LzE1IENoZWNraW5nIGNvbW1pdCBhNzBkZjhhZjhkM2MgKGxpbnV4LXVzZXI6IFN1cHBv
-cnQgZ2RiICdxT2Zmc2V0cycgcXVlcnkgZm9yIEVMRikKRVJST1I6IEF1dGhvciBlbWFpbCBhZGRy
-ZXNzIGlzIG1hbmdsZWQgYnkgdGhlIG1haWxpbmcgbGlzdAojMjogCkF1dGhvcjogSm9zaCBLdW56
-IHZpYSBRZW11LWRldmVsIDxxZW11LWRldmVsQG5vbmdudS5vcmc+Cgp0b3RhbDogMSBlcnJvcnMs
-IDAgd2FybmluZ3MsIDggbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xNSBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoKOS8xNSBDaGVja2luZyBjb21taXQgZGViMThkYjQzYzJhICh0YXJnZXQveHRl
-bnNhOiBsaW51eC11c2VyOiBhZGQgY2FsbDAgQUJJIHN1cHBvcnQpCjEwLzE1IENoZWNraW5nIGNv
-bW1pdCA5MjI2NjlkMWFkNDcgKGxpbnV4LXVzZXI6IGRyb3AgcmVkdW5kYW50IGhhbmRsaW5nIG9m
-IGVudmlyb25tZW50IHZhcmlhYmxlcykKMTEvMTUgQ2hlY2tpbmcgY29tbWl0IGUxNmI4ZGRmODJl
-YiAobGludXgtdXNlcjogQWRkIHN1cHBvcnQgZm9yIFJORFJFU0VFRENSTkcgaW9jdGwpCjEyLzE1
-IENoZWNraW5nIGNvbW1pdCBkNTc0YjNhM2VkNzUgKGxpbnV4LXVzZXI6IEFkZCBzdXBwb3J0IGZv
-ciBGSU9HRVRPV04gYW5kIEZJT1NFVE9XTiBpb2N0bHMpCjEzLzE1IENoZWNraW5nIGNvbW1pdCA0
-MDg4NGVkYmM0NWQgKGxpbnV4LXVzZXI6IEFkZCBzdXBwb3J0IGZvciBGREZMVVNIIGlvY3RsKQox
-NC8xNSBDaGVja2luZyBjb21taXQgMTgxMjE2NjljOTY1IChsaW51eC11c2VyOiBBZGQgc3VwcG9y
-dCBmb3IgRkRNU0dPTiBhbmQgRkRNU0dPRkYgaW9jdGxzKQoxNS8xNSBDaGVja2luZyBjb21taXQg
-YmUyMmI5NTlkNjZmIChsaW51eC11c2VyOiBBZGQgc3VwcG9ydCBmb3IgRkRSRVNFVCwgRkRSQVdD
-TUQsIEZEVFdBRERMRSwgYW5kIEZERUpFQ1QgaW9jdGxzKQo9PT0gT1VUUFVUIEVORCA9PT0KClRl
-c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
-ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDkxMDE2MzYwMC4xOTk3MS0xLWxhdXJl
-bnRAdml2aWVyLmV1L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwg
-Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9d
-LgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
+--L6iaP+gRLNZHKoI4
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Am 11.09.2019 um 09:37 hat Max Reitz geschrieben:
+> On 11.09.19 08:55, Kevin Wolf wrote:
+> > Am 11.09.2019 um 08:20 hat Max Reitz geschrieben:
+> >> On 10.09.19 16:52, Kevin Wolf wrote:
+> >>> Am 09.08.2019 um 18:13 hat Max Reitz geschrieben:
+> >>>> If the driver does not implement bdrv_get_allocated_file_size(), we
+> >>>> should fall back to cumulating the allocated size of all non-COW
+> >>>> children instead of just bs->file.
+> >>>>
+> >>>> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> >>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> >>>
+> >>> This smells like an overgeneralisation, but if we want to count all v=
+mdk
+> >>> extents, the qcow2 external data file, etc. it's an improvement anywa=
+y.
+> >>> A driver that has a child that should not be counted must just rememb=
+er
+> >>> to implement the callback.
+> >>>
+> >>> Let me think of an example... How about quorum, for a change? :-)
+> >>> Or the second blkverify child.
+> >>>
+> >>> Or eventually the block job filter nodes.
+> >>
+> >> I actually think it makes sense for all of these nodes to report the s=
+um
+> >> of all of their children=E2=80=99s allocated sizes.
+> >=20
+> > Hm... Yes, in a way. But not much more than it would make sense to
+> > report the sum of the sizes of all images in the whole backing chain
+> > (this is a useful thing to ask for, just maybe not the right thing to
+> > return for a low-level interface). But I can accept that it's maybe a
+> > bit more expected for quorum and blkverify than for COW images.
+> >=20
+> > If you include the block job filter nodes, I have to disagree, though.
+> > If mirror_top_bs (or any other job filter) sits in the middle of the
+> > source chain, then I certainly don't want to see the target size added
+> > to it.
+>=20
+> Hm, I don=E2=80=99t care much either way.  I think it makes complete sens=
+e to
+> add the target size there, but OTOH it=E2=80=99s only temporary while the=
+ job
+> runs, so it may be a bit confusing if it suddenly goes up and then down
+> again.
+
+I think the number that most users are interested in is knowing how much
+space the image for their /dev/vda takes up on the host.
+
+I can see how they might be interested in not only that one image file,
+but all other image files connected to it, i.e. their /dev/vda with all
+of its snapshots. This would mean counting backing files. I think adding
+up the numbers for this should be done in the management layer.
+
+I can possibly also imagine users wanting to count everything that's
+even loosely connected to their /dev/vda, like copies of it. I doubt,
+however, they want to count only copies that are currently being made,
+but not snapshots and copies that have been completed earlier. So this
+is clearly a management layer thing, too.
+
+> But I think this is the special case, so this is what should be handled
+> in a driver callback.
+
+It's a special case, yes. But see below.
+
+> >> If a quorum node has three children with allocated sizes of 3 MB, 1 MB,
+> >> and 2 MB, respectively (totally possible if some have explicit zeroes
+> >> and others don=E2=80=99t; it may also depend on the protocol, the file=
+system,
+> >> etc.), then I think it makes most sense to report indeed 6 MB for the
+> >> quorum subtree as a whole.  What would you report?  3 MB?
+> >=20
+> > Do it's the quorum way: Just vote!
+>=20
+> Add an option for it?  Average, maximum, median, majority, sum? :-)
+
+We could also introduce a mode with an Electoral College so that
+sometimes an image that missed the majority has a chance to win anyway.
+
+> > No, you're right, of course. -ENOTSUP is probably the only other thing
+> > you could do then.
+> >=20
+> >>> Ehm... Maybe I should just take back what I said first. It almost fee=
+ls
+> >>> like it would be better if qcow2 and vmdk explicitly used a handler t=
+hat
+> >>> counts all children (could still be a generic one in block.c) rather
+> >>> than having to remember to disable the functionality everywhere where=
+ we
+> >>> don't want to have it.
+> >>
+> >> I don=E2=80=99t, because everywhere we don=E2=80=99t want this functio=
+nality, we still
+> >> need to choose a child.  This has to be done by the driver anyway.
+> >=20
+> > Well, by default the primary child, which should cover like 90% of the
+> > drivers?
+>=20
+> Hm, yes.
+>=20
+> But I still think that the drivers that do not want to count every
+> single non-COW child are the exception.
+
+They are, but drivers that want to count more than their primary node
+are exceptions, too. And I think you're more likely to remember adding
+the callback when you want to have a certain feature, not when you don't
+want to have it.
+
+I really think we're likely to forget adding the callback where we need
+to disable the feature.
+
+I can see two options that should address both of our views:
+
+1. Just don't have a fallback at all, make the callback mandatory and
+   provide implementations in block.c that can be referred to in
+   BlockDriver. Not specifying the callback causes an assertion failure,
+   so we'd hopefully notice it quite early (assuming that we run either
+   'qemu-img info' or 'query-block' on a configuration with the block
+   driver, but I think that's faily safe to assume).
+
+2. Make the 90% solution a 100% solution: Allow drivers to have multiple
+   storage children (for vmdk) and then have the fallback add up the
+   primary child plus all storage children. This is what I suggested as
+   the documented semantics in my initial reply to this patch (that you
+   chose not to answer).
+
+   Adding the size of storage children covers qcow2 and vmdk.
+
+   As the job filter won't declare the target or any other involved
+   nodes their storage nodes (I hope), this will do the right thing for
+   them, too.
+
+   For quorum and blkverify both ways could be justifiable. I think they
+   probably shouldn't declare their children as storage nodes. They are
+   more like filters that don't have a single filtered node. So some
+   kind of almost-filters.
+
+Kevin
+
+--L6iaP+gRLNZHKoI4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJdeK//AAoJEH8JsnLIjy/WWvMQAJRmYRPWxzSNswQeBja4f41U
+aNQWLi/UhAQQV4piehvYP3nlxSG+/eM/xrbdQG851kdL5y+4fQBxp+I4dCr+R080
+qGW+5WC/8ng8GpWA2oNd54LOQizBu0XL3sGxZVyzaFNkPDwx3YoGsjfadgOSCl3y
+BfiljDgtOK/wFd0ljxOMYKjPWhipi1OX6DSuuA8a86OILAs/uDfZhkYvrkDbldYx
++6miFo3/T6Zq6ICxkLvYizEkMeb2mGmUybdnwKkT/ctyWqjBm+t7XuLHy2IBITX/
+PMCUicvmdk/KFY/P9PfH3ccZ5nCNPp5cZjd0r6/+3gdkusjnmxygMhIi/SK9JX1o
+j7QpsDaMzAZMOG8TiBkroOz+pGZzWUy0TESa/i+ao4wkrpC9LUkeRlFiqy7yLRBd
+p4PmB4V7wY5Z9ZZVfm4J0EGMw8aREvhg7mNFvnogzk2Gh+AB3bwhmEVj6Son9cCM
+9r1BmebmUSA8G0mSwSMuMJbcDmqteVgxOmZ+Fy17u8jcq/Wy/YBLz+cITY6ByBBh
+N1DVo/X5gRffBeRb0pU8vCY2k0gvwSPy8O22j+gwx43MUoT4jfFwCmQHzhFEsDzQ
+s7bYl9L/904LcSki29ebviSJ0kHSKndjejueKKCkguknBpReFpFB+5WavpZgzgQX
+PIBelBlGgvH06YMF3Szr
+=rnC/
+-----END PGP SIGNATURE-----
+
+--L6iaP+gRLNZHKoI4--
 
