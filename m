@@ -2,81 +2,111 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B22C5ACAE
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 16:08:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE3AC49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 16:11:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E9C020863
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 16:08:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="DACrEz6O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E9C020863
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2204C20863
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 16:11:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2204C20863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i85AM-0007TV-4T
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 12:08:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34787)
+	id 1i85DY-0001A7-8Z
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 12:11:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35957)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chihmin.chao@sifive.com>) id 1i856z-0004DH-Jy
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 12:04:56 -0400
+ (envelope-from <david@redhat.com>) id 1i85CI-00009b-0U
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 12:10:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chihmin.chao@sifive.com>) id 1i856w-0001RU-Ir
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 12:04:53 -0400
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:46303)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <chihmin.chao@sifive.com>)
- id 1i856w-0001R2-Az
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 12:04:50 -0400
-Received: by mail-io1-xd43.google.com with SMTP id d17so25150600ios.13
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 09:04:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=NpxJWpS8/LST6Afz5+sKG/0CQ6l7N8dpKlYJAnkHE2s=;
- b=DACrEz6OkERkS6gR2xU5YRmirFivqPY9qFgdMh8ao+EyXzX10TJtMauo+WSrfnP53r
- fdXLxmDIfgwYCN4X0acigDQRV7IyupVQrlySBdb9cUYvd22tnSVk2M/9yzjeggptBK9q
- TtG0ztm874dQM5yvFkYX2lZ3hqm9TGbodXhmSKx3lb/LcQkQRRgS8m4uS31xSlrxqtHp
- 2YvvGWzGo0OJdUGKuQNL59qf79IOkJH7hVToztGHxr6PRdDY9vppZrpgch/zec7GCnq3
- Dz5e/z09K8m/1jbTZiiyblWt62n+Qt4Bzda8ePRFMhvUNixUph6q/g1Tjkks/GGIcX1b
- ww6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=NpxJWpS8/LST6Afz5+sKG/0CQ6l7N8dpKlYJAnkHE2s=;
- b=JAyQzhRVqogrft22QO7IgV+O/RMdm4BOJKga+VHuoEIWrWUVnxUdfyEekb0NYdkX7a
- xqucYEXTgYtvg9pwa9BuMwlrRAAYweXBldDbYjkbLaYCKGIAeLgxvlwvNSm/TWOKg5Er
- QrVQGzus5SgMsL7ziUavhmBJ6laJ4yAoKu2M5OfK9ufRfKkTCTUJtIAUpnEKP5A3cXkt
- Zt263tjm85gdt0JWsWHhtjDEJqVBraOhnKmUlEKhNdIoxPw8edQgldRt+8JvBQ8zFbzH
- 0XbmEPiRiFrEyI3eQO0QS52BJ6yHKHPCLRwKURsojYWK+zBKgmG4D+KCjI4gcR8izTUc
- rA8w==
-X-Gm-Message-State: APjAAAVig2J4pMUJxL6QU622MEHgHgY8hQNBUeYb1T/GBDPkhQuz9obG
- vbB/aLwqOHClZrFpyw4B0yNmDv3+W4HDg/nZR7F4hA==
-X-Google-Smtp-Source: APXvYqycntMLAPsX39w2VHJ6TCzDl3rB2FHJ96lRCR2v/iJwJwyZF6k6fn/tMOPkVCAeuRAtbepGu73HgjyqcS3ksEQ=
-X-Received: by 2002:a5d:9f0f:: with SMTP id q15mr2397000iot.163.1568217889497; 
- Wed, 11 Sep 2019 09:04:49 -0700 (PDT)
+ (envelope-from <david@redhat.com>) id 1i85CF-00032d-PX
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 12:10:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55436)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1i85CF-000325-Hp; Wed, 11 Sep 2019 12:10:19 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 255763082E57;
+ Wed, 11 Sep 2019 16:10:18 +0000 (UTC)
+Received: from [10.36.116.137] (ovpn-116-137.ams2.redhat.com [10.36.116.137])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5DDD11001938;
+ Wed, 11 Sep 2019 16:10:16 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190906075750.14791-1-david@redhat.com>
+ <20190906075750.14791-3-david@redhat.com>
+ <28507e0d-f7b3-74e6-43df-95a53a162e12@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <5aaf2d21-f56d-dfcd-690c-253724dd55de@redhat.com>
+Date: Wed, 11 Sep 2019 18:10:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <1568183141-67641-1-git-send-email-zhiwei_liu@c-sky.com>
- <1568183141-67641-5-git-send-email-zhiwei_liu@c-sky.com>
-In-Reply-To: <1568183141-67641-5-git-send-email-zhiwei_liu@c-sky.com>
-From: Chih-Min Chao <chihmin.chao@sifive.com>
-Date: Thu, 12 Sep 2019 00:04:38 +0800
-Message-ID: <CAEiOBXWsuVeQ82ockYf=Vwqaxfzoc9fin+w3itNZZho2tO+6Mg@mail.gmail.com>
-To: liuzhiwei <zhiwei_liu@c-sky.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d43
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH v2 04/17] RISC-V: add vector
- extension configure instruction
+In-Reply-To: <28507e0d-f7b3-74e6-43df-95a53a162e12@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Wed, 11 Sep 2019 16:10:18 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 02/28] s390x/tcg: MVCL: Zero out unused
+ bits of address
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,302 +118,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmer@sifive.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, riku.voipio@iki.fi,
- laurent@vivier.eu, wxy194768@alibaba-inc.com,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- wenmeng_zhang@c-sky.com, Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Florian Weimer <fweimer@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Stefano Brivio <sbrivio@redhat.com>,
+ qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 11, 2019 at 2:38 PM liuzhiwei <zhiwei_liu@c-sky.com> wrote:
+On 11.09.19 16:40, Richard Henderson wrote:
+> On 9/6/19 3:57 AM, David Hildenbrand wrote:
+>> We have to zero out unused bits in 24 and 31-bit addressing mode.
+>> Provide a new helper.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  target/s390x/mem_helper.c | 24 ++++++++++++++++++++++--
+>>  1 file changed, 22 insertions(+), 2 deletions(-)
+> 
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> 
+>> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+>> index 39ee9b3175..3152bdafe2 100644
+>> --- a/target/s390x/mem_helper.c
+>> +++ b/target/s390x/mem_helper.c
+>> @@ -469,6 +469,26 @@ static inline uint64_t get_address(CPUS390XState *env, int reg)
+>>      return wrap_address(env, env->regs[reg]);
+>>  }
+>>  
+>> +/*
+>> + * Store the address to the given register, zeroing out unused leftmost
+>> + * bits in bit positions 32-63 (24-bit and 31-bit mode only).
+>> + */
+>> +static inline void set_address_zero(CPUS390XState *env, int reg,
+>> +                                    uint64_t address)
+>> +{
+>> +    if (env->psw.mask & PSW_MASK_64) {
+>> +        env->regs[reg] = address;
+>> +    } else {
+>> +        if (!(env->psw.mask & PSW_MASK_32)) {
+>> +            address &= 0x00ffffff;
+>> +            env->regs[reg] = deposit64(env->regs[reg], 0, 32, address);
+>> +        } else {
+>> +            address &= 0x7fffffff;
+>> +            env->regs[reg] = deposit64(env->regs[reg], 0, 32, address);
+>> +        }
+> 
+> You could perhaps sink the deposit and store line into the outer else.
+> 
 
-> From: LIU Zhiwei <zhiwei_liu@c-sky.com>
->
-> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-> ---
->  target/riscv/Makefile.objs              |   2 +-
->  target/riscv/helper.h                   |   3 +
->  target/riscv/insn32.decode              |   5 ++
->  target/riscv/insn_trans/trans_rvv.inc.c |  46 ++++++++++++
->  target/riscv/translate.c                |   1 +
->  target/riscv/vector_helper.c            | 126
-> ++++++++++++++++++++++++++++++++
->  6 files changed, 182 insertions(+), 1 deletion(-)
->  create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
->  create mode 100644 target/riscv/vector_helper.c
->
-> diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
-> index b1c79bc..d577cef 100644
-> --- a/target/riscv/Makefile.objs
-> +++ b/target/riscv/Makefile.objs
-> @@ -1,4 +1,4 @@
-> -obj-y += translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o
-> gdbstub.o pmp.o
-> +obj-y += translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o
-> vector_helper.o gdbstub.o pmp.o
->
->  DECODETREE = $(SRC_PATH)/scripts/decodetree.py
->
-> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-> index debb22a..652f8c3 100644
-> --- a/target/riscv/helper.h
-> +++ b/target/riscv/helper.h
-> @@ -76,3 +76,6 @@ DEF_HELPER_2(mret, tl, env, tl)
->  DEF_HELPER_1(wfi, void, env)
->  DEF_HELPER_1(tlb_flush, void, env)
->  #endif
-> +/* Vector functions */
-> +DEF_HELPER_4(vector_vsetvli, void, env, i32, i32, i32)
-> +DEF_HELPER_4(vector_vsetvl, void, env, i32, i32, i32)
-> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-> index 77f794e..5dc009c 100644
-> --- a/target/riscv/insn32.decode
-> +++ b/target/riscv/insn32.decode
-> @@ -62,6 +62,7 @@
->  @r_rm    .......   ..... ..... ... ..... ....... %rs2 %rs1 %rm %rd
->  @r2_rm   .......   ..... ..... ... ..... ....... %rs1 %rm %rd
->  @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
-> +@r2_zimm . zimm:11  ..... ... ..... ....... %rs1 %rd
->
->  @sfence_vma ....... ..... .....   ... ..... ....... %rs2 %rs1
->  @sfence_vm  ....... ..... .....   ... ..... ....... %rs1
-> @@ -203,3 +204,7 @@ fcvt_w_d   1100001  00000 ..... ... ..... 1010011
-> @r2_rm
->  fcvt_wu_d  1100001  00001 ..... ... ..... 1010011 @r2_rm
->  fcvt_d_w   1101001  00000 ..... ... ..... 1010011 @r2_rm
->  fcvt_d_wu  1101001  00001 ..... ... ..... 1010011 @r2_rm
-> +
-> +# *** RV32V Extension ***
-> +vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
-> +vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c
-> b/target/riscv/insn_trans/trans_rvv.inc.c
-> new file mode 100644
-> index 0000000..82e7ad6
-> --- /dev/null
-> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-> @@ -0,0 +1,46 @@
-> +/*
-> + * RISC-V translation routines for the RVV Standard Extension.
-> + *
-> + * Copyright (c) 2019 C-SKY Limited. All rights reserved.
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-> for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#define GEN_VECTOR_R(INSN) \
-> +static bool trans_##INSN(DisasContext *ctx, arg_##INSN * a) \
-> +{                                                      \
-> +    TCGv_i32 s1 = tcg_const_i32(a->rs1);               \
-> +    TCGv_i32 s2 = tcg_const_i32(a->rs2);               \
-> +    TCGv_i32 d  = tcg_const_i32(a->rd);                \
-> +    gen_helper_vector_##INSN(cpu_env, s1, s2, d);    \
-> +    tcg_temp_free_i32(s1);                             \
-> +    tcg_temp_free_i32(s2);                             \
-> +    tcg_temp_free_i32(d);                              \
-> +    return true;                                       \
-> +}
-> +
-> +#define GEN_VECTOR_R2_ZIMM(INSN) \
-> +static bool trans_##INSN(DisasContext *ctx, arg_##INSN * a) \
-> +{                                                      \
-> +    TCGv_i32 s1 = tcg_const_i32(a->rs1);               \
-> +    TCGv_i32 zimm = tcg_const_i32(a->zimm);            \
-> +    TCGv_i32 d  = tcg_const_i32(a->rd);                \
-> +    gen_helper_vector_##INSN(cpu_env, s1, zimm, d);      \
-> +    tcg_temp_free_i32(s1);                             \
-> +    tcg_temp_free_i32(zimm);                           \
-> +    tcg_temp_free_i32(d);                              \
-> +    return true;                                       \
-> +}
-> +
-> +GEN_VECTOR_R2_ZIMM(vsetvli)
-> +GEN_VECTOR_R(vsetvl)
-> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index 8d6ab73..587c23e 100644
-> --- a/target/riscv/translate.c
-> +++ b/target/riscv/translate.c
-> @@ -706,6 +706,7 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
->  #include "insn_trans/trans_rva.inc.c"
->  #include "insn_trans/trans_rvf.inc.c"
->  #include "insn_trans/trans_rvd.inc.c"
-> +#include "insn_trans/trans_rvv.inc.c"
->  #include "insn_trans/trans_privileged.inc.c"
->
->  /*
-> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-> new file mode 100644
-> index 0000000..b279e6f
-> --- /dev/null
-> +++ b/target/riscv/vector_helper.c
-> @@ -0,0 +1,126 @@
-> +/*
-> + * RISC-V Vectore Extension Helpers for QEMU.
-> + *
-> + * Copyright (c) 2019 C-SKY Limited. All rights reserved.
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-> for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "cpu.h"
-> +#include "exec/exec-all.h"
-> +#include "exec/helper-proto.h"
-> +#include <math.h>
-> +
-> +#define VECTOR_HELPER(name) HELPER(glue(vector_, name))
-> +
-> +static inline void vector_vtype_set_ill(CPURISCVState *env)
-> +{
-> +    env->vfp.vtype = ((target_ulong)1) << (sizeof(target_ulong) - 1);
-> +    return;
-> +}
-> +
->
-   env->vfp.vtype = ((target_ulong)1) << (sizeof(target_ulong) * 8 - 1);
-
-> +static inline int vector_vtype_get_sew(CPURISCVState *env)
-> +{
-> +    return (env->vfp.vtype >> 2) & 0x7;
-> +}
-> +
->
- extract64(env->vfp.vtype, 2, 3);
-
-> +static inline int vector_get_width(CPURISCVState *env)
-> +{
-> +    return  8 * (1 << vector_vtype_get_sew(env));
-> +}
-> +
-> +static inline int vector_get_lmul(CPURISCVState *env)
-> +{
-> +    return 1 << (env->vfp.vtype & 0x3);
-> +}
-> +
->
- extract64(env->vfp.vtype, 0, 2);
-
-> +static inline int vector_get_vlmax(CPURISCVState *env)
-> +{
-> +    return vector_get_lmul(env) * VLEN / vector_get_width(env);
-> +}
-> +
-> +void VECTOR_HELPER(vsetvl)(CPURISCVState *env, uint32_t rs1, uint32_t rs2,
-> +    uint32_t rd)
-> +{
-> +    int sew, max_sew, vlmax, vl;
-> +
-> +    if (rs2 == 0) {
-> +        vector_vtype_set_ill(env);
-> +        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-> +        return;
-> +    }
-> +    env->vfp.vtype = env->gpr[rs2];
-> +    sew = 1 << vector_get_width(env) / 8;
-> +    max_sew = sizeof(target_ulong);
-> +
-> +    if (env->misa & RVD) {
-> +        max_sew = max_sew > 8 ? max_sew : 8;
-> +    } else if (env->misa & RVF) {
-> +        max_sew = max_sew > 4 ? max_sew : 4;
-> +    }
+Thanks, will do!
 
 
-As far as i understand, max_sew is defined by ELEN but not by existing
-floating-point extensions.
-ELEN should be configurable through command line cpu parameter.
+-- 
 
+Thanks,
 
+David / dhildenb
 
-+    if (sew > max_sew) {
-> +        vector_vtype_set_ill(env);
-> +        return;
-> +    }
-> +
-> +    vlmax = vector_get_vlmax(env);
-> +    if (rs1 == 0) {
-> +        vl = vlmax;
-> +    } else if (env->gpr[rs1] <= vlmax) {
-> +        vl = env->gpr[rs1];
-> +    } else if (env->gpr[rs1] < 2 * vlmax) {
-> +        vl = ceil(env->gpr[rs1] / 2);
-> +    } else {
-> +        vl = vlmax;
-> +    }
-> +    env->vfp.vl = vl;
-> +    env->gpr[rd] = vl;
-> +    env->vfp.vstart = 0;
-> +    return;
-> +}
-> +
-> +void VECTOR_HELPER(vsetvli)(CPURISCVState *env, uint32_t rs1, uint32_t
-> zimm,
-> +    uint32_t rd)
-> +{
-> +    int sew, max_sew, vlmax, vl;
-> +
-> +    env->vfp.vtype = zimm;
-> +    sew = vector_get_width(env) / 8;
-> +    max_sew = sizeof(target_ulong);
-> +
-> +    if (env->misa & RVD) {
-> +        max_sew = max_sew > 8 ? max_sew : 8;
-> +    } else if (env->misa & RVF) {
-> +        max_sew = max_sew > 4 ? max_sew : 4;
-> +    }
-> +    if (sew > max_sew) {
-> +        vector_vtype_set_ill(env);
-> +        return;
-> +    }
-> +
-
-The same comment described above.
-
-> +    vlmax = vector_get_vlmax(env);
-> +    if (rs1 == 0) {
-> +        vl = vlmax;
-> +    } else if (env->gpr[rs1] <= vlmax) {
-> +        vl = env->gpr[rs1];
-> +    } else if (env->gpr[rs1] < 2 * vlmax) {
-> +        vl = ceil(env->gpr[rs1] / 2);
-> +    } else {
-> +        vl = vlmax;
-> +    }
-> +    env->vfp.vl = vl;
-> +    env->gpr[rd] = vl;
-> +    env->vfp.vstart = 0;
-> +    return;
-> +}
-> --
-> 2.7.4
->
->
->
