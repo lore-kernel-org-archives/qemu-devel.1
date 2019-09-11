@@ -2,64 +2,76 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5B97C49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 11:22:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DA77C49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 11:37:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB0A22089F
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 11:22:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB0A22089F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C83F62081B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 11:37:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C83F62081B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernelpath.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i80hX-0006r3-V2
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 07:22:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34867)
+	id 1i80vm-0001p6-P2
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 07:37:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38085)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1i80fl-0005XK-Jh
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 07:20:30 -0400
+ (envelope-from <bounces@canonical.com>) id 1i80ut-0001Cm-5f
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 07:36:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1i80fk-00052s-KE
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 07:20:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51274)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1i80fk-00052h-En
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 07:20:28 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C62DA308404E
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 11:20:27 +0000 (UTC)
-Received: from redhat.com (ovpn-116-70.ams2.redhat.com [10.36.116.70])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 278CD5D6C8;
- Wed, 11 Sep 2019 11:20:26 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: "Dr. David Alan Gilbert \(git\)" <dgilbert@redhat.com>
-In-Reply-To: <20190823103946.7388-1-dgilbert@redhat.com> (David Alan Gilbert's
- message of "Fri, 23 Aug 2019 11:39:46 +0100")
-References: <20190823103946.7388-1-dgilbert@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-Date: Wed, 11 Sep 2019 13:20:23 +0200
-Message-ID: <87woefuljc.fsf@trasno.org>
+ (envelope-from <bounces@canonical.com>) id 1i80un-0002vE-8A
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 07:36:07 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56912)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1i80un-0002us-0P
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 07:36:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1i80uj-0004mX-Fs
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 11:35:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5AE7C2E80E2
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 11:35:57 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Wed, 11 Sep 2019 11:20:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 11 Sep 2019 11:19:48 -0000
+From: Rafael David Tinoco <rafaeldtinoco@kernelpath.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=rafaeldtinoco@kernelpath.com; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=In Progress; importance=Medium; assignee=rafaeldtinoco@kernelpath.com; 
+X-Launchpad-Bug-Tags: qemu-img
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dannf jnsnow lizhengui rafaeldtinoco
+X-Launchpad-Bug-Reporter: dann frazier (dannf)
+X-Launchpad-Bug-Modifier: Rafael David Tinoco (rafaeldtinoco)
+References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
+Message-Id: <156820078886.17538.11974988129261129073.launchpad@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19044";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 87b3a4c4e5c0a078d9c4656f18f04d0ce4b9fa6a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] qemu-file: Rework old qemu_fflush comment
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1805256] Re: qemu-img hangs on
+ rcu_call_ready_event logic in Aarch64 when converting images
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -68,19 +80,460 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: berrange@redhat.com, qemu-devel@nongnu.org
+Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Commit 11808bb removed the non-iovec based write support,
-> the comment hung on.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+** Description changed:
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
++ Command:
++ =
+
++ qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
++ =
+
++ Hangs indefinitely approximately 30% of the runs.
++ =
+
++ ----
++ =
+
++ Workaround:
++ =
+
++ qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
++ =
+
++ Run "qemu-img convert" with "a single coroutine" to avoid this issue.
++ =
+
++ ----
++ =
+
++ (gdb) thread 1
++ ...
++ (gdb) bt
++ #0 0x0000ffffbf1ad81c in __GI_ppoll
++ #1 0x0000aaaaaabcf73c in ppoll
++ #2 qemu_poll_ns
++ #3 0x0000aaaaaabd0764 in os_host_main_loop_wait
++ #4 main_loop_wait
++ ...
++ =
+
++ (gdb) thread 2
++ ...
++ (gdb) bt
++ #0 syscall ()
++ #1 0x0000aaaaaabd41cc in qemu_futex_wait
++ #2 qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)
++ #3 0x0000aaaaaabed05c in call_rcu_thread
++ #4 0x0000aaaaaabd34c8 in qemu_thread_start
++ #5 0x0000ffffbf25c880 in start_thread
++ #6 0x0000ffffbf1b6b9c in thread_start ()
++ =
+
++ (gdb) thread 3
++ ...
++ (gdb) bt
++ #0 0x0000ffffbf11aa20 in __GI___sigtimedwait
++ #1 0x0000ffffbf2671b4 in __sigwait
++ #2 0x0000aaaaaabd1ddc in sigwait_compat
++ #3 0x0000aaaaaabd34c8 in qemu_thread_start
++ #4 0x0000ffffbf25c880 in start_thread
++ #5 0x0000ffffbf1b6b9c in thread_start
++ =
+
++ ----
++ =
+
++ (gdb) run
++ Starting program: /usr/bin/qemu-img convert -f qcow2 -O qcow2
++ ./disk01.ext4.qcow2 ./output.qcow2
++ =
+
++ [New Thread 0xffffbec5ad90 (LWP 72839)]
++ [New Thread 0xffffbe459d90 (LWP 72840)]
++ [New Thread 0xffffbdb57d90 (LWP 72841)]
++ [New Thread 0xffffacac9d90 (LWP 72859)]
++ [New Thread 0xffffa7ffed90 (LWP 72860)]
++ [New Thread 0xffffa77fdd90 (LWP 72861)]
++ [New Thread 0xffffa6ffcd90 (LWP 72862)]
++ [New Thread 0xffffa67fbd90 (LWP 72863)]
++ [New Thread 0xffffa5ffad90 (LWP 72864)]
++ =
+
++ [Thread 0xffffa5ffad90 (LWP 72864) exited]
++ [Thread 0xffffa6ffcd90 (LWP 72862) exited]
++ [Thread 0xffffa77fdd90 (LWP 72861) exited]
++ [Thread 0xffffbdb57d90 (LWP 72841) exited]
++ [Thread 0xffffa67fbd90 (LWP 72863) exited]
++ [Thread 0xffffacac9d90 (LWP 72859) exited]
++ [Thread 0xffffa7ffed90 (LWP 72860) exited]
++ =
+
++ <HUNG w/ 3 threads in the stack trace showed before>
++ """
++ =
+
++ All the tasks left are blocked in a system call, so no task left to call
++ qemu_futex_wake() to unblock thread #2 (in futex()), which would unblock
++ thread #1 (doing poll() in a pipe with thread #2).
++ =
+
++ Those 7 threads exit before disk conversion is complete (sometimes in
++ the beginning, sometimes at the end).
++ =
+
++ ----
++ =
+
++ [ Original Description ]
++ =
+
+  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
+  frequently hangs (~50% of the time) with this command:
+  =
+
+  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
+  =
+
+  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
+  qcow2->qcow2 conversion happens to be something uvtool does every time
+  it fetches images.
+  =
+
+  Once hung, attaching gdb gives the following backtrace:
+  =
+
+  (gdb) bt
+- #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
+274213760, =
+
+-     timeout=3D<optimized out>, timeout@entry=3D0x0, sigmask=3D0xffffc123b=
+950)
+-     at ../sysdeps/unix/sysv/linux/ppoll.c:39
+- #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
+ptimized out>, =
+
+-     __fds=3D<optimized out>) at /usr/include/aarch64-linux-gnu/bits/poll2=
+.h:77
+- #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, =
+
+-     timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.c:322
++ #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
+274213760,
++ =C2=A0=C2=A0=C2=A0=C2=A0timeout=3D<optimized out>, timeout@entry=3D0x0, s=
+igmask=3D0xffffc123b950)
++ =C2=A0=C2=A0=C2=A0=C2=A0at ../sysdeps/unix/sysv/linux/ppoll.c:39
++ #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
+ptimized out>,
++ =C2=A0=C2=A0=C2=A0=C2=A0__fds=3D<optimized out>) at /usr/include/aarch64-=
+linux-gnu/bits/poll2.h:77
++ #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>,
++ =C2=A0=C2=A0=C2=A0=C2=A0timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.=
+c:322
+  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
+-     at util/main-loop.c:233
++ =C2=A0=C2=A0=C2=A0=C2=A0at util/main-loop.c:233
+  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
+  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
+g.c:1980
+  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
+img.c:2456
+  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
+-img.c:4975
+  =
+
+  Reproduced w/ latest QEMU git (@ 53744e0a182)
+
+** Description changed:
+
+  Command:
+  =
+
+- qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
++ qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
+  =
+
+  Hangs indefinitely approximately 30% of the runs.
+  =
+
+  ----
+  =
+
+  Workaround:
+  =
+
+  qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
+  =
+
+  Run "qemu-img convert" with "a single coroutine" to avoid this issue.
+  =
+
+  ----
+  =
+
+  (gdb) thread 1
+  ...
+  (gdb) bt
+  #0 0x0000ffffbf1ad81c in __GI_ppoll
+  #1 0x0000aaaaaabcf73c in ppoll
+  #2 qemu_poll_ns
+  #3 0x0000aaaaaabd0764 in os_host_main_loop_wait
+  #4 main_loop_wait
+  ...
+  =
+
+  (gdb) thread 2
+  ...
+  (gdb) bt
+  #0 syscall ()
+  #1 0x0000aaaaaabd41cc in qemu_futex_wait
+  #2 qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)
+  #3 0x0000aaaaaabed05c in call_rcu_thread
+  #4 0x0000aaaaaabd34c8 in qemu_thread_start
+  #5 0x0000ffffbf25c880 in start_thread
+  #6 0x0000ffffbf1b6b9c in thread_start ()
+  =
+
+  (gdb) thread 3
+  ...
+  (gdb) bt
+  #0 0x0000ffffbf11aa20 in __GI___sigtimedwait
+  #1 0x0000ffffbf2671b4 in __sigwait
+  #2 0x0000aaaaaabd1ddc in sigwait_compat
+  #3 0x0000aaaaaabd34c8 in qemu_thread_start
+  #4 0x0000ffffbf25c880 in start_thread
+  #5 0x0000ffffbf1b6b9c in thread_start
+  =
+
+  ----
+  =
+
+  (gdb) run
+  Starting program: /usr/bin/qemu-img convert -f qcow2 -O qcow2
+  ./disk01.ext4.qcow2 ./output.qcow2
+  =
+
+  [New Thread 0xffffbec5ad90 (LWP 72839)]
+  [New Thread 0xffffbe459d90 (LWP 72840)]
+  [New Thread 0xffffbdb57d90 (LWP 72841)]
+  [New Thread 0xffffacac9d90 (LWP 72859)]
+  [New Thread 0xffffa7ffed90 (LWP 72860)]
+  [New Thread 0xffffa77fdd90 (LWP 72861)]
+  [New Thread 0xffffa6ffcd90 (LWP 72862)]
+  [New Thread 0xffffa67fbd90 (LWP 72863)]
+  [New Thread 0xffffa5ffad90 (LWP 72864)]
+  =
+
+  [Thread 0xffffa5ffad90 (LWP 72864) exited]
+  [Thread 0xffffa6ffcd90 (LWP 72862) exited]
+  [Thread 0xffffa77fdd90 (LWP 72861) exited]
+  [Thread 0xffffbdb57d90 (LWP 72841) exited]
+  [Thread 0xffffa67fbd90 (LWP 72863) exited]
+  [Thread 0xffffacac9d90 (LWP 72859) exited]
+  [Thread 0xffffa7ffed90 (LWP 72860) exited]
+  =
+
+  <HUNG w/ 3 threads in the stack trace showed before>
+  """
+  =
+
+  All the tasks left are blocked in a system call, so no task left to call
+  qemu_futex_wake() to unblock thread #2 (in futex()), which would unblock
+  thread #1 (doing poll() in a pipe with thread #2).
+  =
+
+  Those 7 threads exit before disk conversion is complete (sometimes in
+  the beginning, sometimes at the end).
+  =
+
+  ----
+  =
+
+  [ Original Description ]
+  =
+
+  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
+  frequently hangs (~50% of the time) with this command:
+  =
+
+  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
+  =
+
+  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
+  qcow2->qcow2 conversion happens to be something uvtool does every time
+  it fetches images.
+  =
+
+  Once hung, attaching gdb gives the following backtrace:
+  =
+
+  (gdb) bt
+  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
+274213760,
+  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3D<optimized out>, timeout@entry=3D0x0, s=
+igmask=3D0xffffc123b950)
+  =C2=A0=C2=A0=C2=A0=C2=A0at ../sysdeps/unix/sysv/linux/ppoll.c:39
+  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
+ptimized out>,
+  =C2=A0=C2=A0=C2=A0=C2=A0__fds=3D<optimized out>) at /usr/include/aarch64-=
+linux-gnu/bits/poll2.h:77
+  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>,
+  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.=
+c:322
+  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
+  =C2=A0=C2=A0=C2=A0=C2=A0at util/main-loop.c:233
+  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
+  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
+g.c:1980
+  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
+img.c:2456
+  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
+-img.c:4975
+  =
+
+  Reproduced w/ latest QEMU git (@ 53744e0a182)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1805256
+
+Title:
+  qemu-img hangs on rcu_call_ready_event logic in Aarch64 when
+  converting images
+
+Status in QEMU:
+  In Progress
+Status in qemu package in Ubuntu:
+  In Progress
+
+Bug description:
+  Command:
+
+  qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
+
+  Hangs indefinitely approximately 30% of the runs.
+
+  ----
+
+  Workaround:
+
+  qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
+
+  Run "qemu-img convert" with "a single coroutine" to avoid this issue.
+
+  ----
+
+  (gdb) thread 1
+  ...
+  (gdb) bt
+  #0 0x0000ffffbf1ad81c in __GI_ppoll
+  #1 0x0000aaaaaabcf73c in ppoll
+  #2 qemu_poll_ns
+  #3 0x0000aaaaaabd0764 in os_host_main_loop_wait
+  #4 main_loop_wait
+  ...
+
+  (gdb) thread 2
+  ...
+  (gdb) bt
+  #0 syscall ()
+  #1 0x0000aaaaaabd41cc in qemu_futex_wait
+  #2 qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)
+  #3 0x0000aaaaaabed05c in call_rcu_thread
+  #4 0x0000aaaaaabd34c8 in qemu_thread_start
+  #5 0x0000ffffbf25c880 in start_thread
+  #6 0x0000ffffbf1b6b9c in thread_start ()
+
+  (gdb) thread 3
+  ...
+  (gdb) bt
+  #0 0x0000ffffbf11aa20 in __GI___sigtimedwait
+  #1 0x0000ffffbf2671b4 in __sigwait
+  #2 0x0000aaaaaabd1ddc in sigwait_compat
+  #3 0x0000aaaaaabd34c8 in qemu_thread_start
+  #4 0x0000ffffbf25c880 in start_thread
+  #5 0x0000ffffbf1b6b9c in thread_start
+
+  ----
+
+  (gdb) run
+  Starting program: /usr/bin/qemu-img convert -f qcow2 -O qcow2
+  ./disk01.ext4.qcow2 ./output.qcow2
+
+  [New Thread 0xffffbec5ad90 (LWP 72839)]
+  [New Thread 0xffffbe459d90 (LWP 72840)]
+  [New Thread 0xffffbdb57d90 (LWP 72841)]
+  [New Thread 0xffffacac9d90 (LWP 72859)]
+  [New Thread 0xffffa7ffed90 (LWP 72860)]
+  [New Thread 0xffffa77fdd90 (LWP 72861)]
+  [New Thread 0xffffa6ffcd90 (LWP 72862)]
+  [New Thread 0xffffa67fbd90 (LWP 72863)]
+  [New Thread 0xffffa5ffad90 (LWP 72864)]
+
+  [Thread 0xffffa5ffad90 (LWP 72864) exited]
+  [Thread 0xffffa6ffcd90 (LWP 72862) exited]
+  [Thread 0xffffa77fdd90 (LWP 72861) exited]
+  [Thread 0xffffbdb57d90 (LWP 72841) exited]
+  [Thread 0xffffa67fbd90 (LWP 72863) exited]
+  [Thread 0xffffacac9d90 (LWP 72859) exited]
+  [Thread 0xffffa7ffed90 (LWP 72860) exited]
+
+  <HUNG w/ 3 threads in the stack trace showed before>
+  """
+
+  All the tasks left are blocked in a system call, so no task left to call
+  qemu_futex_wake() to unblock thread #2 (in futex()), which would unblock
+  thread #1 (doing poll() in a pipe with thread #2).
+
+  Those 7 threads exit before disk conversion is complete (sometimes in
+  the beginning, sometimes at the end).
+
+  ----
+
+  [ Original Description ]
+
+  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
+  frequently hangs (~50% of the time) with this command:
+
+  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
+
+  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
+  qcow2->qcow2 conversion happens to be something uvtool does every time
+  it fetches images.
+
+  Once hung, attaching gdb gives the following backtrace:
+
+  (gdb) bt
+  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
+274213760,
+  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3D<optimized out>, timeout@entry=3D0x0, s=
+igmask=3D0xffffc123b950)
+  =C2=A0=C2=A0=C2=A0=C2=A0at ../sysdeps/unix/sysv/linux/ppoll.c:39
+  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
+ptimized out>,
+  =C2=A0=C2=A0=C2=A0=C2=A0__fds=3D<optimized out>) at /usr/include/aarch64-=
+linux-gnu/bits/poll2.h:77
+  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>,
+  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.=
+c:322
+  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
+  =C2=A0=C2=A0=C2=A0=C2=A0at util/main-loop.c:233
+  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
+  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
+g.c:1980
+  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
+img.c:2456
+  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
+-img.c:4975
+
+  Reproduced w/ latest QEMU git (@ 53744e0a182)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1805256/+subscriptions
 
