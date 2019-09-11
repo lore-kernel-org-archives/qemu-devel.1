@@ -2,57 +2,64 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA7AC49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:57:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5E3AC5ACAE
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:57:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EAB22085B
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:57:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EAB22085B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
+	by mail.kernel.org (Postfix) with ESMTPS id ACF3320863
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 14:57:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACF3320863
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i843p-0005WD-8A
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:57:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44745)
+	id 1i844C-0005zA-65
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 10:57:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47935)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>) id 1i83m8-0003CV-Kg
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:39:18 -0400
+ (envelope-from <clg@kaod.org>) id 1i840I-0002OR-1V
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:53:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <geert@linux-m68k.org>) id 1i83m6-0001xW-PO
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:39:16 -0400
-Received: from michel.telenet-ops.be ([2a02:1800:110:4::f00:18]:46362)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <geert@linux-m68k.org>)
- id 1i83m6-0001vF-G9
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:39:14 -0400
-Received: from ramsan ([84.194.98.4]) by michel.telenet-ops.be with bizsmtp
- id 0Ef42100305gfCL06Ef4Rm; Wed, 11 Sep 2019 16:39:10 +0200
-Received: from rox.of.borg ([192.168.97.57]) by ramsan with esmtp (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>)
- id 1i83lv-0006TA-Vs; Wed, 11 Sep 2019 16:39:03 +0200
-Received: from geert by rox.of.borg with local (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>)
- id 1i83lv-0003PF-UY; Wed, 11 Sep 2019 16:39:03 +0200
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-To: Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <bgolaszewski@baylibre.com>
-Date: Wed, 11 Sep 2019 16:38:57 +0200
-Message-Id: <20190911143858.13024-5-geert+renesas@glider.be>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190911143858.13024-1-geert+renesas@glider.be>
-References: <20190911143858.13024-1-geert+renesas@glider.be>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 2a02:1800:110:4::f00:18
-Subject: [Qemu-devel] [PATCH/RFC v2 4/5] gpio: Add GPIO Forwarder Helper
+ (envelope-from <clg@kaod.org>) id 1i840F-00017X-Et
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:53:53 -0400
+Received: from 12.mo5.mail-out.ovh.net ([46.105.39.65]:56926)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i840F-00016b-5l
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 10:53:51 -0400
+Received: from player699.ha.ovh.net (unknown [10.109.159.20])
+ by mo5.mail-out.ovh.net (Postfix) with ESMTP id 9732B24ACE7
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 16:53:48 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+ (Authenticated sender: clg@kaod.org)
+ by player699.ha.ovh.net (Postfix) with ESMTPSA id C01CA9B196BE;
+ Wed, 11 Sep 2019 14:53:39 +0000 (UTC)
+To: Balamuruhan S <bala24@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20190911142925.19197-1-bala24@linux.ibm.com>
+ <20190911142925.19197-4-bala24@linux.ibm.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <3befce98-636f-4c8b-3993-5e595126d968@kaod.org>
+Date: Wed, 11 Sep 2019 16:53:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190911142925.19197-4-bala24@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 755478839592782674
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrtdefgdehgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.39.65
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] hw/ppc/pnv_homer: add PowerNV homer
+ device model
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,364 +71,498 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Marc Zyngier <marc.zyngier@arm.com>, Magnus Damm <magnus.damm@gmail.com>,
- Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-gpio@vger.kernel.org,
- Alexander Graf <graf@amazon.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Harish Jenny K N <harish_kandiga@mentor.com>,
- Phil Reid <preid@electromag.com.au>
+Cc: maddy@linux.vnet.ibm.com, groug@kaod.org, anju@linux.vnet.ibm.com,
+ qemu-ppc@nongnu.org, hari@linux.vnet.ibm.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a helper for creating GPIO chips that merely forward all operations
-to other GPIOs.
+On 11/09/2019 16:29, Balamuruhan S wrote:
+> add PnvHomer device model to emulate homer memory access
+> for pstate table, occ-sensors, slw, occ static and dynamic
+> values for Power8 and Power9 chips.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-This will be used by the GPIO Aggregator.
+I don't remember this "Signed-off-by". Please remove it.
 
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
-I expect this can be used by the GPIO inverter, too, after adding an
-"invert" flag, or a filter function that checks which offsets need
-inversion.
----
- drivers/gpio/Kconfig       |   3 +
- drivers/gpio/Makefile      |   1 +
- drivers/gpio/gpiolib-fwd.c | 272 +++++++++++++++++++++++++++++++++++++
- drivers/gpio/gpiolib-fwd.h |  16 +++
- 4 files changed, 292 insertions(+)
- create mode 100644 drivers/gpio/gpiolib-fwd.c
- create mode 100644 drivers/gpio/gpiolib-fwd.h
+A part from that, it looks good. One minor comment below,
 
-diff --git a/drivers/gpio/Kconfig b/drivers/gpio/Kconfig
-index 38e096e6925fa65d..29d3ce8debcca1f6 100644
---- a/drivers/gpio/Kconfig
-+++ b/drivers/gpio/Kconfig
-@@ -47,6 +47,9 @@ config GPIOLIB_IRQCHIP
- 	select IRQ_DOMAIN
- 	bool
- 
-+config GPIOLIB_FWD
-+	tristate
-+
- config DEBUG_GPIO
- 	bool "Debug GPIO calls"
- 	depends on DEBUG_KERNEL
-diff --git a/drivers/gpio/Makefile b/drivers/gpio/Makefile
-index d2fd19c15bae3fba..8a0e685c92b69855 100644
---- a/drivers/gpio/Makefile
-+++ b/drivers/gpio/Makefile
-@@ -10,6 +10,7 @@ obj-$(CONFIG_GPIOLIB)		+= gpiolib-devprop.o
- obj-$(CONFIG_OF_GPIO)		+= gpiolib-of.o
- obj-$(CONFIG_GPIO_SYSFS)	+= gpiolib-sysfs.o
- obj-$(CONFIG_GPIO_ACPI)		+= gpiolib-acpi.o
-+obj-$(CONFIG_GPIOLIB_FWD)	+= gpiolib-fwd.o
- 
- # Device drivers. Generally keep list sorted alphabetically
- obj-$(CONFIG_GPIO_GENERIC)	+= gpio-generic.o
-diff --git a/drivers/gpio/gpiolib-fwd.c b/drivers/gpio/gpiolib-fwd.c
-new file mode 100644
-index 0000000000000000..28dac8c60a981337
---- /dev/null
-+++ b/drivers/gpio/gpiolib-fwd.c
-@@ -0,0 +1,272 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+//
-+// GPIO Forwarder Helper
-+//
-+// Copyright (C) 2019 Glider bvba
-+
-+#include <linux/bitmap.h>
-+#include <linux/bitops.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/mutex.h>
-+#include <linux/overflow.h>
-+#include <linux/spinlock.h>
-+
-+#include "gpiolib.h"
-+#include "gpiolib-fwd.h"
-+
-+struct gpiochip_fwd {
-+	struct gpio_chip chip;
-+	struct gpio_desc **descs;
-+	union {
-+		struct mutex mlock;	/* protects tmp[] if can_sleep */
-+		spinlock_t slock;	/* protects tmp[] if !can_sleep */
-+	};
-+	unsigned long tmp[];		/* values and descs for multiple ops */
-+};
-+
-+static int gpio_fwd_get_direction(struct gpio_chip *chip, unsigned int offset)
-+{
-+	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
-+
-+	return gpiod_get_direction(fwd->descs[offset]);
-+}
-+
-+static int gpio_fwd_direction_input(struct gpio_chip *chip, unsigned int offset)
-+{
-+	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
-+
-+	return gpiod_direction_input(fwd->descs[offset]);
-+}
-+
-+static int gpio_fwd_direction_output(struct gpio_chip *chip,
-+				     unsigned int offset, int value)
-+{
-+	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
-+
-+	return gpiod_direction_output(fwd->descs[offset], value);
-+}
-+
-+static int gpio_fwd_get(struct gpio_chip *chip, unsigned int offset)
-+{
-+	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
-+
-+	return gpiod_get_value(fwd->descs[offset]);
-+}
-+
-+static int gpio_fwd_get_multiple(struct gpio_chip *chip, unsigned long *mask,
-+				 unsigned long *bits)
-+{
-+	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
-+	unsigned long *values, flags;
-+	struct gpio_desc **descs;
-+	unsigned int i, j = 0;
-+	int error;
-+
-+	if (chip->can_sleep)
-+		mutex_lock(&fwd->mlock);
-+	else
-+		spin_lock_irqsave(&fwd->slock, flags);
-+
-+	values = &fwd->tmp[0];
-+	bitmap_clear(values, 0, fwd->chip.ngpio);
-+	descs = (void *)&fwd->tmp[BITS_TO_LONGS(fwd->chip.ngpio)];
-+
-+	for_each_set_bit(i, mask, fwd->chip.ngpio)
-+		descs[j++] = fwd->descs[i];
-+
-+	error = gpiod_get_array_value(j, descs, NULL, values);
-+	if (!error) {
-+		j = 0;
-+		for_each_set_bit(i, mask, fwd->chip.ngpio)
-+			__assign_bit(i, bits, test_bit(j++, values));
-+	}
-+
-+	if (chip->can_sleep)
-+		mutex_unlock(&fwd->mlock);
-+	else
-+		spin_unlock_irqrestore(&fwd->slock, flags);
-+
-+	return error;
-+}
-+
-+static void gpio_fwd_set(struct gpio_chip *chip, unsigned int offset, int value)
-+{
-+	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
-+
-+	gpiod_set_value(fwd->descs[offset], value);
-+}
-+
-+static void gpio_fwd_set_multiple(struct gpio_chip *chip, unsigned long *mask,
-+				  unsigned long *bits)
-+{
-+	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
-+	unsigned long *values, flags;
-+	struct gpio_desc **descs;
-+	unsigned int i, j = 0;
-+
-+	if (chip->can_sleep)
-+		mutex_lock(&fwd->mlock);
-+	else
-+		spin_lock_irqsave(&fwd->slock, flags);
-+
-+	values = &fwd->tmp[0];
-+	descs = (void *)&fwd->tmp[BITS_TO_LONGS(fwd->chip.ngpio)];
-+
-+	for_each_set_bit(i, mask, fwd->chip.ngpio) {
-+		__assign_bit(j, values, test_bit(i, bits));
-+		descs[j++] = fwd->descs[i];
-+	}
-+
-+	gpiod_set_array_value(j, descs, NULL, values);
-+
-+	if (chip->can_sleep)
-+		mutex_unlock(&fwd->mlock);
-+	else
-+		spin_unlock_irqrestore(&fwd->slock, flags);
-+}
-+
-+static int gpio_fwd_set_config(struct gpio_chip *chip, unsigned int offset,
-+			       unsigned long config)
-+{
-+	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
-+
-+	chip = fwd->descs[offset]->gdev->chip;
-+	if (chip->set_config)
-+		return chip->set_config(chip, offset, config);
-+
-+	return -ENOTSUPP;
-+}
-+
-+static int gpio_fwd_init_valid_mask(struct gpio_chip *chip,
-+				    unsigned long *valid_mask,
-+				    unsigned int ngpios)
-+{
-+	struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
-+	unsigned int i;
-+
-+	for (i = 0; i < ngpios; i++) {
-+		if (!gpiochip_line_is_valid(fwd->descs[i]->gdev->chip,
-+					    gpio_chip_hwgpio(fwd->descs[i])))
-+			clear_bit(i, valid_mask);
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * gpiochip_fwd_create() - Create a new GPIO forwarder
-+ * @label: Name of the forwarder
-+ * @parent: Optional parent device pointer
-+ * @ngpios: Number of GPIOs in the forwarder.
-+ * @descs: Array containing the GPIO descriptors to forward to.
-+ *         This array must contain @ngpios entries, and must not be deallocated
-+ *         before the forwarder has been destroyed again.
-+ *
-+ * This function creates a new gpiochip, which forwards all GPIO operations to
-+ * the passed GPIO descriptors.
-+ *
-+ * Return: An opaque object pointer, or an ERR_PTR()-encoded negative error
-+ *         code on failure.
-+ */
-+struct gpiochip_fwd *gpiochip_fwd_create(const char *label,
-+					 struct device *parent,
-+					 unsigned int ngpios,
-+					 struct gpio_desc *descs[])
-+{
-+	struct gpiochip_fwd *fwd;
-+	struct gpio_chip *chip;
-+	unsigned int i;
-+	int error;
-+
-+	fwd = kzalloc(struct_size(fwd, tmp, BITS_TO_LONGS(ngpios) + ngpios),
-+		      GFP_KERNEL);
-+	if (!fwd)
-+		return ERR_PTR(-ENOMEM);
-+
-+	chip = &fwd->chip;
-+
-+	for (i = 0; i < ngpios; i++) {
-+		pr_debug("%s: gpio %u => gpio-%d (%s)\n", label, i,
-+			 desc_to_gpio(descs[i]), descs[i]->label ? : "?");
-+
-+		error = gpiod_request(descs[i], label);
-+		if (error) {
-+			gpiod_err(descs[i], "%s: Cannot request GPIO: %d\n",
-+				  label, error);
-+			goto free;
-+		}
-+
-+		if (gpiod_cansleep(descs[i]))
-+			chip->can_sleep = true;
-+		if (descs[i]->gdev->chip->set_config)
-+			chip->set_config = gpio_fwd_set_config;
-+		if (descs[i]->gdev->chip->init_valid_mask)
-+			chip->init_valid_mask = gpio_fwd_init_valid_mask;
-+	}
-+
-+	chip->label = label;
-+	chip->parent = parent;
-+	chip->owner = THIS_MODULE;
-+	chip->get_direction = gpio_fwd_get_direction;
-+	chip->direction_input = gpio_fwd_direction_input;
-+	chip->direction_output = gpio_fwd_direction_output;
-+	chip->get = gpio_fwd_get;
-+	chip->get_multiple = gpio_fwd_get_multiple;
-+	chip->set = gpio_fwd_set;
-+	chip->set_multiple = gpio_fwd_set_multiple;
-+	chip->base = -1;
-+	chip->ngpio = ngpios;
-+	fwd->descs = descs;
-+
-+	if (chip->can_sleep)
-+		mutex_init(&fwd->mlock);
-+	else
-+		spin_lock_init(&fwd->slock);
-+
-+	error = gpiochip_add_data(chip, fwd);
-+	if (error)
-+		goto free;
-+
-+	return fwd;
-+
-+free:
-+	while (i-- > 0)
-+		gpiod_free(descs[i]);
-+
-+	kfree(fwd);
-+
-+	return ERR_PTR(error);
-+}
-+EXPORT_SYMBOL_GPL(gpiochip_fwd_create);
-+
-+/**
-+ * gpiochip_fwd_destroy() - Destroy a new GPIO forwarder
-+ * @fwd: Opaque object pointer, as returned by gpiochip_fwd_create()
-+ *
-+ * This function destroys GPIO forwarder gpiochip, previously created by
-+ * gpiochip_fwd_create().
-+
-+ * Return: Zero.
-+ */
-+int gpiochip_fwd_destroy(struct gpiochip_fwd *fwd)
-+{
-+	unsigned int i;
-+
-+	if (IS_ERR_OR_NULL(fwd))
-+		return 0;
-+
-+	gpiochip_remove(&fwd->chip);
-+
-+	for (i = 0; i < fwd->chip.ngpio; i++)
-+		gpiod_free(fwd->descs[i]);
-+
-+	kfree(fwd);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(gpiochip_fwd_destroy);
-+
-+MODULE_AUTHOR("Geert Uytterhoeven <geert+renesas@glider.be>");
-+MODULE_DESCRIPTION("GPIO Forwarder Helper");
-+MODULE_LICENSE("GPL v2");
-diff --git a/drivers/gpio/gpiolib-fwd.h b/drivers/gpio/gpiolib-fwd.h
-new file mode 100644
-index 0000000000000000..68d299afc6883a9c
---- /dev/null
-+++ b/drivers/gpio/gpiolib-fwd.h
-@@ -0,0 +1,16 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * GPIO Forwarder Helper
-+ *
-+ * Copyright (C) 2019 Glider bvba
-+ */
-+
-+struct device;
-+struct gpio_desc;
-+struct gpiochip_fwd;
-+
-+struct gpiochip_fwd *gpiochip_fwd_create(const char *label,
-+					 struct device *parent,
-+					 unsigned int ngpios,
-+					 struct gpio_desc *descs[]);
-+int gpiochip_fwd_destroy(struct gpiochip_fwd *fwd);
--- 
-2.17.1
+> Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
+> ---
+>  hw/ppc/Makefile.objs       |   1 +
+>  hw/ppc/pnv.c               |  30 +++++
+>  hw/ppc/pnv_homer.c         | 269 +++++++++++++++++++++++++++++++++++++=
+++++++++
+>  include/hw/ppc/pnv.h       |   3 +
+>  include/hw/ppc/pnv_homer.h |  53 +++++++++
+>  5 files changed, 356 insertions(+)
+>  create mode 100644 hw/ppc/pnv_homer.c
+>  create mode 100644 include/hw/ppc/pnv_homer.h
+>=20
+> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+> index 2c4e1c8de0..580bb4f0dd 100644
+> --- a/hw/ppc/Makefile.objs
+> +++ b/hw/ppc/Makefile.objs
+> @@ -9,6 +9,7 @@ obj-$(CONFIG_PSERIES) +=3D spapr_tpm_proxy.o
+>  obj-$(CONFIG_SPAPR_RNG) +=3D  spapr_rng.o
+>  # IBM PowerNV
+>  obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_=
+psi.o pnv_occ.o pnv_bmc.o
+> +obj-$(CONFIG_POWERNV) +=3D pnv_homer.o
+>  ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
+>  obj-y +=3D spapr_pci_vfio.o spapr_pci_nvlink2.o
+>  endif
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 80338ffe87..f249e72356 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -847,6 +847,11 @@ static void pnv_chip_power8_instance_init(Object *=
+obj)
+>                              TYPE_PNV8_OCC, &error_abort, NULL);
+>      object_property_add_const_link(OBJECT(&chip8->occ), "psi",
+>                                     OBJECT(&chip8->psi), &error_abort);
+> +
+> +    object_initialize_child(obj, "homer",  &chip8->homer, sizeof(chip8=
+->homer),
+> +                            TYPE_PNV8_HOMER, &error_abort, NULL);
+> +    object_property_add_const_link(OBJECT(&chip8->homer), "chip", obj,
+> +                                   &error_abort);
+>  }
+> =20
+>  static void pnv_chip_icp_realize(Pnv8Chip *chip8, Error **errp)
+> @@ -942,6 +947,16 @@ static void pnv_chip_power8_realize(DeviceState *d=
+ev, Error **errp)
+>      /* OCC SRAM model */
+>      memory_region_add_subregion(get_system_memory(), PNV_OCC_COMMON_AR=
+EA(chip),
+>                                  &chip8->occ.sram_regs);
+> +
+> +    /* HOMER */
+> +    object_property_set_bool(OBJECT(&chip8->homer), true, "realized",
+> +                             &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +    memory_region_add_subregion(get_system_memory(), PNV_HOMER_BASE(ch=
+ip),
+> +                                &chip8->homer.regs);
+>  }
+> =20
+>  static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data=
+)
+> @@ -1024,6 +1039,11 @@ static void pnv_chip_power9_instance_init(Object=
+ *obj)
+>                              TYPE_PNV9_OCC, &error_abort, NULL);
+>      object_property_add_const_link(OBJECT(&chip9->occ), "psi",
+>                                     OBJECT(&chip9->psi), &error_abort);
+> +
+> +    object_initialize_child(obj, "homer",  &chip9->homer, sizeof(chip9=
+->homer),
+> +                            TYPE_PNV9_HOMER, &error_abort, NULL);
+> +    object_property_add_const_link(OBJECT(&chip9->homer), "chip", obj,
+> +                                   &error_abort);
+>  }
+> =20
+>  static void pnv_chip_quad_realize(Pnv9Chip *chip9, Error **errp)
+> @@ -1134,6 +1154,16 @@ static void pnv_chip_power9_realize(DeviceState =
+*dev, Error **errp)
+>      /* OCC SRAM model */
+>      memory_region_add_subregion(get_system_memory(), PNV9_OCC_COMMON_A=
+REA(chip),
+>                                  &chip9->occ.sram_regs);
+> +
+> +    /* HOMER */
+> +    object_property_set_bool(OBJECT(&chip9->homer), true, "realized",
+> +                             &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +    memory_region_add_subregion(get_system_memory(), PNV9_HOMER_BASE(c=
+hip),
+> +                                &chip9->homer.regs);
+>  }
+> =20
+>  static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
+> diff --git a/hw/ppc/pnv_homer.c b/hw/ppc/pnv_homer.c
+> new file mode 100644
+> index 0000000000..707219c73c
+> --- /dev/null
+> +++ b/hw/ppc/pnv_homer.c
+> @@ -0,0 +1,269 @@
+> +/*
+> + * QEMU PowerPC PowerNV Emulation of a few HOMER related registers
+> + *
+> + * Copyright (c) 2019, IBM Corporation.
+> + *
+> + * This program is free software; you can redistribute it and/or modif=
+y
+> + * it under the terms of the GNU General Public License, version 2, as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program; if not, see <http://www.gnu.org/licenses/>=
+.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "exec/hwaddr.h"
+> +#include "exec/memory.h"
+> +#include "sysemu/cpus.h"
+> +#include "hw/qdev-core.h"
+> +#include "hw/ppc/pnv.h"
+> +#include "hw/ppc/pnv_homer.h"
+> +
+> +
+> +static bool core_max_array(void *opaque, hwaddr addr)
+
+you can pass directly 'PnvHomer *homer' here.
+
+
+> +{
+> +    int i;
+> +    PnvHomer *homer =3D PNV_HOMER(opaque);
+> +    PnvHomerClass *hmrc =3D PNV_HOMER_GET_CLASS(homer);
+> +
+> +    for (i =3D 0; i <=3D homer->chip->nr_cores; i++) {
+> +        if (addr =3D=3D (hmrc->core_max_base + i)) {
+> +            return true;
+> +       }
+> +    }
+> +    return false;
+> +}
+> +
+> +/* P8 Pstate table */
+> +
+> +#define PNV8_OCC_PSTATE_VERSION          0x1f8001
+> +#define PNV8_OCC_PSTATE_MIN              0x1f8003
+> +#define PNV8_OCC_PSTATE_VALID            0x1f8000
+> +#define PNV8_OCC_PSTATE_THROTTLE         0x1f8002
+> +#define PNV8_OCC_PSTATE_NOM              0x1f8004
+> +#define PNV8_OCC_PSTATE_TURBO            0x1f8005
+> +#define PNV8_OCC_PSTATE_ULTRA_TURBO      0x1f8006
+> +#define PNV8_OCC_PSTATE_DATA             0x1f8008
+> +#define PNV8_OCC_PSTATE_ID_ZERO          0x1f8010
+> +#define PNV8_OCC_PSTATE_ID_ONE           0x1f8018
+> +#define PNV8_OCC_PSTATE_ID_TWO           0x1f8020
+> +#define PNV8_OCC_VDD_VOLTAGE_IDENTIFIER  0x1f8012
+> +#define PNV8_OCC_VCS_VOLTAGE_IDENTIFIER  0x1f8013
+> +#define PNV8_OCC_PSTATE_ZERO_FREQUENCY   0x1f8014
+> +#define PNV8_OCC_PSTATE_ONE_FREQUENCY    0x1f801c
+> +#define PNV8_OCC_PSTATE_TWO_FREQUENCY    0x1f8024
+> +#define PNV8_CORE_MAX_BASE               0x1f8810
+> +
+> +
+> +static uint64_t pnv_power8_homer_read(void *opaque, hwaddr addr,
+> +                                      unsigned size)
+> +{
+
+PnvHomer *homer =3D PNV_HOMER(opaque);
+
+> +    switch (addr) {
+> +    case PNV8_OCC_PSTATE_VERSION:
+> +    case PNV8_OCC_PSTATE_MIN:
+> +    case PNV8_OCC_PSTATE_ID_ZERO:
+> +        return 0;
+> +    case PNV8_OCC_PSTATE_VALID:
+> +    case PNV8_OCC_PSTATE_THROTTLE:
+> +    case PNV8_OCC_PSTATE_NOM:
+> +    case PNV8_OCC_PSTATE_TURBO:
+> +    case PNV8_OCC_PSTATE_ID_ONE:
+> +    case PNV8_OCC_VDD_VOLTAGE_IDENTIFIER:
+> +    case PNV8_OCC_VCS_VOLTAGE_IDENTIFIER:
+> +        return 1;
+> +    case PNV8_OCC_PSTATE_ULTRA_TURBO:
+> +    case PNV8_OCC_PSTATE_ID_TWO:
+> +        return 2;
+> +    case PNV8_OCC_PSTATE_DATA:
+> +        return 0x1000000000000000;
+> +    /* P8 frequency for 0, 1, and 2 pstates */
+> +    case PNV8_OCC_PSTATE_ZERO_FREQUENCY:
+> +    case PNV8_OCC_PSTATE_ONE_FREQUENCY:
+> +    case PNV8_OCC_PSTATE_TWO_FREQUENCY:
+> +        return 3000;
+> +    }
+> +    /* pstate table core max array */
+> +    if (core_max_array(opaque, addr)) {
+
+        if (core_max_array(homer, addr)) {
+
+> +        return 1;
+> +    }
+> +    return 0;
+> +}
+> +
+> +static void pnv_power8_homer_write(void *opaque, hwaddr addr,
+> +                                   uint64_t val, unsigned size)
+> +{
+> +    /* callback function defined to homer write */
+> +    return;
+> +}
+> +
+> +static const MemoryRegionOps pnv_power8_homer_ops =3D {
+> +    .read =3D pnv_power8_homer_read,
+> +    .write =3D pnv_power8_homer_write,
+> +    .valid.min_access_size =3D 1,
+> +    .valid.max_access_size =3D 8,
+> +    .impl.min_access_size =3D 1,
+> +    .impl.max_access_size =3D 8,
+> +    .endianness =3D DEVICE_BIG_ENDIAN,
+> +};
+> +
+> +static void pnv_homer_power8_class_init(ObjectClass *klass, void *data=
+)
+> +{
+> +    PnvHomerClass *homer =3D PNV_HOMER_CLASS(klass);
+> +
+> +    homer->homer_size =3D PNV_HOMER_SIZE;
+> +    homer->homer_ops =3D &pnv_power8_homer_ops;
+> +    homer->core_max_base =3D PNV8_CORE_MAX_BASE;
+> +}
+> +
+> +static const TypeInfo pnv_homer_power8_type_info =3D {
+> +    .name          =3D TYPE_PNV8_HOMER,
+> +    .parent        =3D TYPE_PNV_HOMER,
+> +    .instance_size =3D sizeof(PnvHomer),
+> +    .class_init    =3D pnv_homer_power8_class_init,
+> +};
+> +
+> +/* P9 Pstate table */
+> +
+> +#define PNV9_OCC_PSTATE_ID_ZERO          0xe2018
+> +#define PNV9_OCC_PSTATE_ID_ONE           0xe2020
+> +#define PNV9_OCC_PSTATE_ID_TWO           0xe2028
+> +#define PNV9_OCC_PSTATE_DATA             0xe2000
+> +#define PNV9_OCC_PSTATE_DATA_AREA        0xe2008
+> +#define PNV9_OCC_PSTATE_MIN              0xe2003
+> +#define PNV9_OCC_PSTATE_NOM              0xe2004
+> +#define PNV9_OCC_PSTATE_TURBO            0xe2005
+> +#define PNV9_OCC_PSTATE_ULTRA_TURBO      0xe2818
+> +#define PNV9_OCC_MAX_PSTATE_ULTRA_TURBO  0xe2006
+> +#define PNV9_OCC_PSTATE_MAJOR_VERSION    0xe2001
+> +#define PNV9_OCC_OPAL_RUNTIME_DATA       0xe2b85
+> +#define PNV9_CHIP_HOMER_IMAGE_POINTER    0x200008
+> +#define PNV9_CHIP_HOMER_BASE             0x0
+> +#define PNV9_OCC_PSTATE_ZERO_FREQUENCY   0xe201c
+> +#define PNV9_OCC_PSTATE_ONE_FREQUENCY    0xe2024
+> +#define PNV9_OCC_PSTATE_TWO_FREQUENCY    0xe202c
+> +#define PNV9_OCC_ROLE_MASTER_OR_SLAVE    0xe2002
+> +#define PNV9_CORE_MAX_BASE               0xe2819
+> +
+> +
+> +static uint64_t pnv_power9_homer_read(void *opaque, hwaddr addr,
+> +                                      unsigned size)
+> +{
+> +    switch (addr) {
+> +    case PNV9_OCC_MAX_PSTATE_ULTRA_TURBO:
+> +    case PNV9_OCC_PSTATE_ID_ZERO:
+> +        return 0;
+> +    case PNV9_OCC_PSTATE_DATA:
+> +    case PNV9_OCC_ROLE_MASTER_OR_SLAVE:
+> +    case PNV9_OCC_PSTATE_NOM:
+> +    case PNV9_OCC_PSTATE_TURBO:
+> +    case PNV9_OCC_PSTATE_ID_ONE:
+> +    case PNV9_OCC_PSTATE_ULTRA_TURBO:
+> +    case PNV9_OCC_OPAL_RUNTIME_DATA:
+> +        return 1;
+> +    case PNV9_OCC_PSTATE_MIN:
+> +    case PNV9_OCC_PSTATE_ID_TWO:
+> +        return 2;
+> +
+> +    /* 3000 khz frequency for 0, 1, and 2 pstates */
+> +    case PNV9_OCC_PSTATE_ZERO_FREQUENCY:
+> +    case PNV9_OCC_PSTATE_ONE_FREQUENCY:
+> +    case PNV9_OCC_PSTATE_TWO_FREQUENCY:
+> +        return 3000;
+> +    case PNV9_OCC_PSTATE_MAJOR_VERSION:
+> +        return 0x90;
+> +    case PNV9_CHIP_HOMER_BASE:
+> +    case PNV9_OCC_PSTATE_DATA_AREA:
+> +    case PNV9_CHIP_HOMER_IMAGE_POINTER:
+> +        return 0x1000000000000000;
+> +    }
+> +    /* pstate table core max array */
+> +    if (core_max_array(opaque, addr)) {
+> +        return 1;
+> +    }
+> +    return 0;
+> +}
+> +
+> +static void pnv_power9_homer_write(void *opaque, hwaddr addr,
+> +                                   uint64_t val, unsigned size)
+> +{
+> +    /* callback function defined to homer write */
+> +    return;
+> +}
+> +
+> +static const MemoryRegionOps pnv_power9_homer_ops =3D {
+> +    .read =3D pnv_power9_homer_read,
+> +    .write =3D pnv_power9_homer_write,
+> +    .valid.min_access_size =3D 1,
+> +    .valid.max_access_size =3D 8,
+> +    .impl.min_access_size =3D 1,
+> +    .impl.max_access_size =3D 8,
+> +    .endianness =3D DEVICE_BIG_ENDIAN,
+> +};
+> +
+> +static void pnv_homer_power9_class_init(ObjectClass *klass, void *data=
+)
+> +{
+> +    PnvHomerClass *homer =3D PNV_HOMER_CLASS(klass);
+> +
+> +    homer->homer_size =3D PNV9_HOMER_SIZE;
+> +    homer->homer_ops =3D &pnv_power9_homer_ops;
+> +    homer->core_max_base =3D PNV9_CORE_MAX_BASE;
+> +}
+> +
+> +static const TypeInfo pnv_homer_power9_type_info =3D {
+> +    .name          =3D TYPE_PNV9_HOMER,
+> +    .parent        =3D TYPE_PNV_HOMER,
+> +    .instance_size =3D sizeof(PnvHomer),
+> +    .class_init    =3D pnv_homer_power9_class_init,
+> +};
+> +
+> +static void pnv_homer_realize(DeviceState *dev, Error **errp)
+> +{
+> +    PnvHomer *homer =3D PNV_HOMER(dev);
+> +    PnvHomerClass *hmrc =3D PNV_HOMER_GET_CLASS(homer);
+> +    Object *obj;
+> +    Error *local_err =3D NULL;
+> +
+> +    obj =3D object_property_get_link(OBJECT(dev), "chip", &local_err);
+> +    if (!obj) {
+> +        error_propagate(errp, local_err);
+> +        error_prepend(errp, "required link 'chip' not found: ");
+> +        return;
+> +    }
+> +    homer->chip =3D PNV_CHIP(obj);
+> +    /* homer region */
+> +    memory_region_init_io(&homer->regs, OBJECT(dev),
+> +                          hmrc->homer_ops, homer, "homer-main-memory",
+> +                          hmrc->homer_size);
+> +}
+> +
+> +static void pnv_homer_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +
+> +    dc->realize =3D pnv_homer_realize;
+> +    dc->desc =3D "PowerNV HOMER Memory";
+> +}
+> +
+> +static const TypeInfo pnv_homer_type_info =3D {
+> +    .name          =3D TYPE_PNV_HOMER,
+> +    .parent        =3D TYPE_DEVICE,
+> +    .instance_size =3D sizeof(PnvHomer),
+> +    .class_init    =3D pnv_homer_class_init,
+> +    .class_size    =3D sizeof(PnvHomerClass),
+> +    .abstract      =3D true,
+> +};
+> +
+> +static void pnv_homer_register_types(void)
+> +{
+> +    type_register_static(&pnv_homer_type_info);
+> +    type_register_static(&pnv_homer_power8_type_info);
+> +    type_register_static(&pnv_homer_power9_type_info);
+> +}
+> +
+> +type_init(pnv_homer_register_types);
+> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+> index 63a4b7b6a7..1cdbe55bf8 100644
+> --- a/include/hw/ppc/pnv.h
+> +++ b/include/hw/ppc/pnv.h
+> @@ -26,6 +26,7 @@
+>  #include "hw/ppc/pnv_lpc.h"
+>  #include "hw/ppc/pnv_psi.h"
+>  #include "hw/ppc/pnv_occ.h"
+> +#include "hw/ppc/pnv_homer.h"
+>  #include "hw/ppc/pnv_xive.h"
+>  #include "hw/ppc/pnv_core.h"
+> =20
+> @@ -76,6 +77,7 @@ typedef struct Pnv8Chip {
+>      PnvLpcController lpc;
+>      Pnv8Psi      psi;
+>      PnvOCC       occ;
+> +    PnvHomer     homer;
+>  } Pnv8Chip;
+> =20
+>  #define TYPE_PNV9_CHIP "pnv9-chip"
+> @@ -90,6 +92,7 @@ typedef struct Pnv9Chip {
+>      Pnv9Psi      psi;
+>      PnvLpcController lpc;
+>      PnvOCC       occ;
+> +    PnvHomer     homer;
+> =20
+>      uint32_t     nr_quads;
+>      PnvQuad      *quads;
+> diff --git a/include/hw/ppc/pnv_homer.h b/include/hw/ppc/pnv_homer.h
+> new file mode 100644
+> index 0000000000..abaec43c2d
+> --- /dev/null
+> +++ b/include/hw/ppc/pnv_homer.h
+> @@ -0,0 +1,53 @@
+> +/*
+> + * QEMU PowerPC PowerNV Emulation of a few HOMER related registers
+> + *
+> + * Copyright (c) 2019, IBM Corporation.
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/li=
+censes/>.
+> + */
+> +
+> +#ifndef PPC_PNV_HOMER_H
+> +#define PPC_PNV_HOMER_H
+> +
+> +#include "hw/ppc/pnv.h"
+> +
+> +#define TYPE_PNV_HOMER "pnv-homer"
+> +#define PNV_HOMER(obj) OBJECT_CHECK(PnvHomer, (obj), TYPE_PNV_HOMER)
+> +#define TYPE_PNV8_HOMER TYPE_PNV_HOMER "-POWER8"
+> +#define PNV8_HOMER(obj) OBJECT_CHECK(PnvHomer, (obj), TYPE_PNV8_HOMER)
+> +#define TYPE_PNV9_HOMER TYPE_PNV_HOMER "-POWER9"
+> +#define PNV9_HOMER(obj) OBJECT_CHECK(PnvHomer, (obj), TYPE_PNV9_HOMER)
+> +
+> +typedef struct PnvHomer {
+> +    DeviceState parent;
+> +
+> +    struct PnvChip *chip;
+> +    MemoryRegion regs;
+> +} PnvHomer;
+> +
+> +#define PNV_HOMER_CLASS(klass)   \
+> +     OBJECT_CLASS_CHECK(PnvHomerClass, (klass), TYPE_PNV_HOMER)
+> +#define PNV_HOMER_GET_CLASS(obj) \
+> +     OBJECT_GET_CLASS(PnvHomerClass, (obj), TYPE_PNV_HOMER)
+> +
+> +typedef struct PnvHomerClass {
+> +    DeviceClass parent_class;
+> +
+> +    int homer_size;
+> +    const MemoryRegionOps *homer_ops;
+> +
+> +    hwaddr core_max_base;
+> +} PnvHomerClass;
+> +
+> +#endif /* PPC_PNV_HOMER_H */
+>=20
 
 
