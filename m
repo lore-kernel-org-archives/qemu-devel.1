@@ -2,93 +2,70 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EA73C5ACAE
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 22:13:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F82AC49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 22:21:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 016752081B
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 22:13:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 016752081B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D22B22085B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 22:21:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D22B22085B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8Arq-0005MY-48
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 18:13:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38014)
+	id 1i8AzT-0007zn-0U
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 18:21:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39367)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i8Ar8-0004cx-O5
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 18:12:55 -0400
+ (envelope-from <bounces@canonical.com>) id 1i8Ayf-0007Xd-43
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 18:20:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i8Ar7-0006E2-Kg
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 18:12:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44068)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1i8Ar5-0006BS-AR; Wed, 11 Sep 2019 18:12:51 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 92F863082135;
- Wed, 11 Sep 2019 22:12:50 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DAB4F5C207;
- Wed, 11 Sep 2019 22:12:47 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190911220849.30840-1-philmd@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <0cf09644-2da1-adda-3691-74206ab13dfd@redhat.com>
-Date: Wed, 11 Sep 2019 17:12:47 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <bounces@canonical.com>) id 1i8Ayd-0001KE-Hd
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 18:20:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41006)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1i8Ayd-0001Ie-Bq
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 18:20:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1i8Ayb-0004aa-ON
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 22:20:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id AE2A62E80C3
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 22:20:37 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190911220849.30840-1-philmd@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="WC0hlZKoX72D0pO3FgRuj2ow2GFdWRnz9"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Wed, 11 Sep 2019 22:12:50 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 11 Sep 2019 22:09:20 -0000
+From: Pierre Muller <1843651@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: pierre-freepascal
+X-Launchpad-Bug-Reporter: Pierre Muller (pierre-freepascal)
+X-Launchpad-Bug-Modifier: Pierre Muller (pierre-freepascal)
+Message-Id: <156823976031.17462.13699805496038510440.malonedeb@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19044";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: c9e3e0b75a90112512c5dbb2593d244b87487ba3
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] block/create: Do not abort if a block
- driver is not available
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1843651] [NEW] m68k fpu bug
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,101 +74,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Reply-To: Bug 1843651 <1843651@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WC0hlZKoX72D0pO3FgRuj2ow2GFdWRnz9
-Content-Type: multipart/mixed; boundary="eUylU63Z5v8s7V61ziRXmntGBWJlgYA6r";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <0cf09644-2da1-adda-3691-74206ab13dfd@redhat.com>
-Subject: Re: [PATCH] block/create: Do not abort if a block driver is not
- available
-References: <20190911220849.30840-1-philmd@redhat.com>
-In-Reply-To: <20190911220849.30840-1-philmd@redhat.com>
+Public bug reported:
 
---eUylU63Z5v8s7V61ziRXmntGBWJlgYA6r
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On gcc123 cfarm machine,
+I was testing m68k executables generated by Free Pascal Compiler.
 
-On 9/11/19 5:08 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> The 'blockdev-create' QMP command was introduced as experimental
-> feature in commit b0292b851b8, using the assert() debug call.
-> It got promoted to 'stable' command in 3fb588a0f2c, but the
-> assert call was not removed.
->=20
-> Some block drivers are optional, and bdrv_find_format() might
-> return a NULL value, triggering the assertion.
->=20
-> Stable code is not expected to abort, so return an error instead.
->=20
-
->=20
-> Reported-by: Xu Tian <xutian@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  block/create.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->=20
-> diff --git a/block/create.c b/block/create.c
-> index 1bd00ed5f8..89812669df 100644
-> --- a/block/create.c
-> +++ b/block/create.c
-> @@ -64,9 +64,13 @@ void qmp_blockdev_create(const char *job_id, Blockde=
-vCreateOptions *options,
->      const char *fmt =3D BlockdevDriver_str(options->driver);
->      BlockDriver *drv =3D bdrv_find_format(fmt);
-> =20
-> +    if (!drv) {
-> +        error_setg(errp, "Block driver '%s' not found or not supported=
-", fmt);
-> +        return;
-> +    }
-> +
->      /* If the driver is in the schema, we know that it exists. But it =
-may not
->       * be whitelisted. */
-> -    assert(drv);
->      if (bdrv_uses_whitelist() && !bdrv_is_whitelisted(drv, false)) {
->          error_setg(errp, "Driver is not whitelisted");
-
-Matches that we error for not being on the whitelist.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+muller@gcc123:~/pas/check$ cat inf.pp
+function get_double(x : double):double;
+  begin
+    get_double:=3Dx;
+  end;
 
 
---eUylU63Z5v8s7V61ziRXmntGBWJlgYA6r--
+var
+  y : double;
+  py : pbyte;
+  i : byte;
+begin
+  y:=3D1.0/0.0;
+  py:=3D@y;
+{$ifdef ENDIAN_LITTLE}
+  write('little endian y=3D');
+  for i:=3D7 downto 0 do
+{$else not ENDIAN_LITTLE}
+  write('big endian y=3D');
+  for i:=3D0 to 7 do
+{$endif}
+    write(hexstr(py[i],2));
+  writeln;
+  y:=3Dget_double(y)+1;
+{$ifdef ENDIAN_LITTLE}
+  write('little endian y=3D');
+  for i:=3D7 downto 0 do
+{$else not ENDIAN_LITTLE}
+  write('big endian y=3D');
+  for i:=3D0 to 7 do
+{$endif}
+    write(hexstr(py[i],2));
+  writeln;
+end.
+muller@gcc123:~/pas/check$ ppc68k inf
+Free Pascal Compiler version 3.3.1-r20:42973M [2019/09/11] for m68k
+Copyright (c) 1993-2019 by Florian Klaempfl and others
+Target OS: Linux for m68k
+Compiling inf.pp
+Assembling program
+Linking inf
+33 lines compiled, 0.1 sec
+muller@gcc123:~/pas/check$ ./inf
+big endian y=3D7FF0000000000000
+big endian y=3D7FFFFFFFFFFFFFFF
+muller@gcc123:~/pas/check$ qemu-m68k ./inf
+big endian y=3D7FF0000000000000
+big endian y=3D7FFFFFFFFFFFFFFF
+muller@gcc123:~/pas/check$ ~/sys-root/bin/qemu-m68k ./inf
+qemu-m68k        qemu-m68k-fixed
+muller@gcc123:~/pas/check$ ~/sys-root/bin/qemu-m68k-fixed ./inf
+big endian y=3D7FF0000000000000
+big endian y=3D7FF0000000000000
 
---WC0hlZKoX72D0pO3FgRuj2ow2GFdWRnz9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+~/sys-root/bin/qemu-m68k  is 4.1.0 release,
+~/sys-root/bin/qemu-m68k-fixed is the same source with a unique change:
 
------BEGIN PGP SIGNATURE-----
+gnu/qemu/qemu-4.1.0/fpu/softfloat-specialize.h:214:#if defined(TARGET_M68K)
+gnu/qemu/qemu-4.1.0/fpu/softfloat-specialize.h-215-#define floatx80_infinit=
+y_low  LIT64(0x0000000000000000)
+gnu/qemu/qemu-4.1.0/fpu/softfloat-specialize.h-216-#else
+gnu/qemu/qemu-4.1.0/fpu/softfloat-specialize.h-217-#define floatx80_infinit=
+y_low  LIT64(0x8000000000000000)
+gnu/qemu/qemu-4.1.0/fpu/softfloat-specialize.h-218-#endif
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl15cV8ACgkQp6FrSiUn
-Q2p3swgAg81i0aaZR80ppDkzA7/5lqs1OB8yB5TmDdkxnBV+8imrlnm2CfeINlch
-f1U9MolOABqqW9wB8p2orrY+c/zFxR3JB4j5eOflSgLl8ePymPrAR4mXwcjTFqM2
-AmmtgMgUDgnv5VnjSvDQxJGE9yn4Fcs3DYRBCuvJZv332WbvenWY4gbMaNpPoCrb
-1Ouhfcf0F+ap2y2iRHcfOwBr84kcbkmt3ey5zD6+reYrvaVap8ez3ts0ofqH6ZWL
-97FICZpck98pr0Jkx10aMxI2rVu/fvQpLim0sJh+lYFvfJtWCaroJoh8bNrQwiII
-iqtrWZ1meUpraQ5/7UwbrcHx5zXEjg==
-=Xbic
------END PGP SIGNATURE-----
+the M68K branch value is set to the same value as the other branch.
 
---WC0hlZKoX72D0pO3FgRuj2ow2GFdWRnz9--
+The problem of the M68K specific floatx86_infinity_low values
+is that is enters in conflict with
+muller@gcc123:~/pas/check$ grep -nA6 invalid_enc  /home/muller/gnu/qemu/qem=
+u-4.1.0/include/fpu/softfloat.h
+752:static inline bool floatx80_invalid_encoding(floatx80 a)
+753-{
+754-    return (a.low & (1ULL << 63)) =3D=3D 0 && (a.high & 0x7FFF) !=3D 0;
+755-}
+
+And thus the m68k variant of floatx80 representing +Infinity is
+considered as an invalid encoding, and thus converted into a NaN 7FFFFFFFFF=
+FFFFFF
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1843651
+
+Title:
+  m68k fpu bug
+
+Status in QEMU:
+  New
+
+Bug description:
+  On gcc123 cfarm machine,
+  I was testing m68k executables generated by Free Pascal Compiler.
+
+  muller@gcc123:~/pas/check$ cat inf.pp
+  function get_double(x : double):double;
+    begin
+      get_double:=3Dx;
+    end;
+
+  =
+
+  var
+    y : double;
+    py : pbyte;
+    i : byte;
+  begin
+    y:=3D1.0/0.0;
+    py:=3D@y;
+  {$ifdef ENDIAN_LITTLE}
+    write('little endian y=3D');
+    for i:=3D7 downto 0 do
+  {$else not ENDIAN_LITTLE}
+    write('big endian y=3D');
+    for i:=3D0 to 7 do
+  {$endif}
+      write(hexstr(py[i],2));
+    writeln;
+    y:=3Dget_double(y)+1;
+  {$ifdef ENDIAN_LITTLE}
+    write('little endian y=3D');
+    for i:=3D7 downto 0 do
+  {$else not ENDIAN_LITTLE}
+    write('big endian y=3D');
+    for i:=3D0 to 7 do
+  {$endif}
+      write(hexstr(py[i],2));
+    writeln;
+  end.
+  muller@gcc123:~/pas/check$ ppc68k inf
+  Free Pascal Compiler version 3.3.1-r20:42973M [2019/09/11] for m68k
+  Copyright (c) 1993-2019 by Florian Klaempfl and others
+  Target OS: Linux for m68k
+  Compiling inf.pp
+  Assembling program
+  Linking inf
+  33 lines compiled, 0.1 sec
+  muller@gcc123:~/pas/check$ ./inf
+  big endian y=3D7FF0000000000000
+  big endian y=3D7FFFFFFFFFFFFFFF
+  muller@gcc123:~/pas/check$ qemu-m68k ./inf
+  big endian y=3D7FF0000000000000
+  big endian y=3D7FFFFFFFFFFFFFFF
+  muller@gcc123:~/pas/check$ ~/sys-root/bin/qemu-m68k ./inf
+  qemu-m68k        qemu-m68k-fixed
+  muller@gcc123:~/pas/check$ ~/sys-root/bin/qemu-m68k-fixed ./inf
+  big endian y=3D7FF0000000000000
+  big endian y=3D7FF0000000000000
+
+  ~/sys-root/bin/qemu-m68k  is 4.1.0 release,
+  ~/sys-root/bin/qemu-m68k-fixed is the same source with a unique change:
+
+  gnu/qemu/qemu-4.1.0/fpu/softfloat-specialize.h:214:#if defined(TARGET_M68=
+K)
+  gnu/qemu/qemu-4.1.0/fpu/softfloat-specialize.h-215-#define floatx80_infin=
+ity_low  LIT64(0x0000000000000000)
+  gnu/qemu/qemu-4.1.0/fpu/softfloat-specialize.h-216-#else
+  gnu/qemu/qemu-4.1.0/fpu/softfloat-specialize.h-217-#define floatx80_infin=
+ity_low  LIT64(0x8000000000000000)
+  gnu/qemu/qemu-4.1.0/fpu/softfloat-specialize.h-218-#endif
+
+  the M68K branch value is set to the same value as the other branch.
+
+  The problem of the M68K specific floatx86_infinity_low values
+  is that is enters in conflict with
+  muller@gcc123:~/pas/check$ grep -nA6 invalid_enc  /home/muller/gnu/qemu/q=
+emu-4.1.0/include/fpu/softfloat.h
+  752:static inline bool floatx80_invalid_encoding(floatx80 a)
+  753-{
+  754-    return (a.low & (1ULL << 63)) =3D=3D 0 && (a.high & 0x7FFF) !=3D =
+0;
+  755-}
+
+  And thus the m68k variant of floatx80 representing +Infinity is
+  considered as an invalid encoding, and thus converted into a NaN 7FFFFFFF=
+FFFFFFFF
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1843651/+subscriptions
 
