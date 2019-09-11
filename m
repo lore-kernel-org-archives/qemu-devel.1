@@ -2,50 +2,51 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01785C49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 17:41:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 787B2C49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 17:49:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE0032081B
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 17:41:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE0032081B
+	by mail.kernel.org (Postfix) with ESMTPS id 515EF2081B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 17:49:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 515EF2081B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i86cj-0000Vb-RL
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 13:41:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52498)
+	id 1i86kS-0002Vi-H2
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 13:49:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54165)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i86bw-0008VF-8p
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 13:40:57 -0400
+ (envelope-from <eblake@redhat.com>) id 1i86jp-00027J-7A
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 13:49:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i86bv-0002rs-0c
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 13:40:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44810)
+ (envelope-from <eblake@redhat.com>) id 1i86jm-0007RN-P3
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 13:49:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47118)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i86bu-0002qt-P6
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 13:40:54 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1i86jm-0007R7-Go
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 13:49:02 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B40B3190C102
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 17:40:53 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C8C8D1DCC
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 17:49:01 +0000 (UTC)
 Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D0EE45D9E2;
- Wed, 11 Sep 2019 17:40:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3300560C18;
+ Wed, 11 Sep 2019 17:49:01 +0000 (UTC)
 To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
  qemu-devel@nongnu.org, pbonzini@redhat.com, berrange@redhat.com,
  quintela@redhat.com
 References: <20190911164202.31136-1-dgilbert@redhat.com>
  <20190911164202.31136-2-dgilbert@redhat.com>
+ <1a03f787-5cf8-6b8e-7489-3f90c3311032@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -72,18 +73,18 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <1a03f787-5cf8-6b8e-7489-3f90c3311032@redhat.com>
-Date: Wed, 11 Sep 2019 12:40:51 -0500
+Message-ID: <4c73915d-c4c8-0829-855b-ab5775d7e6fe@redhat.com>
+Date: Wed, 11 Sep 2019 12:49:00 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190911164202.31136-2-dgilbert@redhat.com>
+In-Reply-To: <1a03f787-5cf8-6b8e-7489-3f90c3311032@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="p71Il7lcb5yFZZddKSgj4mF1gpRtmyIcR"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="5LWnm19geCQZ9RQGmZTdX1H4GFtZGjS8Y"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Wed, 11 Sep 2019 17:40:53 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.71]); Wed, 11 Sep 2019 17:49:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH 1/3] rcu: Add automatically released
@@ -104,78 +105,52 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---p71Il7lcb5yFZZddKSgj4mF1gpRtmyIcR
-Content-Type: multipart/mixed; boundary="e5sPTJgMgEVwCS1SqBvaHOWCF1uM73jYm";
+--5LWnm19geCQZ9RQGmZTdX1H4GFtZGjS8Y
+Content-Type: multipart/mixed; boundary="cmdP5ZJzxoP0LNsWnbDqCR3EUwJwfRczn";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
  qemu-devel@nongnu.org, pbonzini@redhat.com, berrange@redhat.com,
  quintela@redhat.com
-Message-ID: <1a03f787-5cf8-6b8e-7489-3f90c3311032@redhat.com>
+Message-ID: <4c73915d-c4c8-0829-855b-ab5775d7e6fe@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH 1/3] rcu: Add automatically released
  rcu_read_lock variant
 References: <20190911164202.31136-1-dgilbert@redhat.com>
  <20190911164202.31136-2-dgilbert@redhat.com>
-In-Reply-To: <20190911164202.31136-2-dgilbert@redhat.com>
+ <1a03f787-5cf8-6b8e-7489-3f90c3311032@redhat.com>
+In-Reply-To: <1a03f787-5cf8-6b8e-7489-3f90c3311032@redhat.com>
 
---e5sPTJgMgEVwCS1SqBvaHOWCF1uM73jYm
+--cmdP5ZJzxoP0LNsWnbDqCR3EUwJwfRczn
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 9/11/19 11:42 AM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> RCU_READ_LOCK_AUTO takes the rcu_read_lock  and then uses glib's
-> g_auto infrastrcture (and thus whatever the compilers hooks are) to
-> release it on all exits of the block.
->=20
-> Note this macro has a variable declaration in, and hence is not in
-> a while loop.
->=20
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  include/qemu/rcu.h | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
->=20
-> diff --git a/include/qemu/rcu.h b/include/qemu/rcu.h
-> index 22876d1428..6a25b27d28 100644
-> --- a/include/qemu/rcu.h
-> +++ b/include/qemu/rcu.h
-> @@ -154,6 +154,18 @@ extern void call_rcu1(struct rcu_head *head, RCUCB=
-Func *func);
->        }),                                                             =
-   \
->        (RCUCBFunc *)g_free);
-> =20
-> +typedef char rcu_read_auto_t;
+On 9/11/19 12:40 PM, Eric Blake wrote:
 
-Declaring new types ending in _t collides with the namespace reserved by
-POSIX.  While I don't think it will bite us, it's still worth
-considering if a different name is better.
-
-> +static inline void rcu_read_auto_unlock(rcu_read_auto_t *r)
-> +{
-> +  rcu_read_unlock();
-> +}
-> +
-> +G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(rcu_read_auto_t, rcu_read_auto_unlock=
-)
-> +
-> +#define RCU_READ_LOCK_AUTO g_auto(rcu_read_auto_t) \
-> +    _rcu_read_auto =3D 'x'; \
-
-I'm a bit lost at where _rcu_read_auto is declared.  (I could understand
-if an earlier macro had created that typedef via concatenating _ with
-rcu_read_auto_t, but making the preprocessor drop _t is not possible. Is
-this a typo, and if so, why did the compiler not complain?)
-
-> +    rcu_read_lock();
-> +
->  #ifdef __cplusplus
->  }
->  #endif
+>> +
+>> +#define RCU_READ_LOCK_AUTO g_auto(rcu_read_auto_t) \
+>> +    _rcu_read_auto =3D 'x'; \
 >=20
+> I'm a bit lost at where _rcu_read_auto is declared.  (I could understan=
+d
+> if an earlier macro had created that typedef via concatenating _ with
+> rcu_read_auto_t, but making the preprocessor drop _t is not possible. I=
+s
+> this a typo, and if so, why did the compiler not complain?)
+
+Okay, I read it wrong.  This rendering would be easier for me to
+understand (you are declaring a dummy variable right here):
+
+#define RCU_READ_LOCK_AUTO \
+    g_auto(rcu_read_auto_t) _rcu_read_auto =3D 'x'; \
+=2E..
+
+In other words, I'm not used to expecting a split between type and
+variable name across two lines, especially when the type is itself a
+macro call, and where my first reading didn't spot that
+(rcu_read_auto_t) was not the name of the argument to a mixed-case macro
+RCU_READ_LOACK_AUTO_g_auto, rather than g_auto(...) being the start of
+the parameter-less macro RCU_READ_LOCK_AUTO definition.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -183,24 +158,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---e5sPTJgMgEVwCS1SqBvaHOWCF1uM73jYm--
+--cmdP5ZJzxoP0LNsWnbDqCR3EUwJwfRczn--
 
---p71Il7lcb5yFZZddKSgj4mF1gpRtmyIcR
+--5LWnm19geCQZ9RQGmZTdX1H4GFtZGjS8Y
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl15MaMACgkQp6FrSiUn
-Q2qvhAf/Ql2ladoOrIk8Oi5qcUes+na3dGmbSPTf6gO2kd9Lbk6up/hj+JP6QUlU
-WBW5RHcGFNUQP3pghMvg93U2yS6PZRr5SHvOkqoea7pWU/5SWEFNM579UrI508FW
-Gvgca4bSm3ypNF90HcWMR0Ct+B5WaKmiSS1IG2/2ymYN0Afn7svUmKJ7naIVW92c
-AgZ+0gc976jZ0cSo3bv+ZMHekamjQrAXnYnUA9CVWzf2pjEI0ELcToWnYtcqRf7J
-eNtcqL3m2YFDSFTF1yNa2lHTv6amKLFsmFK0OnLYOuXZmiBEfUSkdOTIIM5FoaPu
-slong0hv4yI13puM10pnyVPkinwOsA==
-=VHl9
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl15M4wACgkQp6FrSiUn
+Q2odlgf/cV4tZLbCZ/CgF/rjN3cDOy+O+MBgZC7iyxtRMh7REKYOu/RhJ80/rWyj
+w08OishT0mlpPT3EU673C/dwiBx4LA7ri6J115RX94EU1yIHiRN3h77Nvm03/62/
+P7KrTO0u1lNnsLz32Ph50n1LgJDzogpsGz2kHoFFTWvbbsHQixVcD6upd2k00TjT
+jP6odvr44mjN5pUig6X9h34q9Ogd/h1ViM5TJIwNweViYHO2oUv9tSAEpK6rHK4N
+J2OeocXSfSOzxS0BKQlvLEsTo9C/goEAKOEK/wMl9bUkayV5+8cIRgTh9cQ37h0w
+2DgCxSzUPLUpavbA6rmqzDmJXRI9aA==
+=wQ28
 -----END PGP SIGNATURE-----
 
---p71Il7lcb5yFZZddKSgj4mF1gpRtmyIcR--
+--5LWnm19geCQZ9RQGmZTdX1H4GFtZGjS8Y--
 
