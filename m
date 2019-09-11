@@ -2,67 +2,92 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8839BECDE20
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 06:12:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B8A9ECDE27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 06:21:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D441206CD
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 06:12:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D441206CD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7284A21A4C
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 06:21:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7284A21A4C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7vrW-00083d-JV
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 02:12:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35233)
+	id 1i7w07-00026l-AM
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 02:21:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36365)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i7vqb-0007SJ-Rv
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:11:22 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i7vzL-0001HE-2P
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:20:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i7vqa-00060V-PS
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:11:21 -0400
-Resent-Date: Wed, 11 Sep 2019 02:11:21 -0400
-Resent-Message-Id: <E1i7vqa-00060V-PS@eggs.gnu.org>
-Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21964)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i7vqa-000606-HT
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:11:20 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568182248; cv=none; d=zoho.com; s=zohoarc; 
- b=hsWq855nRhjOB29V2ey/E3NvDXG1iRDvOX8BRRwIVUXrvBePbUh1hIOR0spC7Mt6u9HtEu1jP0ArNqZKMLIVxP+wb90wIRZbHoRUSkWzXPjjARh2W8B7ntoT1kPixCmxvGCCk55B5u8dptf3LAR5mpNr14aKrhIto/oJSRHtX8o=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1568182248;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=iIhb9rISYrnsqU5y0/sRoBWVoal2WQHjNWHiwYFy4Bw=; 
- b=EoVhNBYH+dXO4JE9Co/PH4uZobG17gQzWmNR7Um7B2C7hzhGE0LKisIqJoIuz3OoNEfI7Ee/eepSJOV/BpeYCQ3ruiEafpTmOdksKH4XrNaFTV1sGXPLt5fw+1MMqcMAr1SOtSZB7Xg0D+AZ5WI7ETW21TQlzg0+kEjLukHFyKw=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1568182247359862.0576688127516;
- Tue, 10 Sep 2019 23:10:47 -0700 (PDT)
-In-Reply-To: <20190911034302.29108-1-andrew@aj.id.au>
-Message-ID: <156818224605.15929.1567552683650395230@5dec9699b7de>
+ (envelope-from <mreitz@redhat.com>) id 1i7vzJ-0001l6-US
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:20:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51227)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i7vzG-0001ip-B3; Wed, 11 Sep 2019 02:20:18 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 90E01335E8;
+ Wed, 11 Sep 2019 06:20:17 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-116-94.ams2.redhat.com
+ [10.36.116.94])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A7CC96D09D;
+ Wed, 11 Sep 2019 06:20:15 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20190809161407.11920-1-mreitz@redhat.com>
+ <20190809161407.11920-23-mreitz@redhat.com>
+ <20190910145229.GI4446@localhost.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <d7226d81-b89f-5c24-9dd4-39ae832bf61b@redhat.com>
+Date: Wed, 11 Sep 2019 08:20:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: andrew@aj.id.au
-Date: Tue, 10 Sep 2019 23:10:47 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <20190910145229.GI4446@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="h6Cg2PiRHvuxyoljmZihl55mvH3mkFln9"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Wed, 11 Sep 2019 06:20:17 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.59
-Subject: Re: [Qemu-devel] [PATCH v3] target-arm: Make the counter tick
- relative to cntfrq
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v6 22/42] block: Fix
+ bdrv_get_allocated_file_size's fallback
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,35 +99,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, andrew@aj.id.au, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, joel@jms.id.au, clg@kaod.org
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxMTAzNDMwMi4yOTEw
-OC0xLWFuZHJld0Bhai5pZC5hdS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRvY2tl
-ci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
-bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
-IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0xIE5FVFdP
-Uks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0xIEo9MTQg
-TkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpsaWJ1ZGV2ICAgICAgICAgICBubwpk
-ZWZhdWx0IGRldmljZXMgICB5ZXMKCndhcm5pbmc6IFB5dGhvbiAyIHN1cHBvcnQgaXMgZGVwcmVj
-YXRlZAp3YXJuaW5nOiBQeXRob24gMyB3aWxsIGJlIHJlcXVpcmVkIGZvciBidWlsZGluZyBmdXR1
-cmUgdmVyc2lvbnMgb2YgUUVNVQoKTk9URTogY3Jvc3MtY29tcGlsZXJzIGVuYWJsZWQ6ICAnY2Mn
-CiAgR0VOICAgICB4ODZfNjQtc29mdG1tdS9jb25maWctZGV2aWNlcy5tYWsudG1wCi0tLQpxZW11
-LXN5c3RlbS1hYXJjaDY0OiBJbnZhbGlkIENOVEZSUTogMEh6CkJyb2tlbiBwaXBlCi90bXAvcWVt
-dS10ZXN0L3NyYy90ZXN0cy9saWJxdGVzdC5jOjEzNToga2lsbF9xZW11KCkgdHJpZWQgdG8gdGVy
-bWluYXRlIFFFTVUgcHJvY2VzcyBidXQgZW5jb3VudGVyZWQgZXhpdCBzdGF0dXMgMQpFUlJPUiAt
-IHRvbyBmZXcgdGVzdHMgcnVuIChleHBlY3RlZCA2MSwgZ290IDApCm1ha2U6ICoqKiBbY2hlY2st
-cXRlc3QtYWFyY2g2NF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBq
-b2JzLi4uLgpDb3VsZCBub3QgYWNjZXNzIEtWTSBrZXJuZWwgbW9kdWxlOiBObyBzdWNoIGZpbGUg
-b3IgZGlyZWN0b3J5CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
-dy5vcmcvbG9ncy8yMDE5MDkxMTAzNDMwMi4yOTEwOC0xLWFuZHJld0Bhai5pZC5hdS90ZXN0aW5n
-LmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQg
-YXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
-ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--h6Cg2PiRHvuxyoljmZihl55mvH3mkFln9
+Content-Type: multipart/mixed; boundary="QVBiOXBN90Bdr6eYcpsqeb750ckiB4irE";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <d7226d81-b89f-5c24-9dd4-39ae832bf61b@redhat.com>
+Subject: Re: [PATCH v6 22/42] block: Fix bdrv_get_allocated_file_size's
+ fallback
+References: <20190809161407.11920-1-mreitz@redhat.com>
+ <20190809161407.11920-23-mreitz@redhat.com>
+ <20190910145229.GI4446@localhost.localdomain>
+In-Reply-To: <20190910145229.GI4446@localhost.localdomain>
 
+--QVBiOXBN90Bdr6eYcpsqeb750ckiB4irE
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 10.09.19 16:52, Kevin Wolf wrote:
+> Am 09.08.2019 um 18:13 hat Max Reitz geschrieben:
+>> If the driver does not implement bdrv_get_allocated_file_size(), we
+>> should fall back to cumulating the allocated size of all non-COW
+>> children instead of just bs->file.
+>>
+>> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>=20
+> This smells like an overgeneralisation, but if we want to count all vmd=
+k
+> extents, the qcow2 external data file, etc. it's an improvement anyway.=
+
+> A driver that has a child that should not be counted must just remember=
+
+> to implement the callback.
+>=20
+> Let me think of an example... How about quorum, for a change? :-)
+> Or the second blkverify child.
+>=20
+> Or eventually the block job filter nodes.
+
+I actually think it makes sense for all of these nodes to report the sum
+of all of their children=E2=80=99s allocated sizes.
+
+If a quorum node has three children with allocated sizes of 3 MB, 1 MB,
+and 2 MB, respectively (totally possible if some have explicit zeroes
+and others don=E2=80=99t; it may also depend on the protocol, the filesys=
+tem,
+etc.), then I think it makes most sense to report indeed 6 MB for the
+quorum subtree as a whole.  What would you report?  3 MB?
+
+> Ehm... Maybe I should just take back what I said first. It almost feels=
+
+> like it would be better if qcow2 and vmdk explicitly used a handler tha=
+t
+> counts all children (could still be a generic one in block.c) rather
+> than having to remember to disable the functionality everywhere where w=
+e
+> don't want to have it.
+
+I don=E2=80=99t, because everywhere we don=E2=80=99t want this functional=
+ity, we still
+need to choose a child.  This has to be done by the driver anyway.
+
+Max
+
+> And please adjust the comment for bdrv_get_allocated_file_size(), it
+> only talks about a single file as if trees didn't exist. Actually, it
+> doesn't even seem so easy to define. Maybe primary node + storage nodes=
+?
+> Then vmdk needs to expose its extents as storage nodes (plural!), but
+> in the long run that might be needed anyway.
+
+
+--QVBiOXBN90Bdr6eYcpsqeb750ckiB4irE--
+
+--h6Cg2PiRHvuxyoljmZihl55mvH3mkFln9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl14khwACgkQ9AfbAGHV
+z0BTfAf/Zla4c9NyVFVVam5urY2CLHxakvImsM+mHC4JhlXHmKPVWfBkQE22o2C7
+oWAu6eKx2eOwCVEk92SVCMoDNmPvG9Kg709qpRYZrvFaIE32fEkKAjSqWz6MgtcY
+lui6IiWobU0s/QqohJrv7MNtb00W/dX/1rBE6Tz57h/1dD8/do5d7lD5/TNQyPwO
+U28YsrwqR0Kh3KBiwDXAmurVl9wYombisDhRLXwzZWVvJWzaN7axlN8fwlXLeEe9
+zaGb2tztdtY5y/O0EF4+0f9Tov+h2qDrd5VWu9NQtqXc9dXkBaozYK9abvUFM58l
+qzpVbaF4zxLvPBKq2TaFanbIy5TpFQ==
+=5k+8
+-----END PGP SIGNATURE-----
+
+--h6Cg2PiRHvuxyoljmZihl55mvH3mkFln9--
 
