@@ -2,84 +2,65 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22397ECDE27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0BF7ECDE20
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:17:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E32E02084D
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:14:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="adQiIvN2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E32E02084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id A9BB921D79
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:17:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9BB921D79
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7wpy-0008OK-SE
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:14:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42662)
+	id 1i7wsR-0001qy-J5
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:17:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44101)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i7wco-0002jD-BS
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:01:12 -0400
+ (envelope-from <clg@kaod.org>) id 1i7wlF-0003Cw-N1
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:09:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i7wcm-0002ca-CX
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:01:10 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:34542)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1i7wch-0002Uw-IW; Wed, 11 Sep 2019 03:01:07 -0400
-Received: by mail-ot1-x344.google.com with SMTP id z26so12292367oto.1;
- Wed, 11 Sep 2019 00:00:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=8rd9zmbXeVAMF2vcVt6DDMzJAtl/1bzUM0kjoWQ/HL4=;
- b=adQiIvN2ERCwZok0Q6AziXp1Ef3YcAD5J2HBWcTDUp/Iecq0/j88AodEPkfb85xmfN
- eMvyY+ZiDhwM42ccq1u1KhzWGUGNnod2047CO+Hf7KDs8QbVCkIqo5fzxo8Ql5gLGf1Q
- rHYvaituIbMpJxTV/EGKfxBIRTye3QujsayfqSd51oY5DbB7RKVpGjaBH/4GwWkLT6js
- h3qcn4J7+0P0T/j0WlFxhGDE2iui6NrUAb5xycNqx9IDjNsSmffdfwGEkmoDWI9dTPwM
- /qRAsUsgRBcV3Gw0mXsRVZeCDnynKoouS7cX9nQ6DjpUmXI3pQToPSfhhMseR5Dapu3R
- NJiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=8rd9zmbXeVAMF2vcVt6DDMzJAtl/1bzUM0kjoWQ/HL4=;
- b=D2N/LWoOI7ae+aROPZ2vdYKwYcUZwz1/U19ywQraKtPhxJTc1SE9jUOtGNYNkuZrlM
- FOJiTgA4OqX7RdgcQa0Kyfpg3DH3ewWofnFfd2+MSwJQH9OiK8ZbFx4KyHEHDK4TBemt
- Q6W3RBEvWsLPXACjIiDlvupFnLDKJkJlBSdRq1WvBgnnSVpHVU3nGKIp1vjJ8/xvECyg
- 82onaAAUImNSdpUQRwDpxGgjNKL1Uo1kQn7tZ2Z56KcLGnaB7+x0b4aMiZ4nayerHo+x
- ijdTbkBbWiTATLc3r3aCMD8TCccj711P8sYa8asJiZja+zoDa0bzzHLfWPlyCePK2cSe
- XKlw==
-X-Gm-Message-State: APjAAAWZYpDzkdQayoY4VHoRleZynce1lia17QWdwAyoOWvdE2SShcLH
- iEQaxaHtTDDXSYyW7l0ys+eQtg3G+VKDFbzyJ10=
-X-Google-Smtp-Source: APXvYqz3Qan2m2/3cHeBMJ141T5YQuR8UMcMghRrKCJ57RtNB1lww9QIzncpA/IqKnqlk9XByAuVt/JSXk0+MkqyUX0=
-X-Received: by 2002:a9d:5f09:: with SMTP id f9mr3598367oti.341.1568185257064; 
- Wed, 11 Sep 2019 00:00:57 -0700 (PDT)
+ (envelope-from <clg@kaod.org>) id 1i7wlE-0007Qi-0i
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:09:53 -0400
+Received: from 3.mo173.mail-out.ovh.net ([46.105.34.1]:57269)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i7wlD-0007Pn-Qy
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:09:51 -0400
+Received: from player734.ha.ovh.net (unknown [10.108.42.23])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id 889F310FAAE
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 09:09:48 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+ (Authenticated sender: clg@kaod.org)
+ by player734.ha.ovh.net (Postfix) with ESMTPSA id D364599CC69E;
+ Wed, 11 Sep 2019 07:09:39 +0000 (UTC)
+To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org
+References: <20190911040452.8341-1-david@gibson.dropbear.id.au>
+ <20190911040452.8341-2-david@gibson.dropbear.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <cf4fd712-1130-a977-6adc-9eccd31b55a4@kaod.org>
+Date: Wed, 11 Sep 2019 09:09:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Wed, 11 Sep 2019 00:00:56
- -0700 (PDT)
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Wed, 11 Sep 2019 00:00:56
- -0700 (PDT)
-In-Reply-To: <1568183141-67641-1-git-send-email-zhiwei_liu@c-sky.com>
-References: <1568183141-67641-1-git-send-email-zhiwei_liu@c-sky.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 11 Sep 2019 09:00:56 +0200
-Message-ID: <CAL1e-=iyBP+k6MH+uCd7EAUAqp=hSG7SQOMemuJwdhJVGusYcg@mail.gmail.com>
-To: liuzhiwei <zhiwei_liu@c-sky.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190911040452.8341-2-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 11365959560230308646
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrtddugdduudeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v2 00/17] RISC-V: support vector extension
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.34.1
+Subject: Re: [Qemu-devel] [PATCH 1/7] spapr: Simplify handling of pre ISA
+ 3.0 guest workaround handling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,100 +72,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi, qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
- kbastian@mail.uni-paderborn.de, palmer@sifive.com, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, laurent@vivier.eu, wenmeng_zhang@c-sky.com,
- Alistair.Francis@wdc.com
+Cc: aik@ozlabs.ru, lvivier@redhat.com, philmd@redhat.com, groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-11.09.2019. 08.35, "liuzhiwei" <zhiwei_liu@c-sky.com> =D1=98=D0=B5 =D0=BD=
-=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> Features:
->   * support specification riscv-v-spec-0.7.1(
-https://content.riscv.org/wp-content/uploads/2019/06/17.40-Vector_RISCV-201=
-90611-Vectors.pdf
-).
+On 11/09/2019 06:04, David Gibson wrote:
+> Certain old guest versions don't understand the radix MMU introduced wi=
+th
+> POWER ISA 3.0, but incorrectly select it if presented with the option a=
+t
+> CAS time.  We workaround this in qemu by explicitly excluding the radix
+> (and other ISA 3.0 linked) options if the guest doesn't explicitly note
+> support for ISA 3.0.
+>=20
+> This is handled by the 'cas_legacy_guest_workaround' flag, which is pre=
+tty
+> vague.  Rename it to 'cas_pre_isa3_guest' to be clearer about what it's=
+ for.
+>=20
+> In addition, we unnecessarily call spapr_populate_pa_features() with
+> different options when initially constructing the device tree and when
+> adjusting it at CAS time.  At the initial construct time cas_pre_isa3_g=
+uest
+> is already false, so we can still use the flag, rather than explicitly
+> overriding it to be false at the callsite.
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
-Hi, Zhivei.
 
-The linked document is a presentation, outlining general concepts of the
-instruction set in question, which is certainly useful and nice to have,
-but, for review process, we need *specifications* (especially given that
-they are in draft phase, and therefore "moving target"). Please provide
-such link.
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-I also noticed lack of commit messages, and was really disappointed by
-that. It looks to me you did not honor in entirety our guidlines for
-submitting patches.
+Thanks,
 
-Yours,
-Aleksandar
+C.
 
->   * support basic vector extension.
+> ---
+>  hw/ppc/spapr.c         | 10 ++++------
+>  hw/ppc/spapr_hcall.c   |  3 +--
+>  include/hw/ppc/spapr.h |  2 +-
+>  3 files changed, 6 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 7124053b43..c551001f86 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -218,8 +218,7 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int o=
+ffset, PowerPCCPU *cpu)
+>  /* Populate the "ibm,pa-features" property */
+>  static void spapr_populate_pa_features(SpaprMachineState *spapr,
+>                                         PowerPCCPU *cpu,
+> -                                       void *fdt, int offset,
+> -                                       bool legacy_guest)
+> +                                       void *fdt, int offset)
+>  {
+>      uint8_t pa_features_206[] =3D { 6, 0,
+>          0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
+> @@ -285,7 +284,7 @@ static void spapr_populate_pa_features(SpaprMachine=
+State *spapr,
+>      if ((spapr_get_cap(spapr, SPAPR_CAP_HTM) !=3D 0) && pa_size > 24) =
+{
+>          pa_features[24] |=3D 0x80;    /* Transactional memory support =
+*/
+>      }
+> -    if (legacy_guest && pa_size > 40) {
+> +    if (spapr->cas_pre_isa3_guest && pa_size > 40) {
+>          /* Workaround for broken kernels that attempt (guest) radix
+>           * mode when they can't handle it, if they see the radix bit s=
+et
+>           * in pa-features. So hide it from them. */
+> @@ -348,8 +347,7 @@ static int spapr_fixup_cpu_dt(void *fdt, SpaprMachi=
+neState *spapr)
+>              return ret;
+>          }
+> =20
+> -        spapr_populate_pa_features(spapr, cpu, fdt, offset,
+> -                                   spapr->cas_legacy_guest_workaround)=
+;
+> +        spapr_populate_pa_features(spapr, cpu, fdt, offset);
+>      }
+>      return ret;
+>  }
+> @@ -551,7 +549,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, voi=
+d *fdt, int offset,
+>                            page_sizes_prop, page_sizes_prop_size)));
+>      }
+> =20
+> -    spapr_populate_pa_features(spapr, cpu, fdt, offset, false);
+> +    spapr_populate_pa_features(spapr, cpu, fdt, offset);
+> =20
+>      _FDT((fdt_setprop_cell(fdt, offset, "ibm,chip-id",
+>                             cs->cpu_index / vcpus_per_socket)));
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 23e4bdb829..3d3a67149a 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1765,8 +1765,7 @@ static target_ulong h_client_architecture_support=
+(PowerPCCPU *cpu,
+>              exit(EXIT_FAILURE);
+>          }
+>      }
+> -    spapr->cas_legacy_guest_workaround =3D !spapr_ovec_test(ov1_guest,
+> -                                                          OV1_PPC_3_00=
+);
+> +    spapr->cas_pre_isa3_guest =3D !spapr_ovec_test(ov1_guest, OV1_PPC_=
+3_00);
+>      spapr_ovec_cleanup(ov1_guest);
+>      if (!spapr->cas_reboot) {
+>          /* If spapr_machine_reset() did not set up a HPT but one is ne=
+cessary
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 03111fd55b..dfec8e8e76 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -175,7 +175,7 @@ struct SpaprMachineState {
+> =20
+>      /* ibm,client-architecture-support option negotiation */
+>      bool cas_reboot;
+> -    bool cas_legacy_guest_workaround;
+> +    bool cas_pre_isa3_guest;
+>      SpaprOptionVector *ov5;         /* QEMU-supported option vectors *=
+/
+>      SpaprOptionVector *ov5_cas;     /* negotiated (via CAS) option vec=
+tors */
+>      uint32_t max_compat_pvr;
+>=20
 
->   * support Zvlsseg.
 
->   * support Zvamo.
-
->   * not support Zvediv as it is changing.
->   * fixed VLEN 128bit.
->   * fixed SLEN 128bit.
->   * ELEN support 8bit, 16bit, 32bit, 64bit.
->
-> Todo:
->   * support VLEN configure from qemu command line.
->   * move check code from execution-time to translation-time
->
-> Changelog:
-> V2
->   * use float16_compare{_quiet}
->   * only use GETPC() in outer most helper
->   * add ctx.ext_v Property
->
->
-> LIU Zhiwei (17):
->   RISC-V: add vfp field in CPURISCVState
->   RISC-V: turn on vector extension from command line by cfg.ext_v
->     Property
->   RISC-V: support vector extension csr
->   RISC-V: add vector extension configure instruction
->   RISC-V: add vector extension load and store instructions
->   RISC-V: add vector extension fault-only-first implementation
->   RISC-V: add vector extension atomic instructions
->   RISC-V: add vector extension integer instructions part1,
->     add/sub/adc/sbc
->   RISC-V: add vector extension integer instructions part2, bit/shift
->   RISC-V: add vector extension integer instructions part3, cmp/min/max
->   RISC-V: add vector extension integer instructions part4, mul/div/merge
->   RISC-V: add vector extension fixed point instructions
->   RISC-V: add vector extension float instruction part1, add/sub/mul/div
->   RISC-V: add vector extension float instructions part2,
->     sqrt/cmp/cvt/others
->   RISC-V: add vector extension reduction instructions
->   RISC-V: add vector extension mask instructions
->   RISC-V: add vector extension premutation instructions
->
->  linux-user/riscv/cpu_loop.c             |     7 +
->  target/riscv/Makefile.objs              |     2 +-
->  target/riscv/cpu.c                      |     6 +-
->  target/riscv/cpu.h                      |    30 +
->  target/riscv/cpu_bits.h                 |    15 +
->  target/riscv/cpu_helper.c               |     7 +
->  target/riscv/csr.c                      |    65 +-
->  target/riscv/helper.h                   |   358 +
->  target/riscv/insn32.decode              |   373 +
->  target/riscv/insn_trans/trans_rvv.inc.c |   490 +
->  target/riscv/translate.c                |     1 +
->  target/riscv/vector_helper.c            | 25701
-++++++++++++++++++++++++++++++
->  12 files changed, 27049 insertions(+), 6 deletions(-)
->  create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
->  create mode 100644 target/riscv/vector_helper.c
->
-> --
-> 2.7.4
->
->
