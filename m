@@ -2,87 +2,62 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54ACDECDE20
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:23:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1404DECDE27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:26:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21BE4206CD
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:23:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q0RYwMe3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21BE4206CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D5B8D2089F
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:26:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5B8D2089F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7wxx-000052-BI
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:23:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46392)
+	id 1i7x1m-0001Nb-1o
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:26:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46812)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i7wx2-0007qV-1m
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:22:05 -0400
+ (envelope-from <groug@kaod.org>) id 1i7x15-0000pV-Qq
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:26:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1i7wwz-0003tE-Ql
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:22:03 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37142)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1i7wwz-0003so-LY
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:22:01 -0400
-Received: by mail-oi1-x244.google.com with SMTP id v7so13327537oib.4
- for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 00:22:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=XK8vtOXPgLtzd+3B76eR332u9q2SrO4oMqLV7RFTmoY=;
- b=Q0RYwMe3+9OWLnlqo3kI9Sw9hMhmYe4f60GoAdQUpOO9vfZI9w4DKGXbJUnDOgH9h1
- dvoJUiJAWd0keF89uFRZcgNz/W/W5rCotbc1MD66sMdxDJz7VtwlDREUs54FP8xrbW/v
- o1xl2F1E71qXXxJP+YUMxFw2Nml6rdoobl3sZZ6s3YBMqJoj8X4kR+WmuR9U4ImoDFFb
- /imV/Um7y9RlJ4YLYte344l+pr8gqhjeepAJbE2vrHxDLeW/KJ3IBsAJHDEDpncf+nkA
- cFYKUGrcPufdaKDHJfWbQtuUpuuZlS5DIG5fjKWyKV7H/xJpGgBI1/zA4MOqQULHFTvr
- QKPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=XK8vtOXPgLtzd+3B76eR332u9q2SrO4oMqLV7RFTmoY=;
- b=b8AIM517RZBkWNIAJOvwD3kJlcGWKqwJbZTMpP2qZ9im8VV4IMaMF0MNP5xTH/fwgE
- 2qpyzoHNT++tuSBtzhhG6iN3EekFtC5aTgUbiyBenJBPvt3bZGHDceB03egGzZUo9wSg
- +KCzNBLVyQMGwIbG33TK4A64eOJwOtbkoUJoUSslnGoItQ99KSktjTOcge6qdiiQsTEx
- ZL9eMMucu6MeaL93hppsDZPxXtwgWqiM0BrKAvfGRdrkiGrA8NAA42R+p+BBfFLsXjUd
- NbIswL+iqqHhnjGF/+bnAHEueF8gHOmJniGtem6VKSlRg8GK4mezSIUGOpJgyvbFZxih
- i3hw==
-X-Gm-Message-State: APjAAAWEvakB4hPrP+rUvXAh41Fii8VzLxJZPbp9QlJWK+9xrpKJFVqv
- E7qyx6KZy+E2VSlWQVE+C+RBTR7TDPG4yyRGZRw=
-X-Google-Smtp-Source: APXvYqwEufYESHKpg/Z/68DdL946OPxmx7dRwbW9UpyBm1/t7+7AWe8gp1HMr4MkydcfFNEJKzAa29sL425N6wCwMqc=
-X-Received: by 2002:aca:c505:: with SMTP id v5mr2722035oif.79.1568186520611;
- Wed, 11 Sep 2019 00:22:00 -0700 (PDT)
+ (envelope-from <groug@kaod.org>) id 1i7x14-00061M-BM
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:26:15 -0400
+Received: from 4.mo1.mail-out.ovh.net ([46.105.76.26]:38349)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1i7x14-00060n-4l
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 03:26:14 -0400
+Received: from player714.ha.ovh.net (unknown [10.109.159.191])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id CD59418EA9B
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 09:26:11 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player714.ha.ovh.net (Postfix) with ESMTPSA id C7CE499C7DD8;
+ Wed, 11 Sep 2019 07:26:04 +0000 (UTC)
+Date: Wed, 11 Sep 2019 09:26:03 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190911092603.0a3a4d7a@bahia.lan>
+In-Reply-To: <20190911040452.8341-2-david@gibson.dropbear.id.au>
+References: <20190911040452.8341-1-david@gibson.dropbear.id.au>
+ <20190911040452.8341-2-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Wed, 11 Sep 2019 00:22:00
- -0700 (PDT)
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Wed, 11 Sep 2019 00:22:00
- -0700 (PDT)
-In-Reply-To: <565ed74a-5c6b-c1eb-035e-3eb981487de5@redhat.com>
-References: <20190802160458.25681-1-peter.maydell@linaro.org>
- <565ed74a-5c6b-c1eb-035e-3eb981487de5@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 11 Sep 2019 09:22:00 +0200
-Message-ID: <CAL1e-=h95f0ozY1AqEUX0rPKBjrcWARB=KtX8xO-nm6f6fYRsQ@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH 0/3] target/mips: Convert to
- do_transaction_failed hook
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 11642649465367140838
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrtddugdduvdduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.76.26
+Subject: Re: [Qemu-devel] [PATCH 1/7] spapr: Simplify handling of pre ISA
+ 3.0 guest workaround handling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,129 +69,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paul Burton <pburton@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>,
- James Hogan <jhogan@kernel.org>,
- "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
- qemu-devel@nongnu.org,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- "Maciej W. Rozycki" <macro@linux-mips.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org, clg@kaod.org, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-02.08.2019. 18.29, "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com> =D1=98=
-=D0=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> Cc'ing broader MIPS audience.
->
-> On 8/2/19 6:04 PM, Peter Maydell wrote:
-> > This patchset converts the MIPS target away from the
-> > old broken do_unassigned_access hook to the new (added in
-> > 2017...) do_transaction_failed hook.
-> >
+On Wed, 11 Sep 2019 14:04:46 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Since Herve now tested this series, unless somebody objects, I am going to
-include it in the next Mips queue, scheduled in next few days.
+> Certain old guest versions don't understand the radix MMU introduced with
+> POWER ISA 3.0, but incorrectly select it if presented with the option at
+> CAS time.  We workaround this in qemu by explicitly excluding the radix
+> (and other ISA 3.0 linked) options if the guest doesn't explicitly note
+> support for ISA 3.0.
+> 
+> This is handled by the 'cas_legacy_guest_workaround' flag, which is pretty
+> vague.  Rename it to 'cas_pre_isa3_guest' to be clearer about what it's for.
+> 
+> In addition, we unnecessarily call spapr_populate_pa_features() with
+> different options when initially constructing the device tree and when
+> adjusting it at CAS time.  At the initial construct time cas_pre_isa3_guest
+> is already false, so we can still use the flag, rather than explicitly
+> overriding it to be false at the callsite.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-Thanks to all involved!
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Aleksandar
+>  hw/ppc/spapr.c         | 10 ++++------
+>  hw/ppc/spapr_hcall.c   |  3 +--
+>  include/hw/ppc/spapr.h |  2 +-
+>  3 files changed, 6 insertions(+), 9 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 7124053b43..c551001f86 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -218,8 +218,7 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, PowerPCCPU *cpu)
+>  /* Populate the "ibm,pa-features" property */
+>  static void spapr_populate_pa_features(SpaprMachineState *spapr,
+>                                         PowerPCCPU *cpu,
+> -                                       void *fdt, int offset,
+> -                                       bool legacy_guest)
+> +                                       void *fdt, int offset)
+>  {
+>      uint8_t pa_features_206[] = { 6, 0,
+>          0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
+> @@ -285,7 +284,7 @@ static void spapr_populate_pa_features(SpaprMachineState *spapr,
+>      if ((spapr_get_cap(spapr, SPAPR_CAP_HTM) != 0) && pa_size > 24) {
+>          pa_features[24] |= 0x80;    /* Transactional memory support */
+>      }
+> -    if (legacy_guest && pa_size > 40) {
+> +    if (spapr->cas_pre_isa3_guest && pa_size > 40) {
+>          /* Workaround for broken kernels that attempt (guest) radix
+>           * mode when they can't handle it, if they see the radix bit set
+>           * in pa-features. So hide it from them. */
+> @@ -348,8 +347,7 @@ static int spapr_fixup_cpu_dt(void *fdt, SpaprMachineState *spapr)
+>              return ret;
+>          }
+>  
+> -        spapr_populate_pa_features(spapr, cpu, fdt, offset,
+> -                                   spapr->cas_legacy_guest_workaround);
+> +        spapr_populate_pa_features(spapr, cpu, fdt, offset);
+>      }
+>      return ret;
+>  }
+> @@ -551,7 +549,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+>                            page_sizes_prop, page_sizes_prop_size)));
+>      }
+>  
+> -    spapr_populate_pa_features(spapr, cpu, fdt, offset, false);
+> +    spapr_populate_pa_features(spapr, cpu, fdt, offset);
+>  
+>      _FDT((fdt_setprop_cell(fdt, offset, "ibm,chip-id",
+>                             cs->cpu_index / vcpus_per_socket)));
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 23e4bdb829..3d3a67149a 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1765,8 +1765,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+>              exit(EXIT_FAILURE);
+>          }
+>      }
+> -    spapr->cas_legacy_guest_workaround = !spapr_ovec_test(ov1_guest,
+> -                                                          OV1_PPC_3_00);
+> +    spapr->cas_pre_isa3_guest = !spapr_ovec_test(ov1_guest, OV1_PPC_3_00);
+>      spapr_ovec_cleanup(ov1_guest);
+>      if (!spapr->cas_reboot) {
+>          /* If spapr_machine_reset() did not set up a HPT but one is necessary
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 03111fd55b..dfec8e8e76 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -175,7 +175,7 @@ struct SpaprMachineState {
+>  
+>      /* ibm,client-architecture-support option negotiation */
+>      bool cas_reboot;
+> -    bool cas_legacy_guest_workaround;
+> +    bool cas_pre_isa3_guest;
+>      SpaprOptionVector *ov5;         /* QEMU-supported option vectors */
+>      SpaprOptionVector *ov5_cas;     /* negotiated (via CAS) option vectors */
+>      uint32_t max_compat_pvr;
 
-> > The motivation here is:
-> >  * do_unassigned_access is broken because:
-> >     + it will be called for any kind of access to physical addresses
-> >       where there is no assigned device, whether that access is by the
-> >       CPU or by something else (like a DMA controller!), so it can
-> >       result in spurious guest CPU exceptions.
-> >     + It will also get called even when using KVM, when there's nothing
-> >       useful it can do.
-> >     + It isn't passed in the return-address within the TCG generated
-> >       code, so it isn't able to correctly restore the CPU state
-> >       before generating the exception, and so the exception will
-> >       often be generated with the wrong faulting guest PC value
-> >  * there are now only a few targets still using the old hook,
-> >    so if we can convert them we can delete all the old code
-> >    and complete this API transation. (Patches for SPARC are on
-> >    the list; the other user is RISCV, which accidentally
-> >    implemented the old hook rather than the new one recently.)
-> >
-> > The general approach to the conversion is to check the target for
-> > load/store-by-physical-address operations which were previously
-> > implicitly causing exceptions, to see if they now need to explicitly
-> > check for and handle memory access failures. (The 'git grep' regexes
-> > in docs/devel/loads-stores.rst are useful here: the API families to
-> > look for are ld*_phys/st*_phys, address_space_ld/st*, and
-> > cpu_physical_memory*.)
-> >
-> > For MIPS, there are none of these (the usual place where targets do
-> > this is hardware page table walks where the page table entries are
-> > loaded by physical address, and MIPS doesn't seem to have those).
-> >
-> > Code audit out of the way, the actual hook changeover is pretty
-> > simple.
-> >
-> > The complication here is the MIPS Jazz board, which has some rather
-> > dubious code that intercepts the do_unassigned_access hook to suppress
-> > generation of exceptions for invalid accesses due to data accesses,
-> > while leaving exceptions for invalid instruction fetches in place. I'm
-> > a bit dubious about whether the behaviour we have implemented here is
-> > really what the hardware does -- it seems pretty odd to me to not
-> > generate exceptions for d-side accesses but to generate them for
-> > i-side accesses, and looking back through git and mailing list history
-> > this code is here mainly as "put back the behaviour we had before a
-> > previous commit broke it", and that older behaviour in turn I think is
-> > more historical-accident than because anybody deliberately checked the
-> > hardware behaviour and made QEMU work that way. However, I don't have
-> > any real hardware to do comparative tests on, so this series retains
-> > the same behaviour we had before on this board, by making it intercept
-> > the new hook in the same way it did the old one. I've beefed up the
-> > comment somewhat to indicate what we're doing, why, and why it might
-> > not be right.
-> >
-> > The patch series is structured in three parts:
-> >  * make the Jazz board code support CPUs regardless of which
-> >    of the two hooks they implement
-> >  * switch the MIPS CPUs over to implementing the new hook
-> >  * remove the no-longer-needed Jazz board code for the old
-> >    hook
-> > (This seemed cleaner to me than squashing the whole thing into
-> > a single patch that touched core mips code and the jazz board
-> > at the same time.)
-> >
-> > I have tested this with:
-> >  * the ARC Multiboot BIOS linked to from the bug
-> >    https://bugs.launchpad.net/qemu/+bug/1245924 (and which
-> >    was the test case for needing the hook intercept)
-> >  * a Linux kernel for the 'mips' mips r4k machine
-> >  * 'make check'
-> > Obviously more extensive testing would be useful, but I
-> > don't have any other test images. I also don't have
-> > a KVM MIPS host, which would be worth testing to confirm
-> > that it also still works.
-> >
-> > If anybody happens by some chance to still have a working
-> > real-hardware Magnum or PICA61 board, we could perhaps test
-> > how it handles accesses to invalid memory, but I suspect that
-> > nobody does any more :-)
-> >
-> > thanks
-> > -- PMM
-> >
-> >
-> > Peter Maydell (3):
-> >   hw/mips/mips_jazz: Override do_transaction_failed hook
-> >   target/mips: Switch to do_transaction_failed() hook
-> >   hw/mips/mips_jazz: Remove no-longer-necessary override of
-> >     do_unassigned_access
-> >
-> >  target/mips/internal.h  |  8 ++++---
-> >  hw/mips/mips_jazz.c     | 47 +++++++++++++++++++++++++++++------------
-> >  target/mips/cpu.c       |  2 +-
-> >  target/mips/op_helper.c | 24 +++++++--------------
-> >  4 files changed, 47 insertions(+), 34 deletions(-)
-> >
->
+
