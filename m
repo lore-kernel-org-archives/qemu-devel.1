@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C83FDECDE27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:00:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 970FBECDE20
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:00:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C64021928
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:00:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C64021928
+	by mail.kernel.org (Postfix) with ESMTPS id 696FA20693
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 07:00:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 696FA20693
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i7wc6-0001D8-S9
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:00:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40791)
+	id 1i7wcO-0001Y3-NF
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 03:00:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40831)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i7wRd-0005zV-Du
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:49:38 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i7wRg-00062y-1e
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:49:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i7wRc-0004Lw-E7
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:49:37 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:41639)
+ (envelope-from <laurent@vivier.eu>) id 1i7wRe-0004Mi-0d
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:49:39 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:39589)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i7wRc-0004LP-5r
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:49:36 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i7wRd-0004MJ-P2
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 02:49:37 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MQdtO-1hneOe3lJO-00Neb7; Wed, 11 Sep 2019 08:49:27 +0200
+ id 1N2lzA-1iFbM02H2y-0136Hn; Wed, 11 Sep 2019 08:49:32 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Wed, 11 Sep 2019 08:49:08 +0200
-Message-Id: <20190911064920.1718-4-laurent@vivier.eu>
+Date: Wed, 11 Sep 2019 08:49:18 +0200
+Message-Id: <20190911064920.1718-14-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190911064920.1718-1-laurent@vivier.eu>
 References: <20190911064920.1718-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:BhFz3JGYOqV2oRqgFfYhck60WR/r0kySBhTCOvHWSxF7Kis7fKY
- vY2LdwEoDwQuO+ZKuMD/I0S53u1Ka1bi2Nibue/ONBiSPUKE56B7bVwyHppeBJFZQS09tz3
- XlZh3yw+W1K+78UchimIMpWdaqs6o5FKjC3OFLYKS5DgyxIPE0rw2dDhjmK721uCNYP/M86
- b/J0Xh2NVDALJLnxJvDMA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:XsCRCjD72+c=:1Uao9+BpcdNnoZK+wH3SOk
- t7HRE4ZvMFQqQtYDF/gUH0byvVWGl3QEvDj5AFjZYk854GTC+8BR+5rIUmdWVE1N6Xg7Suw9w
- ChfVnR/kbol6ypoKErMZsKj4en9f9GKb7t3Cknk0XMSHQntB6ey/kG/MzZ/uUo08AwMlt9cPY
- 45RQtVG+dxyhyhkMbjEoZPFBX4B5b1k9cYbXZ8Ef3eQZamHHqnCamUr4KybdxpSTEQfkV+6Ad
- TdF13sjcHAP+5r3xereYrThy3RVx393PT+B0PlApyF74FIM2vMpDrhB653yKPS5U0J8axNM7d
- dZc5lfdg3wwWRBuAfarizyCy4D4UYnhON5Zd8gIO0bQUVtB2/5npJQDgMDt/AN6vcxETCOUjF
- GElDgkMnULYKe9c+oZC7njDMugagM7cOnmb4kmwFjRVc2Mw7wwsXSR4zffmaHcs1s0oK7Ss1Z
- PNxUEaUUNbeD5FLjyQfT544qRTLhl5NOdB/6XSjWqhnlT3N6VIixsvaLHGe/9vQu6C7PrEOVI
- ZvgNdGAzl5J6mH/j0PFyIzk+q8dWs+dYVyUpeSi0/LnmFjtOL98VlO26Z5UKvnnODsyQkcqVV
- 5VA+su51z+ZcRHHdYDfpjCN0prX4Ci8gds0+edEoNPyw3vnCreADyE5I2IuKtTVNKVJ7/9mX3
- mlGBP7yGe9vqH9k2A2uQ2X8ihZ4qq2ii+2/ovSK5t25lqusYnuwkdif9uji7ebs5aQKt8NKK7
- 340CF1Tz9HrdDNUQfrEJvNTpTxs5pYbzhTVhqKfA5z6kwdIMuNQvS4hE6wFpFvFurGC2ifJ5A
- HDvPIZZAKhrRvS6OKZB9BF+Dc55Qec84YgMjFoBWP9P2ay1KL0=
+X-Provags-ID: V03:K1:AIPZmokLRc935u1DfsDlb1DX8Hy2gMKz2nveL2WXzOhKWg2FH8t
+ pFLKRViTCNSOCmazNf7cC7uG9MwOdVf4Ru9RNAFBtp4Bv9STVRPo/Pk9matPPLxkOZcA/Gz
+ Y9KLzl2Z786yk1NiJ4meiCayZE5x7aL7KQTTE/uduPlONSehqOwUc4Oxtw+DUpiWORMzWEq
+ TmQDJJrdmu3r5I/JHvUTA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:T2jYVP9ByZk=:gTOne5bqb3aPuPAnqfQbCP
+ n6XFWHeZnEpz4n8jUdxKHC814Hcjge1NVXP1BYt6e0/3NAr08QZxtbsf6Qi5Eo/w88RN9moW0
+ vj4QFPkPiCpI1IFxqsT3OrBXgHYyUBv6AIY7K6OzYHfS6iRPs1N5wDlG2jdVod2wwOu/k9qYm
+ dexwtanJknBw7W2zHLnbmvxCxqNevOn5v3o82yG9rdcvw9PNwD81bTePNhU7oTjXViaPPz0H5
+ I95jkDhXNFr760Rmk7QWyEM+i2mh4gbf3dKOynmNIuAXqt7mqnLj529DDN0ZpdGC4qPglUUUR
+ pYuzle30ArfFlr0/V5F1Pp02wm5PFYN4UTxYUQplm1jkzj8uNX3EDAuDkgssXkKowgC6I01XK
+ O0Dsmch3jilFxV6STzKcQOHvhmxE9DXDkDqGkTK8pU7ZTqHsytUF3d0RhbeXgL7D9JBNUQrr1
+ YTVdvFSFAtBItik+FP7J3DzfSxFDXJm4Oskn8skl9ZurYdPdd8Z+nEVg5FtxwEHat1SHzGqxS
+ 6zd3CO8pywAIPYFAD+sVnKmDll7r3cCMKeAKqiJOEXC5CMbthR2s3urrz2Ylen460jT3Te4zr
+ Is20Z2Rkfnk3W3JJLGIp6gKjShbZ4Yv4vpPlnpqlyufnp5EET5vXq8nW4swutZVTQaR2uaop2
+ 7Bc/pDd27LNNssfI12pGEWM2wpqgd2w6Zq1Td/qtBzvF44XoLDvU7ccSt5c0+xXHDxmrwngFG
+ Ww3VIoVTkCx/ztcab6kdQ6MIcrjhN3utpi4Br+D+ORFjFn1J0oYZc9zOL2eDWiA07BFnyM4Bi
+ sKDIoMCGL2pm8wTzE4ICJZMv+INnOzuCea03BK5lhUbccyy1Ds=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
-Subject: [Qemu-devel] [PULL v2 03/15] linux-user: erroneous
- fd_trans_unregister call
+X-Received-From: 212.227.126.130
+Subject: [Qemu-devel] [PULL v2 13/15] linux-user: Add support for FDFLUSH
+ ioctl
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,36 +78,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Max Filippov <jcmvbkbc@gmail.com>, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>, Shu-Chun Weng <scw@google.com>
+ Yunqiang Su <ysu@wavecomp.com>, Laurent Vivier <laurent@vivier.eu>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Shu-Chun Weng <scw@google.com>
+From: Yunqiang Su <ysu@wavecomp.com>
 
-timer_getoverrun returns the "overrun count" for the timer, which is not
-a file descriptor and thus should not call fd_trans_unregister on it.
+FDFLUSH is used for flushing buffers of floppy drives. Support in
+QEMU is needed because some of Debian packages use this ioctl while
+running post-build tests. One such example is 'tar' package.
 
-Signed-off-by: Shu-Chun Weng <scw@google.com>
+Signed-off-by: Yunqiang Su <ysu@wavecomp.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20190819185348.221825-1-scw@google.com>
+Message-Id: <1567601968-26946-5-git-send-email-aleksandar.markovic@rt-rk.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/syscall.c | 1 -
- 1 file changed, 1 deletion(-)
+ linux-user/ioctls.h       | 2 ++
+ linux-user/syscall.c      | 1 +
+ linux-user/syscall_defs.h | 4 ++++
+ 3 files changed, 7 insertions(+)
 
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index 1830de96e12b..bc1944804220 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -112,6 +112,8 @@
+      IOCTL(BLKZEROOUT, IOC_W, MK_PTR(MK_ARRAY(TYPE_ULONGLONG, 2)))
+ #endif
+ 
++     IOCTL(FDFLUSH, 0, TYPE_NULL)
++
+ #ifdef FIBMAP
+      IOCTL(FIBMAP, IOC_W | IOC_R, MK_PTR(TYPE_LONG))
+ #endif
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 8b41a03901d4..b42f59a32c8d 100644
+index 6928f654ced3..e2af3c1494fa 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -11847,7 +11847,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             timer_t htimer = g_posix_timers[timerid];
-             ret = get_errno(timer_getoverrun(htimer));
-         }
--        fd_trans_unregister(ret);
-         return ret;
-     }
+@@ -89,6 +89,7 @@
+ #include <linux/kd.h>
+ #include <linux/mtio.h>
+ #include <linux/fs.h>
++#include <linux/fd.h>
+ #if defined(CONFIG_FIEMAP)
+ #include <linux/fiemap.h>
  #endif
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 498223b77787..917202a2035d 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -888,6 +888,10 @@ struct target_pollfd {
+ #define TARGET_BLKROTATIONAL TARGET_IO(0x12, 126)
+ #define TARGET_BLKZEROOUT TARGET_IO(0x12, 127)
+ 
++/* From <linux/fd.h> */
++
++#define TARGET_FDFLUSH        TARGET_IO(2, 0x4b)
++
+ #define TARGET_FIBMAP     TARGET_IO(0x00,1)  /* bmap access */
+ #define TARGET_FIGETBSZ   TARGET_IO(0x00,2)  /* get the block size used for bmap */
+ 
 -- 
 2.21.0
 
