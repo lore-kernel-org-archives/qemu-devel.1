@@ -2,49 +2,50 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE3AC49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 16:11:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BEB4C5ACAE
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 16:13:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2204C20863
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 16:11:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2204C20863
+	by mail.kernel.org (Postfix) with ESMTPS id 1366020863
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 16:13:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1366020863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i85DY-0001A7-8Z
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 12:11:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35957)
+	id 1i85FQ-0002x8-SF
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 12:13:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36420)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1i85CI-00009b-0U
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 12:10:22 -0400
+ (envelope-from <david@redhat.com>) id 1i85EU-0002GZ-UO
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 12:12:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1i85CF-00032d-PX
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 12:10:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55436)
+ (envelope-from <david@redhat.com>) id 1i85EU-0003kf-1p
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 12:12:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57786)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1i85CF-000325-Hp; Wed, 11 Sep 2019 12:10:19 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1i85ET-0003kU-L1; Wed, 11 Sep 2019 12:12:37 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 255763082E57;
- Wed, 11 Sep 2019 16:10:18 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id EC16230860A5;
+ Wed, 11 Sep 2019 16:12:36 +0000 (UTC)
 Received: from [10.36.116.137] (ovpn-116-137.ams2.redhat.com [10.36.116.137])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5DDD11001938;
- Wed, 11 Sep 2019 16:10:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 299AD19C70;
+ Wed, 11 Sep 2019 16:12:34 +0000 (UTC)
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190906075750.14791-1-david@redhat.com>
- <20190906075750.14791-3-david@redhat.com>
- <28507e0d-f7b3-74e6-43df-95a53a162e12@linaro.org>
+ <20190906075750.14791-5-david@redhat.com>
+ <7788b1b6-fbf0-3370-5563-1da4f7124999@linaro.org>
+ <905250c7-b249-6812-391c-408af69d9523@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -91,22 +92,22 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <5aaf2d21-f56d-dfcd-690c-253724dd55de@redhat.com>
-Date: Wed, 11 Sep 2019 18:10:15 +0200
+Message-ID: <c2eb8313-cd97-ce92-7108-e6256a98d6e9@redhat.com>
+Date: Wed, 11 Sep 2019 18:12:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <28507e0d-f7b3-74e6-43df-95a53a162e12@linaro.org>
+In-Reply-To: <905250c7-b249-6812-391c-408af69d9523@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Wed, 11 Sep 2019 16:10:18 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Wed, 11 Sep 2019 16:12:37 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 02/28] s390x/tcg: MVCL: Zero out unused
- bits of address
+Subject: Re: [Qemu-devel] [PATCH v2 04/28] s390x/tcg: MVCL: Process max 2k
+ bytes at a time
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,50 +126,25 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11.09.19 16:40, Richard Henderson wrote:
-> On 9/6/19 3:57 AM, David Hildenbrand wrote:
->> We have to zero out unused bits in 24 and 31-bit addressing mode.
->> Provide a new helper.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  target/s390x/mem_helper.c | 24 ++++++++++++++++++++++--
->>  1 file changed, 22 insertions(+), 2 deletions(-)
+On 11.09.19 17:07, Richard Henderson wrote:
+> On 9/11/19 10:52 AM, Richard Henderson wrote:
+>> The code within Hercules breaks the action at every 2k address boundary -- for
+>> both src and dest.  That's the only way that actually makes sense to me, as
+>> otherwise we end up allowing userspace to read/write into a page without
+>> permission.  Which is a security hole.
 > 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> 
-> 
->> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
->> index 39ee9b3175..3152bdafe2 100644
->> --- a/target/s390x/mem_helper.c
->> +++ b/target/s390x/mem_helper.c
->> @@ -469,6 +469,26 @@ static inline uint64_t get_address(CPUS390XState *env, int reg)
->>      return wrap_address(env, env->regs[reg]);
->>  }
->>  
->> +/*
->> + * Store the address to the given register, zeroing out unused leftmost
->> + * bits in bit positions 32-63 (24-bit and 31-bit mode only).
->> + */
->> +static inline void set_address_zero(CPUS390XState *env, int reg,
->> +                                    uint64_t address)
->> +{
->> +    if (env->psw.mask & PSW_MASK_64) {
->> +        env->regs[reg] = address;
->> +    } else {
->> +        if (!(env->psw.mask & PSW_MASK_32)) {
->> +            address &= 0x00ffffff;
->> +            env->regs[reg] = deposit64(env->regs[reg], 0, 32, address);
->> +        } else {
->> +            address &= 0x7fffffff;
->> +            env->regs[reg] = deposit64(env->regs[reg], 0, 32, address);
->> +        }
-> 
-> You could perhaps sink the deposit and store line into the outer else.
-> 
+> Also, doesn't "2k" come from the old esa/360 page size?
 
-Thanks, will do!
+I have no idea, I was very confused with that.
 
+> 
+> Which means that we could break at 4k pages instead of 2k now
+> and the program wouldn't really be able to tell the difference.
+
+What I had in a previous iteration was to simply process until the end
+of the page(s), to not cross pages (there is one special case with 2k
+vs. 4k when crossing pages when wrapping and running into a
+low-address-protection). So essentially what you suggest. I can add that.
 
 -- 
 
