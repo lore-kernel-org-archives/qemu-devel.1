@@ -2,48 +2,47 @@ Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A15FC49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 23:16:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D60CC49ED6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 23:34:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBCA22085B
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 23:16:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBCA22085B
+	by mail.kernel.org (Postfix) with ESMTPS id CFB462081B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 23:34:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFB462081B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8Bql-00062X-S9
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 19:16:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48869)
+	id 1i8C7o-0001Zk-RI
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 19:34:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51387)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i8Bq1-0005bQ-OC
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 19:15:50 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i8C6r-00013c-8A
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 19:33:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i8Bpy-0005FH-Ob
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 19:15:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53940)
+ (envelope-from <jsnow@redhat.com>) id 1i8C6q-0004HK-5F
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 19:33:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54628)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1i8Bpy-0005EG-G9
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 19:15:46 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1i8C6l-0004Fs-IQ; Wed, 11 Sep 2019 19:33:07 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A81FA308212F;
- Wed, 11 Sep 2019 23:15:43 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 91E1781DE0;
+ Wed, 11 Sep 2019 23:33:06 +0000 (UTC)
 Received: from [10.18.17.203] (dhcp-17-203.bos.redhat.com [10.18.17.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C9E7F5D6A5;
- Wed, 11 Sep 2019 23:15:42 +0000 (UTC)
-To: Mark Syms <Mark.Syms@citrix.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <e2cce2353aa44e2481f01b96ee1e6028@AMSPEX02CL01.citrite.net>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8F1FC19C6A;
+ Wed, 11 Sep 2019 23:33:05 +0000 (UTC)
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <20190911151626.6823-1-berto@igalia.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -120,21 +119,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <5c016081-6ba6-5ae1-524a-6e45c92e9822@redhat.com>
-Date: Wed, 11 Sep 2019 19:15:42 -0400
+Message-ID: <b3bd3fa6-e700-b5d1-0339-8670cd79026e@redhat.com>
+Date: Wed, 11 Sep 2019 19:33:05 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <e2cce2353aa44e2481f01b96ee1e6028@AMSPEX02CL01.citrite.net>
+In-Reply-To: <20190911151626.6823-1-berto@igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Wed, 11 Sep 2019 23:15:43 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Wed, 11 Sep 2019 23:33:06 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Valgrind confused by queue macros
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qcow2: Stop overwriting
+ compressed clusters one by one
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -146,68 +146,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/10/19 9:27 AM, Mark Syms wrote:
-> Hi,
+On 9/11/19 11:16 AM, Alberto Garcia wrote:
+> handle_alloc() tries to find as many contiguous clusters that need
+> copy-on-write as possible in order to allocate all of them at the same
+> time.
 > 
-> While trying to track down an issue in using qemu 4.1 with some development features we needed/wanted to run valgrind on it to find a memory error. Unfortunately the form of the queue macros seems to really confuse valgrind and cause it to report many " Use of uninitialised value " errors.
+> However, compressed clusters are only overwritten one by one, so let's
+> say that we have an image with 1024 consecutive compressed clusters:
 > 
-> As an example, in qemu_aio_coroutine_enter - 
+>    qemu-img create -f qcow2 hd.qcow2 64M
+>    for f in `seq 0 64 65472`; do
+>       qemu-io -c "write -c ${f}k 64k" hd.qcow2
+>    done
 > 
-> Use of uninitialised value of size 8
->    at 0x69E7E5: qemu_aio_coroutine_enter (qemu-coroutine.c:109)
+> In this case trying to overwrite the whole image with one large write
+> request results in 1024 separate allocations:
 > 
-> Conditional jump or move depends on uninitialised value(s)
->    at 0x69E7FA: qemu_aio_coroutine_enter (qemu-coroutine.c:112)
+>    qemu-io -c "write 0 64M" hd.qcow2
 > 
-> Use of uninitialised value of size 8
->    at 0x69E800: qemu_aio_coroutine_enter (qemu-coroutine.c:118)
+> This restriction comes from commit 095a9c58ce12afeeb90c2 from 2018.
+
+You accidentally typed a reasonably modern date. It's from *2008*!
+
+> Nowadays QEMU can overwrite multiple compressed clusters just fine,
+> and in fact it already does: as long as the first cluster that
+> handle_alloc() finds is not compressed, all other compressed clusters
+> in the same batch will be overwritten in one go:
 > 
-> Use of uninitialised value of size 8
->    at 0x69E809: qemu_aio_coroutine_enter (qemu-coroutine.c:120)
+>    qemu-img create -f qcow2 hd.qcow2 64M
+>    qemu-io -c "write -z 0 64k" hd.qcow2
+>    for f in `seq 64 64 65472`; do
+>       qemu-io -c "write -c ${f}k 64k" hd.qcow2
+>    done
 > 
-> Use of uninitialised value of size 8
->    at 0x69E822: qemu_aio_coroutine_enter (qemu-coroutine.c:122)
+> Compared to the previous one, overwriting this image on my computer
+> goes from 8.35s down to 230ms.
 > 
-> Use of uninitialised value of size 8
->    at 0x69E83A: qemu_aio_coroutine_enter (qemu-coroutine.c:134)
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2-cluster.c | 8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
 > 
-> Use of uninitialised value of size 8
->    at 0x69E845: qemu_aio_coroutine_enter (qemu-coroutine.c:139)
-> 
-> This seems to ultimately result from it thinking that pending is not initialised by this line
-> 
->     QSIMPLEQ_HEAD(, Coroutine) pending = QSIMPLEQ_HEAD_INITIALIZER(pending);
-> 
-> As this issue in itself accounts for 7 errors every time that qemu_aio_coroutine_enter is called (which is frequently) valgrind very soon gives up and says the code is too broken to report errors on - unless that is you disable the error-limit which is what we've done but then you still have to identify the real errors in the middle of these ones.
-> 
-> Not sure what it is about the macros in the initialisation line that cause valgrind to think it isn't initialised, whilst there is a small amount of macro magic in there it looks like it does actually result in things being correctly initialised.
-> 
-> This is using valgrind 3.13.0-13.el7 on a CentOS 7 system.
-> 
-> Any clues about how to resolve this? Or is it just a fact of life that valgrind is never going to be happy with this code?
-> 
-> Thanks,
-> 
-> Mark.
+> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> index f09cc992af..dcacd3c450 100644
+> --- a/block/qcow2-cluster.c
+> +++ b/block/qcow2-cluster.c
+> @@ -1351,13 +1351,7 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
+>      }
+>  
+>      entry = be64_to_cpu(l2_slice[l2_index]);
+> -
+> -    /* For the moment, overwrite compressed clusters one by one */
+> -    if (entry & QCOW_OFLAG_COMPRESSED) {
+> -        nb_clusters = 1;
+> -    } else {
+> -        nb_clusters = count_cow_clusters(bs, nb_clusters, l2_slice, l2_index);
+> -    }
+> +    nb_clusters = count_cow_clusters(bs, nb_clusters, l2_slice, l2_index);
+>  
+>      /* This function is only called when there were no non-COW clusters, so if
+>       * we can't find any unallocated or COW clusters either, something is
 > 
 
-I haven't used valgrind on a "real" run of QEMU in some time, usually
-using it for the test suite instead.
+Well, given that count_cow_clusters already works this way, this doesn't
+break anything that wasn't broken before, at least.
 
-In this case, are you sure it's choking on the macro and not getting
-confused about all of the stack swaps that QEMU is doing in the
-coroutine module?
-
-CCing some folks who have worked on valgrind support in the past, they
-might have a more targeted idea.
-
---js
+Reviewed-by: John Snow <jsnow@redhat.com>
 
