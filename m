@@ -2,92 +2,86 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 838E1C47404
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 12:06:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D56C47404
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 12:07:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AE042075C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 12:06:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E32122075C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 12:07:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O5AnKbYu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AE042075C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZnLZlF4d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E32122075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8NrS-0003PD-F1
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 08:06:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47954)
+	id 1i8Nsn-0004Ui-Ou
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 08:07:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48341)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i8Nqi-0002ja-V6
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 08:05:22 -0400
+ (envelope-from <stefanha@gmail.com>) id 1i8Ns6-00042C-9j
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 08:06:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i8Nqh-0004YQ-FU
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 08:05:20 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43438)
+ (envelope-from <stefanha@gmail.com>) id 1i8Ns5-0006wv-3P
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 08:06:46 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37158)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i8Nqh-0004WZ-5C
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 08:05:19 -0400
-Received: by mail-wr1-x443.google.com with SMTP id q17so23450900wrx.10
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 05:05:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=cNC/anTCSpUuBe5oh9cBVMof/FJSpg4mcNvbY2fykeA=;
- b=O5AnKbYupNAM7m8dqK0j7AI/Yaf+yZsmQ4xCGSYwRSMswTvZ21ZXhuc+GCM6vG0ihy
- D9RtdjFLu4JUpYQhNLK//O2C+phlzxpD2OoSV2/8zaIIR5Vusezb9miStXYHRJvvQ/Il
- 6warSZABBX0lJX8weJxGbJENs4payLKL9JI1vof+Ib/vg35zqIoYzzU5PhECL4/+/g42
- aKaLGY7rT7h/xmbw5gTFTRAwfBx0SeTsfmQJ2k1hTOGLfGiyZZRoFeQwelOmhVH+TJHv
- iqWq6dJ15kfD5hucGSZQlDxbbVDHZfHaF1xNXajQd+59lRuNk7SwL8Mk+vSPHXS++x1q
- WK9w==
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1i8Ns4-0006ua-T7
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 08:06:45 -0400
+Received: by mail-wm1-x341.google.com with SMTP id r195so7391251wme.2
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 05:06:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=VQTQdtQ8y3+0fC6PchdJUaw8rLXynOgBJ7e8t7L9FW8=;
+ b=ZnLZlF4duSAHbwloKcwrWCbLMRL/Z6p8D6TpriMBh/jN/2BGXORHDZA7zmsnkeDPf1
+ YDO5FBC/zFY4vYlHg25/yKWDvtK5TOJmg6xQf1A1Vla5i4pDZ/kWMIFmdIxxxvqgcW/S
+ rfbDIhAgqCBamriAJ2OKZFQbSJnUPBGgbjhvr/fcLW0ngdS94IMBP6DJV4oL/RvCeH9e
+ 8Pw7TBIP6lCMbzsxfVUMmCoVAzBkcLX14QtDx3+jl2mdN8rBsOFUrO1Qp5u+A7KJewEz
+ RN5uBxSQk0fq9I8Aq2d9AKLmVKXDIJyoXKRaGz0mTRqT6R+QxVlVz8KsZgz+zgy6SBXw
+ IdhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=cNC/anTCSpUuBe5oh9cBVMof/FJSpg4mcNvbY2fykeA=;
- b=NTVy5lXdpssa5cDBIm+DHFTdKzPfkvhNClfDcs5x/TDdykibPHH6iQ6KIkNMHrjU9U
- DPlLYe+8WBR2fSbdOdFgK6gJ6mKZ9CRgTz1nFPe3+Ec9W0WMBtL3+MTCXmHIZ6kauPQ5
- N5Eqb2LcxJ+q87EAXs1FmSgsqU7UU5QYjsV6xYGTQo2dHDJp3gGsDoQb9vzQc8TY8wo4
- IdgNpD6Skrp/E7Dluk9lJcaiKi+gKrzJ7w6o40UUiOANs0ZnSFjaZIdKMZfqZlOTRg+C
- mtvHCBQYXKH84XO7sgfsZbSapT1oPCFyTvNi/RUpU8tNpGRTtWUzK/4xbDWoE3sgUrPZ
- toLA==
-X-Gm-Message-State: APjAAAVlL2a+qFd3eY9HOrXPGJqIVeXbGkdhIPhcbrRwHvBDa8EueKfr
- 0aZ1IIPSV5se7EyNEXpR4ofuZg==
-X-Google-Smtp-Source: APXvYqyhFNuKKNEDqrKBSJMjr6hJaZ+bAUcC92nmOeE7M8W/lgFKHxlTWEEY5Oe/xTIYp05iojB+Bg==
-X-Received: by 2002:a05:6000:108e:: with SMTP id
- y14mr34353457wrw.344.1568289917697; 
- Thu, 12 Sep 2019 05:05:17 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 207sm9205025wme.17.2019.09.12.05.05.16
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=VQTQdtQ8y3+0fC6PchdJUaw8rLXynOgBJ7e8t7L9FW8=;
+ b=snpWsMA4kELGVrGapSh4o7v2QrlOt8xFKsRGVFdCLlNcT2Zzbt2/bpRyOzpQgthjyy
+ b9F43CwLqimPSc+fRqXMf9LYn3cvQcOvsbSXGCw221LxKTp7L85A9CW7JUjG12LMDAt3
+ IJNJIkGaIa1Dhl4CDTmgCmqkgscYnXhCVhohiZ/Gr3y/9rj20s3fne4uX6GZtYPU9itm
+ T7PaypOZHwoQrLm8YMfsg1LSRF8usZRU5/Aq96dVZI2y/xbPsPre1LLtrWQIu/ZIPn5q
+ ORhMpd1V4eCp8g5dcM4/6UJg0eZRok3vUsBRl8yMP8vFGNXv56pl81Eo3N+Z1AU3AwlP
+ GHIA==
+X-Gm-Message-State: APjAAAWgs877r6GOVRM1GjmeDj6WMqtgPKRrNsyGLjP3Imh6jqB0kHyj
+ XqWvfVIOBEDETOSWO/43cH8=
+X-Google-Smtp-Source: APXvYqxBTYiGqod7Ys+6TZBgx1qp6G3LZFw/i4rsVOH3FaGDGwkDCvrcN5P0ZPapCLLDpkWNL38csw==
+X-Received: by 2002:a1c:d188:: with SMTP id i130mr8299960wmg.101.1568290003543; 
+ Thu, 12 Sep 2019 05:06:43 -0700 (PDT)
+Received: from localhost (178.165.130.7.wireless.dyn.drei.com. [178.165.130.7])
+ by smtp.gmail.com with ESMTPSA id b16sm37948227wrh.5.2019.09.12.05.06.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Sep 2019 05:05:17 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5DF2C1FF87;
- Thu, 12 Sep 2019 13:05:16 +0100 (BST)
-References: <20190910144428.32597-1-peter.maydell@linaro.org>
- <20190910144428.32597-13-peter.maydell@linaro.org>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190910144428.32597-13-peter.maydell@linaro.org>
-Date: Thu, 12 Sep 2019 13:05:16 +0100
-Message-ID: <87a7b9zpmr.fsf@linaro.org>
+ Thu, 12 Sep 2019 05:06:42 -0700 (PDT)
+Date: Thu, 12 Sep 2019 14:06:41 +0200
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Toe Dev <devtoe82@gmail.com>
+Message-ID: <20190912120641.GF23174@stefanha-x1.localdomain>
+References: <CAN+O=TJAFiBEUVudnQ8cszfpo48GG9z-9FecsOtU+HU3PNisHQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="XStn23h1fwudRqtG"
+Content-Disposition: inline
+In-Reply-To: <CAN+O=TJAFiBEUVudnQ8cszfpo48GG9z-9FecsOtU+HU3PNisHQ@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH 12/13] target/arm/arm-semi: Implement
- SH_EXT_STDOUT_STDERR extension
+X-Received-From: 2a00:1450:4864:20::341
+Subject: Re: [Qemu-devel] Subject: Re:  [PATCH] hw/block/nvme
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,88 +93,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org
+Cc: keith.busch@intel.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+--XStn23h1fwudRqtG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> SH_EXT_STDOUT_STDERR is a v2.0 semihosting extension: the guest
-> can open ":tt" with a file mode requesting append access in
-> order to open stderr, in addition to the existing "open for
-> read for stdin or write for stdout". Implement this and
-> report it via the :semihosting-features data.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/arm-semi.c | 22 ++++++++++++++++++++--
->  1 file changed, 20 insertions(+), 2 deletions(-)
->
-> diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-> index 531084b7799..0df8d4d69d6 100644
-> --- a/target/arm/arm-semi.c
-> +++ b/target/arm/arm-semi.c
-> @@ -476,12 +476,16 @@ static uint32_t gdb_flenfn(TaskState *ts, ARMCPU *c=
-pu, GuestFD *gf)
->  #define SHFB_MAGIC_2 0x46
->  #define SHFB_MAGIC_3 0x42
->
-> +/* Feature bits reportable in feature byte 0 */
-> +#define SH_EXT_EXIT_EXTENDED (1 << 0)
+On Tue, Sep 10, 2019 at 11:23:50PM +0300, Toe Dev wrote:
+> Hey,
+> While reviewing I noticed maybe we need to update the spec revision.
+> In: nvme_class_init(...)
+>=20
+> current code  pc->revision=3D2
+> change to: pc->revision=3D3
+> However not really important I think.. Just for consistency.
+> When I done reviewing, should it be patched too, How?
 
-If you swap 12/13 this could be kept with the related feature. I don't
-think one implies the other right?
+The NVMe specification declares the PCI Revision ID field implementation
+specific.  It doesn't seem to be a reflection of the NVMe specification
+supported by the device.
 
-> +#define SH_EXT_STDOUT_STDERR (1 << 1)
-> +
->  static const uint8_t featurefile_data[] =3D {
->      SHFB_MAGIC_0,
->      SHFB_MAGIC_1,
->      SHFB_MAGIC_2,
->      SHFB_MAGIC_3,
-> -    0, /* Feature byte 0 */
-> +    SH_EXT_STDOUT_STDERR, /* Feature byte 0 */
->  };
->
->  static void init_featurefile_guestfd(int guestfd)
-> @@ -674,7 +678,21 @@ target_ulong do_arm_semihosting(CPUARMState *env)
->          }
->
->          if (strcmp(s, ":tt") =3D=3D 0) {
-> -            int result_fileno =3D arg1 < 4 ? STDIN_FILENO : STDOUT_FILEN=
-O;
-> +            int result_fileno;
-> +
-> +            /*
-> +             * We implement SH_EXT_STDOUT_STDERR, so:
-> +             *  open for read =3D=3D stdin
-> +             *  open for write =3D=3D stdout
-> +             *  open for append =3D=3D stderr
-> +             */
+If there is a PCI Vendor 0x8086 Device 0x5845 in the real world with
+revision =3D 3 that we now emulate correctly, then it could be updated.
 
-I love the way the spec documents field2 as an ISO C fopen() mode and
-then an extension literally subverts the meaning to be something else.
-Where the designers worried about adding a SYS_OPEN_TTY function to the
-interface?
+However, for live migration compatibility QEMU must keep old
+guest-visible behavior too.  It's not as simple as changing the revision
+value to 3, because then existing VMs migrating from an old QEMU to a
+new QEMU would suddenly see the hardware change beneath them.
 
-Anyway it meets the spec however weird it might be:
+QEMU has the "machine types" mechanism to deal with this.  QEMU 4.2 and
+later machine types (e.g. "pc-q35-4.2") would use revision =3D 3 while
+older machine types would use revision =3D 2.  This maintains live
+migration compatibility.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+In summary, there is probably no strong reason to change this (although
+I'm not an NVMe expert so maybe I've missed something).
 
-> +            if (arg1 < 4) {
-> +                result_fileno =3D STDIN_FILENO;
-> +            } else if (arg1 < 8) {
-> +                result_fileno =3D STDOUT_FILENO;
-> +            } else {
-> +                result_fileno =3D STDERR_FILENO;
-> +            }
->              associate_guestfd(guestfd, result_fileno);
->              unlock_user(s, arg0, 0);
->              return guestfd;
+--XStn23h1fwudRqtG
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
---
-Alex Benn=C3=A9e
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl16NNAACgkQnKSrs4Gr
+c8jTjQf7B1b134xSLOAswnhZ7AtDuVyA+HXbkYZ+bneW8Bqc8jyBp8/BIUedZYBy
+toMa7ZNs6DXH35wI9sLAeHn7pFoLCxwddzzdOJpKG5595TZE2GaWaE0rd/nOifck
+XSSSIuZflgyx4fM6R1igJ2IyPkOyYvNbxysFmVsRHDrPp/fPUvbfY99WctXyoOG5
+ZWzBCrTeVysCA1zUeqtJhjFnpozdEsT3Ue93v3yuHWFFI+xezD4OhJFlM9pKB76v
+n7bWfO8GBNl9knn2GMhf2bM0FThQcf0tD5+y487naVxa5DM+X676DkP2vnQrG1o9
+b4m+WbFJh/f25mysqG0zT8gIKI+xkg==
+=gxt1
+-----END PGP SIGNATURE-----
+
+--XStn23h1fwudRqtG--
 
