@@ -2,99 +2,83 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DAE5C5ACAE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:38:23 +0000 (UTC)
-Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C1C8C5ACAE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:39:06 +0000 (UTC)
+Received: from lists.gnu.org (unknown [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 137E520856
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:38:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 137E520856
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 12CED20856
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:39:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VtP0XNKB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12CED20856
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8LYT-0006j8-AK
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 05:38:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45076)
+	id 1i8LZA-0007O0-Sc
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 05:39:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43373)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bala24@linux.ibm.com>) id 1i8LRk-0000ES-1D
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:31:25 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i8LIA-0005pe-W8
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:21:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bala24@linux.ibm.com>) id 1i8LRi-0006nF-RN
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:31:23 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14414)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <bala24@linux.ibm.com>)
- id 1i8LRi-0006mt-Kh
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:31:22 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8C9IJxP032394
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 05:31:21 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2uyk7mrk2f-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 05:31:21 -0400
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <bala24@linux.ibm.com>;
- Thu, 12 Sep 2019 10:31:19 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 12 Sep 2019 10:31:17 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id x8C9VGw442795430
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Sep 2019 09:31:16 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5074AAE061;
- Thu, 12 Sep 2019 09:31:16 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CBE5EAE05A;
- Thu, 12 Sep 2019 09:31:14 +0000 (GMT)
-Received: from localhost.in.ibm.com (unknown [9.124.35.221])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 12 Sep 2019 09:31:14 +0000 (GMT)
-From: Balamuruhan S <bala24@linux.ibm.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 12 Sep 2019 15:00:52 +0530
-X-Mailer: git-send-email 2.14.5
-In-Reply-To: <20190912093056.4516-1-bala24@linux.ibm.com>
-References: <20190912093056.4516-1-bala24@linux.ibm.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1i8LI9-0000QM-Nv
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:21:30 -0400
+Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:35211)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i8LI9-0000PZ-IP
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:21:29 -0400
+Received: by mail-oi1-x236.google.com with SMTP id a127so16572347oii.2
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 02:21:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=TNqIZi3uSOI6g9Iu95SIZpcJ4IuWX+ADUadP+K8TlIs=;
+ b=VtP0XNKBTtVbDZDzYTTYrV2jMJHF5Ou7QDJwka0w+GHqIFUDmRl8S7pSMDmYv5d+kH
+ X6C+jrrH/nE/3QYp2FVeRblz2O46LM8H4mdci1XeNUQGBAoZmxiuaFIFQsr2SO3VEbBL
+ N0fzRY0jExlMiGOLSAvvrcZRkn/6N6xHTS4EzOAkl1HGz+/ibj7dakWnZV4/wv5VbJ3i
+ ZOy58t+/vidqQkYp3SDru8ataO6A7dPqNxKAW3a7VYnaBiaTR6hfPERs8u1Q4zHnFWFF
+ SFtJI8Ey6cZv1YnGKpkCFqPCWMq0AtLMzumgtEfun313U0Vx4Q+hc+mtp+BkvCWOhi4Z
+ cTqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=TNqIZi3uSOI6g9Iu95SIZpcJ4IuWX+ADUadP+K8TlIs=;
+ b=ZCo9XCpZQMaeafgqJvUQcbKTbE9PE5tgkZBT/6vFj9R0SJ4ps/d1Re/3UWDRHEMGbB
+ Rhkojq3uVjsXJjGgYloQk8C9PirGpAYZtFH3CBeyFO7Spo/lncBgo69WU1gsDLRuPYwU
+ imBXWD+JNosWUW1FDcnWO8MBM4eAC5NT/AnILI0GzLRVUrFaF6pVi6xj8y3IpTI5s1c9
+ vyz4vOgM8/WIqO31onC7aweMOTf4gobHU6+IANpSnbiLLKXHK/utTz7cnywmSPK3Jy2q
+ zrv1rrQnOKflqQrxEF2hCdmTDxTsIoH+IQXIDKbf17N0fnFDdzSmYajTWbO8jhD3NH3A
+ 3ohg==
+X-Gm-Message-State: APjAAAUnF7l7bGwQ4uTmA07fu1t5hoo4EtemKqyUttxe2aM2xzzLfQy2
+ hz/nahKt3aFzrUHtdUl+jIL3trFshfVYDwmmqtTikQ==
+X-Google-Smtp-Source: APXvYqwFm/vWR1fS38Pg5IYED5LNVlWZ+xcL/DiLExHQV4boqoLsUrxYwI+uGIg5pnwZAVy+xgqO7w8qRQn8wH1znGc=
+X-Received: by 2002:aca:f54d:: with SMTP id t74mr7912448oih.170.1568280088058; 
+ Thu, 12 Sep 2019 02:21:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-x-cbid: 19091209-0020-0000-0000-0000036B5C3C
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19091209-0021-0000-0000-000021C0ED0F
-Message-Id: <20190912093056.4516-2-bala24@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-09-12_04:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1909120099
+References: <20190731160719.11396-1-alex.bennee@linaro.org>
+ <87a7cty0tv.fsf@dusky.pond.sub.org> <875zm5yzgq.fsf@linaro.org>
+ <87d0g6dnbc.fsf_-_@dusky.pond.sub.org> <87y2ytzy17.fsf@linaro.org>
+In-Reply-To: <87y2ytzy17.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Sep 2019 10:21:17 +0100
+Message-ID: <CAFEAcA9Db2ENw7e_1-XOTbHeV=sp_zFxqoq4se+63OK+mQaeew@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0a-001b2d01.pphosted.com id x8C9IJxP032394
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: [Qemu-devel] [PATCH v3 1/4] hw/ppc/pnv_xscom: retrieve homer/occ
- base address from PBA BARs
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::236
+Subject: Re: [Qemu-devel] TCG plugins and the GPL (was: [PATCH v4 00/54]
+ plugins for TCG)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,134 +90,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: maddy@linux.vnet.ibm.com, groug@kaod.org,
- Balamuruhan S <bala24@linux.ibm.com>, anju@linux.vnet.ibm.com,
- qemu-ppc@nongnu.org, clg@kaod.org, hari@linux.vnet.ibm.com,
- david@gibson.dropbear.id.au
+Cc: Markus Armbruster <armbru@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aaron Lindsay <aaron@os.amperecomputing.com>,
+ "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Pranith Kumar <bobby.prani@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-During PowerNV boot skiboot populates the device tree by
-retrieving base address of homer/occ common area from
-PBA BARs and prd ipoll mask by accessing xscom read/write
-accesses.
+On Thu, 12 Sep 2019 at 10:03, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+> Well the first thing will be we are not intending to offer a guaranteed
+> ABI. While we don't want to be changing it at a whim there shouldn't be
+> an expectation that the plugin interface will maintain backwards
+> compatibility (unlike the command line interface ;-). There should be an
+> expectation that plugins will likely need to be rebuilt against the
+> current source tree from time to time.
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
----
- hw/ppc/pnv_xscom.c   | 34 ++++++++++++++++++++++++++++++----
- include/hw/ppc/pnv.h | 18 ++++++++++++++++++
- 2 files changed, 48 insertions(+), 4 deletions(-)
+Wait, what? From my perspective the whole point of the plugin
+interface is that it should be stable, in that at least there's
+a good chance that a plugin you built will work against multiple
+versions of QEMU, and if it doesn't then it should fail with
+a reasonable error message telling you to update. I'm not
+sure we should be landing the plugins infrastructure if we
+don't have that much stability.
 
-diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
-index 67aab98fef..f01d788a65 100644
---- a/hw/ppc/pnv_xscom.c
-+++ b/hw/ppc/pnv_xscom.c
-@@ -36,6 +36,16 @@
- #define PRD_P9_IPOLL_REG_MASK           0x000F0033
- #define PRD_P9_IPOLL_REG_STATUS         0x000F0034
-=20
-+/* PBA BARs */
-+#define P8_PBA_BAR0                     0x2013f00
-+#define P8_PBA_BAR2                     0x2013f02
-+#define P8_PBA_BARMASK0                 0x2013f04
-+#define P8_PBA_BARMASK2                 0x2013f06
-+#define P9_PBA_BAR0                     0x5012b00
-+#define P9_PBA_BAR2                     0x5012b02
-+#define P9_PBA_BARMASK0                 0x5012b04
-+#define P9_PBA_BARMASK2                 0x5012b06
-+
- static void xscom_complete(CPUState *cs, uint64_t hmer_bits)
- {
-     /*
-@@ -74,6 +84,26 @@ static uint64_t xscom_read_default(PnvChip *chip, uint=
-32_t pcba)
-     case 0x18002:       /* ECID2 */
-         return 0;
-=20
-+    case P9_PBA_BAR0:
-+        return PNV9_HOMER_BASE(chip);
-+    case P8_PBA_BAR0:
-+        return PNV_HOMER_BASE(chip);
-+
-+    case P9_PBA_BARMASK0: /* P9 homer region size */
-+        return PNV9_HOMER_SIZE;
-+    case P8_PBA_BARMASK0: /* P8 homer region size */
-+        return PNV_HOMER_SIZE;
-+
-+    case P9_PBA_BAR2: /* P9 occ common area */
-+        return PNV9_OCC_COMMON_AREA(chip);
-+    case P8_PBA_BAR2: /* P8 occ common area */
-+        return PNV_OCC_COMMON_AREA(chip);
-+
-+    case P9_PBA_BARMASK2: /* P9 occ common area size */
-+        return PNV9_OCC_COMMON_AREA_SIZE;
-+    case P8_PBA_BARMASK2: /* P8 occ common area size */
-+        return PNV_OCC_COMMON_AREA_SIZE;
-+
-     case 0x1010c00:     /* PIBAM FIR */
-     case 0x1010c03:     /* PIBAM FIR MASK */
-=20
-@@ -93,13 +123,9 @@ static uint64_t xscom_read_default(PnvChip *chip, uin=
-t32_t pcba)
-     case 0x2020009:     /* ADU stuff, error register */
-     case 0x202000f:     /* ADU stuff, receive status register*/
-         return 0;
--    case 0x2013f00:     /* PBA stuff */
-     case 0x2013f01:     /* PBA stuff */
--    case 0x2013f02:     /* PBA stuff */
-     case 0x2013f03:     /* PBA stuff */
--    case 0x2013f04:     /* PBA stuff */
-     case 0x2013f05:     /* PBA stuff */
--    case 0x2013f06:     /* PBA stuff */
-     case 0x2013f07:     /* PBA stuff */
-         return 0;
-     case 0x2013028:     /* CAPP stuff */
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index fb123edc4e..63a4b7b6a7 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -198,6 +198,16 @@ void pnv_bmc_powerdown(IPMIBmc *bmc);
- #define PNV_XSCOM_BASE(chip)                                            =
-\
-     (0x0003fc0000000000ull + ((uint64_t)(chip)->chip_id) * PNV_XSCOM_SIZ=
-E)
-=20
-+#define PNV_OCC_COMMON_AREA_SIZE    0x0000000000700000ull
-+#define PNV_OCC_COMMON_AREA(chip)                                       =
-\
-+    (0x7fff800000ull + ((uint64_t)PNV_CHIP_INDEX(chip) * \
-+                         PNV_OCC_COMMON_AREA_SIZE))
-+
-+#define PNV_HOMER_SIZE              0x0000000000300000ull
-+#define PNV_HOMER_BASE(chip)                                            =
-\
-+    (0x7ffd800000ull + ((uint64_t)PNV_CHIP_INDEX(chip)) * PNV_HOMER_SIZE=
-)
-+
-+
- /*
-  * XSCOM 0x20109CA defines the ICP BAR:
-  *
-@@ -256,4 +266,12 @@ void pnv_bmc_powerdown(IPMIBmc *bmc);
- #define PNV9_XSCOM_SIZE              0x0000000400000000ull
- #define PNV9_XSCOM_BASE(chip)        PNV9_CHIP_BASE(chip, 0x00603fc00000=
-000ull)
-=20
-+#define PNV9_OCC_COMMON_AREA_SIZE    0x0000000000700000ull
-+#define PNV9_OCC_COMMON_AREA(chip)                                      =
-\
-+    (0x203fff800000ull + ((uint64_t)PNV_CHIP_INDEX(chip) * \
-+                           PNV9_OCC_COMMON_AREA_SIZE))
-+
-+#define PNV9_HOMER_SIZE              0x0000000000300000ull
-+#define PNV9_HOMER_BASE(chip)                                           =
-\
-+    (0x203ffd800000ull + ((uint64_t)PNV_CHIP_INDEX(chip)) * PNV9_HOMER_S=
-IZE)
- #endif /* PPC_PNV_H */
---=20
-2.14.5
-
+thanks
+-- PMM
 
