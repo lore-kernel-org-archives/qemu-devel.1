@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F56C4CEC6
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 15:16:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E36C4CEC6
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 15:16:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 653012081B
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 15:16:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 653012081B
+	by mail.kernel.org (Postfix) with ESMTPS id BBE972081B
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 15:16:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBE972081B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8QpD-0003dN-2c
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 11:15:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38368)
+	id 1i8Qpa-0003pw-BQ
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 11:16:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38363)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i8Qn5-000251-86
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i8Qn5-00024y-83
  for qemu-devel@nongnu.org; Thu, 12 Sep 2019 11:13:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i8Qn3-00036I-7v
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i8Qn3-00036S-8B
  for qemu-devel@nongnu.org; Thu, 12 Sep 2019 11:13:47 -0400
-Received: from relay.sw.ru ([185.231.240.75]:57854)
+Received: from relay.sw.ru ([185.231.240.75]:57858)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1i8Qmz-000348-Sa; Thu, 12 Sep 2019 11:13:42 -0400
+ id 1i8Qmz-00034B-SZ; Thu, 12 Sep 2019 11:13:42 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1i8Qmw-0000kk-Ow; Thu, 12 Sep 2019 18:13:38 +0300
+ id 1i8Qmw-0000kk-Tj; Thu, 12 Sep 2019 18:13:39 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Date: Thu, 12 Sep 2019 18:13:35 +0300
-Message-Id: <20190912151338.21225-2-vsementsov@virtuozzo.com>
+Date: Thu, 12 Sep 2019 18:13:36 +0300
+Message-Id: <20190912151338.21225-3-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190912151338.21225-1-vsementsov@virtuozzo.com>
 References: <20190912151338.21225-1-vsementsov@virtuozzo.com>
@@ -48,7 +48,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH 1/4] block/mirror: simplify do_sync_target_write
+Subject: [Qemu-devel] [PATCH 2/4] block/block-backend: add
+ blk_co_pwritev_part
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,133 +67,69 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-do_sync_target_write is called from bdrv_mirror_top_do_write after
-write/discard operation, all inside active_write/active_write_settle
-protecting us from mirror iteration. So the whole area is dirty for
-sure, no reason to examine dirty bitmap.
+Add blk write function with qiov_offset parameter. It's needed for the
+following commit.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/mirror.c | 95 +++++++++++++++-----------------------------------
- 1 file changed, 28 insertions(+), 67 deletions(-)
+ include/sysemu/block-backend.h |  4 ++++
+ block/block-backend.c          | 17 +++++++++++++----
+ 2 files changed, 17 insertions(+), 4 deletions(-)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index 853e2c7510..d176bf5920 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1203,84 +1203,45 @@ do_sync_target_write(MirrorBlockJob *job, MirrorMethod method,
-                      uint64_t offset, uint64_t bytes,
-                      QEMUIOVector *qiov, int flags)
- {
--    QEMUIOVector target_qiov;
--    uint64_t dirty_offset = offset;
--    uint64_t dirty_bytes;
--
--    if (qiov) {
--        qemu_iovec_init(&target_qiov, qiov->niov);
--    }
--
--    while (true) {
--        bool valid_area;
--        int ret;
--
--        bdrv_dirty_bitmap_lock(job->dirty_bitmap);
--        dirty_bytes = MIN(offset + bytes - dirty_offset, INT_MAX);
--        valid_area = bdrv_dirty_bitmap_next_dirty_area(job->dirty_bitmap,
--                                                       &dirty_offset,
--                                                       &dirty_bytes);
--        if (!valid_area) {
--            bdrv_dirty_bitmap_unlock(job->dirty_bitmap);
--            break;
--        }
-+    int ret;
- 
--        bdrv_reset_dirty_bitmap_locked(job->dirty_bitmap,
--                                       dirty_offset, dirty_bytes);
--        bdrv_dirty_bitmap_unlock(job->dirty_bitmap);
-+    bdrv_reset_dirty_bitmap(job->dirty_bitmap, offset, bytes);
- 
--        job_progress_increase_remaining(&job->common.job, dirty_bytes);
-+    job_progress_increase_remaining(&job->common.job, bytes);
- 
--        assert(dirty_offset - offset <= SIZE_MAX);
--        if (qiov) {
--            qemu_iovec_reset(&target_qiov);
--            qemu_iovec_concat(&target_qiov, qiov,
--                              dirty_offset - offset, dirty_bytes);
--        }
--
--        switch (method) {
--        case MIRROR_METHOD_COPY:
--            ret = blk_co_pwritev(job->target, dirty_offset, dirty_bytes,
--                                 qiov ? &target_qiov : NULL, flags);
--            break;
-+    switch (method) {
-+    case MIRROR_METHOD_COPY:
-+        ret = blk_co_pwritev(job->target, offset, bytes, qiov, flags);
-+        break;
- 
--        case MIRROR_METHOD_ZERO:
--            assert(!qiov);
--            ret = blk_co_pwrite_zeroes(job->target, dirty_offset, dirty_bytes,
--                                       flags);
--            break;
-+    case MIRROR_METHOD_ZERO:
-+        assert(!qiov);
-+        ret = blk_co_pwrite_zeroes(job->target, offset, bytes, flags);
-+        break;
- 
--        case MIRROR_METHOD_DISCARD:
--            assert(!qiov);
--            ret = blk_co_pdiscard(job->target, dirty_offset, dirty_bytes);
--            break;
-+    case MIRROR_METHOD_DISCARD:
-+        assert(!qiov);
-+        ret = blk_co_pdiscard(job->target, offset, bytes);
-+        break;
- 
--        default:
--            abort();
--        }
-+    default:
-+        abort();
-+    }
- 
--        if (ret >= 0) {
--            job_progress_update(&job->common.job, dirty_bytes);
--        } else {
--            BlockErrorAction action;
-+    if (ret >= 0) {
-+        job_progress_update(&job->common.job, bytes);
-+    } else {
-+        BlockErrorAction action;
- 
--            bdrv_set_dirty_bitmap(job->dirty_bitmap, dirty_offset, dirty_bytes);
--            job->actively_synced = false;
-+        bdrv_set_dirty_bitmap(job->dirty_bitmap, offset, bytes);
-+        job->actively_synced = false;
- 
--            action = mirror_error_action(job, false, -ret);
--            if (action == BLOCK_ERROR_ACTION_REPORT) {
--                if (!job->ret) {
--                    job->ret = ret;
--                }
--                break;
-+        action = mirror_error_action(job, false, -ret);
-+        if (action == BLOCK_ERROR_ACTION_REPORT) {
-+            if (!job->ret) {
-+                job->ret = ret;
-             }
-         }
--
--        dirty_offset += dirty_bytes;
--    }
--
--    if (qiov) {
--        qemu_iovec_destroy(&target_qiov);
-     }
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 368d53af77..73f2cef7fe 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -121,6 +121,10 @@ void blk_set_dev_ops(BlockBackend *blk, const BlockDevOps *ops, void *opaque);
+ int coroutine_fn blk_co_preadv(BlockBackend *blk, int64_t offset,
+                                unsigned int bytes, QEMUIOVector *qiov,
+                                BdrvRequestFlags flags);
++int coroutine_fn blk_co_pwritev_part(BlockBackend *blk, int64_t offset,
++                                     unsigned int bytes,
++                                     QEMUIOVector *qiov, size_t qiov_offset,
++                                     BdrvRequestFlags flags);
+ int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
+                                unsigned int bytes, QEMUIOVector *qiov,
+                                BdrvRequestFlags flags);
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 1c605d5444..b3d00478af 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -1176,9 +1176,10 @@ int coroutine_fn blk_co_preadv(BlockBackend *blk, int64_t offset,
+     return ret;
  }
  
+-int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
+-                                unsigned int bytes, QEMUIOVector *qiov,
+-                                BdrvRequestFlags flags)
++int coroutine_fn blk_co_pwritev_part(BlockBackend *blk, int64_t offset,
++                                     unsigned int bytes,
++                                     QEMUIOVector *qiov, size_t qiov_offset,
++                                     BdrvRequestFlags flags)
+ {
+     int ret;
+     BlockDriverState *bs;
+@@ -1205,11 +1206,19 @@ int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
+         flags |= BDRV_REQ_FUA;
+     }
+ 
+-    ret = bdrv_co_pwritev(blk->root, offset, bytes, qiov, flags);
++    ret = bdrv_co_pwritev_part(blk->root, offset, bytes, qiov, qiov_offset,
++                               flags);
+     bdrv_dec_in_flight(bs);
+     return ret;
+ }
+ 
++int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
++                                unsigned int bytes, QEMUIOVector *qiov,
++                                BdrvRequestFlags flags)
++{
++    return blk_co_pwritev_part(blk, offset, bytes, qiov, 0, flags);
++}
++
+ typedef struct BlkRwCo {
+     BlockBackend *blk;
+     int64_t offset;
 -- 
 2.21.0
 
