@@ -2,85 +2,66 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F63FC5ACAE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 10:21:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF4B5C49ED9
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 10:21:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39EAE208C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 10:21:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VUmjhdlh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39EAE208C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A4FB920692
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 10:21:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4FB920692
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60340 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8MDm-0006jt-4j
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 06:21:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53624)
+	id 1i8MEF-0007P7-Dr
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 06:21:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53836)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i8MC0-00058s-R6
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:19:13 -0400
+ (envelope-from <kraxel@redhat.com>) id 1i8MCy-00068Q-UX
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:20:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i8MBz-0007Lc-JR
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:19:12 -0400
-Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:41885)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i8MBz-0007LP-E4
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:19:11 -0400
-Received: by mail-oi1-x234.google.com with SMTP id w17so3443771oiw.8
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 03:19:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=lUN+R38jmZUAOenscLTAvjujHSpq0M6PH78aF1obd8Y=;
- b=VUmjhdlhl0eN6g2pCZ/E8GiltEQUakYwYu9zcAb5j2MzmBH8Ytr90WPhkZCAbuWkvx
- NpeQeTnhRRmuGYkypuNHwmbicfe/npSIzgzTl8lahgArnzekyKFQps7L7uPHfO8qg6uS
- Ey83+ukS4IGvhLXaUDvIcGYjzPXamrAfYzWr7CkFI/PqUd87Kg/DWCcF+2R038Pjy1c9
- lgApYMTkBUSshUS0B/YLKJWTY0hu2If88DtrYOsd7A/B/jCdSAYlRU4IuL2YwSao0Dmj
- W4eVHCe0ktWTmocv/YMPadDxwNg8UB4V9DK4sfBI6GHIr0O9Hr/HwPA66y+QRpK3Yugg
- aY/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=lUN+R38jmZUAOenscLTAvjujHSpq0M6PH78aF1obd8Y=;
- b=oNOu6EtJRXKj6fPB6qJuam3mH5eGrQF6p1rmPIhH/wodpCUXfWdjY9YnCqyvj7hNPu
- vqr3Hx7SPDsT96fcASZ55UW8Mr55gF2+RTW7kWZ8m/Ih+ZczttSrU3tx55G4CqP770+Y
- S+Ms0776vXircDC27T++lxeSPcovi8OI6pXroZCJDoN12QTZxoe9TUGxORjTprocItUg
- XUSEniSjzNxQpI1LGW3+mHtVGY9iS12+PDLYb1n2uh2ilSZ5z8NOhZpDaQ52kNZS+cCJ
- 7hbI8Q1gC5iJToZKt+/kdGm6N8R5BTDy9Ata67k8T6eDrdReW6EzGC21Ltp04QD2OD/0
- /9fQ==
-X-Gm-Message-State: APjAAAXn0eBYdSuSjlWxInfwzqOmv7c6GdeOWL7J0wb8y8NcnYkeAidJ
- NlYF8pm1ffVS09Wcq49mfOnoo54ZLIBMQnpx+RUGkw==
-X-Google-Smtp-Source: APXvYqzXAvUefxSLcjLNpa4EuuHNzs6hPeqmNl44VB2Niywxyg/0IpHpkHnMh8BBSX58KokFOwY/2UHvg14wqFbPCQ0=
-X-Received: by 2002:aca:b48a:: with SMTP id d132mr7984015oif.98.1568283550122; 
- Thu, 12 Sep 2019 03:19:10 -0700 (PDT)
+ (envelope-from <kraxel@redhat.com>) id 1i8MCx-0007g8-49
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:20:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54374)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1i8MCw-0007fb-TS
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:20:11 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4370DA37193;
+ Thu, 12 Sep 2019 10:20:09 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-47.ams2.redhat.com
+ [10.36.116.47])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 99FC94524;
+ Thu, 12 Sep 2019 10:20:08 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id D1C4916E32; Thu, 12 Sep 2019 12:20:07 +0200 (CEST)
+Date: Thu, 12 Sep 2019 12:20:07 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: =?utf-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
+Message-ID: <20190912102007.73bch4avvmx3ugpe@sirius.home.kraxel.org>
+References: <cover.1567965065.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
-References: <20190731160719.11396-1-alex.bennee@linaro.org>
- <87a7cty0tv.fsf@dusky.pond.sub.org> <875zm5yzgq.fsf@linaro.org>
- <87d0g6dnbc.fsf_-_@dusky.pond.sub.org> <87y2ytzy17.fsf@linaro.org>
- <CAFEAcA9Db2ENw7e_1-XOTbHeV=sp_zFxqoq4se+63OK+mQaeew@mail.gmail.com>
- <87v9txzv3o.fsf@linaro.org>
-In-Reply-To: <87v9txzv3o.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Sep 2019 11:18:59 +0100
-Message-ID: <CAFEAcA_dQ4txzn7HzBO8PMwh2K2WpJ+_8LOEMtXxqg5Hmwfzdg@mail.gmail.com>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <cover.1567965065.git.DirtY.iCE.hu@gmail.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Thu, 12 Sep 2019 10:20:09 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::234
-Subject: Re: [Qemu-devel] TCG plugins and the GPL (was: [PATCH v4 00/54]
- plugins for TCG)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 00/24] Audio: Mixeng-free 5.1/7.1 audio
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,49 +73,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aaron Lindsay <aaron@os.amperecomputing.com>,
- "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Pranith Kumar <bobby.prani@gmail.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 12 Sep 2019 at 11:07, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
-> Peter Maydell <peter.maydell@linaro.org> writes:
-> > Wait, what? From my perspective the whole point of the plugin
-> > interface is that it should be stable, in that at least there's
-> > a good chance that a plugin you built will work against multiple
-> > versions of QEMU, and if it doesn't then it should fail with
-> > a reasonable error message telling you to update. I'm not
-> > sure we should be landing the plugins infrastructure if we
-> > don't have that much stability.
->
-> There is a big fat blurry line between "set in stone" and "not requiring
-> you to re-engineer the plugin every QEMU release". I'm saying we should
-> reserve the right to extend and change the plugin API as required but
-> the expectation would be the plugins will continue to work the same way
-> but maybe with tweaks to the API hooks to support additional features.
->
-> It's also a pretty young interface so I would expect some evolution once
-> it is released into the field.
+On Sun, Sep 08, 2019 at 11:22:00PM +0200, K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1=
+n wrote:
+> Hi,
+>=20
+> This is the v2 of my patch series that makes mixeng optional and enable=
+s
+> more than two audio channels.
+>=20
+> Changes from v1:
+>=20
+> * renamed "mixeng" option to "mixing-engine"
+> * dropped patch "audio: remove hw->samples, buffer_size_in/out pcm_ops"
 
-Sure. But I think we should document that we at least intend to
-have some approximation to a compatability/deprecation policy
-here, and some mechanisms for versioning so you get a helpful
-error rather than weird misbehaviour if your plugin is too old.
+What is the testing status of this?
 
-> One problem with the anti-license circumvention measures being suggested
-> is it will mean having to recompile plugins for any given release.
+I've tried (quick playback smoke test):
+  - pa -- works
+  - alsa -- works.
+  - oss -- not working on linux (also in master), probably lack of
+    support in the linux kernel, should be testing with bsd.
+  - spice -- broken (see below), master works fine.
+  - sdl -- not working: "audio: Failed to create voice `adc'" (also in
+    master).
 
-Why should we do this? I think this is making life hard for our
-users for no good reason. We *do* have this check for modules,
-because a module is just a random .so that can do anything in
-QEMU. I thought we had the TCG-plugin interface much more locked
-down than that?
+What about windows+macos?
 
-thanks
--- PMM
+cheers,
+  Gerd
+
+spice:
+
+qemu-system-x86_64: /home/kraxel/projects/qemu/audio/spiceaudio.c:143:
+line_out_put_buffer: Assertion `buf =3D=3D out->frame + out->fpos &&
+out->fpos <=3D out->fsize' failed.
+
+#0  0x00007f55ac24d377 in raise () at /lib64/libc.so.6
+#1  0x00007f55ac24ea68 in abort () at /lib64/libc.so.6
+#2  0x00007f55ac246196 in __assert_fail_base () at /lib64/libc.so.6
+#3  0x00007f55ac246242 in  () at /lib64/libc.so.6
+#4  0x0000557b648dfe30 in line_out_put_buffer (hw=3D0x557b66773a40,
+buf=3D0x557b66709f5c, size=3D1764)
+    at /home/kraxel/projects/qemu/audio/spiceaudio.c:143
+#5  0x0000557b648d8bc6 in audio_pcm_hw_run_out (hw=3D0x557b66773a40,
+live=3D441)
+    at /home/kraxel/projects/qemu/audio/audio.c:1081
+#6  0x0000557b648d8f16 in audio_run_out (s=3D0x557b65b68100)
+    at /home/kraxel/projects/qemu/audio/audio.c:1166
+#7  0x0000557b648d9804 in audio_run (s=3D0x557b65b68100,
+msg=3D0x557b64e41f58 "timer")
+    at /home/kraxel/projects/qemu/audio/audio.c:1349
+#8  0x0000557b648d830b in audio_timer (opaque=3D0x557b65b68100)
+    at /home/kraxel/projects/qemu/audio/audio.c:830
+#9  0x0000557b64cdd1ec in timerlist_run_timers
+(timer_list=3D0x557b65b23730)
+    at /home/kraxel/projects/qemu/util/qemu-timer.c:592
+#10 0x0000557b64cdd296 in qemu_clock_run_timers
+(type=3DQEMU_CLOCK_VIRTUAL)
+    at /home/kraxel/projects/qemu/util/qemu-timer.c:606
+#11 0x0000557b64cdd556 in qemu_clock_run_all_timers ()
+    at /home/kraxel/projects/qemu/util/qemu-timer.c:692
+#12 0x0000557b64cddcf2 in main_loop_wait (nonblocking=3D0)
+    at /home/kraxel/projects/qemu/util/main-loop.c:524
+#13 0x0000557b648c9c9f in main_loop () at
+/home/kraxel/projects/qemu/vl.c:1806
+#14 0x0000557b648d135d in main (argc=3D18, argv=3D0x7ffda3815208,
+envp=3D0x7ffda38152a0)
+    at /home/kraxel/projects/qemu/vl.c:4488
+
+(sleep 3; remote-viewer spice://localhost:12345) & qemu-default
+-enable-kvm -name "qemu fedora audio testing" -M q35 -m 4G -cdrom
+/vmdisk/iso/Fedora-Workstation-Live-x86_64-30-1.2.iso -device intel-hda
+-device hda-micro,audiodev=3Dsnd0 -spice port=3D12345,disable-ticketing
+-audiodev spice,id=3Dsnd0
 
