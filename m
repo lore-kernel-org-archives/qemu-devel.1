@@ -3,60 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB0F9C4CEC6
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:06:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5209C4CEC6
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:06:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95F1F2053B
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:06:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95F1F2053B
+	by mail.kernel.org (Postfix) with ESMTPS id BD5AF2053B
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:06:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD5AF2053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8PjT-0005WO-Uo
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 10:05:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39507)
+	id 1i8Pk5-0006av-9V
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 10:06:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40397)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1i8PR8-0003Gq-RB
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:47:04 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i8PUP-0006fJ-Lm
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:50:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1i8PR7-0001d5-Jh
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:47:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59418)
+ (envelope-from <dgilbert@redhat.com>) id 1i8PUN-0002jl-Sa
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:50:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33194)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1i8PR5-0001ag-0g; Thu, 12 Sep 2019 09:46:59 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i8PUN-0002jQ-L9
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:50:23 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4C7A2308421A;
- Thu, 12 Sep 2019 13:46:58 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-116-179.ams2.redhat.com
- [10.36.116.179])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3DE38600C8;
- Thu, 12 Sep 2019 13:46:57 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Date: Thu, 12 Sep 2019 15:46:04 +0200
-Message-Id: <20190912134604.22019-23-kwolf@redhat.com>
-In-Reply-To: <20190912134604.22019-1-kwolf@redhat.com>
-References: <20190912134604.22019-1-kwolf@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id A3B70308FB9A;
+ Thu, 12 Sep 2019 13:50:22 +0000 (UTC)
+Received: from dgilbert-t580.localhost (unknown [10.36.118.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A02B05D717;
+ Thu, 12 Sep 2019 13:50:18 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, ivanren@tencent.com, peterx@redhat.com,
+ richardw.yang@linux.intel.com, yury-kotov@yandex-team.ru,
+ quintela@redhat.com
+Date: Thu, 12 Sep 2019 14:49:56 +0100
+Message-Id: <20190912135006.14820-3-dgilbert@redhat.com>
+In-Reply-To: <20190912135006.14820-1-dgilbert@redhat.com>
+References: <20190912135006.14820-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Thu, 12 Sep 2019 13:46:58 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Thu, 12 Sep 2019 13:50:22 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 22/22] qcow2: Stop overwriting compressed
- clusters one by one
+Subject: [Qemu-devel] [PULL 02/12] migration: cleanup check on ops in
+ savevm.handlers iterations
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,77 +69,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alberto Garcia <berto@igalia.com>
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-handle_alloc() tries to find as many contiguous clusters that need
-copy-on-write as possible in order to allocate all of them at the same
-time.
+During migration, there are several places to iterate on
+savevm.handlers. And on each iteration, we need to check its ops and
+related callbacks before invoke it.
 
-However, compressed clusters are only overwritten one by one, so let's
-say that we have an image with 1024 consecutive compressed clusters:
+Generally, ops is the first element to check, and it is only necessary
+to check it once.
 
-   qemu-img create -f qcow2 hd.qcow2 64M
-   for f in `seq 0 64 65472`; do
-      qemu-io -c "write -c ${f}k 64k" hd.qcow2
-   done
+This patch clean all the related part in savevm.c to check ops only once
+in those iterations.
 
-In this case trying to overwrite the whole image with one large write
-request results in 1024 separate allocations:
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 
-   qemu-io -c "write 0 64M" hd.qcow2
-
-This restriction comes from commit 095a9c58ce12afeeb90c2 from 2008.
-Nowadays QEMU can overwrite multiple compressed clusters just fine,
-and in fact it already does: as long as the first cluster that
-handle_alloc() finds is not compressed, all other compressed clusters
-in the same batch will be overwritten in one go:
-
-   qemu-img create -f qcow2 hd.qcow2 64M
-   qemu-io -c "write -z 0 64k" hd.qcow2
-   for f in `seq 64 64 65472`; do
-      qemu-io -c "write -c ${f}k 64k" hd.qcow2
-   done
-
-Compared to the previous one, overwriting this image on my computer
-goes from 8.35s down to 230ms.
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: John Snow <jsnow@redhat.com
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <20190819032804.8579-1-richardw.yang@linux.intel.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- block/qcow2-cluster.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ migration/savevm.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index f09cc992af..dcacd3c450 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1351,13 +1351,7 @@ static int handle_alloc(BlockDriverState *bs, uint=
-64_t guest_offset,
-     }
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 4a86128ac4..35426d1db8 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1100,7 +1100,7 @@ void qemu_savevm_state_setup(QEMUFile *f)
+         if (!se->ops || !se->ops->save_setup) {
+             continue;
+         }
+-        if (se->ops && se->ops->is_active) {
++        if (se->ops->is_active) {
+             if (!se->ops->is_active(se->opaque)) {
+                 continue;
+             }
+@@ -1131,7 +1131,7 @@ int qemu_savevm_state_resume_prepare(MigrationState=
+ *s)
+         if (!se->ops || !se->ops->resume_prepare) {
+             continue;
+         }
+-        if (se->ops && se->ops->is_active) {
++        if (se->ops->is_active) {
+             if (!se->ops->is_active(se->opaque)) {
+                 continue;
+             }
+@@ -1227,7 +1227,7 @@ void qemu_savevm_state_complete_postcopy(QEMUFile *=
+f)
+         if (!se->ops || !se->ops->save_live_complete_postcopy) {
+             continue;
+         }
+-        if (se->ops && se->ops->is_active) {
++        if (se->ops->is_active) {
+             if (!se->ops->is_active(se->opaque)) {
+                 continue;
+             }
+@@ -1264,7 +1264,7 @@ int qemu_savevm_state_complete_precopy_iterable(QEM=
+UFile *f, bool in_postcopy)
+             continue;
+         }
 =20
-     entry =3D be64_to_cpu(l2_slice[l2_index]);
--
--    /* For the moment, overwrite compressed clusters one by one */
--    if (entry & QCOW_OFLAG_COMPRESSED) {
--        nb_clusters =3D 1;
--    } else {
--        nb_clusters =3D count_cow_clusters(bs, nb_clusters, l2_slice, l2=
-_index);
--    }
-+    nb_clusters =3D count_cow_clusters(bs, nb_clusters, l2_slice, l2_ind=
-ex);
-=20
-     /* This function is only called when there were no non-COW clusters,=
- so if
-      * we can't find any unallocated or COW clusters either, something i=
-s
+-        if (se->ops && se->ops->is_active) {
++        if (se->ops->is_active) {
+             if (!se->ops->is_active(se->opaque)) {
+                 continue;
+             }
+@@ -1413,7 +1413,7 @@ void qemu_savevm_state_pending(QEMUFile *f, uint64_=
+t threshold_size,
+         if (!se->ops || !se->ops->save_live_pending) {
+             continue;
+         }
+-        if (se->ops && se->ops->is_active) {
++        if (se->ops->is_active) {
+             if (!se->ops->is_active(se->opaque)) {
+                 continue;
+             }
+@@ -2334,7 +2334,7 @@ static int qemu_loadvm_state_setup(QEMUFile *f)
+         if (!se->ops || !se->ops->load_setup) {
+             continue;
+         }
+-        if (se->ops && se->ops->is_active) {
++        if (se->ops->is_active) {
+             if (!se->ops->is_active(se->opaque)) {
+                 continue;
+             }
 --=20
-2.20.1
+2.21.0
 
 
