@@ -2,79 +2,64 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFEDEC4CEC6
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 16:07:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD4E2C4CEC5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 16:08:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8ADB20693
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 16:07:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uIMbAWTr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8ADB20693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 83F402081B
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 16:08:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83F402081B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8Rcy-0006L5-OK
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 12:07:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50681)
+	id 1i8Rdj-00073H-QJ
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 12:08:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51236)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i8RZp-0003hC-Kh
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 12:04:10 -0400
+ (envelope-from <stefanha@redhat.com>) id 1i8Rc1-0005yt-Lf
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 12:06:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i8RZo-0006rn-Am
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 12:04:09 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34238)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i8RZo-0006qg-4z
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 12:04:08 -0400
-Received: by mail-oi1-x241.google.com with SMTP id 12so6347730oiq.1
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 09:04:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=s2Jjte3IicFNSnIdujoo5LTOVDQZOZvERHNYPfd4lRY=;
- b=uIMbAWTrQTxuSnw2rOysr7njJRDPrVn1Z0zm28mGWX1BxNocTSNqwe0NBResti8bsz
- 2HOStbJX9TvZbkH/++q82DruL4p+SR/w5hzPSbI9nDpl++OcCtLIEDzTnJgtkS7l7xX0
- 9g2zJ7XCBudTQpgnS+Xq5bePy14Z0IIrsyCdKGHk17ZMzA5pN4eBn0TYTGGpQiku196z
- p83m6T/WpU73PRTA87KzY4G/IDHmVMES0q7zfiX6znPKnV51Or46PdpkDyVashfCvKFe
- ktk3JpuozFgME2Q3WeKU5aJW02qczA5dSNCkM365hzKhi7rjBB6sNbMnf6ZB+4bML4vK
- jatQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=s2Jjte3IicFNSnIdujoo5LTOVDQZOZvERHNYPfd4lRY=;
- b=ReBOCVryt86PqShBQa2FuEavLoRtF5MLOs0TDxDRRQpq7v6YG6qNcJ7wdLSR9E7Shw
- sJKBMoKHaqqX8hCHXhuEWPOokcXD6/KsLUWUPk8kFVWMD//B8+Gv2TjGIpnArVN/k9iI
- sQdFkuMHS7AyZxrCC0tpLNYwpRNmfwHQ/3gos5DTyKSB/wCBvvsnVBJ/ZqYkrg8OLIxW
- L/PFcEQXjof28NtAd3dhQceErnEaFyZ/jZotk1cgTXuKMf8S0WTRUGsTb4FukdtvZdAA
- 4evblIdrRKyjgKkHU2EsW3CFamxt3TdvYmSUmEjiU796noXIpu8jJKDIvfVSHeA7UW2C
- ibHA==
-X-Gm-Message-State: APjAAAU0nFmPFYRb5oRzcpyAPnvJaeS/cDU5SJQSempjBf7dyj1ZkeI3
- KIQp8tAcG7rUT3kVIIhLPtW/Rf7NCVhNPAThaTZ17A==
-X-Google-Smtp-Source: APXvYqwIq5wHUMeukQWK13By24Vv+51Jxa1CuiQzMt6Sgyo0k8HZPSGYFmAvwM4Aow/UIip05tPDArOnoiM3AwX8+sY=
-X-Received: by 2002:aca:53d4:: with SMTP id h203mr788702oib.146.1568304246638; 
- Thu, 12 Sep 2019 09:04:06 -0700 (PDT)
+ (envelope-from <stefanha@redhat.com>) id 1i8Rby-0007l9-QM
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 12:06:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59732)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1i8Rby-0007kX-5Y
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 12:06:22 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6B4E4309BDAA;
+ Thu, 12 Sep 2019 16:06:20 +0000 (UTC)
+Received: from localhost (ovpn-116-134.ams2.redhat.com [10.36.116.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EF7BB5C28F;
+ Thu, 12 Sep 2019 16:06:19 +0000 (UTC)
+Date: Thu, 12 Sep 2019 18:06:09 +0200
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <20190912160609.GO23174@stefanha-x1.localdomain>
+References: <20190910090310.14032-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-References: <20190912110103.1417887-1-luc.michel@greensocs.com>
-In-Reply-To: <20190912110103.1417887-1-luc.michel@greensocs.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Sep 2019 17:03:55 +0100
-Message-ID: <CAFEAcA-WO=O5zwRDQoNz2zT4sx61j8Jy5px0uFPiWgF_JUpa+A@mail.gmail.com>
-To: Luc Michel <luc.michel@greensocs.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH] target/arm: fix CBAR register for AArch64
- CPUs
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="p/1JFEOz/hVXxMAZ"
+Content-Disposition: inline
+In-Reply-To: <20190910090310.14032-1-vsementsov@virtuozzo.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Thu, 12 Sep 2019 16:06:20 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] util/ioc.c: try to reassure Coverity about
+ qemu_iovec_init_extended
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,55 +71,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 12 Sep 2019 at 12:01, Luc Michel <luc.michel@greensocs.com> wrote:
->
-> For AArch64 CPUs with a CBAR register, we have two views for it:
->   - in AArch64 state, the CBAR_EL1 register (S3_1_C15_C3_0), returns the
->     full 64 bits CBAR value
->   - in AArch32 state, the CBAR register (cp15, opc1=1, CRn=15, CRm=3, opc2=0)
->     returns a 32 bits view such that:
->       CBAR = CBAR_EL1[31:18] 0..0 CBAR_EL1[43:32]
->
-> This commit fixes the current implementation where:
->   - CBAR_EL1 was returning the 32 bits view instead of the full 64 bits
->     value,
->   - CBAR was returning a truncated 32 bits version of the full 64 bits
->     one, instead of the 32 bits view
->   - CBAR was declared as cp15, opc1=4, CRn=15, CRm=0, opc2=0, which is
->     the CBAR register found in the ARMv7 Cortex-Ax CPUs, but not in
->     ARMv8 CPUs.
->
-> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+
+--p/1JFEOz/hVXxMAZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Sep 10, 2019 at 12:03:10PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Make it more obvious, that filling qiov corresponds to qiov allocation,
+> which in turn corresponds to total_niov calculation, based on mid_niov
+> (not mid_len). Still add an assertion to show that there should be no
+> difference.
+>=20
+> Reported-by: Coverity (CID 1405302)
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  target/arm/helper.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 507026c915..755aa18a2d 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -6740,12 +6740,12 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->              ARMCPRegInfo cbar_reginfo[] = {
->                  { .name = "CBAR",
->                    .type = ARM_CP_CONST,
-> -                  .cp = 15, .crn = 15, .crm = 0, .opc1 = 4, .opc2 = 0,
-> -                  .access = PL1_R, .resetvalue = cpu->reset_cbar },
-> +                  .cp = 15, .crn = 15, .crm = 3, .opc1 = 1, .opc2 = 0,
-> +                  .access = PL1_R, .resetvalue = cbar32 },
+>  util/iov.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-This will break the Cortex-A9 &c which use the 15/0/4/0 encoding
-and the un-rearranged value for this register.
+Thanks, applied to my block-next tree:
+https://github.com/stefanha/qemu/commits/block-next
 
-I think we need to check through the TRMs to confirm which CPUs use
-which format for the CBAR, and have a different feature bit for the
-newer format/sysreg encoding, so we can provide the right sysregs for
-the right cores.
+Stefan
 
-thanks
--- PMM
+--p/1JFEOz/hVXxMAZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl16bPAACgkQnKSrs4Gr
+c8gzrgf/U/gflo7VQq0x/WwnDB8t9nYL0PkSoRQgDSq8oYgN+QJ1xZ5+Cuvf6/r9
+lcmh97Lzj+mdGiX1Ed3pydcewmqZ9FS7EtAUaqsYXpGlDegZ34TBnv78Vs2UjGqc
+s/p3VIn4gDWC4OEIzWWn6J4xXtzMHV1PS5tCMg0/l8ijPw8C/RSGaIK77g0I/rkZ
+hxVrsq+qWlESRvfVLGgmCZYS4oAHKpM9KFzz4caiysHeHFAvnDEpeytzMjh2a+ho
+koHW9uMqdFphigMUEU4xbOBjbKjlq16r/HSjaqKcYtsdUrqqoi+QCTNd4mawdRId
+qQ2Kd8KYpV7a11kz+V/PxhQ0NeCv6A==
+=z8p7
+-----END PGP SIGNATURE-----
+
+--p/1JFEOz/hVXxMAZ--
 
