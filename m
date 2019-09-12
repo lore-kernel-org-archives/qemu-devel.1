@@ -2,63 +2,62 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98B89ECDE20
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:56:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18534C5ACAE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:57:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 722BD208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:56:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 722BD208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id DBB97206A5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:57:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBB97206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8Lpe-0001NB-Cj
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 05:56:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49362)
+	id 1i8Lr5-0003tD-3q
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 05:57:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49606)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1i8Lnv-0008Ev-WC
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:54:21 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i8LpT-0001n2-3a
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:55:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1i8Lnu-0004vq-J3
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:54:19 -0400
-Received: from 15.mo4.mail-out.ovh.net ([91.121.62.11]:60328)
+ (envelope-from <dgilbert@redhat.com>) id 1i8LpP-0006ZW-Ay
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:55:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:10785)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i8Lnu-0004tW-By
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:54:18 -0400
-Received: from player157.ha.ovh.net (unknown [10.109.160.23])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id 7CBB5206B83
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 11:54:16 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
- (Authenticated sender: clg@kaod.org)
- by player157.ha.ovh.net (Postfix) with ESMTPSA id 3007C9AA68E9;
- Thu, 12 Sep 2019 09:54:04 +0000 (UTC)
-To: Balamuruhan S <bala24@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20190912093056.4516-1-bala24@linux.ibm.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <b27c56a5-1401-09f3-4d5d-9ff4843c8f26@kaod.org>
-Date: Thu, 12 Sep 2019 11:54:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i8LpN-0006YI-Tj
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:55:51 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1A127307D853;
+ Thu, 12 Sep 2019 09:55:47 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C5AA600C4;
+ Thu, 12 Sep 2019 09:55:46 +0000 (UTC)
+Date: Thu, 12 Sep 2019 10:55:43 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190912095543.GB7230@work-vm>
+References: <20190819032804.8579-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20190912093056.4516-1-bala24@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 1569222997106199378
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrtdehgddvtdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190819032804.8579-1-richardw.yang@linux.intel.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Thu, 12 Sep 2019 09:55:47 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.121.62.11
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] add Homer/OCC common area emulation
- for PowerNV
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2] migration: cleanup check on ops in
+ savevm.handlers iterations
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,89 +69,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: maddy@linux.vnet.ibm.com, groug@kaod.org, anju@linux.vnet.ibm.com,
- qemu-ppc@nongnu.org, hari@linux.vnet.ibm.com, david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/09/2019 11:30, Balamuruhan S wrote:
-> Hi All,
+* Wei Yang (richardw.yang@linux.intel.com) wrote:
+> During migration, there are several places to iterate on
+> savevm.handlers. And on each iteration, we need to check its ops and
+> related callbacks before invoke it.
 > 
-> This is follow-up patch that implements HOMER and OCC SRAM device
-> models to emulate homer memory and occ common area access for pstate
-> table, occ sensors, runtime data and slw.
+> Generally, ops is the first element to check, and it is only necessary
+> to check it once.
+> 
+> This patch clean all the related part in savevm.c to check ops only once
+> in those iterations.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 
-So, now, we can write directly to the OCC SRAM memory region from the
-QEMU monitor. How will skiboot pick up the changes ?  
-
-
-C.
+Queued
 
 > 
-> Currently skiboot disables the homer/occ code path with `QUIRK_NO_PBA`,
-> this quirk have to be removed in skiboot for it to use HOMER and OCC
-> SRAM device models along with a bug fix,
+> ---
+> v2: rebase on latest upstream
+> ---
+>  migration/savevm.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
 > 
-> https://github.com/balamuruhans/skiboot/commit/a655514d2a730e0372a2faee277d1cf01f71a524
-> https://github.com/balamuruhans/skiboot/commit/fd3d93d92ec66a7494346d6d24ced7b48264c9a0
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 4a86128ac4..35426d1db8 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1100,7 +1100,7 @@ void qemu_savevm_state_setup(QEMUFile *f)
+>          if (!se->ops || !se->ops->save_setup) {
+>              continue;
+>          }
+> -        if (se->ops && se->ops->is_active) {
+> +        if (se->ops->is_active) {
+>              if (!se->ops->is_active(se->opaque)) {
+>                  continue;
+>              }
+> @@ -1131,7 +1131,7 @@ int qemu_savevm_state_resume_prepare(MigrationState *s)
+>          if (!se->ops || !se->ops->resume_prepare) {
+>              continue;
+>          }
+> -        if (se->ops && se->ops->is_active) {
+> +        if (se->ops->is_active) {
+>              if (!se->ops->is_active(se->opaque)) {
+>                  continue;
+>              }
+> @@ -1227,7 +1227,7 @@ void qemu_savevm_state_complete_postcopy(QEMUFile *f)
+>          if (!se->ops || !se->ops->save_live_complete_postcopy) {
+>              continue;
+>          }
+> -        if (se->ops && se->ops->is_active) {
+> +        if (se->ops->is_active) {
+>              if (!se->ops->is_active(se->opaque)) {
+>                  continue;
+>              }
+> @@ -1264,7 +1264,7 @@ int qemu_savevm_state_complete_precopy_iterable(QEMUFile *f, bool in_postcopy)
+>              continue;
+>          }
+>  
+> -        if (se->ops && se->ops->is_active) {
+> +        if (se->ops->is_active) {
+>              if (!se->ops->is_active(se->opaque)) {
+>                  continue;
+>              }
+> @@ -1413,7 +1413,7 @@ void qemu_savevm_state_pending(QEMUFile *f, uint64_t threshold_size,
+>          if (!se->ops || !se->ops->save_live_pending) {
+>              continue;
+>          }
+> -        if (se->ops && se->ops->is_active) {
+> +        if (se->ops->is_active) {
+>              if (!se->ops->is_active(se->opaque)) {
+>                  continue;
+>              }
+> @@ -2334,7 +2334,7 @@ static int qemu_loadvm_state_setup(QEMUFile *f)
+>          if (!se->ops || !se->ops->load_setup) {
+>              continue;
+>          }
+> -        if (se->ops && se->ops->is_active) {
+> +        if (se->ops->is_active) {
+>              if (!se->ops->is_active(se->opaque)) {
+>                  continue;
+>              }
+> -- 
+> 2.17.1
 > 
-> This version fixes a review comment from Cedric in previous version,
 > 
-> changes in v3:
->     * pass on PnvHomer *homer directly to core_max_array() function
->       from the caller.
-> 
-> v2 patchset:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg02231.html
-> 
-> changes in v2:
->     * change to PnvHomer/PnvHomerClass instead of PnvHOMER/PnvHOMERClass
->       for better code readabililty.
->     * fabric link to chip to use `nr_cores` from PnvChip struct for
->       core_max_array() as we need to consider active cores in chip and not
->       whole machine.
->     * declare variable well ahead instead in for() loop syntax to make
->       all compilers happy.
->     * change to shorter variable name to `hmrc` instead of `homer_class`.
->     * remove `homer_` prefix for regs as it is not useful.
->     * have separate commit for checkpatch.pl coding style warnings.
-> 
-> v1 patchset:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg01610.html
-> 
-> changes in v1:
->     * breaks it to have separate patch series for Homer and OCC
->       emulation.
->     * reuse PnvOCC device model to implement SRAM device.
->     * implement PnvHomer as separate device model.
->     * have core max base address as part of PnvHOMERClass.
->     * reuse PNV_CHIP_INDEX() instead of introducing new `chip_num`.
->     * define all the memory ops access address as macros.
->     * few coding style warnings given by checkpatch.pl.
-> 
-> rfc patchset:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg00979.html
-> 
-> I request for review, comments and suggestions for the changes.
-> 
-> Balamuruhan S (4):
->   hw/ppc/pnv_xscom: retrieve homer/occ base address from PBA BARs
->   hw/ppc/pnv_occ: add sram device model for occ common area
->   hw/ppc/pnv_homer: add PowerNV homer device model
->   hw/ppc/pnv: fix checkpatch.pl coding style warnings
-> 
->  hw/ppc/Makefile.objs       |   1 +
->  hw/ppc/pnv.c               |  87 ++++++++++++---
->  hw/ppc/pnv_homer.c         | 272 +++++++++++++++++++++++++++++++++++++++++++++
->  hw/ppc/pnv_occ.c           |  78 +++++++++++++
->  hw/ppc/pnv_xscom.c         |  34 +++++-
->  include/hw/ppc/pnv.h       |  21 ++++
->  include/hw/ppc/pnv_homer.h |  53 +++++++++
->  include/hw/ppc/pnv_occ.h   |   3 +
->  8 files changed, 528 insertions(+), 21 deletions(-)
->  create mode 100644 hw/ppc/pnv_homer.c
->  create mode 100644 include/hw/ppc/pnv_homer.h
-> 
-
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
