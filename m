@@ -2,91 +2,91 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8360C47404
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:44:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE3B7C47404
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:44:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1E3420693
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:44:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A0D52075C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:44:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hKMJ26ye"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1E3420693
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SnOAhm/z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A0D52075C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8NWF-0006Tt-FO
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 07:44:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40952)
+	id 1i8NWm-00072z-2u
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 07:44:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41389)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i8NTj-0004in-BJ
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:41:36 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i8NV4-0005in-CH
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:42:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i8NTe-0000CX-Vr
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:41:34 -0400
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:52651)
+ (envelope-from <alex.bennee@linaro.org>) id 1i8NV3-0000hM-2o
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:42:58 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42465)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i8NTd-0000Bh-3B
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:41:30 -0400
-Received: by mail-wm1-x330.google.com with SMTP id x2so1780405wmj.2
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 04:41:28 -0700 (PDT)
+ id 1i8NV2-0000gZ-PA
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:42:56 -0400
+Received: by mail-wr1-x443.google.com with SMTP id q14so28044941wrm.9
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 04:42:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=/NwkzWfPZgfq0Bqf0mBxPSl/Xw9KJk0rkb+vY/zMOQk=;
- b=hKMJ26yeuLTImXxyD8brFshwFTL8Ho9k+6W8gs4EtLo575dNqq8lOhvcFi0ciP4wDN
- OF932QzoON2JPdV2VOu8h85x0WoYuW5qJPTot32FoeSGmN4R6M5/NISBZZdh0g/Z1wSL
- P06/cpXZayEYj+9GfYBkmGTQMrUgtNFdq/QMoLl0zZT70V9/UdiYUgECAGxCatkLn0bZ
- 87MGVG0laXP671IB/LT+tNeJtGTY+le63tCAveKV1nitWU4gX9IVQ6dTQh8DcIyG1EmR
- SdHvk69MVnGTyV7qPL6BK3Bf8PKcj1pN8rjm8bShbCWJvNrawjkGXaXyceGV6gVusDuB
- wBCQ==
+ bh=0Dvtpt029Oo3sA7IupM8HjQ5ZHeoOhkuh6jMZDpIwas=;
+ b=SnOAhm/zk2AjY/lq481U4puVo3WB14Gz9/Qql019IUzvRbaK5ihmtBzfXXEZ696htB
+ BzMXCZNBnf6HvNb4FDK4QlwAp3kYPi10+Djsd0xw+1NAuzfLe7qLuPW7frPkt5tQJqLQ
+ O97A6mj6DgGgGHiD+t6YePEAZgtI7WBS8/uRPJsvAyd/LFX4m0a6KIM2ELPYX59UyfF4
+ zuZxWXpnEX3H5ugOJAtQj/6L5cF4yOzRGsTAyMzWYLhh1GW7WQ79Kv2E1lddCrjBQ5qI
+ M9lnFDHhPA7DXeOOVd6Mjh9txF2WlAbaWDdy11pdwyyM3/hKpPgVBU69kW2I7Z0huq5m
+ EoKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=/NwkzWfPZgfq0Bqf0mBxPSl/Xw9KJk0rkb+vY/zMOQk=;
- b=HNhsZHNzPSDXuAJpUJlBlGJOBsUqiNUTRBrIccyyN2XtTEstBD4f0A1QfTe4mmfDbQ
- 7fJMwaAz/cwvH4oYCYFlCPhSdwjWiQllj8a/KHD5a5pgSNj7cjvPZubDIjPpJkG9+P06
- gheKHOK2+sUe/ZoqNmn14Md2WIcVdOIXZVciGR5KAjzV2gfPZSrUdmxylfpWoGlmFF26
- nPPxQFVagK85645QdwMF50jsxhbKY6jFEufG6z3eoblGlx4GRvOxi8DontvHP91mVLB7
- T7uZvaIWvaAV53OgrHJ87iP3/1YTB9dY6hw9ObyQh78RS2BJqnLKcod/3KSac4lec3E3
- QmRw==
-X-Gm-Message-State: APjAAAVTy2tOuJ4oYcX96dtifO+WcXzSu+P5++H5o8PvIGA4hY2GiPw2
- /bEU0vm9+oZzlUNRS98lRS5+Ig==
-X-Google-Smtp-Source: APXvYqzeEqBWg34yRD1UNzw08vnlKQhGrGf6FZBAcL/OrOUNbwnPdEj0S3iFUUZcBvxkgOx/WTSTBg==
-X-Received: by 2002:a1c:7513:: with SMTP id o19mr7800350wmc.126.1568288487047; 
- Thu, 12 Sep 2019 04:41:27 -0700 (PDT)
+ bh=0Dvtpt029Oo3sA7IupM8HjQ5ZHeoOhkuh6jMZDpIwas=;
+ b=YrasrnG9Njdr1+0kXI8RUmQ5NJRWTJve5lprw7ZvsbW2QrN4wYIaVwgSI5XYUgsSrA
+ NtajvQxPhDj0p7iys8jeq7A6Sj5OJHy1qpXr+ooW15sXZAAY7nVhAwFXsNNX9xyGERcz
+ YlC54jmYllLNSwFOn+r16DCLEp+r23+52DvkbsEyneVFgDQ2QYTeMZVuI/GtEX9xYpku
+ Wbt9aKvoExlqn6dQxrtvz/OfTF/UR8BOA0fude9EVqNYwq5k0EDCiXOUCqoloRj5JkKi
+ QeqIxpqD1296+d5CTo6+uS6ZjDO89LTGrhz58F9LjIbaY5f3yRgv3kf2bDFRxCEbUhfb
+ HoAA==
+X-Gm-Message-State: APjAAAX8hK7ejoDfXCg6Ws9emYdakpPT8aZC1moa2oTsGfn1SZVPQfGF
+ DB535GzD7fuP48iSyxWySBhUdEwcJNw=
+X-Google-Smtp-Source: APXvYqxwwVScn260OBRqQLkv6pZlAJPAqPhu7C6qfU/ZmocnvDyUQbAHXmQLjbJsGyMhsnpuV37Yiw==
+X-Received: by 2002:a5d:45cb:: with SMTP id b11mr33235604wrs.296.1568288575351; 
+ Thu, 12 Sep 2019 04:42:55 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 33sm27615229wra.41.2019.09.12.04.41.26
+ by smtp.gmail.com with ESMTPSA id z21sm5800564wmf.30.2019.09.12.04.42.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Sep 2019 04:41:26 -0700 (PDT)
+ Thu, 12 Sep 2019 04:42:54 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 82D921FF87;
- Thu, 12 Sep 2019 12:41:25 +0100 (BST)
-References: <tencent_3156C5EA2695B7CD53C6114C@qq.com>
- <CAL1e-=hWOXgnTbC0Y2v_CMZOMmQLgdToBAsi+XaW7+9uyN55CA@mail.gmail.com>
- <tencent_23ACCA1A48AFB09124C52E70@qq.com> <87blvy99y9.fsf@linaro.org>
- <tencent_0E8715864EBBAA153BB730E2@qq.com>
+ by zen.linaroharston (Postfix) with ESMTP id D26A41FF87;
+ Thu, 12 Sep 2019 12:42:53 +0100 (BST)
+References: <20190910144428.32597-1-peter.maydell@linaro.org>
+ <20190910144428.32597-5-peter.maydell@linaro.org>
 User-agent: mu4e 1.3.4; emacs 27.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Libo Zhou <zhlb29@foxmail.com>
-In-reply-to: <tencent_0E8715864EBBAA153BB730E2@qq.com>
-Date: Thu, 12 Sep 2019 12:41:25 +0100
-Message-ID: <87h85hzqqi.fsf@linaro.org>
+To: qemu-arm@nongnu.org
+In-reply-to: <20190910144428.32597-5-peter.maydell@linaro.org>
+Date: Thu, 12 Sep 2019 12:42:53 +0100
+Message-ID: <87ftl1zqo2.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::330
-Subject: Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 04/13] target/arm/arm-semi:
+ clean up TaskState* usage in non-user-only code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,67 +98,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Libo Zhou <zhlb29@foxmail.com> writes:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+> The semihosting code has to build for both user-only and softmmu;
+> for user-only it needs access to the TaskState struct that holds
+> per-thread information. For softmmu we don't need it.
 >
+> Currently the softmmu set_swi_errno() takes a CPUARMState *,
+> which it doesn't use, and the 'ts' variable in do_arm_semihosting()
+> is set to either be a TaskState* or a CPUARMState* depending on
+> whether CONFIG_USER_ONLY is set, so that the callsite always
+> passes 'ts'. Since we don't actually need the CPUARMState *,
+> we can instead make set_swi_errno() always take a TaskState*,
+> by providing a local-to-this-file dummy typedef for the softmmu
+> case and setting ts to NULL for softmmu.
 >
->> The gdbstub should allow you do full introspection and adding
->> additional registers is fairly easy, see mips_cpu_gdb_read_register func=
-tion
->> in  target/mips/gdbstub.c.
+> This will make it easier to have other functions which pass
+> through the TaskState*, because now they can have the same
+> prototype regardless of whether they're CONFIG_USER_ONLY or not.
 >
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/arm-semi.c | 48 ++++++++++++++++++++++++-------------------
+>  1 file changed, 27 insertions(+), 21 deletions(-)
 >
+> diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
+> index 05491bf5248..ce3ba554bef 100644
+> --- a/target/arm/arm-semi.c
+> +++ b/target/arm/arm-semi.c
+> @@ -36,6 +36,13 @@
+>  #else
+>  #include "exec/gdbstub.h"
+>  #include "qemu/cutils.h"
+> +
+> +/*
+> + * Dummy typedef so that we can have functions that take
+> + * a TaskState* even if we're building for softmmu; in that
+> + * case the argument will always be NULL.
+> + */
+> +typedef void TaskState;
+>  #endif
 >
-> Hi Alex and Aleksandar,
+>  #define TARGET_SYS_OPEN        0x01
+> @@ -213,27 +220,24 @@ static GuestFD *get_guestfd(int guestfd)
+>      return gf;
+>  }
 >
+> -#ifdef CONFIG_USER_ONLY
+> -static inline uint32_t set_swi_errno(TaskState *ts, uint32_t code)
+> -{
+> -    if (code =3D=3D (uint32_t)-1)
+> -        ts->swi_errno =3D errno;
+> -    return code;
+> -}
+> -#else
+> +#ifndef CONFIG_USER_ONLY
+>  static target_ulong syscall_err;
 >
-> Now I can connect gdb to qemu successfully. And I can use this command
-> to show all the register contents in a gdb session.
+> -static inline uint32_t set_swi_errno(CPUARMState *env, uint32_t code)
+> -{
+> -    if (code =3D=3D (uint32_t)-1) {
+> -        syscall_err =3D errno;
+> -    }
+> -    return code;
+> -}
+> -
+>  #include "exec/softmmu-semi.h"
+>  #endif
+>
+> +static inline uint32_t set_swi_errno(TaskState *ts, uint32_t code)
+> +{
+> +    if (code =3D=3D (uint32_t)-1) {
+> +#ifdef CONFIG_USER_ONLY
+> +        ts->swi_errno =3D errno;
+> +#else
+> +        syscall_err =3D errno;
+> +#endif
+> +    }
+> +    return code;
+> +}
+> +
+>  static target_ulong arm_semi_syscall_len;
+>
+>  static void arm_semi_cb(CPUState *cs, target_ulong ret, target_ulong err)
+> @@ -374,13 +378,15 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>      int nr;
+>      uint32_t ret;
+>      uint32_t len;
+> -#ifdef CONFIG_USER_ONLY
+> -    TaskState *ts =3D cs->opaque;
+> -#else
+> -    CPUARMState *ts =3D env;
+> -#endif
+> +    TaskState *ts;
+>      GuestFD *gf;
+>
+> +#ifdef CONFIG_USER_ONLY
+> +    ts =3D cs->opaque;
+> +#else
+> +    ts =3D NULL;
+> +#endif
 
-You will need to update gdb-xml/$ARCH.xml and the appropriate
-arch_read/write register functions in gdbstub.
+Why not pass cs to set_swi_errno and deal with all the differences in
+the helper?
 
-Alternatively look at commits:
-
-  commit 200bf5b7ffea635079cc05fdfb363372b9544ce7
-  Author: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-  commit 9c513e786d85cc58b8ba56a482566f759e0835b6
-  Author: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-  commit 1f16378718fa87d63f70d0797f4546a88d8e3dd7
-  Author: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
-
-Where Abdallah added a dynamic xml generation to expose all the ARM
-system registers to gdbstub. The details may be different for the MIPS
-backend but from the gdbstub point of view its the same. Provide a
-system description in xml and the arch specific helpers to get and set
-the values.
-
->
->
-> (gdb) layout regs
->
->
-> However, I will need to add some more registers to the CPU. Does adding n=
-ew registers in gdbstub.c also show the new registers in the TUI?
-> I doubt it because when I modified the regnames[] in translate.c, the reg=
-isters' names didn't change in gdb.
->
->
->
-> Cheers,
-> Libo
->
->
->
->> Alex Benn=C3=A9e
+> +
+>      if (is_a64(env)) {
+>          /* Note that the syscall number is in W0, not X0 */
+>          nr =3D env->xregs[0] & 0xffffffffU;
 
 
 --
