@@ -2,84 +2,61 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BD45C4CEC5
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 13:36:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70C68C4CEC6
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 13:49:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCF3F2075C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 13:36:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="uViZi+I/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCF3F2075C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	by mail.kernel.org (Postfix) with ESMTPS id 432222075C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 13:49:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 432222075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8PHK-0007Q3-SL
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 09:36:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36849)
+	id 1i8PTI-0004ZR-3n
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 09:49:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38980)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1i8PEJ-0006Rk-Jh
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:33:48 -0400
+ (envelope-from <kwolf@redhat.com>) id 1i8PQY-0002YZ-6G
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:46:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1i8PEH-0004LB-N5
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:33:47 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:37286)
+ (envelope-from <kwolf@redhat.com>) id 1i8PQW-0001HK-Na
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:46:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60322)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1i8PEC-0004G6-UY; Thu, 12 Sep 2019 09:33:41 -0400
-Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPSA id BD6DB96F52;
- Thu, 12 Sep 2019 13:33:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1568295218;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=09RLHT4nhLz4EnrC+eDZoEnwmDFz+6ZANyFrhbtUzmE=;
- b=uViZi+I/YKDMTmkhTZhjLjQdRrYLsLe9sdqYZpJqt2K8eGUJ/BgkUIoNHGBLBQwqLFjkZm
- EZPUhesvCsEjHeU1bv0ST5TykZnXNJUD5OZ7dgnomu6Ybod3Vbassf6NNdisAJWe74oX4U
- mtP8qi3qJxn5/fYdPEagC8jAX+NfpbM=
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190904162247.24095-1-damien.hedde@greensocs.com>
- <CAFEAcA89q8mwNyhivbrCcTP7c208dbwmVBjF2mmOT5s+dyQ4sQ@mail.gmail.com>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <4b100cde-d739-8cf5-4732-0a53d213a623@greensocs.com>
-Date: Thu, 12 Sep 2019 15:33:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.0
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1i8PQR-0001Dw-R2; Thu, 12 Sep 2019 09:46:21 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9EFE2308A9E2;
+ Thu, 12 Sep 2019 13:46:16 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-116-179.ams2.redhat.com
+ [10.36.116.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9393F600C4;
+ Thu, 12 Sep 2019 13:46:15 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Date: Thu, 12 Sep 2019 15:45:43 +0200
+Message-Id: <20190912134604.22019-2-kwolf@redhat.com>
+In-Reply-To: <20190912134604.22019-1-kwolf@redhat.com>
+References: <20190912134604.22019-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA89q8mwNyhivbrCcTP7c208dbwmVBjF2mmOT5s+dyQ4sQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1568295218;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=09RLHT4nhLz4EnrC+eDZoEnwmDFz+6ZANyFrhbtUzmE=;
- b=438SRY3abflE84JlDFpp61irAYQFkFZT8zTE4ccWaY6Hdi+hzCfjpei+FtTXHQXihTDnQC
- E5f1tY+AQKgv/NTXrFH9v6JAi2TMAp+TpDJWvzsDkcrfiloANzBtxGc3TzjuUgJd0VYbnx
- iSk50nl0GRCHEv3UGrIh5znhd6elxY4=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1568295218; a=rsa-sha256; cv=none;
- b=FV5FZjVOWga01pC64HveS8E6NxtaAUaMyp8Aq4BpotfMleSD7s0F5G8CnUEi3jEYML/cHs
- Ac917gThhLhBv40bu7jFd7MTZJb1GUQEJkOa9XXEKSn8SQaqXHxpb4GKTAwGJ5+euFeLhG
- 35ztb3pUNuTmD7u4Vw3Ity43TDJaZBw=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Thu, 12 Sep 2019 13:46:16 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/raspi: avoid reparenting the sd
- card during qbus tree reset
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 01/22] qcow2: Fix the calculation of the maximum
+ L2 cache size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,85 +68,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Alberto Garcia <berto@igalia.com>
 
+The size of the qcow2 L2 cache defaults to 32 MB, which can be easily
+larger than the maximum amount of L2 metadata that the image can have.
+For example: with 64 KB clusters the user would need a qcow2 image
+with a virtual size of 256 GB in order to have 32 MB of L2 metadata.
 
-On 9/6/19 12:36 PM, Peter Maydell wrote:
-> On Wed, 4 Sep 2019 at 17:23, Damien Hedde <damien.hedde@greensocs.com> wrote:
->>
->> In the raspi machine, the sd card can be on several sd bus (in reality
->> there is one bus but several controllers). It is initially created in
->> the "sd-bus" child in the gpio peripheral. Then is moved (parent bus
->> changes) during machine reset in the "sdhci-bus". It can be moved again
->> by software between the "sdhci-bus" and another bus ("bcm2835-sdhost-bus").
->> Here's the corresponding qbus tree of the raspi machine:
->>  + sysbus
->>    * bcm2835_gpio
->>      + sd-bus
->>        * sd-card
->>    * bcm2835-sdhost
->>      + bcm2835-sdhost-bus
->>    * generic-sdhci
->>      + sdhci-bus
->>
->> During the initial machine reset, the sd card is moved. Since reset is
->> based on qbus tree, moving the card during the reset seems odd (it changes
->> the qbus tree). In this case, because of the order the qbus tree is
->> walked, the sd card ends up being reset twice; the effective reset order call
->> follows:
->>  1 sd-card
->>  2 sd-bus
->>  3 bcm2835_gpio        -> move the sd-card to sdhci_bus
->>  4 bcm2835-sdhost-bus
->>  5 bcm2835-sdhost
->>  6 sd-card             (again)
->>  7 sdhci-bus
->>  8 generic-sdhci
->>
->> This patch adds a raspi machine reset method which moves the sd card
->> to the sdhci-bus before doing the whole reset (which will try to do the
->> move too). By anticipating the move we avoid changing the qdev tree while
->> resetting it.
->>
->> In consequence the step 1 is skipped in the previous list: when reset starts
->> the sd-card is already not a child of bcm2835_gpio.
-> 
-> The solution proposed in this patch pushes something that should
-> really be the business just of the SoC model out to the machine
-> model level; it would be nice to be able to avoid that.
+Because of that, since commit b749562d9822d14ef69c9eaa5f85903010b86c30
+we forbid the L2 cache to become larger than the maximum amount of L2
+metadata for the image, calculated using this formula:
 
-The problem is sysbus is the only common "reset" ancestor of all
-sd-card-buses. So we don't really have a lot of places to do this.
+    uint64_t max_l2_cache =3D virtual_disk_size / (s->cluster_size / 8);
 
-I could move the proposed code to the reset method of
-bcm2835_peripherals which creates the bcm3825_gpio, bcm2835-sdhost and
-generic-sdhci so we don't have to seek these.
-It will works because the reset of bcm2835_peripherals is called before
-the others.
-But in terms of reset/qdev hiearchy, the 'bcm2835_peripherals' it at the
-same level of bcm2835_gpio.
+The problem with this formula is that the result should be rounded up
+to the cluster size because an L2 table on disk always takes one full
+cluster.
 
-The reset order would be:
+For example, a 1280 MB qcow2 image with 64 KB clusters needs exactly
+160 KB of L2 metadata, but we need 192 KB on disk (3 clusters) even if
+the last 32 KB of those are not going to be used.
 
-1 bcm2835_peripherals -> move the sd-card to sdhci_bus.
-2   sd-bus
-3 bcm2835_gpio
-4   bcm2835-sdhost-bus
-5 bcm2835-sdhost
-6     sd-card
-7   sdhci-bus
-8 generic-sdhci
+However QEMU rounds the numbers down and only creates 2 cache tables
+(128 KB), which is not enough for the image.
 
-Would that be an acceptable solution ?
+A quick test doing 4KB random writes on a 1280 MB image gives me
+around 500 IOPS, while with the correct cache size I get 16K IOPS.
 
---
-Thanks
-Damien
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/qcow2.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 0882ff6e92..57734f20cf 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -828,7 +828,11 @@ static void read_cache_sizes(BlockDriverState *bs, Q=
+emuOpts *opts,
+     bool l2_cache_entry_size_set;
+     int min_refcount_cache =3D MIN_REFCOUNT_CACHE_SIZE * s->cluster_size=
+;
+     uint64_t virtual_disk_size =3D bs->total_sectors * BDRV_SECTOR_SIZE;
+-    uint64_t max_l2_cache =3D virtual_disk_size / (s->cluster_size / 8);
++    uint64_t max_l2_entries =3D DIV_ROUND_UP(virtual_disk_size, s->clust=
+er_size);
++    /* An L2 table is always one cluster in size so the max cache size
++     * should be a multiple of the cluster size. */
++    uint64_t max_l2_cache =3D ROUND_UP(max_l2_entries * sizeof(uint64_t)=
+,
++                                     s->cluster_size);
+=20
+     combined_cache_size_set =3D qemu_opt_get(opts, QCOW2_OPT_CACHE_SIZE)=
+;
+     l2_cache_size_set =3D qemu_opt_get(opts, QCOW2_OPT_L2_CACHE_SIZE);
+--=20
+2.20.1
+
 
