@@ -2,67 +2,84 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA8E7C5ACAE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:32:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 934F0C49ED9
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:38:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EA912075C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:32:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EA912075C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 67DA42075C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:38:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67DA42075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8If2-0003en-Ir
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 02:32:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40634)
+	id 1i8IkH-0006SE-I9
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 02:38:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43560)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i8IVW-0002f8-FO
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:23:07 -0400
+ (envelope-from <slp@redhat.com>) id 1i8IjX-0005oE-D0
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:37:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i8IVU-0005n2-Qh
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:23:05 -0400
-Resent-Date: Thu, 12 Sep 2019 02:23:05 -0400
-Resent-Message-Id: <E1i8IVU-0005n2-Qh@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21581)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i8IVU-0005lp-Fj
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:23:04 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568268462; cv=none; d=zoho.com; s=zohoarc; 
- b=eD1EZHwUPf5/+ULzpuoifA+m7okq8tli+h7jHTtieM32zYJQomEGRxeIKmmfNXta+eTOuBsU1iALS1QychpAtx46CwTQ5RUfLp1uVKN0kiOy79taOCY2KVS23J35xsuC9N9xxEwEPkYE8UAxLaht5zukp3WLyvhi5+4T/8YyDGM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1568268462;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=uEJTt2ImCAnNKpCYlvlr0IsyOz+4WLMoRn4IizJ//PQ=; 
- b=e9FQKkT5vSZ7mp9C5w8rwDD0NEnFoauQ861qz3qcVOPiuD1WouyklWegBlqLEcLaj7VSEQNLM3gQaoHFkQIBz4OPkrZdrluOnfz1O46ANIWluuHnz1wkBgIAQO0Uo/wUzKAaA1tfrjwjUD+/HNLdW8GnZXHpycKLfe6gI4++xuY=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1568268454269251.9810127971316;
- Wed, 11 Sep 2019 23:07:34 -0700 (PDT)
-In-Reply-To: <20190912053638.4858-1-tao3.xu@intel.com>
-Message-ID: <156826845281.21839.13142130847236071484@5dec9699b7de>
+ (envelope-from <slp@redhat.com>) id 1i8IjU-0002lH-UT
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:37:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39988)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1i8IjU-0002l0-MC
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:37:32 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id F003BC04BD48
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 06:37:30 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id a4so10220118wrg.8
+ for <qemu-devel@nongnu.org>; Wed, 11 Sep 2019 23:37:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=7u52KF3HxCgSngD0s7yi5RDE7kAPKuM/WHTidpfdNnE=;
+ b=dJLJ++W+KS1rhUJJ2eBW4KPJYy5+6Q0yg0nEHMe9nf/ZpQiIcERJ8wcTYA29mLEMFz
+ BMt5e04K8C8xopwFPjngppVWmRK1yEPtYKJlfrsqlXqS8A7oOadWfr3AsDgwMK8A1mEJ
+ wMdVx6fVBI0Dxk3lI+K38Lo/SO2SJnElZkTHx41uGU3SQHsGy0hWu2W93n50U59iPgwV
+ E5aV3lKtiW6SZ7rxwPCJ/vl6kFmtc4BEpBZjRJCFWigACxh6KWBnoDdAtoxF5HhW0UK+
+ nf58wk8+szeGUqndxtz1Ym5d8I0iyR4c2GHPwZCoavhOkfU+NVke8U3L9bQmu9reWqNL
+ MTKw==
+X-Gm-Message-State: APjAAAVw/5VIGhQnIabV6gZM1uucPHRQiGAysYAngliPDo9vqp5DJaiE
+ aWKPny25S9H1/Y68g5HLs5LgnGN9wUisje+RCMyDUT4cCYuX4WL5Jc0nxzukqH0jjBCZg9ovrcX
+ 8d7dlRXaOl4D7798=
+X-Received: by 2002:a7b:c247:: with SMTP id b7mr363879wmj.121.1568270249351;
+ Wed, 11 Sep 2019 23:37:29 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqz4sjajXTcMSIQKiMMbYqt7dvQ1n1IaX66ZnA5jUpAylbmR69kZ+87CRTcGPnMprxelrn20bQ==
+X-Received: by 2002:a7b:c247:: with SMTP id b7mr363862wmj.121.1568270249054;
+ Wed, 11 Sep 2019 23:37:29 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id l10sm24784896wrh.20.2019.09.11.23.37.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 11 Sep 2019 23:37:28 -0700 (PDT)
+References: <20190911161521.59261-1-slp@redhat.com>
+ <d47f7e67-2f6a-0dd6-3ab5-93626bfbb02d@redhat.com>
+ <6755b34b-b412-9e63-8d25-b7662d0d3860@redhat.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+In-reply-to: <6755b34b-b412-9e63-8d25-b7662d0d3860@redhat.com>
+Date: Thu, 12 Sep 2019 08:37:26 +0200
+Message-ID: <871rwmxbo9.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: tao3.xu@intel.com
-Date: Wed, 11 Sep 2019 23:07:34 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH v11 00/11] Build ACPI Heterogeneous Memory
- Attribute Table (HMAT)
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] nbd/server: attach client channel to the
+ export's AioContext
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,38 +91,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, jingqi.liu@intel.com, tao3.xu@intel.com,
- fan.du@intel.com, qemu-devel@nongnu.org, jonathan.cameron@huawei.com,
- imammedo@redhat.com, dan.j.williams@intel.com
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxMjA1MzYzOC40ODU4
-LTEtdGFvMy54dUBpbnRlbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
-ZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
-YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
-LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRX
-T1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0
-IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKbGlidWRldiAgICAgICAgICAgbm8K
-ZGVmYXVsdCBkZXZpY2VzICAgeWVzCgp3YXJuaW5nOiBQeXRob24gMiBzdXBwb3J0IGlzIGRlcHJl
-Y2F0ZWQKd2FybmluZzogUHl0aG9uIDMgd2lsbCBiZSByZXF1aXJlZCBmb3IgYnVpbGRpbmcgZnV0
-dXJlIHZlcnNpb25zIG9mIFFFTVUKCk5PVEU6IGNyb3NzLWNvbXBpbGVycyBlbmFibGVkOiAgJ2Nj
-JwogIEdFTiAgICAgeDg2XzY0LXNvZnRtbXUvY29uZmlnLWRldmljZXMubWFrLnRtcAotLS0KTG9v
-a2luZyBmb3IgZXhwZWN0ZWQgZmlsZSAndGVzdHMvZGF0YS9hY3BpL3BjL1NSQVQuYWNwaWhtYXQn
-Ckxvb2tpbmcgZm9yIGV4cGVjdGVkIGZpbGUgJ3Rlc3RzL2RhdGEvYWNwaS9wYy9TUkFUJwoqKgpF
-UlJPUjovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvYmlvcy10YWJsZXMtdGVzdC5jOjMyNzpsb2Fk
-X2V4cGVjdGVkX2FtbDogYXNzZXJ0aW9uIGZhaWxlZDogKGV4cF9zZHQuYW1sX2ZpbGUpCkVSUk9S
-IC0gQmFpbCBvdXQhIEVSUk9SOi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9iaW9zLXRhYmxlcy10
-ZXN0LmM6MzI3OmxvYWRfZXhwZWN0ZWRfYW1sOiBhc3NlcnRpb24gZmFpbGVkOiAoZXhwX3NkdC5h
-bWxfZmlsZSkKbWFrZTogKioqIFtjaGVjay1xdGVzdC14ODZfNjRdIEVycm9yIDEKbWFrZTogKioq
-IFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KICBURVNUICAgIGlvdGVzdC1xY293Mjog
-MDM2CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
-cy8yMDE5MDkxMjA1MzYzOC40ODU4LTEtdGFvMy54dUBpbnRlbC5jb20vdGVzdGluZy5kb2NrZXIt
-cXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
-IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
+
+Eric Blake <eblake@redhat.com> writes:
+
+> On 9/11/19 12:21 PM, Eric Blake wrote:
+>> On 9/11/19 11:15 AM, Sergio Lopez wrote:
+>>> On creation, the export's AioContext is set to the same one as the
+>>> BlockBackend, while the AioContext in the client QIOChannel is left
+>>> untouched.
+>>>
+>>> As a result, when using data-plane, nbd_client_receive_next_request()
+>>> schedules coroutines in the IOThread AioContext, while the client's
+>>> QIOChannel is serviced from the main_loop, potentially triggering the
+>>> assertion at qio_channel_restart_[read|write].
+>>>
+>>> To fix this, as soon we have the export corresponding to the client,
+>>> we call qio_channel_attach_aio_context() to attach the QIOChannel
+>>> context to the export's AioContext. This matches with the logic in
+>>> blk_aio_attached().
+>>>
+>>> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=3D1748253
+>>> Signed-off-by: Sergio Lopez <slp@redhat.com>
+>>> ---
+>>>  nbd/server.c | 2 ++
+>>>  1 file changed, 2 insertions(+)
+>>=20
+>> I'd like a second opinion from Kevin, but the description makes sense to
+>> me.  I'm happy to queue this through my NBD tree.
+>>=20
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+> I tried to test this patch, but even with it applied, I still got an
+> aio-context crasher by attempting an nbd-server-start, nbd-server-add,
+> nbd-server-stop (intentionally skipping the nbd-server-remove step) on a
+> domain using iothreads, with a backtrace of:
+>
+> #0  0x00007ff09d070e35 in raise () from target:/lib64/libc.so.6
+> #1  0x00007ff09d05b895 in abort () from target:/lib64/libc.so.6
+> #2  0x000055dd03b9ab86 in error_exit (err=3D1, msg=3D0x55dd03d59fb0
+> <__func__.15769> "qemu_mutex_unlock_impl")
+>     at util/qemu-thread-posix.c:36
+> #3  0x000055dd03b9adcf in qemu_mutex_unlock_impl (mutex=3D0x55dd062d5090,
+> file=3D0x55dd03d59041 "util/async.c",
+>     line=3D523) at util/qemu-thread-posix.c:96
+> #4  0x000055dd03b93433 in aio_context_release (ctx=3D0x55dd062d5030) at
+> util/async.c:523
+> #5  0x000055dd03ac421b in bdrv_do_drained_begin (bs=3D0x55dd0673a2d0,
+> recursive=3Dfalse, parent=3D0x0,
+>     ignore_bds_parents=3Dfalse, poll=3Dtrue) at block/io.c:428
+> #6  0x000055dd03ac4299 in bdrv_drained_begin (bs=3D0x55dd0673a2d0) at
+> block/io.c:434
+> #7  0x000055dd03aafb54 in blk_drain (blk=3D0x55dd06a3ec40) at
+> block/block-backend.c:1605
+> #8  0x000055dd03aae054 in blk_remove_bs (blk=3D0x55dd06a3ec40) at
+> block/block-backend.c:800
+> #9  0x000055dd03aad54a in blk_delete (blk=3D0x55dd06a3ec40) at
+> block/block-backend.c:420
+> #10 0x000055dd03aad7d6 in blk_unref (blk=3D0x55dd06a3ec40) at
+> block/block-backend.c:475
+> #11 0x000055dd03aecb68 in nbd_export_put (exp=3D0x55dd0726f920) at
+> nbd/server.c:1666
+> #12 0x000055dd03aec8fe in nbd_export_close (exp=3D0x55dd0726f920) at
+> nbd/server.c:1616
+> #13 0x000055dd03aecbf1 in nbd_export_close_all () at nbd/server.c:1689
+> #14 0x000055dd03748845 in qmp_nbd_server_stop (errp=3D0x7ffcdf3cb4e8) at
+> blockdev-nbd.c:233
+> ...
+>
+> Does that sound familiar to what you were seeing?  Does it mean we
+> missed another spot where the context is set incorrectly?
+
+It looks like it was trying to release the AioContext while it was still
+held by some other thread. Is this stacktrace from the main thread or an
+iothread? What was the other one doing?
+
+> I'm happy to work with you on IRC for more real-time debugging of this
+> (I'm woefully behind on understanding how aio contexts are supposed to
+> work).
+
+I must be missing some step, because I can't reproduce this one
+here. I've tried both with an idle NDB server and one with a client
+generating I/O. Is it reproducible 100% of them time?
+
+Sergio.
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl1556YACgkQ9GknjS8M
+AjXYaw//Qo4VXFRa2yVy4qAx5Q9OxiE+1adlJmkUkbN22P5F5hCW19e5MXYMU+ns
+qCElQgxiCVwAANN8iejygV6/kN5TqbYtKuUeloBTsJO1L0Pz++Z3tfLHGeyBzBBL
+H3/QBD05pvx2DmN9tUat/j1DPl7kzGgEMmmo9DRvPCwMn5lI2hqvg9jrWAjPTdQS
+wEsVaZy25OK/gRka4hfpaEyb5h0QdxJ2e847shf4T8NmhZOr02JwEXkHRaHI7OID
+XpBcXD5bnkd8Q7RFG0nxxiUBSoKJzMf369+AtYPgpxRJ800unsGMtxL+9qjDJ+Pb
+Y5TTOcFiDLfY6j8NAZP+AcFP3GD3FNfVI/8F0n2iJExki++CUmta184Qas/Yi1vz
+GEJEuVsHrJBcJXgxdbK0N37JJticbdSfUlEPg7x145twj3u2pyuq5Wyc5LYeUt+U
+5LxhvAl7oDeU2iBK1Nu2lL5rsMMVszqNLgjDGkw8xOiBp9/2CJEBB2Lhh44Zg1B6
+aYGG8W+ungPYfzyAVY/HrqkN6asHGuHxggrz9LlD7Nm98FGdWuVTMWxh+IGaCQ/E
+bm6sr5BAsxeff9NWk06ngOSTmLotvlHBXSMkhunerQq0Rx3CO6U5ik/kIWJtE1jf
+MHynRKEp0a3OzRrmnh95Vb+rPF5Erxys2z60cDQEIhj2invcsFk=
+=xC1g
+-----END PGP SIGNATURE-----
+--=-=-=--
 
