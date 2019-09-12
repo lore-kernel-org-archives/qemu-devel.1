@@ -6,89 +6,89 @@ X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 638CBC4CEC5
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 16:43:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD7AEC4CEC6
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 16:54:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D15420830
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 16:43:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 723DE206A5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 16:54:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ooqUJN8K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D15420830
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zYlrYzLB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 723DE206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8SBU-0004E9-Cz
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 12:43:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59253)
+	id 1i8SMz-0007Te-Fv
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 12:54:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35249)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i8SAU-0003nR-4v
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 12:42:03 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i8SMF-000738-73
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 12:54:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i8SAS-0001Ih-Gv
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 12:42:01 -0400
-Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:32768)
+ (envelope-from <richard.henderson@linaro.org>) id 1i8SME-0001DG-0Q
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 12:54:10 -0400
+Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:37485)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i8SAS-0001HU-BL
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 12:42:00 -0400
-Received: by mail-qk1-x743.google.com with SMTP id x134so25140702qkb.0
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 09:42:00 -0700 (PDT)
+ id 1i8SMD-0001Cs-Q2
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 12:54:09 -0400
+Received: by mail-qt1-x841.google.com with SMTP id g13so30017586qtj.4
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 09:54:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=YS9/Qq3kpBdzCw97IrsBJ1Krr6ZKQtQ/hWzHljt+FAY=;
- b=ooqUJN8K+KqObp2dM6XItRBaaZyVxpKRwxjl3f+r8+AQ+z5nemU8Nuuu1WlbVV1von
- 5/cEUQ/0WNdlWml3QlBQ91CNDPMnnl9uvHMwuhFy8SU7YQHl2svVkJfupzAf/ASlNMFh
- O8rGGu6Mdwgj6FwQ7qTH9ypvLSrwd1jMDQ1e8M5UONBsxTPHrgOKI0Yv827bkGVY+mLJ
- tAqrgZpWMwblyNmNLLcehcCC1EcNPNun+WjiILvd/HW03O+0hdUkyaSJoA0HDjM6+Zqu
- txMmu3H+eRSuRc2Wn9iLNbhIVOHUt6s9rvCKf5SdpI7lYkPSiVGR5NhNAHY/b5SAgA9f
- +VQw==
+ bh=bLZSpIJioQpc3lEns+9rQMU3UCzhpeXvbrAurWZ61PM=;
+ b=zYlrYzLBWJ/YHP3SVxNGiOaQtFH8T1GW2HAa4RvydrhhLzsYcHgY+hx/9jhPJEjcO0
+ G4EcAb0w/4vg728qq06wBqyzJADC2vnWdByDyXcFYrmI0fNvuHBJ0thbcIjnPiqABSGm
+ eLsUG9laW1LKM/rDbWhj/OuO2h9yMhNSLm3txkT7bzYM57r/a9jQkSe4YFyonkIlbmn2
+ /COKxl9DZKlGk+2eMBO6HwuMzg/ku6FXDnu0d/zD2EPc3icYm72XLD3FnngLViS/1rxi
+ 0rmS3PY6jetv3pMVlvR5Nmcn4uHqTxBl9R2gtv3eRScoPFP0TveL5pEX5YkSGp17rmq0
+ h3vQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=YS9/Qq3kpBdzCw97IrsBJ1Krr6ZKQtQ/hWzHljt+FAY=;
- b=ZLb8nObMWczitQ5fYB8eoB00NsXNCX6e4b2K3hVC8zJoBnUrc4h9hFsabh6ErQxrEe
- VaI+pVunHgE1oRVL68lTkz7Kq6ztZXqK+4HNYylPA1sBCBvbxJtJfYqBP3DTYUx2h6sY
- oiIuc7g2rPUO53jJWiypbQBBz2YTA83okLKbbjjuge/y2J7YV/lffCpBM/byXxOit2/P
- B74TL1ZPegrlAxi2TGRoQ4uTMOH23OhBP4dl2ZUchC88OqpG2lecbTHqnklC/C6IUdb6
- I57tWvyn5xvA+aGUQkVPhojDqxMF4Vn7bZ4VYjddnvUO2uSJwyIrzZlh6oCqepEoJS5w
- AAVA==
-X-Gm-Message-State: APjAAAVQ8PnxdAKGYu46DPI40nYHJai+emUf7a6NdQFIQZi36/Pui6jL
- MvGbgVzC9fQFZIFqltuhN9acbg==
-X-Google-Smtp-Source: APXvYqxZ6SPy95lWXReYTkumfT22PmbslAKm1zpIMKEw/unfxEXFGNn3tQu7RWllupWf+6XbWr7ICg==
-X-Received: by 2002:a37:9544:: with SMTP id x65mr43714433qkd.100.1568306519036; 
- Thu, 12 Sep 2019 09:41:59 -0700 (PDT)
+ bh=bLZSpIJioQpc3lEns+9rQMU3UCzhpeXvbrAurWZ61PM=;
+ b=GFX0sSwUG7Y+iMgpaUXcffnjQR4IJ5wvAptyujl2/CgK3ypq0GHEmDxOGalNj5HqqQ
+ HdqeVJ/dh0U/Yi3hrE243mjj/pLkbN6Oua1bwG/WpQzDgtoAu1cv0SfU6p/xkf7LYiv7
+ zxyBiMwZgJDxwEhNKNZrrx8gGa+7cNJjrI+okzWkUDaZxktI93P+pAi5prgoXepVjSoJ
+ sijPNb75jIEufLK41u2OrewfYMrQP454JSr6XZx1QUwPBssL6zcm0iWu76yEufcmttL5
+ tlkz8DccVA3M2Tb/kRnCFoQJ/wkDa2dG2NACHGJMLUSnPPl1Vc9YdbUinFqiZCkGYrNF
+ WgLw==
+X-Gm-Message-State: APjAAAUodXaiYCnhRbaV/yMDhFr6/tCTQhmMe18HU1SYosEKMuxOj4xx
+ OdxkOMcwdLQnmQmgdkyx7bZAZw==
+X-Google-Smtp-Source: APXvYqzz0MkkbNZbdfD7+PQbxBB2CXu1ocQ0Grp0cuz4bFIu7FS9Jvughaa4ZW2kJLTvagjp35ROVQ==
+X-Received: by 2002:a0c:a988:: with SMTP id a8mr8595365qvb.34.1568307248511;
+ Thu, 12 Sep 2019 09:54:08 -0700 (PDT)
 Received: from [172.20.5.51] ([67.69.50.154])
- by smtp.gmail.com with ESMTPSA id j137sm11104368qke.64.2019.09.12.09.41.57
+ by smtp.gmail.com with ESMTPSA id 200sm12429267qkf.65.2019.09.12.09.54.07
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Sep 2019 09:41:58 -0700 (PDT)
+ Thu, 12 Sep 2019 09:54:07 -0700 (PDT)
 To: liuzhiwei <zhiwei_liu@c-sky.com>, Alistair.Francis@wdc.com,
  palmer@sifive.com, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de,
  riku.voipio@iki.fi, laurent@vivier.eu, wenmeng_zhang@c-sky.com
 References: <1568183141-67641-1-git-send-email-zhiwei_liu@c-sky.com>
- <1568183141-67641-10-git-send-email-zhiwei_liu@c-sky.com>
+ <1568183141-67641-16-git-send-email-zhiwei_liu@c-sky.com>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <2d4c21ee-3c2c-7c14-82f7-9916b66444cc@linaro.org>
-Date: Thu, 12 Sep 2019 12:41:55 -0400
+Message-ID: <5e0f09a9-7f5a-efbc-762d-56a94bb837e0@linaro.org>
+Date: Thu, 12 Sep 2019 12:54:05 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1568183141-67641-10-git-send-email-zhiwei_liu@c-sky.com>
+In-Reply-To: <1568183141-67641-16-git-send-email-zhiwei_liu@c-sky.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::743
-Subject: Re: [Qemu-devel] [PATCH v2 09/17] RISC-V: add vector extension
- integer instructions part2, bit/shift
+X-Received-From: 2607:f8b0:4864:20::841
+Subject: Re: [Qemu-devel] [PATCH v2 15/17] RISC-V: add vector extension
+ reduction instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,72 +106,54 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/11/19 2:25 AM, liuzhiwei wrote:
-> +void VECTOR_HELPER(vand_vv)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
+> +/* vredsum.vs vd, vs2, vs1, vm # vd[0] = sum(vs1[0] , vs2[*]) */
+> +void VECTOR_HELPER(vredsum_vs)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
 > +    uint32_t rs2, uint32_t rd)
 > +{
-> +    int i, j, vl;
-> +    uint32_t lmul, width, src1, src2, dest, vlmax;
+>  
+> +    int width, lmul, vl, vlmax;
+> +    int i, j, src2;
+> +    uint64_t sum = 0;
 > +
-> +    vl = env->vfp.vl;
-> +    lmul  = vector_get_lmul(env);
-> +    width   = vector_get_width(env);
-> +    vlmax = vector_get_vlmax(env);
+> +    lmul = vector_get_lmul(env);
+> +    vector_lmul_check_reg(env, lmul, rs2, false);
 > +
 > +    if (vector_vtype_ill(env) || vector_overlap_vm_common(lmul, vm, rd)) {
 > +        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
 > +        return;
 > +    }
-> +    vector_lmul_check_reg(env, lmul, rs1, false);
-> +    vector_lmul_check_reg(env, lmul, rs2, false);
-> +    vector_lmul_check_reg(env, lmul, rd, false);
+> +    if (env->vfp.vstart != 0) {
+> +        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+> +        return;
+> +    }
 > +
-> +    for (i = 0; i < vlmax; i++) {
-> +        src1 = rs1 + (i / (VLEN / width));
-> +        src2 = rs2 + (i / (VLEN / width));
-> +        dest = rd + (i / (VLEN / width));
-> +        j = i % (VLEN / width);
-> +        if (i < env->vfp.vstart) {
-> +            continue;
-> +        } else if (i < vl) {
+> +    vl = env->vfp.vl;
+> +    if (vl == 0) {
+> +        return;
+> +    }
+> +
+> +    width = vector_get_width(env);
+> +    vlmax = vector_get_vlmax(env);
+> +
+> +    for (i = 0; i < VLEN / 64; i++) {
+> +        env->vfp.vreg[rd].u64[i] = 0;
+> +    }
+> +
+
+There is no requirement that I see for vd != vs1 && vd != vs2.  Thus clearing
+vd before the operation may clobber the inputs.
+
+> +        if (i < vl) {
 > +            switch (width) {
 > +            case 8:
 > +                if (vector_elem_mask(env, vm, width, lmul, i)) {
-> +                    env->vfp.vreg[dest].u8[j] = env->vfp.vreg[src1].u8[j]
-> +                        & env->vfp.vreg[src2].u8[j];
+> +                    sum += env->vfp.vreg[src2].u8[j];
 > +                }
-> +                break;
+> +                if (i == 0) {
+> +                    sum += env->vfp.vreg[rs1].u8[0];
+> +                }
 
-Note that a non-predicated logical operation need not consider the width.  All
-of the widths perform the same operation, and therefore having the host operate
-on u64 is fastest.  This is another good reason to notice vm=1 within the
-translator and use separate helper functions for masked vs non-masked.
-
-> +void VECTOR_HELPER(vand_vx)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-> +    uint32_t rs2, uint32_t rd)
-...
-> +void VECTOR_HELPER(vand_vi)(CPURISCVState *env, uint32_t vm, uint32_t rs1,
-> +    uint32_t rs2, uint32_t rd)
-
-As with the previous set of arithmetic instructions, these should be a single
-helper that is passed a 64-bit scalar.
-
-Note that scalars smaller than 64-bit can be replicated with dup_const().  At
-which point the logical operation is easily performed in 64-bit units instead
-of any smaller unit.
-
-Note that predication can be handled via logical masking.  For ARM SVE, we have
-a set of functions that map the active bits of a predicate mask to byte masks.
- See e.g.
-
-static inline uint64_t expand_pred_b(uint8_t byte)
-static inline uint64_t expand_pred_h(uint8_t byte)
-static inline uint64_t expand_pred_s(uint8_t byte)
-
-so that the predicated logical and operation looks like
-
-    mask = expand_pred_n(env->vfp.vreg[0].u8[i]);
-    result = in1 & in2;
-    dest = (result & mask) | (dest & ~mask);
+Hoist the rs1 case outside the loop.
 
 
 r~
