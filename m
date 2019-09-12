@@ -3,60 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9184EC4CEC5
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:00:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE4FFC4CEC5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:00:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58A032084D
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:00:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58A032084D
+	by mail.kernel.org (Postfix) with ESMTPS id 8598720856
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:00:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8598720856
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8Pe8-0000Vr-NH
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 10:00:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39204)
+	id 1i8PeW-0000yi-PD
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 10:00:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39119)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1i8PQo-0002sC-Cb
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:46:45 -0400
+ (envelope-from <kwolf@redhat.com>) id 1i8PQf-0002hH-Cv
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:46:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1i8PQm-0001QY-DP
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:46:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43296)
+ (envelope-from <kwolf@redhat.com>) id 1i8PQe-0001Ll-9p
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:46:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60510)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1i8PQi-0001Nl-59; Thu, 12 Sep 2019 09:46:36 -0400
+ id 1i8PQc-0001K1-5G; Thu, 12 Sep 2019 09:46:30 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7C4CD18C4275;
- Thu, 12 Sep 2019 13:46:35 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6DD51300B912;
+ Thu, 12 Sep 2019 13:46:29 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-116-179.ams2.redhat.com
  [10.36.116.179])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 123A3600C4;
- Thu, 12 Sep 2019 13:46:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1F781600C4;
+ Thu, 12 Sep 2019 13:46:27 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Date: Thu, 12 Sep 2019 15:45:51 +0200
-Message-Id: <20190912134604.22019-10-kwolf@redhat.com>
+Date: Thu, 12 Sep 2019 15:45:49 +0200
+Message-Id: <20190912134604.22019-8-kwolf@redhat.com>
 In-Reply-To: <20190912134604.22019-1-kwolf@redhat.com>
 References: <20190912134604.22019-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Thu, 12 Sep 2019 13:46:35 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Thu, 12 Sep 2019 13:46:29 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 09/22] iotests: Restrict file Python tests to
- file
+Subject: [Qemu-devel] [PULL 07/22] vpc: Return 0 from vpc_co_create() on
+ success
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,337 +75,49 @@ Sender: "Qemu-devel"
 
 From: Max Reitz <mreitz@redhat.com>
 
-Most of our Python unittest-style tests only support the file protocol.
-You can run them with any other protocol, but the test will simply
-ignore your choice and use file anyway.
+blockdev_create_run() directly uses .bdrv_co_create()'s return value as
+the job's return value.  Jobs must return 0 on success, not just any
+nonnegative value.  Therefore, using blockdev-create for VPC images may
+currently fail as the vpc driver may return a positive integer.
 
-We should let them signal that they require the file protocol so they
-are skipped when you want to test some other protocol.
+Because there is no point in returning a positive integer anywhere in
+the block layer (all non-negative integers are generally treated as
+complete success), we probably do not want to add more such cases.
+Therefore, fix this problem by making the vpc driver always return 0 in
+case of success.
 
+Suggested-by: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-stable@nongnu.org
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/030 | 3 ++-
- tests/qemu-iotests/040 | 3 ++-
- tests/qemu-iotests/041 | 3 ++-
- tests/qemu-iotests/044 | 3 ++-
- tests/qemu-iotests/045 | 3 ++-
- tests/qemu-iotests/055 | 3 ++-
- tests/qemu-iotests/056 | 3 ++-
- tests/qemu-iotests/057 | 3 ++-
- tests/qemu-iotests/065 | 3 ++-
- tests/qemu-iotests/096 | 3 ++-
- tests/qemu-iotests/118 | 3 ++-
- tests/qemu-iotests/124 | 3 ++-
- tests/qemu-iotests/129 | 3 ++-
- tests/qemu-iotests/132 | 3 ++-
- tests/qemu-iotests/139 | 3 ++-
- tests/qemu-iotests/148 | 3 ++-
- tests/qemu-iotests/151 | 3 ++-
- tests/qemu-iotests/152 | 3 ++-
- tests/qemu-iotests/155 | 3 ++-
- tests/qemu-iotests/163 | 3 ++-
- tests/qemu-iotests/165 | 3 ++-
- tests/qemu-iotests/169 | 3 ++-
- tests/qemu-iotests/196 | 3 ++-
- tests/qemu-iotests/199 | 3 ++-
- tests/qemu-iotests/245 | 3 ++-
- tests/qemu-iotests/257 | 3 ++-
- 26 files changed, 52 insertions(+), 26 deletions(-)
+ block/vpc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index 1b69f318c6..f3766f2a81 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -957,4 +957,5 @@ class TestSetSpeed(iotests.QMPTestCase):
-         self.cancel_and_wait(resume=3DTrue)
+diff --git a/block/vpc.c b/block/vpc.c
+index b25aab0425..5cd3890780 100644
+--- a/block/vpc.c
++++ b/block/vpc.c
+@@ -885,6 +885,7 @@ static int create_dynamic_disk(BlockBackend *blk, uin=
+t8_t *buf,
+         goto fail;
+     }
 =20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['qcow2', 'qed'])
-+    iotests.main(supported_fmts=3D['qcow2', 'qed'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
-index 6db9abf8e6..762ad1ebcb 100755
---- a/tests/qemu-iotests/040
-+++ b/tests/qemu-iotests/040
-@@ -429,4 +429,5 @@ class TestReopenOverlay(ImageCommitTestCase):
-         self.run_commit_test(self.img1, self.img0)
++    ret =3D 0;
+  fail:
+     return ret;
+ }
+@@ -908,7 +909,7 @@ static int create_fixed_disk(BlockBackend *blk, uint8=
+_t *buf,
+         return ret;
+     }
 =20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['qcow2', 'qed'])
-+    iotests.main(supported_fmts=3D['qcow2', 'qed'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-index 8bc8f81db7..8568426311 100755
---- a/tests/qemu-iotests/041
-+++ b/tests/qemu-iotests/041
-@@ -1122,4 +1122,5 @@ class TestOrphanedSource(iotests.QMPTestCase):
-         self.assert_qmp(result, 'error/class', 'GenericError')
+-    return ret;
++    return 0;
+ }
 =20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['qcow2', 'qed'])
-+    iotests.main(supported_fmts=3D['qcow2', 'qed'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/044 b/tests/qemu-iotests/044
-index 9ec3dba734..05ea1f49c5 100755
---- a/tests/qemu-iotests/044
-+++ b/tests/qemu-iotests/044
-@@ -118,4 +118,5 @@ class TestRefcountTableGrowth(iotests.QMPTestCase):
-         pass
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['qcow2'])
-+    iotests.main(supported_fmts=3D['qcow2'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/045 b/tests/qemu-iotests/045
-index d5484a0ee1..01cc038884 100755
---- a/tests/qemu-iotests/045
-+++ b/tests/qemu-iotests/045
-@@ -175,4 +175,5 @@ class TestSCMFd(iotests.QMPTestCase):
-             "File descriptor named '%s' not found" % fdname)
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['raw'])
-+    iotests.main(supported_fmts=3D['raw'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
-index 3437c11507..c732a112d6 100755
---- a/tests/qemu-iotests/055
-+++ b/tests/qemu-iotests/055
-@@ -563,4 +563,5 @@ class TestDriveCompression(iotests.QMPTestCase):
-                                         target=3D'drive1')
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['raw', 'qcow2'])
-+    iotests.main(supported_fmts=3D['raw', 'qcow2'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/056 b/tests/qemu-iotests/056
-index e761e465ae..98c55d8e5a 100755
---- a/tests/qemu-iotests/056
-+++ b/tests/qemu-iotests/056
-@@ -335,4 +335,5 @@ class BackupTest(iotests.QMPTestCase):
-         self.dismissal_failure(True)
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['qcow2', 'qed'])
-+    iotests.main(supported_fmts=3D['qcow2', 'qed'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/057 b/tests/qemu-iotests/057
-index 9f0a5a3057..9fbba759b6 100755
---- a/tests/qemu-iotests/057
-+++ b/tests/qemu-iotests/057
-@@ -256,4 +256,5 @@ class TestSnapshotDelete(ImageSnapshotTestCase):
-         self.assert_qmp(result, 'error/class', 'GenericError')
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['qcow2'])
-+    iotests.main(supported_fmts=3D['qcow2'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/065 b/tests/qemu-iotests/065
-index 8bac383ea7..5b21eb96bd 100755
---- a/tests/qemu-iotests/065
-+++ b/tests/qemu-iotests/065
-@@ -129,4 +129,5 @@ TestQemuImgInfo =3D None
- TestQMP =3D None
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['qcow2'])
-+    iotests.main(supported_fmts=3D['qcow2'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/096 b/tests/qemu-iotests/096
-index a69439602d..ab9cb47822 100755
---- a/tests/qemu-iotests/096
-+++ b/tests/qemu-iotests/096
-@@ -67,4 +67,5 @@ class TestLiveSnapshot(iotests.QMPTestCase):
-         self.checkConfig('target')
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['qcow2'])
-+    iotests.main(supported_fmts=3D['qcow2'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/118 b/tests/qemu-iotests/118
-index 6f45779ee9..ea0b326ae0 100755
---- a/tests/qemu-iotests/118
-+++ b/tests/qemu-iotests/118
-@@ -717,4 +717,5 @@ if __name__ =3D=3D '__main__':
-                        iotests.qemu_default_machine)
-     # Need to support image creation
-     iotests.main(supported_fmts=3D['vpc', 'parallels', 'qcow', 'vdi', 'q=
-cow2',
--                                 'vmdk', 'raw', 'vhdx', 'qed'])
-+                                 'vmdk', 'raw', 'vhdx', 'qed'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
-index 3440f54781..ca40ba3be2 100755
---- a/tests/qemu-iotests/124
-+++ b/tests/qemu-iotests/124
-@@ -779,4 +779,5 @@ class TestIncrementalBackupBlkdebug(TestIncrementalBa=
-ckupBase):
-=20
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['qcow2'])
-+    iotests.main(supported_fmts=3D['qcow2'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/129 b/tests/qemu-iotests/129
-index 9e87e1c8d9..cd6b9e9ce7 100755
---- a/tests/qemu-iotests/129
-+++ b/tests/qemu-iotests/129
-@@ -83,4 +83,5 @@ class TestStopWithBlockJob(iotests.QMPTestCase):
-         self.do_test_stop("block-commit", device=3D"drive0")
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D["qcow2"])
-+    iotests.main(supported_fmts=3D["qcow2"],
-+                 supported_protocols=3D["file"])
-diff --git a/tests/qemu-iotests/132 b/tests/qemu-iotests/132
-index f53ef6e391..0f2a106c81 100755
---- a/tests/qemu-iotests/132
-+++ b/tests/qemu-iotests/132
-@@ -56,4 +56,5 @@ class TestSingleDrive(iotests.QMPTestCase):
-                         'target image does not match source after mirror=
-ing')
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['raw', 'qcow2'])
-+    iotests.main(supported_fmts=3D['raw', 'qcow2'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/139 b/tests/qemu-iotests/139
-index 2176ea51ba..cbb5a76530 100755
---- a/tests/qemu-iotests/139
-+++ b/tests/qemu-iotests/139
-@@ -358,4 +358,5 @@ class TestBlockdevDel(iotests.QMPTestCase):
-=20
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D["qcow2"])
-+    iotests.main(supported_fmts=3D["qcow2"],
-+                 supported_protocols=3D["file"])
-diff --git a/tests/qemu-iotests/148 b/tests/qemu-iotests/148
-index e01b061fe7..8c11c53cba 100755
---- a/tests/qemu-iotests/148
-+++ b/tests/qemu-iotests/148
-@@ -137,4 +137,5 @@ class TestFifoQuorumEvents(TestQuorumEvents):
-=20
- if __name__ =3D=3D '__main__':
-     iotests.verify_quorum()
--    iotests.main(supported_fmts=3D["raw"])
-+    iotests.main(supported_fmts=3D["raw"],
-+                 supported_protocols=3D["file"])
-diff --git a/tests/qemu-iotests/151 b/tests/qemu-iotests/151
-index ad7359fc8d..76ae265cc1 100755
---- a/tests/qemu-iotests/151
-+++ b/tests/qemu-iotests/151
-@@ -142,4 +142,5 @@ class TestActiveMirror(iotests.QMPTestCase):
-=20
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['qcow2', 'raw'])
-+    iotests.main(supported_fmts=3D['qcow2', 'raw'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/152 b/tests/qemu-iotests/152
-index fec546d033..732bf5f062 100755
---- a/tests/qemu-iotests/152
-+++ b/tests/qemu-iotests/152
-@@ -59,4 +59,5 @@ class TestUnaligned(iotests.QMPTestCase):
-=20
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['raw', 'qcow2'])
-+    iotests.main(supported_fmts=3D['raw', 'qcow2'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/155 b/tests/qemu-iotests/155
-index 63a5b5e2c0..e19485911c 100755
---- a/tests/qemu-iotests/155
-+++ b/tests/qemu-iotests/155
-@@ -258,4 +258,5 @@ BaseClass =3D None
- MirrorBaseClass =3D None
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['qcow2'])
-+    iotests.main(supported_fmts=3D['qcow2'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
-index 158ba5d092..081ccc8ac1 100755
---- a/tests/qemu-iotests/163
-+++ b/tests/qemu-iotests/163
-@@ -170,4 +170,5 @@ class TestShrink1M(ShrinkBaseClass):
- ShrinkBaseClass =3D None
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['raw', 'qcow2'])
-+    iotests.main(supported_fmts=3D['raw', 'qcow2'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
-index 88f62d3c6d..5650dc7c87 100755
---- a/tests/qemu-iotests/165
-+++ b/tests/qemu-iotests/165
-@@ -103,4 +103,5 @@ class TestPersistentDirtyBitmap(iotests.QMPTestCase):
-         self.vm.shutdown()
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['qcow2'])
-+    iotests.main(supported_fmts=3D['qcow2'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
-index 7e06cc1145..8c204caf20 100755
---- a/tests/qemu-iotests/169
-+++ b/tests/qemu-iotests/169
-@@ -227,4 +227,5 @@ for cmb in list(itertools.product((True, False), repe=
-at=3D2)):
-                      'do_test_migration_resume_source', *list(cmb))
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['qcow2'])
-+    iotests.main(supported_fmts=3D['qcow2'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/196 b/tests/qemu-iotests/196
-index 4116ebc92b..92fe9244f8 100755
---- a/tests/qemu-iotests/196
-+++ b/tests/qemu-iotests/196
-@@ -63,4 +63,5 @@ class TestInvalidateAutoclear(iotests.QMPTestCase):
-             self.assertEqual(f.read(1), b'\x00')
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['qcow2'])
-+    iotests.main(supported_fmts=3D['qcow2'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/199 b/tests/qemu-iotests/199
-index 651e8df5d9..a2c8ecab5a 100755
---- a/tests/qemu-iotests/199
-+++ b/tests/qemu-iotests/199
-@@ -115,4 +115,5 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTes=
-tCase):
-         self.assert_qmp(result, 'return/sha256', sha256);
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D['qcow2'], supported_cache_modes=3D['n=
-one'])
-+    iotests.main(supported_fmts=3D['qcow2'], supported_cache_modes=3D['n=
-one'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/245 b/tests/qemu-iotests/245
-index bc1ceb9792..41218d5f1d 100644
---- a/tests/qemu-iotests/245
-+++ b/tests/qemu-iotests/245
-@@ -1000,4 +1000,5 @@ class TestBlockdevReopen(iotests.QMPTestCase):
-         self.reopen(opts, {'backing': 'hd2'})
-=20
- if __name__ =3D=3D '__main__':
--    iotests.main(supported_fmts=3D["qcow2"])
-+    iotests.main(supported_fmts=3D["qcow2"],
-+                 supported_protocols=3D["file"])
-diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
-index c2a72c577a..4a636d8ab2 100755
---- a/tests/qemu-iotests/257
-+++ b/tests/qemu-iotests/257
-@@ -557,4 +557,5 @@ def main():
-     test_backup_api()
-=20
- if __name__ =3D=3D '__main__':
--    iotests.script_main(main, supported_fmts=3D['qcow2'])
-+    iotests.script_main(main, supported_fmts=3D['qcow2'],
-+                        supported_protocols=3D['file'])
+ static int calculate_rounded_image_size(BlockdevCreateOptionsVpc *vpc_op=
+ts,
 --=20
 2.20.1
 
