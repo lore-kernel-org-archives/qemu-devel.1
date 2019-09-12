@@ -2,65 +2,73 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94A44C4CEC6
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 19:23:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F30EC4CEC7
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 19:36:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F18720830
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 19:23:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F18720830
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 048C82084D
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 19:36:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 048C82084D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8Ugy-0004li-Gb
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 15:23:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39077)
+	id 1i8UtY-0001IE-2B
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 15:36:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41030)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i8Ufn-0004EM-4c
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 15:22:32 -0400
+ (envelope-from <bounces@canonical.com>) id 1i8UsW-0000Oe-Pl
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 15:35:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i8Ufl-0004l1-Ug
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 15:22:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34376)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1i8Ufj-0004jh-Ey; Thu, 12 Sep 2019 15:22:27 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B672019D369;
- Thu, 12 Sep 2019 19:22:26 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.59])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4CFB65D712;
- Thu, 12 Sep 2019 19:22:22 +0000 (UTC)
-Message-ID: <4c2af664bb2c47a33c43b260e4b6bbd62a03a18b.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>
-Date: Thu, 12 Sep 2019 22:22:20 +0300
-In-Reply-To: <20190906141210.GQ5119@redhat.com>
-References: <20190830205608.18192-1-mlevitsk@redhat.com>
- <20190830205608.18192-10-mlevitsk@redhat.com>
- <20190906141210.GQ5119@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Thu, 12 Sep 2019 19:22:26 +0000 (UTC)
+ (envelope-from <bounces@canonical.com>) id 1i8UsV-000495-8b
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 15:35:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49664)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1i8UsV-00048F-3i
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 15:35:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1i8UsT-0004jc-0n
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 19:35:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 049312E80CD
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 19:35:37 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 12 Sep 2019 19:27:40 -0000
+From: Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: ppc64 testcase
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: 7-pc ajbennee rth
+X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
+X-Launchpad-Bug-Modifier: Richard Henderson (rth)
+References: <156691209320.18814.746226319480624520.malonedeb@soybean.canonical.com>
+Message-Id: <156831646095.1120.12247489491937744903.malone@wampee.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19044";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 8b789267a449a18d77ddb2e03eb1634b6e24bb3e
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 09/10] block/qcow2: implement blockdev-amend
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1841592] Re: ppc: softfloat float implementation
+ issues
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -69,157 +77,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>
+Reply-To: Bug 1841592 <1841592@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 2019-09-06 at 15:12 +0100, Daniel P. Berrang=C3=A9 wrote:
-> On Fri, Aug 30, 2019 at 11:56:07PM +0300, Maxim Levitsky wrote:
-> > Currently only for changing crypto parameters
-> >=20
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  block/qcow2.c        | 71 ++++++++++++++++++++++++++++++++++++++++++=
-++
-> >  qapi/block-core.json |  4 +--
-> >  2 files changed, 73 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/block/qcow2.c b/block/qcow2.c
-> > index 8dff4c6b5f..327d2afd9f 100644
-> > --- a/block/qcow2.c
-> > +++ b/block/qcow2.c
-> > @@ -3082,6 +3082,18 @@ qcow2_co_create(BlockdevCreateOptions *create_=
-options, Error **errp)
-> >      assert(create_options->driver =3D=3D BLOCKDEV_DRIVER_QCOW2);
-> >      qcow2_opts =3D &create_options->u.qcow2;
-> > =20
-> > +    if (!qcow2_opts->has_size) {
-> > +        error_setg(errp, "Size is manadatory for image creation");
-> > +        return -EINVAL;
-> > +
-> > +    }
-> > +
-> > +    if (!qcow2_opts->has_file) {
-> > +        error_setg(errp, "'file' is manadatory for image creation");
-> > +        return -EINVAL;
-> > +
-> > +    }
-> > +
-> >      bs =3D bdrv_open_blockdev_ref(qcow2_opts->file, errp);
-> >      if (bs =3D=3D NULL) {
-> >          return -EIO;
-> > @@ -5112,6 +5124,64 @@ static int qcow2_amend_options(BlockDriverStat=
-e *bs, QemuOpts *opts,
-> >      return 0;
-> >  }
-> > =20
-> > +
-> > +static int coroutine_fn qcow2_co_amend(BlockDriverState *bs,
-> > +                                       BlockdevCreateOptions *opts,
-> > +                                       bool force,
-> > +                                       Error **errp)
-> > +{
-> > +    BlockdevCreateOptionsQcow2 *qopts =3D &opts->u.qcow2;
-> > +    BDRVQcow2State *s =3D bs->opaque;
-> > +    int ret;
-> > +
-> > +    /*
-> > +     * This is ugly as hell, in later versions of this patch
-> > +     * something has to be done about this
-> > +     */
-> > +    if (qopts->has_file || qopts->has_size || qopts->has_data_file |=
-|
-> > +        qopts->has_data_file_raw || qopts->has_version ||
-> > +        qopts->has_backing_file || qopts->has_backing_fmt ||
-> > +        qopts->has_cluster_size || qopts->has_preallocation ||
-> > +        qopts->has_lazy_refcounts || qopts->has_refcount_bits) {
-> > +
-> > +        error_setg(errp,
-> > +                "Only LUKS encryption options can be amended for qco=
-w2 with blockdev-amend");
-> > +        return -EOPNOTSUPP;
-> > +
-> > +    }
-> > +
-> > +    if (qopts->has_encrypt) {
-> > +        if (!s->crypto) {
-> > +            error_setg(errp, "QCOW2 image is not encrypted, can't am=
-end");
-> > +            return -EOPNOTSUPP;
-> > +        }
-> > +
-> > +        if (qopts->encrypt->format !=3D Q_CRYPTO_BLOCK_FORMAT_LUKS) =
-{
-> > +            error_setg(errp,
-> > +                       "Amend can't be used to change the qcow2 encr=
-yption format");
-> > +            return -EOPNOTSUPP;
-> > +        }
-> > +
-> > +        if (s->crypt_method_header !=3D QCOW_CRYPT_LUKS) {
-> > +            error_setg(errp,
-> > +                       "Only LUKS encryption options can be amended =
-for qcow2 with blockdev-amend");
-> > +            return -EOPNOTSUPP;
-> > +        }
-> > +
-> > +        ret =3D qcrypto_block_amend_options(s->crypto,
-> > +                                          qcow2_crypto_hdr_read_func=
-,
-> > +                                          qcow2_crypto_hdr_write_fun=
-c,
-> > +                                          bs,
-> > +                                          qopts->encrypt,
-> > +                                          force,
-> > +                                          errp);
-> > +        if (ret) {
-> > +            return ret;
-> > +        }
-> > +    }
-> > +    return 0;
-> > +}
-> > +
-> >  /*
-> >   * If offset or size are negative, respectively, they will not be in=
-cluded in
-> >   * the BLOCK_IMAGE_CORRUPTED event emitted.
-> > @@ -5304,6 +5374,7 @@ BlockDriver bdrv_qcow2 =3D {
-> >      .mutable_opts        =3D mutable_opts,
-> >      .bdrv_co_check       =3D qcow2_co_check,
-> >      .bdrv_amend_options  =3D qcow2_amend_options,
-> > +    .bdrv_co_amend       =3D qcow2_co_amend,
-> > =20
-> >      .bdrv_detach_aio_context  =3D qcow2_detach_aio_context,
-> >      .bdrv_attach_aio_context  =3D qcow2_attach_aio_context,
-> > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > index 02375fb59a..ba41744427 100644
-> > --- a/qapi/block-core.json
-> > +++ b/qapi/block-core.json
-> > @@ -4312,10 +4312,10 @@
-> >  # Since: 2.12
-> >  ##
-> >  { 'struct': 'BlockdevCreateOptionsQcow2',
-> > -  'data': { 'file':             'BlockdevRef',
-> > +  'data': { '*file':            'BlockdevRef',
-> >              '*data-file':       'BlockdevRef',
-> >              '*data-file-raw':   'bool',
-> > -            'size':             'size',
-> > +            '*size':            'size',
-> >              '*version':         'BlockdevQcow2Version',
-> >              '*backing-file':    'str',
-> >              '*backing-fmt':     'BlockdevDriver',
->=20
-> Docs comment to say they  are mandatory for creation.
-Done
->=20
->=20
-> Regards,
-> Daniel
+It should be a fused multiply add; you may need to use -ffast-math or
+something to get the compiler to generate the proper instruction.
 
-Best regards,
-	Maxim Levitsky
+However, one can see from target/ppc/translate/fp-impl.inc.c:
 
+/* fmadd - fmadds */
+GEN_FLOAT_ACB(madd, 0x1D, 1, PPC_FLOAT);
+
+through to _GEN_FLOAT_ACB:
+
+    gen_helper_f##op(t3, cpu_env, t0, t1, t2);         \
+    if (isfloat) {                                     \
+        gen_helper_frsp(t3, cpu_env, t3);              \
+    }                                                  \
+
+That right there is a double-precision fma followed by a round
+to single precision.  This pattern is replicated for all single
+precision operations, and is of course wrong.
+
+I believe that correct results may be obtained by having
+single-precision helpers that first convert the double-precision
+input into a single-precision input using helper_tosingle(),
+perform the required operation, then convert the result back to
+double-precision using helper_todouble().
+
+The manual says:
+
+# For single-precision arithmetic instructions, all input values
+# must be representable in single format; if they are not, the
+# result placed into the target FPR, and the setting of
+# status bits in the FPSCR and in the Condition Register
+# (if Rc=3D1), are undefined.
+
+The tosingle/todouble conversions are exact and bit-preserving.
+They are used by load-single and store-single that convert a
+single-precision in-memory value to the double-precision register
+value.  Therefore the input given to float32_add using this
+conversion would be exactly the same as if we had given the
+value unmollested from a memory input.
+
+I don't know what real ppc hw does -- whether it takes all of
+the double-precision input bits and rounds to 23-bits, like the
+old 80387 hardware does, or truncates the input as I propose.
+But for architectural results we don't have to care, because
+of the UNDEFINED escape clause.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1841592
+
+Title:
+  ppc: softfloat float implementation issues
+
+Status in QEMU:
+  New
+
+Bug description:
+  Per bug #1841491, Richard Henderson (rth) said:
+  > The float test failure is part of a larger problem for target/powerpc
+  > in which all float routines are implemented incorrectly. They are all
+  > implemented as double operations with rounding to float as a second
+  > step. Which not only produces incorrect exceptions, as in this case,
+  > but incorrect numerical results from the double rounding.
+  >
+  > This should probably be split to a separate bug...
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1841592/+subscriptions
 
