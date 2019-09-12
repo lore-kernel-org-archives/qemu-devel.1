@@ -2,58 +2,99 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 592F4C49ED9
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:37:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DAE5C5ACAE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:38:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3448C21479
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:37:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3448C21479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 137E520856
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:38:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 137E520856
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8LXr-0005q8-FP
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 05:37:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42678)
+	id 1i8LYT-0006j8-AK
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 05:38:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45076)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i8LEm-0002J3-Kk
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:18:01 -0400
+ (envelope-from <bala24@linux.ibm.com>) id 1i8LRk-0000ES-1D
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:31:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i8LEl-00062Q-6Y
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:18:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41492)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1i8LEi-00060S-U2; Thu, 12 Sep 2019 05:17:57 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4AF163003AFE;
- Thu, 12 Sep 2019 09:17:56 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.59])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 14E1E166A2;
- Thu, 12 Sep 2019 09:17:53 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
+ (envelope-from <bala24@linux.ibm.com>) id 1i8LRi-0006nF-RN
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:31:23 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14414)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <bala24@linux.ibm.com>)
+ id 1i8LRi-0006mt-Kh
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:31:22 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x8C9IJxP032394
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 05:31:21 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2uyk7mrk2f-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 05:31:21 -0400
+Received: from localhost
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <bala24@linux.ibm.com>;
+ Thu, 12 Sep 2019 10:31:19 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 12 Sep 2019 10:31:17 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id x8C9VGw442795430
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 12 Sep 2019 09:31:16 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5074AAE061;
+ Thu, 12 Sep 2019 09:31:16 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id CBE5EAE05A;
+ Thu, 12 Sep 2019 09:31:14 +0000 (GMT)
+Received: from localhost.in.ibm.com (unknown [9.124.35.221])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu, 12 Sep 2019 09:31:14 +0000 (GMT)
+From: Balamuruhan S <bala24@linux.ibm.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 12 Sep 2019 12:17:10 +0300
-Message-Id: <20190912091710.21449-13-mlevitsk@redhat.com>
-In-Reply-To: <20190912091710.21449-1-mlevitsk@redhat.com>
-References: <20190912091710.21449-1-mlevitsk@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 12 Sep 2019 09:17:56 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 12/12] qcrypto-luks: more rigorous header
- checking
+Date: Thu, 12 Sep 2019 15:00:52 +0530
+X-Mailer: git-send-email 2.14.5
+In-Reply-To: <20190912093056.4516-1-bala24@linux.ibm.com>
+References: <20190912093056.4516-1-bala24@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+x-cbid: 19091209-0020-0000-0000-0000036B5C3C
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19091209-0021-0000-0000-000021C0ED0F
+Message-Id: <20190912093056.4516-2-bala24@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-12_04:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1909120099
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0a-001b2d01.pphosted.com id x8C9IJxP032394
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [PATCH v3 1/4] hw/ppc/pnv_xscom: retrieve homer/occ
+ base address from PBA BARs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,96 +106,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: maddy@linux.vnet.ibm.com, groug@kaod.org,
+ Balamuruhan S <bala24@linux.ibm.com>, anju@linux.vnet.ibm.com,
+ qemu-ppc@nongnu.org, clg@kaod.org, hari@linux.vnet.ibm.com,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Check that keyslots don't overlap with the data,
-and check that keyslots don't overlap with each other.
-(this is done using naive O(n^2) nested loops,
-but since there are just 8 keyslots, this doesn't really matter.
+During PowerNV boot skiboot populates the device tree by
+retrieving base address of homer/occ common area from
+PBA BARs and prd ipoll mask by accessing xscom read/write
+accesses.
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
 ---
- crypto/block-luks.c | 52 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+ hw/ppc/pnv_xscom.c   | 34 ++++++++++++++++++++++++++++++----
+ include/hw/ppc/pnv.h | 18 ++++++++++++++++++
+ 2 files changed, 48 insertions(+), 4 deletions(-)
 
-diff --git a/crypto/block-luks.c b/crypto/block-luks.c
-index 0d155c6614..6c53bdc428 100644
---- a/crypto/block-luks.c
-+++ b/crypto/block-luks.c
-@@ -530,6 +530,11 @@ qcrypto_block_luks_load_header(QCryptoBlock *block,
- static int
- qcrypto_block_luks_check_header(const QCryptoBlockLUKS *luks, Error **errp)
+diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+index 67aab98fef..f01d788a65 100644
+--- a/hw/ppc/pnv_xscom.c
++++ b/hw/ppc/pnv_xscom.c
+@@ -36,6 +36,16 @@
+ #define PRD_P9_IPOLL_REG_MASK           0x000F0033
+ #define PRD_P9_IPOLL_REG_STATUS         0x000F0034
+=20
++/* PBA BARs */
++#define P8_PBA_BAR0                     0x2013f00
++#define P8_PBA_BAR2                     0x2013f02
++#define P8_PBA_BARMASK0                 0x2013f04
++#define P8_PBA_BARMASK2                 0x2013f06
++#define P9_PBA_BAR0                     0x5012b00
++#define P9_PBA_BAR2                     0x5012b02
++#define P9_PBA_BARMASK0                 0x5012b04
++#define P9_PBA_BARMASK2                 0x5012b06
++
+ static void xscom_complete(CPUState *cs, uint64_t hmer_bits)
  {
-+    size_t i, j;
+     /*
+@@ -74,6 +84,26 @@ static uint64_t xscom_read_default(PnvChip *chip, uint=
+32_t pcba)
+     case 0x18002:       /* ECID2 */
+         return 0;
+=20
++    case P9_PBA_BAR0:
++        return PNV9_HOMER_BASE(chip);
++    case P8_PBA_BAR0:
++        return PNV_HOMER_BASE(chip);
 +
-+    unsigned int header_sectors = QCRYPTO_BLOCK_LUKS_KEY_SLOT_OFFSET /
-+        QCRYPTO_BLOCK_LUKS_SECTOR_SIZE;
++    case P9_PBA_BARMASK0: /* P9 homer region size */
++        return PNV9_HOMER_SIZE;
++    case P8_PBA_BARMASK0: /* P8 homer region size */
++        return PNV_HOMER_SIZE;
 +
-     if (memcmp(luks->header.magic, qcrypto_block_luks_magic,
-                QCRYPTO_BLOCK_LUKS_MAGIC_LEN) != 0) {
-         error_setg(errp, "Volume is not in LUKS format");
-@@ -541,6 +546,53 @@ qcrypto_block_luks_check_header(const QCryptoBlockLUKS *luks, Error **errp)
-                    luks->header.version);
-         return -1;
-     }
++    case P9_PBA_BAR2: /* P9 occ common area */
++        return PNV9_OCC_COMMON_AREA(chip);
++    case P8_PBA_BAR2: /* P8 occ common area */
++        return PNV_OCC_COMMON_AREA(chip);
 +
-+    /* Check all keyslots for corruption  */
-+    for (i = 0 ; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS ; i++) {
++    case P9_PBA_BARMASK2: /* P9 occ common area size */
++        return PNV9_OCC_COMMON_AREA_SIZE;
++    case P8_PBA_BARMASK2: /* P8 occ common area size */
++        return PNV_OCC_COMMON_AREA_SIZE;
 +
-+        const QCryptoBlockLUKSKeySlot *slot1 = &luks->header.key_slots[i];
-+        unsigned int start1 = slot1->key_offset_sector;
-+        unsigned int len1 =
-+            qcrypto_block_luks_splitkeylen_sectors(luks,
-+                                                   header_sectors,
-+                                                   slot1->stripes);
+     case 0x1010c00:     /* PIBAM FIR */
+     case 0x1010c03:     /* PIBAM FIR MASK */
+=20
+@@ -93,13 +123,9 @@ static uint64_t xscom_read_default(PnvChip *chip, uin=
+t32_t pcba)
+     case 0x2020009:     /* ADU stuff, error register */
+     case 0x202000f:     /* ADU stuff, receive status register*/
+         return 0;
+-    case 0x2013f00:     /* PBA stuff */
+     case 0x2013f01:     /* PBA stuff */
+-    case 0x2013f02:     /* PBA stuff */
+     case 0x2013f03:     /* PBA stuff */
+-    case 0x2013f04:     /* PBA stuff */
+     case 0x2013f05:     /* PBA stuff */
+-    case 0x2013f06:     /* PBA stuff */
+     case 0x2013f07:     /* PBA stuff */
+         return 0;
+     case 0x2013028:     /* CAPP stuff */
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index fb123edc4e..63a4b7b6a7 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -198,6 +198,16 @@ void pnv_bmc_powerdown(IPMIBmc *bmc);
+ #define PNV_XSCOM_BASE(chip)                                            =
+\
+     (0x0003fc0000000000ull + ((uint64_t)(chip)->chip_id) * PNV_XSCOM_SIZ=
+E)
+=20
++#define PNV_OCC_COMMON_AREA_SIZE    0x0000000000700000ull
++#define PNV_OCC_COMMON_AREA(chip)                                       =
+\
++    (0x7fff800000ull + ((uint64_t)PNV_CHIP_INDEX(chip) * \
++                         PNV_OCC_COMMON_AREA_SIZE))
 +
-+        if (slot1->stripes == 0) {
-+            error_setg(errp, "Keyslot %zu is corrupted (stripes == 0)", i);
-+            return -1;
-+        }
++#define PNV_HOMER_SIZE              0x0000000000300000ull
++#define PNV_HOMER_BASE(chip)                                            =
+\
++    (0x7ffd800000ull + ((uint64_t)PNV_CHIP_INDEX(chip)) * PNV_HOMER_SIZE=
+)
 +
-+        if (slot1->active != QCRYPTO_BLOCK_LUKS_KEY_SLOT_DISABLED &&
-+            slot1->active != QCRYPTO_BLOCK_LUKS_KEY_SLOT_ENABLED) {
-+            error_setg(errp,
-+                       "Keyslot %zu state (active/disable) is corrupted", i);
-+            return -1;
-+        }
 +
-+        if (start1 + len1 > luks->header.payload_offset_sector) {
-+            error_setg(errp,
-+                       "Keyslot %zu is overlapping with the encrypted payload",
-+                       i);
-+            return -1;
-+        }
+ /*
+  * XSCOM 0x20109CA defines the ICP BAR:
+  *
+@@ -256,4 +266,12 @@ void pnv_bmc_powerdown(IPMIBmc *bmc);
+ #define PNV9_XSCOM_SIZE              0x0000000400000000ull
+ #define PNV9_XSCOM_BASE(chip)        PNV9_CHIP_BASE(chip, 0x00603fc00000=
+000ull)
+=20
++#define PNV9_OCC_COMMON_AREA_SIZE    0x0000000000700000ull
++#define PNV9_OCC_COMMON_AREA(chip)                                      =
+\
++    (0x203fff800000ull + ((uint64_t)PNV_CHIP_INDEX(chip) * \
++                           PNV9_OCC_COMMON_AREA_SIZE))
 +
-+        for (j = i + 1 ; j < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS ; j++) {
-+            const QCryptoBlockLUKSKeySlot *slot2 = &luks->header.key_slots[j];
-+            unsigned int start2 = slot2->key_offset_sector;
-+            unsigned int len2 =
-+                qcrypto_block_luks_splitkeylen_sectors(luks,
-+                                                       header_sectors,
-+                                                       slot2->stripes);
-+
-+            if (start1 + len1 > start2 && start2 + len2 > start1) {
-+                error_setg(errp,
-+                           "Keyslots %zu and %zu are overlapping in the header",
-+                           i, j);
-+                return -1;
-+            }
-+        }
-+
-+    }
-     return 0;
- }
- 
--- 
-2.17.2
++#define PNV9_HOMER_SIZE              0x0000000000300000ull
++#define PNV9_HOMER_BASE(chip)                                           =
+\
++    (0x203ffd800000ull + ((uint64_t)PNV_CHIP_INDEX(chip)) * PNV9_HOMER_S=
+IZE)
+ #endif /* PPC_PNV_H */
+--=20
+2.14.5
 
 
