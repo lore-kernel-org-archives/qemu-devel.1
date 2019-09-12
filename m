@@ -2,68 +2,83 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C97A0C4CEC7
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:47:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0051AC4CEC5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:55:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A372B206A5
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:47:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A372B206A5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=adacore.com
+	by mail.kernel.org (Postfix) with ESMTPS id C00152081B
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:55:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="IVdAIplK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C00152081B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8QNI-0005r1-B9
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 10:47:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48452)
+	id 1i8QV4-0008TG-UX
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 10:55:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34041)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frederic.konrad@adacore.com>) id 1i8QBh-0006aM-Uk
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 10:35:10 -0400
+ (envelope-from <chihmin.chao@sifive.com>) id 1i8QU9-0007mQ-97
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 10:54:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frederic.konrad@adacore.com>) id 1i8QBg-0006Ju-UM
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 10:35:09 -0400
-Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:36910
- helo=smtp.eu.adacore.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
- id 1i8QBg-0006In-OY; Thu, 12 Sep 2019 10:35:08 -0400
-Received: from localhost (localhost [127.0.0.1])
- by filtered-smtp.eu.adacore.com (Postfix) with ESMTP id 9B98981549;
- Thu, 12 Sep 2019 16:35:06 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at eu.adacore.com
-Received: from smtp.eu.adacore.com ([127.0.0.1])
- by localhost (smtp.eu.adacore.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id meCP6MlRMKxx; Thu, 12 Sep 2019 16:35:06 +0200 (CEST)
-Received: from localhost.localdomain (lfbn-tou-1-447-75.w86-206.abo.wanadoo.fr
- [86.206.4.75])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by smtp.eu.adacore.com (Postfix) with ESMTPSA id 5272E812FD;
- Thu, 12 Sep 2019 16:35:06 +0200 (CEST)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-References: <1568296920-29939-1-git-send-email-frederic.konrad@adacore.com>
- <ca55df80-6461-9650-f2e4-b2136d54adc3@redhat.com>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <0f04b987-28d2-e8d2-6c00-9a939b845cec@adacore.com>
-Date: Thu, 12 Sep 2019 16:35:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <chihmin.chao@sifive.com>) id 1i8QU8-0003iW-0N
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 10:54:13 -0400
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:42703)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <chihmin.chao@sifive.com>)
+ id 1i8QU7-0003hy-ON
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 10:54:11 -0400
+Received: by mail-io1-xd41.google.com with SMTP id n197so55365560iod.9
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 07:54:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=fbRovGJL1ys/q2wukbTOOY8adLV0Az6QtxpHk6uBFbw=;
+ b=IVdAIplK9n52ntU2Pow8IrXJ+90KUT9W2CqqheuLIQaTgdhoRrgManupeYVuc/BOPl
+ 0ByfGEdlymTICgByaC/X+nXAWjMScFRMrFpxoD42iZdwec+PskpX1MlB5AQl1qZb8Clf
+ R/vmDvbA8e8s5+4yP11Yzpwe48Z0/cxiqkPO4yrNwcSSQIVNWuEcJGwiJqbC99BY8ADe
+ U0vLRT01t1+oGhpjpcrYdocLfSBNfgta7kUmmYyhRzaqR1pbOujmr+KQ1qUxuPx/gkTX
+ zumuKntGaskLbuQA/AVJnfwLMeDU21FU0/t4gtDEwwj93W1T4IpMSR1uUsRSl/FXymTq
+ lVHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=fbRovGJL1ys/q2wukbTOOY8adLV0Az6QtxpHk6uBFbw=;
+ b=BMHdInDZzvZ78qDrr1MyoKxlFI2GroYiQB/gVzAQmpqCqAug/4fRcIjRU3JvReXu8i
+ LrKpqmNdr9Npubbn/ossUeYvm6Lr950WjlB3mf0JNIg/t9tSEbC1E44g9mZEO+X4Ilf4
+ hkE2Cqbc36O/NmYPzD54txJ+Fn8Y2tIOamudSfa1EyZEjHf7wSZS14PdsZUs58x26GGh
+ pvpAVx+8yATaNWn8jGaYjwEf1975LNQ2GIg+ymgfRpFGdk27Xj/1t8tcvhtayAk08DWk
+ F6u8V1yV5salLAUMoQnxurPInmfbgvWbUDcxDmQ6FzCR6uKqN9kfvDm2LrJREk/bYjxo
+ Zg9Q==
+X-Gm-Message-State: APjAAAXTmolJl8xTw6/+cDzEcn+b+FAbyQl5FWdu9kTLNbeeyB9ytvcs
+ hgLB8iJTUEgdIXY5PjPZqZCNhSTxeYzQQ683av76fg==
+X-Google-Smtp-Source: APXvYqzFQgPIz3BCK6jmQh9qrkx3/l0CwCP1bBvD8YlgM3FqzMUzishwXi1TivXMAzMVEax/ydmFTmiOnxLuM3EGHEc=
+X-Received: by 2002:a6b:ec16:: with SMTP id c22mr4953253ioh.185.1568300050272; 
+ Thu, 12 Sep 2019 07:54:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <ca55df80-6461-9650-f2e4-b2136d54adc3@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 2a02:2ab8:224:1::a0a:d2
-Subject: Re: [Qemu-devel] [PATCH] target/m68k/fpu_helper.c: rename the
- access arguments
+References: <1568183141-67641-1-git-send-email-zhiwei_liu@c-sky.com>
+ <1568183141-67641-2-git-send-email-zhiwei_liu@c-sky.com>
+ <CAEiOBXUveMJGpavU7_zK0UTdNniQvnXnw5MvE-hu7yHCSw8MPQ@mail.gmail.com>
+ <b9c89438-5346-e2ee-403b-3bc1fa1637bc@linaro.org>
+In-Reply-To: <b9c89438-5346-e2ee-403b-3bc1fa1637bc@linaro.org>
+From: Chih-Min Chao <chihmin.chao@sifive.com>
+Date: Thu, 12 Sep 2019 22:53:59 +0800
+Message-ID: <CAEiOBXXsag8hfHJGcqKLVKcVkndC67iPikcp-01WACoBA4ev3Q@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d41
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v2 01/17] RISC-V: add vfp field in
+ CPURISCVState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,62 +90,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: Palmer Dabbelt <palmer@sifive.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, riku.voipio@iki.fi,
+ laurent@vivier.eu, wxy194768@alibaba-inc.com,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ wenmeng_zhang@c-sky.com, Alistair Francis <Alistair.Francis@wdc.com>,
+ liuzhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, Sep 12, 2019 at 6:39 AM Richard Henderson <
+richard.henderson@linaro.org> wrote:
+
+> On 9/11/19 10:51 AM, Chih-Min Chao wrote:
+> > Could  the VLEN be configurable in cpu initialization but not fixed in
+> > compilation phase ?
+> > Take the integer element as example  and the difference should be the
+> > stride of vfp.vreg[x] isn't continuous
+>
+> Do you really want an unbounded amount of vector register storage?
 
 
-Le 9/12/19 =C3=A0 4:32 PM, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit=C2=A0=
-:
-> On 9/12/19 4:02 PM, KONRAD Frederic wrote:
->> The "access" arguments clash with a macro under Windows with MinGW:
->>    CC      m68k-softmmu/target/m68k/fpu_helper.o
->>    target/m68k/fpu_helper.c: In function 'fmovem_predec':
->>    target/m68k/fpu_helper.c:405:56: error: macro "access" passed 4 arg=
-uments,
->>     but takes just 2
->>                 size =3D access(env, addr, &env->fregs[i], ra);
->>
->> So this renames them access_fn.
->=20
-> access() is not your friend... this reminds me of
->=20
-> commit 05e015f73c3b5c50c237d3d8e555e25cfa543a5c
-> Author: KONRAD Frederic <frederic.konrad@adacore.com>
-> Date:   Thu Sep 21 12:04:20 2017 +0200
->=20
->      memory: avoid a name clash with access macro
->=20
->      This avoids a name clash with the access macro on windows 64:
+ Hi Richard,
 
-True, I didn't catch this one at the time because we didn't build m68k.
+VLEN is implementation-defined parameter and the only limitation on spec is
+that it must be power of 2.
+What I prefer is the value could be adjustable in runtime.
 
->=20
->      make
->              CHK version_gen.h
->        CC      aarch64-softmmu/memory.o
->      /home/konrad/qemu/memory.c: In function 'access_with_adjusted_size=
-':
->      /home/konrad/qemu/memory.c:591:73: error: macro "access" passed 7
-> arguments, \
->                       but takes just 2
->                       (size - access_size - i) * 8, access_mask, attrs)=
-;
->                                                                       ^
->>
->> Tested with:
->>   ./configure --target-list=3Dm68k-softmmu
->>   make -j8
->>
->> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
->=20
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Thanks!
-
-Cheers,
-Fred
+>
 
 
+> >     uint8_t *mem = malloc(size)
+> >     for (int idx = 0; idx < 32; ++idx) {
+> >         vfp.vreg[idx].u64 = (void *)&mem[idx * elem];
+> >         vfp.vreg[idx].u32 = (void *)&mem[idx * elem];
+> >         vfp.vreg[idx].u16 = (void *)&mem[idx * elem];
+> >    }
+>
+> This isn't adjusting the stride of the elements.  And in any case this
+> would
+> have to be re-adjusted for every vsetvl.
+>
+>  Not sure about the relation with vsetvl. Could you provide an example ?
+
+Chih-Min
+
+>
+> r~
+>
