@@ -2,65 +2,73 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8367C47404
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 12:42:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56AB5C47404
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 12:43:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE33220830
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 12:42:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE33220830
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2887320830
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 12:43:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2887320830
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8OQt-0001gF-P6
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 08:42:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51391)
+	id 1i8ORc-0002fa-8C
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 08:43:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54172)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1i8OAG-0002sM-Ga
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 08:25:33 -0400
+ (envelope-from <bounces@canonical.com>) id 1i8OPa-0000Su-NP
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 08:41:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1i8OAF-0007OG-IS
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 08:25:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43508)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1i8OAF-0007O8-D6
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 08:25:31 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BAF0230A7B89
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 12:25:30 +0000 (UTC)
-Received: from localhost (ovpn-112-63.ams2.redhat.com [10.36.112.63])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E8A1560F82;
- Thu, 12 Sep 2019 12:25:26 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 12 Sep 2019 16:25:09 +0400
-Message-Id: <20190912122514.22504-2-marcandre.lureau@redhat.com>
-In-Reply-To: <20190912122514.22504-1-marcandre.lureau@redhat.com>
-References: <20190912122514.22504-1-marcandre.lureau@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1i8OPZ-0000Hl-IM
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 08:41:22 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53088)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1i8OPZ-0000HU-DG
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 08:41:21 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1i8OPW-0003vf-29
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 12:41:18 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 20E442E80D5
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 12:41:16 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Thu, 12 Sep 2019 12:25:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 12 Sep 2019 12:33:36 -0000
+From: James Harvey <jamespharvey20@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h jamespharvey20
+X-Launchpad-Bug-Reporter: James Harvey (jamespharvey20)
+X-Launchpad-Bug-Modifier: James Harvey (jamespharvey20)
+References: <156790812963.29382.11232177290822294099.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156829161658.17155.13393838549448949813.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19044";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 886168515f24ede609277c7e04b15844213c3129
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 1/6] migration: fix vmdesc leak on
- vmstate_save() error
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1843151] Re: Regression: QEMU 4.1.0 qxl and KMS
+ resoluiton only 4x10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -69,57 +77,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, quintela@redhat.com, mprivozn@redhat.com,
- dgilbert@redhat.com,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- pbonzini@redhat.com
+Reply-To: Bug 1843151 <1843151@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- migration/qjson.h  | 2 ++
- migration/savevm.c | 3 +--
- 2 files changed, 3 insertions(+), 2 deletions(-)
+Sorry, my #8 was really long.  All builds I've done were in clean
+chroots, so starting from scratch with just git source, with no
+interference from other builds.  Also later in #8, I show that
+--disable-glusterfs doesn't work because some part of the build looks
+for the .so that was never built.
 
-diff --git a/migration/qjson.h b/migration/qjson.h
-index 41664f2d71..1786bb5864 100644
---- a/migration/qjson.h
-+++ b/migration/qjson.h
-@@ -24,4 +24,6 @@ void json_start_object(QJSON *json, const char *name);
- const char *qjson_get_str(QJSON *json);
- void qjson_finish(QJSON *json);
-=20
-+G_DEFINE_AUTOPTR_CLEANUP_FUNC(QJSON, qjson_destroy)
-+
- #endif /* QEMU_QJSON_H */
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 4a86128ac4..6caa35a679 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1290,7 +1290,7 @@ int qemu_savevm_state_complete_precopy_non_iterable=
-(QEMUFile *f,
-                                                     bool in_postcopy,
-                                                     bool inactivate_disk=
-s)
- {
--    QJSON *vmdesc;
-+    g_autoptr(QJSON) vmdesc =3D NULL;
-     int vmdesc_len;
-     SaveStateEntry *se;
-     int ret;
-@@ -1351,7 +1351,6 @@ int qemu_savevm_state_complete_precopy_non_iterable=
-(QEMUFile *f,
-         qemu_put_be32(f, vmdesc_len);
-         qemu_put_buffer(f, (uint8_t *)qjson_get_str(vmdesc), vmdesc_len)=
-;
-     }
--    qjson_destroy(vmdesc);
-=20
-     return 0;
- }
---=20
-2.23.0
+Luckily, be812c0 was easy enough to just manually revert on top of
+4.1.0.
 
+And, good news.  (I hope!)  4.1.0 with be812c0 manually reverted on top
+of it prevents the bug, even WITHOUT "max_outputs=3D1".
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1843151
+
+Title:
+  Regression: QEMU 4.1.0 qxl and KMS resoluiton only 4x10
+
+Status in QEMU:
+  New
+
+Bug description:
+  Host is Arch Linux.  linux 5.2.13, qemu 4.1.0.  virt-viewer 8.0.
+
+  Guest is Arch Linux Sept 2019 ISO.  linux 5.2.11.
+
+  Have replicated this both on a system using amdgpu and one using
+  integrated ASPEED graphics.
+
+  Downgrading from 4.1.0 to 4.0.0 works as usual, see:
+  https://www.youtube.com/watch?v=3DNyMdcYwOCvY
+
+  Going back to 4.1.0 reproduces, see:
+  https://www.youtube.com/watch?v=3DH3nGG2Mk6i0
+
+  4.1.0 displays fine until KMS kicks in.
+
+  Using 4.1.0 with virtio-vga doesn't cause this.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1843151/+subscriptions
 
