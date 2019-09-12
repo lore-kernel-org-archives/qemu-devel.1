@@ -2,60 +2,96 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 543C6C49ED9
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:27:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDD96C49ED9
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:27:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1738220830
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:27:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1738220830
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id 9BEA520830
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:27:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aj.id.au header.i=@aj.id.au header.b="FldCLZAE";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="opUmCwul"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BEA520830
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aj.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8IZP-0006Lr-OQ
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 02:27:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36988)
+	id 1i8IZS-0006N6-JK
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 02:27:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40971)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1i8IGD-0002NX-37
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:22 -0400
+ (envelope-from <andrew@aj.id.au>) id 1i8IXK-0004sM-PW
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:25:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG8-00087o-2Z
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:16 -0400
-Received: from mail01.asahi-net.or.jp ([202.224.55.13]:60015)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG7-00086v-Kt
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:11 -0400
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
- [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 04F4684F64;
- Thu, 12 Sep 2019 15:07:11 +0900 (JST)
-Received: from yo-satoh-debian.localdomain
- (ae227063.dynamic.ppp.asahi-net.or.jp [14.3.227.63])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id B1A85240085;
- Thu, 12 Sep 2019 15:07:10 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-To: qemu-devel@nongnu.org
-Date: Thu, 12 Sep 2019 15:06:55 +0900
-Message-Id: <20190912060701.4642-17-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190912060701.4642-1-ysato@users.sourceforge.jp>
-References: <20190912060701.4642-1-ysato@users.sourceforge.jp>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+ (envelope-from <andrew@aj.id.au>) id 1i8IXI-0006Is-8N
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:24:58 -0400
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:47683)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrew@aj.id.au>)
+ id 1i8IXA-0006Hl-SS; Thu, 12 Sep 2019 02:24:49 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailout.nyi.internal (Postfix) with ESMTP id 39C31224EC;
+ Thu, 12 Sep 2019 02:24:47 -0400 (EDT)
+Received: from imap2 ([10.202.2.52])
+ by compute4.internal (MEProxy); Thu, 12 Sep 2019 02:24:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aj.id.au; h=
+ mime-version:message-id:in-reply-to:references:date:from:to:cc
+ :subject:content-type:content-transfer-encoding; s=fm3; bh=Ph1EM
+ ADjDASZh3KN9TBm15v9QudwLsxsqj8JH8vxcFQ=; b=FldCLZAEu7Bu+SbbAtymy
+ xjVCaHWMDdJldL3J59cH6bStDNnRxX83XHD98EpjNs/LMLTsFb7SpOr+n4xY8rdu
+ QVvMeJEB0ywswhcoISlJQNu4zTiDOB6nILTWP9aBXfrwLLc3tNAhqtl2e9VfA9hH
+ 7NnU2Q1WlRnkq0LpnvvJKNt69emlLA7mAK9KdiNR4e3CnNuxH2RHb9Qt322ZWLKC
+ oUvtXw0G61GQP4ymeOembvOS2xN1cf1RYyTM6SN1Wvx9CYZ8qqduJ8pDOlchzTnS
+ s7xN7qJNb/MphMakOGvIuECfLLBhQKU/2RIixgU9fTfC21VnSnxf7GTtl65aOD8+
+ A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-transfer-encoding:content-type
+ :date:from:in-reply-to:message-id:mime-version:references
+ :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+ :x-sasl-enc; s=fm3; bh=Ph1EMADjDASZh3KN9TBm15v9QudwLsxsqj8JH8vxc
+ FQ=; b=opUmCwulSMYT3f3NyXj0SYLvKxnYBJu3Ge19sq8Li8JDkvylDHqCop3JW
+ 02Q/hRRro3pnizFl4XC89MmDN7ALwDMXYt49mU070CbRy2hiWtVxE1K1aCUZr80b
+ JhmlizGtQCBvFAoOYXwpbVSNa4gf2VtKEGuBK1bKQcr1OqF65YFyvwQZ+XrCz5KR
+ Sl8u7dzkZ+575offH5TIcIhKan3G51r4rLMPfXeEw3A9E3pNGOnCqMP8h5Ul4PAV
+ u3RBnPZMx+1XoEuLf34KsTSj9QJ9mfm+dG+ViAFeO+VNqY4pTAkJu9XldqMMhT/F
+ ttgeWKewPyA6o1xkdnra0PUXbzyEQ==
+X-ME-Sender: <xms:ruR5XWuVgipF3vjNDSGRKhiYQ_kL-xsKQs7DFCDEXGQsEocCeQOfMg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrtdeggddutdekucetufdoteggodetrfdotf
+ fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+ uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+ cujfgurhepofgfggfkjghffffhvffutgfgsehtqhertderreejnecuhfhrohhmpedftehn
+ ughrvgifucflvghffhgvrhihfdcuoegrnhgurhgvfiesrghjrdhiugdrrghuqeenucffoh
+ hmrghinhepohiilhgrsghsrdhorhhgnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrnhgu
+ rhgvfiesrghjrdhiugdrrghunecuvehluhhsthgvrhfuihiivgeptd
+X-ME-Proxy: <xmx:ruR5XRJPlKkOhBjIoMlehlH9j_4uWDOlrj-UqI2p7HUM3yf3SrPPwg>
+ <xmx:ruR5XS_pIDl2yeEOGtwMYSG6R7EetzRdVwzZmybE5TXyUOg3ailYRQ>
+ <xmx:ruR5XfC8V-Vku5KOSqnaEj9yx5X7jIRA5CGOz62KE-sCgln6SBBuhA>
+ <xmx:r-R5XUm1S5B9Qkz9tVAPqLw5SrPlSkxfF2F1QffQDoV6wzthhVx8tg>
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+ id 900EDE00A9; Thu, 12 Sep 2019 02:24:46 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.1.7-237-gf35468d-fmstable-20190912v1
+Mime-Version: 1.0
+Message-Id: <d0d2531e-7ee7-4e99-bab8-1fa6c6baf6c5@www.fastmail.com>
+In-Reply-To: <a9fdcc8b-3a92-587f-28e8-5a997991532e@kaod.org>
+References: <20190912032531.32546-1-andrew@aj.id.au>
+ <a9fdcc8b-3a92-587f-28e8-5a997991532e@kaod.org>
+Date: Thu, 12 Sep 2019 15:55:19 +0930
+From: "Andrew Jeffery" <andrew@aj.id.au>
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, qemu-arm@nongnu.org
+Content-Type: text/plain;charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 202.224.55.13
-Subject: [Qemu-devel] [PATCH v24 16/22] hw/char: RX62N serial communication
- interface (SCI)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 66.111.4.26
+Subject: Re: [Qemu-devel] [PATCH v4] target-arm: Make the counter tick
+ relative to cntfrq
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,465 +103,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Yoshinori Sato <ysato@users.sourceforge.jp>,
- philmd@redhat.com, richard.henderson@linaro.org, imammedo@redhat.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This module supported only non FIFO type.
-Hardware manual.
-https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033=
-ej0140_rx62n.pdf
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190607091116.49044-8-ysato@users.sourceforge.jp>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/hw/char/renesas_sci.h |  45 +++++
- hw/char/renesas_sci.c         | 343 ++++++++++++++++++++++++++++++++++
- hw/char/Kconfig               |   3 +
- hw/char/Makefile.objs         |   1 +
- 4 files changed, 392 insertions(+)
- create mode 100644 include/hw/char/renesas_sci.h
- create mode 100644 hw/char/renesas_sci.c
 
-diff --git a/include/hw/char/renesas_sci.h b/include/hw/char/renesas_sci.=
-h
-new file mode 100644
-index 0000000000..50d1336944
---- /dev/null
-+++ b/include/hw/char/renesas_sci.h
-@@ -0,0 +1,45 @@
-+/*
-+ * Renesas Serial Communication Interface
-+ *
-+ * Copyright (c) 2018 Yoshinori Sato
-+ *
-+ * This code is licensed under the GPL version 2 or later.
-+ *
-+ */
-+
-+#include "chardev/char-fe.h"
-+#include "qemu/timer.h"
-+#include "hw/sysbus.h"
-+
-+#define TYPE_RENESAS_SCI "renesas-sci"
-+#define RSCI(obj) OBJECT_CHECK(RSCIState, (obj), TYPE_RENESAS_SCI)
-+
-+enum {
-+    ERI =3D 0,
-+    RXI =3D 1,
-+    TXI =3D 2,
-+    TEI =3D 3,
-+    SCI_NR_IRQ =3D 4,
-+};
-+
-+typedef struct {
-+    SysBusDevice parent_obj;
-+    MemoryRegion memory;
-+
-+    uint8_t smr;
-+    uint8_t brr;
-+    uint8_t scr;
-+    uint8_t tdr;
-+    uint8_t ssr;
-+    uint8_t rdr;
-+    uint8_t scmr;
-+    uint8_t semr;
-+
-+    uint8_t read_ssr;
-+    int64_t trtime;
-+    int64_t rx_next;
-+    QEMUTimer *timer;
-+    CharBackend chr;
-+    uint64_t input_freq;
-+    qemu_irq irq[SCI_NR_IRQ];
-+} RSCIState;
-diff --git a/hw/char/renesas_sci.c b/hw/char/renesas_sci.c
-new file mode 100644
-index 0000000000..df63c5292e
---- /dev/null
-+++ b/hw/char/renesas_sci.c
-@@ -0,0 +1,343 @@
-+/*
-+ * Renesas Serial Communication Interface
-+ *
-+ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-+ * (Rev.1.40 R01UH0033EJ0140)
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+#include "qemu-common.h"
-+#include "cpu.h"
-+#include "hw/hw.h"
-+#include "hw/irq.h"
-+#include "hw/sysbus.h"
-+#include "hw/registerfields.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/char/renesas_sci.h"
-+#include "migration/vmstate.h"
-+#include "qemu/error-report.h"
-+
-+/* SCI register map */
-+REG8(SMR, 0)
-+  FIELD(SMR, CKS,  0, 2)
-+  FIELD(SMR, MP,   2, 1)
-+  FIELD(SMR, STOP, 3, 1)
-+  FIELD(SMR, PM,   4, 1)
-+  FIELD(SMR, PE,   5, 1)
-+  FIELD(SMR, CHR,  6, 1)
-+  FIELD(SMR, CM,   7, 1)
-+REG8(BRR, 1)
-+REG8(SCR, 2)
-+  FIELD(SCR, CKE, 0, 2)
-+  FIELD(SCR, TEIE, 2, 1)
-+  FIELD(SCR, MPIE, 3, 1)
-+  FIELD(SCR, RE,   4, 1)
-+  FIELD(SCR, TE,   5, 1)
-+  FIELD(SCR, RIE,  6, 1)
-+  FIELD(SCR, TIE,  7, 1)
-+REG8(TDR, 3)
-+REG8(SSR, 4)
-+  FIELD(SSR, MPBT, 0, 1)
-+  FIELD(SSR, MPB,  1, 1)
-+  FIELD(SSR, TEND, 2, 1)
-+  FIELD(SSR, ERR, 3, 3)
-+    FIELD(SSR, PER,  3, 1)
-+    FIELD(SSR, FER,  4, 1)
-+    FIELD(SSR, ORER, 5, 1)
-+  FIELD(SSR, RDRF, 6, 1)
-+  FIELD(SSR, TDRE, 7, 1)
-+REG8(RDR, 5)
-+REG8(SCMR, 6)
-+  FIELD(SCMR, SMIF, 0, 1)
-+  FIELD(SCMR, SINV, 2, 1)
-+  FIELD(SCMR, SDIR, 3, 1)
-+  FIELD(SCMR, BCP2, 7, 1)
-+REG8(SEMR, 7)
-+  FIELD(SEMR, ACS0, 0, 1)
-+  FIELD(SEMR, ABCS, 4, 1)
-+
-+static int can_receive(void *opaque)
-+{
-+    RSCIState *sci =3D RSCI(opaque);
-+    if (sci->rx_next > qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)) {
-+        return 0;
-+    } else {
-+        return FIELD_EX8(sci->scr, SCR, RE);
-+    }
-+}
-+
-+static void receive(void *opaque, const uint8_t *buf, int size)
-+{
-+    RSCIState *sci =3D RSCI(opaque);
-+    sci->rx_next =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime=
-;
-+    if (FIELD_EX8(sci->ssr, SSR, RDRF) || size > 1) {
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, ORER, 1);
-+        if (FIELD_EX8(sci->scr, SCR, RIE)) {
-+            qemu_set_irq(sci->irq[ERI], 1);
-+        }
-+    } else {
-+        sci->rdr =3D buf[0];
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, RDRF, 1);
-+        if (FIELD_EX8(sci->scr, SCR, RIE)) {
-+            qemu_irq_pulse(sci->irq[RXI]);
-+        }
-+    }
-+}
-+
-+static void send_byte(RSCIState *sci)
-+{
-+    if (qemu_chr_fe_backend_connected(&sci->chr)) {
-+        qemu_chr_fe_write_all(&sci->chr, &sci->tdr, 1);
-+    }
-+    timer_mod(sci->timer,
-+              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime);
-+    sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 0);
-+    sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 1);
-+    qemu_set_irq(sci->irq[TEI], 0);
-+    if (FIELD_EX8(sci->scr, SCR, TIE)) {
-+        qemu_irq_pulse(sci->irq[TXI]);
-+    }
-+}
-+
-+static void txend(void *opaque)
-+{
-+    RSCIState *sci =3D RSCI(opaque);
-+    if (!FIELD_EX8(sci->ssr, SSR, TDRE)) {
-+        send_byte(sci);
-+    } else {
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 1);
-+        if (FIELD_EX8(sci->scr, SCR, TEIE)) {
-+            qemu_set_irq(sci->irq[TEI], 1);
-+        }
-+    }
-+}
-+
-+static void update_trtime(RSCIState *sci)
-+{
-+    /* char per bits */
-+    sci->trtime =3D 8 - FIELD_EX8(sci->smr, SMR, CHR);
-+    sci->trtime +=3D FIELD_EX8(sci->smr, SMR, PE);
-+    sci->trtime +=3D FIELD_EX8(sci->smr, SMR, STOP) + 1;
-+    /* x bit transmit time (32 * divrate * brr) / base freq */
-+    sci->trtime *=3D 32 * sci->brr;
-+    sci->trtime *=3D 1 << (2 * FIELD_EX8(sci->smr, SMR, CKS));
-+    sci->trtime *=3D NANOSECONDS_PER_SECOND;
-+    sci->trtime /=3D sci->input_freq;
-+}
-+
-+#define IS_TR_ENABLED(scr) \
-+    (FIELD_EX8(scr, SCR, TE) || FIELD_EX8(scr, SCR, RE))
-+
-+static void sci_write(void *opaque, hwaddr addr, uint64_t val, unsigned =
-size)
-+{
-+    hwaddr offset =3D addr & 0x07;
-+    RSCIState *sci =3D RSCI(opaque);
-+
-+    switch (offset) {
-+    case A_SMR:
-+        if (!IS_TR_ENABLED(sci->scr)) {
-+            sci->smr =3D val;
-+            update_trtime(sci);
-+        }
-+        break;
-+    case A_BRR:
-+        if (!IS_TR_ENABLED(sci->scr)) {
-+            sci->brr =3D val;
-+            update_trtime(sci);
-+        }
-+        break;
-+    case A_SCR:
-+        sci->scr =3D val;
-+        if (FIELD_EX8(sci->scr, SCR, TE)) {
-+            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 1);
-+            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 1);
-+            if (FIELD_EX8(sci->scr, SCR, TIE)) {
-+                qemu_irq_pulse(sci->irq[TXI]);
-+            }
-+        }
-+        if (!FIELD_EX8(sci->scr, SCR, TEIE)) {
-+            qemu_set_irq(sci->irq[TEI], 0);
-+        }
-+        if (!FIELD_EX8(sci->scr, SCR, RIE)) {
-+            qemu_set_irq(sci->irq[ERI], 0);
-+        }
-+        break;
-+    case A_TDR:
-+        sci->tdr =3D val;
-+        if (FIELD_EX8(sci->ssr, SSR, TEND)) {
-+            send_byte(sci);
-+        } else {
-+            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 0);
-+        }
-+        break;
-+    case A_SSR:
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, MPBT,
-+                             FIELD_EX8(val, SSR, MPBT));
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, ERR,
-+                             FIELD_EX8(val, SSR, ERR) & 0x07);
-+        if (FIELD_EX8(sci->read_ssr, SSR, ERR) &&
-+            FIELD_EX8(sci->ssr, SSR, ERR) =3D=3D 0) {
-+            qemu_set_irq(sci->irq[ERI], 0);
-+        }
-+        break;
-+    case A_RDR:
-+        qemu_log_mask(LOG_GUEST_ERROR, "reneas_sci: RDR is read only.\n"=
-);
-+        break;
-+    case A_SCMR:
-+        sci->scmr =3D val; break;
-+    case A_SEMR: /* SEMR */
-+        sci->semr =3D val; break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
-+                      " not implemented\n", offset);
-+    }
-+}
-+
-+static uint64_t sci_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    hwaddr offset =3D addr & 0x07;
-+    RSCIState *sci =3D RSCI(opaque);
-+
-+    switch (offset) {
-+    case A_SMR:
-+        return sci->smr;
-+    case A_BRR:
-+        return sci->brr;
-+    case A_SCR:
-+        return sci->scr;
-+    case A_TDR:
-+        return sci->tdr;
-+    case A_SSR:
-+        sci->read_ssr =3D sci->ssr;
-+        return sci->ssr;
-+    case A_RDR:
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, RDRF, 0);
-+        return sci->rdr;
-+    case A_SCMR:
-+        return sci->scmr;
-+    case A_SEMR:
-+        return sci->semr;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
-+                      " not implemented.\n", offset);
-+    }
-+    return UINT64_MAX;
-+}
-+
-+static const MemoryRegionOps sci_ops =3D {
-+    .write =3D sci_write,
-+    .read  =3D sci_read,
-+    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .impl =3D {
-+        .max_access_size =3D 1,
-+    },
-+};
-+
-+static void rsci_reset(DeviceState *dev)
-+{
-+    RSCIState *sci =3D RSCI(dev);
-+    sci->smr =3D sci->scr =3D 0x00;
-+    sci->brr =3D 0xff;
-+    sci->tdr =3D 0xff;
-+    sci->rdr =3D 0x00;
-+    sci->ssr =3D 0x84;
-+    sci->scmr =3D 0x00;
-+    sci->semr =3D 0x00;
-+    sci->rx_next =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+}
-+
-+static void sci_event(void *opaque, int event)
-+{
-+    RSCIState *sci =3D RSCI(opaque);
-+    if (event =3D=3D CHR_EVENT_BREAK) {
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, FER, 1);
-+        if (FIELD_EX8(sci->scr, SCR, RIE)) {
-+            qemu_set_irq(sci->irq[ERI], 1);
-+        }
-+    }
-+}
-+
-+static void rsci_realize(DeviceState *dev, Error **errp)
-+{
-+    RSCIState *sci =3D RSCI(dev);
-+
-+    if (sci->input_freq =3D=3D 0) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_sci: input-freq property must be set.");
-+        return;
-+    }
-+    qemu_chr_fe_set_handlers(&sci->chr, can_receive, receive,
-+                             sci_event, NULL, sci, NULL, true);
-+}
-+
-+static void rsci_init(Object *obj)
-+{
-+    SysBusDevice *d =3D SYS_BUS_DEVICE(obj);
-+    RSCIState *sci =3D RSCI(obj);
-+    int i;
-+
-+    memory_region_init_io(&sci->memory, OBJECT(sci), &sci_ops,
-+                          sci, "renesas-sci", 0x8);
-+    sysbus_init_mmio(d, &sci->memory);
-+
-+    for (i =3D 0; i < SCI_NR_IRQ; i++) {
-+        sysbus_init_irq(d, &sci->irq[i]);
-+    }
-+    sci->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, txend, sci);
-+}
-+
-+static const VMStateDescription vmstate_rsci =3D {
-+    .name =3D "renesas-sci",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property rsci_properties[] =3D {
-+    DEFINE_PROP_UINT64("input-freq", RSCIState, input_freq, 0),
-+    DEFINE_PROP_CHR("chardev", RSCIState, chr),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void rsci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->realize =3D rsci_realize;
-+    dc->props =3D rsci_properties;
-+    dc->vmsd =3D &vmstate_rsci;
-+    dc->reset =3D rsci_reset;
-+}
-+
-+static const TypeInfo rsci_info =3D {
-+    .name       =3D TYPE_RENESAS_SCI,
-+    .parent     =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(RSCIState),
-+    .instance_init =3D rsci_init,
-+    .class_init =3D rsci_class_init,
-+};
-+
-+static void rsci_register_types(void)
-+{
-+    type_register_static(&rsci_info);
-+}
-+
-+type_init(rsci_register_types)
-diff --git a/hw/char/Kconfig b/hw/char/Kconfig
-index 40e7a8b8bb..874627520c 100644
---- a/hw/char/Kconfig
-+++ b/hw/char/Kconfig
-@@ -46,3 +46,6 @@ config SCLPCONSOLE
-=20
- config TERMINAL3270
-     bool
-+
-+config RENESAS_SCI
-+    bool
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-index 02d8a66925..4472d563b5 100644
---- a/hw/char/Makefile.objs
-+++ b/hw/char/Makefile.objs
-@@ -21,6 +21,7 @@ obj-$(CONFIG_PSERIES) +=3D spapr_vty.o
- obj-$(CONFIG_DIGIC) +=3D digic-uart.o
- obj-$(CONFIG_STM32F2XX_USART) +=3D stm32f2xx_usart.o
- obj-$(CONFIG_RASPI) +=3D bcm2835_aux.o
-+obj-$(CONFIG_RENESAS_SCI) +=3D renesas_sci.o
-=20
- common-obj-$(CONFIG_CMSDK_APB_UART) +=3D cmsdk-apb-uart.o
- common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_ser.o
---=20
-2.20.1
+On Thu, 12 Sep 2019, at 15:52, C=C3=A9dric Le Goater wrote:
+> On 12/09/2019 05:25, Andrew Jeffery wrote:
+> > Allow machines to configure CNTFRQ via a property if the ARM core
+> > supports the generic timer. This is necessary on e.g. the ASPEED AST=
+2600
+> > SoC where the generic timer clock is run at 800MHz or above. The def=
+ault
+> > value for CNTFRQ remains at 62.50MHz (based on GTIMER_SCALE).
+> >=20
+> > CNTFRQ is a read-as-written co-processor register; the property sets=
+ the
+> > register's initial value which is used during realize() to configure=
+ the
+> > QEMUTimers that back the generic timers. Beyond that the firmware ca=
+n to
+> > do whatever it sees fit with the CNTFRQ register though changes to t=
+he
+> > value will not be reflected in the timers' rate.
+> >=20
+> > I've tested this using an out-of-tree AST2600 SoC model (Cortex-A7) =
+with
+> > the SDK u-boot that sets CNTFRQ as appropriate, and by starting/runn=
+ing
+> > machines with assorted ARM CPUs (palmetto-bmc with the ARM926EJ-S,
+> > romulus-bmc with the ARM1176 and raspi2 with the Cortex-A53).
+> >=20
+> > Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+> > ---
+> > v4: Fix configuration for cores without a generic timer
+> >=20
+> > v3: https://patchwork.ozlabs.org/patch/1160634/
+> > Peter - I think this addresses most of your feedback. I still reach =
+into
+> > the QEMUTimer to fetch out scale when adjusting the nexttick
+> > calculation, but we no longer need to update the scale member and fo=
+rce
+> > a recalculation of the period.
+> >=20
+> > v2: https://patchwork.ozlabs.org/patch/1144389/
+> > ---
+> >  roms/SLOF           |  2 +-
+> >  roms/skiboot        |  2 +-
+> >  target/arm/cpu.c    | 43 +++++++++++++++++++++++++++++++++++-------=
+-
+> >  target/arm/cpu.h    |  3 +++
+> >  target/arm/helper.c | 30 ++++++++++++++++++++++++++----
+> >  5 files changed, 66 insertions(+), 14 deletions(-)
+> >=20
+> > diff --git a/roms/SLOF b/roms/SLOF
+> > index 7bfe584e3219..ea221600a116 160000
+> > --- a/roms/SLOF
+> > +++ b/roms/SLOF
+> > @@ -1 +1 @@
+> > -Subproject commit 7bfe584e321946771692711ff83ad2b5850daca7
+> > +Subproject commit ea221600a116883137ef90b2b7ab7d2472bc4f10
+> > diff --git a/roms/skiboot b/roms/skiboot
+> > index 261ca8e779e5..3a6fdede6ce1 160000
+> > --- a/roms/skiboot
+> > +++ b/roms/skiboot
+> > @@ -1 +1 @@
+> > -Subproject commit 261ca8e779e5138869a45f174caa49be6a274501
+> > +Subproject commit 3a6fdede6ce117facec0108afe716cf5d0472c3f
+>=20
+>=20
+> The changes above seem not related.
 
+How did they get in there? :eyeroll:
+
+Thanks. v5 I guess.
+
+Andrew
 
