@@ -2,96 +2,73 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68BB2C4CEC6
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 17:14:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9516AC4CEC6
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 17:22:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 352A5206A5
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 17:14:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gd7rELAL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 352A5206A5
+	by mail.kernel.org (Postfix) with ESMTPS id 6C54C2067D
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 17:22:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C54C2067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8Sfb-0000Q9-DJ
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 13:14:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40757)
+	id 1i8SnP-0003cF-Ap
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 13:22:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43353)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i8Ses-0008Pq-Un
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:13:27 -0400
+ (envelope-from <bounces@canonical.com>) id 1i8SmX-00039O-L7
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:21:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i8Ses-0007gH-0z
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:13:26 -0400
-Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:38409)
+ (envelope-from <bounces@canonical.com>) id 1i8SmW-0002xU-ED
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:21:21 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56228)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i8Ser-0007fu-Rg
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:13:25 -0400
-Received: by mail-qt1-x844.google.com with SMTP id j31so3644144qta.5
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 10:13:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=afTPPA49IbNVhaNyhjkOUPFoYHKl9mFW6We7h9oEz4E=;
- b=gd7rELALpC4YwCf2x5n/iNFU9MjS7oqqtWOxm5zKahJD8vJixIQief1a6/+HXJ7mYx
- GMyAo0Om6q3P9EkQdLYealxImxS4YimQu9cb7z1kiKz8ERLTEUs5ahTht6l5dsMYdmc7
- oviZtKT6opLWL+BzNrzAlKrBWjE1X9JHGNKZHEUFNmBUrp/IyIYg3WBeykintJoS2bLU
- me84hMBvo5t4JGh87rBM5k4t9Gums3OTlNiKeHuswfjvcdCxlx5EEvU+HUtltry+qej4
- a9FZSOmvVspKKOdMDTfnx9HXlW4ji7gWSJhZlh+5iQxwQUa04EHXBtEIntyGAfXX6dzP
- yD3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=afTPPA49IbNVhaNyhjkOUPFoYHKl9mFW6We7h9oEz4E=;
- b=f6zFNSFG9RJhkZ3zLyaxWHc9z1Cqep3btXG1v3LbY4OEYTC2UrbVd9QscWiwceQ4e3
- oLw2ulw6D/+dWlIQoEVJzNjLvCdZH0yaJShdi8dOWlroAOJwTefNM0EW+227yVFwH3ug
- Vv90H6p3aCTVkn3svE5d1LVWYbAOcD0zKppYxj+zKtKf8mJG5d6IsifvY+2qpIqZEKmC
- IAYbn9qMrJ8vxVD8BsIoDjqvRCbrS8UYogGp6xplknS5osQHOVMNu7cEdr7uzHTrbuPF
- 0ojYcszGO+4hdtRhhpyfXlHJhHy4S+KsTQ7xnO9fYf017mXInWqh3C1akzYauaJ+dY/R
- RaKg==
-X-Gm-Message-State: APjAAAVha/NScjqSirtgZc/l9hK+GD1skPAH1eD+eUBVyn6LJj54pG1B
- x8oaMepisb8gw4ICNWa0kTVkIg==
-X-Google-Smtp-Source: APXvYqx1Kx3bhuxBy8Tkpd2YMbVt2M4PL1ee+6I4nnJyNiKwObFmW9j0SulAa9zPOYVjcLTLe6kOqw==
-X-Received: by 2002:a0c:e747:: with SMTP id g7mr836808qvn.244.1568308404859;
- Thu, 12 Sep 2019 10:13:24 -0700 (PDT)
-Received: from [172.20.5.51] ([67.69.50.154])
- by smtp.gmail.com with ESMTPSA id x12sm10647694qtb.32.2019.09.12.10.13.23
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Sep 2019 10:13:24 -0700 (PDT)
-To: liuzhiwei <zhiwei_liu@c-sky.com>, Alistair.Francis@wdc.com,
- palmer@sifive.com, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de,
- riku.voipio@iki.fi, laurent@vivier.eu, wenmeng_zhang@c-sky.com
-References: <1568183141-67641-1-git-send-email-zhiwei_liu@c-sky.com>
- <1568183141-67641-18-git-send-email-zhiwei_liu@c-sky.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <6ca3fc92-080a-9f9f-8ba5-d292d61dac75@linaro.org>
-Date: Thu, 12 Sep 2019 13:13:21 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1i8SmW-0002wt-8m
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:21:20 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1i8SmT-0000z1-UP
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 17:21:18 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id E50852E80CC
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 17:21:17 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1568183141-67641-18-git-send-email-zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::844
-Subject: Re: [Qemu-devel] [PATCH v2 17/17] RISC-V: add vector extension
- premutation instructions
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 12 Sep 2019 17:11:03 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: ppc64 testcase
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: 7-pc
+X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <156691209320.18814.746226319480624520.malonedeb@soybean.canonical.com>
+Message-Id: <156830826380.29187.17665026919636773073.launchpad@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19044";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 56015c39b417666c5c2dca62de1c22dbec5b283f
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1841592] Re: ppc: softfloat float implementation
+ issues
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -100,28 +77,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
+Reply-To: Bug 1841592 <1841592@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/11/19 2:25 AM, liuzhiwei wrote:
-> +/* vfmv.f.s rd, vs2 # rd = vs2[0] (rs1=0)  */
-> +void VECTOR_HELPER(vfmv_f_s)(CPURISCVState *env, uint32_t rs1, uint32_t rs2,
-> +    uint32_t rd)
-...
-> +/* vmv.s.x vd, rs1 # vd[0] = rs1 */
-> +void VECTOR_HELPER(vmv_s_x)(CPURISCVState *env, uint32_t rs1, uint32_t rs2,
-> +    uint32_t rd)
-...
-> +/* vfmv.s.f vd, rs1 #  vd[0] = rs1 (vs2 = 0)  */
-> +void VECTOR_HELPER(vfmv_s_f)(CPURISCVState *env, uint32_t rs1,
-> +    uint32_t rs2, uint32_t rd)
+** Tags added: ppc64 testcase
 
-I'll note that, with the vector parameters known to the translator, as I have
-advocated, these operations are trivially expanded inline as one or two tcg
-operations.
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1841592
 
-r~
+Title:
+  ppc: softfloat float implementation issues
+
+Status in QEMU:
+  New
+
+Bug description:
+  Per bug #1841491, Richard Henderson (rth) said:
+  > The float test failure is part of a larger problem for target/powerpc
+  > in which all float routines are implemented incorrectly. They are all
+  > implemented as double operations with rounding to float as a second
+  > step. Which not only produces incorrect exceptions, as in this case,
+  > but incorrect numerical results from the double rounding.
+  >
+  > This should probably be split to a separate bug...
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1841592/+subscriptions
 
