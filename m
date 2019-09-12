@@ -2,90 +2,91 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BD01C4CECB
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:14:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C71CEC4CECB
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:15:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07327208C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:14:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8BF14208C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:15:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WCEiFMef"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07327208C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sLGW+O+P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BF14208C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8N3A-0001Ir-78
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 07:14:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35546)
+	id 1i8N4U-0002Y8-N4
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 07:15:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35574)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1i8N1w-0000KW-M2
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:12:53 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i8N2C-0000fY-5l
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:13:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1i8N1v-0006mX-PU
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:12:52 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:36767)
+ (envelope-from <alex.bennee@linaro.org>) id 1i8N2A-0006te-VI
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:13:08 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46900)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1i8N1v-0006lf-JK
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:12:51 -0400
-Received: by mail-wr1-x431.google.com with SMTP id y19so27991216wrd.3
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 04:12:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=n8T04u79jUZe66wVUcNWnxBT9Dm4wvJmfZ2mZSFVOl8=;
- b=WCEiFMefSOqIqgjIRLiAUsMJdKLdBjQBwxHYWdjrR530Gkr7zk7GzMkdbv5fog6r8l
- oWdJ6k67hxm+8xnt7OhRgz/WXn7Ly2ysQsOuIDCmGq/W+6Q83WiAYCKNvQRNyjciWwqP
- CpHBQZ9B/nHcji56XCynammpoFU9WrY9+3GENUtrqakdzz6gfKqK29RszEICXNByOYVM
- Ach+CFmxICeV7kf0XsGFErUV2/eZLDgB0lkaSW3auV+xi4rPNZzXPVe4FC6pMJVHgux1
- WsFcK9EHes77HtFn38p+SlF32LEGKtSDU+CE4uw0SUtXSacKUnGwxFAMJ4cf5jNOXKv4
- 94ow==
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i8N2A-0006tK-O8
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:13:06 -0400
+Received: by mail-wr1-x441.google.com with SMTP id d17so15210429wrq.13
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 04:13:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=kvB9JmDJfz0uX5RhQq1pw00isBpwiDvTZQHcqdRPnoI=;
+ b=sLGW+O+PfJSukmNV2HJ8EgtsjKiHF1jOf/veWPMDk/Zc0TXtv068H5QGqL4ZZWjyPQ
+ NPQGDVYpZR5epSAZnimcdMaFs++QSIZk+gHSpJrMuwL2MSLKaokRts+3rdWuS7Pf0p/r
+ 1fjqNN3SIl3aQOZoALOzX+O+hYSCcRtdOWXElb0SL7HUZZXhlRZOUkCEkTsdSz/UW9dJ
+ NwomdoeoBjyjF1nLXA53kuLd5G4h7GNRtS1KtyRnMx/x3YOv9YSKMyLluKNJxsWb6E96
+ NsEyq7mAOUIr3f6OiYyfyZmd/mgEGvZpvP3AglK9xOdgtc1voqvwi+di81Vhr4C53Fwo
+ lZYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=n8T04u79jUZe66wVUcNWnxBT9Dm4wvJmfZ2mZSFVOl8=;
- b=ABUyVJYsxKaE0V4/p5CKO150jTslN2nSl4lq98dzqi869LdBXPw+6g8Yx8NuO38XpE
- Y1wFVp+yJBsNaRFG4HZVMPja+dVIKlH0AQFvwH763TI86KXLaJiLRRM2f/knKWOlCJuZ
- IrAIeGG5ToD1UGImlCQRSg1pFhNyQoPL2Ua/ZlfZMC3s+BKyqwJ1AW1l2HEKv1VeTcl/
- WINdsZyWBJi/4ZdXBWW4OkSM9UJH5z3Hdq/QEya85FrDxuca1D5UDdrApVBxKLCoaEbu
- j/bruKKmCdguQS67xs3n1V7RkPwdvaxHaBOLwaiBA5mj+Psg+6584jcLnxYHq7YtRUmS
- xQ/A==
-X-Gm-Message-State: APjAAAU3th/bAwOgIJl9iZRzqgRaWq0c8DPhzo7uWDrdvzH2Uvlzr4TO
- JNdE03zraUP8x4Hi5cwYu3k=
-X-Google-Smtp-Source: APXvYqzDIda8OqsqahqedAfmTBOwFTAMKoMGLtQb609znzpoBqQmlhiQOrQQtNygGus7J+U0nu/tTA==
-X-Received: by 2002:a5d:6506:: with SMTP id x6mr14747361wru.22.1568286770257; 
- Thu, 12 Sep 2019 04:12:50 -0700 (PDT)
-Received: from localhost (178.165.130.7.wireless.dyn.drei.com. [178.165.130.7])
- by smtp.gmail.com with ESMTPSA id f197sm5983892wme.22.2019.09.12.04.12.49
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=kvB9JmDJfz0uX5RhQq1pw00isBpwiDvTZQHcqdRPnoI=;
+ b=AmTXgmQvKo+LOwsKuoUa1cZtfxwcs2/TWshaAd7KhhrJ7JQ7ASt6QYmeBPdRJdJdYY
+ v96qwaWeLyCv8G8rw1LQdMMC4ylG+/MGqyLKggzaP5PgyIIAjSePUFfXVMER8taaKsnN
+ 003ZIOJPj7LDH3rAakYEiEBRVw4A7rHCTL52+NaChOq3Fc6P2qwg7KXmDgDmneNHXXnh
+ j36rdqcahIQ4NtHm0dPfZUqdmm+kue6OIsnc84GGhwBmv53hergRMAxKCCUUnkRywKro
+ Yaw2Rt8to5Vwgb8MKcmt4srGct5v+hLDXIpnRKCb033b9XdrxoBbjWHj2TQ7XR6L0KJ4
+ T2tA==
+X-Gm-Message-State: APjAAAV46zNtDCSOlLTrs7n0uh3FXqNqvOH+SsRIMkXO+SXo2Bvms82q
+ 8R7jWj0MEwACn18y7OtWhahuJPT3334=
+X-Google-Smtp-Source: APXvYqzdoLiRI9OXtdRLj7lMeXyMDf1DYGsj5DjN/ceA7oBLYF+hHiUdtwyLKs0kl6N3t8Q2a1Wj7A==
+X-Received: by 2002:adf:e548:: with SMTP id z8mr34290861wrm.324.1568286785547; 
+ Thu, 12 Sep 2019 04:13:05 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id q192sm8122126wme.23.2019.09.12.04.13.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Sep 2019 04:12:49 -0700 (PDT)
-Date: Thu, 12 Sep 2019 13:12:48 +0200
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <20190912111248.GD23174@stefanha-x1.localdomain>
-References: <20190827095437.18819-1-stefanha@redhat.com>
- <20190827095437.18819-3-stefanha@redhat.com>
- <20190903172644.GS2744@work-vm>
- <20190904155121.GA25679@stefanha-x1.localdomain>
+ Thu, 12 Sep 2019 04:13:04 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 431171FF87;
+ Thu, 12 Sep 2019 12:13:04 +0100 (BST)
+References: <20190910144428.32597-1-peter.maydell@linaro.org>
+ <20190910144428.32597-6-peter.maydell@linaro.org>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-arm@nongnu.org
+In-reply-to: <20190910144428.32597-6-peter.maydell@linaro.org>
+Date: Thu, 12 Sep 2019 12:13:04 +0100
+Message-ID: <87muf9zs1r.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="kvUQC+jR9YzypDnK"
-Content-Disposition: inline
-In-Reply-To: <20190904155121.GA25679@stefanha-x1.localdomain>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::431
-Subject: Re: [Qemu-devel] [PATCH 2/4] virtiofsd: add --print-capabilities
- option
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 05/13] target/arm/arm-semi:
+ Factor out implementation of SYS_CLOSE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,56 +98,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---kvUQC+jR9YzypDnK
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-On Wed, Sep 04, 2019 at 04:51:21PM +0100, Stefan Hajnoczi wrote:
-> On Tue, Sep 03, 2019 at 06:26:44PM +0100, Dr. David Alan Gilbert wrote:
-> > * Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> > > Add the --print-capabilities option as per vhost-user.rst "Backend
-> > > programs conventions".  Currently there are no advertised features.
-> > >=20
-> > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> >=20
-> > That looks OK to me, but can someone who understands the json
-> > requirement explain what says whether a 'features' entry is optional?
->=20
-> I have defined a VHostUserBackendType ('fs') but no
-> VHostUserBackendCapabilities union field.
->=20
-> I guess this is allowed since many other VIRTIO device types are also
-> defined without a VHostUserBackendCapabilities union field (only 'gpu'
-> and 'input' have one).
+> Currently for the semihosting calls which take a file descriptor
+> (SYS_CLOSE, SYS_WRITE, SYS_READ, SYS_ISTTY, SYS_SEEK, SYS_FLEN)
+> we have effectively two implementations, one for real host files
+> and one for when we indirect via the gdbstub. We want to add a
+> third one to deal with the magic :semihosting-features file.
+>
+> Instead of having a three-way if statement in each of these
+> cases, factor out the implementation of the calls to separate
+> functions which we dispatch to via function pointers selected
+> via the GuestFDType for the guest fd.
+>
+> In this commit, we set up the framework for the dispatch,
+> and convert the SYS_CLOSE call to use it.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Hi Marc-Andr=E9,
-Please review when you have time.  You are the vhost-user.json expert
-:).
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Stefan
+> ---
+>  target/arm/arm-semi.c | 42 +++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 35 insertions(+), 7 deletions(-)
+>
+> diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
+> index ce3ba554bef..f3e0bf77cd3 100644
+> --- a/target/arm/arm-semi.c
+> +++ b/target/arm/arm-semi.c
+> @@ -116,6 +116,7 @@ static int open_modeflags[12] =3D {
+>  typedef enum GuestFDType {
+>      GuestFDUnused =3D 0,
+>      GuestFDHost =3D 1,
+> +    GuestFDGDB =3D 2,
+>  } GuestFDType;
+>
+>  /*
+> @@ -179,14 +180,14 @@ static GuestFD *do_get_guestfd(int guestfd)
+>  /*
+>   * Associate the specified guest fd (which must have been
+>   * allocated via alloc_fd() and not previously used) with
+> - * the specified host fd.
+> + * the specified host/gdb fd.
+>   */
+>  static void associate_guestfd(int guestfd, int hostfd)
+>  {
+>      GuestFD *gf =3D do_get_guestfd(guestfd);
+>
+>      assert(gf);
+> -    gf->type =3D GuestFDHost;
+> +    gf->type =3D use_gdb_syscalls() ? GuestFDGDB : GuestFDHost;
+>      gf->hostfd =3D hostfd;
+>  }
+>
+> @@ -337,6 +338,37 @@ static target_ulong arm_gdb_syscall(ARMCPU *cpu, gdb=
+_syscall_complete_cb cb,
+>      return is_a64(env) ? env->xregs[0] : env->regs[0];
+>  }
+>
+> +/*
+> + * Types for functions implementing various semihosting calls
+> + * for specific types of guest file descriptor. These must all
+> + * do the work and return the required return value for the guest,
+> + * setting the guest errno if appropriate.
+> + */
+> +typedef uint32_t sys_closefn(TaskState *ts, ARMCPU *cpu, GuestFD *gf);
+> +
+> +static uint32_t host_closefn(TaskState *ts, ARMCPU *cpu, GuestFD *gf)
+> +{
+> +    return set_swi_errno(ts, close(gf->hostfd));
+> +}
+> +
+> +static uint32_t gdb_closefn(TaskState *ts, ARMCPU *cpu, GuestFD *gf)
+> +{
+> +    return arm_gdb_syscall(cpu, arm_semi_cb, "close,%x", gf->hostfd);
+> +}
+> +
+> +typedef struct GuestFDFunctions {
+> +    sys_closefn *closefn;
+> +} GuestFDFunctions;
+> +
+> +static const GuestFDFunctions guestfd_fns[] =3D {
+> +    [GuestFDHost] =3D {
+> +        .closefn =3D host_closefn,
+> +    },
+> +    [GuestFDGDB] =3D {
+> +        .closefn =3D gdb_closefn,
+> +    },
+> +};
+> +
+>  /* Read the input value from the argument block; fail the semihosting
+>   * call if the memory read fails.
+>   */
+> @@ -452,11 +484,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>              return set_swi_errno(ts, -1);
+>          }
+>
+> -        if (use_gdb_syscalls()) {
+> -            ret =3D arm_gdb_syscall(cpu, arm_semi_cb, "close,%x", gf->ho=
+stfd);
+> -        } else {
+> -            ret =3D set_swi_errno(ts, close(gf->hostfd));
+> -        }
+> +        ret =3D guestfd_fns[gf->type].closefn(ts, cpu, gf);
+>          dealloc_guestfd(arg0);
+>          return ret;
+>      case TARGET_SYS_WRITEC:
 
---kvUQC+jR9YzypDnK
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl16KDAACgkQnKSrs4Gr
-c8jVhAf+MnO0wa7JSgNN6e8L1Wnq3QL2u2G62Gt2zZMb16kzKZV6CW02oWq0kOMi
-n6TGUTlfXCegSd1Dx9ghh3iYEnO/AGoFoKf3s1S8fGUWlgHzVw8ZAiT0Kc615rL4
-vIHK555a5mXYSxImutFE+ehozw9fOfyDoC4wtGF9azDJph2wH964aIgMYffICY28
-LVLiQl5tEwn8W4rMZF3D45GQMbml+DSCoW+Dwbawn/61GgPsblT15TdP8eTz8g2E
-hOlxtu8Q/swHEOLTkVbf9m1zPGwrzKf3iAx/RKA5YysTzPVZYLO2r+1z5J8yVBsn
-fXWlUvLJC6aqKYG7NNhZnIAxNf/UFg==
-=G8wK
------END PGP SIGNATURE-----
-
---kvUQC+jR9YzypDnK--
+--
+Alex Benn=C3=A9e
 
