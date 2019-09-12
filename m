@@ -2,63 +2,58 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CB6EC4CEC6
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 20:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0204C4CEC7
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 21:10:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E46B12081B
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 20:38:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E46B12081B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sipsolutions.net
+	by mail.kernel.org (Postfix) with ESMTPS id B5ADB20830
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 21:10:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5ADB20830
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8VrP-0004jq-UB
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 16:38:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51834)
+	id 1i8WMF-0002kF-PD
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 17:10:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56903)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <johannes@sipsolutions.net>) id 1i8VqR-0004I0-Cj
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 16:37:39 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1i8WLQ-0002IT-4u
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 17:09:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <johannes@sipsolutions.net>) id 1i8VqQ-0000ke-AV
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 16:37:35 -0400
-Received: from s3.sipsolutions.net ([2a01:4f8:191:4433::2]:42272
- helo=sipsolutions.net)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <johannes@sipsolutions.net>)
- id 1i8VqP-0000i6-HX
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 16:37:33 -0400
-Received: by sipsolutions.net with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <johannes@sipsolutions.net>)
- id 1i8VqJ-0000Mt-TZ; Thu, 12 Sep 2019 22:37:28 +0200
-Message-ID: <b7ddb3f2f546b5f25b1e90c917306b11d5245608.camel@sipsolutions.net>
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 12 Sep 2019 22:37:26 +0200
-In-Reply-To: <20190912122253.GH23174@stefanha-x1.localdomain>
- (sfid-20190912_142301_873866_C4E851C8)
-References: <20190902121233.13382-1-johannes@sipsolutions.net>
- <20190902121233.13382-2-johannes@sipsolutions.net>
- <CAJSP0QXhOQg98FyLzcTnruG7B=b+uUqEd5HvevRKmuP3HhCSmw@mail.gmail.com>
- <45d6dc06b9973aa231f1076a0de279fd5292d2d3.camel@sipsolutions.net>
- <20190912122253.GH23174@stefanha-x1.localdomain>
- (sfid-20190912_142301_873866_C4E851C8)
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
+ (envelope-from <balaton@eik.bme.hu>) id 1i8WLO-00089R-KJ
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 17:09:35 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:33958)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1i8WLO-00087Z-Ed
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 17:09:34 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id B1A0474AB63;
+ Thu, 12 Sep 2019 23:09:22 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 78F15749EDE; Thu, 12 Sep 2019 23:09:22 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 705F67456CA;
+ Thu, 12 Sep 2019 23:09:22 +0200 (CEST)
+Date: Thu, 12 Sep 2019 23:09:22 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Gerd Hoffmann <kraxel@redhat.com>
+In-Reply-To: <20190912121835.18362-3-kraxel@redhat.com>
+Message-ID: <alpine.BSF.2.21.9999.1909122307380.70054@zero.eik.bme.hu>
+References: <20190912121835.18362-1-kraxel@redhat.com>
+ <20190912121835.18362-3-kraxel@redhat.com>
+User-Agent: Alpine 2.21.9999 (BSF 287 2018-06-16)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a01:4f8:191:4433::2
-Subject: Re: [Qemu-devel] [RFC] docs: vhost-user: add in-band kick/call
- messages
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
+Subject: Re: [Qemu-devel] [PATCH 2/2] ati: use vga_read_byte in
+ ati_cursor_define
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,50 +65,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, flier_m@outlook.com,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2019-09-12 at 14:22 +0200, Stefan Hajnoczi wrote:
-> 
-> The vhost-user spec is unclear and inconsistent.  Patches are welcome.
+On Thu, 12 Sep 2019, Gerd Hoffmann wrote:
+> This makes sure reads are confined to vga video memory.
+>
+> Reported-by: xu hang <flier_m@outlook.com>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+> hw/display/ati.c | 11 ++++++-----
+> 1 file changed, 6 insertions(+), 5 deletions(-)
+>
+> diff --git a/hw/display/ati.c b/hw/display/ati.c
+> index 8f940eee221a..6d77c40b8287 100644
+> --- a/hw/display/ati.c
+> +++ b/hw/display/ati.c
+> @@ -19,6 +19,7 @@
+> #include "qemu/osdep.h"
+> #include "ati_int.h"
+> #include "ati_regs.h"
+> +#include "vga-access.h"
+> #include "hw/qdev-properties.h"
+> #include "vga_regs.h"
+> #include "qemu/log.h"
+> @@ -135,19 +136,19 @@ static void ati_vga_switch_mode(ATIVGAState *s)
+> static void ati_cursor_define(ATIVGAState *s)
+> {
+>     uint8_t data[1024];
+> -    uint8_t *src;
+> +    unsigned srcoff;
+>     int i, j, idx = 0;
+>
+>     if ((s->regs.cur_offset & BIT(31)) || s->cursor_guest_mode) {
+>         return; /* Do not update cursor if locked or rendered by guest */
+>     }
+>     /* FIXME handle cur_hv_offs correctly */
+> -    src = s->vga.vram_ptr + s->regs.cur_offset -
+> -          (s->regs.cur_hv_offs >> 16) - (s->regs.cur_hv_offs & 0xffff) * 16;
+> +    srcoff = s->regs.cur_offset -
+> +        (s->regs.cur_hv_offs >> 16) - (s->regs.cur_hv_offs & 0xffff) * 16;
 
-:)
+Do we need similar fix in ati_cursor_draw_line() as well which also 
+accesses cursor data when guest_hwcursor property is true?
 
-> A footnote describing the old terminology would be necessary so that
-> existing documentation, code, etc can still be decyphered when the spec
-> changes the terminology :).
+Regards,
+BALATON Zoltan
 
-Yeah.
-
-But we (you) would have to decide first what the terminology actually
-*should* be :-)
-
-I'd have said something like "host" and "device", but then "host" can
-get confusing in the context of qemu, is it the host that the VM is
-running on? It's the VM that's hosting the device, but that's a bit confusing in this context.
-
-Client/server might work, but it's not very obvious either (**), and
-quite a bit of the text actually gets it wrong right now, so it'd be
-very confusing to swap that and have a footnote or similar indicate that
-it was described the other way around previously ...
-
-Calling it master/slave as the text does now is a bit confusing to me
-because it has DMA (of sorts) and that's called "bus mastering" in most
-other contexts, but perhaps that's what would work best nonetheless,
-though I'm not really a fan of that terminology.
-
-Perhaps master/device would be nicer, getting the term "device" in there
-somewhere would seem appropriate, even if it's not really actually a
-device, but from the view inside the "master" VM it is a device...
-
-
-(**) Btw, is it really true that there's a way to have the device make
-the connection to a listening unix domain socket, as implied by the
-spec? I cannot find evidence for such a mode in any code...
-
-johannes
-
+>     for (i = 0; i < 64; i++) {
+>         for (j = 0; j < 8; j++, idx++) {
+> -            data[idx] = src[i * 16 + j];
+> -            data[512 + idx] = src[i * 16 + j + 8];
+> +            data[idx] = vga_read_byte(&s->vga, srcoff + i * 16 + j);
+> +            data[512 + idx] = vga_read_byte(&s->vga, srcoff + i * 16 + j + 8);
+>         }
+>     }
+>     if (!s->cursor) {
+>
 
