@@ -6,67 +6,66 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C52A2C4CEC6
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 18:43:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 983A7C4CEC7
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 18:43:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99D3E2084F
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 18:43:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99D3E2084F
+	by mail.kernel.org (Postfix) with ESMTPS id 711832084F
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 18:43:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 711832084F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8U3r-0007Ak-KZ
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 14:43:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59124)
+	id 1i8U44-0007QU-Ij
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 14:43:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59134)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i8U1b-0005aO-Qe
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 14:41:00 -0400
+ (envelope-from <bounces@canonical.com>) id 1i8U1c-0005bl-V3
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 14:41:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i8U1a-0003Ou-JW
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 14:40:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37010)
+ (envelope-from <bounces@canonical.com>) id 1i8U1b-0003PB-LK
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 14:41:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37108)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i8U1a-0003Oj-EO
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 14:40:58 -0400
+ id 1i8U1b-0003Oy-G7
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 14:40:59 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i8U1Y-00059w-46
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 18:40:56 +0000
+ id 1i8U1a-00059t-DJ
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 18:40:58 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0D8792E80CC
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 18:40:56 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 62FDE2E8060
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 18:40:58 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Sep 2019 18:32:22 -0000
+Date: Thu, 12 Sep 2019 18:32:41 -0000
 From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: fpu ppc testcase
+X-Launchpad-Bug-Tags: fpu m68k
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 7-pc
-X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
+X-Launchpad-Bug-Commenters: pierre-freepascal
+X-Launchpad-Bug-Reporter: Pierre Muller (pierre-freepascal)
 X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <156830716414.515.16944012251535902875.malonedeb@wampee.canonical.com>
-Message-Id: <156831314322.17231.11777012720914361981.launchpad@gac.canonical.com>
+References: <156823976031.17462.13699805496038510440.malonedeb@gac.canonical.com>
+Message-Id: <156831316189.5987.17336570923993894029.launchpad@soybean.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19044";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: fc78766f54e0b62ec53935a52a781e95c5fd896d
+X-Launchpad-Hash: 10bb8b3523028ae0c5ded873ed0f1624bed065c1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1843795] Re: 'mtfsf' instruction can clear FI
- incorrectly
+Subject: [Qemu-devel] [Bug 1843651] Re: m68k fpu bug
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -77,59 +76,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1843795 <1843795@bugs.launchpad.net>
+Reply-To: Bug 1843651 <1843651@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Tags added: fpu ppc testcase
+** Tags added: fpu m68k
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1843795
+https://bugs.launchpad.net/bugs/1843651
 
 Title:
-  'mtfsf' instruction can clear FI incorrectly
+  m68k fpu bug
 
 Status in QEMU:
   New
 
 Bug description:
-  Using mtfsf instruction can clear the FPSCR FI bit incorrectly.  This cod=
-e snippet exhibits the issue:
-  --
-    fpscr.ll =3D 0x1fffffff;
-    __builtin_mtfsf (0b11111111, fpscr.d);
-    fpscr.d =3D __builtin_mffs ();
-  --
+  On gcc123 cfarm machine,
+  I was testing m68k executables generated by Free Pascal Compiler.
 
-  On POWER9 hardware:
-  mffs    : FPSCR =3D 0x000000007ffff7ff
+  muller@gcc123:~/pas/check$ cat inf.pp
+  function get_double(x : double):double;
+    begin
+      get_double:=3Dx;
+    end;
 
-  On qemu (git master; "-cpu POWER9"):
-  --
-  $ ./mtfsf
-  mffs    : FPSCR =3D 0x000000007ffdffff
-  --
+  =
 
-  Two differences:
-  bit 52: "reserved", so maybe a "don't care" case
-  bit 46: "FI"
+  var
+    y : double;
+    py : pbyte;
+    i : byte;
+  begin
+    y:=3D1.0/0.0;
+    py:=3D@y;
+  {$ifdef ENDIAN_LITTLE}
+    write('little endian y=3D');
+    for i:=3D7 downto 0 do
+  {$else not ENDIAN_LITTLE}
+    write('big endian y=3D');
+    for i:=3D0 to 7 do
+  {$endif}
+      write(hexstr(py[i],2));
+    writeln;
+    y:=3Dget_double(y)+1;
+  {$ifdef ENDIAN_LITTLE}
+    write('little endian y=3D');
+    for i:=3D7 downto 0 do
+  {$else not ENDIAN_LITTLE}
+    write('big endian y=3D');
+    for i:=3D0 to 7 do
+  {$endif}
+      write(hexstr(py[i],2));
+    writeln;
+  end.
+  muller@gcc123:~/pas/check$ ppc68k inf
+  Free Pascal Compiler version 3.3.1-r20:42973M [2019/09/11] for m68k
+  Copyright (c) 1993-2019 by Florian Klaempfl and others
+  Target OS: Linux for m68k
+  Compiling inf.pp
+  Assembling program
+  Linking inf
+  33 lines compiled, 0.1 sec
+  muller@gcc123:~/pas/check$ ./inf
+  big endian y=3D7FF0000000000000
+  big endian y=3D7FFFFFFFFFFFFFFF
+  muller@gcc123:~/pas/check$ qemu-m68k ./inf
+  big endian y=3D7FF0000000000000
+  big endian y=3D7FFFFFFFFFFFFFFF
+  muller@gcc123:~/pas/check$ ~/sys-root/bin/qemu-m68k ./inf
+  qemu-m68k        qemu-m68k-fixed
+  muller@gcc123:~/pas/check$ ~/sys-root/bin/qemu-m68k-fixed ./inf
+  big endian y=3D7FF0000000000000
+  big endian y=3D7FF0000000000000
 
-  $ git log -1 master
-  commit 89ea03a7dc83ca36b670ba7f787802791fcb04b1
-  Merge: 019217c 2531164
-  Author: Peter Maydell <peter.maydell@linaro.org>
-  Date:   Mon Sep 9 09:48:34 2019 +0100
+  ~/sys-root/bin/qemu-m68k  is 4.1.0 release,
+  ~/sys-root/bin/qemu-m68k-fixed is the same source with a unique change:
 
-  I tracked the clear is coming from do_float_check_status, likely the
-  one in gen_mtfsf, but then I get lost figuring out what _should_ be
-  happening. :-/
+  gnu/qemu/qemu-4.1.0/fpu/softfloat-specialize.h:214:#if defined(TARGET_M68=
+K)
+  gnu/qemu/qemu-4.1.0/fpu/softfloat-specialize.h-215-#define floatx80_infin=
+ity_low  LIT64(0x0000000000000000)
+  gnu/qemu/qemu-4.1.0/fpu/softfloat-specialize.h-216-#else
+  gnu/qemu/qemu-4.1.0/fpu/softfloat-specialize.h-217-#define floatx80_infin=
+ity_low  LIT64(0x8000000000000000)
+  gnu/qemu/qemu-4.1.0/fpu/softfloat-specialize.h-218-#endif
 
-  Test attached.
+  the M68K branch value is set to the same value as the other branch.
+
+  The problem of the M68K specific floatx86_infinity_low values
+  is that is enters in conflict with
+  muller@gcc123:~/pas/check$ grep -nA6 invalid_enc  /home/muller/gnu/qemu/q=
+emu-4.1.0/include/fpu/softfloat.h
+  752:static inline bool floatx80_invalid_encoding(floatx80 a)
+  753-{
+  754-    return (a.low & (1ULL << 63)) =3D=3D 0 && (a.high & 0x7FFF) !=3D =
+0;
+  755-}
+
+  And thus the m68k variant of floatx80 representing +Infinity is
+  considered as an invalid encoding, and thus converted into a NaN 7FFFFFFF=
+FFFFFFFF
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1843795/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1843651/+subscriptions
 
