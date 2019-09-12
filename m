@@ -2,49 +2,49 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91732C49ED9
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:25:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 543C6C49ED9
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:27:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5552B20830
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:25:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5552B20830
+	by mail.kernel.org (Postfix) with ESMTPS id 1738220830
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:27:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1738220830
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8IYE-0004qu-2p
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 02:25:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37075)
+	id 1i8IZP-0006Lr-OQ
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 02:27:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36988)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1i8IGF-0002RR-Tk
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:24 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IGD-0002NX-37
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG9-0008AU-HU
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:19 -0400
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:45500)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG8-00087o-2Z
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:16 -0400
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:60015)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG8-00088b-S4
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:13 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG7-00086v-Kt
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:11 -0400
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 7027D6AC5B;
- Thu, 12 Sep 2019 15:07:10 +0900 (JST)
+ by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 04F4684F64;
+ Thu, 12 Sep 2019 15:07:11 +0900 (JST)
 Received: from yo-satoh-debian.localdomain
  (ae227063.dynamic.ppp.asahi-net.or.jp [14.3.227.63])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 2D484240085;
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id B1A85240085;
  Thu, 12 Sep 2019 15:07:10 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Date: Thu, 12 Sep 2019 15:06:53 +0900
-Message-Id: <20190912060701.4642-15-ysato@users.sourceforge.jp>
+Date: Thu, 12 Sep 2019 15:06:55 +0900
+Message-Id: <20190912060701.4642-17-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190912060701.4642-1-ysato@users.sourceforge.jp>
 References: <20190912060701.4642-1-ysato@users.sourceforge.jp>
@@ -53,9 +53,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.14
-Subject: [Qemu-devel] [PATCH v24 14/22] hw/intc: RX62N interrupt controller
- (ICUa)
+X-Received-From: 202.224.55.13
+Subject: [Qemu-devel] [PATCH v24 16/22] hw/char: RX62N serial communication
+ interface (SCI)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,7 +74,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This implementation supported only ICUa.
+This module supported only non FIFO type.
 Hardware manual.
 https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033=
 ej0140_rx62n.pdf
@@ -82,90 +82,78 @@ ej0140_rx62n.pdf
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190607091116.49044-6-ysato@users.sourceforge.jp>
+Message-Id: <20190607091116.49044-8-ysato@users.sourceforge.jp>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/hw/intc/rx_icu.h |  56 ++++++
- hw/intc/rx_icu.c         | 379 +++++++++++++++++++++++++++++++++++++++
- hw/intc/Kconfig          |   3 +
- hw/intc/Makefile.objs    |   1 +
- 4 files changed, 439 insertions(+)
- create mode 100644 include/hw/intc/rx_icu.h
- create mode 100644 hw/intc/rx_icu.c
+ include/hw/char/renesas_sci.h |  45 +++++
+ hw/char/renesas_sci.c         | 343 ++++++++++++++++++++++++++++++++++
+ hw/char/Kconfig               |   3 +
+ hw/char/Makefile.objs         |   1 +
+ 4 files changed, 392 insertions(+)
+ create mode 100644 include/hw/char/renesas_sci.h
+ create mode 100644 hw/char/renesas_sci.c
 
-diff --git a/include/hw/intc/rx_icu.h b/include/hw/intc/rx_icu.h
+diff --git a/include/hw/char/renesas_sci.h b/include/hw/char/renesas_sci.=
+h
 new file mode 100644
-index 0000000000..acfcf06aef
+index 0000000000..50d1336944
 --- /dev/null
-+++ b/include/hw/intc/rx_icu.h
-@@ -0,0 +1,56 @@
-+#ifndef RX_ICU_H
-+#define RX_ICU_H
++++ b/include/hw/char/renesas_sci.h
+@@ -0,0 +1,45 @@
++/*
++ * Renesas Serial Communication Interface
++ *
++ * Copyright (c) 2018 Yoshinori Sato
++ *
++ * This code is licensed under the GPL version 2 or later.
++ *
++ */
 +
-+#include "qemu-common.h"
-+#include "hw/irq.h"
++#include "chardev/char-fe.h"
++#include "qemu/timer.h"
++#include "hw/sysbus.h"
 +
-+enum TRG_MODE {
-+    TRG_LEVEL =3D 0,
-+    TRG_NEDGE =3D 1,      /* Falling */
-+    TRG_PEDGE =3D 2,      /* Raising */
-+    TRG_BEDGE =3D 3,      /* Both */
-+};
-+
-+struct IRQSource {
-+    enum TRG_MODE sense;
-+    int level;
-+};
++#define TYPE_RENESAS_SCI "renesas-sci"
++#define RSCI(obj) OBJECT_CHECK(RSCIState, (obj), TYPE_RENESAS_SCI)
 +
 +enum {
-+    /* Software interrupt request */
-+    SWI =3D 27,
-+    NR_IRQS =3D 256,
++    ERI =3D 0,
++    RXI =3D 1,
++    TXI =3D 2,
++    TEI =3D 3,
++    SCI_NR_IRQ =3D 4,
 +};
 +
-+struct RXICUState {
++typedef struct {
 +    SysBusDevice parent_obj;
-+
 +    MemoryRegion memory;
-+    struct IRQSource src[NR_IRQS];
-+    char *icutype;
-+    uint32_t nr_irqs;
-+    uint32_t *map;
-+    uint32_t nr_sense;
-+    uint32_t *init_sense;
 +
-+    uint8_t ir[NR_IRQS];
-+    uint8_t dtcer[NR_IRQS];
-+    uint8_t ier[NR_IRQS / 8];
-+    uint8_t ipr[142];
-+    uint8_t dmasr[4];
-+    uint16_t fir;
-+    uint8_t nmisr;
-+    uint8_t nmier;
-+    uint8_t nmiclr;
-+    uint8_t nmicr;
-+    int req_irq;
-+    qemu_irq _irq;
-+    qemu_irq _fir;
-+    qemu_irq _swi;
-+};
-+typedef struct RXICUState RXICUState;
++    uint8_t smr;
++    uint8_t brr;
++    uint8_t scr;
++    uint8_t tdr;
++    uint8_t ssr;
++    uint8_t rdr;
++    uint8_t scmr;
++    uint8_t semr;
 +
-+#define TYPE_RXICU "rx-icu"
-+#define RXICU(obj) OBJECT_CHECK(RXICUState, (obj), TYPE_RXICU)
-+
-+#endif /* RX_ICU_H */
-diff --git a/hw/intc/rx_icu.c b/hw/intc/rx_icu.c
++    uint8_t read_ssr;
++    int64_t trtime;
++    int64_t rx_next;
++    QEMUTimer *timer;
++    CharBackend chr;
++    uint64_t input_freq;
++    qemu_irq irq[SCI_NR_IRQ];
++} RSCIState;
+diff --git a/hw/char/renesas_sci.c b/hw/char/renesas_sci.c
 new file mode 100644
-index 0000000000..ac4dcbfe37
+index 0000000000..df63c5292e
 --- /dev/null
-+++ b/hw/intc/rx_icu.c
-@@ -0,0 +1,379 @@
++++ b/hw/char/renesas_sci.c
+@@ -0,0 +1,343 @@
 +/*
-+ * RX Interrupt Control Unit
-+ *
-+ * Warning: Only ICUa is supported.
++ * Renesas Serial Communication Interface
 + *
 + * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
 + * (Rev.1.40 R01UH0033EJ0140)
@@ -190,324 +178,293 @@ ng with
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu-common.h"
 +#include "qemu/log.h"
 +#include "qapi/error.h"
++#include "qemu-common.h"
 +#include "cpu.h"
 +#include "hw/hw.h"
 +#include "hw/irq.h"
 +#include "hw/sysbus.h"
 +#include "hw/registerfields.h"
 +#include "hw/qdev-properties.h"
-+#include "hw/intc/rx_icu.h"
++#include "hw/char/renesas_sci.h"
 +#include "migration/vmstate.h"
 +#include "qemu/error-report.h"
 +
-+REG8(IR, 0)
-+  FIELD(IR, IR,  0, 1)
-+REG8(DTCER, 0x100)
-+  FIELD(DTCER, DTCE,  0, 1)
-+REG8(IER, 0x200)
-+REG8(SWINTR, 0x2e0)
-+  FIELD(SWINTR, SWINT, 0, 1)
-+REG16(FIR, 0x2f0)
-+  FIELD(FIR, FVCT, 0, 8)
-+  FIELD(FIR, FIEN, 15, 1)
-+REG8(IPR, 0x300)
-+  FIELD(IPR, IPR, 0, 4)
-+REG8(DMRSR, 0x400)
-+REG8(IRQCR, 0x500)
-+  FIELD(IRQCR, IRQMD, 2, 2)
-+REG8(NMISR, 0x580)
-+  FIELD(NMISR, NMIST, 0, 1)
-+  FIELD(NMISR, LVDST, 1, 1)
-+  FIELD(NMISR, OSTST, 2, 1)
-+REG8(NMIER, 0x581)
-+  FIELD(NMIER, NMIEN, 0, 1)
-+  FIELD(NMIER, LVDEN, 1, 1)
-+  FIELD(NMIER, OSTEN, 2, 1)
-+REG8(NMICLR, 0x582)
-+  FIELD(NMICLR, NMICLR, 0, 1)
-+  FIELD(NMICLR, OSTCLR, 2, 1)
-+REG8(NMICR, 0x583)
-+  FIELD(NMICR, NMIMD, 3, 1)
++/* SCI register map */
++REG8(SMR, 0)
++  FIELD(SMR, CKS,  0, 2)
++  FIELD(SMR, MP,   2, 1)
++  FIELD(SMR, STOP, 3, 1)
++  FIELD(SMR, PM,   4, 1)
++  FIELD(SMR, PE,   5, 1)
++  FIELD(SMR, CHR,  6, 1)
++  FIELD(SMR, CM,   7, 1)
++REG8(BRR, 1)
++REG8(SCR, 2)
++  FIELD(SCR, CKE, 0, 2)
++  FIELD(SCR, TEIE, 2, 1)
++  FIELD(SCR, MPIE, 3, 1)
++  FIELD(SCR, RE,   4, 1)
++  FIELD(SCR, TE,   5, 1)
++  FIELD(SCR, RIE,  6, 1)
++  FIELD(SCR, TIE,  7, 1)
++REG8(TDR, 3)
++REG8(SSR, 4)
++  FIELD(SSR, MPBT, 0, 1)
++  FIELD(SSR, MPB,  1, 1)
++  FIELD(SSR, TEND, 2, 1)
++  FIELD(SSR, ERR, 3, 3)
++    FIELD(SSR, PER,  3, 1)
++    FIELD(SSR, FER,  4, 1)
++    FIELD(SSR, ORER, 5, 1)
++  FIELD(SSR, RDRF, 6, 1)
++  FIELD(SSR, TDRE, 7, 1)
++REG8(RDR, 5)
++REG8(SCMR, 6)
++  FIELD(SCMR, SMIF, 0, 1)
++  FIELD(SCMR, SINV, 2, 1)
++  FIELD(SCMR, SDIR, 3, 1)
++  FIELD(SCMR, BCP2, 7, 1)
++REG8(SEMR, 7)
++  FIELD(SEMR, ACS0, 0, 1)
++  FIELD(SEMR, ABCS, 4, 1)
 +
-+#define request(icu, n) (icu->ipr[icu->map[n]] << 8 | n)
-+
-+static void set_irq(RXICUState *icu, int n_IRQ, int req)
++static int can_receive(void *opaque)
 +{
-+    if ((icu->fir & R_FIR_FIEN_MASK) &&
-+        (icu->fir & R_FIR_FVCT_MASK) =3D=3D n_IRQ) {
-+        qemu_set_irq(icu->_fir, req);
++    RSCIState *sci =3D RSCI(opaque);
++    if (sci->rx_next > qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)) {
++        return 0;
 +    } else {
-+        qemu_set_irq(icu->_irq, req);
++        return FIELD_EX8(sci->scr, SCR, RE);
 +    }
 +}
 +
-+static void rxicu_request(RXICUState *icu, int n_IRQ)
++static void receive(void *opaque, const uint8_t *buf, int size)
 +{
-+    int enable;
-+
-+    enable =3D icu->ier[n_IRQ / 8] & (1 << (n_IRQ & 7));
-+    if (n_IRQ > 0 && enable !=3D 0 && atomic_read(&icu->req_irq) < 0) {
-+        atomic_set(&icu->req_irq, n_IRQ);
-+        set_irq(icu, n_IRQ, request(icu, n_IRQ));
-+    }
-+}
-+
-+static void rxicu_set_irq(void *opaque, int n_IRQ, int level)
-+{
-+    RXICUState *icu =3D opaque;
-+    struct IRQSource *src;
-+    int issue;
-+
-+    if (n_IRQ >=3D NR_IRQS) {
-+        error_report("%s: IRQ %d out of range", __func__, n_IRQ);
-+        return;
-+    }
-+
-+    src =3D &icu->src[n_IRQ];
-+
-+    level =3D (level !=3D 0);
-+    switch (src->sense) {
-+    case TRG_LEVEL:
-+        /* level-sensitive irq */
-+        issue =3D level;
-+        src->level =3D level;
-+        break;
-+    case TRG_NEDGE:
-+        issue =3D (level =3D=3D 0 && src->level =3D=3D 1);
-+        src->level =3D level;
-+        break;
-+    case TRG_PEDGE:
-+        issue =3D (level =3D=3D 1 && src->level =3D=3D 0);
-+        src->level =3D level;
-+        break;
-+    case TRG_BEDGE:
-+        issue =3D ((level ^ src->level) & 1);
-+        src->level =3D level;
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+    if (issue =3D=3D 0 && src->sense =3D=3D TRG_LEVEL) {
-+        icu->ir[n_IRQ] =3D 0;
-+        if (atomic_read(&icu->req_irq) =3D=3D n_IRQ) {
-+            /* clear request */
-+            set_irq(icu, n_IRQ, 0);
-+            atomic_set(&icu->req_irq, -1);
++    RSCIState *sci =3D RSCI(opaque);
++    sci->rx_next =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime=
+;
++    if (FIELD_EX8(sci->ssr, SSR, RDRF) || size > 1) {
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, ORER, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 1);
 +        }
-+        return;
-+    }
-+    if (issue) {
-+        icu->ir[n_IRQ] =3D 1;
-+        rxicu_request(icu, n_IRQ);
++    } else {
++        sci->rdr =3D buf[0];
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, RDRF, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_irq_pulse(sci->irq[RXI]);
++        }
 +    }
 +}
 +
-+static void rxicu_ack_irq(void *opaque, int no, int level)
++static void send_byte(RSCIState *sci)
 +{
-+    RXICUState *icu =3D opaque;
-+    int i;
-+    int n_IRQ;
-+    int max_pri;
-+
-+    n_IRQ =3D atomic_read(&icu->req_irq);
-+    if (n_IRQ < 0) {
-+        return;
++    if (qemu_chr_fe_backend_connected(&sci->chr)) {
++        qemu_chr_fe_write_all(&sci->chr, &sci->tdr, 1);
 +    }
-+    atomic_set(&icu->req_irq, -1);
-+    if (icu->src[n_IRQ].sense !=3D TRG_LEVEL) {
-+        icu->ir[n_IRQ] =3D 0;
++    timer_mod(sci->timer,
++              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime);
++    sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 0);
++    sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 1);
++    qemu_set_irq(sci->irq[TEI], 0);
++    if (FIELD_EX8(sci->scr, SCR, TIE)) {
++        qemu_irq_pulse(sci->irq[TXI]);
 +    }
++}
 +
-+    max_pri =3D 0;
-+    n_IRQ =3D -1;
-+    for (i =3D 0; i < NR_IRQS; i++) {
-+        if (icu->ir[i]) {
-+            if (max_pri < icu->ipr[icu->map[i]]) {
-+                n_IRQ =3D i;
-+                max_pri =3D icu->ipr[icu->map[i]];
++static void txend(void *opaque)
++{
++    RSCIState *sci =3D RSCI(opaque);
++    if (!FIELD_EX8(sci->ssr, SSR, TDRE)) {
++        send_byte(sci);
++    } else {
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 1);
++        if (FIELD_EX8(sci->scr, SCR, TEIE)) {
++            qemu_set_irq(sci->irq[TEI], 1);
++        }
++    }
++}
++
++static void update_trtime(RSCIState *sci)
++{
++    /* char per bits */
++    sci->trtime =3D 8 - FIELD_EX8(sci->smr, SMR, CHR);
++    sci->trtime +=3D FIELD_EX8(sci->smr, SMR, PE);
++    sci->trtime +=3D FIELD_EX8(sci->smr, SMR, STOP) + 1;
++    /* x bit transmit time (32 * divrate * brr) / base freq */
++    sci->trtime *=3D 32 * sci->brr;
++    sci->trtime *=3D 1 << (2 * FIELD_EX8(sci->smr, SMR, CKS));
++    sci->trtime *=3D NANOSECONDS_PER_SECOND;
++    sci->trtime /=3D sci->input_freq;
++}
++
++#define IS_TR_ENABLED(scr) \
++    (FIELD_EX8(scr, SCR, TE) || FIELD_EX8(scr, SCR, RE))
++
++static void sci_write(void *opaque, hwaddr addr, uint64_t val, unsigned =
+size)
++{
++    hwaddr offset =3D addr & 0x07;
++    RSCIState *sci =3D RSCI(opaque);
++
++    switch (offset) {
++    case A_SMR:
++        if (!IS_TR_ENABLED(sci->scr)) {
++            sci->smr =3D val;
++            update_trtime(sci);
++        }
++        break;
++    case A_BRR:
++        if (!IS_TR_ENABLED(sci->scr)) {
++            sci->brr =3D val;
++            update_trtime(sci);
++        }
++        break;
++    case A_SCR:
++        sci->scr =3D val;
++        if (FIELD_EX8(sci->scr, SCR, TE)) {
++            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 1);
++            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 1);
++            if (FIELD_EX8(sci->scr, SCR, TIE)) {
++                qemu_irq_pulse(sci->irq[TXI]);
 +            }
 +        }
-+    }
-+
-+    if (n_IRQ >=3D 0) {
-+        rxicu_request(icu, n_IRQ);
++        if (!FIELD_EX8(sci->scr, SCR, TEIE)) {
++            qemu_set_irq(sci->irq[TEI], 0);
++        }
++        if (!FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 0);
++        }
++        break;
++    case A_TDR:
++        sci->tdr =3D val;
++        if (FIELD_EX8(sci->ssr, SSR, TEND)) {
++            send_byte(sci);
++        } else {
++            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 0);
++        }
++        break;
++    case A_SSR:
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, MPBT,
++                             FIELD_EX8(val, SSR, MPBT));
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, ERR,
++                             FIELD_EX8(val, SSR, ERR) & 0x07);
++        if (FIELD_EX8(sci->read_ssr, SSR, ERR) &&
++            FIELD_EX8(sci->ssr, SSR, ERR) =3D=3D 0) {
++            qemu_set_irq(sci->irq[ERI], 0);
++        }
++        break;
++    case A_RDR:
++        qemu_log_mask(LOG_GUEST_ERROR, "reneas_sci: RDR is read only.\n"=
+);
++        break;
++    case A_SCMR:
++        sci->scmr =3D val; break;
++    case A_SEMR: /* SEMR */
++        sci->semr =3D val; break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
++                      " not implemented\n", offset);
 +    }
 +}
 +
-+static uint64_t icu_read(void *opaque, hwaddr addr, unsigned size)
++static uint64_t sci_read(void *opaque, hwaddr addr, unsigned size)
 +{
-+    RXICUState *icu =3D opaque;
-+    int reg =3D addr & 0xff;
++    hwaddr offset =3D addr & 0x07;
++    RSCIState *sci =3D RSCI(opaque);
 +
-+    if ((addr !=3D A_FIR && size !=3D 1) ||
-+        (addr =3D=3D A_FIR && size !=3D 2)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "rx_icu: Invalid read size 0x%"
-+                      HWADDR_PRIX "\n", addr);
-+        return UINT64_MAX;
-+    }
-+    switch (addr) {
-+    case A_IR ... A_IR + 0xff:
-+        return icu->ir[reg] & R_IR_IR_MASK;
-+    case A_DTCER ... A_DTCER + 0xff:
-+        return icu->dtcer[reg] & R_DTCER_DTCE_MASK;
-+    case A_IER ... A_IER + 0x1f:
-+        return icu->ier[reg];
-+    case A_SWINTR:
-+        return 0;
-+    case A_FIR:
-+        return icu->fir & (R_FIR_FIEN_MASK | R_FIR_FVCT_MASK);
-+    case A_IPR ... A_IPR + 0x8f:
-+        return icu->ipr[reg] & R_IPR_IPR_MASK;
-+    case A_DMRSR:
-+    case A_DMRSR + 4:
-+    case A_DMRSR + 8:
-+    case A_DMRSR + 12:
-+        return icu->dmasr[reg >> 2];
-+    case A_IRQCR ... A_IRQCR + 0x1f:
-+        return icu->src[64 + reg].sense << R_IRQCR_IRQMD_SHIFT;
-+    case A_NMISR:
-+    case A_NMICLR:
-+        return 0;
-+    case A_NMIER:
-+        return icu->nmier;
-+    case A_NMICR:
-+        return icu->nmicr;
++    switch (offset) {
++    case A_SMR:
++        return sci->smr;
++    case A_BRR:
++        return sci->brr;
++    case A_SCR:
++        return sci->scr;
++    case A_TDR:
++        return sci->tdr;
++    case A_SSR:
++        sci->read_ssr =3D sci->ssr;
++        return sci->ssr;
++    case A_RDR:
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, RDRF, 0);
++        return sci->rdr;
++    case A_SCMR:
++        return sci->scmr;
++    case A_SEMR:
++        return sci->semr;
 +    default:
-+        qemu_log_mask(LOG_UNIMP, "rx_icu: Register 0x%" HWADDR_PRIX
-+                      " not implemented.\n", addr);
-+        break;
++        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
++                      " not implemented.\n", offset);
 +    }
 +    return UINT64_MAX;
 +}
 +
-+static void icu_write(void *opaque, hwaddr addr, uint64_t val, unsigned =
-size)
-+{
-+    RXICUState *icu =3D opaque;
-+    int reg =3D addr & 0xff;
-+
-+    if ((addr !=3D A_FIR && size !=3D 1) ||
-+        (addr =3D=3D A_FIR && size !=3D 2)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "rx_icu: Invalid write size at 0x=
-%"
-+                      HWADDR_PRIX "\n", addr);
-+        return;
-+    }
-+    switch (addr) {
-+    case A_IR ... A_IR + 0xff:
-+        if (icu->src[reg].sense !=3D TRG_LEVEL && val =3D=3D 0) {
-+            icu->ir[reg] =3D 0;
-+        }
-+        break;
-+    case A_DTCER ... A_DTCER + 0xff:
-+        icu->dtcer[reg] =3D val & R_DTCER_DTCE_MASK;
-+        qemu_log_mask(LOG_UNIMP,
-+                      "rx_icu: DTC not implemented\n");
-+        break;
-+    case A_IER ... A_IER + 0x1f:
-+        icu->ier[reg] =3D val;
-+        break;
-+    case A_SWINTR:
-+        if (val & R_SWINTR_SWINT_MASK) {
-+            qemu_irq_pulse(icu->_swi);
-+        }
-+        break;
-+    case A_FIR:
-+        icu->fir =3D val & (R_FIR_FIEN_MASK | R_FIR_FVCT_MASK);
-+        break;
-+    case A_IPR ... A_IPR + 0x8f:
-+        icu->ipr[reg] =3D val & R_IPR_IPR_MASK;
-+        break;
-+    case A_DMRSR:
-+    case A_DMRSR + 4:
-+    case A_DMRSR + 8:
-+    case A_DMRSR + 12:
-+        icu->dmasr[reg >> 2] =3D val;
-+        qemu_log_mask(LOG_UNIMP,
-+                      "rx_icu: DMAC not implemented\n");
-+        break;
-+    case A_IRQCR ... A_IRQCR + 0x1f:
-+        icu->src[64 + reg].sense =3D val >> R_IRQCR_IRQMD_SHIFT;
-+        break;
-+    case A_NMICLR:
-+        break;
-+    case A_NMIER:
-+        icu->nmier |=3D val & (R_NMIER_NMIEN_MASK |
-+                             R_NMIER_LVDEN_MASK |
-+                             R_NMIER_OSTEN_MASK);
-+            break;
-+    case A_NMICR:
-+        if ((icu->nmier & R_NMIER_NMIEN_MASK) =3D=3D 0) {
-+            icu->nmicr =3D val & R_NMICR_NMIMD_MASK;
-+        }
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "rx_icu: Register 0x%" HWADDR_PRIX
-+                      " not implemented\n", addr);
-+        break;
-+    }
-+}
-+
-+static const MemoryRegionOps icu_ops =3D {
-+    .write =3D icu_write,
-+    .read  =3D icu_read,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
++static const MemoryRegionOps sci_ops =3D {
++    .write =3D sci_write,
++    .read  =3D sci_read,
++    .endianness =3D DEVICE_NATIVE_ENDIAN,
 +    .impl =3D {
-+        .max_access_size =3D 2,
++        .max_access_size =3D 1,
 +    },
 +};
 +
-+static void rxicu_realize(DeviceState *dev, Error **errp)
++static void rsci_reset(DeviceState *dev)
 +{
-+    RXICUState *icu =3D RXICU(dev);
-+    int i, j;
++    RSCIState *sci =3D RSCI(dev);
++    sci->smr =3D sci->scr =3D 0x00;
++    sci->brr =3D 0xff;
++    sci->tdr =3D 0xff;
++    sci->rdr =3D 0x00;
++    sci->ssr =3D 0x84;
++    sci->scmr =3D 0x00;
++    sci->semr =3D 0x00;
++    sci->rx_next =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++}
 +
-+    if (icu->init_sense =3D=3D NULL) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "rx_icu: trigger-level property must be set.");
-+        return;
-+    }
-+    for (i =3D j =3D 0; i < NR_IRQS; i++) {
-+        if (icu->init_sense[j] =3D=3D i) {
-+            icu->src[i].sense =3D TRG_LEVEL;
-+            if (j < icu->nr_sense) {
-+                j++;
-+            }
-+        } else {
-+            icu->src[i].sense =3D TRG_PEDGE;
++static void sci_event(void *opaque, int event)
++{
++    RSCIState *sci =3D RSCI(opaque);
++    if (event =3D=3D CHR_EVENT_BREAK) {
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, FER, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 1);
 +        }
 +    }
-+    icu->req_irq =3D -1;
 +}
 +
-+static void rxicu_init(Object *obj)
++static void rsci_realize(DeviceState *dev, Error **errp)
++{
++    RSCIState *sci =3D RSCI(dev);
++
++    if (sci->input_freq =3D=3D 0) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "renesas_sci: input-freq property must be set.");
++        return;
++    }
++    qemu_chr_fe_set_handlers(&sci->chr, can_receive, receive,
++                             sci_event, NULL, sci, NULL, true);
++}
++
++static void rsci_init(Object *obj)
 +{
 +    SysBusDevice *d =3D SYS_BUS_DEVICE(obj);
-+    RXICUState *icu =3D RXICU(obj);
++    RSCIState *sci =3D RSCI(obj);
++    int i;
 +
-+    memory_region_init_io(&icu->memory, OBJECT(icu), &icu_ops,
-+                          icu, "rx-icu", 0x600);
-+    sysbus_init_mmio(d, &icu->memory);
++    memory_region_init_io(&sci->memory, OBJECT(sci), &sci_ops,
++                          sci, "renesas-sci", 0x8);
++    sysbus_init_mmio(d, &sci->memory);
 +
-+    qdev_init_gpio_in(DEVICE(d), rxicu_set_irq, NR_IRQS);
-+    qdev_init_gpio_in_named(DEVICE(d), rxicu_ack_irq, "ack", 1);
-+    sysbus_init_irq(d, &icu->_irq);
-+    sysbus_init_irq(d, &icu->_fir);
-+    sysbus_init_irq(d, &icu->_swi);
++    for (i =3D 0; i < SCI_NR_IRQ; i++) {
++        sysbus_init_irq(d, &sci->irq[i]);
++    }
++    sci->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, txend, sci);
 +}
 +
-+static void rxicu_fini(Object *obj)
-+{
-+    RXICUState *icu =3D RXICU(obj);
-+    g_free(icu->map);
-+    g_free(icu->init_sense);
-+}
-+
-+static const VMStateDescription vmstate_rxicu =3D {
-+    .name =3D "rx-icu",
++static const VMStateDescription vmstate_rsci =3D {
++    .name =3D "renesas-sci",
 +    .version_id =3D 1,
 +    .minimum_version_id =3D 1,
 +    .fields =3D (VMStateField[]) {
@@ -515,58 +472,59 @@ size)
 +    }
 +};
 +
-+static Property rxicu_properties[] =3D {
-+    DEFINE_PROP_ARRAY("ipr-map", RXICUState, nr_irqs, map,
-+                      qdev_prop_uint32, uint32_t),
-+    DEFINE_PROP_ARRAY("trigger-level", RXICUState, nr_sense, init_sense,
-+                      qdev_prop_uint32, uint32_t),
++static Property rsci_properties[] =3D {
++    DEFINE_PROP_UINT64("input-freq", RSCIState, input_freq, 0),
++    DEFINE_PROP_CHR("chardev", RSCIState, chr),
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void rxicu_class_init(ObjectClass *klass, void *data)
++static void rsci_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc =3D DEVICE_CLASS(klass);
 +
-+    dc->realize =3D rxicu_realize;
-+    dc->props =3D rxicu_properties;
-+    dc->vmsd =3D &vmstate_rxicu;
++    dc->realize =3D rsci_realize;
++    dc->props =3D rsci_properties;
++    dc->vmsd =3D &vmstate_rsci;
++    dc->reset =3D rsci_reset;
 +}
 +
-+static const TypeInfo rxicu_info =3D {
-+    .name       =3D TYPE_RXICU,
++static const TypeInfo rsci_info =3D {
++    .name       =3D TYPE_RENESAS_SCI,
 +    .parent     =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(RXICUState),
-+    .instance_init =3D rxicu_init,
-+    .instance_finalize =3D rxicu_fini,
-+    .class_init =3D rxicu_class_init,
++    .instance_size =3D sizeof(RSCIState),
++    .instance_init =3D rsci_init,
++    .class_init =3D rsci_class_init,
 +};
 +
-+static void rxicu_register_types(void)
++static void rsci_register_types(void)
 +{
-+    type_register_static(&rxicu_info);
++    type_register_static(&rsci_info);
 +}
 +
-+type_init(rxicu_register_types)
-diff --git a/hw/intc/Kconfig b/hw/intc/Kconfig
-index 5347f8412c..67e9d97464 100644
---- a/hw/intc/Kconfig
-+++ b/hw/intc/Kconfig
-@@ -58,3 +58,6 @@ config S390_FLIC_KVM
++type_init(rsci_register_types)
+diff --git a/hw/char/Kconfig b/hw/char/Kconfig
+index 40e7a8b8bb..874627520c 100644
+--- a/hw/char/Kconfig
++++ b/hw/char/Kconfig
+@@ -46,3 +46,6 @@ config SCLPCONSOLE
 =20
- config OMPIC
+ config TERMINAL3270
      bool
 +
-+config RX_ICU
++config RENESAS_SCI
 +    bool
-diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-index f726d87532..f17cbd1a9f 100644
---- a/hw/intc/Makefile.objs
-+++ b/hw/intc/Makefile.objs
-@@ -49,3 +49,4 @@ obj-$(CONFIG_ARM_GIC) +=3D arm_gicv3_cpuif.o
- obj-$(CONFIG_MIPS_CPS) +=3D mips_gic.o
- obj-$(CONFIG_NIOS2) +=3D nios2_iic.o
- obj-$(CONFIG_OMPIC) +=3D ompic.o
-+obj-$(CONFIG_RX) +=3D rx_icu.o
+diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+index 02d8a66925..4472d563b5 100644
+--- a/hw/char/Makefile.objs
++++ b/hw/char/Makefile.objs
+@@ -21,6 +21,7 @@ obj-$(CONFIG_PSERIES) +=3D spapr_vty.o
+ obj-$(CONFIG_DIGIC) +=3D digic-uart.o
+ obj-$(CONFIG_STM32F2XX_USART) +=3D stm32f2xx_usart.o
+ obj-$(CONFIG_RASPI) +=3D bcm2835_aux.o
++obj-$(CONFIG_RENESAS_SCI) +=3D renesas_sci.o
+=20
+ common-obj-$(CONFIG_CMSDK_APB_UART) +=3D cmsdk-apb-uart.o
+ common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_ser.o
 --=20
 2.20.1
 
