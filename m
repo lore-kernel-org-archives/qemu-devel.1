@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB41ECDE20
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:13:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C5E3C49ED9
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:17:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7379208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:13:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7379208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 4980420830
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:17:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4980420830
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8IM4-0008TR-3o
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 02:13:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36872)
+	id 1i8IPj-0003jH-0F
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 02:17:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36940)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG9-0002Ll-8F
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:15 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IGB-0002M5-GX
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG7-00087a-TT
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:13 -0400
-Received: from mail01.asahi-net.or.jp ([202.224.55.13]:60001)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG8-00089B-OP
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:15 -0400
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:44447)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG7-00086V-Jp
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:11 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG8-00087s-Dk
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:12 -0400
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 85ED984827;
- Thu, 12 Sep 2019 15:07:09 +0900 (JST)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id BAD916832C;
+ Thu, 12 Sep 2019 15:07:11 +0900 (JST)
 Received: from yo-satoh-debian.localdomain
  (ae227063.dynamic.ppp.asahi-net.or.jp [14.3.227.63])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 4B2FE240085;
- Thu, 12 Sep 2019 15:07:09 +0900 (JST)
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 7DD12240086;
+ Thu, 12 Sep 2019 15:07:11 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Date: Thu, 12 Sep 2019 15:06:49 +0900
-Message-Id: <20190912060701.4642-11-ysato@users.sourceforge.jp>
+Date: Thu, 12 Sep 2019 15:06:58 +0900
+Message-Id: <20190912060701.4642-20-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190912060701.4642-1-ysato@users.sourceforge.jp>
 References: <20190912060701.4642-1-ysato@users.sourceforge.jp>
@@ -53,9 +53,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.13
-Subject: [Qemu-devel] [PATCH v24 10/22] target/rx: Use prt_ldmi for XCHG_mr
- disassembly
+X-Received-From: 202.224.55.15
+Subject: [Qemu-devel] [PATCH v24 19/22] hw/rx: Restrict the RX62N
+ microcontroller to the RX62N CPU core
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,48 +67,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, imammedo@redhat.com,
- Richard Henderson <richard.henderson@linaro.org>,
- Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Note that the ld =3D=3D 3 case handled by prt_ldmi is decoded as
-XCHG_rr and cannot appear here.
+While the VIRT machine can use different microcontrollers,
+the RX62N microcontroller is tied to the RX62N CPU core.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Message-Id: <20190607091116.49044-21-ysato@users.sourceforge.jp>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/rx/disas.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ hw/rx/rx-virt.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/target/rx/disas.c b/target/rx/disas.c
-index 515b365528..db10385fd0 100644
---- a/target/rx/disas.c
-+++ b/target/rx/disas.c
-@@ -366,13 +366,7 @@ static bool trans_XCHG_rr(DisasContext *ctx, arg_XCH=
-G_rr *a)
- /* xchg dsp[rs].<mi>,rd */
- static bool trans_XCHG_mr(DisasContext *ctx, arg_XCHG_mr *a)
- {
--    static const char msize[][4] =3D {
--        "b", "w", "l", "ub", "uw",
--    };
--    char dsp[8];
--
--    rx_index_addr(ctx, dsp, a->ld, a->mi);
--    prt("xchg\t%s[r%d].%s, r%d", dsp, a->rs, msize[a->mi], a->rd);
-+    prt_ldmi(ctx, "xchg", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
+diff --git a/hw/rx/rx-virt.c b/hw/rx/rx-virt.c
+index 4cfe2e3123..9676a5e7bf 100644
+--- a/hw/rx/rx-virt.c
++++ b/hw/rx/rx-virt.c
+@@ -17,6 +17,7 @@
+  */
 =20
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
+@@ -56,6 +57,7 @@ static void rx_load_image(RXCPU *cpu, const char *filen=
+ame,
+=20
+ static void rxvirt_init(MachineState *machine)
+ {
++    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+     RX62NState *s =3D g_new(RX62NState, 1);
+     MemoryRegion *sysmem =3D get_system_memory();
+     MemoryRegion *sdram =3D g_new(MemoryRegion, 1);
+@@ -64,6 +66,12 @@ static void rxvirt_init(MachineState *machine)
+     void *dtb =3D NULL;
+     int dtb_size;
+=20
++    if (strcmp(machine->cpu_type, mc->default_cpu_type) !=3D 0) {
++        error_report("This board can only be used with CPU %s",
++                     mc->default_cpu_type);
++        exit(1);
++    }
++
+     /* Allocate memory space */
+     memory_region_init_ram(sdram, NULL, "sdram", 16 * MiB,
+                            &error_fatal);
 --=20
 2.20.1
 
