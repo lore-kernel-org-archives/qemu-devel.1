@@ -6,78 +6,55 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A322C4CEC7
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 22:17:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E1ABC4CEC6
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 22:33:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F65F2084D
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 22:17:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F65F2084D
+	by mail.kernel.org (Postfix) with ESMTPS id 19D3A20830
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 22:33:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19D3A20830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8XPH-0004XR-5v
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 18:17:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38635)
+	id 1i8Xf2-0001IH-9U
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 18:33:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41703)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1i8XOa-00045g-J1
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 18:16:57 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i8Xby-0007UH-Uk
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 18:30:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1i8XOW-0007oz-TB
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 18:16:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57512)
+ (envelope-from <mlevitsk@redhat.com>) id 1i8Xbx-0005aG-Uf
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 18:30:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40932)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1i8XOS-0007lp-V9
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 18:16:50 -0400
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1i8Xbu-0005W8-Qk; Thu, 12 Sep 2019 18:30:43 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AB33899C41
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 22:16:47 +0000 (UTC)
-Received: by mail-ed1-f69.google.com with SMTP id 34so15705355edf.0
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 15:16:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=L/XZiBUO7jjAPi4cLNV51o6Poa0KYuZo/C9SHNrLo30=;
- b=AD06h+sYkC9+xEm+J3LY6MJzNEm1c35nZeZUbjo/b2vNLFXXBfS7MNNB7CW8PsXz8a
- /ehmEzKGgEorawPj1r1ZVf29ueD2XArsOHzU3fMMz58IbcHjPJ0/ge3THx5Ajz2a12W5
- E8h1YTIdjOKYPZtHwyhJmRvm/8Q9PRTn8GCH/m2aDUKHv9/B+yiEWEwO84AdFwMRcrKX
- v38RXmA0ZiqkB6biTDUoulvGP35DocWsn4DL2kptziq+A/E8BAzbrx5C3sCM4bcevIsz
- s1sjeIt0adCYrcznb+Ww3LoQYynj8R0QUgXlFbNo4bOTva1Lz5f8wjRl/fXyn8deuhC7
- hX9w==
-X-Gm-Message-State: APjAAAUou3qOgMwYBH1QrBGCM18KEKJYmOecIszW80lzMZ4eG4hOXo3U
- IHY3+9zMR/vfFiMz55DL+I2OKdNJL+L1AlpmTEThhAjv1mvnFHIaHnLyE8H3KS7HRJ2mavwVEzx
- dYGZ5jDK+bYHOhFM5PBITXIBGrKCvAYY=
-X-Received: by 2002:a17:906:f205:: with SMTP id
- gt5mr32145195ejb.279.1568326606403; 
- Thu, 12 Sep 2019 15:16:46 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzSS88KJGascjVmwLb2aBGAdv+6fTEkCjIwu4Ua93vdijMfCDpBOaCS8RCtnkCtRVYbEJo40anWWtMSWAXlaWk=
-X-Received: by 2002:a17:906:f205:: with SMTP id
- gt5mr32145183ejb.279.1568326606145; 
- Thu, 12 Sep 2019 15:16:46 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id D037088309;
+ Thu, 12 Sep 2019 22:30:41 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 411265C1B2;
+ Thu, 12 Sep 2019 22:30:36 +0000 (UTC)
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 13 Sep 2019 01:30:17 +0300
+Message-Id: <20190912223028.18496-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-References: <1566284395-30287-1-git-send-email-pbonzini@redhat.com>
- <1566284395-30287-16-git-send-email-pbonzini@redhat.com>
- <46af8966edd45c163d7d0bd974f557cd@ispras.ru>
- <000901d56936$e10a0b60$a31e2220$@ru>
- <ae45ff2c-70d2-da6d-5f65-2d842f060af0@linaro.org>
-In-Reply-To: <ae45ff2c-70d2-da6d-5f65-2d842f060af0@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 13 Sep 2019 00:16:34 +0200
-Message-ID: <CABgObfaznqy28SWGGjRsPhEOEnFD4JLinRoZMxy48DajSRKL3w@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Thu, 12 Sep 2019 22:30:41 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PULL 15/36] memory: fix race between TCG and
- accesses to dirty bitmap
+Subject: [Qemu-devel] [PATCH v2 00/11] RFC crypto/luks: encryption key
+ managment using amend interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,30 +66,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Maydell, Peter" <peter.maydell@linaro.org>,
- Pavel Dovgalyuk <dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Il gio 12 set 2019, 19:43 Richard Henderson <richard.henderson@linaro.org>
-ha scritto:
+This patch series is continuation of my work to add encryption
+key managment to luks/qcow2 with luks.
 
-> >>> Fortunately, in order to fix it, no change is required to the
-> >>> vCPU thread.  However, the reader thread must delay the read after
-> >>> the vCPU thread has finished the write.  This can be approximated
-> >>> conservatively by run_on_cpu, which waits for the end of the current
-> >>> translation block.
->
-> If we are going to delay any read of the dirty flags until vCPU has
-> completed
-> any active TranslationBlock, then we can simplify the TCG operation so
-> that we
-> do not (ab)use the mmio path, and can promote this into the tlb slow path
-> as we
-> have recently done with watchpoints.
+This is second version of this patch set.
+The changes are mostly addressing the review feedback,
+plus I tested (and fixed sadly) the somewhat ugly code
+that allows to still write share a raw luks device,
+while preveting the key managment from happening in this case,
+as it is unsafe.
+I added a new iotest dedicated to that as well.
+
+Best regards,
+	Maxim Levitsky
+
+Maxim Levitsky (11):
+  qcrypto: add suport for amend options
+  qcrypto-luks: extend the create options for upcoming encryption key
+    management
+  qcrypto-luks: implement the encryption key management
+  block: amend: add 'force' option
+  block/crypto: implement the encryption key management
+  qcow2: implement crypto amend options
+  block: add x-blockdev-amend qmp command
+  block/crypto: implement blockdev-amend
+  block/qcow2: implement blockdev-amend
+  iotests: filter few more luks specific create options
+  iotests : add tests for encryption key management
+
+ block.c                          |   4 +-
+ block/Makefile.objs              |   2 +-
+ block/amend.c                    | 116 ++++++++++
+ block/crypto.c                   | 167 +++++++++++++-
+ block/crypto.h                   |  16 ++
+ block/qcow2.c                    | 151 ++++++++++--
+ crypto/block-luks.c              | 382 ++++++++++++++++++++++++++++++-
+ crypto/block.c                   |  31 +++
+ crypto/blockpriv.h               |   8 +
+ include/block/block.h            |   1 +
+ include/block/block_int.h        |  22 +-
+ include/crypto/block.h           |  22 ++
+ qapi/block-core.json             |  39 +++-
+ qapi/crypto.json                 |  19 ++
+ qapi/job.json                    |   4 +-
+ qemu-img-cmds.hx                 |   4 +-
+ qemu-img.c                       |   8 +-
+ qemu-img.texi                    |   6 +-
+ tests/qemu-iotests/082.out       |  54 +++++
+ tests/qemu-iotests/087.out       |   6 +-
+ tests/qemu-iotests/134.out       |   2 +-
+ tests/qemu-iotests/158.out       |   4 +-
+ tests/qemu-iotests/188.out       |   2 +-
+ tests/qemu-iotests/189.out       |   4 +-
+ tests/qemu-iotests/198.out       |   4 +-
+ tests/qemu-iotests/300           | 202 ++++++++++++++++
+ tests/qemu-iotests/300.out       |  98 ++++++++
+ tests/qemu-iotests/301           |  90 ++++++++
+ tests/qemu-iotests/301.out       |  30 +++
+ tests/qemu-iotests/302           | 252 ++++++++++++++++++++
+ tests/qemu-iotests/302.out       |  18 ++
+ tests/qemu-iotests/303           | 228 ++++++++++++++++++
+ tests/qemu-iotests/303.out       |  28 +++
+ tests/qemu-iotests/common.filter |   6 +-
+ tests/qemu-iotests/group         |   9 +
+ 35 files changed, 1986 insertions(+), 53 deletions(-)
+ create mode 100644 block/amend.c
+ create mode 100755 tests/qemu-iotests/300
+ create mode 100644 tests/qemu-iotests/300.out
+ create mode 100755 tests/qemu-iotests/301
+ create mode 100644 tests/qemu-iotests/301.out
+ create mode 100644 tests/qemu-iotests/302
+ create mode 100644 tests/qemu-iotests/302.out
+ create mode 100644 tests/qemu-iotests/303
+ create mode 100644 tests/qemu-iotests/303.out
+
+--=20
+2.17.2
 
 
-Uh, that's true and I agree it would be great. Die notdirty_mem_ops die...
-
-Paolo
