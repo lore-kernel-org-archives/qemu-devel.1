@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF3AAC49ED9
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:28:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C504C5ACAE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:29:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5CE120830
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:28:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5CE120830
+	by mail.kernel.org (Postfix) with ESMTPS id 0194B20830
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:29:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0194B20830
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8IaI-0007Wi-UQ
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 02:28:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37104)
+	id 1i8IbO-0000Tr-SD
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 02:29:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37072)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1i8IGI-0002Uc-7f
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:26 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IGF-0002RC-R5
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG8-000892-Lq
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:21 -0400
-Received: from mail01.asahi-net.or.jp ([202.224.55.13]:60010)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG9-00089g-40
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:19 -0400
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:60023)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG8-00086s-5M
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:12 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG8-000887-Im
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:13 -0400
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail01.asahi-net.or.jp (Postfix) with ESMTPA id B6F1584994;
- Thu, 12 Sep 2019 15:07:10 +0900 (JST)
+ by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 4EFAC852BF;
+ Thu, 12 Sep 2019 15:07:11 +0900 (JST)
 Received: from yo-satoh-debian.localdomain
  (ae227063.dynamic.ppp.asahi-net.or.jp [14.3.227.63])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 67F24240086;
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id F4035240086;
  Thu, 12 Sep 2019 15:07:10 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Date: Thu, 12 Sep 2019 15:06:54 +0900
-Message-Id: <20190912060701.4642-16-ysato@users.sourceforge.jp>
+Date: Thu, 12 Sep 2019 15:06:56 +0900
+Message-Id: <20190912060701.4642-18-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190912060701.4642-1-ysato@users.sourceforge.jp>
 References: <20190912060701.4642-1-ysato@users.sourceforge.jp>
@@ -54,8 +54,7 @@ Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 202.224.55.13
-Subject: [Qemu-devel] [PATCH v24 15/22] hw/timer: RX62N internal timer
- modules
+Subject: [Qemu-devel] [PATCH v24 17/22] hw/rx: RX Target hardware definition
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,152 +66,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Yoshinori Sato <ysato@users.sourceforge.jp>,
- philmd@redhat.com, richard.henderson@linaro.org, imammedo@redhat.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, imammedo@redhat.com, richard.henderson@linaro.org,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-renesas_tmr: 8bit timer modules.
-renesas_cmt: 16bit compare match timer modules.
-This part use many renesas's CPU.
-Hardware manual.
-https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033=
-ej0140_rx62n.pdf
+rx62n - RX62N cpu.
+rx-virt - RX QEMU virtual target.
+
+v23 changes.
+Add missing includes.
+
+v21 changes.
+rx_load_image move to rx-virt.c
 
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190607091116.49044-7-ysato@users.sourceforge.jp>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/hw/timer/renesas_cmt.h |  38 +++
- include/hw/timer/renesas_tmr.h |  53 ++++
- hw/timer/renesas_cmt.c         | 278 ++++++++++++++++++++
- hw/timer/renesas_tmr.c         | 458 +++++++++++++++++++++++++++++++++
- hw/timer/Kconfig               |   6 +
- hw/timer/Makefile.objs         |   3 +
- 6 files changed, 836 insertions(+)
- create mode 100644 include/hw/timer/renesas_cmt.h
- create mode 100644 include/hw/timer/renesas_tmr.h
- create mode 100644 hw/timer/renesas_cmt.c
- create mode 100644 hw/timer/renesas_tmr.c
 
-diff --git a/include/hw/timer/renesas_cmt.h b/include/hw/timer/renesas_cm=
-t.h
+Message-Id: <20190616142836.10614-17-ysato@users.sourceforge.jp>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20190607091116.49044-9-ysato@users.sourceforge.jp>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+[PMD: Use TYPE_RX62N_CPU, use #define for RX62N_NR_TMR/CMT/SCI,
+ renamed CPU -> MCU, device -> microcontroller]
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+v19: Fixed typo (Peter Maydell)
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+---
+ include/hw/rx/rx.h    |   7 ++
+ include/hw/rx/rx62n.h |  91 ++++++++++++++++
+ hw/rx/rx-virt.c       | 127 ++++++++++++++++++++++
+ hw/rx/rx62n.c         | 239 ++++++++++++++++++++++++++++++++++++++++++
+ hw/rx/Kconfig         |  14 +++
+ hw/rx/Makefile.objs   |   2 +
+ 6 files changed, 480 insertions(+)
+ create mode 100644 include/hw/rx/rx.h
+ create mode 100644 include/hw/rx/rx62n.h
+ create mode 100644 hw/rx/rx-virt.c
+ create mode 100644 hw/rx/rx62n.c
+ create mode 100644 hw/rx/Kconfig
+ create mode 100644 hw/rx/Makefile.objs
+
+diff --git a/include/hw/rx/rx.h b/include/hw/rx/rx.h
 new file mode 100644
-index 0000000000..acd25c6e0b
+index 0000000000..ff5924b81f
 --- /dev/null
-+++ b/include/hw/timer/renesas_cmt.h
-@@ -0,0 +1,38 @@
-+/*
-+ * Renesas Compare-match timer Object
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This code is licensed under the GPL version 2 or later.
-+ *
-+ */
++++ b/include/hw/rx/rx.h
+@@ -0,0 +1,7 @@
++#ifndef QEMU_RX_H
++#define QEMU_RX_H
++/* Definitions for RX board emulation.  */
 +
-+#ifndef HW_RENESAS_CMT_H
-+#define HW_RENESAS_CMT_H
-+
-+#include "hw/sysbus.h"
-+
-+#define TYPE_RENESAS_CMT "renesas-cmt"
-+#define RCMT(obj) OBJECT_CHECK(RCMTState, (obj), TYPE_RENESAS_CMT)
-+
-+enum {
-+    CMT_CH =3D 2,
-+    CMT_NR_IRQ =3D 1 * CMT_CH,
-+};
-+
-+typedef struct RCMTState {
-+    SysBusDevice parent_obj;
-+
-+    uint64_t input_freq;
-+    MemoryRegion memory;
-+
-+    uint16_t cmstr;
-+    uint16_t cmcr[CMT_CH];
-+    uint16_t cmcnt[CMT_CH];
-+    uint16_t cmcor[CMT_CH];
-+    int64_t tick[CMT_CH];
-+    qemu_irq cmi[CMT_CH];
-+    QEMUTimer *timer[CMT_CH];
-+} RCMTState;
++#include "target/rx/cpu-qom.h"
 +
 +#endif
-diff --git a/include/hw/timer/renesas_tmr.h b/include/hw/timer/renesas_tm=
-r.h
+diff --git a/include/hw/rx/rx62n.h b/include/hw/rx/rx62n.h
 new file mode 100644
-index 0000000000..5787004c74
+index 0000000000..97ea8ddb8e
 --- /dev/null
-+++ b/include/hw/timer/renesas_tmr.h
-@@ -0,0 +1,53 @@
++++ b/include/hw/rx/rx62n.h
+@@ -0,0 +1,91 @@
 +/*
-+ * Renesas 8bit timer Object
-+ *
-+ * Copyright (c) 2018 Yoshinori Sato
-+ *
-+ * This code is licensed under the GPL version 2 or later.
-+ *
-+ */
-+
-+#ifndef HW_RENESAS_TMR_H
-+#define HW_RENESAS_TMR_H
-+
-+#include "hw/sysbus.h"
-+
-+#define TYPE_RENESAS_TMR "renesas-tmr"
-+#define RTMR(obj) OBJECT_CHECK(RTMRState, (obj), TYPE_RENESAS_TMR)
-+
-+enum timer_event {
-+    cmia =3D 0,
-+    cmib =3D 1,
-+    ovi =3D 2,
-+    none =3D 3,
-+    TMR_NR_EVENTS =3D 4
-+};
-+
-+enum {
-+    TMR_CH =3D 2,
-+    TMR_NR_IRQ =3D 3 * TMR_CH,
-+};
-+
-+typedef struct RTMRState {
-+    SysBusDevice parent_obj;
-+
-+    uint64_t input_freq;
-+    MemoryRegion memory;
-+
-+    uint8_t tcnt[TMR_CH];
-+    uint8_t tcora[TMR_CH];
-+    uint8_t tcorb[TMR_CH];
-+    uint8_t tcr[TMR_CH];
-+    uint8_t tccr[TMR_CH];
-+    uint8_t tcor[TMR_CH];
-+    uint8_t tcsr[TMR_CH];
-+    int64_t tick;
-+    int64_t div_round[TMR_CH];
-+    enum timer_event next[TMR_CH];
-+    qemu_irq cmia[TMR_CH];
-+    qemu_irq cmib[TMR_CH];
-+    qemu_irq ovi[TMR_CH];
-+    QEMUTimer *timer[TMR_CH];
-+} RTMRState;
-+
-+#endif
-diff --git a/hw/timer/renesas_cmt.c b/hw/timer/renesas_cmt.c
-new file mode 100644
-index 0000000000..5d57c447b8
---- /dev/null
-+++ b/hw/timer/renesas_cmt.c
-@@ -0,0 +1,278 @@
-+/*
-+ * Renesas 16bit Compare-match timer
++ * RX62N MCU Object
 + *
 + * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
 + * (Rev.1.40 R01UH0033EJ0140)
@@ -236,774 +153,498 @@ ng with
 + * this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+#include "qemu/timer.h"
-+#include "cpu.h"
-+#include "hw/hw.h"
-+#include "hw/irq.h"
++#ifndef HW_RX_RX62N_H
++#define HW_RX_RX62N_H
++
 +#include "hw/sysbus.h"
-+#include "hw/registerfields.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/timer/renesas_cmt.h"
-+#include "migration/vmstate.h"
-+#include "qemu/error-report.h"
-+
-+/*
-+ *  +0 CMSTR - common control
-+ *  +2 CMCR  - ch0
-+ *  +4 CMCNT - ch0
-+ *  +6 CMCOR - ch0
-+ *  +8 CMCR  - ch1
-+ * +10 CMCNT - ch1
-+ * +12 CMCOR - ch1
-+ * If we think that the address of CH 0 has an offset of +2,
-+ * we can treat it with the same address as CH 1, so define it like that=
-.
-+ */
-+REG16(CMSTR, 0)
-+  FIELD(CMSTR, STR0, 0, 1)
-+  FIELD(CMSTR, STR1, 1, 1)
-+  FIELD(CMSTR, STR,  0, 2)
-+/* This addeess is channel offset */
-+REG16(CMCR, 0)
-+  FIELD(CMCR, CKS, 0, 2)
-+  FIELD(CMCR, CMIE, 6, 1)
-+REG16(CMCNT, 2)
-+REG16(CMCOR, 4)
-+
-+static void update_events(RCMTState *cmt, int ch)
-+{
-+    int64_t next_time;
-+
-+    if ((cmt->cmstr & (1 << ch)) =3D=3D 0) {
-+        /* count disable, so not happened next event. */
-+        return ;
-+    }
-+    next_time =3D cmt->cmcor[ch] - cmt->cmcnt[ch];
-+    next_time *=3D NANOSECONDS_PER_SECOND;
-+    next_time /=3D cmt->input_freq;
-+    /*
-+     * CKS -> div rate
-+     *  0 -> 8 (1 << 3)
-+     *  1 -> 32 (1 << 5)
-+     *  2 -> 128 (1 << 7)
-+     *  3 -> 512 (1 << 9)
-+     */
-+    next_time *=3D 1 << (3 + FIELD_EX16(cmt->cmcr[ch], CMCR, CKS) * 2);
-+    next_time +=3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    timer_mod(cmt->timer[ch], next_time);
-+}
-+
-+static int64_t read_cmcnt(RCMTState *cmt, int ch)
-+{
-+    int64_t delta, now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+
-+    if (cmt->cmstr & (1 << ch)) {
-+        delta =3D (now - cmt->tick[ch]);
-+        delta /=3D NANOSECONDS_PER_SECOND;
-+        delta /=3D cmt->input_freq;
-+        delta /=3D 1 << (3 + FIELD_EX16(cmt->cmcr[ch], CMCR, CKS) * 2);
-+        cmt->tick[ch] =3D now;
-+        return cmt->cmcnt[ch] + delta;
-+    } else {
-+        return cmt->cmcnt[ch];
-+    }
-+}
-+
-+static uint64_t cmt_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    hwaddr offset =3D addr & 0x0f;
-+    RCMTState *cmt =3D opaque;
-+    int ch =3D offset / 0x08;
-+    uint64_t ret;
-+
-+    if (offset =3D=3D A_CMSTR) {
-+        ret =3D 0;
-+        ret =3D FIELD_DP16(ret, CMSTR, STR,
-+                         FIELD_EX16(cmt->cmstr, CMSTR, STR));
-+        return ret;
-+    } else {
-+        offset &=3D 0x07;
-+        if (ch =3D=3D 0) {
-+            offset -=3D 0x02;
-+        }
-+        switch (offset) {
-+        case A_CMCR:
-+            ret =3D 0;
-+            ret =3D FIELD_DP16(ret, CMCR, CKS,
-+                             FIELD_EX16(cmt->cmstr, CMCR, CKS));
-+            ret =3D FIELD_DP16(ret, CMCR, CMIE,
-+                             FIELD_EX16(cmt->cmstr, CMCR, CMIE));
-+            return ret;
-+        case A_CMCNT:
-+            return read_cmcnt(cmt, ch);
-+        case A_CMCOR:
-+            return cmt->cmcor[ch];
-+        }
-+    }
-+    qemu_log_mask(LOG_UNIMP, "renesas_cmt: Register 0x%"
-+                  HWADDR_PRIX " not implemented\n", offset);
-+    return UINT64_MAX;
-+}
-+
-+static void start_stop(RCMTState *cmt, int ch, int st)
-+{
-+    if (st) {
-+        update_events(cmt, ch);
-+    } else {
-+        timer_del(cmt->timer[ch]);
-+    }
-+}
-+
-+static void cmt_write(void *opaque, hwaddr addr, uint64_t val, unsigned =
-size)
-+{
-+    hwaddr offset =3D addr & 0x0f;
-+    RCMTState *cmt =3D opaque;
-+    int ch =3D offset / 0x08;
-+
-+    if (offset =3D=3D A_CMSTR) {
-+        cmt->cmstr =3D FIELD_EX16(val, CMSTR, STR);
-+        start_stop(cmt, 0, FIELD_EX16(cmt->cmstr, CMSTR, STR0));
-+        start_stop(cmt, 1, FIELD_EX16(cmt->cmstr, CMSTR, STR1));
-+    } else {
-+        offset &=3D 0x07;
-+        if (ch =3D=3D 0) {
-+            offset -=3D 0x02;
-+        }
-+        switch (offset) {
-+        case A_CMCR:
-+            cmt->cmcr[ch] =3D FIELD_DP16(cmt->cmcr[ch], CMCR, CKS,
-+                                       FIELD_EX16(val, CMCR, CKS));
-+            cmt->cmcr[ch] =3D FIELD_DP16(cmt->cmcr[ch], CMCR, CMIE,
-+                                       FIELD_EX16(val, CMCR, CMIE));
-+            break;
-+        case 2:
-+            cmt->cmcnt[ch] =3D val;
-+            break;
-+        case 4:
-+            cmt->cmcor[ch] =3D val;
-+            break;
-+        default:
-+            qemu_log_mask(LOG_UNIMP, "renesas_cmt: Register -0x%" HWADDR=
-_PRIX
-+                          " not implemented\n", offset);
-+            return;
-+        }
-+        if (FIELD_EX16(cmt->cmstr, CMSTR, STR) & (1 << ch)) {
-+            update_events(cmt, ch);
-+        }
-+    }
-+}
-+
-+static const MemoryRegionOps cmt_ops =3D {
-+    .write =3D cmt_write,
-+    .read  =3D cmt_read,
-+    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .impl =3D {
-+        .min_access_size =3D 2,
-+        .max_access_size =3D 2,
-+    },
-+};
-+
-+static void timer_events(RCMTState *cmt, int ch)
-+{
-+    cmt->cmcnt[ch] =3D 0;
-+    cmt->tick[ch] =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    update_events(cmt, ch);
-+    if (FIELD_EX16(cmt->cmcr[ch], CMCR, CMIE)) {
-+        qemu_irq_pulse(cmt->cmi[ch]);
-+    }
-+}
-+
-+static void timer_event0(void *opaque)
-+{
-+    RCMTState *cmt =3D opaque;
-+
-+    timer_events(cmt, 0);
-+}
-+
-+static void timer_event1(void *opaque)
-+{
-+    RCMTState *cmt =3D opaque;
-+
-+    timer_events(cmt, 1);
-+}
-+
-+static void rcmt_reset(DeviceState *dev)
-+{
-+    RCMTState *cmt =3D RCMT(dev);
-+    cmt->cmstr =3D 0;
-+    cmt->cmcr[0] =3D cmt->cmcr[1] =3D 0;
-+    cmt->cmcnt[0] =3D cmt->cmcnt[1] =3D 0;
-+    cmt->cmcor[0] =3D cmt->cmcor[1] =3D 0xffff;
-+}
-+
-+static void rcmt_init(Object *obj)
-+{
-+    SysBusDevice *d =3D SYS_BUS_DEVICE(obj);
-+    RCMTState *cmt =3D RCMT(obj);
-+    int i;
-+
-+    memory_region_init_io(&cmt->memory, OBJECT(cmt), &cmt_ops,
-+                          cmt, "renesas-cmt", 0x10);
-+    sysbus_init_mmio(d, &cmt->memory);
-+
-+    for (i =3D 0; i < ARRAY_SIZE(cmt->cmi); i++) {
-+        sysbus_init_irq(d, &cmt->cmi[i]);
-+    }
-+    cmt->timer[0] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, timer_event0, cmt=
-);
-+    cmt->timer[1] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, timer_event1, cmt=
-);
-+}
-+
-+static const VMStateDescription vmstate_rcmt =3D {
-+    .name =3D "rx-cmt",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property rcmt_properties[] =3D {
-+    DEFINE_PROP_UINT64("input-freq", RCMTState, input_freq, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void rcmt_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->props =3D rcmt_properties;
-+    dc->vmsd =3D &vmstate_rcmt;
-+    dc->reset =3D rcmt_reset;
-+}
-+
-+static const TypeInfo rcmt_info =3D {
-+    .name       =3D TYPE_RENESAS_CMT,
-+    .parent     =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(RCMTState),
-+    .instance_init =3D rcmt_init,
-+    .class_init =3D rcmt_class_init,
-+};
-+
-+static void rcmt_register_types(void)
-+{
-+    type_register_static(&rcmt_info);
-+}
-+
-+type_init(rcmt_register_types)
-diff --git a/hw/timer/renesas_tmr.c b/hw/timer/renesas_tmr.c
-new file mode 100644
-index 0000000000..eebdd0cb1f
---- /dev/null
-+++ b/hw/timer/renesas_tmr.c
-@@ -0,0 +1,458 @@
-+/*
-+ * Renesas 8bit timer
-+ *
-+ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-+ * (Rev.1.40 R01UH0033EJ0140)
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+#include "qemu/timer.h"
-+#include "qemu/bitops.h"
-+#include "cpu.h"
-+#include "hw/hw.h"
-+#include "hw/irq.h"
-+#include "hw/sysbus.h"
-+#include "hw/registerfields.h"
-+#include "hw/qdev-properties.h"
++#include "hw/intc/rx_icu.h"
 +#include "hw/timer/renesas_tmr.h"
-+#include "migration/vmstate.h"
-+#include "qemu/error-report.h"
++#include "hw/timer/renesas_cmt.h"
++#include "hw/char/renesas_sci.h"
++#include "target/rx/cpu.h"
++#include "qemu/units.h"
 +
-+REG8(TCR, 0)
-+  FIELD(TCR, CCLR, 3, 2)
-+  FIELD(TCR, OVIE, 5, 1)
-+  FIELD(TCR, CMIEA, 6, 1)
-+  FIELD(TCR, CMIEB, 7, 1)
-+REG8(TCSR, 2)
-+  FIELD(TCSR, OSA, 0, 2)
-+  FIELD(TCSR, OSB, 2, 2)
-+  FIELD(TCSR, ADTE, 4, 2)
-+REG8(TCORA, 4)
-+REG8(TCORB, 6)
-+REG8(TCNT, 8)
-+REG8(TCCR, 10)
-+  FIELD(TCCR, CKS, 0, 3)
-+  FIELD(TCCR, CSS, 3, 2)
-+  FIELD(TCCR, TMRIS, 7, 1)
++#define TYPE_RX62N "rx62n"
++#define RX62N(obj) OBJECT_CHECK(RX62NState, (obj), TYPE_RX62N)
 +
-+#define INTERNAL  0x01
-+#define CASCADING 0x03
-+#define CCLR_A    0x01
-+#define CCLR_B    0x02
++#define RX62N_NR_TMR    2
++#define RX62N_NR_CMT    2
++#define RX62N_NR_SCI    6
 +
-+static const int clkdiv[] =3D {0, 1, 2, 8, 32, 64, 1024, 8192};
++typedef struct RX62NState {
++    SysBusDevice parent_obj;
 +
-+#define concat_reg(reg) ((reg[0] << 8) | reg[1])
-+static void update_events(RTMRState *tmr, int ch)
++    RXCPU cpu;
++    RXICUState icu;
++    RTMRState tmr[RX62N_NR_TMR];
++    RCMTState cmt[RX62N_NR_CMT];
++    RSCIState sci[RX62N_NR_SCI];
++
++    MemoryRegion *sysmem;
++    bool kernel;
++
++    MemoryRegion iram;
++    MemoryRegion iomem1;
++    MemoryRegion d_flash;
++    MemoryRegion iomem2;
++    MemoryRegion iomem3;
++    MemoryRegion c_flash;
++    qemu_irq irq[NR_IRQS];
++} RX62NState;
++
++/*
++ * RX62N Peripheral Address
++ * See users manual section 5
++ */
++#define RX62N_ICUBASE 0x00087000
++#define RX62N_TMRBASE 0x00088200
++#define RX62N_CMTBASE 0x00088000
++#define RX62N_SCIBASE 0x00088240
++
++/*
++ * RX62N Peripheral IRQ
++ * See users manual section 11
++ */
++#define RX62N_TMR_IRQBASE 174
++#define RX62N_CMT_IRQBASE 28
++#define RX62N_SCI_IRQBASE 214
++
++/*
++ * RX62N Internal Memory
++ * It is the value of R5F562N8.
++ * Please change the size for R5F562N7.
++ */
++#define RX62N_IRAM_BASE 0x00000000
++#define RX62N_IRAM_SIZE (96 * KiB)
++#define RX62N_DFLASH_BASE 0x00100000
++#define RX62N_DFLASH_SIZE (32 * KiB)
++#define RX62N_CFLASH_BASE 0xfff80000
++#define RX62N_CFLASH_SIZE (512 * KiB)
++
++#define RX62N_PCLK (48 * 1000 * 1000)
++#endif
+diff --git a/hw/rx/rx-virt.c b/hw/rx/rx-virt.c
+new file mode 100644
+index 0000000000..4cfe2e3123
+--- /dev/null
++++ b/hw/rx/rx-virt.c
+@@ -0,0 +1,127 @@
++/*
++ * RX QEMU virtual platform
++ *
++ * Copyright (c) 2019 Yoshinori Sato
++ *
++ * This program is free software; you can redistribute it and/or modify =
+it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOU=
+T
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
+ for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License alo=
+ng with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "hw/sysbus.h"
++#include "hw/loader.h"
++#include "hw/rx/rx62n.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/qtest.h"
++#include "sysemu/device_tree.h"
++#include "hw/boards.h"
++
++/* Same address of GDB integrated simulator */
++#define SDRAM_BASE 0x01000000
++
++static void rx_load_image(RXCPU *cpu, const char *filename,
++                          uint32_t start, uint32_t size)
 +{
-+    uint16_t diff[TMR_NR_EVENTS], min;
-+    int64_t next_time;
-+    int i, event;
-+
-+    if (tmr->tccr[ch] =3D=3D 0) {
-+        return ;
-+    }
-+    if (FIELD_EX8(tmr->tccr[ch], TCCR, CSS) =3D=3D 0) {
-+        /* external clock mode */
-+        /* event not happened */
-+        return ;
-+    }
-+    if (FIELD_EX8(tmr->tccr[0], TCCR, CSS) =3D=3D CASCADING) {
-+        /* cascading mode */
-+        if (ch =3D=3D 1) {
-+            tmr->next[ch] =3D none;
-+            return ;
-+        }
-+        diff[cmia] =3D concat_reg(tmr->tcora) - concat_reg(tmr->tcnt);
-+        diff[cmib] =3D concat_reg(tmr->tcorb) - concat_reg(tmr->tcnt);
-+        diff[ovi] =3D 0x10000 - concat_reg(tmr->tcnt);
-+    } else {
-+        /* separate mode */
-+        diff[cmia] =3D tmr->tcora[ch] - tmr->tcnt[ch];
-+        diff[cmib] =3D tmr->tcorb[ch] - tmr->tcnt[ch];
-+        diff[ovi] =3D 0x100 - tmr->tcnt[ch];
-+    }
-+    /* Search for the most recently occurring event. */
-+    for (event =3D 0, min =3D diff[0], i =3D 1; i < none; i++) {
-+        if (min > diff[i]) {
-+            event =3D i;
-+            min =3D diff[i];
-+        }
-+    }
-+    tmr->next[ch] =3D event;
-+    next_time =3D diff[event];
-+    next_time *=3D clkdiv[FIELD_EX8(tmr->tccr[ch], TCCR, CKS)];
-+    next_time *=3D NANOSECONDS_PER_SECOND;
-+    next_time /=3D tmr->input_freq;
-+    next_time +=3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    timer_mod(tmr->timer[ch], next_time);
-+}
-+
-+
-+static inline int elapsed_time(RTMRState *tmr, int ch, int64_t delta)
-+{
-+    int divrate =3D clkdiv[FIELD_EX8(tmr->tccr[ch], TCCR, CKS)];
-+    int et;
-+
-+    tmr->div_round[ch] +=3D delta;
-+    if (divrate > 0) {
-+        et =3D tmr->div_round[ch] / divrate;
-+        tmr->div_round[ch] %=3D divrate;
-+    } else {
-+        /* disble clock. so no update */
-+        et =3D 0;
-+    }
-+    return et;
-+}
-+static uint16_t read_tcnt(RTMRState *tmr, unsigned size, int ch)
-+{
-+    int64_t delta, now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    int elapsed, ovf =3D 0;
-+    uint16_t tcnt[2];
-+    uint32_t ret;
-+
-+    delta =3D (now - tmr->tick) * NANOSECONDS_PER_SECOND / tmr->input_fr=
-eq;
-+    if (delta > 0) {
-+        tmr->tick =3D now;
-+
-+        if (FIELD_EX8(tmr->tccr[1], TCCR, CSS) =3D=3D INTERNAL) {
-+            /* timer1 count update */
-+            elapsed =3D elapsed_time(tmr, 1, delta);
-+            if (elapsed >=3D 0x100) {
-+                ovf =3D elapsed >> 8;
-+            }
-+            tcnt[1] =3D tmr->tcnt[1] + (elapsed & 0xff);
-+        }
-+        switch (FIELD_EX8(tmr->tccr[0], TCCR, CSS)) {
-+        case INTERNAL:
-+            elapsed =3D elapsed_time(tmr, 0, delta);
-+            tcnt[0] =3D tmr->tcnt[0] + elapsed;
-+            break;
-+        case CASCADING:
-+            if (ovf > 0) {
-+                tcnt[0] =3D tmr->tcnt[0] + ovf;
-+            }
-+            break;
-+        }
-+    } else {
-+        tcnt[0] =3D tmr->tcnt[0];
-+        tcnt[1] =3D tmr->tcnt[1];
-+    }
-+    if (size =3D=3D 1) {
-+        return tcnt[ch];
-+    } else {
-+        ret =3D 0;
-+        ret =3D deposit32(ret, 0, 8, tcnt[1]);
-+        ret =3D deposit32(ret, 8, 8, tcnt[0]);
-+        return ret;
-+    }
-+}
-+
-+static inline uint8_t read_tccr(uint8_t r)
-+{
-+    uint8_t tccr =3D 0;
-+    tccr =3D FIELD_DP8(tccr, TCCR, TMRIS,
-+                     FIELD_EX8(r, TCCR, TMRIS));
-+    tccr =3D FIELD_DP8(tccr, TCCR, CSS,
-+                     FIELD_EX8(r, TCCR, CSS));
-+    tccr =3D FIELD_DP8(tccr, TCCR, CKS,
-+                     FIELD_EX8(r, TCCR, CKS));
-+    return tccr;
-+}
-+
-+static uint64_t tmr_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    RTMRState *tmr =3D opaque;
-+    int ch =3D addr & 1;
-+    uint64_t ret;
-+
-+    if (size =3D=3D 2 && (ch !=3D 0 || addr =3D=3D A_TCR || addr =3D=3D =
-A_TCSR)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "renesas_tmr: Invalid read size 0=
-x%"
-+                      HWADDR_PRIX "\n", addr);
-+        return UINT64_MAX;
-+    }
-+    switch (addr & 0x0e) {
-+    case A_TCR:
-+        ret =3D 0;
-+        ret =3D FIELD_DP8(ret, TCR, CCLR,
-+                        FIELD_EX8(tmr->tcr[ch], TCR, CCLR));
-+        ret =3D FIELD_DP8(ret, TCR, OVIE,
-+                        FIELD_EX8(tmr->tcr[ch], TCR, OVIE));
-+        ret =3D FIELD_DP8(ret, TCR, CMIEA,
-+                        FIELD_EX8(tmr->tcr[ch], TCR, CMIEA));
-+        ret =3D FIELD_DP8(ret, TCR, CMIEB,
-+                        FIELD_EX8(tmr->tcr[ch], TCR, CMIEB));
-+        return ret;
-+    case A_TCSR:
-+        ret =3D 0;
-+        ret =3D FIELD_DP8(ret, TCSR, OSA,
-+                        FIELD_EX8(tmr->tcsr[ch], TCSR, OSA));
-+        ret =3D FIELD_DP8(ret, TCSR, OSB,
-+                        FIELD_EX8(tmr->tcsr[ch], TCSR, OSB));
-+        switch (ch) {
-+        case 0:
-+            ret =3D FIELD_DP8(ret, TCSR, ADTE,
-+                            FIELD_EX8(tmr->tcsr[ch], TCSR, ADTE));
-+            break;
-+        case 1: /* CH1 ADTE unimplement always 1 */
-+            ret =3D FIELD_DP8(ret, TCSR, ADTE, 1);
-+            break;
-+        }
-+        return ret;
-+    case A_TCORA:
-+        if (size =3D=3D 1) {
-+            return tmr->tcora[ch];
-+        } else if (ch =3D=3D 0) {
-+            return concat_reg(tmr->tcora);
-+        }
-+    case A_TCORB:
-+        if (size =3D=3D 1) {
-+            return tmr->tcorb[ch];
-+        } else {
-+            return concat_reg(tmr->tcorb);
-+        }
-+    case A_TCNT:
-+        return read_tcnt(tmr, size, ch);
-+    case A_TCCR:
-+        if (size =3D=3D 1) {
-+            return read_tccr(tmr->tccr[ch]);
-+        } else {
-+            return read_tccr(tmr->tccr[0]) << 8 | read_tccr(tmr->tccr[1]=
-);
-+        }
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "renesas_tmr: Register 0x%" HWADDR_PRIX
-+                      " not implemented\n", addr);
-+        break;
-+    }
-+    return UINT64_MAX;
-+}
-+
-+#define COUNT_WRITE(reg, val)                   \
-+    do {                                        \
-+        if (size =3D=3D 1) {                        \
-+            tmr->reg[ch] =3D val;                 \
-+            update_events(tmr, ch);             \
-+        } else {                                \
-+            tmr->reg[0] =3D extract32(val, 8, 8); \
-+            tmr->reg[1] =3D extract32(val, 0, 8); \
-+            update_events(tmr, 0);              \
-+            update_events(tmr, 1);              \
-+        }                                       \
-+    } while (0)
-+
-+static void tmr_write(void *opaque, hwaddr addr, uint64_t val, unsigned =
-size)
-+{
-+    RTMRState *tmr =3D opaque;
-+    int ch =3D addr & 1;
-+
-+    if (size =3D=3D 2 && (ch !=3D 0 || addr =3D=3D A_TCR || addr =3D=3D =
-A_TCSR)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_tmr: Invalid write size 0x%" HWADDR_PRIX
-+                      "\n", addr);
-+        return;
-+    }
-+    switch (addr & 0x0e) {
-+    case A_TCR:
-+        tmr->tcr[ch] =3D val;
-+        break;
-+    case A_TCSR:
-+        tmr->tcsr[ch] =3D val;
-+        break;
-+    case A_TCORA:
-+        COUNT_WRITE(tcora, val);
-+        break;
-+    case A_TCORB:
-+        COUNT_WRITE(tcorb, val);
-+        break;
-+    case A_TCNT:
-+        COUNT_WRITE(tcnt, val);
-+        break;
-+    case A_TCCR:
-+        COUNT_WRITE(tccr, val);
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "renesas_tmr: Register 0x%" HWADDR_PRIX
-+                      " not implemented\n", addr);
-+        break;
-+    }
-+}
-+
-+static const MemoryRegionOps tmr_ops =3D {
-+    .write =3D tmr_write,
-+    .read  =3D tmr_read,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
-+    .impl =3D {
-+        .min_access_size =3D 1,
-+        .max_access_size =3D 2,
-+    },
-+};
-+
-+static void timer_events(RTMRState *tmr, int ch);
-+
-+static uint16_t issue_event(RTMRState *tmr, int ch, int sz,
-+                        uint16_t tcnt, uint16_t tcora, uint16_t tcorb)
-+{
-+    uint16_t ret =3D tcnt;
-+
-+    switch (tmr->next[ch]) {
-+    case none:
-+        break;
-+    case cmia:
-+        if (tcnt >=3D tcora) {
-+            if (FIELD_EX8(tmr->tcr[ch], TCR, CCLR) =3D=3D CCLR_A) {
-+                ret =3D tcnt - tcora;
-+            }
-+            if (FIELD_EX8(tmr->tcr[ch], TCR, CMIEA)) {
-+                qemu_irq_pulse(tmr->cmia[ch]);
-+            }
-+            if (sz =3D=3D 8 && ch =3D=3D 0 &&
-+                FIELD_EX8(tmr->tccr[1], TCCR, CSS) =3D=3D CASCADING) {
-+                tmr->tcnt[1]++;
-+                timer_events(tmr, 1);
-+            }
-+        }
-+        break;
-+    case cmib:
-+        if (tcnt >=3D tcorb) {
-+            if (FIELD_EX8(tmr->tcr[ch], TCR, CCLR) =3D=3D CCLR_B) {
-+                ret =3D tcnt - tcorb;
-+            }
-+            if (FIELD_EX8(tmr->tcr[ch], TCR, CMIEB)) {
-+                qemu_irq_pulse(tmr->cmib[ch]);
-+            }
-+        }
-+        break;
-+    case ovi:
-+        if ((tcnt >=3D (1 << sz)) && FIELD_EX8(tmr->tcr[ch], TCR, OVIE))=
- {
-+            qemu_irq_pulse(tmr->ovi[ch]);
-+        }
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+    return ret;
-+}
-+
-+static void timer_events(RTMRState *tmr, int ch)
-+{
-+    uint16_t tcnt;
-+    tmr->tcnt[ch] =3D read_tcnt(tmr, 1, ch);
-+    if (FIELD_EX8(tmr->tccr[0], TCCR, CSS) !=3D CASCADING) {
-+        tmr->tcnt[ch] =3D issue_event(tmr, ch, 8,
-+                                    tmr->tcnt[ch],
-+                                    tmr->tcora[ch], tmr->tcorb[ch]) & 0x=
-ff;
-+    } else {
-+        if (ch =3D=3D 1) {
-+            return ;
-+        }
-+        tcnt =3D issue_event(tmr, ch, 16,
-+                           concat_reg(tmr->tcnt),
-+                           concat_reg(tmr->tcora),
-+                           concat_reg(tmr->tcorb));
-+        tmr->tcnt[0] =3D (tcnt >> 8) & 0xff;
-+        tmr->tcnt[1] =3D tcnt & 0xff;
-+    }
-+    update_events(tmr, ch);
-+}
-+
-+static void timer_event0(void *opaque)
-+{
-+    RTMRState *tmr =3D opaque;
-+
-+    timer_events(tmr, 0);
-+}
-+
-+static void timer_event1(void *opaque)
-+{
-+    RTMRState *tmr =3D opaque;
-+
-+    timer_events(tmr, 1);
-+}
-+
-+static void rtmr_reset(DeviceState *dev)
-+{
-+    RTMRState *tmr =3D RTMR(dev);
-+    tmr->tcr[0]   =3D tmr->tcr[1]   =3D 0x00;
-+    tmr->tcsr[0]  =3D 0x00;
-+    tmr->tcsr[1]  =3D 0x10;
-+    tmr->tcnt[0]  =3D tmr->tcnt[1]  =3D 0x00;
-+    tmr->tcora[0] =3D tmr->tcora[1] =3D 0xff;
-+    tmr->tcorb[0] =3D tmr->tcorb[1] =3D 0xff;
-+    tmr->tccr[0]  =3D tmr->tccr[1]  =3D 0x00;
-+    tmr->next[0]  =3D tmr->next[1]  =3D none;
-+    tmr->tick =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+}
-+
-+static void rtmr_init(Object *obj)
-+{
-+    SysBusDevice *d =3D SYS_BUS_DEVICE(obj);
-+    RTMRState *tmr =3D RTMR(obj);
++    static uint32_t extable[32];
++    long kernel_size;
 +    int i;
 +
-+    memory_region_init_io(&tmr->memory, OBJECT(tmr), &tmr_ops,
-+                          tmr, "renesas-tmr", 0x10);
-+    sysbus_init_mmio(d, &tmr->memory);
-+
-+    for (i =3D 0; i < ARRAY_SIZE(tmr->ovi); i++) {
-+        sysbus_init_irq(d, &tmr->cmia[i]);
-+        sysbus_init_irq(d, &tmr->cmib[i]);
-+        sysbus_init_irq(d, &tmr->ovi[i]);
++    kernel_size =3D load_image_targphys(filename, start, size);
++    if (kernel_size < 0) {
++        fprintf(stderr, "qemu: could not load kernel '%s'\n", filename);
++        exit(1);
 +    }
-+    tmr->timer[0] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, timer_event0, tmr=
-);
-+    tmr->timer[1] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, timer_event1, tmr=
-);
++    cpu->env.pc =3D start;
++
++    /* setup exception trap trampoline */
++    /* linux kernel only works little-endian mode */
++    for (i =3D 0; i < ARRAY_SIZE(extable); i++) {
++        extable[i] =3D cpu_to_le32(0x10 + i * 4);
++    }
++    rom_add_blob_fixed("extable", extable, sizeof(extable), 0xffffff80);
 +}
 +
-+static const VMStateDescription vmstate_rtmr =3D {
-+    .name =3D "rx-tmr",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_END_OF_LIST()
++static void rxvirt_init(MachineState *machine)
++{
++    RX62NState *s =3D g_new(RX62NState, 1);
++    MemoryRegion *sysmem =3D get_system_memory();
++    MemoryRegion *sdram =3D g_new(MemoryRegion, 1);
++    const char *kernel_filename =3D machine->kernel_filename;
++    const char *dtb_filename =3D machine->dtb;
++    void *dtb =3D NULL;
++    int dtb_size;
++
++    /* Allocate memory space */
++    memory_region_init_ram(sdram, NULL, "sdram", 16 * MiB,
++                           &error_fatal);
++    memory_region_add_subregion(sysmem, SDRAM_BASE, sdram);
++
++    /* Initialize MCU */
++    object_initialize_child(OBJECT(machine), "mcu", s,
++                            sizeof(RX62NState), TYPE_RX62N,
++                            &error_fatal, NULL);
++    object_property_set_link(OBJECT(s), OBJECT(get_system_memory()),
++                             "memory", &error_abort);
++    object_property_set_bool(OBJECT(s), kernel_filename !=3D NULL,
++                             "load-kernel", &error_abort);
++    object_property_set_bool(OBJECT(s), true, "realized", &error_abort);
++
++    /* Load kernel and dtb */
++    if (kernel_filename) {
++        rx_load_image(RXCPU(first_cpu), kernel_filename,
++                      SDRAM_BASE + 8 * MiB, 8 * MiB);
++        if (dtb_filename) {
++            dtb =3D load_device_tree(dtb_filename, &dtb_size);
++            if (dtb =3D=3D NULL) {
++                fprintf(stderr, "Couldn't open dtb file %s\n", dtb_filen=
+ame);
++                exit(1);
++            }
++            if (machine->kernel_cmdline &&
++                qemu_fdt_setprop_string(dtb, "/chosen", "bootargs",
++                                        machine->kernel_cmdline) < 0) {
++                fprintf(stderr, "couldn't set /chosen/bootargs\n");
++                exit(1);
++            }
++            rom_add_blob_fixed("dtb", dtb, dtb_size,
++                               SDRAM_BASE + 16 * MiB - dtb_size);
++            /* Set dtb address to R1 */
++            RXCPU(first_cpu)->env.regs[1] =3D 0x02000000 - dtb_size;
++        }
 +    }
++}
++
++static void rxvirt_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc =3D MACHINE_CLASS(oc);
++
++    mc->desc =3D "RX QEMU Virtual Target";
++    mc->init =3D rxvirt_init;
++    mc->is_default =3D 1;
++    mc->default_cpu_type =3D TYPE_RX62N_CPU;
++}
++
++static const TypeInfo rxvirt_type =3D {
++    .name =3D MACHINE_TYPE_NAME("rx-virt"),
++    .parent =3D TYPE_MACHINE,
++    .class_init =3D rxvirt_class_init,
 +};
 +
-+static Property rtmr_properties[] =3D {
-+    DEFINE_PROP_UINT64("input-freq", RTMRState, input_freq, 0),
++static void rxvirt_machine_init(void)
++{
++    type_register_static(&rxvirt_type);
++}
++
++type_init(rxvirt_machine_init)
+diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
+new file mode 100644
+index 0000000000..ac47f2a397
+--- /dev/null
++++ b/hw/rx/rx62n.c
+@@ -0,0 +1,239 @@
++/*
++ * RX62N Microcontroller
++ *
++ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
++ * (Rev.1.40 R01UH0033EJ0140)
++ *
++ * Copyright (c) 2019 Yoshinori Sato
++ *
++ * This program is free software; you can redistribute it and/or modify =
+it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOU=
+T
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
+ for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License alo=
+ng with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "hw/hw.h"
++#include "hw/rx/rx62n.h"
++#include "hw/loader.h"
++#include "hw/sysbus.h"
++#include "hw/qdev-properties.h"
++#include "sysemu/sysemu.h"
++#include "cpu.h"
++
++/*
++ * IRQ -> IPR mapping table
++ * 0x00 - 0x91: IPR no (IPR00 to IPR91)
++ * 0xff: IPR not assigned
++ * See "11.3.1 Interrupt Vector Table" in hardware manual.
++ */
++static const int ipr_table[NR_IRQS] =3D {
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* 15 */
++    0x00, 0xff, 0xff, 0xff, 0xff, 0x01, 0xff, 0x02,
++    0xff, 0xff, 0xff, 0x03, 0x04, 0x05, 0x06, 0x07, /* 31 */
++    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
++    0x10, 0x11, 0x12, 0x13, 0x14, 0x14, 0x14, 0x14, /* 47 */
++    0x15, 0x15, 0x15, 0x15, 0xff, 0xff, 0xff, 0xff,
++    0x18, 0x18, 0x18, 0x18, 0x18, 0x1d, 0x1e, 0x1f, /* 63 */
++    0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
++    0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, /* 79 */
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0x3a, 0x3b, 0x3c, 0xff, 0xff, 0xff, /* 95 */
++    0x40, 0xff, 0x44, 0x45, 0xff, 0xff, 0x48, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* 111 */
++    0xff, 0xff, 0x51, 0x51, 0x51, 0x51, 0x52, 0x52,
++    0x52, 0x53, 0x53, 0x54, 0x54, 0x55, 0x55, 0x56, /* 127 */
++    0x56, 0x57, 0x57, 0x57, 0x57, 0x58, 0x59, 0x59,
++    0x59, 0x59, 0x5a, 0x5b, 0x5b, 0x5b, 0x5c, 0x5c, /* 143 */
++    0x5c, 0x5c, 0x5d, 0x5d, 0x5d, 0x5e, 0x5e, 0x5f,
++    0x5f, 0x60, 0x60, 0x61, 0x61, 0x62, 0x62, 0x62, /* 159 */
++    0x62, 0x63, 0x64, 0x64, 0x64, 0x64, 0x65, 0x66,
++    0x66, 0x66, 0x67, 0x67, 0x67, 0x67, 0x68, 0x68, /* 175 */
++    0x68, 0x69, 0x69, 0x69, 0x6a, 0x6a, 0x6a, 0x6b,
++    0x6b, 0x6b, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* 191 */
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x70, 0x71,
++    0x72, 0x73, 0x74, 0x75, 0xff, 0xff, 0xff, 0xff, /* 207 */
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x80, 0x80,
++    0x80, 0x80, 0x81, 0x81, 0x81, 0x81, 0x82, 0x82, /* 223 */
++    0x82, 0x82, 0x83, 0x83, 0x83, 0x83, 0xff, 0xff,
++    0xff, 0xff, 0x85, 0x85, 0x85, 0x85, 0x86, 0x86, /* 239 */
++    0x86, 0x86, 0xff, 0xff, 0xff, 0xff, 0x88, 0x89,
++    0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, /* 255 */
++};
++
++/*
++ * Level triggerd IRQ list
++ * Not listed IRQ is Edge trigger.
++ * See "11.3.1 Interrupt Vector Table" in hardware manual.
++ */
++static const uint32_t levelirq[] =3D {
++     16,  21,  32,  44,  47,  48,  51,  64,  65,  66,
++     67,  68,  69,  70,  71,  72,  73,  74,  75,  76,
++     77,  78,  79,  90,  91, 170, 171, 172, 173, 214,
++    217, 218, 221, 222, 225, 226, 229, 234, 237, 238,
++    241, 246, 249, 250, 253,
++};
++
++static void register_icu(RX62NState *s)
++{
++    int i;
++    SysBusDevice *icu;
++
++    object_initialize_child(OBJECT(s), "icu", &s->icu, sizeof(RXICUState=
+),
++                            TYPE_RXICU, &error_abort, NULL);
++
++    icu =3D SYS_BUS_DEVICE(&s->icu);
++    sysbus_mmio_map(SYS_BUS_DEVICE(icu), 0, RX62N_ICUBASE);
++    qdev_prop_set_uint32(DEVICE(icu), "len-ipr-map", NR_IRQS);
++    for (i =3D 0; i < NR_IRQS; i++) {
++        char propname[32];
++        snprintf(propname, sizeof(propname), "ipr-map[%d]", i);
++        qdev_prop_set_uint32(DEVICE(icu), propname, ipr_table[i]);
++    }
++    qdev_prop_set_uint32(DEVICE(icu), "len-trigger-level",
++                         ARRAY_SIZE(levelirq));
++    for (i =3D 0; i < ARRAY_SIZE(levelirq); i++) {
++        char propname[32];
++        snprintf(propname, sizeof(propname), "trigger-level[%d]", i);
++        qdev_prop_set_uint32(DEVICE(icu), propname, levelirq[i]);
++    }
++
++    for (i =3D 0; i < NR_IRQS; i++) {
++        s->irq[i] =3D qdev_get_gpio_in(DEVICE(icu), i);
++    }
++
++    qdev_init_nofail(DEVICE(icu));
++    sysbus_connect_irq(icu, 0, qdev_get_gpio_in(DEVICE(&s->cpu), RX_CPU_=
+IRQ));
++    sysbus_connect_irq(icu, 1, qdev_get_gpio_in(DEVICE(&s->cpu), RX_CPU_=
+FIR));
++    sysbus_connect_irq(icu, 2, s->irq[SWI]);
++
++}
++
++static void register_tmr(RX62NState *s, int unit)
++{
++    SysBusDevice *tmr;
++    int i, irqbase;
++
++    object_initialize_child(OBJECT(s), "tmr[*]", &s->tmr[unit],
++                            sizeof(RTMRState), TYPE_RENESAS_TMR,
++                            &error_abort, NULL);
++
++    tmr =3D SYS_BUS_DEVICE(&s->tmr[unit]);
++    sysbus_mmio_map(tmr, 0, RX62N_TMRBASE + unit * 0x10);
++    qdev_prop_set_uint64(DEVICE(tmr), "input-freq", RX62N_PCLK);
++
++    qdev_init_nofail(DEVICE(tmr));
++    irqbase =3D RX62N_TMR_IRQBASE + TMR_NR_IRQ * unit;
++    for (i =3D 0; i < TMR_NR_IRQ; i++) {
++        sysbus_connect_irq(tmr, i, s->irq[irqbase + i]);
++    }
++}
++
++static void register_cmt(RX62NState *s, int unit)
++{
++    SysBusDevice *cmt;
++    int i, irqbase;
++
++    object_initialize_child(OBJECT(s), "cmt[*]", &s->cmt[unit],
++                            sizeof(RCMTState), TYPE_RENESAS_CMT,
++                            &error_abort, NULL);
++
++    cmt =3D SYS_BUS_DEVICE(&s->cmt[unit]);
++    sysbus_mmio_map(cmt, 0, RX62N_CMTBASE + unit * 0x10);
++    qdev_prop_set_uint64(DEVICE(cmt), "input-freq", RX62N_PCLK);
++
++    qdev_init_nofail(DEVICE(cmt));
++    irqbase =3D RX62N_CMT_IRQBASE + CMT_NR_IRQ * unit;
++    for (i =3D 0; i < CMT_NR_IRQ; i++) {
++        sysbus_connect_irq(cmt, i, s->irq[irqbase + i]);
++    }
++}
++
++static void register_sci(RX62NState *s, int unit)
++{
++    SysBusDevice *sci;
++    int i, irqbase;
++
++    object_initialize_child(OBJECT(s), "sci[*]", &s->sci[unit],
++                            sizeof(RSCIState), TYPE_RENESAS_SCI,
++                            &error_abort, NULL);
++
++    sci =3D SYS_BUS_DEVICE(&s->sci[unit]);
++    sysbus_mmio_map(sci, 0, RX62N_SCIBASE + unit * 0x08);
++    qdev_prop_set_chr(DEVICE(sci), "chardev", serial_hd(unit));
++    qdev_prop_set_uint64(DEVICE(sci), "input-freq", RX62N_PCLK);
++
++    qdev_init_nofail(DEVICE(sci));
++    irqbase =3D RX62N_SCI_IRQBASE + SCI_NR_IRQ * unit;
++    for (i =3D 0; i < SCI_NR_IRQ; i++) {
++        sysbus_connect_irq(sci, i, s->irq[irqbase + i]);
++    }
++}
++
++static void rx62n_realize(DeviceState *dev, Error **errp)
++{
++    RX62NState *s =3D RX62N(dev);
++
++    memory_region_init_ram(&s->iram, NULL, "iram", RX62N_IRAM_SIZE, errp=
+);
++    memory_region_add_subregion(s->sysmem, RX62N_IRAM_BASE, &s->iram);
++    memory_region_init_rom(&s->d_flash, NULL, "dataflash",
++                           RX62N_DFLASH_SIZE, errp);
++    memory_region_add_subregion(s->sysmem, RX62N_DFLASH_BASE, &s->d_flas=
+h);
++    memory_region_init_rom(&s->c_flash, NULL, "codeflash",
++                           RX62N_CFLASH_SIZE, errp);
++    memory_region_add_subregion(s->sysmem, RX62N_CFLASH_BASE, &s->c_flas=
+h);
++    if (!s->kernel) {
++        rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
++    }
++
++    /* Initialize CPU */
++    object_initialize_child(OBJECT(s), "cpu", &s->cpu, sizeof(RXCPU),
++                            TYPE_RX62N_CPU, errp, NULL);
++    object_property_set_bool(OBJECT(&s->cpu), true, "realized", errp);
++
++    register_icu(s);
++    s->cpu.env.ack =3D qdev_get_gpio_in_named(DEVICE(&s->icu), "ack", 0)=
+;
++    register_tmr(s, 0);
++    register_tmr(s, 1);
++    register_cmt(s, 0);
++    register_cmt(s, 1);
++    register_sci(s, 0);
++}
++
++static Property rx62n_properties[] =3D {
++    DEFINE_PROP_LINK("memory", RX62NState, sysmem, TYPE_MEMORY_REGION,
++                     MemoryRegion *),
++    DEFINE_PROP_BOOL("load-kernel", RX62NState, kernel, false),
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void rtmr_class_init(ObjectClass *klass, void *data)
++static void rx62n_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc =3D DEVICE_CLASS(klass);
 +
-+    dc->props =3D rtmr_properties;
-+    dc->vmsd =3D &vmstate_rtmr;
-+    dc->reset =3D rtmr_reset;
++    dc->realize =3D rx62n_realize;
++    dc->props =3D rx62n_properties;
 +}
 +
-+static const TypeInfo rtmr_info =3D {
-+    .name       =3D TYPE_RENESAS_TMR,
-+    .parent     =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(RTMRState),
-+    .instance_init =3D rtmr_init,
-+    .class_init =3D rtmr_class_init,
++static const TypeInfo rx62n_info =3D {
++    .name =3D TYPE_RX62N,
++    .parent =3D TYPE_SYS_BUS_DEVICE,
++    .instance_size =3D sizeof(RX62NState),
++    .class_init =3D rx62n_class_init,
 +};
 +
-+static void rtmr_register_types(void)
++static void rx62n_register_types(void)
 +{
-+    type_register_static(&rtmr_info);
++    type_register_static(&rx62n_info);
 +}
 +
-+type_init(rtmr_register_types)
-diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
-index eefc95f35e..4c93874159 100644
---- a/hw/timer/Kconfig
-+++ b/hw/timer/Kconfig
-@@ -58,3 +58,9 @@ config CMSDK_APB_TIMER
- config CMSDK_APB_DUALTIMER
-     bool
-     select PTIMER
-+
-+config RENESAS_TMR8
++type_init(rx62n_register_types)
+diff --git a/hw/rx/Kconfig b/hw/rx/Kconfig
+new file mode 100644
+index 0000000000..a07490a65e
+--- /dev/null
++++ b/hw/rx/Kconfig
+@@ -0,0 +1,14 @@
++config RX
 +    bool
 +
-+config RENESAS_CMT
++config RX62N
 +    bool
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index 123d92c969..706bd1510c 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -40,6 +40,9 @@ obj-$(CONFIG_MC146818RTC) +=3D mc146818rtc.o
-=20
- obj-$(CONFIG_ALLWINNER_A10_PIT) +=3D allwinner-a10-pit.o
-=20
-+obj-$(CONFIG_RENESAS_TMR8) +=3D renesas_tmr.o
-+obj-$(CONFIG_RENESAS_CMT) +=3D renesas_cmt.o
++    select RX
++    select RX_ICU
++    select RENESAS_TMR8
++    select RENESAS_CMT
++    select RENESAS_SCI
 +
- common-obj-$(CONFIG_STM32F2XX_TIMER) +=3D stm32f2xx_timer.o
- common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_timer.o aspeed_rtc.o
-=20
++config RX_VIRT
++    bool
++    select RX62N
+diff --git a/hw/rx/Makefile.objs b/hw/rx/Makefile.objs
+new file mode 100644
+index 0000000000..63f8be0e82
+--- /dev/null
++++ b/hw/rx/Makefile.objs
+@@ -0,0 +1,2 @@
++obj-$(CONFIG_RX62N) +=3D rx62n.o
++obj-$(CONFIG_RX_VIRT) +=3D rx-virt.o
 --=20
 2.20.1
 
