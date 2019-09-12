@@ -2,56 +2,118 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F66C47404
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 13:11:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2352C4CEC5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 13:36:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7AE1C2081B
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 13:11:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AE1C2081B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BDEEF2075C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 13:36:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ZE2Gdk/O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDEEF2075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8OsQ-0000hf-EK
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 09:11:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60886)
+	id 1i8PH3-0007gl-V5
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 09:36:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37155)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1i8Orh-00009R-7x
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:10:26 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1i8PGG-00075W-S6
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:35:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1i8Ord-00080c-T8
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:10:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33802)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1i8Ord-00080B-LX; Thu, 12 Sep 2019 09:10:21 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8982B2A09AC;
- Thu, 12 Sep 2019 13:10:20 +0000 (UTC)
-Received: from thuth.com (ovpn-204-41.brq.redhat.com [10.40.204.41])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C03B919C78;
- Thu, 12 Sep 2019 13:10:15 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 12 Sep 2019 15:10:11 +0200
-Message-Id: <20190912131011.6255-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Thu, 12 Sep 2019 13:10:20 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] hw/*/Makefile.objs: Move many .o files to
- common-objs
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1i8PGF-0005nu-9q
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:35:48 -0400
+Received: from mail-eopbgr140110.outbound.protection.outlook.com
+ ([40.107.14.110]:19854 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1i8PGE-0005mV-IL
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:35:47 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UM8EpZmmk63DpslZyxuWX9bPA+RUwsIHDuPzRN2+nTw7f+OB5Paw+Ojyjd3LmQDrlr0h/0hWQVcnMp8IJhom0b6UaQ9h08GOuwbBHlGBlG8F2qy9QrQasw3cVSqowsNpeL1xBCG0DojEIhtoX4AoqKoO0LXRFa73uY2QtE0SGdjfcXUAVwXIu6tpu686NrMjR67U2tg+ZizLcs/NdjbfEUy7vyYowd6I/4cqBFeViQo5KD/ORet4oRHT2lBdfLJPeBquEJU6rHBs1bTgv25hSsq/opkI8gIrzHt2WVY7jEr+XZSmJdsUS9AY/6gGREZ6TaIUp//Pz05rdUCaIy16RQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eTz7yLKmSj+fS1EKLl/Q3Ba2q1RB0+KMTauEvuUnnD8=;
+ b=La+nBunLVqwFjBlxWanN3t/1acJOzLgYavostn4imRx9uDvyS9YHVENZKL+9wwdR84SAftFzqVeNLTaWJHrmQFx5L1fHNVMn4XeP1OWJGE3uE9kLPY9X8MhvlnP8QFVzskExjql/eeAF2kQQTrp/QNqaQJsAnW82r+4pYtkFh7TkcANPmwQeKv/DXarziKFywZ71yywJoaiaed3syp5yD/t1JMjrYCWnRlBXGREOGmDHpQhX9n5smxFLOhcb8LCKfArVzntRc2bZfg/5nSgfhK8D/3NXJIrZDe+lo9gqwEKZeMRfLmpnE0X5KpYGQMQAJs16U2PGYkkzA+76K2IfHA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eTz7yLKmSj+fS1EKLl/Q3Ba2q1RB0+KMTauEvuUnnD8=;
+ b=ZE2Gdk/ObG7lKU1+p7AlHqYQ3vvLXD3p5hqhVQsxNodICaiem0yf8ZzoFBNzvRRHI4uGhEbrPLRHbYAM0lEdItsZDRUtpjJDDpCyTMDIdAY9Ms/NGkWLNkccIo7Aq0/lpMRka8F8ylMFeYop5OrYQ7A5fvOefcURolcPz5FURYg=
+Received: from HE1PR0802MB2460.eurprd08.prod.outlook.com (10.175.33.138) by
+ HE1PR0802MB2603.eurprd08.prod.outlook.com (10.175.35.16) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2263.15; Thu, 12 Sep 2019 13:35:42 +0000
+Received: from HE1PR0802MB2460.eurprd08.prod.outlook.com
+ ([fe80::4d31:70d0:5b10:7a10]) by HE1PR0802MB2460.eurprd08.prod.outlook.com
+ ([fe80::4d31:70d0:5b10:7a10%6]) with mapi id 15.20.2263.016; Thu, 12 Sep 2019
+ 13:35:42 +0000
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: John Snow <jsnow@redhat.com>, Mark Syms <Mark.Syms@citrix.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Thread-Topic: [Qemu-devel] Valgrind confused by queue macros
+Thread-Index: AdVn2TTmG0WDoKwzR2+3/z64vpIPIABHZ/4AAB4I2oA=
+Date: Thu, 12 Sep 2019 13:35:42 +0000
+Message-ID: <9406b1ac-05fe-0455-f923-895a151baa99@virtuozzo.com>
+References: <e2cce2353aa44e2481f01b96ee1e6028@AMSPEX02CL01.citrite.net>
+ <5c016081-6ba6-5ae1-524a-6e45c92e9822@redhat.com>
+In-Reply-To: <5c016081-6ba6-5ae1-524a-6e45c92e9822@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0402CA0036.eurprd04.prod.outlook.com
+ (2603:10a6:7:7c::25) To HE1PR0802MB2460.eurprd08.prod.outlook.com
+ (2603:10a6:3:dd::10)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 803ac028-56f2-4af0-d865-08d737861b99
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:HE1PR0802MB2603; 
+x-ms-traffictypediagnostic: HE1PR0802MB2603:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <HE1PR0802MB2603830BC09BE3BE3EA3E02CF4B00@HE1PR0802MB2603.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 01583E185C
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(396003)(39850400004)(366004)(376002)(136003)(346002)(189003)(199004)(54906003)(11346002)(476003)(110136005)(66066001)(52116002)(99286004)(76176011)(2616005)(6512007)(5660300002)(44832011)(316002)(53936002)(386003)(6506007)(53546011)(102836004)(4326008)(107886003)(6436002)(486006)(8676002)(6246003)(3846002)(2501003)(2906002)(8936002)(6486002)(186003)(446003)(305945005)(26005)(81156014)(81166006)(229853002)(14454004)(71190400001)(66946007)(36756003)(31686004)(66556008)(71200400001)(86362001)(66476007)(66446008)(64756008)(31696002)(6116002)(478600001)(25786009)(7736002)(256004)(14444005);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:HE1PR0802MB2603;
+ H:HE1PR0802MB2460.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 8TiVs22FjrAWU3dShgYnSwctSKCG6RzP5fpZmeGly8hQI7PTD21+Le2eUvNSoPaYxWXuyyXiFx9XioCXsy4U7R9OavlWLSnmC8iVItm3+Dkb7xwY8LBdXKNlurls14JSTkFWP+/5G6zhr4nCQWxqJiS93Fc/jst9T7gXYCBpQJ9dlbGrSorlO4puxOXz/okqV7OF1BMU/2esx7WqkHPLeLtddva73nYTPDOKaR3NbfIL9xvG+xtZC9M2SVfsc3SXN0wxs8RHOhKRUMZGwopXPeZRhK3Hgd+qU/xZ/bo5SiPX6e1zVo8Axpo6+s2bwR5gvEPzTxc05EfMMe5Mr+s6sfDCVJYl9o3/tbDk9wT+LV/Z1n6GCFzf3tONh32EULqSJFi03hdr4FYNXD+ocrlhdA9phYd2zNE8bPy6Pk7Afhs=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D99510B4BA2D9443A66662E168979CEB@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 803ac028-56f2-4af0-d865-08d737861b99
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Sep 2019 13:35:42.6386 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ZyeRWdwE7lNUV4AslswZ+WJ33WVKs6zqMz/Bg7qsys3ogwb8FLePW6szsomU1IRgd17t1w6MczExD0oXOrL0cF7lcJbKiA9vHyO6Tp6gy2Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2603
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.14.110
+Subject: Re: [Qemu-devel] Valgrind confused by queue macros
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,311 +125,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
+ Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We have many files that apparently do not depend on the target CPU
-configuration, i.e. which can be put into common-obj-y instead of
-obj-y. This way, the code can be shared for example between
-qemu-system-arm and qemu-system-aarch64, or the various big and
-little endian variants like qemu-system-sh4 and qemu-system-sh4eb,
-so that we do not have to compile the code multiple times anymore.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/adc/Makefile.objs     |  2 +-
- hw/block/Makefile.objs   |  2 +-
- hw/char/Makefile.objs    | 16 ++++++++--------
- hw/core/Makefile.objs    |  2 +-
- hw/display/Makefile.objs |  2 +-
- hw/dma/Makefile.objs     |  6 +++---
- hw/gpio/Makefile.objs    |  8 ++++----
- hw/i2c/Makefile.objs     |  4 ++--
- hw/i2c/ppc4xx_i2c.c      |  1 -
- hw/input/Makefile.objs   |  6 +++---
- hw/net/Makefile.objs     |  6 +++---
- hw/nvram/Makefile.objs   |  2 +-
- hw/pcmcia/Makefile.objs  |  2 +-
- hw/sd/Makefile.objs      |  8 ++++----
- hw/ssi/Makefile.objs     |  4 ++--
- hw/timer/Makefile.objs   | 22 +++++++++++-----------
- hw/usb/Makefile.objs     |  4 ++--
- 17 files changed, 48 insertions(+), 49 deletions(-)
-
-diff --git a/hw/adc/Makefile.objs b/hw/adc/Makefile.objs
-index 3f6dfdedae..2b9dc36c7f 100644
---- a/hw/adc/Makefile.objs
-+++ b/hw/adc/Makefile.objs
-@@ -1 +1 @@
--obj-$(CONFIG_STM32F2XX_ADC) += stm32f2xx_adc.o
-+common-obj-$(CONFIG_STM32F2XX_ADC) += stm32f2xx_adc.o
-diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
-index f5f643f0cc..64c1f315c9 100644
---- a/hw/block/Makefile.objs
-+++ b/hw/block/Makefile.objs
-@@ -9,7 +9,7 @@ common-obj-$(CONFIG_ECC) += ecc.o
- common-obj-$(CONFIG_ONENAND) += onenand.o
- common-obj-$(CONFIG_NVME_PCI) += nvme.o
- 
--obj-$(CONFIG_SH4) += tc58128.o
-+common-obj-$(CONFIG_SH4) += tc58128.o
- 
- obj-$(CONFIG_VIRTIO_BLK) += virtio-blk.o
- obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk.o
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-index 02d8a66925..9e9a6c1aff 100644
---- a/hw/char/Makefile.objs
-+++ b/hw/char/Makefile.objs
-@@ -13,14 +13,13 @@ common-obj-$(CONFIG_XILINX) += xilinx_uartlite.o
- common-obj-$(CONFIG_XEN) += xen_console.o
- common-obj-$(CONFIG_CADENCE) += cadence_uart.o
- 
--obj-$(CONFIG_EXYNOS4) += exynos4210_uart.o
--obj-$(CONFIG_COLDFIRE) += mcf_uart.o
--obj-$(CONFIG_OMAP) += omap_uart.o
--obj-$(CONFIG_SH4) += sh_serial.o
--obj-$(CONFIG_PSERIES) += spapr_vty.o
--obj-$(CONFIG_DIGIC) += digic-uart.o
--obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
--obj-$(CONFIG_RASPI) += bcm2835_aux.o
-+common-obj-$(CONFIG_EXYNOS4) += exynos4210_uart.o
-+common-obj-$(CONFIG_COLDFIRE) += mcf_uart.o
-+common-obj-$(CONFIG_OMAP) += omap_uart.o
-+common-obj-$(CONFIG_SH4) += sh_serial.o
-+common-obj-$(CONFIG_DIGIC) += digic-uart.o
-+common-obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
-+common-obj-$(CONFIG_RASPI) += bcm2835_aux.o
- 
- common-obj-$(CONFIG_CMSDK_APB_UART) += cmsdk-apb-uart.o
- common-obj-$(CONFIG_ETRAXFS) += etraxfs_ser.o
-@@ -33,4 +32,5 @@ common-obj-$(CONFIG_MILKYMIST) += milkymist-uart.o
- common-obj-$(CONFIG_SCLPCONSOLE) += sclpconsole.o sclpconsole-lm.o
- 
- obj-$(CONFIG_VIRTIO) += virtio-serial-bus.o
-+obj-$(CONFIG_PSERIES) += spapr_vty.o
- obj-$(CONFIG_TERMINAL3270) += terminal3270.o
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index fd0550d1d9..c94886cd74 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -26,5 +26,5 @@ common-obj-$(CONFIG_GENERIC_LOADER) += generic-loader.o
- common-obj-$(CONFIG_SOFTMMU) += null-machine.o
- 
- obj-$(CONFIG_SOFTMMU) += machine-qmp-cmds.o
--obj-$(CONFIG_SOFTMMU) += numa.o
-+common-obj-$(CONFIG_SOFTMMU) += numa.o
- common-obj-$(CONFIG_SOFTMMU) += machine-hmp-cmds.o
-diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index 5a4066383b..a56ea95d46 100644
---- a/hw/display/Makefile.objs
-+++ b/hw/display/Makefile.objs
-@@ -24,7 +24,7 @@ common-obj-$(CONFIG_BOCHS_DISPLAY) += bochs-display.o
- common-obj-$(CONFIG_BLIZZARD) += blizzard.o
- common-obj-$(CONFIG_EXYNOS4) += exynos4210_fimd.o
- common-obj-$(CONFIG_FRAMEBUFFER) += framebuffer.o
--obj-$(CONFIG_MILKYMIST) += milkymist-vgafb.o
-+common-obj-$(CONFIG_MILKYMIST) += milkymist-vgafb.o
- common-obj-$(CONFIG_ZAURUS) += tc6393xb.o
- 
- obj-$(CONFIG_MILKYMIST_TMU2) += milkymist-tmu2.o
-diff --git a/hw/dma/Makefile.objs b/hw/dma/Makefile.objs
-index b672e7a522..f4b1cfe26d 100644
---- a/hw/dma/Makefile.objs
-+++ b/hw/dma/Makefile.objs
-@@ -8,9 +8,9 @@ common-obj-$(CONFIG_XILINX_AXI) += xilinx_axidma.o
- common-obj-$(CONFIG_ZYNQ_DEVCFG) += xlnx-zynq-devcfg.o
- common-obj-$(CONFIG_ETRAXFS) += etraxfs_dma.o
- common-obj-$(CONFIG_STP2000) += sparc32_dma.o
--obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx_dpdma.o
-+common-obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx_dpdma.o
- common-obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx-zdma.o
- 
--obj-$(CONFIG_OMAP) += omap_dma.o soc_dma.o
--obj-$(CONFIG_PXA2XX) += pxa2xx_dma.o
-+common-obj-$(CONFIG_OMAP) += omap_dma.o soc_dma.o
-+common-obj-$(CONFIG_PXA2XX) += pxa2xx_dma.o
- common-obj-$(CONFIG_RASPI) += bcm2835_dma.o
-diff --git a/hw/gpio/Makefile.objs b/hw/gpio/Makefile.objs
-index e5da0cb54f..afdb4c3a06 100644
---- a/hw/gpio/Makefile.objs
-+++ b/hw/gpio/Makefile.objs
-@@ -5,7 +5,7 @@ common-obj-$(CONFIG_ZAURUS) += zaurus.o
- common-obj-$(CONFIG_E500) += mpc8xxx.o
- common-obj-$(CONFIG_GPIO_KEY) += gpio_key.o
- 
--obj-$(CONFIG_OMAP) += omap_gpio.o
--obj-$(CONFIG_IMX) += imx_gpio.o
--obj-$(CONFIG_RASPI) += bcm2835_gpio.o
--obj-$(CONFIG_NRF51_SOC) += nrf51_gpio.o
-+common-obj-$(CONFIG_OMAP) += omap_gpio.o
-+common-obj-$(CONFIG_IMX) += imx_gpio.o
-+common-obj-$(CONFIG_RASPI) += bcm2835_gpio.o
-+common-obj-$(CONFIG_NRF51_SOC) += nrf51_gpio.o
-diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
-index d7073a401f..6ba976b257 100644
---- a/hw/i2c/Makefile.objs
-+++ b/hw/i2c/Makefile.objs
-@@ -9,5 +9,5 @@ common-obj-$(CONFIG_IMX_I2C) += imx_i2c.o
- common-obj-$(CONFIG_ASPEED_SOC) += aspeed_i2c.o
- common-obj-$(CONFIG_NRF51_SOC) += microbit_i2c.o
- common-obj-$(CONFIG_MPC_I2C) += mpc_i2c.o
--obj-$(CONFIG_OMAP) += omap_i2c.o
--obj-$(CONFIG_PPC4XX) += ppc4xx_i2c.o
-+common-obj-$(CONFIG_OMAP) += omap_i2c.o
-+common-obj-$(CONFIG_PPC4XX) += ppc4xx_i2c.o
-diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
-index 3f015a1581..c0a8e04567 100644
---- a/hw/i2c/ppc4xx_i2c.c
-+++ b/hw/i2c/ppc4xx_i2c.c
-@@ -27,7 +27,6 @@
- #include "qemu/osdep.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
--#include "cpu.h"
- #include "hw/i2c/ppc4xx_i2c.h"
- #include "hw/irq.h"
- 
-diff --git a/hw/input/Makefile.objs b/hw/input/Makefile.objs
-index a1bc502ed0..7a4abb0aa1 100644
---- a/hw/input/Makefile.objs
-+++ b/hw/input/Makefile.objs
-@@ -12,6 +12,6 @@ common-obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-hid.o
- common-obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host.o
- common-obj-$(CONFIG_VHOST_USER_INPUT) += vhost-user-input.o
- 
--obj-$(CONFIG_MILKYMIST) += milkymist-softusb.o
--obj-$(CONFIG_PXA2XX) += pxa2xx_keypad.o
--obj-$(CONFIG_TSC210X) += tsc210x.o
-+common-obj-$(CONFIG_MILKYMIST) += milkymist-softusb.o
-+common-obj-$(CONFIG_PXA2XX) += pxa2xx_keypad.o
-+common-obj-$(CONFIG_TSC210X) += tsc210x.o
-diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
-index 9904273b06..ef57e257ab 100644
---- a/hw/net/Makefile.objs
-+++ b/hw/net/Makefile.objs
-@@ -31,8 +31,8 @@ common-obj-$(CONFIG_SUNHME) += sunhme.o
- common-obj-$(CONFIG_FTGMAC100) += ftgmac100.o
- common-obj-$(CONFIG_SUNGEM) += sungem.o
- 
--obj-$(CONFIG_ETRAXFS) += etraxfs_eth.o
--obj-$(CONFIG_COLDFIRE) += mcf_fec.o
-+common-obj-$(CONFIG_ETRAXFS) += etraxfs_eth.o
-+common-obj-$(CONFIG_COLDFIRE) += mcf_fec.o
- obj-$(CONFIG_MILKYMIST) += milkymist-minimac2.o
- obj-$(CONFIG_PSERIES) += spapr_llan.o
- obj-$(CONFIG_XILINX_ETHLITE) += xilinx_ethlite.o
-@@ -42,7 +42,7 @@ common-obj-$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET)) += vhost_net.o
- common-obj-$(call lnot,$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET))) += vhost_net-stub.o
- common-obj-$(CONFIG_ALL) += vhost_net-stub.o
- 
--obj-$(CONFIG_ETSEC) += fsl_etsec/etsec.o fsl_etsec/registers.o \
-+common-obj-$(CONFIG_ETSEC) += fsl_etsec/etsec.o fsl_etsec/registers.o \
- 			fsl_etsec/rings.o fsl_etsec/miim.o
- 
- common-obj-$(CONFIG_ROCKER) += rocker/rocker.o rocker/rocker_fp.o \
-diff --git a/hw/nvram/Makefile.objs b/hw/nvram/Makefile.objs
-index 26f7b4ca35..f22229c244 100644
---- a/hw/nvram/Makefile.objs
-+++ b/hw/nvram/Makefile.objs
-@@ -4,5 +4,5 @@ common-obj-$(CONFIG_AT24C) += eeprom_at24c.o
- common-obj-y += fw_cfg.o
- common-obj-y += chrp_nvram.o
- common-obj-$(CONFIG_MAC_NVRAM) += mac_nvram.o
-+common-obj-$(CONFIG_NRF51_SOC) += nrf51_nvm.o
- obj-$(CONFIG_PSERIES) += spapr_nvram.o
--obj-$(CONFIG_NRF51_SOC) += nrf51_nvm.o
-diff --git a/hw/pcmcia/Makefile.objs b/hw/pcmcia/Makefile.objs
-index 4eac060c93..02cd986a2c 100644
---- a/hw/pcmcia/Makefile.objs
-+++ b/hw/pcmcia/Makefile.objs
-@@ -1,2 +1,2 @@
- common-obj-y += pcmcia.o
--obj-$(CONFIG_PXA2XX) += pxa2xx.o
-+common-obj-$(CONFIG_PXA2XX) += pxa2xx.o
-diff --git a/hw/sd/Makefile.objs b/hw/sd/Makefile.objs
-index 06657279d1..42e79c2afd 100644
---- a/hw/sd/Makefile.objs
-+++ b/hw/sd/Makefile.objs
-@@ -4,7 +4,7 @@ common-obj-$(CONFIG_SD) += sd.o core.o sdmmc-internal.o
- common-obj-$(CONFIG_SDHCI) += sdhci.o
- common-obj-$(CONFIG_SDHCI_PCI) += sdhci-pci.o
- 
--obj-$(CONFIG_MILKYMIST) += milkymist-memcard.o
--obj-$(CONFIG_OMAP) += omap_mmc.o
--obj-$(CONFIG_PXA2XX) += pxa2xx_mmci.o
--obj-$(CONFIG_RASPI) += bcm2835_sdhost.o
-+common-obj-$(CONFIG_MILKYMIST) += milkymist-memcard.o
-+common-obj-$(CONFIG_OMAP) += omap_mmc.o
-+common-obj-$(CONFIG_PXA2XX) += pxa2xx_mmci.o
-+common-obj-$(CONFIG_RASPI) += bcm2835_sdhost.o
-diff --git a/hw/ssi/Makefile.objs b/hw/ssi/Makefile.objs
-index f5bcc65fe7..07a85f1967 100644
---- a/hw/ssi/Makefile.objs
-+++ b/hw/ssi/Makefile.objs
-@@ -6,5 +6,5 @@ common-obj-$(CONFIG_ASPEED_SOC) += aspeed_smc.o
- common-obj-$(CONFIG_STM32F2XX_SPI) += stm32f2xx_spi.o
- common-obj-$(CONFIG_MSF2) += mss-spi.o
- 
--obj-$(CONFIG_OMAP) += omap_spi.o
--obj-$(CONFIG_IMX) += imx_spi.o
-+common-obj-$(CONFIG_OMAP) += omap_spi.o
-+common-obj-$(CONFIG_IMX) += imx_spi.o
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index 123d92c969..f407523aa4 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -25,20 +25,20 @@ common-obj-$(CONFIG_MILKYMIST) += milkymist-sysctl.o
- common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp-rtc.o
- common-obj-$(CONFIG_NRF51_SOC) += nrf51_timer.o
- 
--obj-$(CONFIG_ALTERA_TIMER) += altera_timer.o
--obj-$(CONFIG_EXYNOS4) += exynos4210_mct.o
--obj-$(CONFIG_EXYNOS4) += exynos4210_pwm.o
--obj-$(CONFIG_EXYNOS4) += exynos4210_rtc.o
--obj-$(CONFIG_OMAP) += omap_gptimer.o
--obj-$(CONFIG_OMAP) += omap_synctimer.o
--obj-$(CONFIG_PXA2XX) += pxa2xx_timer.o
--obj-$(CONFIG_SH4) += sh_timer.o
--obj-$(CONFIG_DIGIC) += digic-timer.o
--obj-$(CONFIG_MIPS_CPS) += mips_gictimer.o
-+common-obj-$(CONFIG_ALTERA_TIMER) += altera_timer.o
-+common-obj-$(CONFIG_EXYNOS4) += exynos4210_mct.o
-+common-obj-$(CONFIG_EXYNOS4) += exynos4210_pwm.o
-+common-obj-$(CONFIG_EXYNOS4) += exynos4210_rtc.o
-+common-obj-$(CONFIG_OMAP) += omap_gptimer.o
-+common-obj-$(CONFIG_OMAP) += omap_synctimer.o
-+common-obj-$(CONFIG_PXA2XX) += pxa2xx_timer.o
-+common-obj-$(CONFIG_SH4) += sh_timer.o
-+common-obj-$(CONFIG_DIGIC) += digic-timer.o
-+common-obj-$(CONFIG_MIPS_CPS) += mips_gictimer.o
- 
- obj-$(CONFIG_MC146818RTC) += mc146818rtc.o
- 
--obj-$(CONFIG_ALLWINNER_A10_PIT) += allwinner-a10-pit.o
-+common-obj-$(CONFIG_ALLWINNER_A10_PIT) += allwinner-a10-pit.o
- 
- common-obj-$(CONFIG_STM32F2XX_TIMER) += stm32f2xx_timer.o
- common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o aspeed_rtc.o
-diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
-index 303ac084a0..ae43ccf263 100644
---- a/hw/usb/Makefile.objs
-+++ b/hw/usb/Makefile.objs
-@@ -13,8 +13,8 @@ common-obj-$(CONFIG_USB_XHCI) += hcd-xhci.o
- common-obj-$(CONFIG_USB_XHCI_NEC) += hcd-xhci-nec.o
- common-obj-$(CONFIG_USB_MUSB) += hcd-musb.o
- 
--obj-$(CONFIG_TUSB6010) += tusb6010.o
--obj-$(CONFIG_IMX)      += chipidea.o
-+common-obj-$(CONFIG_TUSB6010) += tusb6010.o
-+common-obj-$(CONFIG_IMX)      += chipidea.o
- 
- # emulated usb devices
- common-obj-$(CONFIG_USB) += dev-hub.o
--- 
-2.18.1
-
+DQoNCk9uIDEyLzA5LzIwMTkgMDI6MTUsIEpvaG4gU25vdyB3cm90ZToNCj4gDQo+IA0KPiBPbiA5
+LzEwLzE5IDk6MjcgQU0sIE1hcmsgU3ltcyB3cm90ZToNCj4+IEhpLA0KPj4NCj4+IFdoaWxlIHRy
+eWluZyB0byB0cmFjayBkb3duIGFuIGlzc3VlIGluIHVzaW5nIHFlbXUgNC4xIHdpdGggc29tZSBk
+ZXZlbG9wbWVudCBmZWF0dXJlcyB3ZSBuZWVkZWQvd2FudGVkIHRvIHJ1biB2YWxncmluZCBvbiBp
+dCB0byBmaW5kIGEgbWVtb3J5IGVycm9yLiBVbmZvcnR1bmF0ZWx5IHRoZSBmb3JtIG9mIHRoZSBx
+dWV1ZSBtYWNyb3Mgc2VlbXMgdG8gcmVhbGx5IGNvbmZ1c2UgdmFsZ3JpbmQgYW5kIGNhdXNlIGl0
+IHRvIHJlcG9ydCBtYW55ICIgVXNlIG9mIHVuaW5pdGlhbGlzZWQgdmFsdWUgIiBlcnJvcnMuDQo+
+Pg0KPj4gQXMgYW4gZXhhbXBsZSwgaW4gcWVtdV9haW9fY29yb3V0aW5lX2VudGVyIC0NCj4+DQo+
+PiBVc2Ugb2YgdW5pbml0aWFsaXNlZCB2YWx1ZSBvZiBzaXplIDgNCj4+ICAgICBhdCAweDY5RTdF
+NTogcWVtdV9haW9fY29yb3V0aW5lX2VudGVyIChxZW11LWNvcm91dGluZS5jOjEwOSkNCj4+DQo+
+PiBDb25kaXRpb25hbCBqdW1wIG9yIG1vdmUgZGVwZW5kcyBvbiB1bmluaXRpYWxpc2VkIHZhbHVl
+KHMpDQo+PiAgICAgYXQgMHg2OUU3RkE6IHFlbXVfYWlvX2Nvcm91dGluZV9lbnRlciAocWVtdS1j
+b3JvdXRpbmUuYzoxMTIpDQo+Pg0KPj4gVXNlIG9mIHVuaW5pdGlhbGlzZWQgdmFsdWUgb2Ygc2l6
+ZSA4DQo+PiAgICAgYXQgMHg2OUU4MDA6IHFlbXVfYWlvX2Nvcm91dGluZV9lbnRlciAocWVtdS1j
+b3JvdXRpbmUuYzoxMTgpDQo+Pg0KPj4gVXNlIG9mIHVuaW5pdGlhbGlzZWQgdmFsdWUgb2Ygc2l6
+ZSA4DQo+PiAgICAgYXQgMHg2OUU4MDk6IHFlbXVfYWlvX2Nvcm91dGluZV9lbnRlciAocWVtdS1j
+b3JvdXRpbmUuYzoxMjApDQo+Pg0KPj4gVXNlIG9mIHVuaW5pdGlhbGlzZWQgdmFsdWUgb2Ygc2l6
+ZSA4DQo+PiAgICAgYXQgMHg2OUU4MjI6IHFlbXVfYWlvX2Nvcm91dGluZV9lbnRlciAocWVtdS1j
+b3JvdXRpbmUuYzoxMjIpDQo+Pg0KPj4gVXNlIG9mIHVuaW5pdGlhbGlzZWQgdmFsdWUgb2Ygc2l6
+ZSA4DQo+PiAgICAgYXQgMHg2OUU4M0E6IHFlbXVfYWlvX2Nvcm91dGluZV9lbnRlciAocWVtdS1j
+b3JvdXRpbmUuYzoxMzQpDQo+Pg0KPj4gVXNlIG9mIHVuaW5pdGlhbGlzZWQgdmFsdWUgb2Ygc2l6
+ZSA4DQo+PiAgICAgYXQgMHg2OUU4NDU6IHFlbXVfYWlvX2Nvcm91dGluZV9lbnRlciAocWVtdS1j
+b3JvdXRpbmUuYzoxMzkpDQo+Pg0KPj4gVGhpcyBzZWVtcyB0byB1bHRpbWF0ZWx5IHJlc3VsdCBm
+cm9tIGl0IHRoaW5raW5nIHRoYXQgcGVuZGluZyBpcyBub3QgaW5pdGlhbGlzZWQgYnkgdGhpcyBs
+aW5lDQo+Pg0KPj4gICAgICBRU0lNUExFUV9IRUFEKCwgQ29yb3V0aW5lKSBwZW5kaW5nID0gUVNJ
+TVBMRVFfSEVBRF9JTklUSUFMSVpFUihwZW5kaW5nKTsNCj4+DQo+PiBBcyB0aGlzIGlzc3VlIGlu
+IGl0c2VsZiBhY2NvdW50cyBmb3IgNyBlcnJvcnMgZXZlcnkgdGltZSB0aGF0IHFlbXVfYWlvX2Nv
+cm91dGluZV9lbnRlciBpcyBjYWxsZWQgKHdoaWNoIGlzIGZyZXF1ZW50bHkpIHZhbGdyaW5kIHZl
+cnkgc29vbiBnaXZlcyB1cCBhbmQgc2F5cyB0aGUgY29kZSBpcyB0b28gYnJva2VuIHRvIHJlcG9y
+dCBlcnJvcnMgb24gLSB1bmxlc3MgdGhhdCBpcyB5b3UgZGlzYWJsZSB0aGUgZXJyb3ItbGltaXQg
+d2hpY2ggaXMgd2hhdCB3ZSd2ZSBkb25lIGJ1dCB0aGVuIHlvdSBzdGlsbCBoYXZlIHRvIGlkZW50
+aWZ5IHRoZSByZWFsIGVycm9ycyBpbiB0aGUgbWlkZGxlIG9mIHRoZXNlIG9uZXMuDQo+Pg0KPj4g
+Tm90IHN1cmUgd2hhdCBpdCBpcyBhYm91dCB0aGUgbWFjcm9zIGluIHRoZSBpbml0aWFsaXNhdGlv
+biBsaW5lIHRoYXQgY2F1c2UgdmFsZ3JpbmQgdG8gdGhpbmsgaXQgaXNuJ3QgaW5pdGlhbGlzZWQs
+IHdoaWxzdCB0aGVyZSBpcyBhIHNtYWxsIGFtb3VudCBvZiBtYWNybyBtYWdpYyBpbiB0aGVyZSBp
+dCBsb29rcyBsaWtlIGl0IGRvZXMgYWN0dWFsbHkgcmVzdWx0IGluIHRoaW5ncyBiZWluZyBjb3Jy
+ZWN0bHkgaW5pdGlhbGlzZWQuDQo+Pg0KPj4gVGhpcyBpcyB1c2luZyB2YWxncmluZCAzLjEzLjAt
+MTMuZWw3IG9uIGEgQ2VudE9TIDcgc3lzdGVtLg0KPj4NCj4+IEFueSBjbHVlcyBhYm91dCBob3cg
+dG8gcmVzb2x2ZSB0aGlzPyBPciBpcyBpdCBqdXN0IGEgZmFjdCBvZiBsaWZlIHRoYXQgdmFsZ3Jp
+bmQgaXMgbmV2ZXIgZ29pbmcgdG8gYmUgaGFwcHkgd2l0aCB0aGlzIGNvZGU/DQo+Pg0KPj4gVGhh
+bmtzLA0KPj4NCj4+IE1hcmsuDQo+Pg0KPiANCj4gSSBoYXZlbid0IHVzZWQgdmFsZ3JpbmQgb24g
+YSAicmVhbCIgcnVuIG9mIFFFTVUgaW4gc29tZSB0aW1lLCB1c3VhbGx5DQo+IHVzaW5nIGl0IGZv
+ciB0aGUgdGVzdCBzdWl0ZSBpbnN0ZWFkLg0KPiANCj4gSW4gdGhpcyBjYXNlLCBhcmUgeW91IHN1
+cmUgaXQncyBjaG9raW5nIG9uIHRoZSBtYWNybyBhbmQgbm90IGdldHRpbmcNCj4gY29uZnVzZWQg
+YWJvdXQgYWxsIG9mIHRoZSBzdGFjayBzd2FwcyB0aGF0IFFFTVUgaXMgZG9pbmcgaW4gdGhlDQo+
+IGNvcm91dGluZSBtb2R1bGU/DQo+IA0KPiBDQ2luZyBzb21lIGZvbGtzIHdobyBoYXZlIHdvcmtl
+ZCBvbiB2YWxncmluZCBzdXBwb3J0IGluIHRoZSBwYXN0LCB0aGV5DQo+IG1pZ2h0IGhhdmUgYSBt
+b3JlIHRhcmdldGVkIGlkZWEuDQo+IA0KPiAtLWpzDQo+IA0KDQpUaGUgJ2djYyAtRSB1dGlsL3Fl
+bXUtY29yb3V0aW5lLmMnIHNob3dzIHRoZSBleHBsaWNpdCBpbml0aWFsaXphdGlvbiBhcyANCnRo
+aXM6DQoNCnZvaWQgcWVtdV9haW9fY29yb3V0aW5lX2VudGVyKEFpb0NvbnRleHQgKmN0eCwgQ29y
+b3V0aW5lICpjbykNCnsNCiAgICAgc3RydWN0IHsgc3RydWN0IENvcm91dGluZSAqc3FoX2ZpcnN0
+OyBzdHJ1Y3QgQ29yb3V0aW5lICoqc3FoX2xhc3Q7IA0KfSBwZW5kaW5nID0geyAoKHZvaWQgKikw
+KSwgJihwZW5kaW5nKS5zcWhfZmlyc3QgfTsNCi4uLg0KDQpQbGVhc2Ugc2VuZCB0aGUgY29tbWFu
+ZCB5b3UgcmFuIHRoZSBWYWxncmluZCB3aXRoIHRvIHNlZSB0aGUgb3B0aW9ucy4NCklmIHlvdSBj
+YW4gcmVwcm9kdWNlIHRoZSBjYXNlIHJ1bm5pbmcgdGhlIFZhbGdyaW5kIHdpdGggdGhlIG9wdGlv
+bnMgDQondHJhY2stb3JpZ2lucz15ZXMnIGFuZCAnLS1sb2ctZmlsZT1uYW1lLmxvZycsIHRoZSBy
+ZXN1bHRpbmcgbG9nIGZpbGVzIA0Kd2lsbCBiZSBoZWxwZnVsLg0KDQpUaGFua3MsDQpBbmRyZXkN
+Ci0tIA0KV2l0aCB0aGUgYmVzdCByZWdhcmRzLA0KQW5kcmV5IFNoaW5rZXZpY2gNCg==
 
