@@ -2,73 +2,88 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DA9EC5ACAE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 10:35:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 291F0C5ACAE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 10:35:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5209E206A5
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 10:35:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5209E206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id F298C206A5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 10:35:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F298C206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8MRr-0003uU-1x
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 06:35:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55536)
+	id 1i8MRx-00043J-1b
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 06:35:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55375)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i8MNP-0007uV-6F
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:31:00 -0400
+ (envelope-from <slp@redhat.com>) id 1i8MMh-0007KQ-Vi
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:30:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i8MNN-0004CM-G6
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:30:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46162)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i8MNN-0004Bf-9h
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:30:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i8MNL-0006gr-SS
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 10:30:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D52A02E80C8
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 10:30:55 +0000 (UTC)
+ (envelope-from <slp@redhat.com>) id 1i8MMg-0003rD-6e
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:30:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:23421)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1i8MMf-0003qg-Uo
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:30:14 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0815CC050061
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 10:30:13 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id j2so3575734wre.1
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 03:30:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=BIayWO072TUf1lM1FVIPdkQy/JjvQQCrtODiET1IZhI=;
+ b=cUjgNNpHMHpyOj+mU9uI/BEP70Rr5iin5Xz0gElX1qIEwUmmGnfGkirUvt1vAIwy+p
+ w7YnlRbpMGTD0Na+arMWduw/AHdKvTDgB2N2UaEkpSK/2fWxfwN4OwJO57rEP1J0TRyI
+ p8xK+ZgMP0uWhSI0ejNvCxpcNbzZI6/R5/ky/1zQlOcIeM2weY9LHCnnpT2nMvmhRHjc
+ zWoxCSH22i4QoaS18b5DzBYlAd55E2XWNHtVKpdcACZqf5fxXvnDDJjvUEZIBYJfE1kM
+ LZ92o5cbFjXRuGkvU1C1zh55ghrugOWWordx8JegctC1TlQzS6ahTNCR39jeVjhwW10v
+ 8foA==
+X-Gm-Message-State: APjAAAWk94jP5eH8Rhrfpfyn9ln1TfVT8QaTfIm6JgrgcQD3S0L2gdxk
+ Q2y67YYBxUzd96itKervEL0ard96DnHWf+P94yPjWMi23kuFPhBLbvBpmOynuSiArhQjSY8aGEX
+ poqdbxUG32IR7wzM=
+X-Received: by 2002:a1c:a546:: with SMTP id o67mr8030782wme.55.1568284211501; 
+ Thu, 12 Sep 2019 03:30:11 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxGuZKezobXipQyQIdCfglfbn3DoQ0z4zAhgz1zUmLiZtl2Nm2MeIkBlHv5EdObio1soWyJeA==
+X-Received: by 2002:a1c:a546:: with SMTP id o67mr8030764wme.55.1568284211307; 
+ Thu, 12 Sep 2019 03:30:11 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id u8sm4428047wmj.3.2019.09.12.03.30.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Sep 2019 03:30:10 -0700 (PDT)
+References: <20190911161521.59261-1-slp@redhat.com>
+ <d47f7e67-2f6a-0dd6-3ab5-93626bfbb02d@redhat.com>
+ <6755b34b-b412-9e63-8d25-b7662d0d3860@redhat.com>
+ <20190912081414.GC5383@linux.fritz.box>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+In-reply-to: <20190912081414.GC5383@linux.fritz.box>
+Date: Thu, 12 Sep 2019 12:30:08 +0200
+Message-ID: <87y2ytx0wf.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Sep 2019 10:16:32 -0000
-From: James Harvey <jamespharvey20@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h jamespharvey20
-X-Launchpad-Bug-Reporter: James Harvey (jamespharvey20)
-X-Launchpad-Bug-Modifier: James Harvey (jamespharvey20)
-References: <156790812963.29382.11232177290822294099.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156828339303.28699.8537272828952910638.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19044";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 3e6536ca27d00e488c45102131016aab036d53a8
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1843151] Re: Regression: QEMU 4.1.0 qxl and KMS
- resoluiton only 4x10
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] nbd/server: attach client channel to the
+ export's AioContext
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,185 +92,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1843151 <1843151@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Bisection is not going well at all with this code base!
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Before your last reply, I started, and the first between 4.0.0 and 4.1.0
-is aae6500972 which fails compilation:
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Kevin Wolf <kwolf@redhat.com> writes:
 
-...
-  CC      stubs/pci-host-piix.o
-  CC      stubs/ram-block.o
-  CC      stubs/ramfb.o
-  CC      stubs/fw_cfg.o
-  CC      stubs/semihost.o
-  CC      qemu-keymap.o
-  CC      util/filemonitor-stub.o
+> Am 11.09.2019 um 23:33 hat Eric Blake geschrieben:
+>> On 9/11/19 12:21 PM, Eric Blake wrote:
+>> > On 9/11/19 11:15 AM, Sergio Lopez wrote:
+>> >> On creation, the export's AioContext is set to the same one as the
+>> >> BlockBackend, while the AioContext in the client QIOChannel is left
+>> >> untouched.
+>> >>
+>> >> As a result, when using data-plane, nbd_client_receive_next_request()
+>> >> schedules coroutines in the IOThread AioContext, while the client's
+>> >> QIOChannel is serviced from the main_loop, potentially triggering the
+>> >> assertion at qio_channel_restart_[read|write].
+>> >>
+>> >> To fix this, as soon we have the export corresponding to the client,
+>> >> we call qio_channel_attach_aio_context() to attach the QIOChannel
+>> >> context to the export's AioContext. This matches with the logic in
+>> >> blk_aio_attached().
+>> >>
+>> >> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=3D1748253
+>> >> Signed-off-by: Sergio Lopez <slp@redhat.com>
+>> >> ---
+>> >>  nbd/server.c | 2 ++
+>> >>  1 file changed, 2 insertions(+)
+>> >=20
+>> > I'd like a second opinion from Kevin, but the description makes sense =
+to
+>> > me.  I'm happy to queue this through my NBD tree.
+>> >=20
+>> > Reviewed-by: Eric Blake <eblake@redhat.com>
+>>=20
+>> I tried to test this patch, but even with it applied, I still got an
+>> aio-context crasher by attempting an nbd-server-start, nbd-server-add,
+>> nbd-server-stop (intentionally skipping the nbd-server-remove step) on a
+>> domain using iothreads, with a backtrace of:
+>>=20
+>> #0  0x00007ff09d070e35 in raise () from target:/lib64/libc.so.6
+>> #1  0x00007ff09d05b895 in abort () from target:/lib64/libc.so.6
+>> #2  0x000055dd03b9ab86 in error_exit (err=3D1, msg=3D0x55dd03d59fb0
+>> <__func__.15769> "qemu_mutex_unlock_impl")
+>>     at util/qemu-thread-posix.c:36
+>> #3  0x000055dd03b9adcf in qemu_mutex_unlock_impl (mutex=3D0x55dd062d5090,
+>> file=3D0x55dd03d59041 "util/async.c",
+>>     line=3D523) at util/qemu-thread-posix.c:96
+>> #4  0x000055dd03b93433 in aio_context_release (ctx=3D0x55dd062d5030) at
+>> util/async.c:523
+>> #5  0x000055dd03ac421b in bdrv_do_drained_begin (bs=3D0x55dd0673a2d0,
+>> recursive=3Dfalse, parent=3D0x0,
+>>     ignore_bds_parents=3Dfalse, poll=3Dtrue) at block/io.c:428
+>> #6  0x000055dd03ac4299 in bdrv_drained_begin (bs=3D0x55dd0673a2d0) at
+>> block/io.c:434
+>> #7  0x000055dd03aafb54 in blk_drain (blk=3D0x55dd06a3ec40) at
+>> block/block-backend.c:1605
+>> #8  0x000055dd03aae054 in blk_remove_bs (blk=3D0x55dd06a3ec40) at
+>> block/block-backend.c:800
+>> #9  0x000055dd03aad54a in blk_delete (blk=3D0x55dd06a3ec40) at
+>> block/block-backend.c:420
+>> #10 0x000055dd03aad7d6 in blk_unref (blk=3D0x55dd06a3ec40) at
+>> block/block-backend.c:475
+>> #11 0x000055dd03aecb68 in nbd_export_put (exp=3D0x55dd0726f920) at
+>> nbd/server.c:1666
+>> #12 0x000055dd03aec8fe in nbd_export_close (exp=3D0x55dd0726f920) at
+>> nbd/server.c:1616
+>> #13 0x000055dd03aecbf1 in nbd_export_close_all () at nbd/server.c:1689
+>> #14 0x000055dd03748845 in qmp_nbd_server_stop (errp=3D0x7ffcdf3cb4e8) at
+>> blockdev-nbd.c:233
+>> ...
+>>=20
+>> Does that sound familiar to what you were seeing?  Does it mean we
+>> missed another spot where the context is set incorrectly?
+>
+> I think nbd_export_close_all() or one of the NBD functions called by it
+> needs to take the AioContext lock of the associated BlockBackend.
+>
+> The crash is because AIO_POLL_WHILE() wants to temporarily drop the lock
+> that we're not even holding.
 
-Warning, treated as error:
-/build/qemu-bisect/src/qemu/docs/interop/bitmaps.rst:202:Could not lex lite=
-ral_block as "json". Highlighting skipped.
-  CC      ui/input-keymap.o
-  CC      contrib/elf2dmp/main.o
-  CC      contrib/elf2dmp/addrspace.o
-  CC      contrib/elf2dmp/download.o
-  CC      contrib/elf2dmp/pdb.o
-  CC      contrib/elf2dmp/qemu_elf.o
-  CC      contrib/ivshmem-client/ivshmem-client.o
-  CC      contrib/ivshmem-client/main.o
-  CC      contrib/ivshmem-server/ivshmem-server.o
+Yes, I think locking the context during the "if (exp->blk) {" block at
+nbd/server.c:1646 should do the trick.
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+On the other hand, I wonder if there is any situation in which calling
+to blk_unref() without locking the context could be safe. If there isn't
+any, perhaps we should assert that the lock is held if blk->ctx !=3D NULL
+to catch this kind of bugs earlier?
 
-I tried just marking it as good and hoping it was a more recent
-regression, instead of even doing a skip, but efa85a4d1a fails with the
-same error.  I double checked that 4.0.0 and 4.1.0 still get past that
-spot for me, and they do.
+Sergio.
 
-I tried your suggestion, be812c0, but that compiled with this error:
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+-----BEGIN PGP SIGNATURE-----
 
-  CC      crypto/cipher.o
-  CC      crypto/tlscreds.o
-  CC      crypto/tlscredsanon.o
-/build/qemu-bisect/src/qemu/block/gluster.c: In function =E2=80=98qemu_glus=
-ter_co_pwrite_zeroes=E2=80=99:
-/build/qemu-bisect/src/qemu/block/gluster.c:994:52: warning: passing argume=
-nt 4 of =E2=80=98glfs_zerofill_async=E2=80=99 from incompatible pointer typ=
-e [-Wincompatible-pointer
--types]
-  994 |     ret =3D glfs_zerofill_async(s->fd, offset, size, gluster_finish=
-_aiocb, &acb);
-      |                                                    ^~~~~~~~~~~~~~~~=
-~~~~
-      |                                                    |
-      |                                                    void (*)(struct =
-glfs_fd *, ssize_t,  void *) {aka void (*)(struct glfs_fd *, long int,  voi=
-d *)}
-In file included from /build/qemu-bisect/src/qemu/block/gluster.c:12:
-/usr/include/glusterfs/api/glfs.h:993:73: note: expected =E2=80=98glfs_io_c=
-bk=E2=80=99 {aka =E2=80=98void (*)(struct glfs_fd *, long int,  struct glfs=
-_stat *, struct glfs_stat *, void
- *)=E2=80=99} but argument is of type =E2=80=98void (*)(struct glfs_fd *, s=
-size_t,  void *)=E2=80=99 {aka =E2=80=98void (*)(struct glfs_fd *, long int=
-,  void *)=E2=80=99}
-  993 | glfs_zerofill_async(glfs_fd_t *fd, off_t length, off_t len, glfs_io=
-_cbk fn,
-      |                                                             ~~~~~~~=
-~~~~~^~
-/build/qemu-bisect/src/qemu/block/gluster.c: In function =E2=80=98qemu_glus=
-ter_do_truncate=E2=80=99:
-/build/qemu-bisect/src/qemu/block/gluster.c:1035:13: error: too few argumen=
-ts to function =E2=80=98glfs_ftruncate=E2=80=99
- 1035 |         if (glfs_ftruncate(fd, offset)) {
-      |             ^~~~~~~~~~~~~~
-In file included from /build/qemu-bisect/src/qemu/block/gluster.c:12:
-/usr/include/glusterfs/api/glfs.h:768:1: note: declared here
-  768 | glfs_ftruncate(glfs_fd_t *fd, off_t length, struct glfs_stat *prest=
-at,
-      | ^~~~~~~~~~~~~~
-/build/qemu-bisect/src/qemu/block/gluster.c:1046:13: error: too few argumen=
-ts to function =E2=80=98glfs_ftruncate=E2=80=99
- 1046 |         if (glfs_ftruncate(fd, offset)) {
-      |             ^~~~~~~~~~~~~~
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-So, I looked at configure and saw a "--disable-glusterfs" option, and
-tried it.  It still failed with:
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  GEN     it.mo
-  GEN     bg.mo
-  GEN     fr_FR.mo
-  GEN     zh_CN.mo
-  GEN     de_DE.mo
-  GEN     hu.mo
-  GEN     tr.mo
-for obj in hu.mo tr.mo it.mo bg.mo fr_FR.mo zh_CN.mo de_DE.mo; do \
-    base=3D$(basename $obj .mo); \
-    install -d /build/qemu-bisect/pkg/qemu-bisect/usr/share/locale/$base/LC=
-_MESSAGES; \
-    install -m644 $obj /build/qemu-bisect/pkg/qemu-bisect/usr/share/locale/=
-$base/LC_MESSAGES/qemu.mo; \
-done
-make[1]: Leaving directory '/build/qemu-bisect/src/build-full/po'
-install -d -m 0755 "/build/qemu-bisect/pkg/qemu-bisect/usr/share/qemu/keyma=
-ps"
-set -e; for x in da     en-gb  et  fr     fr-ch  is  lt  no  pt-br  sv ar  =
-    de     en-us  fi  fr-be  hr     it  lv  nl         pl  ru     th de-ch =
- es     fo  fr-ca  hu     ja  mk  pt  sl     tr bepo    cz; do \
-        install -c -m 0644 /build/qemu-bisect/src/qemu/pc-bios/keymaps/$x "=
-/build/qemu-bisect/pkg/qemu-bisect/usr/share/qemu/keymaps"; \
-done
-install -c -m 0644 /build/qemu-bisect/src/build-full/trace-events-all "/bui=
-ld/qemu-bisect/pkg/qemu-bisect/usr/share/qemu/trace-events-all"
-for d in aarch64-softmmu alpha-softmmu arm-softmmu cris-softmmu hppa-softmm=
-u i386-softmmu lm32-softmmu m68k-softmmu microblazeel-softmmu microblaze-so=
-ftmmu mips64el-softmmu mips64-softmmu mipsel-softmmu mips-softmmu moxie-sof=
-tmmu nios2-softmmu or1k-softmmu ppc64-softmmu ppc-softmmu riscv32-softmmu r=
-iscv64-softmmu s390x-softmmu sh4eb-softmmu sh4-softmmu sparc64-softmmu spar=
-c-softmmu tricore-softmmu unicore32-softmmu x86_64-softmmu xtensaeb-softmmu=
- xtensa-softmmu aarch64_be-linux-user aarch64-linux-user alpha-linux-user a=
-rmeb-linux-user arm-linux-user cris-linux-user hppa-linux-user i386-linux-u=
-ser m68k-linux-user microblazeel-linux-user microblaze-linux-user mips64el-=
-linux-user mips64-linux-user mipsel-linux-user mips-linux-user mipsn32el-li=
-nux-user mipsn32-linux-user nios2-linux-user
-or1k-linux-user ppc64abi32-linux-user ppc64le-linux-user ppc64-linux-user p=
-pc-linux-user riscv32-linux-user riscv64-linux-user s390x-linux-user sh4eb-=
-linux-user sh4-linux-user sparc32plus-linux-user sparc64-linux-user sparc-l=
-inux-user tilegx-linux-user x86_64-linux-user xtensaeb-linux-user xtensa-li=
-nux-user; do \
-make --no-print-directory --quiet BUILD_DIR=3D/build/qemu-bisect/src/build-=
-full TARGET_DIR=3D$d/ -C $d install || exit 1 ; \
-        done
-make: Leaving directory '/build/qemu-bisect/src/build-full'
-rm: cannot remove 'qemu/block-gluster.so': No such file or directory
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-All of these builds are in clean chroot environments, so they're
-starting from source scratch builds without interference between
-previous attempts.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1843151
-
-Title:
-  Regression: QEMU 4.1.0 qxl and KMS resoluiton only 4x10
-
-Status in QEMU:
-  New
-
-Bug description:
-  Host is Arch Linux.  linux 5.2.13, qemu 4.1.0.  virt-viewer 8.0.
-
-  Guest is Arch Linux Sept 2019 ISO.  linux 5.2.11.
-
-  Have replicated this both on a system using amdgpu and one using
-  integrated ASPEED graphics.
-
-  Downgrading from 4.1.0 to 4.0.0 works as usual, see:
-  https://www.youtube.com/watch?v=3DNyMdcYwOCvY
-
-  Going back to 4.1.0 reproduces, see:
-  https://www.youtube.com/watch?v=3DH3nGG2Mk6i0
-
-  4.1.0 displays fine until KMS kicks in.
-
-  Using 4.1.0 with virtio-vga doesn't cause this.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1843151/+subscriptions
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl16HjAACgkQ9GknjS8M
+AjVQiA/+IPuYpOMLq+ieey1WGqQFYkGtOlvRl8gn5AJ7W3UhW1850v0pnk26XfWr
+7Y+b0jDOMo2brIobebOidmtJ5fX83BySD2sqSD9tON3XDz0u2Lo0rr5+5mePMhoD
+Z/5Y2AuYKqqmyz5IvOBhVgMlOUqf32wxGYbkj+Ick/CH5GqMH+rrub8TlrXlRBCI
+qlf0lRKXsXA3f5SgINiZ3deQTZNiBJwgKwqM5d/Jj6JrG/zXvW2j1DLQdVkLf6/D
+/EgRkfiOg1sVzr6MvIdEuP4sofvhrzGNOkCeoMnxd360ifGBrTpYLwN1v8y1C1og
+fHT4z28LZIHhE4F7xqBdNgIY0ld3Hupl9+EuiRpXI8FS8k4XYjd6xmZgRKuTHILP
+cMcWtrpVVYURQBfehPuzJM0digvURASnKhJuq5iNay/DPyR7l5Y3X+qx8IdqHHL+
+qfAVd0d7pw5rL12xIlw/EyJdF3iYZoDDalQZfWjonVKWEKry1FfKWbhjrSYx6+tV
+qvTKe2T6Nr7NxyvybX3L7CyjIkfCFIxQY9shtAUm7hYRx2Hz2hmIugcfiMPDQz2P
+yXI3ceYu7fRrXVFdm6wdHC0Ir/jty6KW/BwE3REw4INavHsXkWhHUX7kju7yWryN
+tCB0e7SjRlwHE2dCUO0L7jpWJt79RoOO/n+sLt9I4+LX3UmZE0s=
+=qvng
+-----END PGP SIGNATURE-----
+--=-=-=--
 
