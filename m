@@ -2,93 +2,64 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C8B3C4CEC5
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 15:31:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C667C4CEC5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 15:35:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECD852075C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 15:31:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="STemXnZ6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECD852075C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6642C2075C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 15:35:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6642C2075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8R4b-0007vn-V6
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 11:31:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42341)
+	id 1i8R8A-0001Cv-I2
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 11:35:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45359)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i8R0K-0003ij-7t
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 11:27:29 -0400
+ (envelope-from <stefanha@redhat.com>) id 1i8R7P-0000lG-O6
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 11:34:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i8R0H-0002MZ-GJ
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 11:27:27 -0400
-Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:38015)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i8R0H-0002Kc-0U
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 11:27:25 -0400
-Received: by mail-qt1-x844.google.com with SMTP id j31so3223989qta.5
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 08:27:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=G5F7mh6JKW+aDUMg9J6kxcIbyqtf8/3eFQmGQ7rpxrU=;
- b=STemXnZ6OL3jkTfPnJfZrPg80woQIU+ozyyzuJTMTHj11jCEP3fqdfSF8SIINgM4GS
- bkucw0npmQWRXfm4Ch3mA1oR2JKxO6SOBF732VXcE3e2W9dQ6mzXmukEItqW3Zx7dN4b
- v3hRyF6nIMesWGxqpJF9cFxXNc1CAJyrBwUYNV4X32KscA5FCZNn6YMTcCQJlBYhGrD7
- L/GL6zJLAa7jfTP/9rEoHQWR8iovStIShhALFEUeqSllGGIZnaaUr+yEOm5KgBtvXE4O
- uZevv2kP8Mw0J2ymUUGmkuDkw4Xi5SgNdfYE5By7k3zh0pmGeo8LXZycwkXSQTAhLs0i
- h5mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=G5F7mh6JKW+aDUMg9J6kxcIbyqtf8/3eFQmGQ7rpxrU=;
- b=GSv7AmLMTDEOGyjBCrDITu/mhu8fnX3nJuOMax5I7fTZCJ7MaLMC1tGnHwf/Otfov8
- 6sIOF/iaZD9h/yZ1bCIttdOuA0Lsx1sgNPF5zHxQsOyGuaD9u/g7m210YR1+d9JOroai
- QAyItuXWj7na/oc3UWdNGltfASBpmCviW8e8Bfv+Z6s72vqp0BpYifJ4RTG+Q5nY+/Kl
- uv14U1o8NLWByE4EE2vjQ5kUKK038sa5fqR36Dx7ru/Yvrt01yUcix22YKFzCRwWHo9Q
- +8YyrrKY7olDJ6VRpyDAW9IoX2TWPJf02rdw3St4rhYjvkR7BHB7vTa6e+zDEl+ODT1K
- zumg==
-X-Gm-Message-State: APjAAAUVUa+MqiCxNK3P/AC4e83om1Chmeo/2FEnvnvOuL81k0XFv+lk
- 6V4kE9OpZuiF9r5ibcWbqapycg==
-X-Google-Smtp-Source: APXvYqxGL9RLZ/xwDBXush0m97r1mwQvMEF9N2xsXEprI3923/b2ox7HLz3k/wZ/fg3J0kgocleEKA==
-X-Received: by 2002:a0c:e6e4:: with SMTP id m4mr26399193qvn.96.1568302043402; 
- Thu, 12 Sep 2019 08:27:23 -0700 (PDT)
-Received: from [172.20.5.51] ([67.69.50.154])
- by smtp.gmail.com with ESMTPSA id t26sm11111168qkt.10.2019.09.12.08.27.21
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Sep 2019 08:27:22 -0700 (PDT)
-To: liuzhiwei <zhiwei_liu@c-sky.com>, Alistair.Francis@wdc.com,
- palmer@sifive.com, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de,
- riku.voipio@iki.fi, laurent@vivier.eu, wenmeng_zhang@c-sky.com
-References: <1568183141-67641-1-git-send-email-zhiwei_liu@c-sky.com>
- <1568183141-67641-9-git-send-email-zhiwei_liu@c-sky.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <1e707c9c-e74e-8a21-11f7-6ce8d09cf06d@linaro.org>
-Date: Thu, 12 Sep 2019 11:27:20 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <stefanha@redhat.com>) id 1i8R7M-0005Bl-9R
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 11:34:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46872)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1i8R7M-0005Ba-0T
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 11:34:44 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1276B4E4E6;
+ Thu, 12 Sep 2019 15:34:43 +0000 (UTC)
+Received: from localhost (ovpn-116-134.ams2.redhat.com [10.36.116.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9004F3DBB;
+ Thu, 12 Sep 2019 15:34:37 +0000 (UTC)
+Date: Thu, 12 Sep 2019 17:34:35 +0200
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Jagannathan Raman <jag.raman@oracle.com>
+Message-ID: <20190912153435.GM23174@stefanha-x1.localdomain>
+References: <cover.1567534653.git.jag.raman@oracle.com>
+ <51220007b0f8a34cc72ff2847f5deb1f85c9c0e4.1567534653.git.jag.raman@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <1568183141-67641-9-git-send-email-zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::844
-Subject: Re: [Qemu-devel] [PATCH v2 08/17] RISC-V: add vector extension
- integer instructions part1, add/sub/adc/sbc
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="JvUS8mwutKMHKosv"
+Content-Disposition: inline
+In-Reply-To: <51220007b0f8a34cc72ff2847f5deb1f85c9c0e4.1567534653.git.jag.raman@oracle.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Thu, 12 Sep 2019 15:34:43 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC v3 PATCH 07/45] multi-process: define
+ proxy-link object
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,214 +71,459 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, john.g.johnson@oracle.com,
+ mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, quintela@redhat.com,
+ armbru@redhat.com, kanth.ghatraju@oracle.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com,
+ mreitz@redhat.com, ross.lagerwall@citrix.com, marcandre.lureau@gmail.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/11/19 2:25 AM, liuzhiwei wrote:
->  #define VECTOR_HELPER(name) HELPER(glue(vector_, name))
-> +#define SIGNBIT8    (1 << 7)
-> +#define SIGNBIT16   (1 << 15)
-> +#define SIGNBIT32   (1 << 31)
-> +#define SIGNBIT64   ((uint64_t)1 << 63)
 
-Perhaps make up your mind if you want signed or unsigned values?  Perhaps just
-use or redefine INT<N>_MIN instead?
+--JvUS8mwutKMHKosv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> +static int64_t extend_gpr(target_ulong reg)
+On Tue, Sep 03, 2019 at 04:37:33PM -0400, Jagannathan Raman wrote:
+> diff --git a/include/io/proxy-link.h b/include/io/proxy-link.h
+> new file mode 100644
+> index 0000000..ee78cdd
+> --- /dev/null
+> +++ b/include/io/proxy-link.h
+> @@ -0,0 +1,147 @@
+
+Regarding naming: so far I've seen "remote", "mpqemu", and "proxy".
+These concepts aren't well-defined and I'm not sure if they refer to the
+same thing or are different.  ProxyLinkState should be named
+MPQemuLinkState?
+
+It's also unclear to me how tightly coupled this "proxy link" is to PCI
+(since it has PCI Configuration Space commands and how it would be
+cleanly extended to support other busses).
+
+> +/*
+> + * Communication channel between QEMU and remote device process
+> + *
+> + * Copyright 2019, Oracle and/or its affiliates.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef PROXY_LINK_H
+> +#define PROXY_LINK_H
+> +
+> +#include <stddef.h>
+> +#include <stdint.h>
+> +#include <glib.h>
+> +#include <pthread.h>
+> +
+> +#include "qemu/osdep.h"
+> +#include "qom/object.h"
+> +#include "qemu/thread.h"
+> +
+> +typedef struct ProxyLinkState ProxyLinkState;
+> +
+> +#define TYPE_PROXY_LINK "proxy-link"
+> +#define PROXY_LINK(obj) \
+> +    OBJECT_CHECK(ProxyLinkState, (obj), TYPE_PROXY_LINK)
+> +
+> +#define REMOTE_MAX_FDS 8
+> +
+> +#define PROC_HDR_SIZE offsetof(ProcMsg, data1.u64)
+> +
+> +/*
+> + * proc_cmd_t enum type to specify the command to be executed on the remote
+> + * device
+> + *
+> + * Following commands are supported:
+> + * CONF_READ        PCI config. space read
+> + * CONF_WRITE       PCI config. space write
+> + *
+> + */
+> +typedef enum {
+> +    INIT = 0,
+> +    CONF_READ,
+> +    CONF_WRITE,
+> +    MAX,
+> +} proc_cmd_t;
+> +
+> +/*
+> + * ProcMsg Format of the message sent to the remote device from QEMU
+> + *
+> + * cmd         The remote command
+> + * bytestream  Indicates if the data to be shared is structured (data1)
+> + *             or unstructured (data2)
+> + * size        Size of the data to be shared
+> + * data1       Structured data
+> + * fds         File descriptors to be shared with remote device
+> + * data2       Unstructured data
+> + *
+> + */
+> +typedef struct {
+> +    proc_cmd_t cmd;
+> +    int bytestream;
+
+Please use bool.
+
+> +    size_t size;
+> +
+> +    union {
+> +        uint64_t u64;
+> +    } data1;
+> +
+> +    int fds[REMOTE_MAX_FDS];
+> +    int num_fds;
+> +
+> +    uint8_t *data2;
+> +} ProcMsg;
+> +
+> +struct conf_data_msg {
+> +    uint32_t addr;
+> +    uint32_t val;
+> +    int l;
+
+Please pick a descriptive name for this field.
+
+> +};
+> +
+> +/*
+> + * ProcChannel defines the channel that make up the communication link
+> + * between QEMU and remote process
+> + *
+> + * gsrc       GSource object to be used by loop
+> + * gpfd       GPollFD object containing the socket & events to monitor
+> + * sock       Socket to send/receive communication, same as the one in gpfd
+> + * lock       Mutex to synchronize access to the channel
+> + */
+
+Please see the doc comment style in include/qom/object.h for examples of
+how to format doc comments.
+
+> +
+> +typedef struct ProcChannel {
+> +    GSource gsrc;
+> +    GPollFD gpfd;
+> +    int sock;
+> +    QemuMutex lock;
+> +} ProcChannel;
+> +
+> +typedef void (*proxy_link_callback)(GIOCondition cond, ProcChannel *chan);
+> +
+> +/*
+> + * ProxyLinkState Instance info. of the communication
+> + * link between QEMU and remote process. The Link could
+> + * be made up of multiple channels.
+> + *
+> + * ctx        GMainContext to be used for communication
+> + * loop       Main loop that would be used to poll for incoming data
+> + * com        Communication channel to transport control messages
+> + *
+> + */
+> +struct ProxyLinkState {
+> +    Object obj;
+> +
+> +    GMainContext *ctx;
+> +    GMainLoop *loop;
+> +
+> +    ProcChannel *com;
+> +
+> +    proxy_link_callback callback;
+> +};
+> +
+> +ProxyLinkState *proxy_link_create(void);
+> +void proxy_link_finalize(ProxyLinkState *s);
+> +
+> +void proxy_proc_send(ProxyLinkState *s, ProcMsg *msg, ProcChannel *chan);
+> +int proxy_proc_recv(ProxyLinkState *s, ProcMsg *msg, ProcChannel *chan);
+> +
+> +void proxy_link_init_channel(ProxyLinkState *s, ProcChannel **chan, int fd);
+> +void proxy_link_destroy_channel(ProcChannel *chan);
+> +void proxy_link_set_callback(ProxyLinkState *s, proxy_link_callback callback);
+> +void start_handler(ProxyLinkState *s);
+> +
+> +#endif
+> diff --git a/io/Makefile.objs b/io/Makefile.objs
+> index 9a20fce..ff88b46 100644
+> --- a/io/Makefile.objs
+> +++ b/io/Makefile.objs
+> @@ -10,3 +10,5 @@ io-obj-y += channel-util.o
+>  io-obj-y += dns-resolver.o
+>  io-obj-y += net-listener.o
+>  io-obj-y += task.o
+> +
+> +io-obj-$(CONFIG_MPQEMU) += proxy-link.o
+> diff --git a/io/proxy-link.c b/io/proxy-link.c
+> new file mode 100644
+> index 0000000..5eb9718
+> --- /dev/null
+> +++ b/io/proxy-link.c
+> @@ -0,0 +1,292 @@
+> +/*
+> + * Communication channel between QEMU and remote device process
+> + *
+> + * Copyright 2019, Oracle and/or its affiliates.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include <assert.h>
+> +#include <errno.h>
+> +#include <pthread.h>
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <sys/types.h>
+> +#include <sys/socket.h>
+> +#include <sys/un.h>
+> +#include <unistd.h>
+> +
+> +#include "qemu/module.h"
+> +#include "io/proxy-link.h"
+> +#include "qemu/log.h"
+> +
+> +GSourceFuncs gsrc_funcs;
+> +
+> +static void proxy_link_inst_init(Object *obj)
 > +{
-> +    return sign_extend(reg, sizeof(target_ulong) * 8);
+> +    ProxyLinkState *s = PROXY_LINK(obj);
+> +
+> +    s->ctx = g_main_context_default();
+> +    s->loop = g_main_loop_new(s->ctx, FALSE);
+> +}
+> +
+> +static const TypeInfo proxy_link_info = {
+> +    .name = TYPE_PROXY_LINK,
+> +    .parent = TYPE_OBJECT,
+> +    .instance_size = sizeof(ProxyLinkState),
+> +    .instance_init = proxy_link_inst_init,
+> +};
+> +
+> +static void proxy_link_register_types(void)
+> +{
+> +    type_register_static(&proxy_link_info);
+> +}
+> +
+> +type_init(proxy_link_register_types)
+> +
+> +ProxyLinkState *proxy_link_create(void)
+> +{
+> +    return PROXY_LINK(object_new(TYPE_PROXY_LINK));
+> +}
+> +
+> +void proxy_link_finalize(ProxyLinkState *s)
+> +{
+> +    g_main_loop_unref(s->loop);
+> +    g_main_context_unref(s->ctx);
+> +    g_main_loop_quit(s->loop);
+> +
+> +    proxy_link_destroy_channel(s->com);
+> +
+> +    object_unref(OBJECT(s));
 > +}
 
-Note wrt usage:
-+                extend_rs1 = (uint64_t)extend_gpr(env->gpr[rs1]);
+It's strange that the destruction of ProxyLinkState does not use QEMU's
+object system.  How about implementing .instance_finalize(), dropping
+proxy_link_finalize(), and letting the caller unref ProxyLinkState like
+a regular Object?
 
-This is equivalent to "extend_rs1 = (target_long)env->gpr[rs1]".
-
-I don't see how this helper function is helping, really.
-Also, pass gprs by value, not by index.
-
-> +static inline int vector_get_carry(CPURISCVState *env, int width, int lmul,
-> +    int index)
+> +
+> +void proxy_proc_send(ProxyLinkState *s, ProcMsg *msg, ProcChannel *chan)
 > +{
-> +    int mlen = width / lmul;
-> +    int idx = (index * mlen) / 8;
-> +    int pos = (index * mlen) % 8;
+> +    int rc;
+> +    uint8_t *data;
+> +    union {
+> +        char control[CMSG_SPACE(REMOTE_MAX_FDS * sizeof(int))];
+> +        struct cmsghdr align;
+> +    } u;
+> +    struct msghdr hdr;
+> +    struct cmsghdr *chdr;
+> +    int sock = chan->sock;
+> +    QemuMutex *lock = &chan->lock;
 > +
-> +    return (env->vfp.vreg[0].u8[idx] >> pos) & 0x1;
-> +}
-
-Any reason not to re-use vector_elem_mask?
-
-> +static inline uint64_t u64xu64_lh(uint64_t a, uint64_t b)
-> +{
-> +    uint64_t hi_64, carry;
+> +    struct iovec iov = {
+> +        .iov_base = (char *) msg,
+> +        .iov_len = PROC_HDR_SIZE,
+> +    };
 > +
-> +    /* first get the whole product in {hi_64, lo_64} */
-> +    uint64_t a_hi = a >> 32;
-> +    uint64_t a_lo = (uint32_t)a;
-> +    uint64_t b_hi = b >> 32;
-> +    uint64_t b_lo = (uint32_t)b;
+> +    memset(&hdr, 0, sizeof(hdr));
+> +    memset(&u, 0, sizeof(u));
 > +
-> +    /*
-> +     * a * b = (a_hi << 32 + a_lo) * (b_hi << 32 + b_lo)
-> +     *               = (a_hi * b_hi) << 64 + (a_hi * b_lo) << 32 +
-> +     *                 (a_lo * b_hi) << 32 + a_lo * b_lo
-> +     *               = {hi_64, lo_64}
-> +     * hi_64 = ((a_hi * b_lo) << 32 + (a_lo * b_hi) << 32 + (a_lo * b_lo)) >> 64
-> +     *       = (a_hi * b_lo) >> 32 + (a_lo * b_hi) >> 32 + carry
-> +     * carry = ((uint64_t)(uint32_t)(a_hi * b_lo) +
-> +     *           (uint64_t)(uint32_t)(a_lo * b_hi) + (a_lo * b_lo) >> 32) >> 32
-> +     */
+> +    hdr.msg_iov = &iov;
+> +    hdr.msg_iovlen = 1;
 > +
-> +    carry =  ((uint64_t)(uint32_t)(a_hi * b_lo) +
-> +              (uint64_t)(uint32_t)(a_lo * b_hi) +
-> +              ((a_lo * b_lo) >> 32)) >> 32;
-> +
-> +    hi_64 = a_hi * b_hi +
-> +            ((a_hi * b_lo) >> 32) + ((a_lo * b_hi) >> 32) +
-> +            carry;
-> +
-> +    return hi_64;
-> +}
-
-Use mulu64().
-
-> +static inline int64_t s64xu64_lh(int64_t a, uint64_t b)
-> +{
-> +    uint64_t abs_a = a;
-> +    uint64_t lo_64, hi_64;
-> +
-> +    if (a < 0) {
-> +        abs_a =  ~a + 1;
-
- abs_a = -a
-
-> +static inline int64_t s64xs64_lh(int64_t a, int64_t b)
-> +{
-> +    uint64_t abs_a = a, abs_b = b;
-> +    uint64_t lo_64, hi_64;
-> +
-> +    if (a < 0) {
-> +        abs_a =  ~a + 1;
-> +    }
-> +    if (b < 0) {
-> +        abs_b = ~b + 1;
-> +    }
-> +    lo_64 = abs_a * abs_b;
-> +    hi_64 = u64xu64_lh(abs_a, abs_b);
-> +
-> +    if ((a ^ b) & SIGNBIT64) {
-> +        lo_64 = ~lo_64;
-> +        hi_64 = ~hi_64;
-> +        if (lo_64 == UINT64_MAX) {
-> +            lo_64 = 0;
-> +            hi_64 += 1;
-> +        } else {
-> +            lo_64 += 1;
-> +        }
-> +    }
-> +    return hi_64;
-> +}
-
-Use muls64().
-
-
-> +void VECTOR_HELPER(vadc_vvm)(CPURISCVState *env, uint32_t rs1,
-> +    uint32_t rs2, uint32_t rd)
-> +{
-> +    int i, j, vl;
-> +    uint32_t lmul, width, src1, src2, dest, vlmax, carry;
-> +
-> +    vl    = env->vfp.vl;
-> +    lmul  = vector_get_lmul(env);
-> +    width   = vector_get_width(env);
-> +    vlmax = vector_get_vlmax(env);
-> +
-> +    if (vector_vtype_ill(env) || vector_overlap_carry(lmul, rd)) {
-> +        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+> +    if (msg->num_fds > REMOTE_MAX_FDS) {
+> +        qemu_log_mask(LOG_REMOTE_DEBUG, "%s: Max FDs exceeded\n", __func__);
 > +        return;
 > +    }
-> +    vector_lmul_check_reg(env, lmul, rs1, false);
-> +    vector_lmul_check_reg(env, lmul, rs2, false);
-> +    vector_lmul_check_reg(env, lmul, rd, false);
 > +
-> +    for (i = 0; i < vlmax; i++) {
-> +        src1 = rs1 + (i / (VLEN / width));
-> +        src2 = rs2 + (i / (VLEN / width));
-> +        dest = rd + (i / (VLEN / width));
-> +        j = i % (VLEN / width);
-> +        if (i < env->vfp.vstart) {
-> +            continue;
+> +    if (msg->num_fds > 0) {
+> +        size_t fdsize = msg->num_fds * sizeof(int);
+> +
+> +        hdr.msg_control = &u;
+> +        hdr.msg_controllen = sizeof(u);
+> +
+> +        chdr = CMSG_FIRSTHDR(&hdr);
+> +        chdr->cmsg_len = CMSG_LEN(fdsize);
+> +        chdr->cmsg_level = SOL_SOCKET;
+> +        chdr->cmsg_type = SCM_RIGHTS;
+> +        memcpy(CMSG_DATA(chdr), msg->fds, fdsize);
+> +        hdr.msg_controllen = CMSG_SPACE(fdsize);
+> +    }
+> +
+> +    qemu_mutex_lock(lock);
+> +
+> +    do {
+> +        rc = sendmsg(sock, &hdr, 0);
+> +    } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
+> +
+> +    if (rc < 0) {
+> +        qemu_log_mask(LOG_REMOTE_DEBUG, "%s - sendmsg rc is %d, errno is %d,"
+> +                      " sock %d\n", __func__, rc, errno, sock);
+> +        qemu_mutex_unlock(lock);
+> +        return;
+> +    }
+> +
+> +    if (msg->bytestream) {
+> +        data = msg->data2;
+> +    } else {
+> +        data = (uint8_t *)msg + PROC_HDR_SIZE;
+> +    }
+> +
+> +    do {
+> +        rc = write(sock, data, msg->size);
+> +    } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
+> +
+> +    qemu_mutex_unlock(lock);
 
-Again, hoist.
+Can this message be transmitted in a single sendmsg() by including 2
+iovecs instead of just 1?  Then no locking is needed and only one
+syscall is required.
 
-> +        } else if (i < vl) {
+> +}
+> +
+> +
+> +int proxy_proc_recv(ProxyLinkState *s, ProcMsg *msg, ProcChannel *chan)
+> +{
+> +    int rc;
+> +    uint8_t *data;
+> +    union {
+> +        char control[CMSG_SPACE(REMOTE_MAX_FDS * sizeof(int))];
+> +        struct cmsghdr align;
+> +    } u;
+> +    struct msghdr hdr;
+> +    struct cmsghdr *chdr;
+> +    size_t fdsize;
+> +    int sock = chan->sock;
+> +    QemuMutex *lock = &chan->lock;
+> +
+> +    struct iovec iov = {
+> +        .iov_base = (char *) msg,
+> +        .iov_len = PROC_HDR_SIZE,
+> +    };
+> +
+> +    memset(&hdr, 0, sizeof(hdr));
+> +    memset(&u, 0, sizeof(u));
+> +
+> +    hdr.msg_iov = &iov;
+> +    hdr.msg_iovlen = 1;
+> +    hdr.msg_control = &u;
+> +    hdr.msg_controllen = sizeof(u);
+> +
+> +    qemu_mutex_lock(lock);
 
-I would think this too could be moved into the loop condition.
+Sockets are full-duplex (sending and receiving are independent).  Is it
+necessary to use the same lock for both send and receive?
 
-> +            switch (width) {
-> +            case 8:
-> +                carry = vector_get_carry(env, width, lmul, i);
-> +                env->vfp.vreg[dest].u8[j] = env->vfp.vreg[src1].u8[j]
-> +                    + env->vfp.vreg[src2].u8[j] + carry;
-> +                break;
-> +            case 16:
-> +                carry = vector_get_carry(env, width, lmul, i);
-> +                env->vfp.vreg[dest].u16[j] = env->vfp.vreg[src1].u16[j]
-> +                    + env->vfp.vreg[src2].u16[j] + carry;
-> +                break;
-> +            case 32:
-> +                carry = vector_get_carry(env, width, lmul, i);
-> +                env->vfp.vreg[dest].u32[j] = env->vfp.vreg[src1].u32[j]
-> +                    + env->vfp.vreg[src2].u32[j] + carry;
-> +                break;
-> +            case 64:
-> +                carry = vector_get_carry(env, width, lmul, i);
-> +                env->vfp.vreg[dest].u64[j] = env->vfp.vreg[src1].u64[j]
-> +                    + env->vfp.vreg[src2].u64[j] + carry;
-> +                break;
-> +            default:
-> +                riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-> +                break;
-> +            }
-> +        } else {
-> +            vector_tail_common(env, dest, j, width);
+> +
+> +    do {
+> +        rc = recvmsg(sock, &hdr, 0);
+> +    } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
+> +
+> +    if (rc < 0) {
+> +        qemu_log_mask(LOG_REMOTE_DEBUG, "%s - recvmsg rc is %d, errno is %d,"
+> +                      " sock %d\n", __func__, rc, errno, sock);
+> +        qemu_mutex_unlock(lock);
+> +        return rc;
+> +    }
+> +
+> +    msg->num_fds = 0;
+> +    for (chdr = CMSG_FIRSTHDR(&hdr); chdr != NULL;
+> +         chdr = CMSG_NXTHDR(&hdr, chdr)) {
+> +        if ((chdr->cmsg_level == SOL_SOCKET) &&
+> +            (chdr->cmsg_type == SCM_RIGHTS)) {
+> +            fdsize = chdr->cmsg_len - CMSG_LEN(0);
+> +            msg->num_fds = fdsize / sizeof(int);
+> +            memcpy(msg->fds, CMSG_DATA(chdr), fdsize);
 
-With this tail clearing being done as a loop of its own, which would devolve to
-memset on a little-endian host.
+Please validate num_fds before memcpy to prevent the buffer overflow.
 
-
+> +            break;
 > +        }
 > +    }
-> +    env->vfp.vstart = 0;
-> +}
-> +void VECTOR_HELPER(vadc_vxm)(CPURISCVState *env, uint32_t rs1,
-> +    uint32_t rs2, uint32_t rd)
-> +{
+> +
+> +    if (msg->size && msg->bytestream) {
+> +        msg->data2 = calloc(1, msg->size);
+> +        data = msg->data2;
+> +    } else {
+> +        data = (uint8_t *)&msg->data1;
+> +    }
+> +
+> +    if (msg->size) {
+> +        do {
+> +            rc = read(sock, data, msg->size);
+> +        } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
+> +    }
 
-Watch the spacing between functions.
-Pass gpr rs1 by value.
+Please validate size to prevent the buffer overflow.
 
-> +void VECTOR_HELPER(vadc_vim)(CPURISCVState *env, uint32_t rs1,
-> +    uint32_t rs2, uint32_t rd)
-> +{
-...
-> +                env->vfp.vreg[dest].u8[j] = sign_extend(rs1, 5)
+--JvUS8mwutKMHKosv
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Pass the immediate as a sign-extended immediate to begin with, not as an
-unsigned 5-bit field.
+-----BEGIN PGP SIGNATURE-----
 
-All of the rest of the helpers are about the same.
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl16ZYsACgkQnKSrs4Gr
+c8i3kwgAmaUqljM3C1g4G+bEJirz6trwrMmcAuZdb/tmjGIHTyFDclzs3T7oqULm
+0yahOXvFHHgOp3eNfCyWOwl4VKNgCgJqbp++vIWsVrehfNQrigkFbAY5vP98vbs6
+fpWOZWAgni/Xax6HXdxujU2w6qv979THRbBqney+Bl3oHuy6oAG6MhWNHMsd12pH
+vtfVA06B2LeLNXgl7WCdK5Vhzah6QniTGquNKCYtKelh/Ql691mpAHphM2SDy+Vj
+bCz+3aHW8U4Fcz+y0MCjXr9UXe6UnyALPnNABpEF5+Okc5Z18k7WI9jubLQ1JpVH
+hZtWajm7Bd/O9P837hCpbaMUI3OVtw==
+=FuSj
+-----END PGP SIGNATURE-----
 
-Consider creating a helper function that contains the basic outline of the
-vector processing, and takes a (set of) function pointers that perform the
-operation.  With optimization, compiler inlining should produce the same code
-as you have here without having to replicate quite so much code for each
-helper.  You can also fix a bug in the basic outline in one place instead of
-hundreds.
-
-
-r~
+--JvUS8mwutKMHKosv--
 
