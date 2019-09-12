@@ -2,100 +2,66 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94B60C5ACAE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:48:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB984C49ED9
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:48:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68A4B20856
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:48:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68A4B20856
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 935FB20856
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:48:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 935FB20856
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8LiL-0000gk-9W
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 05:48:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45089)
+	id 1i8Lij-0001H2-HK
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 05:48:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46985)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bala24@linux.ibm.com>) id 1i8LRn-0000IG-Vo
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:31:29 -0400
+ (envelope-from <no-reply@patchew.org>) id 1i8Lag-0001Yc-2Y
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:40:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bala24@linux.ibm.com>) id 1i8LRm-0006pI-HJ
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:31:27 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27598
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <no-reply@patchew.org>) id 1i8Lad-0003vd-QZ
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:40:37 -0400
+Resent-Date: Thu, 12 Sep 2019 05:40:37 -0400
+Resent-Message-Id: <E1i8Lad-0003vd-QZ@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21521)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <bala24@linux.ibm.com>)
- id 1i8LRm-0006p9-Cv
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:31:26 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8C9IVKI059259
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 05:31:26 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2uyj88jsxs-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 05:31:25 -0400
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <bala24@linux.ibm.com>;
- Thu, 12 Sep 2019 10:31:24 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 12 Sep 2019 10:31:20 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x8C9VJLB39780604
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Sep 2019 09:31:19 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 700AEAE045;
- Thu, 12 Sep 2019 09:31:19 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E3017AE057;
- Thu, 12 Sep 2019 09:31:17 +0000 (GMT)
-Received: from localhost.in.ibm.com (unknown [9.124.35.221])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 12 Sep 2019 09:31:17 +0000 (GMT)
-From: Balamuruhan S <bala24@linux.ibm.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 12 Sep 2019 15:00:53 +0530
-X-Mailer: git-send-email 2.14.5
-In-Reply-To: <20190912093056.4516-1-bala24@linux.ibm.com>
-References: <20190912093056.4516-1-bala24@linux.ibm.com>
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1i8Lad-0003ug-It
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:40:35 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1568281215; cv=none; d=zoho.com; s=zohoarc; 
+ b=OJmkn81LIYEQtr52xK0CxhbykM9uvE1MZ1jAAge+YRi2Ptmh6wh22rmJxGjeX4SLzmcIC7SFhuFhODE4u3TJtVOeLvD8vE8skfGiKJwKa4h2PPgKHHlftglw3MrGysoStACf+uIFL8BMf6attARbTd5lJ+jr5W1gk02thmDbTrc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1568281215;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=iw11K81OCYKh3GVy3DLYRt7hRqct79dfHWbrSCqKhAw=; 
+ b=G5aGdzsl6kyc553yBNliN9zFR1u7IkNpbUXrQXj/ALw56OS9r7ApWHzT908JaD17wGGjv1Lp5DOT8gHmxOuMWVthCNpZU00gYkGxgmF9eVCm714adwCLcejjAxJ+wKORUyqWnGrbbsHAasI2oneQQjz5fao980tpn/X8xVCamPI=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1568281213061623.7139947607427;
+ Thu, 12 Sep 2019 02:40:13 -0700 (PDT)
+In-Reply-To: <20190912060701.4642-1-ysato@users.sourceforge.jp>
+Message-ID: <156828121179.23941.7504177836467632091@5dec9699b7de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-x-cbid: 19091209-0008-0000-0000-00000314B9F8
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19091209-0009-0000-0000-00004A3328B7
-Message-Id: <20190912093056.4516-3-bala24@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-09-12_04:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1909120099
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0b-001b2d01.pphosted.com id x8C9IVKI059259
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: [Qemu-devel] [PATCH v3 2/4] hw/ppc/pnv_occ: add sram device model
- for occ common area
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ysato@users.sourceforge.jp
+Date: Thu, 12 Sep 2019 02:40:13 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH v24 00/22] Add RX archtecture support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,211 +73,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: maddy@linux.vnet.ibm.com, groug@kaod.org,
- Balamuruhan S <bala24@linux.ibm.com>, anju@linux.vnet.ibm.com,
- qemu-ppc@nongnu.org, clg@kaod.org, hari@linux.vnet.ibm.com,
- david@gibson.dropbear.id.au
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, ysato@users.sourceforge.jp,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org, imammedo@redhat.com,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-emulate occ common area region with occ sram device model which
-occ and skiboot uses it to communicate regarding sensors, slw
-and HWMON in PowerNV emulated host.
-
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
----
- hw/ppc/pnv.c             |  8 +++++
- hw/ppc/pnv_occ.c         | 78 ++++++++++++++++++++++++++++++++++++++++++=
-++++++
- include/hw/ppc/pnv_occ.h |  3 ++
- 3 files changed, 89 insertions(+)
-
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 3f08db7b9e..80338ffe87 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -938,6 +938,10 @@ static void pnv_chip_power8_realize(DeviceState *dev=
-, Error **errp)
-         return;
-     }
-     pnv_xscom_add_subregion(chip, PNV_XSCOM_OCC_BASE, &chip8->occ.xscom_=
-regs);
-+
-+    /* OCC SRAM model */
-+    memory_region_add_subregion(get_system_memory(), PNV_OCC_COMMON_AREA=
-(chip),
-+                                &chip8->occ.sram_regs);
- }
-=20
- static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data)
-@@ -1126,6 +1130,10 @@ static void pnv_chip_power9_realize(DeviceState *d=
-ev, Error **errp)
-         return;
-     }
-     pnv_xscom_add_subregion(chip, PNV9_XSCOM_OCC_BASE, &chip9->occ.xscom=
-_regs);
-+
-+    /* OCC SRAM model */
-+    memory_region_add_subregion(get_system_memory(), PNV9_OCC_COMMON_ARE=
-A(chip),
-+                                &chip9->occ.sram_regs);
- }
-=20
- static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
-diff --git a/hw/ppc/pnv_occ.c b/hw/ppc/pnv_occ.c
-index 8bead2c930..785653bb67 100644
---- a/hw/ppc/pnv_occ.c
-+++ b/hw/ppc/pnv_occ.c
-@@ -30,6 +30,24 @@
- #define OCB_OCI_OCCMISC_AND     0x4021
- #define OCB_OCI_OCCMISC_OR      0x4022
-=20
-+/* OCC sensors */
-+#define OCC_SENSOR_DATA_BLOCK_OFFSET          0x580000
-+#define OCC_SENSOR_DATA_VALID                 0x580001
-+#define OCC_SENSOR_DATA_VERSION               0x580002
-+#define OCC_SENSOR_DATA_READING_VERSION       0x580004
-+#define OCC_SENSOR_DATA_NR_SENSORS            0x580008
-+#define OCC_SENSOR_DATA_NAMES_OFFSET          0x580010
-+#define OCC_SENSOR_DATA_READING_PING_OFFSET   0x580014
-+#define OCC_SENSOR_DATA_READING_PONG_OFFSET   0x58000c
-+#define OCC_SENSOR_DATA_NAME_LENGTH           0x58000d
-+#define OCC_SENSOR_NAME_STRUCTURE_TYPE        0x580023
-+#define OCC_SENSOR_LOC_CORE                   0x580022
-+#define OCC_SENSOR_LOC_GPU                    0x580020
-+#define OCC_SENSOR_TYPE_POWER                 0x580003
-+#define OCC_SENSOR_NAME                       0x580005
-+#define HWMON_SENSORS_MASK                    0x58001e
-+#define SLW_IMAGE_BASE                        0x0
-+
- static void pnv_occ_set_misc(PnvOCC *occ, uint64_t val)
- {
-     bool irq_state;
-@@ -82,6 +100,48 @@ static void pnv_occ_power8_xscom_write(void *opaque, =
-hwaddr addr,
-     }
- }
-=20
-+static uint64_t pnv_occ_common_area_read(void *opaque, hwaddr addr,
-+                                         unsigned width)
-+{
-+    switch (addr) {
-+    /*
-+     * occ-sensor sanity check that asserts the sensor
-+     * header block
-+     */
-+    case OCC_SENSOR_DATA_BLOCK_OFFSET:
-+    case OCC_SENSOR_DATA_VALID:
-+    case OCC_SENSOR_DATA_VERSION:
-+    case OCC_SENSOR_DATA_READING_VERSION:
-+    case OCC_SENSOR_DATA_NR_SENSORS:
-+    case OCC_SENSOR_DATA_NAMES_OFFSET:
-+    case OCC_SENSOR_DATA_READING_PING_OFFSET:
-+    case OCC_SENSOR_DATA_READING_PONG_OFFSET:
-+    case OCC_SENSOR_NAME_STRUCTURE_TYPE:
-+        return 1;
-+    case OCC_SENSOR_DATA_NAME_LENGTH:
-+        return 0x30;
-+    case OCC_SENSOR_LOC_CORE:
-+        return 0x0040;
-+    case OCC_SENSOR_TYPE_POWER:
-+        return 0x0080;
-+    case OCC_SENSOR_NAME:
-+        return 0x1000;
-+    case HWMON_SENSORS_MASK:
-+    case OCC_SENSOR_LOC_GPU:
-+        return 0x8e00;
-+    case SLW_IMAGE_BASE:
-+        return 0x1000000000000000;
-+    }
-+    return 0;
-+}
-+
-+static void pnv_occ_common_area_write(void *opaque, hwaddr addr,
-+                                             uint64_t val, unsigned widt=
-h)
-+{
-+    /* callback function defined to occ common area write */
-+    return;
-+}
-+
- static const MemoryRegionOps pnv_occ_power8_xscom_ops =3D {
-     .read =3D pnv_occ_power8_xscom_read,
-     .write =3D pnv_occ_power8_xscom_write,
-@@ -92,12 +152,24 @@ static const MemoryRegionOps pnv_occ_power8_xscom_op=
-s =3D {
-     .endianness =3D DEVICE_BIG_ENDIAN,
- };
-=20
-+const MemoryRegionOps pnv_occ_sram_ops =3D {
-+    .read =3D pnv_occ_common_area_read,
-+    .write =3D pnv_occ_common_area_write,
-+    .valid.min_access_size =3D 1,
-+    .valid.max_access_size =3D 8,
-+    .impl.min_access_size =3D 1,
-+    .impl.max_access_size =3D 8,
-+    .endianness =3D DEVICE_BIG_ENDIAN,
-+};
-+
- static void pnv_occ_power8_class_init(ObjectClass *klass, void *data)
- {
-     PnvOCCClass *poc =3D PNV_OCC_CLASS(klass);
-=20
-     poc->xscom_size =3D PNV_XSCOM_OCC_SIZE;
-+    poc->sram_size =3D PNV_OCC_COMMON_AREA_SIZE;
-     poc->xscom_ops =3D &pnv_occ_power8_xscom_ops;
-+    poc->sram_ops =3D &pnv_occ_sram_ops;
-     poc->psi_irq =3D PSIHB_IRQ_OCC;
- }
-=20
-@@ -168,7 +240,9 @@ static void pnv_occ_power9_class_init(ObjectClass *kl=
-ass, void *data)
-     PnvOCCClass *poc =3D PNV_OCC_CLASS(klass);
-=20
-     poc->xscom_size =3D PNV9_XSCOM_OCC_SIZE;
-+    poc->sram_size =3D PNV9_OCC_COMMON_AREA_SIZE;
-     poc->xscom_ops =3D &pnv_occ_power9_xscom_ops;
-+    poc->sram_ops =3D &pnv_occ_sram_ops;
-     poc->psi_irq =3D PSIHB9_IRQ_OCC;
- }
-=20
-@@ -199,6 +273,10 @@ static void pnv_occ_realize(DeviceState *dev, Error =
-**errp)
-     /* XScom region for OCC registers */
-     pnv_xscom_region_init(&occ->xscom_regs, OBJECT(dev), poc->xscom_ops,
-                           occ, "xscom-occ", poc->xscom_size);
-+
-+    /* XScom region for OCC SRAM registers */
-+    pnv_xscom_region_init(&occ->sram_regs, OBJECT(dev), poc->sram_ops,
-+                          occ, "occ-common-area", poc->sram_size);
- }
-=20
- static void pnv_occ_class_init(ObjectClass *klass, void *data)
-diff --git a/include/hw/ppc/pnv_occ.h b/include/hw/ppc/pnv_occ.h
-index ed0709bfc0..66b0989be6 100644
---- a/include/hw/ppc/pnv_occ.h
-+++ b/include/hw/ppc/pnv_occ.h
-@@ -38,6 +38,7 @@ typedef struct PnvOCC {
-     PnvPsi *psi;
-=20
-     MemoryRegion xscom_regs;
-+    MemoryRegion sram_regs;
- } PnvOCC;
-=20
- #define PNV_OCC_CLASS(klass) \
-@@ -49,7 +50,9 @@ typedef struct PnvOCCClass {
-     DeviceClass parent_class;
-=20
-     int xscom_size;
-+    int sram_size;
-     const MemoryRegionOps *xscom_ops;
-+    const MemoryRegionOps *sram_ops;
-     int psi_irq;
- } PnvOCCClass;
-=20
---=20
-2.14.5
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxMjA2MDcwMS40NjQy
+LTEteXNhdG9AdXNlcnMuc291cmNlZm9yZ2UuanAvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMg
+dG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IK
+bW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjI0IDAwLzIy
+XSBBZGQgUlggYXJjaHRlY3R1cmUgc3VwcG9ydApNZXNzYWdlLWlkOiAyMDE5MDkxMjA2MDcwMS40
+NjQyLTEteXNhdG9AdXNlcnMuc291cmNlZm9yZ2UuanAKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVs
+bCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
+b3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2Uu
+Lgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hl
+dy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDE5MDkxMjA2MDcw
+MS40NjQyLTEteXNhdG9AdXNlcnMuc291cmNlZm9yZ2UuanAgLT4gcGF0Y2hldy8yMDE5MDkxMjA2
+MDcwMS40NjQyLTEteXNhdG9AdXNlcnMuc291cmNlZm9yZ2UuanAKU3dpdGNoZWQgdG8gYSBuZXcg
+YnJhbmNoICd0ZXN0Jwo0ODM5OTYxIHFhcGkvbWFjaGluZS5qc29uOiBBZGQgUlggY3B1LgplZTFh
+MzRjIEJvb3RMaW51eENvbnNvbGVUZXN0OiBUZXN0IHRoZSBSWC1WaXJ0IG1hY2hpbmUKNGJjZTEx
+MSBBZGQgcngtc29mdG1tdQpkZDBjZWQ5IGh3L3J4OiBSZXN0cmljdCB0aGUgUlg2Mk4gbWljcm9j
+b250cm9sbGVyIHRvIHRoZSBSWDYyTiBDUFUgY29yZQpjOTZiNTI3IGh3L3J4OiBIb25vciAtYWNj
+ZWwgcXRlc3QKZWRkYTQ2MyBody9yeDogUlggVGFyZ2V0IGhhcmR3YXJlIGRlZmluaXRpb24KYzBh
+M2NhZSBody9jaGFyOiBSWDYyTiBzZXJpYWwgY29tbXVuaWNhdGlvbiBpbnRlcmZhY2UgKFNDSSkK
+ZmMyZmE0ZSBody90aW1lcjogUlg2Mk4gaW50ZXJuYWwgdGltZXIgbW9kdWxlcwpkZjJjMTQ5IGh3
+L2ludGM6IFJYNjJOIGludGVycnVwdCBjb250cm9sbGVyIChJQ1VhKQpjM2ZhMTc3IHRhcmdldC9y
+eDogRHVtcCBieXRlcyBmb3IgZWFjaCBpbnNuIGR1cmluZyBkaXNhc3NlbWJseQo5ZmVlMzA1IHRh
+cmdldC9yeDogQ29sbGVjdCBhbGwgYnl0ZXMgZHVyaW5nIGRpc2Fzc2VtYmx5CjJjZTM1MTkgdGFy
+Z2V0L3J4OiBFbWl0IGFsbCBkaXNhc3NlbWJseSBpbiBvbmUgcHJ0KCkKNjBhZDUzNSB0YXJnZXQv
+cng6IFVzZSBwcnRfbGRtaSBmb3IgWENIR19tciBkaXNhc3NlbWJseQo0ZjE1Nzk2IHRhcmdldC9y
+eDogUmVwbGFjZSBvcGVyYW5kIHdpdGggcHJ0X2xkbWkgaW4gZGlzYXNzZW1ibGVyCjU0ZjQ2ZWYg
+dGFyZ2V0L3J4OiBEaXNhc3NlbWJsZSByeF9pbmRleF9hZGRyIGludG8gYSBzdHJpbmcKYjBmOTM5
+YSB0YXJnZXQvcng6IFJYIGRpc2Fzc2VtYmxlcgozMzQzZWY1IHRhcmdldC9yeDogQ1BVIGRlZmlu
+aXRpb24KMjBlNWRhYSB0YXJnZXQvcng6IFRDRyBoZWxwZXIKZDM0NWZmMCB0YXJnZXQvcng6IFRD
+RyB0cmFuc2xhdGlvbgphNmM3M2VkIGh3L3JlZ2lzdGVyZmllbGRzLmg6IEFkZCA4Yml0IGFuZCAx
+NmJpdCByZWdpc3RlciBtYWNyb3MKNjI0ZDI4NiBxZW11L2JpdG9wcy5oOiBBZGQgZXh0cmFjdDgg
+YW5kIGV4dHJhY3QxNgo3YTc1NDRjIE1BSU5UQUlORVJTOiBBZGQgUlgKCj09PSBPVVRQVVQgQkVH
+SU4gPT09CjEvMjIgQ2hlY2tpbmcgY29tbWl0IDdhNzU0NGM4MDYwNiAoTUFJTlRBSU5FUlM6IEFk
+ZCBSWCkKMi8yMiBDaGVja2luZyBjb21taXQgNjI0ZDI4NmRiYzNiIChxZW11L2JpdG9wcy5oOiBB
+ZGQgZXh0cmFjdDggYW5kIGV4dHJhY3QxNikKMy8yMiBDaGVja2luZyBjb21taXQgYTZjNzNlZGFi
+OTc5IChody9yZWdpc3RlcmZpZWxkcy5oOiBBZGQgOGJpdCBhbmQgMTZiaXQgcmVnaXN0ZXIgbWFj
+cm9zKQpVc2Ugb2YgdW5pbml0aWFsaXplZCB2YWx1ZSBpbiBjb25jYXRlbmF0aW9uICguKSBvciBz
+dHJpbmcgYXQgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgbGluZSAyNDg0LgpFUlJPUjogTWFjcm9z
+IHdpdGggbXVsdGlwbGUgc3RhdGVtZW50cyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gYSBkbyAtIHdo
+aWxlIGxvb3AKIzI3OiBGSUxFOiBpbmNsdWRlL2h3L3JlZ2lzdGVyZmllbGRzLmg6MjU6CisjZGVm
+aW5lIFJFRzgocmVnLCBhZGRyKSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgXAorICAgIGVudW0geyBBXyAjIyByZWcgPSAoYWRkcikgfTsgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgZW51bSB7IFJfICMjIHJlZyA9
+IChhZGRyKSB9OwoKRVJST1I6IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxk
+IGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBsb29wCiMzMTogRklMRTogaW5jbHVkZS9ody9y
+ZWdpc3RlcmZpZWxkcy5oOjI5OgorI2RlZmluZSBSRUcxNihyZWcsIGFkZHIpICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgZW51bSB7IEFfICMj
+IHJlZyA9IChhZGRyKSB9OyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IFwKKyAgICBlbnVtIHsgUl8gIyMgcmVnID0gKGFkZHIpIC8gMiB9OwoKdG90YWw6IDIgZXJyb3Jz
+LCAwIHdhcm5pbmdzLCA1NiBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzIyIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCgo0LzIyIENoZWNraW5nIGNvbW1pdCBkMzQ1ZmYwOTE0ZDQgKHRhcmdldC9y
+eDogVENHIHRyYW5zbGF0aW9uKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
+KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMDogCm5ldyBmaWxlIG1vZGUg
+MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMwNjUgbGluZXMgY2hlY2tlZAoK
+UGF0Y2ggNC8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
+dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo1LzIyIENoZWNraW5nIGNvbW1p
+dCAyMGU1ZGFhYmE3NTEgKHRhcmdldC9yeDogVENHIGhlbHBlcikKV0FSTklORzogYWRkZWQsIG1v
+dmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwoj
+MjE6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA2
+NTAgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
+ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
+IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo2
+LzIyIENoZWNraW5nIGNvbW1pdCAzMzQzZWY1ZDA4YzYgKHRhcmdldC9yeDogQ1BVIGRlZmluaXRp
+b24pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRB
+SU5FUlMgbmVlZCB1cGRhdGluZz8KIzM5OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAw
+IGVycm9ycywgMSB3YXJuaW5ncywgNTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvMjIgaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KNy8yMiBDaGVja2luZyBjb21taXQgYjBmOTM5YTQzMWQxICh0
+YXJnZXQvcng6IFJYIGRpc2Fzc2VtYmxlcikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0
+ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzg6IApuZXcgZmls
+ZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNDk3IGxpbmVzIGNo
+ZWNrZWQKClBhdGNoIDcvMjIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8yMiBDaGVja2lu
+ZyBjb21taXQgNTRmNDZlZjFkODZhICh0YXJnZXQvcng6IERpc2Fzc2VtYmxlIHJ4X2luZGV4X2Fk
+ZHIgaW50byBhIHN0cmluZykKOS8yMiBDaGVja2luZyBjb21taXQgNGYxNTc5NjdhYzhjICh0YXJn
+ZXQvcng6IFJlcGxhY2Ugb3BlcmFuZCB3aXRoIHBydF9sZG1pIGluIGRpc2Fzc2VtYmxlcikKMTAv
+MjIgQ2hlY2tpbmcgY29tbWl0IDYwYWQ1MzU4ZGZjZiAodGFyZ2V0L3J4OiBVc2UgcHJ0X2xkbWkg
+Zm9yIFhDSEdfbXIgZGlzYXNzZW1ibHkpCjExLzIyIENoZWNraW5nIGNvbW1pdCAyY2UzNTE5Mzg2
+ZDUgKHRhcmdldC9yeDogRW1pdCBhbGwgZGlzYXNzZW1ibHkgaW4gb25lIHBydCgpKQoxMi8yMiBD
+aGVja2luZyBjb21taXQgOWZlZTMwNTVmNmIyICh0YXJnZXQvcng6IENvbGxlY3QgYWxsIGJ5dGVz
+IGR1cmluZyBkaXNhc3NlbWJseSkKMTMvMjIgQ2hlY2tpbmcgY29tbWl0IGMzZmExNzdjZDI3NCAo
+dGFyZ2V0L3J4OiBEdW1wIGJ5dGVzIGZvciBlYWNoIGluc24gZHVyaW5nIGRpc2Fzc2VtYmx5KQox
+NC8yMiBDaGVja2luZyBjb21taXQgZGYyYzE0OTAwYzQ0IChody9pbnRjOiBSWDYyTiBpbnRlcnJ1
+cHQgY29udHJvbGxlciAoSUNVYSkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
+bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQwOiAKbmV3IGZpbGUgbW9k
+ZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDQ1IGxpbmVzIGNoZWNrZWQK
+ClBhdGNoIDE0LzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE1LzIyIENoZWNraW5nIGNv
+bW1pdCBmYzJmYTRlNmVlN2EgKGh3L3RpbWVyOiBSWDYyTiBpbnRlcm5hbCB0aW1lciBtb2R1bGVz
+KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlO
+RVJTIG5lZWQgdXBkYXRpbmc/CiM1MDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBl
+cnJvcnMsIDEgd2FybmluZ3MsIDg0NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8yMiBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoxNi8yMiBDaGVja2luZyBjb21taXQgYzBhM2NhZTZiZjVhICho
+dy9jaGFyOiBSWDYyTiBzZXJpYWwgY29tbXVuaWNhdGlvbiBpbnRlcmZhY2UgKFNDSSkpCldBUk5J
+Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
+ZCB1cGRhdGluZz8KIzQzOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywg
+MSB3YXJuaW5ncywgNDAxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDE2LzIyIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCjE3LzIyIENoZWNraW5nIGNvbW1pdCBlZGRhNDYzYWQwYWEgKGh3L3J4OiBS
+WCBUYXJnZXQgaGFyZHdhcmUgZGVmaW5pdGlvbikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
+bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjk6IApuZXcg
+ZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0ODAgbGluZXMg
+Y2hlY2tlZAoKUGF0Y2ggMTcvMjIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTgvMjIgQ2hl
+Y2tpbmcgY29tbWl0IGM5NmI1MjdkNWNjMSAoaHcvcng6IEhvbm9yIC1hY2NlbCBxdGVzdCkKMTkv
+MjIgQ2hlY2tpbmcgY29tbWl0IGRkMGNlZDlhMjcwOSAoaHcvcng6IFJlc3RyaWN0IHRoZSBSWDYy
+TiBtaWNyb2NvbnRyb2xsZXIgdG8gdGhlIFJYNjJOIENQVSBjb3JlKQoyMC8yMiBDaGVja2luZyBj
+b21taXQgNGJjZTExMTEzNTUxIChBZGQgcngtc29mdG1tdSkKV0FSTklORzogYWRkZWQsIG1vdmVk
+IG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNTk6
+IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1OSBs
+aW5lcyBjaGVja2VkCgpQYXRjaCAyMC8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyMS8y
+MiBDaGVja2luZyBjb21taXQgZWUxYTM0YzY5MWI0IChCb290TGludXhDb25zb2xlVGVzdDogVGVz
+dCB0aGUgUlgtVmlydCBtYWNoaW5lKQoyMi8yMiBDaGVja2luZyBjb21taXQgNDgzOTk2MWMwYzQ4
+IChxYXBpL21hY2hpbmUuanNvbjogQWRkIFJYIGNwdS4pCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
+dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxl
+IGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwOTEyMDYwNzAxLjQ2NDItMS15c2F0b0B1
+c2Vycy5zb3VyY2Vmb3JnZS5qcC90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0t
+CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hl
+dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
+dC5jb20=
 
 
