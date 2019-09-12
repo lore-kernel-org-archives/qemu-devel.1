@@ -2,68 +2,93 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CA0DC4CEC5
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:58:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A16E6C4CEC5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:59:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC7682081B
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:58:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69C252081B
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:59:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fnarfbargle.com header.i=@fnarfbargle.com header.b="J0x6YTBw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC7682081B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=fnarfbargle.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WiEV1GI8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69C252081B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8QXp-0001vv-RP
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 10:58:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34310)
+	id 1i8QZU-0003D4-J6
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 10:59:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34723)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lists2009@fnarfbargle.com>) id 1i8QW5-0000gg-8H
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 10:56:14 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i8QXh-00026P-SJ
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 10:57:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lists2009@fnarfbargle.com>) id 1i8QW3-0004Rf-HT
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 10:56:12 -0400
-Received: from ns3.fnarfbargle.com ([103.4.19.87]:33004)
+ (envelope-from <richard.henderson@linaro.org>) id 1i8QXg-0004xC-EK
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 10:57:53 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:33998)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lists2009@fnarfbargle.com>)
- id 1i8QVx-0004K9-5V; Thu, 12 Sep 2019 10:56:05 -0400
-Received: from [10.8.0.1] (helo=srv.home ident=heh26227)
- by ns3.fnarfbargle.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.84_2) (envelope-from <lists2009@fnarfbargle.com>)
- id 1i8QTo-0007GA-KP; Thu, 12 Sep 2019 22:53:52 +0800
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=fnarfbargle.com; s=mail; 
- h=Content-Transfer-Encoding:Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject;
- bh=xGd+pcX1KFyrytCSyty7tQuGEaiqj8QdzzNd20ivNN4=; 
- b=J0x6YTBwlu67tO0nnaWxI+Nc6cub3srmAVR67kIZSajU1+7YLfzKtnRpMzKMnJAORgDKwSU68nsjr60vWOao9CG6d/QMtW4niytaWqk86BqD/EhJy5TgIxe1P9gfv9xDE21qKuFaf0nPAQcEwOBEKbPadkkaUh5iD25rUD835DU=;
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <ed421291-7178-d7bc-5ed3-9863d28ceba9@fnarfbargle.com>
- <dd33a398-3c1f-0c92-2318-00ad144e1e5d@fnarfbargle.com>
- <b1782119-abbc-9678-8217-ef576dbf8c93@fnarfbargle.com>
- <20190906190351.GB20068@work-vm>
- <a9799b8b-a294-59e3-f329-060b19cdcf0e@fnarfbargle.com>
- <20190909152205.GC2726@work-vm>
-From: Brad Campbell <lists2009@fnarfbargle.com>
-Message-ID: <cde4d063-0d7a-c0d3-3fff-b87b650802b5@fnarfbargle.com>
-Date: Thu, 12 Sep 2019 22:54:36 +0800
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i8QXg-0004wA-6F
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 10:57:52 -0400
+Received: by mail-qk1-x743.google.com with SMTP id q203so24767891qke.1
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 07:57:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=xsy2kOVTD167AQ683WKVJW7gRRAg7eLJFgC+5Fhug4A=;
+ b=WiEV1GI8i1a6XEstQK6iiS+7fC12W33ErCpruiK6IbEbUICsL4U/fya0xle1R7G1bu
+ 7/Jn0zFNd06NRh8S9mafLIn1SmwVn0dc2lhkniznniD+Ru6YJgfuca38b/1+8Ku8LJTG
+ DnbNqu7HlO3mZR9z6v1xS9evYLhsi65/BGhyRNP6B2MWxnq0QQXLmR2nV09ARTCj67KQ
+ cM93PFCYwBvd8lvZiXrzA0FHZWFbYAAtw6rEpTS7nKJyvQw+fL70ybrzGiK0FWi+qL7E
+ 5dQXzDAAOH3VGuFcIZinplkQalJ+p6x1wB/4Ot6QWC0I3/MuuMBneppg4Y4I55nCMUQm
+ 7NdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=xsy2kOVTD167AQ683WKVJW7gRRAg7eLJFgC+5Fhug4A=;
+ b=YGKzgKAVqhsKUaDf+2t6s5TDkgRSsJDE0zGsCw+QrTDBtMTCluu457HDd80QEwQRpB
+ B+NzC1HaNC/gpPArlQhk9QlhcYv2pdkf0NTWQJuUx4Vmsh/cLXSny6/+Xf7FxSP0aeE/
+ Ll10kW22cRZb+ayqp2A/8RMSzg2lJfV9KQtDOkUxSOZKHL5gjb12faIU2ptzHCaZwChT
+ zyJLYW6JREeAEbc9kzIvWLSOjlyqmMoBNwJFuPCLevuLgBSWypKPfPkuOjXwrrfgpMSd
+ w/DzBO7CZ9iNUazipEwGTFDQnini02eRghS2JtoyZFcWYx4ULCl2u88dcDKXb9s0lE/j
+ yGwg==
+X-Gm-Message-State: APjAAAWOp6yTl6/LoSJLYbjxleN/va0WUr+hmcN3e9vvw3h1rOBP39CF
+ d3BfXGdnwQCRHuTHBbfg/K6dJw==
+X-Google-Smtp-Source: APXvYqyPtC5uLDt5tEspaCxPCLb/waHvYMe8mqW8tiNl5QwFXLWRGvRV4eyn+4gYLomUku9+RlEsmQ==
+X-Received: by 2002:a37:4b02:: with SMTP id y2mr41251379qka.493.1568300271069; 
+ Thu, 12 Sep 2019 07:57:51 -0700 (PDT)
+Received: from [172.20.5.51] ([67.69.50.154])
+ by smtp.gmail.com with ESMTPSA id m14sm1449496qki.27.2019.09.12.07.57.49
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 12 Sep 2019 07:57:50 -0700 (PDT)
+To: liuzhiwei <zhiwei_liu@c-sky.com>, Alistair.Francis@wdc.com,
+ palmer@sifive.com, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de,
+ riku.voipio@iki.fi, laurent@vivier.eu, wenmeng_zhang@c-sky.com
+References: <1568183141-67641-1-git-send-email-zhiwei_liu@c-sky.com>
+ <1568183141-67641-8-git-send-email-zhiwei_liu@c-sky.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <5807ed99-e8a8-b845-2eb8-e8c5ae6176a4@linaro.org>
+Date: Thu, 12 Sep 2019 10:57:47 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190909152205.GC2726@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-AU
+In-Reply-To: <1568183141-67641-8-git-send-email-zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 103.4.19.87
-Subject: Re: [Qemu-devel] [Qemu-discuss] Cross-posted : Odd QXL/KVM
- performance issue with a Windows 7 Guest
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::743
+Subject: Re: [Qemu-devel] [PATCH v2 07/17] RISC-V: add vector extension
+ atomic instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,37 +100,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-discuss@nongnu.org
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/9/19 11:22 pm, Dr. David Alan Gilbert wrote:
-> 
-> Oh, hmm.
-> Sorry I don't know too much where to look then; you have any of:
->    a) Windows
->    b) guest graphics drivers
->    c) spice server in qemu
->   
-> and probalby some more.
-> 
-> So I think it's going to be a case of profiling on the two different
-> systems and see if you can spot anything in particular that stands out.
-> 
+On 9/11/19 2:25 AM, liuzhiwei wrote:
+> +            case 64:
+> +                if (vector_elem_mask(env, vm, width, lmul, i)) {
+> +                    int64_t tmp;
+> +                    idx    = (target_long)env->vfp.vreg[src2].s64[j];
+> +                    addr   = idx + env->gpr[rs1];
+> +
+> +#ifdef CONFIG_SOFTMMU
+> +                    tmp = (int64_t)(int32_t)helper_atomic_xchgl_le(env, addr,
+> +                        env->vfp.vreg[src3].s64[j],
+> +                        make_memop_idx(memop & ~MO_SIGN, mem_idx));
+> +#else
+> +                    tmp = (int64_t)(int32_t)helper_atomic_xchgl_le(env, addr,
+> +                        env->vfp.vreg[src3].s64[j]);
+> +#endif
+> +                    if (wd) {
+> +                        env->vfp.vreg[src3].s64[j] = tmp;
+> +                    }
+> +                    env->vfp.vstart++;
+> +                }
+> +                break;
 
-G'day Dave,
+This will not link if !defined(CONFIG_ATOMIC64).
 
-Thanks for the advice.
+That's pretty rare these days, admittedly.  I think you'd need to compile for
+ppc32 or mips32 (or riscv32!) host to see this.  You can force this condition
+for i686 host with --extra-cflags='-march=i486', just to see if you've got it
+right.
 
-I ran qemu through Valgrind/callgrind and nothing excessive popped up. 
-It looks like the issue might be in Windows, so I'm now trying to figure 
-out how to profile inside the guest.
+There should be two different versions of this helper: one that performs actual
+atomic operations, as above, and a second that performs the same operation with
+non-atomic operations.
 
-Suggestions as to how to profile the qxl driver while it's underway 
-gratefully accepted. I'm working my way through the profiling tools in 
-the Windows SDK & DDK but haven't made much headway.
+The version of the helper that you call should be based on the translation time
+setting of "tb_cflags(s->base.tb) & CF_PARALLEL":  If PARALLEL is set, call the
+atomic helper otherwise the non-atomic helper.
 
-Regards,
-Brad
+If you arrive at a situation in which the host cannot handle any atomic
+operation, then you must raise the EXCP_ATOMIC exception.  This will halt all
+other cpus and run one instruction on this cpu while holding the exclusive lock.
+
+If you cannot detect this condition any earlier than here at runtime, use
+cpu_loop_exit_atomic(), but you must do so before altering any cpu state.
+However, as per my comments for normal loads, you should be able to detect this
+condition at translation time and call gen_helper_exit_atomic().
+
+
+r~
 
