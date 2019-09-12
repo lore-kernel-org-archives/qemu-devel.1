@@ -2,81 +2,82 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56CD2C49ED9
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:02:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D53EC49ED9
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:03:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18A45206CD
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:02:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 573ED20CC7
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:03:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NmD/pBD/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18A45206CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="grhiSMuF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 573ED20CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8KzO-0003aL-TM
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 05:02:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38454)
+	id 1i8L0x-0004yD-Gz
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 05:03:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38706)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent.desnogues@gmail.com>) id 1i8Kwx-0001ib-03
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 04:59:35 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i8KyE-0003FW-S6
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:01:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent.desnogues@gmail.com>) id 1i8Kws-0004V3-2E
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 04:59:34 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:43529)
+ (envelope-from <peter.maydell@linaro.org>) id 1i8KyD-0005TD-Eb
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:00:54 -0400
+Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:37023)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
- id 1i8Kwr-0004Ub-UN; Thu, 12 Sep 2019 04:59:30 -0400
-Received: by mail-io1-xd44.google.com with SMTP id r8so27756081iol.10;
- Thu, 12 Sep 2019 01:59:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i8KyD-0005ST-0o
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:00:53 -0400
+Received: by mail-ot1-x331.google.com with SMTP id s28so25355903otd.4
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 02:00:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=NPpL4OpK/yJcKOIDDXKrVIVtNfYCvKqi68M1Uf5NUu4=;
- b=NmD/pBD/hIyENFX+Jf1Nrh74EHB9TvGrwCAYA4vjiDdS0OU1l8+9P9qSIigO8F2J9C
- J3WJMnsgVQgyCqX9EazqWk7qoUtsDSYZl9Irq6pCbVsn4yUICv+SzN478HbsdgCJQFO7
- 2WMFmo9KqsDfZrxuc1+Up9eQ5ofyebWgIBa6gDrfoxOvGwPvV9mXEUZ1bedXf3b+zP8g
- vtD4qewWUrZ5PjtHLA8DtzV/uuy3G8v3Qj68Vd2MSq8YqDLWgLHbUfJyh8oVZp7k00KZ
- mC8Dn/gFHvNeLCHJcRKZYX+BVe3wu+89/Fp1zEgK3T4pusw3zUgvMaPgt8QNZe+JEMj3
- b39Q==
+ :cc; bh=OKAjqj/41klknl2QNfAVWPQR2aLtTz/mhjdc7DMyAyE=;
+ b=grhiSMuFCmf832JF9vGDDEmzU4Bw7YjAHjUmG1X6dpmvkMFUHp5Cn/w696KXoBRpgX
+ Me50AA5VvakDciC5tuOtEOX5gCratk//qa3MBk/nJ3yKDR72ZFDF9wgMm1zqfc6T17nb
+ Udvo6oH7+jQ//+niLY2D3Fwp5gQixXeIKbYJ8Er1f7hSMl3ofNSBJIAHFrA55tU32HS4
+ X5Ftie4+Q9GYmk+CnLAZDpVhM03yjQ7/Yjm3ta85ArwkSCq3UGtr7/SPbInyQSVuGwuT
+ cY4EQCQkhbJ2sT/3jPwypARibQwAPzwvwLo/g67D0JvaLUAlzzgxA5RtR6qor+PmjC8Q
+ kbPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=NPpL4OpK/yJcKOIDDXKrVIVtNfYCvKqi68M1Uf5NUu4=;
- b=NZKUbIDBNrreb+t2loy8NY9oQAmKw7RwktBmXh2+4O7yWZTSEb+hd9e+kjpz3B88bO
- a3To9Fxq7Vzd/IT0RVYjDXL3+QQAvSe5cxRtecLmrWsS6rU9oTzZs6ROmIiT9FmlEDAd
- IrG8k396giWsMRMZIQIC8+Egc9lHamJ2DkoYmwgRNMTFzMs+ewnsDyTae4ArAZaZ3aC+
- F/kgYKo9lEqa7W0uMVkK2uZezXT4691ahbF265MiuNJvsThCg3LvMerv8/lgKFzXpFIE
- O8Y0yZJxTsunS48btWVu/RQvqQ3Hvovrhon+2wU3h6vwENN3q1zEqm90Hg3CRpRlW5a+
- 9rlw==
-X-Gm-Message-State: APjAAAVaYu91ILfehOc95l0J4HGHVYafidzKePMfp8wKK9qvLTr/UfR+
- zjsP4g40ZTkF29aOkwUVAgz6bCNzeHNELkuJ9YEMlYvUjFU=
-X-Google-Smtp-Source: APXvYqxYWG9KMe1RjO71VwYMQ5N6IGqnCpol9EreN8ajdmND9v2ikU2p3wLZeLGpu433NJhDKPurTNdq2hI0TtyaYlg=
-X-Received: by 2002:a6b:8f15:: with SMTP id r21mr3266284iod.259.1568278768300; 
- Thu, 12 Sep 2019 01:59:28 -0700 (PDT)
+ bh=OKAjqj/41klknl2QNfAVWPQR2aLtTz/mhjdc7DMyAyE=;
+ b=tW3IwP+Lc0+FRnks56D3xsjAsJxQVJVk1JyMoBEYHsEKqLLtNqFV9jBYTTOBBaw+rm
+ sRaecdObQQbyn8x3WxP4s4r6pIYsLENIu25+45wWrbfvo2XwC7wPg4EFPLApyNchhHxS
+ X872/x/O+njA1tKjdvszFiMlqRlNqmOtqabkQDyV8S43CRl3mG828k8XnWIGpuflpegd
+ e3YuAzkYl+CXSesmEO0BrsZMCaKRoqlyCGecq3jsqoc98e8BTVLgTBE9tG1OS3wlTr8e
+ ciVr55R9jw7Hu46UziSxdEqMQgN/JInMwNkc/7RA1LukyjuwzZWvB1p/4/KJhIYMQ6d+
+ KVtA==
+X-Gm-Message-State: APjAAAVKFYZF081PWxEEA/Cf2te+BO0gGQAuQxe08UHcysptumD9g4DC
+ V9u38yyeGvljVlXx6Q3v45qjA++5UWhs/fs4vxyXpQ==
+X-Google-Smtp-Source: APXvYqymNlziH1XSwE9cKbxq00oSoMUgREY43cmo6WTNG7dfeKO7RRLunw0dwnLvYslTGujBYlc9zHFJwaq1w9fgCO8=
+X-Received: by 2002:a9d:68d6:: with SMTP id i22mr26144709oto.232.1568278851677; 
+ Thu, 12 Sep 2019 02:00:51 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190904193059.26202-1-richard.henderson@linaro.org>
- <20190904193059.26202-11-richard.henderson@linaro.org>
-In-Reply-To: <20190904193059.26202-11-richard.henderson@linaro.org>
-From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Thu, 12 Sep 2019 10:59:26 +0200
-Message-ID: <CABoDooPfrrmAo5UdVmysZYihHDJW2Np74rQ5e112SU6of3LowA@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
+References: <20190911155125.11932-1-eric.auger@redhat.com>
+ <20190911155125.11932-4-eric.auger@redhat.com>
+ <CAFEAcA-tZJ2C8=ZH5e7tXzigPu3SGjSJbnLybZTG+hZO-7ZV0A@mail.gmail.com>
+ <1b849672-31a6-3d8d-b8ea-254e737e3b80@redhat.com>
+In-Reply-To: <1b849672-31a6-3d8d-b8ea-254e737e3b80@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Sep 2019 10:00:40 +0100
+Message-ID: <CAFEAcA-xrPP6=dmaee7PZHOr_Fpw-KsCGY5QKHR94wL1uKWL6A@mail.gmail.com>
+To: Auger Eric <eric.auger@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d44
-Subject: Re: [Qemu-devel] [PATCH v4 10/69] target/arm: Simplify op_smlaxxx
- for SMLAL*
+X-Received-From: 2607:f8b0:4864:20::331
+Subject: Re: [Qemu-devel] [RFC v2 3/3] virt: Check
+ KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 for smp_cpus > 256
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,69 +89,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Zenghui Yu <yuzenghui@huawei.com>, Marc Zyngier <maz@kernel.org>,
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Eric Auger <eric.auger.pro@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Richard,
+On Thu, 12 Sep 2019 at 09:57, Auger Eric <eric.auger@redhat.com> wrote:
+>
+> Hi Peter,
+> On 9/12/19 10:42 AM, Peter Maydell wrote:
 
-On Wed, Sep 4, 2019 at 9:39 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Since all of the inputs and outputs are i32, dispense with
-> the intermediate promotion to i64 and use tcg_gen_add2_i32.
->
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate.c | 15 ++++++++-------
->  1 file changed, 8 insertions(+), 7 deletions(-)
->
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 5306e93470..37aa873e25 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -8177,8 +8177,7 @@ DO_QADDSUB(QDSUB, false, true)
->  static bool op_smlaxxx(DisasContext *s, arg_rrrr *a,
->                         int add_long, bool nt, bool mt)
->  {
-> -    TCGv_i32 t0, t1;
-> -    TCGv_i64 t64;
-> +    TCGv_i32 t0, t1, tl, th;
->
->      if (s->thumb
->          ? !arm_dc_feature(s, ARM_FEATURE_THUMB_DSP)
-> @@ -8202,12 +8201,14 @@ static bool op_smlaxxx(DisasContext *s, arg_rrrr *a,
->          store_reg(s, a->rd, t0);
->          break;
->      case 2:
-> -        t64 = tcg_temp_new_i64();
-> -        tcg_gen_ext_i32_i64(t64, t0);
-> +        tl = load_reg(s, a->ra);
-> +        th = load_reg(s, a->rd);
-> +        t1 = tcg_const_i32(0);
+> > Is there really no place to put this check in common code?
 
-The product is sign-extended before the addition so t1 is not always 0.
+> Not sure what you mean by common code here? Do you mean in a common code
+> for ARM machines (I don't think we have any atm) or directly in
+> kvm_init(). I did not want to pollute this latter with this ARM specific
+> fix.
 
-Thanks,
+I'd just rather we didn't have to have the same "if ..." check
+in every arm board that supports KVM.
 
-Laurent
+If kvm_init() happens at a point where we have enough info to
+make the check, then you can put the check in kvm_arch_init(),
+which is the architecture-specific hook that kvm_init() calls.
 
-> +        tcg_gen_add2_i32(tl, th, tl, th, t0, t1);
->          tcg_temp_free_i32(t0);
-> -        gen_addq(s, t64, a->ra, a->rd);
-> -        gen_storeq_reg(s, a->ra, a->rd, t64);
-> -        tcg_temp_free_i64(t64);
-> +        tcg_temp_free_i32(t1);
-> +        store_reg(s, a->ra, tl);
-> +        store_reg(s, a->rd, th);
->          break;
->      default:
->          g_assert_not_reached();
-> --
-> 2.17.1
->
->
+thanks
+-- PMM
 
