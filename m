@@ -2,82 +2,91 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D53EC49ED9
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:03:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FECCC5ACAE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:05:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 573ED20CC7
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:03:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C1FF208C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:05:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="grhiSMuF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 573ED20CC7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xbgmFws5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C1FF208C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8L0x-0004yD-Gz
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 05:03:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38706)
+	id 1i8L2S-0006Lr-HE
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 05:05:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39289)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i8KyE-0003FW-S6
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:01:00 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i8L17-0005F4-D5
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:03:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i8KyD-0005TD-Eb
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:00:54 -0400
-Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:37023)
+ (envelope-from <alex.bennee@linaro.org>) id 1i8L15-0006ed-RD
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:03:53 -0400
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:38526)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i8KyD-0005ST-0o
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:00:53 -0400
-Received: by mail-ot1-x331.google.com with SMTP id s28so25355903otd.4
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 02:00:52 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i8L15-0006eJ-Kh
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:03:51 -0400
+Received: by mail-wm1-x332.google.com with SMTP id o184so6655199wme.3
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 02:03:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=OKAjqj/41klknl2QNfAVWPQR2aLtTz/mhjdc7DMyAyE=;
- b=grhiSMuFCmf832JF9vGDDEmzU4Bw7YjAHjUmG1X6dpmvkMFUHp5Cn/w696KXoBRpgX
- Me50AA5VvakDciC5tuOtEOX5gCratk//qa3MBk/nJ3yKDR72ZFDF9wgMm1zqfc6T17nb
- Udvo6oH7+jQ//+niLY2D3Fwp5gQixXeIKbYJ8Er1f7hSMl3ofNSBJIAHFrA55tU32HS4
- X5Ftie4+Q9GYmk+CnLAZDpVhM03yjQ7/Yjm3ta85ArwkSCq3UGtr7/SPbInyQSVuGwuT
- cY4EQCQkhbJ2sT/3jPwypARibQwAPzwvwLo/g67D0JvaLUAlzzgxA5RtR6qor+PmjC8Q
- kbPg==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=K6nP7CsymagXv00/qxdDIXKv42FlOE+jV31gE71dzdY=;
+ b=xbgmFws5G2DG990U7ExzV0ZoKTk21gUPsiO4qTskf8Jk36mp9Fj26kRmz/z8T8p/qP
+ aoE4UqvBXBZ76IRdNWeG0crHEyfDWE9CkdLXsdfVHtAq9rITQ6m1eB4wX/6Wd0ryR48o
+ C+shxAJLwgmHILwauONVYUVWqSRra0zE24Lz09oW1FLik0JWw/iAa5Z0BQ/xgSl0T80H
+ TDejcgv+7qvBYGUmUTSfDal46oi1qK37yW7XsM5JzFqE1nefR39EmQAeZVpTGAWmN7YM
+ BdD8zd2ueeHo1xr6LUP4Off07ID+5pDmNjJFQ3Ii31C8/Yov1uIsvWIXJ1IN263v+oSR
+ cjsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=OKAjqj/41klknl2QNfAVWPQR2aLtTz/mhjdc7DMyAyE=;
- b=tW3IwP+Lc0+FRnks56D3xsjAsJxQVJVk1JyMoBEYHsEKqLLtNqFV9jBYTTOBBaw+rm
- sRaecdObQQbyn8x3WxP4s4r6pIYsLENIu25+45wWrbfvo2XwC7wPg4EFPLApyNchhHxS
- X872/x/O+njA1tKjdvszFiMlqRlNqmOtqabkQDyV8S43CRl3mG828k8XnWIGpuflpegd
- e3YuAzkYl+CXSesmEO0BrsZMCaKRoqlyCGecq3jsqoc98e8BTVLgTBE9tG1OS3wlTr8e
- ciVr55R9jw7Hu46UziSxdEqMQgN/JInMwNkc/7RA1LukyjuwzZWvB1p/4/KJhIYMQ6d+
- KVtA==
-X-Gm-Message-State: APjAAAVKFYZF081PWxEEA/Cf2te+BO0gGQAuQxe08UHcysptumD9g4DC
- V9u38yyeGvljVlXx6Q3v45qjA++5UWhs/fs4vxyXpQ==
-X-Google-Smtp-Source: APXvYqymNlziH1XSwE9cKbxq00oSoMUgREY43cmo6WTNG7dfeKO7RRLunw0dwnLvYslTGujBYlc9zHFJwaq1w9fgCO8=
-X-Received: by 2002:a9d:68d6:: with SMTP id i22mr26144709oto.232.1568278851677; 
- Thu, 12 Sep 2019 02:00:51 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=K6nP7CsymagXv00/qxdDIXKv42FlOE+jV31gE71dzdY=;
+ b=XNPT/x5z2paw7ztQ/OiIcAL4u3Mmy7iy8HPsfvatXeVQnx2HezvA0OfkFm0jKt2W5K
+ NZRlzHl3QYNpGSJJ56cWQEaYMKTvd6HpSPT0iOUs7a4w4X6o32Us7R+o1ZgPJoISMNHN
+ zZXiYWGchVd5DTfxa5DjjHSFknle0b0gyvBL2X1n/RkZ/7W1JlJ0OZ2mFC6OKixyP5hL
+ eH9VIoKJdEz0kMBMjy6nlphzGHCSketwuspFJcFwZhR0GkY8irs0WnWviWAUs/BckJ/H
+ qgVGijoTr9K+l4mhvFefqzTFrtk0pUq+7wsZrPDyMHr5SDcwlp5wTmm2DELcqW8aVpS7
+ GmMw==
+X-Gm-Message-State: APjAAAWsZ54WKMMSWugEdVN0JSWvHWj8KJTXadASXfjhS+Rk7dm9rCkv
+ mHCBi/dI6lJnLLKR0GAOFrrC3g==
+X-Google-Smtp-Source: APXvYqydI9qFXJCEySA+Z4Wbg9h7NV+efSy6fdBOHOM15WY0H0bFg8mPHMm+9wxAOsDIW8P/Lobpbg==
+X-Received: by 2002:a1c:a984:: with SMTP id s126mr650907wme.26.1568279030065; 
+ Thu, 12 Sep 2019 02:03:50 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id s9sm9044229wme.36.2019.09.12.02.03.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Sep 2019 02:03:49 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 75AC71FF87;
+ Thu, 12 Sep 2019 10:03:48 +0100 (BST)
+References: <20190731160719.11396-1-alex.bennee@linaro.org>
+ <87a7cty0tv.fsf@dusky.pond.sub.org> <875zm5yzgq.fsf@linaro.org>
+ <87d0g6dnbc.fsf_-_@dusky.pond.sub.org>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Markus Armbruster <armbru@redhat.com>
+In-reply-to: <87d0g6dnbc.fsf_-_@dusky.pond.sub.org>
+Date: Thu, 12 Sep 2019 10:03:48 +0100
+Message-ID: <87y2ytzy17.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20190911155125.11932-1-eric.auger@redhat.com>
- <20190911155125.11932-4-eric.auger@redhat.com>
- <CAFEAcA-tZJ2C8=ZH5e7tXzigPu3SGjSJbnLybZTG+hZO-7ZV0A@mail.gmail.com>
- <1b849672-31a6-3d8d-b8ea-254e737e3b80@redhat.com>
-In-Reply-To: <1b849672-31a6-3d8d-b8ea-254e737e3b80@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Sep 2019 10:00:40 +0100
-Message-ID: <CAFEAcA-xrPP6=dmaee7PZHOr_Fpw-KsCGY5QKHR94wL1uKWL6A@mail.gmail.com>
-To: Auger Eric <eric.auger@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::331
-Subject: Re: [Qemu-devel] [RFC v2 3/3] virt: Check
- KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 for smp_cpus > 256
+X-Received-From: 2a00:1450:4864:20::332
+Subject: Re: [Qemu-devel] TCG plugins and the GPL (was: [PATCH v4 00/54]
+ plugins for TCG)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,32 +98,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zenghui Yu <yuzenghui@huawei.com>, Marc Zyngier <maz@kernel.org>,
- qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Eric Auger <eric.auger.pro@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ aaron@os.amperecomputing.com, cota@braap.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, bobby.prani@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 12 Sep 2019 at 09:57, Auger Eric <eric.auger@redhat.com> wrote:
+
+Markus Armbruster <armbru@redhat.com> writes:
+
+> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 >
-> Hi Peter,
-> On 9/12/19 10:42 AM, Peter Maydell wrote:
+>> Markus Armbruster <armbru@redhat.com> writes:
+> [...]
+>>> Please advise why TCG plugins don't undermine the GPL.  Any proposal to
+>>> add a plugin interface needs to do that.
+>>
+>> I'm not sure what we can say about this apart from "ask your lawyer".
+>
+> I'm not asking for a legal argument, I'm asking for a pragmatic one.
+>
+>> I'm certainly not proposing we add any sort of language about what
+>> should and shouldn't be allowed to use the plugin interface. I find it
+>> hard to see how anyone could argue code written to interface with the
+>> plugin API couldn't be considered a derived work.
+>
+> What makes that so?  Is writing a plugin without linking with QEMU code
+> impractical?
 
-> > Is there really no place to put this check in common code?
+The way a plugin works is by linking. The plugin itself would be useless
+unless combined with the QEMU code to do its thing. It is a more
+intimate binding than an IPC interface using some sort of protocol. The
+argument goes that pretty much any kernel module is derived code - but
+again it has never really been litigated in the courts which would be
+the people to set the precedent.
 
-> Not sure what you mean by common code here? Do you mean in a common code
-> for ARM machines (I don't think we have any atm) or directly in
-> kvm_init(). I did not want to pollute this latter with this ARM specific
-> fix.
+>
+>> There are two use cases I have in mind:
+>>
+>> The first is FLOSS developers writing interesting tools that can take
+>> advantage of QEMU's control of the system to do experiments that are
+>> tricky with other setups (Valgrind is limited to same-arch, Dynamo/Pin
+>> are user-space only). I want these experiments to be easy to do without
+>> having to keep hacking and re-hacking QEMU's core code. I would hope
+>> QEMU developers would up-stream theirs into the QEMU source tree but I
+>> can imagine academics will have open source code that will only ever sit
+>> in their paper's repository.
+>
+> GPL'ed code that's not for upstream is 100% legitimate.
+>
+>> The other is users who currently maintain hacked up internal copies of
+>> QEMU as a test bed for whatever piece of silicon they are brewing behind
+>> closed doors. This code would never be distributed (hence never be a GPL
+>> issue)
+>
+> Correct.  We can't force anybody to distribute, and that's only proper.
+>
+>>        and is generally kept private because it's IP sensitive
+>> (e.g: experimenting with different cache models). If we can provide an
+>> interface that allows them to keep their experiments private and
+>> separate from changes to the core code then maybe apart from making
+>> their lives a bit easier we will see some non-IP sensitive contributions
+>> come back to the upstream. I live in hope ;-)
+>
+> I'm concerned about a third case: imlementing stuff as a plugin so you
+> can distribute it with a GPL-incompatible license.  Particularly
+> pernicious when that stuff could be useful upstream.
 
-I'd just rather we didn't have to have the same "if ..." check
-in every arm board that supports KVM.
+If someone were to do that it would depend on a copyright holder (i.e.
+one of us) being willing to challenge that licensing. AIUI GCC used
+additional language in the runtime exception clause:
 
-If kvm_init() happens at a point where we have enough info to
-make the check, then you can put the check in kvm_arch_init(),
-which is the architecture-specific hook that kvm_init() calls.
+  https://www.gnu.org/licenses/gcc-exception-3.1.html
 
-thanks
--- PMM
+which only allows use of the runtime exception if the code has gone
+through GPL compatible code:
+
+  A Compilation Process is "Eligible" if it is done using GCC, alone or
+  with other GPL-compatible software, or if it is done without using any
+  work based on GCC. For example, using non-GPL-compatible Software to
+  optimize any GCC intermediate representations would not qualify as an
+  Eligible Compilation Process.
+
+> Are there any technical difficulties that could make distributing a
+> plugins in binary form impractical?
+
+Well the first thing will be we are not intending to offer a guaranteed
+ABI. While we don't want to be changing it at a whim there shouldn't be
+an expectation that the plugin interface will maintain backwards
+compatibility (unlike the command line interface ;-). There should be an
+expectation that plugins will likely need to be rebuilt against the
+current source tree from time to time.
+
+We could implement a more technical measure analogous to the kernels
+module signing that would require the plugin to be rebuilt with
+reference to the current QEMU source tree although that will be a pain
+even for internally distributed blobs. I'm loathed to implement such a
+system from v1 though given the problem of publicly distributed binary
+blobs is currently only a theoretical problem.
+
+--
+Alex Benn=C3=A9e
 
