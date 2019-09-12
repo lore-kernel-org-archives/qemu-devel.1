@@ -2,94 +2,64 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44578C4CEC6
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 15:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A75BC4CEC5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 15:46:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 150A120578
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 15:36:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lIO8+K3u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 150A120578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4D5D32081B
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 15:46:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D5D32081B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8R99-0002Ba-7L
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 11:36:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45483)
+	id 1i8RIi-0005G3-F5
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 11:46:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47104)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i8R8L-0001a1-U1
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 11:35:46 -0400
+ (envelope-from <stefanha@redhat.com>) id 1i8RHn-0004o2-1L
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 11:45:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i8R8K-0005R0-L2
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 11:35:45 -0400
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:44045)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i8R8K-0005Qr-ED
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 11:35:44 -0400
-Received: by mail-qk1-x741.google.com with SMTP id i78so24854452qke.11
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 08:35:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:from:to:cc:references:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=vbV1VsWRy4JGhj+HyjrWiwMobmXD95X4RSgI2CIV3uQ=;
- b=lIO8+K3uuuo7JCCAKvRKyjDAC2RhD3DoZjiDFWF7t6SqkpqJ5NmBqVTBuxtwnZxGmO
- IobtcFu5q+w9xKN3qpo+3u8jDKx8kvZEyaSNaevFhO0RUeUvK/OZBEz6XCN/DCe2e4ST
- pANyRhKdWYcr3F/RMPQ1RIwPMlCkkYV9ZOUvtXufZPNlZLVsKNp3N8EXYjNbHBc12CR/
- FW7OlvSicRErue7h4tZC+yDYORGaGMmWwsSRfhlp6lgt1jAU2QE6xlpher81JM1XoKAK
- A2Xlv2uAFQ8Zw81URUvwvoLmTczwH3ijAoaubOqjGQbzbWZcShrUuyFWanXRiaBgexn/
- XTqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=vbV1VsWRy4JGhj+HyjrWiwMobmXD95X4RSgI2CIV3uQ=;
- b=oC+lpFkOa21jrqxCRfFT8gZmaRTwqCWJLwQs/ivuhgbQ9GCCdMIv9jhY69/w+QRwOi
- AwyDWlAiwqOIIARN9f35fAZw+aGCJiQc7ipc1ImGqevuZuuHBRvt6i06j8LjuVKSyotg
- MhLu1/VzoEUxU3HcUfAryrX73qZZPoFW0jKc4hiDAos3iXN7tfci5jBBAjcOgx/fd/UH
- LGpS9tNUArKS8BP5kTiq8Fweyob2otfWIFHWHtWBgCvJgKj+Etdtb3R0B0SZj9/pAK8f
- nHM8zu/QbDvjgTBjYZqzGX967+PFZ4ixtgp8V+3B1qvXQ5iEnw7YmrzP+JxMYQ4mCYd/
- 79Sw==
-X-Gm-Message-State: APjAAAXYikcV+jMbGrgXVnmviVTIvxRokf5XWj+t7D6eQjHLmsIK/x/6
- L3ZshKH6hcQtlwcc2FeI98Tjtg==
-X-Google-Smtp-Source: APXvYqyXLoW2qmGXf4NT9fFIk2GnpevuQBqOiNkRlJLHiwZJ/dlCAE7lj7H5GhNWFoRwdoTaT4F0ZQ==
-X-Received: by 2002:a37:981:: with SMTP id 123mr42578896qkj.190.1568302543518; 
- Thu, 12 Sep 2019 08:35:43 -0700 (PDT)
-Received: from [172.20.5.51] ([67.69.50.154])
- by smtp.gmail.com with ESMTPSA id j4sm12601044qkf.116.2019.09.12.08.35.42
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Sep 2019 08:35:42 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: liuzhiwei <zhiwei_liu@c-sky.com>, Alistair.Francis@wdc.com,
- palmer@sifive.com, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de,
- riku.voipio@iki.fi, laurent@vivier.eu, wenmeng_zhang@c-sky.com
-References: <1568183141-67641-1-git-send-email-zhiwei_liu@c-sky.com>
- <1568183141-67641-9-git-send-email-zhiwei_liu@c-sky.com>
- <1e707c9c-e74e-8a21-11f7-6ce8d09cf06d@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <bd07e348-7fd5-8263-a781-1f40f46ed6ac@linaro.org>
-Date: Thu, 12 Sep 2019 11:35:40 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <stefanha@redhat.com>) id 1i8RHl-0000jy-Sg
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 11:45:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52546)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1i8RHl-0000j6-LC
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 11:45:29 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2CD298A1C84;
+ Thu, 12 Sep 2019 15:45:28 +0000 (UTC)
+Received: from localhost (ovpn-116-134.ams2.redhat.com [10.36.116.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D7FF85C22C;
+ Thu, 12 Sep 2019 15:45:20 +0000 (UTC)
+Date: Thu, 12 Sep 2019 17:45:19 +0200
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Jagannathan Raman <jag.raman@oracle.com>
+Message-ID: <20190912154519.GN23174@stefanha-x1.localdomain>
+References: <cover.1567534653.git.jag.raman@oracle.com>
+ <0f0117061fabf398c5d16811ef8787c0ba7d4b0e.1567534653.git.jag.raman@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <1e707c9c-e74e-8a21-11f7-6ce8d09cf06d@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::741
-Subject: Re: [Qemu-devel] [PATCH v2 08/17] RISC-V: add vector extension
- integer instructions part1, add/sub/adc/sbc
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="BtmVPk+Smchi6n7w"
+Content-Disposition: inline
+In-Reply-To: <0f0117061fabf398c5d16811ef8787c0ba7d4b0e.1567534653.git.jag.raman@oracle.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Thu, 12 Sep 2019 15:45:28 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC v3 PATCH 08/45] multi-process: add functions
+ to synchronize proxy and remote endpoints
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,32 +71,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, john.g.johnson@oracle.com,
+ mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, quintela@redhat.com,
+ armbru@redhat.com, kanth.ghatraju@oracle.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com,
+ mreitz@redhat.com, ross.lagerwall@citrix.com, marcandre.lureau@gmail.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/12/19 11:27 AM, Richard Henderson wrote:
->> +void VECTOR_HELPER(vadc_vxm)(CPURISCVState *env, uint32_t rs1,
->> +    uint32_t rs2, uint32_t rd)
->> +{
-> 
-> Watch the spacing between functions.
-> Pass gpr rs1 by value.
-> 
->> +void VECTOR_HELPER(vadc_vim)(CPURISCVState *env, uint32_t rs1,
->> +    uint32_t rs2, uint32_t rd)
->> +{
-> ...
->> +                env->vfp.vreg[dest].u8[j] = sign_extend(rs1, 5)
-> 
-> Pass the immediate as a sign-extended immediate to begin with, not as an
-> unsigned 5-bit field.
 
-Oh, and of course *_vxm and *_vim should be identical, because in both cases
-there is a single scalar parameter.  In the first case the scalar is passed by
-value from the gpr; in the second case the scalar is the sign-extended constant.
+--BtmVPk+Smchi6n7w
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Sep 03, 2019 at 04:37:34PM -0400, Jagannathan Raman wrote:
+> In some cases, for example MMIO read, QEMU has to wait for the remote to
+> complete a command before proceeding. An eventfd based mechanism is
+> added to synchronize QEMU & remote process.
+>=20
+> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> ---
+>  v1 -> v2:
+>    - Added timeout to synchronization functions
+>=20
+>  include/io/proxy-link.h |  8 ++++++++
+>  io/proxy-link.c         | 42 ++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 50 insertions(+)
+>=20
+> diff --git a/include/io/proxy-link.h b/include/io/proxy-link.h
+> index ee78cdd..b76c574 100644
+> --- a/include/io/proxy-link.h
+> +++ b/include/io/proxy-link.h
+> @@ -28,7 +28,9 @@
+>  #include <stddef.h>
+>  #include <stdint.h>
+>  #include <glib.h>
+> +#include <unistd.h>
+>  #include <pthread.h>
+> +#include <sys/eventfd.h>
+> =20
+>  #include "qemu/osdep.h"
+>  #include "qom/object.h"
+> @@ -133,11 +135,17 @@ struct ProxyLinkState {
+>      proxy_link_callback callback;
+>  };
+> =20
+> +#define GET_REMOTE_WAIT eventfd(0, 0)
+> +#define PUT_REMOTE_WAIT(wait) close(wait)
 
-r~
+Can you use functions instead of macros?  eventfd() is Linux-specific so
+this code is not portable.  QEMU has an EventNotifier abstraction but
+I'm not sure if it can be used since this patch doesn't include any code
+that calls GET_REMOTE_WAIT/PUT_REMOTE_WAIT and there are no comments.  I
+don't know what the expected semantics are.
+
+> +#define PROXY_LINK_WAIT_DONE 1
+> +
+>  ProxyLinkState *proxy_link_create(void);
+>  void proxy_link_finalize(ProxyLinkState *s);
+> =20
+>  void proxy_proc_send(ProxyLinkState *s, ProcMsg *msg, ProcChannel *chan);
+>  int proxy_proc_recv(ProxyLinkState *s, ProcMsg *msg, ProcChannel *chan);
+> +uint64_t wait_for_remote(int efd);
+> +void notify_proxy(int fd, uint64_t val);
+> =20
+>  void proxy_link_init_channel(ProxyLinkState *s, ProcChannel **chan, int =
+fd);
+>  void proxy_link_destroy_channel(ProcChannel *chan);
+> diff --git a/io/proxy-link.c b/io/proxy-link.c
+> index 5eb9718..381a38e 100644
+> --- a/io/proxy-link.c
+> +++ b/io/proxy-link.c
+> @@ -31,6 +31,8 @@
+>  #include <sys/socket.h>
+>  #include <sys/un.h>
+>  #include <unistd.h>
+> +#include <limits.h>
+> +#include <poll.h>
+> =20
+>  #include "qemu/module.h"
+>  #include "io/proxy-link.h"
+> @@ -216,6 +218,46 @@ int proxy_proc_recv(ProxyLinkState *s, ProcMsg *msg,=
+ ProcChannel *chan)
+>      return rc;
+>  }
+> =20
+> +uint64_t wait_for_remote(int efd)
+
+Hard to tell if this makes sense without any context.  I notice that
+EFD_CLOEXEC and EFD_NONBLOCK were not used.  It's likely that
+EFD_CLOEXEC should be used.  Since the eventfd is used with poll(2)
+EFD_NONBLOCK should probably also be used so it's certain that read()
+will not block (which could exceed the timeout).
+
+--BtmVPk+Smchi6n7w
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl16aA8ACgkQnKSrs4Gr
+c8jyeAf/XTZee2nByjlaQNXMncefjcpr4rQjhisi3bcG42QbIjdu5iBj5u0RtEg4
+mXq6AVHRN5J7iPUl3+kClCcqkJrPulo7SVONl4d7nrmJ/quoeqEXMecWsLBVj11A
+lvKN5CDC3XlLQuE0bho4vfD079NmJQYH/Gn14GNJr9vDCfTYCHJvceS2wsdvdNdc
+RcY88kEtWdUtvNxBed107IbdGQiLIutmSImwPLbAerclr6T7c7/MyIY6sWKRayvP
+Ch79o8Yrgh68GwqqSJ+AeaoATg/52x+lSulrKIpIUCnh+97DBZAZOFwhB2RMNyt1
+nnDBKpjtgmcXRjyd50aY0m15VhQCzw==
+=WU2J
+-----END PGP SIGNATURE-----
+
+--BtmVPk+Smchi6n7w--
 
