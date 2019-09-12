@@ -2,93 +2,88 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB0D1C4CECB
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:10:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4696AC4CECB
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:10:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6D9B20692
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:10:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0CD8820692
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:10:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J73+YqAf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6D9B20692
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iBUV0xqP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CD8820692
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8MzF-0005cF-RX
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 07:10:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34899)
+	id 1i8Mzx-0006b7-4p
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 07:10:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34945)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i8MyT-00057E-Ep
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:09:18 -0400
+ (envelope-from <stefanha@gmail.com>) id 1i8Mz1-0005cz-UC
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:09:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i8MyS-00055b-6n
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:09:17 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39683)
+ (envelope-from <stefanha@gmail.com>) id 1i8Mz0-0005Gj-T3
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:09:51 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37064)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i8MyR-00055F-WB
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:09:16 -0400
-Received: by mail-wm1-x344.google.com with SMTP id q12so7166240wmj.4
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 04:09:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=8hok+nMqYv/t9kV0Yp9WizuoSJiDuhWYJyrPqN1ME88=;
- b=J73+YqAf6v6qF+adcvZZY7+Qxs7FgfmXuUGOZ598SHByfXBXnHrE/oDwF9+YwKdW++
- QJoxExH/aYI7CulkWBhykz+YwzchmT0vuARcTxI05fpmWGYGsRsrKB+KwhXQ8xkv1dhg
- hwGaFm2uX4AwT1zBNX+fBAvuRTNyZgXql78R7hZlNtFz1MbwjOi4osDFYnK18hfPa6p9
- WxmHHLXnO2xrafuXUDm880kgv8dmuVT1UdIicfFxgsXWn2WkBtGXSM1ufk6b8g0ratYy
- RT9EGyLe2H+5eytAujTZL6TOmfsRzYSh+PWhaXCCxmUXAenbs1EIrBIx6jo/Jq4XKQNB
- 8RMw==
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1i8Mz0-0005GJ-J8
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:09:50 -0400
+Received: by mail-wr1-x444.google.com with SMTP id i1so27383960wro.4
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 04:09:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=ORhCuiJqK8de4jn/N+7sdbMV/7a8UDUHQf0OIqc2dBs=;
+ b=iBUV0xqP3B/GIKko4JBdcxWyKxUifJFHXb8aGXiKDd4UtT9KAKDOd9x0pgwf4wqVGZ
+ GklTCp9ZtdVjMo5eeqyuxOmC2NIJX6dUOP8H5C2Bx93z35uoWy3HFw62NLIhnwrPwcC9
+ N8mh6wI3W/s4eQb10F3OgVfFYaRCQmQp6ZeCCFyLWfjtoYuOVu9uOweeo0iEF+y+9pXb
+ eweZYch8UqxKE1k356a9z/ftiEQEMVaSrN/zE0cObaVuYZViGG7B6ZjDeAjHjND/dAaU
+ qGJRiOZb/TCB/zHbyIoFksFzsqgk8etC1IgVwj8srMJAVz67bayD0b36oyWKPB1vxmVe
+ ND/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=8hok+nMqYv/t9kV0Yp9WizuoSJiDuhWYJyrPqN1ME88=;
- b=c8pK3roXTACUi2QBLFuqUmcTy+97wD8ZruiAwWLbh3ljXz9GNbV7/RjQdjZSpd6Bmu
- D2qWUmNdsBdzuN0DJcvTvEUil9ZICGTUEfvKiVonPd6fEHRHeAfl6jVKx+m7BpzUgnnx
- M9k1PojCulSH7hnRAkZ7gn2beiNtT2Qd9EsGUwxQHkn5j4BzFZ1Ubs+RTO2pKMIPFvZW
- 2CnRXLFJvOCPx8M/Vd5adzUTjTyC+JOMzN68S1Xe/wYHAdz/J3Ss9DE+eZe+3q6opxSN
- dZSdfSFd3FfsxYOC32KXN6xqwHS0+C0voVv2GloqElZJkRpsH0RV7hEIvPU3zZ6cdfHv
- uEFA==
-X-Gm-Message-State: APjAAAXf9WP7EUvmTsX1W1Icng/H6NqMBKMuRlb/d2XRT4982AVMqne9
- DyKJXueeKla1dY42zEX4PxZnuw==
-X-Google-Smtp-Source: APXvYqyFWyhHvuJWKaAUW7voBmrQT3mRVExHs0M2c+qcoI+E0ANLcXRmCrML1qOqiwQx4Q8eGfJzVA==
-X-Received: by 2002:a1c:ef18:: with SMTP id n24mr7871346wmh.29.1568286554729; 
- Thu, 12 Sep 2019 04:09:14 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id r15sm6254765wmh.42.2019.09.12.04.09.14
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=ORhCuiJqK8de4jn/N+7sdbMV/7a8UDUHQf0OIqc2dBs=;
+ b=N2hz0mgDxACKK9wrYjDOB3BBCIfRrXL7ZqWF9zaOMaDT37Z28qUmIus0ZaoWOQgM2g
+ 4vKJNqPgh2hSg+1Tj6dRWtpDRY0bLX5788YZu63SLa9HH7Du0XYhPIuSGup8eVh6bqoS
+ qhbraK9NrgLSwkDyNEVdgK07UR+UhTrB1eEoAZJhy8Q+3qBroeMKC36NY5yzDLsG4pew
+ Sf9XfQsqsJmHugf/K76xa40iczn2c9G69QE+4inlxnP/zQ73WypedE6+Vaf4CriF6jj0
+ r+oepH1h06d5tV01Ty1GST9f1hzHTHit3K40988fwULDbO3kjHKgNudUGtiJ5vctggDy
+ ELVQ==
+X-Gm-Message-State: APjAAAXq9fvMiYnZrEpB0nBa3Q0CGv0epIe2dKG3h105JDFPjLjOm46V
+ 4g3Ub9QJ0KPk0mOf/zf4lW8=
+X-Google-Smtp-Source: APXvYqyXXRCia8Chi9jJ+Dt1UX5Rz8Q/rj6duJ+76PUzKD1ECTTJUV5TeqYv6vzi/QnYRjbCGfybPg==
+X-Received: by 2002:a5d:6943:: with SMTP id r3mr6169582wrw.21.1568286589554;
+ Thu, 12 Sep 2019 04:09:49 -0700 (PDT)
+Received: from localhost (178.165.130.7.wireless.dyn.drei.com. [178.165.130.7])
+ by smtp.gmail.com with ESMTPSA id u22sm44938662wru.72.2019.09.12.04.09.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Sep 2019 04:09:14 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 66FFA1FF87;
- Thu, 12 Sep 2019 12:09:13 +0100 (BST)
-References: <20190910144428.32597-1-peter.maydell@linaro.org>
- <20190910144428.32597-3-peter.maydell@linaro.org>
- <87r24lztgq.fsf@linaro.org>
- <CAFEAcA_s1aYO6ZK2pkrrc+YrdCoUww0H_RTOjvaH8z1FOemP0w@mail.gmail.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-In-reply-to: <CAFEAcA_s1aYO6ZK2pkrrc+YrdCoUww0H_RTOjvaH8z1FOemP0w@mail.gmail.com>
-Date: Thu, 12 Sep 2019 12:09:13 +0100
-Message-ID: <87o8zpzs86.fsf@linaro.org>
+ Thu, 12 Sep 2019 04:09:48 -0700 (PDT)
+Date: Thu, 12 Sep 2019 13:09:47 +0200
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Message-ID: <20190912110947.GB23174@stefanha-x1.localdomain>
+References: <20190903192505.10686-1-johannes@sipsolutions.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="NMuMz9nt05w80d4+"
+Content-Disposition: inline
+In-Reply-To: <20190903192505.10686-1-johannes@sipsolutions.net>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 02/13] target/arm/arm-semi:
- Always set some kind of errno for failed calls
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH] libvhost-user: implement
+ VHOST_USER_PROTOCOL_F_REPLY_ACK
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,61 +95,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org, Johannes Berg <johannes.berg@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+--NMuMz9nt05w80d4+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On Thu, 12 Sep 2019 at 11:42, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->>
->>
->> Peter Maydell <peter.maydell@linaro.org> writes:
->>
->> > If we fail a semihosting call we should always set the
->> > semihosting errno to something; we were failing to do
->> > this for some of the "check inputs for sanity" cases.
->> >
->> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->>
->> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>
->> although:
->>
->> > ---
->> >  target/arm/arm-semi.c | 45 ++++++++++++++++++++++++++-----------------
->> >  1 file changed, 27 insertions(+), 18 deletions(-)
->> >
->> > diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
->> > index 03e60105c05..51b55816faf 100644
->> > --- a/target/arm/arm-semi.c
->> > +++ b/target/arm/arm-semi.c
->> > @@ -232,11 +232,13 @@ static target_ulong arm_gdb_syscall(ARMCPU *cpu,=
- gdb_syscall_complete_cb cb,
->> >  #define GET_ARG(n) do {                                 \
->> >      if (is_a64(env)) {                                  \
->> >          if (get_user_u64(arg ## n, args + (n) * 8)) {   \
->> > -            return -1;                                  \
->> > +            errno =3D EFAULT;                             \
->> > +            return set_swi_errno(ts, -1);               \
->>
->> This looks a little queasy given ts is NULL for the softmmu version. I
->> wonder (depending on your approach to -smp for 1/13) if we should just
->> pass the ARMCPU down to the helper?
->
-> NULL is fine because the softmmu version of set_swi_errno() doesn't
-> do anything with it anyway, right?
+On Tue, Sep 03, 2019 at 10:25:05PM +0300, Johannes Berg wrote:
+> From: Johannes Berg <johannes.berg@intel.com>
+>=20
+> This is really simple, since we know whether a response is
+> already requested or not, so we can just send a (successful)
+> response when there isn't one already.
+>=20
+> Given that, it's not all _that_ useful but the master can at
+> least be sure the message was processed, and we can exercise
+> more code paths using the example code.
+>=20
+> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+> ---
+>  contrib/libvhost-user/libvhost-user.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
 
-Yes it's fine - it just looks a little odd when you are reading it.
-Given TaskState is derived from CPUState which you always have you could
-just pass cs to set_swi_errno and hide the final implementation detail
-there depending on if you are softmmu or linux-user.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-But it's purely a subjective style thing, not a bug hence the r-b ;-)
+--NMuMz9nt05w80d4+
+Content-Type: application/pgp-signature; name="signature.asc"
 
---
-Alex Benn=C3=A9e
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl16J3sACgkQnKSrs4Gr
+c8itygf9F9q+H2F3xMPFabOP4muNBjtlazROSQBZc6EesSxrERPM0PZ2+6u92FJE
+4hkpbP4Bvzu30m4NhApWH99iDeJpIQlg0OMccDv6lLplKzuqOEAECAJmzKhK4zFZ
+wYjWeJFMcTunV8EN1u1x6wrnUzo0ibBfeyWqKQT93Xe4wQAFXnFWWSATKIf2UzII
+Y9J57Oy00dGuVKw79MP2GpoVkgESpWo4d+8DiEKw6wVhS5UcljRygPyROsxZChVz
+j5xW3hxA2VKU0+HpKtLWbT+WZs2qwZynXC1kB1DrCKUJWQ4p1zXtdGA0ZOHfS/IV
+UBKNEow8c7x/0bvLUwgUQ6hH5deqOA==
+=vbYK
+-----END PGP SIGNATURE-----
+
+--NMuMz9nt05w80d4+--
 
