@@ -2,63 +2,59 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F593C5ACAE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 05:50:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96F61C49ED9
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:09:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3286D20830
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 05:50:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3286D20830
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 659C9208C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:09:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 659C9208C2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8I0G-0007Y3-E4
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 01:50:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56624)
+	id 1i8IIH-0004ZQ-4y
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 02:09:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36868)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1i8Hn1-0003bx-1m
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 01:37:08 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG9-0002Lk-6b
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1i8Hmy-000315-Kb
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 01:37:06 -0400
-Received: from mga11.intel.com ([192.55.52.93]:18624)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1i8Hmy-0002zn-8C
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 01:37:04 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 11 Sep 2019 22:37:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,495,1559545200"; d="scan'208";a="186030821"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga007.fm.intel.com with ESMTP; 11 Sep 2019 22:37:02 -0700
-From: Tao Xu <tao3.xu@intel.com>
-To: imammedo@redhat.com,
-	eblake@redhat.com,
-	ehabkost@redhat.com
-Date: Thu, 12 Sep 2019 13:36:37 +0800
-Message-Id: <20190912053638.4858-11-tao3.xu@intel.com>
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG7-00087U-SI
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:13 -0400
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:44430)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG7-00085t-JN
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:11 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+ [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 75C0C682E3;
+ Thu, 12 Sep 2019 15:07:07 +0900 (JST)
+Received: from yo-satoh-debian.localdomain
+ (ae227063.dynamic.ppp.asahi-net.or.jp [14.3.227.63])
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id C68AE240086;
+ Thu, 12 Sep 2019 15:07:06 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org
+Date: Thu, 12 Sep 2019 15:06:40 +0900
+Message-Id: <20190912060701.4642-2-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190912053638.4858-1-tao3.xu@intel.com>
-References: <20190912053638.4858-1-tao3.xu@intel.com>
+In-Reply-To: <20190912060701.4642-1-ysato@users.sourceforge.jp>
+References: <20190912060701.4642-1-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.93
-Subject: [Qemu-devel] [PATCH v11 10/11] hmat acpi: Build Memory Side Cache
- Information Structure(s)
+X-Received-From: 202.224.55.15
+Subject: [Qemu-devel] [PATCH v24 01/22] MAINTAINERS: Add RX
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,123 +66,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, Daniel Black <daniel@linux.ibm.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>, dan.j.williams@intel.com
+Cc: peter.maydell@linaro.org, imammedo@redhat.com, richard.henderson@linaro.org,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Jingqi <jingqi.liu@intel.com>
-
-This structure describes memory side cache information for memory
-proximity domains if the memory side cache is present and the
-physical device forms the memory side cache.
-The software could use this information to effectively place
-the data in memory to maximize the performance of the system
-memory that use the memory side cache.
-
-Reviewed-by: Daniel Black <daniel@linux.ibm.com>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20190607091116.49044-18-ysato@users.sourceforge.jp>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
+ MAINTAINERS | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-Changes in v11:
-    - Move numa option patches forward.
----
- hw/acpi/hmat.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 63 insertions(+), 1 deletion(-)
-
-diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-index 2d76dd0cd1..17a6afec99 100644
---- a/hw/acpi/hmat.c
-+++ b/hw/acpi/hmat.c
-@@ -160,13 +160,62 @@ static void build_hmat_lb(GArray *table_data, HMAT_LB_Info *hmat_lb,
-     }
- }
- 
-+/* ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure: Table 5-147 */
-+static void build_hmat_cache(GArray *table_data, HMAT_Cache_Info *hmat_cache)
-+{
-+    /*
-+     * Cache Attributes: Bits [3:0] – Total Cache Levels
-+     * for this Memory Proximity Domain
-+     */
-+    uint32_t cache_attr = hmat_cache->total_levels & 0xF;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 50eaf005f4..bfc99986cc 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -271,6 +271,13 @@ F: include/hw/riscv/
+ F: linux-user/host/riscv32/
+ F: linux-user/host/riscv64/
+=20
++RENESAS RX CPUs
++M: Yoshinori Sato <ysato@users.sourceforge.jp>
++S: Maintained
++F: target/rx/
++F: hw/rx/
++F: include/hw/rx/
 +
-+    /* Bits [7:4] : Cache Level described in this structure */
-+    cache_attr |= (hmat_cache->level & 0xF) << 4;
+ S390 TCG CPUs
+ M: Richard Henderson <rth@twiddle.net>
+ M: David Hildenbrand <david@redhat.com>
+@@ -1118,6 +1125,18 @@ F: pc-bios/canyonlands.dt[sb]
+ F: pc-bios/u-boot-sam460ex-20100605.bin
+ F: roms/u-boot-sam460ex
+=20
++RX Machines
++-----------
++rx-virt
++M: Yoshinori Sato <ysato@users.sourceforge.jp>
++S: Maintained
++F: hw/rx/rxqemu.c
++F: hw/intc/rx_icu.c
++F: hw/timer/renesas_*.c
++F: hw/char/renesas_sci.c
++F: include/hw/timer/renesas_*.h
++F: include/hw/char/renesas_sci.h
 +
-+    /* Bits [11:8] - Cache Associativity */
-+    cache_attr |= (hmat_cache->associativity & 0xF) << 8;
-+
-+    /* Bits [15:12] - Write Policy */
-+    cache_attr |= (hmat_cache->write_policy & 0xF) << 12;
-+
-+    /* Bits [31:16] - Cache Line size in bytes */
-+    cache_attr |= (hmat_cache->line_size & 0xFFFF) << 16;
-+
-+    cache_attr = cpu_to_le32(cache_attr);
-+
-+    /* Type */
-+    build_append_int_noprefix(table_data, 2, 2);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Length */
-+    build_append_int_noprefix(table_data, 32, 4);
-+    /* Proximity Domain for the Memory */
-+    build_append_int_noprefix(table_data, hmat_cache->mem_proximity, 4);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 4);
-+    /* Memory Side Cache Size */
-+    build_append_int_noprefix(table_data, hmat_cache->size, 8);
-+    /* Cache Attributes */
-+    build_append_int_noprefix(table_data, cache_attr, 4);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /*
-+     * Number of SMBIOS handles (n)
-+     * Linux kernel uses Memory Side Cache Information Structure
-+     * without SMBIOS entries for now, so set Number of SMBIOS handles
-+     * as 0.
-+     */
-+    build_append_int_noprefix(table_data, 0, 2);
-+}
-+
- /* Build HMAT sub table structures */
- static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
- {
-     uint16_t flags;
-     uint32_t *initiator_list;
--    int i, j, hrchy, type;
-+    int i, j, hrchy, type, level;
-     HMAT_LB_Info *numa_hmat_lb;
-+    HMAT_Cache_Info *numa_hmat_cache;
- 
-     for (i = 0; i < nstat->num_nodes; i++) {
-         flags = 0;
-@@ -202,6 +251,19 @@ static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
-             }
-         }
-     }
-+
-+    /*
-+     * ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure:
-+     * Table 5-147
-+     */
-+    for (i = 0; i < nstat->num_nodes; i++) {
-+        for (level = 0; level <= MAX_HMAT_CACHE_LEVEL; level++) {
-+            numa_hmat_cache = nstat->hmat_cache[i][level];
-+            if (numa_hmat_cache) {
-+                build_hmat_cache(table_data, numa_hmat_cache);
-+            }
-+        }
-+    }
-     g_free(initiator_list);
- }
- 
--- 
+ SH4 Machines
+ ------------
+ R2D
+--=20
 2.20.1
 
 
