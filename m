@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38DFAC5ACAE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:09:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED15BECDE20
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:09:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F2D7208C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:09:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F2D7208C2
+	by mail.kernel.org (Postfix) with ESMTPS id C725C208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:09:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C725C208E4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8IIc-0004lP-Kq
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 02:09:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36933)
+	id 1i8IIe-0004nU-IF
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 02:09:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36936)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1i8IGB-0002Ly-7J
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:16 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IGB-0002M0-Av
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG8-00088v-JQ
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG9-0008A8-CJ
  for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:15 -0400
-Received: from mail03.asahi-net.or.jp ([202.224.55.15]:44443)
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:45499)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG8-00087R-8S
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:12 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG8-00088Y-UW
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:13 -0400
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 9013768318;
- Thu, 12 Sep 2019 15:07:11 +0900 (JST)
+ by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 33D366AB99;
+ Thu, 12 Sep 2019 15:07:10 +0900 (JST)
 Received: from yo-satoh-debian.localdomain
  (ae227063.dynamic.ppp.asahi-net.or.jp [14.3.227.63])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 48996240085;
- Thu, 12 Sep 2019 15:07:11 +0900 (JST)
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id EEB52240086;
+ Thu, 12 Sep 2019 15:07:09 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Date: Thu, 12 Sep 2019 15:06:57 +0900
-Message-Id: <20190912060701.4642-19-ysato@users.sourceforge.jp>
+Date: Thu, 12 Sep 2019 15:06:52 +0900
+Message-Id: <20190912060701.4642-14-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190912060701.4642-1-ysato@users.sourceforge.jp>
 References: <20190912060701.4642-1-ysato@users.sourceforge.jp>
@@ -53,8 +53,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.15
-Subject: [Qemu-devel] [PATCH v24 18/22] hw/rx: Honor -accel qtest
+X-Received-From: 202.224.55.14
+Subject: [Qemu-devel] [PATCH v24 13/22] target/rx: Dump bytes for each insn
+ during disassembly
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,57 +76,49 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Issue an error if no kernel, no bios, and not qtest'ing.
-Fixes make check-qtest-rx: test/qom-test.
+There are so many different forms of each RX instruction
+that it will be very useful to be able to look at the bytes
+to see on which path a bug may lie.
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Message-Id: <20190607091116.49044-16-ysato@users.sourceforge.jp>
+Message-Id: <20190607091116.49044-24-ysato@users.sourceforge.jp>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-We could squash this with the previous patch
----
- hw/rx/rx62n.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ target/rx/disas.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
-index ac47f2a397..a0986fd15e 100644
---- a/hw/rx/rx62n.c
-+++ b/hw/rx/rx62n.c
-@@ -21,12 +21,14 @@
+diff --git a/target/rx/disas.c b/target/rx/disas.c
+index 5a32a87534..d73b53db44 100644
+--- a/target/rx/disas.c
++++ b/target/rx/disas.c
+@@ -102,7 +102,21 @@ static int bdsp_s(DisasContext *ctx, int d)
+ /* Include the auto-generated decoder.  */
+ #include "decode.inc.c"
 =20
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "hw/rx/rx62n.h"
- #include "hw/loader.h"
- #include "hw/sysbus.h"
- #include "hw/qdev-properties.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/qtest.h"
- #include "cpu.h"
-=20
- /*
-@@ -191,8 +193,14 @@ static void rx62n_realize(DeviceState *dev, Error **=
-errp)
-     memory_region_init_rom(&s->c_flash, NULL, "codeflash",
-                            RX62N_CFLASH_SIZE, errp);
-     memory_region_add_subregion(s->sysmem, RX62N_CFLASH_BASE, &s->c_flas=
-h);
+-#define prt(...) (ctx->dis->fprintf_func)((ctx->dis->stream), __VA_ARGS_=
+_)
++static void dump_bytes(DisasContext *ctx)
++{
++    int i, len =3D ctx->len;
 +
-     if (!s->kernel) {
--        rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
-+        if (bios_name) {
-+            rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
-+        }  else if (!qtest_enabled()) {
-+            error_report("No bios or kernel specified");
-+            exit(1);
-+        }
-     }
++    for (i =3D 0; i < len; ++i) {
++        ctx->dis->fprintf_func(ctx->dis->stream, "%02x ", ctx->bytes[i])=
+;
++    }
++    ctx->dis->fprintf_func(ctx->dis->stream, "%*c", (8 - i) * 3, '\t');
++}
++
++#define prt(...) \
++    do {                                                        \
++        dump_bytes(ctx);                                        \
++        ctx->dis->fprintf_func(ctx->dis->stream, __VA_ARGS__);  \
++    } while (0)
 =20
-     /* Initialize CPU */
+ #define RX_MEMORY_BYTE 0
+ #define RX_MEMORY_WORD 1
 --=20
 2.20.1
 
