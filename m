@@ -2,73 +2,83 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F30EC4CEC7
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 19:36:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30638C4CEC6
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 19:52:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 048C82084D
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 19:36:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 048C82084D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
+	by mail.kernel.org (Postfix) with ESMTPS id 059002081B
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 19:52:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 059002081B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8UtY-0001IE-2B
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 15:36:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41030)
+	id 1i8V92-0006Om-6K
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 15:52:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43556)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i8UsW-0000Oe-Pl
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 15:35:41 -0400
+ (envelope-from <mst@redhat.com>) id 1i8V8O-0005u7-Uv
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 15:52:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i8UsV-000495-8b
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 15:35:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49664)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i8UsV-00048F-3i
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 15:35:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i8UsT-0004jc-0n
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 19:35:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 049312E80CD
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 19:35:37 +0000 (UTC)
+ (envelope-from <mst@redhat.com>) id 1i8V8M-00039S-KX
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 15:52:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43584)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1i8V8M-00037i-D1
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 15:52:02 -0400
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 90E092EF16A
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 19:52:00 +0000 (UTC)
+Received: by mail-qk1-f197.google.com with SMTP id r141so3053162qke.7
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 12:52:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=aotAdU72G5pTqxYjz+e96Z1fqINic8/KHTXxTc7Etqw=;
+ b=PPcoyoit8ms2MPnQIY70+RpAKe2l2Gj1mqAb7fakjo4G7dOvexnBJvcwMv17bB5apS
+ 0z+sxczx/1sntKKD80Zx31CN5rMJ9af0L1GbMBtXrWc4pDdQJ75nxcZMiuXXoh171mWV
+ 0MMdQiLh7YUabEO0772i2AKoQ/oJx1zFhu+WJF7HTBFmI/bccJNABfXAWw5owy4fZAyD
+ kuHd/uCJxunj8HDIbBaHdvTpwLjYhwAEH3WbnNSE55WnsR5o/RlVYTLCQh/JH5s8V2aj
+ M6d+tBz7pctaZvc+bdcIBdIUtnwfmzDRsevhb2g4dw0exiqeBJvbWDP04DsnTuBonaLl
+ yvMg==
+X-Gm-Message-State: APjAAAU7SyUsf8SArmIiBgWZ/Ktk2j36Q+oZPYmmDfLtMPrax63KsIP0
+ W9T4KEoKrLeUbaSsbJ4mkr4rFmacQGZWlHjZeZ5ob8ybN2B0Fxj35q2w7rtDJlVCX+lJjdQR+vO
+ izw0p7CG3ScS4J0I=
+X-Received: by 2002:ac8:1103:: with SMTP id c3mr19165148qtj.88.1568317919727; 
+ Thu, 12 Sep 2019 12:51:59 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwzVAwSTjlW/84a5DkNdoyC9GQB92QmNtAkFlDOqyI0ilY5p/WteGNIWHh6T+EOQ+UiWNwivg==
+X-Received: by 2002:ac8:1103:: with SMTP id c3mr19165137qtj.88.1568317919563; 
+ Thu, 12 Sep 2019 12:51:59 -0700 (PDT)
+Received: from redhat.com ([80.74.107.118])
+ by smtp.gmail.com with ESMTPSA id f5sm7522529qkg.9.2019.09.12.12.51.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Sep 2019 12:51:58 -0700 (PDT)
+Date: Thu, 12 Sep 2019 15:51:53 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Message-ID: <20190912155023-mutt-send-email-mst@kernel.org>
+References: <20190912181924.48539-1-slp@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Sep 2019 19:27:40 -0000
-From: Richard Henderson <rth@twiddle.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: ppc64 testcase
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 7-pc ajbennee rth
-X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
-X-Launchpad-Bug-Modifier: Richard Henderson (rth)
-References: <156691209320.18814.746226319480624520.malonedeb@soybean.canonical.com>
-Message-Id: <156831646095.1120.12247489491937744903.malone@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19044";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 8b789267a449a18d77ddb2e03eb1634b6e24bb3e
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190912181924.48539-1-slp@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1841592] Re: ppc: softfloat float implementation
- issues
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC PATCH] virtio-blk: schedule
+ virtio_notify_config to run on main context
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,79 +87,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1841592 <1841592@bugs.launchpad.net>
+Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It should be a fused multiply add; you may need to use -ffast-math or
-something to get the compiler to generate the proper instruction.
+On Thu, Sep 12, 2019 at 08:19:25PM +0200, Sergio Lopez wrote:
+> Another AioContext-related issue, and this is a tricky one.
+> 
+> Executing a QMP block_resize request for a virtio-blk device running
+> on an iothread may cause a deadlock involving the following mutexes:
+> 
+>  - main thead
+>   * Has acquired: qemu_mutex_global.
+>   * Is trying the acquire: iothread AioContext lock via
+>     AIO_WAIT_WHILE (after aio_poll).
+> 
+>  - iothread
+>   * Has acquired: AioContext lock.
+>   * Is trying to acquire: qemu_mutex_global (via
+>     virtio_notify_config->prepare_mmio_access).
 
-However, one can see from target/ppc/translate/fp-impl.inc.c:
+Hmm is this really the only case iothread takes qemu mutex?
+If any such access can deadlock, don't we need a generic
+solution? Maybe main thread can drop qemu mutex
+before taking io thread AioContext lock?
 
-/* fmadd - fmadds */
-GEN_FLOAT_ACB(madd, 0x1D, 1, PPC_FLOAT);
-
-through to _GEN_FLOAT_ACB:
-
-    gen_helper_f##op(t3, cpu_env, t0, t1, t2);         \
-    if (isfloat) {                                     \
-        gen_helper_frsp(t3, cpu_env, t3);              \
-    }                                                  \
-
-That right there is a double-precision fma followed by a round
-to single precision.  This pattern is replicated for all single
-precision operations, and is of course wrong.
-
-I believe that correct results may be obtained by having
-single-precision helpers that first convert the double-precision
-input into a single-precision input using helper_tosingle(),
-perform the required operation, then convert the result back to
-double-precision using helper_todouble().
-
-The manual says:
-
-# For single-precision arithmetic instructions, all input values
-# must be representable in single format; if they are not, the
-# result placed into the target FPR, and the setting of
-# status bits in the FPSCR and in the Condition Register
-# (if Rc=3D1), are undefined.
-
-The tosingle/todouble conversions are exact and bit-preserving.
-They are used by load-single and store-single that convert a
-single-precision in-memory value to the double-precision register
-value.  Therefore the input given to float32_add using this
-conversion would be exactly the same as if we had given the
-value unmollested from a memory input.
-
-I don't know what real ppc hw does -- whether it takes all of
-the double-precision input bits and rounds to 23-bits, like the
-old 80387 hardware does, or truncates the input as I propose.
-But for architectural results we don't have to care, because
-of the UNDEFINED escape clause.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1841592
-
-Title:
-  ppc: softfloat float implementation issues
-
-Status in QEMU:
-  New
-
-Bug description:
-  Per bug #1841491, Richard Henderson (rth) said:
-  > The float test failure is part of a larger problem for target/powerpc
-  > in which all float routines are implemented incorrectly. They are all
-  > implemented as double operations with rounding to float as a second
-  > step. Which not only produces incorrect exceptions, as in this case,
-  > but incorrect numerical results from the double rounding.
-  >
-  > This should probably be split to a separate bug...
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1841592/+subscriptions
+> With this change, virtio_blk_resize checks if it's being called from a
+> coroutine context running on a non-main thread, and if that's the
+> case, creates a new coroutine and schedules it to be run on the main
+> thread.
+> 
+> This works, but means the actual operation is done
+> asynchronously, perhaps opening a window in which a "device_del"
+> operation may fit and remove the VirtIODevice before
+> virtio_notify_config() is executed.
+> 
+> I *think* it shouldn't be possible, as BHs will be processed before
+> any new QMP/monitor command, but I'm open to a different approach.
+> 
+> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=1744955
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> ---
+>  hw/block/virtio-blk.c | 25 ++++++++++++++++++++++++-
+>  1 file changed, 24 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> index 18851601cb..c763d071f6 100644
+> --- a/hw/block/virtio-blk.c
+> +++ b/hw/block/virtio-blk.c
+> @@ -16,6 +16,7 @@
+>  #include "qemu/iov.h"
+>  #include "qemu/module.h"
+>  #include "qemu/error-report.h"
+> +#include "qemu/main-loop.h"
+>  #include "trace.h"
+>  #include "hw/block/block.h"
+>  #include "hw/qdev-properties.h"
+> @@ -1086,11 +1087,33 @@ static int virtio_blk_load_device(VirtIODevice *vdev, QEMUFile *f,
+>      return 0;
+>  }
+>  
+> +static void coroutine_fn virtio_resize_co_entry(void *opaque)
+> +{
+> +    VirtIODevice *vdev = opaque;
+> +
+> +    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
+> +    virtio_notify_config(vdev);
+> +    aio_wait_kick();
+> +}
+> +
+>  static void virtio_blk_resize(void *opaque)
+>  {
+>      VirtIODevice *vdev = VIRTIO_DEVICE(opaque);
+> +    Coroutine *co;
+>  
+> -    virtio_notify_config(vdev);
+> +    if (qemu_in_coroutine() &&
+> +        qemu_get_current_aio_context() != qemu_get_aio_context()) {
+> +        /*
+> +         * virtio_notify_config() needs to acquire the global mutex,
+> +         * so calling it from a coroutine running on a non-main context
+> +         * may cause a deadlock. Instead, create a new coroutine and
+> +         * schedule it to be run on the main thread.
+> +         */
+> +        co = qemu_coroutine_create(virtio_resize_co_entry, vdev);
+> +        aio_co_schedule(qemu_get_aio_context(), co);
+> +    } else {
+> +        virtio_notify_config(vdev);
+> +    }
+>  }
+>  
+>  static const BlockDevOps virtio_block_ops = {
+> -- 
+> 2.21.0
 
