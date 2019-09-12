@@ -2,64 +2,79 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A75BC4CEC5
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 15:46:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFEDEC4CEC6
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 16:07:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D5D32081B
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 15:46:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D5D32081B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A8ADB20693
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 16:07:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uIMbAWTr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8ADB20693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8RIi-0005G3-F5
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 11:46:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47104)
+	id 1i8Rcy-0006L5-OK
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 12:07:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50681)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1i8RHn-0004o2-1L
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 11:45:32 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i8RZp-0003hC-Kh
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 12:04:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1i8RHl-0000jy-Sg
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 11:45:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52546)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1i8RHl-0000j6-LC
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 11:45:29 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2CD298A1C84;
- Thu, 12 Sep 2019 15:45:28 +0000 (UTC)
-Received: from localhost (ovpn-116-134.ams2.redhat.com [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D7FF85C22C;
- Thu, 12 Sep 2019 15:45:20 +0000 (UTC)
-Date: Thu, 12 Sep 2019 17:45:19 +0200
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Jagannathan Raman <jag.raman@oracle.com>
-Message-ID: <20190912154519.GN23174@stefanha-x1.localdomain>
-References: <cover.1567534653.git.jag.raman@oracle.com>
- <0f0117061fabf398c5d16811ef8787c0ba7d4b0e.1567534653.git.jag.raman@oracle.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1i8RZo-0006rn-Am
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 12:04:09 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34238)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i8RZo-0006qg-4z
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 12:04:08 -0400
+Received: by mail-oi1-x241.google.com with SMTP id 12so6347730oiq.1
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 09:04:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=s2Jjte3IicFNSnIdujoo5LTOVDQZOZvERHNYPfd4lRY=;
+ b=uIMbAWTrQTxuSnw2rOysr7njJRDPrVn1Z0zm28mGWX1BxNocTSNqwe0NBResti8bsz
+ 2HOStbJX9TvZbkH/++q82DruL4p+SR/w5hzPSbI9nDpl++OcCtLIEDzTnJgtkS7l7xX0
+ 9g2zJ7XCBudTQpgnS+Xq5bePy14Z0IIrsyCdKGHk17ZMzA5pN4eBn0TYTGGpQiku196z
+ p83m6T/WpU73PRTA87KzY4G/IDHmVMES0q7zfiX6znPKnV51Or46PdpkDyVashfCvKFe
+ ktk3JpuozFgME2Q3WeKU5aJW02qczA5dSNCkM365hzKhi7rjBB6sNbMnf6ZB+4bML4vK
+ jatQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=s2Jjte3IicFNSnIdujoo5LTOVDQZOZvERHNYPfd4lRY=;
+ b=ReBOCVryt86PqShBQa2FuEavLoRtF5MLOs0TDxDRRQpq7v6YG6qNcJ7wdLSR9E7Shw
+ sJKBMoKHaqqX8hCHXhuEWPOokcXD6/KsLUWUPk8kFVWMD//B8+Gv2TjGIpnArVN/k9iI
+ sQdFkuMHS7AyZxrCC0tpLNYwpRNmfwHQ/3gos5DTyKSB/wCBvvsnVBJ/ZqYkrg8OLIxW
+ L/PFcEQXjof28NtAd3dhQceErnEaFyZ/jZotk1cgTXuKMf8S0WTRUGsTb4FukdtvZdAA
+ 4evblIdrRKyjgKkHU2EsW3CFamxt3TdvYmSUmEjiU796noXIpu8jJKDIvfVSHeA7UW2C
+ ibHA==
+X-Gm-Message-State: APjAAAU0nFmPFYRb5oRzcpyAPnvJaeS/cDU5SJQSempjBf7dyj1ZkeI3
+ KIQp8tAcG7rUT3kVIIhLPtW/Rf7NCVhNPAThaTZ17A==
+X-Google-Smtp-Source: APXvYqwIq5wHUMeukQWK13By24Vv+51Jxa1CuiQzMt6Sgyo0k8HZPSGYFmAvwM4Aow/UIip05tPDArOnoiM3AwX8+sY=
+X-Received: by 2002:aca:53d4:: with SMTP id h203mr788702oib.146.1568304246638; 
+ Thu, 12 Sep 2019 09:04:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="BtmVPk+Smchi6n7w"
-Content-Disposition: inline
-In-Reply-To: <0f0117061fabf398c5d16811ef8787c0ba7d4b0e.1567534653.git.jag.raman@oracle.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Thu, 12 Sep 2019 15:45:28 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC v3 PATCH 08/45] multi-process: add functions
- to synchronize proxy and remote endpoints
+References: <20190912110103.1417887-1-luc.michel@greensocs.com>
+In-Reply-To: <20190912110103.1417887-1-luc.michel@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Sep 2019 17:03:55 +0100
+Message-ID: <CAFEAcA-WO=O5zwRDQoNz2zT4sx61j8Jy5px0uFPiWgF_JUpa+A@mail.gmail.com>
+To: Luc Michel <luc.michel@greensocs.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH] target/arm: fix CBAR register for AArch64
+ CPUs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,119 +86,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, john.g.johnson@oracle.com,
- mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, quintela@redhat.com,
- armbru@redhat.com, kanth.ghatraju@oracle.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- liran.alon@oracle.com, rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com,
- mreitz@redhat.com, ross.lagerwall@citrix.com, marcandre.lureau@gmail.com,
- pbonzini@redhat.com
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---BtmVPk+Smchi6n7w
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Sep 03, 2019 at 04:37:34PM -0400, Jagannathan Raman wrote:
-> In some cases, for example MMIO read, QEMU has to wait for the remote to
-> complete a command before proceeding. An eventfd based mechanism is
-> added to synchronize QEMU & remote process.
->=20
-> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+On Thu, 12 Sep 2019 at 12:01, Luc Michel <luc.michel@greensocs.com> wrote:
+>
+> For AArch64 CPUs with a CBAR register, we have two views for it:
+>   - in AArch64 state, the CBAR_EL1 register (S3_1_C15_C3_0), returns the
+>     full 64 bits CBAR value
+>   - in AArch32 state, the CBAR register (cp15, opc1=1, CRn=15, CRm=3, opc2=0)
+>     returns a 32 bits view such that:
+>       CBAR = CBAR_EL1[31:18] 0..0 CBAR_EL1[43:32]
+>
+> This commit fixes the current implementation where:
+>   - CBAR_EL1 was returning the 32 bits view instead of the full 64 bits
+>     value,
+>   - CBAR was returning a truncated 32 bits version of the full 64 bits
+>     one, instead of the 32 bits view
+>   - CBAR was declared as cp15, opc1=4, CRn=15, CRm=0, opc2=0, which is
+>     the CBAR register found in the ARMv7 Cortex-Ax CPUs, but not in
+>     ARMv8 CPUs.
+>
+> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 > ---
->  v1 -> v2:
->    - Added timeout to synchronization functions
->=20
->  include/io/proxy-link.h |  8 ++++++++
->  io/proxy-link.c         | 42 ++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 50 insertions(+)
->=20
-> diff --git a/include/io/proxy-link.h b/include/io/proxy-link.h
-> index ee78cdd..b76c574 100644
-> --- a/include/io/proxy-link.h
-> +++ b/include/io/proxy-link.h
-> @@ -28,7 +28,9 @@
->  #include <stddef.h>
->  #include <stdint.h>
->  #include <glib.h>
-> +#include <unistd.h>
->  #include <pthread.h>
-> +#include <sys/eventfd.h>
-> =20
->  #include "qemu/osdep.h"
->  #include "qom/object.h"
-> @@ -133,11 +135,17 @@ struct ProxyLinkState {
->      proxy_link_callback callback;
->  };
-> =20
-> +#define GET_REMOTE_WAIT eventfd(0, 0)
-> +#define PUT_REMOTE_WAIT(wait) close(wait)
+>  target/arm/helper.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 507026c915..755aa18a2d 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -6740,12 +6740,12 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+>              ARMCPRegInfo cbar_reginfo[] = {
+>                  { .name = "CBAR",
+>                    .type = ARM_CP_CONST,
+> -                  .cp = 15, .crn = 15, .crm = 0, .opc1 = 4, .opc2 = 0,
+> -                  .access = PL1_R, .resetvalue = cpu->reset_cbar },
+> +                  .cp = 15, .crn = 15, .crm = 3, .opc1 = 1, .opc2 = 0,
+> +                  .access = PL1_R, .resetvalue = cbar32 },
 
-Can you use functions instead of macros?  eventfd() is Linux-specific so
-this code is not portable.  QEMU has an EventNotifier abstraction but
-I'm not sure if it can be used since this patch doesn't include any code
-that calls GET_REMOTE_WAIT/PUT_REMOTE_WAIT and there are no comments.  I
-don't know what the expected semantics are.
+This will break the Cortex-A9 &c which use the 15/0/4/0 encoding
+and the un-rearranged value for this register.
 
-> +#define PROXY_LINK_WAIT_DONE 1
-> +
->  ProxyLinkState *proxy_link_create(void);
->  void proxy_link_finalize(ProxyLinkState *s);
-> =20
->  void proxy_proc_send(ProxyLinkState *s, ProcMsg *msg, ProcChannel *chan);
->  int proxy_proc_recv(ProxyLinkState *s, ProcMsg *msg, ProcChannel *chan);
-> +uint64_t wait_for_remote(int efd);
-> +void notify_proxy(int fd, uint64_t val);
-> =20
->  void proxy_link_init_channel(ProxyLinkState *s, ProcChannel **chan, int =
-fd);
->  void proxy_link_destroy_channel(ProcChannel *chan);
-> diff --git a/io/proxy-link.c b/io/proxy-link.c
-> index 5eb9718..381a38e 100644
-> --- a/io/proxy-link.c
-> +++ b/io/proxy-link.c
-> @@ -31,6 +31,8 @@
->  #include <sys/socket.h>
->  #include <sys/un.h>
->  #include <unistd.h>
-> +#include <limits.h>
-> +#include <poll.h>
-> =20
->  #include "qemu/module.h"
->  #include "io/proxy-link.h"
-> @@ -216,6 +218,46 @@ int proxy_proc_recv(ProxyLinkState *s, ProcMsg *msg,=
- ProcChannel *chan)
->      return rc;
->  }
-> =20
-> +uint64_t wait_for_remote(int efd)
+I think we need to check through the TRMs to confirm which CPUs use
+which format for the CBAR, and have a different feature bit for the
+newer format/sysreg encoding, so we can provide the right sysregs for
+the right cores.
 
-Hard to tell if this makes sense without any context.  I notice that
-EFD_CLOEXEC and EFD_NONBLOCK were not used.  It's likely that
-EFD_CLOEXEC should be used.  Since the eventfd is used with poll(2)
-EFD_NONBLOCK should probably also be used so it's certain that read()
-will not block (which could exceed the timeout).
-
---BtmVPk+Smchi6n7w
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl16aA8ACgkQnKSrs4Gr
-c8jyeAf/XTZee2nByjlaQNXMncefjcpr4rQjhisi3bcG42QbIjdu5iBj5u0RtEg4
-mXq6AVHRN5J7iPUl3+kClCcqkJrPulo7SVONl4d7nrmJ/quoeqEXMecWsLBVj11A
-lvKN5CDC3XlLQuE0bho4vfD079NmJQYH/Gn14GNJr9vDCfTYCHJvceS2wsdvdNdc
-RcY88kEtWdUtvNxBed107IbdGQiLIutmSImwPLbAerclr6T7c7/MyIY6sWKRayvP
-Ch79o8Yrgh68GwqqSJ+AeaoATg/52x+lSulrKIpIUCnh+97DBZAZOFwhB2RMNyt1
-nnDBKpjtgmcXRjyd50aY0m15VhQCzw==
-=WU2J
------END PGP SIGNATURE-----
-
---BtmVPk+Smchi6n7w--
+thanks
+-- PMM
 
