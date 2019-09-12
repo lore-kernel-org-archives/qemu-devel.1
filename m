@@ -6,56 +6,54 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57113C4CEC7
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 22:34:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2045C4CEC6
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 22:34:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2634220830
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 22:34:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2634220830
+	by mail.kernel.org (Postfix) with ESMTPS id A796C20830
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 22:34:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A796C20830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8XfV-0001oQ-Nc
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 18:34:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42034)
+	id 1i8XfZ-0001ue-BM
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 18:34:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41792)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i8XcU-00088a-4F
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 18:31:19 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i8Xc9-0007iv-VB
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 18:30:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i8XcS-0005yk-OL
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 18:31:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51758)
+ (envelope-from <mlevitsk@redhat.com>) id 1i8Xc8-0005lF-5n
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 18:30:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60552)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1i8XcP-0005wM-IF; Thu, 12 Sep 2019 18:31:13 -0400
+ id 1i8Xc4-0005j7-Fb; Thu, 12 Sep 2019 18:30:52 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E2234898105;
- Thu, 12 Sep 2019 22:31:12 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id BDBF43086222;
+ Thu, 12 Sep 2019 22:30:51 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.59])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9D1805C1B2;
- Thu, 12 Sep 2019 22:31:10 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 802A65C1B2;
+ Thu, 12 Sep 2019 22:30:49 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 13 Sep 2019 01:30:25 +0300
-Message-Id: <20190912223028.18496-9-mlevitsk@redhat.com>
+Date: Fri, 13 Sep 2019 01:30:20 +0300
+Message-Id: <20190912223028.18496-4-mlevitsk@redhat.com>
 In-Reply-To: <20190912223028.18496-1-mlevitsk@redhat.com>
 References: <20190912223028.18496-1-mlevitsk@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Thu, 12 Sep 2019 22:31:12 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Thu, 12 Sep 2019 22:30:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 08/11] block/crypto: implement blockdev-amend
+Subject: [Qemu-devel] [PATCH v2 03/11] qcrypto-luks: implement the
+ encryption key management
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,192 +75,434 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- block/crypto.c       | 85 ++++++++++++++++++++++++++++++++++----------
- qapi/block-core.json |  7 ++--
- 2 files changed, 71 insertions(+), 21 deletions(-)
+ crypto/block-luks.c | 356 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 354 insertions(+), 2 deletions(-)
 
-diff --git a/block/crypto.c b/block/crypto.c
-index f42fa057e6..5905f7f520 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -534,6 +534,17 @@ block_crypto_co_create_luks(BlockdevCreateOptions *c=
-reate_options, Error **errp)
-     assert(create_options->driver =3D=3D BLOCKDEV_DRIVER_LUKS);
-     luks_opts =3D &create_options->u.luks;
-=20
-+    if (!luks_opts->has_size) {
-+        error_setg(errp, "'size' is manadatory for image creation");
-+        return -EINVAL;
-+    }
+diff --git a/crypto/block-luks.c b/crypto/block-luks.c
+index fed80e6646..26ce50b111 100644
+--- a/crypto/block-luks.c
++++ b/crypto/block-luks.c
+@@ -70,6 +70,9 @@ typedef struct QCryptoBlockLUKSKeySlot QCryptoBlockLUKSKeySlot;
+ 
+ #define QCRYPTO_BLOCK_LUKS_SECTOR_SIZE 512LL
+ 
++#define QCRYPTO_BLOCK_LUKS_DEFAULT_ITER_TIME_MS 2000
++#define QCRYPTO_BLOCK_LUKS_ERASE_ITERATIONS 40
 +
-+    if (!luks_opts->has_file) {
-+        error_setg(errp, "'file' is manadatory for image creation");
-+        return -EINVAL;
-+    }
+ static const char qcrypto_block_luks_magic[QCRYPTO_BLOCK_LUKS_MAGIC_LEN] = {
+     'L', 'U', 'K', 'S', 0xBA, 0xBE
+ };
+@@ -219,6 +222,9 @@ struct QCryptoBlockLUKS {
+ 
+     /* Hash algorithm used in pbkdf2 function */
+     QCryptoHashAlgorithm hash_alg;
 +
-+
-     bs =3D bdrv_open_blockdev_ref(luks_opts->file, errp);
-     if (bs =3D=3D NULL) {
-         return -EIO;
-@@ -667,6 +678,39 @@ block_crypto_get_specific_info_luks(BlockDriverState=
- *bs, Error **errp)
++    /* Name of the secret that was used to open the image */
++    char *secret;
+ };
+ 
+ 
+@@ -1070,6 +1076,170 @@ qcrypto_block_luks_find_key(QCryptoBlock *block,
  }
-=20
-=20
-+static int
-+block_crypto_amend_options_generic(BlockDriverState *bs,
-+                                   QCryptoBlockCreateOptions *amend_opti=
-ons,
-+                                   bool force,
-+                                   Error **errp)
+ 
+ 
++
++/*
++ * Returns true if a slot i is marked as active
++ * (contains encrypted copy of the master key)
++ */
++static bool
++qcrypto_block_luks_slot_active(const QCryptoBlockLUKS *luks,
++                               unsigned int slot_idx)
 +{
-+    BlockCrypto *crypto =3D bs->opaque;
-+    int ret =3D -1;
++    uint32_t val = luks->header.key_slots[slot_idx].active;
++    return val ==  QCRYPTO_BLOCK_LUKS_KEY_SLOT_ENABLED;
++}
 +
-+    assert(crypto);
-+    assert(crypto->block);
++/*
++ * Returns the number of slots that are marked as active
++ * (contains encrypted copy of the master key)
++ */
++static unsigned int
++qcrypto_block_luks_count_active_slots(const QCryptoBlockLUKS *luks)
++{
++    size_t i = 0;
++    unsigned int ret = 0;
 +
-+    /* apply for exclusive write permissions to the underlying file*/
-+    crypto->updating_keys =3D true;
-+    ret =3D bdrv_child_refresh_perms(bs, bs->file, errp);
-+    if (ret) {
-+        goto cleanup;
++    for (i = 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
++        if (qcrypto_block_luks_slot_active(luks, i)) {
++            ret++;
++        }
 +    }
-+
-+    ret =3D qcrypto_block_amend_options(crypto->block,
-+                                      block_crypto_read_func,
-+                                      block_crypto_write_func,
-+                                      bs,
-+                                      amend_options,
-+                                      force,
-+                                      errp);
-+cleanup:
-+    /* release exclusive write permissions to the underlying file*/
-+    crypto->updating_keys =3D false;
-+    bdrv_child_refresh_perms(bs, bs->file, errp);
 +    return ret;
 +}
 +
- static int
- block_crypto_amend_options(BlockDriverState *bs,
-                            QemuOpts *opts,
-@@ -678,44 +722,45 @@ block_crypto_amend_options(BlockDriverState *bs,
-     BlockCrypto *crypto =3D bs->opaque;
-     QDict *cryptoopts =3D NULL;
-     QCryptoBlockCreateOptions *amend_options =3D NULL;
--    int ret;
-+    int ret =3D -EINVAL;
-=20
-     assert(crypto);
-     assert(crypto->block);
-=20
--    crypto->updating_keys =3D true;
--
--    ret =3D bdrv_child_refresh_perms(bs, bs->file, errp);
--    if (ret < 0) {
--        goto cleanup;
--    }
--
-     cryptoopts =3D qemu_opts_to_qdict_filtered(opts, NULL,
-                                              &block_crypto_create_opts_l=
-uks,
-                                              true);
-=20
-     qdict_put_str(cryptoopts, "format", "luks");
-     amend_options =3D block_crypto_create_opts_init(cryptoopts, errp);
 +
-     if (!amend_options) {
--        ret =3D -EINVAL;
-         goto cleanup;
-     }
-=20
--    ret =3D qcrypto_block_amend_options(crypto->block,
--                                      block_crypto_read_func,
--                                      block_crypto_write_func,
--                                      bs,
--                                      amend_options,
--                                      force,
--                                      errp);
-+    ret =3D block_crypto_amend_options_generic(bs, amend_options, force,=
- errp);
- cleanup:
--    crypto->updating_keys =3D false;
--    bdrv_child_refresh_perms(bs, bs->file, errp);
-     qapi_free_QCryptoBlockCreateOptions(amend_options);
-     qobject_unref(cryptoopts);
-     return ret;
- }
-=20
++/*
++ * Finds first key slot which is not active
++ * Returns the key slot index, or -1 if doesn't exist
++ */
 +static int
-+coroutine_fn block_crypto_co_amend(BlockDriverState *bs,
-+                                   BlockdevCreateOptions *opts,
-+                                   bool force,
-+                                   Error **errp)
++qcrypto_block_luks_find_free_keyslot(const QCryptoBlockLUKS *luks)
 +{
-+    QCryptoBlockCreateOptions amend_opts;
++    size_t i;
 +
-+    amend_opts =3D (QCryptoBlockCreateOptions) {
-+        .format =3D Q_CRYPTO_BLOCK_FORMAT_LUKS,
-+        .u.luks =3D *qapi_BlockdevCreateOptionsLUKS_base(&opts->u.luks),
-+    };
++    for (i = 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
++        if (!qcrypto_block_luks_slot_active(luks, i)) {
++            return i;
++        }
++    }
++    return -1;
 +
-+    return block_crypto_amend_options_generic(bs, &amend_opts, force, er=
-rp);
 +}
 +
-=20
- static void
- block_crypto_child_perms(BlockDriverState *bs, BdrvChild *c,
-@@ -750,7 +795,8 @@ block_crypto_child_perms(BlockDriverState *bs, BdrvCh=
-ild *c,
-      */
-=20
-     if (crypto->updating_keys) {
--        /*need exclusive write access for header update  */
-+        assert(!(bs->open_flags & BDRV_O_NO_IO));
-+        /*need exclusive read and write access for header update  */
-         perm |=3D BLK_PERM_WRITE;
-         shared &=3D ~(BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE);
++/*
++ * Erases an keyslot given its index
++ * Returns:
++ *    0 if the keyslot was erased successfully
++ *   -1 if a error occurred while erasing the keyslot
++ *
++ */
++static int
++qcrypto_block_luks_erase_key(QCryptoBlock *block,
++                             unsigned int slot_idx,
++                             QCryptoBlockWriteFunc writefunc,
++                             void *opaque,
++                             Error **errp)
++{
++    QCryptoBlockLUKS *luks = block->opaque;
++    QCryptoBlockLUKSKeySlot *slot = &luks->header.key_slots[slot_idx];
++    g_autofree uint8_t *garbagesplitkey = NULL;
++    size_t splitkeylen = luks->header.master_key_len * slot->stripes;
++    size_t i;
++
++    assert(slot_idx < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS);
++    assert(splitkeylen > 0);
++
++    garbagesplitkey = g_new0(uint8_t, splitkeylen);
++
++    /* Reset the key slot header */
++    memset(slot->salt, 0, QCRYPTO_BLOCK_LUKS_SALT_LEN);
++    slot->iterations = 0;
++    slot->active = QCRYPTO_BLOCK_LUKS_KEY_SLOT_DISABLED;
++
++    qcrypto_block_luks_store_header(block,  writefunc, opaque, errp);
++
++    /*
++     * Now try to erase the key material, even if the header
++     * update failed
++     */
++
++    for (i = 0 ; i < QCRYPTO_BLOCK_LUKS_ERASE_ITERATIONS ; i++) {
++        if (qcrypto_random_bytes(garbagesplitkey, splitkeylen, errp) < 0) {
++                /*
++                 * If we failed to get the random data, still write
++                 * at least zeros to the key slot at least once
++                 */
++
++                if (i > 0) {
++                    return -1;
++                }
++        }
++
++        if (writefunc(block,
++                      slot->key_offset_sector * QCRYPTO_BLOCK_LUKS_SECTOR_SIZE,
++                      garbagesplitkey,
++                      splitkeylen,
++                      opaque,
++                      errp) != splitkeylen) {
++            return -1;
++        }
++    }
++    return 0;
++}
++
++
++/*
++ * Erase all the keys that match the given password
++ * Will stop when only one keyslot is remaining
++ * Returns number of slots that were erased or -1 on failure
++ */
++static int
++qcrypto_block_luks_erase_matching_keys(QCryptoBlock *block,
++                                       const char *password,
++                                       QCryptoBlockReadFunc readfunc,
++                                       QCryptoBlockWriteFunc writefunc,
++                                       void *opaque,
++                                       bool force,
++                                       Error **errp)
++{
++    QCryptoBlockLUKS *luks = block->opaque;
++    size_t i;
++    int rv;
++    g_autofree uint8_t *masterkey = NULL;
++    unsigned int erased_cnt = 0;
++    unsigned int active_slot_cnt = qcrypto_block_luks_count_active_slots(luks);
++
++    masterkey = g_new0(uint8_t, luks->header.master_key_len);
++
++    for (i = 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
++
++        /* refuse to erase last key if not forced */
++        if (!force && active_slot_cnt == 1) {
++            break;
++        }
++
++        rv = qcrypto_block_luks_load_key(block, i, password, masterkey,
++                                         readfunc, opaque, errp);
++        if (rv < 0) {
++            return -1;
++        }
++        if (rv == 0) {
++            continue;
++        }
++
++        rv = qcrypto_block_luks_erase_key(block, i, writefunc, opaque, errp);
++        if (rv < 0) {
++            return -1;
++        }
++
++        erased_cnt++;
++        active_slot_cnt--;
++    }
++
++    return erased_cnt;
++}
++
++
+ static int
+ qcrypto_block_luks_open(QCryptoBlock *block,
+                         QCryptoBlockOpenOptions *options,
+@@ -1100,6 +1270,7 @@ qcrypto_block_luks_open(QCryptoBlock *block,
+ 
+     luks = g_new0(QCryptoBlockLUKS, 1);
+     block->opaque = luks;
++    luks->secret = g_strdup(options->u.luks.key_secret);
+ 
+     ret = qcrypto_block_luks_load_header(block, readfunc, opaque, errp);
+     if (ret < 0) {
+@@ -1215,7 +1386,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+ 
+     memcpy(&luks_opts, &options->u.luks, sizeof(luks_opts));
+     if (!luks_opts.has_iter_time) {
+-        luks_opts.iter_time = 2000;
++        luks_opts.iter_time = QCRYPTO_BLOCK_LUKS_DEFAULT_ITER_TIME_MS;
      }
-@@ -786,6 +832,7 @@ static BlockDriver bdrv_crypto_luks =3D {
-     .bdrv_get_info      =3D block_crypto_get_info_luks,
-     .bdrv_get_specific_info =3D block_crypto_get_specific_info_luks,
-     .bdrv_amend_options =3D block_crypto_amend_options,
-+    .bdrv_co_amend      =3D block_crypto_co_amend,
-=20
-     .strong_runtime_opts =3D block_crypto_strong_runtime_opts,
- };
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 7900914506..4a6db98938 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -4211,8 +4211,11 @@
- # Driver specific image creation options for LUKS.
- #
- # @file             Node to create the image format on
-+#                   Mandatory for create
- # @size             Size of the virtual disk in bytes
-+#                   Mandatory for create
- # @preallocation    Preallocation mode for the new image
-+#                   Only for create
- #                   (since: 4.2)
- #                   (default: off; allowed values: off, metadata, falloc=
-, full)
- #
-@@ -4220,8 +4223,8 @@
- ##
- { 'struct': 'BlockdevCreateOptionsLUKS',
-   'base': 'QCryptoBlockCreateOptionsLUKS',
--  'data': { 'file':             'BlockdevRef',
--            'size':             'size',
-+  'data': { '*file':             'BlockdevRef',
-+            '*size':             'size',
-             '*preallocation':   'PreallocMode' } }
-=20
- ##
---=20
+     if (!luks_opts.has_cipher_alg) {
+         luks_opts.cipher_alg = QCRYPTO_CIPHER_ALG_AES_256;
+@@ -1273,6 +1444,8 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+                    optprefix ? optprefix : "");
+         goto error;
+     }
++    luks->secret = g_strdup(options->u.luks.key_secret);
++
+     password = qcrypto_secret_lookup_as_utf8(luks_opts.key_secret, errp);
+     if (!password) {
+         goto error;
+@@ -1504,6 +1677,182 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+ }
+ 
+ 
++#define CHECK_NON_AMEND_OPTION(luks, luks_opts, name) \
++    if (luks_opts.has_##name && luks_opts.name != luks->name) { \
++            error_setg(errp, "Option \"" #name "\" can't be amended"); \
++            goto cleanup; \
++    }
++
++static int
++qcrypto_block_luks_amend_options(QCryptoBlock *block,
++                                 QCryptoBlockReadFunc readfunc,
++                                 QCryptoBlockWriteFunc writefunc,
++                                 void *opaque,
++                                 QCryptoBlockCreateOptions *options,
++                                 bool force,
++                                 Error **errp)
++{
++    QCryptoBlockLUKS *luks = block->opaque;
++    QCryptoBlockCreateOptionsLUKS luks_opts;
++    g_autofree char *old_password = NULL;
++    g_autofree char *password = NULL;
++    const char *unlock_secret = luks->secret;
++    g_autofree uint8_t *masterkey = NULL;
++    int slot = -1;
++    int ret = -1;
++    bool active = true;
++    int64_t iter_time = QCRYPTO_BLOCK_LUKS_DEFAULT_ITER_TIME_MS;
++
++    memcpy(&luks_opts, &options->u.luks, sizeof(luks_opts));
++
++    CHECK_NON_AMEND_OPTION(luks, luks_opts, cipher_alg);
++    CHECK_NON_AMEND_OPTION(luks, luks_opts, cipher_mode);
++    CHECK_NON_AMEND_OPTION(luks, luks_opts, ivgen_alg);
++    CHECK_NON_AMEND_OPTION(luks, luks_opts, ivgen_hash_alg);
++    CHECK_NON_AMEND_OPTION(luks, luks_opts, hash_alg);
++
++    /* Read given slot and check it */
++    if (luks_opts.has_slot) {
++        slot = luks_opts.slot;
++        if (slot < 0 || slot >= QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS) {
++            error_setg(errp,
++                       "Given key slot %i is not supported by LUKS", slot);
++            goto cleanup;
++        }
++    }
++
++    if (luks_opts.has_iter_time) {
++        iter_time = luks_opts.iter_time;
++    }
++
++    if (luks_opts.has_active && luks_opts.active == false) {
++        active = false;
++    }
++
++    if (active) {
++        /* Check that we are not overwriting an active slot */
++        if (!force && slot != -1 &&
++            qcrypto_block_luks_slot_active(luks, slot)) {
++
++            error_setg(errp, "Can't update an active key slot %i",
++                       slot);
++            goto cleanup;
++        }
++
++        /* check that we have the passwords*/
++        if (!luks_opts.has_key_secret) {
++            error_setg(errp, "Can't add a key slot without a  password");
++            goto cleanup;
++        }
++
++        if (luks_opts.has_unlock_secret) {
++            unlock_secret = luks_opts.unlock_secret;
++        }
++
++        /* Read the old password */
++        old_password = qcrypto_secret_lookup_as_utf8(unlock_secret, errp);
++        if (!old_password) {
++            goto cleanup;
++        }
++
++        masterkey = g_new0(uint8_t, luks->header.master_key_len);
++
++        /* Retrieve the master key*/
++        if (qcrypto_block_luks_find_key(block, old_password, masterkey,
++                                        readfunc, opaque,
++                                        errp) < 0) {
++            error_append_hint(errp,
++                              "'unlock-secret' failed to unlock the image");
++            goto cleanup;
++        }
++
++        /* Read the new password*/
++        password = qcrypto_secret_lookup_as_utf8(luks_opts.key_secret, errp);
++        if (!password) {
++            goto cleanup;
++        }
++
++        /* Find the new slot to write to */
++        if (slot == -1) {
++            slot = qcrypto_block_luks_find_free_keyslot(luks);
++
++            if (slot == -1) {
++                error_setg(errp,
++                           "Can't add a keyslot - all key slots are in use");
++                goto cleanup;
++            }
++        }
++
++        /* Store the master key to the new slot */
++        if (qcrypto_block_luks_store_key(block, slot, password, masterkey,
++                                         iter_time, writefunc, opaque,
++                                         errp)) {
++            error_append_hint(errp, "Failed to store the keyslot %i", slot);
++            goto cleanup;
++        }
++
++    } else {
++        /* Check that we are not erasing last key slot */
++        if (qcrypto_block_luks_count_active_slots(luks) <= 1) {
++            if (!force) {
++                error_setg(errp, "Only one slot active - can't erase");
++                goto cleanup;
++            }
++        }
++
++        if (slot != -1) {
++            /* Check that we are not erasing an inactive slot */
++            if (!qcrypto_block_luks_slot_active(luks, luks_opts.slot)) {
++                if (!force) {
++                    error_setg(errp, "Can't erase an inactive key slot %i",
++                               slot);
++                    goto cleanup;
++                }
++            }
++
++            /* Erase the given slot */
++            if (qcrypto_block_luks_erase_key(block, slot,
++                                             writefunc, opaque, errp)) {
++                goto cleanup;
++            }
++
++        } else {
++            if (!luks_opts.has_key_secret) {
++                error_setg(errp,
++                           "To erase a keyslot you have to specify either the"
++                           "slot index or a password "
++                           "(to erase all slots that match it)");
++                goto cleanup;
++            }
++
++            password = qcrypto_secret_lookup_as_utf8(luks_opts.key_secret,
++                                                     errp);
++            if (!password) {
++                goto cleanup;
++            }
++
++            ret = qcrypto_block_luks_erase_matching_keys(block, password,
++                                                       readfunc, writefunc,
++                                                       opaque, force, errp);
++            if (ret == 0) {
++                error_setg(errp,
++                           "Didn't erase a keyslot, because no keyslots match"
++                           " the given password");
++                ret = -EINVAL;
++                goto cleanup;
++            }
++
++            if (ret < 0) {
++                goto cleanup;
++            }
++        }
++    }
++    ret = 0;
++cleanup:
++    return ret;
++}
++
++
+ static int qcrypto_block_luks_get_info(QCryptoBlock *block,
+                                        QCryptoBlockInfo *info,
+                                        Error **errp)
+@@ -1551,7 +1900,9 @@ static int qcrypto_block_luks_get_info(QCryptoBlock *block,
+ 
+ static void qcrypto_block_luks_cleanup(QCryptoBlock *block)
+ {
+-    g_free(block->opaque);
++    QCryptoBlockLUKS *luks = block->opaque;
++    g_free(luks->secret);
++    g_free(luks);
+ }
+ 
+ 
+@@ -1588,6 +1939,7 @@ qcrypto_block_luks_encrypt(QCryptoBlock *block,
+ const QCryptoBlockDriver qcrypto_block_driver_luks = {
+     .open = qcrypto_block_luks_open,
+     .create = qcrypto_block_luks_create,
++    .amend = qcrypto_block_luks_amend_options,
+     .get_info = qcrypto_block_luks_get_info,
+     .cleanup = qcrypto_block_luks_cleanup,
+     .decrypt = qcrypto_block_luks_decrypt,
+-- 
 2.17.2
 
 
