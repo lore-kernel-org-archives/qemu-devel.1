@@ -2,111 +2,91 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F021C47404
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:42:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8360C47404
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:44:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B14E2075C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:42:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1E3420693
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:44:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="etPE92ki"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B14E2075C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hKMJ26ye"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1E3420693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8NUV-00057U-BU
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 07:42:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40871)
+	id 1i8NWF-0006Tt-FO
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 07:44:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40952)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Paul.Durrant@citrix.com>) id 1i8NTL-0004cU-DT
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:41:13 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i8NTj-0004in-BJ
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:41:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Paul.Durrant@citrix.com>) id 1i8NTG-00007O-2Z
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:41:11 -0400
-Received: from esa4.hc3370-68.iphmx.com ([216.71.155.144]:40872)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Paul.Durrant@citrix.com>)
- id 1i8NTF-00006D-QX
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:41:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=citrix.com; s=securemail; t=1568288465;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=oMDBHolEqeuxgWI1uGzW4fwEiGk2tgmxpUrQr3djO+0=;
- b=etPE92kiVTHlDUeM4dkxI1jpIF3A0WXJZTrcSl7H+67lmmJDjZXN4Ypv
- GRS5fiQPXvuvm6m6tSnIHvbjAZTNyofMWJW7nGwxvu0gMhuQBTeZpyTT/
- b4MDUQHFq2qEkrvQAXLaid3Diun2AWMuNnjt9yLmGUKZ9476xqIrBnFBK A=;
-Authentication-Results: esa4.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none;
- spf=None smtp.pra=Paul.Durrant@citrix.com;
- spf=Pass smtp.mailfrom=Paul.Durrant@citrix.com;
- spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa4.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- Paul.Durrant@citrix.com) identity=pra;
- client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="Paul.Durrant@citrix.com"; x-conformance=sidf_compatible
-Received-SPF: Pass (esa4.hc3370-68.iphmx.com: domain of
- Paul.Durrant@citrix.com designates 162.221.158.21 as
- permitted sender) identity=mailfrom;
- client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="Paul.Durrant@citrix.com";
- x-conformance=sidf_compatible; x-record-type="v=spf1";
- x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
- ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
- ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
- ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
-Received-SPF: None (esa4.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- postmaster@mail.citrix.com) identity=helo;
- client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="postmaster@mail.citrix.com";
- x-conformance=sidf_compatible
-IronPort-SDR: 7UFeC0yvM8goqSqaKvtjr+WYt80HQ+XVv4FmDZnoPXzvtHswK4t/BV8pL7NNuWvIU93Rr7BJiU
- wlzr2cvJDnZ1z0nGE/xh9e11kWRgcJpn/OuDif210pbgJ55ZYj67rXYspX0sHve+mIbfsV6H6Q
- gbdAFOeID0sjoHlWoRkj5i8/Q0KhuG25rykgP+2bDrT2j/3AHSEZi6mj1iFlnTmF/p6wj8Udrd
- VIps+YIjYG7Rxg58xjnBa22zQUGPuJQslQNTKxHXrHPsrgcYQWdLsz/rxHvLyy/0WxzD4gOjQR
- 30k=
-X-SBRS: 2.7
-X-MesageID: 5768288
-X-Ironport-Server: esa4.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.64,495,1559534400"; 
-   d="scan'208";a="5768288"
-From: Paul Durrant <Paul.Durrant@citrix.com>
-To: Anthony Perard <anthony.perard@citrix.com>
-Thread-Topic: [PATCH 1/3] xen / notify: introduce a new XenWatchList
- abstraction
-Thread-Index: AQHVaK5IAeEfbYTL0UG7WFNcTuDh0Kcns3IAgAA49PA=
-Date: Thu, 12 Sep 2019 11:40:54 +0000
-Message-ID: <6af73152bb3e4028a4354a30006ad840@AMSPEX02CL03.citrite.net>
-References: <20190911143618.23477-1-paul.durrant@citrix.com>
- <20190911143618.23477-2-paul.durrant@citrix.com>
- <20190912101640.GB1308@perard.uk.xensource.com>
-In-Reply-To: <20190912101640.GB1308@perard.uk.xensource.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <alex.bennee@linaro.org>) id 1i8NTe-0000CX-Vr
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:41:34 -0400
+Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:52651)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i8NTd-0000Bh-3B
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:41:30 -0400
+Received: by mail-wm1-x330.google.com with SMTP id x2so1780405wmj.2
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 04:41:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=/NwkzWfPZgfq0Bqf0mBxPSl/Xw9KJk0rkb+vY/zMOQk=;
+ b=hKMJ26yeuLTImXxyD8brFshwFTL8Ho9k+6W8gs4EtLo575dNqq8lOhvcFi0ciP4wDN
+ OF932QzoON2JPdV2VOu8h85x0WoYuW5qJPTot32FoeSGmN4R6M5/NISBZZdh0g/Z1wSL
+ P06/cpXZayEYj+9GfYBkmGTQMrUgtNFdq/QMoLl0zZT70V9/UdiYUgECAGxCatkLn0bZ
+ 87MGVG0laXP671IB/LT+tNeJtGTY+le63tCAveKV1nitWU4gX9IVQ6dTQh8DcIyG1EmR
+ SdHvk69MVnGTyV7qPL6BK3Bf8PKcj1pN8rjm8bShbCWJvNrawjkGXaXyceGV6gVusDuB
+ wBCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=/NwkzWfPZgfq0Bqf0mBxPSl/Xw9KJk0rkb+vY/zMOQk=;
+ b=HNhsZHNzPSDXuAJpUJlBlGJOBsUqiNUTRBrIccyyN2XtTEstBD4f0A1QfTe4mmfDbQ
+ 7fJMwaAz/cwvH4oYCYFlCPhSdwjWiQllj8a/KHD5a5pgSNj7cjvPZubDIjPpJkG9+P06
+ gheKHOK2+sUe/ZoqNmn14Md2WIcVdOIXZVciGR5KAjzV2gfPZSrUdmxylfpWoGlmFF26
+ nPPxQFVagK85645QdwMF50jsxhbKY6jFEufG6z3eoblGlx4GRvOxi8DontvHP91mVLB7
+ T7uZvaIWvaAV53OgrHJ87iP3/1YTB9dY6hw9ObyQh78RS2BJqnLKcod/3KSac4lec3E3
+ QmRw==
+X-Gm-Message-State: APjAAAVTy2tOuJ4oYcX96dtifO+WcXzSu+P5++H5o8PvIGA4hY2GiPw2
+ /bEU0vm9+oZzlUNRS98lRS5+Ig==
+X-Google-Smtp-Source: APXvYqzeEqBWg34yRD1UNzw08vnlKQhGrGf6FZBAcL/OrOUNbwnPdEj0S3iFUUZcBvxkgOx/WTSTBg==
+X-Received: by 2002:a1c:7513:: with SMTP id o19mr7800350wmc.126.1568288487047; 
+ Thu, 12 Sep 2019 04:41:27 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 33sm27615229wra.41.2019.09.12.04.41.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Sep 2019 04:41:26 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 82D921FF87;
+ Thu, 12 Sep 2019 12:41:25 +0100 (BST)
+References: <tencent_3156C5EA2695B7CD53C6114C@qq.com>
+ <CAL1e-=hWOXgnTbC0Y2v_CMZOMmQLgdToBAsi+XaW7+9uyN55CA@mail.gmail.com>
+ <tencent_23ACCA1A48AFB09124C52E70@qq.com> <87blvy99y9.fsf@linaro.org>
+ <tencent_0E8715864EBBAA153BB730E2@qq.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Libo Zhou <zhlb29@foxmail.com>
+In-reply-to: <tencent_0E8715864EBBAA153BB730E2@qq.com>
+Date: Thu, 12 Sep 2019 12:41:25 +0100
+Message-ID: <87h85hzqqi.fsf@linaro.org>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.155.144
-Subject: Re: [Qemu-devel] [PATCH 1/3] xen / notify: introduce a new
- XenWatchList abstraction
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::330
+Subject: Re: [Qemu-devel] QEMU as ISS (Instruction Set Simulator)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,59 +98,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Stefano
- Stabellini <sstabellini@kernel.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Anthony PERARD <anthony.perard@citrix.com>
-> Sent: 12 September 2019 11:17
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: qemu-devel@nongnu.org; xen-devel@lists.xenproject.org; Stefano Stabel=
-lini <sstabellini@kernel.org>
-> Subject: Re: [PATCH 1/3] xen / notify: introduce a new XenWatchList abstr=
-action
->=20
-> On Wed, Sep 11, 2019 at 03:36:16PM +0100, Paul Durrant wrote:
-> > Xenstore watch call-backs are already abstracted away from XenBus using
-> > the XenWatch data structure but the associated NotifierList manipulatio=
-n
-> > and file handle registation is still open coded in various xen_bus_...(=
-)
->                   ^ registration
 
-Ok.
+Libo Zhou <zhlb29@foxmail.com> writes:
 
-> > functions.
-> > This patch creates a new XenWatchList data structure to allow these
-> > interactions to be abstracted away from XenBus as well. This is in
-> > preparation for a subsequent patch which will introduce separate watch =
-lists
-> > for XenBus and XenDevice objects.
-> >
-> > NOTE: This patch also introduces a new NotifierListEmpty() helper funct=
-ion
->                                          ^ notifier_list_empty() ?
->=20
+> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+>
+>
+>> The gdbstub should allow you do full introspection and adding
+>> additional registers is fairly easy, see mips_cpu_gdb_read_register func=
+tion
+>> in  target/mips/gdbstub.c.
+>
+>
+>
+> Hi Alex and Aleksandar,
+>
+>
+> Now I can connect gdb to qemu successfully. And I can use this command
+> to show all the register contents in a gdb session.
 
-Oops, yes :-)
+You will need to update gdb-xml/$ARCH.xml and the appropriate
+arch_read/write register functions in gdbstub.
 
-> >       for the purposes of adding an assertion that a XenWatchList is no=
-t
-> >       freed whilst its associated NotifierList is still occupied.
-> >
-> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
->=20
-> Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
->=20
+Alternatively look at commits:
 
-Thanks,
+  commit 200bf5b7ffea635079cc05fdfb363372b9544ce7
+  Author: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+  commit 9c513e786d85cc58b8ba56a482566f759e0835b6
+  Author: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
+  commit 1f16378718fa87d63f70d0797f4546a88d8e3dd7
+  Author: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>
 
-  Paul
+Where Abdallah added a dynamic xml generation to expose all the ARM
+system registers to gdbstub. The details may be different for the MIPS
+backend but from the gdbstub point of view its the same. Provide a
+system description in xml and the arch specific helpers to get and set
+the values.
 
-> --
-> Anthony PERARD
+>
+>
+> (gdb) layout regs
+>
+>
+> However, I will need to add some more registers to the CPU. Does adding n=
+ew registers in gdbstub.c also show the new registers in the TUI?
+> I doubt it because when I modified the regnames[] in translate.c, the reg=
+isters' names didn't change in gdb.
+>
+>
+>
+> Cheers,
+> Libo
+>
+>
+>
+>> Alex Benn=C3=A9e
+
+
+--
+Alex Benn=C3=A9e
 
