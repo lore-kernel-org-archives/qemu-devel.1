@@ -2,91 +2,105 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2382EC4CECB
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:21:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC508C4CECB
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:27:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF31E206CD
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:21:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7913E2067D
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:27:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cJRz5JEL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF31E206CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="ZW5o9HbV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7913E2067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8NAJ-0006do-Uw
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 07:21:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36780)
+	id 1i8NGX-00009K-Lo
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 07:27:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37905)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i8N95-0005HG-7P
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:20:16 -0400
+ (envelope-from <anthony.perard@citrix.com>) id 1i8NFt-0008C6-9a
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:27:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i8N94-0001wY-0z
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:20:15 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46011)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i8N93-0001vs-R1
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:20:13 -0400
-Received: by mail-wr1-x441.google.com with SMTP id l16so27922525wrv.12
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 04:20:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=NWZJulbafzGqgTXHDDvNuqov14fJ+mdxykxRgopdKG8=;
- b=cJRz5JELe+Ss1qRiEn7w/48etkoXtLG8WynGT72Xuh+QacQgodG2faz46YPAkmn/ZF
- Jd/pHhVtJWcTEE5TVSesJ7VWIqXneHIUyQu2kJBRKBxhz19BHIK0TuA2c1obORmJeSUU
- VXPGnDkFmaGoITKcc9ieIt1ixE8KYSyoIErhTyjL23o/RZitJNIurqWEyJ33ZHNS1XDD
- z4RPPiEMQeiz0GXF/kFQTEisME8DDstUPAyoQeXIiDsJb8/ujICCVUcnUIpHSZ7kSbxa
- mI0t2cyIS56I6hGg4Wd3Hy7/xbzqqWl31PEEPO2tzFvE03RJoNctFtH5qB5OjjHprtZl
- G+mA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=NWZJulbafzGqgTXHDDvNuqov14fJ+mdxykxRgopdKG8=;
- b=fQOwxATVzd5nGoG6P8K4V2Vwt02CjfOgvwmfeiEmxxCitiTUojN1CzepPXL5EORLag
- BS0Gw7rFxB5KcZ4EOsZMA3sC+qNMxd7y0GQxCTEKzbuzeMRwMG4c3SKVvYqsL3q7x8+w
- iJiUDC6EE/y4JTmnDEXD5932PFLu+UypHgQuKYCS9MPWTLl38j2DnJXaEx0SkyaHX/wj
- lrMH2oDhpdHMUgHftm1rbDT7yNvqjBhZ7Llq8aRmDomvLfQJWSqrHE2LHVcveW4Wzp4b
- Q6SEGVgJ2EhWUaRfWmB0Kf3lk3Akj7q3f/B4xPtbfZrnf3r2IYv5qx6bs+tKu2DARTu9
- YBsA==
-X-Gm-Message-State: APjAAAU5FUXXgtvXKmW6c1fMhVjGYYhkvB/QGP/6yoLzOUbQAzMEivaS
- QStMd9U3KTlKTsTK8seKcal24E9eiGI=
-X-Google-Smtp-Source: APXvYqzg8hGjJsrkUD7KamjWguuPmzqzrlXBgIbhXOFLh7XsfmfZZUwqHhFn+H17Dz584XMq4agSzg==
-X-Received: by 2002:a5d:4405:: with SMTP id z5mr34516668wrq.158.1568287212758; 
- Thu, 12 Sep 2019 04:20:12 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y72sm9235897wmc.26.2019.09.12.04.20.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Sep 2019 04:20:12 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9A0AC1FF87;
- Thu, 12 Sep 2019 12:20:11 +0100 (BST)
-References: <20190910144428.32597-1-peter.maydell@linaro.org>
- <20190910144428.32597-9-peter.maydell@linaro.org>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-arm@nongnu.org
-In-reply-to: <20190910144428.32597-9-peter.maydell@linaro.org>
-Date: Thu, 12 Sep 2019 12:20:11 +0100
-Message-ID: <87impxzrpw.fsf@linaro.org>
+ (envelope-from <anthony.perard@citrix.com>) id 1i8NFs-0004Q6-9E
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:27:17 -0400
+Received: from esa4.hc3370-68.iphmx.com ([216.71.155.144]:40175)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
+ id 1i8NFs-0004Ol-0I
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:27:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1568287635;
+ h=date:from:to:cc:subject:message-id:references:
+ mime-version:in-reply-to;
+ bh=IsK2YwJPy4QTQ6atrOPJy0yGrY6gZzq2Q6xM9wwsL9c=;
+ b=ZW5o9HbVTCEAp/EpHlaKCQMR0jIGKwJrILZjaTmdUCfVgE4APhoDLXsq
+ EpInPHGj2NUdsM9vSiNXM0LEwFQvNsnuh2N+Nz6OjHybAtCDWSqasvEfR
+ UyjRzuHbHvd/xBfknrddaZzhteI2M7a3PWMDYNAJjFJOswNRHQFDqpW4T s=;
+Authentication-Results: esa4.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=anthony.perard@citrix.com;
+ spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa4.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ anthony.perard@citrix.com) identity=pra;
+ client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible
+Received-SPF: Pass (esa4.hc3370-68.iphmx.com: domain of
+ anthony.perard@citrix.com designates 162.221.158.21 as
+ permitted sender) identity=mailfrom;
+ client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
+Received-SPF: None (esa4.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa4.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: cYZJ1UvFYiTnwpf4OZhK0oDClZ3oqj/MsuPT7ZY3VsTVLcsjvkdVMoU3YnFTis5I6ASN1QKZCn
+ Wx/jxl3+IlT+QYBvw2+QoOT+UyKaWZBGaF1Y9X3uo9sbEnmst/B6GA4B6rRRLSb4oK2c+64GNm
+ n1wFdxX0eyBwM3oadzvdSQEJqySx7P52vd0Ffwj/M8cMgPlOUqmKnD7GkchOb/ynXruyOvzPlg
+ 8bliLMogLLk64FzMTxcOUFnj7zwLUQZhNwYJuEUIkgXzppDXr6ZqYanKAEdqJIiFOV3iRGAe15
+ s+Q=
+X-SBRS: 2.7
+X-MesageID: 5767853
+X-Ironport-Server: esa4.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.64,495,1559534400"; 
+   d="scan'208";a="5767853"
+Date: Thu, 12 Sep 2019 12:27:11 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+To: Paul Durrant <paul.durrant@citrix.com>
+Message-ID: <20190912112711.GC1308@perard.uk.xensource.com>
+References: <20190911143618.23477-1-paul.durrant@citrix.com>
+ <20190911143618.23477-3-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 08/13] target/arm/arm-semi:
- Factor out implementation of SYS_ISTTY
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20190911143618.23477-3-paul.durrant@citrix.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 216.71.155.144
+Subject: Re: [Qemu-devel] [PATCH 2/3] xen: introduce separate XenWatchList
+ for XenDevice objects
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,99 +112,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: xen-devel@lists.xenproject.org, Stefano
+ Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, Sep 11, 2019 at 03:36:17PM +0100, Paul Durrant wrote:
+> This patch uses the XenWatchList abstraction to add a separate watch list
+> for each device. This is more scalable than walking a single notifier
+> list for all watches and is also necessary to implement a bug-fix in a
+> subsequent patch.
+> 
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 
-> Factor out the implementation of SYS_ISTTY via the new function
-> tables.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  target/arm/arm-semi.c | 20 +++++++++++++++-----
->  1 file changed, 15 insertions(+), 5 deletions(-)
->
-> diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-> index 48a10dd3c3a..64ed39fc075 100644
-> --- a/target/arm/arm-semi.c
-> +++ b/target/arm/arm-semi.c
-> @@ -349,6 +349,7 @@ typedef uint32_t sys_writefn(TaskState *ts, ARMCPU *c=
-pu, GuestFD *gf,
->                               target_ulong buf, uint32_t len);
->  typedef uint32_t sys_readfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf,
->                              target_ulong buf, uint32_t len);
-> +typedef uint32_t sys_isattyfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf);
->
->  static uint32_t host_closefn(TaskState *ts, ARMCPU *cpu, GuestFD *gf)
->  {
-> @@ -399,6 +400,11 @@ static uint32_t host_readfn(TaskState *ts, ARMCPU *c=
-pu, GuestFD *gf,
->      return len - ret;
->  }
->
-> +static uint32_t host_isattyfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf)
-> +{
-> +    return isatty(gf->hostfd);
-> +}
-> +
->  static uint32_t gdb_closefn(TaskState *ts, ARMCPU *cpu, GuestFD *gf)
->  {
->      return arm_gdb_syscall(cpu, arm_semi_cb, "close,%x", gf->hostfd);
-> @@ -420,10 +426,16 @@ static uint32_t gdb_readfn(TaskState *ts, ARMCPU *c=
-pu, GuestFD *gf,
->                             gf->hostfd, buf, len);
->  }
->
-> +static uint32_t gdb_isattyfn(TaskState *ts, ARMCPU *cpu, GuestFD *gf)
-> +{
-> +    return arm_gdb_syscall(cpu, arm_semi_cb, "isatty,%x", gf->hostfd);
-> +}
-> +
->  typedef struct GuestFDFunctions {
->      sys_closefn *closefn;
->      sys_writefn *writefn;
->      sys_readfn *readfn;
-> +    sys_isattyfn *isattyfn;
->  } GuestFDFunctions;
->
->  static const GuestFDFunctions guestfd_fns[] =3D {
-> @@ -431,11 +443,13 @@ static const GuestFDFunctions guestfd_fns[] =3D {
->          .closefn =3D host_closefn,
->          .writefn =3D host_writefn,
->          .readfn =3D host_readfn,
-> +        .isattyfn =3D host_isattyfn,
->      },
->      [GuestFDGDB] =3D {
->          .closefn =3D gdb_closefn,
->          .writefn =3D gdb_writefn,
->          .readfn =3D gdb_readfn,
-> +        .isattyfn =3D gdb_isattyfn,
->      },
->  };
->
-> @@ -600,11 +614,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
->              return set_swi_errno(ts, -1);
->          }
->
-> -        if (use_gdb_syscalls()) {
-> -            return arm_gdb_syscall(cpu, arm_semi_cb, "isatty,%x", gf->ho=
-stfd);
-> -        } else {
-> -            return isatty(gf->hostfd);
-> -        }
-> +        return guestfd_fns[gf->type].isattyfn(ts, cpu, gf);
->      case TARGET_SYS_SEEK:
->          GET_ARG(0);
->          GET_ARG(1);
-
-
---
-Alex Benn=C3=A9e
+-- 
+Anthony PERARD
 
