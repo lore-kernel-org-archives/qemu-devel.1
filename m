@@ -2,66 +2,63 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE29C49ED9
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 07:49:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9279DC49ED9
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 08:04:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 332A7208C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 07:49:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 332A7208C2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6818B2075C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 08:04:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6818B2075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8Jqi-0006uz-Bn
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 03:49:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55207)
+	id 1i8K5D-000299-KZ
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 04:04:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57029)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i8Jq1-0006RN-Et
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 03:48:23 -0400
+ (envelope-from <kwolf@redhat.com>) id 1i8K4R-0001fg-47
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 04:03:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i8Jpz-0006Qx-FZ
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 03:48:21 -0400
-Resent-Date: Thu, 12 Sep 2019 03:48:21 -0400
-Resent-Message-Id: <E1i8Jpz-0006Qx-FZ@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21563)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i8Jpz-0006Ql-7t
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 03:48:19 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568274477; cv=none; d=zoho.com; s=zohoarc; 
- b=jfN+ke3cqpx+EXQjCH/T0CNy4mxJFPW4PkRT3Sl8K8bNtzRwMlNXVFsDj8kc+/oSc7cM17U2CH6ZZrapdRKV8YthnVBG1CjnJamgtneowW7XHtMoQZ30DqXH6mgsdydnCMbHW9ZBCrs+QMyIpQ73+kti/23YjGxWcwdOZa0socg=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1568274477;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=JuO/apA7/cNQzvK3/ffmDZUsVuM9cXAchVuVwKKsSmc=; 
- b=g3llJm5B1cFl3uHGWHYl5kRGsdy0FfrnHomYzgh7IsveGklFYj4lQHA2yhOhBtWfpH9XDqAU2dv1R6ZOH3908Na41x/htEt3cb6SE5vP8zFHdXXQ9iq4gJWafYIN+GbN3ZyIUPCvMH+oDJTSBfLhjQxrVHjIMV/Hs5pCBvEPlT0=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 156827447663042.39717180765933;
- Thu, 12 Sep 2019 00:47:56 -0700 (PDT)
-In-Reply-To: <20190912060701.4642-1-ysato@users.sourceforge.jp>
-Message-ID: <156827447515.21839.18353659126819904320@5dec9699b7de>
+ (envelope-from <kwolf@redhat.com>) id 1i8K4P-0004EW-Tm
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 04:03:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59200)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1i8K4L-0004CL-NP; Thu, 12 Sep 2019 04:03:09 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4735CC051688;
+ Thu, 12 Sep 2019 08:03:08 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-116-179.ams2.redhat.com [10.36.116.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EF9AA60852;
+ Thu, 12 Sep 2019 08:03:04 +0000 (UTC)
+Date: Thu, 12 Sep 2019 10:03:03 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Message-ID: <20190912080303.GB5383@linux.fritz.box>
+References: <20190911220849.30840-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: ysato@users.sourceforge.jp
-Date: Thu, 12 Sep 2019 00:47:56 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190911220849.30840-1-philmd@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Thu, 12 Sep 2019 08:03:08 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH v24 00/22] Add RX archtecture support
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] block/create: Do not abort if a block
+ driver is not available
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,149 +70,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, ysato@users.sourceforge.jp,
- richard.henderson@linaro.org, qemu-devel@nongnu.org, imammedo@redhat.com,
- philmd@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxMjA2MDcwMS40NjQy
-LTEteXNhdG9AdXNlcnMuc291cmNlZm9yZ2UuanAvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMg
-dG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IK
-bW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjI0IDAwLzIy
-XSBBZGQgUlggYXJjaHRlY3R1cmUgc3VwcG9ydApNZXNzYWdlLWlkOiAyMDE5MDkxMjA2MDcwMS40
-NjQyLTEteXNhdG9AdXNlcnMuc291cmNlZm9yZ2UuanAKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVs
-bCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
-b3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2Uu
-Lgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRk
-MWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2pl
-Y3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTkwOTExMTU1MTI1LjExOTMy
-LTEtZXJpYy5hdWdlckByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTA5MTExNTUxMjUuMTE5MzIt
-MS1lcmljLmF1Z2VyQHJlZGhhdC5jb20KIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDE5
-MDkxMjA2MDcwMS40NjQyLTEteXNhdG9AdXNlcnMuc291cmNlZm9yZ2UuanAgLT4gcGF0Y2hldy8y
-MDE5MDkxMjA2MDcwMS40NjQyLTEteXNhdG9AdXNlcnMuc291cmNlZm9yZ2UuanAKU3dpdGNoZWQg
-dG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4ODQwY2JlIHFhcGkvbWFjaGluZS5qc29uOiBBZGQgUlgg
-Y3B1Lgo0NzcxZDI4IEJvb3RMaW51eENvbnNvbGVUZXN0OiBUZXN0IHRoZSBSWC1WaXJ0IG1hY2hp
-bmUKMGVjMzI5ZSBBZGQgcngtc29mdG1tdQpiYmMzNWUwIGh3L3J4OiBSZXN0cmljdCB0aGUgUlg2
-Mk4gbWljcm9jb250cm9sbGVyIHRvIHRoZSBSWDYyTiBDUFUgY29yZQoxMTAxMzQxIGh3L3J4OiBI
-b25vciAtYWNjZWwgcXRlc3QKYTc0ZjY4NSBody9yeDogUlggVGFyZ2V0IGhhcmR3YXJlIGRlZmlu
-aXRpb24KZDhhNmMzZiBody9jaGFyOiBSWDYyTiBzZXJpYWwgY29tbXVuaWNhdGlvbiBpbnRlcmZh
-Y2UgKFNDSSkKMTlkYjgwNCBody90aW1lcjogUlg2Mk4gaW50ZXJuYWwgdGltZXIgbW9kdWxlcwpk
-NjJjMGZjIGh3L2ludGM6IFJYNjJOIGludGVycnVwdCBjb250cm9sbGVyIChJQ1VhKQpmYjBhOTc3
-IHRhcmdldC9yeDogRHVtcCBieXRlcyBmb3IgZWFjaCBpbnNuIGR1cmluZyBkaXNhc3NlbWJseQo1
-Zjc0MzRlIHRhcmdldC9yeDogQ29sbGVjdCBhbGwgYnl0ZXMgZHVyaW5nIGRpc2Fzc2VtYmx5Cjg1
-YTJjYzUgdGFyZ2V0L3J4OiBFbWl0IGFsbCBkaXNhc3NlbWJseSBpbiBvbmUgcHJ0KCkKNTIyMTQy
-ZiB0YXJnZXQvcng6IFVzZSBwcnRfbGRtaSBmb3IgWENIR19tciBkaXNhc3NlbWJseQoxZGVmNThi
-IHRhcmdldC9yeDogUmVwbGFjZSBvcGVyYW5kIHdpdGggcHJ0X2xkbWkgaW4gZGlzYXNzZW1ibGVy
-CmM2NTVlM2QgdGFyZ2V0L3J4OiBEaXNhc3NlbWJsZSByeF9pbmRleF9hZGRyIGludG8gYSBzdHJp
-bmcKOTZiZGNiNiB0YXJnZXQvcng6IFJYIGRpc2Fzc2VtYmxlcgo2NGU1N2U1IHRhcmdldC9yeDog
-Q1BVIGRlZmluaXRpb24KZGUzNjM4OSB0YXJnZXQvcng6IFRDRyBoZWxwZXIKMDY2MzgyNSB0YXJn
-ZXQvcng6IFRDRyB0cmFuc2xhdGlvbgozNmQ5YWQ0IGh3L3JlZ2lzdGVyZmllbGRzLmg6IEFkZCA4
-Yml0IGFuZCAxNmJpdCByZWdpc3RlciBtYWNyb3MKZjFkOWE3ZiBxZW11L2JpdG9wcy5oOiBBZGQg
-ZXh0cmFjdDggYW5kIGV4dHJhY3QxNgphNGM0NWUyIE1BSU5UQUlORVJTOiBBZGQgUlgKCj09PSBP
-VVRQVVQgQkVHSU4gPT09CjEvMjIgQ2hlY2tpbmcgY29tbWl0IGE0YzQ1ZTIxOGVhNCAoTUFJTlRB
-SU5FUlM6IEFkZCBSWCkKMi8yMiBDaGVja2luZyBjb21taXQgZjFkOWE3ZmRhNGQ2IChxZW11L2Jp
-dG9wcy5oOiBBZGQgZXh0cmFjdDggYW5kIGV4dHJhY3QxNikKMy8yMiBDaGVja2luZyBjb21taXQg
-MzZkOWFkNGQxOGE2IChody9yZWdpc3RlcmZpZWxkcy5oOiBBZGQgOGJpdCBhbmQgMTZiaXQgcmVn
-aXN0ZXIgbWFjcm9zKQpVc2Ugb2YgdW5pbml0aWFsaXplZCB2YWx1ZSBpbiBjb25jYXRlbmF0aW9u
-ICguKSBvciBzdHJpbmcgYXQgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgbGluZSAyNDg0LgpFUlJP
-UjogTWFjcm9zIHdpdGggbXVsdGlwbGUgc3RhdGVtZW50cyBzaG91bGQgYmUgZW5jbG9zZWQgaW4g
-YSBkbyAtIHdoaWxlIGxvb3AKIzI3OiBGSUxFOiBpbmNsdWRlL2h3L3JlZ2lzdGVyZmllbGRzLmg6
-MjU6CisjZGVmaW5lIFJFRzgocmVnLCBhZGRyKSAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgXAorICAgIGVudW0geyBBXyAjIyByZWcgPSAoYWRkcikgfTsg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgZW51bSB7IFJf
-ICMjIHJlZyA9IChhZGRyKSB9OwoKRVJST1I6IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVu
-dHMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBsb29wCiMzMTogRklMRTogaW5j
-bHVkZS9ody9yZWdpc3RlcmZpZWxkcy5oOjI5OgorI2RlZmluZSBSRUcxNihyZWcsIGFkZHIpICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgZW51
-bSB7IEFfICMjIHJlZyA9IChhZGRyKSB9OyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIFwKKyAgICBlbnVtIHsgUl8gIyMgcmVnID0gKGFkZHIpIC8gMiB9OwoKdG90YWw6
-IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA1NiBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzIyIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0LzIyIENoZWNraW5nIGNvbW1pdCAwNjYzODI1NDBjNTMg
-KHRhcmdldC9yeDogVENHIHRyYW5zbGF0aW9uKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
-ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMDogCm5ldyBm
-aWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMwNjUgbGluZXMg
-Y2hlY2tlZAoKUGF0Y2ggNC8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo1LzIyIENoZWNr
-aW5nIGNvbW1pdCBkZTM2Mzg5NTliMTAgKHRhcmdldC9yeDogVENHIGhlbHBlcikKV0FSTklORzog
-YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
-ZGF0aW5nPwojMjE6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdh
-cm5pbmdzLCA2NTAgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS8yMiBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgo2LzIyIENoZWNraW5nIGNvbW1pdCA2NGU1N2U1MWNkZmUgKHRhcmdldC9yeDogQ1BV
-IGRlZmluaXRpb24pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
-ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM5OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
-CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYv
-MjIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNy8yMiBDaGVja2luZyBjb21taXQgOTZiZGNi
-NjUwNzdmICh0YXJnZXQvcng6IFJYIGRpc2Fzc2VtYmxlcikKV0FSTklORzogYWRkZWQsIG1vdmVk
-IG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzg6
-IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNDk3
-IGxpbmVzIGNoZWNrZWQKClBhdGNoIDcvMjIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8y
-MiBDaGVja2luZyBjb21taXQgYzY1NWUzZDc0ZDYyICh0YXJnZXQvcng6IERpc2Fzc2VtYmxlIHJ4
-X2luZGV4X2FkZHIgaW50byBhIHN0cmluZykKOS8yMiBDaGVja2luZyBjb21taXQgMWRlZjU4Yjkz
-NTRlICh0YXJnZXQvcng6IFJlcGxhY2Ugb3BlcmFuZCB3aXRoIHBydF9sZG1pIGluIGRpc2Fzc2Vt
-YmxlcikKMTAvMjIgQ2hlY2tpbmcgY29tbWl0IDUyMjE0MmYzMTliMSAodGFyZ2V0L3J4OiBVc2Ug
-cHJ0X2xkbWkgZm9yIFhDSEdfbXIgZGlzYXNzZW1ibHkpCjExLzIyIENoZWNraW5nIGNvbW1pdCA4
-NWEyY2M1NGJhODIgKHRhcmdldC9yeDogRW1pdCBhbGwgZGlzYXNzZW1ibHkgaW4gb25lIHBydCgp
-KQoxMi8yMiBDaGVja2luZyBjb21taXQgNWY3NDM0ZWI1NzU3ICh0YXJnZXQvcng6IENvbGxlY3Qg
-YWxsIGJ5dGVzIGR1cmluZyBkaXNhc3NlbWJseSkKMTMvMjIgQ2hlY2tpbmcgY29tbWl0IGZiMGE5
-Nzc0N2I0MyAodGFyZ2V0L3J4OiBEdW1wIGJ5dGVzIGZvciBlYWNoIGluc24gZHVyaW5nIGRpc2Fz
-c2VtYmx5KQoxNC8yMiBDaGVja2luZyBjb21taXQgZDYyYzBmY2ZlYzg2IChody9pbnRjOiBSWDYy
-TiBpbnRlcnJ1cHQgY29udHJvbGxlciAoSUNVYSkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
-ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQwOiAKbmV3
-IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDQ1IGxpbmVz
-IGNoZWNrZWQKClBhdGNoIDE0LzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
-IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
-byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE1LzIyIENo
-ZWNraW5nIGNvbW1pdCAxOWRiODA0MDNmYWUgKGh3L3RpbWVyOiBSWDYyTiBpbnRlcm5hbCB0aW1l
-ciBtb2R1bGVzKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
-IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1MDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0
-b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDg0NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8y
-MiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNi8yMiBDaGVja2luZyBjb21taXQgZDhhNmMz
-ZjNkMjFiIChody9jaGFyOiBSWDYyTiBzZXJpYWwgY29tbXVuaWNhdGlvbiBpbnRlcmZhY2UgKFND
-SSkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRB
-SU5FUlMgbmVlZCB1cGRhdGluZz8KIzQzOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAw
-IGVycm9ycywgMSB3YXJuaW5ncywgNDAxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDE2LzIyIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE3LzIyIENoZWNraW5nIGNvbW1pdCBhNzRmNjg1MDQ4MDgg
-KGh3L3J4OiBSWCBUYXJnZXQgaGFyZHdhcmUgZGVmaW5pdGlvbikKV0FSTklORzogYWRkZWQsIG1v
-dmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwoj
-Mjk6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0
-ODAgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTcvMjIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-MTgvMjIgQ2hlY2tpbmcgY29tbWl0IDExMDEzNDE4MGQ4YiAoaHcvcng6IEhvbm9yIC1hY2NlbCBx
-dGVzdCkKMTkvMjIgQ2hlY2tpbmcgY29tbWl0IGJiYzM1ZTAzMTc3NCAoaHcvcng6IFJlc3RyaWN0
-IHRoZSBSWDYyTiBtaWNyb2NvbnRyb2xsZXIgdG8gdGhlIFJYNjJOIENQVSBjb3JlKQoyMC8yMiBD
-aGVja2luZyBjb21taXQgMGVjMzI5ZWVlZWUxIChBZGQgcngtc29mdG1tdSkKV0FSTklORzogYWRk
-ZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0
-aW5nPwojNTk6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5p
-bmdzLCA1OSBsaW5lcyBjaGVja2VkCgpQYXRjaCAyMC8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoyMS8yMiBDaGVja2luZyBjb21taXQgNDc3MWQyODNmOGE1IChCb290TGludXhDb25zb2xl
-VGVzdDogVGVzdCB0aGUgUlgtVmlydCBtYWNoaW5lKQoyMi8yMiBDaGVja2luZyBjb21taXQgODg0
-MGNiZTZiM2FiIChxYXBpL21hY2hpbmUuanNvbjogQWRkIFJYIGNwdS4pCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMg
-YXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwOTEyMDYwNzAxLjQ2NDIt
-MS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcC90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVz
-c2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBz
-Oi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRl
-dmVsQHJlZGhhdC5jb20=
+Am 12.09.2019 um 00:08 hat Philippe Mathieu-Daud=E9 geschrieben:
+> The 'blockdev-create' QMP command was introduced as experimental
+> feature in commit b0292b851b8, using the assert() debug call.
+> It got promoted to 'stable' command in 3fb588a0f2c, but the
+> assert call was not removed.
+>=20
+> Some block drivers are optional, and bdrv_find_format() might
+> return a NULL value, triggering the assertion.
+>=20
+> Stable code is not expected to abort, so return an error instead.
+>=20
+> This is easily reproducible when libnfs is not installed:
+>=20
+>   ./configure
+>   [...]
+>   module support    no
+>   Block whitelist (rw)
+>   Block whitelist (ro)
+>   libiscsi support  yes
+>   libnfs support    no
+>   [...]
+>=20
+> Start QEMU:
+>=20
+>   $ qemu-system-x86_64 -S -qmp unix:/tmp/qemu.qmp,server,nowait
+>=20
+> Send the 'blockdev-create' with the 'nfs' driver:
+>=20
+>   $ ( cat << 'EOF'
+>   {'execute': 'qmp_capabilities'}
+>   {'execute': 'blockdev-create', 'arguments': {'job-id': 'x', 'options'=
+: {'size': 0, 'driver': 'nfs', 'location': {'path': '/', 'server': {'host=
+': '::1', 'type': 'inet'}}}}, 'id': 'x'}
+>   EOF
+>   ) | socat STDIO UNIX:/tmp/qemu.qmp
+>   {"QMP": {"version": {"qemu": {"micro": 50, "minor": 1, "major": 4}, "=
+package": "v4.1.0-733-g89ea03a7dc"}, "capabilities": ["oob"]}}
+>   {"return": {}}
+>=20
+> QEMU crashes:
+>=20
+>   $ gdb qemu-system-x86_64 core
+>   Program received signal SIGSEGV, Segmentation fault.
+>   (gdb) bt
+>   #0  0x00007ffff510957f in raise () at /lib64/libc.so.6
+>   #1  0x00007ffff50f3895 in abort () at /lib64/libc.so.6
+>   #2  0x00007ffff50f3769 in _nl_load_domain.cold.0 () at /lib64/libc.so=
+.6
+>   #3  0x00007ffff5101a26 in .annobin_assert.c_end () at /lib64/libc.so.=
+6
+>   #4  0x0000555555d7e1f1 in qmp_blockdev_create (job_id=3D0x555556baee4=
+0 "x", options=3D0x555557666610, errp=3D0x7fffffffc770) at block/create.c=
+:69
+>   #5  0x0000555555c96b52 in qmp_marshal_blockdev_create (args=3D0x7fffd=
+c003830, ret=3D0x7fffffffc7f8, errp=3D0x7fffffffc7f0) at qapi/qapi-comman=
+ds-block-core.c:1314
+>   #6  0x0000555555deb0a0 in do_qmp_dispatch (cmds=3D0x55555645de70 <qmp=
+_commands>, request=3D0x7fffdc005c70, allow_oob=3Dfalse, errp=3D0x7ffffff=
+fc898) at qapi/qmp-dispatch.c:131
+>   #7  0x0000555555deb2a1 in qmp_dispatch (cmds=3D0x55555645de70 <qmp_co=
+mmands>, request=3D0x7fffdc005c70, allow_oob=3Dfalse) at qapi/qmp-dispatc=
+h.c:174
+>=20
+> With this patch applied, QEMU returns a QMP error:
+>=20
+>   {'execute': 'blockdev-create', 'arguments': {'job-id': 'x', 'options'=
+: {'size': 0, 'driver': 'nfs', 'location': {'path': '/', 'server': {'host=
+': '::1', 'type': 'inet'}}}}, 'id': 'x'}
+>   {"id": "x", "error": {"class": "GenericError", "desc": "Block driver =
+'nfs' not found or not supported"}}
+>=20
+> Reported-by: Xu Tian <xutian@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
+Thanks, applied to the block branch.
+
+Kevin
 
