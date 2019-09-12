@@ -2,64 +2,90 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F1CFC4CEC7
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 17:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6815DC4CEC7
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 17:53:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7733A20830
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 17:47:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7733A20830
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3746C2067D
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 17:53:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XodH/6Lz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3746C2067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8TCI-0004Gs-Pr
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 13:47:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49153)
+	id 1i8THa-0006OJ-D2
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 13:53:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50311)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i8T9v-0002s0-Qa
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:45:33 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i8TGr-0005kF-44
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:52:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i8T9t-0006hr-0t
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:45:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33392)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i8T9s-0006h0-S5
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:45:28 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2394B8AC6FF
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 17:45:28 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.12])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E6DB95C22C;
- Thu, 12 Sep 2019 17:45:26 +0000 (UTC)
-Date: Thu, 12 Sep 2019 18:45:24 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190912174524.GD2722@work-vm>
-References: <20190911190622.7629-1-dgilbert@redhat.com>
- <20190911190622.7629-2-dgilbert@redhat.com>
- <e8802180-3c9a-97b9-dae1-5e07d7843de3@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1i8TGp-0001Go-Ug
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:52:40 -0400
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:46384)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i8TGp-0001GK-LG
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:52:39 -0400
+Received: by mail-qt1-x844.google.com with SMTP id v11so30555882qto.13
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 10:52:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=4DscHssQlyyvcD/YsiJ9lfjnYwlz2SOBt2IH9CNtKls=;
+ b=XodH/6LzOXs6mxD9cSVvgeLEYxkHw/Um3td0+XW4ytEmmATGatrWLK51ZbKhAbnkmW
+ IQU2AKryjTjfdSfz0XsKFg6qH62OIEzBx44HAXh/Pfxdzu9R27I8g8Sjm+shWdDV4SIc
+ Ybk4mLEpgdbSkk8kb+YwbvPdNHMYzsSmjScg83lgjFe2y1p0ie8YI25f8xFj4sPG3mGJ
+ YW/Z7laDy+LpCb1QZEndLoHS8sakGzsXLaqkIcF+TccQy/TAHxTxwozc/Gb+N9tBtWqm
+ qmZ2WzWjh/5w0NdVryWN6tDdIZmbZqOQL9xRBmgQLXwz3+FoUO9oLEaXrQscy5jRdaSe
+ fQkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=4DscHssQlyyvcD/YsiJ9lfjnYwlz2SOBt2IH9CNtKls=;
+ b=jmzOVs5Kq/hdkybZhzGFNMoE3gTC8DVd3cVM+nOwdjlb3HOQmnyErJNuvDxNWJNsey
+ YrUwmbwdJITSxa7hw+8s9sVBOr/zjR73f9FFXOlCtcZ4VBG78s0qbM4OM3mQSs6Gxerb
+ f3YyLqYcqXu+OHHQ8jks6e3x+pAEnlE0YvOgpCWB3XbPHJ+UCYwsqWmNtpPcgFHXkMK/
+ jKXCScDLYYliyjBchauw627jlSIbrVFIS9KkBdYSIqZDorxxsHCPzKIZoo5bcNsSORDj
+ HF2opufGYMR3cV8vddHKucpqSFHRhMXElNlxBeRtslbgY9N8uPRJ0iwFnkb1RXs7A+oc
+ 1nXg==
+X-Gm-Message-State: APjAAAVANcSyMvIpbip+NqVYHa2XLF5mMClLyBNQK8bnArSse2IeBnTx
+ qpCPe2iv1kC+0y2iT0262SFDUA==
+X-Google-Smtp-Source: APXvYqzaB+WepuehCgpco+DdEGR8od5qML7L8X6rmTHilBOGtySDqFUcEpXqNJHBXHXACL8ZBCFaag==
+X-Received: by 2002:ac8:748c:: with SMTP id v12mr42694057qtq.23.1568310758187; 
+ Thu, 12 Sep 2019 10:52:38 -0700 (PDT)
+Received: from [172.20.5.51] ([67.69.50.154])
+ by smtp.gmail.com with ESMTPSA id 20sm12375128qkn.4.2019.09.12.10.52.36
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 12 Sep 2019 10:52:37 -0700 (PDT)
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20190912141820.30702-1-pbonzini@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <1a1b3b4a-05c8-72a0-d7f8-310813863f58@linaro.org>
+Date: Thu, 12 Sep 2019 13:52:34 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e8802180-3c9a-97b9-dae1-5e07d7843de3@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Thu, 12 Sep 2019 17:45:28 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] rcu: Add automatically released
- rcu_read_lock variant
+In-Reply-To: <20190912141820.30702-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::844
+Subject: Re: [Qemu-devel] [PATCH] memory: inline and optimize devend_memop
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,92 +97,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: quintela@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org,
- ehabkost@redhat.com
+Cc: Tony Nguyen <tony.nguyen@bt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 11/09/19 21:06, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > RCU_READ_LOCK_AUTO takes the rcu_read_lock and then uses glib's
-> > g_auto infrastructure (and thus whatever the compiler's hooks are) to
-> > release it on all exits of the block.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  include/qemu/rcu.h | 18 ++++++++++++++++++
-> >  1 file changed, 18 insertions(+)
-> > 
-> > diff --git a/include/qemu/rcu.h b/include/qemu/rcu.h
-> > index 22876d1428..8768a7b60a 100644
-> > --- a/include/qemu/rcu.h
-> > +++ b/include/qemu/rcu.h
-> > @@ -154,6 +154,24 @@ extern void call_rcu1(struct rcu_head *head, RCUCBFunc *func);
-> >        }),                                                                \
-> >        (RCUCBFunc *)g_free);
-> >  
-> > +typedef void RCUReadAuto;
-> > +static inline RCUReadAuto *rcu_read_auto_lock(void)
-> > +{
-> > +    rcu_read_lock();
-> > +    /* Anything non-NULL causes the cleanup function to be called */
-> > +    return (void *)0x1;
+On 9/12/19 10:18 AM, Paolo Bonzini wrote:
+> devend_memop can rely on the fact that the result is always either
+> 0 or MO_BSWAP, corresponding respectively to host endianness and
+> the opposite.  Native (target) endianness in turn can be either
+> the host endianness, in which case MO_BSWAP is only returned for
+> host-opposite endianness, or the opposite, in which case 0 is only
+> returned for host endianness.
 > 
-> Doesn't this cause a warning (should be "(void *)(uintptr_t)1" instead)?
+> With this in mind, devend_memop can be compiled as a setcond+shift
+> for every target.  Do this and, while at it, move it to
+> include/exec/memory.h since !NEED_CPU_H files do not (and should not)
+> need it.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  include/exec/memory.h | 19 ++++++++++++++++++-
+>  memory.c              | 18 ------------------
+>  2 files changed, 18 insertions(+), 19 deletions(-)
 
-Apparently not, but I'll change it anyway.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-> > +}
-> > +
-> > +static inline void rcu_read_auto_unlock(RCUReadAuto *r)
-> > +{
-> > +    rcu_read_unlock();
-> > +}
-> > +
-> > +G_DEFINE_AUTOPTR_CLEANUP_FUNC(RCUReadAuto, rcu_read_auto_unlock)
-> > +
-> > +#define RCU_READ_LOCK_AUTO \
-> > +    g_autoptr(RCUReadAuto) _rcu_read_auto = rcu_read_auto_lock()
-> > +
-> >  #ifdef __cplusplus
-> >  }
-> >  #endif
-> > 
-> 
-> Is it possible to make this a scope, like
-> 
-> 	WITH_RCU_READ_LOCK() {
-> 	}
-> 
-> ?  Perhaps something like
-> 
-> #define WITH_RCU_READ_LOCK()  \
-> 	WITH_RCU_READ_LOCK_(_rcu_read_auto##__COUNTER__)
-> 
-> #define WITH_RCU_READ_LOCK_(var) \
-> 	for (g_autoptr(RCUReadAuto) var = rcu_read_auto_lock();
-> 	     (var); rcu_read_auto_unlock(), (var) = NULL)
-> 
-> where the dummy variable doubles as an execute-once guard and the gauto
-> cleanup is still used in case of a "break".  I'm not sure if the above
-> raises a warning because of the variable declaration inside the for
-> loop, though.
 
-Yes, that works - I'm not seeing any warnings.
-
-Do you think it's best to use the block version for all cases
-or to use the non-block version by taste?
-The block version is quite nice, but that turns most of the patches
-into 'indent everything'.
-
-Dave
-
-> Thanks,
-> 
-> Paolo
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+r~
 
