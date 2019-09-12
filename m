@@ -4,61 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 967E7C49ED9
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 07:37:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2C97ECDE20
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 07:41:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A1BB20830
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 07:37:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A1BB20830
+	by mail.kernel.org (Postfix) with ESMTPS id 8B4BA20830
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 07:41:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B4BA20830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8Jfg-00016c-Gk
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 03:37:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53603)
+	id 1i8JjM-00036o-Kp
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 03:41:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54103)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1i8Jev-0000Ww-F4
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 03:36:54 -0400
+ (envelope-from <drjones@redhat.com>) id 1i8JiG-0002Bk-Ah
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 03:40:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1i8Jeu-00020G-8z
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 03:36:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:9067)
+ (envelope-from <drjones@redhat.com>) id 1i8JiF-00038e-7q
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 03:40:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41984)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <drjones@redhat.com>)
- id 1i8Jer-0001ym-Bw; Thu, 12 Sep 2019 03:36:49 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1i8JiC-00036x-Q5; Thu, 12 Sep 2019 03:40:16 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E55DE3084295;
- Thu, 12 Sep 2019 07:36:47 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 99BC8300BE7F;
+ Thu, 12 Sep 2019 07:40:15 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0437419C6A;
- Thu, 12 Sep 2019 07:36:43 +0000 (UTC)
-Date: Thu, 12 Sep 2019 09:36:41 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EF0375D704;
+ Thu, 12 Sep 2019 07:40:11 +0000 (UTC)
+Date: Thu, 12 Sep 2019 09:40:09 +0200
 From: Andrew Jones <drjones@redhat.com>
 To: Eric Auger <eric.auger@redhat.com>
-Message-ID: <20190912073641.p5x4gtt2s5rlrhl6@kamzik.brq.redhat.com>
+Message-ID: <20190912074009.gkqirjdyvitxwnxw@kamzik.brq.redhat.com>
 References: <20190911155125.11932-1-eric.auger@redhat.com>
- <20190911155125.11932-3-eric.auger@redhat.com>
+ <20190911155125.11932-4-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190911155125.11932-3-eric.auger@redhat.com>
+In-Reply-To: <20190911155125.11932-4-eric.auger@redhat.com>
 User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Thu, 12 Sep 2019 07:36:48 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Thu, 12 Sep 2019 07:40:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC v2 2/3] intc/arm_gic: Support IRQ injection
- for more than 256 vpus
+Subject: Re: [Qemu-devel] [RFC v2 3/3] virt: Check
+ KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 for smp_cpus > 256
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,146 +76,107 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 11, 2019 at 05:51:24PM +0200, Eric Auger wrote:
-> Host kernels that expose the KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 capability
-> allow injection of interrupts along with vcpu ids larger than 255.
-> Let's encode the vpcu id on 12 bits according to the upgraded KVM_IRQ_LINE
-> ABI when needed.
+On Wed, Sep 11, 2019 at 05:51:25PM +0200, Eric Auger wrote:
+> Host kernel within [4.18, 5.3] report an erroneous KVM_MAX_VCPUS=512
+> for ARM. The actual capability to instantiate more than 256 vcpus
+> was fixed in 5.4 with the upgrade of the KVM_IRQ_LINE ABI to support
+> vcpu id encoded on 12 bits instead of 8 and a redistributor consuming
+> a single KVM IO device instead of 2.
 > 
-> Given that we have two callsites that need to assemble
-> the value for kvm_set_irq(), a new helper routine, kvm_arm_set_irq
-> is introduced.
-> 
-> Without that patch qemu exits with "kvm_set_irq: Invalid argument"
-> message.
+> So let's check this capability when attempting to use more than 256
+> vcpus.
 > 
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
 > ---
->  hw/intc/arm_gic_kvm.c |  7 ++-----
->  target/arm/cpu.c      | 10 ++++------
->  target/arm/kvm.c      | 16 ++++++++++++++++
->  target/arm/kvm_arm.h  |  1 +
->  4 files changed, 23 insertions(+), 11 deletions(-)
+>  hw/arm/virt.c        |  4 ++++
+>  target/arm/kvm.c     | 21 +++++++++++++++++++++
+>  target/arm/kvm_arm.h | 15 +++++++++++++++
+>  3 files changed, 40 insertions(+)
 > 
-> diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
-> index b56fda144f..9deb15e7e6 100644
-> --- a/hw/intc/arm_gic_kvm.c
-> +++ b/hw/intc/arm_gic_kvm.c
-> @@ -55,7 +55,7 @@ void kvm_arm_gic_set_irq(uint32_t num_irq, int irq, int level)
->       * has separate fields in the irq number for type,
->       * CPU number and interrupt number.
->       */
-> -    int kvm_irq, irqtype, cpu;
-> +    int irqtype, cpu;
->  
->      if (irq < (num_irq - GIC_INTERNAL)) {
->          /* External interrupt. The kernel numbers these like the GIC
-> @@ -72,10 +72,7 @@ void kvm_arm_gic_set_irq(uint32_t num_irq, int irq, int level)
->          cpu = irq / GIC_INTERNAL;
->          irq %= GIC_INTERNAL;
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 0d1629ccb3..465e3140f7 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1575,6 +1575,10 @@ static void machvirt_init(MachineState *machine)
+>          virt_max_cpus = GIC_NCPU;
 >      }
-> -    kvm_irq = (irqtype << KVM_ARM_IRQ_TYPE_SHIFT)
-> -        | (cpu << KVM_ARM_IRQ_VCPU_SHIFT) | irq;
-> -
-> -    kvm_set_irq(kvm_state, kvm_irq, !!level);
-> +    kvm_arm_set_irq(cpu, irqtype, irq, !!level);
->  }
 >  
->  static void kvm_arm_gicv2_set_irq(void *opaque, int irq, int level)
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 2399c14471..13813fb213 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -576,16 +576,16 @@ static void arm_cpu_kvm_set_irq(void *opaque, int irq, int level)
->      ARMCPU *cpu = opaque;
->      CPUARMState *env = &cpu->env;
->      CPUState *cs = CPU(cpu);
-> -    int kvm_irq = KVM_ARM_IRQ_TYPE_CPU << KVM_ARM_IRQ_TYPE_SHIFT;
->      uint32_t linestate_bit;
-> +    int irq_id;
->  
->      switch (irq) {
->      case ARM_CPU_IRQ:
-> -        kvm_irq |= KVM_ARM_IRQ_CPU_IRQ;
-> +        irq_id = KVM_ARM_IRQ_CPU_IRQ;
->          linestate_bit = CPU_INTERRUPT_HARD;
->          break;
->      case ARM_CPU_FIQ:
-> -        kvm_irq |= KVM_ARM_IRQ_CPU_FIQ;
-> +        irq_id = KVM_ARM_IRQ_CPU_FIQ;
->          linestate_bit = CPU_INTERRUPT_FIQ;
->          break;
->      default:
-> @@ -597,9 +597,7 @@ static void arm_cpu_kvm_set_irq(void *opaque, int irq, int level)
->      } else {
->          env->irq_line_state &= ~linestate_bit;
->      }
-> -
-> -    kvm_irq |= cs->cpu_index << KVM_ARM_IRQ_VCPU_SHIFT;
-> -    kvm_set_irq(kvm_state, kvm_irq, level ? 1 : 0);
-> +    kvm_arm_set_irq(cs->cpu_index, KVM_ARM_IRQ_TYPE_CPU, irq_id, !!level);
->  #endif
->  }
->  
+> +    if (kvm_arm_irq_line_layout_mismatch(MACHINE(vms), max_cpus)) {
+> +        exit(1);
+> +    }
+> +
+>      if (max_cpus > virt_max_cpus) {
+>          error_report("Number of SMP CPUs requested (%d) exceeds max CPUs "
+>                       "supported by machine 'mach-virt' (%d)",
 > diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index b2eaa50b8d..6cdfa2204f 100644
+> index 6cdfa2204f..b601e2f35a 100644
 > --- a/target/arm/kvm.c
 > +++ b/target/arm/kvm.c
-> @@ -744,6 +744,22 @@ int kvm_arm_vgic_probe(void)
->      }
+> @@ -171,6 +171,27 @@ bool kvm_arm_pmu_supported(CPUState *cpu)
+>      return kvm_check_extension(s, KVM_CAP_ARM_PMU_V3);
 >  }
 >  
-> +int kvm_arm_set_irq(int cpu, int irqtype, int irq, int level)
+> +bool kvm_arm_irq_line_layout_mismatch(MachineState *ms, int vcpus)
 > +{
-> +    int kvm_irq = 0;
-
-No need to init to zero, and could just immediately init with the
-line below instead.
-
+> +    KVMState *s;
+> +    bool ret;
 > +
-> +    kvm_irq = (irqtype << KVM_ARM_IRQ_TYPE_SHIFT) | irq;
-> +
-> +    if (cpu != 0) {
-
-No need for this 'if'
-
-> +        int cpu_idx2 = cpu / 256;
-> +        int cpu_idx1 = cpu % 256;
-> +
-> +        kvm_irq |= (cpu_idx1 << KVM_ARM_IRQ_VCPU_SHIFT) |
-> +           ((cpu_idx2 & KVM_ARM_IRQ_VCPU2_MASK) << KVM_ARM_IRQ_VCPU2_SHIFT);
-
-Masking should be unnecessary as the only way it'll do anything is if we
-have vcpus >= 4096, which I imagine will never happen or will be guarded
-against happening elsewhere. Silently masking doesn't look right anyway,
-so I'd either add an assert(cpu_idx2 < 16) and drop the masking or just
-drop the masking.
-
+> +    if (!kvm_enabled()) {
+> +        return false;
 > +    }
-> +    return kvm_set_irq(kvm_state, kvm_irq, !!level);
+> +
+> +    s = KVM_STATE(ms->accelerator);
+> +
+> +    ret = vcpus > 256 &&
+> +          !kvm_check_extension(s, KVM_CAP_ARM_IRQ_LINE_LAYOUT_2);
+> +
+> +    if (ret) {
+> +        error_report("Using more than 256 vcpus requires a host kernel "
+> +                     "with KVM_CAP_ARM_IRQ_LINE_LAYOUT_2");
+> +    }
+> +    return ret;
 > +}
 > +
->  int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
->                               uint64_t address, uint32_t data, PCIDevice *dev)
+>  int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
 >  {
+>      KVMState *s = KVM_STATE(ms->accelerator);
 > diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-> index b3106c8600..b4e19457a0 100644
+> index b4e19457a0..d893d950d8 100644
 > --- a/target/arm/kvm_arm.h
 > +++ b/target/arm/kvm_arm.h
-> @@ -253,6 +253,7 @@ int kvm_arm_vgic_probe(void);
+> @@ -233,6 +233,16 @@ bool kvm_arm_pmu_supported(CPUState *cs);
+>   */
+>  int kvm_arm_get_max_vm_ipa_size(MachineState *ms);
 >  
->  void kvm_arm_pmu_set_irq(CPUState *cs, int irq);
->  void kvm_arm_pmu_init(CPUState *cs);
-> +int kvm_arm_set_irq(int cpu, int irqtype, int irq, int level);
+> +/**
+> + * kvm_arm_irq_line_layout_mismatch - Returns whether the number of vcpus
+> + * exceeds the limit imposed by the legacy KVM_IRQ_LINE ARM layout
+> + * (without the vcpu2_index field).
+> + *
+> + * @ms: Machine state handle
+> + * @vcpus: number of vcpus
+> + */
+> +bool kvm_arm_irq_line_layout_mismatch(MachineState *ms, int vcpus);
+> +
+>  /**
+>   * kvm_arm_sync_mpstate_to_kvm
+>   * @cpu: ARMCPU
+> @@ -281,6 +291,11 @@ static inline int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
+>      return -ENOENT;
+>  }
 >  
->  #else
->  
+> +static inline bool kvm_arm_irq_line_layout_mismatch(MachineState *ms, int vcpus)
+> +{
+> +    return false;
+> +}
+> +
+>  static inline int kvm_arm_vgic_probe(void)
+>  {
+>      return 0;
 > -- 
 > 2.20.1
 > 
 >
 
-Thanks,
-drew 
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
