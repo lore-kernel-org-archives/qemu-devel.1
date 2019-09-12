@@ -6,55 +6,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D752C4CEC6
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:16:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B800BC4CEC5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:18:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D80CE20684
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:16:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D80CE20684
+	by mail.kernel.org (Postfix) with ESMTPS id 32DF520684
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:18:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32DF520684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8Ptf-00017Y-OQ
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 10:16:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41682)
+	id 1i8Pv8-0002vX-RH
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 10:18:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40641)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i8PaX-0006Uu-Ba
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:56:46 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i8PUw-0007IL-Me
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:50:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i8PaW-0006NE-9P
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:56:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34690)
+ (envelope-from <dgilbert@redhat.com>) id 1i8PUv-0003GU-KY
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:50:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37186)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i8PaU-0006Lj-2q; Thu, 12 Sep 2019 09:56:42 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i8PUv-0003Fu-Fn
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 09:50:57 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6D60F8E581;
- Thu, 12 Sep 2019 13:56:41 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A29AE600C4;
- Thu, 12 Sep 2019 13:56:40 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Thu, 12 Sep 2019 15:56:29 +0200
-Message-Id: <20190912135632.13925-2-mreitz@redhat.com>
-In-Reply-To: <20190912135632.13925-1-mreitz@redhat.com>
-References: <20190912135632.13925-1-mreitz@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id CB473C056808;
+ Thu, 12 Sep 2019 13:50:56 +0000 (UTC)
+Received: from dgilbert-t580.localhost (unknown [10.36.118.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7984B5D704;
+ Thu, 12 Sep 2019 13:50:55 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, ivanren@tencent.com, peterx@redhat.com,
+ richardw.yang@linux.intel.com, yury-kotov@yandex-team.ru,
+ quintela@redhat.com
+Date: Thu, 12 Sep 2019 14:50:04 +0100
+Message-Id: <20190912135006.14820-11-dgilbert@redhat.com>
+In-Reply-To: <20190912135006.14820-1-dgilbert@redhat.com>
+References: <20190912135006.14820-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Thu, 12 Sep 2019 13:56:41 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Thu, 12 Sep 2019 13:50:56 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/4] mirror: Do not dereference invalid pointers
+Subject: [Qemu-devel] [PULL 10/12] migration/qemu-file: remove check on
+ writev_buffer in qemu_put_compression_data
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,60 +69,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-mirror_exit_common() may be called twice (if it is called from
-mirror_prepare() and fails, it will be called from mirror_abort()
-again).
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-In such a case, many of the pointers in the MirrorBlockJob object will
-already be freed.  This can be seen most reliably for s->target, which
-is set to NULL (and then dereferenced by blk_bs()).
+The check of writev_buffer is in qemu_fflush, which means it is not
+harmful if it is NULL.
 
-Cc: qemu-stable@nongnu.org
-Fixes: 737efc1eda23b904fbe0e66b37715fb0e5c3e58b
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+And removing it will make the code consistent since all other
+add_to_iovec() is called without the check.
+
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20190911132839.23336-2-richard.weiyang@gmail.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- block/mirror.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ migration/qemu-file.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index fe984efb90..706d80fced 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -620,11 +620,11 @@ static int mirror_exit_common(Job *job)
- {
-     MirrorBlockJob *s =3D container_of(job, MirrorBlockJob, common.job);
-     BlockJob *bjob =3D &s->common;
--    MirrorBDSOpaque *bs_opaque =3D s->mirror_top_bs->opaque;
-+    MirrorBDSOpaque *bs_opaque;
-     AioContext *replace_aio_context =3D NULL;
--    BlockDriverState *src =3D s->mirror_top_bs->backing->bs;
--    BlockDriverState *target_bs =3D blk_bs(s->target);
--    BlockDriverState *mirror_top_bs =3D s->mirror_top_bs;
-+    BlockDriverState *src;
-+    BlockDriverState *target_bs;
-+    BlockDriverState *mirror_top_bs;
-     Error *local_err =3D NULL;
-     bool abort =3D job->ret < 0;
-     int ret =3D 0;
-@@ -634,6 +634,11 @@ static int mirror_exit_common(Job *job)
+diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+index 075faf03c3..66627088d4 100644
+--- a/migration/qemu-file.c
++++ b/migration/qemu-file.c
+@@ -760,9 +760,7 @@ ssize_t qemu_put_compression_data(QEMUFile *f, z_stre=
+am *stream,
      }
-     s->prepared =3D true;
 =20
-+    mirror_top_bs =3D s->mirror_top_bs;
-+    bs_opaque =3D mirror_top_bs->opaque;
-+    src =3D mirror_top_bs->backing->bs;
-+    target_bs =3D blk_bs(s->target);
-+
-     if (bdrv_chain_contains(src, target_bs)) {
-         bdrv_unfreeze_backing_chain(mirror_top_bs, target_bs);
-     }
+     qemu_put_be32(f, blen);
+-    if (f->ops->writev_buffer) {
+-        add_to_iovec(f, f->buf + f->buf_index, blen, false);
+-    }
++    add_to_iovec(f, f->buf + f->buf_index, blen, false);
+     f->buf_index +=3D blen;
+     if (f->buf_index =3D=3D IO_BUF_SIZE) {
+         qemu_fflush(f);
 --=20
 2.21.0
 
