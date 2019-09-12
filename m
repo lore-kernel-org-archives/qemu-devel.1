@@ -2,71 +2,122 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8DDFC4CEC5
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 17:02:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA4EC4CEC5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 17:07:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF1F420830
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 17:02:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF1F420830
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 832512081B
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 17:07:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 832512081B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8STr-0001HR-RL
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 13:02:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37050)
+	id 1i8SYh-0003lh-Me
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 13:07:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38471)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i8SSm-0000pB-63
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:00:57 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i8SXa-0003IY-7n
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i8SSk-0003rR-Q3
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:00:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38162)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i8SSk-0003qz-Jp
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:00:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i8SSi-0005ey-F0
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 17:00:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6FD5C2E80CE
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 17:00:52 +0000 (UTC)
+ (envelope-from <laurent@vivier.eu>) id 1i8SXY-0005L5-W6
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:05:54 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:54239)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1i8SXY-0005Kn-Nd
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 13:05:52 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MWAay-1hamQZ3pBS-00Xea2; Thu, 12 Sep 2019 19:05:42 +0200
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20190908061543.25136-1-f4bug@amsat.org>
+ <20190908061543.25136-5-f4bug@amsat.org>
+ <046c1718-f938-b16f-5100-36406281f040@vivier.eu>
+ <CAAdtpL4ykZAinOZWWUc6jU90DvEijEjaGrAJaRJ_3-bx3tn_zA@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Openpgp: preference=signencrypt
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <58e2954e-cb0c-dfc2-7467-746a278e18a3@vivier.eu>
+Date: Thu, 12 Sep 2019 19:05:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Sep 2019 16:52:44 -0000
-From: Paul Clarke <pc@us.ibm.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 7-pc
-X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
-X-Launchpad-Bug-Modifier: Paul Clarke (7-pc)
-Message-Id: <156830716414.515.16944012251535902875.malonedeb@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19044";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 8ebae8d5cd4f2b3a5e5af78698c3af8aeef39c2b
+In-Reply-To: <CAAdtpL4ykZAinOZWWUc6jU90DvEijEjaGrAJaRJ_3-bx3tn_zA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:qUhr7lpRhPWyqNHgxy605VoNJw/wToSy0x3/AhNUuRr76EzzOKM
+ LlbvLe31Voq6NlQYH7nBmdLQ/GdEZ32IIsdJsR8eGUSo4jljJF5FbR2Xl/S9R7Pw8W7s+Gv
+ QFUMVhl1opcXxBzaPrsIr6yqbAdZUfEMLEUgRcDw6BMAmVT3yQNtFe/NbZsnoC8jHADQe/w
+ qDqg1OdZz++Xl9obWpAnA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:FP6OjpEdQ5g=:ARmpMuxJ4e8WR4YkvopBsA
+ QmADBzqvMO70xr+JxZphQE2fuMxK3810qJ9sKQCYbq2cQJit31VmEleODmxy0ar/ul1iHiI7R
+ +Oc7UPqFARsSGmhsla3lYc1WvIOytlzMyKoJ3KuPdbBUOW/8CaFuTPKfWtLg0NoUvcccP18Yg
+ 6mf6pbv0MCcrtJgDEH0dsEw8c6vHin/+snkO1Xh0EKLeF3QbC6jO/t9zRqsB0VapqTRkG8Ivh
+ 5ybz/Bh74JQiDERNwfEO5+PNFI6TAXW/d6UxvIk0B+jx2SodkpXu5nxJWH5zlgGbD2UBFA986
+ kamJLfOlAJI7+N2XJ6xP+u94o+DOFvtOQNdomxqDq6wHKZe6cn2tBpEZIzUJG+4heMKCNPAgC
+ UrBClJS+cbjROxabIXSBF1D3DdbqcXrEudpf2T6s6BlwFT47ZK28EmY63hF5XKzoLoxOfSQrt
+ jppNZKBoh6YTI0+BLpiXbHr1HjVQ/Hof03kr8lopiDQuXgJwMfyXgoIhgBT2U8vYjA7eXkKNu
+ cKe/VuOzbRGV2/VF7E1wNeaRSV/CAGits9ydwiUuJdQ5Q29X1GzH69LlSBkv8Al+3LqNZ8e1b
+ 2iQjaY7YNV7xVaVktkGcRtjXxeEOQ0X0gzYuQlBeers1HM1/3NO9ZSV7XdZb/eV43iW2S1eh+
+ dlWpmQLjOPFAp0GEUMQ5f9AgqRnc/8hFolY3T4KPBTTLJB4DvGwD3dj2Azq+icZpYbqdI/BED
+ 2wkxEXH4gktcQ9liFt7AtP62UejYBTR2YErXMSDAM4ZANi0s+CwG8GZ8oJ+OBXN3mSFQ/vkEF
+ 0jXnrp4GhkNqZR73VtVUPS/o4tOIcSQhQNg/0splKggXHZSy+dEz5OIzzIXHxanz58xPAPZx8
+ sHXudpHbRYC1efsVgAzjA3ARbifMBa7I8pJNgoe+8=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1843795] [NEW] 'mtfsf' instruction can clear FI
- incorrectly
+X-Received-From: 212.227.17.10
+Subject: Re: [Qemu-devel] [PATCH v6 4/8] linux-user/syscall: Introduce
+ target_sockaddr_nl
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,100 +126,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1843795 <1843795@bugs.launchpad.net>
+Cc: =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>,
+ Riku Voipio <riku.voipio@iki.fi>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+Le 11/09/2019 à 21:34, Philippe Mathieu-Daudé a écrit :
+> On Mon, Sep 9, 2019 at 4:23 PM Laurent Vivier <laurent@vivier.eu> wrote:
+>> Le 08/09/2019 à 08:15, Philippe Mathieu-Daudé a écrit :
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> Tested-By: Guido Günther <agx@sigxcpu.org>
+>>> ---
+>>>  linux-user/syscall.c      | 6 ++++--
+>>>  linux-user/syscall_defs.h | 7 +++++++
+>>>  2 files changed, 11 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>>> index 8b41a03901..5128312db5 100644
+>>> --- a/linux-user/syscall.c
+>>> +++ b/linux-user/syscall.c
+>>> @@ -1494,8 +1494,10 @@ static inline abi_long host_to_target_sockaddr(abi_ulong target_addr,
+>>>          sizeof(target_saddr->sa_family)) {
+>>>          target_saddr->sa_family = tswap16(addr->sa_family);
+>>>      }
+>>> -    if (addr->sa_family == AF_NETLINK && len >= sizeof(struct sockaddr_nl)) {
+>>> -        struct sockaddr_nl *target_nl = (struct sockaddr_nl *)target_saddr;
+>>> +    if (addr->sa_family == AF_NETLINK &&
+>>> +        len >= sizeof(struct target_sockaddr_nl)) {
+>>> +        struct target_sockaddr_nl *target_nl =
+>>> +               (struct target_sockaddr_nl *)target_saddr;
+>>>          target_nl->nl_pid = tswap32(target_nl->nl_pid);
+>>>          target_nl->nl_groups = tswap32(target_nl->nl_groups);
+>>>      } else if (addr->sa_family == AF_PACKET) {
+>>> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+>>> index 0662270300..fcedd0d0fb 100644
+>>> --- a/linux-user/syscall_defs.h
+>>> +++ b/linux-user/syscall_defs.h
+>>> @@ -153,6 +153,13 @@ struct target_sockaddr_un {
+>>>      uint8_t sun_path[108];
+>>>  };
+>>>
+>>> +struct target_sockaddr_nl {
+>>> +    uint16_t nl_family;     /* AF_NETLINK */
+>>> +    uint16_t __pad;
+>>> +    uint32_t nl_pid;
+>>> +    uint32_t nl_groups;
+>>> +};
+>>
+>> You should use abi_ushort and abi_uint to keep alignments good (for
+>> instance m68k aligns on 16bit whereas others on 32bit).
+> 
+> Are you sure? The other target_sockaddr don't use that...
+> Is this because netlink is a host-only structure? (while other are
+> serialized over some interface).
 
-Using mtfsf instruction can clear the FPSCR FI bit incorrectly.  This code =
-snippet exhibits the issue:
---
-  fpscr.ll =3D 0x1fffffff;
-  __builtin_mtfsf (0b11111111, fpscr.d);
-  fpscr.d =3D __builtin_mffs ();
---
+I think other target_sockaddr are wrong too. No one takes really care of
+alignment, and most of the time structures are by construction well aligned.
 
-On POWER9 hardware:
-mffs    : FPSCR =3D 0x000000007ffff7ff
+Thanks,
+Laurent
 
-On qemu (git master; "-cpu POWER9"):
---
-$ ./mtfsf
-mffs    : FPSCR =3D 0x000000007ffdffff
---
-
-Two differences:
-bit 52: "reserved", so maybe a "don't care" case
-bit 46: "FI"
-
-$ git log -1 master
-commit 89ea03a7dc83ca36b670ba7f787802791fcb04b1
-Merge: 019217c 2531164
-Author: Peter Maydell <peter.maydell@linaro.org>
-Date:   Mon Sep 9 09:48:34 2019 +0100
-
-I tracked the clear is coming from do_float_check_status, likely the one
-in gen_mtfsf, but then I get lost figuring out what _should_ be
-happening. :-/
-
-Test attached.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "test case - mtfsf clears FI"
-   https://bugs.launchpad.net/bugs/1843795/+attachment/5288363/+files/mtfsf=
-.c
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1843795
-
-Title:
-  'mtfsf' instruction can clear FI incorrectly
-
-Status in QEMU:
-  New
-
-Bug description:
-  Using mtfsf instruction can clear the FPSCR FI bit incorrectly.  This cod=
-e snippet exhibits the issue:
-  --
-    fpscr.ll =3D 0x1fffffff;
-    __builtin_mtfsf (0b11111111, fpscr.d);
-    fpscr.d =3D __builtin_mffs ();
-  --
-
-  On POWER9 hardware:
-  mffs    : FPSCR =3D 0x000000007ffff7ff
-
-  On qemu (git master; "-cpu POWER9"):
-  --
-  $ ./mtfsf
-  mffs    : FPSCR =3D 0x000000007ffdffff
-  --
-
-  Two differences:
-  bit 52: "reserved", so maybe a "don't care" case
-  bit 46: "FI"
-
-  $ git log -1 master
-  commit 89ea03a7dc83ca36b670ba7f787802791fcb04b1
-  Merge: 019217c 2531164
-  Author: Peter Maydell <peter.maydell@linaro.org>
-  Date:   Mon Sep 9 09:48:34 2019 +0100
-
-  I tracked the clear is coming from do_float_check_status, likely the
-  one in gen_mtfsf, but then I get lost figuring out what _should_ be
-  happening. :-/
-
-  Test attached.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1843795/+subscriptions
 
