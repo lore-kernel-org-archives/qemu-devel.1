@@ -1,140 +1,65 @@
-Return-Path: <SRS0=l4AY=XG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D60CC49ED6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 23:34:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA14AC49ED6
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 00:17:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFB462081B
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Sep 2019 23:34:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFB462081B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7FC5A20872
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 00:17:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="NAeOsleV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FC5A20872
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8C7o-0001Zk-RI
-	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 19:34:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51387)
+	id 1i8Cns-0003Uc-BO
+	for qemu-devel@archiver.kernel.org; Wed, 11 Sep 2019 20:17:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58399)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i8C6r-00013c-8A
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 19:33:14 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1i8CmP-000238-5M
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 20:16:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i8C6q-0004HK-5F
- for qemu-devel@nongnu.org; Wed, 11 Sep 2019 19:33:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54628)
+ (envelope-from <dgibson@ozlabs.org>) id 1i8CmN-00069w-Am
+ for qemu-devel@nongnu.org; Wed, 11 Sep 2019 20:16:08 -0400
+Received: from ozlabs.org ([203.11.71.1]:42627)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i8C6l-0004Fs-IQ; Wed, 11 Sep 2019 19:33:07 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 91E1781DE0;
- Wed, 11 Sep 2019 23:33:06 +0000 (UTC)
-Received: from [10.18.17.203] (dhcp-17-203.bos.redhat.com [10.18.17.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8F1FC19C6A;
- Wed, 11 Sep 2019 23:33:05 +0000 (UTC)
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <20190911151626.6823-1-berto@igalia.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <b3bd3fa6-e700-b5d1-0339-8670cd79026e@redhat.com>
-Date: Wed, 11 Sep 2019 19:33:05 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1i8CmM-00069E-6u; Wed, 11 Sep 2019 20:16:07 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46TK760y9tz9sCJ; Thu, 12 Sep 2019 10:16:01 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1568247362;
+ bh=pprueIE2e1wkHfoKZyoDoh/erCEJZn/MfydSlbNgkbM=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=NAeOsleVZpvSooXohy95KIDxtN3lQ37w9jhP9Dz7mwormEDzF/DuytTzJpyDnqofG
+ l+eklxiBs5QNjxpxVJ4EhCtih7n6ejWvDLwWFbmX03tZusTiLKKwKnurcoEi3Pc7ba
+ iullYkrHbfrZSU7lMuxY2125sYvFYOuYckcS8IcU=
+Date: Thu, 12 Sep 2019 10:15:45 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Balamuruhan S <bala24@linux.ibm.com>
+Message-ID: <20190912001545.GG13785@umbus.fritz.box>
+References: <20190911142925.19197-1-bala24@linux.ibm.com>
+ <20190911142925.19197-5-bala24@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20190911151626.6823-1-berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Wed, 11 Sep 2019 23:33:06 +0000 (UTC)
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="L+ofChggJdETEG3Y"
+Content-Disposition: inline
+In-Reply-To: <20190911142925.19197-5-bala24@linux.ibm.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qcow2: Stop overwriting
- compressed clusters one by one
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] hw/ppc/pnv: fix checkpatch.pl
+ coding style warnings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -146,78 +71,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: maddy@linux.vnet.ibm.com, groug@kaod.org, qemu-devel@nongnu.org,
+ anju@linux.vnet.ibm.com, qemu-ppc@nongnu.org, clg@kaod.org,
+ hari@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+--L+ofChggJdETEG3Y
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 9/11/19 11:16 AM, Alberto Garcia wrote:
-> handle_alloc() tries to find as many contiguous clusters that need
-> copy-on-write as possible in order to allocate all of them at the same
-> time.
-> 
-> However, compressed clusters are only overwritten one by one, so let's
-> say that we have an image with 1024 consecutive compressed clusters:
-> 
->    qemu-img create -f qcow2 hd.qcow2 64M
->    for f in `seq 0 64 65472`; do
->       qemu-io -c "write -c ${f}k 64k" hd.qcow2
->    done
-> 
-> In this case trying to overwrite the whole image with one large write
-> request results in 1024 separate allocations:
-> 
->    qemu-io -c "write 0 64M" hd.qcow2
-> 
-> This restriction comes from commit 095a9c58ce12afeeb90c2 from 2018.
+On Wed, Sep 11, 2019 at 07:59:25PM +0530, Balamuruhan S wrote:
+> There were few trailing comments after `/*` instead in
+> new line and line more than 80 character, these fixes are
+> trivial and doesn't change any logic in code.
+>=20
+> Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
 
-You accidentally typed a reasonably modern date. It's from *2008*!
+This makes sense independent of the rest, so I've applied it now.  The
+rest of the patches I'll wait on a respin to address C=E9dric's comments.
 
-> Nowadays QEMU can overwrite multiple compressed clusters just fine,
-> and in fact it already does: as long as the first cluster that
-> handle_alloc() finds is not compressed, all other compressed clusters
-> in the same batch will be overwritten in one go:
-> 
->    qemu-img create -f qcow2 hd.qcow2 64M
->    qemu-io -c "write -z 0 64k" hd.qcow2
->    for f in `seq 64 64 65472`; do
->       qemu-io -c "write -c ${f}k 64k" hd.qcow2
->    done
-> 
-> Compared to the previous one, overwriting this image on my computer
-> goes from 8.35s down to 230ms.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->  block/qcow2-cluster.c | 8 +-------
->  1 file changed, 1 insertion(+), 7 deletions(-)
-> 
-> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-> index f09cc992af..dcacd3c450 100644
-> --- a/block/qcow2-cluster.c
-> +++ b/block/qcow2-cluster.c
-> @@ -1351,13 +1351,7 @@ static int handle_alloc(BlockDriverState *bs, uint64_t guest_offset,
+>  hw/ppc/pnv.c | 49 ++++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 32 insertions(+), 17 deletions(-)
+>=20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index f249e72356..77a86c6a23 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -187,7 +187,8 @@ static void pnv_dt_core(PnvChip *chip, PnvCore *pc, v=
+oid *fdt)
+> =20
+>      _FDT((fdt_setprop_cell(fdt, offset, "timebase-frequency", tbfreq)));
+>      _FDT((fdt_setprop_cell(fdt, offset, "clock-frequency", cpufreq)));
+> -    _FDT((fdt_setprop_cell(fdt, offset, "ibm,slb-size", cpu->hash64_opts=
+->slb_size)));
+> +    _FDT((fdt_setprop_cell(fdt, offset, "ibm,slb-size",
+> +                           cpu->hash64_opts->slb_size)));
+>      _FDT((fdt_setprop_string(fdt, offset, "status", "okay")));
+>      _FDT((fdt_setprop(fdt, offset, "64-bit", NULL, 0)));
+> =20
+> @@ -200,19 +201,23 @@ static void pnv_dt_core(PnvChip *chip, PnvCore *pc,=
+ void *fdt)
+>                             segs, sizeof(segs))));
 >      }
->  
->      entry = be64_to_cpu(l2_slice[l2_index]);
-> -
-> -    /* For the moment, overwrite compressed clusters one by one */
-> -    if (entry & QCOW_OFLAG_COMPRESSED) {
-> -        nb_clusters = 1;
-> -    } else {
-> -        nb_clusters = count_cow_clusters(bs, nb_clusters, l2_slice, l2_index);
-> -    }
-> +    nb_clusters = count_cow_clusters(bs, nb_clusters, l2_slice, l2_index);
->  
->      /* This function is only called when there were no non-COW clusters, so if
->       * we can't find any unallocated or COW clusters either, something is
-> 
+> =20
+> -    /* Advertise VMX/VSX (vector extensions) if available
+> +    /*
+> +     * Advertise VMX/VSX (vector extensions) if available
+>       *   0 / no property =3D=3D no vector extensions
+>       *   1               =3D=3D VMX / Altivec available
+> -     *   2               =3D=3D VSX available */
+> +     *   2               =3D=3D VSX available
+> +     */
+>      if (env->insns_flags & PPC_ALTIVEC) {
+>          uint32_t vmx =3D (env->insns_flags2 & PPC2_VSX) ? 2 : 1;
+> =20
+>          _FDT((fdt_setprop_cell(fdt, offset, "ibm,vmx", vmx)));
+>      }
+> =20
+> -    /* Advertise DFP (Decimal Floating Point) if available
+> +    /*
+> +     * Advertise DFP (Decimal Floating Point) if available
+>       *   0 / no property =3D=3D no DFP
+> -     *   1               =3D=3D DFP available */
+> +     *   1               =3D=3D DFP available
+> +     */
+>      if (env->insns_flags2 & PPC2_DFP) {
+>          _FDT((fdt_setprop_cell(fdt, offset, "ibm,dfp", 1)));
+>      }
+> @@ -424,7 +429,8 @@ static int pnv_dt_isa_device(DeviceState *dev, void *=
+opaque)
+>      return 0;
+>  }
+> =20
+> -/* The default LPC bus of a multichip system is on chip 0. It's
+> +/*
+> + * The default LPC bus of a multichip system is on chip 0. It's
+>   * recognized by the firmware (skiboot) using a "primary" property.
+>   */
+>  static void pnv_dt_isa(PnvMachineState *pnv, void *fdt)
+> @@ -442,8 +448,10 @@ static void pnv_dt_isa(PnvMachineState *pnv, void *f=
+dt)
+>      assert(phandle > 0);
+>      _FDT((fdt_setprop_cell(fdt, isa_offset, "phandle", phandle)));
+> =20
+> -    /* ISA devices are not necessarily parented to the ISA bus so we
+> -     * can not use object_child_foreach() */
+> +    /*
+> +     * ISA devices are not necessarily parented to the ISA bus so we
+> +     * can not use object_child_foreach()
+> +     */
+>      qbus_walk_children(BUS(pnv->isa_bus), pnv_dt_isa_device, NULL, NULL,=
+ NULL,
+>                         &args);
+>  }
+> @@ -545,7 +553,8 @@ static void pnv_reset(MachineState *machine)
+> =20
+>      qemu_devices_reset();
+> =20
+> -    /* OpenPOWER systems have a BMC, which can be defined on the
+> +    /*
+> +     * OpenPOWER systems have a BMC, which can be defined on the
+>       * command line with:
+>       *
+>       *   -device ipmi-bmc-sim,id=3Dbmc0
+> @@ -705,7 +714,8 @@ static void pnv_init(MachineState *machine)
+> =20
+>          pnv->chips[i] =3D PNV_CHIP(chip);
+> =20
+> -        /* TODO: put all the memory in one node on chip 0 until we find a
+> +        /*
+> +         * TODO: put all the memory in one node on chip 0 until we find a
+>           * way to specify different ranges for each chip
+>           */
+>          if (i =3D=3D 0) {
+> @@ -732,8 +742,10 @@ static void pnv_init(MachineState *machine)
+>      /* Create an RTC ISA device too */
+>      mc146818_rtc_init(pnv->isa_bus, 2000, NULL);
+> =20
+> -    /* OpenPOWER systems use a IPMI SEL Event message to notify the
+> -     * host to powerdown */
+> +    /*
+> +     * OpenPOWER systems use a IPMI SEL Event message to notify the
+> +     * host to powerdown
+> +     */
+>      pnv->powerdown_notifier.notify =3D pnv_powerdown_notify;
+>      qemu_register_powerdown_notifier(&pnv->powerdown_notifier);
+>  }
+> @@ -803,7 +815,8 @@ static void pnv_chip_power9_intc_create(PnvChip *chip=
+, PowerPCCPU *cpu,
+>      pnv_cpu->intc =3D obj;
+>  }
+> =20
+> -/* Allowed core identifiers on a POWER8 Processor Chip :
+> +/*
+> + * Allowed core identifiers on a POWER8 Processor Chip :
+>   *
+>   * <EX0 reserved>
+>   *  EX1  - Venice only
+> @@ -928,8 +941,10 @@ static void pnv_chip_power8_realize(DeviceState *dev=
+, Error **errp)
+>                                              (uint64_t) PNV_XSCOM_BASE(ch=
+ip),
+>                                              PNV_XSCOM_LPC_BASE);
+> =20
+> -    /* Interrupt Management Area. This is the memory region holding
+> -     * all the Interrupt Control Presenter (ICP) registers */
+> +    /*
+> +     * Interrupt Management Area. This is the memory region holding
+> +     * all the Interrupt Control Presenter (ICP) registers
+> +     */
+>      pnv_chip_icp_realize(chip8, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+> @@ -1442,8 +1457,8 @@ static void pnv_machine_class_init(ObjectClass *oc,=
+ void *data)
+>      mc->init =3D pnv_init;
+>      mc->reset =3D pnv_reset;
+>      mc->max_cpus =3D MAX_CPUS;
+> -    mc->block_default_type =3D IF_IDE; /* Pnv provides a AHCI device for
+> -                                      * storage */
+> +    /* Pnv provides a AHCI device for storage */
+> +    mc->block_default_type =3D IF_IDE;
+>      mc->no_parallel =3D 1;
+>      mc->default_boot_order =3D NULL;
+>      /*
 
-Well, given that count_cow_clusters already works this way, this doesn't
-break anything that wasn't broken before, at least.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+--L+ofChggJdETEG3Y
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl15jjAACgkQbDjKyiDZ
+s5LoRRAA50cJCUNaDLeWPrcH2tIxKuCwquWnIsIB822ysWnAEiEx1IbF1Zex/Blg
+PXfviaNhSkwJ1wNaRLF8GMEjNxu4rXS/dzgO6sTriqZfOnBqUIe+8N9tZVTKImsn
+RXhOukOmg2lNaQXkU9INXVg6x81BiSt9dMwVHF3K+ibhBkwoQC0+7DS0iwYDSEOP
+m5MYifxEq8mXSKXLL8qawRhE8MLOg/8jywOoFURRQxrLbBzZGH2/h5oOfLzAFILA
+JHkd+sSMErOYYNQcL3knsODvS6iXRc8H7I+x3r4T/VqrQ8uBvUREhNDUzQ2UGTtR
+yW6IkfDTJBTmcaMCKOeRWVGJYucBvSe4+WRyPyEkfbHRdf9BB0a42S235MoFY7CC
+jVUF4wctmdwf10rl578+t1X+IkiFOO0sqbpVryKI3sJPFhxDI+MfmAJdHuG59eaK
+j25PHVbgM9o7t6Z3Cwu/itcHENDxcCI+Rp8zNFZN2FoqxTCWuNpIh8WMLQyK1jJ8
+UiTPA0VunERL5It2uWQz8XVXpPKMqUVFzWYywasY7813gx7qW8IiGBS+GAq85CZ7
+VUt+SF9LxOgc2oY9mChqR0afa4Be19D/X+xw8oTTImfUj5N6oQ1e5Vq3+LWnFsvZ
+brv+EkE3VOqDACIWfgHC1wAkjeMy3LG5BZl0lnb1HoruVkDL0Lc=
+=pfF3
+-----END PGP SIGNATURE-----
+
+--L+ofChggJdETEG3Y--
 
