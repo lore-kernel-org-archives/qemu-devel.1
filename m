@@ -6,60 +6,58 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02CB9C5ACAE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:53:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D7FC49ED9
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:55:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB4EB206A5
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:53:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB4EB206A5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6B9B8206A5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:55:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B9B8206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8LnC-0006z6-TL
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 05:53:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48900)
+	id 1i8Lp4-0000y7-59
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 05:55:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49287)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1i8Lm8-0005su-Hv
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:52:31 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i8Lnf-0007tK-Qz
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:54:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1i8Lm1-0003d5-HC
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:52:24 -0400
-Received: from 8.mo3.mail-out.ovh.net ([87.98.172.249]:38809)
+ (envelope-from <dgilbert@redhat.com>) id 1i8Lne-0004dS-P3
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:54:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37356)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i8Llw-0003Zg-Mo
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:52:18 -0400
-Received: from player730.ha.ovh.net (unknown [10.108.57.183])
- by mo3.mail-out.ovh.net (Postfix) with ESMTP id B3CA922758D
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 11:52:08 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
- (Authenticated sender: clg@kaod.org)
- by player730.ha.ovh.net (Postfix) with ESMTPSA id 07C5099A8935;
- Thu, 12 Sep 2019 09:51:56 +0000 (UTC)
-To: Balamuruhan S <bala24@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20190912093056.4516-1-bala24@linux.ibm.com>
- <20190912093056.4516-4-bala24@linux.ibm.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <bd8141e4-bfc8-5dc2-608e-945a8f6ca405@kaod.org>
-Date: Thu, 12 Sep 2019 11:51:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i8Lne-0004cl-GS
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:54:02 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3691310CC1E0;
+ Thu, 12 Sep 2019 09:54:01 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 54BBD10AFDEA;
+ Thu, 12 Sep 2019 09:54:00 +0000 (UTC)
+Date: Thu, 12 Sep 2019 10:53:57 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Ivan Ren <renyime@gmail.com>
+Message-ID: <20190912095357.GA7230@work-vm>
+References: <1567044996-2362-1-git-send-email-ivanren@tencent.com>
 MIME-Version: 1.0
-In-Reply-To: <20190912093056.4516-4-bala24@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 1533475676693171026
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrtdehgddvtdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1567044996-2362-1-git-send-email-ivanren@tencent.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Thu, 12 Sep 2019 09:54:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 87.98.172.249
-Subject: Re: [Qemu-devel] [PATCH v3 3/4] hw/ppc/pnv_homer: add PowerNV homer
- device model
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] migration: multifd_send_thread always post
+ p->sem_sync when error happen
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,494 +69,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: maddy@linux.vnet.ibm.com, groug@kaod.org, anju@linux.vnet.ibm.com,
- qemu-ppc@nongnu.org, hari@linux.vnet.ibm.com, david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/09/2019 11:30, Balamuruhan S wrote:
-> add PnvHomer device model to emulate homer memory access
-> for pstate table, occ-sensors, slw, occ static and dynamic
-> values for Power8 and Power9 chips.
->=20
-> Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
+Queued
 
-
-
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-Thanks,
-
-C.
-
+* Ivan Ren (renyime@gmail.com) wrote:
+> From: Ivan Ren <ivanren@tencent.com>
+> 
+> When encounter error, multifd_send_thread should always notify who pay
+> attention to it before exit. Otherwise it may block migration_thread
+> at multifd_send_sync_main forever.
+> 
+> Error as follow:
+> -------------------------------------------------------------------------------
+>  (gdb) bt
+>  #0  0x00007f4d669dfa0b in do_futex_wait.constprop.1 () from /lib64/libpthread.so.0
+>  #1  0x00007f4d669dfa9f in __new_sem_wait_slow.constprop.0 () from /lib64/libpthread.so.0
+>  #2  0x00007f4d669dfb3b in sem_wait@@GLIBC_2.2.5 () from /lib64/libpthread.so.0
+>  #3  0x0000562ccf0a5614 in qemu_sem_wait (sem=sem@entry=0x562cd1b698e8) at util/qemu-thread-posix.c:319
+>  #4  0x0000562ccecb4752 in multifd_send_sync_main (rs=<optimized out>) at /qemu/migration/ram.c:1099
+>  #5  0x0000562ccecb95f4 in ram_save_iterate (f=0x562cd0ecc000, opaque=<optimized out>) at /qemu/migration/ram.c:3550
+>  #6  0x0000562ccef43c23 in qemu_savevm_state_iterate (f=0x562cd0ecc000, postcopy=false) at migration/savevm.c:1189
+>  #7  0x0000562ccef3dcf3 in migration_iteration_run (s=0x562cd09fabf0) at migration/migration.c:3131
+>  #8  migration_thread (opaque=opaque@entry=0x562cd09fabf0) at migration/migration.c:3258
+>  #9  0x0000562ccf0a4c26 in qemu_thread_start (args=<optimized out>) at util/qemu-thread-posix.c:502
+>  #10 0x00007f4d669d9e25 in start_thread () from /lib64/libpthread.so.0
+>  #11 0x00007f4d6670635d in clone () from /lib64/libc.so.6
+>  (gdb) f 4
+>  #4  0x0000562ccecb4752 in multifd_send_sync_main (rs=<optimized out>) at /qemu/migration/ram.c:1099
+>  1099	        qemu_sem_wait(&p->sem_sync);
+>  (gdb) list
+>  1094	    }
+>  1095	    for (i = 0; i < migrate_multifd_channels(); i++) {
+>  1096	        MultiFDSendParams *p = &multifd_send_state->params[i];
+>  1097
+>  1098	        trace_multifd_send_sync_main_wait(p->id);
+>  1099	        qemu_sem_wait(&p->sem_sync);
+>  1100	    }
+>  1101	    trace_multifd_send_sync_main(multifd_send_state->packet_num);
+>  1102	}
+>  1103
+>  (gdb) p i
+>  $1 = 0
+>  (gdb)  p multifd_send_state->params[0].pending_job
+>  $2 = 2    //It means the job before MULTIFD_FLAG_SYNC has already fail
+>  (gdb)  p multifd_send_state->params[0].quit
+>  $3 = true
+> 
+> Signed-off-by: Ivan Ren <ivanren@tencent.com>
 > ---
->  hw/ppc/Makefile.objs       |   1 +
->  hw/ppc/pnv.c               |  30 +++++
->  hw/ppc/pnv_homer.c         | 272 +++++++++++++++++++++++++++++++++++++=
-++++++++
->  include/hw/ppc/pnv.h       |   3 +
->  include/hw/ppc/pnv_homer.h |  53 +++++++++
->  5 files changed, 359 insertions(+)
->  create mode 100644 hw/ppc/pnv_homer.c
->  create mode 100644 include/hw/ppc/pnv_homer.h
->=20
-> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-> index 2c4e1c8de0..580bb4f0dd 100644
-> --- a/hw/ppc/Makefile.objs
-> +++ b/hw/ppc/Makefile.objs
-> @@ -9,6 +9,7 @@ obj-$(CONFIG_PSERIES) +=3D spapr_tpm_proxy.o
->  obj-$(CONFIG_SPAPR_RNG) +=3D  spapr_rng.o
->  # IBM PowerNV
->  obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_=
-psi.o pnv_occ.o pnv_bmc.o
-> +obj-$(CONFIG_POWERNV) +=3D pnv_homer.o
->  ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
->  obj-y +=3D spapr_pci_vfio.o spapr_pci_nvlink2.o
->  endif
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 80338ffe87..f249e72356 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -847,6 +847,11 @@ static void pnv_chip_power8_instance_init(Object *=
-obj)
->                              TYPE_PNV8_OCC, &error_abort, NULL);
->      object_property_add_const_link(OBJECT(&chip8->occ), "psi",
->                                     OBJECT(&chip8->psi), &error_abort);
-> +
-> +    object_initialize_child(obj, "homer",  &chip8->homer, sizeof(chip8=
-->homer),
-> +                            TYPE_PNV8_HOMER, &error_abort, NULL);
-> +    object_property_add_const_link(OBJECT(&chip8->homer), "chip", obj,
-> +                                   &error_abort);
->  }
-> =20
->  static void pnv_chip_icp_realize(Pnv8Chip *chip8, Error **errp)
-> @@ -942,6 +947,16 @@ static void pnv_chip_power8_realize(DeviceState *d=
-ev, Error **errp)
->      /* OCC SRAM model */
->      memory_region_add_subregion(get_system_memory(), PNV_OCC_COMMON_AR=
-EA(chip),
->                                  &chip8->occ.sram_regs);
-> +
-> +    /* HOMER */
-> +    object_property_set_bool(OBJECT(&chip8->homer), true, "realized",
-> +                             &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +    memory_region_add_subregion(get_system_memory(), PNV_HOMER_BASE(ch=
-ip),
-> +                                &chip8->homer.regs);
->  }
-> =20
->  static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data=
-)
-> @@ -1024,6 +1039,11 @@ static void pnv_chip_power9_instance_init(Object=
- *obj)
->                              TYPE_PNV9_OCC, &error_abort, NULL);
->      object_property_add_const_link(OBJECT(&chip9->occ), "psi",
->                                     OBJECT(&chip9->psi), &error_abort);
-> +
-> +    object_initialize_child(obj, "homer",  &chip9->homer, sizeof(chip9=
-->homer),
-> +                            TYPE_PNV9_HOMER, &error_abort, NULL);
-> +    object_property_add_const_link(OBJECT(&chip9->homer), "chip", obj,
-> +                                   &error_abort);
->  }
-> =20
->  static void pnv_chip_quad_realize(Pnv9Chip *chip9, Error **errp)
-> @@ -1134,6 +1154,16 @@ static void pnv_chip_power9_realize(DeviceState =
-*dev, Error **errp)
->      /* OCC SRAM model */
->      memory_region_add_subregion(get_system_memory(), PNV9_OCC_COMMON_A=
-REA(chip),
->                                  &chip9->occ.sram_regs);
-> +
-> +    /* HOMER */
-> +    object_property_set_bool(OBJECT(&chip9->homer), true, "realized",
-> +                             &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +    memory_region_add_subregion(get_system_memory(), PNV9_HOMER_BASE(c=
-hip),
-> +                                &chip9->homer.regs);
->  }
-> =20
->  static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
-> diff --git a/hw/ppc/pnv_homer.c b/hw/ppc/pnv_homer.c
-> new file mode 100644
-> index 0000000000..cc881a3b32
-> --- /dev/null
-> +++ b/hw/ppc/pnv_homer.c
-> @@ -0,0 +1,272 @@
-> +/*
-> + * QEMU PowerPC PowerNV Emulation of a few HOMER related registers
-> + *
-> + * Copyright (c) 2019, IBM Corporation.
-> + *
-> + * This program is free software; you can redistribute it and/or modif=
-y
-> + * it under the terms of the GNU General Public License, version 2, as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>=
-.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "exec/hwaddr.h"
-> +#include "exec/memory.h"
-> +#include "sysemu/cpus.h"
-> +#include "hw/qdev-core.h"
-> +#include "hw/ppc/pnv.h"
-> +#include "hw/ppc/pnv_homer.h"
-> +
-> +
-> +static bool core_max_array(PnvHomer *homer, hwaddr addr)
-> +{
-> +    int i;
-> +    PnvHomerClass *hmrc =3D PNV_HOMER_GET_CLASS(homer);
-> +
-> +    for (i =3D 0; i <=3D homer->chip->nr_cores; i++) {
-> +        if (addr =3D=3D (hmrc->core_max_base + i)) {
-> +            return true;
-> +       }
-> +    }
-> +    return false;
-> +}
-> +
-> +/* P8 Pstate table */
-> +
-> +#define PNV8_OCC_PSTATE_VERSION          0x1f8001
-> +#define PNV8_OCC_PSTATE_MIN              0x1f8003
-> +#define PNV8_OCC_PSTATE_VALID            0x1f8000
-> +#define PNV8_OCC_PSTATE_THROTTLE         0x1f8002
-> +#define PNV8_OCC_PSTATE_NOM              0x1f8004
-> +#define PNV8_OCC_PSTATE_TURBO            0x1f8005
-> +#define PNV8_OCC_PSTATE_ULTRA_TURBO      0x1f8006
-> +#define PNV8_OCC_PSTATE_DATA             0x1f8008
-> +#define PNV8_OCC_PSTATE_ID_ZERO          0x1f8010
-> +#define PNV8_OCC_PSTATE_ID_ONE           0x1f8018
-> +#define PNV8_OCC_PSTATE_ID_TWO           0x1f8020
-> +#define PNV8_OCC_VDD_VOLTAGE_IDENTIFIER  0x1f8012
-> +#define PNV8_OCC_VCS_VOLTAGE_IDENTIFIER  0x1f8013
-> +#define PNV8_OCC_PSTATE_ZERO_FREQUENCY   0x1f8014
-> +#define PNV8_OCC_PSTATE_ONE_FREQUENCY    0x1f801c
-> +#define PNV8_OCC_PSTATE_TWO_FREQUENCY    0x1f8024
-> +#define PNV8_CORE_MAX_BASE               0x1f8810
-> +
-> +
-> +static uint64_t pnv_power8_homer_read(void *opaque, hwaddr addr,
-> +                                      unsigned size)
-> +{
-> +    PnvHomer *homer =3D PNV_HOMER(opaque);
-> +
-> +    switch (addr) {
-> +    case PNV8_OCC_PSTATE_VERSION:
-> +    case PNV8_OCC_PSTATE_MIN:
-> +    case PNV8_OCC_PSTATE_ID_ZERO:
-> +        return 0;
-> +    case PNV8_OCC_PSTATE_VALID:
-> +    case PNV8_OCC_PSTATE_THROTTLE:
-> +    case PNV8_OCC_PSTATE_NOM:
-> +    case PNV8_OCC_PSTATE_TURBO:
-> +    case PNV8_OCC_PSTATE_ID_ONE:
-> +    case PNV8_OCC_VDD_VOLTAGE_IDENTIFIER:
-> +    case PNV8_OCC_VCS_VOLTAGE_IDENTIFIER:
-> +        return 1;
-> +    case PNV8_OCC_PSTATE_ULTRA_TURBO:
-> +    case PNV8_OCC_PSTATE_ID_TWO:
-> +        return 2;
-> +    case PNV8_OCC_PSTATE_DATA:
-> +        return 0x1000000000000000;
-> +    /* P8 frequency for 0, 1, and 2 pstates */
-> +    case PNV8_OCC_PSTATE_ZERO_FREQUENCY:
-> +    case PNV8_OCC_PSTATE_ONE_FREQUENCY:
-> +    case PNV8_OCC_PSTATE_TWO_FREQUENCY:
-> +        return 3000;
-> +    }
-> +    /* pstate table core max array */
-> +    if (core_max_array(homer, addr)) {
-> +        return 1;
-> +    }
-> +    return 0;
-> +}
-> +
-> +static void pnv_power8_homer_write(void *opaque, hwaddr addr,
-> +                                   uint64_t val, unsigned size)
-> +{
-> +    /* callback function defined to homer write */
-> +    return;
-> +}
-> +
-> +static const MemoryRegionOps pnv_power8_homer_ops =3D {
-> +    .read =3D pnv_power8_homer_read,
-> +    .write =3D pnv_power8_homer_write,
-> +    .valid.min_access_size =3D 1,
-> +    .valid.max_access_size =3D 8,
-> +    .impl.min_access_size =3D 1,
-> +    .impl.max_access_size =3D 8,
-> +    .endianness =3D DEVICE_BIG_ENDIAN,
-> +};
-> +
-> +static void pnv_homer_power8_class_init(ObjectClass *klass, void *data=
-)
-> +{
-> +    PnvHomerClass *homer =3D PNV_HOMER_CLASS(klass);
-> +
-> +    homer->homer_size =3D PNV_HOMER_SIZE;
-> +    homer->homer_ops =3D &pnv_power8_homer_ops;
-> +    homer->core_max_base =3D PNV8_CORE_MAX_BASE;
-> +}
-> +
-> +static const TypeInfo pnv_homer_power8_type_info =3D {
-> +    .name          =3D TYPE_PNV8_HOMER,
-> +    .parent        =3D TYPE_PNV_HOMER,
-> +    .instance_size =3D sizeof(PnvHomer),
-> +    .class_init    =3D pnv_homer_power8_class_init,
-> +};
-> +
-> +/* P9 Pstate table */
-> +
-> +#define PNV9_OCC_PSTATE_ID_ZERO          0xe2018
-> +#define PNV9_OCC_PSTATE_ID_ONE           0xe2020
-> +#define PNV9_OCC_PSTATE_ID_TWO           0xe2028
-> +#define PNV9_OCC_PSTATE_DATA             0xe2000
-> +#define PNV9_OCC_PSTATE_DATA_AREA        0xe2008
-> +#define PNV9_OCC_PSTATE_MIN              0xe2003
-> +#define PNV9_OCC_PSTATE_NOM              0xe2004
-> +#define PNV9_OCC_PSTATE_TURBO            0xe2005
-> +#define PNV9_OCC_PSTATE_ULTRA_TURBO      0xe2818
-> +#define PNV9_OCC_MAX_PSTATE_ULTRA_TURBO  0xe2006
-> +#define PNV9_OCC_PSTATE_MAJOR_VERSION    0xe2001
-> +#define PNV9_OCC_OPAL_RUNTIME_DATA       0xe2b85
-> +#define PNV9_CHIP_HOMER_IMAGE_POINTER    0x200008
-> +#define PNV9_CHIP_HOMER_BASE             0x0
-> +#define PNV9_OCC_PSTATE_ZERO_FREQUENCY   0xe201c
-> +#define PNV9_OCC_PSTATE_ONE_FREQUENCY    0xe2024
-> +#define PNV9_OCC_PSTATE_TWO_FREQUENCY    0xe202c
-> +#define PNV9_OCC_ROLE_MASTER_OR_SLAVE    0xe2002
-> +#define PNV9_CORE_MAX_BASE               0xe2819
-> +
-> +
-> +static uint64_t pnv_power9_homer_read(void *opaque, hwaddr addr,
-> +                                      unsigned size)
-> +{
-> +    PnvHomer *homer =3D PNV_HOMER(opaque);
-> +
-> +    switch (addr) {
-> +    case PNV9_OCC_MAX_PSTATE_ULTRA_TURBO:
-> +    case PNV9_OCC_PSTATE_ID_ZERO:
-> +        return 0;
-> +    case PNV9_OCC_PSTATE_DATA:
-> +    case PNV9_OCC_ROLE_MASTER_OR_SLAVE:
-> +    case PNV9_OCC_PSTATE_NOM:
-> +    case PNV9_OCC_PSTATE_TURBO:
-> +    case PNV9_OCC_PSTATE_ID_ONE:
-> +    case PNV9_OCC_PSTATE_ULTRA_TURBO:
-> +    case PNV9_OCC_OPAL_RUNTIME_DATA:
-> +        return 1;
-> +    case PNV9_OCC_PSTATE_MIN:
-> +    case PNV9_OCC_PSTATE_ID_TWO:
-> +        return 2;
-> +
-> +    /* 3000 khz frequency for 0, 1, and 2 pstates */
-> +    case PNV9_OCC_PSTATE_ZERO_FREQUENCY:
-> +    case PNV9_OCC_PSTATE_ONE_FREQUENCY:
-> +    case PNV9_OCC_PSTATE_TWO_FREQUENCY:
-> +        return 3000;
-> +    case PNV9_OCC_PSTATE_MAJOR_VERSION:
-> +        return 0x90;
-> +    case PNV9_CHIP_HOMER_BASE:
-> +    case PNV9_OCC_PSTATE_DATA_AREA:
-> +    case PNV9_CHIP_HOMER_IMAGE_POINTER:
-> +        return 0x1000000000000000;
-> +    }
-> +    /* pstate table core max array */
-> +    if (core_max_array(homer, addr)) {
-> +        return 1;
-> +    }
-> +    return 0;
-> +}
-> +
-> +static void pnv_power9_homer_write(void *opaque, hwaddr addr,
-> +                                   uint64_t val, unsigned size)
-> +{
-> +    /* callback function defined to homer write */
-> +    return;
-> +}
-> +
-> +static const MemoryRegionOps pnv_power9_homer_ops =3D {
-> +    .read =3D pnv_power9_homer_read,
-> +    .write =3D pnv_power9_homer_write,
-> +    .valid.min_access_size =3D 1,
-> +    .valid.max_access_size =3D 8,
-> +    .impl.min_access_size =3D 1,
-> +    .impl.max_access_size =3D 8,
-> +    .endianness =3D DEVICE_BIG_ENDIAN,
-> +};
-> +
-> +static void pnv_homer_power9_class_init(ObjectClass *klass, void *data=
-)
-> +{
-> +    PnvHomerClass *homer =3D PNV_HOMER_CLASS(klass);
-> +
-> +    homer->homer_size =3D PNV9_HOMER_SIZE;
-> +    homer->homer_ops =3D &pnv_power9_homer_ops;
-> +    homer->core_max_base =3D PNV9_CORE_MAX_BASE;
-> +}
-> +
-> +static const TypeInfo pnv_homer_power9_type_info =3D {
-> +    .name          =3D TYPE_PNV9_HOMER,
-> +    .parent        =3D TYPE_PNV_HOMER,
-> +    .instance_size =3D sizeof(PnvHomer),
-> +    .class_init    =3D pnv_homer_power9_class_init,
-> +};
-> +
-> +static void pnv_homer_realize(DeviceState *dev, Error **errp)
-> +{
-> +    PnvHomer *homer =3D PNV_HOMER(dev);
-> +    PnvHomerClass *hmrc =3D PNV_HOMER_GET_CLASS(homer);
-> +    Object *obj;
-> +    Error *local_err =3D NULL;
-> +
-> +    obj =3D object_property_get_link(OBJECT(dev), "chip", &local_err);
-> +    if (!obj) {
-> +        error_propagate(errp, local_err);
-> +        error_prepend(errp, "required link 'chip' not found: ");
-> +        return;
-> +    }
-> +    homer->chip =3D PNV_CHIP(obj);
-> +    /* homer region */
-> +    memory_region_init_io(&homer->regs, OBJECT(dev),
-> +                          hmrc->homer_ops, homer, "homer-main-memory",
-> +                          hmrc->homer_size);
-> +}
-> +
-> +static void pnv_homer_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +
-> +    dc->realize =3D pnv_homer_realize;
-> +    dc->desc =3D "PowerNV HOMER Memory";
-> +}
-> +
-> +static const TypeInfo pnv_homer_type_info =3D {
-> +    .name          =3D TYPE_PNV_HOMER,
-> +    .parent        =3D TYPE_DEVICE,
-> +    .instance_size =3D sizeof(PnvHomer),
-> +    .class_init    =3D pnv_homer_class_init,
-> +    .class_size    =3D sizeof(PnvHomerClass),
-> +    .abstract      =3D true,
-> +};
-> +
-> +static void pnv_homer_register_types(void)
-> +{
-> +    type_register_static(&pnv_homer_type_info);
-> +    type_register_static(&pnv_homer_power8_type_info);
-> +    type_register_static(&pnv_homer_power9_type_info);
-> +}
-> +
-> +type_init(pnv_homer_register_types);
-> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index 63a4b7b6a7..1cdbe55bf8 100644
-> --- a/include/hw/ppc/pnv.h
-> +++ b/include/hw/ppc/pnv.h
-> @@ -26,6 +26,7 @@
->  #include "hw/ppc/pnv_lpc.h"
->  #include "hw/ppc/pnv_psi.h"
->  #include "hw/ppc/pnv_occ.h"
-> +#include "hw/ppc/pnv_homer.h"
->  #include "hw/ppc/pnv_xive.h"
->  #include "hw/ppc/pnv_core.h"
-> =20
-> @@ -76,6 +77,7 @@ typedef struct Pnv8Chip {
->      PnvLpcController lpc;
->      Pnv8Psi      psi;
->      PnvOCC       occ;
-> +    PnvHomer     homer;
->  } Pnv8Chip;
-> =20
->  #define TYPE_PNV9_CHIP "pnv9-chip"
-> @@ -90,6 +92,7 @@ typedef struct Pnv9Chip {
->      Pnv9Psi      psi;
->      PnvLpcController lpc;
->      PnvOCC       occ;
-> +    PnvHomer     homer;
-> =20
->      uint32_t     nr_quads;
->      PnvQuad      *quads;
-> diff --git a/include/hw/ppc/pnv_homer.h b/include/hw/ppc/pnv_homer.h
-> new file mode 100644
-> index 0000000000..abaec43c2d
-> --- /dev/null
-> +++ b/include/hw/ppc/pnv_homer.h
-> @@ -0,0 +1,53 @@
-> +/*
-> + * QEMU PowerPC PowerNV Emulation of a few HOMER related registers
-> + *
-> + * Copyright (c) 2019, IBM Corporation.
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/li=
-censes/>.
-> + */
-> +
-> +#ifndef PPC_PNV_HOMER_H
-> +#define PPC_PNV_HOMER_H
-> +
-> +#include "hw/ppc/pnv.h"
-> +
-> +#define TYPE_PNV_HOMER "pnv-homer"
-> +#define PNV_HOMER(obj) OBJECT_CHECK(PnvHomer, (obj), TYPE_PNV_HOMER)
-> +#define TYPE_PNV8_HOMER TYPE_PNV_HOMER "-POWER8"
-> +#define PNV8_HOMER(obj) OBJECT_CHECK(PnvHomer, (obj), TYPE_PNV8_HOMER)
-> +#define TYPE_PNV9_HOMER TYPE_PNV_HOMER "-POWER9"
-> +#define PNV9_HOMER(obj) OBJECT_CHECK(PnvHomer, (obj), TYPE_PNV9_HOMER)
-> +
-> +typedef struct PnvHomer {
-> +    DeviceState parent;
-> +
-> +    struct PnvChip *chip;
-> +    MemoryRegion regs;
-> +} PnvHomer;
-> +
-> +#define PNV_HOMER_CLASS(klass)   \
-> +     OBJECT_CLASS_CHECK(PnvHomerClass, (klass), TYPE_PNV_HOMER)
-> +#define PNV_HOMER_GET_CLASS(obj) \
-> +     OBJECT_GET_CLASS(PnvHomerClass, (obj), TYPE_PNV_HOMER)
-> +
-> +typedef struct PnvHomerClass {
-> +    DeviceClass parent_class;
-> +
-> +    int homer_size;
-> +    const MemoryRegionOps *homer_ops;
-> +
-> +    hwaddr core_max_base;
-> +} PnvHomerClass;
-> +
-> +#endif /* PPC_PNV_HOMER_H */
->=20
-
+>  migration/ram.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index b01a37e7ca..0047286b7e 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1112,6 +1112,7 @@ static void *multifd_send_thread(void *opaque)
+>      rcu_register_thread();
+>  
+>      if (multifd_send_initial_packet(p, &local_err) < 0) {
+> +        ret = -1;
+>          goto out;
+>      }
+>      /* initial packet */
+> @@ -1179,9 +1180,7 @@ out:
+>       * who pay attention to me.
+>       */
+>      if (ret != 0) {
+> -        if (flags & MULTIFD_FLAG_SYNC) {
+> -            qemu_sem_post(&p->sem_sync);
+> -        }
+> +        qemu_sem_post(&p->sem_sync);
+>          qemu_sem_post(&multifd_send_state->channels_ready);
+>      }
+>  
+> -- 
+> 2.17.2 (Apple Git-113)
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
