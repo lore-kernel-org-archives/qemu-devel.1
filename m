@@ -2,64 +2,94 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CB2AC4CEC6
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1564AC4CEC5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:44:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 330A320830
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:42:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 330A320830
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D4ACF206A5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 14:44:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IkfdzM6i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4ACF206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8QJ5-0002wU-1S
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 10:42:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47703)
+	id 1i8QKr-0004Dj-27
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 10:44:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47889)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1i8Q8J-0003G2-N1
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 10:31:41 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1i8Q94-0003cj-Fj
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 10:32:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1i8Q8H-0004AK-7H
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 10:31:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49034)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1i8Q8G-00049A-W9
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 10:31:37 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 476DF18CB8E7;
- Thu, 12 Sep 2019 14:31:35 +0000 (UTC)
-Received: from localhost (ovpn-117-48.ams2.redhat.com [10.36.117.48])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 802535D9CA;
- Thu, 12 Sep 2019 14:31:28 +0000 (UTC)
-Date: Thu, 12 Sep 2019 16:31:27 +0200
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Jagannathan Raman <jag.raman@oracle.com>
-Message-ID: <20190912143127.GL23174@stefanha-x1.localdomain>
-References: <cover.1567534653.git.jag.raman@oracle.com>
- <aef3fada5cd53cd16dfb485c33407d8b2b5e41b6.1567534653.git.jag.raman@oracle.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1i8Q93-0004if-7P
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 10:32:26 -0400
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:33050)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1i8Q93-0004hi-13
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 10:32:25 -0400
+Received: by mail-qt1-x843.google.com with SMTP id r5so29849379qtd.0
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 07:32:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=uBS103W/hIPtIJjDYmCrdnuJp0w4ne1F6jD7wH4AyKY=;
+ b=IkfdzM6ieVxOJZC3DxVjzB4gLzt+mlX5MBmC1cUwDx5BxB9bkV7OCzc6OIA5D38gv0
+ 5Hytio2sJbZVahpsPLk1+WV9uO/X17K0Euxc84fcc+Y3IHYna4voNoD/Y5daQr4/wnlL
+ G3dzGFiJdcZCdycahBMINwC+MN93DKl9A0IWxu9Cf1WjL17UN0meYaOgs/Y+zDUUCXqr
+ 7Lv4/72KLM+3omSuvF4z6I+mB7IhAz8of3jFzTcuRutb7ZeZWSMj6FYunwzQnRFpnX/P
+ wPim+Gr77fxruHb9/hKZF5h8fjm7grzplR8J3V3vizq/2pQtPDjPjRad3jmpekZz9uhW
+ XJow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=uBS103W/hIPtIJjDYmCrdnuJp0w4ne1F6jD7wH4AyKY=;
+ b=lc+U3EB/8/UDtEqcMeTPtW0sV23f4RHr9D0JUKoIlKfRviqUmhE96CINb6UirSOks3
+ NHPgi+f/bV5GvcyFbAcQsOL9IEanc+p6hQsx3vmUZNRMmzPlBsFCCoSprRKrrjCBLQ8J
+ 2qr6bc5D/4xB1aDtVFhCdje7oQ1SE6jWDHPl6c7JArf4JCa7qMpfxVqQmRforHkmqP9a
+ rJnZ7EF4ftzKDoTyxAO0AgZk5TfL4WX7U6NCTrQfsege+enXtq/4sQuCuAj6fLTpLmpT
+ pE4sXRDbSwiYSQIluBcjKqDiXcS0oykD7FBzzBSrDt0PFEnQAo8m/EX5XIk746GhvgsT
+ qhdw==
+X-Gm-Message-State: APjAAAVOKOA213HbUGpF5uB9jN/NKxpJQlpJqT8rhvHqZajVcksNoSvq
+ qDyLNgxTe1N7FtXzJnKPuPzeRQ==
+X-Google-Smtp-Source: APXvYqzzEKObUH+pYBq70hPKUjcOFt4JmrAf48u7z0pZgkb9qxu+9fjDTjLQG6Ic3lyfTGsf+nttGg==
+X-Received: by 2002:aed:2da4:: with SMTP id i33mr8293066qtd.320.1568298743578; 
+ Thu, 12 Sep 2019 07:32:23 -0700 (PDT)
+Received: from [172.20.5.51] ([67.69.50.154])
+ by smtp.gmail.com with ESMTPSA id c131sm11327881qke.24.2019.09.12.07.32.22
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 12 Sep 2019 07:32:22 -0700 (PDT)
+To: liuzhiwei <zhiwei_liu@c-sky.com>, Alistair.Francis@wdc.com,
+ palmer@sifive.com, sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de,
+ riku.voipio@iki.fi, laurent@vivier.eu, wenmeng_zhang@c-sky.com
+References: <1568183141-67641-1-git-send-email-zhiwei_liu@c-sky.com>
+ <1568183141-67641-7-git-send-email-zhiwei_liu@c-sky.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <78f805d4-720f-6777-bf91-4b4aaf0a15a3@linaro.org>
+Date: Thu, 12 Sep 2019 10:32:20 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ai3I8gwHc37+ASRI"
-Content-Disposition: inline
-In-Reply-To: <aef3fada5cd53cd16dfb485c33407d8b2b5e41b6.1567534653.git.jag.raman@oracle.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Thu, 12 Sep 2019 14:31:35 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC v3 PATCH 05/45] multi-process: Add config
- option for multi-process QEMU
+In-Reply-To: <1568183141-67641-7-git-send-email-zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::843
+Subject: Re: [Qemu-devel] [PATCH v2 06/17] RISC-V: add vector extension
+ fault-only-first implementation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,72 +101,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, john.g.johnson@oracle.com,
- mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, quintela@redhat.com,
- armbru@redhat.com, kanth.ghatraju@oracle.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- liran.alon@oracle.com, rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com,
- mreitz@redhat.com, ross.lagerwall@citrix.com, marcandre.lureau@gmail.com,
- pbonzini@redhat.com
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 9/11/19 2:25 AM, liuzhiwei wrote:
+> diff --git a/linux-user/riscv/cpu_loop.c b/linux-user/riscv/cpu_loop.c
+> index 12aa3c0..d673fa5 100644
+> --- a/linux-user/riscv/cpu_loop.c
+> +++ b/linux-user/riscv/cpu_loop.c
+> @@ -41,6 +41,13 @@ void cpu_loop(CPURISCVState *env)
+>          sigcode = 0;
+>          sigaddr = 0;
+>  
+> +        if (env->foflag) {
+> +            if (env->vfp.vl != 0) {
+> +                env->foflag = false;
+> +                env->pc += 4;
+> +                continue;
+> +            }
+> +        }
+>          switch (trapnr) {
+>          case EXCP_INTERRUPT:
+>              /* just indicate that signals should be handled asap */
+> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+> index e32b612..405caf6 100644
+> --- a/target/riscv/cpu_helper.c
+> +++ b/target/riscv/cpu_helper.c
+> @@ -521,6 +521,13 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+>          [PRV_H] = RISCV_EXCP_H_ECALL,
+>          [PRV_M] = RISCV_EXCP_M_ECALL
+>      };
+> +    if (env->foflag) {
+> +        if (env->vfp.vl != 0) {
+> +            env->foflag = false;
+> +            env->pc += 4;
+> +            return;
+> +        }
+> +    }
 
---ai3I8gwHc37+ASRI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I renew my objection to this FOFLAG mechanism.  I believe, but have no proof,
+that this will race between different types of interrupts.  Once again I
+present the ARM SVE first-fault helpers as proof that there is another way.
 
-On Tue, Sep 03, 2019 at 04:37:31PM -0400, Jagannathan Raman wrote:
-> @@ -1543,6 +1544,10 @@ for opt do
->    ;;
->    --disable-libpmem) libpmem=3Dno
->    ;;
-> +  --enable-mpqemu) mpqemu=3Dyes
-> +  ;;
-> +  --disable-mpqemu) mpqemu=3Dno
+Otherwise, all of the same comments from the normal loads apply.
 
-A previous patch used "remote" instead of "mpqemu", which is confusing.
 
-"mpqemu" seems reasonable.  "remote" is too generic.  Can you use
-"mpqemu" everywhere?
-
-> +  ;;
->    *)
->        echo "ERROR: unknown option $opt"
->        echo "Try '$0 --help' for more information"
-> @@ -1842,6 +1847,7 @@ disabled with --disable-FEATURE, default is enabled=
- if available:
->    capstone        capstone disassembler support
->    debug-mutex     mutex debugging support
->    libpmem         libpmem support
-> +  mpqemu          multi-process QEMU support
-> =20
->  NOTE: The object files are built at the place where configure is launched
->  EOF
-> @@ -6481,6 +6487,7 @@ echo "docker            $docker"
->  echo "libpmem support   $libpmem"
->  echo "libudev           $libudev"
->  echo "default devices   $default_devices"
-> +echo "multiprocess QEMU $mpqemu"
-
-multi-process (see above) or multiprocess? :-)
-
---ai3I8gwHc37+ASRI
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl16Vr4ACgkQnKSrs4Gr
-c8iQmQgAyZx4BdvPfJHzpJZAOtIRhBsW9m/X0fFyVMbitXlMt8vP+BCiqyukO3zA
-pf5k6lFo2ThZn94hkxMUmCjCyHmWQ+G2XOzEoGSq0JK71DajP0cu0eQXSeWPPtmV
-p0EnkDaUMd//IAXfpPTj51KzHwujvTnLKAHgSFC+GdjX5/1+csyxlQsQxBEv6gfQ
-9imFYpWtB8nvNPeSfeniskszcciQTLZZf1BoABkXaL98B7Ene9J5oWV+8K/QGaMq
-WlU3mOLedGusI4WS9cWu+tX/zl0kVE3GSvqb89W2sINbkwDoPBkVtP7pzzgvINiX
-RzYLSYURCEiQE8YM6srXKkm9WPFOgg==
-=LA7j
------END PGP SIGNATURE-----
-
---ai3I8gwHc37+ASRI--
+r~
 
