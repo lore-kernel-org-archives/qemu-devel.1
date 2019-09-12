@@ -2,61 +2,67 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BBDCC5ACAE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 10:18:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0BD3C49ED9
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 10:19:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E92A820830
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 10:18:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E92A820830
+	by mail.kernel.org (Postfix) with ESMTPS id 715DF20830
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 10:19:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 715DF20830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8MBd-0004GF-V7
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 06:18:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53381)
+	id 1i8MBw-0004Zw-15
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 06:19:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53425)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i8M9e-00034B-QN
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:16:47 -0400
+ (envelope-from <berrange@redhat.com>) id 1i8M9y-0003Kv-JC
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:17:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i8M9d-0006Zu-T1
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:16:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44365)
+ (envelope-from <berrange@redhat.com>) id 1i8M9t-0006e7-El
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:17:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58356)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i8M9d-0006Zg-O9
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:16:45 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1i8M9t-0006cX-0W
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 06:17:01 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1DC1A10C0937
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 10:16:45 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.12])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4430E5D9E2;
- Thu, 12 Sep 2019 10:16:44 +0000 (UTC)
-Date: Thu, 12 Sep 2019 11:16:41 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, quintela@redhat.com, berrange@redhat.com
-Message-ID: <20190912101641.GD7230@work-vm>
-References: <20190823103946.7388-1-dgilbert@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 3F2B9302C06D;
+ Thu, 12 Sep 2019 10:17:00 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.17.64])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CABBB5D6A5;
+ Thu, 12 Sep 2019 10:16:53 +0000 (UTC)
+Date: Thu, 12 Sep 2019 11:16:51 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Message-ID: <20190912101651.GK24576@redhat.com>
+References: <20190731160719.11396-1-alex.bennee@linaro.org>
+ <87a7cty0tv.fsf@dusky.pond.sub.org> <875zm5yzgq.fsf@linaro.org>
+ <87d0g6dnbc.fsf_-_@dusky.pond.sub.org> <87y2ytzy17.fsf@linaro.org>
+ <CAFEAcA9Db2ENw7e_1-XOTbHeV=sp_zFxqoq4se+63OK+mQaeew@mail.gmail.com>
+ <87v9txzv3o.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190823103946.7388-1-dgilbert@redhat.com>
+In-Reply-To: <87v9txzv3o.fsf@linaro.org>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Thu, 12 Sep 2019 10:16:45 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Thu, 12 Sep 2019 10:17:00 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] qemu-file: Rework old qemu_fflush comment
+Subject: Re: [Qemu-devel] TCG plugins and the GPL (was: [PATCH v4 00/54]
+ plugins for TCG)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,44 +74,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Aaron Lindsay <aaron@os.amperecomputing.com>,
+ "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Pranith Kumar <bobby.prani@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Commit 11808bb removed the non-iovec based write support,
-> the comment hung on.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On Thu, Sep 12, 2019 at 11:07:07AM +0100, Alex Benn=C3=A9e wrote:
+>=20
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>=20
+> > On Thu, 12 Sep 2019 at 10:03, Alex Benn=C3=A9e <alex.bennee@linaro.or=
+g> wrote:
+> >>
+> >> Well the first thing will be we are not intending to offer a guarant=
+eed
+> >> ABI. While we don't want to be changing it at a whim there shouldn't=
+ be
+> >> an expectation that the plugin interface will maintain backwards
+> >> compatibility (unlike the command line interface ;-). There should b=
+e an
+> >> expectation that plugins will likely need to be rebuilt against the
+> >> current source tree from time to time.
+> >
+> > Wait, what? From my perspective the whole point of the plugin
+> > interface is that it should be stable, in that at least there's
+> > a good chance that a plugin you built will work against multiple
+> > versions of QEMU, and if it doesn't then it should fail with
+> > a reasonable error message telling you to update. I'm not
+> > sure we should be landing the plugins infrastructure if we
+> > don't have that much stability.
+>=20
+> There is a big fat blurry line between "set in stone" and "not requirin=
+g
+> you to re-engineer the plugin every QEMU release". I'm saying we should
+> reserve the right to extend and change the plugin API as required but
+> the expectation would be the plugins will continue to work the same way
+> but maybe with tweaks to the API hooks to support additional features.
+>=20
+> It's also a pretty young interface so I would expect some evolution onc=
+e
+> it is released into the field.
+>=20
+> One problem with the anti-license circumvention measures being suggeste=
+d
+> is it will mean having to recompile plugins for any given release. This
+> isn't a problem for plugins we write but it does add an extra step for
+> out of tree plugins. Maybe being forced to re-compile (but not change
+> the source) is a hurdle we are willing to accept?
 
-Queued
+I can understand & totally support not wishing to break the compilation
+of plugins for every release, by having a reasonably stable API.
 
-> ---
->  migration/qemu-file.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-> index e33c46764f..075faf03c3 100644
-> --- a/migration/qemu-file.c
-> +++ b/migration/qemu-file.c
-> @@ -201,9 +201,8 @@ static void qemu_iovec_release_ram(QEMUFile *f)
->  /**
->   * Flushes QEMUFile buffer
->   *
-> - * If there is writev_buffer QEMUFileOps it uses it otherwise uses
-> - * put_buffer ops. This will flush all pending data. If data was
-> - * only partially flushed, it will set an error state.
-> + * This will flush all pending data. If data was only partially flushed, it
-> + * will set an error state.
->   */
->  void qemu_fflush(QEMUFile *f)
->  {
-> -- 
-> 2.21.0
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+I think forcing recompile for each release is reasonable protection
+to make it less atttractive to create license violating closed source
+plugins.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
