@@ -2,141 +2,88 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=DATE_IN_PAST_12_24,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2832AC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 22:02:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD60C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 22:13:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD2DF206A5
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 22:02:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD2DF206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 53AED20693
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 22:13:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tlpM9MNi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53AED20693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8teT-0000Ku-0t
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 18:02:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53256)
+	id 1i8toh-0003AI-D6
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 18:13:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54546)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i8tdG-0008Cq-73
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 18:01:35 -0400
+ (envelope-from <flukshun@gmail.com>) id 1i8tnx-0002hz-Ah
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 18:12:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i8tdE-0000Nm-SS
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 18:01:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42518)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i8td9-0000MU-Uz; Fri, 13 Sep 2019 18:01:28 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7A30330860BD;
- Fri, 13 Sep 2019 22:01:26 +0000 (UTC)
-Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2280D5D9D3;
- Fri, 13 Sep 2019 22:01:22 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20190911150054.90936-1-vsementsov@virtuozzo.com>
- <20190911150054.90936-3-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <717dad2d-3a78-e64d-6155-a062cd2b0df1@redhat.com>
-Date: Fri, 13 Sep 2019 18:01:22 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <flukshun@gmail.com>) id 1i8tnw-0004M9-3s
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 18:12:37 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38761)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1i8tnv-0004Lw-WA
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 18:12:36 -0400
+Received: by mail-ot1-x341.google.com with SMTP id h17so27011592otn.5
+ for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 15:12:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:mime-version:content-transfer-encoding:to:from:in-reply-to
+ :cc:references:message-id:user-agent:subject:date;
+ bh=fbTyolerSTELJCoHG8xVxQ+aF5ZczYp131brQWOzIhA=;
+ b=tlpM9MNicW1zxI0E8t6eqpe3wb5B8AKCeLLUiKusbVbHTcoPrWy+HX+3vMa4Nj0tzq
+ GJVjrMeU92y4/OxvBUGHN+Yv7EOYLLl55aKOBsETCd0TiUPIbekPgQck7cZc6OkaOZxW
+ ZCFn1ri8jsaBkG99MulROahojO6rfAdos+AphwxAbQk8r1RoczVxUTEvk4CsMbS9esX7
+ 3jpNmshjMQjtQyAbEHOxexYxZrI+teVM4/+8YkhhUaJo4BbEUojPqjjmJ/7RCH6cD9LZ
+ 8+Bo/h3hhSgKKcA6o7eEtXs9dAPgNsoVNH0QqC6lT6BH8HZW65ZX/YaMa3rRUvxefkLI
+ KFtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:mime-version:content-transfer-encoding:to
+ :from:in-reply-to:cc:references:message-id:user-agent:subject:date;
+ bh=fbTyolerSTELJCoHG8xVxQ+aF5ZczYp131brQWOzIhA=;
+ b=KuF4DOPhF3ufXb3xbbKMtmT+xgIncEGrzZm08+QWRdZOITsTrOUsSwc1YL8xOSU2NB
+ rJBWXlftr84DDfcgLNOr88lWhBeLq2oclgRynziM9sulN+9UD/bp67raEt/LN2qY1RbA
+ 9JDGTQmJATLmBjejjWAOAGtsPv1mCBJvrDWGzKDMz3EzzJptWOm/OqXNB7chxoLEF9c/
+ NMgRSpXFCMILO/r4mzVMEMVkYe/K3ZOo7VkG8BHxg19IXoLj8oE/BhL/25voyRoyJl9l
+ zJLUvhrOgQW3nC3bRcxK4GGks6audptZmwxIAV8PdXielAdMPI9XDgLcKqPP42m+M95d
+ 5inA==
+X-Gm-Message-State: APjAAAXqOpd2wPt60pz7XjqDRwx2G5gTZysNeY1L4MowbrisyOh9Cgq9
+ ynS2Ic5fpmqeo4L5Cp2hoG7xQgFc
+X-Google-Smtp-Source: APXvYqx6qa8zoZaUlXSD3o5TpruUwmuEqd1UotiatiQStcaXyaiP/YDZ5Oeb3cGGbMBkjXvYX+E5SQ==
+X-Received: by 2002:a9d:7006:: with SMTP id k6mr34059426otj.303.1568412754539; 
+ Fri, 13 Sep 2019 15:12:34 -0700 (PDT)
+Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
+ [76.251.165.188])
+ by smtp.gmail.com with ESMTPSA id l6sm8747463otr.71.2019.09.13.15.12.33
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Fri, 13 Sep 2019 15:12:33 -0700 (PDT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20190911150054.90936-3-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Fri, 13 Sep 2019 22:01:26 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] block/dirty-bitmap: return int from
- bdrv_remove_persistent_dirty_bitmap
+Content-Transfer-Encoding: quoted-printable
+To: Bishara AbuHattoum <bishara@daynix.com>, qemu-devel@nongnu.org
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20190819131620.1302-2-bishara@daynix.com>
+References: <20190819131620.1302-1-bishara@daynix.com>
+ <20190819131620.1302-2-bishara@daynix.com>
+Message-ID: <156833130242.26182.17002244700908394194@sif>
+User-Agent: alot/0.7
+Date: Thu, 12 Sep 2019 18:35:02 -0500
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH 1/1] qga-win: network-get-interfaces
+ command name field bug fix
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,194 +95,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- mreitz@redhat.com, den@openvz.org
+Cc: Yan Vugenfirer <yan@daynix.com>, Basil Salman <basil@daynix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Quoting Bishara AbuHattoum (2019-08-19 08:16:20)
+> Network interface name is fetched as an encoded WCHAR array, (wide
+> character), then it is decoded using the guest's CP_ACP Windows code
+> page, which is the default code page as configure in the guest's
+> Windows, then it is returned as a byte array, (char array).
+> =
 
+> As stated in the BZ#1733165, when renaming a network interface to a
+> Chinese name and invoking this command, the returned name field has
+> the (\ufffd) value for each Chinese character the name had, this
+> value is an indication that the code page does not have the decoding
+> information for the given character.
+> =
 
-On 9/11/19 11:00 AM, Vladimir Sementsov-Ogievskiy wrote:
-> It's more comfortable to not deal with local_err.
-> 
+> This bug is a result of using the CP_ACP code page for decoding which
+> is an interchangeable code page, instead CP_UTF8 code page should be
+> used for decoding the network interface's name.
+> =
 
-I agree.
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1733165
+> =
 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Bishara AbuHattoum <bishara@daynix.com>
+
+Thanks, applied to qga tree:
+  https://github.com/mdroth/qemu/commits/qga
+
 > ---
->  block/qcow2.h                |  5 ++---
->  include/block/block_int.h    |  6 +++---
->  include/block/dirty-bitmap.h |  5 ++---
->  block/dirty-bitmap.c         |  9 +++++----
->  block/qcow2-bitmap.c         | 20 +++++++++++---------
->  blockdev.c                   |  7 +++----
->  6 files changed, 26 insertions(+), 26 deletions(-)
-> 
-> diff --git a/block/qcow2.h b/block/qcow2.h
-> index 998bcdaef1..99ee88f802 100644
-> --- a/block/qcow2.h
-> +++ b/block/qcow2.h
-> @@ -747,9 +747,8 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
->                                        const char *name,
->                                        uint32_t granularity,
->                                        Error **errp);
-> -void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
-> -                                          const char *name,
-> -                                          Error **errp);
-> +int qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs, const char *name,
-> +                                         Error **errp);
->  
->  ssize_t coroutine_fn
->  qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 0422acdf1c..503ac9e3cd 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -556,9 +556,9 @@ struct BlockDriver {
->                                              const char *name,
->                                              uint32_t granularity,
->                                              Error **errp);
-> -    void (*bdrv_remove_persistent_dirty_bitmap)(BlockDriverState *bs,
-> -                                                const char *name,
-> -                                                Error **errp);
-> +    int (*bdrv_remove_persistent_dirty_bitmap)(BlockDriverState *bs,
-> +                                               const char *name,
-> +                                               Error **errp);
->  
->      /**
->       * Register/unregister a buffer for I/O. For example, when the driver is
-> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-> index 4b4b731b46..07503b03b5 100644
-> --- a/include/block/dirty-bitmap.h
-> +++ b/include/block/dirty-bitmap.h
-> @@ -37,9 +37,8 @@ int bdrv_dirty_bitmap_check(const BdrvDirtyBitmap *bitmap, uint32_t flags,
->                              Error **errp);
->  void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap);
->  void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs);
-> -void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
-> -                                         const char *name,
-> -                                         Error **errp);
-> +int bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs, const char *name,
-> +                                        Error **errp);
->  void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
->  void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
->  void bdrv_enable_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap);
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index 8f42015db9..a52b83b619 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -455,13 +455,14 @@ void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs)
->   * not fail.
->   * This function doesn't release corresponding BdrvDirtyBitmap.
->   */
-> -void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
-> -                                         const char *name,
-> -                                         Error **errp)
-> +int bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs, const char *name,
-> +                                        Error **errp)
+>  qga/commands-win32.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> =
+
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 6b67f16faf..64b1c754b0 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -1387,12 +1387,12 @@ static IP_ADAPTER_ADDRESSES *guest_get_adapters_a=
+ddresses(Error **errp)
+>  static char *guest_wctomb_dup(WCHAR *wstr)
 >  {
->      if (bs->drv && bs->drv->bdrv_remove_persistent_dirty_bitmap) {
-> -        bs->drv->bdrv_remove_persistent_dirty_bitmap(bs, name, errp);
-> +        return bs->drv->bdrv_remove_persistent_dirty_bitmap(bs, name, errp);
->      }
-> +
+>      char *str;
+> -    size_t i;
+> +    size_t str_size;
+> =
 
-But is it a problem if we return an error code without setting errp now?
-If this is for the sake of not having to deal with local_err, we should
-make sure that a non-zero return means that errp is set. Right?
-
-> +    return -ENOTSUP;
+> -    i =3D wcslen(wstr) + 1;
+> -    str =3D g_malloc(i);
+> -    WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK,
+> -                        wstr, -1, str, i, NULL, NULL);
+> +    str_size =3D WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL=
+, NULL);
+> +    /* add 1 to str_size for NULL terminator */
+> +    str =3D g_malloc(str_size + 1);
+> +    WideCharToMultiByte(CP_UTF8, 0, wstr, -1, str, str_size, NULL, NULL);
+>      return str;
 >  }
->  
->  bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
-> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> index b2487101ed..1aaedb3b55 100644
-> --- a/block/qcow2-bitmap.c
-> +++ b/block/qcow2-bitmap.c
-> @@ -1404,11 +1404,10 @@ static Qcow2Bitmap *find_bitmap_by_name(Qcow2BitmapList *bm_list,
->      return NULL;
->  }
->  
-> -void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
-> -                                          const char *name,
-> -                                          Error **errp)
-> +int qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs, const char *name,
-> +                                         Error **errp)
->  {
-> -    int ret;
-> +    int ret = 0;
+> =
 
-I was going to say I'd rather not initialize this, but is this related
-to ubsan linting?
+> -- =
 
->      BDRVQcow2State *s = bs->opaque;
->      Qcow2Bitmap *bm;
->      Qcow2BitmapList *bm_list;
-> @@ -1416,18 +1415,19 @@ void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
->      if (s->nb_bitmaps == 0) {
->          /* Absence of the bitmap is not an error: see explanation above
->           * bdrv_remove_persistent_dirty_bitmap() definition. */
-> -        return;
-> +        return 0;
->      }
->  
->      bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
->                                 s->bitmap_directory_size, errp);
->      if (bm_list == NULL) {
-> -        return;
-> +        return -EIO;
->      }
->  
->      bm = find_bitmap_by_name(bm_list, name);
->      if (bm == NULL) {
-> -        goto fail;
-> +        ret = -EINVAL;
-> +        goto out;
->      }
->  
->      QSIMPLEQ_REMOVE(bm_list, bm, Qcow2Bitmap, entry);
-> @@ -1435,14 +1435,16 @@ void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
->      ret = update_ext_header_and_dir(bs, bm_list);
->      if (ret < 0) {
->          error_setg_errno(errp, -ret, "Failed to update bitmap extension");
-> -        goto fail;
-> +        goto out;
->      }
->  
->      free_bitmap_clusters(bs, &bm->table);
->  
-> -fail:
-> +out:
->      bitmap_free(bm);
->      bitmap_list_free(bm_list);
-> +
-> +    return ret;
->  }
->  
->  void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-> diff --git a/blockdev.c b/blockdev.c
-> index fbef6845c8..0813adfb2b 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -2940,15 +2940,14 @@ static BdrvDirtyBitmap *do_block_dirty_bitmap_remove(
->      }
->  
->      if (bdrv_dirty_bitmap_get_persistence(bitmap)) {
-> +        int ret;
->          AioContext *aio_context = bdrv_get_aio_context(bs);
-> -        Error *local_err = NULL;
->  
->          aio_context_acquire(aio_context);
-> -        bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
-> +        ret = bdrv_remove_persistent_dirty_bitmap(bs, name, errp);
->          aio_context_release(aio_context);
->  
-> -        if (local_err != NULL) {
-> -            error_propagate(errp, local_err);
-> +        if (ret < 0) {
->              return NULL;
->          }
->      }
-> 
+> 2.17.2
+>=20
 
