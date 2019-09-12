@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3D12C49ED9
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 05:45:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBD2EC49ED9
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 05:45:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA81620856
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 05:45:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA81620856
+	by mail.kernel.org (Postfix) with ESMTPS id A065720856
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 05:45:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A065720856
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8Hv3-0002wg-Rm
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 01:45:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56544)
+	id 1i8HvD-00032V-RR
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 01:45:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56631)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1i8Hmu-0003Vi-U3
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 01:37:02 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1i8Hn1-0003d3-Lc
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 01:37:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1i8Hms-0002wl-QV
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 01:37:00 -0400
-Received: from mga11.intel.com ([192.55.52.93]:18591)
+ (envelope-from <tao3.xu@intel.com>) id 1i8Hn0-00031e-Fg
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 01:37:07 -0400
+Received: from mga11.intel.com ([192.55.52.93]:18624)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1i8Hmq-0002t6-SP
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 01:36:58 -0400
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1i8Hn0-0002zn-7n
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 01:37:06 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 11 Sep 2019 22:36:51 -0700
+ 11 Sep 2019 22:37:05 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,495,1559545200"; d="scan'208";a="186030764"
+X-IronPort-AV: E=Sophos;i="5.64,495,1559545200"; d="scan'208";a="186030828"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga007.fm.intel.com with ESMTP; 11 Sep 2019 22:36:49 -0700
+ by fmsmga007.fm.intel.com with ESMTP; 11 Sep 2019 22:37:04 -0700
 From: Tao Xu <tao3.xu@intel.com>
 To: imammedo@redhat.com,
 	eblake@redhat.com,
 	ehabkost@redhat.com
-Date: Thu, 12 Sep 2019 13:36:31 +0800
-Message-Id: <20190912053638.4858-5-tao3.xu@intel.com>
+Date: Thu, 12 Sep 2019 13:36:38 +0800
+Message-Id: <20190912053638.4858-12-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190912053638.4858-1-tao3.xu@intel.com>
 References: <20190912053638.4858-1-tao3.xu@intel.com>
@@ -56,8 +56,8 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 192.55.52.93
-Subject: [Qemu-devel] [PATCH v11 04/11] tests: Add test for QAPI builtin
- type time
+Subject: [Qemu-devel] [PATCH v11 11/11] tests/bios-tables-test: add test
+ cases for ACPI HMAT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,217 +69,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, jonathan.cameron@huawei.com, dan.j.williams@intel.com
+Cc: Jingqi Liu <Jingqi.liu@intel.com>, tao3.xu@intel.com, fan.du@intel.com,
+ qemu-devel@nongnu.org, Daniel Black <daniel@linux.ibm.com>,
+ jonathan.cameron@huawei.com, dan.j.williams@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add tests for time input such as zero, around limit of precision,
-signed upper limit, actual upper limit, beyond limits, time suffixes,
-and etc.
+ACPI table HMAT has been introduced, QEMU now builds HMAT tables for
+Heterogeneous Memory with boot option '-numa node'.
 
+Add test cases on PC and Q35 machines with 2 numa nodes.
+Because HMAT is generated when system enable numa, the
+following tables need to be added for this test:
+  tests/acpi-test-data/pc/*.acpihmat
+  tests/acpi-test-data/pc/HMAT.*
+  tests/acpi-test-data/q35/*.acpihmat
+  tests/acpi-test-data/q35/HMAT.*
+
+Reviewed-by: Daniel Black <daniel@linux.ibm.com>
+Reviewed-by: Jingqi Liu <Jingqi.liu@intel.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
 
-No changes in v11.
+No changes in V11.
 
-New patch in v10.
+Changes in v10:
+    - Update test case, add "-machine hmat=on"
 ---
- tests/test-keyval.c                | 125 +++++++++++++++++++++++++++++
- tests/test-qobject-input-visitor.c |  29 +++++++
- 2 files changed, 154 insertions(+)
+ tests/bios-tables-test.c | 44 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
-diff --git a/tests/test-keyval.c b/tests/test-keyval.c
-index 09b0ae3c68..b36914f0fc 100644
---- a/tests/test-keyval.c
-+++ b/tests/test-keyval.c
-@@ -490,6 +490,130 @@ static void test_keyval_visit_size(void)
-     visit_free(v);
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 9b3d8b0d1b..976788b6fa 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -870,6 +870,48 @@ static void test_acpi_piix4_tcg_dimm_pxm(void)
+     test_acpi_tcg_dimm_pxm(MACHINE_PC);
  }
  
-+static void test_keyval_visit_time(void)
++static void test_acpi_tcg_acpi_hmat(const char *machine)
 +{
-+    Error *err = NULL;
-+    Visitor *v;
-+    QDict *qdict;
-+    uint64_t time;
++    test_data data;
 +
-+    /* Lower limit zero */
-+    qdict = keyval_parse("time1=0", NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &error_abort);
-+    g_assert_cmpuint(time, ==, 0);
-+    visit_check_struct(v, &error_abort);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
-+
-+    /* Around limit of precision: 2^53-1, 2^53, 2^53+1 */
-+    qdict = keyval_parse("time1=9007199254740991,"
-+                         "time2=9007199254740992,"
-+                         "time3=9007199254740993",
-+                         NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 0x1fffffffffffff);
-+    visit_type_time(v, "time2", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 0x20000000000000);
-+    visit_type_time(v, "time3", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 0x20000000000000);
-+    visit_check_struct(v, &error_abort);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
-+
-+    /* Close to signed upper limit 0x7ffffffffffffc00 (53 msbs set) */
-+    qdict = keyval_parse("time1=9223372036854774784," /* 7ffffffffffffc00 */
-+                         "time2=9223372036854775295", /* 7ffffffffffffdff */
-+                         NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 0x7ffffffffffffc00);
-+    visit_type_time(v, "time2", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 0x7ffffffffffffc00);
-+    visit_check_struct(v, &error_abort);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
-+
-+    /* Close to actual upper limit 0xfffffffffffff800 (53 msbs set) */
-+    qdict = keyval_parse("time1=18446744073709549568," /* fffffffffffff800 */
-+                         "time2=18446744073709550591", /* fffffffffffffbff */
-+                         NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 0xfffffffffffff800);
-+    visit_type_time(v, "time2", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 0xfffffffffffff800);
-+    visit_check_struct(v, &error_abort);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
-+
-+    /* Beyond limits */
-+    qdict = keyval_parse("time1=-1,"
-+                         "time2=18446744073709550592", /* fffffffffffffc00 */
-+                         NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &err);
-+    error_free_or_abort(&err);
-+    visit_type_time(v, "time2", &time, &err);
-+    error_free_or_abort(&err);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
-+
-+    /* Suffixes */
-+    qdict = keyval_parse("time1=2ps,time2=3.4ns,time3=5us,"
-+                         "time4=0.6ms,time5=700s",
-+                         NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &error_abort);
-+    g_assert_cmpuint(time, ==, 2);
-+    visit_type_time(v, "time2", &time, &error_abort);
-+    g_assert_cmpuint(time, ==, 3400);
-+    visit_type_time(v, "time3", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 5 * 1000 * 1000);
-+    visit_type_time(v, "time4", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 600 * 1000 * 1000);
-+    visit_type_time(v, "time5", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 700 * 1000000000000ULL);
-+    visit_check_struct(v, &error_abort);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
-+
-+    /* Beyond limit with suffix */
-+    qdict = keyval_parse("time1=18446745s", NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &err);
-+    error_free_or_abort(&err);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
-+
-+    /* Trailing crap */
-+    qdict = keyval_parse("time1=89ks,time2=ns", NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &err);
-+    error_free_or_abort(&err);
-+    visit_type_time(v, "time2", &time, &err);;
-+    error_free_or_abort(&err);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
++    memset(&data, 0, sizeof(data));
++    data.machine = machine;
++    data.variant = ".acpihmat";
++    test_acpi_one(" -machine hmat=on"
++                  " -smp 2,sockets=2"
++                  " -m 128M,slots=2,maxmem=1G"
++                  " -object memory-backend-ram,size=64M,id=m0"
++                  " -object memory-backend-ram,size=64M,id=m1"
++                  " -numa node,nodeid=0,memdev=m0"
++                  " -numa node,nodeid=1,memdev=m1,initiator=0"
++                  " -numa cpu,node-id=0,socket-id=0"
++                  " -numa cpu,node-id=0,socket-id=1"
++                  " -numa hmat-lb,initiator=0,target=0,hierarchy=memory,"
++                  "data-type=access-latency,latency=5ns"
++                  " -numa hmat-lb,initiator=0,target=0,hierarchy=memory,"
++                  "data-type=access-bandwidth,bandwidth=500M"
++                  " -numa hmat-lb,initiator=0,target=1,hierarchy=memory,"
++                  "data-type=access-latency,latency=10ns"
++                  " -numa hmat-lb,initiator=0,target=1,hierarchy=memory,"
++                  "data-type=access-bandwidth,bandwidth=100M"
++                  " -numa hmat-cache,node-id=0,size=0x20000,total=1,level=1"
++                  ",assoc=direct,policy=write-back,line=8"
++                  " -numa hmat-cache,node-id=1,size=0x20000,total=1,level=1"
++                  ",assoc=direct,policy=write-back,line=8",
++                  &data);
++    free_test_data(&data);
 +}
 +
- static void test_keyval_visit_dict(void)
++static void test_acpi_q35_tcg_acpi_hmat(void)
++{
++    test_acpi_tcg_acpi_hmat(MACHINE_Q35);
++}
++
++static void test_acpi_piix4_tcg_acpi_hmat(void)
++{
++    test_acpi_tcg_acpi_hmat(MACHINE_PC);
++}
++
+ static void test_acpi_virt_tcg(void)
  {
-     Error *err = NULL;
-@@ -678,6 +802,7 @@ int main(int argc, char *argv[])
-     g_test_add_func("/keyval/visit/bool", test_keyval_visit_bool);
-     g_test_add_func("/keyval/visit/number", test_keyval_visit_number);
-     g_test_add_func("/keyval/visit/size", test_keyval_visit_size);
-+    g_test_add_func("/keyval/visit/time", test_keyval_visit_time);
-     g_test_add_func("/keyval/visit/dict", test_keyval_visit_dict);
-     g_test_add_func("/keyval/visit/list", test_keyval_visit_list);
-     g_test_add_func("/keyval/visit/optional", test_keyval_visit_optional);
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
-index 6bacabf063..4b5820b744 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -366,6 +366,31 @@ static void test_visitor_in_size_str_fail(TestInputVisitorData *data,
-     error_free_or_abort(&err);
- }
- 
-+static void test_visitor_in_time_str_keyval(TestInputVisitorData *data,
-+                                            const void *unused)
-+{
-+    uint64_t res, value = 265 * 1000 * 1000;
-+    Visitor *v;
-+
-+    v = visitor_input_test_init_full(data, true, "\"265us\"");
-+
-+    visit_type_time(v, NULL, &res, &error_abort);
-+    g_assert_cmpfloat(res, ==, value);
-+}
-+
-+static void test_visitor_in_time_str_fail(TestInputVisitorData *data,
-+                                          const void *unused)
-+{
-+    uint64_t res = 0;
-+    Visitor *v;
-+    Error *err = NULL;
-+
-+    v = visitor_input_test_init(data, "\"265us\"");
-+
-+    visit_type_time(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+}
-+
- static void test_visitor_in_string(TestInputVisitorData *data,
-                                    const void *unused)
- {
-@@ -1311,6 +1336,10 @@ int main(int argc, char **argv)
-                            NULL, test_visitor_in_size_str_keyval);
-     input_visitor_test_add("/visitor/input/size_str_fail",
-                            NULL, test_visitor_in_size_str_fail);
-+    input_visitor_test_add("/visitor/input/time_str_keyval",
-+                           NULL, test_visitor_in_time_str_keyval);
-+    input_visitor_test_add("/visitor/input/time_str_fail",
-+                           NULL, test_visitor_in_time_str_fail);
-     input_visitor_test_add("/visitor/input/string",
-                            NULL, test_visitor_in_string);
-     input_visitor_test_add("/visitor/input/enum",
+     test_data data = {
+@@ -914,6 +956,8 @@ int main(int argc, char *argv[])
+         qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
+         qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_pxm);
+         qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm);
++        qtest_add_func("acpi/piix4/acpihmat", test_acpi_piix4_tcg_acpi_hmat);
++        qtest_add_func("acpi/q35/acpihmat", test_acpi_q35_tcg_acpi_hmat);
+     } else if (strcmp(arch, "aarch64") == 0) {
+         qtest_add_func("acpi/virt", test_acpi_virt_tcg);
+     }
 -- 
 2.20.1
 
