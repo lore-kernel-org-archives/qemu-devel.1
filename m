@@ -2,96 +2,60 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDD96C49ED9
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:27:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF3AAC49ED9
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:28:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BEA520830
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:27:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aj.id.au header.i=@aj.id.au header.b="FldCLZAE";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="opUmCwul"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BEA520830
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aj.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id B5CE120830
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 06:28:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5CE120830
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8IZS-0006N6-JK
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 02:27:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40971)
+	id 1i8IaI-0007Wi-UQ
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 02:28:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37104)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrew@aj.id.au>) id 1i8IXK-0004sM-PW
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:25:00 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IGI-0002Uc-7f
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrew@aj.id.au>) id 1i8IXI-0006Is-8N
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:24:58 -0400
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:47683)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrew@aj.id.au>)
- id 1i8IXA-0006Hl-SS; Thu, 12 Sep 2019 02:24:49 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailout.nyi.internal (Postfix) with ESMTP id 39C31224EC;
- Thu, 12 Sep 2019 02:24:47 -0400 (EDT)
-Received: from imap2 ([10.202.2.52])
- by compute4.internal (MEProxy); Thu, 12 Sep 2019 02:24:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aj.id.au; h=
- mime-version:message-id:in-reply-to:references:date:from:to:cc
- :subject:content-type:content-transfer-encoding; s=fm3; bh=Ph1EM
- ADjDASZh3KN9TBm15v9QudwLsxsqj8JH8vxcFQ=; b=FldCLZAEu7Bu+SbbAtymy
- xjVCaHWMDdJldL3J59cH6bStDNnRxX83XHD98EpjNs/LMLTsFb7SpOr+n4xY8rdu
- QVvMeJEB0ywswhcoISlJQNu4zTiDOB6nILTWP9aBXfrwLLc3tNAhqtl2e9VfA9hH
- 7NnU2Q1WlRnkq0LpnvvJKNt69emlLA7mAK9KdiNR4e3CnNuxH2RHb9Qt322ZWLKC
- oUvtXw0G61GQP4ymeOembvOS2xN1cf1RYyTM6SN1Wvx9CYZ8qqduJ8pDOlchzTnS
- s7xN7qJNb/MphMakOGvIuECfLLBhQKU/2RIixgU9fTfC21VnSnxf7GTtl65aOD8+
- A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-transfer-encoding:content-type
- :date:from:in-reply-to:message-id:mime-version:references
- :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
- :x-sasl-enc; s=fm3; bh=Ph1EMADjDASZh3KN9TBm15v9QudwLsxsqj8JH8vxc
- FQ=; b=opUmCwulSMYT3f3NyXj0SYLvKxnYBJu3Ge19sq8Li8JDkvylDHqCop3JW
- 02Q/hRRro3pnizFl4XC89MmDN7ALwDMXYt49mU070CbRy2hiWtVxE1K1aCUZr80b
- JhmlizGtQCBvFAoOYXwpbVSNa4gf2VtKEGuBK1bKQcr1OqF65YFyvwQZ+XrCz5KR
- Sl8u7dzkZ+575offH5TIcIhKan3G51r4rLMPfXeEw3A9E3pNGOnCqMP8h5Ul4PAV
- u3RBnPZMx+1XoEuLf34KsTSj9QJ9mfm+dG+ViAFeO+VNqY4pTAkJu9XldqMMhT/F
- ttgeWKewPyA6o1xkdnra0PUXbzyEQ==
-X-ME-Sender: <xms:ruR5XWuVgipF3vjNDSGRKhiYQ_kL-xsKQs7DFCDEXGQsEocCeQOfMg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrtdeggddutdekucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- cujfgurhepofgfggfkjghffffhvffutgfgsehtqhertderreejnecuhfhrohhmpedftehn
- ughrvgifucflvghffhgvrhihfdcuoegrnhgurhgvfiesrghjrdhiugdrrghuqeenucffoh
- hmrghinhepohiilhgrsghsrdhorhhgnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrnhgu
- rhgvfiesrghjrdhiugdrrghunecuvehluhhsthgvrhfuihiivgeptd
-X-ME-Proxy: <xmx:ruR5XRJPlKkOhBjIoMlehlH9j_4uWDOlrj-UqI2p7HUM3yf3SrPPwg>
- <xmx:ruR5XS_pIDl2yeEOGtwMYSG6R7EetzRdVwzZmybE5TXyUOg3ailYRQ>
- <xmx:ruR5XfC8V-Vku5KOSqnaEj9yx5X7jIRA5CGOz62KE-sCgln6SBBuhA>
- <xmx:r-R5XUm1S5B9Qkz9tVAPqLw5SrPlSkxfF2F1QffQDoV6wzthhVx8tg>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
- id 900EDE00A9; Thu, 12 Sep 2019 02:24:46 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.1.7-237-gf35468d-fmstable-20190912v1
-Mime-Version: 1.0
-Message-Id: <d0d2531e-7ee7-4e99-bab8-1fa6c6baf6c5@www.fastmail.com>
-In-Reply-To: <a9fdcc8b-3a92-587f-28e8-5a997991532e@kaod.org>
-References: <20190912032531.32546-1-andrew@aj.id.au>
- <a9fdcc8b-3a92-587f-28e8-5a997991532e@kaod.org>
-Date: Thu, 12 Sep 2019 15:55:19 +0930
-From: "Andrew Jeffery" <andrew@aj.id.au>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, qemu-arm@nongnu.org
-Content-Type: text/plain;charset=utf-8
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG8-000892-Lq
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:21 -0400
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:60010)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1i8IG8-00086s-5M
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 02:07:12 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+ [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+ by mail01.asahi-net.or.jp (Postfix) with ESMTPA id B6F1584994;
+ Thu, 12 Sep 2019 15:07:10 +0900 (JST)
+Received: from yo-satoh-debian.localdomain
+ (ae227063.dynamic.ppp.asahi-net.or.jp [14.3.227.63])
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 67F24240086;
+ Thu, 12 Sep 2019 15:07:10 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org
+Date: Thu, 12 Sep 2019 15:06:54 +0900
+Message-Id: <20190912060701.4642-16-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190912060701.4642-1-ysato@users.sourceforge.jp>
+References: <20190912060701.4642-1-ysato@users.sourceforge.jp>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 66.111.4.26
-Subject: Re: [Qemu-devel] [PATCH v4] target-arm: Make the counter tick
- relative to cntfrq
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 202.224.55.13
+Subject: [Qemu-devel] [PATCH v24 15/22] hw/timer: RX62N internal timer
+ modules
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,83 +67,944 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Joel Stanley <joel@jms.id.au>
+Cc: peter.maydell@linaro.org, Yoshinori Sato <ysato@users.sourceforge.jp>,
+ philmd@redhat.com, richard.henderson@linaro.org, imammedo@redhat.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+renesas_tmr: 8bit timer modules.
+renesas_cmt: 16bit compare match timer modules.
+This part use many renesas's CPU.
+Hardware manual.
+https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033=
+ej0140_rx62n.pdf
 
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20190607091116.49044-7-ysato@users.sourceforge.jp>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ include/hw/timer/renesas_cmt.h |  38 +++
+ include/hw/timer/renesas_tmr.h |  53 ++++
+ hw/timer/renesas_cmt.c         | 278 ++++++++++++++++++++
+ hw/timer/renesas_tmr.c         | 458 +++++++++++++++++++++++++++++++++
+ hw/timer/Kconfig               |   6 +
+ hw/timer/Makefile.objs         |   3 +
+ 6 files changed, 836 insertions(+)
+ create mode 100644 include/hw/timer/renesas_cmt.h
+ create mode 100644 include/hw/timer/renesas_tmr.h
+ create mode 100644 hw/timer/renesas_cmt.c
+ create mode 100644 hw/timer/renesas_tmr.c
 
-On Thu, 12 Sep 2019, at 15:52, C=C3=A9dric Le Goater wrote:
-> On 12/09/2019 05:25, Andrew Jeffery wrote:
-> > Allow machines to configure CNTFRQ via a property if the ARM core
-> > supports the generic timer. This is necessary on e.g. the ASPEED AST=
-2600
-> > SoC where the generic timer clock is run at 800MHz or above. The def=
-ault
-> > value for CNTFRQ remains at 62.50MHz (based on GTIMER_SCALE).
-> >=20
-> > CNTFRQ is a read-as-written co-processor register; the property sets=
- the
-> > register's initial value which is used during realize() to configure=
- the
-> > QEMUTimers that back the generic timers. Beyond that the firmware ca=
-n to
-> > do whatever it sees fit with the CNTFRQ register though changes to t=
-he
-> > value will not be reflected in the timers' rate.
-> >=20
-> > I've tested this using an out-of-tree AST2600 SoC model (Cortex-A7) =
-with
-> > the SDK u-boot that sets CNTFRQ as appropriate, and by starting/runn=
-ing
-> > machines with assorted ARM CPUs (palmetto-bmc with the ARM926EJ-S,
-> > romulus-bmc with the ARM1176 and raspi2 with the Cortex-A53).
-> >=20
-> > Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
-> > ---
-> > v4: Fix configuration for cores without a generic timer
-> >=20
-> > v3: https://patchwork.ozlabs.org/patch/1160634/
-> > Peter - I think this addresses most of your feedback. I still reach =
-into
-> > the QEMUTimer to fetch out scale when adjusting the nexttick
-> > calculation, but we no longer need to update the scale member and fo=
-rce
-> > a recalculation of the period.
-> >=20
-> > v2: https://patchwork.ozlabs.org/patch/1144389/
-> > ---
-> >  roms/SLOF           |  2 +-
-> >  roms/skiboot        |  2 +-
-> >  target/arm/cpu.c    | 43 +++++++++++++++++++++++++++++++++++-------=
--
-> >  target/arm/cpu.h    |  3 +++
-> >  target/arm/helper.c | 30 ++++++++++++++++++++++++++----
-> >  5 files changed, 66 insertions(+), 14 deletions(-)
-> >=20
-> > diff --git a/roms/SLOF b/roms/SLOF
-> > index 7bfe584e3219..ea221600a116 160000
-> > --- a/roms/SLOF
-> > +++ b/roms/SLOF
-> > @@ -1 +1 @@
-> > -Subproject commit 7bfe584e321946771692711ff83ad2b5850daca7
-> > +Subproject commit ea221600a116883137ef90b2b7ab7d2472bc4f10
-> > diff --git a/roms/skiboot b/roms/skiboot
-> > index 261ca8e779e5..3a6fdede6ce1 160000
-> > --- a/roms/skiboot
-> > +++ b/roms/skiboot
-> > @@ -1 +1 @@
-> > -Subproject commit 261ca8e779e5138869a45f174caa49be6a274501
-> > +Subproject commit 3a6fdede6ce117facec0108afe716cf5d0472c3f
->=20
->=20
-> The changes above seem not related.
+diff --git a/include/hw/timer/renesas_cmt.h b/include/hw/timer/renesas_cm=
+t.h
+new file mode 100644
+index 0000000000..acd25c6e0b
+--- /dev/null
++++ b/include/hw/timer/renesas_cmt.h
+@@ -0,0 +1,38 @@
++/*
++ * Renesas Compare-match timer Object
++ *
++ * Copyright (c) 2019 Yoshinori Sato
++ *
++ * This code is licensed under the GPL version 2 or later.
++ *
++ */
++
++#ifndef HW_RENESAS_CMT_H
++#define HW_RENESAS_CMT_H
++
++#include "hw/sysbus.h"
++
++#define TYPE_RENESAS_CMT "renesas-cmt"
++#define RCMT(obj) OBJECT_CHECK(RCMTState, (obj), TYPE_RENESAS_CMT)
++
++enum {
++    CMT_CH =3D 2,
++    CMT_NR_IRQ =3D 1 * CMT_CH,
++};
++
++typedef struct RCMTState {
++    SysBusDevice parent_obj;
++
++    uint64_t input_freq;
++    MemoryRegion memory;
++
++    uint16_t cmstr;
++    uint16_t cmcr[CMT_CH];
++    uint16_t cmcnt[CMT_CH];
++    uint16_t cmcor[CMT_CH];
++    int64_t tick[CMT_CH];
++    qemu_irq cmi[CMT_CH];
++    QEMUTimer *timer[CMT_CH];
++} RCMTState;
++
++#endif
+diff --git a/include/hw/timer/renesas_tmr.h b/include/hw/timer/renesas_tm=
+r.h
+new file mode 100644
+index 0000000000..5787004c74
+--- /dev/null
++++ b/include/hw/timer/renesas_tmr.h
+@@ -0,0 +1,53 @@
++/*
++ * Renesas 8bit timer Object
++ *
++ * Copyright (c) 2018 Yoshinori Sato
++ *
++ * This code is licensed under the GPL version 2 or later.
++ *
++ */
++
++#ifndef HW_RENESAS_TMR_H
++#define HW_RENESAS_TMR_H
++
++#include "hw/sysbus.h"
++
++#define TYPE_RENESAS_TMR "renesas-tmr"
++#define RTMR(obj) OBJECT_CHECK(RTMRState, (obj), TYPE_RENESAS_TMR)
++
++enum timer_event {
++    cmia =3D 0,
++    cmib =3D 1,
++    ovi =3D 2,
++    none =3D 3,
++    TMR_NR_EVENTS =3D 4
++};
++
++enum {
++    TMR_CH =3D 2,
++    TMR_NR_IRQ =3D 3 * TMR_CH,
++};
++
++typedef struct RTMRState {
++    SysBusDevice parent_obj;
++
++    uint64_t input_freq;
++    MemoryRegion memory;
++
++    uint8_t tcnt[TMR_CH];
++    uint8_t tcora[TMR_CH];
++    uint8_t tcorb[TMR_CH];
++    uint8_t tcr[TMR_CH];
++    uint8_t tccr[TMR_CH];
++    uint8_t tcor[TMR_CH];
++    uint8_t tcsr[TMR_CH];
++    int64_t tick;
++    int64_t div_round[TMR_CH];
++    enum timer_event next[TMR_CH];
++    qemu_irq cmia[TMR_CH];
++    qemu_irq cmib[TMR_CH];
++    qemu_irq ovi[TMR_CH];
++    QEMUTimer *timer[TMR_CH];
++} RTMRState;
++
++#endif
+diff --git a/hw/timer/renesas_cmt.c b/hw/timer/renesas_cmt.c
+new file mode 100644
+index 0000000000..5d57c447b8
+--- /dev/null
++++ b/hw/timer/renesas_cmt.c
+@@ -0,0 +1,278 @@
++/*
++ * Renesas 16bit Compare-match timer
++ *
++ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
++ * (Rev.1.40 R01UH0033EJ0140)
++ *
++ * Copyright (c) 2019 Yoshinori Sato
++ *
++ * This program is free software; you can redistribute it and/or modify =
+it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOU=
+T
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
+ for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License alo=
+ng with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
++#include "qemu/timer.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "hw/irq.h"
++#include "hw/sysbus.h"
++#include "hw/registerfields.h"
++#include "hw/qdev-properties.h"
++#include "hw/timer/renesas_cmt.h"
++#include "migration/vmstate.h"
++#include "qemu/error-report.h"
++
++/*
++ *  +0 CMSTR - common control
++ *  +2 CMCR  - ch0
++ *  +4 CMCNT - ch0
++ *  +6 CMCOR - ch0
++ *  +8 CMCR  - ch1
++ * +10 CMCNT - ch1
++ * +12 CMCOR - ch1
++ * If we think that the address of CH 0 has an offset of +2,
++ * we can treat it with the same address as CH 1, so define it like that=
+.
++ */
++REG16(CMSTR, 0)
++  FIELD(CMSTR, STR0, 0, 1)
++  FIELD(CMSTR, STR1, 1, 1)
++  FIELD(CMSTR, STR,  0, 2)
++/* This addeess is channel offset */
++REG16(CMCR, 0)
++  FIELD(CMCR, CKS, 0, 2)
++  FIELD(CMCR, CMIE, 6, 1)
++REG16(CMCNT, 2)
++REG16(CMCOR, 4)
++
++static void update_events(RCMTState *cmt, int ch)
++{
++    int64_t next_time;
++
++    if ((cmt->cmstr & (1 << ch)) =3D=3D 0) {
++        /* count disable, so not happened next event. */
++        return ;
++    }
++    next_time =3D cmt->cmcor[ch] - cmt->cmcnt[ch];
++    next_time *=3D NANOSECONDS_PER_SECOND;
++    next_time /=3D cmt->input_freq;
++    /*
++     * CKS -> div rate
++     *  0 -> 8 (1 << 3)
++     *  1 -> 32 (1 << 5)
++     *  2 -> 128 (1 << 7)
++     *  3 -> 512 (1 << 9)
++     */
++    next_time *=3D 1 << (3 + FIELD_EX16(cmt->cmcr[ch], CMCR, CKS) * 2);
++    next_time +=3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    timer_mod(cmt->timer[ch], next_time);
++}
++
++static int64_t read_cmcnt(RCMTState *cmt, int ch)
++{
++    int64_t delta, now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++
++    if (cmt->cmstr & (1 << ch)) {
++        delta =3D (now - cmt->tick[ch]);
++        delta /=3D NANOSECONDS_PER_SECOND;
++        delta /=3D cmt->input_freq;
++        delta /=3D 1 << (3 + FIELD_EX16(cmt->cmcr[ch], CMCR, CKS) * 2);
++        cmt->tick[ch] =3D now;
++        return cmt->cmcnt[ch] + delta;
++    } else {
++        return cmt->cmcnt[ch];
++    }
++}
++
++static uint64_t cmt_read(void *opaque, hwaddr addr, unsigned size)
++{
++    hwaddr offset =3D addr & 0x0f;
++    RCMTState *cmt =3D opaque;
++    int ch =3D offset / 0x08;
++    uint64_t ret;
++
++    if (offset =3D=3D A_CMSTR) {
++        ret =3D 0;
++        ret =3D FIELD_DP16(ret, CMSTR, STR,
++                         FIELD_EX16(cmt->cmstr, CMSTR, STR));
++        return ret;
++    } else {
++        offset &=3D 0x07;
++        if (ch =3D=3D 0) {
++            offset -=3D 0x02;
++        }
++        switch (offset) {
++        case A_CMCR:
++            ret =3D 0;
++            ret =3D FIELD_DP16(ret, CMCR, CKS,
++                             FIELD_EX16(cmt->cmstr, CMCR, CKS));
++            ret =3D FIELD_DP16(ret, CMCR, CMIE,
++                             FIELD_EX16(cmt->cmstr, CMCR, CMIE));
++            return ret;
++        case A_CMCNT:
++            return read_cmcnt(cmt, ch);
++        case A_CMCOR:
++            return cmt->cmcor[ch];
++        }
++    }
++    qemu_log_mask(LOG_UNIMP, "renesas_cmt: Register 0x%"
++                  HWADDR_PRIX " not implemented\n", offset);
++    return UINT64_MAX;
++}
++
++static void start_stop(RCMTState *cmt, int ch, int st)
++{
++    if (st) {
++        update_events(cmt, ch);
++    } else {
++        timer_del(cmt->timer[ch]);
++    }
++}
++
++static void cmt_write(void *opaque, hwaddr addr, uint64_t val, unsigned =
+size)
++{
++    hwaddr offset =3D addr & 0x0f;
++    RCMTState *cmt =3D opaque;
++    int ch =3D offset / 0x08;
++
++    if (offset =3D=3D A_CMSTR) {
++        cmt->cmstr =3D FIELD_EX16(val, CMSTR, STR);
++        start_stop(cmt, 0, FIELD_EX16(cmt->cmstr, CMSTR, STR0));
++        start_stop(cmt, 1, FIELD_EX16(cmt->cmstr, CMSTR, STR1));
++    } else {
++        offset &=3D 0x07;
++        if (ch =3D=3D 0) {
++            offset -=3D 0x02;
++        }
++        switch (offset) {
++        case A_CMCR:
++            cmt->cmcr[ch] =3D FIELD_DP16(cmt->cmcr[ch], CMCR, CKS,
++                                       FIELD_EX16(val, CMCR, CKS));
++            cmt->cmcr[ch] =3D FIELD_DP16(cmt->cmcr[ch], CMCR, CMIE,
++                                       FIELD_EX16(val, CMCR, CMIE));
++            break;
++        case 2:
++            cmt->cmcnt[ch] =3D val;
++            break;
++        case 4:
++            cmt->cmcor[ch] =3D val;
++            break;
++        default:
++            qemu_log_mask(LOG_UNIMP, "renesas_cmt: Register -0x%" HWADDR=
+_PRIX
++                          " not implemented\n", offset);
++            return;
++        }
++        if (FIELD_EX16(cmt->cmstr, CMSTR, STR) & (1 << ch)) {
++            update_events(cmt, ch);
++        }
++    }
++}
++
++static const MemoryRegionOps cmt_ops =3D {
++    .write =3D cmt_write,
++    .read  =3D cmt_read,
++    .endianness =3D DEVICE_NATIVE_ENDIAN,
++    .impl =3D {
++        .min_access_size =3D 2,
++        .max_access_size =3D 2,
++    },
++};
++
++static void timer_events(RCMTState *cmt, int ch)
++{
++    cmt->cmcnt[ch] =3D 0;
++    cmt->tick[ch] =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    update_events(cmt, ch);
++    if (FIELD_EX16(cmt->cmcr[ch], CMCR, CMIE)) {
++        qemu_irq_pulse(cmt->cmi[ch]);
++    }
++}
++
++static void timer_event0(void *opaque)
++{
++    RCMTState *cmt =3D opaque;
++
++    timer_events(cmt, 0);
++}
++
++static void timer_event1(void *opaque)
++{
++    RCMTState *cmt =3D opaque;
++
++    timer_events(cmt, 1);
++}
++
++static void rcmt_reset(DeviceState *dev)
++{
++    RCMTState *cmt =3D RCMT(dev);
++    cmt->cmstr =3D 0;
++    cmt->cmcr[0] =3D cmt->cmcr[1] =3D 0;
++    cmt->cmcnt[0] =3D cmt->cmcnt[1] =3D 0;
++    cmt->cmcor[0] =3D cmt->cmcor[1] =3D 0xffff;
++}
++
++static void rcmt_init(Object *obj)
++{
++    SysBusDevice *d =3D SYS_BUS_DEVICE(obj);
++    RCMTState *cmt =3D RCMT(obj);
++    int i;
++
++    memory_region_init_io(&cmt->memory, OBJECT(cmt), &cmt_ops,
++                          cmt, "renesas-cmt", 0x10);
++    sysbus_init_mmio(d, &cmt->memory);
++
++    for (i =3D 0; i < ARRAY_SIZE(cmt->cmi); i++) {
++        sysbus_init_irq(d, &cmt->cmi[i]);
++    }
++    cmt->timer[0] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, timer_event0, cmt=
+);
++    cmt->timer[1] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, timer_event1, cmt=
+);
++}
++
++static const VMStateDescription vmstate_rcmt =3D {
++    .name =3D "rx-cmt",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static Property rcmt_properties[] =3D {
++    DEFINE_PROP_UINT64("input-freq", RCMTState, input_freq, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void rcmt_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->props =3D rcmt_properties;
++    dc->vmsd =3D &vmstate_rcmt;
++    dc->reset =3D rcmt_reset;
++}
++
++static const TypeInfo rcmt_info =3D {
++    .name       =3D TYPE_RENESAS_CMT,
++    .parent     =3D TYPE_SYS_BUS_DEVICE,
++    .instance_size =3D sizeof(RCMTState),
++    .instance_init =3D rcmt_init,
++    .class_init =3D rcmt_class_init,
++};
++
++static void rcmt_register_types(void)
++{
++    type_register_static(&rcmt_info);
++}
++
++type_init(rcmt_register_types)
+diff --git a/hw/timer/renesas_tmr.c b/hw/timer/renesas_tmr.c
+new file mode 100644
+index 0000000000..eebdd0cb1f
+--- /dev/null
++++ b/hw/timer/renesas_tmr.c
+@@ -0,0 +1,458 @@
++/*
++ * Renesas 8bit timer
++ *
++ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
++ * (Rev.1.40 R01UH0033EJ0140)
++ *
++ * Copyright (c) 2019 Yoshinori Sato
++ *
++ * This program is free software; you can redistribute it and/or modify =
+it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOU=
+T
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
+ for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License alo=
+ng with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
++#include "qemu/timer.h"
++#include "qemu/bitops.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "hw/irq.h"
++#include "hw/sysbus.h"
++#include "hw/registerfields.h"
++#include "hw/qdev-properties.h"
++#include "hw/timer/renesas_tmr.h"
++#include "migration/vmstate.h"
++#include "qemu/error-report.h"
++
++REG8(TCR, 0)
++  FIELD(TCR, CCLR, 3, 2)
++  FIELD(TCR, OVIE, 5, 1)
++  FIELD(TCR, CMIEA, 6, 1)
++  FIELD(TCR, CMIEB, 7, 1)
++REG8(TCSR, 2)
++  FIELD(TCSR, OSA, 0, 2)
++  FIELD(TCSR, OSB, 2, 2)
++  FIELD(TCSR, ADTE, 4, 2)
++REG8(TCORA, 4)
++REG8(TCORB, 6)
++REG8(TCNT, 8)
++REG8(TCCR, 10)
++  FIELD(TCCR, CKS, 0, 3)
++  FIELD(TCCR, CSS, 3, 2)
++  FIELD(TCCR, TMRIS, 7, 1)
++
++#define INTERNAL  0x01
++#define CASCADING 0x03
++#define CCLR_A    0x01
++#define CCLR_B    0x02
++
++static const int clkdiv[] =3D {0, 1, 2, 8, 32, 64, 1024, 8192};
++
++#define concat_reg(reg) ((reg[0] << 8) | reg[1])
++static void update_events(RTMRState *tmr, int ch)
++{
++    uint16_t diff[TMR_NR_EVENTS], min;
++    int64_t next_time;
++    int i, event;
++
++    if (tmr->tccr[ch] =3D=3D 0) {
++        return ;
++    }
++    if (FIELD_EX8(tmr->tccr[ch], TCCR, CSS) =3D=3D 0) {
++        /* external clock mode */
++        /* event not happened */
++        return ;
++    }
++    if (FIELD_EX8(tmr->tccr[0], TCCR, CSS) =3D=3D CASCADING) {
++        /* cascading mode */
++        if (ch =3D=3D 1) {
++            tmr->next[ch] =3D none;
++            return ;
++        }
++        diff[cmia] =3D concat_reg(tmr->tcora) - concat_reg(tmr->tcnt);
++        diff[cmib] =3D concat_reg(tmr->tcorb) - concat_reg(tmr->tcnt);
++        diff[ovi] =3D 0x10000 - concat_reg(tmr->tcnt);
++    } else {
++        /* separate mode */
++        diff[cmia] =3D tmr->tcora[ch] - tmr->tcnt[ch];
++        diff[cmib] =3D tmr->tcorb[ch] - tmr->tcnt[ch];
++        diff[ovi] =3D 0x100 - tmr->tcnt[ch];
++    }
++    /* Search for the most recently occurring event. */
++    for (event =3D 0, min =3D diff[0], i =3D 1; i < none; i++) {
++        if (min > diff[i]) {
++            event =3D i;
++            min =3D diff[i];
++        }
++    }
++    tmr->next[ch] =3D event;
++    next_time =3D diff[event];
++    next_time *=3D clkdiv[FIELD_EX8(tmr->tccr[ch], TCCR, CKS)];
++    next_time *=3D NANOSECONDS_PER_SECOND;
++    next_time /=3D tmr->input_freq;
++    next_time +=3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    timer_mod(tmr->timer[ch], next_time);
++}
++
++
++static inline int elapsed_time(RTMRState *tmr, int ch, int64_t delta)
++{
++    int divrate =3D clkdiv[FIELD_EX8(tmr->tccr[ch], TCCR, CKS)];
++    int et;
++
++    tmr->div_round[ch] +=3D delta;
++    if (divrate > 0) {
++        et =3D tmr->div_round[ch] / divrate;
++        tmr->div_round[ch] %=3D divrate;
++    } else {
++        /* disble clock. so no update */
++        et =3D 0;
++    }
++    return et;
++}
++static uint16_t read_tcnt(RTMRState *tmr, unsigned size, int ch)
++{
++    int64_t delta, now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    int elapsed, ovf =3D 0;
++    uint16_t tcnt[2];
++    uint32_t ret;
++
++    delta =3D (now - tmr->tick) * NANOSECONDS_PER_SECOND / tmr->input_fr=
+eq;
++    if (delta > 0) {
++        tmr->tick =3D now;
++
++        if (FIELD_EX8(tmr->tccr[1], TCCR, CSS) =3D=3D INTERNAL) {
++            /* timer1 count update */
++            elapsed =3D elapsed_time(tmr, 1, delta);
++            if (elapsed >=3D 0x100) {
++                ovf =3D elapsed >> 8;
++            }
++            tcnt[1] =3D tmr->tcnt[1] + (elapsed & 0xff);
++        }
++        switch (FIELD_EX8(tmr->tccr[0], TCCR, CSS)) {
++        case INTERNAL:
++            elapsed =3D elapsed_time(tmr, 0, delta);
++            tcnt[0] =3D tmr->tcnt[0] + elapsed;
++            break;
++        case CASCADING:
++            if (ovf > 0) {
++                tcnt[0] =3D tmr->tcnt[0] + ovf;
++            }
++            break;
++        }
++    } else {
++        tcnt[0] =3D tmr->tcnt[0];
++        tcnt[1] =3D tmr->tcnt[1];
++    }
++    if (size =3D=3D 1) {
++        return tcnt[ch];
++    } else {
++        ret =3D 0;
++        ret =3D deposit32(ret, 0, 8, tcnt[1]);
++        ret =3D deposit32(ret, 8, 8, tcnt[0]);
++        return ret;
++    }
++}
++
++static inline uint8_t read_tccr(uint8_t r)
++{
++    uint8_t tccr =3D 0;
++    tccr =3D FIELD_DP8(tccr, TCCR, TMRIS,
++                     FIELD_EX8(r, TCCR, TMRIS));
++    tccr =3D FIELD_DP8(tccr, TCCR, CSS,
++                     FIELD_EX8(r, TCCR, CSS));
++    tccr =3D FIELD_DP8(tccr, TCCR, CKS,
++                     FIELD_EX8(r, TCCR, CKS));
++    return tccr;
++}
++
++static uint64_t tmr_read(void *opaque, hwaddr addr, unsigned size)
++{
++    RTMRState *tmr =3D opaque;
++    int ch =3D addr & 1;
++    uint64_t ret;
++
++    if (size =3D=3D 2 && (ch !=3D 0 || addr =3D=3D A_TCR || addr =3D=3D =
+A_TCSR)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "renesas_tmr: Invalid read size 0=
+x%"
++                      HWADDR_PRIX "\n", addr);
++        return UINT64_MAX;
++    }
++    switch (addr & 0x0e) {
++    case A_TCR:
++        ret =3D 0;
++        ret =3D FIELD_DP8(ret, TCR, CCLR,
++                        FIELD_EX8(tmr->tcr[ch], TCR, CCLR));
++        ret =3D FIELD_DP8(ret, TCR, OVIE,
++                        FIELD_EX8(tmr->tcr[ch], TCR, OVIE));
++        ret =3D FIELD_DP8(ret, TCR, CMIEA,
++                        FIELD_EX8(tmr->tcr[ch], TCR, CMIEA));
++        ret =3D FIELD_DP8(ret, TCR, CMIEB,
++                        FIELD_EX8(tmr->tcr[ch], TCR, CMIEB));
++        return ret;
++    case A_TCSR:
++        ret =3D 0;
++        ret =3D FIELD_DP8(ret, TCSR, OSA,
++                        FIELD_EX8(tmr->tcsr[ch], TCSR, OSA));
++        ret =3D FIELD_DP8(ret, TCSR, OSB,
++                        FIELD_EX8(tmr->tcsr[ch], TCSR, OSB));
++        switch (ch) {
++        case 0:
++            ret =3D FIELD_DP8(ret, TCSR, ADTE,
++                            FIELD_EX8(tmr->tcsr[ch], TCSR, ADTE));
++            break;
++        case 1: /* CH1 ADTE unimplement always 1 */
++            ret =3D FIELD_DP8(ret, TCSR, ADTE, 1);
++            break;
++        }
++        return ret;
++    case A_TCORA:
++        if (size =3D=3D 1) {
++            return tmr->tcora[ch];
++        } else if (ch =3D=3D 0) {
++            return concat_reg(tmr->tcora);
++        }
++    case A_TCORB:
++        if (size =3D=3D 1) {
++            return tmr->tcorb[ch];
++        } else {
++            return concat_reg(tmr->tcorb);
++        }
++    case A_TCNT:
++        return read_tcnt(tmr, size, ch);
++    case A_TCCR:
++        if (size =3D=3D 1) {
++            return read_tccr(tmr->tccr[ch]);
++        } else {
++            return read_tccr(tmr->tccr[0]) << 8 | read_tccr(tmr->tccr[1]=
+);
++        }
++    default:
++        qemu_log_mask(LOG_UNIMP, "renesas_tmr: Register 0x%" HWADDR_PRIX
++                      " not implemented\n", addr);
++        break;
++    }
++    return UINT64_MAX;
++}
++
++#define COUNT_WRITE(reg, val)                   \
++    do {                                        \
++        if (size =3D=3D 1) {                        \
++            tmr->reg[ch] =3D val;                 \
++            update_events(tmr, ch);             \
++        } else {                                \
++            tmr->reg[0] =3D extract32(val, 8, 8); \
++            tmr->reg[1] =3D extract32(val, 0, 8); \
++            update_events(tmr, 0);              \
++            update_events(tmr, 1);              \
++        }                                       \
++    } while (0)
++
++static void tmr_write(void *opaque, hwaddr addr, uint64_t val, unsigned =
+size)
++{
++    RTMRState *tmr =3D opaque;
++    int ch =3D addr & 1;
++
++    if (size =3D=3D 2 && (ch !=3D 0 || addr =3D=3D A_TCR || addr =3D=3D =
+A_TCSR)) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "renesas_tmr: Invalid write size 0x%" HWADDR_PRIX
++                      "\n", addr);
++        return;
++    }
++    switch (addr & 0x0e) {
++    case A_TCR:
++        tmr->tcr[ch] =3D val;
++        break;
++    case A_TCSR:
++        tmr->tcsr[ch] =3D val;
++        break;
++    case A_TCORA:
++        COUNT_WRITE(tcora, val);
++        break;
++    case A_TCORB:
++        COUNT_WRITE(tcorb, val);
++        break;
++    case A_TCNT:
++        COUNT_WRITE(tcnt, val);
++        break;
++    case A_TCCR:
++        COUNT_WRITE(tccr, val);
++        break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "renesas_tmr: Register 0x%" HWADDR_PRIX
++                      " not implemented\n", addr);
++        break;
++    }
++}
++
++static const MemoryRegionOps tmr_ops =3D {
++    .write =3D tmr_write,
++    .read  =3D tmr_read,
++    .endianness =3D DEVICE_LITTLE_ENDIAN,
++    .impl =3D {
++        .min_access_size =3D 1,
++        .max_access_size =3D 2,
++    },
++};
++
++static void timer_events(RTMRState *tmr, int ch);
++
++static uint16_t issue_event(RTMRState *tmr, int ch, int sz,
++                        uint16_t tcnt, uint16_t tcora, uint16_t tcorb)
++{
++    uint16_t ret =3D tcnt;
++
++    switch (tmr->next[ch]) {
++    case none:
++        break;
++    case cmia:
++        if (tcnt >=3D tcora) {
++            if (FIELD_EX8(tmr->tcr[ch], TCR, CCLR) =3D=3D CCLR_A) {
++                ret =3D tcnt - tcora;
++            }
++            if (FIELD_EX8(tmr->tcr[ch], TCR, CMIEA)) {
++                qemu_irq_pulse(tmr->cmia[ch]);
++            }
++            if (sz =3D=3D 8 && ch =3D=3D 0 &&
++                FIELD_EX8(tmr->tccr[1], TCCR, CSS) =3D=3D CASCADING) {
++                tmr->tcnt[1]++;
++                timer_events(tmr, 1);
++            }
++        }
++        break;
++    case cmib:
++        if (tcnt >=3D tcorb) {
++            if (FIELD_EX8(tmr->tcr[ch], TCR, CCLR) =3D=3D CCLR_B) {
++                ret =3D tcnt - tcorb;
++            }
++            if (FIELD_EX8(tmr->tcr[ch], TCR, CMIEB)) {
++                qemu_irq_pulse(tmr->cmib[ch]);
++            }
++        }
++        break;
++    case ovi:
++        if ((tcnt >=3D (1 << sz)) && FIELD_EX8(tmr->tcr[ch], TCR, OVIE))=
+ {
++            qemu_irq_pulse(tmr->ovi[ch]);
++        }
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    return ret;
++}
++
++static void timer_events(RTMRState *tmr, int ch)
++{
++    uint16_t tcnt;
++    tmr->tcnt[ch] =3D read_tcnt(tmr, 1, ch);
++    if (FIELD_EX8(tmr->tccr[0], TCCR, CSS) !=3D CASCADING) {
++        tmr->tcnt[ch] =3D issue_event(tmr, ch, 8,
++                                    tmr->tcnt[ch],
++                                    tmr->tcora[ch], tmr->tcorb[ch]) & 0x=
+ff;
++    } else {
++        if (ch =3D=3D 1) {
++            return ;
++        }
++        tcnt =3D issue_event(tmr, ch, 16,
++                           concat_reg(tmr->tcnt),
++                           concat_reg(tmr->tcora),
++                           concat_reg(tmr->tcorb));
++        tmr->tcnt[0] =3D (tcnt >> 8) & 0xff;
++        tmr->tcnt[1] =3D tcnt & 0xff;
++    }
++    update_events(tmr, ch);
++}
++
++static void timer_event0(void *opaque)
++{
++    RTMRState *tmr =3D opaque;
++
++    timer_events(tmr, 0);
++}
++
++static void timer_event1(void *opaque)
++{
++    RTMRState *tmr =3D opaque;
++
++    timer_events(tmr, 1);
++}
++
++static void rtmr_reset(DeviceState *dev)
++{
++    RTMRState *tmr =3D RTMR(dev);
++    tmr->tcr[0]   =3D tmr->tcr[1]   =3D 0x00;
++    tmr->tcsr[0]  =3D 0x00;
++    tmr->tcsr[1]  =3D 0x10;
++    tmr->tcnt[0]  =3D tmr->tcnt[1]  =3D 0x00;
++    tmr->tcora[0] =3D tmr->tcora[1] =3D 0xff;
++    tmr->tcorb[0] =3D tmr->tcorb[1] =3D 0xff;
++    tmr->tccr[0]  =3D tmr->tccr[1]  =3D 0x00;
++    tmr->next[0]  =3D tmr->next[1]  =3D none;
++    tmr->tick =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++}
++
++static void rtmr_init(Object *obj)
++{
++    SysBusDevice *d =3D SYS_BUS_DEVICE(obj);
++    RTMRState *tmr =3D RTMR(obj);
++    int i;
++
++    memory_region_init_io(&tmr->memory, OBJECT(tmr), &tmr_ops,
++                          tmr, "renesas-tmr", 0x10);
++    sysbus_init_mmio(d, &tmr->memory);
++
++    for (i =3D 0; i < ARRAY_SIZE(tmr->ovi); i++) {
++        sysbus_init_irq(d, &tmr->cmia[i]);
++        sysbus_init_irq(d, &tmr->cmib[i]);
++        sysbus_init_irq(d, &tmr->ovi[i]);
++    }
++    tmr->timer[0] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, timer_event0, tmr=
+);
++    tmr->timer[1] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, timer_event1, tmr=
+);
++}
++
++static const VMStateDescription vmstate_rtmr =3D {
++    .name =3D "rx-tmr",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static Property rtmr_properties[] =3D {
++    DEFINE_PROP_UINT64("input-freq", RTMRState, input_freq, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void rtmr_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->props =3D rtmr_properties;
++    dc->vmsd =3D &vmstate_rtmr;
++    dc->reset =3D rtmr_reset;
++}
++
++static const TypeInfo rtmr_info =3D {
++    .name       =3D TYPE_RENESAS_TMR,
++    .parent     =3D TYPE_SYS_BUS_DEVICE,
++    .instance_size =3D sizeof(RTMRState),
++    .instance_init =3D rtmr_init,
++    .class_init =3D rtmr_class_init,
++};
++
++static void rtmr_register_types(void)
++{
++    type_register_static(&rtmr_info);
++}
++
++type_init(rtmr_register_types)
+diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
+index eefc95f35e..4c93874159 100644
+--- a/hw/timer/Kconfig
++++ b/hw/timer/Kconfig
+@@ -58,3 +58,9 @@ config CMSDK_APB_TIMER
+ config CMSDK_APB_DUALTIMER
+     bool
+     select PTIMER
++
++config RENESAS_TMR8
++    bool
++
++config RENESAS_CMT
++    bool
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index 123d92c969..706bd1510c 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -40,6 +40,9 @@ obj-$(CONFIG_MC146818RTC) +=3D mc146818rtc.o
+=20
+ obj-$(CONFIG_ALLWINNER_A10_PIT) +=3D allwinner-a10-pit.o
+=20
++obj-$(CONFIG_RENESAS_TMR8) +=3D renesas_tmr.o
++obj-$(CONFIG_RENESAS_CMT) +=3D renesas_cmt.o
++
+ common-obj-$(CONFIG_STM32F2XX_TIMER) +=3D stm32f2xx_timer.o
+ common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_timer.o aspeed_rtc.o
+=20
+--=20
+2.20.1
 
-How did they get in there? :eyeroll:
-
-Thanks. v5 I guess.
-
-Andrew
 
