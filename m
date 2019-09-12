@@ -2,63 +2,64 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FF84C5ACAE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:53:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02CB9C5ACAE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:53:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA8BD206A5
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:53:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA8BD206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BB4EB206A5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 09:53:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB4EB206A5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8Lmu-0006T2-1o
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 05:53:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48169)
+	id 1i8LnC-0006z6-TL
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 05:53:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48900)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i8Li3-0000oX-5w
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:48:16 -0400
+ (envelope-from <clg@kaod.org>) id 1i8Lm8-0005su-Hv
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:52:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i8Li1-0001IR-KM
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:48:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47516)
+ (envelope-from <clg@kaod.org>) id 1i8Lm1-0003d5-HC
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:52:24 -0400
+Received: from 8.mo3.mail-out.ovh.net ([87.98.172.249]:38809)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1i8Lhx-0001F0-44; Thu, 12 Sep 2019 05:48:09 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5855418CB8E1;
- Thu, 12 Sep 2019 09:48:08 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.59])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D43D75D9CA;
- Thu, 12 Sep 2019 09:48:03 +0000 (UTC)
-Message-ID: <f86f16f86445dbe67c4292155348eb2bf9ba4caa.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>
-Date: Thu, 12 Sep 2019 12:48:02 +0300
-In-Reply-To: <20190906135535.GL5119@redhat.com>
-References: <20190830205608.18192-1-mlevitsk@redhat.com>
- <20190830205608.18192-4-mlevitsk@redhat.com>
- <20190906135535.GL5119@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Thu, 12 Sep 2019 09:48:08 +0000 (UTC)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1i8Llw-0003Zg-Mo
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 05:52:18 -0400
+Received: from player730.ha.ovh.net (unknown [10.108.57.183])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id B3CA922758D
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 11:52:08 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+ (Authenticated sender: clg@kaod.org)
+ by player730.ha.ovh.net (Postfix) with ESMTPSA id 07C5099A8935;
+ Thu, 12 Sep 2019 09:51:56 +0000 (UTC)
+To: Balamuruhan S <bala24@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20190912093056.4516-1-bala24@linux.ibm.com>
+ <20190912093056.4516-4-bala24@linux.ibm.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <bd8141e4-bfc8-5dc2-608e-945a8f6ca405@kaod.org>
+Date: Thu, 12 Sep 2019 11:51:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190912093056.4516-4-bala24@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 1533475676693171026
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrtdehgddvtdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 03/10] qcrypto-luks: implement the
- encryption key management
+X-Received-From: 87.98.172.249
+Subject: Re: [Qemu-devel] [PATCH v3 3/4] hw/ppc/pnv_homer: add PowerNV homer
+ device model
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,266 +71,494 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: maddy@linux.vnet.ibm.com, groug@kaod.org, anju@linux.vnet.ibm.com,
+ qemu-ppc@nongnu.org, hari@linux.vnet.ibm.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 2019-09-06 at 14:55 +0100, Daniel P. Berrang=C3=A9 wrote:
-> On Fri, Aug 30, 2019 at 11:56:01PM +0300, Maxim Levitsky wrote:
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  crypto/block-luks.c | 366 ++++++++++++++++++++++++++++++++++++++++++=
-+-
-> >  1 file changed, 364 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/crypto/block-luks.c b/crypto/block-luks.c
-> > index ba20d55246..21325fbc79 100644
-> > --- a/crypto/block-luks.c
-> > +++ b/crypto/block-luks.c
-> > @@ -70,6 +70,9 @@ typedef struct QCryptoBlockLUKSKeySlot QCryptoBlock=
-LUKSKeySlot;
-> > =20
-> >  #define QCRYPTO_BLOCK_LUKS_SECTOR_SIZE 512LL
-> > =20
-> > +#define QCRYPTO_BLOCK_LUKS_DEFAULT_ITER_TIME 2000
+On 12/09/2019 11:30, Balamuruhan S wrote:
+> add PnvHomer device model to emulate homer memory access
+> for pstate table, occ-sensors, slw, occ static and dynamic
+> values for Power8 and Power9 chips.
 >=20
-> Perhaps use  ITER_TIME_MS to make it clear it is millisecs
-Why not... done.
-
->=20
-> > +#define QCRYPTO_BLOCK_LUKS_ERASE_ITERATIONS 40
-> > +
-> >  static const char qcrypto_block_luks_magic[QCRYPTO_BLOCK_LUKS_MAGIC_=
-LEN] =3D {
-> >      'L', 'U', 'K', 'S', 0xBA, 0xBE
-> >  };
-> > @@ -219,6 +222,9 @@ struct QCryptoBlockLUKS {
-> > =20
-> >      /* Hash algorithm used in pbkdf2 function */
-> >      QCryptoHashAlgorithm hash_alg;
-> > +
-> > +    /* Name of the secret that was used to open the image */
-> > +    char *secret;
-> > +
-> > +/*
-> > + * Returns true if a slot i is marked as active
-> > + * (contains encrypted copy of the master key)
-> > + */
-> > +
-> > +static bool
->=20
-> No blank line is wanted between the comment & function.
-> Likewise for the rest of this patch series
-No problem!
+> Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
 
 
->=20
-> > +qcrypto_block_luks_slot_active(const QCryptoBlockLUKS *luks,
-> > +                               unsigned int slot_idx)
-> > +{
-> > +    uint32_t val =3D luks->header.key_slots[slot_idx].active;
-> > +    return val =3D=3D  QCRYPTO_BLOCK_LUKS_KEY_SLOT_ENABLED;
-> > +}
->=20
->=20
->=20
-> > +static int
-> > +qcrypto_block_luks_erase_key(QCryptoBlock *block,
-> > +                             unsigned int slot_idx,
-> > +                             QCryptoBlockWriteFunc writefunc,
-> > +                             void *opaque,
-> > +                             Error **errp)
-> > +{
-> > +    QCryptoBlockLUKS *luks =3D block->opaque;
-> > +    QCryptoBlockLUKSKeySlot *slot =3D &luks->header.key_slots[slot_i=
-dx];
-> > +    g_autofree uint8_t *garbagesplitkey =3D NULL;
-> > +    size_t splitkeylen =3D luks->header.master_key_len * slot->strip=
-es;
-> > +    size_t i;
-> > +
-> > +    assert(slot_idx < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS);
-> > +    assert(splitkeylen > 0);
-> > +
-> > +    garbagesplitkey =3D g_malloc0(splitkeylen);
->=20
-> I'd prefer   g_new0(uint8_t, splitkeylen)
-Done.
 
->=20
-> > +
-> > +    /* Reset the key slot header */
-> > +    memset(slot->salt, 0, QCRYPTO_BLOCK_LUKS_SALT_LEN);
-> > +    slot->iterations =3D 0;
-> > +    slot->active =3D QCRYPTO_BLOCK_LUKS_KEY_SLOT_DISABLED;
-> > +
->=20
->=20
-> > @@ -1522,6 +1700,187 @@ qcrypto_block_luks_create(QCryptoBlock *block=
-,
-> >  }
-> > =20
-> > =20
-> > +#define CHECK_NON_AMEND_OPTION(luks, luks_opts, name) \
-> > +    if (luks_opts.has_##name && luks_opts.name !=3D luks->name) { \
-> > +            error_setg(errp, "Option \"" #name "\" can't be amended"=
-); \
-> > +            goto cleanup; \
-> > +    }
-> > +
-> > +static int
-> > +qcrypto_block_luks_amend_options(QCryptoBlock *block,
-> > +                                 QCryptoBlockReadFunc readfunc,
-> > +                                 QCryptoBlockWriteFunc writefunc,
-> > +                                 void *opaque,
-> > +                                 QCryptoBlockCreateOptions *options,
-> > +                                 bool force,
-> > +                                 Error **errp)
-> > +{
-> > +    QCryptoBlockLUKS *luks =3D block->opaque;
-> > +    QCryptoBlockCreateOptionsLUKS luks_opts;
-> > +    g_autofree char *old_password =3D NULL;
-> > +    g_autofree char *password =3D NULL;
-> > +    const char *unlock_secret =3D luks->secret;
-> > +    g_autofree uint8_t *masterkey =3D NULL;
-> > +    int slot =3D -1;
-> > +    int ret =3D -1;
-> > +    bool active =3D true;
-> > +    int64_t iter_time =3D QCRYPTO_BLOCK_LUKS_DEFAULT_ITER_TIME;
-> > +
-> > +    memcpy(&luks_opts, &options->u.luks, sizeof(luks_opts));
-> > +
-> > +    CHECK_NON_AMEND_OPTION(luks, luks_opts, cipher_alg);
-> > +    CHECK_NON_AMEND_OPTION(luks, luks_opts, cipher_mode);
-> > +    CHECK_NON_AMEND_OPTION(luks, luks_opts, ivgen_alg);
-> > +    CHECK_NON_AMEND_OPTION(luks, luks_opts, ivgen_hash_alg);
-> > +    CHECK_NON_AMEND_OPTION(luks, luks_opts, hash_alg);
-> > +
-> > +    /* Read given slot and check it */
-> > +    if (luks_opts.has_slot) {
-> > +        slot =3D luks_opts.slot;
-> > +        if (slot < 0 || slot >=3D QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS) =
-{
-> > +            error_setg(errp,
-> > +                       "Given key slot %i is not supported by LUKS",=
- slot);
-> > +             goto cleanup;
->=20
-> Off by 1 one indent
-Sorry about that.
->=20
-> > +        }
-> > +    }
-> > +
-> > +    if (luks_opts.has_iter_time) {
-> > +        iter_time =3D luks_opts.iter_time;
-> > +    }
-> > +
-> > +    if (luks_opts.has_active && luks_opts.active =3D=3D false) {
-> > +        active =3D false;
-> > +    }
-> > +
-> > +    if (active) {
-> > +
-> > +        /* Check that we are not overwriting an active slot */
-> > +        if (!force && slot !=3D -1 &&
-> > +            qcrypto_block_luks_slot_active(luks, slot)) {
-> > +
-> > +            error_setg(errp, "Can't update an active key slot %i",
-> > +                       slot);
-> > +            goto cleanup;
-> > +        }
-> > +
-> > +        /* check that we have the passwords*/
-> > +        if (!luks_opts.has_key_secret) {
-> > +            error_setg(errp, "Can't add a key slot without a  passwo=
-rd");
-> > +            goto cleanup;
-> > +        }
-> > +
-> > +        if (luks_opts.has_unlock_secret) {
-> > +            unlock_secret =3D luks_opts.unlock_secret;
-> > +        }
-> > +
-> > +        /* Read the old password */
-> > +        old_password =3D qcrypto_secret_lookup_as_utf8(unlock_secret=
-, errp);
-> > +        if (!old_password) {
-> > +            goto cleanup;
-> > +        }
-> > +
-> > +        masterkey =3D g_new0(uint8_t, luks->header.master_key_len);
-> > +
-> > +        /* Retrieve the master key*/
-> > +        if (qcrypto_block_luks_find_key(block, old_password, masterk=
-ey,
-> > +                                        readfunc, opaque,
-> > +                                        errp) < 0) {
-> > +            error_append_hint(errp,
-> > +                              "unlock secret, doesn't unlock the ima=
-ge");
->=20
-> No need for the ',' in this msg I think.
-Fixed and reworded a bit.
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
->=20
-> > +            goto cleanup;
-> > +        }
-> > +
-> > +        /* Read the new password*/
-> > +        password =3D qcrypto_secret_lookup_as_utf8(luks_opts.key_sec=
-ret, errp);
-> > +        if (!password) {
-> > +            goto cleanup;
-> > +        }
-> > +
-> > +        /* Find the new slot to write to */
-> > +        if (slot =3D=3D -1) {
-> > +            slot =3D qcrypto_block_luks_find_free_keyslot(luks);
-> > +
-> > +            if (slot =3D=3D -1) {
-> > +                error_setg(errp,
-> > +                           "Can't add a keyslot - all key slots are =
-in use");
-> > +                goto cleanup;
-> > +
-> > +            }
->=20
-> Extra blank line
-Agree
->=20
-> > +        }
-> > +
-> > +        /* Store the master key to the new slot */
-> > +        if (qcrypto_block_luks_store_key(block, slot, password, mast=
-erkey,
-> > +                                         iter_time, writefunc, opaqu=
-e,
-> > +                                         errp)) {
-> > +
->=20
->=20
-> Extra blank line
->=20
-> > +            error_append_hint(errp, "Failed to store the keyslot %i"=
-, slot);
-> > +            goto cleanup;
-> > +        }
-> > +
-> > +    } else {
-> > +
-> > +        /* Check that we are not erasing last key slot */
-> > +        if (qcrypto_block_luks_count_active_slots(luks) <=3D 1) {
-> > +
->=20
-> Extra blank line(s)
+Thanks,
 
-I hope I cleaned all blank lines, sorry about that.
+C.
 
-Best regards,
-	Maxim Levitsky
+> ---
+>  hw/ppc/Makefile.objs       |   1 +
+>  hw/ppc/pnv.c               |  30 +++++
+>  hw/ppc/pnv_homer.c         | 272 +++++++++++++++++++++++++++++++++++++=
+++++++++
+>  include/hw/ppc/pnv.h       |   3 +
+>  include/hw/ppc/pnv_homer.h |  53 +++++++++
+>  5 files changed, 359 insertions(+)
+>  create mode 100644 hw/ppc/pnv_homer.c
+>  create mode 100644 include/hw/ppc/pnv_homer.h
+>=20
+> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+> index 2c4e1c8de0..580bb4f0dd 100644
+> --- a/hw/ppc/Makefile.objs
+> +++ b/hw/ppc/Makefile.objs
+> @@ -9,6 +9,7 @@ obj-$(CONFIG_PSERIES) +=3D spapr_tpm_proxy.o
+>  obj-$(CONFIG_SPAPR_RNG) +=3D  spapr_rng.o
+>  # IBM PowerNV
+>  obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_=
+psi.o pnv_occ.o pnv_bmc.o
+> +obj-$(CONFIG_POWERNV) +=3D pnv_homer.o
+>  ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
+>  obj-y +=3D spapr_pci_vfio.o spapr_pci_nvlink2.o
+>  endif
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 80338ffe87..f249e72356 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -847,6 +847,11 @@ static void pnv_chip_power8_instance_init(Object *=
+obj)
+>                              TYPE_PNV8_OCC, &error_abort, NULL);
+>      object_property_add_const_link(OBJECT(&chip8->occ), "psi",
+>                                     OBJECT(&chip8->psi), &error_abort);
+> +
+> +    object_initialize_child(obj, "homer",  &chip8->homer, sizeof(chip8=
+->homer),
+> +                            TYPE_PNV8_HOMER, &error_abort, NULL);
+> +    object_property_add_const_link(OBJECT(&chip8->homer), "chip", obj,
+> +                                   &error_abort);
+>  }
+> =20
+>  static void pnv_chip_icp_realize(Pnv8Chip *chip8, Error **errp)
+> @@ -942,6 +947,16 @@ static void pnv_chip_power8_realize(DeviceState *d=
+ev, Error **errp)
+>      /* OCC SRAM model */
+>      memory_region_add_subregion(get_system_memory(), PNV_OCC_COMMON_AR=
+EA(chip),
+>                                  &chip8->occ.sram_regs);
+> +
+> +    /* HOMER */
+> +    object_property_set_bool(OBJECT(&chip8->homer), true, "realized",
+> +                             &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +    memory_region_add_subregion(get_system_memory(), PNV_HOMER_BASE(ch=
+ip),
+> +                                &chip8->homer.regs);
+>  }
+> =20
+>  static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data=
+)
+> @@ -1024,6 +1039,11 @@ static void pnv_chip_power9_instance_init(Object=
+ *obj)
+>                              TYPE_PNV9_OCC, &error_abort, NULL);
+>      object_property_add_const_link(OBJECT(&chip9->occ), "psi",
+>                                     OBJECT(&chip9->psi), &error_abort);
+> +
+> +    object_initialize_child(obj, "homer",  &chip9->homer, sizeof(chip9=
+->homer),
+> +                            TYPE_PNV9_HOMER, &error_abort, NULL);
+> +    object_property_add_const_link(OBJECT(&chip9->homer), "chip", obj,
+> +                                   &error_abort);
+>  }
+> =20
+>  static void pnv_chip_quad_realize(Pnv9Chip *chip9, Error **errp)
+> @@ -1134,6 +1154,16 @@ static void pnv_chip_power9_realize(DeviceState =
+*dev, Error **errp)
+>      /* OCC SRAM model */
+>      memory_region_add_subregion(get_system_memory(), PNV9_OCC_COMMON_A=
+REA(chip),
+>                                  &chip9->occ.sram_regs);
+> +
+> +    /* HOMER */
+> +    object_property_set_bool(OBJECT(&chip9->homer), true, "realized",
+> +                             &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +    memory_region_add_subregion(get_system_memory(), PNV9_HOMER_BASE(c=
+hip),
+> +                                &chip9->homer.regs);
+>  }
+> =20
+>  static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
+> diff --git a/hw/ppc/pnv_homer.c b/hw/ppc/pnv_homer.c
+> new file mode 100644
+> index 0000000000..cc881a3b32
+> --- /dev/null
+> +++ b/hw/ppc/pnv_homer.c
+> @@ -0,0 +1,272 @@
+> +/*
+> + * QEMU PowerPC PowerNV Emulation of a few HOMER related registers
+> + *
+> + * Copyright (c) 2019, IBM Corporation.
+> + *
+> + * This program is free software; you can redistribute it and/or modif=
+y
+> + * it under the terms of the GNU General Public License, version 2, as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program; if not, see <http://www.gnu.org/licenses/>=
+.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "exec/hwaddr.h"
+> +#include "exec/memory.h"
+> +#include "sysemu/cpus.h"
+> +#include "hw/qdev-core.h"
+> +#include "hw/ppc/pnv.h"
+> +#include "hw/ppc/pnv_homer.h"
+> +
+> +
+> +static bool core_max_array(PnvHomer *homer, hwaddr addr)
+> +{
+> +    int i;
+> +    PnvHomerClass *hmrc =3D PNV_HOMER_GET_CLASS(homer);
+> +
+> +    for (i =3D 0; i <=3D homer->chip->nr_cores; i++) {
+> +        if (addr =3D=3D (hmrc->core_max_base + i)) {
+> +            return true;
+> +       }
+> +    }
+> +    return false;
+> +}
+> +
+> +/* P8 Pstate table */
+> +
+> +#define PNV8_OCC_PSTATE_VERSION          0x1f8001
+> +#define PNV8_OCC_PSTATE_MIN              0x1f8003
+> +#define PNV8_OCC_PSTATE_VALID            0x1f8000
+> +#define PNV8_OCC_PSTATE_THROTTLE         0x1f8002
+> +#define PNV8_OCC_PSTATE_NOM              0x1f8004
+> +#define PNV8_OCC_PSTATE_TURBO            0x1f8005
+> +#define PNV8_OCC_PSTATE_ULTRA_TURBO      0x1f8006
+> +#define PNV8_OCC_PSTATE_DATA             0x1f8008
+> +#define PNV8_OCC_PSTATE_ID_ZERO          0x1f8010
+> +#define PNV8_OCC_PSTATE_ID_ONE           0x1f8018
+> +#define PNV8_OCC_PSTATE_ID_TWO           0x1f8020
+> +#define PNV8_OCC_VDD_VOLTAGE_IDENTIFIER  0x1f8012
+> +#define PNV8_OCC_VCS_VOLTAGE_IDENTIFIER  0x1f8013
+> +#define PNV8_OCC_PSTATE_ZERO_FREQUENCY   0x1f8014
+> +#define PNV8_OCC_PSTATE_ONE_FREQUENCY    0x1f801c
+> +#define PNV8_OCC_PSTATE_TWO_FREQUENCY    0x1f8024
+> +#define PNV8_CORE_MAX_BASE               0x1f8810
+> +
+> +
+> +static uint64_t pnv_power8_homer_read(void *opaque, hwaddr addr,
+> +                                      unsigned size)
+> +{
+> +    PnvHomer *homer =3D PNV_HOMER(opaque);
+> +
+> +    switch (addr) {
+> +    case PNV8_OCC_PSTATE_VERSION:
+> +    case PNV8_OCC_PSTATE_MIN:
+> +    case PNV8_OCC_PSTATE_ID_ZERO:
+> +        return 0;
+> +    case PNV8_OCC_PSTATE_VALID:
+> +    case PNV8_OCC_PSTATE_THROTTLE:
+> +    case PNV8_OCC_PSTATE_NOM:
+> +    case PNV8_OCC_PSTATE_TURBO:
+> +    case PNV8_OCC_PSTATE_ID_ONE:
+> +    case PNV8_OCC_VDD_VOLTAGE_IDENTIFIER:
+> +    case PNV8_OCC_VCS_VOLTAGE_IDENTIFIER:
+> +        return 1;
+> +    case PNV8_OCC_PSTATE_ULTRA_TURBO:
+> +    case PNV8_OCC_PSTATE_ID_TWO:
+> +        return 2;
+> +    case PNV8_OCC_PSTATE_DATA:
+> +        return 0x1000000000000000;
+> +    /* P8 frequency for 0, 1, and 2 pstates */
+> +    case PNV8_OCC_PSTATE_ZERO_FREQUENCY:
+> +    case PNV8_OCC_PSTATE_ONE_FREQUENCY:
+> +    case PNV8_OCC_PSTATE_TWO_FREQUENCY:
+> +        return 3000;
+> +    }
+> +    /* pstate table core max array */
+> +    if (core_max_array(homer, addr)) {
+> +        return 1;
+> +    }
+> +    return 0;
+> +}
+> +
+> +static void pnv_power8_homer_write(void *opaque, hwaddr addr,
+> +                                   uint64_t val, unsigned size)
+> +{
+> +    /* callback function defined to homer write */
+> +    return;
+> +}
+> +
+> +static const MemoryRegionOps pnv_power8_homer_ops =3D {
+> +    .read =3D pnv_power8_homer_read,
+> +    .write =3D pnv_power8_homer_write,
+> +    .valid.min_access_size =3D 1,
+> +    .valid.max_access_size =3D 8,
+> +    .impl.min_access_size =3D 1,
+> +    .impl.max_access_size =3D 8,
+> +    .endianness =3D DEVICE_BIG_ENDIAN,
+> +};
+> +
+> +static void pnv_homer_power8_class_init(ObjectClass *klass, void *data=
+)
+> +{
+> +    PnvHomerClass *homer =3D PNV_HOMER_CLASS(klass);
+> +
+> +    homer->homer_size =3D PNV_HOMER_SIZE;
+> +    homer->homer_ops =3D &pnv_power8_homer_ops;
+> +    homer->core_max_base =3D PNV8_CORE_MAX_BASE;
+> +}
+> +
+> +static const TypeInfo pnv_homer_power8_type_info =3D {
+> +    .name          =3D TYPE_PNV8_HOMER,
+> +    .parent        =3D TYPE_PNV_HOMER,
+> +    .instance_size =3D sizeof(PnvHomer),
+> +    .class_init    =3D pnv_homer_power8_class_init,
+> +};
+> +
+> +/* P9 Pstate table */
+> +
+> +#define PNV9_OCC_PSTATE_ID_ZERO          0xe2018
+> +#define PNV9_OCC_PSTATE_ID_ONE           0xe2020
+> +#define PNV9_OCC_PSTATE_ID_TWO           0xe2028
+> +#define PNV9_OCC_PSTATE_DATA             0xe2000
+> +#define PNV9_OCC_PSTATE_DATA_AREA        0xe2008
+> +#define PNV9_OCC_PSTATE_MIN              0xe2003
+> +#define PNV9_OCC_PSTATE_NOM              0xe2004
+> +#define PNV9_OCC_PSTATE_TURBO            0xe2005
+> +#define PNV9_OCC_PSTATE_ULTRA_TURBO      0xe2818
+> +#define PNV9_OCC_MAX_PSTATE_ULTRA_TURBO  0xe2006
+> +#define PNV9_OCC_PSTATE_MAJOR_VERSION    0xe2001
+> +#define PNV9_OCC_OPAL_RUNTIME_DATA       0xe2b85
+> +#define PNV9_CHIP_HOMER_IMAGE_POINTER    0x200008
+> +#define PNV9_CHIP_HOMER_BASE             0x0
+> +#define PNV9_OCC_PSTATE_ZERO_FREQUENCY   0xe201c
+> +#define PNV9_OCC_PSTATE_ONE_FREQUENCY    0xe2024
+> +#define PNV9_OCC_PSTATE_TWO_FREQUENCY    0xe202c
+> +#define PNV9_OCC_ROLE_MASTER_OR_SLAVE    0xe2002
+> +#define PNV9_CORE_MAX_BASE               0xe2819
+> +
+> +
+> +static uint64_t pnv_power9_homer_read(void *opaque, hwaddr addr,
+> +                                      unsigned size)
+> +{
+> +    PnvHomer *homer =3D PNV_HOMER(opaque);
+> +
+> +    switch (addr) {
+> +    case PNV9_OCC_MAX_PSTATE_ULTRA_TURBO:
+> +    case PNV9_OCC_PSTATE_ID_ZERO:
+> +        return 0;
+> +    case PNV9_OCC_PSTATE_DATA:
+> +    case PNV9_OCC_ROLE_MASTER_OR_SLAVE:
+> +    case PNV9_OCC_PSTATE_NOM:
+> +    case PNV9_OCC_PSTATE_TURBO:
+> +    case PNV9_OCC_PSTATE_ID_ONE:
+> +    case PNV9_OCC_PSTATE_ULTRA_TURBO:
+> +    case PNV9_OCC_OPAL_RUNTIME_DATA:
+> +        return 1;
+> +    case PNV9_OCC_PSTATE_MIN:
+> +    case PNV9_OCC_PSTATE_ID_TWO:
+> +        return 2;
+> +
+> +    /* 3000 khz frequency for 0, 1, and 2 pstates */
+> +    case PNV9_OCC_PSTATE_ZERO_FREQUENCY:
+> +    case PNV9_OCC_PSTATE_ONE_FREQUENCY:
+> +    case PNV9_OCC_PSTATE_TWO_FREQUENCY:
+> +        return 3000;
+> +    case PNV9_OCC_PSTATE_MAJOR_VERSION:
+> +        return 0x90;
+> +    case PNV9_CHIP_HOMER_BASE:
+> +    case PNV9_OCC_PSTATE_DATA_AREA:
+> +    case PNV9_CHIP_HOMER_IMAGE_POINTER:
+> +        return 0x1000000000000000;
+> +    }
+> +    /* pstate table core max array */
+> +    if (core_max_array(homer, addr)) {
+> +        return 1;
+> +    }
+> +    return 0;
+> +}
+> +
+> +static void pnv_power9_homer_write(void *opaque, hwaddr addr,
+> +                                   uint64_t val, unsigned size)
+> +{
+> +    /* callback function defined to homer write */
+> +    return;
+> +}
+> +
+> +static const MemoryRegionOps pnv_power9_homer_ops =3D {
+> +    .read =3D pnv_power9_homer_read,
+> +    .write =3D pnv_power9_homer_write,
+> +    .valid.min_access_size =3D 1,
+> +    .valid.max_access_size =3D 8,
+> +    .impl.min_access_size =3D 1,
+> +    .impl.max_access_size =3D 8,
+> +    .endianness =3D DEVICE_BIG_ENDIAN,
+> +};
+> +
+> +static void pnv_homer_power9_class_init(ObjectClass *klass, void *data=
+)
+> +{
+> +    PnvHomerClass *homer =3D PNV_HOMER_CLASS(klass);
+> +
+> +    homer->homer_size =3D PNV9_HOMER_SIZE;
+> +    homer->homer_ops =3D &pnv_power9_homer_ops;
+> +    homer->core_max_base =3D PNV9_CORE_MAX_BASE;
+> +}
+> +
+> +static const TypeInfo pnv_homer_power9_type_info =3D {
+> +    .name          =3D TYPE_PNV9_HOMER,
+> +    .parent        =3D TYPE_PNV_HOMER,
+> +    .instance_size =3D sizeof(PnvHomer),
+> +    .class_init    =3D pnv_homer_power9_class_init,
+> +};
+> +
+> +static void pnv_homer_realize(DeviceState *dev, Error **errp)
+> +{
+> +    PnvHomer *homer =3D PNV_HOMER(dev);
+> +    PnvHomerClass *hmrc =3D PNV_HOMER_GET_CLASS(homer);
+> +    Object *obj;
+> +    Error *local_err =3D NULL;
+> +
+> +    obj =3D object_property_get_link(OBJECT(dev), "chip", &local_err);
+> +    if (!obj) {
+> +        error_propagate(errp, local_err);
+> +        error_prepend(errp, "required link 'chip' not found: ");
+> +        return;
+> +    }
+> +    homer->chip =3D PNV_CHIP(obj);
+> +    /* homer region */
+> +    memory_region_init_io(&homer->regs, OBJECT(dev),
+> +                          hmrc->homer_ops, homer, "homer-main-memory",
+> +                          hmrc->homer_size);
+> +}
+> +
+> +static void pnv_homer_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +
+> +    dc->realize =3D pnv_homer_realize;
+> +    dc->desc =3D "PowerNV HOMER Memory";
+> +}
+> +
+> +static const TypeInfo pnv_homer_type_info =3D {
+> +    .name          =3D TYPE_PNV_HOMER,
+> +    .parent        =3D TYPE_DEVICE,
+> +    .instance_size =3D sizeof(PnvHomer),
+> +    .class_init    =3D pnv_homer_class_init,
+> +    .class_size    =3D sizeof(PnvHomerClass),
+> +    .abstract      =3D true,
+> +};
+> +
+> +static void pnv_homer_register_types(void)
+> +{
+> +    type_register_static(&pnv_homer_type_info);
+> +    type_register_static(&pnv_homer_power8_type_info);
+> +    type_register_static(&pnv_homer_power9_type_info);
+> +}
+> +
+> +type_init(pnv_homer_register_types);
+> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+> index 63a4b7b6a7..1cdbe55bf8 100644
+> --- a/include/hw/ppc/pnv.h
+> +++ b/include/hw/ppc/pnv.h
+> @@ -26,6 +26,7 @@
+>  #include "hw/ppc/pnv_lpc.h"
+>  #include "hw/ppc/pnv_psi.h"
+>  #include "hw/ppc/pnv_occ.h"
+> +#include "hw/ppc/pnv_homer.h"
+>  #include "hw/ppc/pnv_xive.h"
+>  #include "hw/ppc/pnv_core.h"
+> =20
+> @@ -76,6 +77,7 @@ typedef struct Pnv8Chip {
+>      PnvLpcController lpc;
+>      Pnv8Psi      psi;
+>      PnvOCC       occ;
+> +    PnvHomer     homer;
+>  } Pnv8Chip;
+> =20
+>  #define TYPE_PNV9_CHIP "pnv9-chip"
+> @@ -90,6 +92,7 @@ typedef struct Pnv9Chip {
+>      Pnv9Psi      psi;
+>      PnvLpcController lpc;
+>      PnvOCC       occ;
+> +    PnvHomer     homer;
+> =20
+>      uint32_t     nr_quads;
+>      PnvQuad      *quads;
+> diff --git a/include/hw/ppc/pnv_homer.h b/include/hw/ppc/pnv_homer.h
+> new file mode 100644
+> index 0000000000..abaec43c2d
+> --- /dev/null
+> +++ b/include/hw/ppc/pnv_homer.h
+> @@ -0,0 +1,53 @@
+> +/*
+> + * QEMU PowerPC PowerNV Emulation of a few HOMER related registers
+> + *
+> + * Copyright (c) 2019, IBM Corporation.
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/li=
+censes/>.
+> + */
+> +
+> +#ifndef PPC_PNV_HOMER_H
+> +#define PPC_PNV_HOMER_H
+> +
+> +#include "hw/ppc/pnv.h"
+> +
+> +#define TYPE_PNV_HOMER "pnv-homer"
+> +#define PNV_HOMER(obj) OBJECT_CHECK(PnvHomer, (obj), TYPE_PNV_HOMER)
+> +#define TYPE_PNV8_HOMER TYPE_PNV_HOMER "-POWER8"
+> +#define PNV8_HOMER(obj) OBJECT_CHECK(PnvHomer, (obj), TYPE_PNV8_HOMER)
+> +#define TYPE_PNV9_HOMER TYPE_PNV_HOMER "-POWER9"
+> +#define PNV9_HOMER(obj) OBJECT_CHECK(PnvHomer, (obj), TYPE_PNV9_HOMER)
+> +
+> +typedef struct PnvHomer {
+> +    DeviceState parent;
+> +
+> +    struct PnvChip *chip;
+> +    MemoryRegion regs;
+> +} PnvHomer;
+> +
+> +#define PNV_HOMER_CLASS(klass)   \
+> +     OBJECT_CLASS_CHECK(PnvHomerClass, (klass), TYPE_PNV_HOMER)
+> +#define PNV_HOMER_GET_CLASS(obj) \
+> +     OBJECT_GET_CLASS(PnvHomerClass, (obj), TYPE_PNV_HOMER)
+> +
+> +typedef struct PnvHomerClass {
+> +    DeviceClass parent_class;
+> +
+> +    int homer_size;
+> +    const MemoryRegionOps *homer_ops;
+> +
+> +    hwaddr core_max_base;
+> +} PnvHomerClass;
+> +
+> +#endif /* PPC_PNV_HOMER_H */
+>=20
 
 
