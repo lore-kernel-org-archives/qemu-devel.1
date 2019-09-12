@@ -2,89 +2,73 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AFDDC47404
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:58:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44200C4CEC5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 12:02:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2007F2081B
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:58:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2007F2081B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0E41B20830
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 12:02:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E41B20830
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8Njj-0007HG-9E
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 07:58:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45933)
+	id 1i8No5-0001id-0M
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 08:02:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47216)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1i8Nid-0006EM-Cz
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:57:00 -0400
+ (envelope-from <bounces@canonical.com>) id 1i8Nmo-0000rw-Dr
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 08:01:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1i8Nib-0006km-3A
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:56:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40316)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1i8NiZ-0006k5-SV
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:56:56 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EEBE3C056807
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 11:56:53 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id f11so11838387wrt.18
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 04:56:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=d+ePzB9pk+KT6E/1L3k86VN/UHQcm1vKJZ0nKRjB4XY=;
- b=OQNnRCwOkwt5749r9sjNTs/NSOmmQYuvMFXKeKpboOyLmOJiCYGNZLyAsgK8u0lMPI
- FWb+r7ea9n6ht337YNTPCTAwYeaS3ebruvLfrAaagnWFrvkICMQ+nAPex9lREbtxiL5d
- b6Oe62woSDfQHhyo9w+YTjgFb+H5ymmkzUTG/zXCa4/zOYuR26+alG+1F8BfjhKfCKXk
- qFzxkxqO8tho4mQ91HyE7BB8/g+Z8YG/AzmZKLOMWlhoY2ApxFiTlBLy2hOsLLdQhts5
- 6aSxld6G6BcdpSbQ4fZHsrPeOt94ES6KB/sMlR0O1H6mTPd93rM4iYbmCGnTUh0GAFJw
- EQfw==
-X-Gm-Message-State: APjAAAVrtsnpibYI55uq6icUcooU9hwisXHjmmEBP8+fe3M7WePtqHti
- wR5RyqbTmVvE4mxdN0aR9ce3P0woJvuyAdaUxtX0tjdKolrzaAO30r+iigDahVUX0KOlf7NA482
- qKGXVYaqBos28eCM=
-X-Received: by 2002:a5d:4081:: with SMTP id o1mr6446297wrp.41.1568289412175;
- Thu, 12 Sep 2019 04:56:52 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqySvKn4lYSnr04knUJ3hiLp4SykFNbUm7tZMbkdb3pOhOccndd+uRz8ZPjqVObkNozCTp2hXA==
-X-Received: by 2002:a5d:4081:: with SMTP id o1mr6446274wrp.41.1568289411867;
- Thu, 12 Sep 2019 04:56:51 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id y72sm9371930wmc.26.2019.09.12.04.56.49
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 12 Sep 2019 04:56:50 -0700 (PDT)
-To: Stefan Hajnoczi <stefanha@gmail.com>
-References: <20190830093056.12572-1-stefanha@redhat.com>
- <20190830184445.GF3694@habkost.net>
- <20190912102551.GA23174@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <0d743e7d-fb63-38d0-fe6e-4f24d7c101df@redhat.com>
-Date: Thu, 12 Sep 2019 13:56:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <bounces@canonical.com>) id 1i8Nmm-0008TC-F0
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 08:01:18 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57620)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1i8Nml-0008Rs-Gx
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 08:01:16 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1i8Nmk-00054q-5G
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 12:01:14 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 23BE92E80C7
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 12:01:14 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190912102551.GA23174@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 12 Sep 2019 11:50:48 -0000
+From: Stefan Hajnoczi <1842787@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jamespharvey20 stefanha
+X-Launchpad-Bug-Reporter: James Harvey (jamespharvey20)
+X-Launchpad-Bug-Modifier: Stefan Hajnoczi (stefanha)
+References: <156765384458.824.9301349840467221970.malonedeb@wampee.canonical.com>
+ <156765492325.17024.3771322746781962015.launchpad@gac.canonical.com>
+Message-Id: <20190912115048.GE23174@stefanha-x1.localdomain>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19044";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 0e4dbeeb712b13ec442aff92fe19d2c2cb72cec7
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] memory: fetch pmem size in get_file_size()
+X-Received-From: 91.189.90.7
+Subject: Re: [Qemu-devel] [Bug 1842787] Re: Writes permanently hang with
+ very heavy I/O on virtio-scsi - worse on virtio-blk
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,67 +77,275 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Haozhong Zhang <haozhong.zhang@intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>,
- qemu-devel@nongnu.org, Junyan He <junyan.he@intel.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1842787 <1842787@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20190912115048.BwxAPpOLDEbZIoW7KUL0uytXMcdKQ5a5ivu6x62OoGI@z>
 
-On 12/09/19 12:25, Stefan Hajnoczi wrote:
-> On Fri, Aug 30, 2019 at 03:44:45PM -0300, Eduardo Habkost wrote:
->> On Fri, Aug 30, 2019 at 10:30:56AM +0100, Stefan Hajnoczi wrote:
->>> Neither stat(2) nor lseek(2) report the size of Linux devdax pmem
->>> character device nodes.  Commit 314aec4a6e06844937f1677f6cba21981005f=
-389
->>> ("hostmem-file: reject invalid pmem file sizes") added code to
->>> hostmem-file.c to fetch the size from sysfs and compare against the
->>> user-provided size=3DNUM parameter:
->>>
->>>   if (backend->size > size) {
->>>       error_setg(errp, "size property %" PRIu64 " is larger than "
->>>                  "pmem file \"%s\" size %" PRIu64, backend->size,
->>>                  fb->mem_path, size);
->>>       return;
->>>   }
->>>
->>> It turns out that exec.c:qemu_ram_alloc_from_fd() already has an
->>> equivalent size check but it skips devdax pmem character devices beca=
-use
->>> lseek(2) returns 0:
->>>
->>>   if (file_size > 0 && file_size < size) {
->>>       error_setg(errp, "backing store %s size 0x%" PRIx64
->>>                  " does not match 'size' option 0x" RAM_ADDR_FMT,
->>>                  mem_path, file_size, size);
->>>       return NULL;
->>>   }
->>>
->>> This patch moves the devdax pmem file size code into get_file_size() =
-so
->>> that we check the memory size in a single place:
->>> qemu_ram_alloc_from_fd().  This simplifies the code and makes it more
->>> general.
->>>
->>> This also fixes the problem that hostmem-file only checks the devdax
->>> pmem file size when the pmem=3Don parameter is given.  An unchecked
->>> size=3DNUM parameter can lead to SIGBUS in QEMU so we must always fet=
-ch
->>> the file size for Linux devdax pmem character device nodes.
->>>
->>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->>
->> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->>
->> Paolo, do you want to queue this, or should it go through my
->> memory backend queue?
->=20
-> Ping for Paolo
+On Thu, Sep 05, 2019 at 03:42:03AM -0000, James Harvey wrote:
+> ** Description changed:
+> =
 
-I had actually queued it already, thanks.
+>   Up to date Arch Linux on host and guest.  linux 5.2.11.  QEMU 4.1.0.
+>   Full command line at bottom.
+>   =
 
-Paolo
+>   Host gives QEMU two thin LVM volumes.  The first is the root filesystem,
+>   and the second is for heavy I/O, on a Samsung 970 Evo 1TB.
+>   =
 
+>   When maxing out the I/O on the second virtual block device using virtio-
+>   blk, I often get a "lockup" in about an hour or two.  From the advise of
+>   iggy in IRC, I switched over to virtio-scsi.  It ran perfectly for a few
+>   days, but then "locked up" in the same way.
+>   =
+
+>   By "lockup", I mean writes to the second virtual block device
+>   permanently hang.  I can read files from it, but even "touch foo" never
+>   times out, cannot be "kill -9"'ed, and is stuck in uninterruptible
+>   sleep.
+>   =
+
+>   When this happens, writes to the first virtual block device with the
+>   root filesystem are fine, so the O/S itself remains responsive.
+>   =
+
+>   The second virtual block device uses BTRFS.  But, I have also tried XFS
+>   and reproduced the issue.
+>   =
+
+>   In guest, when this starts, it starts logging "task X blocked for more
+>   than Y seconds".  Below is an example of one of these.  At this point,
+>   anything that is or does in the future write to this block device gets
+>   stuck in uninterruptible sleep.
+>   =
+
+>   -----
+>   =
+
+>   INFO: task kcompactd:232 blocked for more than 860 seconds.
+>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Not tained 5.2.11-1 #1
+>   "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messae.
+>   kcompactd0      D    0   232      2 0x80004000
+>   Call Trace:
+>   =C2=A0? __schedule+0x27f/0x6d0
+>   =C2=A0schedule+0x3d/0xc0
+>   =C2=A0io_schedule+0x12/0x40
+>   =C2=A0__lock_page+0x14a/0x250
+>   =C2=A0? add_to_page_cache_lru+0xe0/0xe0
+>   =C2=A0migrate_pages+0x803/0xb70
+>   =C2=A0? isolate_migratepages_block+0x9f0/0x9f0
+>   =C2=A0? __reset_isolation_suitable+0x110/0x110
+>   =C2=A0compact_zone+0x6a2/0xd30
+>   =C2=A0kcompactd_do_work+0x134/0x260
+>   =C2=A0? kvm_clock_read+0x14/0x30
+>   =C2=A0? kvm_sched_clock_read+0x5/0x10
+>   =C2=A0kcompactd+0xd3/0x220
+>   =C2=A0? wait_woken+0x80/0x80
+>   =C2=A0kthread+0xfd/0x130
+>   =C2=A0? kcompactd_do_work+0x260/0x260
+>   =C2=A0? kthread_park+0x80/0x80
+>   =C2=A0ret_from_fork+0x35/0x40
+>   =
+
+>   -----
+>   =
+
+>   In guest, there are no other dmesg/journalctl entries other than
+>   "task...blocked".
+>   =
+
+>   On host, there are no dmesg/journalctl entries whatsoever.  Everything
+>   else in host continues to work fine, including other QEMU VM's on the
+>   same underlying SSD (but obviously different lvm volumes.)
+>   =
+
+>   I understand there might not be enough to go on here, and I also
+>   understand it's possible this isn't a QEMU bug.  Happy to run given
+>   commands or patches to help diagnose what's going on here.
+>   =
+
+>   I'm now running a custom compiled QEMU 4.1.0, with debug symbols, so I
+>   can get a meaningful backtrace from the host point of view.
+>   =
+
+>   I've only recently tried this level of I/O, so can't say if this is a
+>   new issue.
+>   =
+
+> + When writes are hanging, on host, I can connect to the monitor.  Running
+> + "info block" shows nothing unusual.
+> + =
+
+>   -----
+>   =
+
+>   /usr/bin/qemu-system-x86_64
+>   =C2=A0=C2=A0=C2=A0-name arch,process=3Dqemu:arch
+>   =C2=A0=C2=A0=C2=A0-no-user-config
+>   =C2=A0=C2=A0=C2=A0-nodefaults
+>   =C2=A0=C2=A0=C2=A0-nographic
+>   =C2=A0=C2=A0=C2=A0-uuid 0528162b-2371-41d5-b8da-233fe61b6458
+>   =C2=A0=C2=A0=C2=A0-pidfile /tmp/0528162b-2371-41d5-b8da-233fe61b6458.pid
+>   =C2=A0=C2=A0=C2=A0-machine q35,accel=3Dkvm,vmport=3Doff,dump-guest-core=
+=3Doff
+>   =C2=A0=C2=A0=C2=A0-cpu SandyBridge-IBRS
+>   =C2=A0=C2=A0=C2=A0-smp cpus=3D24,cores=3D12,threads=3D1,sockets=3D2
+>   =C2=A0=C2=A0=C2=A0-m 24G
+>   =C2=A0=C2=A0=C2=A0-drive if=3Dpflash,format=3Draw,readonly,file=3D/usr/=
+share/ovmf/x64/OVMF_CODE.fd
+>   =C2=A0=C2=A0=C2=A0-drive if=3Dpflash,format=3Draw,readonly,file=3D/var/=
+qemu/0528162b-2371-41d5-b8da-233fe61b6458.fd
+>   =C2=A0=C2=A0=C2=A0-monitor telnet:localhost:8000,server,nowait,nodelay
+>   =C2=A0=C2=A0=C2=A0-spice unix,addr=3D/tmp/0528162b-2371-41d5-b8da-233fe=
+61b6458.sock,disable-ticketing
+>   =C2=A0=C2=A0=C2=A0-device ioh3420,id=3Dpcie.1,bus=3Dpcie.0,slot=3D0
+>   =C2=A0=C2=A0=C2=A0-device virtio-vga,bus=3Dpcie.1,addr=3D0
+>   =C2=A0=C2=A0=C2=A0-usbdevice tablet
+>   =C2=A0=C2=A0=C2=A0-netdev bridge,id=3Dnetwork0,br=3Dbr0
+>   =C2=A0=C2=A0=C2=A0-device virtio-net-pci,netdev=3Dnetwork0,mac=3D02:37:=
+de:79:19:09,bus=3Dpcie.0,addr=3D3
+>   =C2=A0=C2=A0=C2=A0-device virtio-scsi-pci,id=3Dscsi1
+>   =C2=A0=C2=A0=C2=A0-drive driver=3Draw,node-name=3Dhd0,file=3D/dev/lvm/a=
+rch_root,if=3Dnone,discard=3Dunmap
+>   =C2=A0=C2=A0=C2=A0-device scsi-hd,drive=3Dhd0,bootindex=3D1
+>   =C2=A0=C2=A0=C2=A0-drive driver=3Draw,node-name=3Dhd1,file=3D/dev/lvm/a=
+rch_nvme,if=3Dnone,discard=3Dunmap
+>   =C2=A0=C2=A0=C2=A0-device scsi-hd,drive=3Dhd1,bootindex=3D2
+
+Please post backtrace of all QEMU threads when I/O is hung.  You can use
+"gdb -p $(pidog qemu-system-x86_64)" to connect GDB and "thread apply
+all bt" to produce a backtrace of all threads.
+
+Stefan
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1842787
+
+Title:
+  Writes permanently hang with very heavy I/O on virtio-scsi - worse on
+  virtio-blk
+
+Status in QEMU:
+  New
+
+Bug description:
+  Up to date Arch Linux on host and guest.  linux 5.2.11.  QEMU 4.1.0.
+  Full command line at bottom.
+
+  Host gives QEMU two thin LVM volumes.  The first is the root
+  filesystem, and the second is for heavy I/O, on a Samsung 970 Evo 1TB.
+
+  When maxing out the I/O on the second virtual block device using
+  virtio-blk, I often get a "lockup" in about an hour or two.  From the
+  advise of iggy in IRC, I switched over to virtio-scsi.  It ran
+  perfectly for a few days, but then "locked up" in the same way.
+
+  By "lockup", I mean writes to the second virtual block device
+  permanently hang.  I can read files from it, but even "touch foo"
+  never times out, cannot be "kill -9"'ed, and is stuck in
+  uninterruptible sleep.
+
+  When this happens, writes to the first virtual block device with the
+  root filesystem are fine, so the O/S itself remains responsive.
+
+  The second virtual block device uses BTRFS.  But, I have also tried
+  XFS and reproduced the issue.
+
+  In guest, when this starts, it starts logging "task X blocked for more
+  than Y seconds".  Below is an example of one of these.  At this point,
+  anything that is or does in the future write to this block device gets
+  stuck in uninterruptible sleep.
+
+  -----
+
+  INFO: task kcompactd:232 blocked for more than 860 seconds.
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Not tained 5.2.11-1 #1
+  "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messae.
+  kcompactd0      D    0   232      2 0x80004000
+  Call Trace:
+  =C2=A0? __schedule+0x27f/0x6d0
+  =C2=A0schedule+0x3d/0xc0
+  =C2=A0io_schedule+0x12/0x40
+  =C2=A0__lock_page+0x14a/0x250
+  =C2=A0? add_to_page_cache_lru+0xe0/0xe0
+  =C2=A0migrate_pages+0x803/0xb70
+  =C2=A0? isolate_migratepages_block+0x9f0/0x9f0
+  =C2=A0? __reset_isolation_suitable+0x110/0x110
+  =C2=A0compact_zone+0x6a2/0xd30
+  =C2=A0kcompactd_do_work+0x134/0x260
+  =C2=A0? kvm_clock_read+0x14/0x30
+  =C2=A0? kvm_sched_clock_read+0x5/0x10
+  =C2=A0kcompactd+0xd3/0x220
+  =C2=A0? wait_woken+0x80/0x80
+  =C2=A0kthread+0xfd/0x130
+  =C2=A0? kcompactd_do_work+0x260/0x260
+  =C2=A0? kthread_park+0x80/0x80
+  =C2=A0ret_from_fork+0x35/0x40
+
+  -----
+
+  In guest, there are no other dmesg/journalctl entries other than
+  "task...blocked".
+
+  On host, there are no dmesg/journalctl entries whatsoever.  Everything
+  else in host continues to work fine, including other QEMU VM's on the
+  same underlying SSD (but obviously different lvm volumes.)
+
+  I understand there might not be enough to go on here, and I also
+  understand it's possible this isn't a QEMU bug.  Happy to run given
+  commands or patches to help diagnose what's going on here.
+
+  I'm now running a custom compiled QEMU 4.1.0, with debug symbols, so I
+  can get a meaningful backtrace from the host point of view.
+
+  I've only recently tried this level of I/O, so can't say if this is a
+  new issue.
+
+  When writes are hanging, on host, I can connect to the monitor.
+  Running "info block" shows nothing unusual.
+
+  -----
+
+  /usr/bin/qemu-system-x86_64
+  =C2=A0=C2=A0=C2=A0-name arch,process=3Dqemu:arch
+  =C2=A0=C2=A0=C2=A0-no-user-config
+  =C2=A0=C2=A0=C2=A0-nodefaults
+  =C2=A0=C2=A0=C2=A0-nographic
+  =C2=A0=C2=A0=C2=A0-uuid 0528162b-2371-41d5-b8da-233fe61b6458
+  =C2=A0=C2=A0=C2=A0-pidfile /tmp/0528162b-2371-41d5-b8da-233fe61b6458.pid
+  =C2=A0=C2=A0=C2=A0-machine q35,accel=3Dkvm,vmport=3Doff,dump-guest-core=
+=3Doff
+  =C2=A0=C2=A0=C2=A0-cpu SandyBridge-IBRS
+  =C2=A0=C2=A0=C2=A0-smp cpus=3D24,cores=3D12,threads=3D1,sockets=3D2
+  =C2=A0=C2=A0=C2=A0-m 24G
+  =C2=A0=C2=A0=C2=A0-drive if=3Dpflash,format=3Draw,readonly,file=3D/usr/sh=
+are/ovmf/x64/OVMF_CODE.fd
+  =C2=A0=C2=A0=C2=A0-drive if=3Dpflash,format=3Draw,readonly,file=3D/var/qe=
+mu/0528162b-2371-41d5-b8da-233fe61b6458.fd
+  =C2=A0=C2=A0=C2=A0-monitor telnet:localhost:8000,server,nowait,nodelay
+  =C2=A0=C2=A0=C2=A0-spice unix,addr=3D/tmp/0528162b-2371-41d5-b8da-233fe61=
+b6458.sock,disable-ticketing
+  =C2=A0=C2=A0=C2=A0-device ioh3420,id=3Dpcie.1,bus=3Dpcie.0,slot=3D0
+  =C2=A0=C2=A0=C2=A0-device virtio-vga,bus=3Dpcie.1,addr=3D0
+  =C2=A0=C2=A0=C2=A0-usbdevice tablet
+  =C2=A0=C2=A0=C2=A0-netdev bridge,id=3Dnetwork0,br=3Dbr0
+  =C2=A0=C2=A0=C2=A0-device virtio-net-pci,netdev=3Dnetwork0,mac=3D02:37:de=
+:79:19:09,bus=3Dpcie.0,addr=3D3
+  =C2=A0=C2=A0=C2=A0-device virtio-scsi-pci,id=3Dscsi1
+  =C2=A0=C2=A0=C2=A0-drive driver=3Draw,node-name=3Dhd0,file=3D/dev/lvm/arc=
+h_root,if=3Dnone,discard=3Dunmap
+  =C2=A0=C2=A0=C2=A0-device scsi-hd,drive=3Dhd0,bootindex=3D1
+  =C2=A0=C2=A0=C2=A0-drive driver=3Draw,node-name=3Dhd1,file=3D/dev/lvm/arc=
+h_nvme,if=3Dnone,discard=3Dunmap
+  =C2=A0=C2=A0=C2=A0-device scsi-hd,drive=3Dhd1,bootindex=3D2
+
+  -----
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1842787/+subscriptions
 
