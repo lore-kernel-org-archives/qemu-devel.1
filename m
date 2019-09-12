@@ -2,88 +2,91 @@ Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B57B0C47404
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:52:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF019C47404
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:57:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DCC12081B
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:52:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A6D82081B
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 11:57:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KeJCsURb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DCC12081B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lxdJaGEX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A6D82081B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8Ndq-0003tK-2V
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 07:52:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44117)
+	id 1i8Nj0-0006Nb-HZ
+	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 07:57:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45843)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1i8Nck-00030p-7S
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:50:55 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i8Nhq-0005Su-Dz
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:56:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1i8Nci-0004zm-Kk
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:50:53 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36519)
+ (envelope-from <alex.bennee@linaro.org>) id 1i8Nho-0006dN-Vj
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:56:10 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:37050)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1i8Nci-0004z6-Ca
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:50:52 -0400
-Received: by mail-wr1-x442.google.com with SMTP id y19so28111930wrd.3
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 04:50:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=jQgRoHrAzq66RdeF9iR2FFcdgfXcu8CIK39K3Jz0Mb0=;
- b=KeJCsURbrm9bgnwgBkNnjt92bPAH+Be7ldExDebp0sGdBkcOycG7Pf/shdTi6AHx+T
- iDcWdhD/hKRvDJ0daj9aDULLSvltBTpFejmVCT8rt27WakTnx2JsZJa/4PW2IAL2mMTk
- idfk0uaoM7K3+8R0pA0Ygrp70McGCXjTZDVDJMzPskdpqnGO2G/BvTsLE4PF4k65Kbf2
- fl+O3ybGj7uqgjL3SpfRBci7J58tzRLF813eI0b9SLcE85ngWKbUNgpWWBhSepzAbJ8a
- BZpk6ulfcXrwj1RrCG1dkb5JmTFDhnvN1w9XgSENtKzntpO7bvp5JVy4sZQp3uo0aT6/
- mktQ==
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i8Nho-0006cn-NV
+ for qemu-devel@nongnu.org; Thu, 12 Sep 2019 07:56:08 -0400
+Received: by mail-wm1-x344.google.com with SMTP id r195so7351385wme.2
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 04:56:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=/iTD3XNZ6c6EFIqRm6vu58w0o/MXtO2LsP01Op1mlGQ=;
+ b=lxdJaGEX2qUEKR+pB2I1LYZhV9R3hCi0N945ttdlsiG6zphmXMmbLeQZiDekwSDCoI
+ Qi1d/M5cchvrdYl1JbdgfwWNtM/Kk/qh92+hBAn22Qr5zXAPMv/7qKGMTAX/+rDhEtA/
+ eDk/9+hBzIgRPTyZY14BEAvXi17t1XQpSFt+IuYTnEL/o58qyimlT36ixwwkp1IdyYkz
+ u/msz1mxd8az7XOMJMRn20CNIkUXmGgEVjh8RWpiFsnsZ21dQiU2f33rry0VfK23hyVt
+ 4h1YwdWFB7UTreF9O/jmPzFyA6nA8ySDkX6CRAH2QNN7KtLtYeCMA2GhzjH0b3iNVo0o
+ gVBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=jQgRoHrAzq66RdeF9iR2FFcdgfXcu8CIK39K3Jz0Mb0=;
- b=sYmYHo2ABs6sgh7lteMJh0IgfvEec+PhlOsondXQWixtzftyg7ZpP109tiODsmzvGH
- vOSEW/Tw+b2O730k/Jker+xaJgtuwRzfiQ2WIGw4plpyDz/04uy5N/ygAMKyOYotu07e
- oM9eLXCm3hpLlqzyR+W392rWJsUF5fuNYNZAknF0maCgg5MKjJRsXRPeC+tqtizd0heJ
- sWDMQHANjiPKua4J9xRYRf1pHB1yLS1BdaHF2+2s/eNVFPyCCidoBfB9yzSINro+F0Ya
- uJxcBI5cvMYRksgrNn1Sos/XG6/6NaMm14W94sU21Tgvcbx7UWn3iZASzVvxIbesnKYZ
- IwVg==
-X-Gm-Message-State: APjAAAXvyH1osisduGGNv3fkEN+Q36YNvtqlRv1b5U6VdtvJCFTmgBDL
- DfrmwLB5aeuu2qBPMBaR3tnou7dJe1A=
-X-Google-Smtp-Source: APXvYqy1MIg2bEHV30zFckrmIsKr3I8etQLt40TQWI2ZyEUbLfgT43rFPwchpZCtkKqFxRczN+IoiA==
-X-Received: by 2002:a5d:4444:: with SMTP id x4mr33468375wrr.11.1568289050968; 
- Thu, 12 Sep 2019 04:50:50 -0700 (PDT)
-Received: from localhost (178.165.130.7.wireless.dyn.drei.com. [178.165.130.7])
- by smtp.gmail.com with ESMTPSA id t25sm5448366wmj.29.2019.09.12.04.50.49
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=/iTD3XNZ6c6EFIqRm6vu58w0o/MXtO2LsP01Op1mlGQ=;
+ b=dRrMgr/l0dii5o3AlU+p0ie6kHEy2OWWWjZ5tHwZo7tcb4Kc20ZqoOsq+PiRZ18HSw
+ M9+Pl2s1gix4zDA2VbUdsv2J4GoaXXg/jAnJYlb4FHumc2tF9pTDDldft+SwsqQdWZJ0
+ YRuXDXmFxuwxFD/S5RN7ANU0xWGFmjetOGXlj7G6JnSI3b3xYEJfZWc44vLKVp6nQ8y6
+ 3sBpWsocOmL9QkKquuSjUiEmpi95ZVgh0D44zJjdVSegnKyevbNBn86L+Sj+SkeYKsue
+ izGDV5ipLRbn4pjqNPQIWcEvmF4kclWwFlVbUDIbGrjxkO7qiJdehNng010SsYSgiE/3
+ bFxA==
+X-Gm-Message-State: APjAAAXXrkygbMWlmKVgBfbllVRt73OsfaHMmZtzJKk2x/79H7ro1SsC
+ mbJtfP4jG9hrvAw82DMNsOCwYQ==
+X-Google-Smtp-Source: APXvYqwYkwLsbQ0E3C45lkvg1aWgxA6ztt+eMBThoUiVz98l2DPMeVDvgXtLiRfOuLDcLra8il9j7w==
+X-Received: by 2002:a1c:6c0c:: with SMTP id h12mr2158771wmc.162.1568289366762; 
+ Thu, 12 Sep 2019 04:56:06 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id q15sm6691142wmb.28.2019.09.12.04.56.05
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Sep 2019 04:50:50 -0700 (PDT)
-Date: Thu, 12 Sep 2019 13:50:48 +0200
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Bug 1842787 <1842787@bugs.launchpad.net>
-Message-ID: <20190912115048.GE23174@stefanha-x1.localdomain>
-References: <156765384458.824.9301349840467221970.malonedeb@wampee.canonical.com>
- <156765492325.17024.3771322746781962015.launchpad@gac.canonical.com>
+ Thu, 12 Sep 2019 04:56:06 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 43FEF1FF87;
+ Thu, 12 Sep 2019 12:56:05 +0100 (BST)
+References: <20190910144428.32597-1-peter.maydell@linaro.org>
+ <20190910144428.32597-12-peter.maydell@linaro.org>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-arm@nongnu.org
+In-reply-to: <20190910144428.32597-12-peter.maydell@linaro.org>
+Date: Thu, 12 Sep 2019 12:56:05 +0100
+Message-ID: <87blvpzq22.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="zaRBsRFn0XYhEU69"
-Content-Disposition: inline
-In-Reply-To: <156765492325.17024.3771322746781962015.launchpad@gac.canonical.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [Bug 1842787] Re: Writes permanently hang with
- very heavy I/O on virtio-scsi - worse on virtio-blk
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 11/13] target/arm/arm-semi:
+ Implement support for semihosting feature detection
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,143 +104,188 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---zaRBsRFn0XYhEU69
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-On Thu, Sep 05, 2019 at 03:42:03AM -0000, James Harvey wrote:
-> ** Description changed:
->=20
->   Up to date Arch Linux on host and guest.  linux 5.2.11.  QEMU 4.1.0.
->   Full command line at bottom.
->  =20
->   Host gives QEMU two thin LVM volumes.  The first is the root filesystem,
->   and the second is for heavy I/O, on a Samsung 970 Evo 1TB.
->  =20
->   When maxing out the I/O on the second virtual block device using virtio-
->   blk, I often get a "lockup" in about an hour or two.  From the advise of
->   iggy in IRC, I switched over to virtio-scsi.  It ran perfectly for a few
->   days, but then "locked up" in the same way.
->  =20
->   By "lockup", I mean writes to the second virtual block device
->   permanently hang.  I can read files from it, but even "touch foo" never
->   times out, cannot be "kill -9"'ed, and is stuck in uninterruptible
->   sleep.
->  =20
->   When this happens, writes to the first virtual block device with the
->   root filesystem are fine, so the O/S itself remains responsive.
->  =20
->   The second virtual block device uses BTRFS.  But, I have also tried XFS
->   and reproduced the issue.
->  =20
->   In guest, when this starts, it starts logging "task X blocked for more
->   than Y seconds".  Below is an example of one of these.  At this point,
->   anything that is or does in the future write to this block device gets
->   stuck in uninterruptible sleep.
->  =20
->   -----
->  =20
->   INFO: task kcompactd:232 blocked for more than 860 seconds.
->   =A0=A0=A0=A0=A0=A0Not tained 5.2.11-1 #1
->   "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messae.
->   kcompactd0      D    0   232      2 0x80004000
->   Call Trace:
->   =A0? __schedule+0x27f/0x6d0
->   =A0schedule+0x3d/0xc0
->   =A0io_schedule+0x12/0x40
->   =A0__lock_page+0x14a/0x250
->   =A0? add_to_page_cache_lru+0xe0/0xe0
->   =A0migrate_pages+0x803/0xb70
->   =A0? isolate_migratepages_block+0x9f0/0x9f0
->   =A0? __reset_isolation_suitable+0x110/0x110
->   =A0compact_zone+0x6a2/0xd30
->   =A0kcompactd_do_work+0x134/0x260
->   =A0? kvm_clock_read+0x14/0x30
->   =A0? kvm_sched_clock_read+0x5/0x10
->   =A0kcompactd+0xd3/0x220
->   =A0? wait_woken+0x80/0x80
->   =A0kthread+0xfd/0x130
->   =A0? kcompactd_do_work+0x260/0x260
->   =A0? kthread_park+0x80/0x80
->   =A0ret_from_fork+0x35/0x40
->  =20
->   -----
->  =20
->   In guest, there are no other dmesg/journalctl entries other than
->   "task...blocked".
->  =20
->   On host, there are no dmesg/journalctl entries whatsoever.  Everything
->   else in host continues to work fine, including other QEMU VM's on the
->   same underlying SSD (but obviously different lvm volumes.)
->  =20
->   I understand there might not be enough to go on here, and I also
->   understand it's possible this isn't a QEMU bug.  Happy to run given
->   commands or patches to help diagnose what's going on here.
->  =20
->   I'm now running a custom compiled QEMU 4.1.0, with debug symbols, so I
->   can get a meaningful backtrace from the host point of view.
->  =20
->   I've only recently tried this level of I/O, so can't say if this is a
->   new issue.
->  =20
-> + When writes are hanging, on host, I can connect to the monitor.  Running
-> + "info block" shows nothing unusual.
-> +=20
->   -----
->  =20
->   /usr/bin/qemu-system-x86_64
->   =A0=A0=A0-name arch,process=3Dqemu:arch
->   =A0=A0=A0-no-user-config
->   =A0=A0=A0-nodefaults
->   =A0=A0=A0-nographic
->   =A0=A0=A0-uuid 0528162b-2371-41d5-b8da-233fe61b6458
->   =A0=A0=A0-pidfile /tmp/0528162b-2371-41d5-b8da-233fe61b6458.pid
->   =A0=A0=A0-machine q35,accel=3Dkvm,vmport=3Doff,dump-guest-core=3Doff
->   =A0=A0=A0-cpu SandyBridge-IBRS
->   =A0=A0=A0-smp cpus=3D24,cores=3D12,threads=3D1,sockets=3D2
->   =A0=A0=A0-m 24G
->   =A0=A0=A0-drive if=3Dpflash,format=3Draw,readonly,file=3D/usr/share/ovm=
-f/x64/OVMF_CODE.fd
->   =A0=A0=A0-drive if=3Dpflash,format=3Draw,readonly,file=3D/var/qemu/0528=
-162b-2371-41d5-b8da-233fe61b6458.fd
->   =A0=A0=A0-monitor telnet:localhost:8000,server,nowait,nodelay
->   =A0=A0=A0-spice unix,addr=3D/tmp/0528162b-2371-41d5-b8da-233fe61b6458.s=
-ock,disable-ticketing
->   =A0=A0=A0-device ioh3420,id=3Dpcie.1,bus=3Dpcie.0,slot=3D0
->   =A0=A0=A0-device virtio-vga,bus=3Dpcie.1,addr=3D0
->   =A0=A0=A0-usbdevice tablet
->   =A0=A0=A0-netdev bridge,id=3Dnetwork0,br=3Dbr0
->   =A0=A0=A0-device virtio-net-pci,netdev=3Dnetwork0,mac=3D02:37:de:79:19:=
-09,bus=3Dpcie.0,addr=3D3
->   =A0=A0=A0-device virtio-scsi-pci,id=3Dscsi1
->   =A0=A0=A0-drive driver=3Draw,node-name=3Dhd0,file=3D/dev/lvm/arch_root,=
-if=3Dnone,discard=3Dunmap
->   =A0=A0=A0-device scsi-hd,drive=3Dhd0,bootindex=3D1
->   =A0=A0=A0-drive driver=3Draw,node-name=3Dhd1,file=3D/dev/lvm/arch_nvme,=
-if=3Dnone,discard=3Dunmap
->   =A0=A0=A0-device scsi-hd,drive=3Dhd1,bootindex=3D2
+> Version 2.0 of the semihosting specification added support for
+> allowing a guest to detect whether the implementation supported
+> particular features. This works by the guest opening a magic
+> file ":semihosting-features", which contains a fixed set of
+> data with some magic numbers followed by a sequence of bytes
+> with feature flags. The file is expected to behave sensibly
+> for the various semihosting calls which operate on files
+> (SYS_FLEN, SYS_SEEK, etc).
+>
+> Implement this as another kind of guest FD using our function
+> table dispatch mechanism. Initially we report no extended
+> features, so we have just one feature flag byte which is zero.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Please post backtrace of all QEMU threads when I/O is hung.  You can use
-"gdb -p $(pidog qemu-system-x86_64)" to connect GDB and "thread apply
-all bt" to produce a backtrace of all threads.
+with your EACCESS suggestion:
 
-Stefan
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
---zaRBsRFn0XYhEU69
-Content-Type: application/pgp-signature; name="signature.asc"
+> ---
+>  target/arm/arm-semi.c | 107 +++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 106 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
+> index f9019b00b8d..531084b7799 100644
+> --- a/target/arm/arm-semi.c
+> +++ b/target/arm/arm-semi.c
+> @@ -117,6 +117,7 @@ typedef enum GuestFDType {
+>      GuestFDUnused =3D 0,
+>      GuestFDHost =3D 1,
+>      GuestFDGDB =3D 2,
+> +    GuestFDFeatureFile =3D 3,
+>  } GuestFDType;
+>
+>  /*
+> @@ -125,7 +126,10 @@ typedef enum GuestFDType {
+>   */
+>  typedef struct GuestFD {
+>      GuestFDType type;
+> -    int hostfd;
+> +    union {
+> +        int hostfd;
+> +        target_ulong featurefile_offset;
+> +    };
+>  } GuestFD;
+>
+>  static GArray *guestfd_array;
+> @@ -467,6 +471,87 @@ static uint32_t gdb_flenfn(TaskState *ts, ARMCPU *cp=
+u, GuestFD *gf)
+>                             gf->hostfd, arm_flen_buf(cpu));
+>  }
+>
+> +#define SHFB_MAGIC_0 0x53
+> +#define SHFB_MAGIC_1 0x48
+> +#define SHFB_MAGIC_2 0x46
+> +#define SHFB_MAGIC_3 0x42
+> +
+> +static const uint8_t featurefile_data[] =3D {
+> +    SHFB_MAGIC_0,
+> +    SHFB_MAGIC_1,
+> +    SHFB_MAGIC_2,
+> +    SHFB_MAGIC_3,
+> +    0, /* Feature byte 0 */
+> +};
+> +
+> +static void init_featurefile_guestfd(int guestfd)
+> +{
+> +    GuestFD *gf =3D do_get_guestfd(guestfd);
+> +
+> +    assert(gf);
+> +    gf->type =3D GuestFDFeatureFile;
+> +    gf->featurefile_offset =3D 0;
+> +}
+> +
+> +static uint32_t featurefile_closefn(TaskState *ts, ARMCPU *cpu, GuestFD =
+*gf)
+> +{
+> +    /* Nothing to do */
+> +    return 0;
+> +}
+> +
+> +static uint32_t featurefile_writefn(TaskState *ts, ARMCPU *cpu, GuestFD =
+*gf,
+> +                                    target_ulong buf, uint32_t len)
+> +{
+> +    /* This fd can never be open for writing */
+> +    errno =3D EBADF;
+> +    return set_swi_errno(ts, -1);
+> +}
+> +
+> +static uint32_t featurefile_readfn(TaskState *ts, ARMCPU *cpu, GuestFD *=
+gf,
+> +                                   target_ulong buf, uint32_t len)
+> +{
+> +    uint32_t i;
+> +#ifndef CONFIG_USER_ONLY
+> +    CPUARMState *env =3D &cpu->env;
+> +#endif
+> +    char *s;
+> +
+> +    s =3D lock_user(VERIFY_WRITE, buf, len, 0);
+> +    if (!s) {
+> +        return len;
+> +    }
+> +
+> +    for (i =3D 0; i < len; i++) {
+> +        if (gf->featurefile_offset >=3D sizeof(featurefile_data)) {
+> +            break;
+> +        }
+> +        s[i] =3D featurefile_data[gf->featurefile_offset];
+> +        gf->featurefile_offset++;
+> +    }
+> +
+> +    unlock_user(s, buf, len);
+> +
+> +    /* Return number of bytes not read */
+> +    return len - i;
+> +}
+> +
+> +static uint32_t featurefile_isattyfn(TaskState *ts, ARMCPU *cpu, GuestFD=
+ *gf)
+> +{
+> +    return 0;
+> +}
+> +
+> +static uint32_t featurefile_seekfn(TaskState *ts, ARMCPU *cpu, GuestFD *=
+gf,
+> +                                   target_ulong offset)
+> +{
+> +    gf->featurefile_offset =3D offset;
+> +    return 0;
+> +}
+> +
+> +static uint32_t featurefile_flenfn(TaskState *ts, ARMCPU *cpu, GuestFD *=
+gf)
+> +{
+> +    return sizeof(featurefile_data);
+> +}
+> +
+>  typedef struct GuestFDFunctions {
+>      sys_closefn *closefn;
+>      sys_writefn *writefn;
+> @@ -493,6 +578,14 @@ static const GuestFDFunctions guestfd_fns[] =3D {
+>          .seekfn =3D gdb_seekfn,
+>          .flenfn =3D gdb_flenfn,
+>      },
+> +    [GuestFDFeatureFile] =3D {
+> +        .closefn =3D featurefile_closefn,
+> +        .writefn =3D featurefile_writefn,
+> +        .readfn =3D featurefile_readfn,
+> +        .isattyfn =3D featurefile_isattyfn,
+> +        .seekfn =3D featurefile_seekfn,
+> +        .flenfn =3D featurefile_flenfn,
+> +    },
+>  };
+>
+>  /* Read the input value from the argument block; fail the semihosting
+> @@ -586,6 +679,18 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>              unlock_user(s, arg0, 0);
+>              return guestfd;
+>          }
+> +        if (strcmp(s, ":semihosting-features") =3D=3D 0) {
+> +            unlock_user(s, arg0, 0);
+> +            /* We must fail opens for modes other than 0 ('r') or 1 ('rb=
+') */
+> +            if (arg1 !=3D 0 && arg1 !=3D 1) {
+> +                dealloc_guestfd(guestfd);
+> +                errno =3D EINVAL;
+> +                return set_swi_errno(ts, -1);
+> +            }
+> +            init_featurefile_guestfd(guestfd);
+> +            return guestfd;
+> +        }
+> +
+>          if (use_gdb_syscalls()) {
+>              ret =3D arm_gdb_syscall(cpu, arm_semi_cb, "open,%s,%x,1a4", =
+arg0,
+>                                    (int)arg2+1, gdb_open_modeflags[arg1]);
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl16MRgACgkQnKSrs4Gr
-c8gdDwf/cbJs5f9P7NlsqQJRotENMWFCBNSkwFAwuUyDzO/YI/54mEohh5JSRxpp
-HGpFeI47sGYsG/PxOkVWF2gjE5ZdCZKCFGfo1dHJBQ8u/5mcu37dlzIz0JYZm3Zh
-Kt9m0kYW+EIFvmAda9/g1/Ogtz12RBLNF+IVWrz/RLsFMIqZbFg1+LYbdrVrXWmz
-BXypimXTr0Cwh1POul4dMVUzxRwJ0z5ctmYC80JmVCmuAOnKPgwWFT3W28rGKcWi
-iuMNVjWKttxEoRHWWeso2l3RoUKrlhmBZXi5+0vPNKnk+h3U20zjlUACCktkwNje
-iCPG1vOzpwW/ztqT5aWITox+MBdhLQ==
-=eBnv
------END PGP SIGNATURE-----
-
---zaRBsRFn0XYhEU69--
+--
+Alex Benn=C3=A9e
 
