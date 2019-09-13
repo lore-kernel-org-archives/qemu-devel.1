@@ -8,82 +8,83 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29F4DC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 23:55:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2BE1C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 23:59:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E819B2083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 23:55:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9CA882083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 23:59:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TwuTqsUU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E819B2083B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HCq2/r4C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CA882083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8vPT-0001Ig-0Q
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 19:55:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38487)
+	id 1i8vTP-0002pE-Q3
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 19:59:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38758)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.weiyang@gmail.com>) id 1i8vOf-0000oo-4y
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 19:54:38 -0400
+ (envelope-from <richard.weiyang@gmail.com>) id 1i8vSd-0002MI-7X
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 19:58:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.weiyang@gmail.com>) id 1i8vOe-0002WQ-09
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 19:54:37 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:37340)
+ (envelope-from <richard.weiyang@gmail.com>) id 1i8vSb-0006DH-AP
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 19:58:43 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:38113)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
- id 1i8vOd-0002Vc-Pw
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 19:54:35 -0400
-Received: by mail-ed1-x543.google.com with SMTP id i1so28456862edv.4
- for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 16:54:35 -0700 (PDT)
+ id 1i8vSY-0006Az-IS
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 19:58:39 -0400
+Received: by mail-ed1-x542.google.com with SMTP id a23so26189780edv.5
+ for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 16:58:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
  :content-disposition:in-reply-to:user-agent;
- bh=r60rTeozZXg8fla4/9Hv53O1/pSsi8t2qM7w+ivltaU=;
- b=TwuTqsUUv4VJNsiXL2FxeZn9Tnp5L1nR/HQDz9Lx5xZBreylroPy2rOqUlUBhkrkNn
- eJ4HxkbCwo+gSxrstWqXT3oOXgNuEAXMhoHyuRIcvVRuQyDFhc/KmAVDGBXJwh9mQfhR
- E8FK3SWFeAQMm6Nyh3aVZB7c0Hu6u2jwPWmfAYuYsoqLJ6d9FfRGvsP/Wlxtdy3/rrEm
- bNcwRDx7629ItawMqx4OoXARW0zPiVeNBygRzmVmiSy9gxsFRSFNDEbGP6sevt2bLrH4
- lXfvjOUZJe3S7HWJFNwJ2/fgwTTgqKx+C2/9ZFRu5KPpaZg8Fw3ZeNaahMBhwLxYtJ0z
- ZFbg==
+ bh=ZhzCf5O/iwQfe3FPmra8yJP26zJl4VyE/RBkrcIHqMM=;
+ b=HCq2/r4C/pwhCvr2JtbV9rJyWkg/0MtMgSUaJcUpIavAm6wzM/98V4rRqRUAUyW8VZ
+ 7Ah5R6VBDzRUh5a9/O2u/ElMrggq58jcKacxCfj1eu7u1S9WbPgGlh5s30iTxYHNlxID
+ Erq1SWShL8fhCw97gVvQCnnp4PkaRlLOl3N68hCczGOR2actWpp2+96hgzX23trwMBNg
+ ZMjdhJfFk453MiY7MSC6/Fj3wbkPIlHMq+hAlYl8A6q73GqqoSUe8kwa/JL6z/t1wmUY
+ fBh2GD4rbFBy+GX1vXs9TYIibNqCYvKF7FAlBiVe0uh0OWa36lfQD4OV6A5ujjtcyI2/
+ S8Cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
  :references:mime-version:content-disposition:in-reply-to:user-agent;
- bh=r60rTeozZXg8fla4/9Hv53O1/pSsi8t2qM7w+ivltaU=;
- b=CkL3Dejh1QdiDxpcvpZIJA4K9DMGxVrl4NwqcYcWXYU5jj1BKssuxsoCe9OnuHs8jf
- yiwKQgVLfphU7yPgMXV7XhU/d79d1tajbCGSDGPNA8nkBuY6IR4qgU4yJ59dvrrd1ovR
- MeBq8KE8A58Ip1uDfj1q4faQGlVr+qOHh4MDZFFeR2cLnSyo+WhLsL3UnzmITH7Gzttv
- C2JTvs/5Yq0C4ud7HHWlDxyFXNE//9JBc8qn3S7ZUMrpy9Ti4ToJnHjh00UNp7JPYNoY
- DA0xZ2je5oy7Kqvesvr/qinz6T8+ECDQfXHCcE7HeZHRaI3VJ2Wa4p6OtgasA9YV6WWi
- WVCA==
-X-Gm-Message-State: APjAAAU7hYKVOhMMzviGITN81MGybpL+FdhrCBbHy33EaenQ1cus3Bw7
- 7fgrT4tT5wIVFRuRT7JE66o=
-X-Google-Smtp-Source: APXvYqxmSbzKx2mGSqwNAYkOoZ+cGrzec4/2vowfUB6UucrzLWVyjlbGSEHG0U5MXrmDImhYzwjUfQ==
-X-Received: by 2002:aa7:d0d1:: with SMTP id u17mr45001249edo.99.1568418874981; 
- Fri, 13 Sep 2019 16:54:34 -0700 (PDT)
+ bh=ZhzCf5O/iwQfe3FPmra8yJP26zJl4VyE/RBkrcIHqMM=;
+ b=nnTLec6buXggw+tule2+f/HOiOqob0WPen1vZ6WYZBFdCzj/oohRNGLhj6+jzTmoOa
+ eSVUvC6PnddY/0ydGsUG3X/LuSQti2qgKvXPwxTvPpaiwBlblCQyBKaiiJADiJNzd20e
+ kZLTb1DJ9VVKsPwXDShxA6LjoccenPbXqgvRZOc+DncVVLsNuCDe/5fhuByEZ5Beu9xC
+ 4tuk/Yfk3+F3bhm+Un1ryGEXU61F0Jn9+0aALwlWbJpYemnQTTQO7aIDb1xSRJK9hBVu
+ /m9YP8sr1MGLwlMozvqIC1N/C2EcXF0PnqNsiB5Wi5Y4uXlyyq2XRMpgAziGZbYVst/7
+ JtRQ==
+X-Gm-Message-State: APjAAAXZ7Kk9VG+ii+iO0gpbai/2ruglSSkngb9u5q/lHGtU24G1mFS2
+ HxYio369WANX4w4+HKU96L0=
+X-Google-Smtp-Source: APXvYqz1mhfF6cRtAkNbD05GZd6pioUZmlbg2IgTdWRjJRFjUsVndWIsiQCORZu57I1dSMqTf6MRuw==
+X-Received: by 2002:a50:8d5e:: with SMTP id t30mr50630095edt.112.1568419117494; 
+ Fri, 13 Sep 2019 16:58:37 -0700 (PDT)
 Received: from localhost ([185.92.221.13])
- by smtp.gmail.com with ESMTPSA id gv20sm407383ejb.43.2019.09.13.16.54.34
+ by smtp.gmail.com with ESMTPSA id q25sm5608375eds.72.2019.09.13.16.58.36
  (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Fri, 13 Sep 2019 16:54:34 -0700 (PDT)
-Date: Fri, 13 Sep 2019 23:54:33 +0000
+ Fri, 13 Sep 2019 16:58:36 -0700 (PDT)
+Date: Fri, 13 Sep 2019 23:58:36 +0000
 From: Wei Yang <richard.weiyang@gmail.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190913235433.u66jqdhx4afnqae5@master>
-References: <20190717005341.14140-1-richardw.yang@linux.intel.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190913235836.vynt6ubiuigrsp64@master>
+References: <20190712032704.7826-1-richardw.yang@linux.intel.com>
+ <20190719175400.GJ3000@work-vm>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190717005341.14140-1-richardw.yang@linux.intel.com>
+In-Reply-To: <20190719175400.GJ3000@work-vm>
 User-Agent: NeoMutt/20170113 (1.7.2)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::543
-Subject: Re: [Qemu-devel] [PATCH] migration: use migration_is_active to
- represent active state
+X-Received-From: 2a00:1450:4864:20::542
+Subject: Re: [Qemu-devel] [PATCH] migration: check length directly to make
+ sure the range is aligned
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,77 +97,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Reply-To: Wei Yang <richard.weiyang@gmail.com>
-Cc: quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, quintela@redhat.com,
+ Wei Yang <richardw.yang@linux.intel.com>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 17, 2019 at 08:53:41AM +0800, Wei Yang wrote:
->Wrap the check into a function to make it easy to read.
+On Fri, Jul 19, 2019 at 06:54:00PM +0100, Dr. David Alan Gilbert wrote:
+>* Wei Yang (richardw.yang@linux.intel.com) wrote:
+>> Since the start addr is already checked, to make sure the range is
+>> aligned, checking the length is enough.
+>> 
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> ---
+>>  exec.c | 7 +++----
+>>  1 file changed, 3 insertions(+), 4 deletions(-)
+>> 
+>> diff --git a/exec.c b/exec.c
+>> index 50ea9c5aaa..8fa980baae 100644
+>> --- a/exec.c
+>> +++ b/exec.c
+>> @@ -4067,10 +4067,9 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
+>>  
+>>      if ((start + length) <= rb->used_length) {
+>>          bool need_madvise, need_fallocate;
+>> -        uint8_t *host_endaddr = host_startaddr + length;
+>> -        if ((uintptr_t)host_endaddr & (rb->page_size - 1)) {
+>> -            error_report("ram_block_discard_range: Unaligned end address: %p",
+>> -                         host_endaddr);
+>> +        if (length & (rb->page_size - 1)) {
+>> +            error_report("ram_block_discard_range: Unaligned length: %lx",
+>> +                         length);
+>
+>Yes, I *think* this is safe, we'll need to watch out for any warnings;
+>David Gibson's balloon fix from February means that the balloon code
+>should now warn in it's case.
+>
+>rth: Want to pick this up?
+>
+>Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 >
 
-Hi, Dave & Juan
+Any other task I should do for progress?
 
-Do you like this one :-) ?
-
->Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->---
-> include/migration/misc.h |  1 +
-> migration/migration.c    | 12 ++++++++----
-> 2 files changed, 9 insertions(+), 4 deletions(-)
->
->diff --git a/include/migration/misc.h b/include/migration/misc.h
->index 5cdbabd094..42d6abc920 100644
->--- a/include/migration/misc.h
->+++ b/include/migration/misc.h
->@@ -61,6 +61,7 @@ void migration_object_init(void);
-> void migration_shutdown(void);
-> void qemu_start_incoming_migration(const char *uri, Error **errp);
-> bool migration_is_idle(void);
->+bool migration_is_active(MigrationState *);
-> void add_migration_state_change_notifier(Notifier *notify);
-> void remove_migration_state_change_notifier(Notifier *notify);
-> bool migration_in_setup(MigrationState *);
->diff --git a/migration/migration.c b/migration/migration.c
->index 43fd8297ef..4c066fc85c 100644
->--- a/migration/migration.c
->+++ b/migration/migration.c
->@@ -1529,8 +1529,7 @@ static void migrate_fd_cleanup(MigrationState *s)
->         qemu_fclose(tmp);
->     }
-> 
->-    assert((s->state != MIGRATION_STATUS_ACTIVE) &&
->-           (s->state != MIGRATION_STATUS_POSTCOPY_ACTIVE));
->+    assert(!migration_is_active(s));
-> 
->     if (s->state == MIGRATION_STATUS_CANCELLING) {
->         migrate_set_state(&s->state, MIGRATION_STATUS_CANCELLING,
->@@ -1690,6 +1689,12 @@ bool migration_is_idle(void)
->     return false;
-> }
-> 
->+bool migration_is_active(MigrationState *s)
->+{
->+    return (s->state == MIGRATION_STATUS_ACTIVE ||
->+            s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
->+}
->+
-> void migrate_init(MigrationState *s)
-> {
->     /*
->@@ -3226,8 +3231,7 @@ static void *migration_thread(void *opaque)
-> 
->     trace_migration_thread_setup_complete();
-> 
->-    while (s->state == MIGRATION_STATUS_ACTIVE ||
->-           s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
->+    while (migration_is_active(s)) {
->         int64_t current_time;
-> 
->         if (urgent || !qemu_file_rate_limit(s->to_dst_file)) {
->-- 
->2.17.1
->
+>>              goto err;
+>>          }
+>>  
+>> -- 
+>> 2.17.1
+>> 
+>--
+>Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 -- 
 Wei Yang
