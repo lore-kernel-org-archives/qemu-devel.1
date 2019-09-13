@@ -2,107 +2,78 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A8EC4CEC5
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 06:26:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA06FC49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 07:13:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5521C208C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 06:26:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5521C208C0
+	by mail.kernel.org (Postfix) with ESMTPS id B5ACE20830
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 07:13:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5ACE20830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8f28-0000QF-9v
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 02:26:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53897)
+	id 1i8flv-0000Om-Rb
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 03:13:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60436)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1i8f1P-0008PW-PA
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 02:25:32 -0400
+ (envelope-from <mlureau@redhat.com>) id 1i8fl2-0008Ky-Dn
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 03:12:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1i8f1N-0008BK-1o
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 02:25:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39224)
+ (envelope-from <mlureau@redhat.com>) id 1i8fkz-00063S-LL
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 03:12:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45372)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1i8f1M-0008AH-Q7; Fri, 13 Sep 2019 02:25:28 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1i8fkz-000632-GO
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 03:12:37 -0400
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B376818C4270;
- Fri, 13 Sep 2019 06:25:26 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-134.ams2.redhat.com [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B936E19C5B;
- Fri, 13 Sep 2019 06:25:25 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20190912184607.3507-1-eblake@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <e9c31ac7-5b92-75d5-7bde-c33f06722744@redhat.com>
-Date: Fri, 13 Sep 2019 08:25:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 9831189AC5
+ for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 07:12:36 +0000 (UTC)
+Received: by mail-ot1-f70.google.com with SMTP id v51so4679505otb.5
+ for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 00:12:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=EK/42hhOXH8Ux2Lr1zGYIfaPvZqGgL1EK/f7aOogMnk=;
+ b=Ui6I0OJf2lBoc0UVed4cvgvY2uqs2OpEXySbOePVkfReHmulE84++Yq9pEPCxI2c72
+ QN6aD5ztBlO043GJTgANuUzjSBEAkGuFBQqYK0s0gnxUCMZlqv/kesN0T+Ozm9CPQRap
+ bSdgcMg1CqBxv7j10yCo6tgDZJrKLLNcIjliJzy+Cax7EUgiK6ulyzc0kgaQ9bS2xf14
+ B16jUGJvbNwba+1Yjv1m6+Eg+UaQ6gZo5CBSPB97N67cYJfKhAyRLYTyXJBncMP5GbE7
+ H0ddP9EAndSgio+DZygWEBzinaK2Ko4aPBboCROnvXkV29MY1as3jz+x58MJr/b25pRk
+ 7+iQ==
+X-Gm-Message-State: APjAAAXwBEn4BuF5RbXPTs/s2xu0vHqTerhmHbWO3ZzVA+rGIcVV8M/p
+ 1eGZSEfuTKpPjM2I4Lg5TO5Rvth361fqGPe4OZgpyNliCr8UQ8WPDmDoVkoCLL/HdYWk1pld5TF
+ avxgM7DJ5eTUmUJAIPYa6y0gFgtBCN8s=
+X-Received: by 2002:aca:38d6:: with SMTP id f205mr2088881oia.76.1568358756137; 
+ Fri, 13 Sep 2019 00:12:36 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwyrErLG+OFledqxksHOuaRPLhfRqr/cjRmaLHF41HAkX9vwI/md89DP+DpsIL/3KxJsYbG/v1ZpHR+XzN3I4I=
+X-Received: by 2002:aca:38d6:: with SMTP id f205mr2088873oia.76.1568358755876; 
+ Fri, 13 Sep 2019 00:12:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190912184607.3507-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Fri, 13 Sep 2019 06:25:26 +0000 (UTC)
+References: <20190912122514.22504-1-marcandre.lureau@redhat.com>
+ <20190912122514.22504-4-marcandre.lureau@redhat.com>
+ <20190912181855.54f20a7e.pasic@linux.ibm.com>
+In-Reply-To: <20190912181855.54f20a7e.pasic@linux.ibm.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Fri, 13 Sep 2019 11:12:24 +0400
+Message-ID: <CAMxuvazwZa7-as+Ef7t-CnCw+G0NFV66-9814T2wM0g6Ag-1YQ@mail.gmail.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] build: Don't ignore qapi-visit-core.c
+Subject: Re: [Qemu-devel] [PATCH v3 3/6] vmstate: replace DeviceState with
+ VMStateIf
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,36 +85,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org
+Cc: "P. Berrange, Daniel" <berrange@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, "Privoznik, Michal" <mprivozn@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Bonzini,
+ Paolo" <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/09/2019 20.46, Eric Blake wrote:
-> This file is version-controlled, and not generated from a .json file.
-> 
-> Fixes: bf582c3461b
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  .gitignore | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/.gitignore b/.gitignore
-> index e9bbc006d39e..7de868d1eab4 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -41,6 +41,7 @@
->  /qapi/qapi-types-*.[ch]
->  /qapi/qapi-types.[ch]
->  /qapi/qapi-visit-*.[ch]
-> +!/qapi/qapi-visit-core.c
->  /qapi/qapi-visit.[ch]
->  /qapi/qapi-doc.texi
->  /qemu-doc.html
-> 
+Hi
 
-Thanks!
+On Thu, Sep 12, 2019 at 8:19 PM Halil Pasic <pasic@linux.ibm.com> wrote:
+>
+> On Thu, 12 Sep 2019 16:25:11 +0400
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+>
+> > diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
+> > index d4807f7777..16b9bbf04d 100644
+> > --- a/hw/s390x/s390-skeys.c
+> > +++ b/hw/s390x/s390-skeys.c
+> > @@ -392,7 +392,7 @@ static inline void s390_skeys_set_migration_enabled=
+(Object *obj, bool value,
+> >          register_savevm_live(NULL, TYPE_S390_SKEYS, 0, 1,
+> >                               &savevm_s390_storage_keys, ss);
+> >      } else {
+> > -        unregister_savevm(DEVICE(ss), TYPE_S390_SKEYS, ss);
+> > +        unregister_savevm(VMSTATE_IF(ss), TYPE_S390_SKEYS, ss);
+> >      }
+> >  }
+>
+> Acked-by: Halil Pasic <pasic@linux.ibm.com>
+>
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+thanks
+
+> BTW what does the 'f' in VMStateIf stand for? (I've had a look
+> at 2/6 but didn't figure out the answer).
+
+"If" stands for interface, and seems to be more common in qemu.
+gobject code usually uses "Iface", and other prefer "I" prefix.
 
