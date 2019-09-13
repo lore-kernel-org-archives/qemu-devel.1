@@ -2,57 +2,64 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2BDDC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 13:38:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79BC5C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 13:39:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A2C6206BB
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 13:38:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A2C6206BB
+	by mail.kernel.org (Postfix) with ESMTPS id 0B1AD206BB
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 13:39:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B1AD206BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8lmB-0005yh-Vd
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 09:38:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38020)
+	id 1i8lnB-00077t-CT
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 09:39:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37252)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i8lkq-0004Vl-8Q
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:36:53 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i8li8-0002C2-Jb
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:34:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i8lko-0003Rl-WB
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:36:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42738)
+ (envelope-from <dgilbert@redhat.com>) id 1i8li4-0002AI-Pb
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:34:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:28885)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1i8lkm-0003Q8-B0; Fri, 13 Sep 2019 09:36:48 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i8li2-00028k-VG
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:34:00 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9F326308402E;
- Fri, 13 Sep 2019 13:36:47 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.39])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 649EF5B681;
- Fri, 13 Sep 2019 13:36:45 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 13 Sep 2019 16:36:27 +0300
-Message-Id: <20190913133627.28450-3-mlevitsk@redhat.com>
-In-Reply-To: <20190913133627.28450-1-mlevitsk@redhat.com>
-References: <20190913133627.28450-1-mlevitsk@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ by mx1.redhat.com (Postfix) with ESMTPS id 8E7B44FCC9
+ for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 13:33:55 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 386695D9E5;
+ Fri, 13 Sep 2019 13:33:45 +0000 (UTC)
+Date: Fri, 13 Sep 2019 14:33:43 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <20190913133343.GD2682@work-vm>
+References: <20190912122514.22504-1-marcandre.lureau@redhat.com>
+ <20190912122514.22504-5-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190912122514.22504-5-marcandre.lureau@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 13 Sep 2019 13:36:47 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Fri, 13 Sep 2019 13:33:55 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 2/2] block/nvme: add support for discard
+Subject: Re: [Qemu-devel] [PATCH v3 4/6] tests: add
+ qtest_expect_exit_status()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,149 +71,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: mprivozn@redhat.com, pbonzini@redhat.com, berrange@redhat.com,
+ qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- block/nvme.c       | 83 ++++++++++++++++++++++++++++++++++++++++++++++
- block/trace-events |  2 ++
- 2 files changed, 85 insertions(+)
+* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
+> Modify the behaviour of qtest_quit() to check against the expected
+> exit status value. The default remains 0.
+>=20
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
 
-diff --git a/block/nvme.c b/block/nvme.c
-index d95265fae4..c17edd6aae 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -112,6 +112,7 @@ typedef struct {
-     bool plugged;
- 
-     bool supports_write_zeroes;
-+    bool supports_discard;
- 
-     CoMutex dma_map_lock;
-     CoQueue dma_flush_queue;
-@@ -463,6 +464,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
- 
-     oncs = le16_to_cpu(idctrl->oncs);
-     s->supports_write_zeroes = !!(oncs & NVME_ONCS_WRITE_ZEROS);
-+    s->supports_discard = !!(oncs & NVME_ONCS_DSM);
- 
-     memset(resp, 0, 4096);
- 
-@@ -1153,6 +1155,86 @@ static coroutine_fn int nvme_co_pwrite_zeroes(BlockDriverState *bs,
- }
- 
- 
-+static int coroutine_fn nvme_co_pdiscard(BlockDriverState *bs,
-+                                         int64_t offset,
-+                                         int bytes)
-+{
-+    BDRVNVMeState *s = bs->opaque;
-+    NVMeQueuePair *ioq = s->queues[1];
-+    NVMeRequest *req;
-+    NvmeDsmRange *buf;
-+    QEMUIOVector local_qiov;
-+    int ret;
-+
-+    NvmeCmd cmd = {
-+        .opcode = NVME_CMD_DSM,
-+        .nsid = cpu_to_le32(s->nsid),
-+        .cdw10 = cpu_to_le32(0), /*number of ranges - 0 based*/
-+        .cdw11 = cpu_to_le32(1 << 2), /*deallocate bit*/
-+    };
-+
-+    NVMeCoData data = {
-+        .ctx = bdrv_get_aio_context(bs),
-+        .ret = -EINPROGRESS,
-+    };
-+
-+    if (!s->supports_discard) {
-+        return -ENOTSUP;
-+    }
-+
-+    assert(s->nr_queues > 1);
-+
-+    buf = qemu_try_blockalign0(bs, s->page_size);
-+    if (!buf) {
-+        return -ENOMEM;
-+    }
-+
-+    buf->nlb = cpu_to_le32(bytes >> s->blkshift);
-+    buf->slba = cpu_to_le64(offset >> s->blkshift);
-+    buf->cattr = 0;
-+
-+    qemu_iovec_init(&local_qiov, 1);
-+    qemu_iovec_add(&local_qiov, buf, 4096);
-+
-+    req = nvme_get_free_req(ioq);
-+    assert(req);
-+
-+    qemu_co_mutex_lock(&s->dma_map_lock);
-+    ret = nvme_cmd_map_qiov(bs, &cmd, req, &local_qiov);
-+    qemu_co_mutex_unlock(&s->dma_map_lock);
-+
-+    if (ret) {
-+        req->busy = false;
-+        goto out;
-+    }
-+
-+    trace_nvme_dsm(s, offset, bytes);
-+
-+    nvme_submit_command(s, ioq, req, &cmd, nvme_rw_cb, &data);
-+
-+    data.co = qemu_coroutine_self();
-+    while (data.ret == -EINPROGRESS) {
-+        qemu_coroutine_yield();
-+    }
-+
-+    qemu_co_mutex_lock(&s->dma_map_lock);
-+    ret = nvme_cmd_unmap_qiov(bs, &local_qiov);
-+    qemu_co_mutex_unlock(&s->dma_map_lock);
-+
-+    if (ret) {
-+        goto out;
-+    }
-+
-+    ret = data.ret;
-+    trace_nvme_dsm_done(s, offset, bytes, ret);
-+out:
-+    qemu_iovec_destroy(&local_qiov);
-+    qemu_vfree(buf);
-+    return ret;
-+
-+}
-+
-+
- static int nvme_reopen_prepare(BDRVReopenState *reopen_state,
-                                BlockReopenQueue *queue, Error **errp)
- {
-@@ -1259,6 +1341,7 @@ static BlockDriver bdrv_nvme = {
-     .bdrv_co_pwritev          = nvme_co_pwritev,
- 
-     .bdrv_co_pwrite_zeroes    = nvme_co_pwrite_zeroes,
-+    .bdrv_co_pdiscard         = nvme_co_pdiscard,
- 
-     .bdrv_co_flush_to_disk    = nvme_co_flush,
-     .bdrv_reopen_prepare      = nvme_reopen_prepare,
-diff --git a/block/trace-events b/block/trace-events
-index 651aa461d5..c61553b4b8 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -153,6 +153,8 @@ nvme_write_zeroes(void *s, uint64_t offset, uint64_t bytes, int flags) "s %p off
- nvme_qiov_unaligned(const void *qiov, int n, void *base, size_t size, int align) "qiov %p n %d base %p size 0x%zx align 0x%x"
- nvme_prw_buffered(void *s, uint64_t offset, uint64_t bytes, int niov, int is_write) "s %p offset %"PRId64" bytes %"PRId64" niov %d is_write %d"
- nvme_rw_done(void *s, int is_write, uint64_t offset, uint64_t bytes, int ret) "s %p is_write %d offset %"PRId64" bytes %"PRId64" ret %d"
-+nvme_dsm(void *s, uint64_t offset, uint64_t bytes) "s %p offset %"PRId64" bytes %"PRId64""
-+nvme_dsm_done(void *s, uint64_t offset, uint64_t bytes, int ret) "s %p offset %"PRId64" bytes %"PRId64" ret %d"
- nvme_dma_map_flush(void *s) "s %p"
- nvme_free_req_queue_wait(void *q) "q %p"
- nvme_cmd_map_qiov(void *s, void *cmd, void *req, void *qiov, int entries) "s %p cmd %p req %p qiov %p entries %d"
--- 
-2.17.2
+This looks similar to the one in the current pending migration pull
+by Yury Kotov:
+   'tests/libqtest: Allow setting expected exit status'
 
+Dave
+
+> ---
+>  tests/libqtest.c | 41 ++++++++++++++++++++++-------------------
+>  tests/libqtest.h |  9 +++++++++
+>  2 files changed, 31 insertions(+), 19 deletions(-)
+>=20
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 0a6b91737e..1f7910e583 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -44,6 +44,7 @@ struct QTestState
+>      bool big_endian;
+>      bool irq_level[MAX_IRQ];
+>      GString *rx;
+> +    int exit_status;
+>  };
+> =20
+>  static GHookList abrt_hooks;
+> @@ -123,27 +124,29 @@ static void kill_qemu(QTestState *s)
+>          assert(pid =3D=3D s->qemu_pid);
+>      }
+> =20
+> -    /*
+> -     * We expect qemu to exit with status 0; anything else is
+> -     * fishy and should be logged with as much detail as possible.
+> -     */
+>      wstatus =3D s->wstatus;
+> -    if (wstatus) {
+> -        if (WIFEXITED(wstatus)) {
+> -            fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEM=
+U "
+> -                    "process but encountered exit status %d\n",
+> -                    __FILE__, __LINE__, WEXITSTATUS(wstatus));
+> -        } else if (WIFSIGNALED(wstatus)) {
+> -            int sig =3D WTERMSIG(wstatus);
+> -            const char *signame =3D strsignal(sig) ?: "unknown ???";
+> -            const char *dump =3D WCOREDUMP(wstatus) ? " (core dumped)"=
+ : "";
+> -
+> -            fprintf(stderr, "%s:%d: kill_qemu() detected QEMU death "
+> -                    "from signal %d (%s)%s\n",
+> -                    __FILE__, __LINE__, sig, signame, dump);
+> +    if (WIFEXITED(wstatus)) {
+> +        if (WEXITSTATUS(wstatus) =3D=3D s->exit_status) {
+> +            return;
+>          }
+> -        abort();
+> +        fprintf(stderr, "%s:%d: kill_qemu() tried to terminate QEMU "
+> +                "process but encountered exit status %d\n",
+> +                __FILE__, __LINE__, WEXITSTATUS(wstatus));
+> +    } else if (WIFSIGNALED(wstatus)) {
+> +        int sig =3D WTERMSIG(wstatus);
+> +        const char *signame =3D strsignal(sig) ?: "unknown ???";
+> +        const char *dump =3D WCOREDUMP(wstatus) ? " (core dumped)" : "=
+";
+> +
+> +        fprintf(stderr, "%s:%d: kill_qemu() detected QEMU death "
+> +                "from signal %d (%s)%s\n",
+> +                __FILE__, __LINE__, sig, signame, dump);
+>      }
+> +    abort();
+> +}
+> +
+> +void qtest_expect_exit_status(QTestState *s, int status)
+> +{
+> +    s->exit_status =3D status;
+>  }
+> =20
+>  static void kill_qemu_hook_func(void *s)
+> @@ -213,7 +216,7 @@ QTestState *qtest_init_without_qmp_handshake(const =
+char *extra_args)
+>      gchar *command;
+>      const char *qemu_binary =3D qtest_qemu_binary();
+> =20
+> -    s =3D g_new(QTestState, 1);
+> +    s =3D g_new0(QTestState, 1);
+> =20
+>      socket_path =3D g_strdup_printf("/tmp/qtest-%d.sock", getpid());
+>      qmp_socket_path =3D g_strdup_printf("/tmp/qtest-%d.qmp", getpid())=
+;
+> diff --git a/tests/libqtest.h b/tests/libqtest.h
+> index c8cffe5d68..d41229d7fd 100644
+> --- a/tests/libqtest.h
+> +++ b/tests/libqtest.h
+> @@ -82,6 +82,15 @@ QTestState *qtest_init_with_serial(const char *extra=
+_args, int *sock_fd);
+>   */
+>  void qtest_quit(QTestState *s);
+> =20
+> +/**
+> + * qtest_expect_exit_status:
+> + * @s: #QTestState instance to operate on.
+> + * @status: the expected exit status
+> + *
+> + * Set the expected exit status when calling qtest_quit().
+> + */
+> +void qtest_expect_exit_status(QTestState *s, int status);
+> +
+>  /**
+>   * qtest_qmp_fds:
+>   * @s: #QTestState instance to operate on.
+> --=20
+> 2.23.0
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
