@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B775EC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:29:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 256A9C4CEC5
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:29:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F017206A4
+	by mail.kernel.org (Postfix) with ESMTPS id EBAD4206A4
 	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:29:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F017206A4
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBAD4206A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8sBj-0002lW-1U
+	id 1i8sBj-0002oa-Ud
 	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 16:29:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39324)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39307)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1i8rxB-00061t-9t
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:14:03 -0400
+ (envelope-from <armbru@redhat.com>) id 1i8rxA-00061N-WB
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:14:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1i8rx8-0000f1-Qj
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:14:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41496)
+ (envelope-from <armbru@redhat.com>) id 1i8rx8-0000ev-P9
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:14:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44874)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i8rx8-0000cW-EE
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i8rx8-0000cY-ET
  for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:13:58 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8139130A5A54;
+ by mx1.redhat.com (Postfix) with ESMTPS id 802B118C8929;
  Fri, 13 Sep 2019 20:13:57 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ED12A5D71C;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E8F395D717;
  Fri, 13 Sep 2019 20:13:54 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 93DD71138406; Fri, 13 Sep 2019 22:13:49 +0200 (CEST)
+ id 9095C11384D8; Fri, 13 Sep 2019 22:13:49 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 13 Sep 2019 22:13:43 +0200
-Message-Id: <20190913201349.24332-11-armbru@redhat.com>
+Date: Fri, 13 Sep 2019 22:13:42 +0200
+Message-Id: <20190913201349.24332-10-armbru@redhat.com>
 In-Reply-To: <20190913201349.24332-1-armbru@redhat.com>
 References: <20190913201349.24332-1-armbru@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 13 Sep 2019 20:13:57 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Fri, 13 Sep 2019 20:13:57 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 10/16] qapi: Permit omitting all flat union
- branches
+Subject: [Qemu-devel] [PATCH v3 09/16] qapi: Permit alternates with just one
+ branch
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,176 +75,120 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Absent flat union branches default to the empty struct (since commit
-800877bb16 "qapi: allow empty branches in flat unions").  But am
-attempt to omit all of them is rejected with "Union 'FOO' has no
-branches".  Harmless oddity, but it's easy to avoid, so do that.
+A union or alternate without branches makes no sense and doesn't work:
+it can't be instantiated.  A union or alternate with just one branch
+works, but is degenerate.  We accept the former, but reject the
+latter.  Weird.  docs/devel/qapi-code-gen.txt doesn't mention the
+difference.  It claims an alternate definition is "is similar to a
+simple union type".
+
+Permit degenerate alternates to make them consistent with unions.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- docs/devel/qapi-code-gen.txt            |  3 +--
- scripts/qapi/common.py                  | 16 ++++++++--------
- tests/qapi-schema/flat-union-empty.err  |  2 +-
- tests/qapi-schema/flat-union-empty.json |  2 +-
- tests/qapi-schema/qapi-schema-test.json |  5 +++++
- tests/qapi-schema/qapi-schema-test.out  |  9 +++++++++
- tests/qapi-schema/union-empty.err       |  2 +-
- tests/qapi-schema/union-empty.json      |  2 +-
- 8 files changed, 27 insertions(+), 14 deletions(-)
+ scripts/qapi/common.py                  | 6 ++----
+ tests/qapi-schema/alternate-empty.err   | 2 +-
+ tests/qapi-schema/alternate-empty.json  | 4 ++--
+ tests/qapi-schema/qapi-schema-test.json | 4 +++-
+ tests/qapi-schema/qapi-schema-test.out  | 6 ++++--
+ 5 files changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 4ce67752a7..ec2d374483 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -436,8 +436,7 @@ Union types are used to let the user choose between s=
-everal different
- variants for an object.  There are two flavors: simple (no
- discriminator or base), and flat (both discriminator and base).  A union
- type is defined using a data dictionary as explained in the following
--paragraphs.  The data dictionary for either type of union must not
--be empty.
-+paragraphs.  Unions must have at least one branch.
-=20
- A simple union type defines a mapping from automatic discriminator
- values to data types like in this example:
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 99db18f3d6..3393a049cc 100644
+index c5c71287c3..99db18f3d6 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -852,7 +852,7 @@ def check_union(expr, info):
+@@ -920,11 +920,9 @@ def check_alternate(expr, info):
+     members =3D expr['data']
+     types_seen =3D {}
 =20
-     # With no discriminator it is a simple union.
-     if discriminator is None:
--        enum_define =3D None
-+        enum_values =3D members.keys()
-         allow_metas =3D ['built-in', 'union', 'alternate', 'struct', 'en=
-um']
-         if base is not None:
-             raise QAPISemError(info, "Simple union '%s' must not have a =
-base" %
-@@ -885,16 +885,17 @@ def check_union(expr, info):
-                                'must not be conditional' %
-                                (base, discriminator, name))
-         enum_define =3D enum_types.get(discriminator_value['type'])
--        allow_metas =3D ['struct']
-         # Do not allow string discriminator
-         if not enum_define:
-             raise QAPISemError(info,
-                                "Discriminator '%s' must be of enumeratio=
-n "
-                                "type" % discriminator)
-+        enum_values =3D enum_get_names(enum_define)
-+        allow_metas =3D ['struct']
-+
-+    if (len(enum_values) =3D=3D 0):
-+        raise QAPISemError(info, "Union '%s' has no branches" % name)
-=20
--    # Check every branch; don't allow an empty union
--    if len(members) =3D=3D 0:
--        raise QAPISemError(info, "Union '%s' cannot have empty 'data'" %=
- name)
+-    # Check every branch; require at least two branches
+-    if len(members) < 2:
++    if len(members) =3D=3D 0:
+         raise QAPISemError(info,
+-                           "Alternate '%s' should have at least two bran=
+ches "
+-                           "in 'data'" % name)
++                           "Alternate '%s' cannot have empty 'data'" % n=
+ame)
      for (key, value) in members.items():
-         check_name(info, "Member of union '%s'" % name, key)
-=20
-@@ -907,8 +908,8 @@ def check_union(expr, info):
-=20
-         # If the discriminator names an enum type, then all members
-         # of 'data' must also be members of the enum type.
--        if enum_define:
--            if key not in enum_get_names(enum_define):
-+        if discriminator is not None:
-+            if key not in enum_values:
-                 raise QAPISemError(info,
-                                    "Discriminator value '%s' is not foun=
-d in "
-                                    "enum '%s'"
-@@ -1578,7 +1579,6 @@ class QAPISchemaObjectTypeVariants(object):
-         assert bool(tag_member) !=3D bool(tag_name)
-         assert (isinstance(tag_name, str) or
-                 isinstance(tag_member, QAPISchemaObjectTypeMember))
--        assert len(variants) > 0
-         for v in variants:
-             assert isinstance(v, QAPISchemaObjectTypeVariant)
-         self._tag_name =3D tag_name
-diff --git a/tests/qapi-schema/flat-union-empty.err b/tests/qapi-schema/f=
-lat-union-empty.err
-index 15754f54eb..fedbc0d1cf 100644
---- a/tests/qapi-schema/flat-union-empty.err
-+++ b/tests/qapi-schema/flat-union-empty.err
+         check_name(info, "Member of alternate '%s'" % name, key)
+         check_known_keys(info,
+diff --git a/tests/qapi-schema/alternate-empty.err b/tests/qapi-schema/al=
+ternate-empty.err
+index bb06c5bfec..86dbc666eb 100644
+--- a/tests/qapi-schema/alternate-empty.err
++++ b/tests/qapi-schema/alternate-empty.err
 @@ -1 +1 @@
--tests/qapi-schema/flat-union-empty.json:4: Union 'Union' cannot have emp=
-ty 'data'
-+tests/qapi-schema/flat-union-empty.json:4: Union 'Union' has no branches
-diff --git a/tests/qapi-schema/flat-union-empty.json b/tests/qapi-schema/=
-flat-union-empty.json
-index 77f1d9abfb..83e1cc7b96 100644
---- a/tests/qapi-schema/flat-union-empty.json
-+++ b/tests/qapi-schema/flat-union-empty.json
-@@ -1,4 +1,4 @@
--# flat unions cannot be empty
-+# flat union discriminator cannot be empty
- { 'enum': 'Empty', 'data': [ ] }
- { 'struct': 'Base', 'data': { 'type': 'Empty' } }
- { 'union': 'Union', 'base': 'Base', 'discriminator': 'type', 'data': { }=
- }
+-tests/qapi-schema/alternate-empty.json:2: Alternate 'Alt' should have at=
+ least two branches in 'data'
++tests/qapi-schema/alternate-empty.json:2: Alternate 'Alt' cannot have em=
+pty 'data'
+diff --git a/tests/qapi-schema/alternate-empty.json b/tests/qapi-schema/a=
+lternate-empty.json
+index fff15baf16..9f445474e6 100644
+--- a/tests/qapi-schema/alternate-empty.json
++++ b/tests/qapi-schema/alternate-empty.json
+@@ -1,2 +1,2 @@
+-# alternates must list at least two types to be useful
+-{ 'alternate': 'Alt', 'data': { 'i': 'int' } }
++# alternates cannot be empty
++{ 'alternate': 'Alt', 'data': { } }
 diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
 qapi-schema-test.json
-index 8b0d47c4ab..75c42eb0e3 100644
+index e6dbbbd328..8b0d47c4ab 100644
 --- a/tests/qapi-schema/qapi-schema-test.json
 +++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -25,6 +25,11 @@
- { 'struct': 'Empty1', 'data': { } }
- { 'struct': 'Empty2', 'base': 'Empty1', 'data': { } }
+@@ -186,19 +186,21 @@
 =20
-+# Likewise for an empty flat union
-+{ 'union': 'Union',
-+  'base': { 'type': 'EnumOne' }, 'discriminator': 'type',
-+  'data': { } }
-+
- { 'command': 'user_def_cmd0', 'data': 'Empty2', 'returns': 'Empty2' }
-=20
- # for testing override of default naming heuristic
+ # test that we correctly compile downstream extensions, as well as munge
+ # ticklish names
++# also test union and alternate with just one branch
+ { 'enum': '__org.qemu_x-Enum', 'data': [ '__org.qemu_x-value' ] }
+ { 'struct': '__org.qemu_x-Base',
+   'data': { '__org.qemu_x-member1': '__org.qemu_x-Enum' } }
+ { 'struct': '__org.qemu_x-Struct', 'base': '__org.qemu_x-Base',
+   'data': { '__org.qemu_x-member2': 'str', '*wchar-t': 'int' } }
+ { 'union': '__org.qemu_x-Union1', 'data': { '__org.qemu_x-branch': 'str'=
+ } }
++{ 'alternate': '__org.qemu_x-Alt1', 'data': { '__org.qemu_x-branch': 'st=
+r' } }
+ { 'struct': '__org.qemu_x-Struct2',
+   'data': { 'array': ['__org.qemu_x-Union1'] } }
+ { 'union': '__org.qemu_x-Union2', 'base': '__org.qemu_x-Base',
+   'discriminator': '__org.qemu_x-member1',
+   'data': { '__org.qemu_x-value': '__org.qemu_x-Struct2' } }
+ { 'alternate': '__org.qemu_x-Alt',
+-  'data': { '__org.qemu_x-branch': 'str', 'b': '__org.qemu_x-Base' } }
++  'data': { '__org.qemu_x-branch': '__org.qemu_x-Base' } }
+ { 'event': '__ORG.QEMU_X-EVENT', 'data': '__org.qemu_x-Struct' }
+ { 'command': '__org.qemu_x-command',
+   'data': { 'a': ['__org.qemu_x-Enum'], 'b': ['__org.qemu_x-Struct'],
 diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
 api-schema-test.out
-index bea7976bbb..98031da96f 100644
+index fb00a21996..bea7976bbb 100644
 --- a/tests/qapi-schema/qapi-schema-test.out
 +++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -23,6 +23,15 @@ enum MyEnum
- object Empty1
- object Empty2
-     base Empty1
-+object q_obj_Union-base
-+    member type: EnumOne optional=3DFalse
-+object Union
-+    base q_obj_Union-base
+@@ -274,6 +274,9 @@ object __org.qemu_x-Union1
+     member type: __org.qemu_x-Union1Kind optional=3DFalse
+     tag type
+     case __org.qemu_x-branch: q_obj_str-wrapper
++alternate __org.qemu_x-Alt1
 +    tag type
-+    case value1: q_empty
-+    case value2: q_empty
-+    case value3: q_empty
-+    case value4: q_empty
- command user_def_cmd0 Empty2 -> Empty2
-    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
-g=3DFalse
- enum QEnumTwo
-diff --git a/tests/qapi-schema/union-empty.err b/tests/qapi-schema/union-=
-empty.err
-index 12c20221bd..d4241a38a2 100644
---- a/tests/qapi-schema/union-empty.err
-+++ b/tests/qapi-schema/union-empty.err
-@@ -1 +1 @@
--tests/qapi-schema/union-empty.json:2: Union 'Union' cannot have empty 'd=
-ata'
-+tests/qapi-schema/union-empty.json:2: Union 'Union' has no branches
-diff --git a/tests/qapi-schema/union-empty.json b/tests/qapi-schema/union=
--empty.json
-index 1f0b13ca21..df3e5e639a 100644
---- a/tests/qapi-schema/union-empty.json
-+++ b/tests/qapi-schema/union-empty.json
-@@ -1,2 +1,2 @@
--# unions cannot be empty
-+# simple unions cannot be empty
- { 'union': 'Union', 'data': { } }
++    case __org.qemu_x-branch: str
+ array __org.qemu_x-Union1List __org.qemu_x-Union1
+ object __org.qemu_x-Struct2
+     member array: __org.qemu_x-Union1List optional=3DFalse
+@@ -283,8 +286,7 @@ object __org.qemu_x-Union2
+     case __org.qemu_x-value: __org.qemu_x-Struct2
+ alternate __org.qemu_x-Alt
+     tag type
+-    case __org.qemu_x-branch: str
+-    case b: __org.qemu_x-Base
++    case __org.qemu_x-branch: __org.qemu_x-Base
+ event __ORG.QEMU_X-EVENT __org.qemu_x-Struct
+    boxed=3DFalse
+ array __org.qemu_x-EnumList __org.qemu_x-Enum
 --=20
 2.21.0
 
