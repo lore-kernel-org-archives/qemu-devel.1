@@ -2,85 +2,88 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78076C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 15:52:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79E7AC49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 15:52:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DDEC20640
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 15:52:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 477BC20640
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 15:52:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dKUj1n+6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DDEC20640
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fScq1Bf1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 477BC20640
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8nrw-0000sR-Sl
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 11:52:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57028)
+	id 1i8ns1-0000vl-FK
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 11:52:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57051)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i8npd-0007Rv-R3
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:49:59 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i8npg-0007Ts-QF
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:50:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i8npc-0000nr-BF
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:49:57 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:35363)
+ (envelope-from <peter.maydell@linaro.org>) id 1i8npf-0000oj-OO
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:50:00 -0400
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:53150)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i8npc-0000nh-2X
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:49:56 -0400
-Received: by mail-wr1-x430.google.com with SMTP id g7so32673819wrx.2
- for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 08:49:55 -0700 (PDT)
+ id 1i8npf-0000oM-Ij
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:49:59 -0400
+Received: by mail-wm1-x32c.google.com with SMTP id x2so3297607wmj.2
+ for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 08:49:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=knJlsnqK4CkmdQ5y6JWnWDeSJIq2/fxWy4SXtbG2pn4=;
- b=dKUj1n+6/DszsisbS/c52vUHpDDIyU0gsjOqjrnHB+bi0raZ2Yn94pHIbWQk5peZcm
- pK/nPERNnp5ECnQiph2VrCBqzHQ0RD1+3jy2GcIBVORWqUzjGZsIEZPctcICOVVX4SOy
- Mre6uVH8RB2ONXZPyNlhkASnF7mIyJR01saZh4cHYuSamxVBVt3Ric8/jJMdjJ740Lf2
- MNt3JobSWoUdJJuZHGkMcs9fZ+6ZY7FLx1vMaQ3ThdMJac5Bg8sRLWtCpf20pw1zUKNL
- rXLUxVxweubkcIeKntQ2pA1t0mwnUYqjZN1KK5OMgKi4p3NO0VWCZOE6sM8x8cbevwZv
- zj5g==
+ bh=HwYqxy/bmpDz5O1ucFFc7CGqvNwTRTsg+04HLrtha5U=;
+ b=fScq1Bf1Nzy077kbEzY2l5n4O+oGu/ukLdXJFFof25g9IX+5pPWN3u40lYuvE6vyi2
+ UAYD041+EbrjU0UnPOqrhzCsljCpkqx6MgnMPpd/hbKeMM+CA/lAci0mEFyI01n5Hqtp
+ 5RzXWff2DQbHh8L4NSvvJYZSCWb6wrD4gMwp4Drlhg1Vr0gK4Y3mq320ARfPKE4CUVIp
+ 5qfVYN3EjvYKfubmFTASg7dUL8kJ0I2Mrs1L3bzIlhHfWvN8L8IVT/DS3Eh6g+VSLDGM
+ xMoI/JauwWWijqNnWSGMhCvk2AjRFM9i7rlFrXH7vK4pewjmXGP7UDggJCdwXuKcTQms
+ yvBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=knJlsnqK4CkmdQ5y6JWnWDeSJIq2/fxWy4SXtbG2pn4=;
- b=MeFSUiyteXiV2TgMKdMFEy4VO15CJXBBbDY9xp780LPDz7rZnSrnT5wYIK7koamV29
- fCkBLuhcqnVd12BfwDgLEAhhAJt9Gr3s711Tl5psjl7MERXCbEWWKuNpSGvPSYQF7QFY
- Rqj9oBiOORFaITQUbiLqA+xMD5zJRMw2zNwWn+SNyx327qntAJAU5QCod+ULhYTEQG8A
- 7us7oENL0ZzWd/K2XqMfzs4b64AbhRegQB97ZcVVMp2fxhPVxgkfb4ufEihFVui1KTs1
- DgH7sauGttLzctO9+B9QvX6fi42BhFeQBJrryxpP1JqMxrqtVolxRcSBCr9iYraJyUVF
- h6Xg==
-X-Gm-Message-State: APjAAAXVPyJF9BdkiinldMYFzWapQd0KRZOTFmcGLAkfI9Uv9g1RhDWO
- 4+WMQelnM/UGM48aNbshLfToer4QY62Tpg==
-X-Google-Smtp-Source: APXvYqwvc+qKasExbjo0GNuXLNK++O3UqxwHpOaAYn89zhETAxUoDw60LgmEXs4VaOgku/bwkU5QvQ==
-X-Received: by 2002:a5d:424c:: with SMTP id s12mr7763201wrr.221.1568389794467; 
- Fri, 13 Sep 2019 08:49:54 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=HwYqxy/bmpDz5O1ucFFc7CGqvNwTRTsg+04HLrtha5U=;
+ b=N0ePXCbyKddh214BcqY0tsGAmyoW5B4n6jvKerJbqE4XjZ6hXbs6rLG3OZApGO9yd6
+ Vmw9Rua3rsTa68tB1e2mklG5zYI3c/qb9pxOUXrk6JORWwgSKiQJB9ouOukeh+oXvBG3
+ 78rh+IQiitS7Lgn1XtVHTr+9ZUt7iKBDDnhpKWxsiJt9jz0RXEUZB2dtUmBWGdu1J1HU
+ RGJajSV3/aMIAbiluB5Udd8Im65ul1WRSQA2CfDTbnF0w9ympm4GL4XpEHdtnISyBbrr
+ lkAsWgfPBXb1iOVv/mWB4tgTO6XlO++LdBhINDVPNsz68l+r121wKPZAFndM6wPURZio
+ fc9Q==
+X-Gm-Message-State: APjAAAVJus9blwx4EtRxti5IPVLhlxIxRRG+PLZx7/PtgFqhAzcVgJp5
+ DyV2LRhtgPYVKB6zQDSMko+cgbPdKllgYA==
+X-Google-Smtp-Source: APXvYqzwdeENPcz7n70WLRy0FzuYbRPzdvUjHATdKsvdvOj8jlQgJZfJZutes77ZXQVXcP0Rhq0qdg==
+X-Received: by 2002:a05:600c:290c:: with SMTP id
+ i12mr3995936wmd.19.1568389798380; 
+ Fri, 13 Sep 2019 08:49:58 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c132sm3562207wme.27.2019.09.13.08.49.53
+ by smtp.gmail.com with ESMTPSA id c132sm3562207wme.27.2019.09.13.08.49.57
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 13 Sep 2019 08:49:53 -0700 (PDT)
+ Fri, 13 Sep 2019 08:49:57 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 13 Sep 2019 16:49:40 +0100
-Message-Id: <20190913154952.27724-1-peter.maydell@linaro.org>
+Date: Fri, 13 Sep 2019 16:49:43 +0100
+Message-Id: <20190913154952.27724-4-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190913154952.27724-1-peter.maydell@linaro.org>
+References: <20190913154952.27724-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::430
-Subject: [Qemu-devel] [PULL 00/12] target-arm queue
+X-Received-From: 2a00:1450:4864:20::32c
+Subject: [Qemu-devel] [PULL 03/12] aspeed: Remove unused SoC definitions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,77 +99,64 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-target-arm queue: mostly aspeed changes from Cédric.
+From: Cédric Le Goater <clg@kaod.org>
 
-thanks
--- PMM
+There are no QEMU Aspeed machines using the SoCs "ast2400-a0" or
+"ast2400".
 
-The following changes since commit 85182c96de61f0b600bbe834d5a23e713162e892:
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Message-id: 20190904070506.1052-4-clg@kaod.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/aspeed_soc.c | 26 --------------------------
+ 1 file changed, 26 deletions(-)
 
-  Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-20190912a' into staging (2019-09-13 14:37:48 +0100)
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index 04480875d0d..3aa73d2438e 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -118,19 +118,6 @@ static const char *aspeed_soc_ast2500_typenames[] = {
+ 
+ static const AspeedSoCInfo aspeed_socs[] = {
+     {
+-        .name         = "ast2400-a0",
+-        .cpu_type     = ARM_CPU_TYPE_NAME("arm926"),
+-        .silicon_rev  = AST2400_A0_SILICON_REV,
+-        .sram_size    = 0x8000,
+-        .spis_num     = 1,
+-        .fmc_typename = "aspeed.smc.fmc",
+-        .spi_typename = aspeed_soc_ast2400_typenames,
+-        .gpio_typename = "aspeed.gpio-ast2400",
+-        .wdts_num     = 2,
+-        .irqmap       = aspeed_soc_ast2400_irqmap,
+-        .memmap       = aspeed_soc_ast2400_memmap,
+-        .num_cpus     = 1,
+-    }, {
+         .name         = "ast2400-a1",
+         .cpu_type     = ARM_CPU_TYPE_NAME("arm926"),
+         .silicon_rev  = AST2400_A1_SILICON_REV,
+@@ -143,19 +130,6 @@ static const AspeedSoCInfo aspeed_socs[] = {
+         .irqmap       = aspeed_soc_ast2400_irqmap,
+         .memmap       = aspeed_soc_ast2400_memmap,
+         .num_cpus     = 1,
+-    }, {
+-        .name         = "ast2400",
+-        .cpu_type     = ARM_CPU_TYPE_NAME("arm926"),
+-        .silicon_rev  = AST2400_A0_SILICON_REV,
+-        .sram_size    = 0x8000,
+-        .spis_num     = 1,
+-        .fmc_typename = "aspeed.smc.fmc",
+-        .spi_typename = aspeed_soc_ast2400_typenames,
+-        .gpio_typename = "aspeed.gpio-ast2400",
+-        .wdts_num     = 2,
+-        .irqmap       = aspeed_soc_ast2400_irqmap,
+-        .memmap       = aspeed_soc_ast2400_memmap,
+-        .num_cpus     = 1,
+     }, {
+         .name         = "ast2500-a1",
+         .cpu_type     = ARM_CPU_TYPE_NAME("arm1176"),
+-- 
+2.20.1
 
-are available in the Git repository at:
-
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190913
-
-for you to fetch changes up to 27a296fce9821e3608d537756cffa6e43a46df3b:
-
-  qemu-ga: Convert invocation documentation to rST (2019-09-13 16:05:01 +0100)
-
-----------------------------------------------------------------
-target-arm queue:
- * aspeed: add a GPIO controller to the SoC
- * aspeed: Various refactorings
- * aspeed: Improve DMA controller modelling
- * atomic_template: fix indentation in GEN_ATOMIC_HELPER
- * qemu-ga: Convert invocation documentation to rST
-
-----------------------------------------------------------------
-Christian Svensson (1):
-      aspeed/smc: Calculate checksum on normal DMA
-
-Cédric Le Goater (7):
-      aspeed: Remove unused SoC definitions
-      aspeed: Use consistent typenames
-      aspeed/smc: Add support for DMAs
-      aspeed/smc: Add DMA calibration settings
-      aspeed/smc: Inject errors in DMA checksum
-      aspeed/scu: Introduce per-SoC SCU types
-      aspeed/scu: Introduce a aspeed_scu_get_apb_freq() routine
-
-Emilio G. Cota (1):
-      atomic_template: fix indentation in GEN_ATOMIC_HELPER
-
-Peter Maydell (1):
-      qemu-ga: Convert invocation documentation to rST
-
-Rashmica Gupta (2):
-      hw/gpio: Add basic Aspeed GPIO model for AST2400 and AST2500
-      aspeed: add a GPIO controller to the SoC
-
- Makefile                      |  24 +-
- hw/gpio/Makefile.objs         |   1 +
- accel/tcg/atomic_template.h   |   2 +-
- include/hw/arm/aspeed_soc.h   |   4 +-
- include/hw/gpio/aspeed_gpio.h | 100 +++++
- include/hw/misc/aspeed_scu.h  |  21 +-
- include/hw/ssi/aspeed_smc.h   |   7 +
- hw/arm/aspeed.c               |   2 +
- hw/arm/aspeed_soc.c           |  63 ++-
- hw/gpio/aspeed_gpio.c         | 884 ++++++++++++++++++++++++++++++++++++++++++
- hw/misc/aspeed_scu.c          | 102 ++---
- hw/ssi/aspeed_smc.c           | 335 +++++++++++++++-
- hw/timer/aspeed_timer.c       |   3 +-
- MAINTAINERS                   |   2 +-
- docs/conf.py                  |  18 +-
- docs/interop/conf.py          |   7 +
- docs/interop/index.rst        |   1 +
- docs/interop/qemu-ga.rst      | 133 +++++++
- qemu-doc.texi                 |   5 -
- qemu-ga.texi                  | 137 -------
- 20 files changed, 1585 insertions(+), 266 deletions(-)
- create mode 100644 include/hw/gpio/aspeed_gpio.h
- create mode 100644 hw/gpio/aspeed_gpio.c
- create mode 100644 docs/interop/qemu-ga.rst
- delete mode 100644 qemu-ga.texi
 
