@@ -2,73 +2,61 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BF4FC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 13:53:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 833A7C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 13:54:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3033520640
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 13:53:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3033520640
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5E4E620640
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 13:54:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E4E620640
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8m0u-00015N-7T
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 09:53:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40159)
+	id 1i8m22-0002Md-Ke
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 09:54:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40447)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i8lyh-000802-M2
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:51:12 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1i8m0d-00012M-Ot
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:53:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i8lyg-0002Ma-Cg
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:51:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59636)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i8lyg-0002Lq-6u
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:51:10 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i8lye-0000et-6E
- for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 13:51:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id F2F612E81C6
- for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 13:50:59 +0000 (UTC)
+ (envelope-from <balaton@eik.bme.hu>) id 1i8m0c-00035J-1s
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:53:11 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:65255)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1i8m0b-00034j-Kp
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:53:10 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 796A27456CC;
+ Fri, 13 Sep 2019 15:53:07 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 5C8DD7456B4; Fri, 13 Sep 2019 15:53:07 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 5A6FD7456CB;
+ Fri, 13 Sep 2019 15:53:07 +0200 (CEST)
+Date: Fri, 13 Sep 2019 15:53:07 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Gerd Hoffmann <kraxel@redhat.com>
+In-Reply-To: <20190913092537.2913-3-kraxel@redhat.com>
+Message-ID: <alpine.BSF.2.21.9999.1909131540070.888@zero.eik.bme.hu>
+References: <20190913092537.2913-1-kraxel@redhat.com>
+ <20190913092537.2913-3-kraxel@redhat.com>
+User-Agent: Alpine 2.21.9999 (BSF 287 2018-06-16)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Sep 2019 13:42:48 -0000
-From: Christophe Lyon <christophe.lyon+launchpad@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Won't Fix; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: christophe-lyon pmaydell
-X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
-X-Launchpad-Bug-Modifier: Christophe Lyon (christophe-lyon)
-References: <150712892432.28170.15132413345734525245.malonedeb@gac.canonical.com>
-Message-Id: <156838216873.4620.8050589503511990589.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19048";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: bbf923b7e1079459ce6d8a593bdcea24ffe67e76
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1721275] Re: Support more ARM CPUs
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] ati: use vga_read_byte in
+ ati_cursor_define
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,56 +65,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1721275 <1721275@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, flier_m@outlook.com,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Regarding Cortex-M7, I've noticed that unlike Cortex-M4, it supports
-double precision floating-point. Is DP supported by qemu?
+On Fri, 13 Sep 2019, Gerd Hoffmann wrote:
+> This makes sure reads are confined to vga video memory.
+>
+> v2: fix ati_cursor_draw_line too.
+>
+> Reported-by: xu hang <flier_m@outlook.com>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+> hw/display/ati.c | 19 ++++++++++---------
+> 1 file changed, 10 insertions(+), 9 deletions(-)
+>
+> diff --git a/hw/display/ati.c b/hw/display/ati.c
+> index 8f940eee221a..f6ae27c0c710 100644
+> --- a/hw/display/ati.c
+> +++ b/hw/display/ati.c
+> @@ -19,6 +19,7 @@
+> #include "qemu/osdep.h"
+> #include "ati_int.h"
+> #include "ati_regs.h"
+> +#include "vga-access.h"
+> #include "hw/qdev-properties.h"
+> #include "vga_regs.h"
+> #include "qemu/log.h"
+> @@ -135,19 +136,19 @@ static void ati_vga_switch_mode(ATIVGAState *s)
+> static void ati_cursor_define(ATIVGAState *s)
+> {
+>     uint8_t data[1024];
+> -    uint8_t *src;
+> +    unsigned srcoff;
 
--- =
+Maybe this should be uint32_t like below for consistency.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1721275
+>     int i, j, idx = 0;
+>
+>     if ((s->regs.cur_offset & BIT(31)) || s->cursor_guest_mode) {
+>         return; /* Do not update cursor if locked or rendered by guest */
+>     }
+>     /* FIXME handle cur_hv_offs correctly */
+> -    src = s->vga.vram_ptr + s->regs.cur_offset -
+> -          (s->regs.cur_hv_offs >> 16) - (s->regs.cur_hv_offs & 0xffff) * 16;
+> +    srcoff = s->regs.cur_offset -
+> +        (s->regs.cur_hv_offs >> 16) - (s->regs.cur_hv_offs & 0xffff) * 16;
+>     for (i = 0; i < 64; i++) {
+>         for (j = 0; j < 8; j++, idx++) {
+> -            data[idx] = src[i * 16 + j];
+> -            data[512 + idx] = src[i * 16 + j + 8];
+> +            data[idx] = vga_read_byte(&s->vga, srcoff + i * 16 + j);
+> +            data[512 + idx] = vga_read_byte(&s->vga, srcoff + i * 16 + j + 8);
+>         }
+>     }
+>     if (!s->cursor) {
+> @@ -189,7 +190,7 @@ static void ati_cursor_invalidate(VGACommonState *vga)
+> static void ati_cursor_draw_line(VGACommonState *vga, uint8_t *d, int scr_y)
+> {
+>     ATIVGAState *s = container_of(vga, ATIVGAState, vga);
+> -    uint8_t *src;
+> +    uint32_t srcoff;
+>     uint32_t *dp = (uint32_t *)d;
+>     int i, j, h;
+>
+> @@ -199,13 +200,13 @@ static void ati_cursor_draw_line(VGACommonState *vga, uint8_t *d, int scr_y)
+>         return;
+>     }
+>     /* FIXME handle cur_hv_offs correctly */
+> -    src = s->vga.vram_ptr + s->cursor_offset + (scr_y - vga->hw_cursor_y) * 16;
+> +    srcoff = s->cursor_offset + (scr_y - vga->hw_cursor_y) * 16;
+>     dp = &dp[vga->hw_cursor_x];
+>     h = ((s->regs.crtc_h_total_disp >> 16) + 1) * 8;
+>     for (i = 0; i < 8; i++) {
+>         uint32_t color;
+> -        uint8_t abits = src[i];
+> -        uint8_t xbits = src[i + 8];
+> +        uint8_t abits = vga_read_byte(vga, srcoff + i);
+> +        uint8_t xbits = vga_read_byte(vga, srcoff + i);
 
-Title:
-  Support more ARM CPUs
+But this is a copy&paste error: xbits definitely should be offset + i + 8.
 
-Status in QEMU:
-  Won't Fix
+Regards,
+BALATON Zoltan
 
-Bug description:
-  Hi,
-
-  This is an enhancement request, rather than a bug report.
-
-  After some discussions/presentations during the last Linaro Connect
-  (SFO17), I understand that it may be easy to add support for more ARM
-  CPUs in QEMU. I am interested in user-mode, if that matters.
-
-  I'm primarily using QEMU for GCC validations, and I'd like to make
-  sure that GCC doesn't generate instructions not supported by the CPU
-  it's supposed to generate code for.
-
-  I'd like to have:
-  cortex-m0
-  cortex-m4
-  cortex-m7
-  cortex-m23
-  cortex-m33
-
-  cortex-a35
-  cortex-a53
-  cortex-a57
-
-  Is it possible?
-  Is it the right place to ask?
-  Should I file separate requests for each?
-
-  Thanks
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1721275/+subscriptions
+>         for (j = 0; j < 8; j++, abits <<= 1, xbits <<= 1) {
+>             if (abits & BIT(7)) {
+>                 if (xbits & BIT(7)) {
+>
 
