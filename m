@@ -2,67 +2,87 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4884CC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 15:18:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FDBEC49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 15:21:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E4AF21479
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 15:18:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E4AF21479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CDEFE20717
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 15:21:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aUGSG+xN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDEFE20717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8nKh-00072K-7d
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 11:17:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51898)
+	id 1i8nOA-0001AC-Tz
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 11:21:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52043)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1i8nJi-0006Zl-7r
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:16:59 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i8nLW-0007b9-0p
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:18:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1i8nJg-0007bF-9R
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:16:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54534)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i8nJg-0007ah-4J
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:16:56 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A4508793C4;
- Fri, 13 Sep 2019 15:16:54 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EB65A60C44;
- Fri, 13 Sep 2019 15:16:51 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 7E590113865F; Fri, 13 Sep 2019 17:16:50 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-References: <20190910063724.28470-1-armbru@redhat.com>
- <20190910063724.28470-15-armbru@redhat.com>
- <608a5ab7-eed6-6f09-95e2-5c28bdeec158@redhat.com>
-Date: Fri, 13 Sep 2019 17:16:50 +0200
-In-Reply-To: <608a5ab7-eed6-6f09-95e2-5c28bdeec158@redhat.com> (Eric Blake's
- message of "Tue, 10 Sep 2019 11:50:32 -0500")
-Message-ID: <87lfus8bvh.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <alex.bennee@linaro.org>) id 1i8nLU-0000It-Pf
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:18:49 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39120)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i8nLU-0000IL-Fi
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:18:48 -0400
+Received: by mail-wr1-x441.google.com with SMTP id r3so2349575wrj.6
+ for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 08:18:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=8EVBqLZByuLzwkxUcoOgl/asrcDGx/FphM0V2g6QcXM=;
+ b=aUGSG+xNJHqtFLFaL6AvYhx5kWlswQ84qZrwa8gWS86CSPPe+4WyO7ADxbARHHR4ap
+ 4QekwGa/RGpJ1jQCNOAazLKtAofIYfI/83YSC+FvgEqgfAqhAPoNwccnGo2QXC+gTFrx
+ ho2qbQrr7DD18lRd6gNQl72Z+Gm8NeCd8RflC59DJhBya57qK+5NPHFso8+g5qbIcZ/n
+ SOSQ7sNZSbqdPR2QjN2W7aLXJ9xFi+3+lKm1VIEdqC6cfX95Pb4cVEk7i4/TQsjS1OJp
+ vPVy4YJ+u4jffBeKO9ynGsTatrMNDScp8ZHf2vJ8mCI5FRFpOsK7kr1LRFTpM+pXhkRa
+ FpKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=8EVBqLZByuLzwkxUcoOgl/asrcDGx/FphM0V2g6QcXM=;
+ b=DGY20zCrZPQQD72ERKFTlb4e7qEEMtQSYTH5aPHV53gQE5qqUOWjAn5O4YnciKTgSx
+ goLE6wRiXILmZtBiTgjeKkpG4J4YGIksdr9gC1JBmer4vPnACUVYF+HVfYFEftEz96kP
+ +Gs6seDChREFGdZaTkoQs4ywZ5QNRMxLM/K8mXDa6cjKewra1+/7S/TzphJEUZ2OrfKB
+ f5SEIN+2+ChFQrHxIJjFeEHt9uVZ3e8ijVHSxf5hyeGJj4pLvD2gkMBlo1wU2JJU62Ey
+ BaEduaibGSQASEkWi/taQLB46I9l/26OSHs60YhF0UqGwcIk7NZJCAlnv8XsoVf6CVWz
+ 41RQ==
+X-Gm-Message-State: APjAAAUbdsPeTORF4RHeqgv2tSqesX+1UZoK1iRSa7jHY2I34k5wNYe3
+ Zs7Ho7w7KZp99L6Oex6kCe232A==
+X-Google-Smtp-Source: APXvYqx2xndvw9IKBCgqzUe/wyAjBF/HvB7V6IanSGVP4FfxxDH4JKMp6WlRDrmTgYCTeccFBXKjTg==
+X-Received: by 2002:a5d:574c:: with SMTP id q12mr40238135wrw.69.1568387926928; 
+ Fri, 13 Sep 2019 08:18:46 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 189sm5765440wma.6.2019.09.13.08.18.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 13 Sep 2019 08:18:46 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 6C9291FF87;
+ Fri, 13 Sep 2019 16:18:45 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Date: Fri, 13 Sep 2019 16:18:39 +0100
+Message-Id: <20190913151845.12582-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Fri, 13 Sep 2019 15:16:54 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 14/16] docs/devel/qapi-code-gen: Rewrite
- introduction to schema
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PATCH v6 0/6] semihosting cleanups (plus minor
+ tests/tcg tweak)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,73 +94,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
- mdroth@linux.vnet.ibm.com
+Cc: qemu-arm@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+Hi Peter,
 
-> On 9/10/19 1:37 AM, Markus Armbruster wrote:
->> The introduction to the QAPI schema is somewhat rambling.  Rewrite for
->> clarity.
->
-> The curse of additions over time.  Thanks for tackling this.
->
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  docs/devel/qapi-code-gen.txt | 106 ++++++++++++++++-------------------
->>  1 file changed, 47 insertions(+), 59 deletions(-)
->> 
->
->> +=== Schema syntax ===
->> +
->> +Syntax is loosely based on JSON (http://www.ietf.org/rfc/rfc8259.txt).
->> +Differences:
->> +
->> +* Comments: start with a hash character (#) that is not part of a
->> +  string, and extend to the end of the line.
->> +
->> +* Strings are enclosed in 'single quotes', not "double quotes".
->> +
->> +* Strings are restricted to ASCII.  All control characters must be
->> +  escaped, even DEL.
->
-> Or rather, control characters are not permitted.  (May affect the
-> earlier 7/16...)
+I've restored the #ifndef CONFIG_USER_ONLY check to M-profile as well
+and split the linux-user semihosting smoke check into a new commit.
 
-I neglected to update this for v2.  Will change to "Strings are
-restricted to printable ASCII, and escape sequences to just '\\'.
+Alex Bennée (6):
+  tests/tcg: clean-up some comments after the de-tangling
+  target/arm: handle M-profile semihosting at translate time
+  target/arm: handle A-profile semihosting at translate time
+  target/arm: remove run time semihosting checks
+  target/arm: remove run-time semihosting checks for linux-user
+  tests/tcg: add linux-user semihosting smoke test for ARM
 
->> +
->> +* Numbers are not supported.
->
-> Yet. But if we allow default values, it won't be much longer before we
-> get there.  (Doesn't affect this patch)
->
->> +
->> +A QAPI schema consists of a series of top-level expressions (JSON
->> +objects).  Their order does not matter.
->
-> Does the order of 'include' and/or 'pragma' matter?
+ linux-user/arm/cpu_loop.c         |  3 -
+ linux-user/arm/target_syscall.h   |  3 -
+ target/arm/helper.c               | 96 +++++++------------------------
+ target/arm/m_helper.c             | 18 ++----
+ target/arm/translate.c            | 30 ++++++++--
+ tests/tcg/Makefile.target         |  7 ++-
+ tests/tcg/aarch64/Makefile.target |  8 ++-
+ tests/tcg/arm/Makefile.target     | 20 ++++---
+ tests/tcg/arm/semihosting.c       | 45 +++++++++++++++
+ 9 files changed, 123 insertions(+), 107 deletions(-)
+ create mode 100644 tests/tcg/arm/semihosting.c
 
-Pragma no, because their scope is the complete schema.
+-- 
+2.20.1
 
-Include no, as long as order doesn't matter for anything else.
-
-Hmm, there's one thing that cares for order: generated documentation is
-in source order.
-
-Hmm^2, subsection "Documentation comments" doesn't mention doc
-generation at all, and we also lack a dsubsection on it under section
-"Code generation".
-
-I'll see what I can do for v3.
-
-> Touchups seem minor enough that I trust you, so you can add:
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
 
