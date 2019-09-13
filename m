@@ -2,87 +2,140 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5790BC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:05:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BD57C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:12:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1860A20692
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:05:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mvista-com.20150623.gappssmtp.com header.i=@mvista-com.20150623.gappssmtp.com header.b="eKRg432d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1860A20692
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mvista.com
+	by mail.kernel.org (Postfix) with ESMTPS id CC481206BB
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:12:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC481206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8roX-0002Ai-7f
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 16:05:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36656)
+	id 1i8rvN-00051I-Tk
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 16:12:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38496)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cminyard@mvista.com>) id 1i8rjn-0007eH-Fv
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:00:17 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i8ruU-0004Rb-OZ
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:11:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cminyard@mvista.com>) id 1i8rjb-0007k3-3J
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:00:05 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:46005)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <cminyard@mvista.com>) id 1i8rja-0007jd-Mz
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 15:59:59 -0400
-Received: by mail-ot1-x342.google.com with SMTP id 41so26755648oti.12
- for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 12:59:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mvista-com.20150623.gappssmtp.com; s=20150623;
- h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=laQc1mgER2G0R7nWWvmAyA91YEL9Vihl+mBNXn3OPRs=;
- b=eKRg432dH2fuWPXxFP7fe7hlysRdj920g/PwhgKCmPWVUElvMtSA2HKGqO6xqhRdSf
- O5bFU9dOhuwlvC0ndDxR17sbyUc3kUKXj8/4gXcBgmAQba9UJMHAug5BZibevGSpKC6C
- F7weMp5mzY9APSdlRAbXtcIYVy+w+Dvxp1wvXRW0Zx7uLM9JkdbJEsyR5dvSrOeVgPDL
- PJ8gSdX8tbGL1cxHQmGQgx7M9PNM2I39z19aOmanTcOVmGW+stDUdzsV1kXElDPxq9Zs
- utJOlhpDpZ5a+iJc6Xy8tOLvyqr6yIgh1ofnUXC6evsfkKI+7xpVt5cr9ka/3NxLO7/8
- /gOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
- :references:mime-version:content-disposition:in-reply-to:user-agent;
- bh=laQc1mgER2G0R7nWWvmAyA91YEL9Vihl+mBNXn3OPRs=;
- b=MyO3A9BG1U4dMoNhsjV5K8ShXowk5/sBM81uNILQs+Gi3UhAHP8UKDkgE3RuKGanl4
- 2+MOVSWshvgyuXaeUe/7vrRoyQyoebHh54UdDK1TTTRLA/V2OMKbdagi+hTp67hAdlFW
- Dkb3imVBeWhqugxeVR3l7GpFt4aeTPOzXbEfypbmsGhbI8cdcvD0hFV30zYybT7cjrOn
- jia88NKrjCvae8GvA107Pjt+lZ0af2hzXbljgPk8zNFDeKzpNkJVGNUywcyT7rb0HoR+
- wCa0FqXUOTMfYY+30HJWaYKAL/gPvsIFmz47dxJo5271gkCmgs2ThG/llXfd3eNgAwCy
- 1jSQ==
-X-Gm-Message-State: APjAAAUUy5qIdk9QvpCKAX5HmiNF6TDhGylNrGbC81Ynz4dDcls8YZlK
- qXrOrxaYG69eXrd49mWFuBwgbg==
-X-Google-Smtp-Source: APXvYqzqbPkBykhcNzBHwrOExdv7tjeslJBP9d8rC0tDHnu5Sjb49zahimYUfnRWA5fbpsi2CsRkxg==
-X-Received: by 2002:a9d:2043:: with SMTP id n61mr44468849ota.17.1568404797251; 
- Fri, 13 Sep 2019 12:59:57 -0700 (PDT)
-Received: from t560 ([47.184.136.59])
- by smtp.gmail.com with ESMTPSA id a10sm6200321oto.17.2019.09.13.12.59.56
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Fri, 13 Sep 2019 12:59:56 -0700 (PDT)
-Date: Fri, 13 Sep 2019 14:59:55 -0500
-From: Corey Minyard <cminyard@mvista.com>
-To: minyard@acm.org
-Message-ID: <20190913195955.GE13434@t560>
-References: <20190819201705.31633-1-minyard@acm.org>
- <20190819201705.31633-16-minyard@acm.org>
+ (envelope-from <jsnow@redhat.com>) id 1i8ruT-0006yS-P4
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:11:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56824)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1i8ruQ-0006vq-VR; Fri, 13 Sep 2019 16:11:11 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A99933091761;
+ Fri, 13 Sep 2019 20:11:09 +0000 (UTC)
+Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D2AC2600C6;
+ Fri, 13 Sep 2019 20:10:59 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190913105205.7581-1-philmd@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <af4ef81c-5a4d-847d-37bd-3696a3b77c68@redhat.com>
+Date: Fri, 13 Sep 2019 16:10:58 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190819201705.31633-16-minyard@acm.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH 15/15] pc: Add an SMB0 ACPI device to q35
+In-Reply-To: <20190913105205.7581-1-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Fri, 13 Sep 2019 20:11:09 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/2] trace: Forbid trailing
+ newline in event format
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,246 +147,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: cminyard@mvista.com
-Cc: Igor Mammedov <imammedo@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 19, 2019 at 03:17:05PM -0500, minyard@acm.org wrote:
-> From: Corey Minyard <cminyard@mvista.com>
-> 
-> This is so I2C devices can be found in the ACPI namespace.  Currently
-> that's only IPMI, but devices can be easily added now.
-> 
-> Adding the devices required some PCI information, and the bus itself
-> to be added to the PCMachineState structure.
-> 
-> Note that this only works on Q35, the ACPI for PIIX4 is not capable
-> of handling an SMBus device.
 
-I haven't recevied any comments on this, and it seems like something
-some people should review.  Is this ok?
 
-Thanks
+On 9/13/19 6:52 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Stefan,
+>=20
+> I'v been confused by trailing newline in trace reports,
+> so this series aims to fix this, by cleaning current
+> formats and add a check to catch new one introduced.
+>=20
+> Regards,
+>=20
+> Phil.
+>=20
+> Philippe Mathieu-Daud=C3=A9 (2):
+>   trace: Remove trailing newline in events
+>   trace: Forbid event format ending with newline character
+>=20
+>  docs/devel/tracing.txt        |  2 ++
+>  hw/misc/trace-events          | 10 +++++-----
+>  hw/scsi/trace-events          |  2 +-
+>  hw/sd/trace-events            |  2 +-
+>  nbd/trace-events              |  4 ++--
+>  net/trace-events              |  6 +++---
+>  scripts/tracetool/__init__.py |  3 +++
+>  7 files changed, 17 insertions(+), 12 deletions(-)
+>=20
 
--corey
+Never mind my bikeshedding.
 
-> 
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Corey Minyard <cminyard@mvista.com>
-> ---
->  hw/i386/acpi-build.c             |  15 +++++++++++++++
->  hw/i386/pc_piix.c                |  12 ++++++------
->  hw/i386/pc_q35.c                 |   9 +++++----
->  include/hw/i386/pc.h             |   2 ++
->  tests/data/acpi/q35/DSDT         | Bin 7841 -> 7879 bytes
->  tests/data/acpi/q35/DSDT.bridge  | Bin 7858 -> 7896 bytes
->  tests/data/acpi/q35/DSDT.cphp    | Bin 8304 -> 8342 bytes
->  tests/data/acpi/q35/DSDT.dimmpxm | Bin 9494 -> 9532 bytes
->  tests/data/acpi/q35/DSDT.ipmibt  | Bin 7916 -> 7954 bytes
->  tests/data/acpi/q35/DSDT.memhp   | Bin 9200 -> 9238 bytes
->  tests/data/acpi/q35/DSDT.mmio64  | Bin 8971 -> 9009 bytes
->  tests/data/acpi/q35/DSDT.numamem | Bin 7847 -> 7885 bytes
->  12 files changed, 28 insertions(+), 10 deletions(-)
-> 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 0c94e21a1a..e5fb3d6ef0 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -1809,6 +1809,18 @@ static Aml *build_q35_osc_method(void)
->      return method;
->  }
->  
-> +static void build_smb0(Aml *table, I2CBus *smbus, int devnr, int func)
-> +{
-> +    Aml *scope = aml_scope("_SB.PCI0");
-> +    Aml *dev = aml_device("SMB0");
-> +
-> +    aml_append(dev, aml_name_decl("_HID", aml_eisaid("APP0005")));
-> +    aml_append(dev, aml_name_decl("_ADR", aml_int(devnr << 16 | func)));
-> +    build_acpi_ipmi_devices(dev, BUS(smbus), "\\_SB.PCI0.SMB0");
-> +    aml_append(scope, dev);
-> +    aml_append(table, scope);
-> +}
-> +
->  static void
->  build_dsdt(GArray *table_data, BIOSLinker *linker,
->             AcpiPmInfo *pm, AcpiMiscInfo *misc,
-> @@ -1862,6 +1874,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->          build_q35_isa_bridge(dsdt);
->          build_isa_devices_aml(dsdt);
->          build_q35_pci0_int(dsdt);
-> +        if (pcms->smbus && !pcmc->do_not_add_smb_acpi) {
-> +            build_smb0(dsdt, pcms->smbus, ICH9_SMB_DEV, ICH9_SMB_FUNC);
-> +        }
->      }
->  
->      if (pcmc->legacy_cpu_hotplug) {
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index 9e187f856a..96311b0a91 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -283,15 +283,14 @@ else {
->  
->      if (pcmc->pci_enabled && acpi_enabled) {
->          DeviceState *piix4_pm;
-> -        I2CBus *smbus;
->  
->          smi_irq = qemu_allocate_irq(pc_acpi_smi_interrupt, first_cpu, 0);
->          /* TODO: Populate SPD eeprom data.  */
-> -        smbus = piix4_pm_init(pci_bus, piix3_devfn + 3, 0xb100,
-> -                              pcms->gsi[9], smi_irq,
-> -                              pc_machine_is_smm_enabled(pcms),
-> -                              &piix4_pm);
-> -        smbus_eeprom_init(smbus, 8, NULL, 0);
-> +        pcms->smbus = piix4_pm_init(pci_bus, piix3_devfn + 3, 0xb100,
-> +                                    pcms->gsi[9], smi_irq,
-> +                                    pc_machine_is_smm_enabled(pcms),
-> +                                    &piix4_pm);
-> +        smbus_eeprom_init(pcms->smbus, 8, NULL, 0);
->  
->          object_property_add_link(OBJECT(machine), PC_MACHINE_ACPI_DEVICE_PROP,
->                                   TYPE_HOTPLUG_HANDLER,
-> @@ -464,6 +463,7 @@ static void pc_i440fx_3_1_machine_options(MachineClass *m)
->  
->      pc_i440fx_4_0_machine_options(m);
->      m->is_default = 0;
-> +    pcmc->do_not_add_smb_acpi = true;
->      m->smbus_no_migration_support = true;
->      m->alias = NULL;
->      pcmc->pvh_enabled = false;
-> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> index be3464f485..7ce4fb6fdb 100644
-> --- a/hw/i386/pc_q35.c
-> +++ b/hw/i386/pc_q35.c
-> @@ -316,10 +316,10 @@ static void pc_q35_init(MachineState *machine)
->  
->      if (pcms->smbus_enabled) {
->          /* TODO: Populate SPD eeprom data.  */
-> -        smbus_eeprom_init(ich9_smb_init(host_bus,
-> -                                        PCI_DEVFN(ICH9_SMB_DEV, ICH9_SMB_FUNC),
-> -                                        0xb100),
-> -                          8, NULL, 0);
-> +        pcms->smbus = ich9_smb_init(host_bus,
-> +                                    PCI_DEVFN(ICH9_SMB_DEV, ICH9_SMB_FUNC),
-> +                                    0xb100);
-> +        smbus_eeprom_init(pcms->smbus, 8, NULL, 0);
->      }
->  
->      pc_cmos_init(pcms, idebus[0], idebus[1], rtc_state);
-> @@ -410,6 +410,7 @@ static void pc_q35_3_1_machine_options(MachineClass *m)
->  
->      pc_q35_4_0_machine_options(m);
->      m->default_kernel_irqchip_split = false;
-> +    pcmc->do_not_add_smb_acpi = true;
->      m->smbus_no_migration_support = true;
->      m->alias = NULL;
->      pcmc->pvh_enabled = false;
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 4bb9e29114..4013ac721c 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -38,6 +38,7 @@ struct PCMachineState {
->      HotplugHandler *acpi_dev;
->      ISADevice *rtc;
->      PCIBus *bus;
-> +    I2CBus *smbus;
->      FWCfgState *fw_cfg;
->      qemu_irq *gsi;
->      PFlashCFI01 *flash[2];
-> @@ -116,6 +117,7 @@ typedef struct PCMachineClass {
->      bool rsdp_in_ram;
->      int legacy_acpi_table_size;
->      unsigned acpi_data_size;
-> +    bool do_not_add_smb_acpi;
->  
->      /* SMBIOS compat: */
->      bool smbios_defaults;
-> diff --git a/tests/data/acpi/q35/DSDT b/tests/data/acpi/q35/DSDT
-> index f9f36d1645c9b57aea38350d67dfaa143845697d..77ea60ffed421c566138fe6341421f579129a582 100644
-> GIT binary patch
-> delta 62
-> zcmZ2zd)$`GCD<k8xEuomWBo=hV@Xw2z4&0K_yA{5gXkv7U|%N#j(87G7aleN23C%E
-> RN0%TTW(IkN%{G#$tN;mh4yXVC
-> 
-> delta 24
-> fcmX?ZyU>=)CD<iop&SDPquoX>W690Qk}0eJT(JhZ
-> 
-> diff --git a/tests/data/acpi/q35/DSDT.bridge b/tests/data/acpi/q35/DSDT.bridge
-> index 29176832ca9842c6654273ae1246321aa38b2821..fbc2d40000428b402586ea9302b5ccf36ef8de1e 100644
-> GIT binary patch
-> delta 62
-> zcmdmFd&8E?CD<k8h8zO}qx?oLV@Xw2z4&0K_yA{5gXkv7U|%N#j(87G7aleN23C%E
-> RN0%TTW(IkN%{G!{tN;Tx4vYW*
-> 
-> delta 24
-> fcmca%yUCWzCD<iolN<vB<Gqbs#*&+pB}-WWXCMci
-> 
-> diff --git a/tests/data/acpi/q35/DSDT.cphp b/tests/data/acpi/q35/DSDT.cphp
-> index 19bdb5d21050f24aaacbafb1f84d6e1d541876c6..6a896cb2142feadbcabc6276b59c138a7e93f540 100644
-> GIT binary patch
-> delta 62
-> zcmez1FwK$6CD<iongRm@<ByG8#*(V4dhx+d@d3`B2GLED!M;ug9Pu8WE<9`k46GdS
-> RjxIqw%nb4jn{6ab*a06=4(I>?
-> 
-> delta 24
-> fcmbQ{_`!k8CD<jTK!JgQar;ItW690QlE&-+VHF1X
-> 
-> diff --git a/tests/data/acpi/q35/DSDT.dimmpxm b/tests/data/acpi/q35/DSDT.dimmpxm
-> index 727fe489b4c8cdd39476ff61e7d7664c816f5291..23fdf5e60a5069f60d6c680ac9c68c4a8a81318e 100644
-> GIT binary patch
-> delta 62
-> zcmbQ{wa1IgCD<jzMwNkq@!&=-V@Xw2z4&0K_yA{5gXkv7U|%N#j(87G7aleN23C%E
-> RN0%TTW(IkN%{G#^xB>h%4&?v<
-> 
-> delta 24
-> fcmdnvHO-65CD<iIOqGFwv0)>ZvE=4t$(!5&ShNQA
-> 
-> diff --git a/tests/data/acpi/q35/DSDT.ipmibt b/tests/data/acpi/q35/DSDT.ipmibt
-> index 9634930e6125de4375d87a56a353f636985599d4..c3fca0a71efa7b55c958a49f305389426fbe7922 100644
-> GIT binary patch
-> delta 62
-> zcmaE3JIRjACD<iINS=X#aq&j3I!RSkz4&0K_yA{5gXkv7U|%N#j(87G7aleN23C%E
-> RN0%TTW(IkN&Fzw@tN{Nt4#fZf
-> 
-> delta 24
-> fcmbPa_r{jXCD<k8jT{35WAa9>I?2uJBvV)cXHo~&
-> 
-> diff --git a/tests/data/acpi/q35/DSDT.memhp b/tests/data/acpi/q35/DSDT.memhp
-> index dad5dc8db2f13bdb0de001da42c13b18286c3061..2abd0e36cd1344cbca3fa4ab59c5db2ea326d125 100644
-> GIT binary patch
-> delta 62
-> zcmez1KFx#6CD<iIOof4gv0x*Yv81Z1UVN}qe1Nm3L3ER3u&<K=N4$rp3lEzB11m?o
-> Rqe~DEGlM+CW*f;ZTmbN04s`$k
-> 
-> delta 24
-> fcmbQ{@xh(TCD<k8gE9jHqrpZlW690QlAE~zWv~Z^
-> 
-> diff --git a/tests/data/acpi/q35/DSDT.mmio64 b/tests/data/acpi/q35/DSDT.mmio64
-> index 20f627ed08a0cae4e144f3e4dd7dd5f1d8d0318c..b32034a11c1f8a0a156df3765df44b14a88dbb4d 100644
-> GIT binary patch
-> delta 62
-> zcmeBn+vvvS66_LUsLa5?sI!sFSW;D0FFx2QKET=2Ai7C1*w@K`Bi_T)g@;Xmft4fP
-> R(Itq7nL(amvyJ3=P5{<m4j2Fc
-> 
-> delta 24
-> fcmdn!*6qgS66_Mft<1o{_<AFkvE=4t$#a|lSziY!
-> 
-> diff --git a/tests/data/acpi/q35/DSDT.numamem b/tests/data/acpi/q35/DSDT.numamem
-> index 7b96a972804e95e191d9d3bf9a965e90f6f7e555..d8b2b47f8b47067d375021a30086ca97d8aca43f 100644
-> GIT binary patch
-> delta 62
-> zcmZ2(d)AiACD<k8tQ-Raqvl2~V@Xw2z4&0K_yA{5gXkv7U|%N#j(87G7aleN23C%E
-> RN0%TTW(IkN%{G$RtN{IN4r%}Z
-> 
-> delta 24
-> fcmX?WyWEz`CD<ioxf}xn<BN@4#*&+pC9_xoWX}hC
-> 
-> -- 
-> 2.17.1
-> 
+Reviewed-by: John Snow <jsnow@redhat.com>
 
