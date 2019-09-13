@@ -2,49 +2,48 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72D06C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 22:27:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B6FC49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 22:44:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 483EA206A5
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 22:27:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 483EA206A5
+	by mail.kernel.org (Postfix) with ESMTPS id C035320830
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 22:44:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C035320830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8u2O-0006lv-3w
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 18:27:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56051)
+	id 1i8uIr-00023U-Vm
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 18:44:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58395)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i8u1W-0006G0-HE
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 18:26:39 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i8uI9-0001Xm-Sp
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 18:43:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i8u1V-00027i-Ca
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 18:26:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59438)
+ (envelope-from <jsnow@redhat.com>) id 1i8uI8-0000Ev-Qn
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 18:43:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55038)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i8u1R-00026S-VV; Fri, 13 Sep 2019 18:26:34 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1i8uI4-0000Dq-B7; Fri, 13 Sep 2019 18:43:45 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D58E6307CDEA;
- Fri, 13 Sep 2019 22:26:32 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7C8E73082E61;
+ Fri, 13 Sep 2019 22:43:42 +0000 (UTC)
 Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8F3195D9CD;
- Fri, 13 Sep 2019 22:26:31 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20190911150054.90936-1-vsementsov@virtuozzo.com>
- <20190911150054.90936-4-vsementsov@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8BCB2600C6;
+ Fri, 13 Sep 2019 22:43:41 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20190912135632.13925-1-mreitz@redhat.com>
+ <20190912135632.13925-2-mreitz@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -121,22 +120,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <884049bb-dd47-fead-ae0c-49e8459bb5a5@redhat.com>
-Date: Fri, 13 Sep 2019 18:26:31 -0400
+Message-ID: <cf03d000-5c59-74e2-cebb-0a62414ce271@redhat.com>
+Date: Fri, 13 Sep 2019 18:43:41 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190911150054.90936-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20190912135632.13925-2-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 13 Sep 2019 22:26:32 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Fri, 13 Sep 2019 22:43:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] block/qcow2: proper locking on
- bitmap add/remove paths
+Subject: Re: [Qemu-devel] [PATCH 1/4] mirror: Do not dereference invalid
+ pointers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,40 +147,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- mreitz@redhat.com, den@openvz.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/11/19 11:00 AM, Vladimir Sementsov-Ogievskiy wrote:
-> qmp_block_dirty_bitmap_add and do_block_dirty_bitmap_remove do acquire
-> aio context since 0a6c86d024c52b. But this is not enough: we also must
-> lock qcow2 mutex when access in-image metadata. Especially it concerns
-> freeing qcow2 clusters.
+On 9/12/19 9:56 AM, Max Reitz wrote:
+> mirror_exit_common() may be called twice (if it is called from
+> mirror_prepare() and fails, it will be called from mirror_abort()
+> again).
 > 
-> To achieve this, move qcow2_can_store_new_dirty_bitmap and
-> qcow2_remove_persistent_dirty_bitmap to coroutine context.
+> In such a case, many of the pointers in the MirrorBlockJob object will
+> already be freed.  This can be seen most reliably for s->target, which
+> is set to NULL (and then dereferenced by blk_bs()).
 > 
-> Since we work in coroutines in correct aio context, we don't need
-> context acquiring in blockdev.c anymore, drop it.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Cc: qemu-stable@nongnu.org
+> Fixes: 737efc1eda23b904fbe0e66b37715fb0e5c3e58b
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-It makes sense to me given the context, but I'll want Kevin or Max to
-eye it over for locking correctness, admittedly.
+Sorry that I left the mirror callbacks such a mess. I think I got the
+design for the completion callbacks completely wrong, because of how
+hard it is to disentangle mirror into something reasonable here.
 
-Here's my good faith RB:
+The original idea was that it calls .prepare, then either .commit or
+.abort, then .clean. Ideally, there would be no exit_common for mirror;
+everything would be sorted into the proper little callback silos.
+
+The problem with the existing design is that if it has already failed by
+.prepare time, we jump straight to .abort, so it has this uneven,
+unbalanced design. The code in abort and cleanup therefore has to work
+doubly-hard to figure out what exactly it needs to do.
+
+It's a mess.
+
+I wonder if it can be improved by always calling prepare, even when
+we've already failed. We could just posit that it now means "prepare to
+commit" or "prepare to abort" but we can do all of the work that can
+still fail there in one shot.
+
+Maybe that will make the work that needs to happen in abort/commit
+easier to digest.
+
+> ---
+>  block/mirror.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/mirror.c b/block/mirror.c
+> index fe984efb90..706d80fced 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -620,11 +620,11 @@ static int mirror_exit_common(Job *job)
+>  {
+>      MirrorBlockJob *s = container_of(job, MirrorBlockJob, common.job);
+>      BlockJob *bjob = &s->common;
+> -    MirrorBDSOpaque *bs_opaque = s->mirror_top_bs->opaque;
+> +    MirrorBDSOpaque *bs_opaque;
+>      AioContext *replace_aio_context = NULL;
+> -    BlockDriverState *src = s->mirror_top_bs->backing->bs;
+> -    BlockDriverState *target_bs = blk_bs(s->target);
+> -    BlockDriverState *mirror_top_bs = s->mirror_top_bs;
+> +    BlockDriverState *src;
+> +    BlockDriverState *target_bs;
+> +    BlockDriverState *mirror_top_bs;
+>      Error *local_err = NULL;
+>      bool abort = job->ret < 0;
+>      int ret = 0;
+> @@ -634,6 +634,11 @@ static int mirror_exit_common(Job *job)
+>      }
+>      s->prepared = true;
+>  
+> +    mirror_top_bs = s->mirror_top_bs;
+> +    bs_opaque = mirror_top_bs->opaque;
+> +    src = mirror_top_bs->backing->bs;
+> +    target_bs = blk_bs(s->target);
+> +
+>      if (bdrv_chain_contains(src, target_bs)) {
+>          bdrv_unfreeze_backing_chain(mirror_top_bs, target_bs);
+>      }
+> 
 
 Reviewed-by: John Snow <jsnow@redhat.com>
-
-
-(I'm not so sure about the aio_wait_kick. Why is that needed here? ...
-
-oh, 4720cbeea1f42fd905fc69338fd42b191e58b412 explains why.
-I suppose any synchronous caller of a co_ function needs to make sure
-that the entry shim kicks on the way out. This seems very easy to get
-wrong, doesn't it?)
 
