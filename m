@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7B90C4CEC8
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:24:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C84C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:24:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA963206A4
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:24:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA963206A4
+	by mail.kernel.org (Postfix) with ESMTPS id BFCC9206A4
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:24:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFCC9206A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8s7K-0007HK-Uf
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 16:24:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39301)
+	id 1i8s7R-0007QN-2x
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 16:24:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39276)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1i8rxA-000619-P2
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:14:02 -0400
+ (envelope-from <armbru@redhat.com>) id 1i8rx9-0005zB-KC
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:14:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1i8rx7-0000cQ-IL
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:14:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42136)
+ (envelope-from <armbru@redhat.com>) id 1i8rx7-0000cI-GX
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:13:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36872)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i8rx7-0000bX-8n
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i8rx7-0000bQ-6K
  for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:13:57 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7DAF210F2E81;
+ by mx1.redhat.com (Postfix) with ESMTPS id 79B01308FBFC;
  Fri, 13 Sep 2019 20:13:56 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2539A194BB;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 201374510;
  Fri, 13 Sep 2019 20:13:56 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id A16D11136448; Fri, 13 Sep 2019 22:13:49 +0200 (CEST)
+ id 9E4281136447; Fri, 13 Sep 2019 22:13:49 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 13 Sep 2019 22:13:47 +0200
-Message-Id: <20190913201349.24332-15-armbru@redhat.com>
+Date: Fri, 13 Sep 2019 22:13:46 +0200
+Message-Id: <20190913201349.24332-14-armbru@redhat.com>
 In-Reply-To: <20190913201349.24332-1-armbru@redhat.com>
 References: <20190913201349.24332-1-armbru@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Fri, 13 Sep 2019 20:13:56 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Fri, 13 Sep 2019 20:13:56 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 14/16] docs/devel/qapi-code-gen: Rewrite
- introduction to schema
+Subject: [Qemu-devel] [PATCH v3 13/16] docs/devel/qapi-code-gen: Rewrite
+ compatibility considerations
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,134 +75,154 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The introduction to the QAPI schema is somewhat rambling.  Rewrite for
-clarity.
+We have some compatibility advice buried in sections "Enumeration
+types" and "Struct types".  Compatibility is actually about commands
+and events.  It devolves to the types used there.  All kinds of types,
+not just enumerations and structs.
+
+Replace the existing advice by a new section "Compatibility
+considerations".
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- docs/devel/qapi-code-gen.txt | 107 ++++++++++++++++-------------------
- 1 file changed, 48 insertions(+), 59 deletions(-)
+ docs/devel/qapi-code-gen.txt | 95 +++++++++++++++++++++++-------------
+ 1 file changed, 60 insertions(+), 35 deletions(-)
 
 diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 2406e1bdbc..e75d680f6e 100644
+index 663ef10a56..2406e1bdbc 100644
 --- a/docs/devel/qapi-code-gen.txt
 +++ b/docs/devel/qapi-code-gen.txt
-@@ -16,65 +16,54 @@ well as the QEMU Guest Agent (QGA) for communicating =
-with the guest.
- The remainder of this document uses "Client JSON Protocol" when
- referring to the wire contents of a QMP or QGA connection.
+@@ -178,14 +178,11 @@ While the C code starts numbering at 0, it is bette=
+r to use explicit
+ comparisons to enum values than implicit comparisons to 0; the C code
+ will also include a generated enum member ending in _MAX for tracking
+ the size of the enum, useful when using common functions for
+-converting between strings and enum values.  Since the wire format
+-always passes by name, it is acceptable to reorder or add new
+-enumeration members in any location without breaking clients of Client
+-JSON Protocol; however, removing enum values would break
+-compatibility.  For any struct that has a member that will only contain
+-a finite set of string values, using an enum type for that member is
+-better than open-coding the member to be type 'str'.
++converting between strings and enum values.
 =20
--To map Client JSON Protocol interfaces to the native C QAPI
--implementations, a JSON-based schema is used to define types and
--function signatures, and a set of scripts is used to generate types,
--signatures, and marshaling/dispatch code. This document will describe
--how the schemas, scripts, and resulting code are used.
--
--
--=3D=3D QMP/Guest agent schema =3D=3D
--
--A QAPI schema file is designed to be loosely based on JSON
--(http://www.ietf.org/rfc/rfc8259.txt) with changes for quoting style
--and the use of comments; a QAPI schema file is then parsed by a python
--code generation program.  A valid QAPI schema consists of a series of
--top-level expressions, with no commas between them.  Where
--dictionaries (JSON objects) are used, they are parsed as python
--OrderedDicts so that ordering is preserved (for predictable layout of
--generated C structs and parameter lists).  Ordering doesn't matter
--between top-level expressions or the keys within an expression, but
--does matter within dictionary values for 'data' and 'returns' members
--of a single expression.  QAPI schema input is written using 'single
--quotes' instead of JSON's "double quotes" (in contrast, Client JSON
--Protocol uses no comments, and while input accepts 'single quotes' as
--an extension, output is strict JSON using only "double quotes").  As
--in JSON, trailing commas are not permitted in arrays or dictionaries.
--Input must be ASCII (although QMP supports full Unicode strings, the
--QAPI parser does not).  At present, there is no place where a QAPI
--schema requires the use of JSON numbers or null.
--
--
--=3D=3D=3D Comments =3D=3D=3D
--
--Comments are allowed; anything between an unquoted # and the following
--newline is ignored.
--
--
--=3D=3D=3D Schema overview =3D=3D=3D
--
--The schema sets up a series of types, as well as commands and events
--that will use those types.  Forward references are allowed: the parser
--scans in two passes, where the first pass learns all type names, and
--the second validates the schema and generates the code.  This allows
--the definition of complex structs that can have mutually recursive
--types, and allows for indefinite nesting of Client JSON Protocol that
--satisfies the schema.  A type name should not be defined more than
--once.  It is permissible for the schema to contain additional types
--not used by any commands or events in the Client JSON Protocol, for
--the side effect of generated C code used internally.
--
--There are eight top-level expressions recognized by the parser:
--'include', 'pragma', 'command', 'struct', 'enum', 'union',
--'alternate', and 'event'.  There are several groups of types: simple
--types (a number of built-in types, such as 'int' and 'str'; as well as
--enumerations), complex types (structs and two flavors of unions), and
--alternate types (a choice between other types).  The 'command' and
--'event' expressions can refer to existing types by name, or list an
--anonymous type as a dictionary. Listing a type name inside an array
--refers to a single-dimension array of that type; multi-dimension
--arrays are not directly supported (although an array of a complex
--struct that contains an array member is possible).
-+To map between Client JSON Protocol interfaces and the native C API,
-+we generate C code from a QAPI schema.  This document describes the
-+QAPI schema language, and how it gets mapped to the Client JSON
-+Protocol and to C.  It additionally provides guidance on maintaining
-+Client JSON Protocol compatibility.
-+
-+
-+=3D=3D The QAPI schema language =3D=3D
-+
-+The QAPI schema defines the Client JSON Protocol's commands and
-+events, as well as types used by them.  Forward references are
-+allowed.
-+
-+It is permissible for the schema to contain additional types not used
-+by any commands or events, for the side effect of generated C code
-+used internally.
-+
-+There are several kinds of types: simple types (a number of built-in
-+types, such as 'int' and 'str'; as well as enumerations), arrays,
-+complex types (structs and two flavors of unions), and alternate types
-+(a choice between other types).
-+
-+
-+=3D=3D=3D Schema syntax =3D=3D=3D
-+
-+Syntax is loosely based on JSON (http://www.ietf.org/rfc/rfc8259.txt).
-+Differences:
-+
-+* Comments: start with a hash character (#) that is not part of a
-+  string, and extend to the end of the line.
-+
-+* Strings are enclosed in 'single quotes', not "double quotes".
-+
-+* Strings are restricted to printable ASCII, and escape sequences to
-+  just '\\'.
-+
-+* Numbers are not supported.
-+
-+A QAPI schema consists of a series of top-level expressions (JSON
-+objects).  Code and documentation is generated in schema definition
-+order.  Code order should not matter.
-+
-+The order of keys within JSON objects does not matter unless
-+explicitly noted.
-+
-+There are eight kinds of top-level expressions: 'include', 'pragma',
-+'command', 'struct', 'enum', 'union', 'alternate', and 'event'.  These
-+are discussed in detail below.
++For any struct that has a member that will only contain a finite set
++of string values, using an enum type for that member is better than
++open-coding the member to be type 'str'.
 =20
- In the rest of this document, usage lines are given for each
- expression type, with literal strings written in lower case and
+ =3D=3D=3D Struct types =3D=3D=3D
+=20
+@@ -203,34 +200,6 @@ name.  An example of a struct is:
+ The use of '*' as a prefix to the name means the member is optional in
+ the corresponding JSON protocol usage.
+=20
+-The default initialization value of an optional argument should not be c=
+hanged
+-between versions of QEMU unless the new default maintains backward
+-compatibility to the user-visible behavior of the old default.
+-
+-With proper documentation, this policy still allows some flexibility; fo=
+r
+-example, documenting that a default of 0 picks an optimal buffer size al=
+lows
+-one release to declare the optimal size at 512 while another release dec=
+lares
+-the optimal size at 4096 - the user-visible behavior is not the bytes us=
+ed by
+-the buffer, but the fact that the buffer was optimal size.
+-
+-On input structures (only mentioned in the 'data' side of a command), ch=
+anging
+-from mandatory to optional is safe (older clients will supply the option=
+, and
+-newer clients can benefit from the default); changing from optional to
+-mandatory is backwards incompatible (older clients may be omitting the o=
+ption,
+-and must continue to work).
+-
+-On output structures (only mentioned in the 'returns' side of a command)=
+,
+-changing from mandatory to optional is in general unsafe (older clients =
+may be
+-expecting the member, and could crash if it is missing), although it
+-can be done if the only way that the optional argument will be omitted
+-is when it is triggered by the presence of a new input flag to the
+-command that older clients don't know to send.  Changing from optional
+-to mandatory is safe.
+-
+-A structure that is used in both input and output of various commands
+-must consider the backwards compatibility constraints of both directions
+-of use.
+-
+ A struct definition can specify another struct as its base.
+ In this case, the members of the base type are included as top-level mem=
+bers
+ of the new struct's dictionary in the Client JSON Protocol wire
+@@ -1037,6 +1006,62 @@ the names of built-in types.  Clients should exami=
+ne member
+ "json-type" instead of hard-coding names of built-in types.
+=20
+=20
++=3D=3D Compatibility considerations =3D=3D
++
++Maintaining backward compatibility at the Client JSON Protocol level
++while evolving the schema requires some care.  This section is about
++syntactic compatibility, which is necessary, but not sufficient, for
++actual compatibility.
++
++Clients send commands with argument data, and receive command
++responses with return data and events with event data.
++
++Adding opt-in functionality to the send direction is backwards
++compatible: adding commands, optional arguments, enumeration values,
++union and alternate branches; turning an argument type into an
++alternate of that type; making mandatory arguments optional.  Clients
++oblivious of the new functionality continue to work.
++
++Incompatible changes include removing commands, command arguments,
++enumeration values, union and alternate branches, adding mandatory
++command arguments, and making optional arguments mandatory.
++
++The specified behavior of an absent optional argument should remain
++the same.  With proper documentation, this policy still allows some
++flexibility; for example, when an optional 'buffer-size' argument is
++specified to default to a sensible buffer size, the actual default
++value can still be changed.  The specified default behavior is not the
++exact size of the buffer, only that the default size is sensible.
++
++Adding functionality to the receive direction is generally backwards
++compatible: adding events, adding return and event data members.
++Clients are expected to ignore the ones they don't know.
++
++Removing "unreachable" stuff like events that can't be triggered
++anymore, optional return or event data members that can't be sent
++anymore, and return or event data member (enumeration) values that
++can't be sent anymore makes no difference to clients, except for
++introspection.  The latter can conceivably confuse clients, so tread
++carefully.
++
++Incompatible changes include removing return and event data members.
++
++Any change to a command definition's 'data' or one of the types used
++there (recursively) needs to consider send direction compatibility.
++
++Any change to a command definition's 'return', an event definition's
++'data', or one of the types used there (recursively) needs to consider
++receive direction compatibility.
++
++Any change to types used in both contexts need to consider both.
++
++Members of enumeration types, complex types and alternate types may be
++reordered freely.  For enumerations and alternate types, this doesn't
++affect the wire encoding.  For complex types, this might make the
++implementation emit JSON object members in a different order, which
++the Client JSON Protocol permits.
++
++
+ =3D=3D Code generation =3D=3D
+=20
+ The QAPI code generator qapi-gen.py generates code and documentation
 --=20
 2.21.0
 
