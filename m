@@ -2,69 +2,74 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8215FC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 14:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6AFDC49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 14:27:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58E4C20717
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 14:26:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58E4C20717
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9EE8620717
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 14:27:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EE8620717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8mX6-0002Cx-2r
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 10:26:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45351)
+	id 1i8mXn-00036b-Pq
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 10:27:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45445)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1i8mVO-0000RC-Jn
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:24:59 -0400
+ (envelope-from <bounces@canonical.com>) id 1i8mWJ-0001gW-8M
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:25:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1i8mVN-0002il-CQ
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:24:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46628)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1i8mVK-0002e3-2c; Fri, 13 Sep 2019 10:24:54 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 27A268980F7;
- Fri, 13 Sep 2019 14:24:53 +0000 (UTC)
-Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
- [10.33.200.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 98E305D712;
- Fri, 13 Sep 2019 14:24:51 +0000 (UTC)
-Date: Fri, 13 Sep 2019 16:24:50 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Message-ID: <20190913142450.GI8312@dhcp-200-226.str.redhat.com>
-References: <20190913125909.15348-1-mlevitsk@redhat.com>
- <20190913125909.15348-2-mlevitsk@redhat.com>
- <5d578974-d02d-8b05-8d51-85715d1d4468@virtuozzo.com>
- <5fdc4891c02c7977762bb76fd877e4383e04be0c.camel@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1i8mWI-00048O-1H
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:25:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48018)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1i8mWH-00043L-SH
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:25:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1i8mWD-0006Yl-7Q
+ for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 14:25:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id EFC0C2E8083
+ for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 14:25:48 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5fdc4891c02c7977762bb76fd877e4383e04be0c.camel@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Fri, 13 Sep 2019 14:24:53 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 13 Sep 2019 14:13:28 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: ppc64 testcase
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: 7-pc ajbennee rth
+X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <156691209320.18814.746226319480624520.malonedeb@soybean.canonical.com>
+Message-Id: <156838400813.4770.10208004596618301324.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19048";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: f18094fffb15b3c1dde0855efbf08397163094df
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 1/3] block/qcow2: refactoring of
- threaded encryption code
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1841592] Re: ppc: softfloat float implementation
+ issues
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -73,72 +78,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- qemu-stable <qemu-stable@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Reply-To: Bug 1841592 <1841592@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 13.09.2019 um 16:07 hat Maxim Levitsky geschrieben:
-> On Fri, 2019-09-13 at 14:01 +0000, Vladimir Sementsov-Ogievskiy wrote:
-> > 13.09.2019 15:59, Maxim Levitsky wrote:
-> > > This commit tries to clarify few function arguments,
-> > > and add comments describing the encrypt/decrypt interface
-> > > 
-> > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > > ---
-> > >   block/qcow2-cluster.c |  9 ++++---
-> > >   block/qcow2-threads.c | 62 ++++++++++++++++++++++++++++++++++---------
-> > >   block/qcow2.c         |  5 ++--
-> > >   block/qcow2.h         |  8 +++---
-> > >   4 files changed, 61 insertions(+), 23 deletions(-)
-> > > 
-> > > diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-> > > index f09cc992af..46b0854d7e 100644
-> > > --- a/block/qcow2-cluster.c
-> > > +++ b/block/qcow2-cluster.c
-> > > @@ -463,8 +463,8 @@ static int coroutine_fn do_perform_cow_read(BlockDriverState *bs,
-> > >   }
-> > >   
-> > >   static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
-> > > -                                                uint64_t src_cluster_offset,
-> > > -                                                uint64_t cluster_offset,
-> > > +                                                uint64_t guest_cluster_offset,
-> > > +                                                uint64_t host_cluster_offset,
-> > >                                                   unsigned offset_in_cluster,
-> > >                                                   uint8_t *buffer,
-> > >                                                   unsigned bytes)
-> > > @@ -474,8 +474,9 @@ static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
-> > >           assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
-> > >           assert((bytes & ~BDRV_SECTOR_MASK) == 0);
-> > >           assert(s->crypto);
-> > > -        if (qcow2_co_encrypt(bs, cluster_offset,
-> > > -                             src_cluster_offset + offset_in_cluster,
-> > > +        if (qcow2_co_encrypt(bs,
-> > > +                             host_cluster_offset + offset_in_cluster,
-> > > +                             guest_cluster_offset + offset_in_cluster,
-> > 
-> > oops, seems you accidentally fixed the bug, which you are going to fix in the next
-> > patch, as now correct offsets are given to qcow2_co_encrypt :)
-> > 
-> > and next patch no is a simple no-logic-change refactoring, so at least commit message
-> > should be changed.
-> 
-> Yep :-( I am trying my best in addition to fixing the bug, also clarify the area to
-> avoid this from happening again.
-> 
-> What do you think that I fold these two patches together after all?
+Dave ran the above testcase on:
 
-No, just make sure that your refactoring patch is really just
-refactoring without semantic change, i.e. make sure to preserve the bug
-in this patch.
+> processor	: 0
+> cpu		: POWER8E (raw), altivec supported
+> clock		: 3325.000000MHz
+> revision	: 2.1 (pvr 004b 0201)
 
-Maybe you should actually have two refactoring patches (this one without
-the addition of offset_in_cluster, and patch 2) and an additional
-one-liner for the actual fix.
+And there are no diffs with what you currently get from master. So I
+think the invalid flag fault is fixed by a previous commit and the
+potential precision faults don't get picked up by the test case. I guess
+we could be a bit smarted about testing the limits.
 
-Kevin
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1841592
+
+Title:
+  ppc: softfloat float implementation issues
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Per bug #1841491, Richard Henderson (rth) said:
+  > The float test failure is part of a larger problem for target/powerpc
+  > in which all float routines are implemented incorrectly. They are all
+  > implemented as double operations with rounding to float as a second
+  > step. Which not only produces incorrect exceptions, as in this case,
+  > but incorrect numerical results from the double rounding.
+  >
+  > This should probably be split to a separate bug...
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1841592/+subscriptions
 
