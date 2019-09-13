@@ -2,118 +2,62 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E3AAC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 16:12:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AF60C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 16:29:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2B8D20693
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 16:12:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="IDEGrYHc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2B8D20693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0CEEC2084F
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 16:29:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CEEC2084F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8oBI-0003tt-SB
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 12:12:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60348)
+	id 1i8oRQ-0008Qd-2F
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 12:29:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34410)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i8oAI-0003IC-I9
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 12:11:20 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i8oQE-00075R-Bw
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 12:27:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i8oAH-00015r-08
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 12:11:18 -0400
-Received: from mail-eopbgr40096.outbound.protection.outlook.com
- ([40.107.4.96]:33406 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1i8oA9-00014E-47; Fri, 13 Sep 2019 12:11:09 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Jq/BhN5VcjgvATEg/Qc0b2PfbmmoS10Vv7UXGj1lOq4Zf074Tj3Qro97dCAtuqx5sITMsFGHpsFUgeMNd29Ha0TZuJVHO2uPNp3iPvvkGDYgQgaUjyIgVDds5Fo/1L3+89cIIT7eXa8WZh5pJV/jgc6Utumy73TnpEWF5sd+u0q8kDS49dlhJREFG28izwJmuhYGubB7Av9t0ttUCbEVP4rvXcZLJuAOa1OuTWAsx/CgtKJSQeuzM9Hwfx5GpXKF836Yt7EZfFZgqWPVy00za3bGrK2hzV+0p8qwJz1B+tIA7L9os58bQLHr5XwmRdaBSqwqnagW+mU1eYDQMrQlog==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=w/Cojr5SH9OMBRUUD9WQy6Lo77MFiyZMm85yweKDRsA=;
- b=IeD+8Q/lmpEITZ6Ai6av0sxsxnf+9A1/JrAanUZCSp6Y6yRRucb+Tjl9DsaLk56mJm3PtcaK6Csw/ieNawV48aR1nyFsEVNw1d3UrcGWvbEDWPNVn3bD+K0207sYtTmBdj80VnqT0wFEAEX+gzAY9Oft8IiRpsuU6OPL0n69xVOk6+bmO03JEMH0TSBSJlXkKm5kSA9MAvm0J2pIfLm06tLVdojCAoTnENSfdJoJR1PWgGVREyuaAWv/exEdEy9uBXfCuuFbulSaGdQAP6oExR7pQz/9rMcJy6WanzO3455VmyPoUFSANrq9CW7qlTmrf38nX/Kq/enmZXizNGJeYQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=w/Cojr5SH9OMBRUUD9WQy6Lo77MFiyZMm85yweKDRsA=;
- b=IDEGrYHcy8d6QYK0zz5lQMqXYwpIHW6oA9UwWN9ZyP0uICteJ9YklcAqDcQygMnxlMm63L03oEROxxhQoGn3jCWhvRWhRJ5r9csHvd740VzPmnwdKs6goO8XTjdMV1V2FqI2AoALozLfUUfaP6fBM755jZL5R+6MOPrTRUHmFmY=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5129.eurprd08.prod.outlook.com (10.255.19.17) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2263.13; Fri, 13 Sep 2019 16:11:06 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2263.016; Fri, 13 Sep 2019
- 16:11:06 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Thread-Topic: [PATCH v5 2/3] block/qcow2: refactor threaded encryption code
-Thread-Index: AQHVakfocQbv54HWUk+glqi2rwogaKcpxx6A
-Date: Fri, 13 Sep 2019 16:11:06 +0000
-Message-ID: <9bb85af9-03a0-23f4-708a-4973a0eb2054@virtuozzo.com>
+ (envelope-from <mlevitsk@redhat.com>) id 1i8oQC-0006vs-OY
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 12:27:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38748)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1i8oQ7-0006uS-Mt; Fri, 13 Sep 2019 12:27:39 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id F0CD2882EA;
+ Fri, 13 Sep 2019 16:27:38 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.39])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BB5F1450E;
+ Fri, 13 Sep 2019 16:27:36 +0000 (UTC)
+Message-ID: <657ba2ee587fd9f1a29016e12b352b3e020ee9e3.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, 
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Date: Fri, 13 Sep 2019 19:27:35 +0300
+In-Reply-To: <9bb85af9-03a0-23f4-708a-4973a0eb2054@virtuozzo.com>
 References: <20190913152818.17843-1-mlevitsk@redhat.com>
  <20190913152818.17843-3-mlevitsk@redhat.com>
-In-Reply-To: <20190913152818.17843-3-mlevitsk@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR07CA0037.eurprd07.prod.outlook.com
- (2603:10a6:7:66::23) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190913191103805
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e68fd3f3-e897-4ee9-96b8-08d73864fb5d
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB5129; 
-x-ms-traffictypediagnostic: DB8PR08MB5129:
-x-microsoft-antispam-prvs: <DB8PR08MB51299C04DDC8330855CE9C4BC1B30@DB8PR08MB5129.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2449;
-x-forefront-prvs: 0159AC2B97
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(396003)(136003)(346002)(39840400004)(366004)(376002)(189003)(199004)(51444003)(6486002)(76176011)(305945005)(66946007)(66476007)(66446008)(64756008)(476003)(2616005)(66556008)(446003)(6116002)(26005)(316002)(3846002)(11346002)(7736002)(14454004)(110136005)(54906003)(52116002)(186003)(4326008)(31686004)(102836004)(486006)(2906002)(25786009)(71190400001)(256004)(14444005)(5660300002)(71200400001)(229853002)(2501003)(386003)(6506007)(8676002)(31696002)(6436002)(81156014)(81166006)(8936002)(36756003)(99286004)(86362001)(478600001)(53936002)(6512007)(6246003)(66066001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5129;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: e8/oRrioUxhIo0tQ5+PGR76WDlINL7XO3TmymLFpZUOoICSH+lHmwVGT4YTEbBaN+XvjPhquu/gH51PU3ygKtI3UzBxjIWrSVoSxQLWu69O4d/ZPeefl6JbxlHKMgW+R0lDGzrqW0BqfgAJE6Q21b9O1lSNnFeylQo6wPDOs45HO19Ao4n2XaNd4jyeL1T2VQ0n8VOJpMX3XBdh8x0zsYdxck6zo7AuTnekV+pDOANjrtlbSp1dOBUKd+WueEBzdxKHwGFhF7HsItsP7EB1Tbei7ejuMqObVypE8XgIPKfNETRluirhbRRg8rQQHx+x7f6R9DdsKqJpeWVNeuq5jPs8CROgXSFSx12vDTkyV599VgIgSLXTuD8R4x5meygyA0fZ0JaB8LswzO+HZ9fVC1aBFDcA/t92XjrmjQQFAnxQ=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <1D5DEE0DC83C924B891C3827DDE63888@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e68fd3f3-e897-4ee9-96b8-08d73864fb5d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Sep 2019 16:11:06.3756 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: /LCv8NqHqYYConPket5mF0TqghGQBIwVCCpLaujJEhCgujzh62DQAjoZmxM+jXx5gI0UbRb8+XD8LqYaNNynjMiar/umm0Dya5EcJkwvpLo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5129
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.4.96
+ <9bb85af9-03a0-23f4-708a-4973a0eb2054@virtuozzo.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Fri, 13 Sep 2019 16:27:39 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH v5 2/3] block/qcow2: refactor threaded
  encryption code
 X-BeenThere: qemu-devel@nongnu.org
@@ -128,181 +72,260 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>,
- =?utf-8?B?RGFuaWVsIFAgLiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
+ "Daniel P . =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
  qemu-stable <qemu-stable@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTMuMDkuMjAxOSAxODoyOCwgTWF4aW0gTGV2aXRza3kgd3JvdGU6DQo+IENoYW5nZSBkb19wZXJm
-b3JtX2Nvd19lbmNyeXB0IGFuZCBpdHMgY2FsbGVlIHFjb3cyX2NvX2VuY3J5cHQNCj4gdG8ganVz
-dCByZWNlaXZlIGZ1bGwgaG9zdCBhbmQgZ3Vlc3Qgb2Zmc2V0cyBhbmQgaW4gcGFyaXRpY3VsYXIN
-Cj4gcmVtb3ZlIHRoZSBvZmZzZXRfaW5fY2x1c3RlciBwYXJhbWV0ZXIgb2YgZG9fcGVyZm9ybV9j
-b3dfZW5jcnlwdCwNCj4gc2luY2UgaXQgaXMgbWlzbGVhZGluZywgYmVjYXVzZSB0aGF0IG9mZnNl
-dCBjYW4gYmUgbGFyZ2VyIHRoYW4NCj4gY2x1c3RlciBzaXplIGN1cnJlbnRseS4NCj4gDQo+IEFs
-c28gZG9jdW1lbnQgdGhlIHFjb3cyX2NvX2VuY3J5cHQgYXJndW1lbnRzIHRvIHByZXZlbnQNCj4g
-dGhhdCBidWcgZnJvbSBoYXBwZW5pbmcgYWdhaW4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IE1heGlt
-IExldml0c2t5IDxtbGV2aXRza0ByZWRoYXQuY29tPg0KPiAtLS0NCj4gICBibG9jay9xY293Mi1j
-bHVzdGVyLmMgfCAzMCArKysrKysrKysrKystLS0tLS0tLS0NCj4gICBibG9jay9xY293Mi10aHJl
-YWRzLmMgfCA2MiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tDQo+
-ICAgYmxvY2svcWNvdzIuYyAgICAgICAgIHwgIDUgKystLQ0KPiAgIGJsb2NrL3Fjb3cyLmggICAg
-ICAgICB8ICA4ICsrKy0tLQ0KPiAgIDQgZmlsZXMgY2hhbmdlZCwgNzMgaW5zZXJ0aW9ucygrKSwg
-MzIgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNvdzItY2x1c3Rlci5j
-IGIvYmxvY2svcWNvdzItY2x1c3Rlci5jDQo+IGluZGV4IGJmZWIwMjQxZDcuLmU4N2E0NjM3ZmQg
-MTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL3Fjb3cyLWNsdXN0ZXIuYw0KPiArKysgYi9ibG9jay9xY293
-Mi1jbHVzdGVyLmMNCj4gQEAgLTQ2MywyMSArNDYzLDIxIEBAIHN0YXRpYyBpbnQgY29yb3V0aW5l
-X2ZuIGRvX3BlcmZvcm1fY293X3JlYWQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+ICAgfQ0KPiAg
-IA0KPiAgIHN0YXRpYyBib29sIGNvcm91dGluZV9mbiBkb19wZXJmb3JtX2Nvd19lbmNyeXB0KEJs
-b2NrRHJpdmVyU3RhdGUgKmJzLA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgdWludDY0X3Qgc3JjX2NsdXN0ZXJfb2Zmc2V0LA0KPiAtICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDY0X3QgY2x1c3Rlcl9v
-ZmZzZXQsDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICB1bnNpZ25lZCBvZmZzZXRfaW5fY2x1c3RlciwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IGd1ZXN0X29mZnNldCwNCj4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IGhvc3Rf
-b2Zmc2V0LA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIHVpbnQ4X3QgKmJ1ZmZlciwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICB1bnNpZ25lZCBieXRlcykNCj4gICB7DQo+ICAgICAgIGlmIChieXRl
-cyAmJiBicy0+ZW5jcnlwdGVkKSB7DQo+ICAgICAgICAgICBCRFJWUWNvdzJTdGF0ZSAqcyA9IGJz
-LT5vcGFxdWU7DQo+IC0gICAgICAgIGFzc2VydCgob2Zmc2V0X2luX2NsdXN0ZXIgJiB+QkRSVl9T
-RUNUT1JfTUFTSykgPT0gMCk7DQo+IC0gICAgICAgIGFzc2VydCgoYnl0ZXMgJiB+QkRSVl9TRUNU
-T1JfTUFTSykgPT0gMCk7DQo+ICsNCj4gKyAgICAgICAgYXNzZXJ0KFFFTVVfSVNfQUxJR05FRChn
-dWVzdF9vZmZzZXQsIEJEUlZfU0VDVE9SX1NJWkUpKTsNCj4gKyAgICAgICAgYXNzZXJ0KFFFTVVf
-SVNfQUxJR05FRChob3N0X29mZnNldCwgQkRSVl9TRUNUT1JfU0laRSkpOw0KPiArICAgICAgICBh
-c3NlcnQoUUVNVV9JU19BTElHTkVEKGJ5dGVzLCBCRFJWX1NFQ1RPUl9TSVpFKSk7DQo+ICAgICAg
-ICAgICBhc3NlcnQocy0+Y3J5cHRvKTsNCj4gLSAgICAgICAgaWYgKHFjb3cyX2NvX2VuY3J5cHQo
-YnMsDQo+IC0gICAgICAgICAgICAgICAgc3RhcnRfb2ZfY2x1c3RlcihzLCBjbHVzdGVyX29mZnNl
-dCArIG9mZnNldF9pbl9jbHVzdGVyKSwNCj4gLSAgICAgICAgICAgICAgICBzcmNfY2x1c3Rlcl9v
-ZmZzZXQgKyBvZmZzZXRfaW5fY2x1c3RlciwNCj4gLSAgICAgICAgICAgICAgICBidWZmZXIsIGJ5
-dGVzKSA8IDApIHsNCj4gKw0KPiArICAgICAgICBpZiAocWNvdzJfY29fZW5jcnlwdChicywgaG9z
-dF9vZmZzZXQsIGd1ZXN0X29mZnNldCwNCj4gKyAgICAgICAgICAgIGJ1ZmZlciwgYnl0ZXMpIDwg
-MCkgew0KDQpzdHJhbmdlIGFsaWdubWVudCBvZiBzZWNvbmQgbGluZSBvZiB0aGUgY29uZGl0aW9u
-Li4gWzFdDQoNCj4gICAgICAgICAgICAgICByZXR1cm4gZmFsc2U7DQo+ICAgICAgICAgICB9DQo+
-ICAgICAgIH0NCj4gQEAgLTg5MSwxMSArODkxLDE1IEBAIHN0YXRpYyBpbnQgcGVyZm9ybV9jb3co
-QmxvY2tEcml2ZXJTdGF0ZSAqYnMsIFFDb3dMMk1ldGEgKm0pDQo+ICAgDQo+ICAgICAgIC8qIEVu
-Y3J5cHQgdGhlIGRhdGEgaWYgbmVjZXNzYXJ5IGJlZm9yZSB3cml0aW5nIGl0ICovDQo+ICAgICAg
-IGlmIChicy0+ZW5jcnlwdGVkKSB7DQo+IC0gICAgICAgIGlmICghZG9fcGVyZm9ybV9jb3dfZW5j
-cnlwdChicywgbS0+b2Zmc2V0LCBtLT5hbGxvY19vZmZzZXQsDQo+IC0gICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBzdGFydC0+b2Zmc2V0LCBzdGFydF9idWZmZXIsDQo+ICsgICAg
-ICAgIGlmICghZG9fcGVyZm9ybV9jb3dfZW5jcnlwdChicywNCj4gKyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIG0tPm9mZnNldCArIHN0YXJ0LT5vZmZzZXQsDQo+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBtLT5hbGxvY19vZmZzZXQgKyBzdGFydC0+b2Zm
-c2V0LA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3RhcnRfYnVmZmVy
-LA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0YXJ0LT5uYl9ieXRl
-cykgfHwNCj4gLSAgICAgICAgICAgICFkb19wZXJmb3JtX2Nvd19lbmNyeXB0KGJzLCBtLT5vZmZz
-ZXQsIG0tPmFsbG9jX29mZnNldCwNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIGVuZC0+b2Zmc2V0LCBlbmRfYnVmZmVyLCBlbmQtPm5iX2J5dGVzKSkgew0KPiArICAgICAg
-ICAgICAgIWRvX3BlcmZvcm1fY293X2VuY3J5cHQoYnMsDQo+ICsgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBtLT5vZmZzZXQgKyBlbmQtPm9mZnNldCwNCj4gKyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIG0tPmFsbG9jX29mZnNldCArIGVuZC0+b2Zmc2V0LA0K
-PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZW5kX2J1ZmZlciwgZW5kLT5u
-Yl9ieXRlcykpIHsNCg0KTG9va2luZyBhdCB0aGlzIG5vdywgSSB0aGluayB0aGF0IGRvX3BlcmZv
-cm1fY293X2VuY3J5cHQgY2FuIGJlIGRyb3BwZWQgYXQgYWxsLA0KYXMgaXQncyBub3cganVzdCBh
-biBleHRyYSB3cmFwcGVyLCBzZW5kaW5nIHNhbWUgcGFyYW1ldGVycyB0byBxY293Ml9jb19lbmNy
-eXB0Lg0KDQpJJ2xsIHNlbmQgYSBmb2xsb3ctdXAsIGlmIHRoaXMgcGF0Y2ggZ29lcyBhcyBpcy4N
-Cg0KPiAgICAgICAgICAgICAgIHJldCA9IC1FSU87DQo+ICAgICAgICAgICAgICAgZ290byBmYWls
-Ow0KPiAgICAgICAgICAgfQ0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNvdzItdGhyZWFkcy5jIGIv
-YmxvY2svcWNvdzItdGhyZWFkcy5jDQo+IGluZGV4IDNiMWU2M2ZlNDEuLjk2NDYyNDNhOWIgMTAw
-NjQ0DQo+IC0tLSBhL2Jsb2NrL3Fjb3cyLXRocmVhZHMuYw0KPiArKysgYi9ibG9jay9xY293Mi10
-aHJlYWRzLmMNCj4gQEAgLTIzNCwxNSArMjM0LDE1IEBAIHN0YXRpYyBpbnQgcWNvdzJfZW5jZGVj
-X3Bvb2xfZnVuYyh2b2lkICpvcGFxdWUpDQo+ICAgfQ0KPiAgIA0KPiAgIHN0YXRpYyBpbnQgY29y
-b3V0aW5lX2ZuDQo+IC1xY293Ml9jb19lbmNkZWMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIHVpbnQ2
-NF90IGZpbGVfY2x1c3Rlcl9vZmZzZXQsDQo+IC0gICAgICAgICAgICAgICAgICB1aW50NjRfdCBv
-ZmZzZXQsIHZvaWQgKmJ1Ziwgc2l6ZV90IGxlbiwgUWNvdzJFbmNEZWNGdW5jIGZ1bmMpDQo+ICtx
-Y293Ml9jb19lbmNkZWMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIHVpbnQ2NF90IGhvc3Rfb2Zmc2V0
-LA0KPiArICAgICAgICAgICAgICAgIHVpbnQ2NF90IGd1ZXN0X29mZnNldCwgdm9pZCAqYnVmLCBz
-aXplX3QgbGVuLA0KPiArICAgICAgICAgICAgICAgIFFjb3cyRW5jRGVjRnVuYyBmdW5jKQ0KPiAg
-IHsNCj4gICAgICAgQkRSVlFjb3cyU3RhdGUgKnMgPSBicy0+b3BhcXVlOw0KPiArDQo+ICAgICAg
-IFFjb3cyRW5jRGVjRGF0YSBhcmcgPSB7DQo+ICAgICAgICAgICAuYmxvY2sgPSBzLT5jcnlwdG8s
-DQo+IC0gICAgICAgIC5vZmZzZXQgPSBzLT5jcnlwdF9waHlzaWNhbF9vZmZzZXQgPw0KPiAtICAg
-ICAgICAgICAgICAgICAgICAgIGZpbGVfY2x1c3Rlcl9vZmZzZXQgKyBvZmZzZXRfaW50b19jbHVz
-dGVyKHMsIG9mZnNldCkgOg0KPiAtICAgICAgICAgICAgICAgICAgICAgIG9mZnNldCwNCj4gKyAg
-ICAgICAgLm9mZnNldCA9IHMtPmNyeXB0X3BoeXNpY2FsX29mZnNldCA/IGhvc3Rfb2Zmc2V0IDog
-Z3Vlc3Rfb2Zmc2V0LA0KPiAgICAgICAgICAgLmJ1ZiA9IGJ1ZiwNCj4gICAgICAgICAgIC5sZW4g
-PSBsZW4sDQo+ICAgICAgICAgICAuZnVuYyA9IGZ1bmMsDQo+IEBAIC0yNTEsMTggKzI1MSw1NCBA
-QCBxY293Ml9jb19lbmNkZWMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIHVpbnQ2NF90IGZpbGVfY2x1
-c3Rlcl9vZmZzZXQsDQo+ICAgICAgIHJldHVybiBxY293Ml9jb19wcm9jZXNzKGJzLCBxY293Ml9l
-bmNkZWNfcG9vbF9mdW5jLCAmYXJnKTsNCj4gICB9DQo+ICAgDQo+ICsNCj4gKy8qDQo+ICsgKiBx
-Y293Ml9jb19lbmNyeXB0KCkNCj4gKyAqDQo+ICsgKiBFbmNyeXB0cyBvbmUgb3IgbW9yZSBjb250
-aWd1b3VzIGFsaWduZWQgc2VjdG9ycw0KPiArICoNCj4gKyAqIEBob3N0X29mZnNldCAtIHVuZGVy
-bHlpbmcgc3RvcmFnZSBvZmZzZXQgb2YgdGhlIGZpcnN0IHNlY3RvciBvZiB0aGUNCj4gKyAqIGRh
-dGEgdG8gYmUgZW5jcnlwdGVkDQo+ICsNCg0KYXN0ZXJpc2sgbWlzc2VkDQoNCj4gKyAqIEBndWVz
-dF9vZmZzZXQgLSBndWVzdCAodmlydHVhbCkgb2Zmc2V0IG9mIHRoZSBmaXJzdCBzZWN0b3Igb2Yg
-dGhlDQo+ICsgKiBkYXRhIHRvIGJlIGVuY3J5cHRlZA0KPiArICoNCj4gKyAqIEBidWYgLSBidWZm
-ZXIgd2l0aCB0aGUgZGF0YSB0byBlbmNyeXB0LCB0aGF0IGFmdGVyIGVuY3J5cHRpb24NCj4gKyAq
-ICAgICAgICB3aWxsIGJlIHdyaXR0ZW4gdG8gdGhlIHVuZGVybHlpbmcgc3RvcmFnZSBkZXZpY2Ug
-YXQNCj4gKyAqICAgICAgICBAaG9zdF9vZmZzZXQNCj4gKyAqDQo+ICsgKiBAbGVuIC0gbGVuZ3Ro
-IG9mIHRoZSBidWZmZXIgKG11c3QgYmUgYSBCRFJWX1NFQ1RPUl9TSVpFIG11bHRpcGxlKQ0KPiAr
-ICoNCj4gKyAqIERlcGVuZGluZyBvbiB0aGUgZW5jcnlwdGlvbiBtZXRob2QsIEBob3N0X2NsdXN0
-ZXJfb2Zmc2V0IGFuZC9vciBAZ3Vlc3Rfb2Zmc2V0DQoNCnMvaG9zdF9jbHVzdGVyX29mZnNldC9o
-b3N0X29mZnNldA0KDQpXaXRoIGF0IGxlYXN0IGFsaWdubWVudFsxXSBhbmQgcy9ob3N0X2NsdXN0
-ZXJfb2Zmc2V0L2hvc3Rfb2Zmc2V0LyBmaXhlZDoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1l
-bnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCj4gKyAqIG1heSBi
-ZSB1c2VkIGZvciBnZW5lcmF0aW5nIHRoZSBpbml0aWFsaXphdGlvbiB2ZWN0b3IgZm9yDQo+ICsg
-KiBlbmNyeXB0aW9uLg0KPiArICoNCj4gKyAqIE5vdGUgdGhhdCB3aGlsZSB0aGUgd2hvbGUgcmFu
-Z2UgbXVzdCBiZSBhbGlnbmVkIG9uIHNlY3RvcnMsIGl0DQo+ICsgKiBkb2VzIG5vdCBoYXZlIHRv
-IGJlIGFsaWduZWQgb24gY2x1c3RlcnMgYW5kIGNhbiBhbHNvIGNyb3NzIGNsdXN0ZXINCj4gKyAq
-IGJvdW5kYXJpZXMNCj4gKyAqDQoNCmhtbSwgZXh0cmEgZW1wdHkgbGluZSBJTUhPLg0KDQo+ICsg
-Ki8NCj4gICBpbnQgY29yb3V0aW5lX2ZuDQo+IC1xY293Ml9jb19lbmNyeXB0KEJsb2NrRHJpdmVy
-U3RhdGUgKmJzLCB1aW50NjRfdCBmaWxlX2NsdXN0ZXJfb2Zmc2V0LA0KPiAtICAgICAgICAgICAg
-ICAgICB1aW50NjRfdCBvZmZzZXQsIHZvaWQgKmJ1Ziwgc2l6ZV90IGxlbikNCj4gK3Fjb3cyX2Nv
-X2VuY3J5cHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIHVpbnQ2NF90IGhvc3Rfb2Zmc2V0LA0KPiAr
-ICAgICAgICAgICAgICAgICB1aW50NjRfdCBndWVzdF9vZmZzZXQsIHZvaWQgKmJ1Ziwgc2l6ZV90
-IGxlbikNCj4gICB7DQo+IC0gICAgcmV0dXJuIHFjb3cyX2NvX2VuY2RlYyhicywgZmlsZV9jbHVz
-dGVyX29mZnNldCwgb2Zmc2V0LCBidWYsIGxlbiwNCj4gLSAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgcWNyeXB0b19ibG9ja19lbmNyeXB0KTsNCj4gKyAgICByZXR1cm4gcWNvdzJfY29fZW5j
-ZGVjKGJzLCBob3N0X29mZnNldCwgZ3Vlc3Rfb2Zmc2V0LCBidWYsIGxlbiwNCj4gKyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIHFjcnlwdG9fYmxvY2tfZW5jcnlwdCk7DQo+ICAgfQ0KPiAgIA0K
-PiArDQo+ICsvKg0KPiArICogcWNvdzJfY29fZGVjcnlwdCgpDQo+ICsgKg0KPiArICogRGVjcnlw
-dHMgb25lIG9yIG1vcmUgY29udGlndW91cyBhbGlnbmVkIHNlY3RvcnMNCj4gKyAqIFNpbWlsYXIg
-dG8gcWNvdzJfY29fZW5jcnlwdA0KPiArICoNCg0KYW5kIHRoaXMgb25lLg0KDQo+ICsgKi8NCj4g
-Kw0KPiAgIGludCBjb3JvdXRpbmVfZm4NCj4gLXFjb3cyX2NvX2RlY3J5cHQoQmxvY2tEcml2ZXJT
-dGF0ZSAqYnMsIHVpbnQ2NF90IGZpbGVfY2x1c3Rlcl9vZmZzZXQsDQo+IC0gICAgICAgICAgICAg
-ICAgIHVpbnQ2NF90IG9mZnNldCwgdm9pZCAqYnVmLCBzaXplX3QgbGVuKQ0KPiArcWNvdzJfY29f
-ZGVjcnlwdChCbG9ja0RyaXZlclN0YXRlICpicywgdWludDY0X3QgaG9zdF9vZmZzZXQsDQo+ICsg
-ICAgICAgICAgICAgICAgIHVpbnQ2NF90IGd1ZXN0X29mZnNldCwgdm9pZCAqYnVmLCBzaXplX3Qg
-bGVuKQ0KPiAgIHsNCj4gLSAgICByZXR1cm4gcWNvdzJfY29fZW5jZGVjKGJzLCBmaWxlX2NsdXN0
-ZXJfb2Zmc2V0LCBvZmZzZXQsIGJ1ZiwgbGVuLA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBxY3J5cHRvX2Jsb2NrX2RlY3J5cHQpOw0KPiArICAgIHJldHVybiBxY293Ml9jb19lbmNk
-ZWMoYnMsIGhvc3Rfb2Zmc2V0LCBndWVzdF9vZmZzZXQsIGJ1ZiwgbGVuLA0KPiArICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgcWNyeXB0b19ibG9ja19kZWNyeXB0KTsNCj4gICB9DQo+IGRpZmYg
-LS1naXQgYS9ibG9jay9xY293Mi5jIGIvYmxvY2svcWNvdzIuYw0KPiBpbmRleCA1NzczNGYyMGNm
-Li5hYzc2ODA5MmJiIDEwMDY0NA0KPiAtLS0gYS9ibG9jay9xY293Mi5jDQo+ICsrKyBiL2Jsb2Nr
-L3Fjb3cyLmMNCj4gQEAgLTIwNjksNyArMjA2OSw4IEBAIHN0YXRpYyBjb3JvdXRpbmVfZm4gaW50
-IHFjb3cyX2NvX3ByZWFkdl9wYXJ0KEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPiAgIA0KPiAgICAg
-ICAgICAgICAgICAgICBhc3NlcnQoKG9mZnNldCAmIChCRFJWX1NFQ1RPUl9TSVpFIC0gMSkpID09
-IDApOw0KPiAgICAgICAgICAgICAgICAgICBhc3NlcnQoKGN1cl9ieXRlcyAmIChCRFJWX1NFQ1RP
-Ul9TSVpFIC0gMSkpID09IDApOw0KPiAtICAgICAgICAgICAgICAgIGlmIChxY293Ml9jb19kZWNy
-eXB0KGJzLCBjbHVzdGVyX29mZnNldCwgb2Zmc2V0LA0KPiArICAgICAgICAgICAgICAgIGlmIChx
-Y293Ml9jb19kZWNyeXB0KGJzLCBjbHVzdGVyX29mZnNldCArIG9mZnNldF9pbl9jbHVzdGVyLA0K
-PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG9mZnNldCwNCj4gICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9kYXRhLCBjdXJfYnl0ZXMp
-IDwgMCkgew0KPiAgICAgICAgICAgICAgICAgICAgICAgcmV0ID0gLUVJTzsNCj4gICAgICAgICAg
-ICAgICAgICAgICAgIGdvdG8gZmFpbDsNCj4gQEAgLTIyODgsNyArMjI4OSw3IEBAIHN0YXRpYyBj
-b3JvdXRpbmVfZm4gaW50IHFjb3cyX2NvX3B3cml0ZXZfcGFydCgNCj4gICAgICAgICAgICAgICBx
-ZW11X2lvdmVjX3RvX2J1ZihxaW92LCBxaW92X29mZnNldCArIGJ5dGVzX2RvbmUsDQo+ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9kYXRhLCBjdXJfYnl0ZXMpOw0KPiAg
-IA0KPiAtICAgICAgICAgICAgaWYgKHFjb3cyX2NvX2VuY3J5cHQoYnMsIGNsdXN0ZXJfb2Zmc2V0
-LCBvZmZzZXQsDQo+ICsgICAgICAgICAgICBpZiAocWNvdzJfY29fZW5jcnlwdChicywgY2x1c3Rl
-cl9vZmZzZXQgKyBvZmZzZXRfaW5fY2x1c3Rlciwgb2Zmc2V0LA0KPiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIGNsdXN0ZXJfZGF0YSwgY3VyX2J5dGVzKSA8IDApIHsNCj4gICAg
-ICAgICAgICAgICAgICAgcmV0ID0gLUVJTzsNCj4gICAgICAgICAgICAgICAgICAgZ290byBvdXRf
-dW5sb2NrZWQ7DQo+IGRpZmYgLS1naXQgYS9ibG9jay9xY293Mi5oIGIvYmxvY2svcWNvdzIuaA0K
-PiBpbmRleCA5OThiY2RhZWYxLi5hNDg4ZDc2MWZmIDEwMDY0NA0KPiAtLS0gYS9ibG9jay9xY293
-Mi5oDQo+ICsrKyBiL2Jsb2NrL3Fjb3cyLmgNCj4gQEAgLTc1OCwxMCArNzU4LDEwIEBAIHNzaXpl
-X3QgY29yb3V0aW5lX2ZuDQo+ICAgcWNvdzJfY29fZGVjb21wcmVzcyhCbG9ja0RyaXZlclN0YXRl
-ICpicywgdm9pZCAqZGVzdCwgc2l6ZV90IGRlc3Rfc2l6ZSwNCj4gICAgICAgICAgICAgICAgICAg
-ICAgIGNvbnN0IHZvaWQgKnNyYywgc2l6ZV90IHNyY19zaXplKTsNCj4gICBpbnQgY29yb3V0aW5l
-X2ZuDQo+IC1xY293Ml9jb19lbmNyeXB0KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCB1aW50NjRfdCBm
-aWxlX2NsdXN0ZXJfb2Zmc2V0LA0KPiAtICAgICAgICAgICAgICAgICB1aW50NjRfdCBvZmZzZXQs
-IHZvaWQgKmJ1Ziwgc2l6ZV90IGxlbik7DQo+ICtxY293Ml9jb19lbmNyeXB0KEJsb2NrRHJpdmVy
-U3RhdGUgKmJzLCB1aW50NjRfdCBob3N0X29mZnNldCwNCj4gKyAgICAgICAgICAgICAgICAgdWlu
-dDY0X3QgZ3Vlc3Rfb2Zmc2V0LCB2b2lkICpidWYsIHNpemVfdCBsZW4pOw0KPiAgIGludCBjb3Jv
-dXRpbmVfZm4NCj4gLXFjb3cyX2NvX2RlY3J5cHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIHVpbnQ2
-NF90IGZpbGVfY2x1c3Rlcl9vZmZzZXQsDQo+IC0gICAgICAgICAgICAgICAgIHVpbnQ2NF90IG9m
-ZnNldCwgdm9pZCAqYnVmLCBzaXplX3QgbGVuKTsNCj4gK3Fjb3cyX2NvX2RlY3J5cHQoQmxvY2tE
-cml2ZXJTdGF0ZSAqYnMsIHVpbnQ2NF90IGhvc3Rfb2Zmc2V0LA0KPiArICAgICAgICAgICAgICAg
-ICB1aW50NjRfdCBndWVzdF9vZmZzZXQsIHZvaWQgKmJ1Ziwgc2l6ZV90IGxlbik7DQo+ICAgDQo+
-ICAgI2VuZGlmDQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On Fri, 2019-09-13 at 16:11 +0000, Vladimir Sementsov-Ogievskiy wrote:
+> 13.09.2019 18:28, Maxim Levitsky wrote:
+> > Change do_perform_cow_encrypt and its callee qcow2_co_encrypt
+> > to just receive full host and guest offsets and in pariticular
+> > remove the offset_in_cluster parameter of do_perform_cow_encrypt,
+> > since it is misleading, because that offset can be larger than
+> > cluster size currently.
+> > 
+> > Also document the qcow2_co_encrypt arguments to prevent
+> > that bug from happening again
+> > 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >   block/qcow2-cluster.c | 30 ++++++++++++---------
+> >   block/qcow2-threads.c | 62 ++++++++++++++++++++++++++++++++++---------
+> >   block/qcow2.c         |  5 ++--
+> >   block/qcow2.h         |  8 +++---
+> >   4 files changed, 73 insertions(+), 32 deletions(-)
+> > 
+> > diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> > index bfeb0241d7..e87a4637fd 100644
+> > --- a/block/qcow2-cluster.c
+> > +++ b/block/qcow2-cluster.c
+> > @@ -463,21 +463,21 @@ static int coroutine_fn do_perform_cow_read(BlockDriverState *bs,
+> >   }
+> >   
+> >   static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
+> > -                                                uint64_t src_cluster_offset,
+> > -                                                uint64_t cluster_offset,
+> > -                                                unsigned offset_in_cluster,
+> > +                                                uint64_t guest_offset,
+> > +                                                uint64_t host_offset,
+> >                                                   uint8_t *buffer,
+> >                                                   unsigned bytes)
+> >   {
+> >       if (bytes && bs->encrypted) {
+> >           BDRVQcow2State *s = bs->opaque;
+> > -        assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
+> > -        assert((bytes & ~BDRV_SECTOR_MASK) == 0);
+> > +
+> > +        assert(QEMU_IS_ALIGNED(guest_offset, BDRV_SECTOR_SIZE));
+> > +        assert(QEMU_IS_ALIGNED(host_offset, BDRV_SECTOR_SIZE));
+> > +        assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
+> >           assert(s->crypto);
+> > -        if (qcow2_co_encrypt(bs,
+> > -                start_of_cluster(s, cluster_offset + offset_in_cluster),
+> > -                src_cluster_offset + offset_in_cluster,
+> > -                buffer, bytes) < 0) {
+> > +
+> > +        if (qcow2_co_encrypt(bs, host_offset, guest_offset,
+> > +            buffer, bytes) < 0) {
+> 
+> strange alignment of second line of the condition.. [1]
+To be honest I am too tired currently, I think I should align to the (
+of function argument if possible.
+I removed the do_perform_cow_encrypt as you suggested so no issue.
+
+> 
+> >               return false;
+> >           }
+> >       }
+> > @@ -891,11 +891,15 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
+> >   
+> >       /* Encrypt the data if necessary before writing it */
+> >       if (bs->encrypted) {
+> > -        if (!do_perform_cow_encrypt(bs, m->offset, m->alloc_offset,
+> > -                                    start->offset, start_buffer,
+> > +        if (!do_perform_cow_encrypt(bs,
+> > +                                    m->offset + start->offset,
+> > +                                    m->alloc_offset + start->offset,
+> > +                                    start_buffer,
+> >                                       start->nb_bytes) ||
+> > -            !do_perform_cow_encrypt(bs, m->offset, m->alloc_offset,
+> > -                                    end->offset, end_buffer, end->nb_bytes)) {
+> > +            !do_perform_cow_encrypt(bs,
+> > +                                    m->offset + end->offset,
+> > +                                    m->alloc_offset + end->offset,
+> > +                                    end_buffer, end->nb_bytes)) {
+> 
+> Looking at this now, I think that do_perform_cow_encrypt can be dropped at all,
+> as it's now just an extra wrapper, sending same parameters to qcow2_co_encrypt.
+> 
+> I'll send a follow-up, if this patch goes as is.
+I kind of agree but I didn't want to make too many changes. I do think 
+now also that it is worth it.
+
+
+> 
+> >               ret = -EIO;
+> >               goto fail;
+> >           }
+> > diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
+> > index 3b1e63fe41..9646243a9b 100644
+> > --- a/block/qcow2-threads.c
+> > +++ b/block/qcow2-threads.c
+> > @@ -234,15 +234,15 @@ static int qcow2_encdec_pool_func(void *opaque)
+> >   }
+> >   
+> >   static int coroutine_fn
+> > -qcow2_co_encdec(BlockDriverState *bs, uint64_t file_cluster_offset,
+> > -                  uint64_t offset, void *buf, size_t len, Qcow2EncDecFunc func)
+> > +qcow2_co_encdec(BlockDriverState *bs, uint64_t host_offset,
+> > +                uint64_t guest_offset, void *buf, size_t len,
+> > +                Qcow2EncDecFunc func)
+> >   {
+> >       BDRVQcow2State *s = bs->opaque;
+> > +
+> >       Qcow2EncDecData arg = {
+> >           .block = s->crypto,
+> > -        .offset = s->crypt_physical_offset ?
+> > -                      file_cluster_offset + offset_into_cluster(s, offset) :
+> > -                      offset,
+> > +        .offset = s->crypt_physical_offset ? host_offset : guest_offset,
+> >           .buf = buf,
+> >           .len = len,
+> >           .func = func,
+> > @@ -251,18 +251,54 @@ qcow2_co_encdec(BlockDriverState *bs, uint64_t file_cluster_offset,
+> >       return qcow2_co_process(bs, qcow2_encdec_pool_func, &arg);
+> >   }
+> >   
+> > +
+> > +/*
+> > + * qcow2_co_encrypt()
+> > + *
+> > + * Encrypts one or more contiguous aligned sectors
+> > + *
+> > + * @host_offset - underlying storage offset of the first sector of the
+> > + * data to be encrypted
+> > +
+> 
+> asterisk missed
+Too tired :-(
+> 
+> > + * @guest_offset - guest (virtual) offset of the first sector of the
+> > + * data to be encrypted
+> > + *
+> > + * @buf - buffer with the data to encrypt, that after encryption
+> > + *        will be written to the underlying storage device at
+> > + *        @host_offset
+> > + *
+> > + * @len - length of the buffer (must be a BDRV_SECTOR_SIZE multiple)
+> > + *
+> > + * Depending on the encryption method, @host_cluster_offset and/or @guest_offset
+> 
+> s/host_cluster_offset/host_offset
+Opps, that is leftover, I remember that I already fixed that, but I guess
+I didn't.
+> 
+> With at least alignment[1] and s/host_cluster_offset/host_offset/ fixed:
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> 
+> > + * may be used for generating the initialization vector for
+> > + * encryption.
+> > + *
+> > + * Note that while the whole range must be aligned on sectors, it
+> > + * does not have to be aligned on clusters and can also cross cluster
+> > + * boundaries
+> > + *
+> 
+> hmm, extra empty line IMHO.
+
+> 
+> > + */
+> >   int coroutine_fn
+> > -qcow2_co_encrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
+> > -                 uint64_t offset, void *buf, size_t len)
+> > +qcow2_co_encrypt(BlockDriverState *bs, uint64_t host_offset,
+> > +                 uint64_t guest_offset, void *buf, size_t len)
+> >   {
+> > -    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
+> > -                             qcrypto_block_encrypt);
+> > +    return qcow2_co_encdec(bs, host_offset, guest_offset, buf, len,
+> > +                           qcrypto_block_encrypt);
+> >   }
+> >   
+> > +
+> > +/*
+> > + * qcow2_co_decrypt()
+> > + *
+> > + * Decrypts one or more contiguous aligned sectors
+> > + * Similar to qcow2_co_encrypt
+> > + *
+> 
+> and this one.
+Doesn't really matter, but no problem to fix.
+
+> 
+> > + */
+> > +
+> >   int coroutine_fn
+> > -qcow2_co_decrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
+> > -                 uint64_t offset, void *buf, size_t len)
+> > +qcow2_co_decrypt(BlockDriverState *bs, uint64_t host_offset,
+> > +                 uint64_t guest_offset, void *buf, size_t len)
+> >   {
+> > -    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
+> > -                             qcrypto_block_decrypt);
+> > +    return qcow2_co_encdec(bs, host_offset, guest_offset, buf, len,
+> > +                           qcrypto_block_decrypt);
+> >   }
+> > diff --git a/block/qcow2.c b/block/qcow2.c
+> > index 57734f20cf..ac768092bb 100644
+> > --- a/block/qcow2.c
+> > +++ b/block/qcow2.c
+> > @@ -2069,7 +2069,8 @@ static coroutine_fn int qcow2_co_preadv_part(BlockDriverState *bs,
+> >   
+> >                   assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
+> >                   assert((cur_bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
+> > -                if (qcow2_co_decrypt(bs, cluster_offset, offset,
+> > +                if (qcow2_co_decrypt(bs, cluster_offset + offset_in_cluster,
+> > +                                     offset,
+> >                                        cluster_data, cur_bytes) < 0) {
+> >                       ret = -EIO;
+> >                       goto fail;
+> > @@ -2288,7 +2289,7 @@ static coroutine_fn int qcow2_co_pwritev_part(
+> >               qemu_iovec_to_buf(qiov, qiov_offset + bytes_done,
+> >                                 cluster_data, cur_bytes);
+> >   
+> > -            if (qcow2_co_encrypt(bs, cluster_offset, offset,
+> > +            if (qcow2_co_encrypt(bs, cluster_offset + offset_in_cluster, offset,
+> >                                    cluster_data, cur_bytes) < 0) {
+> >                   ret = -EIO;
+> >                   goto out_unlocked;
+> > diff --git a/block/qcow2.h b/block/qcow2.h
+> > index 998bcdaef1..a488d761ff 100644
+> > --- a/block/qcow2.h
+> > +++ b/block/qcow2.h
+> > @@ -758,10 +758,10 @@ ssize_t coroutine_fn
+> >   qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
+> >                       const void *src, size_t src_size);
+> >   int coroutine_fn
+> > -qcow2_co_encrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
+> > -                 uint64_t offset, void *buf, size_t len);
+> > +qcow2_co_encrypt(BlockDriverState *bs, uint64_t host_offset,
+> > +                 uint64_t guest_offset, void *buf, size_t len);
+> >   int coroutine_fn
+> > -qcow2_co_decrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
+> > -                 uint64_t offset, void *buf, size_t len);
+> > +qcow2_co_decrypt(BlockDriverState *bs, uint64_t host_offset,
+> > +                 uint64_t guest_offset, void *buf, size_t len);
+> >   
+> >   #endif
+> 
+
+
+Thanks for the review,
+	Best regards,
+		Maxim Levitsky
+
 
