@@ -2,89 +2,58 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D182C4CEC7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 12:02:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B26C4CEC5
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 12:08:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB2F42084F
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 12:02:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB2F42084F
+	by mail.kernel.org (Postfix) with ESMTPS id 2E1B72084F
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 12:08:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E1B72084F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8kHQ-0008IC-SX
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 08:02:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50678)
+	id 1i8kNO-0001dA-8k
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 08:08:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51802)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1i8kGC-0007kR-SA
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 08:01:09 -0400
+ (envelope-from <slp@redhat.com>) id 1i8kMc-000193-D3
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 08:07:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1i8kGB-0003GF-Gk
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 08:01:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56446)
+ (envelope-from <slp@redhat.com>) id 1i8kMa-000631-7I
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 08:07:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34344)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1i8kGB-0003Fj-8J
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 08:01:07 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1i8kMZ-00062o-Vc
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 08:07:44 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5D2F7806CF
- for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 12:01:05 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id q10so407096wro.22
- for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 05:01:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=fN3NreBGFzf7EA2veiuK2JJfFaDgjnZWRYPBpf3Fv9A=;
- b=LSz8r4rc2BMRXI04VHPBapsfvJWKgR7hNYFhNPaFVgY596duqGAlulK/C8PgcDIz2k
- jg9psitvEHDv5VIJ5uxnsJ2K9CKmdkL6GNifFTsMkk/HeX3cCK17MAwo8n6tMlj71/da
- zwitFFkBzKrKsJlAHH3bZ7s3X0tNvCBACNxEIQPMnWfxiVMblCaUEkR1C4CD21/Utkr0
- 8xDi3F4Zf1I4QBpEZCMB+VhvmkytKNJKpxcRYZjfOAN63xRHRHYg60xfB4ulUsaXlglT
- +MUwVa3qu/DHPRP6qic5LfQh9G1/pwkgglhgWcM8jTBw+kZ1pRFV4J6LnEvvCfpaNjCO
- aNcQ==
-X-Gm-Message-State: APjAAAWkdln5uNvTaHKZiK54pkywMpk8Ubsk0ecwUzhPnNjFLuBDbD6H
- XAurLxsb7bsdzxuOARAXnNvkBMXI2p0Yd6FvU5n6nMGaXmgcbuWTofC8BJK9zFf28RNNSozsMxy
- nBBH22tz+WexYRaI=
-X-Received: by 2002:adf:f112:: with SMTP id r18mr1921513wro.88.1568376063979; 
- Fri, 13 Sep 2019 05:01:03 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxJ9C49i1zITgzqIhIfyzIzyAQR9AbW3wDX/1LiQtem1Sa65sOXMJjlMTKE0G8UI2BwXes19Q==
-X-Received: by 2002:adf:f112:: with SMTP id r18mr1921485wro.88.1568376063639; 
- Fri, 13 Sep 2019 05:01:03 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c5d2:4bb2:a923:3a9a?
- ([2001:b07:6468:f312:c5d2:4bb2:a923:3a9a])
- by smtp.gmail.com with ESMTPSA id u18sm2017487wmj.11.2019.09.13.05.01.01
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 13 Sep 2019 05:01:02 -0700 (PDT)
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
- qemu-devel@nongnu.org, ehabkost@redhat.com, berrange@redhat.com,
- quintela@redhat.com
-References: <20190913102538.24167-1-dgilbert@redhat.com>
- <20190913102538.24167-2-dgilbert@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <db74dc28-361e-a3a6-218d-0cedb83ee21d@redhat.com>
-Date: Fri, 13 Sep 2019 14:01:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 244A48980F8;
+ Fri, 13 Sep 2019 12:07:43 +0000 (UTC)
+Received: from dritchie.redhat.com (unknown [10.33.36.15])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7B6285D712;
+ Fri, 13 Sep 2019 12:07:35 +0000 (UTC)
+From: Sergio Lopez <slp@redhat.com>
+To: mst@redhat.com
+Date: Fri, 13 Sep 2019 14:06:01 +0200
+Message-Id: <20190913120559.40835-1-slp@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190913102538.24167-2-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Fri, 13 Sep 2019 12:07:43 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 1/5] rcu: Add automatically released
- rcu_read_lock variants
+Subject: [Qemu-devel] [PATCH v3] virtio-mmio: implement modern (v2)
+ personality (virtio-1)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,94 +65,590 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, Sergio Lopez <slp@redhat.com>, stefanha@gmail.com,
+ cohuck@redhat.com, qemu-devel@nongnu.org, abologna@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/09/19 12:25, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> RCU_READ_LOCK_GUARD() takes the rcu_read_lock and then uses glib's
-> g_auto infrastructure (and thus whatever the compiler's hooks are) to
-> release it on all exits of the block.
-> 
-> WITH_RCU_READ_LOCK_GUARD() is similar but is used as a wrapper for the
-> lock, i.e.:
-> 
->    WITH_RCU_READ_LOCK_GUARD() {
->        stuff under lock
->    }
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  docs/devel/rcu.txt | 16 ++++++++++++++++
->  include/qemu/rcu.h | 25 +++++++++++++++++++++++++
->  2 files changed, 41 insertions(+)
-> 
-> diff --git a/docs/devel/rcu.txt b/docs/devel/rcu.txt
-> index c84e7f42b2..d83fed2f79 100644
-> --- a/docs/devel/rcu.txt
-> +++ b/docs/devel/rcu.txt
-> @@ -187,6 +187,22 @@ The following APIs must be used before RCU is used in a thread:
->  Note that these APIs are relatively heavyweight, and should _not_ be
->  nested.
->  
-> +Convenience macros
-> +==================
-> +
-> +Two macros are provided that automatically release the read lock at the
-> +end of the scope.
-> +
-> +      RCU_READ_LOCK_GUARD()
-> +
-> +         Takes the lock and will release it at the end of the block it's
-> +         used in.
-> +
-> +      WITH_RCU_READ_LOCK_GUARD()  { code }
-> +
-> +         Is used at the head of a block to protect the code within the block.
-> +
-> +Note that 'goto'ing out of the guarded block will also drop the lock.
->  
->  DIFFERENCES WITH LINUX
->  ======================
-> diff --git a/include/qemu/rcu.h b/include/qemu/rcu.h
-> index 22876d1428..3a8d4cf28b 100644
-> --- a/include/qemu/rcu.h
-> +++ b/include/qemu/rcu.h
-> @@ -154,6 +154,31 @@ extern void call_rcu1(struct rcu_head *head, RCUCBFunc *func);
->        }),                                                                \
->        (RCUCBFunc *)g_free);
->  
-> +typedef void RCUReadAuto;
-> +static inline RCUReadAuto *rcu_read_auto_lock(void)
-> +{
-> +    rcu_read_lock();
-> +    /* Anything non-NULL causes the cleanup function to be called */
-> +    return (void *)(uintptr_t)0x1;
-> +}
-> +
-> +static inline void rcu_read_auto_unlock(RCUReadAuto *r)
-> +{
-> +    rcu_read_unlock();
-> +}
-> +
-> +G_DEFINE_AUTOPTR_CLEANUP_FUNC(RCUReadAuto, rcu_read_auto_unlock)
-> +
-> +#define WITH_RCU_READ_LOCK_GUARD() \
-> +    WITH_RCU_READ_LOCK_GUARD_(_rcu_read_auto##__COUNTER__)
-> +
-> +#define WITH_RCU_READ_LOCK_GUARD_(var) \
-> +    for (g_autoptr(RCUReadAuto) var = rcu_read_auto_lock(); \
-> +        (var); rcu_read_auto_unlock(var), (var) = NULL)
-> +
-> +#define RCU_READ_LOCK_GUARD() \
-> +    g_autoptr(RCUReadAuto) _rcu_read_auto = rcu_read_auto_lock()
-> +
->  #ifdef __cplusplus
->  }
->  #endif
-> 
+Implement the modern (v2) personality, according to the VirtIO 1.0
+specification.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Support for v2 among guests is not as widespread as it'd be
+desirable. While the Linux driver has had it for a while, support is
+missing, at least, from Tianocore EDK II, NetBSD and FreeBSD.
+
+For this reason, the v2 personality is disabled, keeping the legacy
+behavior as default. Machine types willing to use v2, can enable it
+using MachineClass's compat_props.
+
+Signed-off-by: Sergio Lopez <slp@redhat.com>
+---
+Changelog:
+
+v3:
+ - Use %HWADDR_PRIx instead of %x. (Stefan Hajnoczi)
+ - Return 0 if host_features_sel > 0 for legacy mode. (Cornelia Huck)
+ - Mask out legacy features in non-legacy mode. (Cornelia Huck)
+ - Log an error in guest attempts to write guest_features with
+   guest_features_sel > 0 in legacy mode. (Cornelia Huck)
+
+v2:
+ - Switch from RFC to PATCH.
+ - Avoid the modern vs. legacy dichotomy. Use legacy or non-legacy
+   instead. (Andrea Bolognani, Cornelia Huck)
+ - Include the register offset in the warning messages. (Stefan
+   Hajnoczi)
+ - Fix device endianness for the non-legacy mode. (Michael S. Tsirkin)
+ - Honor the specs in VIRTIO_MMIO_QUEUE_READY. (Michael S. Tsirkin)
+---
+ hw/virtio/virtio-mmio.c | 342 +++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 319 insertions(+), 23 deletions(-)
+
+diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+index 97b7f35496..3578ae37be 100644
+--- a/hw/virtio/virtio-mmio.c
++++ b/hw/virtio/virtio-mmio.c
+@@ -47,14 +47,24 @@
+         OBJECT_CHECK(VirtIOMMIOProxy, (obj), TYPE_VIRTIO_MMIO)
+=20
+ #define VIRT_MAGIC 0x74726976 /* 'virt' */
+-#define VIRT_VERSION 1
++#define VIRT_VERSION 2
++#define VIRT_VERSION_LEGACY 1
+ #define VIRT_VENDOR 0x554D4551 /* 'QEMU' */
+=20
++typedef struct VirtIOMMIOQueue {
++    uint16_t num;
++    bool enabled;
++    uint32_t desc[2];
++    uint32_t avail[2];
++    uint32_t used[2];
++} VirtIOMMIOQueue;
++
+ typedef struct {
+     /* Generic */
+     SysBusDevice parent_obj;
+     MemoryRegion iomem;
+     qemu_irq irq;
++    bool legacy;
+     /* Guest accessible state needing migration and reset */
+     uint32_t host_features_sel;
+     uint32_t guest_features_sel;
+@@ -62,6 +72,9 @@ typedef struct {
+     /* virtio-bus */
+     VirtioBusState bus;
+     bool format_transport_address;
++    /* Fields only used for non-legacy (v2) devices */
++    uint32_t guest_features[2];
++    VirtIOMMIOQueue vqs[VIRTIO_QUEUE_MAX];
+ } VirtIOMMIOProxy;
+=20
+ static bool virtio_mmio_ioeventfd_enabled(DeviceState *d)
+@@ -115,7 +128,11 @@ static uint64_t virtio_mmio_read(void *opaque, hwadd=
+r offset, unsigned size)
+         case VIRTIO_MMIO_MAGIC_VALUE:
+             return VIRT_MAGIC;
+         case VIRTIO_MMIO_VERSION:
+-            return VIRT_VERSION;
++            if (proxy->legacy) {
++                return VIRT_VERSION_LEGACY;
++            } else {
++                return VIRT_VERSION;
++            }
+         case VIRTIO_MMIO_VENDOR_ID:
+             return VIRT_VENDOR;
+         default:
+@@ -146,28 +163,64 @@ static uint64_t virtio_mmio_read(void *opaque, hwad=
+dr offset, unsigned size)
+     case VIRTIO_MMIO_MAGIC_VALUE:
+         return VIRT_MAGIC;
+     case VIRTIO_MMIO_VERSION:
+-        return VIRT_VERSION;
++        if (proxy->legacy) {
++            return VIRT_VERSION_LEGACY;
++        } else {
++            return VIRT_VERSION;
++        }
+     case VIRTIO_MMIO_DEVICE_ID:
+         return vdev->device_id;
+     case VIRTIO_MMIO_VENDOR_ID:
+         return VIRT_VENDOR;
+     case VIRTIO_MMIO_DEVICE_FEATURES:
+-        if (proxy->host_features_sel) {
+-            return 0;
++        if (proxy->legacy) {
++            if (proxy->host_features_sel) {
++                return 0;
++            } else {
++                return vdev->host_features;
++            }
++        } else {
++            VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_GET_CLASS(vdev);
++            return (vdev->host_features & ~vdc->legacy_features)
++                >> (32 * proxy->host_features_sel);
+         }
+-        return vdev->host_features;
+     case VIRTIO_MMIO_QUEUE_NUM_MAX:
+         if (!virtio_queue_get_num(vdev, vdev->queue_sel)) {
+             return 0;
+         }
+         return VIRTQUEUE_MAX_SIZE;
+     case VIRTIO_MMIO_QUEUE_PFN:
++        if (!proxy->legacy) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: read from legacy register (0x%"
++                          HWADDR_PRIx ") in non-legacy mode\n",
++                          __func__, offset);
++            return 0;
++        }
+         return virtio_queue_get_addr(vdev, vdev->queue_sel)
+             >> proxy->guest_page_shift;
++    case VIRTIO_MMIO_QUEUE_READY:
++        if (proxy->legacy) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: read from non-legacy register (0x%"
++                          HWADDR_PRIx ") in legacy mode\n",
++                          __func__, offset);
++            return 0;
++        }
++        return proxy->vqs[vdev->queue_sel].enabled;
+     case VIRTIO_MMIO_INTERRUPT_STATUS:
+         return atomic_read(&vdev->isr);
+     case VIRTIO_MMIO_STATUS:
+         return vdev->status;
++    case VIRTIO_MMIO_CONFIG_GENERATION:
++        if (proxy->legacy) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: read from non-legacy register (0x%"
++                          HWADDR_PRIx ") in legacy mode\n",
++                          __func__, offset);
++            return 0;
++        }
++        return vdev->generation;
+     case VIRTIO_MMIO_DEVICE_FEATURES_SEL:
+     case VIRTIO_MMIO_DRIVER_FEATURES:
+     case VIRTIO_MMIO_DRIVER_FEATURES_SEL:
+@@ -177,12 +230,20 @@ static uint64_t virtio_mmio_read(void *opaque, hwad=
+dr offset, unsigned size)
+     case VIRTIO_MMIO_QUEUE_ALIGN:
+     case VIRTIO_MMIO_QUEUE_NOTIFY:
+     case VIRTIO_MMIO_INTERRUPT_ACK:
++    case VIRTIO_MMIO_QUEUE_DESC_LOW:
++    case VIRTIO_MMIO_QUEUE_DESC_HIGH:
++    case VIRTIO_MMIO_QUEUE_AVAIL_LOW:
++    case VIRTIO_MMIO_QUEUE_AVAIL_HIGH:
++    case VIRTIO_MMIO_QUEUE_USED_LOW:
++    case VIRTIO_MMIO_QUEUE_USED_HIGH:
+         qemu_log_mask(LOG_GUEST_ERROR,
+-                      "%s: read of write-only register\n",
+-                      __func__);
++                      "%s: read of write-only register (0x%" HWADDR_PRIx=
+ ")\n",
++                      __func__, offset);
+         return 0;
+     default:
+-        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad register offset\n", __fu=
+nc__);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: bad register offset (0x%" HWADDR_PRIx ")\n",
++                      __func__, offset);
+         return 0;
+     }
+     return 0;
+@@ -229,17 +290,41 @@ static void virtio_mmio_write(void *opaque, hwaddr =
+offset, uint64_t value,
+     }
+     switch (offset) {
+     case VIRTIO_MMIO_DEVICE_FEATURES_SEL:
+-        proxy->host_features_sel =3D value;
++        if (value) {
++            proxy->host_features_sel =3D 1;
++        } else {
++            proxy->host_features_sel =3D 0;
++        }
+         break;
+     case VIRTIO_MMIO_DRIVER_FEATURES:
+-        if (!proxy->guest_features_sel) {
+-            virtio_set_features(vdev, value);
++        if (proxy->legacy) {
++            if (proxy->guest_features_sel) {
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "%s: attempt to write guest features with =
+"
++                              "guest_features_sel > 0 in legacy mode\n",
++                              __func__);
++            } else {
++                virtio_set_features(vdev, value);
++            }
++        } else {
++            proxy->guest_features[proxy->guest_features_sel] =3D value;
+         }
+         break;
+     case VIRTIO_MMIO_DRIVER_FEATURES_SEL:
+-        proxy->guest_features_sel =3D value;
++        if (value) {
++            proxy->guest_features_sel =3D 1;
++        } else {
++            proxy->guest_features_sel =3D 0;
++        }
+         break;
+     case VIRTIO_MMIO_GUEST_PAGE_SIZE:
++        if (!proxy->legacy) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: write to legacy register (0x%"
++                          HWADDR_PRIx ") in non-legacy mode\n",
++                          __func__, offset);
++            return;
++        }
+         proxy->guest_page_shift =3D ctz32(value);
+         if (proxy->guest_page_shift > 31) {
+             proxy->guest_page_shift =3D 0;
+@@ -253,15 +338,31 @@ static void virtio_mmio_write(void *opaque, hwaddr =
+offset, uint64_t value,
+         break;
+     case VIRTIO_MMIO_QUEUE_NUM:
+         trace_virtio_mmio_queue_write(value, VIRTQUEUE_MAX_SIZE);
+-        virtio_queue_set_num(vdev, vdev->queue_sel, value);
+-        /* Note: only call this function for legacy devices */
+-        virtio_queue_update_rings(vdev, vdev->queue_sel);
++        if (proxy->legacy) {
++            virtio_queue_set_num(vdev, vdev->queue_sel, value);
++            virtio_queue_update_rings(vdev, vdev->queue_sel);
++        } else {
++            proxy->vqs[vdev->queue_sel].num =3D value;
++        }
+         break;
+     case VIRTIO_MMIO_QUEUE_ALIGN:
+-        /* Note: this is only valid for legacy devices */
++        if (!proxy->legacy) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: write to legacy register (0x%"
++                          HWADDR_PRIx ") in non-legacy mode\n",
++                          __func__, offset);
++            return;
++        }
+         virtio_queue_set_align(vdev, vdev->queue_sel, value);
+         break;
+     case VIRTIO_MMIO_QUEUE_PFN:
++        if (!proxy->legacy) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: write to legacy register (0x%"
++                          HWADDR_PRIx ") in non-legacy mode\n",
++                          __func__, offset);
++            return;
++        }
+         if (value =3D=3D 0) {
+             virtio_reset(vdev);
+         } else {
+@@ -269,6 +370,29 @@ static void virtio_mmio_write(void *opaque, hwaddr o=
+ffset, uint64_t value,
+                                   value << proxy->guest_page_shift);
+         }
+         break;
++    case VIRTIO_MMIO_QUEUE_READY:
++        if (proxy->legacy) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: write to non-legacy register (0x%"
++                          HWADDR_PRIx ") in legacy mode\n",
++                          __func__, offset);
++            return;
++        }
++        if (value) {
++            virtio_queue_set_num(vdev, vdev->queue_sel,
++                                 proxy->vqs[vdev->queue_sel].num);
++            virtio_queue_set_rings(vdev, vdev->queue_sel,
++                ((uint64_t)proxy->vqs[vdev->queue_sel].desc[1]) << 32 |
++                proxy->vqs[vdev->queue_sel].desc[0],
++                ((uint64_t)proxy->vqs[vdev->queue_sel].avail[1]) << 32 |
++                proxy->vqs[vdev->queue_sel].avail[0],
++                ((uint64_t)proxy->vqs[vdev->queue_sel].used[1]) << 32 |
++                proxy->vqs[vdev->queue_sel].used[0]);
++            proxy->vqs[vdev->queue_sel].enabled =3D 1;
++        } else {
++            proxy->vqs[vdev->queue_sel].enabled =3D 0;
++        }
++        break;
+     case VIRTIO_MMIO_QUEUE_NOTIFY:
+         if (value < VIRTIO_QUEUE_MAX) {
+             virtio_queue_notify(vdev, value);
+@@ -283,6 +407,12 @@ static void virtio_mmio_write(void *opaque, hwaddr o=
+ffset, uint64_t value,
+             virtio_mmio_stop_ioeventfd(proxy);
+         }
+=20
++        if (!proxy->legacy && (value & VIRTIO_CONFIG_S_FEATURES_OK)) {
++            virtio_set_features(vdev,
++                                ((uint64_t)proxy->guest_features[1]) << =
+32 |
++                                proxy->guest_features[0]);
++        }
++
+         virtio_set_status(vdev, value & 0xff);
+=20
+         if (value & VIRTIO_CONFIG_S_DRIVER_OK) {
+@@ -293,6 +423,66 @@ static void virtio_mmio_write(void *opaque, hwaddr o=
+ffset, uint64_t value,
+             virtio_reset(vdev);
+         }
+         break;
++    case VIRTIO_MMIO_QUEUE_DESC_LOW:
++        if (proxy->legacy) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: write to non-legacy register (0x%"
++                          HWADDR_PRIx ") in legacy mode\n",
++                          __func__, offset);
++            return;
++        }
++        proxy->vqs[vdev->queue_sel].desc[0] =3D value;
++        break;
++    case VIRTIO_MMIO_QUEUE_DESC_HIGH:
++        if (proxy->legacy) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: write to non-legacy register (0x%"
++                          HWADDR_PRIx ") in legacy mode\n",
++                          __func__, offset);
++            return;
++        }
++        proxy->vqs[vdev->queue_sel].desc[1] =3D value;
++        break;
++    case VIRTIO_MMIO_QUEUE_AVAIL_LOW:
++        if (proxy->legacy) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: write to non-legacy register (0x%"
++                          HWADDR_PRIx ") in legacy mode\n",
++                          __func__, offset);
++            return;
++        }
++        proxy->vqs[vdev->queue_sel].avail[0] =3D value;
++        break;
++    case VIRTIO_MMIO_QUEUE_AVAIL_HIGH:
++        if (proxy->legacy) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: write to non-legacy register (0x%"
++                          HWADDR_PRIx ") in legacy mode\n",
++                          __func__, offset);
++            return;
++        }
++        proxy->vqs[vdev->queue_sel].avail[1] =3D value;
++        break;
++    case VIRTIO_MMIO_QUEUE_USED_LOW:
++        if (proxy->legacy) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: write to non-legacy register (0x%"
++                          HWADDR_PRIx ") in legacy mode\n",
++                          __func__, offset);
++            return;
++        }
++        proxy->vqs[vdev->queue_sel].used[0] =3D value;
++        break;
++    case VIRTIO_MMIO_QUEUE_USED_HIGH:
++        if (proxy->legacy) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: write to non-legacy register (0x%"
++                          HWADDR_PRIx ") in legacy mode\n",
++                          __func__, offset);
++            return;
++        }
++        proxy->vqs[vdev->queue_sel].used[1] =3D value;
++        break;
+     case VIRTIO_MMIO_MAGIC_VALUE:
+     case VIRTIO_MMIO_VERSION:
+     case VIRTIO_MMIO_DEVICE_ID:
+@@ -300,22 +490,31 @@ static void virtio_mmio_write(void *opaque, hwaddr =
+offset, uint64_t value,
+     case VIRTIO_MMIO_DEVICE_FEATURES:
+     case VIRTIO_MMIO_QUEUE_NUM_MAX:
+     case VIRTIO_MMIO_INTERRUPT_STATUS:
++    case VIRTIO_MMIO_CONFIG_GENERATION:
+         qemu_log_mask(LOG_GUEST_ERROR,
+-                      "%s: write to readonly register\n",
+-                      __func__);
++                      "%s: write to read-only register (0x%" HWADDR_PRIx=
+ ")\n",
++                      __func__, offset);
+         break;
+=20
+     default:
+-        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad register offset\n", __fu=
+nc__);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: bad register offset (0x%" HWADDR_PRIx ")\n",
++                      __func__, offset);
+     }
+ }
+=20
+-static const MemoryRegionOps virtio_mem_ops =3D {
++static const MemoryRegionOps virtio_legacy_mem_ops =3D {
+     .read =3D virtio_mmio_read,
+     .write =3D virtio_mmio_write,
+     .endianness =3D DEVICE_NATIVE_ENDIAN,
+ };
+=20
++static const MemoryRegionOps virtio_mem_ops =3D {
++    .read =3D virtio_mmio_read,
++    .write =3D virtio_mmio_write,
++    .endianness =3D DEVICE_LITTLE_ENDIAN,
++};
++
+ static void virtio_mmio_update_irq(DeviceState *opaque, uint16_t vector)
+ {
+     VirtIOMMIOProxy *proxy =3D VIRTIO_MMIO(opaque);
+@@ -349,15 +548,90 @@ static void virtio_mmio_save_config(DeviceState *op=
+aque, QEMUFile *f)
+     qemu_put_be32(f, proxy->guest_page_shift);
+ }
+=20
++static const VMStateDescription vmstate_virtio_mmio_queue_state =3D {
++    .name =3D "virtio_mmio/queue_state",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_UINT16(num, VirtIOMMIOQueue),
++        VMSTATE_BOOL(enabled, VirtIOMMIOQueue),
++        VMSTATE_UINT32_ARRAY(desc, VirtIOMMIOQueue, 2),
++        VMSTATE_UINT32_ARRAY(avail, VirtIOMMIOQueue, 2),
++        VMSTATE_UINT32_ARRAY(used, VirtIOMMIOQueue, 2),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static const VMStateDescription vmstate_virtio_mmio_state_sub =3D {
++    .name =3D "virtio_mmio/state",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(guest_features, VirtIOMMIOProxy, 2),
++        VMSTATE_STRUCT_ARRAY(vqs, VirtIOMMIOProxy, VIRTIO_QUEUE_MAX, 0,
++                             vmstate_virtio_mmio_queue_state,
++                             VirtIOMMIOQueue),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static const VMStateDescription vmstate_virtio_mmio =3D {
++    .name =3D "virtio_mmio",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .minimum_version_id_old =3D 1,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_END_OF_LIST()
++    },
++    .subsections =3D (const VMStateDescription * []) {
++        &vmstate_virtio_mmio_state_sub,
++        NULL
++    }
++};
++
++static void virtio_mmio_save_extra_state(DeviceState *opaque, QEMUFile *=
+f)
++{
++    VirtIOMMIOProxy *proxy =3D VIRTIO_MMIO(opaque);
++
++    vmstate_save_state(f, &vmstate_virtio_mmio, proxy, NULL);
++}
++
++static int virtio_mmio_load_extra_state(DeviceState *opaque, QEMUFile *f=
+)
++{
++    VirtIOMMIOProxy *proxy =3D VIRTIO_MMIO(opaque);
++
++    return vmstate_load_state(f, &vmstate_virtio_mmio, proxy, 1);
++}
++
++static bool virtio_mmio_has_extra_state(DeviceState *opaque)
++{
++    VirtIOMMIOProxy *proxy =3D VIRTIO_MMIO(opaque);
++
++    return !proxy->legacy;
++}
++
+ static void virtio_mmio_reset(DeviceState *d)
+ {
+     VirtIOMMIOProxy *proxy =3D VIRTIO_MMIO(d);
++    int i;
+=20
+     virtio_mmio_stop_ioeventfd(proxy);
+     virtio_bus_reset(&proxy->bus);
+     proxy->host_features_sel =3D 0;
+     proxy->guest_features_sel =3D 0;
+     proxy->guest_page_shift =3D 0;
++
++    if (!proxy->legacy) {
++        proxy->guest_features[0] =3D proxy->guest_features[1] =3D 0;
++
++        for (i =3D 0; i < VIRTIO_QUEUE_MAX; i++) {
++            proxy->vqs[i].enabled =3D 0;
++            proxy->vqs[i].num =3D 0;
++            proxy->vqs[i].desc[0] =3D proxy->vqs[i].desc[1] =3D 0;
++            proxy->vqs[i].avail[0] =3D proxy->vqs[i].avail[1] =3D 0;
++            proxy->vqs[i].used[0] =3D proxy->vqs[i].used[1] =3D 0;
++        }
++    }
+ }
+=20
+ static int virtio_mmio_set_guest_notifier(DeviceState *d, int n, bool as=
+sign,
+@@ -420,11 +694,22 @@ assign_error:
+     return r;
+ }
+=20
++static void virtio_mmio_pre_plugged(DeviceState *d, Error **errp)
++{
++    VirtIOMMIOProxy *proxy =3D VIRTIO_MMIO(d);
++    VirtIODevice *vdev =3D virtio_bus_get_device(&proxy->bus);
++
++    if (!proxy->legacy) {
++        virtio_add_feature(&vdev->host_features, VIRTIO_F_VERSION_1);
++    }
++}
++
+ /* virtio-mmio device */
+=20
+ static Property virtio_mmio_properties[] =3D {
+     DEFINE_PROP_BOOL("format_transport_address", VirtIOMMIOProxy,
+                      format_transport_address, true),
++    DEFINE_PROP_BOOL("force-legacy", VirtIOMMIOProxy, legacy, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
+@@ -436,8 +721,15 @@ static void virtio_mmio_realizefn(DeviceState *d, Er=
+ror **errp)
+     qbus_create_inplace(&proxy->bus, sizeof(proxy->bus), TYPE_VIRTIO_MMI=
+O_BUS,
+                         d, NULL);
+     sysbus_init_irq(sbd, &proxy->irq);
+-    memory_region_init_io(&proxy->iomem, OBJECT(d), &virtio_mem_ops, pro=
+xy,
+-                          TYPE_VIRTIO_MMIO, 0x200);
++    if (proxy->legacy) {
++        memory_region_init_io(&proxy->iomem, OBJECT(d),
++                              &virtio_legacy_mem_ops, proxy,
++                              TYPE_VIRTIO_MMIO, 0x200);
++    } else {
++        memory_region_init_io(&proxy->iomem, OBJECT(d),
++                              &virtio_mem_ops, proxy,
++                              TYPE_VIRTIO_MMIO, 0x200);
++    }
+     sysbus_init_mmio(sbd, &proxy->iomem);
+ }
+=20
+@@ -508,9 +800,13 @@ static void virtio_mmio_bus_class_init(ObjectClass *=
+klass, void *data)
+     k->notify =3D virtio_mmio_update_irq;
+     k->save_config =3D virtio_mmio_save_config;
+     k->load_config =3D virtio_mmio_load_config;
++    k->save_extra_state =3D virtio_mmio_save_extra_state;
++    k->load_extra_state =3D virtio_mmio_load_extra_state;
++    k->has_extra_state =3D virtio_mmio_has_extra_state;
+     k->set_guest_notifiers =3D virtio_mmio_set_guest_notifiers;
+     k->ioeventfd_enabled =3D virtio_mmio_ioeventfd_enabled;
+     k->ioeventfd_assign =3D virtio_mmio_ioeventfd_assign;
++    k->pre_plugged =3D virtio_mmio_pre_plugged;
+     k->has_variable_vring_alignment =3D true;
+     bus_class->max_dev =3D 1;
+     bus_class->get_dev_path =3D virtio_mmio_bus_get_dev_path;
+--=20
+2.21.0
+
 
