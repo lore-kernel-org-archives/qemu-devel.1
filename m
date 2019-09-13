@@ -2,62 +2,139 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1223FC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:29:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BB5EC49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:32:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D97AC206A4
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:29:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D97AC206A4
+	by mail.kernel.org (Postfix) with ESMTPS id CA5F920717
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:32:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA5F920717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8sBm-0002tV-RB
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 16:29:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39263)
+	id 1i8sFI-00062m-Ut
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 16:32:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41675)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1i8rx8-0005yT-Mg
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:14:01 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i8sC8-00040g-4n
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:29:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1i8rx6-0000bC-C2
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:13:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41808)
+ (envelope-from <jsnow@redhat.com>) id 1i8sC7-0005eX-39
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:29:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60964)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i8rx6-0000aA-20
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:13:56 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1i8sC4-0005dA-7Z; Fri, 13 Sep 2019 16:29:24 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4D346C05683F;
- Fri, 13 Sep 2019 20:13:55 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E6B42600CE;
- Fri, 13 Sep 2019 20:13:54 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 8D4AA11384A9; Fri, 13 Sep 2019 22:13:49 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 13 Sep 2019 22:13:41 +0200
-Message-Id: <20190913201349.24332-9-armbru@redhat.com>
-In-Reply-To: <20190913201349.24332-1-armbru@redhat.com>
-References: <20190913201349.24332-1-armbru@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 51AD77F769;
+ Fri, 13 Sep 2019 20:29:23 +0000 (UTC)
+Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1BAA86012A;
+ Fri, 13 Sep 2019 20:29:11 +0000 (UTC)
+To: Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org
+References: <20190913105626.22353-1-slp@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <366cd715-c9f0-340d-2f9e-b4f64498f136@redhat.com>
+Date: Fri, 13 Sep 2019 16:29:10 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20190913105626.22353-1-slp@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Fri, 13 Sep 2019 20:13:55 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.27]); Fri, 13 Sep 2019 20:29:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 08/16] qapi: Permit 'boxed' with empty type
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] virtio-blk: schedule
+ virtio_notify_config to run on main context
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,257 +146,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org,
+ stefanha@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We reject empty types with 'boxed': true.  We don't really need that
-to work, but making it work is actually simpler than rejecting it, so
-do that.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- tests/test-qmp-cmds.c                   |  4 ++++
- scripts/qapi/commands.py                |  4 ++--
- scripts/qapi/common.py                  | 14 ++------------
- scripts/qapi/events.py                  | 10 +++++-----
- tests/Makefile.include                  |  1 -
- tests/qapi-schema/args-boxed-empty.err  |  1 -
- tests/qapi-schema/args-boxed-empty.exit |  1 -
- tests/qapi-schema/args-boxed-empty.json |  3 ---
- tests/qapi-schema/args-boxed-empty.out  |  0
- tests/qapi-schema/qapi-schema-test.json |  2 ++
- tests/qapi-schema/qapi-schema-test.out  |  4 ++++
- 11 files changed, 19 insertions(+), 25 deletions(-)
- delete mode 100644 tests/qapi-schema/args-boxed-empty.err
- delete mode 100644 tests/qapi-schema/args-boxed-empty.exit
- delete mode 100644 tests/qapi-schema/args-boxed-empty.json
- delete mode 100644 tests/qapi-schema/args-boxed-empty.out
 
-diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index ab389f42da..36fdf5b115 100644
---- a/tests/test-qmp-cmds.c
-+++ b/tests/test-qmp-cmds.c
-@@ -97,6 +97,10 @@ void qmp_boxed_union(UserDefListUnion *arg, Error **er=
-rp)
- {
- }
-=20
-+void qmp_boxed_empty(Empty1 *arg, Error **errp)
-+{
-+}
-+
- __org_qemu_x_Union1 *qmp___org_qemu_x_command(__org_qemu_x_EnumList *a,
-                                               __org_qemu_x_StructList *b=
-,
-                                               __org_qemu_x_Union2 *c,
-diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-index b929e07be4..7e3dd1068a 100644
---- a/scripts/qapi/commands.py
-+++ b/scripts/qapi/commands.py
-@@ -30,7 +30,7 @@ def gen_call(name, arg_type, boxed, ret_type):
-=20
-     argstr =3D ''
-     if boxed:
--        assert arg_type and not arg_type.is_empty()
-+        assert arg_type
-         argstr =3D '&arg, '
-     elif arg_type:
-         assert not arg_type.variants
-@@ -96,7 +96,7 @@ def gen_marshal_decl(name):
-=20
-=20
- def gen_marshal(name, arg_type, boxed, ret_type):
--    have_args =3D arg_type and not arg_type.is_empty()
-+    have_args =3D boxed or (arg_type and not arg_type.is_empty())
-=20
-     ret =3D mcgen('''
-=20
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 0fb1d1956a..c5c71287c3 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -1687,12 +1687,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
-             self.arg_type =3D schema.lookup_type(self._arg_type_name)
-             assert isinstance(self.arg_type, QAPISchemaObjectType)
-             self.arg_type.check(schema)
--            if self.boxed:
--                if self.arg_type.is_empty():
--                    raise QAPISemError(self.info,
--                                       "Cannot use 'boxed' with empty ty=
-pe")
--            else:
--                assert not self.arg_type.variants
-+            assert not self.arg_type.variants or self.boxed
-         elif self.boxed:
-             raise QAPISemError(self.info, "Use of 'boxed' requires 'data=
-'")
-         if self._ret_type_name:
-@@ -1721,12 +1716,7 @@ class QAPISchemaEvent(QAPISchemaEntity):
-             self.arg_type =3D schema.lookup_type(self._arg_type_name)
-             assert isinstance(self.arg_type, QAPISchemaObjectType)
-             self.arg_type.check(schema)
--            if self.boxed:
--                if self.arg_type.is_empty():
--                    raise QAPISemError(self.info,
--                                       "Cannot use 'boxed' with empty ty=
-pe")
--            else:
--                assert not self.arg_type.variants
-+            assert not self.arg_type.variants or self.boxed
-         elif self.boxed:
-             raise QAPISemError(self.info, "Use of 'boxed' requires 'data=
-'")
-=20
-diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
-index b732581046..e0abfef7b0 100644
---- a/scripts/qapi/events.py
-+++ b/scripts/qapi/events.py
-@@ -65,6 +65,8 @@ def gen_event_send(name, arg_type, boxed, event_enum_na=
-me, event_emit):
-     # practice, we can rename our local variables with a leading _ prefi=
-x,
-     # or split the code into a wrapper function that creates a boxed
-     # 'param' object then calls another to do the real work.
-+    have_args =3D boxed or (arg_type and not arg_type.is_empty())
-+
-     ret =3D mcgen('''
-=20
- %(proto)s
-@@ -73,15 +75,13 @@ def gen_event_send(name, arg_type, boxed, event_enum_=
-name, event_emit):
- ''',
-                 proto=3Dbuild_event_send_proto(name, arg_type, boxed))
-=20
--    if arg_type and not arg_type.is_empty():
-+    if have_args:
-         ret +=3D mcgen('''
-     QObject *obj;
-     Visitor *v;
- ''')
-         if not boxed:
-             ret +=3D gen_param_var(arg_type)
--    else:
--        assert not boxed
-=20
-     ret +=3D mcgen('''
-=20
-@@ -90,7 +90,7 @@ def gen_event_send(name, arg_type, boxed, event_enum_na=
-me, event_emit):
- ''',
-                  name=3Dname)
-=20
--    if arg_type and not arg_type.is_empty():
-+    if have_args:
-         ret +=3D mcgen('''
-     v =3D qobject_output_visitor_new(&obj);
- ''')
-@@ -121,7 +121,7 @@ def gen_event_send(name, arg_type, boxed, event_enum_=
-name, event_emit):
-                  event_emit=3Devent_emit,
-                  c_enum=3Dc_enum_const(event_enum_name, name))
-=20
--    if arg_type and not arg_type.is_empty():
-+    if have_args:
-         ret +=3D mcgen('''
-     visit_free(v);
- ''')
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 023a4e4789..52caeb705e 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -312,7 +312,6 @@ qapi-schema +=3D args-array-empty.json
- qapi-schema +=3D args-array-unknown.json
- qapi-schema +=3D args-bad-boxed.json
- qapi-schema +=3D args-boxed-anon.json
--qapi-schema +=3D args-boxed-empty.json
- qapi-schema +=3D args-boxed-string.json
- qapi-schema +=3D args-int.json
- qapi-schema +=3D args-invalid.json
-diff --git a/tests/qapi-schema/args-boxed-empty.err b/tests/qapi-schema/a=
-rgs-boxed-empty.err
-deleted file mode 100644
-index 039603e85c..0000000000
---- a/tests/qapi-schema/args-boxed-empty.err
-+++ /dev/null
-@@ -1 +0,0 @@
--tests/qapi-schema/args-boxed-empty.json:3: Cannot use 'boxed' with empty=
- type
-diff --git a/tests/qapi-schema/args-boxed-empty.exit b/tests/qapi-schema/=
-args-boxed-empty.exit
-deleted file mode 100644
-index d00491fd7e..0000000000
---- a/tests/qapi-schema/args-boxed-empty.exit
-+++ /dev/null
-@@ -1 +0,0 @@
--1
-diff --git a/tests/qapi-schema/args-boxed-empty.json b/tests/qapi-schema/=
-args-boxed-empty.json
-deleted file mode 100644
-index 52717e065f..0000000000
---- a/tests/qapi-schema/args-boxed-empty.json
-+++ /dev/null
-@@ -1,3 +0,0 @@
--# 'boxed' requires a non-empty type
--{ 'struct': 'Empty', 'data': {} }
--{ 'command': 'foo', 'boxed': true, 'data': 'Empty' }
-diff --git a/tests/qapi-schema/args-boxed-empty.out b/tests/qapi-schema/a=
-rgs-boxed-empty.out
-deleted file mode 100644
-index e69de29bb2..0000000000
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
-qapi-schema-test.json
-index 0fadb4ddd7..e6dbbbd328 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -149,6 +149,7 @@
- { 'command': 'guest-sync', 'data': { 'arg': 'any' }, 'returns': 'any' }
- { 'command': 'boxed-struct', 'boxed': true, 'data': 'UserDefZero' }
- { 'command': 'boxed-union', 'data': 'UserDefListUnion', 'boxed': true }
-+{ 'command': 'boxed-empty', 'boxed': true, 'data': 'Empty1' }
-=20
- # Smoke test on out-of-band and allow-preconfig-test
- { 'command': 'test-flags-command', 'allow-oob': true, 'allow-preconfig':=
- true }
-@@ -181,6 +182,7 @@
-   'data': { 'a' : 'EventStructOne', 'b' : 'str', '*c': 'str', '*enum3': =
-'EnumOne' } }
- { 'event': 'EVENT_E', 'boxed': true, 'data': 'UserDefZero' }
- { 'event': 'EVENT_F', 'boxed': true, 'data': 'UserDefFlatUnion' }
-+{ 'event': 'EVENT_G', 'boxed': true, 'data': 'Empty1' }
-=20
- # test that we correctly compile downstream extensions, as well as munge
- # ticklish names
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-index 5470a525f5..fb00a21996 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -221,6 +221,8 @@ command boxed-struct UserDefZero -> None
-    gen=3DTrue success_response=3DTrue boxed=3DTrue oob=3DFalse preconfig=
-=3DFalse
- command boxed-union UserDefListUnion -> None
-    gen=3DTrue success_response=3DTrue boxed=3DTrue oob=3DFalse preconfig=
-=3DFalse
-+command boxed-empty Empty1 -> None
-+   gen=3DTrue success_response=3DTrue boxed=3DTrue oob=3DFalse preconfig=
-=3DFalse
- command test-flags-command None -> None
-    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DTrue preconfig=
-=3DTrue
- object UserDefOptions
-@@ -254,6 +256,8 @@ event EVENT_E UserDefZero
-    boxed=3DTrue
- event EVENT_F UserDefFlatUnion
-    boxed=3DTrue
-+event EVENT_G Empty1
-+   boxed=3DTrue
- enum __org.qemu_x-Enum
-     member __org.qemu_x-value
- object __org.qemu_x-Base
---=20
-2.21.0
+On 9/13/19 6:56 AM, Sergio Lopez wrote:
+> virtio_notify_config() needs to acquire the global mutex, which isn't
+> allowed from an iothread, and may lead to a deadlock like this:
+> 
+>  - main thead
+>   * Has acquired: qemu_global_mutex.
+>   * Is trying the acquire: iothread AioContext lock via
+>     AIO_WAIT_WHILE (after aio_poll).
+> 
+>  - iothread
+>   * Has acquired: AioContext lock.
+>   * Is trying to acquire: qemu_global_mutex (via
+>     virtio_notify_config->prepare_mmio_access).
+> 
+> If virtio_blk_resize() is called from an iothread, schedule
+> virtio_notify_config() to be run in the main context BH.
+> 
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> ---
+> Changelog
+> 
+> v2:
+>  - Use aio_bh_schedule_oneshot instead of scheduling a coroutine
+>    (thanks Kevin Wolf).
+>  - Switch from RFC to v2 patch.
+> ---
+>  hw/block/virtio-blk.c | 21 ++++++++++++++++++++-
+>  1 file changed, 20 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> index 18851601cb..669dc60f5b 100644
+> --- a/hw/block/virtio-blk.c
+> +++ b/hw/block/virtio-blk.c
+> @@ -16,6 +16,7 @@
+>  #include "qemu/iov.h"
+>  #include "qemu/module.h"
+>  #include "qemu/error-report.h"
+> +#include "qemu/main-loop.h"
+>  #include "trace.h"
+>  #include "hw/block/block.h"
+>  #include "hw/qdev-properties.h"
+> @@ -1086,11 +1087,29 @@ static int virtio_blk_load_device(VirtIODevice *vdev, QEMUFile *f,
+>      return 0;
+>  }
+>  
+> +static void virtio_resize_cb(void *opaque)
+> +{
+> +    VirtIODevice *vdev = opaque;
+> +
+> +    assert(qemu_get_current_aio_context() == qemu_get_aio_context());
+> +    virtio_notify_config(vdev);
+> +}
+> +
+>  static void virtio_blk_resize(void *opaque)
+>  {
+>      VirtIODevice *vdev = VIRTIO_DEVICE(opaque);
+>  
+> -    virtio_notify_config(vdev);
+> +    if (qemu_get_current_aio_context() != qemu_get_aio_context()) {
+> +        /*
+> +         * virtio_notify_config() needs to acquire the global mutex,
+> +         * so it can't be called from an iothread. Instead, schedule
+> +         * it to be run in the main context BH.
+> +         */
+> +        aio_bh_schedule_oneshot(qemu_get_aio_context(),
+> +                                virtio_resize_cb, vdev);
+> +    } else {
+> +        virtio_notify_config(vdev);
+> +    }
+>  }
+>  
+>  static const BlockDevOps virtio_block_ops = {
+> 
 
+Do we need to bother to check our current context before firing off the
+oneshot? It's simpler to just fire off the oneshot. I can't imagine that
+resize is a hot path that needs to worry about being that efficient.
+
+Well, I guess it doesn't hurt either.
+
+Reviewed-by: John Snow <jsnow@redhat.com>
 
