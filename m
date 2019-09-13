@@ -2,58 +2,73 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9868C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 13:03:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13CE7C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 13:07:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EF0F206BB
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 13:03:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EF0F206BB
+	by mail.kernel.org (Postfix) with ESMTPS id DF441206A5
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 13:07:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF441206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8lEL-0000yZ-6m
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 09:03:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59694)
+	id 1i8lIS-0004eF-0p
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 09:07:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60811)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i8lAY-0006wX-77
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 08:59:23 -0400
+ (envelope-from <armbru@redhat.com>) id 1i8lFG-0002ZF-9j
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:04:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i8lAW-0001m6-Qs
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 08:59:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:10700)
+ (envelope-from <armbru@redhat.com>) id 1i8lFF-0005I2-7l
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:04:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33552)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1i8lAT-0001iC-U0; Fri, 13 Sep 2019 08:59:18 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i8lFF-0005Hj-2s
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:04:13 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 406F33090FCB;
- Fri, 13 Sep 2019 12:59:17 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.39])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 244095D772;
- Fri, 13 Sep 2019 12:59:13 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 13 Sep 2019 15:59:07 +0300
-Message-Id: <20190913125909.15348-2-mlevitsk@redhat.com>
-In-Reply-To: <20190913125909.15348-1-mlevitsk@redhat.com>
-References: <20190913125909.15348-1-mlevitsk@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Fri, 13 Sep 2019 12:59:17 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6231F10CC1E5;
+ Fri, 13 Sep 2019 13:04:12 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B7834410E;
+ Fri, 13 Sep 2019 13:04:06 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 47E0B113865F; Fri, 13 Sep 2019 15:04:05 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Giuseppe Lettieri <giuseppe.lettieri@unipi.it>
+References: <20190806151435.10740-1-armbru@redhat.com>
+ <20190806151435.10740-28-armbru@redhat.com>
+ <8c2a6fad-6ac1-21b1-c17c-e1bd5ac41c9f@redhat.com>
+ <87a7ckrat7.fsf@dusky.pond.sub.org>
+ <ee3709c9-f351-081a-3aeb-53b7b6036b0a@redhat.com>
+ <87imr8l0ti.fsf_-_@dusky.pond.sub.org>
+ <695325d7-a0c3-73c1-97ab-f62fb345c622@unipi.it>
+ <87blwzho1y.fsf@dusky.pond.sub.org>
+ <2fb98b77-efab-6092-dd5a-fa50c3c4b3f9@redhat.com>
+ <58e7895e-4910-4d4c-79d8-dead7de69ab7@unipi.it>
+Date: Fri, 13 Sep 2019 15:04:05 +0200
+In-Reply-To: <58e7895e-4910-4d4c-79d8-dead7de69ab7@unipi.it> (Giuseppe
+ Lettieri's message of "Mon, 2 Sep 2019 22:50:13 +0200")
+Message-ID: <87blvocpq2.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Fri, 13 Sep 2019 13:04:12 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 1/3] block/qcow2: refactoring of threaded
- encryption code
+Subject: Re: [Qemu-devel] Is network backend netmap worth keeping?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,184 +80,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, qemu-stable <qemu-stable@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. Berrange" <berrange@redhat.com>, Luigi Rizzo <rizzo@iet.unipi.it>,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+ Vincenzo Maffione <v.maffione@gmail.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Giuseppe Lettieri <g.lettieri@iet.unipi.it>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This commit tries to clarify few function arguments,
-and add comments describing the encrypt/decrypt interface
+Giuseppe Lettieri <giuseppe.lettieri@unipi.it> writes:
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- block/qcow2-cluster.c |  9 ++++---
- block/qcow2-threads.c | 62 ++++++++++++++++++++++++++++++++++---------
- block/qcow2.c         |  5 ++--
- block/qcow2.h         |  8 +++---
- 4 files changed, 61 insertions(+), 23 deletions(-)
+> Hi all,
+>
+> I have been thinking of the submodule suggestion and I have also
+> prepared a patch for it (attached). However, I am not sure about what
+> we want to achieve with it. In particular, I am not sure that the
+> option is useful for end users. The problem is that netmap, unlike
+> capstone and slirp, is a library plus a kernel module. If netmap is
+> not installed in the system, the --enable-netmap=git option will
+> successfully build qemu with netmap support, but then -netdev netmap
+> will fail at runtime.
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index f09cc992af..46b0854d7e 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -463,8 +463,8 @@ static int coroutine_fn do_perform_cow_read(BlockDriverState *bs,
- }
- 
- static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
--                                                uint64_t src_cluster_offset,
--                                                uint64_t cluster_offset,
-+                                                uint64_t guest_cluster_offset,
-+                                                uint64_t host_cluster_offset,
-                                                 unsigned offset_in_cluster,
-                                                 uint8_t *buffer,
-                                                 unsigned bytes)
-@@ -474,8 +474,9 @@ static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
-         assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
-         assert((bytes & ~BDRV_SECTOR_MASK) == 0);
-         assert(s->crypto);
--        if (qcow2_co_encrypt(bs, cluster_offset,
--                             src_cluster_offset + offset_in_cluster,
-+        if (qcow2_co_encrypt(bs,
-+                             host_cluster_offset + offset_in_cluster,
-+                             guest_cluster_offset + offset_in_cluster,
-                              buffer, bytes) < 0) {
-             return false;
-         }
-diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
-index 3b1e63fe41..9646243a9b 100644
---- a/block/qcow2-threads.c
-+++ b/block/qcow2-threads.c
-@@ -234,15 +234,15 @@ static int qcow2_encdec_pool_func(void *opaque)
- }
- 
- static int coroutine_fn
--qcow2_co_encdec(BlockDriverState *bs, uint64_t file_cluster_offset,
--                  uint64_t offset, void *buf, size_t len, Qcow2EncDecFunc func)
-+qcow2_co_encdec(BlockDriverState *bs, uint64_t host_offset,
-+                uint64_t guest_offset, void *buf, size_t len,
-+                Qcow2EncDecFunc func)
- {
-     BDRVQcow2State *s = bs->opaque;
-+
-     Qcow2EncDecData arg = {
-         .block = s->crypto,
--        .offset = s->crypt_physical_offset ?
--                      file_cluster_offset + offset_into_cluster(s, offset) :
--                      offset,
-+        .offset = s->crypt_physical_offset ? host_offset : guest_offset,
-         .buf = buf,
-         .len = len,
-         .func = func,
-@@ -251,18 +251,54 @@ qcow2_co_encdec(BlockDriverState *bs, uint64_t file_cluster_offset,
-     return qcow2_co_process(bs, qcow2_encdec_pool_func, &arg);
- }
- 
-+
-+/*
-+ * qcow2_co_encrypt()
-+ *
-+ * Encrypts one or more contiguous aligned sectors
-+ *
-+ * @host_offset - underlying storage offset of the first sector of the
-+ * data to be encrypted
-+
-+ * @guest_offset - guest (virtual) offset of the first sector of the
-+ * data to be encrypted
-+ *
-+ * @buf - buffer with the data to encrypt, that after encryption
-+ *        will be written to the underlying storage device at
-+ *        @host_offset
-+ *
-+ * @len - length of the buffer (must be a BDRV_SECTOR_SIZE multiple)
-+ *
-+ * Depending on the encryption method, @host_cluster_offset and/or @guest_offset
-+ * may be used for generating the initialization vector for
-+ * encryption.
-+ *
-+ * Note that while the whole range must be aligned on sectors, it
-+ * does not have to be aligned on clusters and can also cross cluster
-+ * boundaries
-+ *
-+ */
- int coroutine_fn
--qcow2_co_encrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
--                 uint64_t offset, void *buf, size_t len)
-+qcow2_co_encrypt(BlockDriverState *bs, uint64_t host_offset,
-+                 uint64_t guest_offset, void *buf, size_t len)
- {
--    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
--                             qcrypto_block_encrypt);
-+    return qcow2_co_encdec(bs, host_offset, guest_offset, buf, len,
-+                           qcrypto_block_encrypt);
- }
- 
-+
-+/*
-+ * qcow2_co_decrypt()
-+ *
-+ * Decrypts one or more contiguous aligned sectors
-+ * Similar to qcow2_co_encrypt
-+ *
-+ */
-+
- int coroutine_fn
--qcow2_co_decrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
--                 uint64_t offset, void *buf, size_t len)
-+qcow2_co_decrypt(BlockDriverState *bs, uint64_t host_offset,
-+                 uint64_t guest_offset, void *buf, size_t len)
- {
--    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
--                             qcrypto_block_decrypt);
-+    return qcow2_co_encdec(bs, host_offset, guest_offset, buf, len,
-+                           qcrypto_block_decrypt);
- }
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 0882ff6e92..7ec50157e0 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2065,7 +2065,8 @@ static coroutine_fn int qcow2_co_preadv_part(BlockDriverState *bs,
- 
-                 assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
-                 assert((cur_bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
--                if (qcow2_co_decrypt(bs, cluster_offset, offset,
-+                if (qcow2_co_decrypt(bs, cluster_offset + offset_in_cluster,
-+                                     offset,
-                                      cluster_data, cur_bytes) < 0) {
-                     ret = -EIO;
-                     goto fail;
-@@ -2284,7 +2285,7 @@ static coroutine_fn int qcow2_co_pwritev_part(
-             qemu_iovec_to_buf(qiov, qiov_offset + bytes_done,
-                               cluster_data, cur_bytes);
- 
--            if (qcow2_co_encrypt(bs, cluster_offset, offset,
-+            if (qcow2_co_encrypt(bs, cluster_offset + offset_in_cluster, offset,
-                                  cluster_data, cur_bytes) < 0) {
-                 ret = -EIO;
-                 goto out_unlocked;
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 998bcdaef1..a488d761ff 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -758,10 +758,10 @@ ssize_t coroutine_fn
- qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
-                     const void *src, size_t src_size);
- int coroutine_fn
--qcow2_co_encrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
--                 uint64_t offset, void *buf, size_t len);
-+qcow2_co_encrypt(BlockDriverState *bs, uint64_t host_offset,
-+                 uint64_t guest_offset, void *buf, size_t len);
- int coroutine_fn
--qcow2_co_decrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
--                 uint64_t offset, void *buf, size_t len);
-+qcow2_co_decrypt(BlockDriverState *bs, uint64_t host_offset,
-+                 uint64_t guest_offset, void *buf, size_t len);
- 
- #endif
--- 
-2.17.2
+Yes.
 
+What happens when I build with --enable-netmap=system on host A, then
+run the resulting binary on some host B that doesn't have netmap
+installed?
+
+>                       On the other end, if netmap is installed in the
+> system, using the =git option may cause qemu to be built against a
+> different, possibly incompatible version.
+
+Yes.  We default to netmap=system, though.  If you break things by
+passing arcane arguments to configure, you get to keep the pieces :)
+
+> If the option is only useful for developers to check that some qemu
+> change does not break anything, then probably it should be enabled in
+> some other, less visible way. What do you think?
+
+I think an --enable-netmap patterned after --enable-capstone and
+--enable-slirp has sufficiently low visibility as long as the default is
+sane.
+
+We clearly want configure to pick netmap=system when the system provides
+netmap.
+
+What shall configure pick when the system doesn't provide it?  If you
+think netmap=git is too dangerous for general audience, consider
+disabling netmap then.  Experts can still compile-test with
+--enable-netmap=git.  Our CI certainly should.
 
