@@ -4,46 +4,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68B38C4CEC8
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 19:55:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C8C8C4CEC8
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:03:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33C5C2053B
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 19:55:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33C5C2053B
+	by mail.kernel.org (Postfix) with ESMTPS id CE04520692
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:03:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE04520692
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8rfZ-0006Lj-Aw
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 15:55:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35863)
+	id 1i8rmj-0000WS-RX
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 16:03:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37005)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i8reo-0005kg-Jz
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 15:55:03 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i8rlI-0008Nh-Db
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:01:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i8ren-00060i-LN
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 15:55:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47890)
+ (envelope-from <jsnow@redhat.com>) id 1i8rlH-0000Dy-7F
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 16:01:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51870)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i8rek-0005wq-TF; Fri, 13 Sep 2019 15:54:59 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1i8rlE-0000C9-4R; Fri, 13 Sep 2019 16:01:40 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BE84B18CB8EF;
- Fri, 13 Sep 2019 19:54:57 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id AB3A880F83;
+ Fri, 13 Sep 2019 20:01:38 +0000 (UTC)
 Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5E942608C2;
- Fri, 13 Sep 2019 19:54:53 +0000 (UTC)
-To: Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org
-References: <20190913152507.56197-1-slp@redhat.com>
- <20190913152507.56197-2-slp@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1BC11194BB;
+ Fri, 13 Sep 2019 20:01:33 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190913105205.7581-1-philmd@redhat.com>
+ <20190913105205.7581-3-philmd@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -120,22 +121,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <f10c8f6d-5ad2-b37c-16b7-659a3f02661c@redhat.com>
-Date: Fri, 13 Sep 2019 15:54:52 -0400
+Message-ID: <965bb469-c5a0-d854-ba32-ac5485ffae1d@redhat.com>
+Date: Fri, 13 Sep 2019 16:01:32 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190913152507.56197-2-slp@redhat.com>
+In-Reply-To: <20190913105205.7581-3-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Fri, 13 Sep 2019 19:54:57 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Fri, 13 Sep 2019 20:01:38 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 1/2] blockdev: release the
- AioContext at drive_backup_prepare
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] trace: Forbid event
+ format ending with newline character
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,51 +148,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com,
- qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/13/19 11:25 AM, Sergio Lopez wrote:
-> do_drive_backup() already acquires the AioContext, so release it
-> before the call.
-> 
-> Signed-off-by: Sergio Lopez <slp@redhat.com>
+On 9/13/19 6:52 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Event format ending with newlines confuse the trace reports.
+> Forbid them.
+>=20
+> Add a check to refuse new format added with trailing newline:
+>=20
+>   $ make
+>   [...]
+>     GEN     hw/misc/trace.h
+>   Traceback (most recent call last):
+>     File "scripts/tracetool.py", line 152, in <module>
+>       main(sys.argv)
+>     File "scripts/tracetool.py", line 143, in main
+>       events.extend(tracetool.read_events(fh, arg))
+>     File "scripts/tracetool/__init__.py", line 367, in read_events
+>       event =3D Event.build(line)
+>     File "scripts/tracetool/__init__.py", line 281, in build
+>       raise ValueError("Event format can not end with a newline charact=
+er")
+>   ValueError: Error at hw/misc/trace-events:121: Event format can not e=
+nd with a newline character
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  blockdev.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
-> 
-> diff --git a/blockdev.c b/blockdev.c
-> index fbef6845c8..3927fdab80 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -1783,20 +1783,16 @@ static void drive_backup_prepare(BlkActionState *common, Error **errp)
->  
->      aio_context = bdrv_get_aio_context(bs);
->      aio_context_acquire(aio_context);
-> -
->      /* Paired with .clean() */
->      bdrv_drained_begin(bs);
+>  docs/devel/tracing.txt        | 2 ++
+>  scripts/tracetool/__init__.py | 3 +++
+>  2 files changed, 5 insertions(+)
+>=20
+> diff --git a/docs/devel/tracing.txt b/docs/devel/tracing.txt
+> index 76e492a489..8231bbf5d1 100644
+> --- a/docs/devel/tracing.txt
+> +++ b/docs/devel/tracing.txt
+> @@ -112,6 +112,8 @@ Trace events should use types as follows:
+>  Format strings should reflect the types defined in the trace event.  T=
+ake
+>  special care to use PRId64 and PRIu64 for int64_t and uint64_t types,
+>  respectively.  This ensures portability between 32- and 64-bit platfor=
+ms.
+> +Format strings must not end with a newline character.  It is the respo=
+nsibility
+> +of backends to adapt line ending for proper logging.
+> =20
+>  Each event declaration will start with the event name, then its argume=
+nts,
+>  finally a format string for pretty-printing. For example:
+> diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__=
+.py
+> index 6fca674936..57df74e67c 100644
+> --- a/scripts/tracetool/__init__.py
+> +++ b/scripts/tracetool/__init__.py
+> @@ -277,6 +277,9 @@ class Event(object):
+>          if fmt.find("%m") !=3D -1 or fmt_trans.find("%m") !=3D -1:
+>              raise ValueError("Event format '%m' is forbidden, pass the=
+ error "
+>                               "as an explicit trace argument")
+> +        if fmt.endswith("\\n\""):
+> +            raise ValueError("Event format must not end with a newline=
+ "
 
-Do we need to make this change to blockdev_backup_prepare as well?
-
-> +    aio_context_release(aio_context);
->  
->      state->bs = bs;
->  
->      state->job = do_drive_backup(backup, common->block_job_txn, &local_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
-> -        goto out;
->      }
-> -
-> -out:
-> -    aio_context_release(aio_context);
->  }
->  
->  static void drive_backup_commit(BlkActionState *common)
-> 
+It's barely worth mentioning, but you can use r"\n" for cases like this,
+if it makes it easier to read.
 
