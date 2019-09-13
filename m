@@ -2,87 +2,89 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.2 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPOOFED_FREEMAIL,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B57C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:50:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C8A3C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 21:02:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A51BB206A5
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 20:50:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NTukjVzj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A51BB206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D093420CC7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 21:02:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D093420CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8sW1-000659-Pc
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 16:50:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55783)
+	id 1i8shw-0000Tb-T1
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 17:02:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45524)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gorcunov@gmail.com>) id 1i8nji-0003D2-LX
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:43:51 -0400
+ (envelope-from <philmd@redhat.com>) id 1i8sgU-0008LV-Vh
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 17:00:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gorcunov@gmail.com>) id 1i8njh-00043E-HM
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:43:50 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:36249)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <gorcunov@gmail.com>) id 1i8njh-00042T-9f
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:43:49 -0400
-Received: by mail-lj1-x244.google.com with SMTP id r14so4495865ljn.3
- for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 08:43:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:subject:message-id:mime-version:content-disposition
- :user-agent; bh=jgKKW5aJp4Q5nX7o5nn0ll5PZTXD30muXp2gJ8hwP7c=;
- b=NTukjVzjmrIUFOCC7bDsiG1cQw6Y8Att60dfPKgKq4psGg+Lg+30dncZAY0D9cV/qe
- gA6Wu7PI8zFA1a2PexqhczATvJLs7iHcN1sTCYahuDktAYW8T0O3aDXLmP37reDH0VE8
- JkHyTu72kr2Xk5ZBxsZPTM0VsBi3vdGR1hOTAwCNhEYRPObA1q+fDbR/yVIveSgddJSK
- rEwiBVUdha0zUvGoJ7NzU/35PEKuvQ1ppCQiZ6FfwLCu8SBPcEztZ8VkUkG6b9THD6rd
- uD+qp7Y0v+7LSBSc6lx3kWgyyCxrqvmpqEcgY1/3Is3G5eV+9V8z6BiJ+IGDETGnGni+
- UOgA==
+ (envelope-from <philmd@redhat.com>) id 1i8sgQ-0004Mz-KO
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 17:00:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41196)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i8sgQ-0004L8-9W
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 17:00:46 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6F1B6793ED
+ for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 21:00:42 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id h6so11632660wrh.6
+ for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 14:00:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:subject:message-id:mime-version
- :content-disposition:user-agent;
- bh=jgKKW5aJp4Q5nX7o5nn0ll5PZTXD30muXp2gJ8hwP7c=;
- b=c0kQZGGYa005u+Tq7nZYk40Y4G+oG27aBgt9qhAPX6k9gw+t3vDvwOguhAvP/zjbAC
- J+7rMk8mVRLS0xVnDTFBYHLiA/9br6Fh/Qm7WdjNUaSmSNDF79HIOCdLe/ajekBVnlNI
- C7Nr2RmRX6FH4e7tkXVP2M0yQ22St+3LarBas7qa0ZYdCC1nEDFRUm7o5VnE43wNABWQ
- U79qzoZE4y3RHOnHSzDuA4jSgZuDQOcMPHEJ8QPUjtKhTGH8V7G/YbZAeutXJXQ3CsFQ
- 8KapIrzWXUp4G+4hUvdTMvrHYGkLSdD0mWSGuR10ypsw/u2+Vb5aTmtSKYYpBYiuU2x+
- NI+Q==
-X-Gm-Message-State: APjAAAUZIG6/UZSOz/1rhBHfn5vuz4o0v2xPtbC+CvaTFCfGcltauWdG
- FbfTuaspZLG9ExI+WTtAm5jnAPN3
-X-Google-Smtp-Source: APXvYqzbeRv2/8LLRsGy7WwxYzHCUDe4lbDrk9Eq+xOSkW5ZtSrDew6wdImIBkoCYoupRfiXasaJrg==
-X-Received: by 2002:a2e:3513:: with SMTP id z19mr31330904ljz.135.1568389427082; 
- Fri, 13 Sep 2019 08:43:47 -0700 (PDT)
-Received: from uranus.localdomain ([5.18.103.226])
- by smtp.gmail.com with ESMTPSA id o5sm7048871lfn.42.2019.09.13.08.43.45
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 13 Sep 2019 08:43:45 -0700 (PDT)
-Received: by uranus.localdomain (Postfix, from userid 1000)
- id 5FC9F460FA3; Fri, 13 Sep 2019 18:43:44 +0300 (MSK)
-Date: Fri, 13 Sep 2019 18:43:44 +0300
-From: Cyrill Gorcunov <gorcunov@gmail.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20190913154344.GH1508@uranus>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=kyqv/Y6T9sJQ2ug2lFb61NvZTGauswqC03XbHBBu0ls=;
+ b=nYvUfQmZ7STtOhjvzKm53lziJnV/MRoCIMeCOncXlB08/S4oLSg1DUtt1Za5vfErzh
+ cXgWQh3ukaZ2aDY73zKop3Blkp6ucJ35nCz2ag9Tzn3R4sDSdk2sdO5ON991r6ttQqMG
+ ONB+G3ScG9gTwmtoLsKjC5S0dEKLJCYVzD2sExbp50Dd+R2nHe0BxyKwQSvlMh1jF0Un
+ tcN7Ulxo00WFhOK6oyu61vAQ/e1KQQtNjBKgWM6N9xBeuCWGGIE2yBTObNHLiqVB5fuJ
+ I/cKslZvsnu+EZ03hiLQz4enUhvcSZ+53dotjUrtbi8ngguai57km3FI5fYFuXLjr7Bl
+ NVVA==
+X-Gm-Message-State: APjAAAUghFXbegEgsC+iyCVcoYa5/b45mmBO6PIrddahHolNIx6w+dyd
+ HXEIdwTWbjOZ7HeZsVX+ESPMuccIlpGoONqAgGV8OM6AGF9B+Y6vLX5awDLEupdJdgVwktYpPVV
+ RMwUCuu0vDnFNflk=
+X-Received: by 2002:a5d:66c5:: with SMTP id k5mr13379215wrw.304.1568408441159; 
+ Fri, 13 Sep 2019 14:00:41 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxr4krfxK6uAwSAD2CVo8PFPKB/1R2JX+EDPbVIGEJQvcl8q/vEnN81X3v9pozRuswlZFVTVw==
+X-Received: by 2002:a5d:66c5:: with SMTP id k5mr13379205wrw.304.1568408440936; 
+ Fri, 13 Sep 2019 14:00:40 -0700 (PDT)
+Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id u8sm2938692wmj.3.2019.09.13.14.00.39
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 13 Sep 2019 14:00:40 -0700 (PDT)
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20190913105205.7581-1-philmd@redhat.com>
+ <20190913105205.7581-3-philmd@redhat.com>
+ <965bb469-c5a0-d854-ba32-ac5485ffae1d@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <a5664c3e-2c83-b9fc-e3f9-5797356d6b6e@redhat.com>
+Date: Fri, 13 Sep 2019 23:00:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::244
-X-Mailman-Approved-At: Fri, 13 Sep 2019 16:47:11 -0400
-Subject: [Qemu-devel] [PATCH] error-report: Add info_report_once helper
+In-Reply-To: <965bb469-c5a0-d854-ba32-ac5485ffae1d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] trace: Forbid event
+ format ending with newline character
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,80 +96,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We already have error_report_once and warn_report_once,
-thus lets add info_report_once to complement. Actually
-I use this helper a lot so might be usefull for others.
+On 9/13/19 10:01 PM, John Snow wrote:
+> On 9/13/19 6:52 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Event format ending with newlines confuse the trace reports.
+>> Forbid them.
+>>
+>> Add a check to refuse new format added with trailing newline:
+>>
+>>   $ make
+>>   [...]
+>>     GEN     hw/misc/trace.h
+>>   Traceback (most recent call last):
+>>     File "scripts/tracetool.py", line 152, in <module>
+>>       main(sys.argv)
+>>     File "scripts/tracetool.py", line 143, in main
+>>       events.extend(tracetool.read_events(fh, arg))
+>>     File "scripts/tracetool/__init__.py", line 367, in read_events
+>>       event =3D Event.build(line)
+>>     File "scripts/tracetool/__init__.py", line 281, in build
+>>       raise ValueError("Event format can not end with a newline charac=
+ter")
+>>   ValueError: Error at hw/misc/trace-events:121: Event format can not =
+end with a newline character
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> ---
+>>  docs/devel/tracing.txt        | 2 ++
+>>  scripts/tracetool/__init__.py | 3 +++
+>>  2 files changed, 5 insertions(+)
+>>
+>> diff --git a/docs/devel/tracing.txt b/docs/devel/tracing.txt
+>> index 76e492a489..8231bbf5d1 100644
+>> --- a/docs/devel/tracing.txt
+>> +++ b/docs/devel/tracing.txt
+>> @@ -112,6 +112,8 @@ Trace events should use types as follows:
+>>  Format strings should reflect the types defined in the trace event.  =
+Take
+>>  special care to use PRId64 and PRIu64 for int64_t and uint64_t types,
+>>  respectively.  This ensures portability between 32- and 64-bit platfo=
+rms.
+>> +Format strings must not end with a newline character.  It is the resp=
+onsibility
+>> +of backends to adapt line ending for proper logging.
+>> =20
+>>  Each event declaration will start with the event name, then its argum=
+ents,
+>>  finally a format string for pretty-printing. For example:
+>> diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init_=
+_.py
+>> index 6fca674936..57df74e67c 100644
+>> --- a/scripts/tracetool/__init__.py
+>> +++ b/scripts/tracetool/__init__.py
+>> @@ -277,6 +277,9 @@ class Event(object):
+>>          if fmt.find("%m") !=3D -1 or fmt_trans.find("%m") !=3D -1:
+>>              raise ValueError("Event format '%m' is forbidden, pass th=
+e error "
+>>                               "as an explicit trace argument")
+>> +        if fmt.endswith("\\n\""):
+>> +            raise ValueError("Event format must not end with a newlin=
+e "
+>=20
+> It's barely worth mentioning, but you can use r"\n" for cases like this=
+,
+> if it makes it easier to read.
 
-Signed-off-by: Cyrill Gorcunov <gorcunov@gmail.com>
----
- include/qemu/error-report.h |   13 +++++++++++++
- util/qemu-error.c           |   20 ++++++++++++++++++++
- 2 files changed, 33 insertions(+)
+TIL Python r"" :)
 
-Index: vanilla.git/include/qemu/error-report.h
-===================================================================
---- vanilla.git.orig/include/qemu/error-report.h
-+++ vanilla.git/include/qemu/error-report.h
-@@ -47,6 +47,8 @@ bool error_report_once_cond(bool *printe
-     GCC_FMT_ATTR(2, 3);
- bool warn_report_once_cond(bool *printed, const char *fmt, ...)
-     GCC_FMT_ATTR(2, 3);
-+bool info_report_once_cond(bool *printed, const char *fmt, ...)
-+    GCC_FMT_ATTR(2, 3);
- 
- void error_init(const char *argv0);
- 
-@@ -72,6 +74,17 @@ void error_init(const char *argv0);
-                               fmt, ##__VA_ARGS__);      \
-     })
- 
-+/*
-+ * Similar to info_report(), except it prints the message just once.
-+ * Return true when it prints, false otherwise.
-+ */
-+#define info_report_once(fmt, ...)                      \
-+    ({                                                  \
-+        static bool print_once_;                        \
-+        info_report_once_cond(&print_once_,             \
-+                              fmt, ##__VA_ARGS__);      \
-+    })
-+
- const char *error_get_progname(void);
- extern bool enable_timestamp_msg;
- 
-Index: vanilla.git/util/qemu-error.c
-===================================================================
---- vanilla.git.orig/util/qemu-error.c
-+++ vanilla.git/util/qemu-error.c
-@@ -350,6 +350,26 @@ bool warn_report_once_cond(bool *printed
-     return true;
- }
- 
-+/*
-+ * Like info_report(), except print just once.
-+ * If *printed is false, print the message, and flip *printed to true.
-+ * Return whether the message was printed.
-+ */
-+bool info_report_once_cond(bool *printed, const char *fmt, ...)
-+{
-+    va_list ap;
-+
-+    assert(printed);
-+    if (*printed) {
-+        return false;
-+    }
-+    *printed = true;
-+    va_start(ap, fmt);
-+    vreport(REPORT_TYPE_INFO, fmt, ap);
-+    va_end(ap);
-+    return true;
-+}
-+
- static char *qemu_glog_domains;
- 
- static void qemu_log_func(const gchar *log_domain,
+This would be r"\n\"", right? We need to match the trailing '"'.
+Same length, not sure which string is easier to review =3D)
 
