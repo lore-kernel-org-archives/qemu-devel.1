@@ -2,68 +2,64 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCAEFC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 11:36:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BE3FC4CEC7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 11:49:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A340B20693
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 11:36:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A340B20693
+	by mail.kernel.org (Postfix) with ESMTPS id EA1AA20830
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 11:49:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA1AA20830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8jsG-0004y9-Ma
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 07:36:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46171)
+	id 1i8k4z-0000VD-GV
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 07:49:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48493)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1i8jr6-0003z6-8N
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 07:35:13 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i8k3b-0007mz-PH
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 07:48:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1i8jr5-0005HU-3p
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 07:35:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46782)
+ (envelope-from <mlevitsk@redhat.com>) id 1i8k3a-0004jK-9M
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 07:48:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59336)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1i8jqz-0005AR-EC; Fri, 13 Sep 2019 07:35:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1i8k3U-0004fM-02; Fri, 13 Sep 2019 07:48:01 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8665D3084037;
- Fri, 13 Sep 2019 11:35:04 +0000 (UTC)
-Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
- [10.33.200.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B0C05608C2;
- Fri, 13 Sep 2019 11:35:00 +0000 (UTC)
-Date: Fri, 13 Sep 2019 13:34:59 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190913113459.GE8312@dhcp-200-226.str.redhat.com>
-References: <20190816153015.447957-1-vsementsov@virtuozzo.com>
- <20190816153015.447957-4-vsementsov@virtuozzo.com>
- <20190913100146.GC8312@dhcp-200-226.str.redhat.com>
- <d6ca4ea6-2939-4d0f-c6f6-ff32a337de01@virtuozzo.com>
- <40620e71-a5e0-b955-d310-eef14ad3871c@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="32u276st3Jlj2kUU"
-Content-Disposition: inline
-In-Reply-To: <40620e71-a5e0-b955-d310-eef14ad3871c@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 13 Sep 2019 11:35:04 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 330058A1C94;
+ Fri, 13 Sep 2019 11:47:57 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.39])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 924965C207;
+ Fri, 13 Sep 2019 11:47:55 +0000 (UTC)
+Message-ID: <a5d1b02b9c2fb4b1500a55837f3c021dba4d05f2.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Date: Fri, 13 Sep 2019 14:47:54 +0300
+In-Reply-To: <cd6879cf-222d-ea48-0bb7-49d0fc455374@redhat.com>
+References: <20190910124136.10565-1-mreitz@redhat.com>
+ <20190910124136.10565-7-mreitz@redhat.com>
+ <b3a81eca84577a0524bd1be8366852e2801a65f1.camel@redhat.com>
+ <cd6879cf-222d-ea48-0bb7-49d0fc455374@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Fri, 13 Sep 2019 11:47:57 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 3/5] block/qcow2: refactor
- qcow2_co_preadv_part
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 6/7] curl: Handle success
+ in multi_check_completion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,95 +71,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---32u276st3Jlj2kUU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Am 13.09.2019 um 13:06 hat Max Reitz geschrieben:
-> On 13.09.19 12:53, Vladimir Sementsov-Ogievskiy wrote:
-> > 13.09.2019 13:01, Kevin Wolf wrote:
-> >> Am 16.08.2019 um 17:30 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >>> Further patch will run partial requests of iterations of
-> >>> qcow2_co_preadv in parallel for performance reasons. To prepare for
-> >>> this, separate part which may be parallelized into separate function
-> >>> (qcow2_co_preadv_task).
-> >>>
-> >>> While being here, also separate encrypted clusters reading to own
-> >>> function, like it is done for compressed reading.
-> >>>
-> >>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> >>> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> >>> ---
-> >>>   qapi/block-core.json |   2 +-
-> >>>   block/qcow2.c        | 205 +++++++++++++++++++++++-----------------=
----
-> >>>   2 files changed, 111 insertions(+), 96 deletions(-)
-> >>>
-> >>> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> >>> index 0d43d4f37c..dd80aa11db 100644
-> >>> --- a/qapi/block-core.json
-> >>> +++ b/qapi/block-core.json
-> >>> @@ -3266,7 +3266,7 @@
-> >>>               'pwritev_rmw_tail', 'pwritev_rmw_after_tail', 'pwritev',
-> >>>               'pwritev_zero', 'pwritev_done', 'empty_image_prepare',
-> >>>               'l1_shrink_write_table', 'l1_shrink_free_l2_clusters',
-> >>> -            'cor_write', 'cluster_alloc_space', 'none'] }
-> >>> +            'cor_write', 'cluster_alloc_space', 'none', 'read_encryp=
-ted'] }
-> >>
-> >> What's the point of this new blkdebug event?
-> >>
-> >> Obviously, read_aio for an encrypted image must mean a read of encrypt=
-ed
-> >> data. The same image can never trigger both read_aio and
-> >> read_encrypted, so why do we need to distinguish them as two different
-> >> events?
-> >>
+On Fri, 2019-09-13 at 13:20 +0200, Max Reitz wrote:
+> On 10.09.19 18:13, Maxim Levitsky wrote:
+> > On Tue, 2019-09-10 at 14:41 +0200, Max Reitz wrote:
+> > > Background: As of cURL 7.59.0, it verifies that several functions a=
+re
+> > > not called from within a callback.  Among these functions is
+> > > curl_multi_add_handle().
+> > >=20
+> > > curl_read_cb() is a callback from cURL and not a coroutine.  Waking=
+ up
+> > > acb->co will lead to entering it then and there, which means the cu=
+rrent
+> > > request will settle and the caller (if it runs in the same coroutin=
+e)
+> > > may then issue the next request.  In such a case, we will enter
+> > > curl_setup_preadv() effectively from within curl_read_cb().
+> > >=20
+> > > Calling curl_multi_add_handle() will then fail and the new request =
+will
+> > > not be processed.
+> > >=20
+> > > Fix this by not letting curl_read_cb() wake up acb->co.  Instead, l=
+eave
+> > > the whole business of settling the AIOCB objects to
+> > > curl_multi_check_completion() (which is called from our timer callb=
+ack
+> > > and our FD handler, so not from any cURL callbacks).
+> > >=20
+> > > Reported-by: Natalie Gavrielov <ngavrilo@redhat.com>
+> > > Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1740193
+> > > Cc: qemu-stable@nongnu.org
+> > > Signed-off-by: Max Reitz <mreitz@redhat.com>
+> > > ---
+> > >  block/curl.c | 69 ++++++++++++++++++++++--------------------------=
+----
+> > >  1 file changed, 29 insertions(+), 40 deletions(-)
+> > >=20
+> > > diff --git a/block/curl.c b/block/curl.c
+> > > index fd70f1ebc4..c343c7ed3d 100644
+> > > --- a/block/curl.c
+> > > +++ b/block/curl.c
+> > > @@ -229,7 +229,6 @@ static size_t curl_read_cb(void *ptr, size_t si=
+ze, size_t nmemb, void *opaque)
+> > >  {
+> > >      CURLState *s =3D ((CURLState*)opaque);
+> > >      size_t realsize =3D size * nmemb;
+> > > -    int i;
+> > > =20
+> > >      trace_curl_read_cb(realsize);
+> > > =20
+> > > @@ -245,32 +244,6 @@ static size_t curl_read_cb(void *ptr, size_t s=
+ize, size_t nmemb, void *opaque)
+> > >      memcpy(s->orig_buf + s->buf_off, ptr, realsize);
+> > >      s->buf_off +=3D realsize;
+> > > =20
+> > > -    for(i=3D0; i<CURL_NUM_ACB; i++) {
+> > > -        CURLAIOCB *acb =3D s->acb[i];
+> > > -
+> > > -        if (!acb)
+> > > -            continue;
+> > > -
+> > > -        if ((s->buf_off >=3D acb->end)) {
+> > > -            size_t request_length =3D acb->bytes;
+> > > -
+> > > -            qemu_iovec_from_buf(acb->qiov, 0, s->orig_buf + acb->s=
+tart,
+> > > -                                acb->end - acb->start);
+> > > -
+> > > -            if (acb->end - acb->start < request_length) {
+> > > -                size_t offset =3D acb->end - acb->start;
+> > > -                qemu_iovec_memset(acb->qiov, offset, 0,
+> > > -                                  request_length - offset);
+> > > -            }
+> > > -
+> > > -            acb->ret =3D 0;
+> > > -            s->acb[i] =3D NULL;
+> > > -            qemu_mutex_unlock(&s->s->mutex);
+> > > -            aio_co_wake(acb->co);
+> > > -            qemu_mutex_lock(&s->s->mutex);
+> > > -        }
+> > > -    }
+> > > -
+> > >  read_end:
+> > >      /* curl will error out if we do not return this value */
+> > >      return size * nmemb;
+> > > @@ -351,13 +324,14 @@ static void curl_multi_check_completion(BDRVC=
+URLState *s)
+> > >              break;
+> > > =20
+> > >          if (msg->msg =3D=3D CURLMSG_DONE) {
+> > > +            int i;
+> > >              CURLState *state =3D NULL;
+> > > +            bool error =3D msg->data.result !=3D CURLE_OK;
+> > > +
+> > >              curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE,
+> > >                                (char **)&state);
+> > > =20
+> > > -            /* ACBs for successful messages get completed in curl_=
+read_cb */
+> > > -            if (msg->data.result !=3D CURLE_OK) {
+> > > -                int i;
+> > > +            if (error) {
+> > >                  static int errcount =3D 100;
+> > > =20
+> > >                  /* Don't lose the original error message from curl=
+, since
+> > > @@ -369,20 +343,35 @@ static void curl_multi_check_completion(BDRVC=
+URLState *s)
+> > >                          error_report("curl: further errors suppres=
+sed");
+> > >                      }
+> > >                  }
+> > > +            }
+> > > =20
+> > > -                for (i =3D 0; i < CURL_NUM_ACB; i++) {
+> > > -                    CURLAIOCB *acb =3D state->acb[i];
+> > > +            for (i =3D 0; i < CURL_NUM_ACB; i++) {
+> > > +                CURLAIOCB *acb =3D state->acb[i];
+> > > =20
+> > > -                    if (acb =3D=3D NULL) {
+> > > -                        continue;
+> > > -                    }
+> > > +                if (acb =3D=3D NULL) {
+> > > +                    continue;
+> > > +                }
+> > > +
+> > > +                if (!error) {
+> > > +                    /* Assert that we have read all data */
+> > > +                    assert(state->buf_off >=3D acb->end);
+> > > +
+> > > +                    qemu_iovec_from_buf(acb->qiov, 0,
+> > > +                                        state->orig_buf + acb->sta=
+rt,
+> > > +                                        acb->end - acb->start);
+> > > =20
+> > > -                    acb->ret =3D -EIO;
+> > > -                    state->acb[i] =3D NULL;
+> > > -                    qemu_mutex_unlock(&s->mutex);
+> > > -                    aio_co_wake(acb->co);
+> > > -                    qemu_mutex_lock(&s->mutex);
+> > > +                    if (acb->end - acb->start < acb->bytes) {
+> > > +                        size_t offset =3D acb->end - acb->start;
+> > > +                        qemu_iovec_memset(acb->qiov, offset, 0,
+> > > +                                          acb->bytes - offset);
+> > > +                    }
 > >=20
-> > Seems I just done it looking at qcow2_co_preadv_compressed..
+> > Original code was memsetting the tail of the buffer before waking up =
+the coroutine.
+> > Is this change intended?
 > >=20
-> > Anyway, I think you are right, so, I don't mind if Max drops this new e=
-vent
-> > and use read_aio in his branch, or I can resend the series or send a fo=
-llow-up,
-> > whichever you prefer.
+> > aio_co_wake doesn't enter the co-routine if already in coroutine, but
+> > I think that this is an aio fd handler with isn't run in co-routine i=
+tself,
+> > so the callback could run with not yet ready data.
 >=20
-> Should I squash this in?
+> (Sorry, I don=E2=80=99t know why I forgot to reply.)
+>=20
+> I don=E2=80=99t see how anything changes.  aio_co_wake() is still calle=
+d after
+> the qemu_iovec_memset().
+Oops, in this specific areas of the patch, I totally missed the diff mark=
+ers.
 
-Looks good to me.
+So,
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 
---32u276st3Jlj2kUU
-Content-Type: application/pgp-signature; name="signature.asc"
+Best regards,
+	Maxim Levitsky
 
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJde37jAAoJEH8JsnLIjy/W4kAP/i/WKjJ7dTsmT5i4gDes/Rv2
-yV9nhkKy9t2VWhlVGO5kl8ddsMRrxmD1QODsuQApJX3mphaZ5Mg56DpRGPBp32LL
-x6zxMcN0iHNILhq4E+79Z/mdPNYkYm3V7nZZmnQBiszajUuNYXObzP85+OOBVpDG
-6V2i5PXMmyB7hxPz5qXEqyTTIP3km2y8uNjuSUZcOLByMxVeIpQBWFGQYifPe18O
-xJ4yp7QakiaJ2KQpAO23n8eGsdBi5O2Bxfw7QbJKJ7XA4pQcxqLBhmCcG9JM5cnA
-MRrvajQcQmwKl/A7QHsL32+nvCPKdUaKm/33eHz/ZKJUC/Xmax74XSdNGRO8/hj0
-D+tbseGxGbZrBs1dfAu5q831hHlvuP/tqSAuz/41BdC/dp1xN592yssurhIfULON
-wShejz5lAUjry31WRrkrdBWsQyrRy8YxA/M0RYY7cL3uxf17UovQ+QaAFHMdTrJP
-1j1FcWVJfA5hl/pYv3uJE0s+G94CPNjRGJ4xtEzMTHOzBPk0DJ+HlsPQN71eA9If
-lvrX1xQiwv/U+3PG9emMUYQmOxMfljvAswAdcBR/EFRnSZJGJx8XbKjtj19Nf49V
-rsfFCqb5UPgFyCE7R+tNo5HMwm/OKLanjcOImd5pVvc/0W4kSGTQDHsawkarhx4f
-pjWIOK+GrInqJKGjCP9g
-=IZmg
------END PGP SIGNATURE-----
-
---32u276st3Jlj2kUU--
 
