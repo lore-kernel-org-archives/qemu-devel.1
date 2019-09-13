@@ -6,82 +6,84 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23848C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 11:03:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F4E8C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 11:06:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC00820830
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 11:03:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC00820830
+	by mail.kernel.org (Postfix) with ESMTPS id 16A3020830
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 11:06:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16A3020830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8jMI-00061i-Ot
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 07:03:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41603)
+	id 1i8jOy-00088P-9M
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 07:06:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42079)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i8jKz-000588-99
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 07:02:02 -0400
+ (envelope-from <philmd@redhat.com>) id 1i8jOI-0007iX-Jr
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 07:05:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i8jKy-0005iI-CQ
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 07:02:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46568)
+ (envelope-from <philmd@redhat.com>) id 1i8jOH-0007sE-8V
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 07:05:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47154)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i8jKy-0005hP-79
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 07:02:00 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i8jOH-0007ri-3S
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 07:05:25 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 399504FCDA
- for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 11:01:59 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id f63so1187432wma.7
- for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 04:01:59 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 03AB4356F9
+ for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 11:05:24 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id v18so280324wro.16
+ for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 04:05:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=U+/yDAIEQdjSUuPEqM/3Ahpv5JaD1YKojO1Ki8uJkGc=;
- b=F6ut5S5QafIHlgs672hu/P1S5NcGs484qkpAjRNwiXmsRn1aV5098JvNDUQ3kqCHY2
- wE6kUTgcmWbbASWn1DNYujdCeFasY1mdpu8c2COzKN4JyZj/4qGxclrlIUkx06vZENBq
- gSx6IZRiRn+O7SgEBO1b9/VSaMfYGiEn90f1E4whdQG5LUd+O+EbtofNYURxHARO0XWR
- MX/+pPnnKMR8qJiH/2/TksIkjA4uEyHGkMqr7Gj1JNMEZzIoLQjn3afm/bC2wsfvp+5U
- sojHHdVinc2JicCq//5sbqSOslPd5MUPeeWubVb6Q3zLkCaiMsuIA2VtXQD+0ceFTdcp
- o/wg==
-X-Gm-Message-State: APjAAAUzzNR4bjZiU4GpylYIWfsXXElmTlYn3es7tNiwnVkYZ6olh0Xr
- 9e7gYopQbvK0nwxriXRsimeCc/64Lbi0VU8NrPreYSrbGZGY/LDC7cONkPlTPLMCXs7ohiy070b
- Pz++PqhKbzZLNTlw=
-X-Received: by 2002:adf:ee45:: with SMTP id w5mr37711611wro.246.1568372518024; 
- Fri, 13 Sep 2019 04:01:58 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzkLVbJ6rAK4c6BdsFBvREDMN9HTH/X1oy9G2ain0xnhZ2N5pFDTyFwTAxM0t5ez5SwBV9/Jg==
-X-Received: by 2002:adf:ee45:: with SMTP id w5mr37711596wro.246.1568372517823; 
- Fri, 13 Sep 2019 04:01:57 -0700 (PDT)
+ bh=pTJupkw/xHBw7sJqgCBqgHMXtALvOeZ3ZLZ968/cVRw=;
+ b=i1fzByEk/iM6bIuPxMBwncaKQb+UDggrR7kwXVqL7f9AdiZ7cqm51vVK4ZNpUqM9F+
+ 7uzYwLoRXa1mI3WEmZMq4Y8Sj4Ygj72/wy9uQGkzEs8vMPuy8tlDbkUZCHcK5MXnM4AF
+ GcKouuxuqYVHnyxrw6UBWf2IjAEmFC85jkJOvP9h7b9rbWEqR7/egCNweksAZmNxF7AP
+ nEmwbRj6CyG4kE/ofY5H8iAh+4zeYUV09VDvGA8BZo222BmD2f4Y//bTd3xd3w4GWV2o
+ sJg/rwRUJL/DaxnGL3gHs32vRXL1u2001y0iqWSs+bbelJUphtiRAegePy5qXPNx4L+S
+ 2gTw==
+X-Gm-Message-State: APjAAAWbHR6Hq3Re97YXAqOf2o0NdbaNoQlajflSGLaGutdL0mLwbhmr
+ xdZPOg/MUpvMU0g+fzldLEzLdAW3mD4egEY1hxQ+ckUOZN5wAPozwSkBatclm0aifMYYnlgelLf
+ WMFfJ4Xsbn0qqtt4=
+X-Received: by 2002:a05:600c:224d:: with SMTP id
+ a13mr2875339wmm.45.1568372722827; 
+ Fri, 13 Sep 2019 04:05:22 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxPqnOWy8rCTyyl1RtpoEdNUReeHD76Odh5PjinfYY2BB6juwtxv2ekhwf3JTX6ItcBggYGJA==
+X-Received: by 2002:a05:600c:224d:: with SMTP id
+ a13mr2875320wmm.45.1568372722661; 
+ Fri, 13 Sep 2019 04:05:22 -0700 (PDT)
 Received: from [192.168.1.41] (251.red-88-10-102.dynamicip.rima-tde.net.
  [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id r28sm36374905wrr.94.2019.09.13.04.01.56
+ by smtp.gmail.com with ESMTPSA id v64sm2406488wmf.12.2019.09.13.04.05.21
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 13 Sep 2019 04:01:57 -0700 (PDT)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190912183058.17947-1-richard.henderson@linaro.org>
+ Fri, 13 Sep 2019 04:05:22 -0700 (PDT)
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20190912184607.3507-1-eblake@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <cdabfdcd-a7e2-fefb-3e35-a05c3b593dcf@redhat.com>
-Date: Fri, 13 Sep 2019 13:01:56 +0200
+Message-ID: <3669d4b7-a0af-60a4-e519-e4bcfb033460@redhat.com>
+Date: Fri, 13 Sep 2019 13:05:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190912183058.17947-1-richard.henderson@linaro.org>
+In-Reply-To: <20190912184607.3507-1-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Fix sign-extension for SMLAL*
+Subject: Re: [Qemu-devel] [PATCH] build: Don't ignore qapi-visit-core.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,39 +95,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent.desnogues@gmail.com, peter.maydell@linaro.org
+Cc: Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/12/19 8:30 PM, Richard Henderson wrote:
-> The 32-bit product should be sign-extended, not zero-extended.
+On 9/12/19 8:46 PM, Eric Blake wrote:
+> This file is version-controlled, and not generated from a .json file.
 >=20
-> Fixes: ea96b374641b
-> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Fixes: bf582c3461b
+> Reported-by: Thomas Huth <thuth@redhat.com>
+
+Good catch!
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
->  target/arm/translate.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  .gitignore | 1 +
+>  1 file changed, 1 insertion(+)
 >=20
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 34bb280e3d..fd2f0e3048 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -8045,7 +8045,9 @@ static bool op_smlaxxx(DisasContext *s, arg_rrrr =
-*a,
->      case 2:
->          tl =3D load_reg(s, a->ra);
->          th =3D load_reg(s, a->rd);
-> -        t1 =3D tcg_const_i32(0);
-> +        /* Sign-extend the 32-bit product to 64 bits.  */
-> +        t1 =3D tcg_temp_new_i32();
-> +        tcg_gen_sari_i32(t1, t0, 31);
->          tcg_gen_add2_i32(tl, th, tl, th, t0, t1);
->          tcg_temp_free_i32(t0);
->          tcg_temp_free_i32(t1);
+> diff --git a/.gitignore b/.gitignore
+> index e9bbc006d39e..7de868d1eab4 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -41,6 +41,7 @@
+>  /qapi/qapi-types-*.[ch]
+>  /qapi/qapi-types.[ch]
+>  /qapi/qapi-visit-*.[ch]
+> +!/qapi/qapi-visit-core.c
+>  /qapi/qapi-visit.[ch]
+>  /qapi/qapi-doc.texi
+>  /qemu-doc.html
 >=20
 
