@@ -2,50 +2,51 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64F10C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 11:11:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B95C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 11:14:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C42320678
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 11:11:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C42320678
+	by mail.kernel.org (Postfix) with ESMTPS id CBF5920830
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 11:14:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBF5920830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42503 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8jTo-0003Bw-Eg
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 07:11:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42833)
+	id 1i8jWj-0004RW-Um
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 07:14:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43126)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i8jT6-0002hb-4L
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 07:10:25 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i8jW2-0003wH-Mk
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 07:13:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i8jT4-0002Xg-Vk
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 07:10:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:29089)
+ (envelope-from <mreitz@redhat.com>) id 1i8jW1-000554-6s
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 07:13:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37170)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i8jSz-0002SZ-UH; Fri, 13 Sep 2019 07:10:18 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1i8jVy-00052N-HF; Fri, 13 Sep 2019 07:13:22 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EA791309174E;
- Fri, 13 Sep 2019 11:10:15 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 73185A26660;
+ Fri, 13 Sep 2019 11:13:21 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-116-81.ams2.redhat.com
  [10.36.116.81])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0ECB4600CE;
- Fri, 13 Sep 2019 11:10:07 +0000 (UTC)
-To: Sergio Lopez <slp@redhat.com>
-References: <20190912161624.40886-1-slp@redhat.com>
- <3ceab9a7-e002-a33e-d996-8c4fba374ece@redhat.com> <87v9twwn8r.fsf@redhat.com>
- <26ff362d-10a8-bcca-0b05-a4d51e88ad37@redhat.com> <87tv9gwlgi.fsf@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 91BD560600;
+ Fri, 13 Sep 2019 11:13:19 +0000 (UTC)
+To: ronnie sahlberg <ronniesahlberg@gmail.com>
+References: <20190910154110.6905-1-pl@kamp.de>
+ <20190910154110.6905-3-pl@kamp.de>
+ <e2b37e13-ef22-4a16-38e5-3866e7d5409a@redhat.com>
+ <CAN05THTY99Zj84LerBurGsHJDZToiYkhXvM=0eoL4SOHYUf=qw@mail.gmail.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -72,22 +73,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <a98204a6-abb3-342d-bfff-ed10b69bbc98@redhat.com>
-Date: Fri, 13 Sep 2019 13:10:05 +0200
+Message-ID: <478d0923-a502-c96a-bcfe-49b9e742b5be@redhat.com>
+Date: Fri, 13 Sep 2019 13:13:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <87tv9gwlgi.fsf@redhat.com>
+In-Reply-To: <CAN05THTY99Zj84LerBurGsHJDZToiYkhXvM=0eoL4SOHYUf=qw@mail.gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="RIMkdhUiTlgXgGu4VRu24YjVmRAxpGlJD"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Fri, 13 Sep 2019 11:10:15 +0000 (UTC)
+ boundary="Oae0sECOFgbl9MmtU4yymbR8G0XxV8Rfl"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Fri, 13 Sep 2019 11:13:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] blockdev: avoid acquiring AioContext lock
- twice at do_drive_backup()
+Subject: Re: [Qemu-devel] [PATCH V2 2/2] block/nfs: add support for
+ nfs_umount
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,148 +100,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- armbru@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Lieven <pl@kamp.de>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ "open list:Block layer core" <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RIMkdhUiTlgXgGu4VRu24YjVmRAxpGlJD
-Content-Type: multipart/mixed; boundary="qfP6Tk9A0QyAIva2jI5xm2htQJF4pasYn";
+--Oae0sECOFgbl9MmtU4yymbR8G0XxV8Rfl
+Content-Type: multipart/mixed; boundary="MrM4O78pldliqPIZ0DCBlPszGhyAGg9YB";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
-To: Sergio Lopez <slp@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com,
- armbru@redhat.com
-Message-ID: <a98204a6-abb3-342d-bfff-ed10b69bbc98@redhat.com>
-Subject: Re: [PATCH] blockdev: avoid acquiring AioContext lock twice at
- do_drive_backup()
-References: <20190912161624.40886-1-slp@redhat.com>
- <3ceab9a7-e002-a33e-d996-8c4fba374ece@redhat.com> <87v9twwn8r.fsf@redhat.com>
- <26ff362d-10a8-bcca-0b05-a4d51e88ad37@redhat.com> <87tv9gwlgi.fsf@redhat.com>
-In-Reply-To: <87tv9gwlgi.fsf@redhat.com>
+To: ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc: Peter Lieven <pl@kamp.de>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <478d0923-a502-c96a-bcfe-49b9e742b5be@redhat.com>
+Subject: Re: [PATCH V2 2/2] block/nfs: add support for nfs_umount
+References: <20190910154110.6905-1-pl@kamp.de>
+ <20190910154110.6905-3-pl@kamp.de>
+ <e2b37e13-ef22-4a16-38e5-3866e7d5409a@redhat.com>
+ <CAN05THTY99Zj84LerBurGsHJDZToiYkhXvM=0eoL4SOHYUf=qw@mail.gmail.com>
+In-Reply-To: <CAN05THTY99Zj84LerBurGsHJDZToiYkhXvM=0eoL4SOHYUf=qw@mail.gmail.com>
 
---qfP6Tk9A0QyAIva2jI5xm2htQJF4pasYn
+--MrM4O78pldliqPIZ0DCBlPszGhyAGg9YB
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 13.09.19 12:15, Sergio Lopez wrote:
+On 13.09.19 12:09, ronnie sahlberg wrote:
+> On Wed, Sep 11, 2019 at 5:48 PM Max Reitz <mreitz@redhat.com> wrote:
+>>
+>> On 10.09.19 17:41, Peter Lieven wrote:
+>>> libnfs recently added support for unmounting. Add support
+>>> in Qemu too.
+>>>
+>>> Signed-off-by: Peter Lieven <pl@kamp.de>
+>>> ---
+>>>  block/nfs.c | 3 +++
+>>>  1 file changed, 3 insertions(+)
+>>>
+>>> diff --git a/block/nfs.c b/block/nfs.c
+>>> index 2c98508275..f39acfdb28 100644
+>>> --- a/block/nfs.c
+>>> +++ b/block/nfs.c
+>>> @@ -398,6 +398,9 @@ static void nfs_client_close(NFSClient *client)
+>>>              nfs_close(client->context, client->fh);
+>>>              client->fh =3D NULL;
+>>>          }
+>>> +#ifdef LIBNFS_FEATURE_UMOUNT
+>>> +        nfs_umount(client->context);
+>>> +#endif
+>>>          nfs_destroy_context(client->context);
+>>>          client->context =3D NULL;
+>>>      }
+>>
+>> I don=E2=80=99t understand what unmounting means in this context.  Is =
+it just
+>> generic clean-up for NFSv3 (it appears that it=E2=80=99s a no-op for N=
+FSv4)?
+>> Why isn=E2=80=99t that done by nfs_destroy_context()?
 >=20
-> Max Reitz <mreitz@redhat.com> writes:
+> Umount is weird since there isn't actually any state in NFSv3 and
+> "mounting" in nfsv3 is really just a matter of converting the path to
+> be mounted into a filehandle.
+> That is all the mount protocol is really used for.
 >=20
->> On 13.09.19 11:37, Sergio Lopez wrote:
->>>
->>> Max Reitz <mreitz@redhat.com> writes:
->>>
->>>> On 12.09.19 18:16, Sergio Lopez wrote:
->>>>> do_drive_backup() acquires the AioContext lock of the corresponding=
-
->>>>> BlockDriverState. This is not a problem when it's called from
->>>>> qmp_drive_backup(), but drive_backup_prepare() also acquires the lo=
-ck
->>>>> before calling it.
->>>>>
->>>>> This change adds a BlockDriverState argument to do_drive_backup(),
->>>>> which is used to signal that the context lock is already acquired a=
-nd
->>>>> to save a couple of redundant calls.
->>>>
->>>> But those redundant calls don=E2=80=99t really hurt (it=E2=80=99s ju=
-st bdrv_lookup_bs(),
->>>> as far as I can tell).  Wouldn=E2=80=99t it be simpler to just relea=
-se the
->>>> context lock in drive_backup_prepare() before calling do_drive_backu=
-p()?
->>>>  The BDS is drained anyway.
->>>
->>> Redundant calls rarely hurt, they're just redundant ;-)
->>
->> If they=E2=80=99re expensive and in a hot path, they hurt.
->>
->>>> On top of that, do_backup_common() calls bdrv_try_set_aio_context() =
-to
->>>> bring the target into the source=E2=80=99s AioContext.  However, thi=
-s function
->>>> must be called with the old AioContext held, and the new context not=
- held.
->>>
->>> Is this documented somewhere? I see nothing in the function declarati=
-on
->>> nor definition.
->>>
->>> I'm starting to get the feeling that the block layer is riddled with
->>> unwritten rules and assumptions that makes every change a lot harder
->>> than it should be.
->>
->> It is written, it=E2=80=99s just that it=E2=80=99s written in
->> bdrv_set_aio_context_ignore()=E2=80=99s definition.
->>
->> Yes, we should document it directly for bdrv_try_set_aio_context(), to=
-o,
->> because that=E2=80=99s what external callers are much more likely to u=
-se.
->>
->>>> Currently, it=E2=80=99s called exactly the other way around: With th=
-e new
->>>> context held, but the old one not held.
->>>>
->>>> So I think it indeed actually makes more sense to release the AioCon=
-text
->>>> before calling do_drive_backup(), and to move the
->>>> bdrv_try_set_aio_context() call for target_bs to the callers of
->>>> do_backup_common() (where they have not yet taken the AioContext loc=
-k).
->>>
->>> OK. I see this also happens in external_snapshot_prepare() and
->>> qmp_drive_mirror() too. I guess we should fix these too.
->>>
->>> In qmp_drive_mirror(), would it be safe to delay the acquisition of a=
-ny
->>> context until just before the blockdev_mirror_common()?
->>
->> From mirror=E2=80=99s perspective I think so, but I don=E2=80=99t thin=
-k it=E2=80=99s safe to
->> access any of a BDS=E2=80=99s fields without having acquired its AioCo=
-ntext.
->> (In fact, I wonder whether we should acquire the context even before
->> bdrv_op_is_blocked()...)
+> This is all handled in a separate protocol/server called rpc.mountd
+> that is separate from NFSd. Running as a different process and
+> listening to a different port.
+> And the only purpose of rpc.mountd is to take a path to a share and
+> return a nfsv3 filehandle to the root of that path.
+> As a side-effect, rpc.mountd also keeps track of which clients have
+> called MNT but not yet UMNT and thus showmount -a
+> can give a lost of all client that have "mounted" the share but not
+> yet called "UMNT".
 >=20
-> In that case, I wonder if we can safely release the context to honor
-> bdrv_try_set_aio_context() requirements, knowing we aren't in a drained=
+> It has no effect at all on NFSv3 and is purely cosmetic. This ONLY
+> affects "showmount -a" output.
+> NFSv4 does away with all these separate protocols such as mount,
+> statd, nlm and even portmapper
+> so there is not even a concept of showmount -a for nfsv4.
+>=20
+>=20
+> As the libnfs maintainer, why did I do nfs_umount() the way I did?
+> First of all, I think of nfs UMNT as really just cosmetic and didn't
+> want to put too much work into it. But people wanted it.
+>=20
+> I implemented it as a sync function since I think few people would
+> actually use it at all and it meant that I just didn't have to invest
+> in having to build an async piupelinje.
+>=20
+> I did NOT implement it inside nfs_destroy_context() since that
+> function is supposed to be, in my view, non-blocking andn should just
+> tear the connection and immediately return.
+> As unmount would be
+> * close the tcp socket to the nfs server
+> * open new socket to portmapper and ask "where is rpc.mountd"
+> * close socket to portmapper, then open new socket to rpc.mountd
+>  * tell rpc.mountd to remove us from the showmount -a list
+> * close socket
+>=20
+> I just took the cheap and easy path. Do it as a sync function with my
+> own eventloop.
+>=20
+> Again, UMNT has no real effect on anything related to NFS except what
+> showmount -a will return. That is one big reason why
+> I was just not much motivated enough to build it as an async function.
+>=20
+> Once we all switch to NFSv4 this will all be moot since the MOUNT
+> protocol no longer exists and neither does rpc.mountd.
 
-> section.
-
-Hm.  I suppose it depends.  From the main context, it is OK to access
-all fields that only the main context accesses.  So
-bdrv_try_set_aio_context() should be safe because they do that.
-
-I suppose the same goes for bdrv_op_is_blocked(), because op blockers
-are only set up or removed in the main context.  So it should be safe as
-it is after all.
+OK.  Thanks a lot for the detailed explanation! :-)
 
 Max
 
 
---qfP6Tk9A0QyAIva2jI5xm2htQJF4pasYn--
+--MrM4O78pldliqPIZ0DCBlPszGhyAGg9YB--
 
---RIMkdhUiTlgXgGu4VRu24YjVmRAxpGlJD
+--Oae0sECOFgbl9MmtU4yymbR8G0XxV8Rfl
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl17eQ0ACgkQ9AfbAGHV
-z0ClSAf/Se03aI+WqjgfBZW5HZ7eP4+yjlmZaPp+7KwciQD8yRxSxRTMD1FbKTGa
-xBwsf3pZUoCd40xFPe2+bNdgO8RrLCH3DRyj5NOvInNbem4EQbuIOfa2gC2zq6MO
-L9rk3DNLfIzDLLh4mf3jmQnCzwwsYR3gzXkF5f9ZdZXnj1IY/vqbvD02hEC7SvTx
-T8UToCqAjOqBpMg6UXVow8iP/xrCz20W9YkP8Nx4rC4+WJBvIM36lyuLHDBZcfxi
-XdifVY90hyHLc0cvIiLN1MbHRELZbhWZbs7Ovx/IJxFbWrHIPb2yhJB7c2tXsEDo
-n/tDZYAb4lgjgIclhh5pqfn2VK4c+Q==
-=XKkT
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl17ec0ACgkQ9AfbAGHV
+z0Ar7Af+NQtaOjhrGDV8+aOZmssh5w9BtpletDfumo26J9/eu8Abw5MzETmLHUiH
+IQXP792RP00v618ws8BeyePANeufcAbQ1h0M7oC6byfxfXU/WeKKISBQy5kw3Ugc
+AjTZq0Jr+7GZqPNQjxE41TEANdJo/5crGHRTNdWF8sblNcIvPw7pVpVpHn4sf/2t
+TUo3dhTNBekrN1PVK5Is7ybDSsm9APXw9DivebRNBNeL27pXdilHXZnPK+6Pp74Z
+74HKJyZ2e8BmNrz+cX2sDN62nJ1BsgzgTKBxNXQBllWMEbszTZUu5Q6kxxBRw7iL
+TGQ5ollhrT6nNIIz4zco8mqzt3CeJg==
+=zvTI
 -----END PGP SIGNATURE-----
 
---RIMkdhUiTlgXgGu4VRu24YjVmRAxpGlJD--
+--Oae0sECOFgbl9MmtU4yymbR8G0XxV8Rfl--
 
