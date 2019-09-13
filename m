@@ -2,118 +2,142 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14085C4CEC8
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 18:26:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB0A0C4CECA
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 18:31:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3C46206A5
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 18:26:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="tBSDHAHw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3C46206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 80F7D2054F
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 18:31:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80F7D2054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8qHQ-0004Nw-RA
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 14:26:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50820)
+	id 1i8qLh-000650-Iq
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 14:31:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51408)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i8qGf-0003sG-Mw
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 14:26:03 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i8qKj-0005Rb-3d
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 14:30:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i8qGe-0003LQ-7T
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 14:26:01 -0400
-Received: from mail-eopbgr130124.outbound.protection.outlook.com
- ([40.107.13.124]:33937 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1i8qGd-0003KF-GZ; Fri, 13 Sep 2019 14:26:00 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kOQoFCBOT8A76vIzNRB0jU8agNmdCg/MIrHKda93KwEb7YzEqud86vVcy5Q+wM4KTuXVS7BkWqPr94AcTjtS8aIwiUzXpTGr6gAdltvIBeRsl5Kr34GtuYWvFzoR2hNaJS0lyn3Lc3msbei5TW5edOvHWisi8SAFQnB1tFk+jGY68ulLRIxXBINjdScVxhZd7b3q9NLU8G1ExguW29WgVc6RZyCFh8cJ3jCKt2tJ1V0oaX+KONE811CWnSG1qJKkFQQSv8fnPsjZaC8c3mx6w4UrfmAQo/VUVYM8CFcnAXNL54Ebvk5BPeP/rvnvhpIOzqK790SEUnUClBIJfEanhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wQi3kG9r/XxFIOUQ6FgZC/TKjKlfSHr4wbA80T7JEww=;
- b=LUVcHj6dg8M1Mm1CaxR1Er78wtqiVUWcd8fXTLkaXe6mIO/qamKq+1C865H4wJUqyuXV+3HoYBaOiE+SQVMTa0JVEUYP8BUDZc+ah6EN0bsygJ8KABP9OANr7hVifDcBeTCwCCMeYSVtqRi1JP09cOMaKPPu87MlAt015EYYfuR46tgAbJi4CAm+IhlnYPy0uwGAT1OasM05gtQZ+vTwxGLtCtxc5gz8+7CJ0hOa6qYU9fLb9sxcnz2+Fqw3w7dN5DWyAgmePeHHcR3laPa5wbpgE/eyloqxPI1TjvxqUYFoZ3qWVp6EEPIZpcWNNEfgmqic5w1ldmW6zb1kwEQ+Lg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wQi3kG9r/XxFIOUQ6FgZC/TKjKlfSHr4wbA80T7JEww=;
- b=tBSDHAHwEai++ambNYZVoBHIO9S7RYAh8hAHpqwG1WtPfyPJbBifY3IAutWArPd9NaN4SW+o93xQLKf2j5iKDPM++0m4jBUZbVb/l7KtzE5az/gght0m5pUJGKVmpZsbBIhXUW0Tnx/VZ3qWvh6tJgazgYbyipauClXPQ05cEvU=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5244.eurprd08.prod.outlook.com (10.255.17.151) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2241.18; Fri, 13 Sep 2019 18:25:56 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2263.016; Fri, 13 Sep 2019
- 18:25:56 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Thread-Topic: [PATCH v11 04/14] block/backup: introduce BlockCopyState
-Thread-Index: AQHVZ8HWULZDkPZpMke6HdjhrfznqKcp8daA
-Date: Fri, 13 Sep 2019 18:25:56 +0000
-Message-ID: <bafea6c6-38cc-1848-92ea-ec891457515a@virtuozzo.com>
-References: <20190910102332.20560-1-vsementsov@virtuozzo.com>
- <20190910102332.20560-5-vsementsov@virtuozzo.com>
-In-Reply-To: <20190910102332.20560-5-vsementsov@virtuozzo.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0226.eurprd05.prod.outlook.com
- (2603:10a6:3:fa::26) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190913212553627
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 5cfae784-806b-474a-dad3-08d73877d160
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB5244; 
-x-ms-traffictypediagnostic: DB8PR08MB5244:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DB8PR08MB5244BB806868CEEDAF125B9BC1B30@DB8PR08MB5244.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:42;
-x-forefront-prvs: 0159AC2B97
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(396003)(366004)(346002)(136003)(376002)(39850400004)(189003)(199004)(305945005)(66946007)(6506007)(476003)(5660300002)(486006)(71200400001)(31686004)(6486002)(386003)(2616005)(76176011)(7736002)(7416002)(3846002)(71190400001)(66476007)(446003)(11346002)(2906002)(81166006)(66556008)(2351001)(8676002)(81156014)(64756008)(102836004)(229853002)(26005)(8936002)(66446008)(186003)(6916009)(52116002)(99286004)(107886003)(86362001)(36756003)(478600001)(2501003)(14454004)(53936002)(6116002)(6436002)(14444005)(6246003)(256004)(5640700003)(4326008)(316002)(66066001)(6512007)(54906003)(25786009)(31696002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5244;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 9gK5i3ImcBs53sqE+tt7ygGkedtUvcQyi3nHCUIJq2lOqA/AFHs7tr6kXre+8KI1AjOUpGsngJN0sEJZQC0P6Rqqsir9Rrs6Yr761ERH8Z42vFFzey9K/ySz2k+3INQFg/ePsj0fhkJ5U8Xo4KU94dsW4rgH73j11uMCrdpoy/PDzEYfO1fGpXoBXK/SCZ7oGYOTk4prmRYaVoAcfI0/1rKzoHCfeX/2mMtmjWphOxN7tGE5QqdyyKfqUgJR2QYbu4nZy5ZLfQ3DSfWPkBM7JcCzfM2OVuIv7aSaMCAql1LSSL1WXnhTCIAwCf3BX18QiE8DNms2uTvIrWD/AZV7sZ9jGHc935GnG/DmNjImHJ2va1pUH8b0Ayh8t9f3lakIN5otnvLuQjmrGfCvsTTBjz5IbL4Dx7X6xVBWaoG4w1o=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <68A2E29C8538524D89692CB6312212E1@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <jsnow@redhat.com>) id 1i8qKh-000506-Vd
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 14:30:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44230)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1i8qKe-0004yY-MJ; Fri, 13 Sep 2019 14:30:08 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C5A64E8CB3;
+ Fri, 13 Sep 2019 18:30:07 +0000 (UTC)
+Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8AFBB1001948;
+ Fri, 13 Sep 2019 18:30:03 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20190819201851.24418-1-mreitz@redhat.com>
+ <20190819201851.24418-7-mreitz@redhat.com>
+ <44f97011-4a02-7832-c253-d43474f79d44@redhat.com>
+ <a829185c-7c09-5afe-1479-15054ad59807@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <33f60f4e-8156-e46f-8500-79b0982348b2@redhat.com>
+Date: Fri, 13 Sep 2019 14:30:03 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5cfae784-806b-474a-dad3-08d73877d160
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Sep 2019 18:25:56.2935 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 9laShDq8ODgcwW5okFP+CdURRMcoJXjeJvVLgSlvlGS9URO2WlK43bTanREH5YiwqxGSy+ynMGPkYuQO+5pwxMumz8KUpWd+JxbrsjbY7GU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5244
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.13.124
-Subject: Re: [Qemu-devel] [PATCH v11 04/14] block/backup: introduce
- BlockCopyState
+In-Reply-To: <a829185c-7c09-5afe-1479-15054ad59807@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Fri, 13 Sep 2019 18:30:07 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 6/8] iotests: Test driver whitelisting
+ in 093
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,98 +149,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- Denis Lunev <den@virtuozzo.com>,
- "wencongyang2@huawei.com" <wencongyang2@huawei.com>,
- "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTAuMDkuMjAxOSAxMzoyMywgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-U3BsaXQgY29weWluZyBjb2RlIHBhcnQgZnJvbSBiYWNrdXAgdG8gImJsb2NrLWNvcHkiLCBpbmNs
-dWRpbmcgc2VwYXJhdGUNCj4gc3RhdGUgc3RydWN0dXJlIGFuZCBmdW5jdGlvbiByZW5hbWluZy4g
-VGhpcyBpcyBuZWVkZWQgdG8gc2hhcmUgaXQgd2l0aA0KPiBiYWNrdXAtdG9wIGZpbHRlciBkcml2
-ZXIgaW4gZnVydGhlciBjb21taXRzLg0KPiANCj4gTm90ZXM6DQo+IA0KPiAxLiBBcyBCbG9ja0Nv
-cHlTdGF0ZSBrZWVwcyBvd24gQmxvY2tCYWNrZW5kIG9iamVjdHMsIHJlbWFpbmluZw0KPiBqb2It
-PmNvbW1vbi5ibGsgdXNlcnMgb25seSB1c2UgaXQgdG8gZ2V0IGJzIGJ5IGJsa19icygpIGNhbGws
-IHNvIGNsZWFyDQo+IGpvYi0+Y29tbWVuLmJsayBwZXJtaXNzaW9ucyBzZXQgaW4gYmxvY2tfam9i
-X2NyZWF0ZSBhbmQgYWRkDQo+IGpvYi0+c291cmNlX2JzIHRvIGJlIHVzZWQgaW5zdGVhZCBvZiBi
-bGtfYnMoam9iLT5jb21tb24uYmxrKSwgdG8ga2VlcA0KPiBpdCBtb3JlIGNsZWFyIHdoaWNoIGJz
-IHdlIHVzZSB3aGVuIGludHJvZHVjZSBiYWNrdXAtdG9wIGZpbHRlciBpbg0KPiBmdXJ0aGVyIGNv
-bW1pdC4NCj4gDQo+IDIuIFJlbmFtZSBzL2luaXRpYWxpemluZ19iaXRtYXAvc2tpcF91bmFsbG9j
-YXRlZC8gdG8gc291bmQgYSBiaXQgYmV0dGVyDQo+IGFzIGludGVyZmFjZSB0byBCbG9ja0NvcHlT
-dGF0ZQ0KPiANCj4gMy4gU3BsaXQgaXMgbm90IHZlcnkgY2xlYW46IHRoZXJlIGxlZnQgc29tZSBk
-dXBsaWNhdGVkIGZpZWxkcywgYmFja3VwDQo+IGNvZGUgdXNlcyBzb21lIEJsb2NrQ29weVN0YXRl
-IGZpZWxkcyBkaXJlY3RseSwgbGV0J3MgcG9zdHBvbmUgaXQgZm9yDQo+IGZ1cnRoZXIgaW1wcm92
-ZW1lbnRzIGFuZCBrZWVwIHRoaXMgY29tbWVudCBzaW1wbGVyIGZvciByZXZpZXcuDQo+IA0KPiBT
-aWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZp
-cnR1b3p6by5jb20+DQo+IC0tLQ0KDQoNClsuLl0NCg0KPiArDQo+ICtzdGF0aWMgQmxvY2tDb3B5
-U3RhdGUgKmJsb2NrX2NvcHlfc3RhdGVfbmV3KA0KPiArICAgICAgICBCbG9ja0RyaXZlclN0YXRl
-ICpzb3VyY2UsIEJsb2NrRHJpdmVyU3RhdGUgKnRhcmdldCwNCj4gKyAgICAgICAgaW50NjRfdCBj
-bHVzdGVyX3NpemUsIEJkcnZSZXF1ZXN0RmxhZ3Mgd3JpdGVfZmxhZ3MsDQo+ICsgICAgICAgIFBy
-b2dyZXNzQnl0ZXNDYWxsYmFja0Z1bmMgcHJvZ3Jlc3NfYnl0ZXNfY2FsbGJhY2ssDQo+ICsgICAg
-ICAgIFByb2dyZXNzUmVzZXRDYWxsYmFja0Z1bmMgcHJvZ3Jlc3NfcmVzZXRfY2FsbGJhY2ssDQo+
-ICsgICAgICAgIHZvaWQgKnByb2dyZXNzX29wYXF1ZSwgRXJyb3IgKiplcnJwKQ0KPiArew0KPiAr
-ICAgIEJsb2NrQ29weVN0YXRlICpzOw0KPiArICAgIGludCByZXQ7DQo+ICsgICAgdWludDY0X3Qg
-bm9fcmVzaXplID0gQkxLX1BFUk1fQ09OU0lTVEVOVF9SRUFEIHwgQkxLX1BFUk1fV1JJVEUgfA0K
-PiArICAgICAgICAgICAgICAgICAgICAgICAgIEJMS19QRVJNX1dSSVRFX1VOQ0hBTkdFRCB8IEJM
-S19QRVJNX0dSQVBIX01PRDsNCj4gKyAgICBCZHJ2RGlydHlCaXRtYXAgKmNvcHlfYml0bWFwOw0K
-PiArDQo+ICsgICAgY29weV9iaXRtYXAgPSBiZHJ2X2NyZWF0ZV9kaXJ0eV9iaXRtYXAoc291cmNl
-LCBjbHVzdGVyX3NpemUsIE5VTEwsIGVycnApOw0KPiArICAgIGlmICghY29weV9iaXRtYXApIHsN
-Cj4gKyAgICAgICAgcmV0dXJuIE5VTEw7DQo+ICsgICAgfQ0KPiArICAgIGJkcnZfZGlzYWJsZV9k
-aXJ0eV9iaXRtYXAoY29weV9iaXRtYXApOw0KPiArDQo+ICsgICAgcyA9IGdfbmV3KEJsb2NrQ29w
-eVN0YXRlLCAxKTsNCj4gKyAgICAqcyA9IChCbG9ja0NvcHlTdGF0ZSkgew0KPiArICAgICAgICAu
-c291cmNlID0gYmxrX25ldyhiZHJ2X2dldF9haW9fY29udGV4dChzb3VyY2UpLA0KPiArICAgICAg
-ICAgICAgICAgICAgICAgICAgICBCTEtfUEVSTV9DT05TSVNURU5UX1JFQUQsIG5vX3Jlc2l6ZSks
-DQo+ICsgICAgICAgIC50YXJnZXQgPSBibGtfbmV3KGJkcnZfZ2V0X2Fpb19jb250ZXh0KHRhcmdl
-dCksDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgIEJMS19QRVJNX1dSSVRFLCBub19yZXNp
-emUpLA0KPiArICAgICAgICAuY29weV9iaXRtYXAgPSBjb3B5X2JpdG1hcCwNCj4gKyAgICAgICAg
-LmNsdXN0ZXJfc2l6ZSA9IGNsdXN0ZXJfc2l6ZSwNCj4gKyAgICAgICAgLmxlbiA9IGJkcnZfZGly
-dHlfYml0bWFwX3NpemUoY29weV9iaXRtYXApLA0KPiArICAgICAgICAud3JpdGVfZmxhZ3MgPSB3
-cml0ZV9mbGFncywNCj4gKyAgICAgICAgLnVzZV9jb3B5X3JhbmdlID0gISh3cml0ZV9mbGFncyAm
-IEJEUlZfUkVRX1dSSVRFX0NPTVBSRVNTRUQpLA0KPiArICAgICAgICAucHJvZ3Jlc3NfYnl0ZXNf
-Y2FsbGJhY2sgPSBwcm9ncmVzc19ieXRlc19jYWxsYmFjaywNCj4gKyAgICAgICAgLnByb2dyZXNz
-X3Jlc2V0X2NhbGxiYWNrID0gcHJvZ3Jlc3NfcmVzZXRfY2FsbGJhY2ssDQo+ICsgICAgICAgIC5w
-cm9ncmVzc19vcGFxdWUgPSBwcm9ncmVzc19vcGFxdWUsDQo+ICsgICAgfTsNCj4gKw0KPiArICAg
-IHMtPmNvcHlfcmFuZ2Vfc2l6ZSA9IFFFTVVfQUxJR05fVVAoTUlOKGJsa19nZXRfbWF4X3RyYW5z
-ZmVyKHMtPnNvdXJjZSksDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgYmxrX2dldF9tYXhfdHJhbnNmZXIocy0+dGFyZ2V0KSksDQo+ICsgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBzLT5jbHVzdGVyX3NpemUpOw0KDQpwcmVleGlzdGVu
-dCwgYnV0IGl0IG9idmlvdXNseSBzaG91bGQgYmUgUUVNVV9BTElHTl9ET1dOLiBJIGNhbiByZXNl
-bmQgd2l0aCBhIHNlcGFyYXRlDQpmaXgsIGl0IG1heSBiZSBmaXhlZCB3aGlsZSBxdWV1aW5nIChp
-ZiByZXNlbmQgaXMgbm90IG5lZWRlZCBmb3Igb3RoZXIgcmVhc29ucykgb3INCkknbGwgc2VuZCBh
-IGZvbGxvdy11cCBmaXggbGF0ZXIsIHdoaWNoZXZlciB5b3UgcHJlZmVyLg0KDQo+ICsNCj4gKyAg
-ICAvKg0KPiArICAgICAqIFdlIGp1c3QgYWxsb3cgYWlvIGNvbnRleHQgY2hhbmdlIG9uIG91ciBi
-bG9jayBiYWNrZW5kcy4gYmxvY2tfY29weSgpIHVzZXINCj4gKyAgICAgKiAobm93IGl0J3Mgb25s
-eSBiYWNrdXApIGlzIHJlc3BvbnNpYmxlIGZvciBzb3VyY2UgYW5kIHRhcmdldCBiZWluZyBpbiBz
-YW1lDQo+ICsgICAgICogYWlvIGNvbnRleHQuDQo+ICsgICAgICovDQo+ICsgICAgYmxrX3NldF9k
-aXNhYmxlX3JlcXVlc3RfcXVldWluZyhzLT5zb3VyY2UsIHRydWUpOw0KPiArICAgIGJsa19zZXRf
-YWxsb3dfYWlvX2NvbnRleHRfY2hhbmdlKHMtPnNvdXJjZSwgdHJ1ZSk7DQo+ICsgICAgYmxrX3Nl
-dF9kaXNhYmxlX3JlcXVlc3RfcXVldWluZyhzLT50YXJnZXQsIHRydWUpOw0KPiArICAgIGJsa19z
-ZXRfYWxsb3dfYWlvX2NvbnRleHRfY2hhbmdlKHMtPnRhcmdldCwgdHJ1ZSk7DQo+ICsNCg0KWy4u
-XQ0KDQo+IEBAIC03NjAsMjEgKzg2MCwxOSBAQCBCbG9ja0pvYiAqYmFja3VwX2pvYl9jcmVhdGUo
-Y29uc3QgY2hhciAqam9iX2lkLCBCbG9ja0RyaXZlclN0YXRlICpicywNCj4gICAgICAgICogRm9y
-IG1vcmUgaW5mb3JtYXRpb24gc2VlIGNvbW1pdCBmOGQ1OWRmYjQwYmIgYW5kIHRlc3QNCj4gICAg
-ICAgICogdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMg0KDQpbLi5dDQoNCj4gICAgICAgam9iLT5jbHVz
-dGVyX3NpemUgPSBjbHVzdGVyX3NpemU7DQo+IC0gICAgam9iLT5jb3B5X2JpdG1hcCA9IGNvcHlf
-Yml0bWFwOw0KPiAtICAgIGNvcHlfYml0bWFwID0gTlVMTDsNCj4gLSAgICBqb2ItPnVzZV9jb3B5
-X3JhbmdlID0gIWNvbXByZXNzOyAvKiBjb21wcmVzc2lvbiBpc24ndCBzdXBwb3J0ZWQgZm9yIGl0
-ICovDQo+IC0gICAgam9iLT5jb3B5X3JhbmdlX3NpemUgPSBNSU5fTk9OX1pFUk8oYmxrX2dldF9t
-YXhfdHJhbnNmZXIoam9iLT5jb21tb24uYmxrKSwNCj4gLSAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBibGtfZ2V0X21heF90cmFuc2Zlcihqb2ItPnRhcmdldCkpOw0KPiAt
-ICAgIGpvYi0+Y29weV9yYW5nZV9zaXplID0gTUFYKGpvYi0+Y2x1c3Rlcl9zaXplLA0KPiAtICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFFFTVVfQUxJR05fVVAoam9iLT5jb3B5X3Jhbmdl
-X3NpemUsDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBq
-b2ItPmNsdXN0ZXJfc2l6ZSkpOw0KPiAtDQo+IC0gICAgLyogUmVxdWlyZWQgcGVybWlzc2lvbnMg
-YXJlIGFscmVhZHkgdGFrZW4gd2l0aCB0YXJnZXQncyBibGtfbmV3KCkgKi8NCj4gKw0KPiArICAg
-IC8qIFJlcXVpcmVkIHBlcm1pc3Npb25zIGFyZSBhbHJlYWR5IHRha2VuIGJ5IGJsb2NrLWNvcHkt
-c3RhdGUgdGFyZ2V0ICovDQo+ICAgICAgIGJsb2NrX2pvYl9hZGRfYmRydigmam9iLT5jb21tb24s
-ICJ0YXJnZXQiLCB0YXJnZXQsIDAsIEJMS19QRVJNX0FMTCwNCj4gICAgICAgICAgICAgICAgICAg
-ICAgICAgICZlcnJvcl9hYm9ydCk7DQo+ICAgICAgIGpvYi0+bGVuID0gbGVuOw0KDQoNCi0tIA0K
-QmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+
+
+On 9/13/19 8:47 AM, Max Reitz wrote:
+> On 20.08.19 23:32, John Snow wrote:
+>>
+>>
+>> On 8/19/19 4:18 PM, Max Reitz wrote:
+>>> null-aio may not be whitelisted.  Skip all test cases that require it.
+>>>
+>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>> ---
+>>>  tests/qemu-iotests/093 | 12 +++++++++---
+>>>  1 file changed, 9 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
+>>> index 50c1e7f2ec..f03fa24a07 100755
+>>> --- a/tests/qemu-iotests/093
+>>> +++ b/tests/qemu-iotests/093
+>>> @@ -24,7 +24,7 @@ import iotests
+>>>  nsec_per_sec = 1000000000
+>>>  
+>>>  class ThrottleTestCase(iotests.QMPTestCase):
+>>> -    test_img = "null-aio://"
+>>> +    test_driver = "null-aio"
+>>>      max_drives = 3
+>>>  
+>>>      def blockstats(self, device):
+>>> @@ -35,10 +35,14 @@ class ThrottleTestCase(iotests.QMPTestCase):
+>>>                  return stat['rd_bytes'], stat['rd_operations'], stat['wr_bytes'], stat['wr_operations']
+>>>          raise Exception("Device not found for blockstats: %s" % device)
+>>>  
+>>> +    def required_drivers(self):
+>>> +        return [self.test_driver]
+>>> +
+>>> +    @iotests.skip_if_unsupported(required_drivers)
+>>
+>> Oh, I see why you're passing args[0] back to the callback now. Why not
+>> just pass self.required_drivers and call it with no arguments instead?
+>>
+>> You can get a bound version that way that doesn't need additional
+>> arguments, and then the callback is free to take generic callables of
+>> any kind.
+> 
+> Am I doing something wrong?
+> 
+> I just get
+> 
+> +Traceback (most recent call last):
+> +  File "093", line 26, in <module>
+> +    class ThrottleTestCase(iotests.QMPTestCase):
+> +  File "093", line 41, in ThrottleTestCase
+> +    @iotests.skip_if_unsupported(self.required_drivers)
+> +NameError: name 'self' is not defined
+> 
+> this way.
+> 
+> Max
+> 
+What was I even talking about? :\ Well.
+
+I'd still like to define func_wrapper with a nod to the type constraint
+it has:
+
+def func_wrapper(instance: iotests.QMPTestCase, *args, **kwargs):
+    [...]
+
+
+Then, you'd write:
+
+if callable(required_formats):
+    fmts = required_formats(instance)
+else:
+    fmts = required_formats
+
+
+And:
+
+> +    def required_drivers(self):
+> +        return [self.test_driver]
+> +
+> +    @iotests.skip_if_unsupported(required_drivers)
+>      def setUp(self):
+
+The problem is that 'self' isn't defined at the class level, so I was
+mistaken about being able to use it :( Python does not have a notion of
+a lexical constant to refer to the class being defined; and of course we
+do not have an instance variable at definition time.
+
+Sorry for the wild goose chase.
+
+It's fine as-is.
+
+(I wanted a way to define the required_formats callback without forcing
+it to be a class method, but the decorator code runs at definition time
+and we just don't HAVE the instance; so the way you wrote it is I think
+the only way it CAN be written without some much nastier trickery.)
 
