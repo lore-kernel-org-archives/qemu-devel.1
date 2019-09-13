@@ -2,65 +2,66 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C16BC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 10:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2854DC49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 10:22:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE23920830
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 10:22:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=duncanthrax.net header.i=@duncanthrax.net header.b="abXFPUv6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE23920830
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stackframe.org
+	by mail.kernel.org (Postfix) with ESMTPS id F0C1020830
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 10:22:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0C1020830
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8iiR-0005hL-O4
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 06:22:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33476)
+	id 1i8ij2-0006NU-3f
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 06:22:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34358)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <svens@stackframe.org>) id 1i8idl-0001ub-IA
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 06:17:22 -0400
+ (envelope-from <kwolf@redhat.com>) id 1i8ihh-0005JT-Ad
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 06:21:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <svens@stackframe.org>) id 1i8idk-00017W-HI
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 06:17:21 -0400
-Received: from smtp.duncanthrax.net ([2001:470:70c5:1111::170]:34320)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <svens@stackframe.org>)
- id 1i8idk-00016Z-4r
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 06:17:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=duncanthrax.net; s=dkim; h=Content-Transfer-Encoding:MIME-Version:
- References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=T/vNNqU0upqf6XS8y3LAK1FXx4ffxM5S3CP1z6fMnmY=; b=abXFPUv6TCqp3euC+Q4KkuEUp/
- KunwgUXhS8IF6fMs5ownTLORWzMh+FwNDXm9nGPxf3KeyYQF4GkPi8Ts8qfAOXbrMD+oka/P5ECce
- T20WJwtgnRdklkgrci0HxDx3NBiBIuVut59sYz1hI9kWsZYjGX1zy2g2P36a8au6HmeE=;
-Received: from hsi-kbw-046-005-233-221.hsi8.kabel-badenwuerttemberg.de
- ([46.5.233.221] helo=x280.stackframe.org)
- by smtp.eurescom.eu with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.86_2) (envelope-from <svens@stackframe.org>)
- id 1i8idi-00076C-2H; Fri, 13 Sep 2019 12:17:18 +0200
-From: Sven Schnelle <svens@stackframe.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 13 Sep 2019 12:17:13 +0200
-Message-Id: <20190913101714.29019-2-svens@stackframe.org>
-X-Mailer: git-send-email 2.23.0.rc1
-In-Reply-To: <20190913101714.29019-1-svens@stackframe.org>
-References: <20190913101714.29019-1-svens@stackframe.org>
+ (envelope-from <kwolf@redhat.com>) id 1i8ihc-0003id-IC
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 06:21:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53402)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1i8ihR-0003eR-Bw; Fri, 13 Sep 2019 06:21:09 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id CB68130860BD;
+ Fri, 13 Sep 2019 10:21:07 +0000 (UTC)
+Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
+ [10.33.200.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 940F15D9C3;
+ Fri, 13 Sep 2019 10:21:06 +0000 (UTC)
+Date: Fri, 13 Sep 2019 12:21:05 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190913102105.GD8312@dhcp-200-226.str.redhat.com>
+References: <20190910154110.6905-1-pl@kamp.de>
+ <20190910154110.6905-2-pl@kamp.de>
+ <ede55319-ca74-ab1c-6b3e-8558d9e6bdd8@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:470:70c5:1111::170
-Subject: [Qemu-devel] [PATCH 1/2] target/hppa: prevent trashing of temporary
- in trans_mtctl()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature"; boundary="f2QGlHpHGjS2mn6Y"
+Content-Disposition: inline
+In-Reply-To: <ede55319-ca74-ab1c-6b3e-8558d9e6bdd8@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Fri, 13 Sep 2019 10:21:07 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH V2 1/2] block/nfs: tear down aio before
+ nfs_close
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,46 +73,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>, Sven Schnelle <svens@stackframe.org>,
- qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: ronniesahlberg@gmail.com, Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-nullify_over() calls brcond which destroys all temporaries.
 
-Signed-off-by: Sven Schnelle <svens@stackframe.org>
----
- target/hppa/translate.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+--f2QGlHpHGjS2mn6Y
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 53e17d8963..b12525d535 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -2214,10 +2214,11 @@ static bool trans_mtsp(DisasContext *ctx, arg_mtsp *a)
- static bool trans_mtctl(DisasContext *ctx, arg_mtctl *a)
- {
-     unsigned ctl = a->t;
--    TCGv_reg reg = load_gpr(ctx, a->r);
-+    TCGv_reg reg;
-     TCGv_reg tmp;
- 
-     if (ctl == CR_SAR) {
-+        reg = load_gpr(ctx, a->r);
-         tmp = tcg_temp_new();
-         tcg_gen_andi_reg(tmp, reg, TARGET_REGISTER_BITS - 1);
-         save_or_nullify(ctx, cpu_sar, tmp);
-@@ -2232,6 +2233,8 @@ static bool trans_mtctl(DisasContext *ctx, arg_mtctl *a)
- 
- #ifndef CONFIG_USER_ONLY
-     nullify_over(ctx);
-+    reg = load_gpr(ctx, a->r);
-+
-     switch (ctl) {
-     case CR_IT:
-         gen_helper_write_interval_timer(cpu_env, reg);
--- 
-2.23.0.rc1
+Am 13.09.2019 um 11:51 hat Max Reitz geschrieben:
+> On 10.09.19 17:41, Peter Lieven wrote:
+> > nfs_close is a sync call from libnfs and has its own event
+> > handler polling on the nfs FD. Avoid that both QEMU and libnfs
+> > are intefering here.
+> >=20
+> > CC: qemu-stable@nongnu.org
+> > Signed-off-by: Peter Lieven <pl@kamp.de>
+> > ---
+> >  block/nfs.c | 6 ++++--
+> >  1 file changed, 4 insertions(+), 2 deletions(-)
+>=20
+> I=E2=80=99ve just seen that Kevin has already included the second patch (=
+in its
+> v1) in his pull request.
 
+Oops, sorry about this. Peter hasn't pulled yet, so I'll update the tag
+for the pull request. Let's see which version gets merged in the end.
+
+Kevin
+
+--f2QGlHpHGjS2mn6Y
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJde22RAAoJEH8JsnLIjy/WZIkQAMV1trhGBNCDnmFG/iGC1N2m
+TbrnFn6OGQ9YBNa//mZMRB8ofRAvz5zt0Z5+BTcJsfJWdz6xQRvn29YM5J9J+PkL
+s31G1kbDeoFVEjUOIYfGqXtaFFOhNd8zsEIfy3dbWXyDDbtD52nl1Tpz3m4Yr6b0
+UyUVWXQ9MIGkWcFsxf4tatYweHDaCDk9msj6JBpXCFIdjmkiTz4wcWc/ZjgI4t3v
+d365xfZoND7KoTMEbUeIVEc5RexFkaPMMlQInsrGgC5w7kuXz+w5PxR7Z5jlNl5z
+KdZa4od1t/sP4CbVLlub6efteG0QPUgVDTTsnKtQoku6hK+4McPIGNy8Cds/M1Rb
+gShgUL3w12G2gRosX2jO2bx5WupTAcYHYyvg3dRscVmVHYCpXJGnkzv1jq5pBn1E
+GyyQd3k/yPjNfyt59w5NVrbFcBjyy6qYQ91HW1OyS3ud72zlQUOO6Q9G8X39HSGB
+Sz6UjYXo3vBkTNAAHgL0WEIRrkF6ySgDMKVvc0EN2sYhU0t43cYcAuoY6a3NTaNh
+9vU728Dz4FRBtRSM2Q6XgDNNEYxLkh94RyZT4HR1EoDuZWrYzemag2aF8NeXRD1l
+Tcs0QZ2N4yRNO6h5/3HqZorO1pKyyt3qzQxjAvalW8DXcevcnak7FNKK1/6qP7KP
+DOawSq/fcajEXl05O4fV
+=WM3B
+-----END PGP SIGNATURE-----
+
+--f2QGlHpHGjS2mn6Y--
 
