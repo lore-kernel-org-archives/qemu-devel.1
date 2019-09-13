@@ -2,92 +2,64 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FC23C4CEC5
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 13:30:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 673F9C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 13:34:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21F5420640
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 13:30:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jsmcFBYi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21F5420640
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3EF8320640
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 13:34:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EF8320640
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8lek-0007sw-Rr
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 09:30:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36058)
+	id 1i8liP-00026R-8F
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 09:34:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36167)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1i8ld5-0006V9-A3
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:28:52 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i8le8-0007mn-7U
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:29:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1i8ld4-0007TB-Ay
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:28:51 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37277)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1i8ld4-0007SP-3Y
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:28:50 -0400
-Received: by mail-wm1-x341.google.com with SMTP id r195so2820426wme.2
- for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 06:28:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=4udeLUKboGyQ12jto7cHCku2+XufErIS42HSucLb99c=;
- b=jsmcFBYibb5Z6sMBSPmnd9WR1hh3+I1XF8+WXzMHvWQKjWcmS8N8o4OxqP3QgBgXQU
- ipQLVAqXysP5DDVled/sqDc7GpoXlsDBNJhcq1BRqOG/9qsMhOKUMMGwSGSizI3Rvh5Q
- 3h1LXfTbg4PjnbkwUxF46/t8zL/pDdF4rIzjpahci7VHm0234cQMbVL1q3KIid9C7sKO
- abAMYQ/ahXof/y0Otr5mjG/rM7ZGPr74sOFcmEamyx2m3uNcXrqWRxoSsf+2h4sw5sf+
- uBRQyOBUeRg9KwWp2znjTr9Lwrc/JdRkZNLqDhG5dXSn6NTSJHTXJdRU3GJuIRUjQRAp
- T+jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=4udeLUKboGyQ12jto7cHCku2+XufErIS42HSucLb99c=;
- b=ucXjoWFoHJtejSB7RsU73PhUQlJdxUTjaxp1LnejBvWuMCpNhwVv94dC5nntnIzJEo
- IuzTG9f8SE/+riWGKruco8RTNj9CQNCgiuk+7hLKS88xunoW8cwKAUjuSu+IlMRAgiTI
- iFdCw6qfmE5QKA7ZCCbdvRquCLZxRd5h1r9IjQYX2SFW9qPbts8q666OziUfLt/f5pE/
- xFmRvd2KEKLxmjtTerxsskbhnNfn4unApcjKEcThbZnGZumJ8pxXx1NbGBKeDfeUg23n
- voXyXYRwNx4uyLTEuzBYCZYXZGxfq1mWzG3B3n7YJ8PmrQ6rr97VrvUTEHc6up9NfNGA
- rE5w==
-X-Gm-Message-State: APjAAAWZ7PujSSzWFT8CqmiurYfsaVf6BRUiiKRhxjC6LMJdu1rSjVAv
- kFfcvsUWEAPNRodEXnkYsz0Qfw==
-X-Google-Smtp-Source: APXvYqxUVg+MpxQganOirY/MjNrJHOijY8qChhdmxWaG4nDgG7aMlRIlsWLD5KAY7eO/tMLBKTnL+g==
-X-Received: by 2002:a7b:cb9a:: with SMTP id m26mr3527976wmi.57.1568381328365; 
- Fri, 13 Sep 2019 06:28:48 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id v6sm4037244wma.24.2019.09.13.06.28.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 13 Sep 2019 06:28:47 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id DF8B11FF87;
- Fri, 13 Sep 2019 14:28:46 +0100 (BST)
-References: <20190911164959.11003-1-alex.bennee@linaro.org>
- <20190911164959.11003-3-alex.bennee@linaro.org>
- <CAFEAcA8NsdpEMOH1MFDta0LUswyqSDHCgtOh6g5k3+EU0FVuHA@mail.gmail.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-In-reply-to: <CAFEAcA8NsdpEMOH1MFDta0LUswyqSDHCgtOh6g5k3+EU0FVuHA@mail.gmail.com>
-Date: Fri, 13 Sep 2019 14:28:46 +0100
-Message-ID: <875zlwz5o1.fsf@linaro.org>
+ (envelope-from <dgilbert@redhat.com>) id 1i8le6-00087A-Lf
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:29:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54096)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i8le6-00086q-Gw
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 09:29:54 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8FCE4875222
+ for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 13:29:53 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3DD7A5D71C;
+ Fri, 13 Sep 2019 13:29:49 +0000 (UTC)
+Date: Fri, 13 Sep 2019 14:29:47 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <20190913132947.GC2682@work-vm>
+References: <20190912122514.22504-1-marcandre.lureau@redhat.com>
+ <20190912122514.22504-2-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190912122514.22504-2-marcandre.lureau@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Fri, 13 Sep 2019 13:29:53 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v5 2/5] target/arm: handle M-profile
- semihosting at translate time
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 1/6] migration: fix vmdesc leak on
+ vmstate_save() error
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,65 +71,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: mprivozn@redhat.com, pbonzini@redhat.com, berrange@redhat.com,
+ qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> On Wed, 11 Sep 2019 at 17:50, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->>
->> We do this for other semihosting calls so we might as well do it for
->> M-profile as well.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->>
->> ---
->> v2
->>   - update for change to gen_exception_internal_insn API
->> v3
->>   - update for decode tree
->> v4
->>   - use !IS_USER
->> ---
->
->> diff --git a/target/arm/translate.c b/target/arm/translate.c
->> index 34bb280e3da..6689acc911e 100644
->> --- a/target/arm/translate.c
->> +++ b/target/arm/translate.c
->> @@ -8424,7 +8424,13 @@ static bool trans_BKPT(DisasContext *s, arg_BKPT =
-*a)
->>      if (!ENABLE_ARCH_5) {
->>          return false;
->>      }
->> -    gen_exception_bkpt_insn(s, syn_aa32_bkpt(a->imm, false));
->> +    if (arm_dc_feature(s, ARM_FEATURE_M) &&
->> +        semihosting_enabled() && !IS_USER(s) &&
->> +        (a->imm =3D=3D 0xab)) {
->> +        gen_exception_internal_insn(s, s->base.pc_next, EXCP_SEMIHOST);
->> +    } else {
->> +        gen_exception_bkpt_insn(s, syn_aa32_bkpt(a->imm, false));
->> +    }
->>      return true;
->>  }
->
-> This is still disabling semihosting for the linux-user-mode
-> build for M-profile, isn't it ?
+Could have put that as a separate patch.
 
-Sure - as rth suggested. But m-profile doesn't run Linux so why would we
-support it in linux-user?
-
->
-> thanks
-> -- PMM
-
-
+> ---
+>  migration/qjson.h  | 2 ++
+>  migration/savevm.c | 3 +--
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/migration/qjson.h b/migration/qjson.h
+> index 41664f2d71..1786bb5864 100644
+> --- a/migration/qjson.h
+> +++ b/migration/qjson.h
+> @@ -24,4 +24,6 @@ void json_start_object(QJSON *json, const char *name)=
+;
+>  const char *qjson_get_str(QJSON *json);
+>  void qjson_finish(QJSON *json);
+> =20
+> +G_DEFINE_AUTOPTR_CLEANUP_FUNC(QJSON, qjson_destroy)
+> +
+>  #endif /* QEMU_QJSON_H */
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 4a86128ac4..6caa35a679 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1290,7 +1290,7 @@ int qemu_savevm_state_complete_precopy_non_iterab=
+le(QEMUFile *f,
+>                                                      bool in_postcopy,
+>                                                      bool inactivate_di=
+sks)
+>  {
+> -    QJSON *vmdesc;
+> +    g_autoptr(QJSON) vmdesc =3D NULL;
+>      int vmdesc_len;
+>      SaveStateEntry *se;
+>      int ret;
+> @@ -1351,7 +1351,6 @@ int qemu_savevm_state_complete_precopy_non_iterab=
+le(QEMUFile *f,
+>          qemu_put_be32(f, vmdesc_len);
+>          qemu_put_buffer(f, (uint8_t *)qjson_get_str(vmdesc), vmdesc_le=
+n);
+>      }
+> -    qjson_destroy(vmdesc);
+> =20
+>      return 0;
+>  }
+> --=20
+> 2.23.0
+>=20
 --
-Alex Benn=C3=A9e
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
