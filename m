@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B530C49ED7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B83F7C4CEC7
 	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 08:22:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 691DF207FC
+	by mail.kernel.org (Postfix) with ESMTPS id 78C2E2089F
 	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 08:22:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="iSNBXhtw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 691DF207FC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="QzwOjYuf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78C2E2089F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8gqd-0004qG-CQ
+	id 1i8gqd-0004qg-Cx
 	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 04:22:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43470)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43480)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Paul.Durrant@citrix.com>) id 1i8gp1-0003Qx-PR
+ (envelope-from <Paul.Durrant@citrix.com>) id 1i8gp2-0003R0-7i
  for qemu-devel@nongnu.org; Fri, 13 Sep 2019 04:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Paul.Durrant@citrix.com>) id 1i8gp0-0001fO-4p
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 04:20:51 -0400
+ (envelope-from <Paul.Durrant@citrix.com>) id 1i8gp0-0001fh-Jj
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 04:20:52 -0400
 Received: from esa2.hc3370-68.iphmx.com ([216.71.145.153]:19379)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <Paul.Durrant@citrix.com>)
- id 1i8goz-0001eN-Tb
+ id 1i8gp0-0001eN-Bc
  for qemu-devel@nongnu.org; Fri, 13 Sep 2019 04:20:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=citrix.com; s=securemail; t=1568362850;
+ d=citrix.com; s=securemail; t=1568362851;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=6PlZ2lXpbh2CSB2DLWsfrhSBmytgBCKnemkIarlXGh4=;
- b=iSNBXhtwQ2JLyrounsamvY8ibLxOTf1Jo+lWsxG9UMwAMCFGWtxlutYJ
- +JlxRfynHqbyQ1unzjQLmpPh/SWNoKaoKwKusPgE/Z2aMix7a6RVrINv6
- N0drEWfdfbnWNsnXJGtJUmHJBp1A2vlGxGa3MpH+44AzLD+zhml0pc3Ee E=;
+ bh=eLGcxY10AzEoEcFv4IR8/MmpdTtjmJMTD2W3sUX56d4=;
+ b=QzwOjYufP0uZAHnn3q4ZeP/j4qBuJMfwA4rpwugFAUNA4VdaPR+VwUa6
+ qf5Ar54jLoxV8VX3tSe8si1SPTIu8kbsa3sgHKAQxyYIQq4B71Z8rvGPO
+ MnWI9KrfU4KZS/B8Gttd9KpV/F+2CA5yiRdaDBg9lU1UJ6JvpdWOWgop6 8=;
 Authentication-Results: esa2.hc3370-68.iphmx.com;
  dkim=none (message not signed) header.i=none;
  spf=None smtp.pra=paul.durrant@citrix.com;
@@ -73,22 +73,22 @@ Received-SPF: None (esa2.hc3370-68.iphmx.com: no sender
  envelope-from="Paul.Durrant@citrix.com";
  x-sender="postmaster@mail.citrix.com";
  x-conformance=sidf_compatible
-IronPort-SDR: JvH9zJMIc1Jqc8eZ9wN7XhYgshMbSOEmpWZsCHHxfjz8n4DFk++dvzDDuIcC/GDJLwpGmEdKCb
- Bl1dBFB9z2rrwEB8mv8cbocpd6Pi7fZhAhL8vI2vljIfjkgVvifzHvngPWD66BrGKK6RZSocIp
- aEegCPSFY77SDeR+keLtK+RRR8VVoUjT+Iip8VklMzXjAqSXxV5Lq4oUVyjinrm3I8vggfbION
- hx17cxOVLA+q0UvIKrBO8m55CTADYXmfxc2VcTizXE0dm4oqe4m5/Yw+kfJFX7+XykuUr1TRNR
- trA=
+IronPort-SDR: iTssoMWwfzwfJCPCQQhiM1gbBN5dm10624MLZYPExfnkujNOVfwSzYoACFkX1ds443dKioSI/f
+ pd7LuqTn7KAkcFIo6BqFV1OLk5LfnPejs8zocA+TJpu6bJm7jkXHWLoR3Sn0YF2fZ++V94x7LE
+ iARkSM1GrTIOTvnCOOPNhridekMArF0u57U/ZHv4BmBMn/ZYGlcq6DkNN2iPATPPCDKKawfFob
+ KMXAYbD0Z1fRijRG0GIq+HPdhxH57Mex5R8vIlzPLndWzgVez0Ei9taFKuwCJkM+mkM7eaBRBA
+ JZE=
 X-SBRS: 2.7
-X-MesageID: 5522405
+X-MesageID: 5522406
 X-Ironport-Server: esa2.hc3370-68.iphmx.com
 X-Remote-IP: 162.221.158.21
 X-Policy: $RELAYED
 X-IronPort-AV: E=Sophos;i="5.64,500,1559534400"; 
-   d="scan'208";a="5522405"
+   d="scan'208";a="5522406"
 From: Paul Durrant <paul.durrant@citrix.com>
 To: <qemu-devel@nongnu.org>, <xen-devrel@lists.xenproject.org>
-Date: Fri, 13 Sep 2019 09:20:41 +0100
-Message-ID: <20190913082043.31288-2-paul.durrant@citrix.com>
+Date: Fri, 13 Sep 2019 09:20:43 +0100
+Message-ID: <20190913082043.31288-4-paul.durrant@citrix.com>
 X-Mailer: git-send-email 2.20.1.2.gb21ebb6
 In-Reply-To: <20190913082043.31288-1-paul.durrant@citrix.com>
 References: <20190913082043.31288-1-paul.durrant@citrix.com>
@@ -97,8 +97,8 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
 X-Received-From: 216.71.145.153
-Subject: [Qemu-devel] [PATCH v3 1/3] xen / notify: introduce a new
- XenWatchList abstraction
+Subject: [Qemu-devel] [PATCH v3 3/3] xen: perform XenDevice clean-up in
+ XenBus watch handler
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,261 +117,245 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Xenstore watch call-backs are already abstracted away from XenBus using
-the XenWatch data structure but the associated NotifierList manipulation
-and file handle registration is still open coded in various xen_bus_...()
-functions.
-This patch creates a new XenWatchList data structure to allow these
-interactions to be abstracted away from XenBus as well. This is in
-preparation for a subsequent patch which will introduce separate watch lists
-for XenBus and XenDevice objects.
+Cleaning up offline XenDevice objects directly in
+xen_device_backend_changed() is dangerous as xen_device_unrealize() will
+modify the watch list that is being walked. Even the QLIST_FOREACH_SAFE()
+used in notifier_list_notify() is insufficient as *two* notifiers (for
+the frontend and backend watches) are removed, thus potentially rendering
+the 'next' pointer unsafe.
 
-NOTE: This patch also introduces a new notifier_list_empty() helper function
-      for the purposes of adding an assertion that a XenWatchList is not
-      freed whilst its associated NotifierList is still occupied.
+The solution is to use the XenBus backend_watch handler to do the clean-up
+instead, as it is invoked whilst walking a separate watch list.
+
+This patch therefore adds a new 'inactive_devices' list to XenBus, to which
+offline devices are added by xen_device_backend_changed(). The XenBus
+backend_watch registration is also changed to not only invoke
+xen_bus_enumerate() but also a new xen_bus_cleanup() function, which will
+walk 'inactive_devices' and perform the necessary actions.
+For safety an extra 'online' check is also added to xen_bus_type_enumerate()
+to make sure that no attempt is made to create a new XenDevice object for a
+backend that is offline.
+
+NOTE: This patch also includes some cosmetic changes:
+      - substitute the local variable name 'backend_state'
+        in xen_bus_type_enumerate() with 'state', since there
+        is no ambiguity with any other state in that context.
+      - change xen_device_state_is_active() to
+        xen_device_frontend_is_active() (and pass a XenDevice directly)
+        since the state tests contained therein only apply to a frontend.
+      - use 'state' rather then 'xendev->backend_state' in
+        xen_device_backend_changed() to shorten the code.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
 ---
 Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+
+v3:
+ - s/offline_devices/inactive_devices/g
+ - Also add an 'inactive' boolean to XenDevice which is set when the
+   device is added to the inactive list so we really can make sure that it
+   doesn't happen more than once
+
+v2:
+ - Make sure we don't try to add a XenDevice to 'offline_devices' more than
+   once
 ---
- hw/xen/trace-events      |   5 +-
- hw/xen/xen-bus.c         | 117 +++++++++++++++++++++++++--------------
- include/hw/xen/xen-bus.h |   3 +-
- include/qemu/notify.h    |   2 +
- util/notify.c            |   5 ++
- 5 files changed, 87 insertions(+), 45 deletions(-)
+ hw/xen/trace-events      |  2 +
+ hw/xen/xen-bus.c         | 94 +++++++++++++++++++++++++++++-----------
+ include/hw/xen/xen-bus.h |  3 ++
+ 3 files changed, 74 insertions(+), 25 deletions(-)
 
 diff --git a/hw/xen/trace-events b/hw/xen/trace-events
-index bc82ecb1a5..ac8d9c20d2 100644
+index 80ce3dafad..e6885bc751 100644
 --- a/hw/xen/trace-events
 +++ b/hw/xen/trace-events
-@@ -19,9 +19,8 @@ xen_bus_unrealize(void) ""
+@@ -17,8 +17,10 @@ xen_domid_restrict(int err) "err: %u"
+ xen_bus_realize(void) ""
+ xen_bus_unrealize(void) ""
  xen_bus_enumerate(void) ""
++xen_bus_cleanup(void) ""
  xen_bus_type_enumerate(const char *type) "type: %s"
  xen_bus_backend_create(const char *type, const char *path) "type: %s path: %s"
--xen_bus_add_watch(const char *node, const char *key, char *token) "node: %s key: %s token: %s"
--xen_bus_remove_watch(const char *node, const char *key, char *token) "node: %s key: %s token: %s"
--xen_bus_watch(const char *token) "token: %s"
-+xen_bus_add_watch(const char *node, const char *key) "node: %s key: %s"
-+xen_bus_remove_watch(const char *node, const char *key) "node: %s key: %s"
++xen_bus_device_cleanup(const char *type, char *name) "type: %s name: %s"
+ xen_bus_add_watch(const char *node, const char *key) "node: %s key: %s"
+ xen_bus_remove_watch(const char *node, const char *key) "node: %s key: %s"
  xen_device_realize(const char *type, char *name) "type: %s name: %s"
- xen_device_unrealize(const char *type, char *name) "type: %s name: %s"
- xen_device_backend_state(const char *type, char *name, const char *state) "type: %s name: %s -> %s"
 diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index 025df5e59f..28efaccff2 100644
+index 810a4e2df3..55c157393d 100644
 --- a/hw/xen/xen-bus.c
 +++ b/hw/xen/xen-bus.c
-@@ -157,18 +157,60 @@ static void free_watch(XenWatch *watch)
-     g_free(watch);
+@@ -340,13 +340,18 @@ static void xen_bus_type_enumerate(XenBus *xenbus, const char *type)
+     for (i = 0; i < n; i++) {
+         char *backend_path = g_strdup_printf("%s/%s", domain_path,
+                                              backend[i]);
+-        enum xenbus_state backend_state;
++        enum xenbus_state state;
++        unsigned int online;
+ 
+         if (xs_node_scanf(xenbus->xsh, XBT_NULL, backend_path, "state",
+-                          NULL, "%u", &backend_state) != 1)
+-            backend_state = XenbusStateUnknown;
++                          NULL, "%u", &state) != 1)
++            state = XenbusStateUnknown;
+ 
+-        if (backend_state == XenbusStateInitialising) {
++        if (xs_node_scanf(xenbus->xsh, XBT_NULL, backend_path, "online",
++                          NULL, "%u", &online) != 1)
++            online = 0;
++
++        if (online && state == XenbusStateInitialising) {
+             Error *local_err = NULL;
+ 
+             xen_bus_backend_create(xenbus, type, backend[i], backend_path,
+@@ -365,9 +370,8 @@ out:
+     g_free(domain_path);
  }
  
--static XenWatch *xen_bus_add_watch(XenBus *xenbus, const char *node,
--                                   const char *key, XenWatchHandler handler,
--                                   void *opaque, Error **errp)
-+struct XenWatchList {
-+    struct xs_handle *xsh;
-+    NotifierList notifiers;
-+};
-+
-+static void watch_list_event(void *opaque)
+-static void xen_bus_enumerate(void *opaque)
++static void xen_bus_enumerate(XenBus *xenbus)
+ {
+-    XenBus *xenbus = opaque;
+     char **type;
+     unsigned int i, n;
+ 
+@@ -385,6 +389,45 @@ static void xen_bus_enumerate(void *opaque)
+     free(type);
+ }
+ 
++static void xen_bus_device_cleanup(XenDevice *xendev)
 +{
-+    XenWatchList *watch_list = opaque;
-+    char **v;
-+    const char *token;
++    const char *type = object_get_typename(OBJECT(xendev));
++    Error *local_err = NULL;
 +
-+    v = xs_check_watch(watch_list->xsh);
-+    if (!v) {
-+        return;
++    trace_xen_bus_device_cleanup(type, xendev->name);
++
++    g_assert(!xendev->backend_online);
++
++    if (!xen_backend_try_device_destroy(xendev, &local_err)) {
++        object_unparent(OBJECT(xendev));
 +    }
 +
-+    token = v[XS_WATCH_TOKEN];
-+
-+    notifier_list_notify(&watch_list->notifiers, (void *)token);
-+
-+    free(v);
++    if (local_err) {
++        error_report_err(local_err);
++    }
 +}
 +
-+static XenWatchList *watch_list_create(struct xs_handle *xsh)
++static void xen_bus_cleanup(XenBus *xenbus)
 +{
-+    XenWatchList *watch_list = g_new0(XenWatchList, 1);
++    XenDevice *xendev, *next;
 +
-+    g_assert(xsh);
++    trace_xen_bus_cleanup();
 +
-+    watch_list->xsh = xsh;
-+    notifier_list_init(&watch_list->notifiers);
-+    qemu_set_fd_handler(xs_fileno(watch_list->xsh), watch_list_event, NULL,
-+                        watch_list);
-+
-+    return watch_list;
++    QLIST_FOREACH_SAFE(xendev, &xenbus->inactive_devices, list, next) {
++        g_assert(xendev->inactive);
++        QLIST_REMOVE(xendev, list);
++        xen_bus_device_cleanup(xendev);
++    }
 +}
 +
-+static void watch_list_destroy(XenWatchList *watch_list)
++static void xen_bus_backend_changed(void *opaque)
 +{
-+    g_assert(notifier_list_empty(&watch_list->notifiers));
-+    qemu_set_fd_handler(xs_fileno(watch_list->xsh), NULL, NULL, NULL);
-+    g_free(watch_list);
++    XenBus *xenbus = opaque;
++
++    xen_bus_enumerate(xenbus);
++    xen_bus_cleanup(xenbus);
 +}
 +
-+static XenWatch *watch_list_add(XenWatchList *watch_list, const char *node,
-+                                const char *key, XenWatchHandler handler,
-+                                void *opaque, Error **errp)
+ static void xen_bus_unrealize(BusState *bus, Error **errp)
  {
-     XenWatch *watch = new_watch(node, key, handler, opaque);
-     Error *local_err = NULL;
+     XenBus *xenbus = XEN_BUS(bus);
+@@ -433,7 +476,7 @@ static void xen_bus_realize(BusState *bus, Error **errp)
  
--    trace_xen_bus_add_watch(watch->node, watch->key, watch->token);
-+    notifier_list_add(&watch_list->notifiers, &watch->notifier);
- 
--    notifier_list_add(&xenbus->watch_notifiers, &watch->notifier);
--
--    xs_node_watch(xenbus->xsh, node, key, watch->token, &local_err);
-+    xs_node_watch(watch_list->xsh, node, key, watch->token, &local_err);
+     xenbus->backend_watch =
+         xen_bus_add_watch(xenbus, "", /* domain root node */
+-                          "backend", xen_bus_enumerate, &local_err);
++                          "backend", xen_bus_backend_changed, &local_err);
      if (local_err) {
-         error_propagate(errp, local_err);
- 
-@@ -181,18 +223,34 @@ static XenWatch *xen_bus_add_watch(XenBus *xenbus, const char *node,
-     return watch;
- }
- 
--static void xen_bus_remove_watch(XenBus *xenbus, XenWatch *watch,
--                                 Error **errp)
-+static void watch_list_remove(XenWatchList *watch_list, XenWatch *watch,
-+                              Error **errp)
+         /* This need not be treated as a hard error so don't propagate */
+         error_reportf_err(local_err,
+@@ -555,9 +598,9 @@ static void xen_device_backend_set_online(XenDevice *xendev, bool online)
+  * Tell from the state whether the frontend is likely alive,
+  * i.e. it will react to a change of state of the backend.
+  */
+-static bool xen_device_state_is_active(enum xenbus_state state)
++static bool xen_device_frontend_is_active(XenDevice *xendev)
  {
--    trace_xen_bus_remove_watch(watch->node, watch->key, watch->token);
--
--    xs_node_unwatch(xenbus->xsh, watch->node, watch->key, watch->token,
-+    xs_node_unwatch(watch_list->xsh, watch->node, watch->key, watch->token,
-                     errp);
+-    switch (state) {
++    switch (xendev->frontend_state) {
+     case XenbusStateInitWait:
+     case XenbusStateInitialised:
+     case XenbusStateConnected:
+@@ -594,30 +637,31 @@ static void xen_device_backend_changed(void *opaque)
+      * state to Closing, but there is no active frontend then set the
+      * backend state to Closed.
+      */
+-    if (xendev->backend_state == XenbusStateClosing &&
+-        !xen_device_state_is_active(xendev->frontend_state)) {
++    if (state == XenbusStateClosing &&
++        !xen_device_frontend_is_active(xendev)) {
+         xen_device_backend_set_state(xendev, XenbusStateClosed);
+     }
  
-     notifier_remove(&watch->notifier);
-     free_watch(watch);
+     /*
+      * If a backend is still 'online' then we should leave it alone but,
+-     * if a backend is not 'online', then the device should be destroyed
+-     * once the state is Closed.
++     * if a backend is not 'online', then the device is a candidate
++     * for destruction. Hence add it to the 'inactive' list to be cleaned
++     * by xen_bus_cleanup().
+      */
+-    if (!xendev->backend_online &&
+-        (xendev->backend_state == XenbusStateClosed ||
+-         xendev->backend_state == XenbusStateInitialising ||
+-         xendev->backend_state == XenbusStateInitWait ||
+-         xendev->backend_state == XenbusStateUnknown)) {
+-        Error *local_err = NULL;
++    if (!online &&
++        (state == XenbusStateClosed ||  state == XenbusStateInitialising ||
++         state == XenbusStateInitWait || state == XenbusStateUnknown) &&
++        !xendev->inactive) {
++        XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
+ 
+-        if (!xen_backend_try_device_destroy(xendev, &local_err)) {
+-            object_unparent(OBJECT(xendev));
+-        }
++        xendev->inactive = true;
++        QLIST_INSERT_HEAD(&xenbus->inactive_devices, xendev, list);
+ 
+-        if (local_err) {
+-            error_report_err(local_err);
+-        }
++        /*
++         * Re-write the state to cause a XenBus backend_watch notification,
++         * resulting in a call to xen_bus_cleanup().
++         */
++        xen_device_backend_printf(xendev, "state", "%u", state);
+     }
  }
- 
-+static XenWatch *xen_bus_add_watch(XenBus *xenbus, const char *node,
-+                                   const char *key, XenWatchHandler handler,
-+                                   void *opaque, Error **errp)
-+{
-+    trace_xen_bus_add_watch(node, key);
-+
-+    return watch_list_add(xenbus->watch_list, node, key, handler, opaque,
-+                          errp);
-+}
-+
-+static void xen_bus_remove_watch(XenBus *xenbus, XenWatch *watch,
-+                                 Error **errp)
-+{
-+    trace_xen_bus_remove_watch(watch->node, watch->key);
-+
-+    watch_list_remove(xenbus->watch_list, watch, errp);
-+}
-+
- static void xen_bus_backend_create(XenBus *xenbus, const char *type,
-                                    const char *name, char *path,
-                                    Error **errp)
-@@ -338,35 +396,14 @@ static void xen_bus_unrealize(BusState *bus, Error **errp)
-         xenbus->backend_watch = NULL;
-     }
- 
--    if (!xenbus->xsh) {
--        return;
-+    if (xenbus->watch_list) {
-+        watch_list_destroy(xenbus->watch_list);
-+        xenbus->watch_list = NULL;
-     }
- 
--    qemu_set_fd_handler(xs_fileno(xenbus->xsh), NULL, NULL, NULL);
--
--    xs_close(xenbus->xsh);
--}
--
--static void xen_bus_watch(void *opaque)
--{
--    XenBus *xenbus = opaque;
--    char **v;
--    const char *token;
--
--    g_assert(xenbus->xsh);
--
--    v = xs_check_watch(xenbus->xsh);
--    if (!v) {
--        return;
-+    if (xenbus->xsh) {
-+        xs_close(xenbus->xsh);
-     }
--
--    token = v[XS_WATCH_TOKEN];
--
--    trace_xen_bus_watch(token);
--
--    notifier_list_notify(&xenbus->watch_notifiers, (void *)token);
--
--    free(v);
- }
- 
- static void xen_bus_realize(BusState *bus, Error **errp)
-@@ -390,9 +427,7 @@ static void xen_bus_realize(BusState *bus, Error **errp)
-         xenbus->backend_id = 0; /* Assume lack of node means dom0 */
-     }
- 
--    notifier_list_init(&xenbus->watch_notifiers);
--    qemu_set_fd_handler(xs_fileno(xenbus->xsh), xen_bus_watch, NULL,
--                        xenbus);
-+    xenbus->watch_list = watch_list_create(xenbus->xsh);
- 
-     module_call_init(MODULE_INIT_XEN_BACKEND);
  
 diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index 1c2d9dfdb8..88b84e29bb 100644
+index 0d198148f6..3d5532258d 100644
 --- a/include/hw/xen/xen-bus.h
 +++ b/include/hw/xen/xen-bus.h
-@@ -14,6 +14,7 @@
+@@ -32,7 +32,9 @@ typedef struct XenDevice {
+     XenWatch *backend_online_watch;
+     xengnttab_handle *xgth;
+     bool feature_grant_copy;
++    bool inactive;
+     QLIST_HEAD(, XenEventChannel) event_channels;
++    QLIST_ENTRY(XenDevice) list;
+ } XenDevice;
  
- typedef void (*XenWatchHandler)(void *opaque);
- 
-+typedef struct XenWatchList XenWatchList;
- typedef struct XenWatch XenWatch;
- typedef struct XenEventChannel XenEventChannel;
- 
-@@ -63,7 +64,7 @@ typedef struct XenBus {
-     BusState qbus;
-     domid_t backend_id;
+ typedef char *(*XenDeviceGetName)(XenDevice *xendev, Error **errp);
+@@ -68,6 +70,7 @@ typedef struct XenBus {
      struct xs_handle *xsh;
--    NotifierList watch_notifiers;
-+    XenWatchList *watch_list;
+     XenWatchList *watch_list;
      XenWatch *backend_watch;
++    QLIST_HEAD(, XenDevice) inactive_devices;
  } XenBus;
  
-diff --git a/include/qemu/notify.h b/include/qemu/notify.h
-index a3d73e4bc7..bcfa70fb2e 100644
---- a/include/qemu/notify.h
-+++ b/include/qemu/notify.h
-@@ -40,6 +40,8 @@ void notifier_remove(Notifier *notifier);
- 
- void notifier_list_notify(NotifierList *list, void *data);
- 
-+bool notifier_list_empty(NotifierList *list);
-+
- /* Same as Notifier but allows .notify() to return errors */
- typedef struct NotifierWithReturn NotifierWithReturn;
- 
-diff --git a/util/notify.c b/util/notify.c
-index aee8d93cb0..76bab212ae 100644
---- a/util/notify.c
-+++ b/util/notify.c
-@@ -40,6 +40,11 @@ void notifier_list_notify(NotifierList *list, void *data)
-     }
- }
- 
-+bool notifier_list_empty(NotifierList *list)
-+{
-+    return QLIST_EMPTY(&list->notifiers);
-+}
-+
- void notifier_with_return_list_init(NotifierWithReturnList *list)
- {
-     QLIST_INIT(&list->notifiers);
+ typedef struct XenBusClass {
 -- 
 2.20.1.2.gb21ebb6
 
