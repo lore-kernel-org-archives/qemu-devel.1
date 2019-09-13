@@ -2,89 +2,64 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A1DEC4CEC8
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 18:15:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 308FBC4CEC8
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 18:20:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E18F9206A5
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 18:15:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wSvzMGwN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E18F9206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E5572206A5
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 18:20:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5572206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8q65-00083Y-L9
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 14:15:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49229)
+	id 1i8qBG-0001qd-0i
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 14:20:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49962)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1i8q54-0007Fo-7k
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 14:14:03 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i8qAU-0001DA-Vh
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 14:19:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1i8q53-0006po-3u
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 14:14:01 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:38353)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1i8q52-0006oK-SE
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 14:14:01 -0400
-Received: by mail-ed1-x542.google.com with SMTP id a23so25601061edv.5
- for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 11:14:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=8uBuaXYFL4Cvm9iMwUlQx8ETWJTml2hU7suR2oueijY=;
- b=wSvzMGwNr1P4AgVyh+YwRukw3vwrAqnvAa+Fw5C8dT6DyvAxMadq/KaTl8nZDXaSeK
- I+xHZep8Gq2mc+BwKxI1IZJpQd64X5897OYR/Tv6cp4Gitjb4RBNQMIviMWmhmJuUCBX
- a4MwnClGDYqvP5OH47ZmqcbIWDi/RpPKJ650zyc3ETsge/vibM1ohrKIa7cDFcm/y07h
- QAOO2mh2Wqz0Xce0dPRrpqeFBwvaF/Mvm/7glHxy7FkbHvULxpq3HtcUv+ITwV2MCL8J
- t689LZN8ZgJ0MxrvpayO97OSi9uGaS1jmT/1WPVRnFm0hNmE5p1I7w0zTDUqc/mfzlKu
- MbZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=8uBuaXYFL4Cvm9iMwUlQx8ETWJTml2hU7suR2oueijY=;
- b=MEcumuqSVus1nCI6izMm1Z9OdqG1ZRKjiGn0zJYGs6xsNZt9bn+ADH6YKpUDNl8bf5
- QMrwfPgeUe7OUS6ZstfW5qbXwcvy3wPKYeX7xrE/VZbSfdI8s4CiGrUnocYGNXta0DTK
- QFF6AUpu4GkZ8APPxmjC6BBKIxTslWi604/YnohXtCBfN5z98mymQHcNHxleC2Ogjz3d
- +bnfPEL/HREovW65JEteTBEVeHNMV4c9lQbMdHicU/B97adlWdjC4l1uIQ5dRfIuuiYf
- yagRttgI3hjVzWy0AI56RzJmzf3t5MeWmBXJCQSzGWouzNRgaUYk/MCoho4dDcXT40fy
- W07A==
-X-Gm-Message-State: APjAAAV/wYWvczWWNJRfQoVbvHrmN46lqg/W6pxvgu1Ai7DDv0J+bAzX
- HeQvriDDAobSV2kwzALHbQPJSw==
-X-Google-Smtp-Source: APXvYqym1tEk1V3SEnCtmMVKD+VFbCc6n+9gA/YwAN6Ev7OlocmIDADLaVTClmx7erQ7B47uQSYkHg==
-X-Received: by 2002:aa7:c1c7:: with SMTP id d7mr48924432edp.34.1568398438801; 
- Fri, 13 Sep 2019 11:13:58 -0700 (PDT)
-Received: from [192.168.44.107] ([185.81.138.17])
- by smtp.gmail.com with ESMTPSA id s19sm3227811ejs.78.2019.09.13.11.13.56
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 13 Sep 2019 11:13:58 -0700 (PDT)
-To: Sven Schnelle <svens@stackframe.org>
-References: <20190913101714.29019-1-svens@stackframe.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <0b78ccdf-4c03-a60e-5884-a6833f6dde2b@linaro.org>
-Date: Fri, 13 Sep 2019 14:13:53 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190913101714.29019-1-svens@stackframe.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+ (envelope-from <mlevitsk@redhat.com>) id 1i8qAT-0000cu-C7
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 14:19:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44364)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1i8qAO-0000au-4F; Fri, 13 Sep 2019 14:19:32 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6A2B6307CDEA;
+ Fri, 13 Sep 2019 18:19:31 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.39])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 676C45D9C3;
+ Fri, 13 Sep 2019 18:19:29 +0000 (UTC)
+Message-ID: <51f8e8ba359602a8b9056e5800a97b29ec19cd29.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, 
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Date: Fri, 13 Sep 2019 21:19:28 +0300
+In-Reply-To: <63f11a7a-44a6-9556-063b-3d762a6e9293@virtuozzo.com>
+References: <20190913172741.5662-1-mlevitsk@redhat.com>
+ <20190913172741.5662-3-mlevitsk@redhat.com>
+ <63f11a7a-44a6-9556-063b-3d762a6e9293@virtuozzo.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::542
-Subject: Re: [Qemu-devel] [PATCH 0/2] HPPA tcg fixes
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Fri, 13 Sep 2019 18:19:31 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v6 2/3] block/qcow2: refactor threaded
+ encryption code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,21 +71,290 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Daniel P . =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
+ qemu-stable <qemu-stable@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/13/19 6:17 AM, Sven Schnelle wrote:
-> Sven Schnelle (2):
->   target/hppa: prevent trashing of temporary in trans_mtctl()
->   target/hppa: prevent trashing of temporary in do_depw_sar()
+On Fri, 2019-09-13 at 17:51 +0000, Vladimir Sementsov-Ogievskiy wrote:
+> 13.09.2019 20:27, Maxim Levitsky wrote:
+> > Change the qcow2_co_encrypt to just receive full host and
+> > guest offsets and in pariticular remove the
+> > offset_in_cluster parameter of do_perform_cow_encrypt,
+> > since it is misleading, because that offset can be larger than
+> > cluster size currently.
+> > 
+> > Remove the do_perform_cow_encrypt by merging it with
+> > qcow2_co_encrypt
+> > 
+> > Also document the qcow2_co_encrypt arguments to prevent
+> > that bug from happening again
+> > 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> > ---
+> >   block/qcow2-cluster.c | 35 +++++--------------
+> >   block/qcow2-threads.c | 81 ++++++++++++++++++++++++++++++++++++-------
+> >   block/qcow2.c         |  5 +--
+> >   block/qcow2.h         |  8 ++---
+> >   4 files changed, 83 insertions(+), 46 deletions(-)
+> > 
+> > diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> > index bfeb0241d7..f42b8a404c 100644
+> > --- a/block/qcow2-cluster.c
+> > +++ b/block/qcow2-cluster.c
+> > @@ -462,28 +462,6 @@ static int coroutine_fn do_perform_cow_read(BlockDriverState *bs,
+> >       return 0;
+> >   }
+> >   
+> > -static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
+> > -                                                uint64_t src_cluster_offset,
+> > -                                                uint64_t cluster_offset,
+> > -                                                unsigned offset_in_cluster,
+> > -                                                uint8_t *buffer,
+> > -                                                unsigned bytes)
+> > -{
+> > -    if (bytes && bs->encrypted) {
+> > -        BDRVQcow2State *s = bs->opaque;
+> > -        assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
+> > -        assert((bytes & ~BDRV_SECTOR_MASK) == 0);
+> > -        assert(s->crypto);
+> > -        if (qcow2_co_encrypt(bs,
+> > -                start_of_cluster(s, cluster_offset + offset_in_cluster),
+> > -                src_cluster_offset + offset_in_cluster,
+> > -                buffer, bytes) < 0) {
+> > -            return false;
+> > -        }
+> > -    }
+> > -    return true;
+> > -}
+> > -
+> >   static int coroutine_fn do_perform_cow_write(BlockDriverState *bs,
+> >                                                uint64_t cluster_offset,
+> >                                                unsigned offset_in_cluster,
+> > @@ -891,11 +869,14 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
+> >   
+> >       /* Encrypt the data if necessary before writing it */
+> >       if (bs->encrypted) {
+> > -        if (!do_perform_cow_encrypt(bs, m->offset, m->alloc_offset,
+> > -                                    start->offset, start_buffer,
+> > -                                    start->nb_bytes) ||
+> > -            !do_perform_cow_encrypt(bs, m->offset, m->alloc_offset,
+> > -                                    end->offset, end_buffer, end->nb_bytes)) {
+> > +        if (!qcow2_co_encrypt(bs,
+> > +                              m->offset + start->offset,
+> > +                              m->alloc_offset + start->offset,
+> > +                              start_buffer, start->nb_bytes) ||
 > 
->  target/hppa/translate.c | 15 ++++++++++-----
->  1 file changed, 10 insertions(+), 5 deletions(-)
+> You got caught)
 
-Thanks, queued.
+Ha!, I am just too tired.
+
+> second argument qcow2_co_encrypt is host_offset and third is guest_offset.
+> 
+> I noticed this difference when reviewing previous version, and it's actually
+> additional reason to drop the function. Unfortunately, I didn't said.
+> 
+> Also, we can use return value of qcow2_co_encrypt instead of dropping it,
+> 
+> something like classical
+> 
+> ret = qcow2_co_encrypt(..)
+> if (ret < 0) {
+>     goto fail;
+> }
+> 
+> ret = qcow2_co_encrypt(..)
+> if (ret < 0) {
+>     goto fail;
+> }
+> 
+> Also, IMHO, too much changes too keep reviewed-by mark. Still, maybe it's my
+> "with it least fixed" is misleading, may be interpreted like removing the
+> function and corresponding refactoring is included..
+Yea. So V7 there will be...
+Re-factoring is hard (but worth it) :-(
+
+> 
+> 
+> > +            !qcow2_co_encrypt(bs,
+> > +                              m->offset + end->offset,
+> > +                              m->alloc_offset + end->offset,
+> > +                              end_buffer, end->nb_bytes)) {
+> >               ret = -EIO;
+> >               goto fail;
+> >           }
+> > diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
+> > index 3b1e63fe41..b31d45fb2b 100644
+> > --- a/block/qcow2-threads.c
+> > +++ b/block/qcow2-threads.c
+> > @@ -234,15 +234,15 @@ static int qcow2_encdec_pool_func(void *opaque)
+> >   }
+> >   
+> >   static int coroutine_fn
+> > -qcow2_co_encdec(BlockDriverState *bs, uint64_t file_cluster_offset,
+> > -                  uint64_t offset, void *buf, size_t len, Qcow2EncDecFunc func)
+> > +qcow2_co_encdec(BlockDriverState *bs, uint64_t host_offset,
+> > +                uint64_t guest_offset, void *buf, size_t len,
+> > +                Qcow2EncDecFunc func)
+> >   {
+> >       BDRVQcow2State *s = bs->opaque;
+> > +
+> >       Qcow2EncDecData arg = {
+> >           .block = s->crypto,
+> > -        .offset = s->crypt_physical_offset ?
+> > -                      file_cluster_offset + offset_into_cluster(s, offset) :
+> > -                      offset,
+> > +        .offset = s->crypt_physical_offset ? host_offset : guest_offset,
+> >           .buf = buf,
+> >           .len = len,
+> >           .func = func,
+> > @@ -251,18 +251,73 @@ qcow2_co_encdec(BlockDriverState *bs, uint64_t file_cluster_offset,
+> >       return qcow2_co_process(bs, qcow2_encdec_pool_func, &arg);
+> >   }
+> >   
+> > +
+> > +/*
+> > + * qcow2_co_encrypt()
+> > + *
+> > + * Encrypts one or more contiguous aligned sectors
+> > + *
+> > + * @host_offset - underlying storage offset of the first sector of the
+> > + * data to be encrypted
+> > + *
+> > + * @guest_offset - guest (virtual) offset of the first sector of the
+> > + * data to be encrypted
+> > + *
+> > + * @buf - buffer with the data to encrypt, that after encryption
+> > + *        will be written to the underlying storage device at
+> > + *        @host_offset
+> > + *
+> > + * @len - length of the buffer (must be a BDRV_SECTOR_SIZE multiple)
+> > + *
+> > + * Depending on the encryption method, @host_offset and/or @guest_offset
+> > + * may be used for generating the initialization vector for
+> > + * encryption.
+> > + *
+> > + * Note that while the whole range must be aligned on sectors, it
+> > + * does not have to be aligned on clusters and can also cross cluster
+> > + * boundaries
+> > + */
+> >   int coroutine_fn
+> > -qcow2_co_encrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
+> > -                 uint64_t offset, void *buf, size_t len)
+> > +qcow2_co_encrypt(BlockDriverState *bs, uint64_t host_offset,
+> > +                 uint64_t guest_offset, void *buf, size_t len)
+> >   {
+> > -    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
+> > -                             qcrypto_block_encrypt);
+> > +
+> > +    BDRVQcow2State *s = bs->opaque;
+> > +    assert(QEMU_IS_ALIGNED(guest_offset, BDRV_SECTOR_SIZE));
+> > +    assert(QEMU_IS_ALIGNED(host_offset, BDRV_SECTOR_SIZE));
+> > +    assert(QEMU_IS_ALIGNED(len, BDRV_SECTOR_SIZE));
+> > +    assert(s->crypto);
+> 
+> Hmm, better to move these asertions to _encdec I think, and don't duplicate
+> them in two functions.
+
+OK.
+
+> 
+> > +
+> > +    if (!len) {
+> > +        return 0;
+> > +    }
+> 
+> Aha, that's why you don't check this in perform_cow. That's OK,
+> but still, better keep it in _encdec and don't duplicate.
 
 
-r~
+OK.
+
+> 
+> > +
+> > +    return qcow2_co_encdec(bs, host_offset, guest_offset, buf, len,
+> > +                           qcrypto_block_encrypt);
+> >   }
+> >   
+> > +
+> > +/*
+> > + * qcow2_co_decrypt()
+> > + *
+> > + * Decrypts one or more contiguous aligned sectors
+> > + * Similar to qcow2_co_encrypt
+> > + */
+> > +
+> >   int coroutine_fn
+> > -qcow2_co_decrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
+> > -                 uint64_t offset, void *buf, size_t len)
+> > +qcow2_co_decrypt(BlockDriverState *bs, uint64_t host_offset,
+> > +                 uint64_t guest_offset, void *buf, size_t len)
+> >   {
+> > -    return qcow2_co_encdec(bs, file_cluster_offset, offset, buf, len,
+> > -                             qcrypto_block_decrypt);
+> > +    BDRVQcow2State *s = bs->opaque;
+> > +    assert(QEMU_IS_ALIGNED(guest_offset, BDRV_SECTOR_SIZE));
+> > +    assert(QEMU_IS_ALIGNED(host_offset, BDRV_SECTOR_SIZE));
+> > +    assert(QEMU_IS_ALIGNED(len, BDRV_SECTOR_SIZE));
+> > +    assert(s->crypto);
+> > +
+> > +    if (!len) {
+> > +        return 0;
+> > +    }
+> > +
+> > +    return qcow2_co_encdec(bs, host_offset, guest_offset, buf, len,
+> > +                           qcrypto_block_decrypt);
+> >   }
+> > diff --git a/block/qcow2.c b/block/qcow2.c
+> > index 57734f20cf..ac768092bb 100644
+> > --- a/block/qcow2.c
+> > +++ b/block/qcow2.c
+> > @@ -2069,7 +2069,8 @@ static coroutine_fn int qcow2_co_preadv_part(BlockDriverState *bs,
+> >   
+> >                   assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
+> >                   assert((cur_bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
+> > -                if (qcow2_co_decrypt(bs, cluster_offset, offset,
+> > +                if (qcow2_co_decrypt(bs, cluster_offset + offset_in_cluster,
+> > +                                     offset,
+> >                                        cluster_data, cur_bytes) < 0) {
+> >                       ret = -EIO;
+> >                       goto fail;
+> > @@ -2288,7 +2289,7 @@ static coroutine_fn int qcow2_co_pwritev_part(
+> >               qemu_iovec_to_buf(qiov, qiov_offset + bytes_done,
+> >                                 cluster_data, cur_bytes);
+> >   
+> > -            if (qcow2_co_encrypt(bs, cluster_offset, offset,
+> > +            if (qcow2_co_encrypt(bs, cluster_offset + offset_in_cluster, offset,
+> >                                    cluster_data, cur_bytes) < 0) {
+> >                   ret = -EIO;
+> >                   goto out_unlocked;
+> > diff --git a/block/qcow2.h b/block/qcow2.h
+> > index 998bcdaef1..a488d761ff 100644
+> > --- a/block/qcow2.h
+> > +++ b/block/qcow2.h
+> > @@ -758,10 +758,10 @@ ssize_t coroutine_fn
+> >   qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
+> >                       const void *src, size_t src_size);
+> >   int coroutine_fn
+> > -qcow2_co_encrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
+> > -                 uint64_t offset, void *buf, size_t len);
+> > +qcow2_co_encrypt(BlockDriverState *bs, uint64_t host_offset,
+> > +                 uint64_t guest_offset, void *buf, size_t len);
+> >   int coroutine_fn
+> > -qcow2_co_decrypt(BlockDriverState *bs, uint64_t file_cluster_offset,
+> > -                 uint64_t offset, void *buf, size_t len);
+> > +qcow2_co_decrypt(BlockDriverState *bs, uint64_t host_offset,
+> > +                 uint64_t guest_offset, void *buf, size_t len);
+> >   
+> >   #endif
+> > 
+
+
+Best regards,
+	Maxim Levitsky
+
 
