@@ -2,122 +2,70 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DD30C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 15:47:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AA6CC49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 15:49:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBAAC2081B
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 15:47:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="fxri9zaQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBAAC2081B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2BD5D2081B
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 15:49:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BD5D2081B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8nn6-0005Me-UX
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 11:47:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56156)
+	id 1i8np7-000742-4T
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 11:49:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56735)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i8nkt-0003xN-6H
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:45:04 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1i8nnh-0005v3-OL
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:47:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i8nkr-0004sg-Mn
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:45:03 -0400
-Received: from mail-eopbgr10099.outbound.protection.outlook.com
- ([40.107.1.99]:7821 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1i8nkl-0004hi-Uv; Fri, 13 Sep 2019 11:44:56 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oDhmQQ3tD+v5TRt7/qthCQt7GN0fnHGvWC94DJDpuYBFEb/S+wqoVP1TT7c9FtUNOlZzQJLI7Kq6GBwoXgzhgMT5Mqo5j4SAMamwTt1vP+ipnR1pHli0xpEvfCGwU8v87TXxoQGqsUX2GxihloPCBYIR2T6sHiVq3X+zEPC8bG18zpE3I58/vsAKoRBI6xo7qRlM/dEEzoxWEA+vS/A3vhXW9oSGdnu1OvIJpBq1xOhL/fQxhaJVZoayyxBQJkmUW2gPLRV1QYcxqOvbz67GE0bTMcIi7MTg8N1nnqwHxdOD7Wzw3ZDvGqaGuDce0g3VbgVqGWLJP+J/DgZ4cH2YyQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JZ32vdQms0WIA6up0mXAyRjA0LPMZzlLOqJq3einwBk=;
- b=lflC9Aw8L9Xvh8LfcThQQyxSHJIGQxAOQnN1s1emoQsVsPfQHauIb8NtzczsHMEFiClezDXradgV727DewT7qB6Bl0GVANVLsPu5fx1qZ1ZL4p1J65gvcJY1mCYFT+5BucSfHFU2UYa0sLH8ng8f9G6IAkifUCZtI5oNFDK8YPKFtqLAtWYLwqG4YHWa557SxYFAEHR9uw3KKvuw+XUXLadEVu9SZRZQlFE71SViuPIvJPdmvj6zS/VccX+EsxNQD25JH+ptrQgjrMebiPjcv+IsKstYpUmmcbHPQrZPAP4Symg1vi9ynoEKbWyWyffXmsv1szz9e5vRNSH18NwFaQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JZ32vdQms0WIA6up0mXAyRjA0LPMZzlLOqJq3einwBk=;
- b=fxri9zaQTImz/OFbGXGkJd4mOOtWK8reYjVMw1ndmBAs52JqfjHccONe5cyKjj0ih8YZf7HGlxsyYpnXJgAxrBL5X7M0HiGVnReHSCAJ8alwKjrtYj6eSOlpVoIBCrehelffkYcez/tc5pGyu14+dYRAFVBgnZwqtssS5dQB5jQ=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5531.eurprd08.prod.outlook.com (52.133.243.199) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2263.17; Fri, 13 Sep 2019 15:44:54 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2263.016; Fri, 13 Sep 2019
- 15:44:54 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Thread-Topic: [PATCH v5 1/3] Fix qcow2+luks corruption introduced by commit
- 8ac0f15f335
-Thread-Index: AQHVakfmT7LKCGOnKkSfQz/snxq8lKcpv8yA
-Date: Fri, 13 Sep 2019 15:44:53 +0000
-Message-ID: <170075bf-2837-6934-cbe0-aaf67eb748df@virtuozzo.com>
-References: <20190913152818.17843-1-mlevitsk@redhat.com>
- <20190913152818.17843-2-mlevitsk@redhat.com>
-In-Reply-To: <20190913152818.17843-2-mlevitsk@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0102CA0057.eurprd01.prod.exchangelabs.com
- (2603:10a6:7:7d::34) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190913184451516
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a8a21f58-7cf8-4ad9-ba09-08d738615224
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB5531; 
-x-ms-traffictypediagnostic: DB8PR08MB5531:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <DB8PR08MB55316F9507F66E8FDC64DD5CC1B30@DB8PR08MB5531.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:49;
-x-forefront-prvs: 0159AC2B97
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(136003)(39840400004)(366004)(396003)(376002)(346002)(189003)(199004)(6486002)(2501003)(66066001)(71190400001)(71200400001)(6436002)(476003)(36756003)(229853002)(66946007)(102836004)(66476007)(110136005)(54906003)(66556008)(64756008)(66446008)(99286004)(53936002)(256004)(52116002)(6246003)(5660300002)(31686004)(386003)(6506007)(486006)(4326008)(6512007)(6306002)(2906002)(966005)(31696002)(478600001)(186003)(7736002)(2616005)(76176011)(305945005)(446003)(25786009)(81166006)(81156014)(8936002)(8676002)(11346002)(316002)(6116002)(26005)(3846002)(14454004)(86362001)(98903001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5531;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: WAnQlUeNIsF4bPa/z7LMDfzBsD6eCPXeHbux0upx9PwtVHPwGSlQHgjCJesd/RM/B2YUoFcXOO36zU0AFphDlZPC2pEXcnxXKJ2erAWedOd+qggjqzPaTmKoMGbkjCxy7H85MoCxxdDfrC9Pt6jJyrN/nTMRnHgWZDNYuazVoMYY/CU+e4h3Ndg65ZpM9CV4BSvVleZ4IUFGCMVN8AtcY9yH5tC2TmCSzBIFjcbNuCRpsq97owD7JP3hVlkyxx+OE0VjZf9DbHv0nDMZ6/GmNjtkvNdtgYt2YiLiml5edd2heLrq9kzqW3I5c3WMJi9oWjNHvYO/J8T5tQuFVQOzg6E9LxRWNSlTOztKmPPf87ON/67QplDV0w5486SLV+JvE7K93Z2gkcnY73P/8JLw2AGhHAs4E0PWu8zM+AVzCzs=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <BAAAEAEEB89836479833BCC4DBB9E385@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <alex.williamson@redhat.com>) id 1i8nnf-0000J7-LJ
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:47:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58208)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1i8nnf-0000IV-Dh
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 11:47:55 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 91A5710C0922;
+ Fri, 13 Sep 2019 15:47:53 +0000 (UTC)
+Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D9F64450C;
+ Fri, 13 Sep 2019 15:47:50 +0000 (UTC)
+Date: Fri, 13 Sep 2019 09:47:50 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Message-ID: <20190913094750.03759a4d@x1.home>
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D572135@SHSMSX104.ccr.corp.intel.com>
+References: <1566845753-18993-1-git-send-email-kwankhede@nvidia.com>
+ <1566845753-18993-2-git-send-email-kwankhede@nvidia.com>
+ <20190828145045.20f2a7b3@x1.home>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D553133@SHSMSX104.ccr.corp.intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D553184@SHSMSX104.ccr.corp.intel.com>
+ <20190830103252.2b427144@x1.home>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D560D74@SHSMSX104.ccr.corp.intel.com>
+ <20190912154106.4e784906@x1.home>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D572135@SHSMSX104.ccr.corp.intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a8a21f58-7cf8-4ad9-ba09-08d738615224
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Sep 2019 15:44:53.8787 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: v5EEqEqZRCFjbi/vU1PZn0PcXQYqt90PSQ5FxRcaZuyiVCLwgbuloZLhsRVYGhehIKXiIaK9buqSICQlCzxpGkpDIBe/vew+wItHRKjC2Jo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5531
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.1.99
-Subject: Re: [Qemu-devel] [PATCH v5 1/3] Fix qcow2+luks corruption
- introduced by commit 8ac0f15f335
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Fri, 13 Sep 2019 15:47:53 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v8 01/13] vfio: KABI for migration interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,55 +77,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?utf-8?B?RGFuaWVsIFAgLiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- qemu-stable <qemu-stable@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Liu,
+ Yi L" <yi.l.liu@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Zhao,
+ Yan Y" <yan.y.zhao@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTMuMDkuMjAxOSAxODoyOCwgTWF4aW0gTGV2aXRza3kgd3JvdGU6DQo+IFRoaXMgZml4ZXMgc3Vi
-dGxlIGNvcnJ1cHRpb24gaW50cm9kdWNlZCBieSBsdWtzIHRocmVhZGVkIGVuY3J5cHRpb24NCj4g
-aW4gY29tbWl0IDhhYzBmMTVmMzM1DQo+IA0KPiBCdWd6aWxsYTogaHR0cHM6Ly9idWd6aWxsYS5y
-ZWRoYXQuY29tL3Nob3dfYnVnLmNnaT9pZD0xNzQ1OTIyDQo+IA0KPiBUaGUgY29ycnVwdGlvbiBo
-YXBwZW5zIHdoZW4gd2UgZG8gYSB3cml0ZSB0aGF0DQo+ICAgICAqIHdyaXRlcyB0byB0d28gb3Ig
-bW9yZSB1bmFsbG9jYXRlZCBjbHVzdGVycyBhdCBvbmNlDQo+ICAgICAqIGRvZXNuJ3QgZnVsbHkg
-Y292ZXIgdGhlIGZpcnN0IHNlY3Rvcg0KPiAgICAgKiBkb2Vzbid0IGZ1bGx5IGNvdmVyIHRoZSBs
-YXN0IHNlY3Rvcg0KPiANCj4gSW4gdGhpcyBjYXNlLCB3aGVuIGFsbG9jYXRpbmcgdGhlIG5ldyBj
-bHVzdGVycyB3ZSBDT1cgYm90aCBhcmVhcw0KPiBwcmlvciB0byB0aGUgd3JpdGUgYW5kIGFmdGVy
-IHRoZSB3cml0ZSwgYW5kIHdlIGVuY3J5cHQgdGhlbS4NCj4gDQo+IFRoZSBhYm92ZSBtZW50aW9u
-ZWQgY29tbWl0IGFjY2lkZW50YWxseSBtYWRlIGl0IHNvIHdlIGVuY3J5cHQgdGhlDQo+IHNlY29u
-ZCBDT1cgYXJlYSB1c2luZyB0aGUgcGh5c2ljYWwgY2x1c3RlciBvZmZzZXQgb2YgdGhlIGZpcnN0
-IGFyZWEuDQo+IA0KPiBUaGUgcHJvYmxlbSBpcyB0aGF0IG9mZnNldF9pbl9jbHVzdGVyIGluIGRv
-X3BlcmZvcm1fY293X2VuY3J5cHQNCj4gY2FuIGJlIGxhcmdlciB0aGF0IHRoZSBjbHVzdGVyIHNp
-emUsIHRodXMgY2x1c3Rlcl9vZmZzZXQNCj4gd2lsbCBubyBsb25nZXIgcG9pbnQgdG8gdGhlIHN0
-YXJ0IG9mIHRoZSBjbHVzdGVyIGF0IHdoaWNoIGVuY3J5cHRlZA0KPiBhcmVhIHN0YXJ0cy4NCj4g
-DQo+IE5leHQgcGF0Y2ggaW4gdGhpcyBzZXJpZXMgd2lsbCByZWZhY3RvciB0aGUgY29kZSB0byBh
-dm9pZCBhbGwgdGhlc2UNCj4gYXNzdW1wdGlvbnMuDQo+IA0KPiBJbiB0aGUgYnVncmVwb3J0IHRo
-YXQgd2FzIHRyaWdnZXJlZCBieSByZWJhc2luZyBhIGx1a3MgaW1hZ2UgdG8gbmV3LA0KPiB6ZXJv
-IGZpbGxlZCBiYXNlLCB3aGljaCBsb3Qgb2Ygc3VjaCB3cml0ZXMsIGFuZCBjYXVzZXMgc29tZSBm
-aWxlcw0KPiB3aXRoIHplcm8gYXJlYXMgdG8gY29udGFpbiBnYXJiYWdlIHRoZXJlIGluc3RlYWQu
-DQo+IEJ1dCBhcyBkZXNjcmliZWQgYWJvdmUgaXQgY2FuIGhhcHBlbiBlbHNld2hlcmUgYXMgd2Vs
-bA0KPiANCj4gDQo+IFNpZ25lZC1vZmYtYnk6IE1heGltIExldml0c2t5IDxtbGV2aXRza0ByZWRo
-YXQuY29tPg0KDQpSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNl
-bWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQo+IC0tLQ0KPiAgIGJsb2NrL3Fjb3cyLWNsdXN0ZXIu
-YyB8IDcgKysrKy0tLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKyksIDMgZGVs
-ZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNvdzItY2x1c3Rlci5jIGIvYmxv
-Y2svcWNvdzItY2x1c3Rlci5jDQo+IGluZGV4IGRjYWNkM2M0NTAuLmJmZWIwMjQxZDcgMTAwNjQ0
-DQo+IC0tLSBhL2Jsb2NrL3Fjb3cyLWNsdXN0ZXIuYw0KPiArKysgYi9ibG9jay9xY293Mi1jbHVz
-dGVyLmMNCj4gQEAgLTQ3NCw5ICs0NzQsMTAgQEAgc3RhdGljIGJvb2wgY29yb3V0aW5lX2ZuIGRv
-X3BlcmZvcm1fY293X2VuY3J5cHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+ICAgICAgICAgICBh
-c3NlcnQoKG9mZnNldF9pbl9jbHVzdGVyICYgfkJEUlZfU0VDVE9SX01BU0spID09IDApOw0KPiAg
-ICAgICAgICAgYXNzZXJ0KChieXRlcyAmIH5CRFJWX1NFQ1RPUl9NQVNLKSA9PSAwKTsNCj4gICAg
-ICAgICAgIGFzc2VydChzLT5jcnlwdG8pOw0KPiAtICAgICAgICBpZiAocWNvdzJfY29fZW5jcnlw
-dChicywgY2x1c3Rlcl9vZmZzZXQsDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNy
-Y19jbHVzdGVyX29mZnNldCArIG9mZnNldF9pbl9jbHVzdGVyLA0KPiAtICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBidWZmZXIsIGJ5dGVzKSA8IDApIHsNCj4gKyAgICAgICAgaWYgKHFjb3cy
-X2NvX2VuY3J5cHQoYnMsDQo+ICsgICAgICAgICAgICAgICAgc3RhcnRfb2ZfY2x1c3RlcihzLCBj
-bHVzdGVyX29mZnNldCArIG9mZnNldF9pbl9jbHVzdGVyKSwNCj4gKyAgICAgICAgICAgICAgICBz
-cmNfY2x1c3Rlcl9vZmZzZXQgKyBvZmZzZXRfaW5fY2x1c3RlciwNCj4gKyAgICAgICAgICAgICAg
-ICBidWZmZXIsIGJ5dGVzKSA8IDApIHsNCj4gICAgICAgICAgICAgICByZXR1cm4gZmFsc2U7DQo+
-ICAgICAgICAgICB9DQo+ICAgICAgIH0NCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFk
-aW1pcg0K
+On Thu, 12 Sep 2019 23:00:03 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
+
+> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > Sent: Thursday, September 12, 2019 10:41 PM
+> > 
+> > On Tue, 3 Sep 2019 06:57:27 +0000
+> > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> >   
+> > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > > > Sent: Saturday, August 31, 2019 12:33 AM
+> > > >
+> > > > On Fri, 30 Aug 2019 08:06:32 +0000
+> > > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> > > >  
+> > > > > > From: Tian, Kevin
+> > > > > > Sent: Friday, August 30, 2019 3:26 PM
+> > > > > >  
+> > > > > [...]  
+> > > > > > > How does QEMU handle the fact that IOVAs are potentially  
+> > dynamic  
+> > > > while  
+> > > > > > > performing the live portion of a migration?  For example, each  
+> > time a  
+> > > > > > > guest driver calls dma_map_page() or dma_unmap_page(), a
+> > > > > > > MemoryRegionSection pops in or out of the AddressSpace for the  
+> > device  
+> > > > > > > (I'm assuming a vIOMMU where the device AddressSpace is not
+> > > > > > > system_memory).  I don't see any QEMU code that intercepts that  
+> > > > change  
+> > > > > > > in the AddressSpace such that the IOVA dirty pfns could be  
+> > recorded and  
+> > > > > > > translated to GFNs.  The vendor driver can't track these beyond  
+> > getting  
+> > > > > > > an unmap notification since it only knows the IOVA pfns, which  
+> > can be  
+> > > > > > > re-used with different GFN backing.  Once the DMA mapping is  
+> > torn  
+> > > > down,  
+> > > > > > > it seems those dirty pfns are lost in the ether.  If this works in  
+> > QEMU,  
+> > > > > > > please help me find the code that handles it.  
+> > > > > >
+> > > > > > I'm curious about this part too. Interestingly, I didn't find any  
+> > log_sync  
+> > > > > > callback registered by emulated devices in Qemu. Looks dirty pages
+> > > > > > by emulated DMAs are recorded in some implicit way. But KVM  
+> > always  
+> > > > > > reports dirty page in GFN instead of IOVA, regardless of the  
+> > presence of  
+> > > > > > vIOMMU. If Qemu also tracks dirty pages in GFN for emulated DMAs
+> > > > > >  (translation can be done when DMA happens), then we don't need
+> > > > > > worry about transient mapping from IOVA to GFN. Along this way  
+> > we  
+> > > > > > also want GFN-based dirty bitmap being reported through VFIO,
+> > > > > > similar to what KVM does. For vendor drivers, it needs to translate
+> > > > > > from IOVA to HVA to GFN when tracking DMA activities on VFIO
+> > > > > > devices. IOVA->HVA is provided by VFIO. for HVA->GFN, it can be
+> > > > > > provided by KVM but I'm not sure whether it's exposed now.
+> > > > > >  
+> > > > >
+> > > > > HVA->GFN can be done through hva_to_gfn_memslot in kvm_host.h.  
+> > > >
+> > > > I thought it was bad enough that we have vendor drivers that depend  
+> > on  
+> > > > KVM, but designing a vfio interface that only supports a KVM interface
+> > > > is more undesirable.  I also note without comment that  
+> > gfn_to_memslot()  
+> > > > is a GPL symbol.  Thanks,  
+> > >
+> > > yes it is bad, but sometimes inevitable. If you recall our discussions
+> > > back to 3yrs (when discussing the 1st mdev framework), there were  
+> > similar  
+> > > hypervisor dependencies in GVT-g, e.g. querying gpa->hpa when
+> > > creating some shadow structures. gpa->hpa is definitely hypervisor
+> > > specific knowledge, which is easy in KVM (gpa->hva->hpa), but needs
+> > > hypercall in Xen. but VFIO already makes assumption based on KVM-
+> > > only flavor when implementing vfio_{un}pin_page_external.  
+> > 
+> > Where's the KVM assumption there?  The MAP_DMA ioctl takes an IOVA
+> > and
+> > HVA.  When an mdev vendor driver calls vfio_pin_pages(), we GUP the HVA
+> > to get an HPA and provide an array of HPA pfns back to the caller.  The
+> > other vGPU mdev vendor manages to make use of this without KVM... the
+> > KVM interface used by GVT-g is GPL-only.  
+> 
+> To be clear it's the assumption on the host-based hypervisors e.g. KVM.
+> GUP is a perfect example, which doesn't work for Xen since DomU's
+> memory doesn't belong to Dom0. VFIO in Dom0 has to find the HPA
+> through Xen specific hypercalls.
+
+VFIO does not assume a hypervisor at all.  Yes, it happens to work well
+with a host-based hypervisor like KVM were we can simply use GUP, but
+I'd hardly call using the standard mechanism to pin a user page and get
+the pfn within the Linux kernel a KVM assumption.  The fact that Dom0
+Xen requires work here while KVM does not does is not an equivalency to
+VFIO assuming KVM.  Thanks,
+
+Alex
+ 
+> > > So GVT-g
+> > > has to maintain an internal abstraction layer to support both Xen and
+> > > KVM. Maybe someday we will re-consider introducing some hypervisor
+> > > abstraction layer in VFIO, if this issue starts to hurt other devices and
+> > > Xen guys are willing to support VFIO.  
+> > 
+> > Once upon a time, we had a KVM specific device assignment interface,
+> > ie. legacy KVM devie assignment.  We developed VFIO specifically to get
+> > KVM out of the business of being a (bad) device driver.  We do have
+> > some awareness and interaction between VFIO and KVM in the vfio-kvm
+> > pseudo device, but we still try to keep those interfaces generic.  In
+> > some cases we're not very successful at that, see vfio_group_set_kvm(),
+> > but that's largely just a mechanism to associate a cookie with a group
+> > to be consumed by the mdev vendor driver such that it can work with kvm
+> > external to vfio.  I don't intend to add further hypervisor awareness
+> > to vfio.
+> >   
+> > > Back to this IOVA issue, I discussed with Yan and we found another
+> > > hypervisor-agnostic alternative, by learning from vhost. vhost is very
+> > > similar to VFIO - DMA also happens in the kernel, while it already
+> > > supports vIOMMU.
+> > >
+> > > Generally speaking, there are three paths of dirty page collection
+> > > in Qemu so far (as previously noted, Qemu always tracks the dirty
+> > > bitmap in GFN):  
+> > 
+> > GFNs or simply PFNs within an AddressSpace?
+> >   
+> > > 1) Qemu-tracked memory writes (e.g. emulated DMAs). Dirty bitmaps
+> > > are updated directly when the guest memory is being updated. For
+> > > example, PCI writes are completed through pci_dma_write, which
+> > > goes through vIOMMU to translate IOVA into GPA and then update
+> > > the bitmap through cpu_physical_memory_set_dirty_range.  
+> > 
+> > Right, so the IOVA to GPA (GFN) occurs through an explicit translation
+> > on the IOMMU AddressSpace.
+> >   
+> > > 2) Memory writes that are not tracked by Qemu are collected by
+> > > registering .log_sync() callback, which is invoked in the dirty logging
+> > > process. Now there are two users: kvm and vhost.
+> > >
+> > >   2.1) KVM tracks CPU-side memory writes, through write-protection
+> > > or EPT A/D bits (+PML). This part is always based on GFN and returned
+> > > to Qemu when kvm_log_sync is invoked;
+> > >
+> > >   2.2) vhost tracks kernel-side DMA writes, by interpreting vring
+> > > data structure. It maintains an internal iotlb which is synced with
+> > > Qemu vIOMMU through a specific interface:
+> > > 	- new vhost message type (VHOST_IOTLB_UPDATE/INVALIDATE)
+> > > for Qemu to keep vhost iotlb in sync
+> > > 	- new VHOST_IOTLB_MISS message to notify Qemu in case of
+> > > a miss in vhost iotlb.
+> > > 	- Qemu registers a log buffer to kernel vhost driver. The latter
+> > > update the buffer (using internal iotlb to get GFN) when serving vring
+> > > descriptor.
+> > >
+> > > VFIO could also implement an internal iotlb, so vendor drivers can
+> > > utilize the iotlb to update the GFN-based dirty bitmap. Ideally we
+> > > don't need re-invent another iotlb protocol as vhost does. vIOMMU
+> > > already sends map/unmap ioctl cmds upon any change of IOVA
+> > > mapping. We may introduce a v2 map/unmap interface, allowing
+> > > Qemu to pass both {iova, gpa, hva} together to keep internal iotlb
+> > > in-sync. But we may also need a iotlb_miss_upcall interface, if VFIO
+> > > doesn't want to cache full-size vIOMMU mappings.
+> > >
+> > > Definitely this alternative needs more work and possibly less
+> > > performant (if maintaining a small size iotlb) than straightforward
+> > > calling into KVM interface. But the gain is also obvious, since it
+> > > is fully constrained with VFIO.
+> > >
+> > > Thoughts? :-)  
+> > 
+> > So vhost must then be configuring a listener across system memory
+> > rather than only against the device AddressSpace like we do in vfio,
+> > such that it get's log_sync() callbacks for the actual GPA space rather
+> > than only the IOVA space.  OTOH, QEMU could understand that the device
+> > AddressSpace has a translate function and apply the IOVA dirty bits to
+> > the system memory AddressSpace.  Wouldn't it make more sense for
+> > QEMU
+> > to perform a log_sync() prior to removing a MemoryRegionSection within
+> > an AddressSpace and update the GPA rather than pushing GPA awareness
+> > and potentially large tracking structures into the host kernel?  Thanks,
+> >   
+> 
+> It is an interesting idea.  One drawback is that log_sync might be
+> frequently invoked in IOVA case, but I guess the overhead is not much 
+> compared to the total overhead of emulating the IOTLB invalidation. 
+> Maybe other folks can better comment why this model was not 
+> considered before, e.g. when vhost iotlb was introduced.
+> 
+> Thanks
+> Kevin
+
 
