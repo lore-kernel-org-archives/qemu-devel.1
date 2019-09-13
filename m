@@ -6,89 +6,60 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 795D0C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 16:38:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B477FC49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 16:40:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 513B1206BB
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 16:38:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 513B1206BB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4214C206BB
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 16:40:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4214C206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8oaG-0005Qs-C3
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 12:38:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35664)
+	id 1i8ocr-00073m-5j
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 12:40:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36085)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1i8oYq-0003qE-43
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 12:36:41 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i8oc0-0006JM-C0
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 12:39:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1i8oYo-0002gY-Jp
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 12:36:39 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57988
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1i8oYo-0002b6-FB
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 12:36:38 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8DGWTKQ095104
- for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 12:36:27 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2v0cjewcnu-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 12:36:27 -0400
-Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Fri, 13 Sep 2019 17:36:25 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 13 Sep 2019 17:36:24 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x8DGaNHc58589188
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 13 Sep 2019 16:36:23 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8B572AE04D;
- Fri, 13 Sep 2019 16:36:23 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6B17CAE045;
- Fri, 13 Sep 2019 16:36:23 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.1.250])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri, 13 Sep 2019 16:36:23 +0000 (GMT)
-From: Greg Kurz <groug@kaod.org>
-To: Greg Kurz <groug@kaod.org>
-Date: Fri, 13 Sep 2019 18:36:23 +0200
-User-Agent: StGit/unknown-version
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+ (envelope-from <mlevitsk@redhat.com>) id 1i8obz-0005Ki-9R
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 12:39:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47426)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1i8obw-0005IT-ST; Fri, 13 Sep 2019 12:39:53 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 311678AC6FF;
+ Fri, 13 Sep 2019 16:39:52 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.39])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2E46F60925;
+ Fri, 13 Sep 2019 16:39:49 +0000 (UTC)
+Message-ID: <46eebf1924837b97ee28eeb1f43d199b80b4bacd.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, 
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Date: Fri, 13 Sep 2019 19:39:49 +0300
+In-Reply-To: <5645f290-b34e-6b51-00cf-b7c4b4a0927a@virtuozzo.com>
+References: <20190913152818.17843-1-mlevitsk@redhat.com>
+ <20190913152818.17843-4-mlevitsk@redhat.com>
+ <5645f290-b34e-6b51-00cf-b7c4b4a0927a@virtuozzo.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19091316-0012-0000-0000-0000034AEBE3
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19091316-0013-0000-0000-000021855CA8
-Message-Id: <156839258306.2228854.8411024885973295628.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-09-13_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=850 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909130167
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: [Qemu-devel] [PATCH] 9p: Print error hints if option parsing fails
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Fri, 13 Sep 2019 16:39:52 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v5 3/3] qemu-iotests: Add test for bz
+ #1745922
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,79 +71,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Daniel P . =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ qemu-stable <qemu-stable@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Option parsing fonctions are called with &error_fatal, which
-causes error_setg() to call exit() and the hints are never
-printed.
+On Fri, 2019-09-13 at 16:27 +0000, Vladimir Sementsov-Ogievskiy wrote:
+> 13.09.2019 18:28, Maxim Levitsky wrote:
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >   tests/qemu-iotests/263     | 91 ++++++++++++++++++++++++++++++++++++++
+> >   tests/qemu-iotests/263.out | 40 +++++++++++++++++
+> >   tests/qemu-iotests/group   |  2 +
+> >   3 files changed, 133 insertions(+)
+> >   create mode 100755 tests/qemu-iotests/263
+> >   create mode 100644 tests/qemu-iotests/263.out
+> > 
+> > diff --git a/tests/qemu-iotests/263 b/tests/qemu-iotests/263
+> > new file mode 100755
+> > index 0000000000..d2c030fae9
+> > --- /dev/null
+> > +++ b/tests/qemu-iotests/263
+> 
+> [..]
+> 
+> > --- a/tests/qemu-iotests/group
+> > +++ b/tests/qemu-iotests/group
+> > @@ -274,5 +274,7 @@
+> >   257 rw
+> >   258 rw quick
+> >   262 rw quick migration
+> > +263 rw quick
+> >   265 rw auto quick
+> >   266 rw quick
+> > +>>>>>>> patched
+> > 
+> 
+> last line is a mistake.
+Last minute merge mistake :-(
 
-Use an intermediate error object so that exit() happens in
-error_propagate() after error_append_hint() could be called.
+> 
+> also, test failed for me:
+> 
+> 263      fail       [19:21:35] [19:21:35]                    output mismatch (see 263.out.bad)
+> --- /work/src/qemu/maxim-luks/tests/qemu-iotests/263.out        2019-09-13 19:11:45.464727427 +0300
+> +++ /work/src/qemu/maxim-luks/tests/qemu-iotests/263.out.bad    2019-09-13 19:21:35.535381253 +0300
+> @@ -2,6 +2,7 @@
+> 
+>   testing LUKS qcow2 encryption
+> 
+> +qemu-img: TEST_DIR/t.IMGFMT: No crypto library supporting PBKDF in this build: Function not implemented
+>   Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
+>   == reading the whole image ==
+>   read 1048576/1048576 bytes at offset 0
+> Failures: 263
+> Failed 1 of 1 tests
+> 
+> 
+> and if reconfigure with
+>   --enable-gnutls --enable-gcrypt --enable-vhost-crypto --enable-crypto-afalg
+> (don't know which one is actually needed)
+> it works..
+> 
+> so, we at least should skip the test if it's unsupported
+Don't know. I based this test on 188 and it also doesn't have anything special about this.
+Its not in auto group though.
+I guess we need to ask Daniel about this.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/9pfs/9p-local.c |   11 +++++++----
- hw/9pfs/9p-proxy.c |   11 +++++++----
- 2 files changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 6f7309f4e691..2c80d2ac30f5 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -1486,8 +1486,9 @@ static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
-     Error *local_err = NULL;
- 
-     if (!sec_model) {
--        error_setg(errp, "security_model property not set");
--        error_append_security_model_hint(errp);
-+        error_setg(&local_err, "security_model property not set");
-+        error_append_security_model_hint(&local_err);
-+        error_propagate(errp, local_err);
-         return -1;
-     }
- 
-@@ -1501,8 +1502,10 @@ static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
-     } else if (!strcmp(sec_model, "mapped-file")) {
-         fse->export_flags |= V9FS_SM_MAPPED_FILE;
-     } else {
--        error_setg(errp, "invalid security_model property '%s'", sec_model);
--        error_append_security_model_hint(errp);
-+        error_setg(&local_err, "invalid security_model property '%s'",
-+                   sec_model);
-+        error_append_security_model_hint(&local_err);
-+        error_propagate(errp, local_err);
-         return -1;
-     }
- 
-diff --git a/hw/9pfs/9p-proxy.c b/hw/9pfs/9p-proxy.c
-index 97ab9c58a573..5de5e53702f7 100644
---- a/hw/9pfs/9p-proxy.c
-+++ b/hw/9pfs/9p-proxy.c
-@@ -1126,15 +1126,18 @@ static int proxy_parse_opts(QemuOpts *opts, FsDriverEntry *fs, Error **errp)
- {
-     const char *socket = qemu_opt_get(opts, "socket");
-     const char *sock_fd = qemu_opt_get(opts, "sock_fd");
-+    Error *local_err = NULL;
- 
-     if (!socket && !sock_fd) {
--        error_setg(errp, "both socket and sock_fd properties are missing");
--        error_append_socket_sockfd_hint(errp);
-+        error_setg(&local_err, "both socket and sock_fd properties are missing");
-+        error_append_socket_sockfd_hint(&local_err);
-+        error_propagate(errp, local_err);
-         return -1;
-     }
-     if (socket && sock_fd) {
--        error_setg(errp, "both socket and sock_fd properties are set");
--        error_append_socket_sockfd_hint(errp);
-+        error_setg(&local_err, "both socket and sock_fd properties are set");
-+        error_append_socket_sockfd_hint(&local_err);
-+        error_propagate(errp, local_err);
-         return -1;
-     }
-     if (socket) {
+
+Best regards,
+	Maxim Levitsky
 
 
