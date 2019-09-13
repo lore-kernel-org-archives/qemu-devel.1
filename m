@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B6FC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 22:44:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E69B6C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 22:54:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C035320830
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 22:44:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C035320830
+	by mail.kernel.org (Postfix) with ESMTPS id AE78320692
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 22:54:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE78320692
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8uIr-00023U-Vm
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 18:44:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58395)
+	id 1i8uSZ-0005nH-R5
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 18:54:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59732)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i8uI9-0001Xm-Sp
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 18:43:50 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i8uRf-0005GO-4t
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 18:53:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i8uI8-0000Ev-Qn
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 18:43:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55038)
+ (envelope-from <jsnow@redhat.com>) id 1i8uRe-00044L-0f
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 18:53:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60610)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i8uI4-0000Dq-B7; Fri, 13 Sep 2019 18:43:45 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1i8uRa-00042o-NN; Fri, 13 Sep 2019 18:53:34 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7C8E73082E61;
- Fri, 13 Sep 2019 22:43:42 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 501B5806CF;
+ Fri, 13 Sep 2019 22:53:33 +0000 (UTC)
 Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8BCB2600C6;
- Fri, 13 Sep 2019 22:43:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 81429194B9;
+ Fri, 13 Sep 2019 22:53:32 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20190912135632.13925-1-mreitz@redhat.com>
- <20190912135632.13925-2-mreitz@redhat.com>
+ <20190912135632.13925-4-mreitz@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -120,22 +120,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <cf03d000-5c59-74e2-cebb-0a62414ce271@redhat.com>
-Date: Fri, 13 Sep 2019 18:43:41 -0400
+Message-ID: <d5231f69-9c50-c1d8-6680-5e835b907861@redhat.com>
+Date: Fri, 13 Sep 2019 18:53:32 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190912135632.13925-2-mreitz@redhat.com>
+In-Reply-To: <20190912135632.13925-4-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 13 Sep 2019 22:43:42 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Fri, 13 Sep 2019 22:53:33 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/4] mirror: Do not dereference invalid
- pointers
+Subject: Re: [Qemu-devel] [PATCH 3/4] iotests: Add @error to
+ wait_until_completed
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -156,78 +156,87 @@ Sender: "Qemu-devel"
 
 
 On 9/12/19 9:56 AM, Max Reitz wrote:
-> mirror_exit_common() may be called twice (if it is called from
-> mirror_prepare() and fails, it will be called from mirror_abort()
-> again).
+> Callers can use this new parameter to expect failure during the
+> completion process.
 > 
-> In such a case, many of the pointers in the MirrorBlockJob object will
-> already be freed.  This can be seen most reliably for s->target, which
-> is set to NULL (and then dereferenced by blk_bs()).
-> 
-> Cc: qemu-stable@nongnu.org
-> Fixes: 737efc1eda23b904fbe0e66b37715fb0e5c3e58b
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
-
-Sorry that I left the mirror callbacks such a mess. I think I got the
-design for the completion callbacks completely wrong, because of how
-hard it is to disentangle mirror into something reasonable here.
-
-The original idea was that it calls .prepare, then either .commit or
-.abort, then .clean. Ideally, there would be no exit_common for mirror;
-everything would be sorted into the proper little callback silos.
-
-The problem with the existing design is that if it has already failed by
-.prepare time, we jump straight to .abort, so it has this uneven,
-unbalanced design. The code in abort and cleanup therefore has to work
-doubly-hard to figure out what exactly it needs to do.
-
-It's a mess.
-
-I wonder if it can be improved by always calling prepare, even when
-we've already failed. We could just posit that it now means "prepare to
-commit" or "prepare to abort" but we can do all of the work that can
-still fail there in one shot.
-
-Maybe that will make the work that needs to happen in abort/commit
-easier to digest.
-
 > ---
->  block/mirror.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
+>  tests/qemu-iotests/iotests.py | 18 ++++++++++++------
+>  1 file changed, 12 insertions(+), 6 deletions(-)
 > 
-> diff --git a/block/mirror.c b/block/mirror.c
-> index fe984efb90..706d80fced 100644
-> --- a/block/mirror.c
-> +++ b/block/mirror.c
-> @@ -620,11 +620,11 @@ static int mirror_exit_common(Job *job)
->  {
->      MirrorBlockJob *s = container_of(job, MirrorBlockJob, common.job);
->      BlockJob *bjob = &s->common;
-> -    MirrorBDSOpaque *bs_opaque = s->mirror_top_bs->opaque;
-> +    MirrorBDSOpaque *bs_opaque;
->      AioContext *replace_aio_context = NULL;
-> -    BlockDriverState *src = s->mirror_top_bs->backing->bs;
-> -    BlockDriverState *target_bs = blk_bs(s->target);
-> -    BlockDriverState *mirror_top_bs = s->mirror_top_bs;
-> +    BlockDriverState *src;
-> +    BlockDriverState *target_bs;
-> +    BlockDriverState *mirror_top_bs;
->      Error *local_err = NULL;
->      bool abort = job->ret < 0;
->      int ret = 0;
-> @@ -634,6 +634,11 @@ static int mirror_exit_common(Job *job)
->      }
->      s->prepared = true;
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> index b26271187c..300347c7c8 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -745,15 +745,20 @@ class QMPTestCase(unittest.TestCase):
+>          self.assert_no_active_block_jobs()
+>          return result
 >  
-> +    mirror_top_bs = s->mirror_top_bs;
-> +    bs_opaque = mirror_top_bs->opaque;
-> +    src = mirror_top_bs->backing->bs;
-> +    target_bs = blk_bs(s->target);
-> +
->      if (bdrv_chain_contains(src, target_bs)) {
->          bdrv_unfreeze_backing_chain(mirror_top_bs, target_bs);
->      }
+> -    def wait_until_completed(self, drive='drive0', check_offset=True, wait=60.0):
+> +    def wait_until_completed(self, drive='drive0', check_offset=True, wait=60.0,
+> +                             error=None):
+>          '''Wait for a block job to finish, returning the event'''
+>          while True:
+>              for event in self.vm.get_qmp_events(wait=wait):
+>                  if event['event'] == 'BLOCK_JOB_COMPLETED':
+>                      self.assert_qmp(event, 'data/device', drive)
+> -                    self.assert_qmp_absent(event, 'data/error')
+> -                    if check_offset:
+> -                        self.assert_qmp(event, 'data/offset', event['data']['len'])
+> +                    if error is None:
+> +                        self.assert_qmp_absent(event, 'data/error')
+> +                        if check_offset:
+> +                            self.assert_qmp(event, 'data/offset',
+> +                                            event['data']['len'])
+> +                    else:
+> +                        self.assert_qmp(event, 'data/error', error)
+>                      self.assert_no_active_block_jobs()
+>                      return event
+>                  elif event['event'] == 'JOB_STATUS_CHANGE':
+> @@ -771,7 +776,8 @@ class QMPTestCase(unittest.TestCase):
+>          self.assert_qmp(event, 'data/type', 'mirror')
+>          self.assert_qmp(event, 'data/offset', event['data']['len'])
+>  
+> -    def complete_and_wait(self, drive='drive0', wait_ready=True):
+> +    def complete_and_wait(self, drive='drive0', wait_ready=True,
+> +                          completion_error=None):
+>          '''Complete a block job and wait for it to finish'''
+>          if wait_ready:
+>              self.wait_ready(drive=drive)
+> @@ -779,7 +785,7 @@ class QMPTestCase(unittest.TestCase):
+>          result = self.vm.qmp('block-job-complete', device=drive)
+>          self.assert_qmp(result, 'return', {})
+>  
+> -        event = self.wait_until_completed(drive=drive)
+> +        event = self.wait_until_completed(drive=drive, error=completion_error)
+>          self.assert_qmp(event, 'data/type', 'mirror')
+>  
+>      def pause_wait(self, job_id='job0'):
 > 
+
+toot toot more optional parameters. lay them at the altar of
+noncommittal python design.
+
+I completely forget what the difference between unittest.TestCase and
+qtest.QEMUQtestMachine is and why they each have job management methods.
+
+Well, OK: the VM one is a simple subclass of the general-purpose VM
+machine to add some more useful stuff. the unittest one implements some
+general-purpose behavior with asserts that only work in the unittest world.
+
+Still,
+
+It's a little fun that we've got run_job as well as cancel_and_wait,
+wait_until_completed, wait_ready, wait_ready_and_cancel, pause_wait and
+pause_job and they all seem to implement job run-state logic management
+a little differently.
+
+Probably no bugs there, I bet.
+
+*cough* Not your fault, anyway, so please take this accolade:
 
 Reviewed-by: John Snow <jsnow@redhat.com>
+
+
+(it's probably my fault)
 
