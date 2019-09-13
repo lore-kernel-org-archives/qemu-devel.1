@@ -2,56 +2,46 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F59C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 18:52:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E36B4C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 19:33:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63CFC20830
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 18:52:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63CFC20830
+	by mail.kernel.org (Postfix) with ESMTPS id B1AF220640
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 19:33:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1AF220640
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8qgM-0007SS-EO
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 14:52:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54249)
+	id 1i8rJY-0007hS-PX
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 15:33:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60883)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1i8qdX-0005XK-Td
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 14:49:41 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i8rIo-0007Ee-UC
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 15:32:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1i8qdW-0004FL-CE
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 14:49:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53096)
+ (envelope-from <jsnow@redhat.com>) id 1i8rIi-0007fc-QH
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 15:32:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42934)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1i8qdT-0004DZ-7a; Fri, 13 Sep 2019 14:49:35 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1i8rIi-0007fJ-IE
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 15:32:12 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 68752804F2;
- Fri, 13 Sep 2019 18:49:34 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 891CE8665A;
+ Fri, 13 Sep 2019 19:32:11 +0000 (UTC)
 Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 43DF7799C;
- Fri, 13 Sep 2019 18:49:33 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-References: <20190806152611.280389-1-vsementsov@virtuozzo.com>
- <fa5f14a1-e05d-24e7-a51e-ad7737d5f4a1@redhat.com>
- <c0f0831f-851b-a76d-208c-22d97e4392d8@virtuozzo.com>
- <57111ad3-6acc-1027-2e5a-f203929e48b6@redhat.com>
- <c773ab2c-368c-825e-dd51-5ff8b5060c2b@virtuozzo.com>
- <f125fc22-98ae-3146-4fba-524da959bf17@redhat.com>
- <0ccc2288-fd76-25f9-0cc7-c92fd8ea5d36@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C49DF194BB;
+ Fri, 13 Sep 2019 19:32:08 +0000 (UTC)
+To: qemu-devel <qemu-devel@nongnu.org>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -128,21 +118,20 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <495800ff-c664-7a9b-4b3f-0bea9741784e@redhat.com>
-Date: Fri, 13 Sep 2019 14:49:32 -0400
+Message-ID: <12460c01-6960-bd66-501a-46fc31ad7be1@redhat.com>
+Date: Fri, 13 Sep 2019 15:32:08 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <0ccc2288-fd76-25f9-0cc7-c92fd8ea5d36@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Fri, 13 Sep 2019 18:49:34 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Fri, 13 Sep 2019 19:32:11 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2] util/hbitmap: strict hbitmap_reset
+Subject: [Qemu-devel] Python3 support for patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -154,135 +143,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Denis Lunev <den@virtuozzo.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi,
+
+I quite like the patches tool; but python2 is notably doomed.
+
+I tried my hand at polishing it up for python3 and pushed the results
+here: https://github.com/jnsnow/patches/tree/python3
+
+I didn't faff around with trying to add simultaneous support: this is a
+direct conversion in one big chunk. I used 2to3 and supplemented with
+pylint and flake8 to find problem spots.
+
+I don't use all of the features of this tool, but maybe if you'd like to
+give this a try you can test this branch and let me know if I missed any
+spots.
+
+You can install patches 0.3.1 using the standard incantations:
+> python3 setup.py install --user
+
+If it's too broken, you can uninstall it later with:
+> pip3 uninstall patches
+
+You may need to check back to the master branch and force a
+reinstallation of the python2 version to get the bin back in your PATH:
+
+> git checkout master
+> python2 setup.py install --user
 
 
-On 9/12/19 4:20 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 11.09.2019 20:59, John Snow wrote:
->>
->>
->> On 9/11/19 11:13 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> 07.08.2019 19:27, John Snow wrote:
->>>>
->>>>
->>>> On 8/6/19 12:19 PM, Vladimir Sementsov-Ogievskiy wrote:
->>>>> 06.08.2019 19:09, Max Reitz wrote:
->>>>>> On 06.08.19 17:26, Vladimir Sementsov-Ogievskiy wrote:
->>>>>>> hbitmap_reset has an unobvious property: it rounds requested region up.
->>>>>>> It may provoke bugs, like in recently fixed write-blocking mode of
->>>>>>> mirror: user calls reset on unaligned region, not keeping in mind that
->>>>>>> there are possible unrelated dirty bytes, covered by rounded-up region
->>>>>>> and information of this unrelated "dirtiness" will be lost.
->>>>>>>
->>>>>>> Make hbitmap_reset strict: assert that arguments are aligned, allowing
->>>>>>> only one exception when @start + @count == hb->orig_size. It's needed
->>>>>>> to comfort users of hbitmap_next_dirty_area, which cares about
->>>>>>> hb->orig_size.
->>>>>>>
->>>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>>>>> ---
->>>>>>>
->>>>>>> v2 based on Max's https://github.com/XanClic/qemu.git block
->>>>>>> which will be merged soon to 4.1, and this patch goes to 4.2
->>>>>>> Based-on: https://github.com/XanClic/qemu.git block
->>>>>>>
->>>>>>> v1 was "[PATCH] util/hbitmap: fix unaligned reset", and as I understand
->>>>>>> we all agreed to just assert alignment instead of aligning down
->>>>>>> automatically.
->>>>>>>
->>>>>>>     include/qemu/hbitmap.h | 5 +++++
->>>>>>>     tests/test-hbitmap.c   | 2 +-
->>>>>>>     util/hbitmap.c         | 4 ++++
->>>>>>>     3 files changed, 10 insertions(+), 1 deletion(-)
->>>>>>>
->>>>>>> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
->>>>>>> index 4afbe6292e..7865e819ca 100644
->>>>>>> --- a/include/qemu/hbitmap.h
->>>>>>> +++ b/include/qemu/hbitmap.h
->>>>>>> @@ -132,6 +132,11 @@ void hbitmap_set(HBitmap *hb, uint64_t start, uint64_t count);
->>>>>>>      * @count: Number of bits to reset.
->>>>>>>      *
->>>>>>>      * Reset a consecutive range of bits in an HBitmap.
->>>>>>> + * @start and @count must be aligned to bitmap granularity. The only exception
->>>>>>> + * is resetting the tail of the bitmap: @count may be equal to @start +
->>>>>>> + * hb->orig_size,
->>>>>>
->>>>>> s/@start + hb->orig_size/hb->orig_size - @start/, I think.
->>>>>
->>>>> Ha, I wanted to say start + count equal to orig_size. Yours is OK too of course.
->>>>>
->>>>>>
->>>>>>>        in this case @count may be not aligned. @start + @count
->>>>>>
->>>>>> +are
->>>>>>
->>>>>> With those fixed:
->>>>>>
->>>>>> Reviewed-by: Max Reitz <mreitz@redhat.com>
->>>>>
->>>>> Thanks!
->>>>>
->>>>
->>>> I'll add this to the pile for 4.2, after I fix the rebase conflicts that
->>>> arose from 4.1-rc4.
->>>>
->>>
->>> Hi!
->>>
->>> Didn't you forget, or should I resend?
->>>
->>>
->>
->> I must have dropped the patch by accident during the rebasing. As an
->> apology, I squashed in Max's suggestions from the list. Check that they
->> look OK, please?
->>
->> Thanks, applied to my bitmaps tree:
->>
->> https://github.com/jnsnow/qemu/commits/bitmaps
->> https://github.com/jnsnow/qemu.git
->>
-> 
-> Thanks! Still:
-> 
-> Quote from your branch:
-> 
->  >   * Reset a consecutive range of bits in an HBitmap.
->  > + * @start and @count must be aligned to bitmap granularity. The only exception
->  > + * is resetting the tail of the bitmap: @count may be equal to hb->orig_size -
->  > + * start, in this case @count may be not aligned. @start + @count are
-> 
-> s/start/@start/ (corresponds to Max's comment, too)
-> 
-
-OK, you got it.
-
-> Also, I'm not sure about "are" suggested by Max. "are" is for plural, but here I meant
-> one object: sum of @start and @count.
-> 
-
-There's not great agreement universally about how to treat things like
-collective nouns. Sometimes "Data" is singular, but sometimes it's
-plural. "It depends."
-
-In this case, "start + count" refers to one sum, but two constituent
-pieces, so it's functioning like a collective noun.
-
-We might say "a + b (together) /are/ ..." but also "the sum of a + b /is/".
-
-> So, you may use exactly "Sum of @start and @count is" or "(@start + @count) sum is" or
-> just "(@start + @count) is", whichever you like more.
-> 
-
-I like using "the sum of @x and @y is" for being grammatically unambiguous.
-
-updated and pushed.
-
-(Sorry about my language again! --js)
+Happy python2 doomsday,
+--js
 
