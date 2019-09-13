@@ -2,63 +2,62 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-4.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B96CEC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 09:22:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6429C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 09:27:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 928AE20CC7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 09:22:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 928AE20CC7
+	by mail.kernel.org (Postfix) with ESMTPS id 9BE7A208C2
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 09:27:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BE7A208C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8hmD-0003NO-QP
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 05:22:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53564)
+	id 1i8hr4-0005Sp-4s
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 05:27:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54122)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1i8hlQ-0002st-PM
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 05:21:13 -0400
+ (envelope-from <kraxel@redhat.com>) id 1i8hpq-0004F3-5t
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 05:25:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1i8hlP-0005JB-Ts
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 05:21:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43664)
+ (envelope-from <kraxel@redhat.com>) id 1i8hpp-0007S1-1K
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 05:25:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46410)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>)
- id 1i8hlN-0005IE-VS; Fri, 13 Sep 2019 05:21:10 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1i8hpo-0007RG-Sp
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 05:25:44 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 805BE8980FB;
- Fri, 13 Sep 2019 09:21:08 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AB22B60600;
- Fri, 13 Sep 2019 09:20:57 +0000 (UTC)
-Date: Fri, 13 Sep 2019 11:20:55 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Message-ID: <20190913092055.kxvwzzmwp5mra3gh@kamzik.brq.redhat.com>
-References: <20190913083615.14719-1-eric.auger@redhat.com>
- <20190913083615.14719-4-eric.auger@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190913083615.14719-4-eric.auger@redhat.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Fri, 13 Sep 2019 09:21:08 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3C3F37BDA1;
+ Fri, 13 Sep 2019 09:25:44 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-47.ams2.redhat.com
+ [10.36.116.47])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A5D8D5D9C3;
+ Fri, 13 Sep 2019 09:25:38 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 9D2A893C5; Fri, 13 Sep 2019 11:25:37 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 13 Sep 2019 11:25:37 +0200
+Message-Id: <20190913092537.2913-3-kraxel@redhat.com>
+In-Reply-To: <20190913092537.2913-1-kraxel@redhat.com>
+References: <20190913092537.2913-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Fri, 13 Sep 2019 09:25:44 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 3/6] exec: assert on
- memory_region_register_iommu_notifier() failure
+Subject: [Qemu-devel] [PATCH v2 2/2] ati: use vga_read_byte in
+ ati_cursor_define
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,50 +69,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, mst@redhat.com, qemu-devel@nongnu.org,
- peterx@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org,
- pbonzini@redhat.com, eric.auger.pro@gmail.com
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ flier_m@outlook.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 13, 2019 at 10:36:12AM +0200, Eric Auger wrote:
-> memory_region_register_iommu_notifier now returns an error
-> in case of failure. Assert in such a case.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  exec.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index 235d6bc883..da30251a2b 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -692,7 +692,8 @@ static void tcg_register_iommu_notifier(CPUState *cpu,
->                              0,
->                              HWADDR_MAX,
->                              iommu_idx);
-> -        memory_region_register_iommu_notifier(notifier->mr, &notifier->n);
-> +        assert(!memory_region_register_iommu_notifier(notifier->mr,
-> +                                                      &notifier->n));
+This makes sure reads are confined to vga video memory.
 
- ret = memory_region_register_iommu_notifier(notifier->mr, &notifier->n);
- assert(!ret);
+v2: fix ati_cursor_draw_line too.
 
-to avoid functions with side effects being called inside assert()'s, as
-assert()'s could be compiled as no-ops.
+Reported-by: xu hang <flier_m@outlook.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/ati.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-Same comment for next patch.
+diff --git a/hw/display/ati.c b/hw/display/ati.c
+index 8f940eee221a..f6ae27c0c710 100644
+--- a/hw/display/ati.c
++++ b/hw/display/ati.c
+@@ -19,6 +19,7 @@
+ #include "qemu/osdep.h"
+ #include "ati_int.h"
+ #include "ati_regs.h"
++#include "vga-access.h"
+ #include "hw/qdev-properties.h"
+ #include "vga_regs.h"
+ #include "qemu/log.h"
+@@ -135,19 +136,19 @@ static void ati_vga_switch_mode(ATIVGAState *s)
+ static void ati_cursor_define(ATIVGAState *s)
+ {
+     uint8_t data[1024];
+-    uint8_t *src;
++    unsigned srcoff;
+     int i, j, idx = 0;
+ 
+     if ((s->regs.cur_offset & BIT(31)) || s->cursor_guest_mode) {
+         return; /* Do not update cursor if locked or rendered by guest */
+     }
+     /* FIXME handle cur_hv_offs correctly */
+-    src = s->vga.vram_ptr + s->regs.cur_offset -
+-          (s->regs.cur_hv_offs >> 16) - (s->regs.cur_hv_offs & 0xffff) * 16;
++    srcoff = s->regs.cur_offset -
++        (s->regs.cur_hv_offs >> 16) - (s->regs.cur_hv_offs & 0xffff) * 16;
+     for (i = 0; i < 64; i++) {
+         for (j = 0; j < 8; j++, idx++) {
+-            data[idx] = src[i * 16 + j];
+-            data[512 + idx] = src[i * 16 + j + 8];
++            data[idx] = vga_read_byte(&s->vga, srcoff + i * 16 + j);
++            data[512 + idx] = vga_read_byte(&s->vga, srcoff + i * 16 + j + 8);
+         }
+     }
+     if (!s->cursor) {
+@@ -189,7 +190,7 @@ static void ati_cursor_invalidate(VGACommonState *vga)
+ static void ati_cursor_draw_line(VGACommonState *vga, uint8_t *d, int scr_y)
+ {
+     ATIVGAState *s = container_of(vga, ATIVGAState, vga);
+-    uint8_t *src;
++    uint32_t srcoff;
+     uint32_t *dp = (uint32_t *)d;
+     int i, j, h;
+ 
+@@ -199,13 +200,13 @@ static void ati_cursor_draw_line(VGACommonState *vga, uint8_t *d, int scr_y)
+         return;
+     }
+     /* FIXME handle cur_hv_offs correctly */
+-    src = s->vga.vram_ptr + s->cursor_offset + (scr_y - vga->hw_cursor_y) * 16;
++    srcoff = s->cursor_offset + (scr_y - vga->hw_cursor_y) * 16;
+     dp = &dp[vga->hw_cursor_x];
+     h = ((s->regs.crtc_h_total_disp >> 16) + 1) * 8;
+     for (i = 0; i < 8; i++) {
+         uint32_t color;
+-        uint8_t abits = src[i];
+-        uint8_t xbits = src[i + 8];
++        uint8_t abits = vga_read_byte(vga, srcoff + i);
++        uint8_t xbits = vga_read_byte(vga, srcoff + i);
+         for (j = 0; j < 8; j++, abits <<= 1, xbits <<= 1) {
+             if (abits & BIT(7)) {
+                 if (xbits & BIT(7)) {
+-- 
+2.18.1
 
-Thanks,
-drew
-
->      }
->  
->      if (!notifier->active) {
-> -- 
-> 2.20.1
-> 
-> 
 
