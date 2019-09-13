@@ -2,118 +2,62 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B952AC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 14:03:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 969C0C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 14:08:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7014420692
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 14:03:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="DrR8Etll"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7014420692
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6B874205ED
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 14:08:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B874205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8mAb-0005b6-HV
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 10:03:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41897)
+	id 1i8mFo-0007zV-D5
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 10:08:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42895)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i8m90-0004Mn-31
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:01:51 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i8mF2-0007NT-Qm
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:08:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1i8m8y-0006zT-3c
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:01:49 -0400
-Received: from mail-eopbgr50123.outbound.protection.outlook.com
- ([40.107.5.123]:50306 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1i8m8p-0006vU-Of; Fri, 13 Sep 2019 10:01:40 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Vd4MVFk2PJA7Y07zj8LFEIe7BIWeGL40uFOyLpAzP1YlXfmtfTf6tbjxODbBDqZ8WTNctCDHQdHpKxhD6rsTDxLHw9x9xyXRBMdMhVFCQ/qCECLKKzUfwrm9m9fcMKdXlk3oqT/OcSs0ePE83CA5T6V9B14N6iC7ny3BX/lPxd9IbUibya63C/qW/3uVUJGRSeiScMJHW2wgvG+8Pdc5/n9i9u3+WVFJHDvR14UK40elCA3M5Cxti1guSCrVh1vJpnmg4A+NywZ18VRvG/MwfV3eKXxXZ8DxySRaSvJtF6H08JZ2k94HKGTPCp4Pbd8E6UFvII1Vqth5ZRh42CU1sg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lV0umcBa2YlcyRYeTuxadawUZejLwwT565+xJSpqWPQ=;
- b=b0Pm45StGEYtT3FkvXCVfRYkfl9oQ2aR9pG3q8qRT+ZMuir4BlHbRx97C9XfBqwHNM5bVzGfaq37o14Yap1lTXRPI8EuNhTFdkocY3piihbsTFxNugNLBHRsILdx2VGeS15KoaV/1k4Tm6iqc12qnmG8j9hKIyU6qCoOHALrkA0/YFqvLMx1LD0d3m/g0jinV36r8LK03Gtt97ESfewalTfOh/4PZA+kzVraIP7x/KCtyOD+Y45epEhnlwuJTukNT/cfj2/8h7wOdZhzH1IkyUUDtRF6kDECbTJVcLGc2jq1cJNW3aqFQPYaLIGGaap92ghOLILnCgHZbs09Wzjt5g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lV0umcBa2YlcyRYeTuxadawUZejLwwT565+xJSpqWPQ=;
- b=DrR8EtlldhXfGuEcwZ3mBGqolHNof2vVnyPGYFp4KSdYFgIFEzT5drr37njmrf1QUEouTqf2nVl3IfytOnytFjPJAgrARJ/yE9gtj2HpHYtLLRyxkIEPLB+jNX0J4DCp+1bbPpI/WvE8gbUnZUeHc9bPYTmqxilitLHA3pB5UuM=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5402.eurprd08.prod.outlook.com (52.133.241.74) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2263.17; Fri, 13 Sep 2019 14:01:37 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2263.016; Fri, 13 Sep 2019
- 14:01:37 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Thread-Topic: [PATCH v4 1/3] block/qcow2: refactoring of threaded encryption
- code
-Thread-Index: AQHVajMOj6Verwh1NkqU8HmUL2OtZKcpoxmA
-Date: Fri, 13 Sep 2019 14:01:37 +0000
-Message-ID: <5d578974-d02d-8b05-8d51-85715d1d4468@virtuozzo.com>
+ (envelope-from <mlevitsk@redhat.com>) id 1i8mF1-0001NJ-OU
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:08:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45360)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1i8mEy-0001KM-JU; Fri, 13 Sep 2019 10:08:00 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9636210DCC8B;
+ Fri, 13 Sep 2019 14:07:59 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.39])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 82EA55D9CD;
+ Fri, 13 Sep 2019 14:07:57 +0000 (UTC)
+Message-ID: <5fdc4891c02c7977762bb76fd877e4383e04be0c.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, 
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Date: Fri, 13 Sep 2019 17:07:56 +0300
+In-Reply-To: <5d578974-d02d-8b05-8d51-85715d1d4468@virtuozzo.com>
 References: <20190913125909.15348-1-mlevitsk@redhat.com>
  <20190913125909.15348-2-mlevitsk@redhat.com>
-In-Reply-To: <20190913125909.15348-2-mlevitsk@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1P195CA0002.EURP195.PROD.OUTLOOK.COM (2603:10a6:3:fd::12)
- To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190913170133762
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 48fbf25a-24a9-4a92-1861-08d73852e487
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB5402; 
-x-ms-traffictypediagnostic: DB8PR08MB5402:
-x-microsoft-antispam-prvs: <DB8PR08MB54025B04BD14E64BF51DC1AEC1B30@DB8PR08MB5402.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:243;
-x-forefront-prvs: 0159AC2B97
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(376002)(346002)(136003)(39840400004)(366004)(396003)(199004)(189003)(76176011)(99286004)(8676002)(71190400001)(8936002)(14444005)(478600001)(81166006)(7736002)(305945005)(71200400001)(11346002)(4326008)(446003)(81156014)(66066001)(26005)(2616005)(25786009)(316002)(6116002)(3846002)(31696002)(229853002)(36756003)(6506007)(386003)(6486002)(2906002)(110136005)(102836004)(6512007)(53936002)(2501003)(486006)(86362001)(6246003)(54906003)(6436002)(31686004)(66946007)(66446008)(64756008)(66476007)(186003)(66556008)(5660300002)(52116002)(14454004)(256004)(476003);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5402;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: GcPRHNk8vTjgDyPzSQ5gOuLWn0+o3IglEoEwFVuo4jiPo6SEfPv3Bn2hEITQc6tPEnIwulzM2PmAAEw++rT6wSWFfgAz4ReJlJwCh+HnikEWOZahMMRmW0rr3+C7hmO+OgaTf57i3L8blj47UaENd/evo3CW8jX6JTEm6U+0iYVKE9XErIjrotHevOwUIRxFKH7PUVLK4ziIDoDglaXKGWz77tRznNb7LJNu44sqhh113iM6gZMGu3zkFRS+vrI3FYBawpjXyWcoYAR+1el+aREE8oH23kcxyd6nTzk2AkTC5NI2Kw3QTAe+VDtGDne5OEMMbKSjQiB8SfIa9h+BlMl7CC8a5CucIkTYZ9HqZlpe3j6b3Av0dtCMbUq+eYgMDCdX04k+k+T6p9sEtc55W0Xcmw4yZM5GVCJpih0NAZ0=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <73CDB7CDBD03BC4A8374FB1ACB265110@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 48fbf25a-24a9-4a92-1861-08d73852e487
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Sep 2019 14:01:37.0638 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lb8A9JoIZ2Xsu6zhDImhso3wc1X8s46jmkb/vsz0XJRyXdI5fngcexbzo+dQIQp1NaNkqh5vyJTZVOT71b4SqVRd7yp0hJ3/tJnzI0RDzyQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5402
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.5.123
+ <5d578974-d02d-8b05-8d51-85715d1d4468@virtuozzo.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Fri, 13 Sep 2019 14:07:59 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH v4 1/3] block/qcow2: refactoring of
  threaded encryption code
 X-BeenThere: qemu-devel@nongnu.org
@@ -128,150 +72,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>,
- =?utf-8?B?RGFuaWVsIFAgLiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- qemu-stable <qemu-stable@nongnu.org>, Max Reitz <mreitz@redhat.com>
+ "Daniel P . =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
+ qemu-stable <qemu-stable@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTMuMDkuMjAxOSAxNTo1OSwgTWF4aW0gTGV2aXRza3kgd3JvdGU6DQo+IFRoaXMgY29tbWl0IHRy
-aWVzIHRvIGNsYXJpZnkgZmV3IGZ1bmN0aW9uIGFyZ3VtZW50cywNCj4gYW5kIGFkZCBjb21tZW50
-cyBkZXNjcmliaW5nIHRoZSBlbmNyeXB0L2RlY3J5cHQgaW50ZXJmYWNlDQo+IA0KPiBTaWduZWQt
-b2ZmLWJ5OiBNYXhpbSBMZXZpdHNreSA8bWxldml0c2tAcmVkaGF0LmNvbT4NCj4gLS0tDQo+ICAg
-YmxvY2svcWNvdzItY2x1c3Rlci5jIHwgIDkgKysrKy0tLQ0KPiAgIGJsb2NrL3Fjb3cyLXRocmVh
-ZHMuYyB8IDYyICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0NCj4g
-ICBibG9jay9xY293Mi5jICAgICAgICAgfCAgNSArKy0tDQo+ICAgYmxvY2svcWNvdzIuaCAgICAg
-ICAgIHwgIDggKysrLS0tDQo+ICAgNCBmaWxlcyBjaGFuZ2VkLCA2MSBpbnNlcnRpb25zKCspLCAy
-MyBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9ibG9jay9xY293Mi1jbHVzdGVyLmMg
-Yi9ibG9jay9xY293Mi1jbHVzdGVyLmMNCj4gaW5kZXggZjA5Y2M5OTJhZi4uNDZiMDg1NGQ3ZSAx
-MDA2NDQNCj4gLS0tIGEvYmxvY2svcWNvdzItY2x1c3Rlci5jDQo+ICsrKyBiL2Jsb2NrL3Fjb3cy
-LWNsdXN0ZXIuYw0KPiBAQCAtNDYzLDggKzQ2Myw4IEBAIHN0YXRpYyBpbnQgY29yb3V0aW5lX2Zu
-IGRvX3BlcmZvcm1fY293X3JlYWQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+ICAgfQ0KPiAgIA0K
-PiAgIHN0YXRpYyBib29sIGNvcm91dGluZV9mbiBkb19wZXJmb3JtX2Nvd19lbmNyeXB0KEJsb2Nr
-RHJpdmVyU3RhdGUgKmJzLA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgdWludDY0X3Qgc3JjX2NsdXN0ZXJfb2Zmc2V0LA0KPiAtICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDY0X3QgY2x1c3Rlcl9vZmZz
-ZXQsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1
-aW50NjRfdCBndWVzdF9jbHVzdGVyX29mZnNldCwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IGhvc3RfY2x1c3Rlcl9vZmZzZXQsDQo+
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdW5zaWdu
-ZWQgb2Zmc2V0X2luX2NsdXN0ZXIsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgdWludDhfdCAqYnVmZmVyLA0KPiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVuc2lnbmVkIGJ5dGVzKQ0KPiBAQCAtNDc0
-LDggKzQ3NCw5IEBAIHN0YXRpYyBib29sIGNvcm91dGluZV9mbiBkb19wZXJmb3JtX2Nvd19lbmNy
-eXB0KEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPiAgICAgICAgICAgYXNzZXJ0KChvZmZzZXRfaW5f
-Y2x1c3RlciAmIH5CRFJWX1NFQ1RPUl9NQVNLKSA9PSAwKTsNCj4gICAgICAgICAgIGFzc2VydCgo
-Ynl0ZXMgJiB+QkRSVl9TRUNUT1JfTUFTSykgPT0gMCk7DQo+ICAgICAgICAgICBhc3NlcnQocy0+
-Y3J5cHRvKTsNCj4gLSAgICAgICAgaWYgKHFjb3cyX2NvX2VuY3J5cHQoYnMsIGNsdXN0ZXJfb2Zm
-c2V0LA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzcmNfY2x1c3Rlcl9vZmZzZXQg
-KyBvZmZzZXRfaW5fY2x1c3RlciwNCj4gKyAgICAgICAgaWYgKHFjb3cyX2NvX2VuY3J5cHQoYnMs
-DQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGhvc3RfY2x1c3Rlcl9vZmZzZXQgKyBv
-ZmZzZXRfaW5fY2x1c3RlciwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZ3Vlc3Rf
-Y2x1c3Rlcl9vZmZzZXQgKyBvZmZzZXRfaW5fY2x1c3RlciwNCg0Kb29wcywgc2VlbXMgeW91IGFj
-Y2lkZW50YWxseSBmaXhlZCB0aGUgYnVnLCB3aGljaCB5b3UgYXJlIGdvaW5nIHRvIGZpeCBpbiB0
-aGUgbmV4dA0KcGF0Y2gsIGFzIG5vdyBjb3JyZWN0IG9mZnNldHMgYXJlIGdpdmVuIHRvIHFjb3cy
-X2NvX2VuY3J5cHQgOikNCg0KYW5kIG5leHQgcGF0Y2ggbm8gaXMgYSBzaW1wbGUgbm8tbG9naWMt
-Y2hhbmdlIHJlZmFjdG9yaW5nLCBzbyBhdCBsZWFzdCBjb21taXQgbWVzc2FnZQ0Kc2hvdWxkIGJl
-IGNoYW5nZWQuDQoNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJ1ZmZlciwgYnl0
-ZXMpIDwgMCkgew0KPiAgICAgICAgICAgICAgIHJldHVybiBmYWxzZTsNCj4gICAgICAgICAgIH0N
-Cj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLXRocmVhZHMuYyBiL2Jsb2NrL3Fjb3cyLXRocmVh
-ZHMuYw0KPiBpbmRleCAzYjFlNjNmZTQxLi45NjQ2MjQzYTliIDEwMDY0NA0KPiAtLS0gYS9ibG9j
-ay9xY293Mi10aHJlYWRzLmMNCj4gKysrIGIvYmxvY2svcWNvdzItdGhyZWFkcy5jDQo+IEBAIC0y
-MzQsMTUgKzIzNCwxNSBAQCBzdGF0aWMgaW50IHFjb3cyX2VuY2RlY19wb29sX2Z1bmModm9pZCAq
-b3BhcXVlKQ0KPiAgIH0NCj4gICANCj4gICBzdGF0aWMgaW50IGNvcm91dGluZV9mbg0KPiAtcWNv
-dzJfY29fZW5jZGVjKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCB1aW50NjRfdCBmaWxlX2NsdXN0ZXJf
-b2Zmc2V0LA0KPiAtICAgICAgICAgICAgICAgICAgdWludDY0X3Qgb2Zmc2V0LCB2b2lkICpidWYs
-IHNpemVfdCBsZW4sIFFjb3cyRW5jRGVjRnVuYyBmdW5jKQ0KPiArcWNvdzJfY29fZW5jZGVjKEJs
-b2NrRHJpdmVyU3RhdGUgKmJzLCB1aW50NjRfdCBob3N0X29mZnNldCwNCj4gKyAgICAgICAgICAg
-ICAgICB1aW50NjRfdCBndWVzdF9vZmZzZXQsIHZvaWQgKmJ1Ziwgc2l6ZV90IGxlbiwNCj4gKyAg
-ICAgICAgICAgICAgICBRY293MkVuY0RlY0Z1bmMgZnVuYykNCj4gICB7DQo+ICAgICAgIEJEUlZR
-Y293MlN0YXRlICpzID0gYnMtPm9wYXF1ZTsNCj4gKw0KPiAgICAgICBRY293MkVuY0RlY0RhdGEg
-YXJnID0gew0KPiAgICAgICAgICAgLmJsb2NrID0gcy0+Y3J5cHRvLA0KPiAtICAgICAgICAub2Zm
-c2V0ID0gcy0+Y3J5cHRfcGh5c2ljYWxfb2Zmc2V0ID8NCj4gLSAgICAgICAgICAgICAgICAgICAg
-ICBmaWxlX2NsdXN0ZXJfb2Zmc2V0ICsgb2Zmc2V0X2ludG9fY2x1c3RlcihzLCBvZmZzZXQpIDoN
-Cj4gLSAgICAgICAgICAgICAgICAgICAgICBvZmZzZXQsDQo+ICsgICAgICAgIC5vZmZzZXQgPSBz
-LT5jcnlwdF9waHlzaWNhbF9vZmZzZXQgPyBob3N0X29mZnNldCA6IGd1ZXN0X29mZnNldCwNCg0K
-TmljZSBjaGFuZ2UuIE9idmlvdXNseSBvcmlnaW5hbCBkZXNpZ24gd2FzIHdvcnNlLg0KDQo+ICAg
-ICAgICAgICAuYnVmID0gYnVmLA0KPiAgICAgICAgICAgLmxlbiA9IGxlbiwNCj4gICAgICAgICAg
-IC5mdW5jID0gZnVuYywNCj4gQEAgLTI1MSwxOCArMjUxLDU0IEBAIHFjb3cyX2NvX2VuY2RlYyhC
-bG9ja0RyaXZlclN0YXRlICpicywgdWludDY0X3QgZmlsZV9jbHVzdGVyX29mZnNldCwNCj4gICAg
-ICAgcmV0dXJuIHFjb3cyX2NvX3Byb2Nlc3MoYnMsIHFjb3cyX2VuY2RlY19wb29sX2Z1bmMsICZh
-cmcpOw0KPiAgIH0NCj4gICANCj4gKw0KPiArLyoNCj4gKyAqIHFjb3cyX2NvX2VuY3J5cHQoKQ0K
-PiArICoNCj4gKyAqIEVuY3J5cHRzIG9uZSBvciBtb3JlIGNvbnRpZ3VvdXMgYWxpZ25lZCBzZWN0
-b3JzDQo+ICsgKg0KPiArICogQGhvc3Rfb2Zmc2V0IC0gdW5kZXJseWluZyBzdG9yYWdlIG9mZnNl
-dCBvZiB0aGUgZmlyc3Qgc2VjdG9yIG9mIHRoZQ0KPiArICogZGF0YSB0byBiZSBlbmNyeXB0ZWQN
-Cj4gKw0KPiArICogQGd1ZXN0X29mZnNldCAtIGd1ZXN0ICh2aXJ0dWFsKSBvZmZzZXQgb2YgdGhl
-IGZpcnN0IHNlY3RvciBvZiB0aGUNCj4gKyAqIGRhdGEgdG8gYmUgZW5jcnlwdGVkDQo+ICsgKg0K
-PiArICogQGJ1ZiAtIGJ1ZmZlciB3aXRoIHRoZSBkYXRhIHRvIGVuY3J5cHQsIHRoYXQgYWZ0ZXIg
-ZW5jcnlwdGlvbg0KPiArICogICAgICAgIHdpbGwgYmUgd3JpdHRlbiB0byB0aGUgdW5kZXJseWlu
-ZyBzdG9yYWdlIGRldmljZSBhdA0KPiArICogICAgICAgIEBob3N0X29mZnNldA0KPiArICoNCj4g
-KyAqIEBsZW4gLSBsZW5ndGggb2YgdGhlIGJ1ZmZlciAobXVzdCBiZSBhIEJEUlZfU0VDVE9SX1NJ
-WkUgbXVsdGlwbGUpDQo+ICsgKg0KPiArICogRGVwZW5kaW5nIG9uIHRoZSBlbmNyeXB0aW9uIG1l
-dGhvZCwgQGhvc3RfY2x1c3Rlcl9vZmZzZXQgYW5kL29yIEBndWVzdF9vZmZzZXQNCj4gKyAqIG1h
-eSBiZSB1c2VkIGZvciBnZW5lcmF0aW5nIHRoZSBpbml0aWFsaXphdGlvbiB2ZWN0b3IgZm9yDQo+
-ICsgKiBlbmNyeXB0aW9uLg0KPiArICoNCj4gKyAqIE5vdGUgdGhhdCB3aGlsZSB0aGUgd2hvbGUg
-cmFuZ2UgbXVzdCBiZSBhbGlnbmVkIG9uIHNlY3RvcnMsIGl0DQo+ICsgKiBkb2VzIG5vdCBoYXZl
-IHRvIGJlIGFsaWduZWQgb24gY2x1c3RlcnMgYW5kIGNhbiBhbHNvIGNyb3NzIGNsdXN0ZXINCj4g
-KyAqIGJvdW5kYXJpZXMNCj4gKyAqDQo+ICsgKi8NCj4gICBpbnQgY29yb3V0aW5lX2ZuDQo+IC1x
-Y293Ml9jb19lbmNyeXB0KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCB1aW50NjRfdCBmaWxlX2NsdXN0
-ZXJfb2Zmc2V0LA0KPiAtICAgICAgICAgICAgICAgICB1aW50NjRfdCBvZmZzZXQsIHZvaWQgKmJ1
-Ziwgc2l6ZV90IGxlbikNCj4gK3Fjb3cyX2NvX2VuY3J5cHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMs
-IHVpbnQ2NF90IGhvc3Rfb2Zmc2V0LA0KPiArICAgICAgICAgICAgICAgICB1aW50NjRfdCBndWVz
-dF9vZmZzZXQsIHZvaWQgKmJ1Ziwgc2l6ZV90IGxlbikNCj4gICB7DQo+IC0gICAgcmV0dXJuIHFj
-b3cyX2NvX2VuY2RlYyhicywgZmlsZV9jbHVzdGVyX29mZnNldCwgb2Zmc2V0LCBidWYsIGxlbiwN
-Cj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcWNyeXB0b19ibG9ja19lbmNyeXB0KTsN
-Cj4gKyAgICByZXR1cm4gcWNvdzJfY29fZW5jZGVjKGJzLCBob3N0X29mZnNldCwgZ3Vlc3Rfb2Zm
-c2V0LCBidWYsIGxlbiwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgIHFjcnlwdG9fYmxv
-Y2tfZW5jcnlwdCk7DQo+ICAgfQ0KPiAgIA0KPiArDQo+ICsvKg0KPiArICogcWNvdzJfY29fZGVj
-cnlwdCgpDQo+ICsgKg0KPiArICogRGVjcnlwdHMgb25lIG9yIG1vcmUgY29udGlndW91cyBhbGln
-bmVkIHNlY3RvcnMNCj4gKyAqIFNpbWlsYXIgdG8gcWNvdzJfY29fZW5jcnlwdA0KPiArICoNCj4g
-KyAqLw0KPiArDQo+ICAgaW50IGNvcm91dGluZV9mbg0KPiAtcWNvdzJfY29fZGVjcnlwdChCbG9j
-a0RyaXZlclN0YXRlICpicywgdWludDY0X3QgZmlsZV9jbHVzdGVyX29mZnNldCwNCj4gLSAgICAg
-ICAgICAgICAgICAgdWludDY0X3Qgb2Zmc2V0LCB2b2lkICpidWYsIHNpemVfdCBsZW4pDQo+ICtx
-Y293Ml9jb19kZWNyeXB0KEJsb2NrRHJpdmVyU3RhdGUgKmJzLCB1aW50NjRfdCBob3N0X29mZnNl
-dCwNCj4gKyAgICAgICAgICAgICAgICAgdWludDY0X3QgZ3Vlc3Rfb2Zmc2V0LCB2b2lkICpidWYs
-IHNpemVfdCBsZW4pDQo+ICAgew0KPiAtICAgIHJldHVybiBxY293Ml9jb19lbmNkZWMoYnMsIGZp
-bGVfY2x1c3Rlcl9vZmZzZXQsIG9mZnNldCwgYnVmLCBsZW4sDQo+IC0gICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHFjcnlwdG9fYmxvY2tfZGVjcnlwdCk7DQo+ICsgICAgcmV0dXJuIHFjb3cy
-X2NvX2VuY2RlYyhicywgaG9zdF9vZmZzZXQsIGd1ZXN0X29mZnNldCwgYnVmLCBsZW4sDQo+ICsg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBxY3J5cHRvX2Jsb2NrX2RlY3J5cHQpOw0KPiAgIH0N
-Cj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLmMgYi9ibG9jay9xY293Mi5jDQo+IGluZGV4IDA4
-ODJmZjZlOTIuLjdlYzUwMTU3ZTAgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL3Fjb3cyLmMNCj4gKysr
-IGIvYmxvY2svcWNvdzIuYw0KPiBAQCAtMjA2NSw3ICsyMDY1LDggQEAgc3RhdGljIGNvcm91dGlu
-ZV9mbiBpbnQgcWNvdzJfY29fcHJlYWR2X3BhcnQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+ICAg
-DQo+ICAgICAgICAgICAgICAgICAgIGFzc2VydCgob2Zmc2V0ICYgKEJEUlZfU0VDVE9SX1NJWkUg
-LSAxKSkgPT0gMCk7DQo+ICAgICAgICAgICAgICAgICAgIGFzc2VydCgoY3VyX2J5dGVzICYgKEJE
-UlZfU0VDVE9SX1NJWkUgLSAxKSkgPT0gMCk7DQo+IC0gICAgICAgICAgICAgICAgaWYgKHFjb3cy
-X2NvX2RlY3J5cHQoYnMsIGNsdXN0ZXJfb2Zmc2V0LCBvZmZzZXQsDQo+ICsgICAgICAgICAgICAg
-ICAgaWYgKHFjb3cyX2NvX2RlY3J5cHQoYnMsIGNsdXN0ZXJfb2Zmc2V0ICsgb2Zmc2V0X2luX2Ns
-dXN0ZXIsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgb2Zmc2V0LA0K
-PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX2RhdGEsIGN1
-cl9ieXRlcykgPCAwKSB7DQo+ICAgICAgICAgICAgICAgICAgICAgICByZXQgPSAtRUlPOw0KPiAg
-ICAgICAgICAgICAgICAgICAgICAgZ290byBmYWlsOw0KPiBAQCAtMjI4NCw3ICsyMjg1LDcgQEAg
-c3RhdGljIGNvcm91dGluZV9mbiBpbnQgcWNvdzJfY29fcHdyaXRldl9wYXJ0KA0KPiAgICAgICAg
-ICAgICAgIHFlbXVfaW92ZWNfdG9fYnVmKHFpb3YsIHFpb3Zfb2Zmc2V0ICsgYnl0ZXNfZG9uZSwN
-Cj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX2RhdGEsIGN1cl9ieXRl
-cyk7DQo+ICAgDQo+IC0gICAgICAgICAgICBpZiAocWNvdzJfY29fZW5jcnlwdChicywgY2x1c3Rl
-cl9vZmZzZXQsIG9mZnNldCwNCj4gKyAgICAgICAgICAgIGlmIChxY293Ml9jb19lbmNyeXB0KGJz
-LCBjbHVzdGVyX29mZnNldCArIG9mZnNldF9pbl9jbHVzdGVyLCBvZmZzZXQsDQo+ICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9kYXRhLCBjdXJfYnl0ZXMpIDwgMCkg
-ew0KPiAgICAgICAgICAgICAgICAgICByZXQgPSAtRUlPOw0KPiAgICAgICAgICAgICAgICAgICBn
-b3RvIG91dF91bmxvY2tlZDsNCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLmggYi9ibG9jay9x
-Y293Mi5oDQo+IGluZGV4IDk5OGJjZGFlZjEuLmE0ODhkNzYxZmYgMTAwNjQ0DQo+IC0tLSBhL2Js
-b2NrL3Fjb3cyLmgNCj4gKysrIGIvYmxvY2svcWNvdzIuaA0KPiBAQCAtNzU4LDEwICs3NTgsMTAg
-QEAgc3NpemVfdCBjb3JvdXRpbmVfZm4NCj4gICBxY293Ml9jb19kZWNvbXByZXNzKEJsb2NrRHJp
-dmVyU3RhdGUgKmJzLCB2b2lkICpkZXN0LCBzaXplX3QgZGVzdF9zaXplLA0KPiAgICAgICAgICAg
-ICAgICAgICAgICAgY29uc3Qgdm9pZCAqc3JjLCBzaXplX3Qgc3JjX3NpemUpOw0KPiAgIGludCBj
-b3JvdXRpbmVfZm4NCj4gLXFjb3cyX2NvX2VuY3J5cHQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIHVp
-bnQ2NF90IGZpbGVfY2x1c3Rlcl9vZmZzZXQsDQo+IC0gICAgICAgICAgICAgICAgIHVpbnQ2NF90
-IG9mZnNldCwgdm9pZCAqYnVmLCBzaXplX3QgbGVuKTsNCj4gK3Fjb3cyX2NvX2VuY3J5cHQoQmxv
-Y2tEcml2ZXJTdGF0ZSAqYnMsIHVpbnQ2NF90IGhvc3Rfb2Zmc2V0LA0KPiArICAgICAgICAgICAg
-ICAgICB1aW50NjRfdCBndWVzdF9vZmZzZXQsIHZvaWQgKmJ1Ziwgc2l6ZV90IGxlbik7DQo+ICAg
-aW50IGNvcm91dGluZV9mbg0KPiAtcWNvdzJfY29fZGVjcnlwdChCbG9ja0RyaXZlclN0YXRlICpi
-cywgdWludDY0X3QgZmlsZV9jbHVzdGVyX29mZnNldCwNCj4gLSAgICAgICAgICAgICAgICAgdWlu
-dDY0X3Qgb2Zmc2V0LCB2b2lkICpidWYsIHNpemVfdCBsZW4pOw0KPiArcWNvdzJfY29fZGVjcnlw
-dChCbG9ja0RyaXZlclN0YXRlICpicywgdWludDY0X3QgaG9zdF9vZmZzZXQsDQo+ICsgICAgICAg
-ICAgICAgICAgIHVpbnQ2NF90IGd1ZXN0X29mZnNldCwgdm9pZCAqYnVmLCBzaXplX3QgbGVuKTsN
-Cj4gICANCj4gICAjZW5kaWYNCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Fri, 2019-09-13 at 14:01 +0000, Vladimir Sementsov-Ogievskiy wrote:
+> 13.09.2019 15:59, Maxim Levitsky wrote:
+> > This commit tries to clarify few function arguments,
+> > and add comments describing the encrypt/decrypt interface
+> > 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >   block/qcow2-cluster.c |  9 ++++---
+> >   block/qcow2-threads.c | 62 ++++++++++++++++++++++++++++++++++---------
+> >   block/qcow2.c         |  5 ++--
+> >   block/qcow2.h         |  8 +++---
+> >   4 files changed, 61 insertions(+), 23 deletions(-)
+> > 
+> > diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> > index f09cc992af..46b0854d7e 100644
+> > --- a/block/qcow2-cluster.c
+> > +++ b/block/qcow2-cluster.c
+> > @@ -463,8 +463,8 @@ static int coroutine_fn do_perform_cow_read(BlockDriverState *bs,
+> >   }
+> >   
+> >   static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
+> > -                                                uint64_t src_cluster_offset,
+> > -                                                uint64_t cluster_offset,
+> > +                                                uint64_t guest_cluster_offset,
+> > +                                                uint64_t host_cluster_offset,
+> >                                                   unsigned offset_in_cluster,
+> >                                                   uint8_t *buffer,
+> >                                                   unsigned bytes)
+> > @@ -474,8 +474,9 @@ static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
+> >           assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
+> >           assert((bytes & ~BDRV_SECTOR_MASK) == 0);
+> >           assert(s->crypto);
+> > -        if (qcow2_co_encrypt(bs, cluster_offset,
+> > -                             src_cluster_offset + offset_in_cluster,
+> > +        if (qcow2_co_encrypt(bs,
+> > +                             host_cluster_offset + offset_in_cluster,
+> > +                             guest_cluster_offset + offset_in_cluster,
+> 
+> oops, seems you accidentally fixed the bug, which you are going to fix in the next
+> patch, as now correct offsets are given to qcow2_co_encrypt :)
+> 
+> and next patch no is a simple no-logic-change refactoring, so at least commit message
+> should be changed.
+
+Yep :-( I am trying my best in addition to fixing the bug, also clarify the area to
+avoid this from happening again.
+
+What do you think that I fold these two patches together after all?
+Best regards,
+	Maxim Levitsky
+
+
 
