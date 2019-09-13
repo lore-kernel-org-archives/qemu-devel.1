@@ -3,72 +3,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C8F6C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 14:34:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B660DC49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 14:38:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25F2420717
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 14:34:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25F2420717
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8EFEE20CC7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 14:38:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EFEE20CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8meb-0007NN-A0
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 10:34:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46231)
+	id 1i8miW-0000Yb-KM
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 10:38:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46688)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1i8mdg-0006tF-Kl
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:33:33 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1i8mhX-0008H2-LR
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:37:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1i8mdf-0000TS-By
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:33:32 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:44414)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i8mdf-0000T0-69
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:33:31 -0400
-Received: by mail-pl1-f193.google.com with SMTP id k1so13319739pls.11
- for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 07:33:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=ZcgtA7DUzweE6P+F0iSw5YWH7DE6YUf2lnvzah0tYC0=;
- b=gsWD+GcUsQ6yG4kgynJwZ1BSlDRd79Tf7jE+7S+Y0Otl6sq04g85dWl7BGLd7CV9nx
- n90k3W3GQOO1NARpGrgk1pn8mmKD3VjAo1gjIujkaKomZJTRc1KeYgoGklc7NRn1XYoQ
- v+TxamREU7SvLqSxAZdXjunUKDNl57GfY+d9pQHhZ1MFMtl3B90anrED8h3uGT4xgHjb
- RpdxvZjT89iEzw2pJKu/+tQ8gGRLrF0RUOmZaRjUejPDOlsR+BplmRc07NobNqd6Hdrm
- LWNsHuD6yFKZ5THarDbyjc1WS8YPj9TRXrm3J0Kb5bPHSrJCaj9zG10CaM8MmbtOVHAo
- AmCA==
-X-Gm-Message-State: APjAAAUOlEtmZ/vukdCqnYogTlrFht1Iu0usyPiRnJX7pYx3JQYcXa03
- vfrmX3/V1B6dcjaacj64t3fqGg==
-X-Google-Smtp-Source: APXvYqxtRY6ZXLmxssxB9Qa/E8e+bwcaMuq4LjXP+IYn0wnPdtxHjNg4Crku65r3921zyOqd/4rgHg==
-X-Received: by 2002:a17:902:7685:: with SMTP id
- m5mr50039821pll.218.1568385209712; 
- Fri, 13 Sep 2019 07:33:29 -0700 (PDT)
-Received: from localhost (amx-tls3.starhub.net.sg. [203.116.164.13])
- by smtp.gmail.com with ESMTPSA id g202sm38389325pfb.155.2019.09.13.07.33.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 13 Sep 2019 07:33:29 -0700 (PDT)
-Date: Fri, 13 Sep 2019 07:33:29 -0700 (PDT)
-X-Google-Original-Date: Fri, 13 Sep 2019 07:33:20 PDT (-0700)
-In-Reply-To: <1567786819-22142-19-git-send-email-bmeng.cn@gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: bmeng.cn@gmail.com
-Message-ID: <mhng-81295c42-a2f8-4f95-a54f-f9a319e10a36@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ (envelope-from <mlevitsk@redhat.com>) id 1i8mhW-0002UB-II
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:37:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58724)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1i8mhU-0002Sx-3L; Fri, 13 Sep 2019 10:37:28 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 68BEE10F2E82;
+ Fri, 13 Sep 2019 14:37:27 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.39])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 95BC3608AB;
+ Fri, 13 Sep 2019 14:37:24 +0000 (UTC)
+Message-ID: <fcde308649669fa3379d8477b06194634e0ccd44.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Date: Fri, 13 Sep 2019 17:37:23 +0300
+In-Reply-To: <20190913142450.GI8312@dhcp-200-226.str.redhat.com>
+References: <20190913125909.15348-1-mlevitsk@redhat.com>
+ <20190913125909.15348-2-mlevitsk@redhat.com>
+ <5d578974-d02d-8b05-8d51-85715d1d4468@virtuozzo.com>
+ <5fdc4891c02c7977762bb76fd877e4383e04be0c.camel@redhat.com>
+ <20190913142450.GI8312@dhcp-200-226.str.redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Fri, 13 Sep 2019 14:37:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.214.193
-Subject: Re: [Qemu-devel] [PATCH v8 18/32] riscv: sifive_u: Set the minimum
- number of cpus to 2
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] block/qcow2: refactoring of
+ threaded encryption code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,83 +72,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
- qemu-devel@nongnu.org
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Daniel P . =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ qemu-stable <qemu-stable@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 06 Sep 2019 09:20:05 PDT (-0700), bmeng.cn@gmail.com wrote:
-> It is not useful if we only have one management CPU.
->
-> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
->
-> ---
->
-> Changes in v8: None
-> Changes in v7: None
-> Changes in v6: None
-> Changes in v5: None
-> Changes in v4: None
-> Changes in v3:
-> - use management cpu count + 1 for the min_cpus
->
-> Changes in v2:
-> - update the file header to indicate at least 2 harts are created
->
->  hw/riscv/sifive_u.c         | 4 +++-
->  include/hw/riscv/sifive_u.h | 2 ++
->  2 files changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 2947e06..2023b71 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -10,7 +10,8 @@
->   * 1) CLINT (Core Level Interruptor)
->   * 2) PLIC (Platform Level Interrupt Controller)
->   *
-> - * This board currently uses a hardcoded devicetree that indicates one hart.
-> + * This board currently generates devicetree dynamically that indicates at least
-> + * two harts.
->   *
->   * This program is free software; you can redistribute it and/or modify it
->   * under the terms and conditions of the GNU General Public License,
-> @@ -433,6 +434,7 @@ static void riscv_sifive_u_machine_init(MachineClass *mc)
->       * management CPU.
->       */
->      mc->max_cpus = 4;
-> +    mc->min_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + 1;
->  }
->
->  DEFINE_MACHINE("sifive_u", riscv_sifive_u_machine_init)
-> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-> index f25bad8..6d22741 100644
-> --- a/include/hw/riscv/sifive_u.h
-> +++ b/include/hw/riscv/sifive_u.h
-> @@ -69,6 +69,8 @@ enum {
->      SIFIVE_U_GEM_CLOCK_FREQ = 125000000
->  };
->
-> +#define SIFIVE_U_MANAGEMENT_CPU_COUNT   1
-> +
->  #define SIFIVE_U_PLIC_HART_CONFIG "MS"
->  #define SIFIVE_U_PLIC_NUM_SOURCES 54
->  #define SIFIVE_U_PLIC_NUM_PRIORITIES 7
+On Fri, 2019-09-13 at 16:24 +0200, Kevin Wolf wrote:
+> Am 13.09.2019 um 16:07 hat Maxim Levitsky geschrieben:
+> > On Fri, 2019-09-13 at 14:01 +0000, Vladimir Sementsov-Ogievskiy wrote:
+> > > 13.09.2019 15:59, Maxim Levitsky wrote:
+> > > > This commit tries to clarify few function arguments,
+> > > > and add comments describing the encrypt/decrypt interface
+> > > > 
+> > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > > ---
+> > > >   block/qcow2-cluster.c |  9 ++++---
+> > > >   block/qcow2-threads.c | 62 ++++++++++++++++++++++++++++++++++---------
+> > > >   block/qcow2.c         |  5 ++--
+> > > >   block/qcow2.h         |  8 +++---
+> > > >   4 files changed, 61 insertions(+), 23 deletions(-)
+> > > > 
+> > > > diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> > > > index f09cc992af..46b0854d7e 100644
+> > > > --- a/block/qcow2-cluster.c
+> > > > +++ b/block/qcow2-cluster.c
+> > > > @@ -463,8 +463,8 @@ static int coroutine_fn do_perform_cow_read(BlockDriverState *bs,
+> > > >   }
+> > > >   
+> > > >   static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
+> > > > -                                                uint64_t src_cluster_offset,
+> > > > -                                                uint64_t cluster_offset,
+> > > > +                                                uint64_t guest_cluster_offset,
+> > > > +                                                uint64_t host_cluster_offset,
+> > > >                                                   unsigned offset_in_cluster,
+> > > >                                                   uint8_t *buffer,
+> > > >                                                   unsigned bytes)
+> > > > @@ -474,8 +474,9 @@ static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
+> > > >           assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
+> > > >           assert((bytes & ~BDRV_SECTOR_MASK) == 0);
+> > > >           assert(s->crypto);
+> > > > -        if (qcow2_co_encrypt(bs, cluster_offset,
+> > > > -                             src_cluster_offset + offset_in_cluster,
+> > > > +        if (qcow2_co_encrypt(bs,
+> > > > +                             host_cluster_offset + offset_in_cluster,
+> > > > +                             guest_cluster_offset + offset_in_cluster,
+> > > 
+> > > oops, seems you accidentally fixed the bug, which you are going to fix in the next
+> > > patch, as now correct offsets are given to qcow2_co_encrypt :)
+> > > 
+> > > and next patch no is a simple no-logic-change refactoring, so at least commit message
+> > > should be changed.
+> > 
+> > Yep :-( I am trying my best in addition to fixing the bug, also clarify the area to
+> > avoid this from happening again.
+> > 
+> > What do you think that I fold these two patches together after all?
+> 
+> No, just make sure that your refactoring patch is really just
+> refactoring without semantic change, i.e. make sure to preserve the bug
+> in this patch.
+> 
+> Maybe you should actually have two refactoring patches (this one without
+> the addition of offset_in_cluster, and patch 2) and an additional
+> one-liner for the actual fix.
+> 
+> Kevin
 
-This fails "make check", so I'm going to squash in this
+Let me do it simplier I'll just split it to one liner patch that fixes it
+and second patch that does all the refactoring.
 
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index ca9f7fea41..adecbf1dd9 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -528,6 +528,7 @@ static void riscv_sifive_u_machine_init(MachineClass *mc)
-     mc->init = riscv_sifive_u_init;
-     mc->max_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + SIFIVE_U_COMPUTE_CPU_COUNT;
-     mc->min_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + 1;
-+    mc->default_cpus = mc->max_cpus;
- }
+Best regards,
+	Maxim Levitsky
 
- DEFINE_MACHINE("sifive_u", riscv_sifive_u_machine_init)
+
 
