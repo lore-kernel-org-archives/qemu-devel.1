@@ -2,66 +2,66 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2854DC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 10:22:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04057C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 10:25:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0C1020830
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 10:22:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0C1020830
+	by mail.kernel.org (Postfix) with ESMTPS id CDCE920830
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 10:25:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDCE920830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8ij2-0006NU-3f
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 06:22:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34358)
+	id 1i8ilq-0007nF-1U
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 06:25:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34912)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1i8ihh-0005JT-Ad
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 06:21:30 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i8il1-0007Ec-TL
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 06:24:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1i8ihc-0003id-IC
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 06:21:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53402)
+ (envelope-from <dgilbert@redhat.com>) id 1i8il0-0005Fx-Tf
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 06:24:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51714)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1i8ihR-0003eR-Bw; Fri, 13 Sep 2019 06:21:09 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i8il0-0005Fa-OT
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 06:24:50 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CB68130860BD;
- Fri, 13 Sep 2019 10:21:07 +0000 (UTC)
-Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
- [10.33.200.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 940F15D9C3;
- Fri, 13 Sep 2019 10:21:06 +0000 (UTC)
-Date: Fri, 13 Sep 2019 12:21:05 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190913102105.GD8312@dhcp-200-226.str.redhat.com>
-References: <20190910154110.6905-1-pl@kamp.de>
- <20190910154110.6905-2-pl@kamp.de>
- <ede55319-ca74-ab1c-6b3e-8558d9e6bdd8@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 697B118C8936
+ for <qemu-devel@nongnu.org>; Fri, 13 Sep 2019 10:24:49 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3FE2A5C219;
+ Fri, 13 Sep 2019 10:24:48 +0000 (UTC)
+Date: Fri, 13 Sep 2019 11:24:45 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <20190913102445.GA2682@work-vm>
+References: <20190911190622.7629-1-dgilbert@redhat.com>
+ <20190911190622.7629-2-dgilbert@redhat.com>
+ <e8802180-3c9a-97b9-dae1-5e07d7843de3@redhat.com>
+ <20190912174524.GD2722@work-vm>
+ <cfead2da-0ccd-b629-4e5d-05cdffa34698@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="f2QGlHpHGjS2mn6Y"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ede55319-ca74-ab1c-6b3e-8558d9e6bdd8@redhat.com>
+In-Reply-To: <cfead2da-0ccd-b629-4e5d-05cdffa34698@redhat.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Fri, 13 Sep 2019 10:21:07 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Fri, 13 Sep 2019 10:24:49 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH V2 1/2] block/nfs: tear down aio before
- nfs_close
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] rcu: Add automatically released
+ rcu_read_lock variant
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,58 +73,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ronniesahlberg@gmail.com, Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, qemu-stable@nongnu.org
+Cc: quintela@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org,
+ ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> On 12/09/19 19:45, Dr. David Alan Gilbert wrote:
+> > Do you think it's best to use the block version for all cases
+> > or to use the non-block version by taste?
+> > The block version is quite nice, but that turns most of the patches
+> > into 'indent everything'.
+> 
+> I don't really know myself.
 
---f2QGlHpHGjS2mn6Y
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+OK, new version coming up with a mix - the diffs do look a lot more
+hectic with the block version.
 
-Am 13.09.2019 um 11:51 hat Max Reitz geschrieben:
-> On 10.09.19 17:41, Peter Lieven wrote:
-> > nfs_close is a sync call from libnfs and has its own event
-> > handler polling on the nfs FD. Avoid that both QEMU and libnfs
-> > are intefering here.
-> >=20
-> > CC: qemu-stable@nongnu.org
-> > Signed-off-by: Peter Lieven <pl@kamp.de>
-> > ---
-> >  block/nfs.c | 6 ++++--
-> >  1 file changed, 4 insertions(+), 2 deletions(-)
->=20
-> I=E2=80=99ve just seen that Kevin has already included the second patch (=
-in its
-> v1) in his pull request.
+> On first glance I didn't like too much the non-block version and thought
+> it was because our coding standards does not include variables declared
+> in the middle of a block.
 
-Oops, sorry about this. Peter hasn't pulled yet, so I'll update the tag
-for the pull request. Let's see which version gets merged in the end.
+I took that as being a coding standard to avoid confusing humans and
+since it wasn't visible it didn't matter too much.
 
-Kevin
+> However, I think what really bothering me is
+> "AUTO" in the name.  What do you think about "RCU_READ_LOCK_GUARD()"?
+> The block version would have the additional prefix "WITH_".
 
---f2QGlHpHGjS2mn6Y
-Content-Type: application/pgp-signature; name="signature.asc"
+Oh well, if it's just the name we can fix that.
 
------BEGIN PGP SIGNATURE-----
+> We could also add LOCK_GUARD(lock) and WITH_LOCK_GUARD(lock), using
+> QemuLockable for polymorphism.  I even had patches a while ago (though
+> they used something like LOCK_GUARD(guard_var, lock).  I think we
+> dropped them because of fear that the API was a bit over-engineered.
 
-iQIcBAEBAgAGBQJde22RAAoJEH8JsnLIjy/WZIkQAMV1trhGBNCDnmFG/iGC1N2m
-TbrnFn6OGQ9YBNa//mZMRB8ofRAvz5zt0Z5+BTcJsfJWdz6xQRvn29YM5J9J+PkL
-s31G1kbDeoFVEjUOIYfGqXtaFFOhNd8zsEIfy3dbWXyDDbtD52nl1Tpz3m4Yr6b0
-UyUVWXQ9MIGkWcFsxf4tatYweHDaCDk9msj6JBpXCFIdjmkiTz4wcWc/ZjgI4t3v
-d365xfZoND7KoTMEbUeIVEc5RexFkaPMMlQInsrGgC5w7kuXz+w5PxR7Z5jlNl5z
-KdZa4od1t/sP4CbVLlub6efteG0QPUgVDTTsnKtQoku6hK+4McPIGNy8Cds/M1Rb
-gShgUL3w12G2gRosX2jO2bx5WupTAcYHYyvg3dRscVmVHYCpXJGnkzv1jq5pBn1E
-GyyQd3k/yPjNfyt59w5NVrbFcBjyy6qYQ91HW1OyS3ud72zlQUOO6Q9G8X39HSGB
-Sz6UjYXo3vBkTNAAHgL0WEIRrkF6ySgDMKVvc0EN2sYhU0t43cYcAuoY6a3NTaNh
-9vU728Dz4FRBtRSM2Q6XgDNNEYxLkh94RyZT4HR1EoDuZWrYzemag2aF8NeXRD1l
-Tcs0QZ2N4yRNO6h5/3HqZorO1pKyyt3qzQxjAvalW8DXcevcnak7FNKK1/6qP7KP
-DOawSq/fcajEXl05O4fV
-=WM3B
------END PGP SIGNATURE-----
+Probably a separate set.
 
---f2QGlHpHGjS2mn6Y--
+Dave
+
+> Paolo
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
