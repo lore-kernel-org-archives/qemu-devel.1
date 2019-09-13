@@ -1,72 +1,84 @@
-Return-Path: <SRS0=eeqW=XH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67EBDC4CEC7
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 23:31:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F536C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 06:04:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B16A206CD
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Sep 2019 23:31:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B16A206CD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id EFBE620678
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 06:04:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T/fHbGgI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFBE620678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8YYx-0008SV-Cs
-	for qemu-devel@archiver.kernel.org; Thu, 12 Sep 2019 19:31:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52796)
+	id 1i8egx-0003he-1H
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 02:04:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51229)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i8YXz-0007yh-LG
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 19:30:44 -0400
+ (envelope-from <laurent.desnogues@gmail.com>) id 1i8eft-0003Fj-GJ
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 02:03:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i8YXy-0000QP-9w
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 19:30:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41082)
+ (envelope-from <laurent.desnogues@gmail.com>) id 1i8efs-0007gm-Cc
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 02:03:17 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:46221)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i8YXy-0000Q3-4j
- for qemu-devel@nongnu.org; Thu, 12 Sep 2019 19:30:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i8YXw-0000XB-Nl
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 23:30:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id AC1862E80C8
- for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 23:30:40 +0000 (UTC)
+ (Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
+ id 1i8efs-0007ga-5i
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 02:03:16 -0400
+Received: by mail-io1-xd44.google.com with SMTP id d17so38621401ios.13
+ for <qemu-devel@nongnu.org>; Thu, 12 Sep 2019 23:03:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=bOPqtsCZUEmkW61Z1UiHPSnn4D8rdaBaYSAyKW+ncYE=;
+ b=T/fHbGgIgn8xyldrBaYWce5u6TqbSP2FZbK5kld2oH+2OFtPOIxR2FpF4/Ss63CyJt
+ 5dJtzUqGPFoELq99cRZzGBOaTtyesjB79jSbNS6iZS5BNQksaKHVZM5ryDWktBvfb/y6
+ bBUNAEHmh+qoB/ZV1ZxvxHKl+/HEsbMleOApyJ91t6v86bFWRtSmjHLeVcDMdLtJSTDd
+ N9zpvyreupbNOmCZMbkQzHr7FSkZjKVm8fcPwedX+S4n26/SWAq0EefxvJh5T+bhwTmj
+ JVamrY6p589Cf1hjE9GfDqh1y/b0ldjglqediRSaYKyqTfCQbWRr/Y263EDlCnpfJQ59
+ YuPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=bOPqtsCZUEmkW61Z1UiHPSnn4D8rdaBaYSAyKW+ncYE=;
+ b=a799UDBUjx4si8kknSwSGvNn+uzH7oGA0Lk03Yszpo690+2mBs4cipN5lEQngNx/CZ
+ xlfUSo84PjqRL6y2ThEO1Cuy35TVeiHJazdzFERezFZwwylTT3chVKRxXK/FTEZiHMY6
+ P5rvc2D3I3pmNYFNrt5yabwLbRSR6tuT+Ko54ZSzhJ+eCjR8VhnqfcNxOJ1zxfwRElGi
+ DHr46T8reogp5O5axaPZzJMpspJ99g6e77MlXBr72p19xagomD5epb27E/iFfdhO2ETv
+ BXROeEBuB/kDq4DnKJDVpV0qFPGND/V+ZqDHEuMGAoob2MWXDrQgpYfOAorU7pw7nlKM
+ yMig==
+X-Gm-Message-State: APjAAAUVLEgz7b+S8JdVfxgB0dLOEDZpHbS5uQ1KFhqeLvYhMGKUC7vv
+ RnfuFljUnsrp8Ah1vZGGNJvtploI+6q9gMmHbQ4cxyTod9vbIGJX
+X-Google-Smtp-Source: APXvYqyt8+J2ZwOnkb3EMzzO/QM39jah4XO6uQZiAgAYESei6hXqXv9QW6T58DGRdEs96c1CsK5Qf8F/5Z6FK+HNZcE=
+X-Received: by 2002:a02:92:: with SMTP id 140mr12079572jaa.98.1568354595125;
+ Thu, 12 Sep 2019 23:03:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Sep 2019 23:20:51 -0000
-From: John Snow <1843852@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jnsnow
-X-Launchpad-Bug-Reporter: John Snow (jnsnow)
-X-Launchpad-Bug-Modifier: John Snow (jnsnow)
-Message-Id: <156833045171.17307.14707838609727225916.malonedeb@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19044";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 037a5333f01f9f30f100b141903a74bf7d9e8a05
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1843852] [NEW] QEMU does not express a dependency
- on perl-Test-Harness
+References: <20190912183058.17947-1-richard.henderson@linaro.org>
+In-Reply-To: <20190912183058.17947-1-richard.henderson@linaro.org>
+From: Laurent Desnogues <laurent.desnogues@gmail.com>
+Date: Fri, 13 Sep 2019 08:03:11 +0200
+Message-ID: <CABoDooNuDmKmPdRZ-tXrKuvN3W9LEKrF+-xLcbRB__7rU0i1Lg@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d44
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Fix sign-extension for SMLAL*
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,84 +87,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1843852 <1843852@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+Hello,
 
-This is a minor thing; in Fedora you can install most of the developer
-dependencies by issuing something like `dnf builddep qemu-kvm` and this
-takes care of just about everything such that you can run ./configure
-and make.
+On Thu, Sep 12, 2019 at 8:31 PM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> The 32-bit product should be sign-extended, not zero-extended.
+>
+> Fixes: ea96b374641b
+> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-For "make check" though, configure doesn't catch that you'll need perl-
-Test-Harness; so it fails halfway through the check routine, and you'll
-see this:
+No more failures on my tests.
 
-```
-Can't locate TAP/Parser.pm in @INC (you may need to install the TAP::Parser=
- module) (@INC contains: /usr/local/lib64/perl5 /usr/local/share/perl5 /usr=
-/lib64/perl5/vendor_perl /usr/share/perl5/vendor_perl /usr/lib64/perl5 /usr=
-/share/perl5) at ./scripts/tap-driver.pl line 30.
-BEGIN failed--compilation aborted at ./scripts/tap-driver.pl line 30.
-make: *** [/home/jhuston/src/qemu/tests/Makefile.include:905: check-unit] E=
-rror 2
-```
+Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 
-I'm not sure how we should express this dependency; it shouldn't be a
-requirement for building, but it IS a dependency for testing. We
-probably ought not let users skip the qapi tests just because they don't
-have the perl requirement met.
+Thanks,
 
-(And, separately, the Fedora package should list this as a builddep, but
-that's not an issue for here.)
+Laurent
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1843852
-
-Title:
-  QEMU does not express a dependency on perl-Test-Harness
-
-Status in QEMU:
-  New
-
-Bug description:
-  This is a minor thing; in Fedora you can install most of the developer
-  dependencies by issuing something like `dnf builddep qemu-kvm` and
-  this takes care of just about everything such that you can run
-  ./configure and make.
-
-  For "make check" though, configure doesn't catch that you'll need
-  perl-Test-Harness; so it fails halfway through the check routine, and
-  you'll see this:
-
-  ```
-  Can't locate TAP/Parser.pm in @INC (you may need to install the TAP::Pars=
-er module) (@INC contains: /usr/local/lib64/perl5 /usr/local/share/perl5 /u=
-sr/lib64/perl5/vendor_perl /usr/share/perl5/vendor_perl /usr/lib64/perl5 /u=
-sr/share/perl5) at ./scripts/tap-driver.pl line 30.
-  BEGIN failed--compilation aborted at ./scripts/tap-driver.pl line 30.
-  make: *** [/home/jhuston/src/qemu/tests/Makefile.include:905: check-unit]=
- Error 2
-  ```
-
-  I'm not sure how we should express this dependency; it shouldn't be a
-  requirement for building, but it IS a dependency for testing. We
-  probably ought not let users skip the qapi tests just because they
-  don't have the perl requirement met.
-
-  (And, separately, the Fedora package should list this as a builddep,
-  but that's not an issue for here.)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1843852/+subscriptions
+> ---
+>  target/arm/translate.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 34bb280e3d..fd2f0e3048 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -8045,7 +8045,9 @@ static bool op_smlaxxx(DisasContext *s, arg_rrrr *a,
+>      case 2:
+>          tl = load_reg(s, a->ra);
+>          th = load_reg(s, a->rd);
+> -        t1 = tcg_const_i32(0);
+> +        /* Sign-extend the 32-bit product to 64 bits.  */
+> +        t1 = tcg_temp_new_i32();
+> +        tcg_gen_sari_i32(t1, t0, 31);
+>          tcg_gen_add2_i32(tl, th, tl, th, t0, t1);
+>          tcg_temp_free_i32(t0);
+>          tcg_temp_free_i32(t1);
+> --
+> 2.17.1
+>
 
