@@ -2,59 +2,61 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBAA4C4CEC5
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 10:54:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ECF0C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 10:55:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C79F32084F
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 10:54:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C79F32084F
+	by mail.kernel.org (Postfix) with ESMTPS id 747AD2084F
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 10:55:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 747AD2084F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8jDK-0005KL-EY
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 06:54:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39668)
+	id 1i8jEm-0007Sk-JP
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 06:55:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39716)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i8jBc-0003Tl-NR
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 06:52:21 -0400
+ (envelope-from <philmd@redhat.com>) id 1i8jBm-0003cQ-Fv
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 06:52:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i8jBb-0005sy-OB
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 06:52:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36292)
+ (envelope-from <philmd@redhat.com>) id 1i8jBl-0005zu-HL
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 06:52:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53978)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1i8jBY-0005q9-RK; Fri, 13 Sep 2019 06:52:16 -0400
+ id 1i8jBh-0005wB-Hk; Fri, 13 Sep 2019 06:52:25 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 28CFE9ACE;
- Fri, 13 Sep 2019 10:52:16 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8E6D21DA4;
+ Fri, 13 Sep 2019 10:52:23 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 79B63600D1;
- Fri, 13 Sep 2019 10:52:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E953600CE;
+ Fri, 13 Sep 2019 10:52:19 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 13 Sep 2019 12:52:03 +0200
-Message-Id: <20190913105205.7581-1-philmd@redhat.com>
+Date: Fri, 13 Sep 2019 12:52:05 +0200
+Message-Id: <20190913105205.7581-3-philmd@redhat.com>
+In-Reply-To: <20190913105205.7581-1-philmd@redhat.com>
+References: <20190913105205.7581-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Fri, 13 Sep 2019 10:52:16 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Fri, 13 Sep 2019 10:52:23 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 0/2] trace: Forbid trailing newline in event
- format
+Subject: [Qemu-devel] [PATCH 2/2] trace: Forbid event format ending with
+ newline character
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,29 +76,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Stefan,
+Event format ending with newlines confuse the trace reports.
+Forbid them.
 
-I'v been confused by trailing newline in trace reports,
-so this series aims to fix this, by cleaning current
-formats and add a check to catch new one introduced.
+Add a check to refuse new format added with trailing newline:
 
-Regards,
+  $ make
+  [...]
+    GEN     hw/misc/trace.h
+  Traceback (most recent call last):
+    File "scripts/tracetool.py", line 152, in <module>
+      main(sys.argv)
+    File "scripts/tracetool.py", line 143, in main
+      events.extend(tracetool.read_events(fh, arg))
+    File "scripts/tracetool/__init__.py", line 367, in read_events
+      event =3D Event.build(line)
+    File "scripts/tracetool/__init__.py", line 281, in build
+      raise ValueError("Event format can not end with a newline character=
+")
+  ValueError: Error at hw/misc/trace-events:121: Event format can not end=
+ with a newline character
 
-Phil.
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ docs/devel/tracing.txt        | 2 ++
+ scripts/tracetool/__init__.py | 3 +++
+ 2 files changed, 5 insertions(+)
 
-Philippe Mathieu-Daud=C3=A9 (2):
-  trace: Remove trailing newline in events
-  trace: Forbid event format ending with newline character
-
- docs/devel/tracing.txt        |  2 ++
- hw/misc/trace-events          | 10 +++++-----
- hw/scsi/trace-events          |  2 +-
- hw/sd/trace-events            |  2 +-
- nbd/trace-events              |  4 ++--
- net/trace-events              |  6 +++---
- scripts/tracetool/__init__.py |  3 +++
- 7 files changed, 17 insertions(+), 12 deletions(-)
-
+diff --git a/docs/devel/tracing.txt b/docs/devel/tracing.txt
+index 76e492a489..8231bbf5d1 100644
+--- a/docs/devel/tracing.txt
++++ b/docs/devel/tracing.txt
+@@ -112,6 +112,8 @@ Trace events should use types as follows:
+ Format strings should reflect the types defined in the trace event.  Tak=
+e
+ special care to use PRId64 and PRIu64 for int64_t and uint64_t types,
+ respectively.  This ensures portability between 32- and 64-bit platforms=
+.
++Format strings must not end with a newline character.  It is the respons=
+ibility
++of backends to adapt line ending for proper logging.
+=20
+ Each event declaration will start with the event name, then its argument=
+s,
+ finally a format string for pretty-printing. For example:
+diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.p=
+y
+index 6fca674936..57df74e67c 100644
+--- a/scripts/tracetool/__init__.py
++++ b/scripts/tracetool/__init__.py
+@@ -277,6 +277,9 @@ class Event(object):
+         if fmt.find("%m") !=3D -1 or fmt_trans.find("%m") !=3D -1:
+             raise ValueError("Event format '%m' is forbidden, pass the e=
+rror "
+                              "as an explicit trace argument")
++        if fmt.endswith("\\n\""):
++            raise ValueError("Event format must not end with a newline "
++                             "character")
+=20
+         if len(fmt_trans) > 0:
+             fmt =3D [fmt_trans, fmt]
 --=20
 2.20.1
 
