@@ -2,95 +2,68 @@ Return-Path: <SRS0=wgY8=XI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B11AC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 14:52:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BC92C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 14:53:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7320C20693
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 14:52:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7320C20693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id D675620830
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Sep 2019 14:53:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D675620830
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8mvX-000384-EF
-	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 10:51:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48524)
+	id 1i8mwg-0004up-SY
+	for qemu-devel@archiver.kernel.org; Fri, 13 Sep 2019 10:53:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47767)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pc@us.ibm.com>) id 1i8muT-00027f-0e
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:50:53 -0400
+ (envelope-from <kwolf@redhat.com>) id 1i8mqF-0006iv-10
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:46:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pc@us.ibm.com>) id 1i8muP-0000lk-Qp
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:50:50 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20262)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pc@us.ibm.com>) id 1i8muP-0000lF-Jg
- for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:50:49 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8DEl3Ud042014; Fri, 13 Sep 2019 10:50:44 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
- [169.63.121.186])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2v0c3mb248-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 13 Sep 2019 10:50:43 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x8DEmB1e001870;
- Fri, 13 Sep 2019 14:50:42 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com
- (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
- by ppma03wdc.us.ibm.com with ESMTP id 2uytdx7kba-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 13 Sep 2019 14:50:42 +0000
-Received: from b03ledav001.gho.boulder.ibm.com
- (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
- by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x8DEoes255181808
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 13 Sep 2019 14:50:40 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E2DEA6E05B;
- Fri, 13 Sep 2019 14:50:39 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 389196E052;
- Fri, 13 Sep 2019 14:50:39 +0000 (GMT)
-Received: from oc3272150783.ibm.com (unknown [9.160.39.69])
- by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTPS;
- Fri, 13 Sep 2019 14:50:38 +0000 (GMT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20190913134935.29696-1-alex.bennee@linaro.org>
-From: Paul Clarke <pc@us.ibm.com>
-Message-ID: <70173025-eef0-ff89-3c8f-517397ca42f3@us.ibm.com>
-Date: Fri, 13 Sep 2019 09:50:37 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <kwolf@redhat.com>) id 1i8mqD-0006u6-Qv
+ for qemu-devel@nongnu.org; Fri, 13 Sep 2019 10:46:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52422)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1i8mqA-0006tC-NL; Fri, 13 Sep 2019 10:46:26 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C5F913064FD1;
+ Fri, 13 Sep 2019 14:46:25 +0000 (UTC)
+Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
+ [10.33.200.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 716E660C44;
+ Fri, 13 Sep 2019 14:46:23 +0000 (UTC)
+Date: Fri, 13 Sep 2019 16:46:22 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Message-ID: <20190913144622.GK8312@dhcp-200-226.str.redhat.com>
+References: <20190913125909.15348-1-mlevitsk@redhat.com>
+ <20190913125909.15348-2-mlevitsk@redhat.com>
+ <5d578974-d02d-8b05-8d51-85715d1d4468@virtuozzo.com>
+ <5fdc4891c02c7977762bb76fd877e4383e04be0c.camel@redhat.com>
+ <20190913142450.GI8312@dhcp-200-226.str.redhat.com>
+ <fcde308649669fa3379d8477b06194634e0ccd44.camel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190913134935.29696-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-09-13_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=898 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909130148
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0a-001b2d01.pphosted.com id x8DEl3Ud042014
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: Re: [Qemu-devel] [PATCH] tests/tcg: add float_madds test to
- multiarch
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fcde308649669fa3379d8477b06194634e0ccd44.camel@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Fri, 13 Sep 2019 14:46:25 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] block/qcow2: refactoring of
+ threaded encryption code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,80 +75,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: 1841592@bugs.launchpad.net, richard.henderson@linaro.org
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ qemu-stable <qemu-stable@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/13/19 8:49 AM, Alex Benn=C3=A9e wrote:
-> +static float f32_numbers[] =3D {
-> +    -SNANF,
-> +    -NAN,
-> +    -INFINITY,
-> +    -FLT_MAX,
-> +    -1.111E+31,
-> +    -1.111E+30,
-> +    -1.08700982e-12,
-> +    -1.78051176e-20,
-> +    -FLT_MIN,
-> +    0.0,
-> +    FLT_MIN,
-> +    2.98023224e-08,
-> +    5.96046E-8, /* min positive FP16 subnormal */
-> +    6.09756E-5, /* max subnormal FP16 */
-> +    6.10352E-5, /* min positive normal FP16 */
-> +    1.0,
-> +    1.0009765625, /* smallest float after 1.0 FP16 */
-> +    2.0,
-> +    M_E, M_PI,
-> +    65503.0,
-> +    65504.0, /* max FP16 */
-> +    65505.0,
-> +    131007.0,
-> +    131008.0, /* max AFP */
-> +    131009.0,
-> +    1.111E+30,
-> +    FLT_MAX,
-> +    INFINITY,
-> +    NAN,
-> +    SNANF
-> +};
+Am 13.09.2019 um 16:37 hat Maxim Levitsky geschrieben:
+> On Fri, 2019-09-13 at 16:24 +0200, Kevin Wolf wrote:
+> > Am 13.09.2019 um 16:07 hat Maxim Levitsky geschrieben:
+> > > On Fri, 2019-09-13 at 14:01 +0000, Vladimir Sementsov-Ogievskiy wrote:
+> > > > 13.09.2019 15:59, Maxim Levitsky wrote:
+> > > > > This commit tries to clarify few function arguments,
+> > > > > and add comments describing the encrypt/decrypt interface
+> > > > > 
+> > > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > > > ---
+> > > > >   block/qcow2-cluster.c |  9 ++++---
+> > > > >   block/qcow2-threads.c | 62 ++++++++++++++++++++++++++++++++++---------
+> > > > >   block/qcow2.c         |  5 ++--
+> > > > >   block/qcow2.h         |  8 +++---
+> > > > >   4 files changed, 61 insertions(+), 23 deletions(-)
+> > > > > 
+> > > > > diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> > > > > index f09cc992af..46b0854d7e 100644
+> > > > > --- a/block/qcow2-cluster.c
+> > > > > +++ b/block/qcow2-cluster.c
+> > > > > @@ -463,8 +463,8 @@ static int coroutine_fn do_perform_cow_read(BlockDriverState *bs,
+> > > > >   }
+> > > > >   
+> > > > >   static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
+> > > > > -                                                uint64_t src_cluster_offset,
+> > > > > -                                                uint64_t cluster_offset,
+> > > > > +                                                uint64_t guest_cluster_offset,
+> > > > > +                                                uint64_t host_cluster_offset,
+> > > > >                                                   unsigned offset_in_cluster,
+> > > > >                                                   uint8_t *buffer,
+> > > > >                                                   unsigned bytes)
+> > > > > @@ -474,8 +474,9 @@ static bool coroutine_fn do_perform_cow_encrypt(BlockDriverState *bs,
+> > > > >           assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
+> > > > >           assert((bytes & ~BDRV_SECTOR_MASK) == 0);
+> > > > >           assert(s->crypto);
+> > > > > -        if (qcow2_co_encrypt(bs, cluster_offset,
+> > > > > -                             src_cluster_offset + offset_in_cluster,
+> > > > > +        if (qcow2_co_encrypt(bs,
+> > > > > +                             host_cluster_offset + offset_in_cluster,
+> > > > > +                             guest_cluster_offset + offset_in_cluster,
+> > > > 
+> > > > oops, seems you accidentally fixed the bug, which you are going to fix in the next
+> > > > patch, as now correct offsets are given to qcow2_co_encrypt :)
+> > > > 
+> > > > and next patch no is a simple no-logic-change refactoring, so at least commit message
+> > > > should be changed.
+> > > 
+> > > Yep :-( I am trying my best in addition to fixing the bug, also clarify the area to
+> > > avoid this from happening again.
+> > > 
+> > > What do you think that I fold these two patches together after all?
+> > 
+> > No, just make sure that your refactoring patch is really just
+> > refactoring without semantic change, i.e. make sure to preserve the bug
+> > in this patch.
+> > 
+> > Maybe you should actually have two refactoring patches (this one without
+> > the addition of offset_in_cluster, and patch 2) and an additional
+> > one-liner for the actual fix.
+> > 
+> > Kevin
+> 
+> Let me do it simplier I'll just split it to one liner patch that fixes it
+> and second patch that does all the refactoring.
 
-I've noticed that Glibc prefers to use hex representation for float value=
-s, to ensure an accurate representation.  If you care to do so, here they=
- are:
-static float f32_numbers[] =3D {
-    -SNANF,=20
-    -NAN,  =20
-    -INFINITY,
-    -FLT_MAX,
-    -0x1.1874b2p+103,
-    -0x1.c0bab6p+99,
-    -0x1.31f75p-40,
-    -0x1.505444p-66,
-    -FLT_MIN,
-    0.0,   =20
-    FLT_MIN,
-    0x1p-25,
-    0x1.ffffe6p-25, /* min positive FP16 subnormal */
-    0x1.ff801ap-15, /* max subnormal FP16 */
-    0x1.00000cp-14, /* min positive normal FP16 */
-    1.0,   =20
-    0x1.004p+0, /* smallest float after 1.0 FP16 */
-    2.0,   =20
-    M_E, M_PI,
-    0x1.ffbep+15,
-    0x1.ffcp+15, /* max FP16 */
-    0x1.ffc2p+15,
-    0x1.ffbfp+16,
-    0x1.ffcp+16, /* max AFP */
-    0x1.ffc1p+16,
-    0x1.c0bab6p+99,
-    FLT_MAX,
-    INFINITY,
-    NAN,   =20
-    SNANF  =20
-};
+Fine with me, as long as the fix is kept separate from the refactoring.
 
-PC
+Kevin
 
