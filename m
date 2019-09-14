@@ -3,62 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B548EC4CECA
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 15:43:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE3FDC4CEC7
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 15:43:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D3CA20830
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 15:43:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D3CA20830
+	by mail.kernel.org (Postfix) with ESMTPS id 91A0B20644
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 15:43:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91A0B20644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9ACq-0005bs-5M
-	for qemu-devel@archiver.kernel.org; Sat, 14 Sep 2019 11:43:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54311)
+	id 1i9ACt-0005eY-SO
+	for qemu-devel@archiver.kernel.org; Sat, 14 Sep 2019 11:43:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54368)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1i9A5A-0004xY-1L
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 11:35:31 -0400
+ (envelope-from <armbru@redhat.com>) id 1i9A5C-00050l-L9
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 11:35:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1i9A57-0004x9-Rd
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 11:35:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48256)
+ (envelope-from <armbru@redhat.com>) id 1i9A5A-0004z3-LK
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 11:35:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46796)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i9A53-0004ty-U1
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 11:35:25 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i9A5A-0004sm-46
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 11:35:28 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2134018CB8F2;
- Sat, 14 Sep 2019 15:35:16 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9AD6210DCC8D;
+ Sat, 14 Sep 2019 15:35:13 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 960FE62A76;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 67CA75FCA2;
  Sat, 14 Sep 2019 15:35:13 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C2E971133004; Sat, 14 Sep 2019 17:35:06 +0200 (CEST)
+ id B971B113306C; Sat, 14 Sep 2019 17:35:06 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Sat, 14 Sep 2019 17:35:05 +0200
-Message-Id: <20190914153506.2151-19-armbru@redhat.com>
+Date: Sat, 14 Sep 2019 17:35:02 +0200
+Message-Id: <20190914153506.2151-16-armbru@redhat.com>
 In-Reply-To: <20190914153506.2151-1-armbru@redhat.com>
 References: <20190914153506.2151-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Sat, 14 Sep 2019 15:35:16 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.64]); Sat, 14 Sep 2019 15:35:13 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 18/19] qapi: Fix excessive
- QAPISchemaEntity.check() recursion
+Subject: [Qemu-devel] [PATCH 15/19] qapi: Clean up around check_known_keys()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,266 +74,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Entity checking goes back to commit ac88219a6c "qapi: New QAPISchema
-intermediate representation", v2.5.0.  It's designed to work as
-follows: QAPISchema.check() calls .check() for all the schema's
-entities.  An entity's .check() recurses into another entity's
-.check() only if the C struct generated for the former contains the C
-struct generated for the latter (pointers don't count).  This is used
-to detect "object contains itself".
-
-There are two instances of this:
-
-* An object's C struct contains its base's C struct
-
-  QAPISchemaObjectType.check() calls self.base.check()
-
-* An object's C struct contains its variants' C structs
-
-  QAPISchemaObjectTypeVariants().check calls v.type.check().  Since
-  commit b807a1e1e3 "qapi: Check for QAPI collisions involving variant
-  members", v2.6.0.
-
-Thus, only object types can participate in recursion.
-
-QAPISchemaObjectType.check() is made for that: it checks @self when
-called the first time, recursing into base and variants, it reports an
-"contains itself" error when this recursion reaches an object being
-checked, and does nothing it reaches an object that has been checked
-already.
-
-The other .check() may safely assume they get called exactly once.
-
-Sadly, this design has since eroded:
-
-* QAPISchemaCommand.check() and QAPISchemaEvent.check() call
-  .args_type.check().  Since commit c818408e44 "qapi: Implement boxed
-  types for commands/events", v2.7.0.  Harmless, since args_type can
-  only be an object type.
-
-* QAPISchemaEntity.check() calls ._ifcond.check() when inheriting the
-  condition from another type.  Since commit 4fca21c1b0 qapi: leave
-  the ifcond attribute undefined until check(), v3.0.0.  This makes
-  simple union wrapper types recurse into the wrapped type (nothing
-  else uses this condition inheritance).  The .check() of types used
-  as simple union branch type get called multiple times.
-
-* QAPISchemaObjectType.check() calls its super type's .check()
-  *before* the conditional handling multiple calls.  Also since commit
-  4fca21c1b0.  QAPISchemaObjectType.check()'s guard against multiple
-  checking doesn't protect QAPISchemaEntity.check().
-
-* QAPISchemaArrayType.check() calls .element_type.check().  Also since
-  commit 4fca21c1b0.  The .check() of types used as array element
-  types get called multiple times.
-
-  Commit 56a4689582 "qapi: Fix array first used in a different module"
-  (v4.0.0) added more code relying on this .element_type.check().
-
-The absence of explosions suggests the .check() involved happen to be
-effectively idempotent.
-
-Fix the unwanted recursion anyway:
-
-* QAPISchemaCommand.check() and QAPISchemaEvent.check() calling
-  .args_type.check() is unnecessary.  Delete the calls.
-
-* Fix QAPISchemaObjectType.check() to call its super type's .check()
-  after the conditional handling multiple calls.
-
-* A QAPISchemaEntity's .ifcond becomes valid at .check().  This is due
-  to arrays and simple unions.
-
-  Most types get ifcond and info passed to their constructor.
-
-  Array types don't: they get it from their element type, which
-  becomes known only in .element_type.check().
-
-  The implicit wrapper object types for simple union branches don't:
-  they get it from the wrapped type, which might be an array.
-
-  Ditch the idea to set .ifcond in .check().  Instead, turn it into a
-  property and compute it on demand.  Safe because it's only used
-  after the schema has been checked.
-
-  Most types simply return the ifcond passed to their constructor.
-
-  Array types forward to their .element_type instead, and the wrapper
-  types forward to the wrapped type.
-
-* A QAPISchemaEntity's .module becomes valid at .check().  This is
-  because computing it needs info and schema.fname, and because array
-  types get it from their element type instead.
-
-  Make it a property  just like .ifcond.
-
-Additionally, have QAPISchemaEntity.check() assert it gets called at
-most once, so the design invariant will stick this time.  Neglecting
-that was entirely my fault.
+All callers pass a dict argument to @keys, except check_keys() passes
+a dict's .keys().  Drop .keys() there, and rename parameter @keys to
+@value.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/common.py | 74 +++++++++++++++++++++++++++++-------------
- 1 file changed, 52 insertions(+), 22 deletions(-)
+ scripts/qapi/common.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index e2c87d1349..c199a2b58c 100644
+index 4d4e0be770..3c3154a039 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -1155,7 +1155,7 @@ class QAPISchemaEntity(object):
-     def __init__(self, name, info, doc, ifcond=3DNone):
-         assert name is None or isinstance(name, str)
-         self.name =3D name
--        self.module =3D None
-+        self._module =3D None
-         # For explicitly defined entities, info points to the (explicit)
-         # definition.  For builtins (and their arrays), info is None.
-         # For implicitly defined entities, info points to a place that
-@@ -1164,21 +1164,27 @@ class QAPISchemaEntity(object):
-         self.info =3D info
-         self.doc =3D doc
-         self._ifcond =3D ifcond or []
-+        self._checked =3D False
+@@ -1011,18 +1011,18 @@ def check_struct(expr, info):
+             check_name(info, "Feature of struct %s" % name, f['name'])
 =20
-     def c_name(self):
-         return c_name(self.name)
 =20
-     def check(self, schema):
--        if isinstance(self._ifcond, QAPISchemaType):
--            # inherit the condition from a type
--            typ =3D self._ifcond
--            typ.check(schema)
--            self.ifcond =3D typ.ifcond
--        else:
--            self.ifcond =3D self._ifcond
-+        assert not self._checked
-         if self.info:
--            self.module =3D os.path.relpath(self.info['file'],
--                                          os.path.dirname(schema.fname))
-+            self._module =3D os.path.relpath(self.info['file'],
-+                                           os.path.dirname(schema.fname)=
-)
-+        self._checked =3D True
-+
-+    @property
-+    def ifcond(self):
-+        assert self._checked
-+        return self._ifcond
-+
-+    @property
-+    def module(self):
-+        assert self._checked
-+        return self._module
+-def check_known_keys(info, source, keys, required, optional):
++def check_known_keys(info, source, value, required, optional):
 =20
-     def is_implicit(self):
-         return not self.info
-@@ -1353,9 +1359,16 @@ class QAPISchemaArrayType(QAPISchemaType):
-         QAPISchemaType.check(self, schema)
-         self.element_type =3D schema.lookup_type(self._element_type_name=
-)
-         assert self.element_type
--        self.element_type.check(schema)
--        self.module =3D self.element_type.module
--        self.ifcond =3D self.element_type.ifcond
-+
-+    @property
-+    def ifcond(self):
-+        assert self._checked
-+        return self.element_type.ifcond
-+
-+    @property
-+    def module(self):
-+        assert self._checked
-+        return self.element_type.module
+     def pprint(elems):
+         return ', '.join("'" + e + "'" for e in sorted(elems))
 =20
-     def is_implicit(self):
-         return True
-@@ -1402,13 +1415,20 @@ class QAPISchemaObjectType(QAPISchemaType):
-         self.features =3D features
-=20
-     def check(self, schema):
--        QAPISchemaType.check(self, schema)
--        if self.members is False:               # check for cycles
-+        # This calls another type T's .check() exactly when the C
-+        # struct emitted by gen_object() contains that T's C struct
-+        # (pointers don't count).
-+        if self.members is not None:
-+            # A previous .check() completed: nothing to do
-+            return
-+        if self._checked:
-+            # Recursed: C struct contains itself
-             raise QAPISemError(self.info,
-                                "Object %s contains itself" % self.name)
--        if self.members is not None:            # already checked
--            return
--        self.members =3D False                    # mark as being checke=
-d
-+
-+        QAPISchemaType.check(self, schema)
-+        assert self._checked and self.members is None
-+
-         seen =3D OrderedDict()
-         if self._base_name:
-             self.base =3D schema.lookup_type(self._base_name)
-@@ -1420,10 +1440,11 @@ class QAPISchemaObjectType(QAPISchemaType):
-             m.check_clash(self.info, seen)
-             if self.doc:
-                 self.doc.connect_member(m)
--        self.members =3D seen.values()
-+        members =3D seen.values()
-+
-         if self.variants:
-             self.variants.check(schema, seen)
--            assert self.variants.tag_member in self.members
-+            assert self.variants.tag_member in members
-             self.variants.check_clash(self.info, seen)
-=20
-         # Features are in a name space separate from members
-@@ -1434,6 +1455,8 @@ class QAPISchemaObjectType(QAPISchemaType):
-         if self.doc:
-             self.doc.check()
-=20
-+        self.members =3D members  # mark completed
-+
-     # Check that the members of this type do not cause duplicate JSON me=
-mbers,
-     # and update seen to track the members seen so far. Report any error=
-s
-     # on behalf of info, which is not necessarily self.info
-@@ -1442,6 +1465,15 @@ class QAPISchemaObjectType(QAPISchemaType):
-         for m in self.members:
-             m.check_clash(info, seen)
-=20
-+    @property
-+    def ifcond(self):
-+        assert self._checked
-+        if isinstance(self._ifcond, QAPISchemaType):
-+            # Simple union wrapper type inherits from wrapped type;
-+            # see _make_implicit_object_type()
-+            return self._ifcond.ifcond
-+        return self._ifcond
-+
-     def is_implicit(self):
-         # See QAPISchema._make_implicit_object_type(), as well as
-         # _def_predefineds()
-@@ -1658,7 +1690,6 @@ class QAPISchemaCommand(QAPISchemaEntity):
-         if self._arg_type_name:
-             self.arg_type =3D schema.lookup_type(self._arg_type_name)
-             assert isinstance(self.arg_type, QAPISchemaObjectType)
--            self.arg_type.check(schema)
-             assert not self.arg_type.variants or self.boxed
-         elif self.boxed:
-             raise QAPISemError(self.info, "Use of 'boxed' requires 'data=
-'")
-@@ -1687,7 +1718,6 @@ class QAPISchemaEvent(QAPISchemaEntity):
-         if self._arg_type_name:
-             self.arg_type =3D schema.lookup_type(self._arg_type_name)
-             assert isinstance(self.arg_type, QAPISchemaObjectType)
--            self.arg_type.check(schema)
-             assert not self.arg_type.variants or self.boxed
-         elif self.boxed:
-             raise QAPISemError(self.info, "Use of 'boxed' requires 'data=
-'")
+-    missing =3D set(required) - set(keys)
++    missing =3D set(required) - set(value)
+     if missing:
+         raise QAPISemError(info, "Key%s %s %s missing from %s"
+                            % ('s' if len(missing) > 1 else '', pprint(mi=
+ssing),
+                               'are' if len(missing) > 1 else 'is', sourc=
+e))
+     allowed =3D set(required + optional)
+-    unknown =3D set(keys) - allowed
++    unknown =3D set(value) - allowed
+     if unknown:
+         raise QAPISemError(info, "Unknown key%s %s in %s\nValid keys are=
+ %s."
+                            % ('s' if len(unknown) > 1 else '', pprint(un=
+known),
+@@ -1035,7 +1035,7 @@ def check_keys(expr, info, meta, required, optional=
+=3D[]):
+         raise QAPISemError(info, "'%s' key must have a string value" % m=
+eta)
+     required =3D required + [meta]
+     source =3D "%s '%s'" % (meta, name)
+-    check_known_keys(info, source, expr.keys(), required, optional)
++    check_known_keys(info, source, expr, required, optional)
+     for (key, value) in expr.items():
+         if key in ['gen', 'success-response'] and value is not False:
+             raise QAPISemError(info,
 --=20
 2.21.0
 
