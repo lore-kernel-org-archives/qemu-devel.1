@@ -2,60 +2,63 @@ Return-Path: <SRS0=fVwN=XJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A12C0C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 15:37:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C8DC4CEC7
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 15:37:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7090720717
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 15:37:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7090720717
+	by mail.kernel.org (Postfix) with ESMTPS id 89CD620717
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 15:37:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89CD620717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9A6n-0006gc-TG
-	for qemu-devel@archiver.kernel.org; Sat, 14 Sep 2019 11:37:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54248)
+	id 1i9A6p-0006ig-0x
+	for qemu-devel@archiver.kernel.org; Sat, 14 Sep 2019 11:37:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54267)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1i9A55-0004x8-CA
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 11:35:25 -0400
+ (envelope-from <armbru@redhat.com>) id 1i9A57-0004xF-SJ
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 11:35:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1i9A4x-0004tW-Ex
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 11:35:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56174)
+ (envelope-from <armbru@redhat.com>) id 1i9A53-0004vd-Rq
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 11:35:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46790)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i9A4v-0004rN-CT
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 11:35:13 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1i9A4x-0004sC-CP
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 11:35:16 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F0A933C916;
- Sat, 14 Sep 2019 15:35:10 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5244910DCC8B;
+ Sat, 14 Sep 2019 15:35:12 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 08E7626573;
- Sat, 14 Sep 2019 15:35:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ED8745E9C3;
+ Sat, 14 Sep 2019 15:35:11 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 89DD3113865F; Sat, 14 Sep 2019 17:35:06 +0200 (CEST)
+ id 991A311385C9; Sat, 14 Sep 2019 17:35:06 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Sat, 14 Sep 2019 17:34:47 +0200
-Message-Id: <20190914153506.2151-1-armbru@redhat.com>
+Date: Sat, 14 Sep 2019 17:34:52 +0200
+Message-Id: <20190914153506.2151-6-armbru@redhat.com>
+In-Reply-To: <20190914153506.2151-1-armbru@redhat.com>
+References: <20190914153506.2151-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Sat, 14 Sep 2019 15:35:11 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Sat, 14 Sep 2019 15:35:12 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 00/19] qapi: Frontend fixes and cleanups
+Subject: [Qemu-devel] [PATCH 05/19] tests/qapi-schema: Demonstrate
+ insufficient 'if' checking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,132 +75,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Here's the next batch of qapi patches, based on my "[PATCH v3 00/16]
-qapi: Schema language cleanups & doc improvements".  There's more in
-the pipeline.
+Cover invalid 'if' in struct members, features, union and alternate
+branches.  Four out of four are broken.  Mark FIXME.
 
-Based-on: <20190913201349.24332-1-armbru@redhat.com>
-
-Markus Armbruster (19):
-  tests/qapi-schema: Cover unknown pragma
-  tests/qapi-schema: Delete two redundant tests
-  tests/qapi-schema: Demonstrate misleading optional tag error
-  tests/qapi-schema: Demonstrate broken discriminator errors
-  tests/qapi-schema: Demonstrate insufficient 'if' checking
-  tests/qapi-schema: Demonstrate suboptimal lexical errors
-  qapi: Use quotes more consistently in frontend error messages
-  qapi: Improve reporting of lexical errors
-  qapi: Remove null from schema language
-  qapi: Fix broken discriminator error messages
-  qapi: Reject blank 'if' conditions in addition to empty ones
-  qapi: Fix missing 'if' checks in struct, union, alternate 'data'
-  qapi: Normalize 'if' in check_exprs(), like other sugar
-  qapi: Simplify check_keys()
-  qapi: Clean up around check_known_keys()
-  qapi: Delete useless check_exprs() code for simple union kind
-  qapi: Fix to .check() empty structs just once
-  qapi: Fix excessive QAPISchemaEntity.check() recursion
-  qapi: Assert .visit() and .check_clash() run only after .check()
-
- docs/devel/qapi-code-gen.txt                  |   4 +-
- scripts/qapi/common.py                        | 233 +++++++++---------
- tests/Makefile.include                        |   9 +-
- .../alternate-branch-if-invalid.err           |   1 +
- ....exit =3D> alternate-branch-if-invalid.exit} |   0
- .../alternate-branch-if-invalid.json          |   3 +
- ...ta.out =3D> alternate-branch-if-invalid.out} |   0
- tests/qapi-schema/bad-if-list.err             |   2 +-
- tests/qapi-schema/bad-if-list.json            |   2 +-
- tests/qapi-schema/bad-type-int.err            |   2 +-
- tests/qapi-schema/bad-type-int.json           |   2 +-
- tests/qapi-schema/doc-missing-colon.err       |   2 +-
- tests/qapi-schema/double-data.err             |   1 -
- tests/qapi-schema/double-data.json            |   2 -
- tests/qapi-schema/duplicate-key.err           |   2 +-
- tests/qapi-schema/duplicate-key.json          |   2 +-
- tests/qapi-schema/enum-int-member.err         |   2 +-
- tests/qapi-schema/escape-outside-string.err   |   1 +
- tests/qapi-schema/features-if-invalid.err     |   1 +
- ...rmat-err.exit =3D> features-if-invalid.exit} |   0
- tests/qapi-schema/features-if-invalid.json    |   4 +
- ...format-err.out =3D> features-if-invalid.out} |   0
- .../flat-union-discriminator-bad-name.err     |   1 +
- .../flat-union-discriminator-bad-name.exit    |   1 +
- .../flat-union-discriminator-bad-name.json    |  11 +
- .../flat-union-discriminator-bad-name.out     |   0
- .../flat-union-invalid-discriminator.err      |   2 +-
- .../flat-union-invalid-discriminator.json     |   5 +-
- .../flat-union-invalid-if-discriminator.err   |   2 +-
- .../flat-union-invalid-if-discriminator.json  |   5 +-
- .../flat-union-optional-discriminator.err     |   2 +-
- .../flat-union-optional-discriminator.json    |   3 +-
- tests/qapi-schema/funny-char.err              |   2 +-
- tests/qapi-schema/funny-word.err              |   1 +
- tests/qapi-schema/funny-word.exit             |   1 +
- tests/qapi-schema/funny-word.json             |   1 +
- tests/qapi-schema/funny-word.out              |   0
- tests/qapi-schema/include-before-err.err      |   2 +-
- tests/qapi-schema/include-format-err.err      |   1 -
- tests/qapi-schema/include-format-err.json     |   2 -
- tests/qapi-schema/include-nested-err.err      |   2 +-
- tests/qapi-schema/leading-comma-list.err      |   2 +-
- tests/qapi-schema/leading-comma-object.err    |   2 +-
- tests/qapi-schema/missing-colon.err           |   2 +-
- tests/qapi-schema/missing-comma-list.err      |   2 +-
- tests/qapi-schema/missing-comma-object.err    |   2 +-
- tests/qapi-schema/non-objects.err             |   2 +-
- .../pragma-name-case-whitelist-crap.json      |   2 +-
- tests/qapi-schema/pragma-unknown.err          |   1 +
- tests/qapi-schema/pragma-unknown.exit         |   1 +
- tests/qapi-schema/pragma-unknown.json         |   1 +
- tests/qapi-schema/pragma-unknown.out          |   0
- tests/qapi-schema/quoted-structural-chars.err |   2 +-
- .../qapi-schema/struct-member-if-invalid.err  |   1 +
- .../qapi-schema/struct-member-if-invalid.exit |   1 +
- .../qapi-schema/struct-member-if-invalid.json |   3 +
- .../qapi-schema/struct-member-if-invalid.out  |   0
- tests/qapi-schema/trailing-comma-list.err     |   2 +-
- tests/qapi-schema/unclosed-list.err           |   2 +-
- tests/qapi-schema/unclosed-object.err         |   2 +-
- tests/qapi-schema/union-base-empty.err        |   2 +-
- tests/qapi-schema/union-branch-if-invalid.err |   1 +
- .../qapi-schema/union-branch-if-invalid.exit  |   1 +
- .../qapi-schema/union-branch-if-invalid.json  |   6 +
- tests/qapi-schema/union-branch-if-invalid.out |   0
- 65 files changed, 202 insertions(+), 157 deletions(-)
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ tests/Makefile.include                        |  4 ++++
+ .../alternate-branch-if-invalid.err           |  0
+ .../alternate-branch-if-invalid.exit          |  1 +
+ .../alternate-branch-if-invalid.json          |  4 ++++
+ .../alternate-branch-if-invalid.out           | 16 +++++++++++++
+ tests/qapi-schema/features-if-invalid.err     |  0
+ tests/qapi-schema/features-if-invalid.exit    |  1 +
+ tests/qapi-schema/features-if-invalid.json    |  5 ++++
+ tests/qapi-schema/features-if-invalid.out     | 14 +++++++++++
+ .../qapi-schema/struct-member-if-invalid.err  |  0
+ .../qapi-schema/struct-member-if-invalid.exit |  1 +
+ .../qapi-schema/struct-member-if-invalid.json |  4 ++++
+ .../qapi-schema/struct-member-if-invalid.out  | 15 ++++++++++++
+ tests/qapi-schema/union-branch-if-invalid.err |  0
+ .../qapi-schema/union-branch-if-invalid.exit  |  1 +
+ .../qapi-schema/union-branch-if-invalid.json  |  7 ++++++
+ tests/qapi-schema/union-branch-if-invalid.out | 23 +++++++++++++++++++
+ 17 files changed, 96 insertions(+)
  create mode 100644 tests/qapi-schema/alternate-branch-if-invalid.err
- rename tests/qapi-schema/{double-data.exit =3D> alternate-branch-if-inva=
-lid.exit} (100%)
+ create mode 100644 tests/qapi-schema/alternate-branch-if-invalid.exit
  create mode 100644 tests/qapi-schema/alternate-branch-if-invalid.json
- rename tests/qapi-schema/{double-data.out =3D> alternate-branch-if-inval=
-id.out} (100%)
- delete mode 100644 tests/qapi-schema/double-data.err
- delete mode 100644 tests/qapi-schema/double-data.json
- create mode 100644 tests/qapi-schema/escape-outside-string.err
+ create mode 100644 tests/qapi-schema/alternate-branch-if-invalid.out
  create mode 100644 tests/qapi-schema/features-if-invalid.err
- rename tests/qapi-schema/{include-format-err.exit =3D> features-if-inval=
-id.exit} (100%)
+ create mode 100644 tests/qapi-schema/features-if-invalid.exit
  create mode 100644 tests/qapi-schema/features-if-invalid.json
- rename tests/qapi-schema/{include-format-err.out =3D> features-if-invali=
-d.out} (100%)
- create mode 100644 tests/qapi-schema/flat-union-discriminator-bad-name.e=
-rr
- create mode 100644 tests/qapi-schema/flat-union-discriminator-bad-name.e=
-xit
- create mode 100644 tests/qapi-schema/flat-union-discriminator-bad-name.j=
-son
- create mode 100644 tests/qapi-schema/flat-union-discriminator-bad-name.o=
-ut
- create mode 100644 tests/qapi-schema/funny-word.err
- create mode 100644 tests/qapi-schema/funny-word.exit
- create mode 100644 tests/qapi-schema/funny-word.json
- create mode 100644 tests/qapi-schema/funny-word.out
- delete mode 100644 tests/qapi-schema/include-format-err.err
- delete mode 100644 tests/qapi-schema/include-format-err.json
- create mode 100644 tests/qapi-schema/pragma-unknown.err
- create mode 100644 tests/qapi-schema/pragma-unknown.exit
- create mode 100644 tests/qapi-schema/pragma-unknown.json
- create mode 100644 tests/qapi-schema/pragma-unknown.out
+ create mode 100644 tests/qapi-schema/features-if-invalid.out
  create mode 100644 tests/qapi-schema/struct-member-if-invalid.err
  create mode 100644 tests/qapi-schema/struct-member-if-invalid.exit
  create mode 100644 tests/qapi-schema/struct-member-if-invalid.json
@@ -207,6 +115,234 @@ ut
  create mode 100644 tests/qapi-schema/union-branch-if-invalid.json
  create mode 100644 tests/qapi-schema/union-branch-if-invalid.out
 
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index a11bde743e..c108a83076 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -295,6 +295,7 @@ check-qtest-generic-y +=3D tests/test-hmp$(EXESUF)
+ qapi-schema +=3D alternate-any.json
+ qapi-schema +=3D alternate-array.json
+ qapi-schema +=3D alternate-base.json
++qapi-schema +=3D alternate-branch-if-invalid.json
+ qapi-schema +=3D alternate-clash.json
+ qapi-schema +=3D alternate-conflict-dict.json
+ qapi-schema +=3D alternate-conflict-enum-bool.json
+@@ -379,6 +380,7 @@ qapi-schema +=3D event-member-invalid-dict.json
+ qapi-schema +=3D event-nest-struct.json
+ qapi-schema +=3D features-bad-type.json
+ qapi-schema +=3D features-duplicate-name.json
++qapi-schema +=3D features-if-invalid.json
+ qapi-schema +=3D features-missing-name.json
+ qapi-schema +=3D features-name-bad-type.json
+ qapi-schema +=3D features-no-list.json
+@@ -453,6 +455,7 @@ qapi-schema +=3D string-code-point-127.json
+ qapi-schema +=3D struct-base-clash-deep.json
+ qapi-schema +=3D struct-base-clash.json
+ qapi-schema +=3D struct-data-invalid.json
++qapi-schema +=3D struct-member-if-invalid.json
+ qapi-schema +=3D struct-member-invalid-dict.json
+ qapi-schema +=3D struct-member-invalid.json
+ qapi-schema +=3D trailing-comma-list.json
+@@ -464,6 +467,7 @@ qapi-schema +=3D unclosed-string.json
+ qapi-schema +=3D union-base-empty.json
+ qapi-schema +=3D union-base-no-discriminator.json
+ qapi-schema +=3D union-branch-case.json
++qapi-schema +=3D union-branch-if-invalid.json
+ qapi-schema +=3D union-branch-invalid-dict.json
+ qapi-schema +=3D union-clash-branches.json
+ qapi-schema +=3D union-empty.json
+diff --git a/tests/qapi-schema/alternate-branch-if-invalid.err b/tests/qa=
+pi-schema/alternate-branch-if-invalid.err
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/alternate-branch-if-invalid.exit b/tests/q=
+api-schema/alternate-branch-if-invalid.exit
+new file mode 100644
+index 0000000000..573541ac97
+--- /dev/null
++++ b/tests/qapi-schema/alternate-branch-if-invalid.exit
+@@ -0,0 +1 @@
++0
+diff --git a/tests/qapi-schema/alternate-branch-if-invalid.json b/tests/q=
+api-schema/alternate-branch-if-invalid.json
+new file mode 100644
+index 0000000000..6497f53475
+--- /dev/null
++++ b/tests/qapi-schema/alternate-branch-if-invalid.json
+@@ -0,0 +1,4 @@
++# Cover alternative with invalid 'if'
++# FIXME not rejected, would generate '#if  \n'
++{ 'alternate': 'Alt',
++  'data': { 'branch': { 'type': 'int', 'if': ' ' } } }
+diff --git a/tests/qapi-schema/alternate-branch-if-invalid.out b/tests/qa=
+pi-schema/alternate-branch-if-invalid.out
+new file mode 100644
+index 0000000000..89305d7f21
+--- /dev/null
++++ b/tests/qapi-schema/alternate-branch-if-invalid.out
+@@ -0,0 +1,16 @@
++module None
++object q_empty
++enum QType
++    prefix QTYPE
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
++module alternate-branch-if-invalid.json
++alternate Alt
++    tag type
++    case branch: int
++        if [' ']
+diff --git a/tests/qapi-schema/features-if-invalid.err b/tests/qapi-schem=
+a/features-if-invalid.err
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/features-if-invalid.exit b/tests/qapi-sche=
+ma/features-if-invalid.exit
+new file mode 100644
+index 0000000000..573541ac97
+--- /dev/null
++++ b/tests/qapi-schema/features-if-invalid.exit
+@@ -0,0 +1 @@
++0
+diff --git a/tests/qapi-schema/features-if-invalid.json b/tests/qapi-sche=
+ma/features-if-invalid.json
+new file mode 100644
+index 0000000000..e6a524196d
+--- /dev/null
++++ b/tests/qapi-schema/features-if-invalid.json
+@@ -0,0 +1,5 @@
++# Cover feature with invalid 'if'
++# FIXME not rejected, misinterpreded as unconditional
++{ 'struct': 'Stru',
++  'data': {},
++  'features': [{'name': 'f', 'if': null }] }
+diff --git a/tests/qapi-schema/features-if-invalid.out b/tests/qapi-schem=
+a/features-if-invalid.out
+new file mode 100644
+index 0000000000..9c2637baa3
+--- /dev/null
++++ b/tests/qapi-schema/features-if-invalid.out
+@@ -0,0 +1,14 @@
++module None
++object q_empty
++enum QType
++    prefix QTYPE
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
++module features-if-invalid.json
++object Stru
++    feature f
+diff --git a/tests/qapi-schema/struct-member-if-invalid.err b/tests/qapi-=
+schema/struct-member-if-invalid.err
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/struct-member-if-invalid.exit b/tests/qapi=
+-schema/struct-member-if-invalid.exit
+new file mode 100644
+index 0000000000..573541ac97
+--- /dev/null
++++ b/tests/qapi-schema/struct-member-if-invalid.exit
+@@ -0,0 +1 @@
++0
+diff --git a/tests/qapi-schema/struct-member-if-invalid.json b/tests/qapi=
+-schema/struct-member-if-invalid.json
+new file mode 100644
+index 0000000000..73987e04fc
+--- /dev/null
++++ b/tests/qapi-schema/struct-member-if-invalid.json
+@@ -0,0 +1,4 @@
++# Cover member with invalid 'if'
++# FIXME not rejected, would generate '#if True\n'
++{ 'struct': 'Stru',
++  'data': { 'member': { 'type': 'int', 'if': true } } }
+diff --git a/tests/qapi-schema/struct-member-if-invalid.out b/tests/qapi-=
+schema/struct-member-if-invalid.out
+new file mode 100644
+index 0000000000..8fbb97985c
+--- /dev/null
++++ b/tests/qapi-schema/struct-member-if-invalid.out
+@@ -0,0 +1,15 @@
++module None
++object q_empty
++enum QType
++    prefix QTYPE
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
++module struct-member-if-invalid.json
++object Stru
++    member member: int optional=3DFalse
++        if [True]
+diff --git a/tests/qapi-schema/union-branch-if-invalid.err b/tests/qapi-s=
+chema/union-branch-if-invalid.err
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/union-branch-if-invalid.exit b/tests/qapi-=
+schema/union-branch-if-invalid.exit
+new file mode 100644
+index 0000000000..573541ac97
+--- /dev/null
++++ b/tests/qapi-schema/union-branch-if-invalid.exit
+@@ -0,0 +1 @@
++0
+diff --git a/tests/qapi-schema/union-branch-if-invalid.json b/tests/qapi-=
+schema/union-branch-if-invalid.json
+new file mode 100644
+index 0000000000..859b63b610
+--- /dev/null
++++ b/tests/qapi-schema/union-branch-if-invalid.json
+@@ -0,0 +1,7 @@
++# Cover branch with invalid 'if'
++# FIXME not rejected, would generate '#if \n'
++{ 'enum': 'Branches', 'data': ['branch1'] }
++{ 'struct': 'Stru', 'data': { 'member': 'str' } }
++{ 'union': 'Uni',
++  'base': { 'tag': 'Branches' }, 'discriminator': 'tag',
++  'data': { 'branch1': { 'type': 'Stru', 'if': [''] } } }
+diff --git a/tests/qapi-schema/union-branch-if-invalid.out b/tests/qapi-s=
+chema/union-branch-if-invalid.out
+new file mode 100644
+index 0000000000..2ed43218af
+--- /dev/null
++++ b/tests/qapi-schema/union-branch-if-invalid.out
+@@ -0,0 +1,23 @@
++module None
++object q_empty
++enum QType
++    prefix QTYPE
++    member none
++    member qnull
++    member qnum
++    member qstring
++    member qdict
++    member qlist
++    member qbool
++module union-branch-if-invalid.json
++enum Branches
++    member branch1
++object Stru
++    member member: str optional=3DFalse
++object q_obj_Uni-base
++    member tag: Branches optional=3DFalse
++object Uni
++    base q_obj_Uni-base
++    tag tag
++    case branch1: Stru
++        if ['']
 --=20
 2.21.0
 
