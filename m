@@ -2,87 +2,72 @@ Return-Path: <SRS0=fVwN=XJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DD15C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 18:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BD29C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 19:03:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D46EA206A4
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 18:58:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="makBJ80e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D46EA206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 292A320692
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 19:03:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 292A320692
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9DFA-00022w-Tp
-	for qemu-devel@archiver.kernel.org; Sat, 14 Sep 2019 14:58:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54342)
+	id 1i9DK5-0003Jg-5T
+	for qemu-devel@archiver.kernel.org; Sat, 14 Sep 2019 15:03:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54805)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gorcunov@gmail.com>) id 1i9DEI-0001c7-Ig
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 14:57:07 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1i9DHl-0002lZ-SO
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 15:00:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gorcunov@gmail.com>) id 1i9DEH-0000DN-8b
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 14:57:06 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:42846)
+ (envelope-from <palmer@dabbelt.com>) id 1i9DHk-0001vY-Et
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 15:00:41 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:39893)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <gorcunov@gmail.com>) id 1i9DEG-0000Cv-Va
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 14:57:05 -0400
-Received: by mail-lf1-x143.google.com with SMTP id c195so9584597lfg.9
- for <qemu-devel@nongnu.org>; Sat, 14 Sep 2019 11:57:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=0DTjWe83PEeKAfZ77pJUpJ1SuMpU/tIMoLavaRj9hSg=;
- b=makBJ80evqUAPNUSQej7g3dFEZ/9mXMTCO8vt3cRUTFzZnMCgle7JRBK+jzXBwBsvu
- /wJD1zOeoXcMM7qQTk8fWROfVtU3XMyuCrEGOkD1Url2u1OxtLd0WOjvnhxEP3o1umjt
- b/X4Ey22fRfmJYnICQ0ST+peYkoc7PUEDPWNgf6HoHxW4Oge4HkNjBsmw2oKCxQ44kLd
- UeE8NqFDyPYuBuF3RItKcL6DiEr69Q7tOobstv/gRix0uwnKPU1kdbdLVpQkC8D2NGLB
- RxXVyAM4RdbpGEQiPk23dn4H6Cb45QtoRVI9oHAZU43bOxkOjIcL+ABjTcEz3cbV2RwL
- 7lsw==
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i9DHk-0001v8-8z
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 15:00:40 -0400
+Received: by mail-pf1-f196.google.com with SMTP id i1so11190532pfa.6
+ for <qemu-devel@nongnu.org>; Sat, 14 Sep 2019 12:00:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=0DTjWe83PEeKAfZ77pJUpJ1SuMpU/tIMoLavaRj9hSg=;
- b=U0xoK8Mh8xywPIfiqABjHmdDpeUWhpmKfico75ix4vcKkAS6YJZT4VYt33IB3XWFNM
- z+Rj3CSrFxlqgU4gyRVhiaZJy2DWdBqXqTUzoYKtNk1hxDsT5ABrmvk/OO97tn3V0lzV
- UXAEiNOoYIXmXEiSeRM0x5JczaLyVzKSZKd3w4HjkC6ppr/b9AnMvuQXYfbv2dSBMfuA
- Zq/PRwn7/ZBAhMBFA0fCl5im1UBw4yLHnfmbGC2cCNcikE3hZuwgiFDe4YzErIzmNdq9
- 1v5fMqz4cIK3SjhEUsVZxjDFbCms/MqIQ0/Ux1LjVtCE9884zrYKcbH/W8Qjhku2NSZy
- KKlQ==
-X-Gm-Message-State: APjAAAXg++Op0hNFGPs9vf8GbZGzhWjnne2lZ7sAoI2xUo1+TdZ3b1A7
- GocilPBr0M5hU6u0uDTzbCgjcblQnnY=
-X-Google-Smtp-Source: APXvYqxdV3MYWgLlOZWeM7o653RlITt8cGx9eTuI/ZEwoTKACPQE2j/Hn2JxzOTA6Uk7orKTiLoPEQ==
-X-Received: by 2002:ac2:5925:: with SMTP id v5mr5428733lfi.8.1568487422360;
- Sat, 14 Sep 2019 11:57:02 -0700 (PDT)
-Received: from uranus.localdomain ([5.18.103.226])
- by smtp.gmail.com with ESMTPSA id z19sm7203375ljj.50.2019.09.14.11.57.00
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=Q+ZtLM++dtjWC3FwNLOVxw/kKAndyJKMVCk+RAU58YA=;
+ b=raZuQOQnEqcMhhaDE3av1bKEPS3sOwGFbEuauvgtGm9BawRpjlDZKgfEEJzzHKD1xp
+ vkaiOzZt+0beh5kamvUWQdx6gtL+TyZqFRJpKz0i1TWg7IwC2DvM/XMI+LRwbPTIwueH
+ ddT/f0EWdTlxqoidTCjzrp/GXBlOVkkLGvQg7dJycZSPlVSLsZmgJW8cFJYcilforXLE
+ IGzMxbxscVX3L+Bku3rezLSx92HLDq4tflnUrflsBKfOlFbkvH6TXIkEaEUP1yW+NcGS
+ ED5gEKJXMCF/99dAVGEragSRxLd729oP66woS360VaRI9MoLlIRDSL26ed3+Df1dtNFp
+ pfCg==
+X-Gm-Message-State: APjAAAWXeBiv+kT+LkdRBfL0Ek9Mbn722yQFNiFIqGcw8QpdMFKf6e0d
+ Jpgqw0BzyV+SAPK0WNuU2IUZHg==
+X-Google-Smtp-Source: APXvYqxp61xa6q5WJXeDgHu6godzYQIzCGF/Auzz5QzwereCL5qmpi78AzClM0NV1a+UJtkvV6ZIsQ==
+X-Received: by 2002:a63:590f:: with SMTP id n15mr37897296pgb.190.1568487638232; 
+ Sat, 14 Sep 2019 12:00:38 -0700 (PDT)
+Received: from localhost (amx-tls3.starhub.net.sg. [203.116.164.13])
+ by smtp.gmail.com with ESMTPSA id q22sm38030167pgh.49.2019.09.14.12.00.35
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 14 Sep 2019 11:57:00 -0700 (PDT)
-Received: by uranus.localdomain (Postfix, from userid 1000)
- id 90483461115; Sat, 14 Sep 2019 21:57:00 +0300 (MSK)
-Date: Sat, 14 Sep 2019 21:57:00 +0300
-From: Cyrill Gorcunov <gorcunov@gmail.com>
-To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190914185700.GI1508@uranus>
-References: <20190913154344.GH1508@uranus> <87sgoy3emv.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87sgoy3emv.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::143
-Subject: Re: [Qemu-devel] [PATCH] error-report: Add info_report_once helper
+ Sat, 14 Sep 2019 12:00:37 -0700 (PDT)
+Date: Sat, 14 Sep 2019 12:00:37 -0700 (PDT)
+X-Google-Original-Date: Sat, 14 Sep 2019 11:54:31 PDT (-0700)
+In-Reply-To: <CAEUhbmUksfEiGLZ0qzsWkaDOaocTvkEYefiSUmGZT7TftYfmEg@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: bmeng.cn@gmail.com
+Message-ID: <mhng-165ebd8f-3595-48d3-a614-79f52d81c14c@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.210.196
+Subject: Re: [Qemu-devel] [PATCH v8 18/32] riscv: sifive_u: Set the minimum
+ number of cpus to 2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,37 +79,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Sep 14, 2019 at 08:40:40PM +0200, Markus Armbruster wrote:
-> You neglected to cc: the maintainer (me).  I spotted this anyway, more
-> or less by chance.  Next time, please use scripts/get_maintainer.pl to
-> find people you might want to cc:.
+On Fri, 13 Sep 2019 08:25:21 PDT (-0700), bmeng.cn@gmail.com wrote:
+> Hi Palmer,
+>
+> On Fri, Sep 13, 2019 at 10:33 PM Palmer Dabbelt <palmer@sifive.com> wrote:
+>>
+>> On Fri, 06 Sep 2019 09:20:05 PDT (-0700), bmeng.cn@gmail.com wrote:
+>> > It is not useful if we only have one management CPU.
+>> >
+>> > Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+>> > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+>> >
+>> > ---
+>> >
+>> > Changes in v8: None
+>> > Changes in v7: None
+>> > Changes in v6: None
+>> > Changes in v5: None
+>> > Changes in v4: None
+>> > Changes in v3:
+>> > - use management cpu count + 1 for the min_cpus
+>> >
+>> > Changes in v2:
+>> > - update the file header to indicate at least 2 harts are created
+>> >
+>> >  hw/riscv/sifive_u.c         | 4 +++-
+>> >  include/hw/riscv/sifive_u.h | 2 ++
+>> >  2 files changed, 5 insertions(+), 1 deletion(-)
+>> >
+>> > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+>> > index 2947e06..2023b71 100644
+>> > --- a/hw/riscv/sifive_u.c
+>> > +++ b/hw/riscv/sifive_u.c
+>> > @@ -10,7 +10,8 @@
+>> >   * 1) CLINT (Core Level Interruptor)
+>> >   * 2) PLIC (Platform Level Interrupt Controller)
+>> >   *
+>> > - * This board currently uses a hardcoded devicetree that indicates one hart.
+>> > + * This board currently generates devicetree dynamically that indicates at least
+>> > + * two harts.
+>> >   *
+>> >   * This program is free software; you can redistribute it and/or modify it
+>> >   * under the terms and conditions of the GNU General Public License,
+>> > @@ -433,6 +434,7 @@ static void riscv_sifive_u_machine_init(MachineClass *mc)
+>> >       * management CPU.
+>> >       */
+>> >      mc->max_cpus = 4;
+>> > +    mc->min_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + 1;
+>> >  }
+>> >
+>> >  DEFINE_MACHINE("sifive_u", riscv_sifive_u_machine_init)
+>> > diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+>> > index f25bad8..6d22741 100644
+>> > --- a/include/hw/riscv/sifive_u.h
+>> > +++ b/include/hw/riscv/sifive_u.h
+>> > @@ -69,6 +69,8 @@ enum {
+>> >      SIFIVE_U_GEM_CLOCK_FREQ = 125000000
+>> >  };
+>> >
+>> > +#define SIFIVE_U_MANAGEMENT_CPU_COUNT   1
+>> > +
+>> >  #define SIFIVE_U_PLIC_HART_CONFIG "MS"
+>> >  #define SIFIVE_U_PLIC_NUM_SOURCES 54
+>> >  #define SIFIVE_U_PLIC_NUM_PRIORITIES 7
+>>
+>> This fails "make check", so I'm going to squash in this
+>>
+>> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+>> index ca9f7fea41..adecbf1dd9 100644
+>> --- a/hw/riscv/sifive_u.c
+>> +++ b/hw/riscv/sifive_u.c
+>> @@ -528,6 +528,7 @@ static void riscv_sifive_u_machine_init(MachineClass *mc)
+>>      mc->init = riscv_sifive_u_init;
+>>      mc->max_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + SIFIVE_U_COMPUTE_CPU_COUNT;
+>>      mc->min_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + 1;
+>> +    mc->default_cpus = mc->max_cpus;
+>
+> Thank you for fixing the 'make check'. Shouldn't it be:
+>
+> mc->default_cpus = mc->min_cpus;
 
-Ah, sorry for that. Will do next time, thanks!
+We have 5 harts on the board that this matches, so I figured that'd be the 
+better default.
 
-> Cyrill Gorcunov <gorcunov@gmail.com> writes:
-> 
-> > We already have error_report_once and warn_report_once,
-> > thus lets add info_report_once to complement. Actually
-> > I use this helper a lot so might be usefull for others.
-> >
-> > Signed-off-by: Cyrill Gorcunov <gorcunov@gmail.com>
-> 
-> Patch looks reasonable enough.  However, the new info_report_once() and
-> info_report_once_cond() aren't used.  Your commit message suggests you
-> have users in unpublished code.  Is that correct?
-
-Exactly. I work on yet unpublished but open source code
-(https://src.openvz.org/projects/UP/repos/qemu/browse) to be
-precise. But work is still in progress and hasn't been pushed
-out.
-
-You know I posted the patch simply because it might be
-useful for someone and it looks a bit incomplete that
-we have "warn/error once" but no info_once. Up to you
-to decide if we need it in vanilla tree.
+>
+> ?
+>
+>>  }
+>>
+>>  DEFINE_MACHINE("sifive_u", riscv_sifive_u_machine_init)
+>
+> Regards,
+> Bin
 
