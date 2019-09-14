@@ -2,67 +2,72 @@ Return-Path: <SRS0=fVwN=XJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 512C5C49ED6
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 04:36:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F00BFC4CEC9
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 13:01:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EEE620693
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 04:36:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EEE620693
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id C4CBD206A4
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 13:01:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4CBD206A4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8zmz-0000ne-9B
-	for qemu-devel@archiver.kernel.org; Sat, 14 Sep 2019 00:36:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40088)
+	id 1i97gJ-0007rK-RW
+	for qemu-devel@archiver.kernel.org; Sat, 14 Sep 2019 09:01:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35302)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i8zmD-0000Hh-5B
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 00:35:14 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1i97ec-0006vf-AB
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 08:59:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i8zmB-0005Oq-Dq
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 00:35:12 -0400
-Resent-Date: Sat, 14 Sep 2019 00:35:12 -0400
-Resent-Message-Id: <E1i8zmB-0005Oq-Dq@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21432)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i8zmB-0005E5-5e
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 00:35:11 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568429378; cv=none; d=zoho.com; s=zohoarc; 
- b=OCR8d45O5zuaVEu/R69m8agr6Hxdo4tKDizU3Cditrnux9/8YKHaecO8ODSFnZZD3VxVoDB4ZiBDETHS1I+CkWGvoSkRN4k9CpRIbJAwMAOIxTRO5zELn6ASaqWyNW8L/aVYYLcsXwSn8Y4rzn7SyBbNxawZedV9wtkdPFJ+Kq8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1568429378;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=D2awET0OCR4/t/8ySFsGLAkJjz2h4OdVW0bJnhDz0iw=; 
- b=E4BOOxjJ+jasCBVVXnZi759iYtbL/Jl3UK2zhKJNChbPG7B+yr1LLXr3vytvR6dxLvpQz5aGBYsRD//tM9YHzcl6MCvz0po+MHkFnK8K3tj8bXkVhZwSyKa4F/4Pc7VHxE4F4YmIiHdJlsDOYtqFP6uMd5IKBkSXfmE16bNkgGY=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 156842937672858.46839278150367;
- Fri, 13 Sep 2019 19:49:36 -0700 (PDT)
-In-Reply-To: <20190913201349.24332-1-armbru@redhat.com>
-Message-ID: <156842937572.31080.2162917881478968917@5dec9699b7de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: armbru@redhat.com
-Date: Fri, 13 Sep 2019 19:49:36 -0700 (PDT)
-X-ZohoMailClient: External
+ (envelope-from <palmer@dabbelt.com>) id 1i97eY-00007w-Su
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 08:59:54 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:45836)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i97eY-00007S-N7
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 08:59:50 -0400
+Received: by mail-pf1-f196.google.com with SMTP id y72so19727740pfb.12
+ for <qemu-devel@nongnu.org>; Sat, 14 Sep 2019 05:59:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=nS/Bkx5ETvR0+ddguHIK8HfguCPB04A7fuip6hdV0zk=;
+ b=haQhleyEMuSHPbhS2P2iwx0Ea+MIVNAq318IcU58bHvHhq96ugE2nXnvmkTyy2ZGfs
+ EriVMl/YPTPMg/Os2nk3m/jJ8T8lgvD+2prVLCmBezb3tBsz2MwG7jlkjwK8z7hHTvmn
+ DjMwys4WqI6CLwOXFff2hUFN7fetZ7++uQr+dCC0l8xuXVrVd+O9XDE2iRX5jLD0+P8o
+ qHFvF0MfbRwwjr4/sZyAYO7EE+73cl1/dVkj3C++zu7gdMpv4Iblh06itn3BeCcEVqAi
+ 9pFAQypmYIFxyn+N326QS97Cs573RYffTrVBs4Ua8OBkPPvpolRBkKEJ5eMPu5Ssp6m5
+ pPJQ==
+X-Gm-Message-State: APjAAAXA3/xJU8IOkp8jafTqNgUeFBoo9GCTVmqPSEPQOyEGrFWKkoq8
+ ltkgijo7D4BwBLOnRol27Rd+Pg==
+X-Google-Smtp-Source: APXvYqxzgTIlllV62yaI0pOs+DbLKXnTRJAMQ541M7FE42Ev7vPzdS/y7YPeA0p7PXwA6oeUFNboZw==
+X-Received: by 2002:a17:90a:aa82:: with SMTP id
+ l2mr11072854pjq.73.1568465989011; 
+ Sat, 14 Sep 2019 05:59:49 -0700 (PDT)
+Received: from localhost (amx-tls3.starhub.net.sg. [203.116.164.13])
+ by smtp.gmail.com with ESMTPSA id z12sm50416072pfj.41.2019.09.14.05.59.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 14 Sep 2019 05:59:48 -0700 (PDT)
+Date: Sat, 14 Sep 2019 05:59:48 -0700 (PDT)
+X-Google-Original-Date: Sat, 14 Sep 2019 05:23:48 PDT (-0700)
+In-Reply-To: <CAL1e-=iyBP+k6MH+uCd7EAUAqp=hSG7SQOMemuJwdhJVGusYcg@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: aleksandar.m.mail@gmail.com
+Message-ID: <mhng-307e8199-1ecf-4627-9d24-83656d2423f7@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.54
-Subject: Re: [Qemu-devel] [PATCH v3 00/16] qapi: Schema language cleanups &
- doc improvements
+ [fuzzy]
+X-Received-From: 209.85.210.196
+Subject: Re: [Qemu-devel] [PATCH v2 00/17] RISC-V: support vector extension
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,95 +79,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
- mdroth@linux.vnet.ibm.com
+Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, riku.voipio@iki.fi,
+ qemu-devel@nongnu.org, wxy194768@alibaba-inc.com, laurent@vivier.eu,
+ wenmeng_zhang@c-sky.com, Alistair Francis <Alistair.Francis@wdc.com>,
+ zhiwei_liu@c-sky.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxMzIwMTM0OS4yNDMz
-Mi0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAwLzE2XSBxYXBpOiBT
-Y2hlbWEgbGFuZ3VhZ2UgY2xlYW51cHMgJiBkb2MgaW1wcm92ZW1lbnRzCk1lc3NhZ2UtaWQ6IDIw
-MTkwOTEzMjAxMzQ5LjI0MzMyLTEtYXJtYnJ1QHJlZGhhdC5jb20KVHlwZTogc2VyaWVzCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9k
-ZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
-IGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
-ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
-Cjk0OTE3ODcgcWFwaTogVHdlYWsgY29kZSB0byBtYXRjaCBkb2NzL2RldmVsL3FhcGktY29kZS1n
-ZW4udHh0CjZmYjRhMjcgZG9jcy9kZXZlbC9xYXBpLWNvZGUtZ2VuOiBJbXByb3ZlIFFBUEkgc2No
-ZW1hIGxhbmd1YWdlIGRvYwphNDc0NDk0IGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogUmV3cml0
-ZSBpbnRyb2R1Y3Rpb24gdG8gc2NoZW1hCjY2NDAyNzIgZG9jcy9kZXZlbC9xYXBpLWNvZGUtZ2Vu
-OiBSZXdyaXRlIGNvbXBhdGliaWxpdHkgY29uc2lkZXJhdGlvbnMKZDNjZWM3OCBkb2NzL2RldmVs
-L3FhcGktY29kZS1nZW46IFJlb3JkZXIgc2VjdGlvbnMgZm9yIHJlYWRhYmlsaXR5CmI0OGFiYTMg
-cWFwaTogQWRqdXN0IGZyb250ZW5kIGVycm9ycyB0byBzYXkgZW51bSB2YWx1ZSwgbm90IG1lbWJl
-cgo3MGNlNjE5IHFhcGk6IFBlcm1pdCBvbWl0dGluZyBhbGwgZmxhdCB1bmlvbiBicmFuY2hlcwo0
-ZWNkNjg4IHFhcGk6IFBlcm1pdCBhbHRlcm5hdGVzIHdpdGgganVzdCBvbmUgYnJhbmNoCjZmYjhm
-OWUgcWFwaTogUGVybWl0ICdib3hlZCcgd2l0aCBlbXB0eSB0eXBlCmM1ZTkwOTcgcWFwaTogRHJv
-cCBzdXBwb3J0IGZvciBlc2NhcGUgc2VxdWVuY2VzIG90aGVyIHRoYW4gXFwKMTEzODM2ZiBxYXBp
-OiBSZXN0cmljdCBzdHJpbmdzIHRvIHByaW50YWJsZSBBU0NJSQpmZTc2MGYzIHRlc3RzL3FhcGkt
-c2NoZW1hOiBEZW1vbnN0cmF0ZSBiYWQgcmVwb3J0aW5nIG9mIGZ1bm55IGNoYXJhY3RlcnMKNzc2
-ZGY3YyBkb2NzL2RldmVsL3FhcGktY29kZS1nZW46IE1pbm9yIHNwZWNpZmljYXRpb24gZml4ZXMK
-MTgxYTQzOCBxYXBpOiBEcm9wIHN1cHBvcnQgZm9yIGJveGVkIGFsdGVybmF0ZSBhcmd1bWVudHMK
-NTdmOTc0MCBxYXBpOiBEcm9wIGNoZWNrX3R5cGUoKSdzIHJlZHVuZGFudCBwYXJhbWV0ZXIgQGFs
-bG93X29wdGlvbmFsCjc5NzVjNWQgc2NyaXB0cy9naXQub3JkZXJmaWxlOiBNYXRjaCBRQVBJIHNj
-aGVtYSBtb3JlIHByZWNpc2VseQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xNiBDaGVja2luZyBj
-b21taXQgNzk3NWM1ZDY5Y2NhIChzY3JpcHRzL2dpdC5vcmRlcmZpbGU6IE1hdGNoIFFBUEkgc2No
-ZW1hIG1vcmUgcHJlY2lzZWx5KQoyLzE2IENoZWNraW5nIGNvbW1pdCA1N2Y5NzQwYjVkNmMgKHFh
-cGk6IERyb3AgY2hlY2tfdHlwZSgpJ3MgcmVkdW5kYW50IHBhcmFtZXRlciBAYWxsb3dfb3B0aW9u
-YWwpCjMvMTYgQ2hlY2tpbmcgY29tbWl0IDE4MWE0Mzg0ZThiOCAocWFwaTogRHJvcCBzdXBwb3J0
-IGZvciBib3hlZCBhbHRlcm5hdGUgYXJndW1lbnRzKQo0LzE2IENoZWNraW5nIGNvbW1pdCA3NzZk
-ZjdjZDQ1YzYgKGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogTWlub3Igc3BlY2lmaWNhdGlvbiBm
-aXhlcykKNS8xNiBDaGVja2luZyBjb21taXQgZmU3NjBmMzk0NjFjICh0ZXN0cy9xYXBpLXNjaGVt
-YTogRGVtb25zdHJhdGUgYmFkIHJlcG9ydGluZyBvZiBmdW5ueSBjaGFyYWN0ZXJzKQo2LzE2IENo
-ZWNraW5nIGNvbW1pdCAxMTM4MzZmMzFkZDUgKHFhcGk6IFJlc3RyaWN0IHN0cmluZ3MgdG8gcHJp
-bnRhYmxlIEFTQ0lJKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
-b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxMDk6IApuZXcgZmlsZSBtb2RlIDEwMDY0
-NAoKRVJST1I6IEludmFsaWQgVVRGLTgsIHBhdGNoIGFuZCBjb21taXQgbWVzc2FnZSBzaG91bGQg
-YmUgZW5jb2RlZCBpbiBVVEYtOAojMTI2OiBGSUxFOiB0ZXN0cy9xYXBpLXNjaGVtYS9zdHJpbmct
-Y29kZS1wb2ludC0xMjcuanNvbjoyOgoreyAnY29tbWFuZCc6ICfijKYnIH0KICAgICAgICAgICAg
-ICAgXgoKRVJST1I6IEludmFsaWQgVVRGLTgsIHBhdGNoIGFuZCBjb21taXQgbWVzc2FnZSBzaG91
-bGQgYmUgZW5jb2RlZCBpbiBVVEYtOAojMTUyOiBGSUxFOiB0ZXN0cy9xYXBpLXNjaGVtYS9zdHJp
-bmctY29kZS1wb2ludC0zMS5qc29uOjI6Cit7ICdjb21tYW5kJzogJ+KQnycgfQogICAgICAgICAg
-ICAgICBeCgp0b3RhbDogMiBlcnJvcnMsIDEgd2FybmluZ3MsIDc2IGxpbmVzIGNoZWNrZWQKClBh
-dGNoIDYvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjcvMTYgQ2hlY2tpbmcgY29tbWl0
-IGM1ZTkwOTc1YzhjNSAocWFwaTogRHJvcCBzdXBwb3J0IGZvciBlc2NhcGUgc2VxdWVuY2VzIG90
-aGVyIHRoYW4gXFwpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
-ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzc0OiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAw
-NjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDUzIGxpbmVzIGNoZWNrZWQKClBhdGNo
-IDcvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8xNiBDaGVja2luZyBjb21taXQgNmZi
-OGY5ZTdiYWE3IChxYXBpOiBQZXJtaXQgJ2JveGVkJyB3aXRoIGVtcHR5IHR5cGUpCldBUk5JTkc6
-IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1
-cGRhdGluZz8KIzEzMDogCmRlbGV0ZWQgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3Jz
-LCAxIHdhcm5pbmdzLCAxMjkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xNiBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgo5LzE2IENoZWNraW5nIGNvbW1pdCA0ZWNkNjg4Y2Q2YTEgKHFhcGk6IFBl
-cm1pdCBhbHRlcm5hdGVzIHdpdGgganVzdCBvbmUgYnJhbmNoKQoxMC8xNiBDaGVja2luZyBjb21t
-aXQgNzBjZTYxOWNmNmFmIChxYXBpOiBQZXJtaXQgb21pdHRpbmcgYWxsIGZsYXQgdW5pb24gYnJh
-bmNoZXMpCjExLzE2IENoZWNraW5nIGNvbW1pdCBiNDhhYmEzYTMzOGMgKHFhcGk6IEFkanVzdCBm
-cm9udGVuZCBlcnJvcnMgdG8gc2F5IGVudW0gdmFsdWUsIG5vdCBtZW1iZXIpCjEyLzE2IENoZWNr
-aW5nIGNvbW1pdCBkM2NlYzc4Njk3MjIgKGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogUmVvcmRl
-ciBzZWN0aW9ucyBmb3IgcmVhZGFiaWxpdHkpCjEzLzE2IENoZWNraW5nIGNvbW1pdCA2NjQwMjcy
-OWQxMzkgKGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogUmV3cml0ZSBjb21wYXRpYmlsaXR5IGNv
-bnNpZGVyYXRpb25zKQoxNC8xNiBDaGVja2luZyBjb21taXQgYTQ3NDQ5NGEwMTBiIChkb2NzL2Rl
-dmVsL3FhcGktY29kZS1nZW46IFJld3JpdGUgaW50cm9kdWN0aW9uIHRvIHNjaGVtYSkKMTUvMTYg
-Q2hlY2tpbmcgY29tbWl0IDZmYjRhMjczZTFmNiAoZG9jcy9kZXZlbC9xYXBpLWNvZGUtZ2VuOiBJ
-bXByb3ZlIFFBUEkgc2NoZW1hIGxhbmd1YWdlIGRvYykKMTYvMTYgQ2hlY2tpbmcgY29tbWl0IDk0
-OTE3ODdkMzY4OSAocWFwaTogVHdlYWsgY29kZSB0byBtYXRjaCBkb2NzL2RldmVsL3FhcGktY29k
-ZS1nZW4udHh0KQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
-b2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcv
-bG9ncy8yMDE5MDkxMzIwMTM0OS4yNDMzMi0xLWFybWJydUByZWRoYXQuY29tL3Rlc3RpbmcuY2hl
-Y2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
-YnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Wed, 11 Sep 2019 00:00:56 PDT (-0700), aleksandar.m.mail@gmail.com wrote:
+> 11.09.2019. 08.35, "liuzhiwei" <zhiwei_liu@c-sky.com> је написао/ла:
+>>
+>> Features:
+>>   * support specification riscv-v-spec-0.7.1(
+> https://content.riscv.org/wp-content/uploads/2019/06/17.40-Vector_RISCV-20190611-Vectors.pdf
+> ).
+>
+> Hi, Zhivei.
+>
+> The linked document is a presentation, outlining general concepts of the
+> instruction set in question, which is certainly useful and nice to have,
+> but, for review process, we need *specifications* (especially given that
+> they are in draft phase, and therefore "moving target"). Please provide
+> such link.
 
+Here's the V spec repository
+
+    https://github.com/riscv/riscv-v-spec
+
+and the exact 0.7.1 specification PDF
+
+    https://github.com/riscv/riscv-v-spec/releases/download/0.7.1/riscv-v-spec-0.7.1.pdf
+
+In RISC-V land this constitutes an official draft -- there's a whole process 
+for getting a specification ratified, but that isn't done for these draft 
+specifications.  The RISC-V QEMU maintainers agree that we'll take 
+implementations of drafts as long as there's a concrete definition we can point 
+at, like this one.
+
+> I also noticed lack of commit messages, and was really disappointed by
+> that. It looks to me you did not honor in entirety our guidlines for
+> submitting patches.
+>
+> Yours,
+> Aleksandar
+>
+>>   * support basic vector extension.
+>
+>>   * support Zvlsseg.
+>
+>>   * support Zvamo.
+>
+>>   * not support Zvediv as it is changing.
+>>   * fixed VLEN 128bit.
+>>   * fixed SLEN 128bit.
+>>   * ELEN support 8bit, 16bit, 32bit, 64bit.
+>>
+>> Todo:
+>>   * support VLEN configure from qemu command line.
+>>   * move check code from execution-time to translation-time
+>>
+>> Changelog:
+>> V2
+>>   * use float16_compare{_quiet}
+>>   * only use GETPC() in outer most helper
+>>   * add ctx.ext_v Property
+>>
+>>
+>> LIU Zhiwei (17):
+>>   RISC-V: add vfp field in CPURISCVState
+>>   RISC-V: turn on vector extension from command line by cfg.ext_v
+>>     Property
+>>   RISC-V: support vector extension csr
+>>   RISC-V: add vector extension configure instruction
+>>   RISC-V: add vector extension load and store instructions
+>>   RISC-V: add vector extension fault-only-first implementation
+>>   RISC-V: add vector extension atomic instructions
+>>   RISC-V: add vector extension integer instructions part1,
+>>     add/sub/adc/sbc
+>>   RISC-V: add vector extension integer instructions part2, bit/shift
+>>   RISC-V: add vector extension integer instructions part3, cmp/min/max
+>>   RISC-V: add vector extension integer instructions part4, mul/div/merge
+>>   RISC-V: add vector extension fixed point instructions
+>>   RISC-V: add vector extension float instruction part1, add/sub/mul/div
+>>   RISC-V: add vector extension float instructions part2,
+>>     sqrt/cmp/cvt/others
+>>   RISC-V: add vector extension reduction instructions
+>>   RISC-V: add vector extension mask instructions
+>>   RISC-V: add vector extension premutation instructions
+>>
+>>  linux-user/riscv/cpu_loop.c             |     7 +
+>>  target/riscv/Makefile.objs              |     2 +-
+>>  target/riscv/cpu.c                      |     6 +-
+>>  target/riscv/cpu.h                      |    30 +
+>>  target/riscv/cpu_bits.h                 |    15 +
+>>  target/riscv/cpu_helper.c               |     7 +
+>>  target/riscv/csr.c                      |    65 +-
+>>  target/riscv/helper.h                   |   358 +
+>>  target/riscv/insn32.decode              |   373 +
+>>  target/riscv/insn_trans/trans_rvv.inc.c |   490 +
+>>  target/riscv/translate.c                |     1 +
+>>  target/riscv/vector_helper.c            | 25701
+> ++++++++++++++++++++++++++++++
+>>  12 files changed, 27049 insertions(+), 6 deletions(-)
+>>  create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
+>>  create mode 100644 target/riscv/vector_helper.c
+>>
+>> --
+>> 2.7.4
+>>
+>>
 
