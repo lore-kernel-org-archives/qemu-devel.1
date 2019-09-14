@@ -3,72 +3,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61603C49ED6
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 04:32:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 512C5C49ED6
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 04:36:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38B3A20693
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 04:32:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38B3A20693
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1EEE620693
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 04:36:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EEE620693
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i8zjh-0007Jt-AY
-	for qemu-devel@archiver.kernel.org; Sat, 14 Sep 2019 00:32:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39595)
+	id 1i8zmz-0000ne-9B
+	for qemu-devel@archiver.kernel.org; Sat, 14 Sep 2019 00:36:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40088)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i8zhE-0006Ew-Sk
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 00:30:06 -0400
+ (envelope-from <no-reply@patchew.org>) id 1i8zmD-0000Hh-5B
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 00:35:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i8zhB-0006DP-7y
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 00:30:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39274)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i8zhB-00062l-2e
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 00:30:01 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i8zh8-0008D1-Cv
- for <qemu-devel@nongnu.org>; Sat, 14 Sep 2019 04:29:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 49ED82E8084
- for <qemu-devel@nongnu.org>; Sat, 14 Sep 2019 04:29:58 +0000 (UTC)
+ (envelope-from <no-reply@patchew.org>) id 1i8zmB-0005Oq-Dq
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 00:35:12 -0400
+Resent-Date: Sat, 14 Sep 2019 00:35:12 -0400
+Resent-Message-Id: <E1i8zmB-0005Oq-Dq@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21432)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1i8zmB-0005E5-5e
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 00:35:11 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1568429378; cv=none; d=zoho.com; s=zohoarc; 
+ b=OCR8d45O5zuaVEu/R69m8agr6Hxdo4tKDizU3Cditrnux9/8YKHaecO8ODSFnZZD3VxVoDB4ZiBDETHS1I+CkWGvoSkRN4k9CpRIbJAwMAOIxTRO5zELn6ASaqWyNW8L/aVYYLcsXwSn8Y4rzn7SyBbNxawZedV9wtkdPFJ+Kq8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1568429378;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=D2awET0OCR4/t/8ySFsGLAkJjz2h4OdVW0bJnhDz0iw=; 
+ b=E4BOOxjJ+jasCBVVXnZi759iYtbL/Jl3UK2zhKJNChbPG7B+yr1LLXr3vytvR6dxLvpQz5aGBYsRD//tM9YHzcl6MCvz0po+MHkFnK8K3tj8bXkVhZwSyKa4F/4Pc7VHxE4F4YmIiHdJlsDOYtqFP6uMd5IKBkSXfmE16bNkgGY=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 156842937672858.46839278150367;
+ Fri, 13 Sep 2019 19:49:36 -0700 (PDT)
+In-Reply-To: <20190913201349.24332-1-armbru@redhat.com>
+Message-ID: <156842937572.31080.2162917881478968917@5dec9699b7de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 14 Sep 2019 04:17:25 -0000
-From: Launchpad Bug Tracker <1606899@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: freddy77 janitor lersek th-huth
-X-Launchpad-Bug-Reporter: Frediano Ziglio (freddy77)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <20160727115911.17233.55909.malonedeb@wampee.canonical.com>
-Message-Id: <156843464539.4426.17925080327585241766.malone@loganberry.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19048";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 6cbaa053ff08072e9b9b1df8e8832240f1da2de5
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: armbru@redhat.com
+Date: Fri, 13 Sep 2019 19:49:36 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1606899] Re: virtio-vga does not let guest
- poweroff properly
+X-Received-From: 136.143.188.54
+Subject: Re: [Qemu-devel] [PATCH v3 00/16] qapi: Schema language cleanups &
+ doc improvements
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,92 +74,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1606899 <1606899@bugs.launchpad.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
+ mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxMzIwMTM0OS4yNDMz
+Mi0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAwLzE2XSBxYXBpOiBT
+Y2hlbWEgbGFuZ3VhZ2UgY2xlYW51cHMgJiBkb2MgaW1wcm92ZW1lbnRzCk1lc3NhZ2UtaWQ6IDIw
+MTkwOTEzMjAxMzQ5LjI0MzMyLTEtYXJtYnJ1QHJlZGhhdC5jb20KVHlwZTogc2VyaWVzCgo9PT0g
+VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9k
+ZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
+IGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
+ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
+Cjk0OTE3ODcgcWFwaTogVHdlYWsgY29kZSB0byBtYXRjaCBkb2NzL2RldmVsL3FhcGktY29kZS1n
+ZW4udHh0CjZmYjRhMjcgZG9jcy9kZXZlbC9xYXBpLWNvZGUtZ2VuOiBJbXByb3ZlIFFBUEkgc2No
+ZW1hIGxhbmd1YWdlIGRvYwphNDc0NDk0IGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogUmV3cml0
+ZSBpbnRyb2R1Y3Rpb24gdG8gc2NoZW1hCjY2NDAyNzIgZG9jcy9kZXZlbC9xYXBpLWNvZGUtZ2Vu
+OiBSZXdyaXRlIGNvbXBhdGliaWxpdHkgY29uc2lkZXJhdGlvbnMKZDNjZWM3OCBkb2NzL2RldmVs
+L3FhcGktY29kZS1nZW46IFJlb3JkZXIgc2VjdGlvbnMgZm9yIHJlYWRhYmlsaXR5CmI0OGFiYTMg
+cWFwaTogQWRqdXN0IGZyb250ZW5kIGVycm9ycyB0byBzYXkgZW51bSB2YWx1ZSwgbm90IG1lbWJl
+cgo3MGNlNjE5IHFhcGk6IFBlcm1pdCBvbWl0dGluZyBhbGwgZmxhdCB1bmlvbiBicmFuY2hlcwo0
+ZWNkNjg4IHFhcGk6IFBlcm1pdCBhbHRlcm5hdGVzIHdpdGgganVzdCBvbmUgYnJhbmNoCjZmYjhm
+OWUgcWFwaTogUGVybWl0ICdib3hlZCcgd2l0aCBlbXB0eSB0eXBlCmM1ZTkwOTcgcWFwaTogRHJv
+cCBzdXBwb3J0IGZvciBlc2NhcGUgc2VxdWVuY2VzIG90aGVyIHRoYW4gXFwKMTEzODM2ZiBxYXBp
+OiBSZXN0cmljdCBzdHJpbmdzIHRvIHByaW50YWJsZSBBU0NJSQpmZTc2MGYzIHRlc3RzL3FhcGkt
+c2NoZW1hOiBEZW1vbnN0cmF0ZSBiYWQgcmVwb3J0aW5nIG9mIGZ1bm55IGNoYXJhY3RlcnMKNzc2
+ZGY3YyBkb2NzL2RldmVsL3FhcGktY29kZS1nZW46IE1pbm9yIHNwZWNpZmljYXRpb24gZml4ZXMK
+MTgxYTQzOCBxYXBpOiBEcm9wIHN1cHBvcnQgZm9yIGJveGVkIGFsdGVybmF0ZSBhcmd1bWVudHMK
+NTdmOTc0MCBxYXBpOiBEcm9wIGNoZWNrX3R5cGUoKSdzIHJlZHVuZGFudCBwYXJhbWV0ZXIgQGFs
+bG93X29wdGlvbmFsCjc5NzVjNWQgc2NyaXB0cy9naXQub3JkZXJmaWxlOiBNYXRjaCBRQVBJIHNj
+aGVtYSBtb3JlIHByZWNpc2VseQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xNiBDaGVja2luZyBj
+b21taXQgNzk3NWM1ZDY5Y2NhIChzY3JpcHRzL2dpdC5vcmRlcmZpbGU6IE1hdGNoIFFBUEkgc2No
+ZW1hIG1vcmUgcHJlY2lzZWx5KQoyLzE2IENoZWNraW5nIGNvbW1pdCA1N2Y5NzQwYjVkNmMgKHFh
+cGk6IERyb3AgY2hlY2tfdHlwZSgpJ3MgcmVkdW5kYW50IHBhcmFtZXRlciBAYWxsb3dfb3B0aW9u
+YWwpCjMvMTYgQ2hlY2tpbmcgY29tbWl0IDE4MWE0Mzg0ZThiOCAocWFwaTogRHJvcCBzdXBwb3J0
+IGZvciBib3hlZCBhbHRlcm5hdGUgYXJndW1lbnRzKQo0LzE2IENoZWNraW5nIGNvbW1pdCA3NzZk
+ZjdjZDQ1YzYgKGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogTWlub3Igc3BlY2lmaWNhdGlvbiBm
+aXhlcykKNS8xNiBDaGVja2luZyBjb21taXQgZmU3NjBmMzk0NjFjICh0ZXN0cy9xYXBpLXNjaGVt
+YTogRGVtb25zdHJhdGUgYmFkIHJlcG9ydGluZyBvZiBmdW5ueSBjaGFyYWN0ZXJzKQo2LzE2IENo
+ZWNraW5nIGNvbW1pdCAxMTM4MzZmMzFkZDUgKHFhcGk6IFJlc3RyaWN0IHN0cmluZ3MgdG8gcHJp
+bnRhYmxlIEFTQ0lJKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
+b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxMDk6IApuZXcgZmlsZSBtb2RlIDEwMDY0
+NAoKRVJST1I6IEludmFsaWQgVVRGLTgsIHBhdGNoIGFuZCBjb21taXQgbWVzc2FnZSBzaG91bGQg
+YmUgZW5jb2RlZCBpbiBVVEYtOAojMTI2OiBGSUxFOiB0ZXN0cy9xYXBpLXNjaGVtYS9zdHJpbmct
+Y29kZS1wb2ludC0xMjcuanNvbjoyOgoreyAnY29tbWFuZCc6ICfijKYnIH0KICAgICAgICAgICAg
+ICAgXgoKRVJST1I6IEludmFsaWQgVVRGLTgsIHBhdGNoIGFuZCBjb21taXQgbWVzc2FnZSBzaG91
+bGQgYmUgZW5jb2RlZCBpbiBVVEYtOAojMTUyOiBGSUxFOiB0ZXN0cy9xYXBpLXNjaGVtYS9zdHJp
+bmctY29kZS1wb2ludC0zMS5qc29uOjI6Cit7ICdjb21tYW5kJzogJ+KQnycgfQogICAgICAgICAg
+ICAgICBeCgp0b3RhbDogMiBlcnJvcnMsIDEgd2FybmluZ3MsIDc2IGxpbmVzIGNoZWNrZWQKClBh
+dGNoIDYvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjcvMTYgQ2hlY2tpbmcgY29tbWl0
+IGM1ZTkwOTc1YzhjNSAocWFwaTogRHJvcCBzdXBwb3J0IGZvciBlc2NhcGUgc2VxdWVuY2VzIG90
+aGVyIHRoYW4gXFwpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
+ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzc0OiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAw
+NjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDUzIGxpbmVzIGNoZWNrZWQKClBhdGNo
+IDcvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8xNiBDaGVja2luZyBjb21taXQgNmZi
+OGY5ZTdiYWE3IChxYXBpOiBQZXJtaXQgJ2JveGVkJyB3aXRoIGVtcHR5IHR5cGUpCldBUk5JTkc6
+IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1
+cGRhdGluZz8KIzEzMDogCmRlbGV0ZWQgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3Jz
+LCAxIHdhcm5pbmdzLCAxMjkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xNiBoYXMgc3R5bGUgcHJv
+YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
+b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
+IE1BSU5UQUlORVJTLgo5LzE2IENoZWNraW5nIGNvbW1pdCA0ZWNkNjg4Y2Q2YTEgKHFhcGk6IFBl
+cm1pdCBhbHRlcm5hdGVzIHdpdGgganVzdCBvbmUgYnJhbmNoKQoxMC8xNiBDaGVja2luZyBjb21t
+aXQgNzBjZTYxOWNmNmFmIChxYXBpOiBQZXJtaXQgb21pdHRpbmcgYWxsIGZsYXQgdW5pb24gYnJh
+bmNoZXMpCjExLzE2IENoZWNraW5nIGNvbW1pdCBiNDhhYmEzYTMzOGMgKHFhcGk6IEFkanVzdCBm
+cm9udGVuZCBlcnJvcnMgdG8gc2F5IGVudW0gdmFsdWUsIG5vdCBtZW1iZXIpCjEyLzE2IENoZWNr
+aW5nIGNvbW1pdCBkM2NlYzc4Njk3MjIgKGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogUmVvcmRl
+ciBzZWN0aW9ucyBmb3IgcmVhZGFiaWxpdHkpCjEzLzE2IENoZWNraW5nIGNvbW1pdCA2NjQwMjcy
+OWQxMzkgKGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogUmV3cml0ZSBjb21wYXRpYmlsaXR5IGNv
+bnNpZGVyYXRpb25zKQoxNC8xNiBDaGVja2luZyBjb21taXQgYTQ3NDQ5NGEwMTBiIChkb2NzL2Rl
+dmVsL3FhcGktY29kZS1nZW46IFJld3JpdGUgaW50cm9kdWN0aW9uIHRvIHNjaGVtYSkKMTUvMTYg
+Q2hlY2tpbmcgY29tbWl0IDZmYjRhMjczZTFmNiAoZG9jcy9kZXZlbC9xYXBpLWNvZGUtZ2VuOiBJ
+bXByb3ZlIFFBUEkgc2NoZW1hIGxhbmd1YWdlIGRvYykKMTYvMTYgQ2hlY2tpbmcgY29tbWl0IDk0
+OTE3ODdkMzY4OSAocWFwaTogVHdlYWsgY29kZSB0byBtYXRjaCBkb2NzL2RldmVsL3FhcGktY29k
+ZS1nZW4udHh0KQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
+b2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcv
+bG9ncy8yMDE5MDkxMzIwMTM0OS4yNDMzMi0xLWFybWJydUByZWRoYXQuY29tL3Rlc3RpbmcuY2hl
+Y2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
+YnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
+YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1606899
-
-Title:
-  virtio-vga does not let guest poweroff properly
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  I have a VM running rawhide (Fedora development) and I can't poweroff
-  the machine when I enable virtio-vga. Reboot works correctly. Using
-  QXL works also. The machine arrive to print the "Powering off" message
-  (from Linux kernel) but then hangs.
-
-  The command line is
-
-  /usr/bin/qemu-system-x86_64 -machine accel=3Dkvm -name rawhide -machine
-  pc-i440fx-2.3,accel=3Dkvm,usb=3Doff -cpu Haswell-noTSX -m 2048 -realtime
-  mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid
-  64216421-aec4-4ce4-aa52-aed9e4e31a1c -no-user-config -nodefaults
-  -chardev
-  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/rawhide.monitor,serv=
-er,nowait
-  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
-  base=3Dutc,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddiscard -no-
-  hpet -no-shutdown -global PIIX4_PM.disable_s3=3D1 -global
-  PIIX4_PM.disable_s4=3D1 -boot strict=3Don -device ich9-usb-
-  ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x6.0x7 -device ich9-usb-
-  uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpci.0,multifunction=3Don,addr=
-=3D0x6
-  -device ich9-usb-
-  uhci2,masterbus=3Dusb.0,firstport=3D2,bus=3Dpci.0,addr=3D0x6.0x1 -device =
-ich9
-  -usb-uhci3,masterbus=3Dusb.0,firstport=3D4,bus=3Dpci.0,addr=3D0x6.0x2 -de=
-vice
-  virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x5 -drive
-  file=3D/home/rawhide.qcow2,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dqco=
-w2
-  -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x7,drive=3Ddrive-vi=
-rtio-
-  disk0,id=3Dvirtio-disk0,bootindex=3D1 -drive if=3Dnone,id=3Ddrive-
-  ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive-
-  ide0-0-0,id=3Dide0-0-0 -netdev user,id=3Dhostnet0 -device virtio-net-
-  pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:fc:11:43,bus=3Dpci.0,addr=
-=3D0x3
-  -chardev pty,id=3Dcharserial0 -device isa-
-  serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
-  socket,id=3Dcharchannel0,path=3D/var/lib/libvirt/qemu/channel/target/rawh=
-ide.org.qemu.guest_agent.0,server,nowait
-  -device virtserialport,bus=3Dvirtio-
-  serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.gue=
-st_agent.0
-  -chardev spicevmc,id=3Dcharchannel1,name=3Dvdagent -device
-  virtserialport,bus=3Dvirtio-
-  serial0.0,nr=3D2,chardev=3Dcharchannel1,id=3Dchannel1,name=3Dcom.redhat.s=
-pice.0
-  -device usb-tablet,id=3Dinput0 -spice ipv4,addr=3D0.0.0.0,port=3D5900
-  ,disable-ticketing,image-compression=3Dlz,seamless-migration=3Don
-  ,streaming-video=3Dfilter -device virtio-vga,bus=3Dpci.0,addr=3D0x2 -devi=
-ce
-  intel-hda,id=3Dsound0,bus=3Dpci.0,addr=3D0x4 -device hda-
-  duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -chardev
-  spicevmc,id=3Dcharredir0,name=3Dusbredir -device usb-
-  redir,chardev=3Dcharredir0,id=3Dredir0 -chardev
-  spicevmc,id=3Dcharredir1,name=3Dusbredir -device usb-
-  redir,chardev=3Dcharredir1,id=3Dredir1 -device virtio-balloon-
-  pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8 -msg timestamp=3Don
-
-  I though was due to Virgl but disabling it does not change.
-
-  I'm using Qemu 2.6.0 from Fedora 24.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1606899/+subscriptions
 
