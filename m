@@ -2,72 +2,80 @@ Return-Path: <SRS0=fVwN=XJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BD29C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 19:03:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC609C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 19:41:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 292A320692
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 19:03:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 292A320692
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8ECD4206CD
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Sep 2019 19:41:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ECD4206CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9DK5-0003Jg-5T
-	for qemu-devel@archiver.kernel.org; Sat, 14 Sep 2019 15:03:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54805)
+	id 1i9DvY-0002ed-K8
+	for qemu-devel@archiver.kernel.org; Sat, 14 Sep 2019 15:41:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59998)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1i9DHl-0002lZ-SO
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 15:00:43 -0400
+ (envelope-from <mst@redhat.com>) id 1i9Duf-0001kQ-6N
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 15:40:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1i9DHk-0001vY-Et
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 15:00:41 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:39893)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1i9DHk-0001v8-8z
- for qemu-devel@nongnu.org; Sat, 14 Sep 2019 15:00:40 -0400
-Received: by mail-pf1-f196.google.com with SMTP id i1so11190532pfa.6
- for <qemu-devel@nongnu.org>; Sat, 14 Sep 2019 12:00:39 -0700 (PDT)
+ (envelope-from <mst@redhat.com>) id 1i9Duc-0005eo-Ho
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 15:40:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36156)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1i9Duc-0005e1-Ct
+ for qemu-devel@nongnu.org; Sat, 14 Sep 2019 15:40:50 -0400
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 572BBC057F88
+ for <qemu-devel@nongnu.org>; Sat, 14 Sep 2019 19:40:48 +0000 (UTC)
+Received: by mail-qt1-f200.google.com with SMTP id p56so10363013qtj.14
+ for <qemu-devel@nongnu.org>; Sat, 14 Sep 2019 12:40:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=Q+ZtLM++dtjWC3FwNLOVxw/kKAndyJKMVCk+RAU58YA=;
- b=raZuQOQnEqcMhhaDE3av1bKEPS3sOwGFbEuauvgtGm9BawRpjlDZKgfEEJzzHKD1xp
- vkaiOzZt+0beh5kamvUWQdx6gtL+TyZqFRJpKz0i1TWg7IwC2DvM/XMI+LRwbPTIwueH
- ddT/f0EWdTlxqoidTCjzrp/GXBlOVkkLGvQg7dJycZSPlVSLsZmgJW8cFJYcilforXLE
- IGzMxbxscVX3L+Bku3rezLSx92HLDq4tflnUrflsBKfOlFbkvH6TXIkEaEUP1yW+NcGS
- ED5gEKJXMCF/99dAVGEragSRxLd729oP66woS360VaRI9MoLlIRDSL26ed3+Df1dtNFp
- pfCg==
-X-Gm-Message-State: APjAAAWXeBiv+kT+LkdRBfL0Ek9Mbn722yQFNiFIqGcw8QpdMFKf6e0d
- Jpgqw0BzyV+SAPK0WNuU2IUZHg==
-X-Google-Smtp-Source: APXvYqxp61xa6q5WJXeDgHu6godzYQIzCGF/Auzz5QzwereCL5qmpi78AzClM0NV1a+UJtkvV6ZIsQ==
-X-Received: by 2002:a63:590f:: with SMTP id n15mr37897296pgb.190.1568487638232; 
- Sat, 14 Sep 2019 12:00:38 -0700 (PDT)
-Received: from localhost (amx-tls3.starhub.net.sg. [203.116.164.13])
- by smtp.gmail.com with ESMTPSA id q22sm38030167pgh.49.2019.09.14.12.00.35
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=bWyMGnIhqHppP3/mJiC/n+N5R0HC/vxhwnt6qngL+p8=;
+ b=E79SnAXIJRnfJomyJQZZJeyVD6NcRDYJLiGQ8yJ9CMhkJz3h5VUSaWIeUVbxov3hX3
+ 462WvJ2b5MAdMh80KYeQNsEcPJKN2IvKn7A5IVh1M0ic9ut6ufqPMzcTdSDPLP+oHXlX
+ YAmMYzXGiopDUWasNttKHBdlVeQD1okZIwb7gWPKrDx3AOWEqPzGbdtrljNpksPTgn5s
+ EMJzNHEKGYZAuHc91bJ0uS1hhZb/xoLAhQw1lk99rgfm7/09DC0s+dRyJtohb9mmzeI2
+ JJXX9ujD/aOon9Asl8mCupC9U06YyzI6V8LWPZFIq1By3k2BnylMSLkDC806xProkdoO
+ RweQ==
+X-Gm-Message-State: APjAAAWjaj0Tmd21IfOVMWtGuNGfAlAQyLF6G98jhwDEFZuBUSNeohL8
+ BzBZ9MZNJJN6qtzWbBDBzu/WNIdFCYcX6a6e1rwvjPSEYn3DEuw05gIpa65DQO4cckIKuEubYtB
+ akM30YrWB2DtwT/I=
+X-Received: by 2002:ae9:ed89:: with SMTP id c131mr14600415qkg.81.1568490047613; 
+ Sat, 14 Sep 2019 12:40:47 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyYmoYDv3w/h2hoJtWIb81PD4qGFiPNW+RMRhmaXGrlkuwcs7Hd4N3idH/ACxJA8Biqg7KGmQ==
+X-Received: by 2002:ae9:ed89:: with SMTP id c131mr14600408qkg.81.1568490047467; 
+ Sat, 14 Sep 2019 12:40:47 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
+ by smtp.gmail.com with ESMTPSA id k199sm15862445qke.45.2019.09.14.12.40.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 14 Sep 2019 12:00:37 -0700 (PDT)
-Date: Sat, 14 Sep 2019 12:00:37 -0700 (PDT)
-X-Google-Original-Date: Sat, 14 Sep 2019 11:54:31 PDT (-0700)
-In-Reply-To: <CAEUhbmUksfEiGLZ0qzsWkaDOaocTvkEYefiSUmGZT7TftYfmEg@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: bmeng.cn@gmail.com
-Message-ID: <mhng-165ebd8f-3595-48d3-a614-79f52d81c14c@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ Sat, 14 Sep 2019 12:40:46 -0700 (PDT)
+Date: Sat, 14 Sep 2019 15:40:41 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Wei Yang <richard.weiyang@gmail.com>
+Message-ID: <20190914154026-mutt-send-email-mst@kernel.org>
+References: <20190730003740.20694-1-richardw.yang@linux.intel.com>
+ <20190913234746.jb5a5vlwl6cebudz@master>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190913234746.jb5a5vlwl6cebudz@master>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.210.196
-Subject: Re: [Qemu-devel] [PATCH v8 18/32] riscv: sifive_u: Set the minimum
- number of cpus to 2
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] refine memory_device_get_free_addr
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,102 +87,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
+Cc: imammedo@redhat.com, david@redhat.com,
+ Wei Yang <richardw.yang@linux.intel.com>, ehabkost@redhat.com,
  qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 13 Sep 2019 08:25:21 PDT (-0700), bmeng.cn@gmail.com wrote:
-> Hi Palmer,
->
-> On Fri, Sep 13, 2019 at 10:33 PM Palmer Dabbelt <palmer@sifive.com> wrote:
->>
->> On Fri, 06 Sep 2019 09:20:05 PDT (-0700), bmeng.cn@gmail.com wrote:
->> > It is not useful if we only have one management CPU.
->> >
->> > Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
->> > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
->> >
->> > ---
->> >
->> > Changes in v8: None
->> > Changes in v7: None
->> > Changes in v6: None
->> > Changes in v5: None
->> > Changes in v4: None
->> > Changes in v3:
->> > - use management cpu count + 1 for the min_cpus
->> >
->> > Changes in v2:
->> > - update the file header to indicate at least 2 harts are created
->> >
->> >  hw/riscv/sifive_u.c         | 4 +++-
->> >  include/hw/riscv/sifive_u.h | 2 ++
->> >  2 files changed, 5 insertions(+), 1 deletion(-)
->> >
->> > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
->> > index 2947e06..2023b71 100644
->> > --- a/hw/riscv/sifive_u.c
->> > +++ b/hw/riscv/sifive_u.c
->> > @@ -10,7 +10,8 @@
->> >   * 1) CLINT (Core Level Interruptor)
->> >   * 2) PLIC (Platform Level Interrupt Controller)
->> >   *
->> > - * This board currently uses a hardcoded devicetree that indicates one hart.
->> > + * This board currently generates devicetree dynamically that indicates at least
->> > + * two harts.
->> >   *
->> >   * This program is free software; you can redistribute it and/or modify it
->> >   * under the terms and conditions of the GNU General Public License,
->> > @@ -433,6 +434,7 @@ static void riscv_sifive_u_machine_init(MachineClass *mc)
->> >       * management CPU.
->> >       */
->> >      mc->max_cpus = 4;
->> > +    mc->min_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + 1;
->> >  }
->> >
->> >  DEFINE_MACHINE("sifive_u", riscv_sifive_u_machine_init)
->> > diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
->> > index f25bad8..6d22741 100644
->> > --- a/include/hw/riscv/sifive_u.h
->> > +++ b/include/hw/riscv/sifive_u.h
->> > @@ -69,6 +69,8 @@ enum {
->> >      SIFIVE_U_GEM_CLOCK_FREQ = 125000000
->> >  };
->> >
->> > +#define SIFIVE_U_MANAGEMENT_CPU_COUNT   1
->> > +
->> >  #define SIFIVE_U_PLIC_HART_CONFIG "MS"
->> >  #define SIFIVE_U_PLIC_NUM_SOURCES 54
->> >  #define SIFIVE_U_PLIC_NUM_PRIORITIES 7
->>
->> This fails "make check", so I'm going to squash in this
->>
->> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
->> index ca9f7fea41..adecbf1dd9 100644
->> --- a/hw/riscv/sifive_u.c
->> +++ b/hw/riscv/sifive_u.c
->> @@ -528,6 +528,7 @@ static void riscv_sifive_u_machine_init(MachineClass *mc)
->>      mc->init = riscv_sifive_u_init;
->>      mc->max_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + SIFIVE_U_COMPUTE_CPU_COUNT;
->>      mc->min_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + 1;
->> +    mc->default_cpus = mc->max_cpus;
->
-> Thank you for fixing the 'make check'. Shouldn't it be:
->
-> mc->default_cpus = mc->min_cpus;
+On Fri, Sep 13, 2019 at 11:47:46PM +0000, Wei Yang wrote:
+> On Tue, Jul 30, 2019 at 08:37:38AM +0800, Wei Yang wrote:
+> >When we iterate the memory-device list to get the available range, it is not
+> >necessary to iterate the whole list.
+> >
+> >1) no more overlap for hinted range if tmp exceed it
+> >
+> >v2:
+> >   * remove #2 as suggested by Igor and David
+> >   * add some comment to inform address assignment stay the same as before
+> >     this change 
+> >
+> >Wei Yang (2):
+> >  memory-device: not necessary to use goto for the last check
+> >  memory-device: break the loop if tmp exceed the hinted range
+> >
+> > hw/mem/memory-device.c | 3 ++-
+> > 1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> 
+> Would someone take this patch set?
 
-We have 5 harts on the board that this matches, so I figured that'd be the 
-better default.
+yes looks good to me too.
+Eduardo?
 
->
-> ?
->
->>  }
->>
->>  DEFINE_MACHINE("sifive_u", riscv_sifive_u_machine_init)
->
-> Regards,
-> Bin
+> >-- 
+> >2.17.1
+> >
+> 
+> -- 
+> Wei Yang
+> Help you, Help me
 
