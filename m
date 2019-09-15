@@ -2,66 +2,88 @@ Return-Path: <SRS0=GetT=XK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40FC6C4CECC
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 15:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1317CC4CECC
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 16:10:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 099E4214AF
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 15:57:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 099E4214AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id D25D3214D8
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 16:10:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="KQCV/Hjz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D25D3214D8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9Wte-0007xh-7q
-	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 11:57:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49914)
+	id 1i9X6i-0005FK-R9
+	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 12:10:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51138)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1i9Wsq-0007Ng-4o
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 11:56:17 -0400
+ (envelope-from <lukasstraub2@web.de>) id 1i9X3p-0004g0-Ii
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 12:07:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1i9Wso-0000o7-AX
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 11:56:15 -0400
-Resent-Date: Sun, 15 Sep 2019 11:56:15 -0400
-Resent-Message-Id: <E1i9Wso-0000o7-AX@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21584)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1i9Wso-0000mM-26; Sun, 15 Sep 2019 11:56:14 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568562936; cv=none; d=zoho.com; s=zohoarc; 
- b=O3i2oREvcXKsOUQ7ZOqKUt6wiTtGf4WBY3bMqCXcwv3yuNAmKJBMBDGSkCFffEXMhcjSMT/B0lFxXkFkQmPvR8kMyycVwUlagESEOM10N3fhOCZy0MML4Cg7enlLD6HGrj/hKS1ZZa2CWr+sO7AZVtbPWy2Sm3GYBlrDfRfxAUw=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1568562936;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=w+JlEdSlfERxUjsEgkIjQM7rk9acr/lZAjhskEameZs=; 
- b=hE1gdNo0XYvcD2Fnp+9OxaiXfLhkks/KS0VRa1O2iWlSCgdV601Y6pSZQrfZQbupQlBgA2M0nUo6VFJRikwullJloIJGx3nwokBWFGF1GgJeFj2QzFhDxbjBoeUlpALnGKNibX1+DMarrcSZTvi/wOp3s2vgIAESD8WpYdQeSfE=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1568562934521898.2932253658304;
- Sun, 15 Sep 2019 08:55:34 -0700 (PDT)
-In-Reply-To: <20190915153751.11333-1-laurent@vivier.eu>
-Message-ID: <156856293238.3060.806906487490327324@5dec9699b7de>
+ (envelope-from <lukasstraub2@web.de>) id 1i9X3o-0004JQ-IF
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 12:07:37 -0400
+Received: from mout.web.de ([212.227.15.4]:37277)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1i9X3o-0004H1-6A
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 12:07:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1568563624;
+ bh=lO2+lEtynshWUePIvXeVTjzPeQe/38MegxHYjMcL8RQ=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=KQCV/HjzW6/H4vL0ELJhl4fqvkfePoAZ+EbEs7L7/jqhldzfandKi/UxcVwzFpE/V
+ 1Wy0U+DVmo9OkP31L1v7KcWoauEaXJB7w0WpxxFf8MrjzC1K46H6uhj+LroGJyBYww
+ DTg3ZnHAAwzJJdyNh+gm2+dcXug7vuCpkGg7QzsY=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([88.130.61.53]) by smtp.web.de (mrweb003
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0M3k9J-1iRTPV0NUX-00rFao; Sun, 15
+ Sep 2019 18:07:04 +0200
+Date: Sun, 15 Sep 2019 18:07:01 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: "Zhang, Chen" <chen.zhang@intel.com>
+Message-ID: <20190915180701.7b6edfc8@luklap>
+In-Reply-To: <9CFF81C0F6B98A43A459C9EDAD400D7806264100@shsmsx102.ccr.corp.intel.com>
+References: <cover.1568110100.git.lukasstraub2@web.de>
+ <77d2eb7d0ce8a1887a575119e21ce0a06d4af533.1568110100.git.lukasstraub2@web.de>
+ <9CFF81C0F6B98A43A459C9EDAD400D7806264100@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: laurent@vivier.eu
-Date: Sun, 15 Sep 2019 08:55:34 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:31mE3bqvTv9RuGs4LcWS0hVLmRuDwcnbvdn5XYuLcvZ155zWTsr
+ xzgJfPj+qA48yR75vJtIUgQjLA6FvEu+QMs2jJv6/+MbYTpVmEYLis42Y/SFRpmUzB+eI9V
+ Gl9uIyKwfbdD1foNbyIE2h0k+JkPQgAy554vWAi6n7MbLpmqsn7i38TEJ7GPL6cgiXqLNYO
+ kif5+WideG27Rq7KQzEZg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:t8nNbdzVRLA=:Lx2At0ZaJ9z+PdpjBBw1Sx
+ O/ELLuLkV8gyNt0J+wWgVVXWZxIEmaq6VM8leuGkYluT9pjXdr6JrRdASOkO2Te1MQmaI2SdS
+ dzM1hNM6lAybgm/fJlQG5x/9PIL/B16n9n5BwsX0Vk5YGK9jPD9OINr5BE9+jGBvQXIg7EPb/
+ K/FwAUSbvTCjtaV9pPHI9Gqnz5AE+f3cTX84aJbzh05aNp7R1AWEPKu7YIWrLQGQRBxciwof2
+ HIkr9w/tGoDF5Pdb+MTW8FLkOcu924XWroq4Qhj5puKwzfFyawEOc0lhoLDcn6fkf+GplTYOP
+ t//XGHto1rWQ7BQS7hhrZqkdZ84YEtDFOm4Dkf6b3NN8MuE6PEYoqNEantmGGOs2uWtqqs/Hk
+ wV2nWzAbVsCweU64ic4zrVvmvj/nuNlolrE6QPz22oZHtM5xjFWkoG/pUv79ikChFH1Z79c9O
+ +qKmEJGGp6I0Z8qj3DUon5bjGuoVDzrXWjHEU1/3u2NSDkdvyQEyOyH4yagbKDBfgBymup74F
+ wGLKrFMVBvw2v4X+QRr7NLmq8igL/xVM9VTRaM75JS/WenUroHnLQpHGNUi+0vZfT62+zuEpp
+ fYZd8UKXuX/4xA1797dYJJh1vV6oFWXgTckf2hLB1ueemF/jqQnIqGD57jojvLPt3v4nTDREe
+ K1wFNk7/syqAFmQ5dgbUjhbIuVMEIbdYuRmSRtFYzTELNmU+RP1eDbqZiIlDq5918vUSzKUnh
+ Pr07LghvQBHSf7IOWc3oTlJam9pcqKQddEO8quB9aMWX0maPK7Kdq0x7tH4vE4qanRQiQ4h7T
+ nOOdVJ2pcTzMMCP9B5MqyKGZqXzSEcb3OFssHC1++pEys8r3pOq3DtAffwE3Hr56BNETHrIBg
+ 8CTkqQ3JX2eiRYB9CLu91vCtANCsXSjXnYzq+RRFdBjddODjsCnFdT2QYLpQgg5jkUM5NG0OU
+ X8yJ4kJfQvp01+LvcS2zmHXAJT2gcBwzyWfc55oZ7Xh6kCtSDSkYNS7gqL76VA4m4/5pkBzbR
+ B25xh9tABCL7jHfBp7PXAsovAXNpe2gLEUyocHWkdCk9PsetgmktV4DMHi2maaZhPJz630ahI
+ gVZNPsaIjixToqQmnHB0M7TnMH8Ip0gZNCpwP3LDKfRE00hmEy9BRbxBMJ9gT+aNsNjdDV8my
+ HrNTQH4VDaxoaaPbBXsT7FV4mFP2HsaiEjPXw5SSR53TG5tQMvsfFxEvsDuvDVe0wTXihnWHB
+ 5RvYH3iLNrhvt5OfuxvKlRdijIbQR5nGr8R9+rTvkYGtJhUoNFlvaAwKwcDw=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH v12 0/9] hw/m68k: add Apple Machintosh
- Quadra 800 machine
+X-Received-From: 212.227.15.4
+Subject: Re: [Qemu-devel] [PATCH v4 3/4] net/filter.c: Add Options to insert
+ filters anywhere in the filter list
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,84 +95,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-block@nongnu.org, huth@tuxfamily.org,
- jasowang@redhat.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
- laurent@vivier.eu, hpoussin@reactos.org, aurelien@aurel32.net,
- pbonzini@redhat.com, marcandre.lureau@redhat.com, mreitz@redhat.com,
- dgilbert@redhat.com, kraxel@redhat.com
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxNTE1Mzc1MS4xMTMz
-My0xLWxhdXJlbnRAdml2aWVyLmV1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYxMiAwLzldIGh3L202OGs6
-IGFkZCBBcHBsZSBNYWNoaW50b3NoIFF1YWRyYSA4MDAgbWFjaGluZQpNZXNzYWdlLWlkOiAyMDE5
-MDkxNTE1Mzc1MS4xMTMzMy0xLWxhdXJlbnRAdml2aWVyLmV1ClR5cGU6IHNlcmllcwoKPT09IFRF
-U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2
-L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBi
-YXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
-MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1w
-cm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE5MDkxNTE1Mzc1MS4x
-MTMzMy0xLWxhdXJlbnRAdml2aWVyLmV1IC0+IHBhdGNoZXcvMjAxOTA5MTUxNTM3NTEuMTEzMzMt
-MS1sYXVyZW50QHZpdmllci5ldQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjA4MTcz
-NjQgQm9vdExpbnV4Q29uc29sZVRlc3Q6IFRlc3QgdGhlIFF1YWRyYSA4MDAKZTNhZTc1ZCBody9t
-NjhrOiBkZWZpbmUgTWFjaW50b3NoIFF1YWRyYSA4MDAKNjdhNTNjMiBody9tNjhrOiBhZGQgYSBk
-dW1teSBTV0lNIGZsb3BweSBjb250cm9sbGVyCjNmZDQwMjcgaHcvbTY4azogYWRkIE51YnVzIG1h
-Y2ZiIHZpZGVvIGNhcmQKNDFjMGMyZCBody9tNjhrOiBhZGQgTnVidXMgc3VwcG9ydAo4Y2VmM2Fi
-IGh3L202OGs6IGltcGxlbWVudCBBREIgYnVzIHN1cHBvcnQgZm9yIHZpYQo4ODY2MTk1IGh3L202
-OGs6IGFkZCBWSUEgc3VwcG9ydAo3Y2I0YmM5IGRwODM5M3g6IG1hbmFnZSBiaWcgZW5kaWFuIGJ1
-cwpjZjgwOWFhIGVzcDogYWRkIHBzZXVkby1ETUEgYXMgdXNlZCBieSBNYWNpbnRvc2gKCj09PSBP
-VVRQVVQgQkVHSU4gPT09CjEvOSBDaGVja2luZyBjb21taXQgY2Y4MDlhYWRiMzMyIChlc3A6IGFk
-ZCBwc2V1ZG8tRE1BIGFzIHVzZWQgYnkgTWFjaW50b3NoKQoyLzkgQ2hlY2tpbmcgY29tbWl0IDdj
-YjRiYzkxMmEyYSAoZHA4MzkzeDogbWFuYWdlIGJpZyBlbmRpYW4gYnVzKQozLzkgQ2hlY2tpbmcg
-Y29tbWl0IDg4NjYxOTUxNjYzNiAoaHcvbTY4azogYWRkIFZJQSBzdXBwb3J0KQpXQVJOSU5HOiBh
-ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
-YXRpbmc/CiM4MzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogc3BhY2UgcHJvaGliaXRl
-ZCBhZnRlciB0aGF0ICcmJicgKGN0eDpXeFcpCiM0MzI6IEZJTEU6IGh3L21pc2MvbWFjX3ZpYS5j
-OjM0NToKKyAgICAgICAgaWYgKCEodjFzLT5sYXN0X2IgJiBWSUExQl92UlRDQ2xrKSAmJiAocy0+
-YiAmIFZJQTFCX3ZSVENDbGspKSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCA4NjYgbGluZXMgY2hlY2tl
-ZAoKUGF0Y2ggMy85IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0LzkgQ2hlY2tpbmcgY29t
-bWl0IDhjZWYzYWJlYTM3NSAoaHcvbTY4azogaW1wbGVtZW50IEFEQiBidXMgc3VwcG9ydCBmb3Ig
-dmlhKQo1LzkgQ2hlY2tpbmcgY29tbWl0IDQxYzBjMmQ2MzA0NCAoaHcvbTY4azogYWRkIE51YnVz
-IHN1cHBvcnQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMg
-TUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzY0OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRv
-dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNTMxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDUvOSBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo2LzkgQ2hlY2tpbmcgY29tbWl0IDNmZDQwMjdhNmEy
-MiAoaHcvbTY4azogYWRkIE51YnVzIG1hY2ZiIHZpZGVvIGNhcmQpCldBUk5JTkc6IGFkZGVkLCBt
-b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
-Izc1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywg
-NTk3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvOSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo3
-LzkgQ2hlY2tpbmcgY29tbWl0IDY3YTUzYzI0MGUwNyAoaHcvbTY4azogYWRkIGEgZHVtbXkgU1dJ
-TSBmbG9wcHkgY29udHJvbGxlcikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmls
-ZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNjI6IApuZXcgZmlsZSBtb2Rl
-IDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1OTEgbGluZXMgY2hlY2tlZAoK
-UGF0Y2ggNy85IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjgvOSBDaGVja2luZyBjb21taXQg
-ZTNhZTc1ZDYzMjY0IChody9tNjhrOiBkZWZpbmUgTWFjaW50b3NoIFF1YWRyYSA4MDApCldBUk5J
-Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
-ZCB1cGRhdGluZz8KIzcwOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywg
-MSB3YXJuaW5ncywgNTMwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvOSBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgo5LzkgQ2hlY2tpbmcgY29tbWl0IDA4MTczNjQzZGQ5MyAoQm9vdExpbnV4Q29u
-c29sZVRlc3Q6IFRlc3QgdGhlIFF1YWRyYSA4MDApCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0
-Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwOTE1MTUzNzUxLjExMzMzLTEtbGF1cmVudEB2
-aXZpZXIuZXUvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5l
-cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Tue, 10 Sep 2019 20:12:45 +0000
+"Zhang, Chen" <chen.zhang@intel.com> wrote:
+
+> > -----Original Message-----
+> > From: Lukas Straub <lukasstraub2@web.de>
+> > Sent: Tuesday, September 10, 2019 6:15 PM
+> > To: qemu-devel <qemu-devel@nongnu.org>
+> > Cc: Zhang, Chen <chen.zhang@intel.com>; Jason Wang
+> > <jasowang@redhat.com>; Wen Congyang <wencongyang2@huawei.com>;
+> > Xie Changlong <xiechanglong.d@gmail.com>; kwolf@redhat.com;
+> > mreitz@redhat.com
+> > Subject: [PATCH v4 3/4] net/filter.c: Add Options to insert filters an=
+ywhere in
+> > the filter list
+> >
+> > To switch the Secondary to Primary, we need to insert new filters befo=
+re the
+> > filter-rewriter.
+> >
+> > Add the options insert=3D and position=3D to be able to insert filters=
+ anywhere in
+> > the filter list.
+> >
+> > position should be either "head", "tail" or the id of another filter.
+>
+> In current patch, we cannot distinguish the real "head/tail" or the ID =
+=3D "head/tail".
+> And in real environment we can't order users reserve the "head/tail" as =
+keywords.
+> So, I think we can use position=3DID-xxxx/head/tail to solve this issue,=
+ or do you have any other idea?
+>
+
+Hi,
+Yes, I will change that.
+
+Regards,
+Lukas Straub
+
+> Thanks
+> Zhang Chen
+>
+> > insert should be either "before" or "behind" to specify where to inser=
+t the
+> > new filter relative to the one specified with position.
+> >
+> > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+> > ---
 
 
