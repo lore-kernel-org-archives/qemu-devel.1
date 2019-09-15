@@ -5,80 +5,80 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01452C4CEC7
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 12:26:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B042C4CEC7
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 12:28:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D7172077C
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 12:26:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3300B2077C
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 12:28:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GTvxiJ20"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D7172077C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Twv4kK3/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3300B2077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9Tbs-0001kq-Iz
-	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 08:26:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50518)
+	id 1i9Tdm-0003SY-8e
+	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 08:28:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50532)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1i9TWo-0005DG-OS
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 08:21:20 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1i9TWq-0005Ev-5u
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 08:21:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1i9TWm-0001Oi-FX
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 08:21:18 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45672)
+ (envelope-from <mrolnik@gmail.com>) id 1i9TWn-0001Q0-Rt
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 08:21:20 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:35076)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1i9TWm-0001O3-8C
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 08:21:16 -0400
-Received: by mail-wr1-x442.google.com with SMTP id r5so2157202wrm.12
- for <qemu-devel@nongnu.org>; Sun, 15 Sep 2019 05:21:16 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1i9TWn-0001P8-Kf
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 08:21:17 -0400
+Received: by mail-wr1-x429.google.com with SMTP id v8so766913wrt.2
+ for <qemu-devel@nongnu.org>; Sun, 15 Sep 2019 05:21:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=KnzwXm9DGa8updfHvfNXSEz/qG/OHlkhJSqLyJjiNdY=;
- b=GTvxiJ20R8Tt1ha8BeY5hcRC9qgoYZgMf3KzTI4fRvSGJ6SQeiXYM+7hyb1gO/XhWT
- /mZrpHI4nEbiAGBB7EYpwFFukW3IRhfQ8fJMh74tKm91+XQad8TbMizxW9E/p7a8JlkH
- 27k794Wjjel49/JYUH3uQGWI+C0uxG2Xo0+PyM/i7xObCXrnA2CoGpUkjQlsRGBAgA6c
- wsxDK63jHLPh4PRuiNuJbN8uLBgmiiYDFBGXhcNyLugGq2oHB87AFJdd/74z/qRmGQxo
- VEgYcpPsUjxTLbRsM5Bn3wCui0u9fm4uQ1tGOrgrbAFZtRm804vPJfjk17hxqzdrzsLE
- WBOw==
+ bh=hYnyNxKNyyGLUB6YcRWUkH6yR1pR0zLFfDbtc3NY77s=;
+ b=Twv4kK3/Thgqb4xYp5IxUU3Xf6edXr+rQoqfKgoQHmmyaggXMZmrfZgIwgaKJrfvkn
+ feaP/VgY0iAe74W6bNnf37Wjl1BlYQOduKwCtpXPjGTBk7ZkV5NlD8Vu9Unzltq3NFY5
+ XkaX0bxxo+t6gBLopI5lfWunzv/JIvZZzWLSTc319BOAFmxBk2v2vPYSDJZSVry7LhQS
+ k8SnwucmDlZ4J0Wf3HkmwKbDritfzLtFulBVJEWn2hC2sYU2QdOXt+ESrFWNBBcqiE/A
+ RKTrWDKidVE2kNnTMnf5E4rsH92kg17vKu6BvZCZZlgJGxg9ATWMez882GpGa/tPchwd
+ u4jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=KnzwXm9DGa8updfHvfNXSEz/qG/OHlkhJSqLyJjiNdY=;
- b=HWxmkyoy8pQI4YCEJsWGGrT0M0Q94v3QuMj2EBQxRhN2ypk1F+4qmcgHkd76rlD3h2
- EbBHl8+uJdLxcmk9EGH9ZgZAomS9sZT5cC254EFKQyd8zki21ikQlvQHIZO5WW5dk59k
- vtPop9INnR5NuU2DF3O6ZDWFx58P0dUp68LdgZSI5JHboeAq6CWUhO25ZhMMOvWqp80c
- s6YR/UDVGr9Im2vMNDnv7ZHrSrnzKqT05ohivd+wo5pXEFatmxPCsCi3aGq+nZR9i61L
- /F46wKGHnaU9TA72swWqfNXJL+rl2EZfvwoEiroJSGRc3aVP+f/TAyG89gPTpcUB4bAJ
- ujHA==
-X-Gm-Message-State: APjAAAXfcAY3u0qQRNruqqhiuPkTcEC2dkAPHo+kWhzeO/7OPqp1pLCe
- nlPwcFR59h+Z7kvGJfQhE0m0mDPbESa6Hg==
-X-Google-Smtp-Source: APXvYqzUGQzm7dglTPDzG5iDkApyZh1BLoIXdA97yls0caPPU211bdjonZN9ekFOmBCgbrUf9NDISg==
-X-Received: by 2002:adf:e410:: with SMTP id g16mr13044362wrm.297.1568550074842; 
- Sun, 15 Sep 2019 05:21:14 -0700 (PDT)
+ bh=hYnyNxKNyyGLUB6YcRWUkH6yR1pR0zLFfDbtc3NY77s=;
+ b=sX+1SWDbko0A2gWNxDvvYvtvygM6M28NQyfqnYn+2Xpktfi6T9aez1xC1azPe8CONP
+ 9S3h95my2h0mx6avxJYdPyorP0q7Aeiu+iurjkY5orwVfwXKBNx7nvrsjOyP1RSPWxXx
+ zSbsnmdDrgpYS90kVSjAITP6CcKtAgsUfme3usxcXTbf+aRmzBhJJLJqoFXx647Ll688
+ Ik+3mO+zpYu/duKxozkHi9bWoy0l3rMGqY1/SUJayozlGgr2NYcOVz8D2webJnsU+rOC
+ HZblnUknGcAhNu3SRkjubO6bIceMfmFrLCNEP6NSdztOy4l/wTujD1+KWp7SYOYbZF+s
+ U7AA==
+X-Gm-Message-State: APjAAAUgdcGFwui8fFF0swZN6QQ4JPIpmeIK+4yiGVYRCrV7Cc9YtmGr
+ apXFfUcfsxDx9IP3fpI22yQKe3r42G5Etw==
+X-Google-Smtp-Source: APXvYqwc/y7Ik6X1azvw3ctb+Ka5L1unMOxt0if4dzFY4HapgBCfb0XnJhAj4P2v9i4nBsDcAEm3Pw==
+X-Received: by 2002:a5d:4247:: with SMTP id s7mr15170481wrr.110.1568550076176; 
+ Sun, 15 Sep 2019 05:21:16 -0700 (PDT)
 Received: from 8c859074c0ff.ant.amazon.com.com ([213.57.17.146])
- by smtp.gmail.com with ESMTPSA id b194sm15947032wmg.46.2019.09.15.05.21.07
+ by smtp.gmail.com with ESMTPSA id b194sm15947032wmg.46.2019.09.15.05.21.14
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Sun, 15 Sep 2019 05:21:14 -0700 (PDT)
+ Sun, 15 Sep 2019 05:21:15 -0700 (PDT)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 15 Sep 2019 15:20:13 +0300
-Message-Id: <20190915122015.45852-7-mrolnik@gmail.com>
+Date: Sun, 15 Sep 2019 15:20:14 +0300
+Message-Id: <20190915122015.45852-8-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20190915122015.45852-1-mrolnik@gmail.com>
 References: <20190915122015.45852-1-mrolnik@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH v31 6/8] target/avr: Add example board
- configuration
+X-Received-From: 2a00:1450:4864:20::429
+Subject: [Qemu-devel] [PATCH v31 7/8] target/avr: Register AVR support with
+ the rest of QEMU, the build system, and the MAINTAINERS file
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,342 +96,370 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A simple board setup that configures an AVR CPU to run a given firmware image.
-This is all that's useful to implement without peripheral emulation as AVR CPUs include a lot of on-board peripherals.
-
-NOTE: this is not a real board !!!!
-NOTE: it's used for CPU testing!!!!
-
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
 ---
- hw/Kconfig           |   1 +
- hw/avr/Kconfig       |   6 +
- hw/avr/Makefile.objs |   1 +
- hw/avr/sample.c      | 282 +++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 290 insertions(+)
- create mode 100644 hw/avr/Kconfig
- create mode 100644 hw/avr/Makefile.objs
- create mode 100644 hw/avr/sample.c
+ MAINTAINERS                     |  6 +++
+ arch_init.c                     |  2 +
+ configure                       | 89 ++++++++++++++++++---------------
+ default-configs/avr-softmmu.mak |  5 ++
+ include/disas/dis-asm.h         |  6 +++
+ include/sysemu/arch_init.h      |  1 +
+ qapi/machine.json               |  3 +-
+ target/avr/Makefile.objs        | 33 ++++++++++++
+ tests/machine-none-test.c       |  1 +
+ 9 files changed, 104 insertions(+), 42 deletions(-)
+ create mode 100644 default-configs/avr-softmmu.mak
+ create mode 100644 target/avr/Makefile.objs
 
-diff --git a/hw/Kconfig b/hw/Kconfig
-index b45db3c813..f185fcb19e 100644
---- a/hw/Kconfig
-+++ b/hw/Kconfig
-@@ -42,6 +42,7 @@ source watchdog/Kconfig
- # arch Kconfig
- source arm/Kconfig
- source alpha/Kconfig
-+source avr/Kconfig
- source cris/Kconfig
- source hppa/Kconfig
- source i386/Kconfig
-diff --git a/hw/avr/Kconfig b/hw/avr/Kconfig
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 50eaf005f4..94d50a97ac 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -163,6 +163,12 @@ S: Maintained
+ F: hw/arm/smmu*
+ F: include/hw/arm/smmu*
+ 
++AVR TCG CPUs
++M: Michael Rolnik <mrolnik@gmail.com>
++S: Maintained
++F: target/avr/
++F: hw/avr/
++
+ CRIS TCG CPUs
+ M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+ S: Maintained
+diff --git a/arch_init.c b/arch_init.c
+index 0a1531124c..fb308aa802 100644
+--- a/arch_init.c
++++ b/arch_init.c
+@@ -85,6 +85,8 @@ int graphic_depth = 32;
+ #define QEMU_ARCH QEMU_ARCH_UNICORE32
+ #elif defined(TARGET_XTENSA)
+ #define QEMU_ARCH QEMU_ARCH_XTENSA
++#elif defined(TARGET_AVR)
++#define QEMU_ARCH QEMU_ARCH_AVR
+ #endif
+ 
+ const uint32_t arch_type = QEMU_ARCH;
+diff --git a/configure b/configure
+index 30aad233d1..b2b805f5c2 100755
+--- a/configure
++++ b/configure
+@@ -1994,7 +1994,7 @@ EOF
+ 
+ if ! compile_prog "-Werror" "" ; then
+     error_exit "Your compiler does not support the __thread specifier for " \
+-	"Thread-Local Storage (TLS). Please upgrade to a version that does."
++    "Thread-Local Storage (TLS). Please upgrade to a version that does."
+ fi
+ 
+ if test "$pie" = ""; then
+@@ -2783,7 +2783,7 @@ if test "$gnutls" != "no"; then
+         fi
+     fi
+     if test "$pass" = "no" && test "$gnutls" = "yes"; then
+-	feature_not_found "gnutls" "Install gnutls devel >= 3.1.18"
++    feature_not_found "gnutls" "Install gnutls devel >= 3.1.18"
+     else
+         gnutls="$pass"
+     fi
+@@ -2815,16 +2815,16 @@ fi
+ has_libgcrypt() {
+     if ! has "libgcrypt-config"
+     then
+-	return 1
++    return 1
+     fi
+ 
+     if test -n "$cross_prefix"
+     then
+-	host=$(libgcrypt-config --host)
+-	if test "$host-" != $cross_prefix
+-	then
+-	    return 1
+-	fi
++    host=$(libgcrypt-config --host)
++    if test "$host-" != $cross_prefix
++    then
++        return 1
++    fi
+     fi
+ 
+     maj=`libgcrypt-config --version | awk -F . '{print $1}'`
+@@ -3034,7 +3034,7 @@ EOF
+          sdl_cflags="$sdl_cflags $(aalib-config --cflags 2>/dev/null)"
+       fi
+       if compile_prog "$sdl_cflags" "$sdl_libs" ; then
+-	:
++    :
+       else
+         sdl=no
+       fi
+@@ -3652,8 +3652,8 @@ EOF
+ if ! compile_prog "$CFLAGS" "$LIBS" ; then
+     error_exit "sizeof(size_t) doesn't match GLIB_SIZEOF_SIZE_T."\
+                "You probably need to set PKG_CONFIG_LIBDIR"\
+-	       "to point to the right pkg-config files for your"\
+-	       "build target"
++           "to point to the right pkg-config files for your"\
++           "build target"
+ fi
+ 
+ # Silence clang 3.5.0 warnings about glib attribute __alloc_size__ usage
+@@ -4163,8 +4163,8 @@ if test "$glusterfs" != "no" ; then
+ int
+ main(void)
+ {
+-	/* new glfs_ftruncate() passes two additional args */
+-	return glfs_ftruncate(NULL, 0, NULL, NULL);
++    /* new glfs_ftruncate() passes two additional args */
++    return glfs_ftruncate(NULL, 0, NULL, NULL);
+ }
+ EOF
+     if compile_prog "$glusterfs_cflags" "$glusterfs_libs" ; then
+@@ -4181,9 +4181,9 @@ glusterfs_iocb(glfs_fd_t *fd, ssize_t ret, struct glfs_stat *prestat, struct glf
+ int
+ main(void)
+ {
+-	glfs_io_cbk iocb = &glusterfs_iocb;
+-	iocb(NULL, 0 , NULL, NULL, NULL);
+-	return 0;
++    glfs_io_cbk iocb = &glusterfs_iocb;
++    iocb(NULL, 0 , NULL, NULL, NULL);
++    return 0;
+ }
+ EOF
+     if compile_prog "$glusterfs_cflags" "$glusterfs_libs" ; then
+@@ -4210,8 +4210,8 @@ cat > $TMPC << EOF
+ int
+ main(void)
+ {
+-	/* try to start inotify */
+-	return inotify_init();
++    /* try to start inotify */
++    return inotify_init();
+ }
+ EOF
+ if compile_prog "" "" ; then
+@@ -4884,8 +4884,8 @@ if test "$mingw32" = "yes" && test "$guest_agent" != "no" && \
+     *\ *) # The SDK is installed in "Program Files" by default, but we cannot
+           # handle path with spaces. So we symlink the headers into ".sdk/vss".
+           vss_win32_include="-isystem $source_path/.sdk/vss"
+-	  symlink "$vss_win32_sdk/inc" "$source_path/.sdk/vss/inc"
+-	  ;;
++      symlink "$vss_win32_sdk/inc" "$source_path/.sdk/vss/inc"
++      ;;
+     *)    vss_win32_include="-isystem $vss_win32_sdk"
+   esac
+   cat > $TMPC << EOF
+@@ -5606,7 +5606,7 @@ if test "$membarrier" = "yes"; then
+     int main(void) {
+         syscall(__NR_membarrier, MEMBARRIER_CMD_QUERY, 0);
+         syscall(__NR_membarrier, MEMBARRIER_CMD_SHARED, 0);
+-	exit(0);
++    exit(0);
+     }
+ EOF
+         if compile_prog "" "" ; then
+@@ -5683,7 +5683,7 @@ if test "$crypto_afalg" = "yes"
+ then
+     if test "$have_afalg" != "yes"
+     then
+-	error_exit "AF_ALG requested but could not be detected"
++    error_exit "AF_ALG requested but could not be detected"
+     fi
+ fi
+ 
+@@ -5860,18 +5860,18 @@ fi
+ # check for libpmem
+ 
+ if test "$libpmem" != "no"; then
+-	if $pkg_config --exists "libpmem"; then
+-		libpmem="yes"
+-		libpmem_libs=$($pkg_config --libs libpmem)
+-		libpmem_cflags=$($pkg_config --cflags libpmem)
+-		libs_softmmu="$libs_softmmu $libpmem_libs"
+-		QEMU_CFLAGS="$QEMU_CFLAGS $libpmem_cflags"
+-	else
+-		if test "$libpmem" = "yes" ; then
+-			feature_not_found "libpmem" "Install nvml or pmdk"
+-		fi
+-		libpmem="no"
+-	fi
++    if $pkg_config --exists "libpmem"; then
++        libpmem="yes"
++        libpmem_libs=$($pkg_config --libs libpmem)
++        libpmem_cflags=$($pkg_config --cflags libpmem)
++        libs_softmmu="$libs_softmmu $libpmem_libs"
++        QEMU_CFLAGS="$QEMU_CFLAGS $libpmem_cflags"
++    else
++        if test "$libpmem" = "yes" ; then
++            feature_not_found "libpmem" "Install nvml or pmdk"
++        fi
++        libpmem="no"
++    fi
+ fi
+ 
+ ##########################################
+@@ -6595,10 +6595,10 @@ echo "CONFIG_AUDIO_DRIVERS=$audio_drv_list" >> $config_host_mak
+ for drv in $audio_drv_list; do
+     def=CONFIG_AUDIO_$(echo $drv | LC_ALL=C tr '[a-z]' '[A-Z]')
+     case "$drv" in
+-	alsa | oss | pa | sdl)
+-	    echo "$def=m" >> $config_host_mak ;;
+-	*)
+-	    echo "$def=y" >> $config_host_mak ;;
++    alsa | oss | pa | sdl)
++        echo "$def=m" >> $config_host_mak ;;
++    *)
++        echo "$def=y" >> $config_host_mak ;;
+     esac
+ done
+ echo "ALSA_LIBS=$alsa_libs" >> $config_host_mak
+@@ -7446,6 +7446,10 @@ case "$target_name" in
+     mttcg="yes"
+     gdb_xml_files="aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
+   ;;
++  avr)
++    gdb_xml_files="avr-cpu.xml"
++    target_compiler=$cross_cc_avr
++  ;;
+   cris)
+   ;;
+   hppa)
+@@ -7665,6 +7669,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+       disas_config "ARM_A64"
+     fi
+   ;;
++  avr)
++    disas_config "AVR"
++  ;;
+   cris)
+     disas_config "CRIS"
+   ;;
+@@ -7878,10 +7885,10 @@ preserve_env() {
+ 
+     if test -n "$envval"
+     then
+-	echo "$envname='$envval'" >> config.status
+-	echo "export $envname" >> config.status
++    echo "$envname='$envval'" >> config.status
++    echo "export $envname" >> config.status
+     else
+-	echo "unset $envname" >> config.status
++    echo "unset $envname" >> config.status
+     fi
+ }
+ 
+diff --git a/default-configs/avr-softmmu.mak b/default-configs/avr-softmmu.mak
 new file mode 100644
-index 0000000000..92aa1e6afb
+index 0000000000..d1e1c28118
 --- /dev/null
-+++ b/hw/avr/Kconfig
-@@ -0,0 +1,6 @@
-+config AVR_SAMPLE
-+    bool
-+    select AVR_TIMER16
-+    select AVR_USART
-+    select AVR_MASK
-+    select UNIMP
-diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
++++ b/default-configs/avr-softmmu.mak
+@@ -0,0 +1,5 @@
++# Default configuration for avr-softmmu
++
++# Boards:
++#
++CONFIG_AVR_SAMPLE=y
+diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
+index e9c7dd8eb4..8bedce17ac 100644
+--- a/include/disas/dis-asm.h
++++ b/include/disas/dis-asm.h
+@@ -211,6 +211,12 @@ enum bfd_architecture
+ #define bfd_mach_m32r          0  /* backwards compatibility */
+   bfd_arch_mn10200,    /* Matsushita MN10200 */
+   bfd_arch_mn10300,    /* Matsushita MN10300 */
++  bfd_arch_avr,       /* Atmel AVR microcontrollers.  */
++#define bfd_mach_avr1          1
++#define bfd_mach_avr2          2
++#define bfd_mach_avr3          3
++#define bfd_mach_avr4          4
++#define bfd_mach_avr5          5
+   bfd_arch_cris,       /* Axis CRIS */
+ #define bfd_mach_cris_v0_v10   255
+ #define bfd_mach_cris_v32      32
+diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+index 62c6fe4cf1..893df26ce2 100644
+--- a/include/sysemu/arch_init.h
++++ b/include/sysemu/arch_init.h
+@@ -24,6 +24,7 @@ enum {
+     QEMU_ARCH_NIOS2 = (1 << 17),
+     QEMU_ARCH_HPPA = (1 << 18),
+     QEMU_ARCH_RISCV = (1 << 19),
++    QEMU_ARCH_AVR = (1 << 20),
+ };
+ 
+ extern const uint32_t arch_type;
+diff --git a/qapi/machine.json b/qapi/machine.json
+index ca26779f1a..e080844835 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -21,11 +21,12 @@
+ #        is true even for "qemu-system-x86_64".
+ #
+ # ppcemb: dropped in 3.1
++# avr: sicne 4.2
+ #
+ # Since: 3.0
+ ##
+ { 'enum' : 'SysEmuTarget',
+-  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
++  'data' : [ 'aarch64', 'alpha', 'arm', 'avr', 'cris', 'hppa', 'i386', 'lm32',
+              'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
+              'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
+              'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
+diff --git a/target/avr/Makefile.objs b/target/avr/Makefile.objs
 new file mode 100644
-index 0000000000..626b7064b3
+index 0000000000..2976affd95
 --- /dev/null
-+++ b/hw/avr/Makefile.objs
-@@ -0,0 +1 @@
-+obj-y += sample.o
-diff --git a/hw/avr/sample.c b/hw/avr/sample.c
-new file mode 100644
-index 0000000000..2295ec1b79
---- /dev/null
-+++ b/hw/avr/sample.c
-@@ -0,0 +1,282 @@
-+/*
-+ * QEMU AVR CPU
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
-+ */
++++ b/target/avr/Makefile.objs
+@@ -0,0 +1,33 @@
++#
++#  QEMU AVR CPU
++#
++#  Copyright (c) 2019 Michael Rolnik
++#
++#  This library is free software; you can redistribute it and/or
++#  modify it under the terms of the GNU Lesser General Public
++#  License as published by the Free Software Foundation; either
++#  version 2.1 of the License, or (at your option) any later version.
++#
++#  This library is distributed in the hope that it will be useful,
++#  but WITHOUT ANY WARRANTY; without even the implied warranty of
++#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++#  Lesser General Public License for more details.
++#
++#  You should have received a copy of the GNU Lesser General Public
++#  License along with this library; if not, see
++#  <http://www.gnu.org/licenses/lgpl-2.1.html>
++#
 +
-+/*
-+ *  NOTE:
-+ *      This is not a real AVR board, this is an example!
-+ *      The CPU is an approximation of an ATmega2560, but is missing various
-+ *      built-in peripherals.
-+ *
-+ *      This example board loads provided binary file into flash memory and
-+ *      executes it from 0x00000000 address in the code memory space.
-+ *
-+ *      Currently used for AVR CPU validation
-+ *
-+ */
++DECODETREE = $(SRC_PATH)/scripts/decodetree.py
++decode-y = $(SRC_PATH)/target/avr/insn.decode
 +
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu-common.h"
-+#include "cpu.h"
-+#include "hw/hw.h"
-+#include "sysemu/sysemu.h"
-+#include "sysemu/qtest.h"
-+#include "ui/console.h"
-+#include "hw/boards.h"
-+#include "hw/loader.h"
-+#include "qemu/error-report.h"
-+#include "exec/address-spaces.h"
-+#include "include/hw/sysbus.h"
-+#include "include/hw/char/avr_usart.h"
-+#include "include/hw/timer/avr_timer16.h"
-+#include "include/hw/misc/avr_mask.h"
-+#include "elf.h"
-+#include "hw/misc/unimp.h"
++target/avr/decode_insn.inc.c: $(decode-y) $(DECODETREE)
++	$(call quiet-command, \
++	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn --insnwidth 16 $<, \
++	  "GEN", $(TARGET_DIR)$@)
 +
-+#define SIZE_FLASH 0x00040000
-+#define SIZE_SRAM 0x00002000
-+/*
-+ * Size of additional "external" memory, as if the AVR were configured to use
-+ * an external RAM chip.
-+ * Note that the configuration registers that normally enable this feature are
-+ * unimplemented.
-+ */
-+#define SIZE_EXMEM 0x00000000
++target/avr/translate.o: target/avr/decode_insn.inc.c
 +
-+/* Offsets of peripherals in emulated memory space (i.e. not host addresses)  */
-+#define PRR0_BASE 0x64
-+#define PRR1_BASE 0x65
-+#define USART_BASE 0xc0
-+#define TIMER1_BASE 0x80
-+#define TIMER1_IMSK_BASE 0x6f
-+#define TIMER1_IFR_BASE 0x36
-+
-+/* Interrupt numbers used by peripherals */
-+#define USART_RXC_IRQ 24
-+#define USART_DRE_IRQ 25
-+#define USART_TXC_IRQ 26
-+
-+#define TIMER1_CAPT_IRQ 15
-+#define TIMER1_COMPA_IRQ 16
-+#define TIMER1_COMPB_IRQ 17
-+#define TIMER1_COMPC_IRQ 18
-+#define TIMER1_OVF_IRQ 19
-+
-+/*  Power reduction     */
-+#define PRR1_BIT_PRTIM5     0x05    /*  Timer/Counter5  */
-+#define PRR1_BIT_PRTIM4     0x04    /*  Timer/Counter4  */
-+#define PRR1_BIT_PRTIM3     0x03    /*  Timer/Counter3  */
-+#define PRR1_BIT_PRUSART3   0x02    /*  USART3  */
-+#define PRR1_BIT_PRUSART2   0x01    /*  USART2  */
-+#define PRR1_BIT_PRUSART1   0x00    /*  USART1  */
-+
-+#define PRR0_BIT_PRTWI      0x06    /*  TWI */
-+#define PRR0_BIT_PRTIM2     0x05    /*  Timer/Counter2  */
-+#define PRR0_BIT_PRTIM0     0x04    /*  Timer/Counter0  */
-+#define PRR0_BIT_PRTIM1     0x03    /*  Timer/Counter1  */
-+#define PRR0_BIT_PRSPI      0x02    /*  Serial Peripheral Interface */
-+#define PRR0_BIT_PRUSART0   0x01    /*  USART0  */
-+#define PRR0_BIT_PRADC      0x00    /*  ADC */
-+
-+typedef struct {
-+    MachineClass parent;
-+} SampleMachineClass;
-+
-+typedef struct {
-+    MachineState parent;
-+    MemoryRegion *ram;
-+    MemoryRegion *flash;
-+    AVRUsartState *usart0;
-+    AVRTimer16State *timer1;
-+    AVRMaskState *prr[2];
-+} SampleMachineState;
-+
-+#define TYPE_SAMPLE_MACHINE MACHINE_TYPE_NAME("sample")
-+
-+#define SAMPLE_MACHINE(obj) \
-+    OBJECT_CHECK(SampleMachineState, obj, TYPE_SAMPLE_MACHINE)
-+#define SAMPLE_MACHINE_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(SampleMachineClass, obj, TYPE_SAMPLE_MACHINE)
-+#define SAMPLE_MACHINE_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(SampleMachineClass, klass, TYPE_SAMPLE_MACHINE)
-+
-+static void sample_init(MachineState *machine)
-+{
-+    SampleMachineState *sms = SAMPLE_MACHINE(machine);
-+    MemoryRegion *system_memory = get_system_memory();
-+    AVRCPU *cpu;
-+    const char *firmware = NULL;
-+    const char *filename;
-+    int bytes_loaded;
-+    SysBusDevice *busdev;
-+    DeviceState *cpudev;
-+
-+    system_memory = get_system_memory();
-+    sms->ram = g_new(MemoryRegion, 1);
-+    sms->flash = g_new(MemoryRegion, 1);
-+
-+    cpu = AVR_CPU(cpu_create(machine->cpu_type));
-+    cpudev = DEVICE(cpu);
-+
-+
-+    memory_region_init_rom(sms->flash, NULL, "avr.flash", SIZE_FLASH,
-+            &error_fatal);
-+    memory_region_add_subregion(system_memory, OFFSET_CODE, sms->flash);
-+
-+    /* following are atmel2560 device */
-+    create_unimplemented_device("usart 3", OFFSET_DATA + 0x0130, 0x0007);
-+    create_unimplemented_device("timer-counter-16bit 5",
-+            OFFSET_DATA + 0x0120, 0x000e);
-+    create_unimplemented_device("gpio L", OFFSET_DATA + 0x0109, 0x0003);
-+    create_unimplemented_device("gpio K", OFFSET_DATA + 0x0106, 0x0003);
-+    create_unimplemented_device("gpio J", OFFSET_DATA + 0x0103, 0x0003);
-+    create_unimplemented_device("gpio H", OFFSET_DATA + 0x0100, 0x0003);
-+    create_unimplemented_device("usart 2", OFFSET_DATA + 0x00d0, 0x0007);
-+    create_unimplemented_device("usart 1", OFFSET_DATA + 0x00c8, 0x0007);
-+    create_unimplemented_device("usart 0", OFFSET_DATA + 0x00c0, 0x0007);
-+    create_unimplemented_device("twi", OFFSET_DATA + 0x00b8, 0x0006);
-+    create_unimplemented_device("timer-counter-async-8bit 2",
-+            OFFSET_DATA + 0x00b0, 0x0007);
-+    create_unimplemented_device("timer-counter-16bit 4",
-+            OFFSET_DATA + 0x00a0, 0x000e);
-+    create_unimplemented_device("timer-counter-16bit 3",
-+            OFFSET_DATA + 0x0090, 0x000e);
-+    create_unimplemented_device("timer-counter-16bit 1",
-+            OFFSET_DATA + 0x0080, 0x000e);
-+    create_unimplemented_device("ac / adc",
-+            OFFSET_DATA + 0x0078, 0x0008);
-+    create_unimplemented_device("ext-mem-iface",
-+            OFFSET_DATA + 0x0074, 0x0002);
-+    create_unimplemented_device("int-controller",
-+            OFFSET_DATA + 0x0068, 0x000c);
-+    create_unimplemented_device("sys",
-+            OFFSET_DATA + 0x0060, 0x0007);
-+    create_unimplemented_device("spi",
-+            OFFSET_DATA + 0x004c, 0x0003);
-+    create_unimplemented_device("ext-mem-iface",
-+            OFFSET_DATA + 0x004a, 0x0002);
-+    create_unimplemented_device("timer-counter-pwm-8bit 0",
-+            OFFSET_DATA + 0x0043, 0x0006);
-+    create_unimplemented_device("ext-mem-iface",
-+            OFFSET_DATA + 0x003e, 0x0005);
-+    create_unimplemented_device("int-controller",
-+            OFFSET_DATA + 0x0035, 0x0009);
-+    create_unimplemented_device("gpio G", OFFSET_DATA + 0x0032, 0x0003);
-+    create_unimplemented_device("gpio F", OFFSET_DATA + 0x002f, 0x0003);
-+    create_unimplemented_device("gpio E", OFFSET_DATA + 0x002c, 0x0003);
-+    create_unimplemented_device("gpio D", OFFSET_DATA + 0x0029, 0x0003);
-+    create_unimplemented_device("gpio C", OFFSET_DATA + 0x0026, 0x0003);
-+    create_unimplemented_device("gpio B", OFFSET_DATA + 0x0023, 0x0003);
-+    create_unimplemented_device("gpio A", OFFSET_DATA + 0x0020, 0x0003);
-+
-+    memory_region_allocate_system_memory(
-+        sms->ram, NULL, "avr.ram", SIZE_SRAM + SIZE_EXMEM);
-+    memory_region_add_subregion(system_memory, OFFSET_DATA + 0x200, sms->ram);
-+
-+    /* Power Reduction built-in peripheral */
-+    sms->prr[0] = AVR_MASK(sysbus_create_simple(TYPE_AVR_MASK,
-+                    OFFSET_DATA + PRR0_BASE, NULL));
-+    sms->prr[1] = AVR_MASK(sysbus_create_simple(TYPE_AVR_MASK,
-+                    OFFSET_DATA + PRR1_BASE, NULL));
-+
-+    /* USART 0 built-in peripheral */
-+    sms->usart0 = AVR_USART(object_new(TYPE_AVR_USART));
-+    busdev = SYS_BUS_DEVICE(sms->usart0);
-+    qdev_prop_set_chr(DEVICE(sms->usart0), "chardev", serial_hd(0));
-+    object_property_set_bool(OBJECT(sms->usart0), true, "realized",
-+            &error_fatal);
-+    sysbus_mmio_map(busdev, 0, OFFSET_DATA + USART_BASE);
-+    /*
-+     * These IRQ numbers don't match the datasheet because we're counting from
-+     * zero and not including reset.
-+     */
-+    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(cpudev, USART_RXC_IRQ));
-+    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(cpudev, USART_DRE_IRQ));
-+    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(cpudev, USART_TXC_IRQ));
-+    sysbus_connect_irq(SYS_BUS_DEVICE(sms->prr[1]), PRR1_BIT_PRUSART1,
-+            qdev_get_gpio_in(DEVICE(sms->usart0), 0));
-+
-+    /* Timer 1 built-in periphal */
-+    sms->timer1 = AVR_TIMER16(object_new(TYPE_AVR_TIMER16));
-+    object_property_set_bool(OBJECT(sms->timer1), true, "realized",
-+            &error_fatal);
-+    busdev = SYS_BUS_DEVICE(sms->timer1);
-+    sysbus_mmio_map(busdev, 0, OFFSET_DATA + TIMER1_BASE);
-+    sysbus_mmio_map(busdev, 1, OFFSET_DATA + TIMER1_IMSK_BASE);
-+    sysbus_mmio_map(busdev, 2, OFFSET_DATA + TIMER1_IFR_BASE);
-+    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(cpudev, TIMER1_CAPT_IRQ));
-+    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(cpudev, TIMER1_COMPA_IRQ));
-+    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(cpudev, TIMER1_COMPB_IRQ));
-+    sysbus_connect_irq(busdev, 3, qdev_get_gpio_in(cpudev, TIMER1_COMPC_IRQ));
-+    sysbus_connect_irq(busdev, 4, qdev_get_gpio_in(cpudev, TIMER1_OVF_IRQ));
-+    sysbus_connect_irq(SYS_BUS_DEVICE(sms->prr[0]), PRR0_BIT_PRTIM1,
-+            qdev_get_gpio_in(DEVICE(sms->timer1), 0));
-+
-+    /* Load firmware (contents of flash) trying to auto-detect format */
-+    firmware = machine->firmware;
-+    if (firmware != NULL) {
-+        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
-+        if (filename == NULL) {
-+            error_report("Unable to find %s", firmware);
-+            exit(1);
-+        }
-+
-+        bytes_loaded = load_elf(
-+            filename, NULL, NULL, NULL, NULL, NULL, NULL, 0, EM_NONE, 0, 0);
-+        if (bytes_loaded < 0) {
-+            bytes_loaded = load_image_targphys(
-+                filename, OFFSET_CODE, SIZE_FLASH);
-+        }
-+        if (bytes_loaded < 0) {
-+            error_report(
-+                "Unable to load firmware image %s as ELF or raw binary",
-+                firmware);
-+            exit(1);
-+        }
-+    }
-+}
-+
-+static void sample_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+
-+    mc->desc = "AVR sample/example board (ATmega2560)";
-+    mc->init = sample_init;
-+    mc->default_cpus = 1;
-+    mc->min_cpus = mc->default_cpus;
-+    mc->max_cpus = mc->default_cpus;
-+    mc->default_cpu_type = "avr6-avr-cpu"; /* ATmega2560. */
-+    mc->is_default = 1;
-+}
-+
-+static const TypeInfo sample_info = {
-+    .name = TYPE_SAMPLE_MACHINE,
-+    .parent = TYPE_MACHINE,
-+    .instance_size = sizeof(SampleMachineState),
-+    .class_size = sizeof(SampleMachineClass),
-+    .class_init = sample_class_init,
-+};
-+
-+static void sample_machine_init(void)
-+{
-+    type_register_static(&sample_info);
-+}
-+
-+type_init(sample_machine_init);
++obj-y += translate.o cpu.o helper.o
++obj-y += gdbstub.o
++obj-$(CONFIG_SOFTMMU) += machine.o
+diff --git a/tests/machine-none-test.c b/tests/machine-none-test.c
+index 5953d31755..3e5c74e73e 100644
+--- a/tests/machine-none-test.c
++++ b/tests/machine-none-test.c
+@@ -27,6 +27,7 @@ static struct arch2cpu cpus_map[] = {
+     /* tested targets list */
+     { "arm", "cortex-a15" },
+     { "aarch64", "cortex-a57" },
++    { "avr", "avr6-avr-cpu" },
+     { "x86_64", "qemu64,apic-id=0" },
+     { "i386", "qemu32,apic-id=0" },
+     { "alpha", "ev67" },
 -- 
 2.17.2 (Apple Git-113)
 
