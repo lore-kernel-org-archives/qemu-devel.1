@@ -2,71 +2,70 @@ Return-Path: <SRS0=GetT=XK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE9CC4CECC
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 15:48:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81851C4CEC7
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 15:49:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10DA320873
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 15:48:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10DA320873
+	by mail.kernel.org (Postfix) with ESMTPS id 4549D20873
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 15:49:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4549D20873
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9WlJ-00048t-56
-	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 11:48:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48267)
+	id 1i9Wmf-0005Rr-Gh
+	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 11:49:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48289)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1i9Wbu-0003fJ-6O
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 11:38:49 -0400
+ (envelope-from <laurent@vivier.eu>) id 1i9Wbw-0003gi-3e
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 11:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1i9Wbq-0003SX-Oh
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 11:38:46 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:46829)
+ (envelope-from <laurent@vivier.eu>) id 1i9Wbs-0003TV-6O
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 11:38:47 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:44551)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1i9Wbq-0003Rp-C9; Sun, 15 Sep 2019 11:38:42 -0400
+ id 1i9Wbr-0003Sn-Ov; Sun, 15 Sep 2019 11:38:44 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MQdMG-1hlnBj1nde-00NhNi; Sun, 15 Sep 2019 17:38:14 +0200
+ id 1MXpQA-1hbN3O452C-00Y6R6; Sun, 15 Sep 2019 17:38:19 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Sun, 15 Sep 2019 17:37:48 +0200
-Message-Id: <20190915153751.11333-7-laurent@vivier.eu>
+Date: Sun, 15 Sep 2019 17:37:50 +0200
+Message-Id: <20190915153751.11333-9-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190915153751.11333-1-laurent@vivier.eu>
 References: <20190915153751.11333-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:5asyZekA5dtHZanSX53MI+igtZOyV3sMOTJs+2AcEQe62WjulSv
- cdnV8/hd2TH/LRwL8mCAw0Aqim2G77dM5UuXd+opad2yhDK4tcDaNMrVNBCclxFigmLxwDG
- acO8R4K/c0D+T3depkjTVjzSRVqRUiIncqaYXXfFOIYjhx7a2d7WOaWiZezDNDQ/t2AcAVm
- Wz62/DUJ/Q0A83hFFeUtA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:nyuE9vUadlA=:EIaEvmYaAMVt4wgwPDU8xO
- bMUpIKCk3LDCcW0hUb7PcSACuYF3bandLLrrKwdnAMPb1OUvMWC7xIPn4o0nqhCyHUgDZZ8oA
- 82yD9Y2z37QHr6WQwt0Ky2Pbw412EBU1r4S7//5rm/LDU7vYGSLkzcK3y+PPAj49TsurVHudR
- Q8dX7YmTJjiv90Mh1aAmEafbmrS0LC7PeiJmER2Hf+786GnPg8YR2H3w/hor4YY5QmP079bI1
- TaIq+C5Xf6fBlAyUwa7ADA7VTQT5OIfOHKgdMoPLjQTq7xxhnO/GCM0KSG8Nr/L5oBqON7bQE
- X2FZbkT1mjQh2hLEyg3CJGMD/oLtSAfb/eN7Q9eF6aJJ5oasuiymFreYCgoH42W2pBU0A+VPe
- bSdmTquvN4TPsc9vxyaRYuEo0Aw0C7cSH1xTy+iPJsvLlvQe5RAvN/fbO7j8w/Frhe3NDa/Jb
- fNFALR/TXi2JsFwUNZAsZhmlRncAKQpnL3P+BTdh+O/Du8i3V95NICQPaXDwKwPS+xcTXR/sd
- znFG2p84dcjQa92nQIx4TVAnNZhoKVitDR1mnUXnn8+auMeYJ0gMqC/RZNFBurouvfJYZjAmj
- DUDaAeRHXLDPfXp4l9n9h+/njPg9Ty3VUEy0c3Bs0/W+FWzYyaWXa/mjVSqTXKorc1NwNDMQe
- U1FfDKQ8HHBCtlN8nLjas6vAS78LTtd73Rd9QdskLGGfG9dAilzVUHZq9B3WGJ/Zjlqi+CEmt
- yeLp42WzbqTzyK7ERB4sbRDP1FzEPfg3+wcpjZ6NO1ulu9iFDKCykUs5UIdf4dwKo5AShgIFP
- BUGJtOCWbKM54s9vqkrC5zp8/Cb4H2WqC4/SVX+oZD3Jnsxa6Z83nPGYX4jIu40dGNPXdMcwh
- yKxG4Xk++Y1n1fQdc2YlBDcJFNzhyOGgDSrw52D7Q=
+X-Provags-ID: V03:K1:2VfZs9QooFO/ZDVCYVWxvEvzaclX8y1AYGXe/60z0RVAHCm5rBV
+ 1V5tpKlh0U/xjpB52tBZeBy78pEnk0054mYNgxEn9gYXLGG6XZ6kh5XcGWf1GHO4Qglg3j9
+ prdkfwOumS+r6Z/tD1GuhS3e8XVyLCxF3RhqNU8sAvrAyrW5BdbY/2c+rCxDFQ7PWLKnWFM
+ hY/7dB4kjkyqAoyDaNdfg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:BKYG8aSY/R4=:xiozylb9LEmK5eBFYDZFHy
+ ouVLs72G9MxqarVUgVIP8tKvQDYR+blqYZWvS3jMDLT2iyO+zW24ebtYhIY8yl+WKk9hdGlei
+ 17+alUfXrsafRxrLJieeElJGAmOt84w5T7ouE3/M2zVF4yHtwdVDc++jOw8e/VVg7dZJjL6Ml
+ +FSV0SDmbksel+fzSAvGKY/eKLUI0uYthoa+kjrw6Pz/WnEpJovgOQ0Cy1EjeGSbFaq2h9Vv+
+ ziROtOJfdotK0r7ScG7D0Tk9QAPqZEbQu++jwnpB+PssaQCg+YKesuuiT23jAdQqEAoYyzNjP
+ VVc8g6JHKXCU66Y9I7uSqOk6q4xHE60ewlzoUMHHTPwBskFjP3jetxNVI+GsybdgiLo4gYgAx
+ S7dW323hg5UXdfLi4mcdlRvqcdI4ohqKWUWzI9qSo7TRZlo78P4gJkNlTc9PCAtFyY5783l44
+ uKniqxsBtRVzl85KfJrvPqG6VYD5d2BjvH0K00q4yOzbH/C+fCfuPL3hyLaRjIhiwIL77XbX7
+ bMZuXzvm3ob2NT4Ltf+LGiey7JxrxyS5CrxEw5JHXHZud7t3PjfUepvDWkV3q0GvSdv7C1O+Z
+ QpgKhJSKgdwYcFIsUGZDIBfBJbQf1gMKGiUkVPXEYQ8QzfzvXne1jg23eBMTdg+G9XSk+J714
+ bcuYBGBfeInSBBHp6A/EW11xxH88C4VMZft1/od9rHPeAI66xe0VgjyeyxHIBXfR55eRHOKOW
+ ePEWqla8ZXHMSjv1SbtgwfvaqKCZ/A9/duV1FBzr0/k9N/mK8aJuXxB1R9vrBFAdyKEfPgmiv
+ 3PXPSevhSyH7ZtdIg2qwwhOG+tK7HdocLgC+vP7gHEK5og4ZkUzRHosvyPgbsGvI0Hmklb+ea
+ Y/rZq96WzcEFgTaNry1w==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
-Subject: [Qemu-devel] [PATCH v12 6/9] hw/m68k: add Nubus macfb video card
+X-Received-From: 212.227.17.10
+Subject: [Qemu-devel] [PATCH v12 8/9] hw/m68k: define Macintosh Quadra 800
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,674 +91,596 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds support for a graphic framebuffer device.
-This device can be added as a sysbus device or as a NuBus device.
+If you want to test the machine, it doesn't yet boot a MacROM, but you can
+boot a linux kernel from the command line.
 
-It is accessed as a framebuffer but the color palette can be set.
+You can install your own disk using debian-installer with:
+
+    ./qemu-system-m68k \
+    -M q800 \
+    -serial none -serial mon:stdio \
+    -m 1000M -drive file=m68k.qcow2,format=qcow2 \
+    -net nic,model=dp83932,addr=09:00:07:12:34:57 \
+    -append "console=ttyS0 vga=off" \
+    -kernel vmlinux-4.15.0-2-m68k \
+    -initrd initrd.gz \
+    -drive file=debian-9.0-m68k-NETINST-1.iso \
+    -drive file=m68k.qcow2,format=qcow2 \
+    -nographic
+
+If you use a graphic adapter instead of "-nographic", you can use "-g"
+to set the size of the display (I use "-g 1600x800x24").
 
 Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
-Reviewed-by: Thomas Huth <huth@tuxfamily.org>
 ---
- MAINTAINERS                |   2 +
- arch_init.c                |   4 +
- hw/display/Kconfig         |   5 +
- hw/display/Makefile.objs   |   1 +
- hw/display/macfb.c         | 477 +++++++++++++++++++++++++++++++++++++
- hw/m68k/Kconfig            |   1 +
- include/hw/display/macfb.h |  64 +++++
- qemu-options.hx            |   2 +-
- vl.c                       |   3 +-
- 9 files changed, 557 insertions(+), 2 deletions(-)
- create mode 100644 hw/display/macfb.c
- create mode 100644 include/hw/display/macfb.h
+ MAINTAINERS           |   2 +
+ hw/m68k/Kconfig       |   3 +
+ hw/m68k/Makefile.objs |   1 +
+ hw/m68k/bootinfo.h    | 114 ++++++++++++
+ hw/m68k/q800.c        | 394 ++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 514 insertions(+)
+ create mode 100644 hw/m68k/bootinfo.h
+ create mode 100644 hw/m68k/q800.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 864255b908..173dc68456 100644
+index d741e2957c..42c721626c 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -922,8 +922,10 @@ M: Laurent Vivier <laurent@vivier.eu>
+@@ -920,10 +920,12 @@ F: include/hw/m68k/next-cube.h
+ q800
+ M: Laurent Vivier <laurent@vivier.eu>
  S: Maintained
++F: hw/m68k/q800.c
  F: hw/misc/mac_via.c
  F: hw/nubus/*
-+F: hw/display/macfb.c
+ F: hw/display/macfb.c
+ F: hw/block/swim.c
++F: hw/m68k/bootinfo.h
  F: include/hw/misc/mac_via.h
  F: include/hw/nubus/*
-+F: include/hw/display/macfb.h
- 
- MicroBlaze Machines
- -------------------
-diff --git a/arch_init.c b/arch_init.c
-index 0a1531124c..705d0b94ad 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -38,6 +38,10 @@
- int graphic_width = 1024;
- int graphic_height = 768;
- int graphic_depth = 8;
-+#elif defined(TARGET_M68K)
-+int graphic_width = 800;
-+int graphic_height = 600;
-+int graphic_depth = 8;
- #else
- int graphic_width = 800;
- int graphic_height = 600;
-diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-index cbdf7b1a67..c500d1fc6d 100644
---- a/hw/display/Kconfig
-+++ b/hw/display/Kconfig
-@@ -132,3 +132,8 @@ config ATI_VGA
-     select VGA
-     select BITBANG_I2C
-     select DDC
-+
-+config MACFB
-+    bool
-+    select FRAMEBUFFER
-+    depends on NUBUS
-diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index 5a4066383b..f2182e3bef 100644
---- a/hw/display/Makefile.objs
-+++ b/hw/display/Makefile.objs
-@@ -26,6 +26,7 @@ common-obj-$(CONFIG_EXYNOS4) += exynos4210_fimd.o
- common-obj-$(CONFIG_FRAMEBUFFER) += framebuffer.o
- obj-$(CONFIG_MILKYMIST) += milkymist-vgafb.o
- common-obj-$(CONFIG_ZAURUS) += tc6393xb.o
-+common-obj-$(CONFIG_MACFB) += macfb.o
- 
- obj-$(CONFIG_MILKYMIST_TMU2) += milkymist-tmu2.o
- milkymist-tmu2.o-cflags := $(X11_CFLAGS) $(OPENGL_CFLAGS)
-diff --git a/hw/display/macfb.c b/hw/display/macfb.c
-new file mode 100644
-index 0000000000..f4fa8e3206
---- /dev/null
-+++ b/hw/display/macfb.c
-@@ -0,0 +1,477 @@
-+/*
-+ * QEMU Motorola 680x0 Macintosh Video Card Emulation
-+ *                 Copyright (c) 2012-2018 Laurent Vivier
-+ *
-+ * some parts from QEMU G364 framebuffer Emulator.
-+ *                 Copyright (c) 2007-2011 Herve Poussineau
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/units.h"
-+#include "hw/sysbus.h"
-+#include "ui/console.h"
-+#include "ui/pixel_ops.h"
-+#include "hw/nubus/nubus.h"
-+#include "hw/display/macfb.h"
-+#include "qapi/error.h"
-+#include "hw/qdev-properties.h"
-+#include "migration/vmstate.h"
-+
-+#define VIDEO_BASE 0x00001000
-+#define DAFB_BASE  0x00800000
-+
-+#define MACFB_PAGE_SIZE 4096
-+#define MACFB_VRAM_SIZE (4 * MiB)
-+
-+#define DAFB_RESET      0x200
-+#define DAFB_LUT        0x213
-+
-+
-+typedef void macfb_draw_line_func(MacfbState *s, uint8_t *d, uint32_t addr,
-+                                  int width);
-+
-+static inline uint8_t macfb_read_byte(MacfbState *s, uint32_t addr)
-+{
-+    return s->vram[addr & s->vram_bit_mask];
-+}
-+
-+/* 1-bit color */
-+static void macfb_draw_line1(MacfbState *s, uint8_t *d, uint32_t addr,
-+                             int width)
-+{
-+    uint8_t r, g, b;
-+    int x;
-+
-+    for (x = 0; x < width; x++) {
-+        int bit = x & 7;
-+        int idx = (macfb_read_byte(s, addr) >> (7 - bit)) & 1;
-+        r = g = b  = ((1 - idx) << 7);
-+        addr += (bit == 7);
-+
-+        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
-+        d += 4;
-+    }
-+}
-+
-+/* 2-bit color */
-+static void macfb_draw_line2(MacfbState *s, uint8_t *d, uint32_t addr,
-+                             int width)
-+{
-+    uint8_t r, g, b;
-+    int x;
-+
-+    for (x = 0; x < width; x++) {
-+        int bit = (x & 3);
-+        int idx = (macfb_read_byte(s, addr) >> ((3 - bit) << 1)) & 3;
-+        r = s->color_palette[idx * 3];
-+        g = s->color_palette[idx * 3 + 1];
-+        b = s->color_palette[idx * 3 + 2];
-+        addr += (bit == 3);
-+
-+        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
-+        d += 4;
-+    }
-+}
-+
-+/* 4-bit color */
-+static void macfb_draw_line4(MacfbState *s, uint8_t *d, uint32_t addr,
-+                             int width)
-+{
-+    uint8_t r, g, b;
-+    int x;
-+
-+    for (x = 0; x < width; x++) {
-+        int bit = x & 1;
-+        int idx = (macfb_read_byte(s, addr) >> ((1 - bit) << 2)) & 15;
-+        r = s->color_palette[idx * 3];
-+        g = s->color_palette[idx * 3 + 1];
-+        b = s->color_palette[idx * 3 + 2];
-+        addr += (bit == 1);
-+
-+        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
-+        d += 4;
-+    }
-+}
-+
-+/* 8-bit color */
-+static void macfb_draw_line8(MacfbState *s, uint8_t *d, uint32_t addr,
-+                             int width)
-+{
-+    uint8_t r, g, b;
-+    int x;
-+
-+    for (x = 0; x < width; x++) {
-+        r = s->color_palette[macfb_read_byte(s, addr) * 3];
-+        g = s->color_palette[macfb_read_byte(s, addr) * 3 + 1];
-+        b = s->color_palette[macfb_read_byte(s, addr) * 3 + 2];
-+        addr++;
-+
-+        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
-+        d += 4;
-+    }
-+}
-+
-+/* 16-bit color */
-+static void macfb_draw_line16(MacfbState *s, uint8_t *d, uint32_t addr,
-+                              int width)
-+{
-+    uint8_t r, g, b;
-+    int x;
-+
-+    for (x = 0; x < width; x++) {
-+        uint16_t pixel;
-+        pixel = (macfb_read_byte(s, addr) << 8) | macfb_read_byte(s, addr + 1);
-+        r = ((pixel >> 10) & 0x1f) << 3;
-+        g = ((pixel >> 5) & 0x1f) << 3;
-+        b = (pixel & 0x1f) << 3;
-+        addr += 2;
-+
-+        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
-+        d += 4;
-+    }
-+}
-+
-+/* 24-bit color */
-+static void macfb_draw_line24(MacfbState *s, uint8_t *d, uint32_t addr,
-+                              int width)
-+{
-+    uint8_t r, g, b;
-+    int x;
-+
-+    for (x = 0; x < width; x++) {
-+        r = macfb_read_byte(s, addr);
-+        g = macfb_read_byte(s, addr + 1);
-+        b = macfb_read_byte(s, addr + 2);
-+        addr += 3;
-+
-+        *(uint32_t *)d = rgb_to_pixel32(r, g, b);
-+        d += 4;
-+    }
-+}
-+
-+
-+enum {
-+    MACFB_DRAW_LINE1,
-+    MACFB_DRAW_LINE2,
-+    MACFB_DRAW_LINE4,
-+    MACFB_DRAW_LINE8,
-+    MACFB_DRAW_LINE16,
-+    MACFB_DRAW_LINE24,
-+    MACFB_DRAW_LINE_NB,
-+};
-+
-+static macfb_draw_line_func * const
-+                              macfb_draw_line_table[MACFB_DRAW_LINE_NB] = {
-+    macfb_draw_line1,
-+    macfb_draw_line2,
-+    macfb_draw_line4,
-+    macfb_draw_line8,
-+    macfb_draw_line16,
-+    macfb_draw_line24,
-+};
-+
-+static int macfb_check_dirty(MacfbState *s, DirtyBitmapSnapshot *snap,
-+                             ram_addr_t addr, int len)
-+{
-+    return memory_region_snapshot_get_dirty(&s->mem_vram, snap, addr, len);
-+}
-+
-+static void macfb_draw_graphic(MacfbState *s)
-+{
-+    DisplaySurface *surface = qemu_console_surface(s->con);
-+    DirtyBitmapSnapshot *snap = NULL;
-+    ram_addr_t page;
-+    uint32_t v = 0;
-+    int y, ymin;
-+    int macfb_stride = (s->depth * s->width + 7) / 8;
-+    macfb_draw_line_func *macfb_draw_line;
-+
-+    switch (s->depth) {
-+    case 1:
-+        v = MACFB_DRAW_LINE1;
-+        break;
-+    case 2:
-+        v = MACFB_DRAW_LINE2;
-+        break;
-+    case 4:
-+        v = MACFB_DRAW_LINE4;
-+        break;
-+    case 8:
-+        v = MACFB_DRAW_LINE8;
-+        break;
-+    case 16:
-+        v = MACFB_DRAW_LINE16;
-+        break;
-+    case 24:
-+        v = MACFB_DRAW_LINE24;
-+        break;
-+    }
-+
-+    macfb_draw_line = macfb_draw_line_table[v];
-+    assert(macfb_draw_line != NULL);
-+
-+    snap = memory_region_snapshot_and_clear_dirty(&s->mem_vram, 0x0,
-+                                             memory_region_size(&s->mem_vram),
-+                                             DIRTY_MEMORY_VGA);
-+
-+    ymin = -1;
-+    page = 0;
-+    for (y = 0; y < s->height; y++, page += macfb_stride) {
-+        if (macfb_check_dirty(s, snap, page, macfb_stride)) {
-+            uint8_t *data_display;
-+
-+            data_display = surface_data(surface) + y * surface_stride(surface);
-+            macfb_draw_line(s, data_display, page, s->width);
-+
-+            if (ymin < 0) {
-+                ymin = y;
-+            }
-+        } else {
-+            if (ymin >= 0) {
-+                dpy_gfx_update(s->con, 0, ymin, s->width, y - ymin);
-+                ymin = -1;
-+            }
-+        }
-+    }
-+
-+    if (ymin >= 0) {
-+        dpy_gfx_update(s->con, 0, ymin, s->width, y - ymin);
-+    }
-+
-+    g_free(snap);
-+}
-+
-+static void macfb_invalidate_display(void *opaque)
-+{
-+    MacfbState *s = opaque;
-+
-+    memory_region_set_dirty(&s->mem_vram, 0, MACFB_VRAM_SIZE);
-+}
-+
-+static void macfb_update_display(void *opaque)
-+{
-+    MacfbState *s = opaque;
-+    DisplaySurface *surface = qemu_console_surface(s->con);
-+
-+    qemu_flush_coalesced_mmio_buffer();
-+
-+    if (s->width == 0 || s->height == 0) {
-+        return;
-+    }
-+
-+    if (s->width != surface_width(surface) ||
-+        s->height != surface_height(surface)) {
-+        qemu_console_resize(s->con, s->width, s->height);
-+    }
-+
-+    macfb_draw_graphic(s);
-+}
-+
-+static void macfb_reset(MacfbState *s)
-+{
-+    int i;
-+
-+    s->palette_current = 0;
-+    for (i = 0; i < 256; i++) {
-+        s->color_palette[i * 3] = 255 - i;
-+        s->color_palette[i * 3 + 1] = 255 - i;
-+        s->color_palette[i * 3 + 2] = 255 - i;
-+    }
-+    memset(s->vram, 0, MACFB_VRAM_SIZE);
-+    macfb_invalidate_display(s);
-+}
-+
-+static uint64_t macfb_ctrl_read(void *opaque,
-+                                hwaddr addr,
-+                                unsigned int size)
-+{
-+    return 0;
-+}
-+
-+static void macfb_ctrl_write(void *opaque,
-+                             hwaddr addr,
-+                             uint64_t val,
-+                             unsigned int size)
-+{
-+    MacfbState *s = opaque;
-+    switch (addr) {
-+    case DAFB_RESET:
-+        s->palette_current = 0;
-+        break;
-+    case DAFB_LUT:
-+        s->color_palette[s->palette_current++] = val;
-+        if (s->palette_current % 3) {
-+            macfb_invalidate_display(s);
-+        }
-+        break;
-+    }
-+}
-+
-+static const MemoryRegionOps macfb_ctrl_ops = {
-+    .read = macfb_ctrl_read,
-+    .write = macfb_ctrl_write,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+    .impl.min_access_size = 1,
-+    .impl.max_access_size = 4,
-+};
-+
-+static int macfb_post_load(void *opaque, int version_id)
-+{
-+    macfb_invalidate_display(opaque);
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_macfb = {
-+    .name = "macfb",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .minimum_version_id_old = 1,
-+    .post_load = macfb_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8_ARRAY(color_palette, MacfbState, 256 * 3),
-+        VMSTATE_UINT32(palette_current, MacfbState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const GraphicHwOps macfb_ops = {
-+    .invalidate = macfb_invalidate_display,
-+    .gfx_update = macfb_update_display,
-+};
-+
-+static void macfb_common_realize(DeviceState *dev, MacfbState *s, Error **errp)
-+{
-+    DisplaySurface *surface;
-+
-+    if (s->depth != 1 && s->depth != 2 && s->depth != 4 && s->depth != 8 &&
-+        s->depth != 16 && s->depth != 24) {
-+        error_setg(errp, "unknown guest depth %d", s->depth);
-+        return;
-+    }
-+
-+    s->con = graphic_console_init(dev, 0, &macfb_ops, s);
-+    surface = qemu_console_surface(s->con);
-+
-+    if (surface_bits_per_pixel(surface) != 32) {
-+        error_setg(errp, "unknown host depth %d",
-+                   surface_bits_per_pixel(surface));
-+        return;
-+    }
-+
-+    memory_region_init_io(&s->mem_ctrl, NULL, &macfb_ctrl_ops, s, "macfb-ctrl",
-+                          0x1000);
-+
-+    memory_region_init_ram_nomigrate(&s->mem_vram, OBJECT(s), "macfb-vram",
-+                                     MACFB_VRAM_SIZE, errp);
-+    s->vram = memory_region_get_ram_ptr(&s->mem_vram);
-+    s->vram_bit_mask = MACFB_VRAM_SIZE - 1;
-+    vmstate_register_ram(&s->mem_vram, dev);
-+    memory_region_set_coalescing(&s->mem_vram);
-+}
-+
-+static void macfb_sysbus_realize(DeviceState *dev, Error **errp)
-+{
-+    MacfbSysBusState *s = MACFB(dev);
-+    MacfbState *ms = &s->macfb;
-+
-+    macfb_common_realize(dev, ms, errp);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(s), &ms->mem_ctrl);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(s), &ms->mem_vram);
-+}
-+
-+const uint8_t macfb_rom[] = {
-+    255, 0, 0, 0,
-+};
-+
-+static void macfb_nubus_realize(DeviceState *dev, Error **errp)
-+{
-+    NubusDevice *nd = NUBUS_DEVICE(dev);
-+    MacfbNubusState *s = NUBUS_MACFB(dev);
-+    MacfbNubusDeviceClass *ndc = MACFB_NUBUS_GET_CLASS(dev);
-+    MacfbState *ms = &s->macfb;
-+
-+    ndc->parent_realize(dev, errp);
-+
-+    macfb_common_realize(dev, ms, errp);
-+    memory_region_add_subregion(&nd->slot_mem, DAFB_BASE, &ms->mem_ctrl);
-+    memory_region_add_subregion(&nd->slot_mem, VIDEO_BASE, &ms->mem_vram);
-+
-+    nubus_register_rom(nd, macfb_rom, sizeof(macfb_rom), 1, 9, 0xf);
-+}
-+
-+static void macfb_sysbus_reset(DeviceState *d)
-+{
-+    MacfbSysBusState *s = MACFB(d);
-+    macfb_reset(&s->macfb);
-+}
-+
-+static void macfb_nubus_reset(DeviceState *d)
-+{
-+    MacfbNubusState *s = NUBUS_MACFB(d);
-+    macfb_reset(&s->macfb);
-+}
-+
-+static Property macfb_sysbus_properties[] = {
-+    DEFINE_PROP_UINT32("width", MacfbSysBusState, macfb.width, 640),
-+    DEFINE_PROP_UINT32("height", MacfbSysBusState, macfb.height, 480),
-+    DEFINE_PROP_UINT8("depth", MacfbSysBusState, macfb.depth, 8),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static Property macfb_nubus_properties[] = {
-+    DEFINE_PROP_UINT32("width", MacfbNubusState, macfb.width, 640),
-+    DEFINE_PROP_UINT32("height", MacfbNubusState, macfb.height, 480),
-+    DEFINE_PROP_UINT8("depth", MacfbNubusState, macfb.depth, 8),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void macfb_sysbus_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = macfb_sysbus_realize;
-+    dc->desc = "SysBus Macintosh framebuffer";
-+    dc->reset = macfb_sysbus_reset;
-+    dc->vmsd = &vmstate_macfb;
-+    dc->props = macfb_sysbus_properties;
-+}
-+
-+static void macfb_nubus_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    MacfbNubusDeviceClass *ndc = MACFB_NUBUS_DEVICE_CLASS(klass);
-+
-+    device_class_set_parent_realize(dc, macfb_nubus_realize,
-+                                    &ndc->parent_realize);
-+    dc->desc = "Nubus Macintosh framebuffer";
-+    dc->reset = macfb_nubus_reset;
-+    dc->vmsd = &vmstate_macfb;
-+    dc->props = macfb_nubus_properties;
-+}
-+
-+static TypeInfo macfb_sysbus_info = {
-+    .name          = TYPE_MACFB,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(MacfbSysBusState),
-+    .class_init    = macfb_sysbus_class_init,
-+};
-+
-+static TypeInfo macfb_nubus_info = {
-+    .name          = TYPE_NUBUS_MACFB,
-+    .parent        = TYPE_NUBUS_DEVICE,
-+    .instance_size = sizeof(MacfbNubusState),
-+    .class_init    = macfb_nubus_class_init,
-+    .class_size    = sizeof(MacfbNubusDeviceClass),
-+};
-+
-+static void macfb_register_types(void)
-+{
-+    type_register_static(&macfb_sysbus_info);
-+    type_register_static(&macfb_nubus_info);
-+}
-+
-+type_init(macfb_register_types)
+ F: include/hw/display/macfb.h
 diff --git a/hw/m68k/Kconfig b/hw/m68k/Kconfig
-index 947cd42c01..ef4917dee6 100644
+index bab4885ca5..c757e7dfa4 100644
 --- a/hw/m68k/Kconfig
 +++ b/hw/m68k/Kconfig
-@@ -17,3 +17,4 @@ config Q800
-     bool
-     select MAC_VIA
+@@ -19,3 +19,6 @@ config Q800
      select NUBUS
-+    select MACFB
-diff --git a/include/hw/display/macfb.h b/include/hw/display/macfb.h
+     select MACFB
+     select SWIM
++    select ESCC
++    select ESP
++    select DP8393X
+diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
+index f25854730d..b2c9e5ab12 100644
+--- a/hw/m68k/Makefile.objs
++++ b/hw/m68k/Makefile.objs
+@@ -1,3 +1,4 @@
+ obj-$(CONFIG_AN5206) += an5206.o mcf5206.o
+ obj-$(CONFIG_MCF5208) += mcf5208.o mcf_intc.o
+ obj-$(CONFIG_NEXTCUBE) += next-kbd.o next-cube.o
++obj-$(CONFIG_Q800) += q800.o
+diff --git a/hw/m68k/bootinfo.h b/hw/m68k/bootinfo.h
 new file mode 100644
-index 0000000000..26367ae2c4
+index 0000000000..5f8ded2686
 --- /dev/null
-+++ b/include/hw/display/macfb.h
-@@ -0,0 +1,64 @@
++++ b/hw/m68k/bootinfo.h
+@@ -0,0 +1,114 @@
 +/*
-+ * QEMU Motorola 680x0 Macintosh Video Card Emulation
-+ *                 Copyright (c) 2012-2018 Laurent Vivier
++ * SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note
 + *
-+ * some parts from QEMU G364 framebuffer Emulator.
-+ *                 Copyright (c) 2007-2011 Herve Poussineau
++ * Bootinfo tags from linux bootinfo.h and bootinfo-mac.h:
++ * This is an easily parsable and extendable structure containing all
++ * information to be passed from the bootstrap to the kernel
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
++ * This structure is copied right after the kernel by the bootstrap
++ * routine.
 + */
 +
-+#ifndef MACFB_H
-+#define MACFB_H
++#ifndef HW_M68K_BOOTINFO_H
++#define HW_M68K_BOOTINFO_H
++struct bi_record {
++    uint16_t tag;        /* tag ID */
++    uint16_t size;       /* size of record */
++    uint32_t data[0];    /* data */
++};
++
++/* machine independent tags */
++
++#define BI_LAST         0x0000 /* last record */
++#define BI_MACHTYPE     0x0001 /* machine type (u_long) */
++#define BI_CPUTYPE      0x0002 /* cpu type (u_long) */
++#define BI_FPUTYPE      0x0003 /* fpu type (u_long) */
++#define BI_MMUTYPE      0x0004 /* mmu type (u_long) */
++#define BI_MEMCHUNK     0x0005 /* memory chunk address and size */
++                               /* (struct mem_info) */
++#define BI_RAMDISK      0x0006 /* ramdisk address and size */
++                               /* (struct mem_info) */
++#define BI_COMMAND_LINE 0x0007 /* kernel command line parameters */
++                               /* (string) */
++
++/*  Macintosh-specific tags (all u_long) */
++
++#define BI_MAC_MODEL    0x8000  /* Mac Gestalt ID (model type) */
++#define BI_MAC_VADDR    0x8001  /* Mac video base address */
++#define BI_MAC_VDEPTH   0x8002  /* Mac video depth */
++#define BI_MAC_VROW     0x8003  /* Mac video rowbytes */
++#define BI_MAC_VDIM     0x8004  /* Mac video dimensions */
++#define BI_MAC_VLOGICAL 0x8005  /* Mac video logical base */
++#define BI_MAC_SCCBASE  0x8006  /* Mac SCC base address */
++#define BI_MAC_BTIME    0x8007  /* Mac boot time */
++#define BI_MAC_GMTBIAS  0x8008  /* Mac GMT timezone offset */
++#define BI_MAC_MEMSIZE  0x8009  /* Mac RAM size (sanity check) */
++#define BI_MAC_CPUID    0x800a  /* Mac CPU type (sanity check) */
++#define BI_MAC_ROMBASE  0x800b  /* Mac system ROM base address */
++
++/*  Macintosh hardware profile data */
++
++#define BI_MAC_VIA1BASE 0x8010  /* Mac VIA1 base address (always present) */
++#define BI_MAC_VIA2BASE 0x8011  /* Mac VIA2 base address (type varies) */
++#define BI_MAC_VIA2TYPE 0x8012  /* Mac VIA2 type (VIA, RBV, OSS) */
++#define BI_MAC_ADBTYPE  0x8013  /* Mac ADB interface type */
++#define BI_MAC_ASCBASE  0x8014  /* Mac Apple Sound Chip base address */
++#define BI_MAC_SCSI5380 0x8015  /* Mac NCR 5380 SCSI (base address, multi) */
++#define BI_MAC_SCSIDMA  0x8016  /* Mac SCSI DMA (base address) */
++#define BI_MAC_SCSI5396 0x8017  /* Mac NCR 53C96 SCSI (base address, multi) */
++#define BI_MAC_IDETYPE  0x8018  /* Mac IDE interface type */
++#define BI_MAC_IDEBASE  0x8019  /* Mac IDE interface base address */
++#define BI_MAC_NUBUS    0x801a  /* Mac Nubus type (none, regular, pseudo) */
++#define BI_MAC_SLOTMASK 0x801b  /* Mac Nubus slots present */
++#define BI_MAC_SCCTYPE  0x801c  /* Mac SCC serial type (normal, IOP) */
++#define BI_MAC_ETHTYPE  0x801d  /* Mac builtin ethernet type (Sonic, MACE */
++#define BI_MAC_ETHBASE  0x801e  /* Mac builtin ethernet base address */
++#define BI_MAC_PMU      0x801f  /* Mac power management / poweroff hardware */
++#define BI_MAC_IOP_SWIM 0x8020  /* Mac SWIM floppy IOP */
++#define BI_MAC_IOP_ADB  0x8021  /* Mac ADB IOP */
++
++#define BOOTINFO0(as, base, id) \
++    do { \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, sizeof(struct bi_record)); \
++        base += 2; \
++    } while (0)
++
++#define BOOTINFO1(as, base, id, value) \
++    do { \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, sizeof(struct bi_record) + 4); \
++        base += 2; \
++        stl_phys(as, base, value); \
++        base += 4; \
++    } while (0)
++
++#define BOOTINFO2(as, base, id, value1, value2) \
++    do { \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, sizeof(struct bi_record) + 8); \
++        base += 2; \
++        stl_phys(as, base, value1); \
++        base += 4; \
++        stl_phys(as, base, value2); \
++        base += 4; \
++    } while (0)
++
++#define BOOTINFOSTR(as, base, id, string) \
++    do { \
++        int i; \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, \
++                 (sizeof(struct bi_record) + strlen(string) + 2) & ~1); \
++        base += 2; \
++        for (i = 0; string[i]; i++) { \
++            stb_phys(as, base++, string[i]); \
++        } \
++        stb_phys(as, base++, 0); \
++        base = (parameters_base + 1) & ~1; \
++    } while (0)
++#endif
+diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
+new file mode 100644
+index 0000000000..039bfbd88b
+--- /dev/null
++++ b/hw/m68k/q800.c
+@@ -0,0 +1,394 @@
++/*
++ * QEMU Motorla 680x0 Macintosh hardware System Emulator
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
 +
 +#include "qemu/osdep.h"
-+#include "exec/memory.h"
++#include "qemu-common.h"
++#include "sysemu/sysemu.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "hw/boards.h"
++#include "hw/irq.h"
++#include "elf.h"
++#include "hw/loader.h"
 +#include "ui/console.h"
++#include "exec/address-spaces.h"
++#include "hw/char/escc.h"
++#include "hw/sysbus.h"
++#include "hw/scsi/esp.h"
++#include "bootinfo.h"
++#include "hw/misc/mac_via.h"
++#include "hw/input/adb.h"
++#include "hw/nubus/mac-nubus-bridge.h"
++#include "hw/display/macfb.h"
++#include "hw/block/swim.h"
++#include "net/net.h"
++#include "qapi/error.h"
++#include "sysemu/qtest.h"
++#include "sysemu/runstate.h"
++#include "sysemu/reset.h"
 +
-+typedef struct MacfbState {
-+    MemoryRegion mem_vram;
-+    MemoryRegion mem_ctrl;
-+    QemuConsole *con;
++#define MACROM_ADDR     0x40000000
++#define MACROM_SIZE     0x00100000
 +
-+    uint8_t *vram;
-+    uint32_t vram_bit_mask;
-+    uint32_t palette_current;
-+    uint8_t color_palette[256 * 3];
-+    uint32_t width, height; /* in pixels */
-+    uint8_t depth;
-+} MacfbState;
++#define MACROM_FILENAME "MacROM.bin"
 +
-+#define TYPE_MACFB "sysbus-macfb"
-+#define MACFB(obj) \
-+    OBJECT_CHECK(MacfbSysBusState, (obj), TYPE_MACFB)
++#define Q800_MACHINE_ID 35
++#define Q800_CPU_ID (1 << 2)
++#define Q800_FPU_ID (1 << 2)
++#define Q800_MMU_ID (1 << 2)
++
++#define MACH_MAC        3
++#define Q800_MAC_CPU_ID 2
++
++#define VIA_BASE              0x50f00000
++#define SONIC_PROM_BASE       0x50f08000
++#define SONIC_BASE            0x50f0a000
++#define SCC_BASE              0x50f0c020
++#define ESP_BASE              0x50f10000
++#define ESP_PDMA              0x50f10100
++#define ASC_BASE              0x50F14000
++#define SWIM_BASE             0x50F1E000
++#define NUBUS_SUPER_SLOT_BASE 0x60000000
++#define NUBUS_SLOT_BASE       0xf0000000
++
++/*
++ * the video base, whereas it a Nubus address,
++ * is needed by the kernel to have early display and
++ * thus provided by the bootloader
++ */
++#define VIDEO_BASE            0xf9001000
++
++#define MAC_CLOCK  3686418
++
++/*
++ * The GLUE (General Logic Unit) is an Apple custom integrated circuit chip
++ * that performs a variety of functions (RAM management, clock generation, ...).
++ * The GLUE chip receives interrupt requests from various devices,
++ * assign priority to each, and asserts one or more interrupt line to the
++ * CPU.
++ */
 +
 +typedef struct {
-+    SysBusDevice busdev;
++    M68kCPU *cpu;
++    uint8_t ipr;
++} GLUEState;
 +
-+    MacfbState macfb;
-+} MacfbSysBusState;
++static void GLUE_set_irq(void *opaque, int irq, int level)
++{
++    GLUEState *s = opaque;
++    int i;
 +
-+#define MACFB_NUBUS_DEVICE_CLASS(class) \
-+    OBJECT_CLASS_CHECK(MacfbNubusDeviceClass, (class), TYPE_NUBUS_MACFB)
-+#define MACFB_NUBUS_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(MacfbNubusDeviceClass, (obj), TYPE_NUBUS_MACFB)
++    if (level) {
++        s->ipr |= 1 << irq;
++    } else {
++        s->ipr &= ~(1 << irq);
++    }
 +
-+typedef struct MacfbNubusDeviceClass {
-+    DeviceClass parent_class;
++    for (i = 7; i >= 0; i--) {
++        if ((s->ipr >> i) & 1) {
++            m68k_set_irq_level(s->cpu, i + 1, i + 25);
++            return;
++        }
++    }
++    m68k_set_irq_level(s->cpu, 0, 0);
++}
 +
-+    DeviceRealize parent_realize;
-+} MacfbNubusDeviceClass;
++static void main_cpu_reset(void *opaque)
++{
++    M68kCPU *cpu = opaque;
++    CPUState *cs = CPU(cpu);
 +
-+#define TYPE_NUBUS_MACFB "nubus-macfb"
-+#define NUBUS_MACFB(obj) \
-+    OBJECT_CHECK(MacfbNubusState, (obj), TYPE_NUBUS_MACFB)
++    cpu_reset(cs);
++    cpu->env.aregs[7] = ldl_phys(cs->as, 0);
++    cpu->env.pc = ldl_phys(cs->as, 4);
++}
 +
-+typedef struct {
-+    NubusDevice busdev;
++static void q800_init(MachineState *machine)
++{
++    M68kCPU *cpu = NULL;
++    int linux_boot;
++    int32_t kernel_size;
++    uint64_t elf_entry;
++    char *filename;
++    int bios_size;
++    ram_addr_t initrd_base;
++    int32_t initrd_size;
++    MemoryRegion *rom;
++    MemoryRegion *ram;
++    ram_addr_t ram_size = machine->ram_size;
++    const char *kernel_filename = machine->kernel_filename;
++    const char *initrd_filename = machine->initrd_filename;
++    const char *kernel_cmdline = machine->kernel_cmdline;
++    hwaddr parameters_base;
++    CPUState *cs;
++    DeviceState *dev;
++    DeviceState *via_dev;
++    SysBusESPState *sysbus_esp;
++    ESPState *esp;
++    SysBusDevice *sysbus;
++    BusState *adb_bus;
++    NubusBus *nubus;
++    GLUEState *irq;
++    qemu_irq *pic;
 +
-+    MacfbState macfb;
-+} MacfbNubusState;
++    linux_boot = (kernel_filename != NULL);
 +
-+#endif
-diff --git a/qemu-options.hx b/qemu-options.hx
-index bbfd936d29..e14b0b2beb 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1798,7 +1798,7 @@ ETEXI
- 
- DEF("g", 1, QEMU_OPTION_g ,
-     "-g WxH[xDEPTH]  Set the initial graphical resolution and depth\n",
--    QEMU_ARCH_PPC | QEMU_ARCH_SPARC)
-+    QEMU_ARCH_PPC | QEMU_ARCH_SPARC | QEMU_ARCH_M68K)
- STEXI
- @item -g @var{width}x@var{height}[x@var{depth}]
- @findex -g
-diff --git a/vl.c b/vl.c
-index 630f5c5e9c..aa02e5b735 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3270,7 +3270,8 @@ int main(int argc, char **argv, char **envp)
-                     if (*p == 'x') {
-                         p++;
-                         depth = strtol(p, (char **)&p, 10);
--                        if (depth != 8 && depth != 15 && depth != 16 &&
-+                        if (depth != 1 && depth != 2 && depth != 4 &&
-+                            depth != 8 && depth != 15 && depth != 16 &&
-                             depth != 24 && depth != 32)
-                             goto graphic_error;
-                     } else if (*p == '\0') {
++    /* init CPUs */
++    cpu = M68K_CPU(cpu_create(machine->cpu_type));
++    qemu_register_reset(main_cpu_reset, cpu);
++
++    ram = g_malloc(sizeof(*ram));
++    memory_region_init_ram(ram, NULL, "m68k_mac.ram", ram_size, &error_abort);
++    memory_region_add_subregion(get_system_memory(), 0, ram);
++
++    /* IRQ Glue */
++
++    irq = g_new0(GLUEState, 1);
++    irq->cpu = cpu;
++    pic = qemu_allocate_irqs(GLUE_set_irq, irq, 8);
++
++    /* VIA */
++
++    via_dev = qdev_create(NULL, TYPE_MAC_VIA);
++    qdev_init_nofail(via_dev);
++    sysbus = SYS_BUS_DEVICE(via_dev);
++    sysbus_mmio_map(sysbus, 0, VIA_BASE);
++    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 0, pic[0]);
++    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 1, pic[1]);
++
++
++    adb_bus = qdev_get_child_bus(via_dev, "adb.0");
++    dev = qdev_create(adb_bus, TYPE_ADB_KEYBOARD);
++    qdev_init_nofail(dev);
++    dev = qdev_create(adb_bus, TYPE_ADB_MOUSE);
++    qdev_init_nofail(dev);
++
++    /* MACSONIC */
++
++    if (nb_nics > 1) {
++        error_report("q800 can only have one ethernet interface");
++        exit(1);
++    }
++
++    qemu_check_nic_model(&nd_table[0], "dp83932");
++
++    /*
++     * MacSonic driver needs an Apple MAC address
++     * Valid prefix are:
++     * 00:05:02 Apple
++     * 00:80:19 Dayna Communications, Inc.
++     * 00:A0:40 Apple
++     * 08:00:07 Apple
++     * (Q800 use the last one)
++     */
++    nd_table[0].macaddr.a[0] = 0x08;
++    nd_table[0].macaddr.a[1] = 0x00;
++    nd_table[0].macaddr.a[2] = 0x07;
++
++    dev = qdev_create(NULL, "dp8393x");
++    qdev_set_nic_properties(dev, &nd_table[0]);
++    qdev_prop_set_uint8(dev, "it_shift", 2);
++    qdev_prop_set_bit(dev, "big_endian", true);
++    qdev_prop_set_ptr(dev, "dma_mr", get_system_memory());
++    qdev_init_nofail(dev);
++    sysbus = SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(sysbus, 0, SONIC_BASE);
++    sysbus_mmio_map(sysbus, 1, SONIC_PROM_BASE);
++    sysbus_connect_irq(sysbus, 0, pic[2]);
++
++    /* SCC */
++
++    dev = qdev_create(NULL, TYPE_ESCC);
++    qdev_prop_set_uint32(dev, "disabled", 0);
++    qdev_prop_set_uint32(dev, "frequency", MAC_CLOCK);
++    qdev_prop_set_uint32(dev, "it_shift", 1);
++    qdev_prop_set_bit(dev, "bit_swap", true);
++    qdev_prop_set_chr(dev, "chrA", serial_hd(0));
++    qdev_prop_set_chr(dev, "chrB", serial_hd(1));
++    qdev_prop_set_uint32(dev, "chnBtype", 0);
++    qdev_prop_set_uint32(dev, "chnAtype", 0);
++    qdev_init_nofail(dev);
++    sysbus = SYS_BUS_DEVICE(dev);
++    sysbus_connect_irq(sysbus, 0, pic[3]);
++    sysbus_connect_irq(sysbus, 1, pic[3]);
++    sysbus_mmio_map(sysbus, 0, SCC_BASE);
++
++    /* SCSI */
++
++    dev = qdev_create(NULL, TYPE_ESP);
++    sysbus_esp = ESP_STATE(dev);
++    esp = &sysbus_esp->esp;
++    esp->dma_memory_read = NULL;
++    esp->dma_memory_write = NULL;
++    esp->dma_opaque = NULL;
++    sysbus_esp->it_shift = 4;
++    esp->dma_enabled = 1;
++    qdev_init_nofail(dev);
++
++    sysbus = SYS_BUS_DEVICE(dev);
++    sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in_named(via_dev,
++                                                         "via2-irq",
++                                                         VIA2_IRQ_SCSI_BIT));
++    sysbus_connect_irq(sysbus, 1,
++                       qdev_get_gpio_in_named(via_dev, "via2-irq",
++                                              VIA2_IRQ_SCSI_DATA_BIT));
++    sysbus_mmio_map(sysbus, 0, ESP_BASE);
++    sysbus_mmio_map(sysbus, 1, ESP_PDMA);
++
++    scsi_bus_legacy_handle_cmdline(&esp->bus);
++
++    /* SWIM floppy controller */
++
++    dev = qdev_create(NULL, TYPE_SWIM);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, SWIM_BASE);
++
++    /* NuBus */
++
++    dev = qdev_create(NULL, TYPE_MAC_NUBUS_BRIDGE);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, NUBUS_SUPER_SLOT_BASE);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 1, NUBUS_SLOT_BASE);
++
++    nubus = MAC_NUBUS_BRIDGE(dev)->bus;
++
++    /* framebuffer in nubus slot #9 */
++
++    dev = qdev_create(BUS(nubus), TYPE_NUBUS_MACFB);
++    qdev_prop_set_uint32(dev, "width", graphic_width);
++    qdev_prop_set_uint32(dev, "height", graphic_height);
++    qdev_prop_set_uint8(dev, "depth", graphic_depth);
++    qdev_init_nofail(dev);
++
++    cs = CPU(cpu);
++    if (linux_boot) {
++        uint64_t high;
++        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
++                               &elf_entry, NULL, &high, 1,
++                               EM_68K, 0, 0);
++        if (kernel_size < 0) {
++            error_report("could not load kernel '%s'", kernel_filename);
++            exit(1);
++        }
++        stl_phys(cs->as, 4, elf_entry); /* reset initial PC */
++        parameters_base = (high + 1) & ~1;
++
++        BOOTINFO1(cs->as, parameters_base, BI_MACHTYPE, MACH_MAC);
++        BOOTINFO1(cs->as, parameters_base, BI_FPUTYPE, Q800_FPU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_MMUTYPE, Q800_MMU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_CPUTYPE, Q800_CPU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_CPUID, Q800_MAC_CPU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_MODEL, Q800_MACHINE_ID);
++        BOOTINFO1(cs->as, parameters_base,
++                  BI_MAC_MEMSIZE, ram_size >> 20); /* in MB */
++        BOOTINFO2(cs->as, parameters_base, BI_MEMCHUNK, 0, ram_size);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VADDR, VIDEO_BASE);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VDEPTH, graphic_depth);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VDIM,
++                  (graphic_height << 16) | graphic_width);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VROW,
++                  (graphic_width * graphic_depth + 7) / 8);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_SCCBASE, SCC_BASE);
++
++        if (kernel_cmdline) {
++            BOOTINFOSTR(cs->as, parameters_base, BI_COMMAND_LINE,
++                        kernel_cmdline);
++        }
++
++        /* load initrd */
++        if (initrd_filename) {
++            initrd_size = get_image_size(initrd_filename);
++            if (initrd_size < 0) {
++                error_report("could not load initial ram disk '%s'",
++                             initrd_filename);
++                exit(1);
++            }
++
++            initrd_base = (ram_size - initrd_size) & TARGET_PAGE_MASK;
++            load_image_targphys(initrd_filename, initrd_base,
++                                ram_size - initrd_base);
++            BOOTINFO2(cs->as, parameters_base, BI_RAMDISK, initrd_base,
++                      initrd_size);
++        } else {
++            initrd_base = 0;
++            initrd_size = 0;
++        }
++        BOOTINFO0(cs->as, parameters_base, BI_LAST);
++    } else {
++        uint8_t *ptr;
++        /* allocate and load BIOS */
++        rom = g_malloc(sizeof(*rom));
++        memory_region_init_ram(rom, NULL, "m68k_mac.rom", MACROM_SIZE,
++                               &error_abort);
++        if (bios_name == NULL) {
++            bios_name = MACROM_FILENAME;
++        }
++        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
++        memory_region_set_readonly(rom, true);
++        memory_region_add_subregion(get_system_memory(), MACROM_ADDR, rom);
++
++        /* Load MacROM binary */
++        if (filename) {
++            bios_size = load_image_targphys(filename, MACROM_ADDR, MACROM_SIZE);
++            g_free(filename);
++        } else {
++            bios_size = -1;
++        }
++
++        /* Remove qtest_enabled() check once firmware files are in the tree */
++        if (!qtest_enabled()) {
++            if (bios_size < 0 || bios_size > MACROM_SIZE) {
++                error_report("could not load MacROM '%s'", bios_name);
++                exit(1);
++            }
++
++            ptr = rom_ptr(MACROM_ADDR, MACROM_SIZE);
++            stl_phys(cs->as, 0, ldl_p(ptr));    /* reset initial SP */
++            stl_phys(cs->as, 4,
++                     MACROM_ADDR + ldl_p(ptr + 4)); /* reset initial PC */
++        }
++    }
++}
++
++static void q800_machine_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++    mc->desc = "Macintosh Quadra 800";
++    mc->init = q800_init;
++    mc->default_cpu_type = M68K_CPU_TYPE_NAME("m68040");
++    mc->max_cpus = 1;
++    mc->is_default = 0;
++    mc->block_default_type = IF_SCSI;
++}
++
++static const TypeInfo q800_machine_typeinfo = {
++    .name       = MACHINE_TYPE_NAME("q800"),
++    .parent     = TYPE_MACHINE,
++    .class_init = q800_machine_class_init,
++};
++
++static void q800_machine_register_types(void)
++{
++    type_register_static(&q800_machine_typeinfo);
++}
++
++type_init(q800_machine_register_types)
 -- 
 2.21.0
 
