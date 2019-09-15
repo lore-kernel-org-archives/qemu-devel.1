@@ -2,94 +2,84 @@ Return-Path: <SRS0=GetT=XK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1CE3C4CEC7
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 19:30:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49909C4CECD
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 19:31:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB81320873
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 19:30:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 15C522067D
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 19:31:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jrlx9cGD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB81320873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="U0/GS2YT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15C522067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9aDg-0003nf-SW
-	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 15:30:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39930)
+	id 1i9aEi-0003kZ-L3
+	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 15:31:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39569)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i9a7c-0005xR-AE
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 15:23:45 -0400
+ (envelope-from <lukasstraub2@web.de>) id 1i9a4R-0003bf-Se
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 15:20:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i9a7a-0001x2-IW
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 15:23:44 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:32769)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1i9a7a-0001wl-A0
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 15:23:42 -0400
-Received: by mail-ed1-x542.google.com with SMTP id c4so2493176edl.0
- for <qemu-devel@nongnu.org>; Sun, 15 Sep 2019 12:23:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=lDG6NNDECQDn4/nyyITVRisGzx5VHFjiAPGOHzavck0=;
- b=jrlx9cGDmj6FGmXnUr0ITnmu6RO5pc/3KV3VIC5u/2wyd9EWjMEpw2FPeahmLRyMRm
- 5J6KB8zJL5u5CxvU9+AydP2p3TqgvuvXrDeYUAmu9WL0qWkvmseG4mp04pOvlQhhNkeM
- djqhbtIhhANWbTtvZbiGxti5D8vj2kTvFSfmgd1vldzx+d7oqHC1VhFm6KKzGMcIRUiw
- /F/MzzXsMDy5sw+S18Chi6S/MxocZXixPNInVMbcbyVuDcS2rCotKXlPC7LL/u+HgcJs
- 2OUjK3iZdo3MnfzkCskaKtItENc3v3Q2vyu8KuL6Tt0JWOR44MsMgK0aFZIgUL7stG+2
- l0pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=lDG6NNDECQDn4/nyyITVRisGzx5VHFjiAPGOHzavck0=;
- b=eii/EbPoANaZbEfhTD2/OijFW9Kn2j1EYgdsCp9qwaPW9cKOl3E9Y6xL34QuMxXhs7
- ZKvVw3s52i53SjkA+mUyKtWhZYbIqpkM9Ah9dAFJii8dER3MRCnzEBQE3Sp5teLddUOn
- 88nnbOHRkbn/pHI5jKB0gX82NyE80aipcWxEsVmyV0g18giN9tUqgBlxD4P5Bd921Gb/
- wxvIkmh7ZrU/kBDUw/++KMzcAM1qHrCCo48iUod68hl4Rlxdt6No+BRwf8ga/tRGfb4t
- GBoKXtx3g/L65YN3KefVpe/AGwJurUlLvfk3CqPS28fNzeVMHvbicpyBi8Q6nvEWFRPt
- dnuw==
-X-Gm-Message-State: APjAAAUdYK5hvTnjShGbHQxMbv+VvxUkimTlnIe9/ABpyagvKNTMZxIZ
- qkTeguDgLDj2Fb+NMBnm4cV+81/q
-X-Google-Smtp-Source: APXvYqzbrVgKDOq8jTOYptEaurBjC+5R/RY8RWcNchZ3l6OJ48vnpo8vvY7Lov45vEGJa7V/5lX/Yw==
-X-Received: by 2002:a05:6402:13d0:: with SMTP id
- a16mr58178216edx.154.1568575421015; 
- Sun, 15 Sep 2019 12:23:41 -0700 (PDT)
-Received: from nullptr.home.dirty-ice.org
- (2a01-036c-0113-74ef-0000-0000-0000-0005.pool6.digikabel.hu.
- [2a01:36c:113:74ef::5])
- by smtp.gmail.com with ESMTPSA id j20sm6480562edy.95.2019.09.15.12.23.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 15 Sep 2019 12:23:40 -0700 (PDT)
-From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
- <dirty.ice.hu@gmail.com>
-X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
- <DirtY.iCE.hu@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Sun, 15 Sep 2019 21:23:18 +0200
-Message-Id: <3978a3642e68da4d0af61c7618fcaa4ee22b009f.1568574965.git.DirtY.iCE.hu@gmail.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <cover.1568574965.git.DirtY.iCE.hu@gmail.com>
-References: <cover.1568574965.git.DirtY.iCE.hu@gmail.com>
+ (envelope-from <lukasstraub2@web.de>) id 1i9a4Q-00012i-V7
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 15:20:27 -0400
+Received: from mout.web.de ([212.227.15.14]:36371)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1i9a4Q-000112-M3
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 15:20:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1568575195;
+ bh=ppWNVTe6sizP2ChzFyAocsWaZ00+Z0YbkfJfWzg8wOo=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
+ b=U0/GS2YTymIVp6kPrtVOF34Q9WBQWfIs1yuH5+hda9pLdZVTDS7RzV5wCSAiG0pW/
+ I1aTuhP8wTY/g3wdCZV4fYxbZO/lpiaTDe3V+E2rNFtaFaTekyukbMmXkGvTs44rcp
+ 5071GXenibbNQqtx0FaoHIP1YfaOSMftSGkgMyF4=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([88.130.61.53]) by smtp.web.de (mrweb004
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MN87U-1i2zPn17Oq-006jR5; Sun, 15
+ Sep 2019 21:19:55 +0200
+Date: Sun, 15 Sep 2019 21:19:50 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: qemu-devel <qemu-devel@nongnu.org>
+Message-ID: <cover.1568574478.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::542
-Subject: [Qemu-devel] [PATCH v3 02/24] alsaaudio: port to the new audio
- backend api
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:afOcVmkcVjSwCj9QnuphNDfip6nfzVGKyItYe92gZ9RHEv7krDu
+ 3ugYjb9bOq4Yvl17Se1Jh5JFZzFHm5FUrvCjmXjk8Rr1h79Qhg7Coa5UYJOVA+NtW9C7aH9
+ LEwdPj7Q33L9LTPPN0DHaWTNky3EZYdXjqGUOv9XMFWgvzBb1DSucamZH+KoLgSm3Sn0fiG
+ bQmuQuSc3YOu+YLxzzNLQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:TNIdZaQIBzg=:tH0P0HyRgJGwCTNm+IStj2
+ v0mIjOs/4OBpuSlkebczyYfARK3QTPraoL8N9dxB0LkSy3/P8bj6XSr33drhgfr8L2dz0wBbT
+ QmGEddOGUXNxDBQAvc2VA/vOZSM1MGOlJECFv8K4L94xdzdDS6Man7xIbS7ORdpQ9Yj4KIdoP
+ W2+qt4dTch9yXGrZqBYBO6uHHHppqM7Dvo0Ea3vV1dj7cqi1Wg3RLxEe4MTERf1LT9PFiDqSc
+ SmT4jVIs/kg+1Z3O2x0ScS5oCeMv/q4EUhNwIqnko9m9X84nYaB3Gc3/i+Q8p/G5cVSmzgGn5
+ P1MFomnISDQjXFzNiEQ7frvl+TzRmmf6XSf0hfewhksyYjd+EOWyRaM1WlXYF412x0uSOf9sm
+ 1xh7dS2vQ/D5mXvCCfaLRaDYWDMibBroKz7UdR/t+a3ELDpB0QI8XzPuPrpjNbMXhLxFcE2tn
+ szdt4D30wiNavpaAfLip2g/1DRRqp8DdYq2BaQ/VN1qw/jU6+0PNCFrqbmY7PtlYY6/f63tkq
+ Jqg6jhSIHRgVAFCg/d7uf4LifK2HS+AZn9QSa4K4rjFwWxkEbNl2oTK1FUECLtQVuSpvgPxZr
+ qctotXic8/Y60DV3Tp++q/iwVM0ubYwgAVJFOdbMXnUxrjXYne0xxSsWRJmTlniaS2YwU2CTl
+ otnJ5qMLDkkkiMmd7G5LZnwMMC/YI0Dw7UxfUiYQT4A4wy7rhoBkHuQeiE7S7diyEdi9/Hw2z
+ E5mthjS037/65s1efPJP3VIH6javI0u5Ik3CIqCABrRJeYE/0CQmNrBx/DOhYuT+HQKxyJ3d+
+ PY4SH7I1X6dNgVhxmAUQ0dmMrnNbhMauiRrXz0oMQx+MtTaVugekIC/FoTxE1rlSZigaiEdj0
+ BCyOQO+imE0X1GSvzzlqaeGe9fVc6Itaw/V/Un1B9DK1eaml7vMcPEc162xfSEt0AnjgwlktY
+ W0LzcLpdlRxuKzCRFip1iq6LeQLnBuBFPlyH61+TF7mWxKeERzgsQBOKY6Igv6CQp8iP/xoT2
+ aFarAymM/Km0Mv4O9Wz/xyHD8O2/L4yjMRTAv573QulJi+gQGJfTo/AsFQfgcpDOA4HsyDx73
+ 7bcuhxjRjnFuKjXy1ID3Q+j2ayHvGsY6aM1i6c3ASpIBQtRFzCZR3Bw3yy9mI++Z1NglIUf09
+ IEX3wgPlj9hhOyErqZz5wePuXeV0o1cbPinNLJ6hI9n9gziyd8nO2sSDJh3MfbAiObXj0+AjF
+ t+B53FJV//8pPDIXJqs7tcNcIf/IyeK4JtVhwHejFTh0VTgjq3NDwogK/Mmc=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.15.14
+Subject: [Qemu-devel] [PATCH v5 0/4] colo: Add support for continuous
+ replication
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,405 +91,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: kwolf@redhat.com, Wen Congyang <wencongyang2@huawei.com>,
+ Jason Wang <jasowang@redhat.com>, mreitz@redhat.com,
+ Zhang Chen <chen.zhang@intel.com>, Xie Changlong <xiechanglong.d@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
----
- audio/alsaaudio.c | 302 ++++++++++++----------------------------------
- 1 file changed, 80 insertions(+), 222 deletions(-)
+Hello Everyone,
+These Patches add support for continuous replication to colo. This means
+that after the Primary fails and the Secondary did a failover, the Seconda=
+ry
+can then become Primary and resume replication to a new Secondary.
 
-diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
-index 591344dccd..19124d09d8 100644
---- a/audio/alsaaudio.c
-+++ b/audio/alsaaudio.c
-@@ -44,9 +44,6 @@ struct pollhlp {
- 
- typedef struct ALSAVoiceOut {
-     HWVoiceOut hw;
--    int wpos;
--    int pending;
--    void *pcm_buf;
-     snd_pcm_t *handle;
-     struct pollhlp pollhlp;
-     Audiodev *dev;
-@@ -55,7 +52,6 @@ typedef struct ALSAVoiceOut {
- typedef struct ALSAVoiceIn {
-     HWVoiceIn hw;
-     snd_pcm_t *handle;
--    void *pcm_buf;
-     struct pollhlp pollhlp;
-     Audiodev *dev;
- } ALSAVoiceIn;
-@@ -602,102 +598,64 @@ static int alsa_open(bool in, struct alsa_params_req *req,
-     return -1;
- }
- 
--static snd_pcm_sframes_t alsa_get_avail (snd_pcm_t *handle)
-+static size_t alsa_write(HWVoiceOut *hw, void *buf, size_t len)
- {
--    snd_pcm_sframes_t avail;
--
--    avail = snd_pcm_avail_update (handle);
--    if (avail < 0) {
--        if (avail == -EPIPE) {
--            if (!alsa_recover (handle)) {
--                avail = snd_pcm_avail_update (handle);
--            }
--        }
--
--        if (avail < 0) {
--            alsa_logerr (avail,
--                         "Could not obtain number of available frames\n");
--            return -1;
--        }
--    }
-+    ALSAVoiceOut *alsa = (ALSAVoiceOut *) hw;
-+    size_t pos = 0;
-+    size_t len_frames = len >> hw->info.shift;
-+
-+    while (len_frames) {
-+        char *src = advance(buf, pos);
-+        snd_pcm_sframes_t written;
-+
-+        written = snd_pcm_writei(alsa->handle, src, len_frames);
-+
-+        if (written <= 0) {
-+            switch (written) {
-+            case 0:
-+                trace_alsa_wrote_zero(len_frames);
-+                return pos;
-+
-+            case -EPIPE:
-+                if (alsa_recover(alsa->handle)) {
-+                    alsa_logerr(written, "Failed to write %zu frames\n",
-+                                len_frames);
-+                    return pos;
-+                }
-+                trace_alsa_xrun_out();
-+                continue;
-+
-+            case -ESTRPIPE:
-+                /*
-+                 * stream is suspended and waiting for an application
-+                 * recovery
-+                 */
-+                if (alsa_resume(alsa->handle)) {
-+                    alsa_logerr(written, "Failed to write %zu frames\n",
-+                                len_frames);
-+                    return pos;
-+                }
-+                trace_alsa_resume_out();
-+                continue;
- 
--    return avail;
--}
-+            case -EAGAIN:
-+                return pos;
- 
--static void alsa_write_pending (ALSAVoiceOut *alsa)
--{
--    HWVoiceOut *hw = &alsa->hw;
--
--    while (alsa->pending) {
--        int left_till_end_samples = hw->samples - alsa->wpos;
--        int len = MIN (alsa->pending, left_till_end_samples);
--        char *src = advance (alsa->pcm_buf, alsa->wpos << hw->info.shift);
--
--        while (len) {
--            snd_pcm_sframes_t written;
--
--            written = snd_pcm_writei (alsa->handle, src, len);
--
--            if (written <= 0) {
--                switch (written) {
--                case 0:
--                    trace_alsa_wrote_zero(len);
--                    return;
--
--                case -EPIPE:
--                    if (alsa_recover (alsa->handle)) {
--                        alsa_logerr (written, "Failed to write %d frames\n",
--                                     len);
--                        return;
--                    }
--                    trace_alsa_xrun_out();
--                    continue;
--
--                case -ESTRPIPE:
--                    /* stream is suspended and waiting for an
--                       application recovery */
--                    if (alsa_resume (alsa->handle)) {
--                        alsa_logerr (written, "Failed to write %d frames\n",
--                                     len);
--                        return;
--                    }
--                    trace_alsa_resume_out();
--                    continue;
--
--                case -EAGAIN:
--                    return;
--
--                default:
--                    alsa_logerr (written, "Failed to write %d frames from %p\n",
--                                 len, src);
--                    return;
--                }
-+            default:
-+                alsa_logerr(written, "Failed to write %zu frames from %p\n",
-+                            len, src);
-+                return pos;
-             }
--
--            alsa->wpos = (alsa->wpos + written) % hw->samples;
--            alsa->pending -= written;
--            len -= written;
-         }
--    }
--}
--
--static size_t alsa_run_out(HWVoiceOut *hw, size_t live)
--{
--    ALSAVoiceOut *alsa = (ALSAVoiceOut *) hw;
--    size_t decr;
--    snd_pcm_sframes_t avail;
- 
--    avail = alsa_get_avail (alsa->handle);
--    if (avail < 0) {
--        dolog ("Could not get number of available playback frames\n");
--        return 0;
-+        pos += written << hw->info.shift;
-+        if (written < len_frames) {
-+            break;
-+        }
-+        len_frames -= written;
-     }
- 
--    decr = MIN (live, avail);
--    decr = audio_pcm_hw_clip_out (hw, alsa->pcm_buf, decr, alsa->pending);
--    alsa->pending += decr;
--    alsa_write_pending (alsa);
--    return decr;
-+    return pos;
- }
- 
- static void alsa_fini_out (HWVoiceOut *hw)
-@@ -706,9 +664,6 @@ static void alsa_fini_out (HWVoiceOut *hw)
- 
-     ldebug ("alsa_fini\n");
-     alsa_anal_close (&alsa->handle, &alsa->pollhlp);
--
--    g_free(alsa->pcm_buf);
--    alsa->pcm_buf = NULL;
- }
- 
- static int alsa_init_out(HWVoiceOut *hw, struct audsettings *as,
-@@ -737,14 +692,6 @@ static int alsa_init_out(HWVoiceOut *hw, struct audsettings *as,
-     audio_pcm_init_info (&hw->info, &obt_as);
-     hw->samples = obt.samples;
- 
--    alsa->pcm_buf = audio_calloc(__func__, obt.samples, 1 << hw->info.shift);
--    if (!alsa->pcm_buf) {
--        dolog("Could not allocate DAC buffer (%zu samples, each %d bytes)\n",
--              hw->samples, 1 << hw->info.shift);
--        alsa_anal_close1 (&handle);
--        return -1;
--    }
--
-     alsa->pollhlp.s = hw->s;
-     alsa->handle = handle;
-     alsa->dev = dev;
-@@ -839,14 +786,6 @@ static int alsa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-     audio_pcm_init_info (&hw->info, &obt_as);
-     hw->samples = obt.samples;
- 
--    alsa->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
--    if (!alsa->pcm_buf) {
--        dolog("Could not allocate ADC buffer (%zu samples, each %d bytes)\n",
--              hw->samples, 1 << hw->info.shift);
--        alsa_anal_close1 (&handle);
--        return -1;
--    }
--
-     alsa->pollhlp.s = hw->s;
-     alsa->handle = handle;
-     alsa->dev = dev;
-@@ -858,129 +797,48 @@ static void alsa_fini_in (HWVoiceIn *hw)
-     ALSAVoiceIn *alsa = (ALSAVoiceIn *) hw;
- 
-     alsa_anal_close (&alsa->handle, &alsa->pollhlp);
--
--    g_free(alsa->pcm_buf);
--    alsa->pcm_buf = NULL;
- }
- 
--static size_t alsa_run_in(HWVoiceIn *hw)
-+static size_t alsa_read(HWVoiceIn *hw, void *buf, size_t len)
- {
-     ALSAVoiceIn *alsa = (ALSAVoiceIn *) hw;
--    int hwshift = hw->info.shift;
--    int i;
--    size_t live = audio_pcm_hw_get_live_in (hw);
--    size_t dead = hw->samples - live;
--    size_t decr;
--    struct {
--        size_t add;
--        size_t len;
--    } bufs[2] = {
--        { .add = hw->wpos, .len = 0 },
--        { .add = 0,        .len = 0 }
--    };
--    snd_pcm_sframes_t avail;
--    snd_pcm_uframes_t read_samples = 0;
--
--    if (!dead) {
--        return 0;
--    }
-+    size_t pos = 0;
- 
--    avail = alsa_get_avail (alsa->handle);
--    if (avail < 0) {
--        dolog ("Could not get number of captured frames\n");
--        return 0;
--    }
--
--    if (!avail) {
--        snd_pcm_state_t state;
--
--        state = snd_pcm_state (alsa->handle);
--        switch (state) {
--        case SND_PCM_STATE_PREPARED:
--            avail = hw->samples;
--            break;
--        case SND_PCM_STATE_SUSPENDED:
--            /* stream is suspended and waiting for an application recovery */
--            if (alsa_resume (alsa->handle)) {
--                dolog ("Failed to resume suspended input stream\n");
--                return 0;
--            }
--            trace_alsa_resume_in();
--            break;
--        default:
--            trace_alsa_no_frames(state);
--            return 0;
--        }
--    }
-+    while (len) {
-+        void *dst = advance(buf, pos);
-+        snd_pcm_sframes_t nread;
- 
--    decr = MIN(dead, avail);
--    if (!decr) {
--        return 0;
--    }
-+        nread = snd_pcm_readi(alsa->handle, dst, len >> hw->info.shift);
- 
--    if (hw->wpos + decr > hw->samples) {
--        bufs[0].len = (hw->samples - hw->wpos);
--        bufs[1].len = (decr - (hw->samples - hw->wpos));
--    }
--    else {
--        bufs[0].len = decr;
--    }
-+        if (nread <= 0) {
-+            switch (nread) {
-+            case 0:
-+                trace_alsa_read_zero(len);
-+                return pos;;
- 
--    for (i = 0; i < 2; ++i) {
--        void *src;
--        struct st_sample *dst;
--        snd_pcm_sframes_t nread;
--        snd_pcm_uframes_t len;
--
--        len = bufs[i].len;
--
--        src = advance (alsa->pcm_buf, bufs[i].add << hwshift);
--        dst = hw->conv_buf + bufs[i].add;
--
--        while (len) {
--            nread = snd_pcm_readi (alsa->handle, src, len);
--
--            if (nread <= 0) {
--                switch (nread) {
--                case 0:
--                    trace_alsa_read_zero(len);
--                    goto exit;
--
--                case -EPIPE:
--                    if (alsa_recover (alsa->handle)) {
--                        alsa_logerr (nread, "Failed to read %ld frames\n", len);
--                        goto exit;
--                    }
--                    trace_alsa_xrun_in();
--                    continue;
--
--                case -EAGAIN:
--                    goto exit;
--
--                default:
--                    alsa_logerr (
--                        nread,
--                        "Failed to read %ld frames from %p\n",
--                        len,
--                        src
--                        );
--                    goto exit;
-+            case -EPIPE:
-+                if (alsa_recover(alsa->handle)) {
-+                    alsa_logerr(nread, "Failed to read %zu frames\n", len);
-+                    return pos;
-                 }
--            }
-+                trace_alsa_xrun_in();
-+                continue;
- 
--            hw->conv (dst, src, nread);
-+            case -EAGAIN:
-+                return pos;
- 
--            src = advance (src, nread << hwshift);
--            dst += nread;
--
--            read_samples += nread;
--            len -= nread;
-+            default:
-+                alsa_logerr(nread, "Failed to read %zu frames to %p\n",
-+                            len, dst);
-+                return pos;;
-+            }
-         }
-+
-+        pos += nread << hw->info.shift;
-+        len -= nread << hw->info.shift;
-     }
- 
-- exit:
--    hw->wpos = (hw->wpos + read_samples) % hw->samples;
--    return read_samples;
-+    return pos;
- }
- 
- static int alsa_ctl_in (HWVoiceIn *hw, int cmd, ...)
-@@ -1065,12 +923,12 @@ static void alsa_audio_fini (void *opaque)
- static struct audio_pcm_ops alsa_pcm_ops = {
-     .init_out = alsa_init_out,
-     .fini_out = alsa_fini_out,
--    .run_out  = alsa_run_out,
-+    .write    = alsa_write,
-     .ctl_out  = alsa_ctl_out,
- 
-     .init_in  = alsa_init_in,
-     .fini_in  = alsa_fini_in,
--    .run_in   = alsa_run_in,
-+    .read     = alsa_read,
-     .ctl_in   = alsa_ctl_in,
- };
- 
--- 
-2.23.0
+On a side note, I wrote a Pacemaker Resource Agent for colo which I will
+post when its ready.
+I have to say it's quite fun to randomly kill a Node, wait for resync
+and repeat and see how the VM stays alive all the time. :)
 
+Regards,
+Lukas Straub
+
+v5:
+ - change syntax for the position=3D parameter
+ - fix spelling mistake
+
+v4:
+ - fix checkpatch.pl warnings
+
+v3:
+ - add test for replication changes
+ - check if the filter to be inserted before/behind belongs to the same in=
+terface
+ - fix the error message for the position=3D parameter
+ - rename term "after" -> "behind" and variable "insert_before" -> "insert=
+_before_flag"
+ - document the quorum node on the secondary side
+ - simplify quorum parameters in documentation
+ - remove trailing spaces in documentation
+ - clarify the testing procedure in documentation
+
+v2:
+ - fix email formating
+ - fix checkpatch.pl warnings
+ - fix patchew error
+ - clearer commit messages
+
+
+Lukas Straub (4):
+  block/replication.c: Ignore requests after failover
+  tests/test-replication.c: Add test for ignoring requests after
+    failover
+  net/filter.c: Add Options to insert filters anywhere in the filter
+    list
+  colo: Update Documentation for continuous replication
+
+ block/replication.c        |  38 ++++++-
+ docs/COLO-FT.txt           | 212 +++++++++++++++++++++++++++----------
+ docs/block-replication.txt |  28 +++--
+ include/net/filter.h       |   2 +
+ net/filter.c               |  92 +++++++++++++++-
+ qemu-options.hx            |  10 +-
+ tests/test-replication.c   |  52 +++++++++
+ 7 files changed, 358 insertions(+), 76 deletions(-)
+
+=2D-
+2.20.1
 
