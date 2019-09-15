@@ -5,79 +5,80 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9023DC4CEC7
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 12:26:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01452C4CEC7
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 12:26:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 592172077C
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 12:26:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D7172077C
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 12:26:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WCmT2nnl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 592172077C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GTvxiJ20"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D7172077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9TbV-0001IV-53
-	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 08:26:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50457)
+	id 1i9Tbs-0001kq-Iz
+	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 08:26:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50518)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1i9TWd-0004yJ-3M
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 08:21:08 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1i9TWo-0005DG-OS
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 08:21:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1i9TWb-0001Ep-Kh
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 08:21:07 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36466)
+ (envelope-from <mrolnik@gmail.com>) id 1i9TWm-0001Oi-FX
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 08:21:18 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45672)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1i9TWb-0001Dz-DM
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 08:21:05 -0400
-Received: by mail-wm1-x343.google.com with SMTP id t3so7212067wmj.1
- for <qemu-devel@nongnu.org>; Sun, 15 Sep 2019 05:21:05 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1i9TWm-0001O3-8C
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 08:21:16 -0400
+Received: by mail-wr1-x442.google.com with SMTP id r5so2157202wrm.12
+ for <qemu-devel@nongnu.org>; Sun, 15 Sep 2019 05:21:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=oElsIV9jGIkcznG1hjJ8A0RR90Xk82sVn+s7o2gFZVw=;
- b=WCmT2nnlOYoTMtxD0KTfBMPlPctq6T0XuFFM3xu/N2CN1UlwbqFF4X7nXhW940XpfD
- uIzK7TKkCQwP2rnIowBIdCCo/B1jachdDQsrzFm919BbYOap4w7ePFxuHAkEO+q/PnpS
- TO1V3lIUArV3u4KCgClE5d7hexVstWAcLdkamKY2ZQB8aTj689AY/ayLtLFBxDMhBkdd
- +R2tUwO29hnNvBWVqePT7TfpsADcAddvLULeLe9pS8AlbgS2MUqlIt6NvdgBbVGo65NH
- FxY7SIXw1la9smOB1KFj7cDm83TXkvo1Augp0BF+C1sCaENiweFYmIbuv/kQioLsPuaJ
- 4g7Q==
+ bh=KnzwXm9DGa8updfHvfNXSEz/qG/OHlkhJSqLyJjiNdY=;
+ b=GTvxiJ20R8Tt1ha8BeY5hcRC9qgoYZgMf3KzTI4fRvSGJ6SQeiXYM+7hyb1gO/XhWT
+ /mZrpHI4nEbiAGBB7EYpwFFukW3IRhfQ8fJMh74tKm91+XQad8TbMizxW9E/p7a8JlkH
+ 27k794Wjjel49/JYUH3uQGWI+C0uxG2Xo0+PyM/i7xObCXrnA2CoGpUkjQlsRGBAgA6c
+ wsxDK63jHLPh4PRuiNuJbN8uLBgmiiYDFBGXhcNyLugGq2oHB87AFJdd/74z/qRmGQxo
+ VEgYcpPsUjxTLbRsM5Bn3wCui0u9fm4uQ1tGOrgrbAFZtRm804vPJfjk17hxqzdrzsLE
+ WBOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=oElsIV9jGIkcznG1hjJ8A0RR90Xk82sVn+s7o2gFZVw=;
- b=TviMYlXPhTqEnGX/46MzCAAU9BB6PttzF6BAh9X7Tdct00Rrw46S9XwsiRlwcFdKse
- lsmivSmQWJXJr2Av2l9uuNMalTx9yWNw6DwEMOBhqdFJVyBBobnyyrVx7N244IlO+7PJ
- jIRez+iHCgZlLZ+lEBHl2CRoA0ldgQxR6QpmcfUGsmegPivRUcGjT0ZbsEtVaKQ1DX5E
- GqX1BRoeuf44dwP12kOF/n8sTaS5I4lOIkDxIDeRpZfBstUgCmUIFqBsfU/r7gxnMxis
- 3HSpggHxcOU+xXvC1O5vP6tCejX/x6kEOuvI+HCbrfTbmXXZr/W6uMrxZMqZppDd47FQ
- sMWg==
-X-Gm-Message-State: APjAAAWTPAZ3ks+3jBmv58H/nGFr9AQ6hQb4q5aiS3XRPsOl2PtgcWvA
- IEx5exImPIWrLw21iuzQ690vOo9GXuclaQ==
-X-Google-Smtp-Source: APXvYqw+fe3y4bGlYzZ/NsDAvRvrtrYI2uTNV0fRRVTZf93Qt37uAnHchGJjo3hGa6LYa42Nfo3ocw==
-X-Received: by 2002:a1c:eb06:: with SMTP id j6mr11065382wmh.76.1568550063904; 
- Sun, 15 Sep 2019 05:21:03 -0700 (PDT)
+ bh=KnzwXm9DGa8updfHvfNXSEz/qG/OHlkhJSqLyJjiNdY=;
+ b=HWxmkyoy8pQI4YCEJsWGGrT0M0Q94v3QuMj2EBQxRhN2ypk1F+4qmcgHkd76rlD3h2
+ EbBHl8+uJdLxcmk9EGH9ZgZAomS9sZT5cC254EFKQyd8zki21ikQlvQHIZO5WW5dk59k
+ vtPop9INnR5NuU2DF3O6ZDWFx58P0dUp68LdgZSI5JHboeAq6CWUhO25ZhMMOvWqp80c
+ s6YR/UDVGr9Im2vMNDnv7ZHrSrnzKqT05ohivd+wo5pXEFatmxPCsCi3aGq+nZR9i61L
+ /F46wKGHnaU9TA72swWqfNXJL+rl2EZfvwoEiroJSGRc3aVP+f/TAyG89gPTpcUB4bAJ
+ ujHA==
+X-Gm-Message-State: APjAAAXfcAY3u0qQRNruqqhiuPkTcEC2dkAPHo+kWhzeO/7OPqp1pLCe
+ nlPwcFR59h+Z7kvGJfQhE0m0mDPbESa6Hg==
+X-Google-Smtp-Source: APXvYqzUGQzm7dglTPDzG5iDkApyZh1BLoIXdA97yls0caPPU211bdjonZN9ekFOmBCgbrUf9NDISg==
+X-Received: by 2002:adf:e410:: with SMTP id g16mr13044362wrm.297.1568550074842; 
+ Sun, 15 Sep 2019 05:21:14 -0700 (PDT)
 Received: from 8c859074c0ff.ant.amazon.com.com ([213.57.17.146])
- by smtp.gmail.com with ESMTPSA id b194sm15947032wmg.46.2019.09.15.05.21.02
+ by smtp.gmail.com with ESMTPSA id b194sm15947032wmg.46.2019.09.15.05.21.07
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Sun, 15 Sep 2019 05:21:03 -0700 (PDT)
+ Sun, 15 Sep 2019 05:21:14 -0700 (PDT)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 15 Sep 2019 15:20:10 +0300
-Message-Id: <20190915122015.45852-4-mrolnik@gmail.com>
+Date: Sun, 15 Sep 2019 15:20:13 +0300
+Message-Id: <20190915122015.45852-7-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20190915122015.45852-1-mrolnik@gmail.com>
 References: <20190915122015.45852-1-mrolnik@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH v31 3/8] target/avr: Add instruction decoding
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH v31 6/8] target/avr: Add example board
+ configuration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,197 +96,342 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This includes:
-- encoding of all 16 bit instructions
-- encoding of all 32 bit instructions
+A simple board setup that configures an AVR CPU to run a given firmware image.
+This is all that's useful to implement without peripheral emulation as AVR CPUs include a lot of on-board peripherals.
+
+NOTE: this is not a real board !!!!
+NOTE: it's used for CPU testing!!!!
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
 ---
- target/avr/insn.decode | 175 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 175 insertions(+)
- create mode 100644 target/avr/insn.decode
+ hw/Kconfig           |   1 +
+ hw/avr/Kconfig       |   6 +
+ hw/avr/Makefile.objs |   1 +
+ hw/avr/sample.c      | 282 +++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 290 insertions(+)
+ create mode 100644 hw/avr/Kconfig
+ create mode 100644 hw/avr/Makefile.objs
+ create mode 100644 hw/avr/sample.c
 
-diff --git a/target/avr/insn.decode b/target/avr/insn.decode
+diff --git a/hw/Kconfig b/hw/Kconfig
+index b45db3c813..f185fcb19e 100644
+--- a/hw/Kconfig
++++ b/hw/Kconfig
+@@ -42,6 +42,7 @@ source watchdog/Kconfig
+ # arch Kconfig
+ source arm/Kconfig
+ source alpha/Kconfig
++source avr/Kconfig
+ source cris/Kconfig
+ source hppa/Kconfig
+ source i386/Kconfig
+diff --git a/hw/avr/Kconfig b/hw/avr/Kconfig
 new file mode 100644
-index 0000000000..6b387762c6
+index 0000000000..92aa1e6afb
 --- /dev/null
-+++ b/target/avr/insn.decode
-@@ -0,0 +1,175 @@
-+#
-+#   A = [16 .. 31]
-+#   B = [16 .. 23]
-+#   C = [24, 26, 28, 30]
-+#   D = [0, 2, 4, 6, 8, .. 30]
++++ b/hw/avr/Kconfig
+@@ -0,0 +1,6 @@
++config AVR_SAMPLE
++    bool
++    select AVR_TIMER16
++    select AVR_USART
++    select AVR_MASK
++    select UNIMP
+diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
+new file mode 100644
+index 0000000000..626b7064b3
+--- /dev/null
++++ b/hw/avr/Makefile.objs
+@@ -0,0 +1 @@
++obj-y += sample.o
+diff --git a/hw/avr/sample.c b/hw/avr/sample.c
+new file mode 100644
+index 0000000000..2295ec1b79
+--- /dev/null
++++ b/hw/avr/sample.c
+@@ -0,0 +1,282 @@
++/*
++ * QEMU AVR CPU
++ *
++ * Copyright (c) 2019 Michael Rolnik
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
 +
-+%rd             4:5
-+%rr             9:1 0:4
++/*
++ *  NOTE:
++ *      This is not a real AVR board, this is an example!
++ *      The CPU is an approximation of an ATmega2560, but is missing various
++ *      built-in peripherals.
++ *
++ *      This example board loads provided binary file into flash memory and
++ *      executes it from 0x00000000 address in the code memory space.
++ *
++ *      Currently used for AVR CPU validation
++ *
++ */
 +
-+&rd_rr          rd rr
-+&rd_imm         rd imm
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/qtest.h"
++#include "ui/console.h"
++#include "hw/boards.h"
++#include "hw/loader.h"
++#include "qemu/error-report.h"
++#include "exec/address-spaces.h"
++#include "include/hw/sysbus.h"
++#include "include/hw/char/avr_usart.h"
++#include "include/hw/timer/avr_timer16.h"
++#include "include/hw/misc/avr_mask.h"
++#include "elf.h"
++#include "hw/misc/unimp.h"
 +
-+@op_rd_rr       .... .. . ..... ....        &rd_rr      rd=%rd rr=%rr
-+ADD             0000 11 . ..... ....        @op_rd_rr
-+ADC             0001 11 . ..... ....        @op_rd_rr
-+AND             0010 00 . ..... ....        @op_rd_rr
-+CP              0001 01 . ..... ....        @op_rd_rr
-+CPC             0000 01 . ..... ....        @op_rd_rr
-+CPSE            0001 00 . ..... ....        @op_rd_rr
-+EOR             0010 01 . ..... ....        @op_rd_rr
-+MOV             0010 11 . ..... ....        @op_rd_rr
-+MUL             1001 11 . ..... ....        @op_rd_rr
-+OR              0010 10 . ..... ....        @op_rd_rr
-+SBC             0000 10 . ..... ....        @op_rd_rr
-+SUB             0001 10 . ..... ....        @op_rd_rr
++#define SIZE_FLASH 0x00040000
++#define SIZE_SRAM 0x00002000
++/*
++ * Size of additional "external" memory, as if the AVR were configured to use
++ * an external RAM chip.
++ * Note that the configuration registers that normally enable this feature are
++ * unimplemented.
++ */
++#define SIZE_EXMEM 0x00000000
 +
++/* Offsets of peripherals in emulated memory space (i.e. not host addresses)  */
++#define PRR0_BASE 0x64
++#define PRR1_BASE 0x65
++#define USART_BASE 0xc0
++#define TIMER1_BASE 0x80
++#define TIMER1_IMSK_BASE 0x6f
++#define TIMER1_IFR_BASE 0x36
 +
-+%rd_c           4:2                         !function=to_C
-+%imm6           6:2 0:4
++/* Interrupt numbers used by peripherals */
++#define USART_RXC_IRQ 24
++#define USART_DRE_IRQ 25
++#define USART_TXC_IRQ 26
 +
-+@op_rd_imm6     .... .... .. .. ....        &rd_imm     rd=%rd_c imm=%imm6
-+ADIW            1001 0110 .. .. ....        @op_rd_imm6
-+SBIW            1001 0111 .. .. ....        @op_rd_imm6
++#define TIMER1_CAPT_IRQ 15
++#define TIMER1_COMPA_IRQ 16
++#define TIMER1_COMPB_IRQ 17
++#define TIMER1_COMPC_IRQ 18
++#define TIMER1_OVF_IRQ 19
 +
++/*  Power reduction     */
++#define PRR1_BIT_PRTIM5     0x05    /*  Timer/Counter5  */
++#define PRR1_BIT_PRTIM4     0x04    /*  Timer/Counter4  */
++#define PRR1_BIT_PRTIM3     0x03    /*  Timer/Counter3  */
++#define PRR1_BIT_PRUSART3   0x02    /*  USART3  */
++#define PRR1_BIT_PRUSART2   0x01    /*  USART2  */
++#define PRR1_BIT_PRUSART1   0x00    /*  USART1  */
 +
-+%rd_a           4:4                         !function=to_A
-+%rr_a           0:4                         !function=to_A
-+%rd_d           4:4                         !function=to_D
-+%rr_d           0:4                         !function=to_D
-+%imm8           8:4 0:4
++#define PRR0_BIT_PRTWI      0x06    /*  TWI */
++#define PRR0_BIT_PRTIM2     0x05    /*  Timer/Counter2  */
++#define PRR0_BIT_PRTIM0     0x04    /*  Timer/Counter0  */
++#define PRR0_BIT_PRTIM1     0x03    /*  Timer/Counter1  */
++#define PRR0_BIT_PRSPI      0x02    /*  Serial Peripheral Interface */
++#define PRR0_BIT_PRUSART0   0x01    /*  USART0  */
++#define PRR0_BIT_PRADC      0x00    /*  ADC */
 +
-+@op_rd_imm8     .... .... .... ....         &rd_imm     rd=%rd_a imm=%imm8
-+ANDI            0111 .... .... ....         @op_rd_imm8
-+CPI             0011 .... .... ....         @op_rd_imm8
-+LDI             1110 .... .... ....         @op_rd_imm8
-+ORI             0110 .... .... ....         @op_rd_imm8
-+SBCI            0100 .... .... ....         @op_rd_imm8
-+SUBI            0101 .... .... ....         @op_rd_imm8
++typedef struct {
++    MachineClass parent;
++} SampleMachineClass;
 +
++typedef struct {
++    MachineState parent;
++    MemoryRegion *ram;
++    MemoryRegion *flash;
++    AVRUsartState *usart0;
++    AVRTimer16State *timer1;
++    AVRMaskState *prr[2];
++} SampleMachineState;
 +
-+@op_rd          .... ... rd:5 ....
-+ASR             1001 010 ..... 0101         @op_rd
-+COM             1001 010 ..... 0000         @op_rd
-+DEC             1001 010 ..... 1010         @op_rd
-+ELPM2           1001 000 ..... 0110         @op_rd
-+ELPMX           1001 000 ..... 0111         @op_rd
-+INC             1001 010 ..... 0011         @op_rd
-+LDX1            1001 000 ..... 1100         @op_rd
-+LDX2            1001 000 ..... 1101         @op_rd
-+LDX3            1001 000 ..... 1110         @op_rd
-+LDY2            1001 000 ..... 1001         @op_rd
-+LDY3            1001 000 ..... 1010         @op_rd
-+LDZ2            1001 000 ..... 0001         @op_rd
-+LDZ3            1001 000 ..... 0010         @op_rd
-+LPM2            1001 000 ..... 0100         @op_rd
-+LPMX            1001 000 ..... 0101         @op_rd
-+LSR             1001 010 ..... 0110         @op_rd
-+NEG             1001 010 ..... 0001         @op_rd
-+POP             1001 000 ..... 1111         @op_rd
-+PUSH            1001 001 ..... 1111         @op_rd
-+ROR             1001 010 ..... 0111         @op_rd
-+STY2            1001 001 ..... 1001         @op_rd
-+STY3            1001 001 ..... 1010         @op_rd
-+STZ2            1001 001 ..... 0001         @op_rd
-+STZ3            1001 001 ..... 0010         @op_rd
-+SWAP            1001 010 ..... 0010         @op_rd
++#define TYPE_SAMPLE_MACHINE MACHINE_TYPE_NAME("sample")
 +
++#define SAMPLE_MACHINE(obj) \
++    OBJECT_CHECK(SampleMachineState, obj, TYPE_SAMPLE_MACHINE)
++#define SAMPLE_MACHINE_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(SampleMachineClass, obj, TYPE_SAMPLE_MACHINE)
++#define SAMPLE_MACHINE_CLASS(klass) \
++    OBJECT_CLASS_CHECK(SampleMachineClass, klass, TYPE_SAMPLE_MACHINE)
 +
-+@op_bit         .... .... . bit:3 ....
-+BCLR            1001 0100 1 ... 1000        @op_bit
-+BSET            1001 0100 0 ... 1000        @op_bit
++static void sample_init(MachineState *machine)
++{
++    SampleMachineState *sms = SAMPLE_MACHINE(machine);
++    MemoryRegion *system_memory = get_system_memory();
++    AVRCPU *cpu;
++    const char *firmware = NULL;
++    const char *filename;
++    int bytes_loaded;
++    SysBusDevice *busdev;
++    DeviceState *cpudev;
 +
++    system_memory = get_system_memory();
++    sms->ram = g_new(MemoryRegion, 1);
++    sms->flash = g_new(MemoryRegion, 1);
 +
-+@op_rd_bit      .... ... rd:5 . bit:3
-+BLD             1111 100 ..... 0 ...        @op_rd_bit
-+BST             1111 101 ..... 0 ...        @op_rd_bit
-+
-+
-+@op_bit_imm     .... .. imm:s7 bit:3
-+BRBC            1111 01 ....... ...         @op_bit_imm
-+BRBS            1111 00 ....... ...         @op_bit_imm
-+
-+
-+BREAK           1001 0101 1001 1000
-+EICALL          1001 0101 0001 1001
-+EIJMP           1001 0100 0001 1001
-+ELPM1           1001 0101 1101 1000
-+ICALL           1001 0101 0000 1001
-+IJMP            1001 0100 0000 1001
-+LPM1            1001 0101 1100 1000
-+NOP             0000 0000 0000 0000
-+RET             1001 0101 0000 1000
-+RETI            1001 0101 0001 1000
-+SLEEP           1001 0101 1000 1000
-+SPM             1001 0101 1110 1000
-+SPMX            1001 0101 1111 1000
-+WDR             1001 0101 1010 1000
-+
-+
-+@op_reg_bit     .... .... reg:5 bit:3
-+CBI             1001 1000 ..... ...         @op_reg_bit
-+SBI             1001 1010 ..... ...         @op_reg_bit
-+SBIC            1001 1001 ..... ...         @op_reg_bit
-+SBIS            1001 1011 ..... ...         @op_reg_bit
-+
-+
-+DES             1001 0100 imm:4 1011
-+
-+
-+%rd_b           4:3                         !function=to_B
-+%rr_b           0:3                         !function=to_B
-+@fmul           .... .... . ... . ...       &rd_rr      rd=%rd_b rr=%rr_b
-+FMUL            0000 0011 0 ... 1 ...       @fmul
-+FMULS           0000 0011 1 ... 0 ...       @fmul
-+FMULSU          0000 0011 1 ... 1 ...       @fmul
-+MULSU           0000 0011 0 ... 0 ...       @fmul
-+
-+
-+%io_imm         9:2 0:4
-+@io_rd_imm      .... . .. ..... ....        &rd_imm     rd=%rd imm=%io_imm
-+IN              1011 0 .. ..... ....        @io_rd_imm
-+OUT             1011 1 .. ..... ....        @io_rd_imm
-+
-+
-+XCH             1001 001 rd:5 0100
-+LAC             1001 001 rd:5 0110
-+LAS             1001 001 rd:5 0101
-+LAT             1001 001 rd:5 0111
-+STX1            1001 001 rr:5 1100
-+STX2            1001 001 rr:5 1101
-+STX3            1001 001 rr:5 1110
-+
-+
-+%ldst_d_imm     13:1 10:2 0:3
-+@ldst_d         .. . . .. . rd:5  . ...     &rd_imm     imm=%ldst_d_imm
-+LDDY            10 . 0 .. 0 ..... 1 ...     @ldst_d
-+LDDZ            10 . 0 .. 0 ..... 0 ...     @ldst_d
-+STDY            10 . 0 .. 1 ..... 1 ...     @ldst_d
-+STDZ            10 . 0 .. 1 ..... 0 ...     @ldst_d
-+
-+
-+MOVW            0000 0001 .... ....         &rd_rr      rd=%rd_d rr=%rr_d
-+MULS            0000 0010 .... ....         &rd_rr      rd=%rd_a rr=%rr_a
-+
-+RCALL           1101 imm:s12
-+RJMP            1100 imm:s12
-+
-+SBRC            1111 110 rr:5 0 bit:3
-+SBRS            1111 111 rr:5 0 bit:3
-+
-+# The 22-bit immediate is partially in the opcode word,
-+# and partially in the next.  Use append_16 to build the
-+# complete 22-bit value.
-+%imm_call       4:5 0:1                     !function=append_16
-+CALL            1001 010 ..... 111 .        imm=%imm_call
-+JMP             1001 010 ..... 110 .        imm=%imm_call
++    cpu = AVR_CPU(cpu_create(machine->cpu_type));
++    cpudev = DEVICE(cpu);
 +
 +
-+# The 16-bit immediate is completely in the next word.
-+# Fields cannot be defined with no bits, so we cannot play
-+# the same trick and append to a zero-bit value.
-+# Defer reading the immediate until trans_{LDS,STS}.
-+@ldst_s         .... ... rd:5 ....          imm=0
-+LDS             1001 000 ..... 0000         @ldst_s
-+STS             1001 001 ..... 0000         @ldst_s
++    memory_region_init_rom(sms->flash, NULL, "avr.flash", SIZE_FLASH,
++            &error_fatal);
++    memory_region_add_subregion(system_memory, OFFSET_CODE, sms->flash);
++
++    /* following are atmel2560 device */
++    create_unimplemented_device("usart 3", OFFSET_DATA + 0x0130, 0x0007);
++    create_unimplemented_device("timer-counter-16bit 5",
++            OFFSET_DATA + 0x0120, 0x000e);
++    create_unimplemented_device("gpio L", OFFSET_DATA + 0x0109, 0x0003);
++    create_unimplemented_device("gpio K", OFFSET_DATA + 0x0106, 0x0003);
++    create_unimplemented_device("gpio J", OFFSET_DATA + 0x0103, 0x0003);
++    create_unimplemented_device("gpio H", OFFSET_DATA + 0x0100, 0x0003);
++    create_unimplemented_device("usart 2", OFFSET_DATA + 0x00d0, 0x0007);
++    create_unimplemented_device("usart 1", OFFSET_DATA + 0x00c8, 0x0007);
++    create_unimplemented_device("usart 0", OFFSET_DATA + 0x00c0, 0x0007);
++    create_unimplemented_device("twi", OFFSET_DATA + 0x00b8, 0x0006);
++    create_unimplemented_device("timer-counter-async-8bit 2",
++            OFFSET_DATA + 0x00b0, 0x0007);
++    create_unimplemented_device("timer-counter-16bit 4",
++            OFFSET_DATA + 0x00a0, 0x000e);
++    create_unimplemented_device("timer-counter-16bit 3",
++            OFFSET_DATA + 0x0090, 0x000e);
++    create_unimplemented_device("timer-counter-16bit 1",
++            OFFSET_DATA + 0x0080, 0x000e);
++    create_unimplemented_device("ac / adc",
++            OFFSET_DATA + 0x0078, 0x0008);
++    create_unimplemented_device("ext-mem-iface",
++            OFFSET_DATA + 0x0074, 0x0002);
++    create_unimplemented_device("int-controller",
++            OFFSET_DATA + 0x0068, 0x000c);
++    create_unimplemented_device("sys",
++            OFFSET_DATA + 0x0060, 0x0007);
++    create_unimplemented_device("spi",
++            OFFSET_DATA + 0x004c, 0x0003);
++    create_unimplemented_device("ext-mem-iface",
++            OFFSET_DATA + 0x004a, 0x0002);
++    create_unimplemented_device("timer-counter-pwm-8bit 0",
++            OFFSET_DATA + 0x0043, 0x0006);
++    create_unimplemented_device("ext-mem-iface",
++            OFFSET_DATA + 0x003e, 0x0005);
++    create_unimplemented_device("int-controller",
++            OFFSET_DATA + 0x0035, 0x0009);
++    create_unimplemented_device("gpio G", OFFSET_DATA + 0x0032, 0x0003);
++    create_unimplemented_device("gpio F", OFFSET_DATA + 0x002f, 0x0003);
++    create_unimplemented_device("gpio E", OFFSET_DATA + 0x002c, 0x0003);
++    create_unimplemented_device("gpio D", OFFSET_DATA + 0x0029, 0x0003);
++    create_unimplemented_device("gpio C", OFFSET_DATA + 0x0026, 0x0003);
++    create_unimplemented_device("gpio B", OFFSET_DATA + 0x0023, 0x0003);
++    create_unimplemented_device("gpio A", OFFSET_DATA + 0x0020, 0x0003);
++
++    memory_region_allocate_system_memory(
++        sms->ram, NULL, "avr.ram", SIZE_SRAM + SIZE_EXMEM);
++    memory_region_add_subregion(system_memory, OFFSET_DATA + 0x200, sms->ram);
++
++    /* Power Reduction built-in peripheral */
++    sms->prr[0] = AVR_MASK(sysbus_create_simple(TYPE_AVR_MASK,
++                    OFFSET_DATA + PRR0_BASE, NULL));
++    sms->prr[1] = AVR_MASK(sysbus_create_simple(TYPE_AVR_MASK,
++                    OFFSET_DATA + PRR1_BASE, NULL));
++
++    /* USART 0 built-in peripheral */
++    sms->usart0 = AVR_USART(object_new(TYPE_AVR_USART));
++    busdev = SYS_BUS_DEVICE(sms->usart0);
++    qdev_prop_set_chr(DEVICE(sms->usart0), "chardev", serial_hd(0));
++    object_property_set_bool(OBJECT(sms->usart0), true, "realized",
++            &error_fatal);
++    sysbus_mmio_map(busdev, 0, OFFSET_DATA + USART_BASE);
++    /*
++     * These IRQ numbers don't match the datasheet because we're counting from
++     * zero and not including reset.
++     */
++    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(cpudev, USART_RXC_IRQ));
++    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(cpudev, USART_DRE_IRQ));
++    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(cpudev, USART_TXC_IRQ));
++    sysbus_connect_irq(SYS_BUS_DEVICE(sms->prr[1]), PRR1_BIT_PRUSART1,
++            qdev_get_gpio_in(DEVICE(sms->usart0), 0));
++
++    /* Timer 1 built-in periphal */
++    sms->timer1 = AVR_TIMER16(object_new(TYPE_AVR_TIMER16));
++    object_property_set_bool(OBJECT(sms->timer1), true, "realized",
++            &error_fatal);
++    busdev = SYS_BUS_DEVICE(sms->timer1);
++    sysbus_mmio_map(busdev, 0, OFFSET_DATA + TIMER1_BASE);
++    sysbus_mmio_map(busdev, 1, OFFSET_DATA + TIMER1_IMSK_BASE);
++    sysbus_mmio_map(busdev, 2, OFFSET_DATA + TIMER1_IFR_BASE);
++    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(cpudev, TIMER1_CAPT_IRQ));
++    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(cpudev, TIMER1_COMPA_IRQ));
++    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(cpudev, TIMER1_COMPB_IRQ));
++    sysbus_connect_irq(busdev, 3, qdev_get_gpio_in(cpudev, TIMER1_COMPC_IRQ));
++    sysbus_connect_irq(busdev, 4, qdev_get_gpio_in(cpudev, TIMER1_OVF_IRQ));
++    sysbus_connect_irq(SYS_BUS_DEVICE(sms->prr[0]), PRR0_BIT_PRTIM1,
++            qdev_get_gpio_in(DEVICE(sms->timer1), 0));
++
++    /* Load firmware (contents of flash) trying to auto-detect format */
++    firmware = machine->firmware;
++    if (firmware != NULL) {
++        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
++        if (filename == NULL) {
++            error_report("Unable to find %s", firmware);
++            exit(1);
++        }
++
++        bytes_loaded = load_elf(
++            filename, NULL, NULL, NULL, NULL, NULL, NULL, 0, EM_NONE, 0, 0);
++        if (bytes_loaded < 0) {
++            bytes_loaded = load_image_targphys(
++                filename, OFFSET_CODE, SIZE_FLASH);
++        }
++        if (bytes_loaded < 0) {
++            error_report(
++                "Unable to load firmware image %s as ELF or raw binary",
++                firmware);
++            exit(1);
++        }
++    }
++}
++
++static void sample_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++
++    mc->desc = "AVR sample/example board (ATmega2560)";
++    mc->init = sample_init;
++    mc->default_cpus = 1;
++    mc->min_cpus = mc->default_cpus;
++    mc->max_cpus = mc->default_cpus;
++    mc->default_cpu_type = "avr6-avr-cpu"; /* ATmega2560. */
++    mc->is_default = 1;
++}
++
++static const TypeInfo sample_info = {
++    .name = TYPE_SAMPLE_MACHINE,
++    .parent = TYPE_MACHINE,
++    .instance_size = sizeof(SampleMachineState),
++    .class_size = sizeof(SampleMachineClass),
++    .class_init = sample_class_init,
++};
++
++static void sample_machine_init(void)
++{
++    type_register_static(&sample_info);
++}
++
++type_init(sample_machine_init);
 -- 
 2.17.2 (Apple Git-113)
 
