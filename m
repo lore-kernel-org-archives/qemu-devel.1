@@ -2,94 +2,91 @@ Return-Path: <SRS0=GetT=XK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6585C4CEC7
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 19:36:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B458C4CEC7
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 19:36:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD1AD20830
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 19:36:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC06B20830
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 19:36:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SpDlm6aO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD1AD20830
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZsQg6kKh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC06B20830
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9aJf-0000i4-Bt
-	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 15:36:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39940)
+	id 1i9aJv-00015Q-Kb
+	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 15:36:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39906)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i9a7d-0005y6-4b
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 15:23:46 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i9a7a-0005wG-FL
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 15:23:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1i9a7b-0001xK-Ih
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 15:23:45 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:39683)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1i9a7Z-0001wf-8p
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 15:23:42 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:37071)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1i9a7b-0001xC-CG
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 15:23:43 -0400
-Received: by mail-ed1-x541.google.com with SMTP id g12so5559714eds.6
- for <qemu-devel@nongnu.org>; Sun, 15 Sep 2019 12:23:43 -0700 (PDT)
+ id 1i9a7Z-0001wZ-3K
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 15:23:41 -0400
+Received: by mail-ed1-x543.google.com with SMTP id i1so31286544edv.4
+ for <qemu-devel@nongnu.org>; Sun, 15 Sep 2019 12:23:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=P1Yx/dZ4rieO/0gJLGQ3xdgMx3pyBcyEnZuiP7yaO78=;
- b=SpDlm6aOx60ZNNYoMDHN0RdDvqSzLV1SkAYsoj8AiEFeBrzcH/Gl/bP7ujTQMX77lT
- fsP8CPUmI0XQKn41svTMOgqEocJxaQTbMty1w3D1nzt2x+pK9PsOawsl7ALaYbh3Xw0s
- mNkitxr4E2UZIOGeHhptbDFIJh9e6TAHduLwqOum7gzC/W3H4cJT9k/WrZYf05isQtI4
- pv9ZC0BtYvb/a+yJ+8goIZX4q8fQoOKsb6Mu75e7vStdQhMsgI0BydPDXkmVOiD31nTY
- Uxu4rF0oQWT4I/uMmXbFW4MyMwqNFx6Jx2O9ggBnSGmJGtZyVSU15sGH2v+pVmyH0AtW
- BJkA==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ZTU5jLClRXmm07p3hBrUPaHvGbZyzECyrX2o1d804so=;
+ b=ZsQg6kKhFgzcJWhnO+0Lww8qmbdQZhq0HkQoYFHmvMkfE3mP1aDE2ISMhxfNKIAuKj
+ YLv9XweAGB5r5PllTyn+F/325gHhRH/gNBIGd9eT7tW4WisKWCsdNQbaJT534yKGA2Wq
+ 71RiVt3c6mWlUxvZAtGvbzcq5+spW5oiaZWr36zsJPgJIe0t1+sYW3klerL4+0k3Zt/u
+ zzhEqXpQxMygKvKNb1XKi1O1TCBPwBOOng28qwNx5/0qH4rPNVikc1brcQnf0nRRpjTe
+ Di5/qC/gXKXLodOfYW10zv4scy55y5G6BAN1ylhvfWBk8WuuJ11hcoDYXyaXEXbt8AjU
+ No+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=P1Yx/dZ4rieO/0gJLGQ3xdgMx3pyBcyEnZuiP7yaO78=;
- b=aKoE5z60ncTT6o+xW0+daT055iuOp5colFAYpkecnMXTc9WC9ikro88skRhasQhvsr
- gsnqP25Ep6DkrvkTsANn9pZxLr4u2F2TXfcc8zwCXez5+cGELkzMNQQ2dr07Ci+CL8p1
- so+QOJeMn04LbTw0ShXNda9Qlf/1gfoTyaYhAJHQGw2M9OSkeQ0bjmLS88HGh7ANc5jG
- l+oVDYc91rsCN04WGgvdu53YjyJjxg1uH49ZIsQSkHaQrFFkx9gGl+ZUin5SpWzp0iW3
- I2QZRJKgKWcPrmrGyzEFpxRhy5yj1X0DOTl/SfIvaJdNRtWMU7WTKT2z1qL/1OzZ8mpH
- uPDA==
-X-Gm-Message-State: APjAAAVrHwE8y6c7Z7DZUKlW9mvr8Z26LpEm1EibJmTXs8SZXL+5kIU2
- gS5Jr50UWcacnYRi6YXcEV+bGIVV
-X-Google-Smtp-Source: APXvYqwMIaJRN2CztljPdRwO77ENwMB9297JKVM3XB41K13/StznmXHvqyoNuF2WG8jGLr+9a7tVCA==
-X-Received: by 2002:a17:906:81d9:: with SMTP id
- e25mr48463538ejx.37.1568575421769; 
- Sun, 15 Sep 2019 12:23:41 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ZTU5jLClRXmm07p3hBrUPaHvGbZyzECyrX2o1d804so=;
+ b=OHFmq4yt9xbyIdEivlqe1fUIeTHzf14qlkc2hK88adXCSynfjxE+3Fe2/5if82BjMz
+ /+IM12TPufojUqojhVcZeIbsCpTk4cgVL2npNXaRhUPAlRqkO4uVIBltpvZWrOQ8Dg9F
+ v6HlVUfVi4DVMV5nY15LIYhUdkqtsPFzEpu/ZFXVbHBD9HQADvrrtA+tk7rouWaz7R85
+ 8P9H8y7eSb38ju1g3WF9zc1RGoMNxGSZdJzOhivY/TS7jTLaP2XGVSn7PWSXa0jSmZvh
+ YD3aIgFoWh/Frv3Ch4NCJ1Opjt2TSXaWYn3kEBbQFKcPJg3VsPEGM31N7g2DEPGELg8i
+ iilQ==
+X-Gm-Message-State: APjAAAXbUTHzIGYur/6PPzOklqlWAoz4qGoeKFlBLIH9YMaF0e0JzkwG
+ tq16HSaN2X6ySZzo7Q+fl2mXqGLq
+X-Google-Smtp-Source: APXvYqxTxA9gm0UJSNCGdSAoD5oOnPkr2cLML4fuxMy3gejzWwGe9Z/Hzupk6KP3u3RpXLzwJF/RUQ==
+X-Received: by 2002:a17:906:5a8d:: with SMTP id
+ l13mr48851078ejq.219.1568575419238; 
+ Sun, 15 Sep 2019 12:23:39 -0700 (PDT)
 Received: from nullptr.home.dirty-ice.org
  (2a01-036c-0113-74ef-0000-0000-0000-0005.pool6.digikabel.hu.
  [2a01:36c:113:74ef::5])
- by smtp.gmail.com with ESMTPSA id j20sm6480562edy.95.2019.09.15.12.23.41
+ by smtp.gmail.com with ESMTPSA id j20sm6480562edy.95.2019.09.15.12.23.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 15 Sep 2019 12:23:41 -0700 (PDT)
+ Sun, 15 Sep 2019 12:23:38 -0700 (PDT)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
  <dirty.ice.hu@gmail.com>
 X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
  <DirtY.iCE.hu@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 15 Sep 2019 21:23:19 +0200
-Message-Id: <60d68c051ed180c7315f7cdd6084b58b6fc9bb6d.1568574965.git.DirtY.iCE.hu@gmail.com>
+Date: Sun, 15 Sep 2019 21:23:16 +0200
+Message-Id: <cover.1568574965.git.DirtY.iCE.hu@gmail.com>
 X-Mailer: git-send-email 2.23.0
-In-Reply-To: <cover.1568574965.git.DirtY.iCE.hu@gmail.com>
-References: <cover.1568574965.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::541
-Subject: [Qemu-devel] [PATCH v3 03/24] coreaudio: port to the new audio
- backend api
+X-Received-From: 2a00:1450:4864:20::543
+Subject: [Qemu-devel] [PATCH v3 00/24] Audio: Mixeng-free 5.1/7.1 audio
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,204 +103,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
----
- audio/coreaudio.c | 130 ++++++++++++++++++++++++----------------------
- 1 file changed, 69 insertions(+), 61 deletions(-)
+Hi,
 
-diff --git a/audio/coreaudio.c b/audio/coreaudio.c
-index d1be58b40a..5cde42f982 100644
---- a/audio/coreaudio.c
-+++ b/audio/coreaudio.c
-@@ -43,9 +43,6 @@ typedef struct coreaudioVoiceOut {
-     UInt32 audioDevicePropertyBufferFrameSize;
-     AudioStreamBasicDescription outputStreamBasicDescription;
-     AudioDeviceIOProcID ioprocid;
--    size_t live;
--    size_t decr;
--    size_t rpos;
- } coreaudioVoiceOut;
- 
- #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
-@@ -397,31 +394,29 @@ static int coreaudio_unlock (coreaudioVoiceOut *core, const char *fn_name)
-     return 0;
- }
- 
--static size_t coreaudio_run_out(HWVoiceOut *hw, size_t live)
--{
--    size_t decr;
--    coreaudioVoiceOut *core = (coreaudioVoiceOut *) hw;
--
--    if (coreaudio_lock (core, "coreaudio_run_out")) {
--        return 0;
-+#define COREAUDIO_WRAPPER_FUNC(name, ret_type, args_decl, args) \
-+    static ret_type glue(coreaudio_, name)args_decl             \
-+    {                                                           \
-+        coreaudioVoiceOut *core = (coreaudioVoiceOut *) hw;     \
-+        ret_type ret;                                           \
-+                                                                \
-+        if (coreaudio_lock(core, "coreaudio_" #name)) {         \
-+            return 0;                                           \
-+        }                                                       \
-+                                                                \
-+        ret = glue(audio_generic_, name)args;                   \
-+                                                                \
-+        coreaudio_unlock(core, "coreaudio_" #name);             \
-+        return ret;                                             \
-     }
--
--    if (core->decr > live) {
--        ldebug ("core->decr %d live %d core->live %d\n",
--                core->decr,
--                live,
--                core->live);
--    }
--
--    decr = MIN (core->decr, live);
--    core->decr -= decr;
--
--    core->live = live - decr;
--    hw->rpos = core->rpos;
--
--    coreaudio_unlock (core, "coreaudio_run_out");
--    return decr;
--}
-+COREAUDIO_WRAPPER_FUNC(get_buffer_out, void *, (HWVoiceOut *hw, size_t *size),
-+                       (hw, size))
-+COREAUDIO_WRAPPER_FUNC(put_buffer_out_nowrite, size_t,
-+                       (HWVoiceOut *hw, void *buf, size_t size),
-+                       (hw, buf, size))
-+COREAUDIO_WRAPPER_FUNC(write, size_t, (HWVoiceOut *hw, void *buf, size_t size),
-+                       (hw, buf, size))
-+#undef COREAUDIO_WRAPPER_FUNC
- 
- /* callback to feed audiooutput buffer */
- static OSStatus audioDeviceIOProc(
-@@ -433,19 +428,11 @@ static OSStatus audioDeviceIOProc(
-     const AudioTimeStamp* inOutputTime,
-     void* hwptr)
- {
--    UInt32 frame, frameCount;
--    float *out = outOutputData->mBuffers[0].mData;
-+    UInt32 frameCount, pending_frames;
-+    void *out = outOutputData->mBuffers[0].mData;
-     HWVoiceOut *hw = hwptr;
-     coreaudioVoiceOut *core = (coreaudioVoiceOut *) hwptr;
--    int rpos, live;
--    struct st_sample *src;
--#ifndef FLOAT_MIXENG
--#ifdef RECIPROCAL
--    const float scale = 1.f / UINT_MAX;
--#else
--    const float scale = UINT_MAX;
--#endif
--#endif
-+    size_t len;
- 
-     if (coreaudio_lock (core, "audioDeviceIOProc")) {
-         inInputTime = 0;
-@@ -453,42 +440,51 @@ static OSStatus audioDeviceIOProc(
-     }
- 
-     frameCount = core->audioDevicePropertyBufferFrameSize;
--    live = core->live;
-+    pending_frames = hw->pending_emul >> hw->info.shift;
- 
-     /* if there are not enough samples, set signal and return */
--    if (live < frameCount) {
-+    if (pending_frames < frameCount) {
-         inInputTime = 0;
-         coreaudio_unlock (core, "audioDeviceIOProc(empty)");
-         return 0;
-     }
- 
--    rpos = core->rpos;
--    src = hw->mix_buf + rpos;
-+    len = frameCount << hw->info.shift;
-+    while (len) {
-+        size_t write_len;
-+        ssize_t start = ((ssize_t) hw->pos_emul) - hw->pending_emul;
-+        if (start < 0) {
-+            start += hw->size_emul;
-+        }
-+        assert(start >= 0 && start < hw->size_emul);
- 
--    /* fill buffer */
--    for (frame = 0; frame < frameCount; frame++) {
--#ifdef FLOAT_MIXENG
--        *out++ = src[frame].l; /* left channel */
--        *out++ = src[frame].r; /* right channel */
--#else
--#ifdef RECIPROCAL
--        *out++ = src[frame].l * scale; /* left channel */
--        *out++ = src[frame].r * scale; /* right channel */
--#else
--        *out++ = src[frame].l / scale; /* left channel */
--        *out++ = src[frame].r / scale; /* right channel */
--#endif
--#endif
--    }
-+        write_len = MIN(MIN(hw->pending_emul, len),
-+                        hw->size_emul - start);
- 
--    rpos = (rpos + frameCount) % hw->samples;
--    core->decr += frameCount;
--    core->rpos = rpos;
-+        memcpy(out, hw->buf_emul + start, write_len);
-+        hw->pending_emul -= write_len;
-+        len -= write_len;
-+        out += write_len;
-+    }
- 
-     coreaudio_unlock (core, "audioDeviceIOProc");
-     return 0;
- }
- 
-+static UInt32 coreaudio_get_flags(struct audio_pcm_info *info,
-+                                  struct audsettings *as)
-+{
-+    UInt32 flags = info->sign ? kAudioFormatFlagIsSignedInteger : 0;
-+    if (as->endianness) { /* 0 = little, 1 = big */
-+        flags |= kAudioFormatFlagIsBigEndian;
-+    }
-+
-+    if (flags == 0) { /* must not be 0 */
-+        flags = kAudioFormatFlagsAreAllClear;
-+    }
-+    return flags;
-+}
-+
- static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
-                               void *drv_opaque)
- {
-@@ -576,6 +572,16 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
- 
-     /* set Samplerate */
-     core->outputStreamBasicDescription.mSampleRate = (Float64) as->freq;
-+    core->outputStreamBasicDescription.mFormatID = kAudioFormatLinearPCM;
-+    core->outputStreamBasicDescription.mFormatFlags =
-+        coreaudio_get_flags(&hw->info, as);
-+    core->outputStreamBasicDescription.mBytesPerPacket =
-+        core->outputStreamBasicDescription.mBytesPerFrame =
-+        hw->info.nchannels * hw->info.bits / 8;
-+    core->outputStreamBasicDescription.mFramesPerPacket = 1;
-+    core->outputStreamBasicDescription.mChannelsPerFrame = hw->info.nchannels;
-+    core->outputStreamBasicDescription.mBitsPerChannel = hw->info.bits;
-+
-     status = coreaudio_set_streamformat(core->outputDeviceID,
-                                         &core->outputStreamBasicDescription);
-     if (status != kAudioHardwareNoError) {
-@@ -686,7 +692,9 @@ static void coreaudio_audio_fini (void *opaque)
- static struct audio_pcm_ops coreaudio_pcm_ops = {
-     .init_out = coreaudio_init_out,
-     .fini_out = coreaudio_fini_out,
--    .run_out  = coreaudio_run_out,
-+    .write    = coreaudio_write,
-+    .get_buffer_out = coreaudio_get_buffer_out,
-+    .put_buffer_out = coreaudio_put_buffer_out_nowrite,
-     .ctl_out  = coreaudio_ctl_out
- };
- 
+I've updated my patch series, fixing some bugs related to spice audio.
+This should now work with all supported backends on linux, dsound and
+coreaudio remain untested.
+
+Regards,
+Zoltan
+
+Kővágó, Zoltán (24):
+  audio: api for mixeng code free backends
+  alsaaudio: port to the new audio backend api
+  coreaudio: port to the new audio backend api
+  dsoundaudio: port to the new audio backend api
+  noaudio: port to the new audio backend api
+  ossaudio: port to the new audio backend api
+  paaudio: port to the new audio backend api
+  sdlaudio: port to the new audio backend api
+  spiceaudio: port to the new audio backend api
+  wavaudio: port to the new audio backend api
+  audio: remove remains of the old backend api
+  audio: unify input and output mixeng buffer management
+  audio: common rate control code for timer based outputs
+  audio: split ctl_* functions into enable_* and volume_*
+  audio: add mixeng option (documentation)
+  audio: make mixeng optional
+  paaudio: get/put_buffer functions
+  audio: support more than two channels in volume setting
+  audio: replace shift in audio_pcm_info with bytes_per_frame
+  audio: basic support for multichannel audio
+  paaudio: channel-map option
+  usb-audio: do not count on avail bytes actually available
+  usb-audio: support more than two channels of audio
+  usbaudio: change playback counters to 64 bit
+
+ audio/Makefile.objs     |   1 -
+ audio/alsaaudio.c       | 372 ++++++++------------------
+ audio/audio.c           | 527 +++++++++++++++++++++++++++++--------
+ audio/audio.h           |  10 +
+ audio/audio_int.h       |  81 ++++--
+ audio/audio_pt_int.c    | 173 ------------
+ audio/audio_pt_int.h    |  22 --
+ audio/audio_template.h  |  31 ++-
+ audio/coreaudio.c       | 143 +++++-----
+ audio/dsound_template.h |  53 ++--
+ audio/dsoundaudio.c     | 359 +++++++------------------
+ audio/noaudio.c         |  78 +++---
+ audio/ossaudio.c        | 360 ++++++++++---------------
+ audio/paaudio.c         | 566 +++++++++++++---------------------------
+ audio/sdlaudio.c        | 104 ++++----
+ audio/spiceaudio.c      | 256 +++++++-----------
+ audio/wavaudio.c        |  78 ++----
+ configure               |   5 -
+ hw/usb/dev-audio.c      | 459 +++++++++++++++++++++++++++-----
+ qapi/audio.json         |  12 +-
+ qemu-options.hx         |  15 ++
+ 21 files changed, 1697 insertions(+), 2008 deletions(-)
+ delete mode 100644 audio/audio_pt_int.c
+ delete mode 100644 audio/audio_pt_int.h
+
 -- 
 2.23.0
 
