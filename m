@@ -2,73 +2,66 @@ Return-Path: <SRS0=GetT=XK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=DATE_IN_PAST_12_24,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC9E1C4CEC7
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 23:36:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8182DC4CEC4
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 23:42:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A65220678
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 23:36:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A65220678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 459F520678
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Sep 2019 23:42:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="TlkCXv35"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 459F520678
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9e4e-0004Nl-M2
-	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 19:36:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35363)
+	id 1i9e9h-0006Db-Fv
+	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 19:42:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35959)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1i9e3O-0003Vj-48
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 19:35:40 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1i9e8r-0005lJ-WB
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 19:41:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1i9e3K-00069L-7c
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 19:35:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56864)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1i9e3I-000687-9y
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 19:35:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1i9e3E-0004kv-Je
- for <qemu-devel@nongnu.org>; Sun, 15 Sep 2019 23:35:28 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6560D2E80CB
- for <qemu-devel@nongnu.org>; Sun, 15 Sep 2019 23:35:28 +0000 (UTC)
+ (envelope-from <dgibson@ozlabs.org>) id 1i9e8q-0008Id-Jd
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 19:41:17 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:58057 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1i9e8p-0008GR-FC; Sun, 15 Sep 2019 19:41:16 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46Wm9201jdz9sNx; Mon, 16 Sep 2019 09:41:09 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1568590870;
+ bh=zltnrM80upxAW/h5AZAqld/X6iIGiXNs492AbwheTbc=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=TlkCXv35Sh3KEF18+DX3u86DhLA+DSSpSff28vw9qt5/m2wzVNvzRXHEmLN5AHO6C
+ MR8x/xICFUakIfFN3dZAH7fHg9Nk+LIvU3VD+7OUwJUhn8uEpb4knGZqTgV+mfHfc1
+ uhqVOOqen0Vow6sPBLVhq2axi0uisHn2WE5uS73w=
+Date: Sun, 15 Sep 2019 19:42:42 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Message-ID: <20190915094242.GB2104@umbus.fritz.box>
+References: <156829860985.2073005.5893493824873412773.stgit@bahia.tls.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 15 Sep 2019 23:26:35 -0000
-From: James Harvey <jamespharvey20@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jamespharvey20
-X-Launchpad-Bug-Reporter: James Harvey (jamespharvey20)
-X-Launchpad-Bug-Modifier: James Harvey (jamespharvey20)
-References: <156855280668.581.6516749257263798071.malonedeb@wampee.canonical.com>
-Message-Id: <156858999601.32435.3530038468855163581.launchpad@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19048";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 9448a6e547e6d75762c1c74930314affbed7ab88
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="NDin8bjvE/0mNLFQ"
+Content-Disposition: inline
+In-Reply-To: <156829860985.2073005.5893493824873412773.stgit@bahia.tls.ibm.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1844053] Re: task blocked for more than X seconds
- - events drm_fb_helper_dirty_work
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH] spapr: Report kvm_irqchip_in_kernel() in
+ 'info pic'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,345 +70,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1844053 <1844053@bugs.launchpad.net>
+Cc: qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Description changed:
 
-  I've had bunches of these errors on 9 different boots, between
-  2019-08-21 and now, with Arch host and guest, from linux 5.1.16 to
-  5.2.14 on host and guest, with QEMU 4.0.0 and 4.1.0.  spice 0.14.2,
-  spice-gtk 0.37, spice-protocol 0.14.0, virt-viewer 8.0.
-  =
+--NDin8bjvE/0mNLFQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  I've been fighting with some other issues related to a 5.2 btrfs
-  regression, a QEMU qxl regression (see bug 1843151) which I ran into
-  when trying to temporarily abandon virtio-vga, and I haven't paid enough
-  attention to what impact it has on the system when these occur.  In
-  journalctl, I can see I often rebooted minutes after they occurred, but
-  sometimes much later.  That must mean whenever I saw it happen that I
-  rebooted the VM, or potentially it impacted functionality of the system.
-  =
+On Thu, Sep 12, 2019 at 04:30:09PM +0200, Greg Kurz wrote:
+65;5603;1c> Unless the machine was started with kernel-irqchip=3Don, we can=
+not easily
+> tell if we're actually using an in-kernel or an emulated irqchip. This
+> information is important enough that it is worth printing it in 'info
+> pic'.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-  Please let me know if and how I can get more information for you if
-  needed.
-  =
+Applied, thanks.
 
-  I've replicated this on both a system with integrated ASPEED video, and
-  on an AMD Vega 64 running amdgpu.
-  =
+> ---
+>  hw/ppc/spapr.c |    4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 761f8214c312..348c007ffbd3 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -81,6 +81,8 @@
+>  #include "hw/mem/memory-device.h"
+>  #include "hw/ppc/spapr_tpm_proxy.h"
+> =20
+> +#include "monitor/monitor.h"
+> +
+>  #include <libfdt.h>
+> =20
+>  /* SLOF memory layout:
+> @@ -4360,6 +4362,8 @@ static void spapr_pic_print_info(InterruptStatsProv=
+ider *obj,
+>      SpaprMachineState *spapr =3D SPAPR_MACHINE(obj);
+> =20
+>      spapr->irq->print_info(spapr, mon);
+> +    monitor_printf(mon, "irqchip: %s\n",
+> +                   kvm_irqchip_in_kernel() ? "in-kernel" : "emulated");
+>  }
+> =20
+>  int spapr_get_vcpu_id(PowerPCCPU *cpu)
+>=20
 
-  As an example, I have one boot which reported at 122 seconds, 245, 368,
-  491, 614, 737, 860, 983, 1105, 1228, then I rebooted.
-  =
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-  I have another that reported 122/245/368/491/614/737, went away for 10
-  minutes, then started reporting again 122/245/368/491, and went away.
-  Then, I rebooted about 20 hours later.
-  =
+--NDin8bjvE/0mNLFQ
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  Host system has no graphical impact when this happens, and logs nothing
-  in its journalctl.
-  =
+-----BEGIN PGP SIGNATURE-----
 
-+ Guest is tty mode only, with kernel argument "video=3D1280x1024".  No x
-+ server.
-+ =
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1+B5IACgkQbDjKyiDZ
+s5JkxhAAla4CZmkj3UEk1fHH4X+n0/XeOTFFuxQ+dThPoiOEZXDWGHJ1/gX42mme
+AAtiP/AjrxqIJIKMXW47128Y3r481/ObzJElmL3duFmDnyBMHY9xeAbaipwM0AzV
+Wh3/II29bwvnTMlmbWmOqZjwmyv+gSlzsUsLPPLrO0JHt1KielOvNquY6xugO6n1
+TRzO4wlAnnmyoduvciyKgyeW9Nk0UZMvvVDkRmhyakoUi0jkNMzva2i2xa1eWsHO
+c0/v3v+2rAqj/0HYuQPMP6kVxDac1DyF4WMLdgC9R2bv3CrpUU7NIw06nA6ez58V
+osYlZZP+4/2nI5yyAHq9gBns3ge50ToBPtRm3IIXu85CBlt4bqykbnIiSSpE+ktW
+TLSIQHuL0pkA9lW5uey1/toRi5sGW3KFkHZt9o11TAbMb5HCG1oS0LkEgXzBY6oF
+EIvOU6VmhSrIrvgW6k0eHDWb/zCu1JwHl7FST3IYbr5i+vLbqeSVePj4iJmDg00o
+YzvcshK0GyENS7cg/fIWsj4rb708XRP0mCjUwCIAmlY5iD9gDRo9E3CSgRVBAkdB
+KzRbGgwU4a5whyWrDdOh7cU8eaMcyBEmedHDFAPPxy8QQJJOJ7CpzavtyQbDrwTf
+cTYszXUdu3SZ2j8KjbJ54wOcZP7MkQ88iBvFYh5BICk8bAIhX1E=
+=Axbr
+-----END PGP SIGNATURE-----
 
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  =
-
-  INFO: task kworker/0:1:15 blocked for more than 122 seconds.
--       Not tainted 5.2.14-1 #1
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Not tainted 5.2.14-1 #1
-  "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-  kworker/0:1     D    0    15      2 0x800004000
-  Workqueue: events drm_fb_helper_dirty_work [drm_kms_helper]
-  Call Trace:
--  ? __schedule+0x27f/0x6d0
--  schedule+0x3d/0xc0
--  virtio_gpu_queue_fenced_ctrl_buffer+0xa1/0x130 [virtio_gpu]
--  ? wait_woken+0x80/0x80
--  virtio_gpu_surface_dirty+0x2a5/0x300 [virtio_gpu]
--  drm_fb_helper_dirty_work+0x156/0x160 [drm_kms_helper]
--  process_one_work+0x19a/0x3b0
--  worker_tread+0x50/0x3a0
--  kthread+0xfd/0x130
--  ? process_one_work+0x3b0/0x3b0
--  ? kthread_park+0x80/0x80
--  ret_from_fork+0x35/0x40
-+ =C2=A0? __schedule+0x27f/0x6d0
-+ =C2=A0schedule+0x3d/0xc0
-+ =C2=A0virtio_gpu_queue_fenced_ctrl_buffer+0xa1/0x130 [virtio_gpu]
-+ =C2=A0? wait_woken+0x80/0x80
-+ =C2=A0virtio_gpu_surface_dirty+0x2a5/0x300 [virtio_gpu]
-+ =C2=A0drm_fb_helper_dirty_work+0x156/0x160 [drm_kms_helper]
-+ =C2=A0process_one_work+0x19a/0x3b0
-+ =C2=A0worker_tread+0x50/0x3a0
-+ =C2=A0kthread+0xfd/0x130
-+ =C2=A0? process_one_work+0x3b0/0x3b0
-+ =C2=A0? kthread_park+0x80/0x80
-+ =C2=A0ret_from_fork+0x35/0x40
-  =
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  =
-
-  /usr/bin/qemu-system-x86_64 \
--    -name vm,process=3Dqemu:vm \
--    -no-user-config \
--    -nodefaults \
--    -nographic \
--    -uuid <uuid> \
--    -pidfile <pidfile> \
--    -machine q35,accel=3Dkvm,vmport=3Doff,dump-guest-core=3Doff \
--    -cpu SandyBridge-IBRS \
--    -smp cpus=3D4,cores=3D2,threads=3D1,sockets=3D2 \
--    -m 4G \
--    -drive if=3Dpflash,format=3Draw,readonly,file=3D/usr/share/ovmf/x64/OV=
-MF_CODE.fd \
--    -drive if=3Dpflash,format=3Draw,file=3D/var/qemu/efivars/vm.fd \
--    -monitor telnet:localhost:8000,server,nowait,nodelay \
--    -spice unix,addr=3D/tmp/spice.vm.sock,disable-ticketing \
--    -device ioh3420,id=3Dpcie.1,bus=3Dpcie.0,slot=3D0 \
--    -device virtio-vga,bus=3Dpcie.1,addr=3D0 \
--    -usbdevice tablet \
--    -netdev bridge,id=3Dnetwork0,br=3Dbr0 \
--    -device virtio-net-pci,netdev=3Dnetwork0,mac=3DF4:F6:34:F6:34:2d,bus=
-=3Dpcie.0,addr=3D3 \
--    -device virtio-scsi-pci,id=3Dscsi1 \
--    -drive driver=3Draw,node-name=3Dhd0,file=3D/dev/lvm/vm,if=3Dnone,disca=
-rd=3Dunmap,cache=3Dnone,aio=3Dthreads
-+ =C2=A0=C2=A0=C2=A0-name vm,process=3Dqemu:vm \
-+ =C2=A0=C2=A0=C2=A0-no-user-config \
-+ =C2=A0=C2=A0=C2=A0-nodefaults \
-+ =C2=A0=C2=A0=C2=A0-nographic \
-+ =C2=A0=C2=A0=C2=A0-uuid <uuid> \
-+ =C2=A0=C2=A0=C2=A0-pidfile <pidfile> \
-+ =C2=A0=C2=A0=C2=A0-machine q35,accel=3Dkvm,vmport=3Doff,dump-guest-core=
-=3Doff \
-+ =C2=A0=C2=A0=C2=A0-cpu SandyBridge-IBRS \
-+ =C2=A0=C2=A0=C2=A0-smp cpus=3D4,cores=3D2,threads=3D1,sockets=3D2 \
-+ =C2=A0=C2=A0=C2=A0-m 4G \
-+ =C2=A0=C2=A0=C2=A0-drive if=3Dpflash,format=3Draw,readonly,file=3D/usr/sh=
-are/ovmf/x64/OVMF_CODE.fd \
-+ =C2=A0=C2=A0=C2=A0-drive if=3Dpflash,format=3Draw,file=3D/var/qemu/efivar=
-s/vm.fd \
-+ =C2=A0=C2=A0=C2=A0-monitor telnet:localhost:8000,server,nowait,nodelay \
-+ =C2=A0=C2=A0=C2=A0-spice unix,addr=3D/tmp/spice.vm.sock,disable-ticketing=
- \
-+ =C2=A0=C2=A0=C2=A0-device ioh3420,id=3Dpcie.1,bus=3Dpcie.0,slot=3D0 \
-+ =C2=A0=C2=A0=C2=A0-device virtio-vga,bus=3Dpcie.1,addr=3D0 \
-+ =C2=A0=C2=A0=C2=A0-usbdevice tablet \
-+ =C2=A0=C2=A0=C2=A0-netdev bridge,id=3Dnetwork0,br=3Dbr0 \
-+ =C2=A0=C2=A0=C2=A0-device virtio-net-pci,netdev=3Dnetwork0,mac=3DF4:F6:34=
-:F6:34:2d,bus=3Dpcie.0,addr=3D3 \
-+ =C2=A0=C2=A0=C2=A0-device virtio-scsi-pci,id=3Dscsi1 \
-+ =C2=A0=C2=A0=C2=A0-drive driver=3Draw,node-name=3Dhd0,file=3D/dev/lvm/vm,=
-if=3Dnone,discard=3Dunmap,cache=3Dnone,aio=3Dthreads
-
-** Description changed:
-
-  I've had bunches of these errors on 9 different boots, between
-  2019-08-21 and now, with Arch host and guest, from linux 5.1.16 to
-  5.2.14 on host and guest, with QEMU 4.0.0 and 4.1.0.  spice 0.14.2,
-  spice-gtk 0.37, spice-protocol 0.14.0, virt-viewer 8.0.
-  =
-
-  I've been fighting with some other issues related to a 5.2 btrfs
-  regression, a QEMU qxl regression (see bug 1843151) which I ran into
-  when trying to temporarily abandon virtio-vga, and I haven't paid enough
-- attention to what impact it has on the system when these occur.  In
-- journalctl, I can see I often rebooted minutes after they occurred, but
-- sometimes much later.  That must mean whenever I saw it happen that I
-- rebooted the VM, or potentially it impacted functionality of the system.
-+ attention to what impact specifically this virtio_gpu issue has on the
-+ system In journalctl, I can see I often rebooted minutes after they
-+ occurred, but sometimes much later.  That must mean whenever I saw it
-+ happen that I rebooted the VM, or potentially it impacted functionality
-+ of the system.
-  =
-
-  Please let me know if and how I can get more information for you if
-  needed.
-  =
-
-  I've replicated this on both a system with integrated ASPEED video, and
-  on an AMD Vega 64 running amdgpu.
-  =
-
-  As an example, I have one boot which reported at 122 seconds, 245, 368,
-  491, 614, 737, 860, 983, 1105, 1228, then I rebooted.
-  =
-
-  I have another that reported 122/245/368/491/614/737, went away for 10
-  minutes, then started reporting again 122/245/368/491, and went away.
-  Then, I rebooted about 20 hours later.
-  =
-
-  Host system has no graphical impact when this happens, and logs nothing
-  in its journalctl.
-  =
-
-  Guest is tty mode only, with kernel argument "video=3D1280x1024".  No x
-  server.
-  =
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  =
-
-  INFO: task kworker/0:1:15 blocked for more than 122 seconds.
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Not tainted 5.2.14-1 #1
-  "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-  kworker/0:1     D    0    15      2 0x800004000
-  Workqueue: events drm_fb_helper_dirty_work [drm_kms_helper]
-  Call Trace:
-  =C2=A0? __schedule+0x27f/0x6d0
-  =C2=A0schedule+0x3d/0xc0
-  =C2=A0virtio_gpu_queue_fenced_ctrl_buffer+0xa1/0x130 [virtio_gpu]
-  =C2=A0? wait_woken+0x80/0x80
-  =C2=A0virtio_gpu_surface_dirty+0x2a5/0x300 [virtio_gpu]
-  =C2=A0drm_fb_helper_dirty_work+0x156/0x160 [drm_kms_helper]
-  =C2=A0process_one_work+0x19a/0x3b0
-  =C2=A0worker_tread+0x50/0x3a0
-  =C2=A0kthread+0xfd/0x130
-  =C2=A0? process_one_work+0x3b0/0x3b0
-  =C2=A0? kthread_park+0x80/0x80
-  =C2=A0ret_from_fork+0x35/0x40
-  =
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  =
-
-  /usr/bin/qemu-system-x86_64 \
-  =C2=A0=C2=A0=C2=A0-name vm,process=3Dqemu:vm \
-  =C2=A0=C2=A0=C2=A0-no-user-config \
-  =C2=A0=C2=A0=C2=A0-nodefaults \
-  =C2=A0=C2=A0=C2=A0-nographic \
-  =C2=A0=C2=A0=C2=A0-uuid <uuid> \
-  =C2=A0=C2=A0=C2=A0-pidfile <pidfile> \
-  =C2=A0=C2=A0=C2=A0-machine q35,accel=3Dkvm,vmport=3Doff,dump-guest-core=
-=3Doff \
-  =C2=A0=C2=A0=C2=A0-cpu SandyBridge-IBRS \
-  =C2=A0=C2=A0=C2=A0-smp cpus=3D4,cores=3D2,threads=3D1,sockets=3D2 \
-  =C2=A0=C2=A0=C2=A0-m 4G \
-  =C2=A0=C2=A0=C2=A0-drive if=3Dpflash,format=3Draw,readonly,file=3D/usr/sh=
-are/ovmf/x64/OVMF_CODE.fd \
-  =C2=A0=C2=A0=C2=A0-drive if=3Dpflash,format=3Draw,file=3D/var/qemu/efivar=
-s/vm.fd \
-  =C2=A0=C2=A0=C2=A0-monitor telnet:localhost:8000,server,nowait,nodelay \
-  =C2=A0=C2=A0=C2=A0-spice unix,addr=3D/tmp/spice.vm.sock,disable-ticketing=
- \
-  =C2=A0=C2=A0=C2=A0-device ioh3420,id=3Dpcie.1,bus=3Dpcie.0,slot=3D0 \
-  =C2=A0=C2=A0=C2=A0-device virtio-vga,bus=3Dpcie.1,addr=3D0 \
-  =C2=A0=C2=A0=C2=A0-usbdevice tablet \
-  =C2=A0=C2=A0=C2=A0-netdev bridge,id=3Dnetwork0,br=3Dbr0 \
-  =C2=A0=C2=A0=C2=A0-device virtio-net-pci,netdev=3Dnetwork0,mac=3DF4:F6:34=
-:F6:34:2d,bus=3Dpcie.0,addr=3D3 \
-  =C2=A0=C2=A0=C2=A0-device virtio-scsi-pci,id=3Dscsi1 \
-  =C2=A0=C2=A0=C2=A0-drive driver=3Draw,node-name=3Dhd0,file=3D/dev/lvm/vm,=
-if=3Dnone,discard=3Dunmap,cache=3Dnone,aio=3Dthreads
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1844053
-
-Title:
-  task blocked for more than X seconds - events drm_fb_helper_dirty_work
-
-Status in QEMU:
-  New
-
-Bug description:
-  I've had bunches of these errors on 9 different boots, between
-  2019-08-21 and now, with Arch host and guest, from linux 5.1.16 to
-  5.2.14 on host and guest, with QEMU 4.0.0 and 4.1.0.  spice 0.14.2,
-  spice-gtk 0.37, spice-protocol 0.14.0, virt-viewer 8.0.
-
-  I've been fighting with some other issues related to a 5.2 btrfs
-  regression, a QEMU qxl regression (see bug 1843151) which I ran into
-  when trying to temporarily abandon virtio-vga, and I haven't paid
-  enough attention to what impact specifically this virtio_gpu issue has
-  on the system In journalctl, I can see I often rebooted minutes after
-  they occurred, but sometimes much later.  That must mean whenever I
-  saw it happen that I rebooted the VM, or potentially it impacted
-  functionality of the system.
-
-  Please let me know if and how I can get more information for you if
-  needed.
-
-  I've replicated this on both a system with integrated ASPEED video,
-  and on an AMD Vega 64 running amdgpu.
-
-  As an example, I have one boot which reported at 122 seconds, 245,
-  368, 491, 614, 737, 860, 983, 1105, 1228, then I rebooted.
-
-  I have another that reported 122/245/368/491/614/737, went away for 10
-  minutes, then started reporting again 122/245/368/491, and went away.
-  Then, I rebooted about 20 hours later.
-
-  Host system has no graphical impact when this happens, and logs
-  nothing in its journalctl.
-
-  Guest is tty mode only, with kernel argument "video=3D1280x1024".  No x
-  server.
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  INFO: task kworker/0:1:15 blocked for more than 122 seconds.
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Not tainted 5.2.14-1 #1
-  "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-  kworker/0:1     D    0    15      2 0x800004000
-  Workqueue: events drm_fb_helper_dirty_work [drm_kms_helper]
-  Call Trace:
-  =C2=A0? __schedule+0x27f/0x6d0
-  =C2=A0schedule+0x3d/0xc0
-  =C2=A0virtio_gpu_queue_fenced_ctrl_buffer+0xa1/0x130 [virtio_gpu]
-  =C2=A0? wait_woken+0x80/0x80
-  =C2=A0virtio_gpu_surface_dirty+0x2a5/0x300 [virtio_gpu]
-  =C2=A0drm_fb_helper_dirty_work+0x156/0x160 [drm_kms_helper]
-  =C2=A0process_one_work+0x19a/0x3b0
-  =C2=A0worker_tread+0x50/0x3a0
-  =C2=A0kthread+0xfd/0x130
-  =C2=A0? process_one_work+0x3b0/0x3b0
-  =C2=A0? kthread_park+0x80/0x80
-  =C2=A0ret_from_fork+0x35/0x40
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  /usr/bin/qemu-system-x86_64 \
-  =C2=A0=C2=A0=C2=A0-name vm,process=3Dqemu:vm \
-  =C2=A0=C2=A0=C2=A0-no-user-config \
-  =C2=A0=C2=A0=C2=A0-nodefaults \
-  =C2=A0=C2=A0=C2=A0-nographic \
-  =C2=A0=C2=A0=C2=A0-uuid <uuid> \
-  =C2=A0=C2=A0=C2=A0-pidfile <pidfile> \
-  =C2=A0=C2=A0=C2=A0-machine q35,accel=3Dkvm,vmport=3Doff,dump-guest-core=
-=3Doff \
-  =C2=A0=C2=A0=C2=A0-cpu SandyBridge-IBRS \
-  =C2=A0=C2=A0=C2=A0-smp cpus=3D4,cores=3D2,threads=3D1,sockets=3D2 \
-  =C2=A0=C2=A0=C2=A0-m 4G \
-  =C2=A0=C2=A0=C2=A0-drive if=3Dpflash,format=3Draw,readonly,file=3D/usr/sh=
-are/ovmf/x64/OVMF_CODE.fd \
-  =C2=A0=C2=A0=C2=A0-drive if=3Dpflash,format=3Draw,file=3D/var/qemu/efivar=
-s/vm.fd \
-  =C2=A0=C2=A0=C2=A0-monitor telnet:localhost:8000,server,nowait,nodelay \
-  =C2=A0=C2=A0=C2=A0-spice unix,addr=3D/tmp/spice.vm.sock,disable-ticketing=
- \
-  =C2=A0=C2=A0=C2=A0-device ioh3420,id=3Dpcie.1,bus=3Dpcie.0,slot=3D0 \
-  =C2=A0=C2=A0=C2=A0-device virtio-vga,bus=3Dpcie.1,addr=3D0 \
-  =C2=A0=C2=A0=C2=A0-usbdevice tablet \
-  =C2=A0=C2=A0=C2=A0-netdev bridge,id=3Dnetwork0,br=3Dbr0 \
-  =C2=A0=C2=A0=C2=A0-device virtio-net-pci,netdev=3Dnetwork0,mac=3DF4:F6:34=
-:F6:34:2d,bus=3Dpcie.0,addr=3D3 \
-  =C2=A0=C2=A0=C2=A0-device virtio-scsi-pci,id=3Dscsi1 \
-  =C2=A0=C2=A0=C2=A0-drive driver=3Draw,node-name=3Dhd0,file=3D/dev/lvm/vm,=
-if=3Dnone,discard=3Dunmap,cache=3Dnone,aio=3Dthreads
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1844053/+subscriptions
+--NDin8bjvE/0mNLFQ--
 
