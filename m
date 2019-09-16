@@ -2,48 +2,49 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 888E8C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 12:43:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E9BC49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 12:51:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5669420665
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 12:43:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5669420665
+	by mail.kernel.org (Postfix) with ESMTPS id 3958A2067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 12:51:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3958A2067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9qLw-0000Or-CE
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 08:43:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34945)
+	id 1i9qTG-0003Cs-9Z
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 08:51:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35486)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i9qKv-0008Bi-5V
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 08:42:34 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i9qP1-0001jn-98
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 08:46:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i9qKt-0006uC-SX
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 08:42:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46758)
+ (envelope-from <mreitz@redhat.com>) id 1i9qOz-0000CS-Vx
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 08:46:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44252)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i9qKp-0006sJ-3f; Mon, 16 Sep 2019 08:42:27 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1i9qOw-0000Ai-Mu; Mon, 16 Sep 2019 08:46:42 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E262CA70E;
- Mon, 16 Sep 2019 12:42:25 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 75FCF30860A5;
+ Mon, 16 Sep 2019 12:46:41 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A58DC60BE1;
- Mon, 16 Sep 2019 12:42:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0BB715D9DC;
+ Mon, 16 Sep 2019 12:46:37 +0000 (UTC)
 To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
 References: <20190915203655.21638-1-mlevitsk@redhat.com>
- <20190915203655.21638-2-mlevitsk@redhat.com>
+ <20190915203655.21638-3-mlevitsk@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -70,22 +71,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <de464a16-d4c4-5adb-69f8-4f1ed1717533@redhat.com>
-Date: Mon, 16 Sep 2019 14:42:20 +0200
+Message-ID: <a603c258-b16d-8136-183a-821523765e72@redhat.com>
+Date: Mon, 16 Sep 2019 14:46:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190915203655.21638-2-mlevitsk@redhat.com>
+In-Reply-To: <20190915203655.21638-3-mlevitsk@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="caOjIlolDftIqjlzmFnjbKHOvlG3cFyYj"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+ boundary="d6ywZYvfn3cFzi9Nf6UtDHJun28EVCQPl"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Mon, 16 Sep 2019 12:42:25 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Mon, 16 Sep 2019 12:46:41 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v7 1/3] block/qcow2: Fix corruption
- introduced by commit 8ac0f15f335
+Subject: Re: [Qemu-devel] [PATCH v7 2/3] block/qcow2: refactor encryption
+ code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,8 +107,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---caOjIlolDftIqjlzmFnjbKHOvlG3cFyYj
-Content-Type: multipart/mixed; boundary="1fiOmnlFOfQRCnLjp07dTSzlfCyh15W8o";
+--d6ywZYvfn3cFzi9Nf6UtDHJun28EVCQPl
+Content-Type: multipart/mixed; boundary="7i3QBlI7gmjEgW4qFGGsHihAsmiKTugSK";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
@@ -116,77 +117,74 @@ Cc: Kevin Wolf <kwolf@redhat.com>,
  qemu-block@nongnu.org, =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?=
  <berrange@redhat.com>, Eric Blake <eblake@redhat.com>,
  qemu-stable <qemu-stable@nongnu.org>
-Message-ID: <de464a16-d4c4-5adb-69f8-4f1ed1717533@redhat.com>
-Subject: Re: [PATCH v7 1/3] block/qcow2: Fix corruption introduced by commit
- 8ac0f15f335
+Message-ID: <a603c258-b16d-8136-183a-821523765e72@redhat.com>
+Subject: Re: [PATCH v7 2/3] block/qcow2: refactor encryption code
 References: <20190915203655.21638-1-mlevitsk@redhat.com>
- <20190915203655.21638-2-mlevitsk@redhat.com>
-In-Reply-To: <20190915203655.21638-2-mlevitsk@redhat.com>
+ <20190915203655.21638-3-mlevitsk@redhat.com>
+In-Reply-To: <20190915203655.21638-3-mlevitsk@redhat.com>
 
---1fiOmnlFOfQRCnLjp07dTSzlfCyh15W8o
+--7i3QBlI7gmjEgW4qFGGsHihAsmiKTugSK
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 15.09.19 22:36, Maxim Levitsky wrote:
-> This fixes subtle corruption introduced by luks threaded encryption
-> in commit 8ac0f15f335
+> * Change the qcow2_co_{encrypt|decrypt} to just receive full host and
+>   guest offsets and use this function directly instead of calling
+>   do_perform_cow_encrypt (which is removed by that patch).
 >=20
-> Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=3D1745922
+> * Adjust qcow2_co_encdec to take full host and guest offsets as well.
 >=20
-> The corruption happens when we do a write that
->    * writes to two or more unallocated clusters at once
->    * doesn't fully cover the first sector
->    * doesn't fully cover the last sector
->    * uses luks encryption
->=20
-> In this case, when allocating the new clusters we COW both areas
-> prior to the write and after the write, and we encrypt them.
->=20
-> The above mentioned commit accidentally made it so we encrypt the
-> second COW area using the physical cluster offset of the first area.
->=20
-> The problem is that offset_in_cluster in do_perform_cow_encrypt
-> can be larger that the cluster size, thus cluster_offset
-> will no longer point to the start of the cluster at which encrypted
-> area starts.
->=20
-> Next patch in this series will refactor the code to avoid all these
-> assumptions.
->=20
-> In the bugreport that was triggered by rebasing a luks image to new,
-> zero filled base, which lot of such writes, and causes some files
-> with zero areas to contain garbage there instead.
-> But as described above it can happen elsewhere as well
->=20
+> * Document the qcow2_co_{encrypt|decrypt} arguments
+>   to prevent the bug fixed in former commit from hopefully
+>   happening again.
 >=20
 > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/qcow2-cluster.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  block/qcow2-cluster.c | 41 ++++++++++------------------
+>  block/qcow2-threads.c | 63 +++++++++++++++++++++++++++++++++----------=
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+>  block/qcow2.c         |  5 ++--
+>  block/qcow2.h         |  8 +++---
+>  4 files changed, 70 insertions(+), 47 deletions(-)
+
+Looks good to me, but there are conflicts with two series I=E2=80=99ve al=
+ready
+taken to my branch: Namely =E2=80=9Cqcow2: async handling of fragmented i=
+o=E2=80=9D by
+Vladimir and =E2=80=9CAlignment checks cleanup=E2=80=8B=E2=80=9D by Nir.
+
+Unfortunately, those conflicts (while not difficult to resolve) are not
+quite trivial, so I=E2=80=99d rather not resolve them myself.
+
+I=E2=80=99ll send a pull request today, but until they are in master, you=
+ could
+rebase on my branch (either of
+- https://git.xanclic.moe/XanClic/qemu.git block
+- https://github.com/XanClic/qemu.git block
+, whichever you prefer that works).
+
+Max
 
 
---1fiOmnlFOfQRCnLjp07dTSzlfCyh15W8o--
+--7i3QBlI7gmjEgW4qFGGsHihAsmiKTugSK--
 
---caOjIlolDftIqjlzmFnjbKHOvlG3cFyYj
+--d6ywZYvfn3cFzi9Nf6UtDHJun28EVCQPl
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1/gywACgkQ9AfbAGHV
-z0B2rwgAn89m/lVSzkV/b2ei2YV8qeLuDCpzubmVYtlGuDivIcWPuOH8M/9FjsY2
-QGPSaQqt4JCuHBOA3zrtd3ujes1gX8Qv87OJUKrL1WTkOWuT/zpTga5RuwoGBn4I
-fpVSfmOPKkfvBFpYGy93TJkPzno66JRZyUkgiA2JR1T8V3rbA8IoSNlNMt4YsUsG
-wh4pRYez+4rRrfwfb2ZuS+p2kf1sNuHw2F/1I2HUMFUjqyac5M3H59S+zgl2ytuR
-o6v0yN+GptYfuOFmyi9cUqK2qOfHsnBJhyn7q/+O/oyS72HV1pLVgif5yley9YK+
-QJN+F66kZ/CPRm08BsyxgxdaEz7RDg==
-=eBVf
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1/hCsACgkQ9AfbAGHV
+z0BBJggAtpZ8XdXRyHRtAqJzPwc7P+hjBc+F87FX4UVoL8RgZfjKwd1mbg8MVsc/
+ZFQr1TFudZ6nCsWoekO5ih9e9NWrk49ms+zm7VnKRtIRXABNn8ugNj3rMfY5PvYe
+vv8Meyh85UuPpndRapjd+PTawey6ueVca9nKhVWD062UN64tH4g8QdLK/yIdQhsU
+f6fFeQ+lVDnBB+r8PazdKEUTF/GJ9Yfp2MHEQcKtiQxLkkXksDA9TL6o77xtWYQq
+dmCJc2pghm2qv1fhkh0S8qanD8mS41vH+k0YOC+b7+AkxZ51r1toWWRUbbdoXoJu
+haxm7pH+LjevLCpbHMtBJ8YPrUDFLA==
+=atcZ
 -----END PGP SIGNATURE-----
 
---caOjIlolDftIqjlzmFnjbKHOvlG3cFyYj--
+--d6ywZYvfn3cFzi9Nf6UtDHJun28EVCQPl--
 
