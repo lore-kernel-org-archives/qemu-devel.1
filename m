@@ -2,64 +2,86 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E102C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 09:07:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2F51C49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 09:09:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6AD8214D9
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 09:07:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6AD8214D9
+	by mail.kernel.org (Postfix) with ESMTPS id B509C214AF
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 09:09:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B509C214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60177 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9myY-0000r7-Mq
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 05:07:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35905)
+	id 1i9n0Y-0002Jy-O9
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 05:09:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36168)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i9mxd-0000JF-BL
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 05:06:20 -0400
+ (envelope-from <tgolembi@redhat.com>) id 1i9myu-0001Oz-N8
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 05:07:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i9mxZ-0008Fx-JX
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 05:06:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47720)
+ (envelope-from <tgolembi@redhat.com>) id 1i9mys-00006T-A3
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 05:07:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34073)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i9mxZ-0008FW-7c
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 05:06:13 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1i9mys-00006E-1n
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 05:07:34 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9248C10B78
- for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 09:06:11 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.13])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CB9C35D721;
- Mon, 16 Sep 2019 09:06:09 +0000 (UTC)
-Date: Mon, 16 Sep 2019 10:06:06 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <20190916090606.GA2887@work-vm>
-References: <20190912122514.22504-1-marcandre.lureau@redhat.com>
- <20190912122514.22504-4-marcandre.lureau@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 848E04E926
+ for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 09:07:32 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id n3so5540407wmf.3
+ for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 02:07:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=c6dXK6pT5T/pf5AtiTSs1tfrfgwFOBsfVpu5YrBCOUU=;
+ b=Hccy/kBEji4lZSSa4iS+qJgTzxPQrZBk0k6wHO8TxLwBrPB8VglVi0d4xwuAuncmKI
+ Q4QnRt2F7S2TgB+QzxLJHSSVkigoyLmHaYYDTdJeWaYj4o6ym7UZvsEzRo+U6N9G1jq+
+ lkRU3SwCYO+vO8dEcQw4EhfRJ5JLeCIQzBkvLTW2kVcpY8J6tW3NBGFz/0MA7Pbs27I0
+ kYOc6poICri9ZySKnut2xXEBPlVlDqKUdRfw/BtI3Ce9iY/Rk7xoBUxnUYRd3jYGEt4T
+ gIoFHoPnIrtsEh+6iCQ/xAuUyshWyL50z8BUMBNngUEVBpIesbIh7dz73HHqtsJKW8Oj
+ MuGQ==
+X-Gm-Message-State: APjAAAXD083PGe7n0pQcdEVzZV4QSLFKzChgTwK5yIBnRMha0J1///pj
+ Lw29+h+31NsBx5iIedJxHvwVvclQo0jCJT5IlltbSBLWRhycnn0jnKXjtSQqazWVFsHx00tQ2GE
+ k+ooyp4dVpeWgnFk=
+X-Received: by 2002:adf:e7c4:: with SMTP id e4mr40238602wrn.62.1568624851275; 
+ Mon, 16 Sep 2019 02:07:31 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzf6jjMXrpgdMUkmMWjCw9FTCJz3Y7nplOdI6/hiQEr03RFnLhL/V8ZgKr0AheUv4/BhbHX/g==
+X-Received: by 2002:adf:e7c4:: with SMTP id e4mr40238585wrn.62.1568624850958; 
+ Mon, 16 Sep 2019 02:07:30 -0700 (PDT)
+Received: from auriga.localdomain (nat-pool-brq-t.redhat.com. [213.175.37.10])
+ by smtp.gmail.com with ESMTPSA id
+ z4sm8892433wrh.93.2019.09.16.02.07.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Sep 2019 02:07:30 -0700 (PDT)
+Date: Mon, 16 Sep 2019 11:07:29 +0200
+From: =?utf-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <20190916090728.ux6udmc2y5pydchf@auriga.localdomain>
+References: <10eeadc9a86a7e3b9fa287c0389f0597f5c6a49b.1567094601.git.tgolembi@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190912122514.22504-4-marcandre.lureau@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Mon, 16 Sep 2019 09:06:11 +0000 (UTC)
+In-Reply-To: <10eeadc9a86a7e3b9fa287c0389f0597f5c6a49b.1567094601.git.tgolembi@redhat.com>
+User-Agent: NeoMutt/20180716
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 3/6] vmstate: replace DeviceState with
- VMStateIf
+Subject: Re: [Qemu-devel] [PATCH] qga: add command guest-get-devices for
+ reporting VirtIO devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,502 +93,345 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mprivozn@redhat.com, pbonzini@redhat.com, berrange@redhat.com,
- qemu-devel@nongnu.org, quintela@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
-> Replace DeviceState dependency with VMStateIf on vmstate API.
+gentle reminder
+
+On Thu, Aug 29, 2019 at 06:03:21PM +0200, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD=
+ wrote:
+> Add command for reporting devices on Windows guest. The intent is not s=
+o
+> much to report the devices but more importantly the driver (and its
+> version) that is assigned to the device.
 >=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
 > ---
->  docs/devel/migration.rst     |  2 +-
->  hw/block/onenand.c           |  2 +-
->  hw/core/qdev.c               |  7 ++++---
->  hw/ide/cmd646.c              |  2 +-
->  hw/ide/isa.c                 |  2 +-
->  hw/ide/piix.c                |  2 +-
->  hw/ide/via.c                 |  2 +-
->  hw/misc/max111x.c            |  2 +-
->  hw/net/eepro100.c            |  4 ++--
->  hw/net/vmxnet3.c             |  2 +-
->  hw/nvram/eeprom93xx.c        |  4 ++--
->  hw/ppc/spapr_drc.c           |  9 +++++----
->  hw/ppc/spapr_iommu.c         |  4 ++--
->  hw/s390x/s390-skeys.c        |  2 +-
->  include/migration/register.h |  4 ++--
->  include/migration/vmstate.h  |  8 ++++----
->  migration/savevm.c           | 26 +++++++++++++-------------
->  stubs/vmstate.c              |  4 ++--
->  18 files changed, 45 insertions(+), 43 deletions(-)
+>  qga/commands-posix.c |  11 +++
+>  qga/commands-win32.c | 195 ++++++++++++++++++++++++++++++++++++++++++-
+>  qga/qapi-schema.json |  32 +++++++
+>  3 files changed, 237 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/docs/devel/migration.rst b/docs/devel/migration.rst
-> index f7668ae389..c9932194d9 100644
-> --- a/docs/devel/migration.rst
-> +++ b/docs/devel/migration.rst
-> @@ -183,7 +183,7 @@ another to load the state back.
+> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> index dfc05f5b8a..9adf8bb520 100644
+> --- a/qga/commands-posix.c
+> +++ b/qga/commands-posix.c
+> @@ -2709,6 +2709,7 @@ int64_t qmp_guest_fsfreeze_thaw(Error **errp)
 > =20
->  .. code:: c
-> =20
-> -  int register_savevm_live(DeviceState *dev,
-> +  int register_savevm_live(VMStateIf *obj,
->                             const char *idstr,
->                             int instance_id,
->                             int version_id,
-> diff --git a/hw/block/onenand.c b/hw/block/onenand.c
-> index fcc5a69b90..9c233c12e4 100644
-> --- a/hw/block/onenand.c
-> +++ b/hw/block/onenand.c
-> @@ -822,7 +822,7 @@ static void onenand_realize(DeviceState *dev, Error=
- **errp)
->      onenand_mem_setup(s);
->      sysbus_init_irq(sbd, &s->intr);
->      sysbus_init_mmio(sbd, &s->container);
-> -    vmstate_register(dev,
-> +    vmstate_register(VMSTATE_IF(dev),
->                       ((s->shift & 0x7f) << 24)
->                       | ((s->id.man & 0xff) << 16)
->                       | ((s->id.dev & 0xff) << 8)
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 7e083dfcae..ad18c0383d 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -849,7 +849,8 @@ static void device_set_realized(Object *obj, bool v=
-alue, Error **errp)
->          dev->canonical_path =3D object_get_canonical_path(OBJECT(dev))=
-;
-> =20
->          if (qdev_get_vmsd(dev)) {
-> -            if (vmstate_register_with_alias_id(dev, -1, qdev_get_vmsd(=
-dev), dev,
-> +            if (vmstate_register_with_alias_id(VMSTATE_IF(dev),
-> +                                               -1, qdev_get_vmsd(dev),=
- dev,
->                                                 dev->instance_id_alias,
->                                                 dev->alias_required_for=
-_version,
->                                                 &local_err) < 0) {
-> @@ -884,7 +885,7 @@ static void device_set_realized(Object *obj, bool v=
-alue, Error **errp)
->                                       local_errp);
->          }
->          if (qdev_get_vmsd(dev)) {
-> -            vmstate_unregister(dev, qdev_get_vmsd(dev), dev);
-> +            vmstate_unregister(VMSTATE_IF(dev), qdev_get_vmsd(dev), de=
-v);
->          }
->          if (dc->unrealize) {
->              local_errp =3D local_err ? NULL : &local_err;
-> @@ -908,7 +909,7 @@ child_realize_fail:
->      }
-> =20
->      if (qdev_get_vmsd(dev)) {
-> -        vmstate_unregister(dev, qdev_get_vmsd(dev), dev);
-> +        vmstate_unregister(VMSTATE_IF(dev), qdev_get_vmsd(dev), dev);
->      }
-> =20
->  post_realize_fail:
-> diff --git a/hw/ide/cmd646.c b/hw/ide/cmd646.c
-> index f3ccd11c79..01a982acbc 100644
-> --- a/hw/ide/cmd646.c
-> +++ b/hw/ide/cmd646.c
-> @@ -301,7 +301,7 @@ static void pci_cmd646_ide_realize(PCIDevice *dev, =
-Error **errp)
->          ide_register_restart_cb(&d->bus[i]);
->      }
-> =20
-> -    vmstate_register(DEVICE(dev), 0, &vmstate_ide_pci, d);
-> +    vmstate_register(VMSTATE_IF(dev), 0, &vmstate_ide_pci, d);
->      qemu_register_reset(cmd646_reset, d);
->  }
-> =20
-> diff --git a/hw/ide/isa.c b/hw/ide/isa.c
-> index 7b6e283679..9c7f88b2d5 100644
-> --- a/hw/ide/isa.c
-> +++ b/hw/ide/isa.c
-> @@ -75,7 +75,7 @@ static void isa_ide_realizefn(DeviceState *dev, Error=
- **errp)
->      ide_init_ioport(&s->bus, isadev, s->iobase, s->iobase2);
->      isa_init_irq(isadev, &s->irq, s->isairq);
->      ide_init2(&s->bus, s->irq);
-> -    vmstate_register(dev, 0, &vmstate_ide_isa, s);
-> +    vmstate_register(VMSTATE_IF(dev), 0, &vmstate_ide_isa, s);
->      ide_register_restart_cb(&s->bus);
->  }
-> =20
-> diff --git a/hw/ide/piix.c b/hw/ide/piix.c
-> index fba6bc8bff..cbaee9e2cc 100644
-> --- a/hw/ide/piix.c
-> +++ b/hw/ide/piix.c
-> @@ -159,7 +159,7 @@ static void pci_piix_ide_realize(PCIDevice *dev, Er=
-ror **errp)
->      bmdma_setup_bar(d);
->      pci_register_bar(dev, 4, PCI_BASE_ADDRESS_SPACE_IO, &d->bmdma_bar)=
-;
-> =20
-> -    vmstate_register(DEVICE(dev), 0, &vmstate_ide_pci, d);
-> +    vmstate_register(VMSTATE_IF(dev), 0, &vmstate_ide_pci, d);
-> =20
->      pci_piix_init_ports(d);
->  }
-> diff --git a/hw/ide/via.c b/hw/ide/via.c
-> index 7087dc676e..6b9d4c6d78 100644
-> --- a/hw/ide/via.c
-> +++ b/hw/ide/via.c
-> @@ -193,7 +193,7 @@ static void via_ide_realize(PCIDevice *dev, Error *=
-*errp)
->      bmdma_setup_bar(d);
->      pci_register_bar(dev, 4, PCI_BASE_ADDRESS_SPACE_IO, &d->bmdma_bar)=
-;
-> =20
-> -    vmstate_register(DEVICE(dev), 0, &vmstate_ide_pci, d);
-> +    vmstate_register(VMSTATE_IF(dev), 0, &vmstate_ide_pci, d);
-> =20
->      for (i =3D 0; i < 2; i++) {
->          ide_bus_new(&d->bus[i], sizeof(d->bus[i]), DEVICE(d), i, 2);
-> diff --git a/hw/misc/max111x.c b/hw/misc/max111x.c
-> index a713149f16..211008ce02 100644
-> --- a/hw/misc/max111x.c
-> +++ b/hw/misc/max111x.c
-> @@ -146,7 +146,7 @@ static int max111x_init(SSISlave *d, int inputs)
->      s->input[7] =3D 0x80;
->      s->com =3D 0;
-> =20
-> -    vmstate_register(dev, -1, &vmstate_max111x, s);
-> +    vmstate_register(VMSTATE_IF(dev), -1, &vmstate_max111x, s);
 >      return 0;
 >  }
+> +
+>  #endif /* CONFIG_FSFREEZE */
 > =20
-> diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-> index cc2dd8b1c9..cc71a7a036 100644
-> --- a/hw/net/eepro100.c
-> +++ b/hw/net/eepro100.c
-> @@ -1815,7 +1815,7 @@ static void pci_nic_uninit(PCIDevice *pci_dev)
->  {
->      EEPRO100State *s =3D DO_UPCAST(EEPRO100State, dev, pci_dev);
-> =20
-> -    vmstate_unregister(&pci_dev->qdev, s->vmstate, s);
-> +    vmstate_unregister(VMSTATE_IF(&pci_dev->qdev), s->vmstate, s);
->      g_free(s->vmstate);
->      eeprom93xx_free(&pci_dev->qdev, s->eeprom);
->      qemu_del_nic(s->nic);
-> @@ -1874,7 +1874,7 @@ static void e100_nic_realize(PCIDevice *pci_dev, =
-Error **errp)
-> =20
->      s->vmstate =3D g_memdup(&vmstate_eepro100, sizeof(vmstate_eepro100=
-));
->      s->vmstate->name =3D qemu_get_queue(s->nic)->model;
-> -    vmstate_register(&pci_dev->qdev, -1, s->vmstate, s);
-> +    vmstate_register(VMSTATE_IF(&pci_dev->qdev), -1, s->vmstate, s);
->  }
-> =20
->  static void eepro100_instance_init(Object *obj)
-> diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
-> index b07adeed9c..8625e93dc9 100644
-> --- a/hw/net/vmxnet3.c
-> +++ b/hw/net/vmxnet3.c
-> @@ -2247,7 +2247,7 @@ static void vmxnet3_pci_uninit(PCIDevice *pci_dev=
+>  #if !defined(CONFIG_FSTRIM)
+> @@ -2757,6 +2758,8 @@ GList *ga_command_blacklist_init(GList *blacklist=
 )
-> =20
->      VMW_CBPRN("Starting uninit...");
-> =20
-> -    unregister_savevm(dev, "vmxnet3-msix", s);
-> +    unregister_savevm(VMSTATE_IF(dev), "vmxnet3-msix", s);
-> =20
->      vmxnet3_net_uninit(s);
-> =20
-> diff --git a/hw/nvram/eeprom93xx.c b/hw/nvram/eeprom93xx.c
-> index 5b01b9b03f..07f09549ed 100644
-> --- a/hw/nvram/eeprom93xx.c
-> +++ b/hw/nvram/eeprom93xx.c
-> @@ -321,7 +321,7 @@ eeprom_t *eeprom93xx_new(DeviceState *dev, uint16_t=
- nwords)
->      /* Output DO is tristate, read results in 1. */
->      eeprom->eedo =3D 1;
->      logout("eeprom =3D 0x%p, nwords =3D %u\n", eeprom, nwords);
-> -    vmstate_register(dev, 0, &vmstate_eeprom, eeprom);
-> +    vmstate_register(VMSTATE_IF(dev), 0, &vmstate_eeprom, eeprom);
->      return eeprom;
->  }
-> =20
-> @@ -329,7 +329,7 @@ void eeprom93xx_free(DeviceState *dev, eeprom_t *ee=
-prom)
->  {
->      /* Destroy EEPROM. */
->      logout("eeprom =3D 0x%p\n", eeprom);
-> -    vmstate_unregister(dev, &vmstate_eeprom, eeprom);
-> +    vmstate_unregister(VMSTATE_IF(dev), &vmstate_eeprom, eeprom);
->      g_free(eeprom);
->  }
-> =20
-> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> index 62f1a42592..17aeac3801 100644
-> --- a/hw/ppc/spapr_drc.c
-> +++ b/hw/ppc/spapr_drc.c
-> @@ -511,7 +511,7 @@ static void realize(DeviceState *d, Error **errp)
->          error_propagate(errp, err);
->          return;
->      }
-> -    vmstate_register(DEVICE(drc), spapr_drc_index(drc), &vmstate_spapr=
-_drc,
-> +    vmstate_register(VMSTATE_IF(drc), spapr_drc_index(drc), &vmstate_s=
-papr_drc,
->                       drc);
->      trace_spapr_drc_realize_complete(spapr_drc_index(drc));
->  }
-> @@ -523,7 +523,7 @@ static void unrealize(DeviceState *d, Error **errp)
->      gchar *name;
-> =20
->      trace_spapr_drc_unrealize(spapr_drc_index(drc));
-> -    vmstate_unregister(DEVICE(drc), &vmstate_spapr_drc, drc);
-> +    vmstate_unregister(VMSTATE_IF(drc), &vmstate_spapr_drc, drc);
->      root_container =3D container_get(object_get_root(), DRC_CONTAINER_=
-PATH);
->      name =3D g_strdup_printf("%x", spapr_drc_index(drc));
->      object_property_del(root_container, name, errp);
-> @@ -619,7 +619,8 @@ static void realize_physical(DeviceState *d, Error =
-**errp)
->          return;
->      }
-> =20
-> -    vmstate_register(DEVICE(drcp), spapr_drc_index(SPAPR_DR_CONNECTOR(=
-drcp)),
-> +    vmstate_register(VMSTATE_IF(drcp),
-> +                     spapr_drc_index(SPAPR_DR_CONNECTOR(drcp)),
->                       &vmstate_spapr_drc_physical, drcp);
->      qemu_register_reset(drc_physical_reset, drcp);
->  }
-> @@ -635,7 +636,7 @@ static void unrealize_physical(DeviceState *d, Erro=
-r **errp)
->          return;
->      }
-> =20
-> -    vmstate_unregister(DEVICE(drcp), &vmstate_spapr_drc_physical, drcp=
-);
-> +    vmstate_unregister(VMSTATE_IF(drcp), &vmstate_spapr_drc_physical, =
-drcp);
->      qemu_unregister_reset(drc_physical_reset, drcp);
->  }
-> =20
-> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
-> index e87b3d50f7..b9e7854da9 100644
-> --- a/hw/ppc/spapr_iommu.c
-> +++ b/hw/ppc/spapr_iommu.c
-> @@ -315,7 +315,7 @@ static void spapr_tce_table_realize(DeviceState *de=
-v, Error **errp)
-> =20
->      QLIST_INSERT_HEAD(&spapr_tce_tables, tcet, list);
-> =20
-> -    vmstate_register(DEVICE(tcet), tcet->liobn, &vmstate_spapr_tce_tab=
-le,
-> +    vmstate_register(VMSTATE_IF(tcet), tcet->liobn, &vmstate_spapr_tce=
-_table,
->                       tcet);
->  }
-> =20
-> @@ -418,7 +418,7 @@ static void spapr_tce_table_unrealize(DeviceState *=
-dev, Error **errp)
->  {
->      SpaprTceTable *tcet =3D SPAPR_TCE_TABLE(dev);
-> =20
-> -    vmstate_unregister(DEVICE(tcet), &vmstate_spapr_tce_table, tcet);
-> +    vmstate_unregister(VMSTATE_IF(tcet), &vmstate_spapr_tce_table, tce=
-t);
-> =20
->      QLIST_REMOVE(tcet, list);
-> =20
-> diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
-> index d4807f7777..16b9bbf04d 100644
-> --- a/hw/s390x/s390-skeys.c
-> +++ b/hw/s390x/s390-skeys.c
-> @@ -392,7 +392,7 @@ static inline void s390_skeys_set_migration_enabled=
-(Object *obj, bool value,
->          register_savevm_live(NULL, TYPE_S390_SKEYS, 0, 1,
->                               &savevm_s390_storage_keys, ss);
->      } else {
-> -        unregister_savevm(DEVICE(ss), TYPE_S390_SKEYS, ss);
-> +        unregister_savevm(VMSTATE_IF(ss), TYPE_S390_SKEYS, ss);
->      }
->  }
-> =20
-> diff --git a/include/migration/register.h b/include/migration/register.=
-h
-> index 74f1578b29..f22f180286 100644
-> --- a/include/migration/register.h
-> +++ b/include/migration/register.h
-> @@ -70,13 +70,13 @@ typedef struct SaveVMHandlers {
->      int (*resume_prepare)(MigrationState *s, void *opaque);
->  } SaveVMHandlers;
-> =20
-> -int register_savevm_live(DeviceState *dev,
-> +int register_savevm_live(VMStateIf *obj,
->                           const char *idstr,
->                           int instance_id,
->                           int version_id,
->                           const SaveVMHandlers *ops,
->                           void *opaque);
-> =20
-> -void unregister_savevm(DeviceState *dev, const char *idstr, void *opaq=
-ue);
-> +void unregister_savevm(VMStateIf *obj, const char *idstr, void *opaque=
-);
-> =20
+>      blacklist =3D g_list_append(blacklist, g_strdup("guest-fstrim"));
 >  #endif
-> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> index bdcf8a1652..1911e37d72 100644
-> --- a/include/migration/vmstate.h
-> +++ b/include/migration/vmstate.h
-> @@ -1116,22 +1116,22 @@ int vmstate_save_state_v(QEMUFile *f, const VMS=
-tateDescription *vmsd,
->  bool vmstate_save_needed(const VMStateDescription *vmsd, void *opaque)=
-;
 > =20
->  /* Returns: 0 on success, -1 on failure */
-> -int vmstate_register_with_alias_id(DeviceState *dev, int instance_id,
-> +int vmstate_register_with_alias_id(VMStateIf *obj, int instance_id,
->                                     const VMStateDescription *vmsd,
->                                     void *base, int alias_id,
->                                     int required_for_version,
->                                     Error **errp);
-> =20
->  /* Returns: 0 on success, -1 on failure */
-> -static inline int vmstate_register(DeviceState *dev, int instance_id,
-> +static inline int vmstate_register(VMStateIf *obj, int instance_id,
->                                     const VMStateDescription *vmsd,
->                                     void *opaque)
->  {
-> -    return vmstate_register_with_alias_id(dev, instance_id, vmsd,
-> +    return vmstate_register_with_alias_id(obj, instance_id, vmsd,
->                                            opaque, -1, 0, NULL);
+> +    blacklist =3D g_list_append(blacklist, g_strdup("guest-get-devices=
+"));
+> +
+>      return blacklist;
 >  }
 > =20
-> -void vmstate_unregister(DeviceState *dev, const VMStateDescription *vm=
-sd,
-> +void vmstate_unregister(VMStateIf *obj, const VMStateDescription *vmsd=
-,
->                          void *opaque);
+> @@ -2977,3 +2980,11 @@ GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
 > =20
->  struct MemoryRegion;
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 6caa35a679..7902da16e6 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -684,7 +684,7 @@ static void savevm_state_handler_insert(SaveStateEn=
-try *nse)
->     of the system, so instance_id should be removed/replaced.
->     Meanwhile pass -1 as instance_id if you do not already have a clear=
-ly
->     distinguishing id for all instances of your device class. */
-> -int register_savevm_live(DeviceState *dev,
-> +int register_savevm_live(VMStateIf *obj,
->                           const char *idstr,
->                           int instance_id,
->                           int version_id,
-> @@ -704,8 +704,8 @@ int register_savevm_live(DeviceState *dev,
->          se->is_ram =3D 1;
->      }
-> =20
-> -    if (dev) {
-> -        char *id =3D qdev_get_dev_path(dev);
-> +    if (obj) {
-> +        char *id =3D vmstate_if_get_id(obj);
->          if (id) {
->              if (snprintf(se->idstr, sizeof(se->idstr), "%s/", id) >=3D
->                  sizeof(se->idstr)) {
-> @@ -736,17 +736,17 @@ int register_savevm_live(DeviceState *dev,
->      return 0;
+>      return info;
 >  }
+> +
+> +GuestDeviceInfoList *qmp_guest_get_devices(Error **errp)
+> +{
+> +    error_setg(errp, QERR_UNSUPPORTED);
+> +
+> +    return NULL;
+> +}
+> +
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 6b67f16faf..0bb93422c7 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -21,10 +21,11 @@
+>  #ifdef CONFIG_QGA_NTDDSCSI
+>  #include <winioctl.h>
+>  #include <ntddscsi.h>
+> +#endif
+>  #include <setupapi.h>
+>  #include <cfgmgr32.h>
+>  #include <initguid.h>
+> -#endif
+> +#include <devpropdef.h>
+>  #include <lm.h>
+>  #include <wtsapi32.h>
+>  #include <wininet.h>
+> @@ -38,6 +39,36 @@
+>  #include "qemu/host-utils.h"
+>  #include "qemu/base64.h"
 > =20
-> -void unregister_savevm(DeviceState *dev, const char *idstr, void *opaq=
-ue)
-> +void unregister_savevm(VMStateIf *obj, const char *idstr, void *opaque=
-)
->  {
->      SaveStateEntry *se, *new_se;
->      char id[256] =3D "";
+> +
+> +/* The following should be in devpkey.h, but it isn't */
+> +DEFINE_DEVPROPKEY(DEVPKEY_NAME, 0xb725f130, 0x47ef, 0x101a, 0xa5, 0xf1=
+, 0x02,
+> +    0x60, 0x8c, 0x9e, 0xeb, 0xac, 10);  /* DEVPROP_TYPE_STRING */
+> +DEFINE_DEVPROPKEY(DEVPKEY_Device_HardwareIds, 0xa45c254e, 0xdf1c, 0x4e=
+fd, 0x80,
+> +    0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0, 3);
+> +    /* DEVPROP_TYPE_STRING_LIST */
+> +DEFINE_DEVPROPKEY(DEVPKEY_Device_DriverDate, 0xa8b865dd, 0x2e3d, 0x409=
+4, 0xad,
+> +    0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6, 2);  /* DEVPROP_TYPE_FILE=
+TIME */
+> +DEFINE_DEVPROPKEY(DEVPKEY_Device_DriverVersion, 0xa8b865dd, 0x2e3d, 0x=
+4094,
+> +    0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6, 3);
+> +    /* DEVPROP_TYPE_STRING */
+> +/* The following should be in sal.h, but it isn't */
+> +#ifndef _Out_writes_bytes_opt_
+> +#define _Out_writes_bytes_opt_(s)
+> +#endif
+> +/* The following shoud be in cfgmgr32.h, but it isn't */
+> +#ifndef CM_Get_DevNode_Property
+> +CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(
+> +    _In_  DEVINST               dnDevInst,
+> +    _In_  CONST DEVPROPKEY    * PropertyKey,
+> +    _Out_ DEVPROPTYPE         * PropertyType,
+> +    _Out_writes_bytes_opt_(*PropertyBufferSize) PBYTE PropertyBuffer,
+> +    _Inout_ PULONG              PropertyBufferSize,
+> +    _In_  ULONG                 ulFlags
+> +    );
+> +#define CM_Get_DevNode_Property                  CM_Get_DevNode_Proper=
+tyW
+> +#endif
+> +
+> +
+>  #ifndef SHTDN_REASON_FLAG_PLANNED
+>  #define SHTDN_REASON_FLAG_PLANNED 0x80000000
+>  #endif
+> @@ -2234,3 +2265,165 @@ GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
 > =20
-> -    if (dev) {
-> -        char *path =3D qdev_get_dev_path(dev);
-> -        if (path) {
-> -            pstrcpy(id, sizeof(id), path);
-> +    if (obj) {
-> +        char *oid =3D vmstate_if_get_id(obj);
-> +        if (oid) {
-> +            pstrcpy(id, sizeof(id), oid);
->              pstrcat(id, sizeof(id), "/");
-> -            g_free(path);
-> +            g_free(oid);
->          }
-
-And since your previous patch defaults vmstate_if_get_id to return
-qdev_get_dev_path that should mean there's no change.
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
->      }
->      pstrcat(id, sizeof(id), idstr);
-> @@ -760,7 +760,7 @@ void unregister_savevm(DeviceState *dev, const char=
- *idstr, void *opaque)
->      }
+>      return info;
 >  }
-> =20
-> -int vmstate_register_with_alias_id(DeviceState *dev, int instance_id,
-> +int vmstate_register_with_alias_id(VMStateIf *obj, int instance_id,
->                                     const VMStateDescription *vmsd,
->                                     void *opaque, int alias_id,
->                                     int required_for_version,
-> @@ -778,8 +778,8 @@ int vmstate_register_with_alias_id(DeviceState *dev=
-, int instance_id,
->      se->vmsd =3D vmsd;
->      se->alias_id =3D alias_id;
-> =20
-> -    if (dev) {
-> -        char *id =3D qdev_get_dev_path(dev);
-> +    if (obj) {
-> +        char *id =3D vmstate_if_get_id(obj);
->          if (id) {
->              if (snprintf(se->idstr, sizeof(se->idstr), "%s/", id) >=3D
->                  sizeof(se->idstr)) {
-> @@ -810,7 +810,7 @@ int vmstate_register_with_alias_id(DeviceState *dev=
-, int instance_id,
->      return 0;
->  }
-> =20
-> -void vmstate_unregister(DeviceState *dev, const VMStateDescription *vm=
-sd,
-> +void vmstate_unregister(VMStateIf *obj, const VMStateDescription *vmsd=
-,
->                          void *opaque)
->  {
->      SaveStateEntry *se, *new_se;
-> diff --git a/stubs/vmstate.c b/stubs/vmstate.c
-> index e1e89b87f0..6951d9fdc5 100644
-> --- a/stubs/vmstate.c
-> +++ b/stubs/vmstate.c
-> @@ -3,7 +3,7 @@
-> =20
->  const VMStateDescription vmstate_dummy =3D {};
-> =20
-> -int vmstate_register_with_alias_id(DeviceState *dev,
-> +int vmstate_register_with_alias_id(VMStateIf *obj,
->                                     int instance_id,
->                                     const VMStateDescription *vmsd,
->                                     void *base, int alias_id,
-> @@ -13,7 +13,7 @@ int vmstate_register_with_alias_id(DeviceState *dev,
->      return 0;
->  }
-> =20
-> -void vmstate_unregister(DeviceState *dev,
-> +void vmstate_unregister(VMStateIf *obj,
->                          const VMStateDescription *vmsd,
->                          void *opaque)
->  {
+> +
+> +/*
+> + * Safely get device property. Returned strings are using wide charact=
+ers.
+> + * Caller is responsible for freeing the buffer.
+> + */
+> +static LPBYTE cm_get_property(DEVINST devInst, const DEVPROPKEY *propN=
+ame,
+> +    PDEVPROPTYPE propType)
+> +{
+> +    CONFIGRET cr;
+> +    LPBYTE buffer =3D NULL;
+> +    ULONG bufferLen =3D 0;
+> +
+> +    /* First query for needed space */
+> +    cr =3D CM_Get_DevNode_Property(devInst, propName, propType,
+> +        buffer, &bufferLen, 0);
+> +    if ((cr !=3D CR_SUCCESS) && (cr !=3D CR_BUFFER_SMALL)) {
+> +
+> +        g_debug(
+> +            "failed to get size of device property, device error code=3D=
+%lx",
+> +            cr);
+> +        return NULL;
+> +    }
+> +    buffer =3D (LPBYTE)g_malloc(bufferLen);
+> +    cr =3D CM_Get_DevNode_Property(devInst, propName, propType,
+> +        buffer, &bufferLen, 0);
+> +    if (cr !=3D CR_SUCCESS) {
+> +        g_free(buffer);
+> +        g_debug(
+> +            "failed to get device property, device error code=3D%lx", =
+cr);
+> +        return NULL;
+> +    }
+> +    return buffer;
+> +}
+> +
+> +/*
+> + * https://docs.microsoft.com/en-us/windows-hardware/drivers/install/i=
+dentifiers-for-pci-devices
+> + */
+> +#define DEVICE_PCI_RE "PCI\\\\VEN_(1AF4|1B36)&DEV_([0-9A-B]{4})(&|$)"
+> +
+> +GuestDeviceInfoList *qmp_guest_get_devices(Error **errp)
+> +{
+> +    GuestDeviceInfoList *head =3D NULL, *cur_item =3D NULL, *item =3D =
+NULL;
+> +    HDEVINFO dev_info =3D INVALID_HANDLE_VALUE;
+> +    SP_DEVINFO_DATA dev_info_data;
+> +    int i;
+> +    GError *gerr =3D NULL;
+> +    GRegex *device_pci_re =3D NULL;
+> +
+> +    device_pci_re =3D g_regex_new(DEVICE_PCI_RE,
+> +        G_REGEX_ANCHORED | G_REGEX_OPTIMIZE, 0,
+> +        &gerr);
+> +
+> +    if (gerr) {
+> +        error_setg(errp, QERR_QGA_COMMAND_FAILED, gerr->message);
+> +        g_error_free(gerr);
+> +        goto out;
+> +    }
+> +
+> +    dev_info_data.cbSize =3D sizeof(SP_DEVINFO_DATA);
+> +    dev_info =3D SetupDiGetClassDevs(0, 0, 0, DIGCF_PRESENT | DIGCF_AL=
+LCLASSES);
+> +    if (dev_info =3D=3D INVALID_HANDLE_VALUE) {
+> +        error_setg(errp, "failed to get device tree");
+> +        goto out;
+> +    }
+> +
+> +    g_debug("enumerating devices");
+> +    for (i =3D 0; SetupDiEnumDeviceInfo(dev_info, i, &dev_info_data); =
+i++) {
+> +        LPWSTR name =3D NULL, hwIDs =3D NULL, lpValue;
+> +        bool skip =3D true;
+> +        DEVPROPTYPE cmType;
+> +        SYSTEMTIME stUTC;
+> +        LPFILETIME pfdDriverDate;
+> +        LPWSTR driverVersion;
+> +
+> +        GuestDeviceInfo *device =3D g_new0(GuestDeviceInfo, 1);
+> +
+> +        name =3D (LPWSTR)cm_get_property(dev_info_data.DevInst, &DEVPK=
+EY_NAME,
+> +            &cmType);
+> +        if (name =3D=3D NULL) {
+> +            g_debug("failed to get device description");
+> +            goto next;
+> +        }
+> +        device->driver_name =3D guest_wctomb_dup(name);
+> +        g_free(name);
+> +        g_debug("querying device: %s", device->driver_name);
+> +
+> +        hwIDs =3D (LPWSTR)cm_get_property(dev_info_data.DevInst,
+> +            &DEVPKEY_Device_HardwareIds, &cmType);
+> +        if (hwIDs =3D=3D NULL) {
+> +            g_debug("failed to get hardware IDs");
+> +            goto next;
+> +        }
+> +        for (lpValue =3D hwIDs;
+> +            '\0' !=3D *lpValue;
+> +            lpValue +=3D lstrlenW(lpValue) + 1) {
+> +            GMatchInfo *match_info;
+> +            char *hwID =3D guest_wctomb_dup(lpValue);
+> +            /* g_debug("hwID: %s", hwID); */
+> +            if (!g_regex_match(device_pci_re, hwID, 0, &match_info)) {
+> +                continue;
+> +            }
+> +            skip =3D false;
+> +            device->vendor_id =3D g_match_info_fetch(match_info, 1);
+> +            device->device_id =3D g_match_info_fetch(match_info, 2);
+> +            g_match_info_free(match_info);
+> +        }
+> +        free(hwIDs);
+> +
+> +        if (skip) {
+> +            goto next;
+> +        }
+> +
+> +        driverVersion =3D (LPWSTR)cm_get_property(dev_info_data.DevIns=
+t,
+> +            &DEVPKEY_Device_DriverVersion, &cmType);
+> +        if (driverVersion =3D=3D NULL) {
+> +            g_debug("failed to get driver version");
+> +            goto next;
+> +        }
+> +        device->driver_version =3D guest_wctomb_dup(driverVersion);
+> +        free(driverVersion);
+> +
+> +        pfdDriverDate =3D (LPFILETIME)cm_get_property(dev_info_data.De=
+vInst,
+> +            &DEVPKEY_Device_DriverDate, &cmType);
+> +        if (driverVersion =3D=3D NULL) {
+> +            g_debug("failed to get driver date");
+> +            goto next;
+> +        }
+> +        FileTimeToSystemTime(pfdDriverDate, &stUTC);
+> +        free(pfdDriverDate);
+> +        device->driver_date =3D g_strdup_printf("%02d/%02d/%04d",
+> +            stUTC.wMonth, stUTC.wDay, stUTC.wYear);
+> +        g_debug("Driver Version: %s,%s\n", device->driver_date,
+> +            device->driver_version);
+> +
+> +        item =3D g_new0(GuestDeviceInfoList, 1);
+> +        item->value =3D device;
+> +        if (!cur_item) {
+> +            head =3D cur_item =3D item;
+> +        } else {
+> +            cur_item->next =3D item;
+> +            cur_item =3D item;
+> +        }
+> +        continue;
+> +
+> +next:
+> +        g_free(device->vendor_id);
+> +        g_free(device->device_id);
+> +        g_free(device->driver_date);
+> +        g_free(device->driver_name);
+> +        g_free(device->driver_version);
+> +        g_free(device);
+> +    }
+> +
+> +out:
+> +
+> +    if (dev_info !=3D INVALID_HANDLE_VALUE) {
+> +        SetupDiDestroyDeviceInfoList(dev_info);
+> +    }
+> +    g_regex_unref(device_pci_re);
+> +
+> +    return head;
+> +}
+> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+> index fb4605cc19..ed73b0b1c6 100644
+> --- a/qga/qapi-schema.json
+> +++ b/qga/qapi-schema.json
+> @@ -1242,3 +1242,35 @@
+>  ##
+>  { 'command': 'guest-get-osinfo',
+>    'returns': 'GuestOSInfo' }
+> +
+> +##
+> +# @GuestDeviceInfo:
+> +#
+> +# @vendor-id: vendor ID as hexadecimal string in uper case without 0x =
+prefix
+> +# @device-id: device ID as hexadecimal string in uper case without 0x =
+prefix
+> +# @driver-name: name of the associated driver
+> +# @driver-date: driver release date in format MM/DD/YY
+> +# @driver-version: driver version
+> +#
+> +# Since: 4.1.1
+> +##
+> +{ 'struct': 'GuestDeviceInfo',
+> +  'data': {
+> +      'vendor-id': 'str',
+> +      'device-id': 'str',
+> +      'driver-name': 'str',
+> +      'driver-date': 'str',
+> +      'driver-version': 'str'
+> +      } }
+> +
+> +##
+> +# @guest-get-devices:
+> +#
+> +# Retrieve information about device drivers in Windows guest
+> +#
+> +# Returns: @GuestOSInfo
+> +#
+> +# Since: 4.1.1
+> +##
+> +{ 'command': 'guest-get-devices',
+> +  'returns': ['GuestDeviceInfo'] }
 > --=20
-> 2.23.0
+> 2.22.0
 >=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+--=20
+Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
 
