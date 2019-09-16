@@ -2,59 +2,87 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96786C4CECD
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 15:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7445DC4CECE
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 15:15:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E2582053B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 15:15:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E2582053B
+	by mail.kernel.org (Postfix) with ESMTPS id 4310C2053B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 15:15:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M3rAubFD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4310C2053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9sjI-0006k5-NI
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 11:15:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51134)
+	id 1i9sjJ-0006g2-UN
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 11:15:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53830)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i9ruX-0003NM-PT
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:23:27 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1i9sD8-0006fR-3b
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:42:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i9ruW-0000q1-42
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:23:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40336)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i9ruT-0000oj-2b; Mon, 16 Sep 2019 10:23:21 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 29DA918C427A;
- Mon, 16 Sep 2019 14:23:20 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9876B600C1;
- Mon, 16 Sep 2019 14:23:19 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Mon, 16 Sep 2019 16:22:40 +0200
-Message-Id: <20190916142246.31474-11-mreitz@redhat.com>
-In-Reply-To: <20190916142246.31474-1-mreitz@redhat.com>
-References: <20190916142246.31474-1-mreitz@redhat.com>
+ (envelope-from <paolo.bonzini@gmail.com>) id 1i9sD5-0007Xm-CU
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:42:37 -0400
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:54517)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1i9sD5-0007XC-28
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:42:35 -0400
+Received: by mail-wm1-x333.google.com with SMTP id p7so60499wmp.4
+ for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 07:42:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=36OSTNyRUV4b/XNoOmWOxSWxIOvrUZW6VSBB/hBkj2A=;
+ b=M3rAubFDI/++9ySeVt2ZAUzAsMAL5TKSLbUuhWfRVVPl6NJ74EqrQFkQFZdmxQU8Cj
+ KZ+nHHysyoP2sIT/u15ohpfUNInSVV7tGTMFDcmNpvjhsGF0V/ACRkkaZy36lAfX96qA
+ EkUtYQEm/srjrP59vGU3oMSUbugFyG0jGYzazOYerIOB+Prj2loj9bhf9nrO7hekixIx
+ L9mKGd18Jiq1WjNP1OtN5D9fIlFY8bqEpF+OxJnSlKxjPF3LhMCmKM++k2R2cFXkXakf
+ xDhGvZ4xu7su21m5tbpfKPRwzs3Al+Ko3MeTl+i0FvkSVGtIQyxwYZOZEYy5Iw/d+Xzg
+ a33A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=36OSTNyRUV4b/XNoOmWOxSWxIOvrUZW6VSBB/hBkj2A=;
+ b=fkHUfeZQOyRurZRaNID5ukXDc51HrWtXBBfPRbBea5/bnwFwyLWLBz6XJGlhMrHrNZ
+ fEl7oZKzS/UA407+gQ8LLSOgiKuxFLMEJ4GW0tRi7tItexDzdPKzM/zpwQzJdlnHnFkr
+ 4lvwUOeCN+LrJblE5N3PZN29JB2XuhyU9XVKZZBIhUd4YlZyI7obZkLEgms7/TIJXujl
+ 3LeYxgmSZ+QjVG0EiHObRK+oKSD2nSekDSklZ2qpFGEAduJ/yxJS5qFVkWe490oSyzGx
+ pPZ9YK+o3kyvUrNEtHZzeP4RWOpo2s+Lcq8fHg3dDBy7JBKhbwhJbWCitR/Lsz058g+U
+ 9RCw==
+X-Gm-Message-State: APjAAAXESvsMpEt7KouszKTV8omgfDWvnb4+0GKk+sAvmMucCNUQzzzj
+ ZqUOMMcs5cRwkpH8I5HxdnG9YN2s
+X-Google-Smtp-Source: APXvYqwjI+TZOsg90wzejZQpQ3EWrzz3d/Q+dflbV0YleaElngDBYZsZIOc+kHeDIMYRobbSa/NtxA==
+X-Received: by 2002:a1c:c789:: with SMTP id x131mr79907wmf.20.1568644953459;
+ Mon, 16 Sep 2019 07:42:33 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id i14sm17024298wra.78.2019.09.16.07.42.32
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 16 Sep 2019 07:42:32 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 16 Sep 2019 16:42:00 +0200
+Message-Id: <1568644929-9124-21-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1568644929-9124-1-git-send-email-pbonzini@redhat.com>
+References: <1568644929-9124-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Mon, 16 Sep 2019 14:23:20 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 10/16] curl: Report only ready sockets
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::333
+Subject: [Qemu-devel] [PULL 20/29] hw/i386/pc: Pass the apic_id_limit value
+ by argument
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,70 +94,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead of reporting all sockets to cURL, only report the one that has
-caused curl_multi_do_locked() to be called.  This lets us get rid of the
-QLIST_FOREACH_SAFE() list, which was actually wrong: SAFE foreaches are
-only safe when the current element is removed in each iteration.  If it
-possible for the list to be concurrently modified, we cannot guarantee
-that only the current element will be removed.  Therefore, we must not
-use QLIST_FOREACH_SAFE() here.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Fixes: ff5ca1664af85b24a4180d595ea6873fd3deac57
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190910124136.10565-6-mreitz@redhat.com
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+Pass the apic_id_limit value by argument, this will
+allow us to remove the PCMachineState argument later.
+
+Suggested-by: Samuel Ortiz <sameo@linux.intel.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20190818225414.22590-7-philmd@redhat.com>
 ---
- block/curl.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+ hw/i386/pc.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/block/curl.c b/block/curl.c
-index cf2686218d..fd70f1ebc4 100644
---- a/block/curl.c
-+++ b/block/curl.c
-@@ -392,24 +392,19 @@ static void curl_multi_check_completion(BDRVCURLSta=
-te *s)
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index dc2ae6d..c0e9d83 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -937,7 +937,8 @@ static void pc_build_smbios(PCMachineState *pcms)
  }
-=20
- /* Called with s->mutex held.  */
--static void curl_multi_do_locked(CURLSocket *ready_socket)
-+static void curl_multi_do_locked(CURLSocket *socket)
+ 
+ static FWCfgState *fw_cfg_arch_create(PCMachineState *pcms,
+-                                      uint16_t boot_cpus)
++                                      uint16_t boot_cpus,
++                                      uint16_t apic_id_limit)
  {
--    CURLSocket *socket, *next_socket;
--    CURLState *s =3D ready_socket->state;
-+    BDRVCURLState *s =3D socket->state->s;
-     int running;
-     int r;
-=20
--    if (!s->s->multi) {
-+    if (!s->multi) {
-         return;
-     }
-=20
--    /* Need to use _SAFE because curl_multi_socket_action() may trigger
--     * curl_sock_cb() which might modify this list */
--    QLIST_FOREACH_SAFE(socket, &s->sockets, next, next_socket) {
--        do {
--            r =3D curl_multi_socket_action(s->s->multi, socket->fd, 0, &=
-running);
--        } while (r =3D=3D CURLM_CALL_MULTI_PERFORM);
--    }
-+    do {
-+        r =3D curl_multi_socket_action(s->multi, socket->fd, 0, &running=
-);
-+    } while (r =3D=3D CURLM_CALL_MULTI_PERFORM);
- }
-=20
- static void curl_multi_do(void *arg)
---=20
-2.21.0
+     FWCfgState *fw_cfg;
+     uint64_t *numa_fw_cfg;
+@@ -1870,7 +1871,7 @@ void pc_memory_init(PCMachineState *pcms,
+                                         option_rom_mr,
+                                         1);
+ 
+-    fw_cfg = fw_cfg_arch_create(pcms, pcms->boot_cpus);
++    fw_cfg = fw_cfg_arch_create(pcms, pcms->boot_cpus, pcms->apic_id_limit);
+ 
+     rom_set_fw(fw_cfg);
+ 
+-- 
+1.8.3.1
+
 
 
