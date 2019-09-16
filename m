@@ -2,66 +2,73 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8B95C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 13:17:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B94FC49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 13:19:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EED620644
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 13:17:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EED620644
+	by mail.kernel.org (Postfix) with ESMTPS id 6E7F321670
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 13:19:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E7F321670
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9qsk-0002L3-EX
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 09:17:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39539)
+	id 1i9quw-0003YA-Ik
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 09:19:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39761)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i9qqh-0001ea-Nx
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 09:15:25 -0400
+ (envelope-from <imammedo@redhat.com>) id 1i9qsK-0002Os-9E
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 09:17:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i9qqe-0005c3-5q
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 09:15:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53364)
+ (envelope-from <imammedo@redhat.com>) id 1i9qsH-0006Co-Fg
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 09:17:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45408)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i9qqd-0005bL-TX
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 09:15:20 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1i9qsH-00069T-3F; Mon, 16 Sep 2019 09:17:01 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8720F3090FC2;
- Mon, 16 Sep 2019 13:15:18 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.111])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E1A7F5C1D6;
- Mon, 16 Sep 2019 13:15:16 +0000 (UTC)
-Date: Mon, 16 Sep 2019 14:15:14 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Message-ID: <20190916131514.GG2887@work-vm>
-References: <20190912122514.22504-1-marcandre.lureau@redhat.com>
- <20190912122514.22504-6-marcandre.lureau@redhat.com>
- <20190916100035.GC2887@work-vm>
- <CAJ+F1C+GAJc8vYVLzBZWonVkjp-rdWFemAdwgE2sbxJDFKp0Uw@mail.gmail.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 3DA9B3086218;
+ Mon, 16 Sep 2019 13:16:50 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2F8BF5D9DC;
+ Mon, 16 Sep 2019 13:16:46 +0000 (UTC)
+Date: Mon, 16 Sep 2019 15:16:44 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <20190916151644.700e5591@redhat.com>
+In-Reply-To: <09480baa-c736-6726-4852-777f99fd54c6@de.ibm.com>
+References: <20190806094834.7691-2-imammedo@redhat.com>
+ <20190807153241.24050-1-imammedo@redhat.com>
+ <20190820180727.32cf4891.cohuck@redhat.com>
+ <20190827145629.62c5839e@redhat.com>
+ <0abe612b-5a00-4ebc-9874-6b794d411f51@de.ibm.com>
+ <20190829140402.3a547a76@redhat.com>
+ <6afa8d99-c958-6f60-69f4-f84151358479@de.ibm.com>
+ <20190829143125.17a44fa5@redhat.com>
+ <ff7b7534-e954-84f2-34a9-bfa0ac37c8fe@de.ibm.com>
+ <20190830114105.312cf69f@redhat.com>
+ <4f816851-9435-51e0-81e9-0dc2ac47ff78@de.ibm.com>
+ <20190902154929.16f32591@redhat.com>
+ <09480baa-c736-6726-4852-777f99fd54c6@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1C+GAJc8vYVLzBZWonVkjp-rdWFemAdwgE2sbxJDFKp0Uw@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Mon, 16 Sep 2019 13:15:18 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.42]); Mon, 16 Sep 2019 13:16:50 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 5/6] docs: start a document to describe
- D-Bus usage
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-4.2 v5 1/2] kvm: s390:
+ split too big memory section on several memslots
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,161 +80,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Juan Quintela <quintela@redhat.com>, Michal Privoznik <mprivozn@redhat.com>,
- QEMU <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: thuth@redhat.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
-> Hi
->=20
-> On Mon, Sep 16, 2019 at 2:02 PM Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
-> >
-> > (Copying in Stefan since he was looking at DBus for virtiofs)
-> >
-> > * Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
-> > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> > > ---
-> > >  docs/interop/dbus.rst  | 73 ++++++++++++++++++++++++++++++++++++++=
-++++
-> > >  docs/interop/index.rst |  1 +
-> > >  2 files changed, 74 insertions(+)
-> > >  create mode 100644 docs/interop/dbus.rst
-> > >
-> > > diff --git a/docs/interop/dbus.rst b/docs/interop/dbus.rst
-> > > new file mode 100644
-> > > index 0000000000..c08f026edc
-> > > --- /dev/null
-> > > +++ b/docs/interop/dbus.rst
-> > > @@ -0,0 +1,73 @@
-> > > +=3D=3D=3D=3D=3D
-> > > +D-Bus
-> > > +=3D=3D=3D=3D=3D
-> > > +
-> > > +Introduction
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +
-> > > +QEMU may be running with various helper processes involved:
-> > > + - vhost-user* processes (gpu, virtfs, input, etc...)
-> > > + - TPM emulation (or other devices)
-> > > + - user networking (slirp)
-> > > + - network services (DHCP/DNS, samba/ftp etc)
-> > > + - background tasks (compression, streaming etc)
-> > > + - client UI
-> > > + - admin & cli
-> > > +
-> > > +Having several processes allows stricter security rules, as well a=
-s
-> > > +greater modularity.
-> > > +
-> > > +While QEMU itself uses QMP as primary IPC (and Spice/VNC for remot=
-e
-> > > +display), D-Bus is the de facto IPC of choice on Unix systems. The
-> > > +wire format is machine friendly, good bindings exist for various
-> > > +languages, and there are various tools available.
-> > > +
-> > > +Using a bus, helper processes can discover and communicate with ea=
-ch
-> > > +other easily, without going through QEMU. The bus topology is also
-> > > +easier to apprehend and debug than a mesh. However, it is wise to
-> > > +consider the security aspects of it.
-> > > +
-> > > +Security
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +
-> > > +A QEMU D-Bus bus should be private to a single VM. Thus, only
-> > > +cooperative tasks are running on the same bus to serve the VM.
-> > > +
-> > > +D-Bus, the protocol and standard, doesn't have mechanisms to enfor=
-ce
-> > > +security between peers once the connection is established. Peers m=
-ay
-> > > +have additional mechanisms to enforce security rules, based for
-> > > +example on UNIX credentials.
-> > > +
-> > > +dbus-daemon can enforce various policies based on the UID/GID of t=
-he
-> > > +processes that are connected to it. It is thus a good idea to run
-> > > +helpers as different UID from QEMU and set appropriate policies (s=
-o
-> > > +helper processes are only allowed to talk to qemu for example).
-> > > +
-> > > +For example, this allows only ``qemu`` user to talk to ``qemu-help=
-er``
-> > > +``org.qemu.Helper1`` service:
-> > > +
-> > > +.. code:: xml
-> > > +
-> > > +  <policy user=3D"qemu">
-> > > +     <allow send_destination=3D"org.qemu.Helper1"/>
-> > > +     <allow receive_sender=3D"org.qemu.Helper1"/>
-> > > +  </policy>
-> > > +
-> > > +  <policy user=3D"qemu-helper">
-> > > +     <allow own=3D"org.qemu.Helper1"/>
-> > > +  </policy>
-> > > +
-> > > +
-> > > +dbus-daemon can also perfom SELinux checks based on the security
-> > > +context of the source and the target. For example, ``virtiofs_t``
-> > > +could be allowed to send a message to ``svirt_t``, but ``virtiofs_=
-t``
-> > > +wouldn't be allowed to send a message to ``virtiofs_t``.
-> >
-> > I think we need to start thinking about this more now rather than
-> > 'can'. .
->=20
-> Do you have a specific question we can answer or guide for qemu? Is
-> there something we have to document or implement?
->=20
-> Since qemu is not managing the extra processes or applying policies, I
-> don't know what else could be done. From qemu pov, it can rely on
-> management layer to trust the bus and the helpers, similar to trusting
-> the system in general.
+On Tue, 3 Sep 2019 08:57:38 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Well pretty much the same questions I asked in the discussion on v2;
-what is the supported configuration to ensure that one helper that's
-been compromised can't attack the others and qemu?
+> On 02.09.19 15:49, Igor Mammedov wrote:
+> > On Fri, 30 Aug 2019 18:19:29 +0200
+> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >   
+> >> On 30.08.19 11:41, Igor Mammedov wrote:  
+> >>> On Thu, 29 Aug 2019 14:41:13 +0200
+> >>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >>>     
+> >>>> On 29.08.19 14:31, Igor Mammedov wrote:    
+> >>>>> On Thu, 29 Aug 2019 14:07:44 +0200
+> >>>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >>>>>       
+> >>>>>> On 29.08.19 14:04, Igor Mammedov wrote:      
+> >>>>>>> On Thu, 29 Aug 2019 08:47:49 +0200
+> >>>>>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >>>>>>>         
+> >>>>>>>> On 27.08.19 14:56, Igor Mammedov wrote:        
+> >>>>>>>>> On Tue, 20 Aug 2019 18:07:27 +0200
+> >>>>>>>>> Cornelia Huck <cohuck@redhat.com> wrote:
+> >>>>>>>>>           
+> >>>>>>>>>> On Wed,  7 Aug 2019 11:32:41 -0400
+> >>>>>>>>>> Igor Mammedov <imammedo@redhat.com> wrote:
+> >>>>>>>>>>          
+> >>>>>>>>>>> Max memslot size supported by kvm on s390 is 8Tb,
+> >>>>>>>>>>> move logic of splitting RAM in chunks upto 8T to KVM code.
+> >>>>>>>>>>>
+> >>>>>>>>>>> This way it will hide KVM specific restrictions in KVM code
+> >>>>>>>>>>> and won't affect baord level design decisions. Which would allow
+> >>>>>>>>>>> us to avoid misusing memory_region_allocate_system_memory() API
+> >>>>>>>>>>> and eventually use a single hostmem backend for guest RAM.
+> >>>>>>>>>>>
+> >>>>>>>>>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> >>>>>>>>>>> ---
+> >>>>>>>>>>> v5:
+> >>>>>>>>>>>   * move computation 'size -= slot_size' inside of loop body
+> >>>>>>>>>>>           (David Hildenbrand <david@redhat.com>)
+> >>>>>>>>>>> v4:
+> >>>>>>>>>>>   * fix compilation issue
+> >>>>>>>>>>>           (Christian Borntraeger <borntraeger@de.ibm.com>)
+> >>>>>>>>>>>   * advance HVA along with GPA in kvm_set_phys_mem()
+> >>>>>>>>>>>           (Christian Borntraeger <borntraeger@de.ibm.com>)
+> >>>>>>>>>>>
+> >>>>>>>>>>> patch prepares only KVM side for switching to single RAM memory region
+> >>>>>>>>>>> another patch will take care of  dropping manual RAM partitioning in
+> >>>>>>>>>>> s390 code.            
+> >>>>>>>>>>
+> >>>>>>>>>> I may have lost track a bit -- what is the status of this patch (and
+> >>>>>>>>>> the series)?          
+> >>>>>>>>>
+> >>>>>>>>> Christian,
+> >>>>>>>>>
+> >>>>>>>>> could you test it on a host that have sufficient amount of RAM?          
+> >>>>>>>>
+> >>>>>>>>
+> >>>>>>>> This version looks good. I was able to start a 9TB guest.
+> >>>>>>>> [pid 215723] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=8796091973632, userspace_addr=0x3ffee700000}) = 0
+> >>>>>>>> [pid 215723] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=1, flags=0, guest_phys_addr=0x7fffff00000, memory_size=1099512676352, userspace_addr=0xbffee600000}) = 0      
+> >>>>>>      
+> >>>>>>>> The only question is if we want to fix the weird alignment (0x7fffff00000) when
+> >>>>>>>> we already add a migration barrier for uber-large guests.
+> >>>>>>>> Maybe we could split at 4TB to avoid future problem with larger page sizes?        
+> >>>>>>> That probably should be a separate patch on top.        
+> >>>>>>
+> >>>>>> Right. The split in KVM code is transparent to migration and other parts of QEMU, correct?      
+> >>>>>
+> >>>>> it should not affect other QEMU parts and migration (to my limited understanding of it),
+> >>>>> we are passing to KVM memory slots upto KVM_SLOT_MAX_BYTES as we were doing before by
+> >>>>> creating several memory regions instead of one as described in [2/2] commit message.
+> >>>>>
+> >>>>> Also could you also test migration of +9Tb guest, to check that nothing where broken by
+> >>>>> accident in QEMU migration code?      
+> >>>>
+> >>>> I only have one server that is large enough :-/    
+> >>> Could you test offline migration on it (to a file and restore from it)?    
+> >>
+> >> I tested migration with a hacked QEMU (basically split in KVM code at 1GB instead of 8TB) and
+> >> the restore from file failed with data corruption in the guest. The current code
+> >> does work when I use small memslots. No idea yet what is wrong.  
+> > 
+> > I've tested 2Gb (max, I can test) guest (also hacked up version)
+> > and it worked for me.
+> > How do you test it and detect corruption so I could try to reproduce it locally?
+> > (given it worked before, there is no much hope but I could try)  
+> 
+> I basically started a guest with just kernel and ramdisk on the command line and
+> then in the monitor I did 
+> migrate "exec: cat > savefile"
+> and then I restarted the guest with
+> -incoming "exec: cat savefile"
+> 
+> the guest then very quickly crashed with random kernel oopses. 
+Well, I wasn't able to reproduce that. So I've looked at the kvm part of
+migration and it turned out migration didn't even start as KVM was
+concerned.
 
-Dave
+Issue was in that migration related kvm code parts assumed 1:1
+relation between MemorySection and memslot which isn't true anymore.
+I'll respin v6 with that fixed (i.e. make sure that kvm parts can handle
+1:n MemorySection:memslots invariant).
 
-> > Dave
-> >
-> > > +Guidelines
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +
-> > > +When implementing new D-Bus interfaces, it is recommended to follo=
-w
-> > > +the "D-Bus API Design Guidelines":
-> > > +https://dbus.freedesktop.org/doc/dbus-api-design.html
-> > > +
-> > > +The "org.qemu*" prefix is reserved for the QEMU project.
-> > > diff --git a/docs/interop/index.rst b/docs/interop/index.rst
-> > > index b4bfcab417..fa4478ce2e 100644
-> > > --- a/docs/interop/index.rst
-> > > +++ b/docs/interop/index.rst
-> > > @@ -13,6 +13,7 @@ Contents:
-> > >     :maxdepth: 2
-> > >
-> > >     bitmaps
-> > > +   dbus
-> > >     live-block-operations
-> > >     pr-helper
-> > >     vhost-user
-> > > --
-> > > 2.23.0
-> > >
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >
->=20
->=20
-> --=20
-> Marc-Andr=E9 Lureau
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+PS:
+I've tested (1Gb segments hack) pinpong migration (via file) with Fedora 29
+in boot loop.
+ 
+> Using libvirts managedsave should work as well. 
+> 
+
 
