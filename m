@@ -2,49 +2,48 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E9BC49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 12:51:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5331BC4CECD
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 12:52:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3958A2067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 12:51:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3958A2067D
+	by mail.kernel.org (Postfix) with ESMTPS id 2D99321670
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 12:52:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D99321670
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9qTG-0003Cs-9Z
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 08:51:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35486)
+	id 1i9qUd-0004Ph-97
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 08:52:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35576)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i9qP1-0001jn-98
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 08:46:48 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i9qPF-0001wg-Em
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 08:47:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i9qOz-0000CS-Vx
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 08:46:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44252)
+ (envelope-from <mreitz@redhat.com>) id 1i9qPD-0000In-U2
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 08:47:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47502)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i9qOw-0000Ai-Mu; Mon, 16 Sep 2019 08:46:42 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1i9qPB-0000H1-9x; Mon, 16 Sep 2019 08:46:57 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 75FCF30860A5;
- Mon, 16 Sep 2019 12:46:41 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 881B91802182;
+ Mon, 16 Sep 2019 12:46:56 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0BB715D9DC;
- Mon, 16 Sep 2019 12:46:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2CF3F60BE1;
+ Mon, 16 Sep 2019 12:46:53 +0000 (UTC)
 To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
 References: <20190915203655.21638-1-mlevitsk@redhat.com>
- <20190915203655.21638-3-mlevitsk@redhat.com>
+ <20190915203655.21638-4-mlevitsk@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,22 +70,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <a603c258-b16d-8136-183a-821523765e72@redhat.com>
-Date: Mon, 16 Sep 2019 14:46:35 +0200
+Message-ID: <330d3833-a4da-a872-8dbe-45220faf2e30@redhat.com>
+Date: Mon, 16 Sep 2019 14:46:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190915203655.21638-3-mlevitsk@redhat.com>
+In-Reply-To: <20190915203655.21638-4-mlevitsk@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="d6ywZYvfn3cFzi9Nf6UtDHJun28EVCQPl"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Mon, 16 Sep 2019 12:46:41 +0000 (UTC)
+ boundary="E0mxPsyrr6LntDhS4E4fX0TKkiTweI7Ew"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Mon, 16 Sep 2019 12:46:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v7 2/3] block/qcow2: refactor encryption
- code
+Subject: Re: [Qemu-devel] [PATCH v7 3/3] qemu-iotests: Add test for bz
+ #1745922
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,8 +106,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---d6ywZYvfn3cFzi9Nf6UtDHJun28EVCQPl
-Content-Type: multipart/mixed; boundary="7i3QBlI7gmjEgW4qFGGsHihAsmiKTugSK";
+--E0mxPsyrr6LntDhS4E4fX0TKkiTweI7Ew
+Content-Type: multipart/mixed; boundary="AM9OPSJVt8EHyE0s8blEP8HrzlovJIDOd";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
@@ -117,74 +116,50 @@ Cc: Kevin Wolf <kwolf@redhat.com>,
  qemu-block@nongnu.org, =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?=
  <berrange@redhat.com>, Eric Blake <eblake@redhat.com>,
  qemu-stable <qemu-stable@nongnu.org>
-Message-ID: <a603c258-b16d-8136-183a-821523765e72@redhat.com>
-Subject: Re: [PATCH v7 2/3] block/qcow2: refactor encryption code
+Message-ID: <330d3833-a4da-a872-8dbe-45220faf2e30@redhat.com>
+Subject: Re: [PATCH v7 3/3] qemu-iotests: Add test for bz #1745922
 References: <20190915203655.21638-1-mlevitsk@redhat.com>
- <20190915203655.21638-3-mlevitsk@redhat.com>
-In-Reply-To: <20190915203655.21638-3-mlevitsk@redhat.com>
+ <20190915203655.21638-4-mlevitsk@redhat.com>
+In-Reply-To: <20190915203655.21638-4-mlevitsk@redhat.com>
 
---7i3QBlI7gmjEgW4qFGGsHihAsmiKTugSK
+--AM9OPSJVt8EHyE0s8blEP8HrzlovJIDOd
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 15.09.19 22:36, Maxim Levitsky wrote:
-> * Change the qcow2_co_{encrypt|decrypt} to just receive full host and
->   guest offsets and use this function directly instead of calling
->   do_perform_cow_encrypt (which is removed by that patch).
->=20
-> * Adjust qcow2_co_encdec to take full host and guest offsets as well.
->=20
-> * Document the qcow2_co_{encrypt|decrypt} arguments
->   to prevent the bug fixed in former commit from hopefully
->   happening again.
->=20
 > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Tested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/qcow2-cluster.c | 41 ++++++++++------------------
->  block/qcow2-threads.c | 63 +++++++++++++++++++++++++++++++++----------=
+>  tests/qemu-iotests/263     | 91 ++++++++++++++++++++++++++++++++++++++=
 
->  block/qcow2.c         |  5 ++--
->  block/qcow2.h         |  8 +++---
->  4 files changed, 70 insertions(+), 47 deletions(-)
+>  tests/qemu-iotests/263.out | 40 +++++++++++++++++
+>  tests/qemu-iotests/group   |  1 +
+>  3 files changed, 132 insertions(+)
+>  create mode 100755 tests/qemu-iotests/263
+>  create mode 100644 tests/qemu-iotests/263.out
 
-Looks good to me, but there are conflicts with two series I=E2=80=99ve al=
-ready
-taken to my branch: Namely =E2=80=9Cqcow2: async handling of fragmented i=
-o=E2=80=9D by
-Vladimir and =E2=80=9CAlignment checks cleanup=E2=80=8B=E2=80=9D by Nir.
-
-Unfortunately, those conflicts (while not difficult to resolve) are not
-quite trivial, so I=E2=80=99d rather not resolve them myself.
-
-I=E2=80=99ll send a pull request today, but until they are in master, you=
- could
-rebase on my branch (either of
-- https://git.xanclic.moe/XanClic/qemu.git block
-- https://github.com/XanClic/qemu.git block
-, whichever you prefer that works).
-
-Max
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---7i3QBlI7gmjEgW4qFGGsHihAsmiKTugSK--
+--AM9OPSJVt8EHyE0s8blEP8HrzlovJIDOd--
 
---d6ywZYvfn3cFzi9Nf6UtDHJun28EVCQPl
+--E0mxPsyrr6LntDhS4E4fX0TKkiTweI7Ew
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1/hCsACgkQ9AfbAGHV
-z0BBJggAtpZ8XdXRyHRtAqJzPwc7P+hjBc+F87FX4UVoL8RgZfjKwd1mbg8MVsc/
-ZFQr1TFudZ6nCsWoekO5ih9e9NWrk49ms+zm7VnKRtIRXABNn8ugNj3rMfY5PvYe
-vv8Meyh85UuPpndRapjd+PTawey6ueVca9nKhVWD062UN64tH4g8QdLK/yIdQhsU
-f6fFeQ+lVDnBB+r8PazdKEUTF/GJ9Yfp2MHEQcKtiQxLkkXksDA9TL6o77xtWYQq
-dmCJc2pghm2qv1fhkh0S8qanD8mS41vH+k0YOC+b7+AkxZ51r1toWWRUbbdoXoJu
-haxm7pH+LjevLCpbHMtBJ8YPrUDFLA==
-=atcZ
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1/hDsACgkQ9AfbAGHV
+z0Alegf/TI38hBG7l1Q/3d1dqrZ8ekrpH58QQtMeTFAeaJqoDjOuFBF2wBMLrlT1
+WOY9ROhtnGby2vDkKtuBrj6X1doDE/h5b4tCptL8ReQTMIhK+9MriusNtnmI6Qvy
+Xw+2GmIcVugv3hz7ToYFzXKtXTsDg0puF22I1QyjGscq/17pHQ8Av+TSc8cGxwpn
+a24hqOluaAbw4dHsG1/HLknTcKw7CAWi0QC72Ae4+k4K73pzIq9pvYN5fyTcCfc1
+mE5gYYngAD53wqB6Y+Tk9JNw61Q+L7tM/1VKUMctF/L5X4wQDoCk5byof6GrEydq
+pdtb0QJnZRTSineKY7G2jlYfy8QdSA==
+=ZSy0
 -----END PGP SIGNATURE-----
 
---d6ywZYvfn3cFzi9Nf6UtDHJun28EVCQPl--
+--E0mxPsyrr6LntDhS4E4fX0TKkiTweI7Ew--
 
