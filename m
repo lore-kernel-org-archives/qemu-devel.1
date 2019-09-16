@@ -2,69 +2,61 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D2CFC49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:35:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 174F1C49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:36:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 471AF2184D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:35:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=polymtl.ca header.i=@polymtl.ca header.b="bR9mu/FJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 471AF2184D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=polymtl.ca
+	by mail.kernel.org (Postfix) with ESMTPS id E03862184D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:36:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E03862184D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9tyi-0001vi-Bv
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 12:35:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36657)
+	id 1i9tzE-0002Y7-Uh
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 12:36:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35504)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <olivier.dion@polymtl.ca>) id 1i9tMb-0007yl-RI
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:56:31 -0400
+ (envelope-from <philmd@redhat.com>) id 1i9tGv-0000rE-JP
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:50:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <olivier.dion@polymtl.ca>) id 1i9tMZ-00047k-8t
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:56:29 -0400
-Received: from smtp.polymtl.ca ([132.207.4.11]:47308)
+ (envelope-from <philmd@redhat.com>) id 1i9tGu-00022k-BM
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:50:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46364)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <olivier.dion@polymtl.ca>)
- id 1i9tMZ-00045z-2F
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:56:27 -0400
-Received: from clara.localdomain (modemcable059.101-200-24.mc.videotron.ca
- [24.200.101.59]) (authenticated bits=0)
- by smtp.polymtl.ca (8.14.7/8.14.7) with ESMTP id x8GFtwgY006121
- (version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT); 
- Mon, 16 Sep 2019 11:56:18 -0400
-DKIM-Filter: OpenDKIM Filter v2.11.0 smtp.polymtl.ca x8GFtwgY006121
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=polymtl.ca;
- s=default; t=1568649379;
- bh=/hSMpdkHAV+GRRFXHYbEqSBWoOpNrQe7qkJthuSQHIs=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=bR9mu/FJAJGWMgWeMw7baUP6ePWd7ZOe9l2h8vomZGAqDCynhHjwjCX5j5/+h/Tfr
- T71cLNgQlH2ud+YsEOWO0+zaWpAx21r0LdUdAvdao7QsXhShBnJWdgX+GXTj3pHO+e
- uNqMb4pz+wPICaCYO4ZtVNA/b/OXWu559klJkYSo=
-From: Olivier Dion <olivier.dion@polymtl.ca>
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1i9tGr-00021N-3i; Mon, 16 Sep 2019 11:50:33 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 09FE1302C081;
+ Mon, 16 Sep 2019 15:50:32 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-115.brq.redhat.com [10.40.204.115])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E296D19C4F;
+ Mon, 16 Sep 2019 15:50:20 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 16 Sep 2019 11:55:45 -0400
-Message-Id: <20190916155545.29928-2-olivier.dion@polymtl.ca>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20190916155545.29928-1-olivier.dion@polymtl.ca>
-References: <20190807135458.32440-1-dion@linutronix.de>
- <20190916155545.29928-1-olivier.dion@polymtl.ca>
+Date: Mon, 16 Sep 2019 17:48:39 +0200
+Message-Id: <20190916154847.28936-6-philmd@redhat.com>
+In-Reply-To: <20190916154847.28936-1-philmd@redhat.com>
+References: <20190916154847.28936-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Poly-FromMTA: (modemcable059.101-200-24.mc.videotron.ca [24.200.101.59]) at
- Mon, 16 Sep 2019 15:55:58 +0000
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 132.207.4.11
-Subject: [Qemu-devel] [PATCH v2 1/1] Handle /proc/self/exe in syscall execve
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Mon, 16 Sep 2019 15:50:32 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 05/13] hw: Move M41T80 device from hw/timer/ to
+ hw/rtc/ subdirectory
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,59 +68,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Olivier Dion <olivier.dion@polymtl.ca>, john.ogness@linutronix.de
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Andrew Jeffery <andrew@aj.id.au>, qemu-ppc@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If not handled, QEMU will execve itself instead of the emulated
-process.  The function do_openat already solves the /proc/self/exe
-problem, so we can use it to get the executable file descriptor.  We
-then make a safe call to execveat.
+The M41T80 is a Real Time Clock, not a timer.
+Move it under the hw/rtc/ subdirectory.
 
-Note that safe_execve has been replaced by safe_execveat, since the
-former is now useless.
-
-Signed-off-by: Olivier Dion <olivier.dion@polymtl.ca>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- linux-user/syscall.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ MAINTAINERS                | 2 +-
+ hw/rtc/Kconfig             | 4 ++++
+ hw/rtc/Makefile.objs       | 1 +
+ hw/{timer =3D> rtc}/m41t80.c | 0
+ hw/timer/Kconfig           | 4 ----
+ hw/timer/Makefile.objs     | 1 -
+ 6 files changed, 6 insertions(+), 6 deletions(-)
+ rename hw/{timer =3D> rtc}/m41t80.c (100%)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index e2af3c1494..68340bcb67 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -736,7 +736,7 @@ safe_syscall4(pid_t, wait4, pid_t, pid, int *, status, int, options, \
-               struct rusage *, rusage)
- safe_syscall5(int, waitid, idtype_t, idtype, id_t, id, siginfo_t *, infop, \
-               int, options, struct rusage *, rusage)
--safe_syscall3(int, execve, const char *, filename, char **, argv, char **, envp)
-+safe_syscall5(int, execveat, int, dirfd, const char *, pathname, char **, argv, char **, envp, int, flags)
- safe_syscall6(int, pselect6, int, nfds, fd_set *, readfds, fd_set *, writefds, \
-               fd_set *, exceptfds, struct timespec *, timeout, void *, sig)
- safe_syscall5(int, ppoll, struct pollfd *, ufds, unsigned int, nfds,
-@@ -7507,8 +7507,18 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-              * before the execve completes and makes it the other
-              * program's problem.
-              */
--            ret = get_errno(safe_execve(p, argp, envp));
--            unlock_user(p, arg1, 0);
-+            {
-+                int execfd = get_errno(do_openat(cpu_env, AT_FDCWD, p, O_PATH, 0));
-+                unlock_user(p, arg1, 0);
-+                if (is_error(execfd)) {
-+                    ret = execfd;
-+                    goto execve_end;
-+                }
-+                ret = get_errno(safe_execveat(execfd, "",
-+                                              argp, envp,
-+                                              AT_EMPTY_PATH));
-+                close(execfd);
-+            }
- 
-             goto execve_end;
- 
--- 
-2.23.0
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 679b026fe0..fd68b2383a 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1113,7 +1113,7 @@ F: hw/ppc/sam460ex.c
+ F: hw/ppc/ppc440_pcix.c
+ F: hw/display/sm501*
+ F: hw/ide/sii3112.c
+-F: hw/timer/m41t80.c
++F: hw/rtc/m41t80.c
+ F: pc-bios/canyonlands.dt[sb]
+ F: pc-bios/u-boot-sam460ex-20100605.bin
+ F: roms/u-boot-sam460ex
+diff --git a/hw/rtc/Kconfig b/hw/rtc/Kconfig
+index 159c233517..434b20b2b1 100644
+--- a/hw/rtc/Kconfig
++++ b/hw/rtc/Kconfig
+@@ -1,3 +1,7 @@
++config M41T80
++    bool
++    depends on I2C
++
+ config M48T59
+     bool
+=20
+diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
+index c87f81405e..89e8e48c64 100644
+--- a/hw/rtc/Makefile.objs
++++ b/hw/rtc/Makefile.objs
+@@ -1,3 +1,4 @@
++common-obj-$(CONFIG_M41T80) +=3D m41t80.o
+ common-obj-$(CONFIG_M48T59) +=3D m48t59.o
+ ifeq ($(CONFIG_ISA_BUS),y)
+ common-obj-$(CONFIG_M48T59) +=3D m48t59-isa.o
+diff --git a/hw/timer/m41t80.c b/hw/rtc/m41t80.c
+similarity index 100%
+rename from hw/timer/m41t80.c
+rename to hw/rtc/m41t80.c
+diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
+index a57e9b59fc..a6b668b255 100644
+--- a/hw/timer/Kconfig
++++ b/hw/timer/Kconfig
+@@ -20,10 +20,6 @@ config HPET
+ config I8254
+     bool
+=20
+-config M41T80
+-    bool
+-    depends on I2C
+-
+ config TWL92230
+     bool
+     depends on I2C
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index fe2d1fbc40..2fb12162a6 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -6,7 +6,6 @@ common-obj-$(CONFIG_CADENCE) +=3D cadence_ttc.o
+ common-obj-$(CONFIG_DS1338) +=3D ds1338.o
+ common-obj-$(CONFIG_HPET) +=3D hpet.o
+ common-obj-$(CONFIG_I8254) +=3D i8254_common.o i8254.o
+-common-obj-$(CONFIG_M41T80) +=3D m41t80.o
+ common-obj-$(CONFIG_PUV3) +=3D puv3_ost.o
+ common-obj-$(CONFIG_TWL92230) +=3D twl92230.o
+ common-obj-$(CONFIG_XILINX) +=3D xilinx_timer.o
+--=20
+2.20.1
 
 
