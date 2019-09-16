@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B45BAC49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 07:25:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38A40C49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 07:26:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E02520644
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 07:25:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E02520644
+	by mail.kernel.org (Postfix) with ESMTPS id 0EA9420644
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 07:26:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EA9420644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9lOT-0003X5-8N
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 03:25:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50053)
+	id 1i9lOY-0003gu-V5
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 03:25:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50093)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1i9lMb-0001uj-FZ
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 03:24:00 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1i9lMi-00021v-Hs
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 03:24:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1i9lMZ-0007ir-7u
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 03:23:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49224)
+ (envelope-from <eric.auger@redhat.com>) id 1i9lMh-0007l6-Bt
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 03:24:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45712)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1i9lMZ-0007iY-2e
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 03:23:55 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1i9lMh-0007kr-3l
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 03:24:03 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8D9F73086258;
- Mon, 16 Sep 2019 07:23:53 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5991F10B78;
+ Mon, 16 Sep 2019 07:24:02 +0000 (UTC)
 Received: from [10.36.116.33] (ovpn-116-33.ams2.redhat.com [10.36.116.33])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9893F19C69;
- Mon, 16 Sep 2019 07:23:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AE7C55D9E1;
+ Mon, 16 Sep 2019 07:23:49 +0000 (UTC)
 To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
 References: <20190812074531.28970-1-peterx@redhat.com>
- <20190812074531.28970-4-peterx@redhat.com>
+ <20190812074531.28970-3-peterx@redhat.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <4177fdbe-480f-20ce-2d0a-eedec6387f13@redhat.com>
-Date: Mon, 16 Sep 2019 09:23:39 +0200
+Message-ID: <a8d4d0b7-8d2b-119f-f74e-81104db70945@redhat.com>
+Date: Mon, 16 Sep 2019 09:23:48 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20190812074531.28970-4-peterx@redhat.com>
+In-Reply-To: <20190812074531.28970-3-peterx@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Mon, 16 Sep 2019 07:23:53 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Mon, 16 Sep 2019 07:24:02 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH RFC 3/4] pc/q35: Disallow vfio-pci hotplug
- without VT-d caching mode
+Subject: Re: [Qemu-devel] [PATCH RFC 2/4] qdev/machine: Introduce
+ hotplug_allowed hook
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,63 +85,110 @@ Sender: "Qemu-devel"
 Hi Peter,
 
 On 8/12/19 9:45 AM, Peter Xu wrote:
-> Instead of bailing out when trying to hotplug a vfio-pci device with
-> below configuration:
-> 
->   -device intel-iommu,caching-mode=off
-> 
-> With this we can return a warning message to the user via QMP/HMP and
-> the VM will continue to work after failing the hotplug:
-> 
->   (qemu) device_add vfio-pci,bus=root.3,host=05:00.0,id=vfio1
->   Error: Device assignment is not allowed without enabling caching-mode=on for Intel IOMMU.
+> Introduce this new per-machine hook to give any machine class a chance
+> to do a sanity check on the to-be-hotplugged device as a sanity test.
+> This will be used for x86 to try to detect some illegal configuration
+> of devices, e.g., possible conflictions between vfio-pci and x86
+conflicts
+> vIOMMU.
 > 
 > Signed-off-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
+Thanks
+
 Eric
 > ---
->  hw/i386/pc.c | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
+>  hw/core/qdev.c         | 17 +++++++++++++++++
+>  include/hw/boards.h    |  9 +++++++++
+>  include/hw/qdev-core.h |  1 +
+>  qdev-monitor.c         |  7 +++++++
+>  4 files changed, 34 insertions(+)
 > 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 549c437050..4ea00c7bd2 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -2905,6 +2905,26 @@ static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
->      }
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 94ebc0a4a1..d792b43c37 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -236,6 +236,23 @@ HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev)
+>      return NULL;
 >  }
 >  
-> +
-> +static bool pc_hotplug_allowed(MachineState *ms, DeviceState *dev, Error **errp)
+> +bool qdev_hotplug_allowed(DeviceState *dev, Error **errp)
 > +{
-> +    X86IOMMUState *iommu = x86_iommu_get_default();
-> +    IntelIOMMUState *intel_iommu;
+> +    MachineState *machine;
+> +    MachineClass *mc;
+> +    Object *m_obj = qdev_get_machine();
 > +
-> +    if (iommu &&
-> +        object_dynamic_cast((Object *)iommu, TYPE_INTEL_IOMMU_DEVICE) &&
-> +        object_dynamic_cast((Object *)dev, "vfio-pci")) {
-> +        intel_iommu = INTEL_IOMMU_DEVICE(iommu);
-> +        if (!intel_iommu->caching_mode) {
-> +            error_setg(errp, "Device assignment is not allowed without "
-> +                       "enabling caching-mode=on for Intel IOMMU.");
-> +            return false;
+> +    if (object_dynamic_cast(m_obj, TYPE_MACHINE)) {
+> +        machine = MACHINE(m_obj);
+> +        mc = MACHINE_GET_CLASS(machine);
+> +        if (mc->hotplug_allowed) {
+> +            return mc->hotplug_allowed(machine, dev, errp);
 > +        }
 > +    }
 > +
 > +    return true;
 > +}
 > +
->  static void pc_machine_class_init(ObjectClass *oc, void *data)
+>  HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev)
 >  {
->      MachineClass *mc = MACHINE_CLASS(oc);
-> @@ -2929,6 +2949,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
->      pcmc->pvh_enabled = true;
->      assert(!mc->get_hotplug_handler);
->      mc->get_hotplug_handler = pc_get_hotplug_handler;
-> +    mc->hotplug_allowed = pc_hotplug_allowed;
->      mc->cpu_index_to_instance_props = pc_cpu_index_to_props;
->      mc->get_default_cpu_node_id = pc_get_default_cpu_node_id;
->      mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
+>      if (dev->parent_bus) {
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index a71d1a53a5..1cf63be45d 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -166,6 +166,13 @@ typedef struct {
+>   *    The function pointer to hook different machine specific functions for
+>   *    parsing "smp-opts" from QemuOpts to MachineState::CpuTopology and more
+>   *    machine specific topology fields, such as smp_dies for PCMachine.
+> + * @hotplug_allowed:
+> + *    If the hook is provided, then it'll be called for each device
+> + *    hotplug to check whether the device hotplug is allowed.  Return
+> + *    true to grant allowance or false to reject the hotplug.  When
+> + *    false is returned, an error must be set to show the reason of
+> + *    the rejection.  If the hook is not provided, all hotplug will be
+> + *    allowed.
+>   */
+>  struct MachineClass {
+>      /*< private >*/
+> @@ -223,6 +230,8 @@ struct MachineClass {
+>  
+>      HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+>                                             DeviceState *dev);
+> +    bool (*hotplug_allowed)(MachineState *state, DeviceState *dev,
+> +                            Error **errp);
+>      CpuInstanceProperties (*cpu_index_to_instance_props)(MachineState *machine,
+>                                                           unsigned cpu_index);
+>      const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index 136df7774c..88e7ec4b60 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -284,6 +284,7 @@ void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
+>                                   int required_for_version);
+>  HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev);
+>  HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev);
+> +bool qdev_hotplug_allowed(DeviceState *dev, Error **errp);
+>  /**
+>   * qdev_get_hotplug_handler: Get handler responsible for device wiring
+>   *
+> diff --git a/qdev-monitor.c b/qdev-monitor.c
+> index 58222c2211..6c80602771 100644
+> --- a/qdev-monitor.c
+> +++ b/qdev-monitor.c
+> @@ -614,6 +614,13 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+>      /* create device */
+>      dev = DEVICE(object_new(driver));
+>  
+> +    /* Check whether the hotplug is allowed by the machine */
+> +    if (qdev_hotplug && !qdev_hotplug_allowed(dev, &err)) {
+> +        /* Error must be set in the machine hook */
+> +        assert(err);
+> +        goto err_del_dev;
+> +    }
+> +
+>      if (bus) {
+>          qdev_set_parent_bus(dev, bus);
+>      } else if (qdev_hotplug && !qdev_get_machine_hotplug_handler(dev)) {
 > 
 
