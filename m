@@ -2,87 +2,59 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00C0DC49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:45:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0FB5C49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:49:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7AF6D214DE
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:45:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vFnuQT0g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AF6D214DE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A7008206C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:49:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7008206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9sGA-0000Ij-O3
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 10:45:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49665)
+	id 1i9sJI-0002jX-Vs
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 10:49:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51063)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i9rnK-0004OW-0f
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:16:00 -0400
+ (envelope-from <mreitz@redhat.com>) id 1i9ruQ-0003Dj-S8
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:23:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i9rnH-0006vG-PE
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:15:57 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51322)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i9rnH-0006ul-Ar
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:15:55 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 7so10362965wme.1
- for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 07:15:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=0pnYN3RXjA7UBIBYIotlAccmHjY/D9vmktQW67WnPW8=;
- b=vFnuQT0g/Orap8IjExRqmdI34nHdbzHGbhHrdxgnPl8mUNzUHemHSufsbFpNGyVBzZ
- p+VhiaMzzb0db9sssSs/mNIk0OMZDaCQAdFn/5GDQfOW9LfUI4G75o6WFQVAw5jf+7sG
- c5tXEo7p2xCAi2h01z6IK9u5ofhDIaT/HeySZRe5ZAsP1oBAkRkt3HDEoWdEsggu1Z2z
- 1norD/19SkaKw52p58sMonFoZ7JzK0dS0Snu/hLQeq5ZKnzy7syHW6HlfL39SjiEzN6k
- PFtA6uHr9Vwyd4Dibe1OpF1712mXE0nHe84BSjfLqINpgFKx9CGN9c1MUEinnXv9NYy4
- /eNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=0pnYN3RXjA7UBIBYIotlAccmHjY/D9vmktQW67WnPW8=;
- b=XFMJVchOJtpmLf48OzZ3Znsfr0TDgaiRt2y24tIyvM0z3Jt1/qrfYWw4tC9LEHVdPG
- nxhH+O3k6oDuVY5mxzIUQ/HlkNBEqvjBs9Ot1Z3bNxLJF3zhq+ogi4NeIMOmZA6vV4Q8
- OG60FhLTAdkKEDUT4SR9C9O66nsEkDbJszRAvRpmthNUDJibERAn8+CmbB7/OSVeLRSv
- ywTftUYTkMYYYKY1Ldflvp6TA7jb0yrqho81nAQPMGThbIGM8J3aan9hzSSCC39PYBzS
- GPEfcY54lbHhiQxEx3kl01CH2C8lCRhokoUHlXSklMdEjFcOvpWHOu/5qwlHzh4f98Ks
- Tupg==
-X-Gm-Message-State: APjAAAXoI2BpGL4mdca3LOebUlPagvLeGhnlQGUYJC5lbXRMSto3Djw2
- JCnH3lFCBxJGmP3yKJ/ai1eIsf5nbH3acQ==
-X-Google-Smtp-Source: APXvYqwmvGsfZ7KdIUo76pgt70Vxt3/hitTHVvURlDbfnmtf9AyvQrpzaITmB2t4hiTzoCZLsiz5dg==
-X-Received: by 2002:a1c:a546:: with SMTP id o67mr14871998wme.55.1568643354347; 
- Mon, 16 Sep 2019 07:15:54 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s9sm15185884wme.36.2019.09.16.07.15.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Sep 2019 07:15:53 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Date: Mon, 16 Sep 2019 15:15:35 +0100
-Message-Id: <20190916141544.17540-7-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190916141544.17540-1-peter.maydell@linaro.org>
-References: <20190916141544.17540-1-peter.maydell@linaro.org>
+ (envelope-from <mreitz@redhat.com>) id 1i9ruP-0000nN-GY
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:23:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43040)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1i9ruM-0000mJ-KC; Mon, 16 Sep 2019 10:23:14 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E297A796E0;
+ Mon, 16 Sep 2019 14:23:13 +0000 (UTC)
+Received: from localhost (unknown [10.40.205.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C7DC1001B13;
+ Mon, 16 Sep 2019 14:23:13 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Date: Mon, 16 Sep 2019 16:22:38 +0200
+Message-Id: <20190916142246.31474-9-mreitz@redhat.com>
+In-Reply-To: <20190916142246.31474-1-mreitz@redhat.com>
+References: <20190916142246.31474-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH v2 06/15] target/arm/arm-semi: Use
- set_swi_errno() in gdbstub callback functions
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Mon, 16 Sep 2019 14:23:13 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 08/16] curl: Check completion in curl_multi_do()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,79 +66,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When we are routing semihosting operations through the gdbstub, the
-work of sorting out the return value and setting errno if necessary
-is done by callback functions which are invoked by the gdbstub code.
-Clean up some ifdeffery in those functions by having them call
-set_swi_errno() to set the semihosting errno.
+While it is more likely that transfers complete after some file
+descriptor has data ready to read, we probably should not rely on it.
+Better be safe than sorry and call curl_multi_check_completion() in
+curl_multi_do(), too, just like it is done in curl_multi_read().
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+With this change, curl_multi_do() and curl_multi_read() are actually the
+same, so drop curl_multi_read() and use curl_multi_do() as the sole FD
+handler.
+
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20190910124136.10565-4-mreitz@redhat.com
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- target/arm/arm-semi.c | 27 ++++++---------------------
- 1 file changed, 6 insertions(+), 21 deletions(-)
+ block/curl.c | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
 
-diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-index 2618588076f..02cd673d47d 100644
---- a/target/arm/arm-semi.c
-+++ b/target/arm/arm-semi.c
-@@ -259,17 +259,11 @@ static void arm_semi_cb(CPUState *cs, target_ulong ret, target_ulong err)
+diff --git a/block/curl.c b/block/curl.c
+index 95d7b77dc0..5838afef99 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -139,7 +139,6 @@ typedef struct BDRVCURLState {
+=20
+ static void curl_clean_state(CURLState *s);
+ static void curl_multi_do(void *arg);
+-static void curl_multi_read(void *arg);
+=20
+ #ifdef NEED_CURL_TIMER_CALLBACK
+ /* Called from curl_multi_do_locked, with s->mutex held.  */
+@@ -186,7 +185,7 @@ static int curl_sock_cb(CURL *curl, curl_socket_t fd,=
+ int action,
+     switch (action) {
+         case CURL_POLL_IN:
+             aio_set_fd_handler(s->aio_context, fd, false,
+-                               curl_multi_read, NULL, NULL, state);
++                               curl_multi_do, NULL, NULL, state);
+             break;
+         case CURL_POLL_OUT:
+             aio_set_fd_handler(s->aio_context, fd, false,
+@@ -194,7 +193,7 @@ static int curl_sock_cb(CURL *curl, curl_socket_t fd,=
+ int action,
+             break;
+         case CURL_POLL_INOUT:
+             aio_set_fd_handler(s->aio_context, fd, false,
+-                               curl_multi_read, curl_multi_do, NULL, sta=
+te);
++                               curl_multi_do, curl_multi_do, NULL, state=
+);
+             break;
+         case CURL_POLL_REMOVE:
+             aio_set_fd_handler(s->aio_context, fd, false,
+@@ -416,15 +415,6 @@ static void curl_multi_do(void *arg)
  {
-     ARMCPU *cpu = ARM_CPU(cs);
-     CPUARMState *env = &cpu->env;
--#ifdef CONFIG_USER_ONLY
--    TaskState *ts = cs->opaque;
--#endif
-     target_ulong reg0 = is_a64(env) ? env->xregs[0] : env->regs[0];
- 
-     if (ret == (target_ulong)-1) {
--#ifdef CONFIG_USER_ONLY
--        ts->swi_errno = err;
--#else
--        syscall_err = err;
--#endif
-+        errno = err;
-+        set_swi_errno(env, -1);
-         reg0 = ret;
-     } else {
-         /* Fixup syscalls that use nonstardard return conventions.  */
-@@ -326,11 +320,8 @@ static void arm_semi_flen_cb(CPUState *cs, target_ulong ret, target_ulong err)
-     } else {
-         env->regs[0] = size;
-     }
--#ifdef CONFIG_USER_ONLY
--    ((TaskState *)cs->opaque)->swi_errno = err;
--#else
--    syscall_err = err;
--#endif
-+    errno = err;
-+    set_swi_errno(env, -1);
- }
- 
- static int arm_semi_open_guestfd;
-@@ -339,15 +330,9 @@ static void arm_semi_open_cb(CPUState *cs, target_ulong ret, target_ulong err)
- {
-     ARMCPU *cpu = ARM_CPU(cs);
-     CPUARMState *env = &cpu->env;
--#ifdef CONFIG_USER_ONLY
--    TaskState *ts = cs->opaque;
--#endif
-     if (ret == (target_ulong)-1) {
--#ifdef CONFIG_USER_ONLY
--        ts->swi_errno = err;
--#else
--        syscall_err = err;
--#endif
-+        errno = err;
-+        set_swi_errno(env, -1);
-         dealloc_guestfd(arm_semi_open_guestfd);
-     } else {
-         associate_guestfd(arm_semi_open_guestfd, ret);
--- 
-2.20.1
+     CURLState *s =3D (CURLState *)arg;
+=20
+-    qemu_mutex_lock(&s->s->mutex);
+-    curl_multi_do_locked(s);
+-    qemu_mutex_unlock(&s->s->mutex);
+-}
+-
+-static void curl_multi_read(void *arg)
+-{
+-    CURLState *s =3D (CURLState *)arg;
+-
+     qemu_mutex_lock(&s->s->mutex);
+     curl_multi_do_locked(s);
+     curl_multi_check_completion(s->s);
+--=20
+2.21.0
 
 
