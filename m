@@ -2,61 +2,97 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CC43C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:21:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3FC1C49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:24:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E73B720665
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:21:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E73B720665
+	by mail.kernel.org (Postfix) with ESMTPS id B2E142184D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:24:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M/HPRJMm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2E142184D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9tkW-0004Nf-5c
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 12:21:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35972)
+	id 1i9tnI-0007Zk-Cp
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 12:24:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60584)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i9tIg-0003MB-4N
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:52:27 -0400
+ (envelope-from <mst@redhat.com>) id 1i9sxg-00050M-N1
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:30:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i9tIe-0002fg-Me
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:52:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49472)
+ (envelope-from <mst@redhat.com>) id 1i9sxf-0001d1-EL
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:30:44 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33562
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1i9tIb-0002dj-MQ; Mon, 16 Sep 2019 11:52:21 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BB3AC308402E;
- Mon, 16 Sep 2019 15:52:20 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-115.brq.redhat.com [10.40.204.115])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8919019C4F;
- Mon, 16 Sep 2019 15:52:04 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 16 Sep 2019 17:48:45 +0200
-Message-Id: <20190916154847.28936-12-philmd@redhat.com>
-In-Reply-To: <20190916154847.28936-1-philmd@redhat.com>
-References: <20190916154847.28936-1-philmd@redhat.com>
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1i9sxe-0001cV-PT
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:30:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1568647841;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=te3evpxZ+xN1wQC1yCOin2y8byAP9R+d80VqueBPR3I=;
+ b=M/HPRJMmgEYmqEdAtkkvZFMwYqCjqFUThAu/O7dgb193h0Ix+LT71VjXtClGHcUnRC6gXd
+ bO29iK3n4qswfqYUOlc6VOvTtXbCOMiqyizwhIrdFF/MhGofY90s/6lA3wQdYV6FySMufQ
+ wVGQ2Pxf9gwKZPc9WwxP6ZKFJX2fdLw=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-346-bsBAAAMROqmoaS8AThI7RA-1; Mon, 16 Sep 2019 11:30:40 -0400
+Received: by mail-qt1-f200.google.com with SMTP id n5so473236qtp.5
+ for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 08:30:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=+kyMHWIzdDDa0kHLKcIALBjG7dIK1Osv/wN3pWM03nA=;
+ b=d0bLPUaVkQyx/WuNNtkjaR1gMaHK/nZR1mgJ7PIbUOkKegUcGpeZyf6wud0kmARyz3
+ v361zk7iuH122pt6b3WCxhjJHaZlBZkiFBhwhzDrWXrX/3d/qBojfX4nHS6zg5q5Eqa0
+ kdShAlsKyvNMY9m7rhj3QNb0GX+Eijv614CPjmOKa5JChLeb+ZPIP4m+tYN6Q5Fh2fkL
+ lawLtJHZjjqD2SgD5pmt5tX/uWL1Y/5q+VcWoaMQQ+ZIt52N0Xp56qy6Pgncc3twEVED
+ eBp54dbTqdOsNcv93Oy5cBDxEQiIAhDhVu/aM06vQdzun4bMBEbB14UKIuLCYxWenuDf
+ 2M5Q==
+X-Gm-Message-State: APjAAAUb71A++IAgMwHkDa81NzM019PLNlEDXoKHs6iPj7av5b0DHZav
+ gSM3mIxq3iTJsppe8ura7OqnCbsbG0fNo6xbSCoXlNYSFPw3UaBIArsYEAo0yduT/n+UhDBb78V
+ sYiL2yA6A3ZTx/yA=
+X-Received: by 2002:ac8:480b:: with SMTP id g11mr100474qtq.359.1568647839183; 
+ Mon, 16 Sep 2019 08:30:39 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyAYbsZzVknH40g891MIZXMy0ThCnAHLHZZOCjW8/Gmy5Ja/x98NkAQ/nHzWE6PwH85bXaZvQ==
+X-Received: by 2002:ac8:480b:: with SMTP id g11mr100460qtq.359.1568647839000; 
+ Mon, 16 Sep 2019 08:30:39 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
+ by smtp.gmail.com with ESMTPSA id x15sm3291235qkh.44.2019.09.16.08.30.36
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Sep 2019 08:30:38 -0700 (PDT)
+Date: Mon, 16 Sep 2019 11:30:34 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Message-ID: <20190916112430-mutt-send-email-mst@kernel.org>
+References: <20190911134539.25650-1-johannes@sipsolutions.net>
+ <20190911134539.25650-2-johannes@sipsolutions.net>
+ <20190911095650-mutt-send-email-mst@kernel.org>
+ <fedd74ed3e9cc554287b202e73b047a938515113.camel@sipsolutions.net>
+ <674086baeed5fce100d0882e668d5e36f026bd71.camel@sipsolutions.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Mon, 16 Sep 2019 15:52:20 +0000 (UTC)
+In-Reply-To: <674086baeed5fce100d0882e668d5e36f026bd71.camel@sipsolutions.net>
+X-MC-Unique: bsBAAAMROqmoaS8AThI7RA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 11/13] hw: Move Aspeed RTC from hw/timer/ to
- hw/rtc/ subdirectory
+X-Received-From: 205.139.110.61
+Subject: Re: [Qemu-devel] [RFC v2 1/2] docs: vhost-user: add in-band
+ kick/call messages
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,147 +104,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Andrew Jeffery <andrew@aj.id.au>, qemu-ppc@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move RTC devices under the hw/rtc/ subdirectory.
+On Mon, Sep 16, 2019 at 01:40:35PM +0200, Johannes Berg wrote:
+> Hi Michael,
+>=20
+> I had just wanted to prepare a resend, but
+>=20
+> > > Hmm I don't like this. I propose that with VHOST_USER_PROTOCOL_F_IN_B=
+AND_NOTIFICATIONS
+> > > we just don't allow VHOST_USER_SET_VRING_CALL (if you think it's
+> > > important to allow them, we can say that we do not require them).
+> >=20
+> > You can't actually skip SET_VRING_CALL, it's necessary to start a vring=
+,
+> > so libvhost-user for example calls dev->iface->queue_set_started() only
+> > in this case. The docs in the "Starting and stopping rings" section als=
+o
+> > explain this.
+>=20
+> [...]
+>=20
+> > See above. But I guess we could put a flag into bit 9 indicating that
+> > you want to use messages instead of polling or a file descriptor, if yo=
+u
+> > prefer.
+>=20
+> Personally, I don't think it matters since right now I can see the in-
+> band notification as being really necessary/useful only for simulation
+> work, and in that case no polling will be doable.
+>=20
+> If you do think it's important to not make the two mutually exclusive,
+> how would you prefer to have this handled? With a new flag, e.g. in bit
+> 9, indicating "use inband signalling instead of polling or eventfd"?
+>=20
+> Thanks,
+> johannes
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/rtc/Makefile.objs                   | 1 +
- hw/{timer =3D> rtc}/aspeed_rtc.c         | 2 +-
- hw/rtc/trace-events                    | 4 ++++
- hw/timer/Makefile.objs                 | 2 +-
- hw/timer/trace-events                  | 4 ----
- include/hw/arm/aspeed_soc.h            | 2 +-
- include/hw/{timer =3D> rtc}/aspeed_rtc.h | 3 ---
- 7 files changed, 8 insertions(+), 10 deletions(-)
- rename hw/{timer =3D> rtc}/aspeed_rtc.c (99%)
- rename include/hw/{timer =3D> rtc}/aspeed_rtc.h (92%)
 
-diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
-index 3d4763fc26..8dc9fcd3a9 100644
---- a/hw/rtc/Makefile.objs
-+++ b/hw/rtc/Makefile.objs
-@@ -10,3 +10,4 @@ common-obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-zynqmp-rtc.o
- common-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_rtc.o
- obj-$(CONFIG_MC146818RTC) +=3D mc146818rtc.o
- common-obj-$(CONFIG_SUN4V_RTC) +=3D sun4v-rtc.o
-+common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_rtc.o
-diff --git a/hw/timer/aspeed_rtc.c b/hw/rtc/aspeed_rtc.c
-similarity index 99%
-rename from hw/timer/aspeed_rtc.c
-rename to hw/rtc/aspeed_rtc.c
-index 5313017353..3ca1183558 100644
---- a/hw/timer/aspeed_rtc.c
-+++ b/hw/rtc/aspeed_rtc.c
-@@ -8,7 +8,7 @@
-=20
- #include "qemu/osdep.h"
- #include "qemu-common.h"
--#include "hw/timer/aspeed_rtc.h"
-+#include "hw/rtc/aspeed_rtc.h"
- #include "migration/vmstate.h"
- #include "qemu/log.h"
- #include "qemu/timer.h"
-diff --git a/hw/rtc/trace-events b/hw/rtc/trace-events
-index 7f1945ad4c..d6749f4616 100644
---- a/hw/rtc/trace-events
-+++ b/hw/rtc/trace-events
-@@ -13,3 +13,7 @@ pl031_read(uint32_t addr, uint32_t value) "addr 0x%08x =
-value 0x%08x"
- pl031_write(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
- pl031_alarm_raised(void) "alarm raised"
- pl031_set_alarm(uint32_t ticks) "alarm set for %u ticks"
-+
-+# aspeed-rtc.c
-+aspeed_rtc_read(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " val=
-ue 0x%08" PRIx64
-+aspeed_rtc_write(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " va=
-lue 0x%08" PRIx64
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index 33191d74cb..83091770df 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -29,7 +29,7 @@ common-obj-$(CONFIG_MIPS_CPS) +=3D mips_gictimer.o
- common-obj-$(CONFIG_ALLWINNER_A10_PIT) +=3D allwinner-a10-pit.o
-=20
- common-obj-$(CONFIG_STM32F2XX_TIMER) +=3D stm32f2xx_timer.o
--common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_timer.o aspeed_rtc.o
-+common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_timer.o
-=20
- common-obj-$(CONFIG_CMSDK_APB_TIMER) +=3D cmsdk-apb-timer.o
- common-obj-$(CONFIG_CMSDK_APB_DUALTIMER) +=3D cmsdk-apb-dualtimer.o
-diff --git a/hw/timer/trace-events b/hw/timer/trace-events
-index 1459d07237..e18b87fc96 100644
---- a/hw/timer/trace-events
-+++ b/hw/timer/trace-events
-@@ -66,10 +66,6 @@ cmsdk_apb_dualtimer_read(uint64_t offset, uint64_t dat=
-a, unsigned size) "CMSDK A
- cmsdk_apb_dualtimer_write(uint64_t offset, uint64_t data, unsigned size)=
- "CMSDK APB dualtimer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size=
- %u"
- cmsdk_apb_dualtimer_reset(void) "CMSDK APB dualtimer: reset"
-=20
--# hw/timer/aspeed-rtc.c
--aspeed_rtc_read(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " val=
-ue 0x%08" PRIx64
--aspeed_rtc_write(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " va=
-lue 0x%08" PRIx64
--
- # nrf51_timer.c
- nrf51_timer_read(uint64_t addr, uint32_t value, unsigned size) "read add=
-r 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
- nrf51_timer_write(uint64_t addr, uint32_t value, unsigned size) "write a=
-ddr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
-diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
-index ab5052b12c..5a443006ed 100644
---- a/include/hw/arm/aspeed_soc.h
-+++ b/include/hw/arm/aspeed_soc.h
-@@ -17,7 +17,7 @@
- #include "hw/misc/aspeed_sdmc.h"
- #include "hw/misc/aspeed_xdma.h"
- #include "hw/timer/aspeed_timer.h"
--#include "hw/timer/aspeed_rtc.h"
-+#include "hw/rtc/aspeed_rtc.h"
- #include "hw/i2c/aspeed_i2c.h"
- #include "hw/ssi/aspeed_smc.h"
- #include "hw/watchdog/wdt_aspeed.h"
-diff --git a/include/hw/timer/aspeed_rtc.h b/include/hw/rtc/aspeed_rtc.h
-similarity index 92%
-rename from include/hw/timer/aspeed_rtc.h
-rename to include/hw/rtc/aspeed_rtc.h
-index 15ba42912b..156c8faee3 100644
---- a/include/hw/timer/aspeed_rtc.h
-+++ b/include/hw/rtc/aspeed_rtc.h
-@@ -8,9 +8,6 @@
- #ifndef ASPEED_RTC_H
- #define ASPEED_RTC_H
-=20
--#include <stdint.h>
--
--#include "hw/irq.h"
- #include "hw/sysbus.h"
-=20
- typedef struct AspeedRtcState {
+So first we really need to fix up Starting and stopping section,
+explaining that if the FD is invalid, this means ring
+is immediately started, right?
+
+If we want to keep it simple, my proposal is this, if
+VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS is set then
+VHOST_USER_SET_VRING_CALL and VHOST_USER_SET_VRING_KICK are not valid.
+Starting/stopping ring needs to be updated, teaching it
+that ring is started after it gets a kick.
+
+
 --=20
-2.20.1
+MST
 
 
