@@ -2,88 +2,53 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C40F7C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:41:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C77CEC49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:41:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F7D9206A4
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:41:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WvqY0DFd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F7D9206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 998C3206A4
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:41:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 998C3206A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9sBY-0003y1-Ro
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 10:41:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49909)
+	id 1i9sBd-0004BA-T9
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 10:41:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50364)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i9rnU-0004eD-Tz
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:16:10 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i9rqb-0007E0-Jj
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:19:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i9rnS-00072p-Ey
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:16:08 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39490)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i9rnS-00072E-1j
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:16:06 -0400
-Received: by mail-wr1-x441.google.com with SMTP id r3so8933470wrj.6
- for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 07:16:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=SXBAqhquP2Lg4Ybq8pMEcyecszVWdFjmxwIvTxGKiO0=;
- b=WvqY0DFd3ahqD6PJc4Eokd0KPmTwnsPDUrgGli1ZJcCrndiQ/uMwDHtK0sdf3eGS5C
- nYTbZaAdtBA3hgjGz4Nh5apol5XdJuqIw8Nh1UqDZdZz9osomXyL8A/vCgshougEdl1G
- M/DrmVa6Ch6xN2ldAa1AY7OL0XBUcra2+1pVjbCIbmBE/sX000qN7tUJVBxFxJzwRXMl
- WpiEY1M8oDhUgu4howcH4ZfEQ9qK5JCMspsYPgL/deMaWoUSMdgSI0/zOMa0KXlE7Sgs
- XO7PET144AhppOFjte9qO/UGSk8Nvpmzf1uSxvJF60Gb6OOsuSuFBGCOIxOfYbAgEXLt
- ciyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=SXBAqhquP2Lg4Ybq8pMEcyecszVWdFjmxwIvTxGKiO0=;
- b=V3gwwiZMnMX/2XlIDdJOFUXKgIYrf5vtTEOsBSAS30jawxe6Cdh6VjTtZrlefZwHo8
- uqjjw/s39RxHTFSRBYaowmVVeC1Qp6QxkitJ4jYBSBUoAdVUShhMPsK+cNu693Dd2yN6
- XNdgjyh24MENvKzDopo+NmfyEEg0mLrXodjURyJ2iZzKlwb8GttSiTitBXiiGKBJk9dc
- 7XD8c8/jpvopKIs4bq3zrtdIDKYgkwmAAXbar9PtxJivkI4GXj8u5P/e+E+IZ4y3GQRE
- X8p6oPmcUXSKTw6eZFeOErU+GFlNrhiC8fOzdx8Z2uurPldDth4gbzLrroZFaDPDaM2D
- pfdA==
-X-Gm-Message-State: APjAAAWgRLcqCRF69G/sHoYXu/vbGmJTndoZXsKRwfN+WfQr4PvQV2d3
- hkYLjol2qhg2KL72orDJT9O+bA4D7pQvyg==
-X-Google-Smtp-Source: APXvYqw/2Y0ATN8S7+P+F/py2zDH5OqUBFFPXksWf9VBp2G0HIhK/dvtiULlxkR/pr7zM+q/w/fvNQ==
-X-Received: by 2002:adf:de03:: with SMTP id b3mr40938wrm.14.1568643365067;
- Mon, 16 Sep 2019 07:16:05 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s9sm15185884wme.36.2019.09.16.07.16.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Sep 2019 07:16:04 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Date: Mon, 16 Sep 2019 15:15:44 +0100
-Message-Id: <20190916141544.17540-16-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190916141544.17540-1-peter.maydell@linaro.org>
-References: <20190916141544.17540-1-peter.maydell@linaro.org>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1i9rqZ-0007v9-Lg
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:19:21 -0400
+Received: from relay.sw.ru ([185.231.240.75]:58096)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1i9rqV-0007sh-Bc; Mon, 16 Sep 2019 10:19:15 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1i9rqS-0003EA-PU; Mon, 16 Sep 2019 17:19:12 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Date: Mon, 16 Sep 2019 17:19:10 +0300
+Message-Id: <20190916141911.5255-4-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190916141911.5255-1-vsementsov@virtuozzo.com>
+References: <20190916141911.5255-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PATCH v2 15/15] target/arm/arm-semi: Implement
- SH_EXT_STDOUT_STDERR extension
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH 3/4] block/dirty-bitmap: drop
+ BdrvDirtyBitmap.mutex
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,67 +60,273 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ quintela@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org,
+ stefanha@redhat.com, den@openvz.org, mreitz@redhat.com, jsnow@redhat.com,
+ dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SH_EXT_STDOUT_STDERR is a v2.0 semihosting extension: the guest
-can open ":tt" with a file mode requesting append access in
-order to open stderr, in addition to the existing "open for
-read for stdin or write for stdout". Implement this and
-report it via the :semihosting-features data.
+mutex field is just a pointer to bs->dirty_bitmap_mutex, so no needs
+to store it in BdrvDirtyBitmap when we have bs pointer in it (since
+previous patch).
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Drop mutex field. Constantly use bdrv_dirty_bitmaps_lock/unlock in
+block/dirty-bitmap.c to make it more obvious that it's not per-bitmap
+lock. Still, for simplicity, leave bdrv_dirty_bitmap_lock/unlock
+functions as an external API.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- target/arm/arm-semi.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+ block/dirty-bitmap.c | 84 +++++++++++++++++++++-----------------------
+ 1 file changed, 41 insertions(+), 43 deletions(-)
 
-diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-index f65d8c907e8..6f7b6d801bf 100644
---- a/target/arm/arm-semi.c
-+++ b/target/arm/arm-semi.c
-@@ -516,13 +516,14 @@ static uint32_t gdb_flenfn(ARMCPU *cpu, GuestFD *gf)
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index f3dc7b3ca5..76a8e59e61 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -28,7 +28,6 @@
+ #include "block/blockjob.h"
  
- /* Feature bits reportable in feature byte 0 */
- #define SH_EXT_EXIT_EXTENDED (1 << 0)
-+#define SH_EXT_STDOUT_STDERR (1 << 1)
+ struct BdrvDirtyBitmap {
+-    QemuMutex *mutex;
+     BlockDriverState *bs;
+     HBitmap *bitmap;            /* Dirty bitmap implementation */
+     bool busy;                  /* Bitmap is busy, it can't be used via QMP */
+@@ -71,12 +70,12 @@ static inline void bdrv_dirty_bitmaps_unlock(BlockDriverState *bs)
  
- static const uint8_t featurefile_data[] = {
-     SHFB_MAGIC_0,
-     SHFB_MAGIC_1,
-     SHFB_MAGIC_2,
-     SHFB_MAGIC_3,
--    SH_EXT_EXIT_EXTENDED, /* Feature byte 0 */
-+    SH_EXT_EXIT_EXTENDED | SH_EXT_STDOUT_STDERR, /* Feature byte 0 */
- };
+ void bdrv_dirty_bitmap_lock(BdrvDirtyBitmap *bitmap)
+ {
+-    qemu_mutex_lock(bitmap->mutex);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+ }
  
- static void init_featurefile_guestfd(int guestfd)
-@@ -710,7 +711,21 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+ void bdrv_dirty_bitmap_unlock(BdrvDirtyBitmap *bitmap)
+ {
+-    qemu_mutex_unlock(bitmap->mutex);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+ 
+ /* Called with BQL or dirty_bitmap lock taken.  */
+@@ -116,7 +115,6 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
+     }
+     bitmap = g_new0(BdrvDirtyBitmap, 1);
+     bitmap->bs = bs;
+-    bitmap->mutex = &bs->dirty_bitmap_mutex;
+     bitmap->bitmap = hbitmap_alloc(bitmap_size, ctz32(granularity));
+     bitmap->size = bitmap_size;
+     bitmap->name = g_strdup(name);
+@@ -150,9 +148,9 @@ static bool bdrv_dirty_bitmap_busy(const BdrvDirtyBitmap *bitmap)
+ 
+ void bdrv_dirty_bitmap_set_busy(BdrvDirtyBitmap *bitmap, bool busy)
+ {
+-    qemu_mutex_lock(bitmap->mutex);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bitmap->busy = busy;
+-    qemu_mutex_unlock(bitmap->mutex);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+ 
+ /* Called with BQL taken.  */
+@@ -277,10 +275,10 @@ void bdrv_enable_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap)
+ /* Called with BQL taken. */
+ void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap)
+ {
+-    assert(bitmap->mutex == bitmap->successor->mutex);
+-    qemu_mutex_lock(bitmap->mutex);
++    assert(bitmap->bs == bitmap->successor->bs);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bdrv_enable_dirty_bitmap_locked(bitmap->successor);
+-    qemu_mutex_unlock(bitmap->mutex);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+ 
+ /* Called within bdrv_dirty_bitmap_lock..unlock and with BQL taken.  */
+@@ -360,9 +358,9 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BdrvDirtyBitmap *parent,
+ {
+     BdrvDirtyBitmap *ret;
+ 
+-    qemu_mutex_lock(parent->mutex);
++    bdrv_dirty_bitmaps_lock(parent->bs);
+     ret = bdrv_reclaim_dirty_bitmap_locked(parent, errp);
+-    qemu_mutex_unlock(parent->mutex);
++    bdrv_dirty_bitmaps_unlock(parent->bs);
+ 
+     return ret;
+ }
+@@ -434,16 +432,16 @@ void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+ 
+ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+ {
+-    bdrv_dirty_bitmap_lock(bitmap);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bitmap->disabled = true;
+-    bdrv_dirty_bitmap_unlock(bitmap);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+ 
+ void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+ {
+-    bdrv_dirty_bitmap_lock(bitmap);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bdrv_enable_dirty_bitmap_locked(bitmap);
+-    bdrv_dirty_bitmap_unlock(bitmap);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+ 
+ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs)
+@@ -484,9 +482,9 @@ bool bdrv_dirty_bitmap_get_locked(BdrvDirtyBitmap *bitmap, int64_t offset)
+ bool bdrv_dirty_bitmap_get(BdrvDirtyBitmap *bitmap, int64_t offset)
+ {
+     bool ret;
+-    bdrv_dirty_bitmap_lock(bitmap);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     ret = bdrv_dirty_bitmap_get_locked(bitmap, offset);
+-    bdrv_dirty_bitmap_unlock(bitmap);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ 
+     return ret;
+ }
+@@ -551,9 +549,9 @@ void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
+ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+                            int64_t offset, int64_t bytes)
+ {
+-    bdrv_dirty_bitmap_lock(bitmap);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bdrv_set_dirty_bitmap_locked(bitmap, offset, bytes);
+-    bdrv_dirty_bitmap_unlock(bitmap);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+ 
+ /* Called within bdrv_dirty_bitmap_lock..unlock */
+@@ -567,15 +565,15 @@ void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
+ void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+                              int64_t offset, int64_t bytes)
+ {
+-    bdrv_dirty_bitmap_lock(bitmap);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bdrv_reset_dirty_bitmap_locked(bitmap, offset, bytes);
+-    bdrv_dirty_bitmap_unlock(bitmap);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+ 
+ void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
+ {
+     assert(!bdrv_dirty_bitmap_readonly(bitmap));
+-    bdrv_dirty_bitmap_lock(bitmap);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     if (!out) {
+         hbitmap_reset_all(bitmap->bitmap);
+     } else {
+@@ -584,7 +582,7 @@ void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
+                                        hbitmap_granularity(backup));
+         *out = backup;
+     }
+-    bdrv_dirty_bitmap_unlock(bitmap);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+ 
+ void bdrv_restore_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *backup)
+@@ -679,9 +677,9 @@ bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap)
+ /* Called with BQL taken. */
+ void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value)
+ {
+-    qemu_mutex_lock(bitmap->mutex);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bitmap->readonly = value;
+-    qemu_mutex_unlock(bitmap->mutex);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+ 
+ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs)
+@@ -699,27 +697,27 @@ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs)
+ /* Called with BQL taken. */
+ void bdrv_dirty_bitmap_set_persistence(BdrvDirtyBitmap *bitmap, bool persistent)
+ {
+-    qemu_mutex_lock(bitmap->mutex);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bitmap->persistent = persistent;
+-    qemu_mutex_unlock(bitmap->mutex);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+ 
+ /* Called with BQL taken. */
+ void bdrv_dirty_bitmap_set_inconsistent(BdrvDirtyBitmap *bitmap)
+ {
+-    qemu_mutex_lock(bitmap->mutex);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     assert(bitmap->persistent == true);
+     bitmap->inconsistent = true;
+     bitmap->disabled = true;
+-    qemu_mutex_unlock(bitmap->mutex);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+ 
+ /* Called with BQL taken. */
+ void bdrv_dirty_bitmap_skip_store(BdrvDirtyBitmap *bitmap, bool skip)
+ {
+-    qemu_mutex_lock(bitmap->mutex);
++    bdrv_dirty_bitmaps_lock(bitmap->bs);
+     bitmap->skip_store = skip;
+-    qemu_mutex_unlock(bitmap->mutex);
++    bdrv_dirty_bitmaps_unlock(bitmap->bs);
+ }
+ 
+ bool bdrv_dirty_bitmap_get_persistence(BdrvDirtyBitmap *bitmap)
+@@ -779,9 +777,9 @@ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
+ {
+     bool ret;
+ 
+-    qemu_mutex_lock(dest->mutex);
+-    if (src->mutex != dest->mutex) {
+-        qemu_mutex_lock(src->mutex);
++    bdrv_dirty_bitmaps_lock(dest->bs);
++    if (src->bs != dest->bs) {
++        bdrv_dirty_bitmaps_lock(src->bs);
+     }
+ 
+     if (bdrv_dirty_bitmap_check(dest, BDRV_BITMAP_DEFAULT, errp)) {
+@@ -801,9 +799,9 @@ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
+     assert(ret);
+ 
+ out:
+-    qemu_mutex_unlock(dest->mutex);
+-    if (src->mutex != dest->mutex) {
+-        qemu_mutex_unlock(src->mutex);
++    bdrv_dirty_bitmaps_unlock(dest->bs);
++    if (src->bs != dest->bs) {
++        bdrv_dirty_bitmaps_unlock(src->bs);
+     }
+ }
+ 
+@@ -827,9 +825,9 @@ bool bdrv_dirty_bitmap_merge_internal(BdrvDirtyBitmap *dest,
+     assert(!bdrv_dirty_bitmap_inconsistent(src));
+ 
+     if (lock) {
+-        qemu_mutex_lock(dest->mutex);
+-        if (src->mutex != dest->mutex) {
+-            qemu_mutex_lock(src->mutex);
++        bdrv_dirty_bitmaps_lock(dest->bs);
++        if (src->bs != dest->bs) {
++            bdrv_dirty_bitmaps_lock(src->bs);
          }
+     }
  
-         if (strcmp(s, ":tt") == 0) {
--            int result_fileno = arg1 < 4 ? STDIN_FILENO : STDOUT_FILENO;
-+            int result_fileno;
-+
-+            /*
-+             * We implement SH_EXT_STDOUT_STDERR, so:
-+             *  open for read == stdin
-+             *  open for write == stdout
-+             *  open for append == stderr
-+             */
-+            if (arg1 < 4) {
-+                result_fileno = STDIN_FILENO;
-+            } else if (arg1 < 8) {
-+                result_fileno = STDOUT_FILENO;
-+            } else {
-+                result_fileno = STDERR_FILENO;
-+            }
-             associate_guestfd(guestfd, result_fileno);
-             unlock_user(s, arg0, 0);
-             return guestfd;
+@@ -842,9 +840,9 @@ bool bdrv_dirty_bitmap_merge_internal(BdrvDirtyBitmap *dest,
+     }
+ 
+     if (lock) {
+-        qemu_mutex_unlock(dest->mutex);
+-        if (src->mutex != dest->mutex) {
+-            qemu_mutex_unlock(src->mutex);
++        bdrv_dirty_bitmaps_unlock(dest->bs);
++        if (src->bs != dest->bs) {
++            bdrv_dirty_bitmaps_unlock(src->bs);
+         }
+     }
+ 
 -- 
-2.20.1
+2.21.0
 
 
