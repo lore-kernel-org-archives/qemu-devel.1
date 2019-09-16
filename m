@@ -2,64 +2,78 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75909C4CEC7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 00:44:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 423A1C4CEC7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 01:52:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F764206A4
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 00:44:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="DyF1334K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F764206A4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 179F72067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 01:52:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 179F72067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9f8J-0008CQ-DG
-	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 20:44:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41659)
+	id 1i9gC2-00018P-6w
+	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 21:52:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47032)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i9f5W-0005ZK-IH
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 20:41:56 -0400
+ (envelope-from <kevin.tian@intel.com>) id 1i9gBM-0000cR-Mi
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 21:52:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i9f5V-0005Am-4b
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 20:41:54 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:35579 helo=ozlabs.org)
+ (envelope-from <kevin.tian@intel.com>) id 1i9gBK-0007rq-EU
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 21:51:59 -0400
+Received: from mga09.intel.com ([134.134.136.24]:55483)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i9f5U-0005AQ-1k; Sun, 15 Sep 2019 20:41:53 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46WnVx6m7Zz9sCJ; Mon, 16 Sep 2019 10:41:45 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1568594505;
- bh=fVy+OTMPWlp6IxZAltLahRTiL0ZRoub5i4pPltEVuhU=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=DyF1334K/5kZ47WFH9Wg+QRI+vyfMtfe36fhg/l1M4ILbLH4PMtWVvnKV56p9aI2k
- GEY9Zk+jB40qQ5YZ8j6S0ooQ/JmJ+euYaR3BGR2qVtkQfFkKkzwoHg7XUWHtgkjaYd
- BhuE4bkyE5ktoyDHggsAIJbbHBzcsnPdHUPKYk4w=
-Date: Mon, 16 Sep 2019 10:36:39 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Balamuruhan S <bala24@linux.ibm.com>
-Message-ID: <20190916003639.GD2104@umbus.fritz.box>
-References: <20190912093056.4516-1-bala24@linux.ibm.com>
+ (Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+ id 1i9gBK-0007r8-6L
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 21:51:58 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 15 Sep 2019 18:51:49 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,510,1559545200"; d="scan'208";a="193309394"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+ by FMSMGA003.fm.intel.com with ESMTP; 15 Sep 2019 18:51:48 -0700
+Received: from fmsmsx119.amr.corp.intel.com (10.18.124.207) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sun, 15 Sep 2019 18:51:48 -0700
+Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
+ FMSMSX119.amr.corp.intel.com (10.18.124.207) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sun, 15 Sep 2019 18:51:48 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.32]) by
+ SHSMSX105.ccr.corp.intel.com ([169.254.11.23]) with mapi id 14.03.0439.000;
+ Mon, 16 Sep 2019 09:51:46 +0800
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Jason Wang <jasowang@redhat.com>
+Thread-Topic: vhost, iova, and dirty page tracking
+Thread-Index: AdVsLg/AAnCsYtAES/qfxc77B9v7gQ==
+Date: Mon, 16 Sep 2019 01:51:46 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D577BEA@SHSMSX104.ccr.corp.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNWZhOTM3MzUtYzk2MC00MzhiLWJkZWQtMDJiZjBjZTY1ZGZhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiK09TQm5uU1Q2WURHdG1wbG45Y0VTeFJYYmJFbDV3XC9YZlFkSXdMXC9EM0hLVEVReE13NFBuUGdydkZMTFd4b1VRIn0=
+dlp-product: dlpe-windows
+dlp-version: 11.0.400.15
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="llIrKcgUOe3dCx0c"
-Content-Disposition: inline
-In-Reply-To: <20190912093056.4516-1-bala24@linux.ibm.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] add Homer/OCC common area emulation
- for PowerNV
+X-Received-From: 134.134.136.24
+Subject: [Qemu-devel] vhost, iova, and dirty page tracking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,122 +85,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: maddy@linux.vnet.ibm.com, groug@kaod.org, qemu-devel@nongnu.org,
- anju@linux.vnet.ibm.com, qemu-ppc@nongnu.org, clg@kaod.org,
- hari@linux.vnet.ibm.com
+Cc: "Alex Williamson
+ \(alex.williamson@redhat.com\)" <alex.williamson@redhat.com>, "Zhao,
+ Yan Y" <yan.y.zhao@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi, Jason
 
---llIrKcgUOe3dCx0c
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+We had a discussion about dirty page tracking in VFIO, when vIOMMU
+is enabled:
 
-On Thu, Sep 12, 2019 at 03:00:51PM +0530, Balamuruhan S wrote:
-> Hi All,
->=20
-> This is follow-up patch that implements HOMER and OCC SRAM device
-> models to emulate homer memory and occ common area access for pstate
-> table, occ sensors, runtime data and slw.
->=20
-> Currently skiboot disables the homer/occ code path with `QUIRK_NO_PBA`,
-> this quirk have to be removed in skiboot for it to use HOMER and OCC
-> SRAM device models along with a bug fix,
->=20
-> https://github.com/balamuruhans/skiboot/commit/a655514d2a730e0372a2faee27=
-7d1cf01f71a524
-> https://github.com/balamuruhans/skiboot/commit/fd3d93d92ec66a7494346d6d24=
-ced7b48264c9a0
->=20
-> This version fixes a review comment from Cedric in previous version,
+https://lists.nongnu.org/archive/html/qemu-devel/2019-09/msg02690.html
 
-Applied to ppc-for-4.2, thanks.
+It's actually a similar model as vhost - Qemu cannot interpose the fast-pat=
+h
+DMAs thus relies on the kernel part to track and report dirty page informat=
+ion.
+Currently Qemu tracks dirty pages in GFN level, thus demanding a translatio=
+n
+from IOVA to GPA. Then the open in our discussion is where this translation
+should happen. Doing the translation in kernel implies a device iotlb flavo=
+r,
+which is what vhost implements today. It requires potentially large trackin=
+g
+structures in the host kernel, but leveraging the existing log_sync flow in=
+ Qemu.
+On the other hand, Qemu may perform log_sync for every removal of IOVA
+mapping and then do the translation itself, then avoiding the GPA awareness
+in the kernel side. It needs some change to current Qemu log-sync flow, and=
+=20
+may bring more overhead if IOVA is frequently unmapped.
 
->=20
-> changes in v3:
->     * pass on PnvHomer *homer directly to core_max_array() function
->       from the caller.
->=20
-> v2 patchset:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg02231.html
->=20
-> changes in v2:
->     * change to PnvHomer/PnvHomerClass instead of PnvHOMER/PnvHOMERClass
->       for better code readabililty.
->     * fabric link to chip to use `nr_cores` from PnvChip struct for
->       core_max_array() as we need to consider active cores in chip and not
->       whole machine.
->     * declare variable well ahead instead in for() loop syntax to make
->       all compilers happy.
->     * change to shorter variable name to `hmrc` instead of `homer_class`.
->     * remove `homer_` prefix for regs as it is not useful.
->     * have separate commit for checkpatch.pl coding style warnings.
->=20
-> v1 patchset:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg01610.html
->=20
-> changes in v1:
->     * breaks it to have separate patch series for Homer and OCC
->       emulation.
->     * reuse PnvOCC device model to implement SRAM device.
->     * implement PnvHomer as separate device model.
->     * have core max base address as part of PnvHOMERClass.
->     * reuse PNV_CHIP_INDEX() instead of introducing new `chip_num`.
->     * define all the memory ops access address as macros.
->     * few coding style warnings given by checkpatch.pl.
->=20
-> rfc patchset:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg00979.html
->=20
-> I request for review, comments and suggestions for the changes.
->=20
-> Balamuruhan S (4):
->   hw/ppc/pnv_xscom: retrieve homer/occ base address from PBA BARs
->   hw/ppc/pnv_occ: add sram device model for occ common area
->   hw/ppc/pnv_homer: add PowerNV homer device model
->   hw/ppc/pnv: fix checkpatch.pl coding style warnings
->=20
->  hw/ppc/Makefile.objs       |   1 +
->  hw/ppc/pnv.c               |  87 ++++++++++++---
->  hw/ppc/pnv_homer.c         | 272 +++++++++++++++++++++++++++++++++++++++=
-++++++
->  hw/ppc/pnv_occ.c           |  78 +++++++++++++
->  hw/ppc/pnv_xscom.c         |  34 +++++-
->  include/hw/ppc/pnv.h       |  21 ++++
->  include/hw/ppc/pnv_homer.h |  53 +++++++++
->  include/hw/ppc/pnv_occ.h   |   3 +
->  8 files changed, 528 insertions(+), 21 deletions(-)
->  create mode 100644 hw/ppc/pnv_homer.c
->  create mode 100644 include/hw/ppc/pnv_homer.h
->=20
+So we'd like to hear about your opinions, especially about how you came
+down to the current iotlb approach for vhost.=20
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+p.s. Alex's comment is also copied here from original thread.
 
---llIrKcgUOe3dCx0c
-Content-Type: application/pgp-signature; name="signature.asc"
+> So vhost must then be configuring a listener across system memory
+> rather than only against the device AddressSpace like we do in vfio,
+> such that it get's log_sync() callbacks for the actual GPA space rather
+> than only the IOVA space.  OTOH, QEMU could understand that the device
+> AddressSpace has a translate function and apply the IOVA dirty bits to
+> the system memory AddressSpace.  Wouldn't it make more sense for
+> QEMU
+> to perform a log_sync() prior to removing a MemoryRegionSection within
+> an AddressSpace and update the GPA rather than pushing GPA awareness
+> and potentially large tracking structures into the host kernel?
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1+2RUACgkQbDjKyiDZ
-s5ICphAAoyFPB7NI0Mw8mdMNt3ZY0zavJfYyok6AoR59PwB6vG4RXkq98uqqY43K
-PqYxKMWoLmIMBojN7aGv3bp6uKntJq+XvQmduR6dAU9ZsOyKh97amhSep1QVplni
-06ZMlCb/jnhaPrULGI5hp0XfR5OmldsHj2I+Y7GWhKDv16gVXYQpTNJ4Ne2M3VDT
-5/sW4GIi7V0PKYeDHccM4GC8nXA8qu8W4M9rCcDFguy8XIUpJZ/51Cv3X5wwZgPX
-ueLa14XFuImFv8o4C0KirHEDhN3zfwoSFMk7ZFFv27WA9HY58FF/olZhnnEI8MBY
-ROXPjrvQRkvmEWq7PlwHt2aq6byvRepkMmuBW4EBsYywMSGzvxh0xEHMsNdkl77P
-n1KeBUmlY3A/Unu3nt/3PXL0a2jGZIHg91+O10V75t06Jw7L/5JoRRNRnj+fa7jQ
-+4W0NQ/kgyopbOexvqJVmhRp+bFoTdqy6KeISy9KAzdx+MPUKsIrwA9GNQj7IOFJ
-Ql7kuD8MiYrOdVktuyRVEV7u3CuZXugJg1K2AswDKWAOzVx9nuyWXJ30OQaQtdCF
-/uzr50r8e8nI8WuBOtElOqRASIEcl12zEwJd35Vsxc/F/w6TtOtsnga9PiLx1UGF
-lZBf+oWOTwoQDejnJd34yChCYCACOK2IMNQcMyCSluM75iFNQxg=
-=JT/w
------END PGP SIGNATURE-----
-
---llIrKcgUOe3dCx0c--
+Thanks
+Kevin
 
