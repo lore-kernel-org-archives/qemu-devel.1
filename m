@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C26EC49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:40:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 898FBC49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:44:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D760A21852
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:40:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D760A21852
+	by mail.kernel.org (Postfix) with ESMTPS id 601AF21852
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:44:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 601AF21852
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9u37-0006ej-Lo
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 12:40:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35663)
+	id 1i9u6x-0002Uo-Pt
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 12:44:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36038)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i9tHq-0002BL-MQ
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:51:35 -0400
+ (envelope-from <philmd@redhat.com>) id 1i9tIs-0003ey-3J
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:52:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i9tHp-0002Hh-9l
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:51:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42018)
+ (envelope-from <philmd@redhat.com>) id 1i9tIr-0002lD-0Z
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:52:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57414)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1i9tHm-0002GI-Mh; Mon, 16 Sep 2019 11:51:30 -0400
+ id 1i9tIo-0002k4-J6; Mon, 16 Sep 2019 11:52:34 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BDB5A81DEC;
- Mon, 16 Sep 2019 15:51:29 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A3B433090FC9;
+ Mon, 16 Sep 2019 15:52:33 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-115.brq.redhat.com [10.40.204.115])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0526719C4F;
- Mon, 16 Sep 2019 15:51:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 86C2F196AE;
+ Mon, 16 Sep 2019 15:52:21 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 16 Sep 2019 17:48:42 +0200
-Message-Id: <20190916154847.28936-9-philmd@redhat.com>
+Date: Mon, 16 Sep 2019 17:48:46 +0200
+Message-Id: <20190916154847.28936-13-philmd@redhat.com>
 In-Reply-To: <20190916154847.28936-1-philmd@redhat.com>
 References: <20190916154847.28936-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Mon, 16 Sep 2019 15:51:30 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Mon, 16 Sep 2019 15:52:33 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 08/13] hw: Move DS1338 device from hw/timer/ to
- hw/rtc/ subdirectory
+Subject: [Qemu-devel] [PATCH 12/13] hw/rtc/mc146818: Include
+ mc146818rtc_regs.h a bit less
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,71 +88,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The DS1338 is a Real Time Clock, not a timer.
-Move it under the hw/rtc/ subdirectory.
+Only 2 source files require the "mc146818rtc_regs.h" header.
+Instead of having it processed 12 times, by all objects
+using "mc146818rtc.h", include it directly where used.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/rtc/Kconfig             | 4 ++++
- hw/rtc/Makefile.objs       | 1 +
- hw/{timer =3D> rtc}/ds1338.c | 0
- hw/timer/Kconfig           | 4 ----
- hw/timer/Makefile.objs     | 1 -
- 5 files changed, 5 insertions(+), 5 deletions(-)
- rename hw/{timer =3D> rtc}/ds1338.c (100%)
+ hw/rtc/mc146818rtc.c         | 1 +
+ hw/timer/hpet.c              | 1 +
+ include/hw/rtc/mc146818rtc.h | 1 -
+ 3 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/rtc/Kconfig b/hw/rtc/Kconfig
-index dff9d60946..45daa8d655 100644
---- a/hw/rtc/Kconfig
-+++ b/hw/rtc/Kconfig
-@@ -1,3 +1,7 @@
-+config DS1338
-+    bool
-+    depends on I2C
-+
- config M41T80
-     bool
-     depends on I2C
-diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
-index 810a38ee7b..b195863291 100644
---- a/hw/rtc/Makefile.objs
-+++ b/hw/rtc/Makefile.objs
-@@ -1,3 +1,4 @@
-+common-obj-$(CONFIG_DS1338) +=3D ds1338.o
- common-obj-$(CONFIG_M41T80) +=3D m41t80.o
- common-obj-$(CONFIG_M48T59) +=3D m48t59.o
- ifeq ($(CONFIG_ISA_BUS),y)
-diff --git a/hw/timer/ds1338.c b/hw/rtc/ds1338.c
-similarity index 100%
-rename from hw/timer/ds1338.c
-rename to hw/rtc/ds1338.c
-diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
-index 9357875f28..a990f9fe35 100644
---- a/hw/timer/Kconfig
-+++ b/hw/timer/Kconfig
-@@ -9,10 +9,6 @@ config ARM_MPTIMER
- config A9_GTIMER
-     bool
+diff --git a/hw/rtc/mc146818rtc.c b/hw/rtc/mc146818rtc.c
+index ced15f764f..9d4ed54f65 100644
+--- a/hw/rtc/mc146818rtc.c
++++ b/hw/rtc/mc146818rtc.c
+@@ -35,6 +35,7 @@
+ #include "sysemu/reset.h"
+ #include "sysemu/runstate.h"
+ #include "hw/rtc/mc146818rtc.h"
++#include "hw/rtc/mc146818rtc_regs.h"
+ #include "migration/vmstate.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-commands-misc-target.h"
+diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
+index 02bf8a8ce8..9f17aaa278 100644
+--- a/hw/timer/hpet.c
++++ b/hw/timer/hpet.c
+@@ -34,6 +34,7 @@
+ #include "hw/timer/hpet.h"
+ #include "hw/sysbus.h"
+ #include "hw/rtc/mc146818rtc.h"
++#include "hw/rtc/mc146818rtc_regs.h"
+ #include "migration/vmstate.h"
+ #include "hw/timer/i8254.h"
 =20
--config DS1338
--    bool
--    depends on I2C
--
- config HPET
-     bool
-     default y if PC
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index 23be70b71d..70b61b69c7 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -3,7 +3,6 @@ common-obj-$(CONFIG_ARM_MPTIMER) +=3D arm_mptimer.o
- common-obj-$(CONFIG_ARM_V7M) +=3D armv7m_systick.o
- common-obj-$(CONFIG_A9_GTIMER) +=3D a9gtimer.o
- common-obj-$(CONFIG_CADENCE) +=3D cadence_ttc.o
--common-obj-$(CONFIG_DS1338) +=3D ds1338.o
- common-obj-$(CONFIG_HPET) +=3D hpet.o
- common-obj-$(CONFIG_I8254) +=3D i8254_common.o i8254.o
- common-obj-$(CONFIG_PUV3) +=3D puv3_ost.o
+diff --git a/include/hw/rtc/mc146818rtc.h b/include/hw/rtc/mc146818rtc.h
+index 888e04f9ab..09e273a2a1 100644
+--- a/include/hw/rtc/mc146818rtc.h
++++ b/include/hw/rtc/mc146818rtc.h
+@@ -26,7 +26,6 @@
+ #define MC146818RTC_H
+=20
+ #include "hw/isa/isa.h"
+-#include "hw/rtc/mc146818rtc_regs.h"
+=20
+ #define TYPE_MC146818_RTC "mc146818rtc"
+=20
 --=20
 2.20.1
 
