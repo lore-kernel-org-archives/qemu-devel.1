@@ -2,65 +2,61 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 824F3C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:20:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CC43C49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:21:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58A7C20678
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:20:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58A7C20678
+	by mail.kernel.org (Postfix) with ESMTPS id E73B720665
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:21:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E73B720665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9tk8-0003tX-OR
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 12:20:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38824)
+	id 1i9tkW-0004Nf-5c
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 12:21:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35972)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1i9tYY-00027b-Ud
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 12:08:52 -0400
+ (envelope-from <philmd@redhat.com>) id 1i9tIg-0003MB-4N
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:52:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1i9tYV-0002B4-QR
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 12:08:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56444)
+ (envelope-from <philmd@redhat.com>) id 1i9tIe-0002fg-Me
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:52:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49472)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>)
- id 1i9tYV-0001yn-FI; Mon, 16 Sep 2019 12:08:47 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1i9tIb-0002dj-MQ; Mon, 16 Sep 2019 11:52:21 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EF354307D965;
- Mon, 16 Sep 2019 16:08:44 +0000 (UTC)
-Received: from dhcp-17-173.bos.redhat.com (dhcp-17-173.bos.redhat.com
- [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E0B8A5C1D6;
- Mon, 16 Sep 2019 16:08:40 +0000 (UTC)
-Date: Mon, 16 Sep 2019 12:08:39 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Message-ID: <20190916160839.GA2724@dhcp-17-173.bos.redhat.com>
-References: <20190915211940.30427-1-f4bug@amsat.org>
- <20190915211940.30427-2-f4bug@amsat.org>
+ by mx1.redhat.com (Postfix) with ESMTPS id BB3AC308402E;
+ Mon, 16 Sep 2019 15:52:20 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-115.brq.redhat.com [10.40.204.115])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8919019C4F;
+ Mon, 16 Sep 2019 15:52:04 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 16 Sep 2019 17:48:45 +0200
+Message-Id: <20190916154847.28936-12-philmd@redhat.com>
+In-Reply-To: <20190916154847.28936-1-philmd@redhat.com>
+References: <20190916154847.28936-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190915211940.30427-2-f4bug@amsat.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Mon, 16 Sep 2019 16:08:45 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Mon, 16 Sep 2019 15:52:20 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] tests/acceptance: Add test that
- runs NetBSD 4.0 installer on PRep/40p
+Subject: [Qemu-devel] [PATCH 11/13] hw: Move Aspeed RTC from hw/timer/ to
+ hw/rtc/ subdirectory
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,169 +68,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Thomas Huth <huth@tuxfamily.org>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>,
- =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
- qemu-ppc@nongnu.org,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Andrew Jeffery <andrew@aj.id.au>, qemu-ppc@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Sep 15, 2019 at 11:19:35PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> As of this commit, NetBSD 4.0 is very old. However it is enough to
-> test the PRep/40p machine.
->=20
-> User case from:
-> http://mail-index.netbsd.org/port-prep/2017/04/11/msg000112.html
->=20
-> Reviewed-by: Herv=E9 Poussineau <hpoussin@reactos.org>
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
-> Installers after 4.0 doesn't work anymore, not sure if this is a
-> problem from the QEMU model or from NetBSD.
-> ---
->  MAINTAINERS                      |  1 +
->  tests/acceptance/ppc_prep_40p.py | 63 ++++++++++++++++++++++++++++++++
->  2 files changed, 64 insertions(+)
->  create mode 100644 tests/acceptance/ppc_prep_40p.py
->=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 50eaf005f4..ce809c7dee 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1068,6 +1068,7 @@ F: hw/timer/m48t59-isa.c
->  F: include/hw/isa/pc87312.h
->  F: include/hw/timer/m48t59.h
->  F: pc-bios/ppc_rom.bin
-> +F: tests/acceptance/machine_ppc_prep_40p.py
-> =20
->  sPAPR
->  M: David Gibson <david@gibson.dropbear.id.au>
-> diff --git a/tests/acceptance/ppc_prep_40p.py b/tests/acceptance/ppc_pr=
-ep_40p.py
-> new file mode 100644
-> index 0000000000..53f2d2ecf0
-> --- /dev/null
-> +++ b/tests/acceptance/ppc_prep_40p.py
-> @@ -0,0 +1,63 @@
-> +# Functional test that boots a PReP/40p machine and checks its serial =
-console.
-> +#
-> +# Copyright (c) Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2 or
-> +# later. See the COPYING file in the top-level directory.
-> +
-> +import os
-> +import logging
-> +
-> +from avocado import skipIf
-> +from avocado_qemu import Test
-> +
-> +
-> +class IbmPrep40pMachine(Test):
-> +
-> +    timeout =3D 60
-> +
-> +    # TODO refactor to MachineTest
+Move RTC devices under the hw/rtc/ subdirectory.
 
-Your TODO is a clear sign of awareness of the duplicated code that
-follows.  The mention of a MachineTest points into the direction that
-I can see as the best final solution (that is, test classes that target
-specific test scenarions).
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/rtc/Makefile.objs                   | 1 +
+ hw/{timer =3D> rtc}/aspeed_rtc.c         | 2 +-
+ hw/rtc/trace-events                    | 4 ++++
+ hw/timer/Makefile.objs                 | 2 +-
+ hw/timer/trace-events                  | 4 ----
+ include/hw/arm/aspeed_soc.h            | 2 +-
+ include/hw/{timer =3D> rtc}/aspeed_rtc.h | 3 ---
+ 7 files changed, 8 insertions(+), 10 deletions(-)
+ rename hw/{timer =3D> rtc}/aspeed_rtc.c (99%)
+ rename include/hw/{timer =3D> rtc}/aspeed_rtc.h (92%)
 
-But, it may be a more effective refactor strategy, to simply turn the
-`wait_for_console_pattern` from a method into a utility function, and
-then the discussion of the common test classes (say MachineTest,
-GuestTest, MigrationTest) can follow later.
+diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
+index 3d4763fc26..8dc9fcd3a9 100644
+--- a/hw/rtc/Makefile.objs
++++ b/hw/rtc/Makefile.objs
+@@ -10,3 +10,4 @@ common-obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-zynqmp-rtc.o
+ common-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_rtc.o
+ obj-$(CONFIG_MC146818RTC) +=3D mc146818rtc.o
+ common-obj-$(CONFIG_SUN4V_RTC) +=3D sun4v-rtc.o
++common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_rtc.o
+diff --git a/hw/timer/aspeed_rtc.c b/hw/rtc/aspeed_rtc.c
+similarity index 99%
+rename from hw/timer/aspeed_rtc.c
+rename to hw/rtc/aspeed_rtc.c
+index 5313017353..3ca1183558 100644
+--- a/hw/timer/aspeed_rtc.c
++++ b/hw/rtc/aspeed_rtc.c
+@@ -8,7 +8,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+-#include "hw/timer/aspeed_rtc.h"
++#include "hw/rtc/aspeed_rtc.h"
+ #include "migration/vmstate.h"
+ #include "qemu/log.h"
+ #include "qemu/timer.h"
+diff --git a/hw/rtc/trace-events b/hw/rtc/trace-events
+index 7f1945ad4c..d6749f4616 100644
+--- a/hw/rtc/trace-events
++++ b/hw/rtc/trace-events
+@@ -13,3 +13,7 @@ pl031_read(uint32_t addr, uint32_t value) "addr 0x%08x =
+value 0x%08x"
+ pl031_write(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
+ pl031_alarm_raised(void) "alarm raised"
+ pl031_set_alarm(uint32_t ticks) "alarm set for %u ticks"
++
++# aspeed-rtc.c
++aspeed_rtc_read(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " val=
+ue 0x%08" PRIx64
++aspeed_rtc_write(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " va=
+lue 0x%08" PRIx64
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index 33191d74cb..83091770df 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -29,7 +29,7 @@ common-obj-$(CONFIG_MIPS_CPS) +=3D mips_gictimer.o
+ common-obj-$(CONFIG_ALLWINNER_A10_PIT) +=3D allwinner-a10-pit.o
+=20
+ common-obj-$(CONFIG_STM32F2XX_TIMER) +=3D stm32f2xx_timer.o
+-common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_timer.o aspeed_rtc.o
++common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_timer.o
+=20
+ common-obj-$(CONFIG_CMSDK_APB_TIMER) +=3D cmsdk-apb-timer.o
+ common-obj-$(CONFIG_CMSDK_APB_DUALTIMER) +=3D cmsdk-apb-dualtimer.o
+diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+index 1459d07237..e18b87fc96 100644
+--- a/hw/timer/trace-events
++++ b/hw/timer/trace-events
+@@ -66,10 +66,6 @@ cmsdk_apb_dualtimer_read(uint64_t offset, uint64_t dat=
+a, unsigned size) "CMSDK A
+ cmsdk_apb_dualtimer_write(uint64_t offset, uint64_t data, unsigned size)=
+ "CMSDK APB dualtimer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size=
+ %u"
+ cmsdk_apb_dualtimer_reset(void) "CMSDK APB dualtimer: reset"
+=20
+-# hw/timer/aspeed-rtc.c
+-aspeed_rtc_read(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " val=
+ue 0x%08" PRIx64
+-aspeed_rtc_write(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " va=
+lue 0x%08" PRIx64
+-
+ # nrf51_timer.c
+ nrf51_timer_read(uint64_t addr, uint32_t value, unsigned size) "read add=
+r 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
+ nrf51_timer_write(uint64_t addr, uint32_t value, unsigned size) "write a=
+ddr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
+diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
+index ab5052b12c..5a443006ed 100644
+--- a/include/hw/arm/aspeed_soc.h
++++ b/include/hw/arm/aspeed_soc.h
+@@ -17,7 +17,7 @@
+ #include "hw/misc/aspeed_sdmc.h"
+ #include "hw/misc/aspeed_xdma.h"
+ #include "hw/timer/aspeed_timer.h"
+-#include "hw/timer/aspeed_rtc.h"
++#include "hw/rtc/aspeed_rtc.h"
+ #include "hw/i2c/aspeed_i2c.h"
+ #include "hw/ssi/aspeed_smc.h"
+ #include "hw/watchdog/wdt_aspeed.h"
+diff --git a/include/hw/timer/aspeed_rtc.h b/include/hw/rtc/aspeed_rtc.h
+similarity index 92%
+rename from include/hw/timer/aspeed_rtc.h
+rename to include/hw/rtc/aspeed_rtc.h
+index 15ba42912b..156c8faee3 100644
+--- a/include/hw/timer/aspeed_rtc.h
++++ b/include/hw/rtc/aspeed_rtc.h
+@@ -8,9 +8,6 @@
+ #ifndef ASPEED_RTC_H
+ #define ASPEED_RTC_H
+=20
+-#include <stdint.h>
+-
+-#include "hw/irq.h"
+ #include "hw/sysbus.h"
+=20
+ typedef struct AspeedRtcState {
+--=20
+2.20.1
 
-> +    def wait_for_console_pattern(self, success_message, failure_messag=
-e=3DNone):
-
-Following the previous suggestion, `self` would become something like `te=
-st`.
-
-> +        """
-> +        Waits for messages to appear on the console, while logging the=
- content
-> +
-
-Documented as something like:
-
-  :param test: an Avocado test containing a VM that will have its console
-               read and probed for a success or failure message
-  :type test: :class:`avocado_qemu.Test`
-
-> +        :param success_message: if this message appears, test succeeds
-> +        :param failure_message: if this message appears, test fails
-> +        """
-> +        console =3D self.vm.console_socket.makefile()
-> +        console_logger =3D logging.getLogger('console')
-> +        while True:
-> +            msg =3D console.readline().strip()
-> +            if not msg:
-> +                continue
-> +            console_logger.debug(msg)
-> +            if success_message in msg:
-> +                break
-> +            if failure_message and failure_message in msg:
-> +                fail =3D 'Failure message found in console: %s' % fail=
-ure_message
-> +                self.fail(fail)
-> +
-> +    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI=
-')
-> +    def test_factory_firmware_and_netbsd(self):
-> +        """
-> +        :avocado: tags=3Darch:ppc
-> +        :avocado: tags=3Dmachine:40p
-> +        :avocado: tags=3Dslowness:high
-
-This is certainly a discussion in itself, but I wonder what is your
-criteria for definising the slowness level of a test.  FOY, this one
-takes me ~17 seconds on my local machine.
-
-> +        """
-> +        bios_url =3D ('ftp://ftp.boulder.ibm.com/rs6000/firmware/'
-> +                    '7020-40p/P12H0456.IMG')
-> +        bios_hash =3D '1775face4e6dc27f3a6ed955ef6eb331bf817f03'
-> +        bios_path =3D self.fetch_asset(bios_url, asset_hash=3Dbios_has=
-h)
-> +        drive_url =3D ('https://ftp.netbsd.org/pub/NetBSD/NetBSD-archi=
-ve/'
-> +                     'NetBSD-4.0/prep/installation/floppy/generic_com0=
-.fs')
-> +        drive_hash =3D 'dbcfc09912e71bd5f0d82c7c1ee43082fb596ceb'
-> +        drive_path =3D self.fetch_asset(drive_url, asset_hash=3Ddrive_=
-hash)
-> +
-> +        self.vm.set_machine('40p')
-
-FIY, Avocado 72.0 (due Tomorrow) will have relaxed strictness for tags
-values.  That will allow us to represent all current machine type
-names in ":avocado: tags=3Dmachine:$VALUE" (such as "s390-ccw-virtio").
-Then we'll be able to reuse them here, avoiding a bit of boiler plate
-code.
-
-> +        self.vm.set_console()
-> +        self.vm.add_args('-bios', bios_path,
-> +                         '-fda', drive_path)
-> +        self.vm.launch()
-> +        os_banner =3D 'NetBSD 4.0 (GENERIC) #0: Sun Dec 16 00:49:40 PS=
-T 2007'
-> +        self.wait_for_console_pattern(os_banner)
-> +        self.wait_for_console_pattern('Model: IBM PPS Model 6015')
-> --=20
-> 2.20.1
->=20
-
-Overall it looks good and works for me.  Let me know what you think of
-the wait_for_console_pattern() refactor suggestions.
-
-- Cleber.
 
