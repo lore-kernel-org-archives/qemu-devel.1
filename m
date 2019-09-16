@@ -2,90 +2,141 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBDCBC49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:52:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76E77C49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:54:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CA3D20678
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:52:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CA3D20678
+	by mail.kernel.org (Postfix) with ESMTPS id 4D6E320678
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:54:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D6E320678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9uF2-0002L5-PR
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 12:52:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40476)
+	id 1i9uH6-0004Sn-Ga
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 12:54:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43549)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i9tj9-0003zQ-9d
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 12:19:48 -0400
+ (envelope-from <jsnow@redhat.com>) id 1i9tvX-0007r0-9k
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 12:32:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i9tj7-0005oy-6f
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 12:19:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47816)
+ (envelope-from <jsnow@redhat.com>) id 1i9tvR-0004Sj-Go
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 12:32:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42472)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i9tj6-0005oU-UC
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 12:19:45 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1i9tvD-0004Nx-AT; Mon, 16 Sep 2019 12:32:15 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 758F76412B
- for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 16:19:43 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id j2so124795wre.1
- for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 09:19:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=/nCeEFcwNYNmavubZMs4+O41Pm/FoNBLtnz4Kw++jmQ=;
- b=pxfFGDRaN2f1xoFV9dyP8VHfI/1jdT6WEsY5FSeIng5tsT+jZ3eSRCeLomnykisTxO
- SSh05w4AYkSH43e8Kc8cEwPaHyVkmJkRYAlCPpPPrtUapA/HBZqK5WuMucGjTfjL1D3Q
- UiineV+PXoU+gUbmuNQRduXQaLltYcj9aLrgXEUj60vCrdcFROWh7+PDXKZ+oiYDalfs
- PLj71K1jIUYsz+kByZWyfXIUGCsBgnhbvi+0vKSqBCN1kpBDaM3oD7suUvGKpdNdbQ13
- vC9Y2eg0MvmzUf0OvCMiEQKbPhseZkwMuxOWkMn4D6/pkGhKj6H2Zy6EJZuzZWSUJD4j
- LhTg==
-X-Gm-Message-State: APjAAAWQp6dCWjuMOnoRod4BmD31aMZGYcZFa5kCnTOyTX+PIEfUwXG9
- mZIxI107jtOFIb9MNjXxkxdAF00aou8zAOocpnnU3YN9NOv/3T5V9YfoO+/WFoWOxpu619iOGOq
- rqw3hd1RzCRGgkOk=
-X-Received: by 2002:adf:a415:: with SMTP id d21mr49553wra.94.1568650782182;
- Mon, 16 Sep 2019 09:19:42 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzZ7AjunQTFCvEBZewnQ8gHQdMk/6Jy+i6MK+EUB9Fzq+6aDMy1nbisqebbmI3grjZVN/BpmQ==
-X-Received: by 2002:adf:a415:: with SMTP id d21mr49516wra.94.1568650781823;
- Mon, 16 Sep 2019 09:19:41 -0700 (PDT)
-Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id v6sm40213wma.24.2019.09.16.09.19.40
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 16 Sep 2019 09:19:41 -0700 (PDT)
-To: Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>
-References: <20190915211940.30427-1-f4bug@amsat.org>
- <20190915211940.30427-2-f4bug@amsat.org>
- <20190916160839.GA2724@dhcp-17-173.bos.redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <252b6e94-fe8f-f9a7-0d4b-4743b1809a06@redhat.com>
-Date: Mon, 16 Sep 2019 18:19:39 +0200
+ by mx1.redhat.com (Postfix) with ESMTPS id 386ACC065123;
+ Mon, 16 Sep 2019 16:32:13 +0000 (UTC)
+Received: from [10.18.17.165] (dhcp-17-165.bos.redhat.com [10.18.17.165])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 652195F7C0;
+ Mon, 16 Sep 2019 16:32:12 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20190912001633.11372-1-jsnow@redhat.com>
+ <20190912001633.11372-2-jsnow@redhat.com>
+ <974b64b8-a191-c529-4e77-6a38b372c4b8@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <376bbe1c-09dd-2dfc-cebe-6144f3411ec5@redhat.com>
+Date: Mon, 16 Sep 2019 12:32:11 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190916160839.GA2724@dhcp-17-173.bos.redhat.com>
+In-Reply-To: <974b64b8-a191-c529-4e77-6a38b372c4b8@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Mon, 16 Sep 2019 16:32:13 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] tests/acceptance: Add test that
- runs NetBSD 4.0 installer on PRep/40p
+Subject: Re: [Qemu-devel] [PATCH v4 1/4] iotests: add script_initialize
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,185 +148,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-ppc@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/16/19 6:08 PM, Cleber Rosa wrote:
-> On Sun, Sep 15, 2019 at 11:19:35PM +0200, Philippe Mathieu-Daud=C3=A9 w=
-rote:
->> As of this commit, NetBSD 4.0 is very old. However it is enough to
->> test the PRep/40p machine.
+
+
+On 9/16/19 10:56 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 12.09.2019 3:16, John Snow wrote:
+>> Like script_main, but doesn't require a single point of entry.
+>> Replace all existing initialization sections with this drop-in replacement.
 >>
->> User case from:
->> http://mail-index.netbsd.org/port-prep/2017/04/11/msg000112.html
+>> This brings debug support to all existing script-style iotests.
 >>
->> Reviewed-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> Note: supported_oses=['linux'] was omitted, as it is a default argument.
+> 
+> But after this patch all test which didn't check os start to check linux
+> (as it's default).. So all tests which worked on other platforms will now
+> be skipped on these other platforms?
+> 
+
+def verify_platform(supported_oses=['linux']):
+    if True not in [sys.platform.startswith(x) for x in supported_oses]:
+        notrun('not suitable for this OS: %s' % sys.platform)
+
+
+It was already the default. I didn't *make* it the default. There is no
+change here. Feel free to propose a fix, but I don't think it's within
+the scope of this series.
+
+> Finally do we support something except linux for iotests?
+> for bash tests _supported_os also used only with "Linux" in 87 tests..
+> 
+
+Evidently, not really. See bc521696607c5348fcd8a9e57b408d0ac0dbe2f8
+
+> May be we'd better drop both _supported_os and supported_oses alltogether,
+> and don't care?
+> 
+
+Beyond the scope of this series.
+
+> Anyway, if we support only linux, any reason to skip almost all tests,
+> if someone tries to run test on other platform? Let him run what he wants.
+
+Maybe true, maybe not.
+
+> 
+>> Signed-off-by: John Snow <jsnow@redhat.com>
 >> ---
->> Installers after 4.0 doesn't work anymore, not sure if this is a
->> problem from the QEMU model or from NetBSD.
->> ---
->>  MAINTAINERS                      |  1 +
->>  tests/acceptance/ppc_prep_40p.py | 63 +++++++++++++++++++++++++++++++=
-+
->>  2 files changed, 64 insertions(+)
->>  create mode 100644 tests/acceptance/ppc_prep_40p.py
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 50eaf005f4..ce809c7dee 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -1068,6 +1068,7 @@ F: hw/timer/m48t59-isa.c
->>  F: include/hw/isa/pc87312.h
->>  F: include/hw/timer/m48t59.h
->>  F: pc-bios/ppc_rom.bin
->> +F: tests/acceptance/machine_ppc_prep_40p.py
->> =20
->>  sPAPR
->>  M: David Gibson <david@gibson.dropbear.id.au>
->> diff --git a/tests/acceptance/ppc_prep_40p.py b/tests/acceptance/ppc_p=
-rep_40p.py
->> new file mode 100644
->> index 0000000000..53f2d2ecf0
->> --- /dev/null
->> +++ b/tests/acceptance/ppc_prep_40p.py
->> @@ -0,0 +1,63 @@
->> +# Functional test that boots a PReP/40p machine and checks its serial=
- console.
->> +#
->> +# Copyright (c) Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> +#
->> +# This work is licensed under the terms of the GNU GPL, version 2 or
->> +# later. See the COPYING file in the top-level directory.
+> 
+> [..]
+> 
+>> +def execute_test(test_function=None, *args, **kwargs):
+>> +    """Run either unittest or script-style tests."""
 >> +
->> +import os
->> +import logging
+>> +    debug = execute_setup_common(*args, **kwargs)
+>>       if not test_function:
+>> -        execute_unittest(output, verbosity, debug)
+>> +        execute_unittest(debug)
+>>       else:
+>>           test_function()
+>>   
+>> +# This is called from script-style iotests without a single point of entry
+>> +def script_initialize(*args, **kwargs):
+>> +    """Initialize script-style tests without running any tests."""
+>> +    execute_setup_common(*args, **kwargs)
 >> +
->> +from avocado import skipIf
->> +from avocado_qemu import Test
->> +
->> +
->> +class IbmPrep40pMachine(Test):
->> +
->> +    timeout =3D 60
->> +
->> +    # TODO refactor to MachineTest
->=20
-> Your TODO is a clear sign of awareness of the duplicated code that
-> follows.  The mention of a MachineTest points into the direction that
-> I can see as the best final solution (that is, test classes that target
-> specific test scenarions).
->=20
-> But, it may be a more effective refactor strategy, to simply turn the
-> `wait_for_console_pattern` from a method into a utility function, and
-> then the discussion of the common test classes (say MachineTest,
-> GuestTest, MigrationTest) can follow later.
+>> +# This is called from script-style iotests with a single point of entry
+>>   def script_main(test_function, *args, **kwargs):
+>>       """Run script-style tests outside of the unittest framework"""
+>>       execute_test(test_function, *args, **kwargs)
+>>   
+>> +# This is called from unittest style iotests
+>>   def main(*args, **kwargs):
+>>       """Run tests using the unittest framework"""
+> 
+> 
+> Hmm, now two different styles of code documenting used: comment and doc-string,
+> both containing almost equal meaning.. I don't like it, still don't really mind.
 
-Yes, I'd like we clean this and make it robust, but for now, the more
-tests we have, the better we can see how the common MachineTest should
-be. Let's do this in another follow-up series.
-
->> +    def wait_for_console_pattern(self, success_message, failure_messa=
-ge=3DNone):
->=20
-> Following the previous suggestion, `self` would become something like `=
-test`.
->=20
->> +        """
->> +        Waits for messages to appear on the console, while logging th=
-e content
->> +
->=20
-> Documented as something like:
->=20
->   :param test: an Avocado test containing a VM that will have its conso=
-le
->                read and probed for a success or failure message
->   :type test: :class:`avocado_qemu.Test`
->=20
->> +        :param success_message: if this message appears, test succeed=
-s
->> +        :param failure_message: if this message appears, test fails
->> +        """
->> +        console =3D self.vm.console_socket.makefile()
->> +        console_logger =3D logging.getLogger('console')
->> +        while True:
->> +            msg =3D console.readline().strip()
->> +            if not msg:
->> +                continue
->> +            console_logger.debug(msg)
->> +            if success_message in msg:
->> +                break
->> +            if failure_message and failure_message in msg:
->> +                fail =3D 'Failure message found in console: %s' % fai=
-lure_message
->> +                self.fail(fail)
->> +
->> +    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-C=
-I')
->> +    def test_factory_firmware_and_netbsd(self):
->> +        """
->> +        :avocado: tags=3Darch:ppc
->> +        :avocado: tags=3Dmachine:40p
->> +        :avocado: tags=3Dslowness:high
->=20
-> This is certainly a discussion in itself, but I wonder what is your
-> criteria for definising the slowness level of a test.  FOY, this one
-> takes me ~17 seconds on my local machine.
-
-Ah, I was running this in my --enable-debug --enable-tcg-debug
-out-of-tree directory, it takes >2min here.
-
->> +        """
->> +        bios_url =3D ('ftp://ftp.boulder.ibm.com/rs6000/firmware/'
->> +                    '7020-40p/P12H0456.IMG')
->> +        bios_hash =3D '1775face4e6dc27f3a6ed955ef6eb331bf817f03'
->> +        bios_path =3D self.fetch_asset(bios_url, asset_hash=3Dbios_ha=
-sh)
->> +        drive_url =3D ('https://ftp.netbsd.org/pub/NetBSD/NetBSD-arch=
-ive/'
->> +                     'NetBSD-4.0/prep/installation/floppy/generic_com=
-0.fs')
->> +        drive_hash =3D 'dbcfc09912e71bd5f0d82c7c1ee43082fb596ceb'
->> +        drive_path =3D self.fetch_asset(drive_url, asset_hash=3Ddrive=
-_hash)
->> +
->> +        self.vm.set_machine('40p')
->=20
-> FIY, Avocado 72.0 (due Tomorrow) will have relaxed strictness for tags
-> values.  That will allow us to represent all current machine type
-> names in ":avocado: tags=3Dmachine:$VALUE" (such as "s390-ccw-virtio").
-> Then we'll be able to reuse them here, avoiding a bit of boiler plate
-> code.
-
-Good news!
-
->> +        self.vm.set_console()
->> +        self.vm.add_args('-bios', bios_path,
->> +                         '-fda', drive_path)
->> +        self.vm.launch()
->> +        os_banner =3D 'NetBSD 4.0 (GENERIC) #0: Sun Dec 16 00:49:40 P=
-ST 2007'
->> +        self.wait_for_console_pattern(os_banner)
->> +        self.wait_for_console_pattern('Model: IBM PPS Model 6015')
->> --=20
->> 2.20.1
->>
->=20
-> Overall it looks good and works for me.  Let me know what you think of
-> the wait_for_console_pattern() refactor suggestions.
-
-Thanks, I agree we can do it later :)
-
-Regards,
-
-Phil.
+I think I was trying to document what the function /does/ separately
+from a note about explaining how and where it is used. It's quite nearly
+redundant and if it's distracting I can remove it.
 
