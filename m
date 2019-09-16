@@ -2,60 +2,84 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C689C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 15:25:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58565C49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 15:28:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 505E52067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 15:25:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 505E52067B
+	by mail.kernel.org (Postfix) with ESMTPS id 25368206A4
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 15:28:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BbUlwGO+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25368206A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9st2-0007ZI-VJ
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 11:25:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51261)
+	id 1i9svF-0001kl-T7
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 11:28:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53855)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1i9rug-0003YU-U7
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:23:36 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1i9sDC-0006gY-EI
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:42:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1i9ruf-0000wO-Fb
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:23:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45478)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1i9ruc-0000tC-D7; Mon, 16 Sep 2019 10:23:30 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A6ABE10C093C;
- Mon, 16 Sep 2019 14:23:29 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 252FB600C1;
- Mon, 16 Sep 2019 14:23:28 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Mon, 16 Sep 2019 16:22:43 +0200
-Message-Id: <20190916142246.31474-14-mreitz@redhat.com>
-In-Reply-To: <20190916142246.31474-1-mreitz@redhat.com>
-References: <20190916142246.31474-1-mreitz@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Mon, 16 Sep 2019 14:23:29 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 13/16] blockjob: update nodes head while
- removing all bdrv
+ (envelope-from <paolo.bonzini@gmail.com>) id 1i9sDA-0007ZP-1l
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:42:41 -0400
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:54519)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1i9sD7-0007YJ-V8
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:42:38 -0400
+Received: by mail-wm1-x335.google.com with SMTP id p7so60637wmp.4
+ for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 07:42:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:subject:date:message-id:in-reply-to:references;
+ bh=KiFCZUVAPnnWNqhg3WDsyPWMV8xe1NmN4cPuEbcJmC4=;
+ b=BbUlwGO+gso8YZDbG4T+MReP3mREKgRl1mYeC45zamXl+voad8SeFVwmMlZDYQeQRF
+ 8tRt5iW+6pZOYAjs7wXyNmlzUwpmm3XgSiaLBeircu9bzQsVQc37ogAXfaOdZalYFhzb
+ +e80/3a3AiIJkAePRLLN6sCZ64pc95ENY7b0ZLkdNX5ullcDwVBHiNsLln+LLaM63Uq7
+ YlXZb77GIHFCGbU8x1fHgkC7lwqEfgwdpJwzzlz3Gbn+QUiN8aGINU3pkxMA3jEfnOUD
+ uyYGMnRHNXPKv2hV1Q9pnHTn3pfMjW3ewUaH6VBYU5xNNYsA9fUJdk/mWnB0srWvBxKx
+ R8Kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
+ :in-reply-to:references;
+ bh=KiFCZUVAPnnWNqhg3WDsyPWMV8xe1NmN4cPuEbcJmC4=;
+ b=XwwgoGbf1Vdoa2ESMIe74d+Apru3zjPWoXN0FpipE2JQiwEbHftAUiUIEIcgxzqZrz
+ wTfms09sKdURWvN9GtGmNjOOBqQm7LOiJ4e7a1aD1sW2YTHchKQKakr1IrZBHwgB5V5K
+ wzxBqM2YVCjzRMmVi3VmEQYRXKZ9fYL5nCCEVIoUh44zd/hOuNJEyu6et5NT6YZReg1d
+ Yko4pyo4TZT6oVY3zdydKpp50YNo2o9x1zxpYoBpCHrUSYljNEu4Wu5knCuzzM2KgFcy
+ iNfpYLlTz3JJVv/KGVlcPZ0Ix43oyRpoeh4ynvCGA6FHqVgJHe8nNpSSA/j6Ig20iiyX
+ PMbg==
+X-Gm-Message-State: APjAAAV0Ro8VfjmyaHtO3iXlyLGWS1iuyxl2UDLBi/5h96ioHlRb1q6d
+ 9HIQW+ONnJe4ERjmjZalNMXMP1u3
+X-Google-Smtp-Source: APXvYqwpFtieHmWoMHoSEI4NxDvLoh0fZ7yPel91NweI9mQBSi8HUzJUxwfChB3t2DMfZDUJRqAfQA==
+X-Received: by 2002:a1c:2302:: with SMTP id j2mr47813wmj.174.1568644955495;
+ Mon, 16 Sep 2019 07:42:35 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id i14sm17024298wra.78.2019.09.16.07.42.34
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 16 Sep 2019 07:42:34 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 16 Sep 2019 16:42:02 +0200
+Message-Id: <1568644929-9124-23-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1568644929-9124-1-git-send-email-pbonzini@redhat.com>
+References: <1568644929-9124-1-git-send-email-pbonzini@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::335
+Subject: [Qemu-devel] [PULL 22/29] hw/i386/pc: Replace PCMachineState
+ argument with MachineState in fw_cfg_arch_create
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,67 +91,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sergio Lopez <slp@redhat.com>
+In the previous commit we removed the last access to PCMachineState.
+Replace it with a generic MachineState argument and use it to retrieve
+the CPUArchIdList.
 
-block_job_remove_all_bdrv() iterates through job->nodes, calling
-bdrv_root_unref_child() for each entry. The call to the latter may
-reach child_job_[can_]set_aio_ctx(), which will also attempt to
-traverse job->nodes, potentially finding entries that where freed
-on previous iterations.
-
-To avoid this situation, update job->nodes head on each iteration to
-ensure that already freed entries are no longer linked to the list.
-
-RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=3D1746631
-Signed-off-by: Sergio Lopez <slp@redhat.com>
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190911100316.32282-1-mreitz@redhat.com
-Reviewed-by: Sergio Lopez <slp@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- blockjob.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+ hw/i386/pc.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/blockjob.c b/blockjob.c
-index 2abed0f551..c6e20e2fcd 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -175,14 +175,23 @@ static const BdrvChildRole child_job =3D {
-=20
- void block_job_remove_all_bdrv(BlockJob *job)
- {
--    GSList *l;
--    for (l =3D job->nodes; l; l =3D l->next) {
-+    /*
-+     * bdrv_root_unref_child() may reach child_job_[can_]set_aio_ctx(),
-+     * which will also traverse job->nodes, so consume the list one by
-+     * one to make sure that such a concurrent access does not attempt
-+     * to process an already freed BdrvChild.
-+     */
-+    while (job->nodes) {
-+        GSList *l =3D job->nodes;
-         BdrvChild *c =3D l->data;
-+
-+        job->nodes =3D l->next;
-+
-         bdrv_op_unblock_all(c->bs, job->blocker);
-         bdrv_root_unref_child(c);
-+
-+        g_slist_free_1(l);
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 5b3f615..8d2e600 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -936,15 +936,15 @@ static void pc_build_smbios(PCMachineState *pcms)
      }
--    g_slist_free(job->nodes);
--    job->nodes =3D NULL;
  }
-=20
- bool block_job_has_bdrv(BlockJob *job, BlockDriverState *bs)
---=20
-2.21.0
+ 
+-static FWCfgState *fw_cfg_arch_create(PCMachineState *pcms,
+-                                      const CPUArchIdList *cpus,
++static FWCfgState *fw_cfg_arch_create(MachineState *ms,
+                                       uint16_t boot_cpus,
+                                       uint16_t apic_id_limit)
+ {
+     FWCfgState *fw_cfg;
+     uint64_t *numa_fw_cfg;
+     int i;
+-    MachineState *ms = MACHINE(pcms);
++    MachineClass *mc = MACHINE_GET_CLASS(ms);
++    const CPUArchIdList *cpus = mc->possible_cpu_arch_ids(ms);
+     int nb_numa_nodes = ms->numa_state->num_nodes;
+ 
+     fw_cfg = fw_cfg_init_io_dma(FW_CFG_IO_BASE, FW_CFG_IO_BASE + 4,
+@@ -1869,7 +1869,7 @@ void pc_memory_init(PCMachineState *pcms,
+                                         option_rom_mr,
+                                         1);
+ 
+-    fw_cfg = fw_cfg_arch_create(pcms, mc->possible_cpu_arch_ids(machine),
++    fw_cfg = fw_cfg_arch_create(machine,
+                                 pcms->boot_cpus, pcms->apic_id_limit);
+ 
+     rom_set_fw(fw_cfg);
+-- 
+1.8.3.1
+
 
 
