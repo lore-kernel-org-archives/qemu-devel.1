@@ -2,67 +2,87 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8750C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 18:56:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B02D5C49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 19:14:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CF2B206A4
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 18:56:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CF2B206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7D3F320830
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 19:14:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JLDXT/Un"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D3F320830
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9wB1-0005BY-On
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 14:56:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43174)
+	id 1i9wSY-0001jO-DT
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 15:14:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45964)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1i9w9l-0004cR-Qg
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 14:55:31 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1i9wRP-0001CC-NG
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 15:13:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1i9w9f-0005eV-O1
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 14:55:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56926)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>)
- id 1i9w9f-0005e8-CQ; Mon, 16 Sep 2019 14:55:19 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8A8AC5117D;
- Mon, 16 Sep 2019 18:55:18 +0000 (UTC)
-Received: from dhcp-17-173.bos.redhat.com (dhcp-17-173.bos.redhat.com
- [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C838B600F8;
- Mon, 16 Sep 2019 18:55:14 +0000 (UTC)
-Date: Mon, 16 Sep 2019 14:55:13 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Message-ID: <20190916185513.GA13659@dhcp-17-173.bos.redhat.com>
-References: <20190915211940.30427-1-f4bug@amsat.org>
- <20190915211940.30427-3-f4bug@amsat.org>
- <20190916175914.GA7550@dhcp-17-173.bos.redhat.com>
+ (envelope-from <marcandre.lureau@gmail.com>) id 1i9wRJ-0006lh-GP
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 15:13:39 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36256)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1i9wRJ-0006kp-15
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 15:13:33 -0400
+Received: by mail-wm1-x342.google.com with SMTP id t3so490006wmj.1
+ for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 12:13:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=ii0LBZ4BW4bRFdrxv21hMzIjyRBFyPtw/aEWJDXB55Q=;
+ b=JLDXT/Un8FDk+Pr8sBXnZ6fo+SC/1wxFIyAJ0HVy2atlN8B8B3I/sQkq02fqzqKePJ
+ MuMHf2/2gcGUvrsP7WxUnLOVvRl4bumMVbPH9l0a7HRcvk1ZRsYrRhgSSO+X6SpfFfeu
+ xtbmF70mLsCz5EMfmHhUV/koUCcb0dyL8xuPUV1lfBNMDg5chKDWwXhPbu2Zqaizm/2w
+ vccl1QrcNjt/R8TjJPjnkWlyJPM7pKgdoux8TnRlH5THdMJFUkNNUxGwzO13aeQHab+P
+ xfnR+mrGlcM3c3VIljtc0CQZ4zZQxO9rH1rdZOoZfpBl/Iey81sqEKJzxnm51360Abjq
+ fAtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=ii0LBZ4BW4bRFdrxv21hMzIjyRBFyPtw/aEWJDXB55Q=;
+ b=ckwXiuocQjuqAJJe52wMaFOpLS5DU04zIhCVm2hZWZMIGnen8Dy5P/Pe511kt2OfMU
+ qUKWLIlw/JMgGVDvqR3wrcCICn/8zZaNHDJ5kZ9ZdcRNKtHhYzmoLg/IpUHg0mJmFlwc
+ BT88mNGCoIi79XxTCpeCGNsSwSkP6Tovt3LY3+2PaP6k6ce/etVyrwVszykJKHZS6diV
+ My5nrbMCc4LknfIGwAMEukzsZvlSShogfHU/hFVhCc6vu/Sqr6VhG3dhizL9ghgyBSGo
+ /f4IOPJZhdTKwNtzJriYysdwff4zdhrsOOIbS8bKu+A4i8tzbq1Pcsrp4XzhYD/cFXiT
+ 2EHQ==
+X-Gm-Message-State: APjAAAVkBNWbMDPzvMEibZyXjNerfnHSB4Ge0QCaPuVIUYWzjYIQPrhJ
+ MB9tFCGGcnSMbpQ53j9+Eipa7hwgZA71Mhhncjw=
+X-Google-Smtp-Source: APXvYqwdeV1Q0dUm75LeJ2wDL+69JRpxhIhSXaE+ucpuBDTsp//TEzi3Fp7h0xniaGN6Db0cBz1HSufVpyTtKQSLXmA=
+X-Received: by 2002:a1c:c789:: with SMTP id x131mr494804wmf.20.1568661211529; 
+ Mon, 16 Sep 2019 12:13:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190916175914.GA7550@dhcp-17-173.bos.redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Mon, 16 Sep 2019 18:55:18 +0000 (UTC)
+References: <20190912122514.22504-1-marcandre.lureau@redhat.com>
+ <20190912122514.22504-6-marcandre.lureau@redhat.com>
+ <20190916100035.GC2887@work-vm>
+ <CAJ+F1C+GAJc8vYVLzBZWonVkjp-rdWFemAdwgE2sbxJDFKp0Uw@mail.gmail.com>
+ <20190916131514.GG2887@work-vm>
+In-Reply-To: <20190916131514.GG2887@work-vm>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 16 Sep 2019 23:13:18 +0400
+Message-ID: <CAJ+F1C+mbPHHO_Oet-CxUsfAxTrLvezvcV=+0KG+Rv2za=-arg@mail.gmail.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] tests/acceptance: Test Open
- Firmware on the PReP/40p
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH v3 5/6] docs: start a document to describe
+ D-Bus usage
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,137 +94,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Thomas Huth <huth@tuxfamily.org>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>,
- =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
- qemu-ppc@nongnu.org,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, Michal Privoznik <mprivozn@redhat.com>,
+ QEMU <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 16, 2019 at 01:59:22PM -0400, Cleber Rosa wrote:
-> On Sun, Sep 15, 2019 at 11:19:36PM +0200, Philippe Mathieu-Daud=E9 wrot=
-e:
-> > User case from:
-> > https://tyom.blogspot.com/2019/04/aixprep-under-qemu-how-to.html
-> >=20
-> > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> > ---
-> >  tests/acceptance/ppc_prep_40p.py | 21 +++++++++++++++++++++
-> >  1 file changed, 21 insertions(+)
-> >=20
-> > diff --git a/tests/acceptance/ppc_prep_40p.py b/tests/acceptance/ppc_=
-prep_40p.py
-> > index 53f2d2ecf0..a0eac40d9f 100644
-> > --- a/tests/acceptance/ppc_prep_40p.py
-> > +++ b/tests/acceptance/ppc_prep_40p.py
-> > @@ -61,3 +61,24 @@ class IbmPrep40pMachine(Test):
-> >          os_banner =3D 'NetBSD 4.0 (GENERIC) #0: Sun Dec 16 00:49:40 =
-PST 2007'
-> >          self.wait_for_console_pattern(os_banner)
-> >          self.wait_for_console_pattern('Model: IBM PPS Model 6015')
-> > +
-> > +    def test_openfirmware(self):
-> > +        """
-> > +        :avocado: tags=3Darch:ppc
-> > +        :avocado: tags=3Dmachine:40p
-> > +        """
-> > +        bios_url =3D ('https://github.com/artyom-tarasenko/openfirmw=
-are/'
-> > +                    'releases/download/40p-20190413/q40pofw-serial.r=
-om')
-> > +        bios_hash =3D '880c80172ea5b2247c0ac2a8bf36bbe385192c72'
-> > +        bios_path =3D self.fetch_asset(bios_url, asset_hash=3Dbios_h=
-ash)
-> > +
-> > +        self.vm.set_machine('40p')
-> > +        self.vm.set_console()
-> > +        self.vm.add_args('-bios', bios_path)
-> > +
-> > +        self.vm.launch()
-> > +        self.wait_for_console_pattern('QEMU PReP/40p')
-> > +        fw_banner =3D 'Open Firmware, built  April 13, 2019 09:29:23=
-'
-> > +        self.wait_for_console_pattern(fw_banner)
-> > +        prompt_msg =3D 'Type any key to interrupt automatic startup'
-> > +        self.wait_for_console_pattern(prompt_msg)
-> > --=20
-> > 2.20.1
-> >=20
->=20
-> Tested-by: Cleber Rosa <crosa@redhat.com>
-> Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Hi
 
-Actually, I'm seeing random but consistent failures.  I've tracked
-it down to the 'Open Firmware, built  April 13, 2019 09:29:23'.  Out
-of 100 executions I got 27 failures, with that line logged as:
+On Mon, Sep 16, 2019 at 5:15 PM Dr. David Alan Gilbert
+<dgilbert@redhat.com> wrote:
+>
+> * Marc-Andr=C3=A9 Lureau (marcandre.lureau@gmail.com) wrote:
+> > Hi
+> >
+> > On Mon, Sep 16, 2019 at 2:02 PM Dr. David Alan Gilbert
+> > <dgilbert@redhat.com> wrote:
+> > >
+> > > (Copying in Stefan since he was looking at DBus for virtiofs)
+> > >
+> > > * Marc-Andr=C3=A9 Lureau (marcandre.lureau@redhat.com) wrote:
+> > > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > > > ---
+> > > >  docs/interop/dbus.rst  | 73 ++++++++++++++++++++++++++++++++++++++=
+++++
+> > > >  docs/interop/index.rst |  1 +
+> > > >  2 files changed, 74 insertions(+)
+> > > >  create mode 100644 docs/interop/dbus.rst
+> > > >
+> > > > diff --git a/docs/interop/dbus.rst b/docs/interop/dbus.rst
+> > > > new file mode 100644
+> > > > index 0000000000..c08f026edc
+> > > > --- /dev/null
+> > > > +++ b/docs/interop/dbus.rst
+> > > > @@ -0,0 +1,73 @@
+> > > > +=3D=3D=3D=3D=3D
+> > > > +D-Bus
+> > > > +=3D=3D=3D=3D=3D
+> > > > +
+> > > > +Introduction
+> > > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > > +
+> > > > +QEMU may be running with various helper processes involved:
+> > > > + - vhost-user* processes (gpu, virtfs, input, etc...)
+> > > > + - TPM emulation (or other devices)
+> > > > + - user networking (slirp)
+> > > > + - network services (DHCP/DNS, samba/ftp etc)
+> > > > + - background tasks (compression, streaming etc)
+> > > > + - client UI
+> > > > + - admin & cli
+> > > > +
+> > > > +Having several processes allows stricter security rules, as well a=
+s
+> > > > +greater modularity.
+> > > > +
+> > > > +While QEMU itself uses QMP as primary IPC (and Spice/VNC for remot=
+e
+> > > > +display), D-Bus is the de facto IPC of choice on Unix systems. The
+> > > > +wire format is machine friendly, good bindings exist for various
+> > > > +languages, and there are various tools available.
+> > > > +
+> > > > +Using a bus, helper processes can discover and communicate with ea=
+ch
+> > > > +other easily, without going through QEMU. The bus topology is also
+> > > > +easier to apprehend and debug than a mesh. However, it is wise to
+> > > > +consider the security aspects of it.
+> > > > +
+> > > > +Security
+> > > > +=3D=3D=3D=3D=3D=3D=3D=3D
+> > > > +
+> > > > +A QEMU D-Bus bus should be private to a single VM. Thus, only
+> > > > +cooperative tasks are running on the same bus to serve the VM.
+> > > > +
+> > > > +D-Bus, the protocol and standard, doesn't have mechanisms to enfor=
+ce
+> > > > +security between peers once the connection is established. Peers m=
+ay
+> > > > +have additional mechanisms to enforce security rules, based for
+> > > > +example on UNIX credentials.
+> > > > +
+> > > > +dbus-daemon can enforce various policies based on the UID/GID of t=
+he
+> > > > +processes that are connected to it. It is thus a good idea to run
+> > > > +helpers as different UID from QEMU and set appropriate policies (s=
+o
+> > > > +helper processes are only allowed to talk to qemu for example).
+> > > > +
+> > > > +For example, this allows only ``qemu`` user to talk to ``qemu-help=
+er``
+> > > > +``org.qemu.Helper1`` service:
+> > > > +
+> > > > +.. code:: xml
+> > > > +
+> > > > +  <policy user=3D"qemu">
+> > > > +     <allow send_destination=3D"org.qemu.Helper1"/>
+> > > > +     <allow receive_sender=3D"org.qemu.Helper1"/>
+> > > > +  </policy>
+> > > > +
+> > > > +  <policy user=3D"qemu-helper">
+> > > > +     <allow own=3D"org.qemu.Helper1"/>
+> > > > +  </policy>
+> > > > +
+> > > > +
+> > > > +dbus-daemon can also perfom SELinux checks based on the security
+> > > > +context of the source and the target. For example, ``virtiofs_t``
+> > > > +could be allowed to send a message to ``svirt_t``, but ``virtiofs_=
+t``
+> > > > +wouldn't be allowed to send a message to ``virtiofs_t``.
+> > >
+> > > I think we need to start thinking about this more now rather than
+> > > 'can'. .
+> >
+> > Do you have a specific question we can answer or guide for qemu? Is
+> > there something we have to document or implement?
+> >
+> > Since qemu is not managing the extra processes or applying policies, I
+> > don't know what else could be done. From qemu pov, it can rely on
+> > management layer to trust the bus and the helpers, similar to trusting
+> > the system in general.
+>
+> Well pretty much the same questions I asked in the discussion on v2;
+> what is the supported configuration to ensure that one helper that's
+> been compromised can't attack the others and qemu?
 
-  2019-09-16 14:44:54,540 ppc_prep_40p     L0033 DEBUG| Firmware, built  =
-April 13, 2019 09:29:23
-  2019-09-16 14:45:00,762 ppc_prep_40p     L0033 DEBUG| n Firmware, built=
-  April 13, 2019 09:29:23
-  2019-09-16 14:45:06,575 ppc_prep_40p     L0033 DEBUG| Firmware, built  =
-April 13, 2019 09:29:23
-  2019-09-16 14:45:12,859 ppc_prep_40p     L0033 DEBUG| n Firmware, built=
-  April 13, 2019 09:29:23
-  2019-09-16 14:45:18,707 ppc_prep_40p     L0033 DEBUG| Firmware, built  =
-April 13, 2019 09:29:23
-  2019-09-16 14:45:21,876 ppc_prep_40p     L0033 DEBUG| en Firmware, buil=
-t  April 13, 2019 09:29:23
-  2019-09-16 14:45:28,054 ppc_prep_40p     L0033 DEBUG| Firmware, built  =
-April 13, 2019 09:29:23
-  2019-09-16 14:45:31,163 ppc_prep_40p     L0033 DEBUG| Firmware, built  =
-April 13, 2019 09:29:23
-  2019-09-16 14:45:34,291 ppc_prep_40p     L0033 DEBUG| en Firmware, buil=
-t  April 13, 2019 09:29:23
-  2019-09-16 14:45:57,719 ppc_prep_40p     L0033 DEBUG| Firmware, built  =
-April 13, 2019 09:29:23
-  2019-09-16 14:46:03,610 ppc_prep_40p     L0033 DEBUG| Firmware, built  =
-April 13, 2019 09:29:23
-  2019-09-16 14:46:06,795 ppc_prep_40p     L0033 DEBUG| n Firmware, built=
-  April 13, 2019 09:29:23
-  2019-09-16 14:46:17,087 ppc_prep_40p     L0033 DEBUG| n Firmware, built=
-  April 13, 2019 09:29:23
-  2019-09-16 14:46:21,534 ppc_prep_40p     L0033 DEBUG| Firmware, built  =
-April 13, 2019 09:29:23
-  2019-09-16 14:46:24,694 ppc_prep_40p     L0033 DEBUG| Firmware, built  =
-April 13, 2019 09:29:23
-  2019-09-16 14:46:38,076 ppc_prep_40p     L0033 DEBUG| Firmware, built  =
-April 13, 2019 09:29:23
-  2019-09-16 14:46:49,863 ppc_prep_40p     L0033 DEBUG| n Firmware, built=
-  April 13, 2019 09:29:23
-  2019-09-16 14:46:54,435 ppc_prep_40p     L0033 DEBUG| Firmware, built  =
-April 13, 2019 09:29:23
-  2019-09-16 14:47:00,672 ppc_prep_40p     L0033 DEBUG| Firmware, built  =
-April 13, 2019 09:29:23
-  2019-09-16 14:47:03,834 ppc_prep_40p     L0033 DEBUG| n Firmware, built=
-  April 13, 2019 09:29:23
-  2019-09-16 14:47:06,852 ppc_prep_40p     L0033 DEBUG| Firmware, built  =
-April 13, 2019 09:29:23
-  2019-09-16 14:47:14,276 ppc_prep_40p     L0033 DEBUG| n Firmware, built=
-  April 13, 2019 09:29:23
-  2019-09-16 14:47:17,380 ppc_prep_40p     L0033 DEBUG| Firmware, built  =
-April 13, 2019 09:29:23
-  2019-09-16 14:47:34,749 ppc_prep_40p     L0033 DEBUG| n Firmware, built=
-  April 13, 2019 09:29:23
-  2019-09-16 14:47:39,217 ppc_prep_40p     L0033 DEBUG| n Firmware, built=
-  April 13, 2019 09:29:23
-  2019-09-16 14:47:43,750 ppc_prep_40p     L0033 DEBUG| Firmware, built  =
-April 13, 2019 09:29:23
-  2019-09-16 14:48:04,003 ppc_prep_40p     L0033 DEBUG| Firmware, built  =
-April 13, 2019 09:29:23
+I thought I gave the answer to that question above. What is missing? I
+don't think one can generalize it here, it will be a case by case for
+each helper, how they interact with each other and qemu.
 
-Given that we're not seeing this behavior in other target/marchine
-tests, my first impression is that this is what's being produced
-by QEMU, and not what's being badly captured by the Avocado and/or
-the test code.
+>
+> Dave
+>
+> > > Dave
+> > >
+> > > > +Guidelines
+> > > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > > +
+> > > > +When implementing new D-Bus interfaces, it is recommended to follo=
+w
+> > > > +the "D-Bus API Design Guidelines":
+> > > > +https://dbus.freedesktop.org/doc/dbus-api-design.html
+> > > > +
+> > > > +The "org.qemu*" prefix is reserved for the QEMU project.
+> > > > diff --git a/docs/interop/index.rst b/docs/interop/index.rst
+> > > > index b4bfcab417..fa4478ce2e 100644
+> > > > --- a/docs/interop/index.rst
+> > > > +++ b/docs/interop/index.rst
+> > > > @@ -13,6 +13,7 @@ Contents:
+> > > >     :maxdepth: 2
+> > > >
+> > > >     bitmaps
+> > > > +   dbus
+> > > >     live-block-operations
+> > > >     pr-helper
+> > > >     vhost-user
+> > > > --
+> > > > 2.23.0
+> > > >
+> > > --
+> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > >
+> >
+> >
+> > --
+> > Marc-Andr=C3=A9 Lureau
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-Any ideas?
 
-- Cleber.
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
