@@ -2,82 +2,85 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B602AC4CEC4
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 03:34:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75610C4CEC4
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 03:36:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87315206C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 03:34:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87315206C2
+	by mail.kernel.org (Postfix) with ESMTPS id 47055206C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 03:36:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47055206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9hmB-0006C7-PF
-	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 23:34:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57078)
+	id 1i9ho6-0007Q0-HI
+	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 23:36:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57405)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1i9hlU-0005mk-0q
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 23:33:25 -0400
+ (envelope-from <peterx@redhat.com>) id 1i9hnJ-0006vG-Da
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 23:35:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1i9hlS-0002se-3m
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 23:33:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43824)
+ (envelope-from <peterx@redhat.com>) id 1i9hnH-0003h0-LM
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 23:35:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44016)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1i9hlQ-0002rq-FN
- for qemu-devel@nongnu.org; Sun, 15 Sep 2019 23:33:21 -0400
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197])
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1i9hnH-0003gZ-BF
+ for qemu-devel@nongnu.org; Sun, 15 Sep 2019 23:35:15 -0400
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 69B69C059758
- for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 03:33:19 +0000 (UTC)
-Received: by mail-pg1-f197.google.com with SMTP id w5so21334596pgs.5
- for <qemu-devel@nongnu.org>; Sun, 15 Sep 2019 20:33:19 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2E394C059B7A
+ for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 03:35:14 +0000 (UTC)
+Received: by mail-pf1-f200.google.com with SMTP id v3so19774990pff.4
+ for <qemu-devel@nongnu.org>; Sun, 15 Sep 2019 20:35:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to:user-agent;
- bh=4MI/XiD/cEoNossYaCLoezLIzha76O6A/TVJCv/RTPg=;
- b=KVDt9U/47BOpeMUSubDWL18MYPBa3FUATELv6b9rpwkv3eCZP+HCqkMVcmzFlSTmVH
- qpp7M4TDnDVQDQQ3VCKzupKA493/p2k3XgZPiUx0nKqiHJgLxRbn7zEzNew/6IwPU6Gl
- ixpXgs+tdZilgukqOwC6ZBXJFiWJscGZo0Oq9t1oFS7y0UwXFxwosEPQ/u3ayaH6UhpN
- KZxCU5kqESDxUKOOWa5OJcRWC/nskZjAXwVZGS5Nt17eZCttQeXafBeyxdLdTHLGPp8m
- 6uQ2i6YC2gWc5nR5lW6lGoe6sOxxdk2k15b9KH+c5MOlmLaq0cqT9fRj1n5x+9lEloXF
- Qb8g==
-X-Gm-Message-State: APjAAAUOoC/ATm4jI4tJQQDP8WcrDhuPX+LZ/Hjjhn645EJhx0VfFy2I
- VjWEnW+9gKXtegXGsb+7f0dehfcbqdFIDFPDFhUHGMAsaEetoYLoP5Mxvj6L5xVYf1sov5rtBlR
- MiPmxyz5rPr9wLrg=
-X-Received: by 2002:a63:5b23:: with SMTP id p35mr53183808pgb.366.1568604798823; 
- Sun, 15 Sep 2019 20:33:18 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxv/xsreg9PfwKYjp1l1+XzaFoudVLPbUAqQ55/zMHYFCTOhEeO1OY2DOEQdsQRh1qShpho1g==
-X-Received: by 2002:a63:5b23:: with SMTP id p35mr53183791pgb.366.1568604798532; 
- Sun, 15 Sep 2019 20:33:18 -0700 (PDT)
+ bh=1Nna47Iikl1N0ydAaQUtB54jP0EYr+/6I67YefDRvsc=;
+ b=kHJ8xdbHPcfAALYqqNOpuEEIuwERP4sJBzM1Ayx5yVdE3iusSlvO+YnG8bn4AgqE+y
+ fqEvShR2VP3s450DXyq72ZAfvzRG5hm/pOszFUXkv8zBEhVUrzilbRG+i57gk1vgFacK
+ Pd2lWHjBD8dsSjYbMRxrFyCz3ngtGM+sdzJ9cmcC/Y29pyF14CIu9rhGOlQs0c86nmqO
+ CUOnCXqiTMsW/dcNWX2DuoX+INpuCFDMmiA6dslmRWtbUZyrxMxsboCdiYW7uRjHO+Af
+ y+OatTMpev8dnyqDcdfJBxLUP3cfOCmguRq5GCQhxWeOO8EdxdgFjBnzOQ9sRxg1dd8B
+ pA/A==
+X-Gm-Message-State: APjAAAW7Xb3Qgbfv+CZ8k5rU9NNAb0wo+80LSUe8jkvPNtOLZ5bojjR3
+ MLWY1gMWXQ1EH1LJenceP7jAPs6n/bda7hxPigLb65Iw3xKFMpSHQw08V9nw1Nyk6zewUs3VRUv
+ Dn5Y/j+dKGYVEPis=
+X-Received: by 2002:aa7:8ad7:: with SMTP id b23mr4286943pfd.254.1568604913675; 
+ Sun, 15 Sep 2019 20:35:13 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyDHqVJCvXRNoCZgUb5T/jaBJATCe/ClEnomXipuSzwMRA2z1R8U+FkjBtRtZXVAlSY7eNUjQ==
+X-Received: by 2002:aa7:8ad7:: with SMTP id b23mr4286934pfd.254.1568604913506; 
+ Sun, 15 Sep 2019 20:35:13 -0700 (PDT)
 Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id z20sm6636599pfj.156.2019.09.15.20.33.14
+ by smtp.gmail.com with ESMTPSA id g8sm28637338pgk.1.2019.09.15.20.35.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 15 Sep 2019 20:33:17 -0700 (PDT)
-Date: Mon, 16 Sep 2019 11:33:08 +0800
+ Sun, 15 Sep 2019 20:35:12 -0700 (PDT)
+Date: Mon, 16 Sep 2019 11:35:02 +0800
 From: Peter Xu <peterx@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Message-ID: <20190916033308.GD14232@xz-x1>
-References: <20190913083615.14719-1-eric.auger@redhat.com>
- <20190913083615.14719-6-eric.auger@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190916033501.GE14232@xz-x1>
+References: <20190812074531.28970-1-peterx@redhat.com>
+ <20190820052240.GG13560@xz-x1>
+ <f8e320ca-8c24-a562-1f5b-e55bd5c64d4a@redhat.com>
+ <20190821050302.GA25454@xz-x1>
+ <8106168f-1648-5823-8a69-f93638c74c66@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190913083615.14719-6-eric.auger@redhat.com>
+In-Reply-To: <8106168f-1648-5823-8a69-f93638c74c66@redhat.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 5/6] intel_iommu: Let
- vtd_iommu_notify_flag_changed() fail
+Subject: Re: [Qemu-devel] [PATCH RFC 0/4] intel_iommu: Do sanity check of
+ vfio-pci earlier
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,46 +92,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, mst@redhat.com, qemu-devel@nongnu.org,
- alex.williamson@redhat.com, qemu-arm@nongnu.org, pbonzini@redhat.com,
- eric.auger.pro@gmail.com
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+ Bandan Das <bsd@redhat.com>,
+ Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 13, 2019 at 10:36:14AM +0200, Eric Auger wrote:
-> In case a MAP notifier is attempted to be registered without
-> caching mode, let's simply return an error. This latter now is
-> handled in the VFIO code.
+On Wed, Aug 21, 2019 at 09:50:43AM +0200, Paolo Bonzini wrote:
+> On 21/08/19 07:03, Peter Xu wrote:
+> > On Tue, Aug 20, 2019 at 08:24:49AM +0200, Paolo Bonzini wrote:
+> >> On 20/08/19 07:22, Peter Xu wrote:
+> >>> On Mon, Aug 12, 2019 at 09:45:27AM +0200, Peter Xu wrote:
+> >>>> This is a RFC series.
+> >>>>
+> >>>> The VT-d code has some defects, one of them is that we cannot detect
+> >>>> the misuse of vIOMMU and vfio-pci early enough.
+> >>>>
+> >>>> For example, logically this is not allowed:
+> >>>>
+> >>>>   -device intel-iommu,caching-mode=off \
+> >>>>   -device vfio-pci,host=05:00.0
+> >>>>
+> >>>> Because the caching mode is required to make vfio-pci devices
+> >>>> functional.
+> >>>>
+> >>>> Previously we did this sanity check in vtd_iommu_notify_flag_changed()
+> >>>> as when the memory regions change their attributes.  However that's
+> >>>> too late in most cases!  Because the memory region layouts will only
+> >>>> change after IOMMU is enabled, and that's in most cases during the
+> >>>> guest OS boots.  So when the configuration is wrong, we will only bail
+> >>>> out during the guest boots rather than simply telling the user before
+> >>>> QEMU starts.
+> >>>>
+> >>>> The same problem happens on device hotplug, say, when we have this:
+> >>>>
+> >>>>   -device intel-iommu,caching-mode=off
+> >>>>
+> >>>> Then we do something like:
+> >>>>
+> >>>>   (HMP) device_add vfio-pci,host=05:00.0,bus=pcie.1
+> >>>>
+> >>>> If at that time the vIOMMU is enabled in the guest then the QEMU
+> >>>> process will simply quit directly due to this hotplug event.  This is
+> >>>> a bit insane...
+> >>>>
+> >>>> This series tries to solve above two problems by introducing two
+> >>>> sanity checks upon these places separately:
+> >>>>
+> >>>>   - machine done
+> >>>>   - hotplug device
+> >>>>
+> >>>> This is a bit awkward but I hope this could be better than before.
+> >>>> There is of course other solutions like hard-code the check into
+> >>>> vfio-pci but I feel it even more unpretty.  I didn't think out any
+> >>>> better way to do this, if there is please kindly shout out.
+> >>>>
+> >>>> Please have a look to see whether this would be acceptable, thanks.
+> >>>
+> >>> Any more comment on this?
+> >>
+> >> No problem from me, but I wouldn't mind if someone else merged it. :)
+> > 
+> > Can I read this as an "acked-by"? :)
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  hw/i386/intel_iommu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Yes, it shouldn't even need Acked-by since there are other maintainers
+> that handle this part of the tree:
 > 
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 7a89ea9ba1..2f66d6882c 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -2931,7 +2931,7 @@ static int vtd_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
->      if (!s->caching_mode && new & IOMMU_NOTIFIER_MAP) {
->          error_report("We need to set caching-mode=on for intel-iommu to enable "
->                       "device assignment with IOMMU protection.");
-> -        exit(1);
-> +        return -EINVAL;
+> Paolo Bonzini <pbonzini@redhat.com> (maintainer:X86 TCG CPUs)
+> Richard Henderson <rth@twiddle.net> (maintainer:X86 TCG CPUs)
+> Eduardo Habkost <ehabkost@redhat.com> (maintainer:X86 TCG CPUs)
+> "Michael S. Tsirkin" <mst@redhat.com> (supporter:PC)
+> Marcel Apfelbaum <marcel.apfelbaum@gmail.com> (supporter:PC)
 
-This might be conflicting with the other series because that's going
-to drop these lines:
+Michael (or any maintainers listed above):
 
-https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg01968.html
-
-Though current change looks ok to me, and I don't even know which one
-will reach master earlier after all so let's see. :)
-
-The rest patches besides patch 1 all look sane to me. If we're going
-to have "Error **" then the rest patches might need trivial touch-ups
-of course.  And, IMHO squashing the whole series into patch 1 could be
-better, but it's a personal preference only.
+Do any of you have any further comment on this series?  Do any of you
+like to merge this?
 
 Thanks,
 
