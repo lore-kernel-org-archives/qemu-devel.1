@@ -2,65 +2,91 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DAE5C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 10:03:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBAF6C49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 10:03:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3112F2067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 10:03:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3112F2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A74862067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 10:03:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iCrXEZRB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A74862067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9nqv-0006rH-DD
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 06:03:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44376)
+	id 1i9nrG-0007Gu-JF
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 06:03:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44424)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1i9noR-0005oh-En
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 06:00:53 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1i9nou-00060e-Ts
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 06:01:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1i9noL-0004zK-1j
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 06:00:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41738)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i9noK-0004z5-QG
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 06:00:44 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 15F3318C4278
- for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 10:00:44 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.13])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EFEC45D9E1;
- Mon, 16 Sep 2019 10:00:37 +0000 (UTC)
-Date: Mon, 16 Sep 2019 11:00:35 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- stefanha@redhat.com
-Message-ID: <20190916100035.GC2887@work-vm>
-References: <20190912122514.22504-1-marcandre.lureau@redhat.com>
- <20190912122514.22504-6-marcandre.lureau@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1i9not-00059A-4y
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 06:01:20 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39232)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1i9nor-00058O-9g
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 06:01:17 -0400
+Received: by mail-wr1-x444.google.com with SMTP id r3so8030720wrj.6
+ for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 03:01:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=U5fMvZVgGm0JtYr11rc8jEtD3MnDLmxagCi7doLfANs=;
+ b=iCrXEZRByaufabAg5S7pTvAdr108xRgBSjByz4E8wXkz+5tX35ZV/gMib1oKdfGxVM
+ b9WhXxQMVFV9iZ9AvgxdJ4IgWN5CqrBv+TsAt0sosHrs4QOUc3rbIGAfms/EiAZLxJif
+ POR6M6HIQIhdjsXqzW7J/0V/nllqkd1XssY+m5F6QdBS6bX8vBW5KQeyoO1OWIHHloNc
+ 3iZIE4UlTVvnVGKiDd10LePyQDcdeNdumwa0/3cLn6L4r9W+Aa+GqFbKGiwFTUGI5x5i
+ fqO2SsbLn5Bu+tCxf3Jyj0RgVIzfS/VRxcS3VkVoodlFEBkSB/psLImeuec5zLvsAFbL
+ 6eSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=U5fMvZVgGm0JtYr11rc8jEtD3MnDLmxagCi7doLfANs=;
+ b=fftSWa8qhpS3v4OWhiYGmODD3hmcQ+15NUG5/SzIr4eLSsgqswwPl4tNvqFjdorvB7
+ Zw+7OWjxLry2q9Lzn4s8nI/+zu36QsL7F3GWp/oOTi/UVwqCzxv+pc3TJ2o4Ac6gEbWA
+ z6ZftRFgAEkO72utKjzTSLAQkw8gU2PNt0McmFu+ealJqdeLmGGoZla+sw5I/Eh8/gqC
+ AnhM7ExxeJF9exiMnKTOwO2h2Zep6ISUPKyqd02JCjVClYBxsJI6/CS8hu5FujRJYzik
+ TEDXFJsDBCR5gPvkZQd0ceKpHgT+pPtrcUmd6p+0BZJ7cOMaH7DSx5uyZOTmcs1lbTnq
+ 137Q==
+X-Gm-Message-State: APjAAAVSTMqSqsrRsuFQxYEqbv3gkXjpIcb3gEwCwtr1hBjxixLr9OCH
+ 1jWCWJLFz07XSlhsAj5oZkj5ZA==
+X-Google-Smtp-Source: APXvYqxgUC0VrBkI0RlfaYeOyPQbmyiv1rP6A5qUvEyes2UxflL3myGVWHB/bdI8Rc24kfDwTxCqfQ==
+X-Received: by 2002:a05:6000:43:: with SMTP id k3mr4179342wrx.84.1568628076007; 
+ Mon, 16 Sep 2019 03:01:16 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id i1sm7424512wmb.19.2019.09.16.03.01.15
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Sep 2019 03:01:15 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 955EA1FF87;
+ Mon, 16 Sep 2019 11:01:14 +0100 (BST)
+References: <20190915211940.30427-1-f4bug@amsat.org>
+ <20190915211940.30427-6-f4bug@amsat.org>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+In-reply-to: <20190915211940.30427-6-f4bug@amsat.org>
+Date: Mon, 16 Sep 2019 11:01:14 +0100
+Message-ID: <87k1a81rx1.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190912122514.22504-6-marcandre.lureau@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Mon, 16 Sep 2019 10:00:44 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 5/6] docs: start a document to describe
- D-Bus usage
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] .travis.yml: Let the avocado job
+ run the 40p tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,121 +98,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mprivozn@redhat.com, pbonzini@redhat.com, berrange@redhat.com,
- qemu-devel@nongnu.org, quintela@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>,
+ =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>,
+ Cleber Rosa <crosa@redhat.com>, qemu-ppc@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-(Copying in Stefan since he was looking at DBus for virtiofs)
 
-* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  docs/interop/dbus.rst  | 73 ++++++++++++++++++++++++++++++++++++++++++
->  docs/interop/index.rst |  1 +
->  2 files changed, 74 insertions(+)
->  create mode 100644 docs/interop/dbus.rst
->=20
-> diff --git a/docs/interop/dbus.rst b/docs/interop/dbus.rst
-> new file mode 100644
-> index 0000000000..c08f026edc
-> --- /dev/null
-> +++ b/docs/interop/dbus.rst
-> @@ -0,0 +1,73 @@
-> +=3D=3D=3D=3D=3D
-> +D-Bus
-> +=3D=3D=3D=3D=3D
-> +
-> +Introduction
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +QEMU may be running with various helper processes involved:
-> + - vhost-user* processes (gpu, virtfs, input, etc...)
-> + - TPM emulation (or other devices)
-> + - user networking (slirp)
-> + - network services (DHCP/DNS, samba/ftp etc)
-> + - background tasks (compression, streaming etc)
-> + - client UI
-> + - admin & cli
-> +
-> +Having several processes allows stricter security rules, as well as
-> +greater modularity.
-> +
-> +While QEMU itself uses QMP as primary IPC (and Spice/VNC for remote
-> +display), D-Bus is the de facto IPC of choice on Unix systems. The
-> +wire format is machine friendly, good bindings exist for various
-> +languages, and there are various tools available.
-> +
-> +Using a bus, helper processes can discover and communicate with each
-> +other easily, without going through QEMU. The bus topology is also
-> +easier to apprehend and debug than a mesh. However, it is wise to
-> +consider the security aspects of it.
-> +
-> +Security
-> +=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +A QEMU D-Bus bus should be private to a single VM. Thus, only
-> +cooperative tasks are running on the same bus to serve the VM.
-> +
-> +D-Bus, the protocol and standard, doesn't have mechanisms to enforce
-> +security between peers once the connection is established. Peers may
-> +have additional mechanisms to enforce security rules, based for
-> +example on UNIX credentials.
-> +
-> +dbus-daemon can enforce various policies based on the UID/GID of the
-> +processes that are connected to it. It is thus a good idea to run
-> +helpers as different UID from QEMU and set appropriate policies (so
-> +helper processes are only allowed to talk to qemu for example).
-> +
-> +For example, this allows only ``qemu`` user to talk to ``qemu-helper``
-> +``org.qemu.Helper1`` service:
-> +
-> +.. code:: xml
-> +
-> +  <policy user=3D"qemu">
-> +     <allow send_destination=3D"org.qemu.Helper1"/>
-> +     <allow receive_sender=3D"org.qemu.Helper1"/>
-> +  </policy>
-> +
-> +  <policy user=3D"qemu-helper">
-> +     <allow own=3D"org.qemu.Helper1"/>
-> +  </policy>
-> +
-> +
-> +dbus-daemon can also perfom SELinux checks based on the security
-> +context of the source and the target. For example, ``virtiofs_t``
-> +could be allowed to send a message to ``svirt_t``, but ``virtiofs_t``
-> +wouldn't be allowed to send a message to ``virtiofs_t``.
+> If this list continues to grow we can
+> - split it (as other jobs)
+> - move them to GitLab where we can have multi-stage jobs,
+>   avocado tests run on top of build jobs.
+> ---
+>  .travis.yml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/.travis.yml b/.travis.yml
+> index d0b9e099b9..69a37f7387 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -267,7 +267,7 @@ matrix:
+>
+>      # Acceptance (Functional) tests
+>      - env:
+> -        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
+oftmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-soft=
+mmu,alpha-softmmu,ppc64-softmmu,m68k-softmmu"
+> +        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
+oftmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-soft=
+mmu,alpha-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu"
+>          - TEST_CMD=3D"make check-acceptance"
+>        after_failure:
+>          - cat tests/results/latest/job.log
 
-I think we need to start thinking about this more now rather than
-'can'. .
 
-Dave
-
-> +Guidelines
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +When implementing new D-Bus interfaces, it is recommended to follow
-> +the "D-Bus API Design Guidelines":
-> +https://dbus.freedesktop.org/doc/dbus-api-design.html
-> +
-> +The "org.qemu*" prefix is reserved for the QEMU project.
-> diff --git a/docs/interop/index.rst b/docs/interop/index.rst
-> index b4bfcab417..fa4478ce2e 100644
-> --- a/docs/interop/index.rst
-> +++ b/docs/interop/index.rst
-> @@ -13,6 +13,7 @@ Contents:
->     :maxdepth: 2
-> =20
->     bitmaps
-> +   dbus
->     live-block-operations
->     pr-helper
->     vhost-user
-> --=20
-> 2.23.0
->=20
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Benn=C3=A9e
 
