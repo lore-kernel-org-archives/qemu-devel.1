@@ -2,86 +2,61 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9B56C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:26:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31A2EC49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:29:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A91E6214DE
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:26:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rfnFwqjA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A91E6214DE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 08E7C2184D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:29:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08E7C2184D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9tpg-0002A7-LQ
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 12:26:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60980)
+	id 1i9tsD-0004ED-5z
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 12:29:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35432)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1i9t09-0006tY-Qb
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:33:19 -0400
+ (envelope-from <philmd@redhat.com>) id 1i9tGk-0000bh-Ve
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:50:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1i9t08-0003M9-OR
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:33:17 -0400
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:54975)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1i9t08-0003Lb-I7
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:33:16 -0400
-Received: by mail-wm1-x332.google.com with SMTP id p7so252918wmp.4
- for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 08:33:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=D6YGUbR9BdCGcEa9DD/zNGfvBUbgKnJJMLtswwo8nZ8=;
- b=rfnFwqjAuipgKas6Jq1zxfx2dObIUf1JMcVpb5YGCNkn73QHBVw2B333B2ebfXaA4f
- c4n+4S31WmmRjsEO0J51QugqgKfqut2VHxkdeaqIIxF4X7u+54/2Bn24EtUMf/UBVDXw
- X6RXSYK5zus1TKAnhm8ZMp/EYSMKUfyKxOfps+oANdEDi6YRWT07Y/EIyu8JqjTjX0bt
- BvfhzVvAWpFjFgChn8LCXfglIJEdTEhyJslcnPW+UHLkdtfivU2XM86kO1x8g8sCbA++
- 5bnsy+bZLlRHh5PFmkq/NbFgfCplwZ9I//tUAa2RwWJceSeecK4NkFjy875+9AF81D7Q
- ZV9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=D6YGUbR9BdCGcEa9DD/zNGfvBUbgKnJJMLtswwo8nZ8=;
- b=jPtMRS/vcbK34GPP8gyau79mj8XyJxGmKJgGhsc+wXfD/7DyQVt8QXivZfTqrkKNM6
- suA29DYfMm7qJOzJdGIkiH6XKTU8NpXI9sp2s02KYKD7dLuuZaFIH5hCEj0ZrR/1Whuv
- ubbpe4Ba3N31RP5igxtg2ULbQ2DZYd5MXuqTKioUFGycHXXYKUA0AocAvOM1W2IGoi5A
- Gt1BL/SZqQGw04Ep2LsQFVd4QABm+39aVRezFyflu753NwZO5q87I3OhM9pZBTEbuTrt
- VElLg9XERLeE06QH1m68vDCQAmfgXk1+EJxWBEr96kkk6eG/7RL/1etaCjbv7D5rERaZ
- +SBA==
-X-Gm-Message-State: APjAAAXEUUwpGnUnw+tnusVurVzLzX5BGcVrhfUdeDPO3B1sfHJsIQls
- 4iDV+WRxkkJrC0xYEFyXLp0=
-X-Google-Smtp-Source: APXvYqwf93/FtMnaBos6f0NymSYGaihZNrGsupvZW7o3ovoVMBTVAGku1who481w9mNGWDUMGORfyA==
-X-Received: by 2002:a1c:e709:: with SMTP id e9mr111668wmh.65.1568647994953;
- Mon, 16 Sep 2019 08:33:14 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id o3sm190952wmh.38.2019.09.16.08.33.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Sep 2019 08:33:13 -0700 (PDT)
-Date: Mon, 16 Sep 2019 16:33:12 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190916153312.GD25552@stefanha-x1.localdomain>
-References: <CAFEAcA88YR0mU2N=-immpWVFCnnU6fJsorZYHSyerfMO72iZaA@mail.gmail.com>
+ (envelope-from <philmd@redhat.com>) id 1i9tGj-0001zG-8z
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:50:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51176)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1i9tGf-0001xj-AT; Mon, 16 Sep 2019 11:50:21 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 54FEC757C2;
+ Mon, 16 Sep 2019 15:50:20 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-115.brq.redhat.com [10.40.204.115])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 15CF9196AE;
+ Mon, 16 Sep 2019 15:50:03 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 16 Sep 2019 17:48:38 +0200
+Message-Id: <20190916154847.28936-5-philmd@redhat.com>
+In-Reply-To: <20190916154847.28936-1-philmd@redhat.com>
+References: <20190916154847.28936-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="/unnNtmY43mpUSKx"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA88YR0mU2N=-immpWVFCnnU6fJsorZYHSyerfMO72iZaA@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::332
-Subject: Re: [Qemu-devel] test-aio-multithread assertion
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Mon, 16 Sep 2019 15:50:20 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 04/13] hw: Move M48T59 device from hw/timer/ to
+ hw/rtc/ subdirectory
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,64 +68,287 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Andrew Jeffery <andrew@aj.id.au>, qemu-ppc@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The M48T59 is a Real Time Clock, not a timer.
+Move it under the hw/rtc/ subdirectory.
 
---/unnNtmY43mpUSKx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ MAINTAINERS                         |  4 +-
+ hw/ppc/ppc405_boards.c              |  2 +-
+ hw/ppc/prep.c                       |  2 +-
+ hw/rtc/Kconfig                      |  3 ++
+ hw/rtc/Makefile.objs                |  4 ++
+ hw/{timer =3D> rtc}/m48t59-internal.h |  0
+ hw/{timer =3D> rtc}/m48t59-isa.c      |  4 +-
+ hw/{timer =3D> rtc}/m48t59.c          |  2 +-
+ hw/sparc/sun4m.c                    |  2 +-
+ hw/sparc64/sun4u.c                  |  2 +-
+ hw/timer/Kconfig                    |  3 --
+ hw/timer/Makefile.objs              |  4 --
+ include/hw/rtc/m48t59.h             | 57 +++++++++++++++++++++++++++++
+ 13 files changed, 73 insertions(+), 16 deletions(-)
+ rename hw/{timer =3D> rtc}/m48t59-internal.h (100%)
+ rename hw/{timer =3D> rtc}/m48t59-isa.c (98%)
+ rename hw/{timer =3D> rtc}/m48t59.c (99%)
+ create mode 100644 include/hw/rtc/m48t59.h
 
-On Wed, Sep 04, 2019 at 12:50:21PM +0100, Peter Maydell wrote:
-> Hi; I've been seeing intermittently on the BSDs this assertion
-> running test-aio-multithread as part of 'make check':
->=20
-> MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-> tests/test-aio-multithread -m=3Dquick -k --tap < /dev/null |
-> ./scripts/tap-drive
-> r.pl --test-name=3D"test-aio-multithread"
-> PASS 1 test-aio-multithread /aio/multi/lifecycle
-> PASS 2 test-aio-multithread /aio/multi/schedule
-> ERROR - too few tests run (expected 5, got 2)
-> Assertion failed: (!qemu_lockcnt_count(&ctx->list_lock)), function
-> aio_ctx_finalize, file /home/qemu/qemu-test.kaRA0o/src/util/async.c,
-> line 283.
-> Abort trap (core dumped)
-> gmake: *** [/home/qemu/qemu-test.kaRA0o/src/tests/Makefile.include:905:
-> check-unit] Error 1
->=20
-> Anybody got any ideas?
->=20
-> (this is with the tests/vm setups; I've seen this on FreeBSD
-> and NetBSD.)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 481f2318cb..679b026fe0 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1064,9 +1064,9 @@ F: hw/pci-host/prep.[hc]
+ F: hw/isa/i82378.c
+ F: hw/isa/pc87312.c
+ F: hw/dma/i82374.c
+-F: hw/timer/m48t59-isa.c
++F: hw/rtc/m48t59-isa.c
+ F: include/hw/isa/pc87312.h
+-F: include/hw/timer/m48t59.h
++F: include/hw/rtc/m48t59.h
+ F: pc-bios/ppc_rom.bin
+=20
+ sPAPR
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index 388cae0b43..1f721feed6 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -29,7 +29,7 @@
+ #include "cpu.h"
+ #include "hw/ppc/ppc.h"
+ #include "ppc405.h"
+-#include "hw/timer/m48t59.h"
++#include "hw/rtc/m48t59.h"
+ #include "hw/block/flash.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/qtest.h"
+diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+index 3a51536e1a..862345c2ac 100644
+--- a/hw/ppc/prep.c
++++ b/hw/ppc/prep.c
+@@ -25,7 +25,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+-#include "hw/timer/m48t59.h"
++#include "hw/rtc/m48t59.h"
+ #include "hw/char/serial.h"
+ #include "hw/block/fdc.h"
+ #include "net/net.h"
+diff --git a/hw/rtc/Kconfig b/hw/rtc/Kconfig
+index 7ffd702268..159c233517 100644
+--- a/hw/rtc/Kconfig
++++ b/hw/rtc/Kconfig
+@@ -1,3 +1,6 @@
++config M48T59
++    bool
++
+ config PL031
+     bool
+=20
+diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
+index 3cac0d5a63..c87f81405e 100644
+--- a/hw/rtc/Makefile.objs
++++ b/hw/rtc/Makefile.objs
+@@ -1,2 +1,6 @@
++common-obj-$(CONFIG_M48T59) +=3D m48t59.o
++ifeq ($(CONFIG_ISA_BUS),y)
++common-obj-$(CONFIG_M48T59) +=3D m48t59-isa.o
++endif
+ common-obj-$(CONFIG_PL031) +=3D pl031.o
+ obj-$(CONFIG_MC146818RTC) +=3D mc146818rtc.o
+diff --git a/hw/timer/m48t59-internal.h b/hw/rtc/m48t59-internal.h
+similarity index 100%
+rename from hw/timer/m48t59-internal.h
+rename to hw/rtc/m48t59-internal.h
+diff --git a/hw/timer/m48t59-isa.c b/hw/rtc/m48t59-isa.c
+similarity index 98%
+rename from hw/timer/m48t59-isa.c
+rename to hw/rtc/m48t59-isa.c
+index 5e5432abfd..7fde854c0f 100644
+--- a/hw/timer/m48t59-isa.c
++++ b/hw/rtc/m48t59-isa.c
+@@ -1,5 +1,5 @@
+ /*
+- * QEMU M48T59 and M48T08 NVRAM emulation (ISA bus interface
++ * QEMU M48T59 and M48T08 NVRAM emulation (ISA bus interface)
+  *
+  * Copyright (c) 2003-2005, 2007 Jocelyn Mayer
+  * Copyright (c) 2013 Herv=C3=A9 Poussineau
+@@ -26,7 +26,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/isa/isa.h"
+ #include "hw/qdev-properties.h"
+-#include "hw/timer/m48t59.h"
++#include "hw/rtc/m48t59.h"
+ #include "m48t59-internal.h"
+ #include "qemu/module.h"
+=20
+diff --git a/hw/timer/m48t59.c b/hw/rtc/m48t59.c
+similarity index 99%
+rename from hw/timer/m48t59.c
+rename to hw/rtc/m48t59.c
+index a9fc2f981a..fc592b9fb1 100644
+--- a/hw/timer/m48t59.c
++++ b/hw/rtc/m48t59.c
+@@ -27,7 +27,7 @@
+ #include "qemu-common.h"
+ #include "hw/irq.h"
+ #include "hw/qdev-properties.h"
+-#include "hw/timer/m48t59.h"
++#include "hw/rtc/m48t59.h"
+ #include "qemu/timer.h"
+ #include "sysemu/runstate.h"
+ #include "sysemu/sysemu.h"
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 6c5a17a020..2aaa5bf1ae 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -31,7 +31,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu/timer.h"
+ #include "hw/sparc/sun4m_iommu.h"
+-#include "hw/timer/m48t59.h"
++#include "hw/rtc/m48t59.h"
+ #include "migration/vmstate.h"
+ #include "hw/sparc/sparc32_dma.h"
+ #include "hw/block/fdc.h"
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 1ded2a4c9a..955082773b 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -36,7 +36,7 @@
+ #include "hw/pci-host/sabre.h"
+ #include "hw/char/serial.h"
+ #include "hw/char/parallel.h"
+-#include "hw/timer/m48t59.h"
++#include "hw/rtc/m48t59.h"
+ #include "migration/vmstate.h"
+ #include "hw/input/i8042.h"
+ #include "hw/block/fdc.h"
+diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
+index af415c8ef8..a57e9b59fc 100644
+--- a/hw/timer/Kconfig
++++ b/hw/timer/Kconfig
+@@ -24,9 +24,6 @@ config M41T80
+     bool
+     depends on I2C
+=20
+-config M48T59
+-    bool
+-
+ config TWL92230
+     bool
+     depends on I2C
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index b0159189cf..fe2d1fbc40 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -7,10 +7,6 @@ common-obj-$(CONFIG_DS1338) +=3D ds1338.o
+ common-obj-$(CONFIG_HPET) +=3D hpet.o
+ common-obj-$(CONFIG_I8254) +=3D i8254_common.o i8254.o
+ common-obj-$(CONFIG_M41T80) +=3D m41t80.o
+-common-obj-$(CONFIG_M48T59) +=3D m48t59.o
+-ifeq ($(CONFIG_ISA_BUS),y)
+-common-obj-$(CONFIG_M48T59) +=3D m48t59-isa.o
+-endif
+ common-obj-$(CONFIG_PUV3) +=3D puv3_ost.o
+ common-obj-$(CONFIG_TWL92230) +=3D twl92230.o
+ common-obj-$(CONFIG_XILINX) +=3D xilinx_timer.o
+diff --git a/include/hw/rtc/m48t59.h b/include/hw/rtc/m48t59.h
+new file mode 100644
+index 0000000000..e7ea4e8761
+--- /dev/null
++++ b/include/hw/rtc/m48t59.h
+@@ -0,0 +1,57 @@
++/*
++ * QEMU M48T59 and M48T08 NVRAM emulation
++ *
++ * Copyright (c) 2003-2005, 2007 Jocelyn Mayer
++ * Copyright (c) 2013 Herv=C3=A9 Poussineau
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
++ * of this software and associated documentation files (the "Software"),=
+ to deal
++ * in the Software without restriction, including without limitation the=
+ rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be includ=
+ed in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
++ * THE SOFTWARE.
++ */
++
++#ifndef HW_RTC_M48T59_H
++#define HW_RTC_M48T59_H
++
++#include "exec/hwaddr.h"
++#include "qom/object.h"
++
++#define TYPE_NVRAM "nvram"
++
++#define NVRAM_CLASS(klass) \
++    OBJECT_CLASS_CHECK(NvramClass, (klass), TYPE_NVRAM)
++#define NVRAM_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(NvramClass, (obj), TYPE_NVRAM)
++#define NVRAM(obj) \
++    INTERFACE_CHECK(Nvram, (obj), TYPE_NVRAM)
++
++typedef struct Nvram Nvram;
++
++typedef struct NvramClass {
++    InterfaceClass parent;
++
++    uint32_t (*read)(Nvram *obj, uint32_t addr);
++    void (*write)(Nvram *obj, uint32_t addr, uint32_t val);
++    void (*toggle_lock)(Nvram *obj, int lock);
++} NvramClass;
++
++Nvram *m48t59_init_isa(ISABus *bus, uint32_t io_base, uint16_t size,
++                       int base_year, int type);
++Nvram *m48t59_init(qemu_irq IRQ, hwaddr mem_base,
++                   uint32_t io_base, uint16_t size, int base_year,
++                   int type);
++
++#endif /* HW_M48T59_H */
+--=20
+2.20.1
 
-Last week I triaged a ppc64le test-aio-multithread test_multi_fair_mutex
-failure (race condition but reproduces after a few minutes) and sent it
-on to Paolo.
-
-I don't have time to investigate additional failures right now but
-please keep reminding us if you encounter failures.
-
-Stefan
-
---/unnNtmY43mpUSKx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1/qzgACgkQnKSrs4Gr
-c8hmjQf/Q2lVIIysAFb5mCwbCqMHd4m07mf5XaXZiCfSDY5Sy1NR3HjG5yJP6V4y
-FLZ55mKrheIwiutcPrWtpsDDTIvqupmuEyaA/6ksNdeqgYQQCQ4DahnTcdhlejmo
-7u9/KbCQUF5IuzpTRnctI95H9xIJCtBF6hbGBqir5g6KPX7a7WBZc2yvdVsRmkMC
-pjgTbQBzt0MAvhWFDfMe4piMx/Z20o6emfLJ9dRkgE8NWdoPuXNhtjgdEzPkNe7A
-c3EyKCx0oztzeSv8WZUj7qK7JVi7cJveNsOF5leoS6+4Qe0Vh/9bJAPR0FOmWfGM
-J9qreMKL9qOJZVVkjyUhG7zc+RAsiw==
-=wJSC
------END PGP SIGNATURE-----
-
---/unnNtmY43mpUSKx--
 
