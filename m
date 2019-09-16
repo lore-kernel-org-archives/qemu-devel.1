@@ -6,80 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38290C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 11:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E91EAC4CECD
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 11:26:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C6B1206A4
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 11:20:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C6B1206A4
+	by mail.kernel.org (Postfix) with ESMTPS id C2FA42067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 11:26:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2FA42067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9p33-00038j-6j
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 07:20:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53406)
+	id 1i9p9U-0006Vf-Vt
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 07:26:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54157)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1i9p1C-0001s1-5X
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 07:18:08 -0400
+ (envelope-from <slp@redhat.com>) id 1i9p8R-0005zg-C3
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 07:25:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1i9p1A-0003Iw-JD
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 07:18:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56280)
+ (envelope-from <slp@redhat.com>) id 1i9p8Q-0006xF-86
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 07:25:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:2827)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1i9p1A-0003Gs-6M
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 07:18:04 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <slp@redhat.com>)
+ id 1i9p8M-0006va-Rz; Mon, 16 Sep 2019 07:25:30 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F3B4885A03
- for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 11:18:02 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id l6so15844177wrn.2
- for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 04:18:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version;
- bh=92n9iVmIP8WXpmFiP/z+yc2Hv3AQzU9gAWb8le/yzV4=;
- b=Ib0tyabkx4U3YO9WAPlX3X1OjscksU2XL4xkQ0qQmViU/ByMbsGQ1DRcj1yGdMV5lB
- dadcdFwBv8oWiegNfKL/LmShYsqiEOwgHFY023zmdjlLXJwSjuoa8123u6gPKcORGYd7
- RMGtjwB5X/CVVesYPK4ahangVZ+rc1ZqOKVADAJUbVvWiyBrICBiWkwwCIRSY3T/NHYU
- jOxZ+/9/mFihhuJPuXWg3kY/OmJpG8zwUR6GOF6mf5GhSMTjnBSdoL5P9zTvJd01PZgw
- H6GKmyLzQszTdWeYRQ7BDlvynwWkjisafnU594iLPh1YaPw0bYVY2t/FZYejKJdiBHQ2
- 8jpw==
-X-Gm-Message-State: APjAAAWn0ZheMKgwCJmAOZs91UxhQL6xsk61JSlYmiYN/WkfNw4nVKNl
- CwxMbze8ursdIUdddb6HJHxr8kw2VVTcHBSRY7TDZyuYv4VX2g6pOBNUC7Z6skraE8Fbo+H8yGI
- 2ygGCI91Y5eLhDl4=
-X-Received: by 2002:a1c:cb05:: with SMTP id b5mr13378519wmg.79.1568632681721; 
- Mon, 16 Sep 2019 04:18:01 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzP8HjU3vkpI7bHnMIBPMd7byITbejL9fq7axIQCuEZNhqY0mGc6Smeiwj986P7l/TbpLTt0w==
-X-Received: by 2002:a1c:cb05:: with SMTP id b5mr13378488wmg.79.1568632681449; 
- Mon, 16 Sep 2019 04:18:01 -0700 (PDT)
-Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
- [95.120.215.139])
- by smtp.gmail.com with ESMTPSA id m11sm6549605wrn.59.2019.09.16.04.18.00
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Sep 2019 04:18:00 -0700 (PDT)
-References: <20190913152507.56197-1-slp@redhat.com>
- <20190913152507.56197-2-slp@redhat.com>
- <f10c8f6d-5ad2-b37c-16b7-659a3f02661c@redhat.com>
-User-agent: mu4e 1.2.0; emacs 26.2
+ by mx1.redhat.com (Postfix) with ESMTPS id C588F4E926;
+ Mon, 16 Sep 2019 11:25:29 +0000 (UTC)
+Received: from dritchie.redhat.com (unknown [10.33.36.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 146FA5D9DC;
+ Mon, 16 Sep 2019 11:25:20 +0000 (UTC)
 From: Sergio Lopez <slp@redhat.com>
-To: John Snow <jsnow@redhat.com>
-In-reply-to: <f10c8f6d-5ad2-b37c-16b7-659a3f02661c@redhat.com>
-Date: Mon, 16 Sep 2019 13:17:58 +0200
-Message-ID: <87blvkh4m1.fsf@redhat.com>
+To: qemu-block@nongnu.org
+Date: Mon, 16 Sep 2019 13:24:12 +0200
+Message-Id: <20190916112411.21636-1-slp@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Mon, 16 Sep 2019 11:25:29 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 1/2] blockdev: release the
- AioContext at drive_backup_prepare
+Subject: [Qemu-devel] [PATCH v3] virtio-blk: schedule virtio_notify_config
+ to run on main context
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,82 +65,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Sergio Lopez <slp@redhat.com>, mst@redhat.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+virtio_notify_config() needs to acquire the global mutex, which isn't
+allowed from an iothread, and may lead to a deadlock like this:
 
+ - main thead
+  * Has acquired: qemu_global_mutex.
+  * Is trying the acquire: iothread AioContext lock via
+    AIO_WAIT_WHILE (after aio_poll).
 
-John Snow <jsnow@redhat.com> writes:
+ - iothread
+  * Has acquired: AioContext lock.
+  * Is trying to acquire: qemu_global_mutex (via
+    virtio_notify_config->prepare_mmio_access).
 
-> On 9/13/19 11:25 AM, Sergio Lopez wrote:
->> do_drive_backup() already acquires the AioContext, so release it
->> before the call.
->>=20
->> Signed-off-by: Sergio Lopez <slp@redhat.com>
->> ---
->>  blockdev.c | 6 +-----
->>  1 file changed, 1 insertion(+), 5 deletions(-)
->>=20
->> diff --git a/blockdev.c b/blockdev.c
->> index fbef6845c8..3927fdab80 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
->> @@ -1783,20 +1783,16 @@ static void drive_backup_prepare(BlkActionState =
-*common, Error **errp)
->>=20=20
->>      aio_context =3D bdrv_get_aio_context(bs);
->>      aio_context_acquire(aio_context);
->> -
->>      /* Paired with .clean() */
->>      bdrv_drained_begin(bs);
->
-> Do we need to make this change to blockdev_backup_prepare as well?
+If virtio_blk_resize() is called from an iothread, schedule
+virtio_notify_config() to be run in the main context BH.
 
-Yes, we do. Thanks.
+Signed-off-by: Sergio Lopez <slp@redhat.com>
+---
+Changelog
 
->> +    aio_context_release(aio_context);
->>=20=20
->>      state->bs =3D bs;
->>=20=20
->>      state->job =3D do_drive_backup(backup, common->block_job_txn, &loca=
-l_err);
->>      if (local_err) {
->>          error_propagate(errp, local_err);
->> -        goto out;
->>      }
->> -
->> -out:
->> -    aio_context_release(aio_context);
->>  }
->>=20=20
->>  static void drive_backup_commit(BlkActionState *common)
->>=20
+v3:
+ - Unconditionally schedule the work to be done in the main context BH
+   (thanks John Snow and Kevin Wolf).
 
+v2:
+ - Use aio_bh_schedule_oneshot instead of scheduling a coroutine
+   (thanks Kevin Wolf).
+ - Switch from RFC to v2 patch.
+---
+ hw/block/virtio-blk.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 18851601cb..0163285f6f 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -16,6 +16,7 @@
+ #include "qemu/iov.h"
+ #include "qemu/module.h"
+ #include "qemu/error-report.h"
++#include "qemu/main-loop.h"
+ #include "trace.h"
+ #include "hw/block/block.h"
+ #include "hw/qdev-properties.h"
+@@ -1086,11 +1087,25 @@ static int virtio_blk_load_device(VirtIODevice *v=
+dev, QEMUFile *f,
+     return 0;
+ }
+=20
++static void virtio_resize_cb(void *opaque)
++{
++    VirtIODevice *vdev =3D opaque;
++
++    assert(qemu_get_current_aio_context() =3D=3D qemu_get_aio_context())=
+;
++    virtio_notify_config(vdev);
++}
++
+ static void virtio_blk_resize(void *opaque)
+ {
+     VirtIODevice *vdev =3D VIRTIO_DEVICE(opaque);
+=20
+-    virtio_notify_config(vdev);
++    /*
++     * virtio_notify_config() needs to acquire the global mutex,
++     * so it can't be called from an iothread. Instead, schedule
++     * it to be run in the main context BH.
++     */
++    aio_bh_schedule_oneshot(qemu_get_aio_context(),
++                            virtio_resize_cb, vdev);
+ }
+=20
+ static const BlockDevOps virtio_block_ops =3D {
+--=20
+2.21.0
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl1/b2YACgkQ9GknjS8M
-AjVCNBAAtmLEKsClvuqPnT/xgqSaHk7VL6vqoRjyCFPZruvhTz9q0ctE0Hb0eyvI
-pWW7FkYMGyRwoARJMNzRbi15wFfuM0jO60PyoZ/lf/DAPcy2hSufnBEEiAkZoYXm
-GOZpFhzAdtV2cVJEadDdesGLgNYbjwMSkWtZyOHTTVRbUoS77zoPE1TeGnkNEsyt
-HLc0mI/OmMahPdG4WAjehD26UEhdgwN6nKNQQfFjwiCcrfEuv27B8clarGfBSrC3
-VhjgJnHG8ONfnVHdiTFwTENng+SKW+3RGH9pxob/wD4Sc1nDr6qLBkjGSvNBEiC9
-o2QaltIpglcFWjAyL3FXKpd+ycOtfj4bbZPOsxZVe/9LnJuzMgYCKXDFY/2a4Ulh
-MZcBbd1k+WyCDewInWemVNghSZMrPbyAWGc3k+jq536/8vPmud4Z77pwlicLgwRb
-pWyoBENWdLnFboTpw9gWQGx9/lx+BqhjsEmKctqyKwrDZf/KQZbDAwNkge68gzKu
-Ii9r/g1sCWRNpMidXjZi/t77lGIPIpL86Wlent4mWa2wRP2GAZUQflGuAS4a3Lso
-h9WDZIklyb/JCqhyq/bsZeAdFFuRXqI5Ojg6GBwHgSi+UNFY06r1pbxBanTDCfuG
-9sjRULd8E2OYQXizmCxBh3K7Eb/WjFBzs19xtrSuKqyS/DnFmYo=
-=/+V/
------END PGP SIGNATURE-----
---=-=-=--
 
