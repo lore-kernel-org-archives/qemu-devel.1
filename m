@@ -2,58 +2,60 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E91EAC4CECD
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 11:26:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3BE1C4CECD
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 11:41:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2FA42067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 11:26:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2FA42067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9641620650
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 11:41:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9641620650
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sipsolutions.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9p9U-0006Vf-Vt
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 07:26:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54157)
+	id 1i9pOH-0000Ry-Ov
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 07:41:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55567)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1i9p8R-0005zg-C3
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 07:25:36 -0400
+ (envelope-from <johannes@sipsolutions.net>) id 1i9pN5-0008Og-RP
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 07:40:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1i9p8Q-0006xF-86
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 07:25:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:2827)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>)
- id 1i9p8M-0006va-Rz; Mon, 16 Sep 2019 07:25:30 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C588F4E926;
- Mon, 16 Sep 2019 11:25:29 +0000 (UTC)
-Received: from dritchie.redhat.com (unknown [10.33.36.134])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 146FA5D9DC;
- Mon, 16 Sep 2019 11:25:20 +0000 (UTC)
-From: Sergio Lopez <slp@redhat.com>
-To: qemu-block@nongnu.org
-Date: Mon, 16 Sep 2019 13:24:12 +0200
-Message-Id: <20190916112411.21636-1-slp@redhat.com>
+ (envelope-from <johannes@sipsolutions.net>) id 1i9pN4-0006NG-Qx
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 07:40:43 -0400
+Received: from s3.sipsolutions.net ([2a01:4f8:191:4433::2]:60568
+ helo=sipsolutions.net)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <johannes@sipsolutions.net>)
+ id 1i9pN4-0006MF-KN
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 07:40:42 -0400
+Received: by sipsolutions.net with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <johannes@sipsolutions.net>)
+ id 1i9pMz-0000oI-7G; Mon, 16 Sep 2019 13:40:37 +0200
+Message-ID: <674086baeed5fce100d0882e668d5e36f026bd71.camel@sipsolutions.net>
+From: Johannes Berg <johannes@sipsolutions.net>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Date: Mon, 16 Sep 2019 13:40:35 +0200
+In-Reply-To: <fedd74ed3e9cc554287b202e73b047a938515113.camel@sipsolutions.net>
+References: <20190911134539.25650-1-johannes@sipsolutions.net>
+ <20190911134539.25650-2-johannes@sipsolutions.net>
+ <20190911095650-mutt-send-email-mst@kernel.org>
+ <fedd74ed3e9cc554287b202e73b047a938515113.camel@sipsolutions.net>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Mon, 16 Sep 2019 11:25:29 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3] virtio-blk: schedule virtio_notify_config
- to run on main context
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a01:4f8:191:4433::2
+Subject: Re: [Qemu-devel] [RFC v2 1/2] docs: vhost-user: add in-band
+ kick/call messages
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,86 +67,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Sergio Lopez <slp@redhat.com>, mst@redhat.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-virtio_notify_config() needs to acquire the global mutex, which isn't
-allowed from an iothread, and may lead to a deadlock like this:
+Hi Michael,
 
- - main thead
-  * Has acquired: qemu_global_mutex.
-  * Is trying the acquire: iothread AioContext lock via
-    AIO_WAIT_WHILE (after aio_poll).
+I had just wanted to prepare a resend, but
 
- - iothread
-  * Has acquired: AioContext lock.
-  * Is trying to acquire: qemu_global_mutex (via
-    virtio_notify_config->prepare_mmio_access).
+> > Hmm I don't like this. I propose that with VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS
+> > we just don't allow VHOST_USER_SET_VRING_CALL (if you think it's
+> > important to allow them, we can say that we do not require them).
+> 
+> You can't actually skip SET_VRING_CALL, it's necessary to start a vring,
+> so libvhost-user for example calls dev->iface->queue_set_started() only
+> in this case. The docs in the "Starting and stopping rings" section also
+> explain this.
 
-If virtio_blk_resize() is called from an iothread, schedule
-virtio_notify_config() to be run in the main context BH.
+[...]
 
-Signed-off-by: Sergio Lopez <slp@redhat.com>
----
-Changelog
+> See above. But I guess we could put a flag into bit 9 indicating that
+> you want to use messages instead of polling or a file descriptor, if you
+> prefer.
 
-v3:
- - Unconditionally schedule the work to be done in the main context BH
-   (thanks John Snow and Kevin Wolf).
+Personally, I don't think it matters since right now I can see the in-
+band notification as being really necessary/useful only for simulation
+work, and in that case no polling will be doable.
 
-v2:
- - Use aio_bh_schedule_oneshot instead of scheduling a coroutine
-   (thanks Kevin Wolf).
- - Switch from RFC to v2 patch.
----
- hw/block/virtio-blk.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+If you do think it's important to not make the two mutually exclusive,
+how would you prefer to have this handled? With a new flag, e.g. in bit
+9, indicating "use inband signalling instead of polling or eventfd"?
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 18851601cb..0163285f6f 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -16,6 +16,7 @@
- #include "qemu/iov.h"
- #include "qemu/module.h"
- #include "qemu/error-report.h"
-+#include "qemu/main-loop.h"
- #include "trace.h"
- #include "hw/block/block.h"
- #include "hw/qdev-properties.h"
-@@ -1086,11 +1087,25 @@ static int virtio_blk_load_device(VirtIODevice *v=
-dev, QEMUFile *f,
-     return 0;
- }
-=20
-+static void virtio_resize_cb(void *opaque)
-+{
-+    VirtIODevice *vdev =3D opaque;
-+
-+    assert(qemu_get_current_aio_context() =3D=3D qemu_get_aio_context())=
-;
-+    virtio_notify_config(vdev);
-+}
-+
- static void virtio_blk_resize(void *opaque)
- {
-     VirtIODevice *vdev =3D VIRTIO_DEVICE(opaque);
-=20
--    virtio_notify_config(vdev);
-+    /*
-+     * virtio_notify_config() needs to acquire the global mutex,
-+     * so it can't be called from an iothread. Instead, schedule
-+     * it to be run in the main context BH.
-+     */
-+    aio_bh_schedule_oneshot(qemu_get_aio_context(),
-+                            virtio_resize_cb, vdev);
- }
-=20
- static const BlockDevOps virtio_block_ops =3D {
---=20
-2.21.0
+Thanks,
+johannes
 
 
