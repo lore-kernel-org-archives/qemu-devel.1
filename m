@@ -5,79 +5,78 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E37D4C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 21:45:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 016AFC49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 21:48:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A199E214AF
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 21:45:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9F82214AF
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 21:48:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AuaFVrBM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A199E214AF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ItSHY9nO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9F82214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9yo2-0000wA-Nk
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 17:45:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35588)
+	id 1i9yra-0002K4-1M
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 17:48:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36018)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1i9yn8-0000Cc-S7
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 17:44:16 -0400
+ (envelope-from <alistair23@gmail.com>) id 1i9yqW-0001e2-7z
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 17:47:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1i9yn7-0001cx-Ce
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 17:44:14 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:37115)
+ (envelope-from <alistair23@gmail.com>) id 1i9yqV-0002i9-6l
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 17:47:44 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:41079)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1i9yn6-0001cQ-TU; Mon, 16 Sep 2019 17:44:13 -0400
-Received: by mail-lf1-x141.google.com with SMTP id w67so1165014lff.4;
- Mon, 16 Sep 2019 14:44:12 -0700 (PDT)
+ id 1i9yqU-0002gQ-VG; Mon, 16 Sep 2019 17:47:43 -0400
+Received: by mail-lf1-x143.google.com with SMTP id r2so1141389lfn.8;
+ Mon, 16 Sep 2019 14:47:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=ydq/wOLNsVLu6DqAx1bi9sX41tAUm839UCibkHYqB+U=;
- b=AuaFVrBMa7k8XWhGI3mpm4hMbxzh2Qw/K46Y1nrbWP95OahsDwZGczNg+adQA9m2dg
- RaGNn6Sc9jXUXRkoC2LTjDOQQ85hrFe4UXlWFBU8Q/jdhtxQgkXK5+TXtz0lFdDzLwkj
- 5IEy515UP4hRxxFaB8RYf4AwgwfOOZJpgQl7wXe71j3sMQ+pc3eiDXdXZf8zpqsN3Fpe
- h31gKdgzWSHNvdAc29eKWhEwRDu1aSjFONfBwGGF/vj91SxHdrqCJLEta7Y0QsBjMIBg
- Cs+Lc23a0oRxBfLjlf2hamsZqExJFotXnOIJW8kxiVJYwmnsO+IxQ3CWRRt8p0N9hmkv
- +JrA==
+ bh=d6KsQJZ4uOyC2kdk7MqSRWQlWcAq1Lv8qHXSBMW/b9Q=;
+ b=ItSHY9nOzTCzVMLRr4d2oWSz6AoLhREAUiG8wFWG/VNkS8A+COXukZvpLFtWXv9mgZ
+ oWMfGQrjiLS4dC6ZuwWXClpywoEesNvYH32NBUAePfWCE0ShEVPI//yZk6ZSGaE9EjcC
+ 784pA+OPRnOOhXqSmX6w8NsH2Qhh+WfwcB+wI5ZHJR5DzqudQegwLIq7wMQTfVm7nSAB
+ z4pqlwmpVvTYs7eMJBvku+Nx8D34yylijFqYWXVV3FYivtq/t3UOqnhV7EraQaLWxnBd
+ ZDVSysaR1uTyi6U12Zv8ofU0yG/bm+dqWeTKxnhMqENATy8Gh3Gs/Wx/A4DLT1xGyjJt
+ Lbow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=ydq/wOLNsVLu6DqAx1bi9sX41tAUm839UCibkHYqB+U=;
- b=fcdeY3WlOmn9TbTMyIJ6/hdLjCp4N89FezUGoHIckhzk97+dHaM73G+eH8nTR3ux2Z
- Ox+gU9K/MIW4jxS20hUiWM/oTzKWahEYFETMo1ufHoQQ+jHCsvqefYX+XhobM+Moda7h
- O8unOXjuQm2obMzK+i4Vn0KdJiryf4Y27SukfoiB8k/y06yeKEHpqGDgcLaYlUvq8OIH
- ArJwI5duOSObpoYSBvvAEtaHJxOvSr4+iZAxYmM376JPzfBSw1WUoXo3ouxog9AYOwTw
- 6ypXncenoQU9VB0xeVfDQvuYrkptpgT8J8TrDAtsVPt8yCR5SyrsrufaldXG4WYamBq3
- PaVA==
-X-Gm-Message-State: APjAAAVyQqp4iaYPP7Kmz5SgRFJpX+M2RLKFkPhvY49Vofjv2YKgkis6
- 6BLVSdDRr5/syXGt3/74S815oDzmuSKqVEgboYM=
-X-Google-Smtp-Source: APXvYqxAvJWylPMSmdRgZIiOaYe08Q7IwKTbVLdMdC9ZXwYBwaNljfUVI7Tp0fZa4bkjUp2/nPQ2q5XiFCZ2YJuaOPM=
-X-Received: by 2002:ac2:51cd:: with SMTP id u13mr161547lfm.135.1568670251059; 
- Mon, 16 Sep 2019 14:44:11 -0700 (PDT)
+ bh=d6KsQJZ4uOyC2kdk7MqSRWQlWcAq1Lv8qHXSBMW/b9Q=;
+ b=g6vsZKYyCP7w9q5ZycPUKqeGM0oPiIdVZ4r9MJ7NsxJEbgi72Hn62h4TutW9YgjoP+
+ m9m0luWaS2HO0xvTh1ReN1APUmQmb9bkabIxx/yq1nHxJG8/2wzhea0af3UdeMOQHPg1
+ RBPwIxHWZFbSwtzgoa6Yh9dbezyk+ieMaUlZJ+oYe+RnriZy0Mka7Z/D/bqF3HMBkyZD
+ K3yDL4A6ZEJysz2ni02KqMULHADR72xjfez/KBu1AIZq+FDOQcTxbroK4JI81Ae9iMRh
+ +IVCw7jYi15sPfvfGzYA2oSXsj9wD7WHeWOikO9/VgJOaMBNC27cftRVzlBecd11kwLG
+ VH5A==
+X-Gm-Message-State: APjAAAWH/GqJaCAzDan9tGV6bsxvEWl6r1AM/fwFvw1Hqfv8Q3VED1+v
+ SN1wt3cusD1g8qnjy9VIa8/kg+KFb1XVmQpZXts=
+X-Google-Smtp-Source: APXvYqz203nAyxQdvO8s2n6qurpE5FzGJMudr1vTtDG4MPrBc6JmfPLjFBZ5gYBsM4T11A1YS29XodOFansiaL+Kky8=
+X-Received: by 2002:ac2:4a69:: with SMTP id q9mr176281lfp.86.1568670461772;
+ Mon, 16 Sep 2019 14:47:41 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190916154847.28936-1-philmd@redhat.com>
- <20190916154847.28936-8-philmd@redhat.com>
-In-Reply-To: <20190916154847.28936-8-philmd@redhat.com>
+ <20190916154847.28936-9-philmd@redhat.com>
+In-Reply-To: <20190916154847.28936-9-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 16 Sep 2019 14:39:40 -0700
-Message-ID: <CAKmqyKNM5AkkdS6MHtyRqdN16cyiN2abG5DDfJY48OnJAGE5OA@mail.gmail.com>
+Date: Mon, 16 Sep 2019 14:43:10 -0700
+Message-ID: <CAKmqyKOFCbNyOvrm2Y4UuB9X96dGO5NEz1=yZju0kqhJ-j_vOA@mail.gmail.com>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::141
-Subject: Re: [Qemu-devel] [PATCH 07/13] hw: Move TWL92230 device from
+X-Received-From: 2a00:1450:4864:20::143
+Subject: Re: [Qemu-devel] [PATCH 08/13] hw: Move DS1338 device from
  hw/timer/ to hw/rtc/ subdirectory
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,12 +109,11 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 16, 2019 at 9:37 AM Philippe Mathieu-Daud=C3=A9
+On Mon, Sep 16, 2019 at 9:39 AM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
 >
-> The TWL92230 is an "energy management device" companion with
-> a RTC. Since we mostly model the RTC, move it under the hw/rtc/
-> subdirectory.
+> The DS1338 is a Real Time Clock, not a timer.
+> Move it under the hw/rtc/ subdirectory.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
@@ -124,85 +122,66 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  MAINTAINERS                  | 2 +-
->  hw/rtc/Kconfig               | 4 ++++
->  hw/rtc/Makefile.objs         | 1 +
->  hw/{timer =3D> rtc}/twl92230.c | 0
->  hw/timer/Kconfig             | 4 ----
->  hw/timer/Makefile.objs       | 1 -
->  6 files changed, 6 insertions(+), 6 deletions(-)
->  rename hw/{timer =3D> rtc}/twl92230.c (100%)
+>  hw/rtc/Kconfig             | 4 ++++
+>  hw/rtc/Makefile.objs       | 1 +
+>  hw/{timer =3D> rtc}/ds1338.c | 0
+>  hw/timer/Kconfig           | 4 ----
+>  hw/timer/Makefile.objs     | 1 -
+>  5 files changed, 5 insertions(+), 5 deletions(-)
+>  rename hw/{timer =3D> rtc}/ds1338.c (100%)
 >
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index fb9a1ed075..d17058264b 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -663,7 +663,7 @@ F: hw/display/blizzard.c
->  F: hw/input/lm832x.c
->  F: hw/input/tsc2005.c
->  F: hw/misc/cbus.c
-> -F: hw/timer/twl92230.c
-> +F: hw/rtc/twl92230.c
->  F: include/hw/display/blizzard.h
->  F: include/hw/input/tsc2xxx.h
->  F: include/hw/misc/cbus.h
 > diff --git a/hw/rtc/Kconfig b/hw/rtc/Kconfig
-> index cc7fead764..dff9d60946 100644
+> index dff9d60946..45daa8d655 100644
 > --- a/hw/rtc/Kconfig
 > +++ b/hw/rtc/Kconfig
-> @@ -8,6 +8,10 @@ config M48T59
->  config PL031
->      bool
->
-> +config TWL92230
+> @@ -1,3 +1,7 @@
+> +config DS1338
 > +    bool
 > +    depends on I2C
 > +
->  config MC146818RTC
+>  config M41T80
 >      bool
->
+>      depends on I2C
 > diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
-> index 4621b37bc2..810a38ee7b 100644
+> index 810a38ee7b..b195863291 100644
 > --- a/hw/rtc/Makefile.objs
 > +++ b/hw/rtc/Makefile.objs
-> @@ -4,5 +4,6 @@ ifeq ($(CONFIG_ISA_BUS),y)
->  common-obj-$(CONFIG_M48T59) +=3D m48t59-isa.o
->  endif
->  common-obj-$(CONFIG_PL031) +=3D pl031.o
-> +common-obj-$(CONFIG_TWL92230) +=3D twl92230.o
->  obj-$(CONFIG_MC146818RTC) +=3D mc146818rtc.o
->  common-obj-$(CONFIG_SUN4V_RTC) +=3D sun4v-rtc.o
-> diff --git a/hw/timer/twl92230.c b/hw/rtc/twl92230.c
+> @@ -1,3 +1,4 @@
+> +common-obj-$(CONFIG_DS1338) +=3D ds1338.o
+>  common-obj-$(CONFIG_M41T80) +=3D m41t80.o
+>  common-obj-$(CONFIG_M48T59) +=3D m48t59.o
+>  ifeq ($(CONFIG_ISA_BUS),y)
+> diff --git a/hw/timer/ds1338.c b/hw/rtc/ds1338.c
 > similarity index 100%
-> rename from hw/timer/twl92230.c
-> rename to hw/rtc/twl92230.c
+> rename from hw/timer/ds1338.c
+> rename to hw/rtc/ds1338.c
 > diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
-> index b04c928136..9357875f28 100644
+> index 9357875f28..a990f9fe35 100644
 > --- a/hw/timer/Kconfig
 > +++ b/hw/timer/Kconfig
-> @@ -20,10 +20,6 @@ config HPET
->  config I8254
+> @@ -9,10 +9,6 @@ config ARM_MPTIMER
+>  config A9_GTIMER
 >      bool
 >
-> -config TWL92230
+> -config DS1338
 > -    bool
 > -    depends on I2C
 > -
->  config ALTERA_TIMER
+>  config HPET
 >      bool
->      select PTIMER
+>      default y if PC
 > diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-> index 034bd30255..23be70b71d 100644
+> index 23be70b71d..70b61b69c7 100644
 > --- a/hw/timer/Makefile.objs
 > +++ b/hw/timer/Makefile.objs
-> @@ -7,7 +7,6 @@ common-obj-$(CONFIG_DS1338) +=3D ds1338.o
+> @@ -3,7 +3,6 @@ common-obj-$(CONFIG_ARM_MPTIMER) +=3D arm_mptimer.o
+>  common-obj-$(CONFIG_ARM_V7M) +=3D armv7m_systick.o
+>  common-obj-$(CONFIG_A9_GTIMER) +=3D a9gtimer.o
+>  common-obj-$(CONFIG_CADENCE) +=3D cadence_ttc.o
+> -common-obj-$(CONFIG_DS1338) +=3D ds1338.o
 >  common-obj-$(CONFIG_HPET) +=3D hpet.o
 >  common-obj-$(CONFIG_I8254) +=3D i8254_common.o i8254.o
 >  common-obj-$(CONFIG_PUV3) +=3D puv3_ost.o
-> -common-obj-$(CONFIG_TWL92230) +=3D twl92230.o
->  common-obj-$(CONFIG_XILINX) +=3D xilinx_timer.o
->  common-obj-$(CONFIG_SLAVIO) +=3D slavio_timer.o
->  common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_timer.o
 > --
 > 2.20.1
 >
