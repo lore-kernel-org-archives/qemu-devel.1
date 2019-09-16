@@ -2,62 +2,82 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2B71C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 21:14:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CD1EC49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 21:28:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CC6C2067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 21:14:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F34B20644
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 21:28:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=linuxsystems.it header.i=@linuxsystems.it header.b="OGFgF6yp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CC6C2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linuxsystems.it
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YPM0oyHB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F34B20644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9yKU-00075J-Ou
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 17:14:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59030)
+	id 1i9yYE-0008Rh-VX
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 17:28:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33361)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <darkbasic@linuxsystems.it>) id 1i9yJF-0006ck-Rc
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 17:13:22 -0400
+ (envelope-from <alistair23@gmail.com>) id 1i9yWj-0007j5-1Q
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 17:27:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <darkbasic@linuxsystems.it>) id 1i9yJE-0000TR-OR
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 17:13:21 -0400
-Received: from mail.linuxsystems.it ([79.7.78.67]:48139)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <darkbasic@linuxsystems.it>)
- id 1i9yJE-0008Hq-Bf
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 17:13:20 -0400
-Received: by mail.linuxsystems.it (Postfix, from userid 33)
- id 983EE20BBB5; Mon, 16 Sep 2019 23:06:22 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxsystems.it;
- s=linuxsystems.it; t=1568667982;
- bh=NeVXrl+B8ZDmWPvv6LpfU/CXoUWrHcygcjhMmMMdDBc=;
- h=To:Subject:Date:From:From;
- b=OGFgF6ypA10cG+gEvQqvuqEPB68rgpbL/W2ntsbgU5gBBKQ4eZqeG/Tla28nKknYi
- QUTKyb75Nc16kx/iV95j7Joim2vySUI6JHJp2Jc/0lSkJvV2zl2WFUM4/0jyFuQ1py
- kZ7gD1U6p1KlK/X96VY7o7cjZzt+NE0BF2fSI9+g=
-To: qemu-devel@nongnu.org
-X-PHP-Originating-Script: 0:rcube.php
+ (envelope-from <alistair23@gmail.com>) id 1i9yWe-0002gk-WA
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 17:27:16 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:36945)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1i9yWZ-0002cP-8p; Mon, 16 Sep 2019 17:27:11 -0400
+Received: by mail-lj1-x243.google.com with SMTP id c22so1371935ljj.4;
+ Mon, 16 Sep 2019 14:27:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=BTOQyzbQ2zzSk/LSkK1aPuLLtX4mpaW87OMJqtfZHl8=;
+ b=YPM0oyHBWXp+6Z/salWitZpDJFgOjN5B9FriLooB+vGdzSZZKMwzT8fHVe+s+DB1Mk
+ /3E2wLG+filgEVHODiXyOCSe6xioBDdi6xjHnwBskZSjbsLnuVhXN/r8z2hrl1eiUN0V
+ 3S2GgY+RiU4wXBIfAxWl8pvjA8vPoGHO9yfi4gjab/E+6lDxB+HI8KmAJpJnmJ0RNHPY
+ ubw8G7L9cpBjz6aWFxMnl1SIwi/OjWZr4vbhyRimkqnuC50O7z0irG+0FWnQLMg6h7iM
+ L9PMpq2WIKzBTyAmCPBzQw7Mg+hmmp06kyo9qJnZsJ8CpB/iSH/hoqYycPiUvmi/yBYi
+ AXcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=BTOQyzbQ2zzSk/LSkK1aPuLLtX4mpaW87OMJqtfZHl8=;
+ b=KSjTCcwRAzLy421zmmDmbjAFYRNzDLGD9miF2LU1E1yegNKT6gj2FkQlRHCRVo1WXp
+ krC5M5eyZDw/snzWgIyYQhwyLcdwm0dc2qOWwhmxSXxgBbvJxoR3QO8izMs7hlsuS1f5
+ uEd1pab0fATPZr2mAlleoueL+Z+0b3WGa7KiQl7KSJ9XUs3uK6Sm3v8vy8U2TtB+z32M
+ BnY4egOeuPDWIo20cQisPqMWiKHKZfhLMB1KuOXhm+F1vAtU+zP2QuOrmqlGicg9XCTC
+ ifHz55B5DeOCWKpr9Ef2S92bOAJ1gyLztqDFM/EJZ5JR3ERXTp00Gz6iQDATZXWumuMl
+ s3rA==
+X-Gm-Message-State: APjAAAWWbcavhCqrRrzF4BxKHvNj4a3HJIw5QlvIBxm/LT5pl5jO+Krs
+ qf5C9Bnkd8n1+3YZFJUsGLT55a2/agD0fL+9K2U=
+X-Google-Smtp-Source: APXvYqwEqk717/7leXorq+geCtFggH/PP3JANQiXz9d4t2QQKgZYdinuoS5iiTxYfjAw1VznB2f6K5Wuey/l55ULrgg=
+X-Received: by 2002:a2e:780a:: with SMTP id t10mr890315ljc.119.1568669223797; 
+ Mon, 16 Sep 2019 14:27:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Mon, 16 Sep 2019 23:06:22 +0200
-From: =?UTF-8?Q?Niccol=C3=B2_Belli?= <darkbasic@linuxsystems.it>
-Message-ID: <83f649c6482bf363c38e7f3778d866f4@linuxsystems.it>
-X-Sender: darkbasic@linuxsystems.it
-User-Agent: Roundcube Webmail/1.1.5
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 79.7.78.67
-Subject: [Qemu-devel] ELF load command alignment not page-aligned
+References: <20190916154847.28936-1-philmd@redhat.com>
+ <20190916154847.28936-4-philmd@redhat.com>
+In-Reply-To: <20190916154847.28936-4-philmd@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 16 Sep 2019 14:22:32 -0700
+Message-ID: <CAKmqyKNC015doC43JnRrqgeoBGu53rDUWsZE6FL-O_b1zC+8eQ@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::243
+Subject: Re: [Qemu-devel] [PATCH 03/13] hw: Move MC146818 device from
+ hw/timer/ to hw/rtc/ subdirectory
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,20 +89,412 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Andrew Jeffery <andrew@aj.id.au>, "open list:New World" <qemu-ppc@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
-I'm trying to use qemu-user-static to chroot into a foreign amd64 
-environment from my ppc64le host.
-The host has a 64k page size, while x86_64 uses 4k.
-I get those errors while loading shared libraries: "ELF load command 
-alignment not page-aligned"
-Is there any way to fix this? I cannot simply switch to 4k page size 
-because my btrfs filesystem won't mount anymore (it requires the 
-sectorsize to be equal to the page size).
+On Mon, Sep 16, 2019 at 9:31 AM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> The MC146818 is a Real Time Clock, not a timer.
+> Move it under the hw/rtc/ subdirectory.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Bests,
-Niccolo'
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
+> ---
+>  MAINTAINERS                                  |  4 +--
+>  hw/alpha/dp264.c                             |  2 +-
+>  hw/hppa/machine.c                            |  2 +-
+>  hw/i386/acpi-build.c                         |  2 +-
+>  hw/i386/pc.c                                 |  2 +-
+>  hw/i386/pc_q35.c                             |  2 +-
+>  hw/mips/mips_fulong2e.c                      |  2 +-
+>  hw/mips/mips_jazz.c                          |  2 +-
+>  hw/mips/mips_malta.c                         |  2 +-
+>  hw/mips/mips_r4k.c                           |  2 +-
+>  hw/ppc/pnv.c                                 |  2 +-
+>  hw/ppc/prep.c                                |  2 +-
+>  hw/rtc/Kconfig                               |  3 ++
+>  hw/rtc/Makefile.objs                         |  1 +
+>  hw/{timer =3D> rtc}/mc146818rtc.c              |  2 +-
+>  hw/timer/Kconfig                             |  3 --
+>  hw/timer/Makefile.objs                       |  2 --
+>  hw/timer/hpet.c                              |  2 +-
+>  include/hw/rtc/mc146818rtc.h                 | 38 ++++++++++++++++++++
+>  include/hw/{timer =3D> rtc}/mc146818rtc_regs.h |  1 +
+>  include/hw/timer/mc146818rtc.h               | 14 --------
+>  tests/rtc-test.c                             |  2 +-
+>  22 files changed, 59 insertions(+), 35 deletions(-)
+>  rename hw/{timer =3D> rtc}/mc146818rtc.c (99%)
+>  create mode 100644 include/hw/rtc/mc146818rtc.h
+>  rename include/hw/{timer =3D> rtc}/mc146818rtc_regs.h (98%)
+>  delete mode 100644 include/hw/timer/mc146818rtc.h
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 5562d2c6d0..481f2318cb 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1263,7 +1263,7 @@ F: hw/misc/debugexit.c
+>  F: hw/misc/pc-testdev.c
+>  F: hw/timer/hpet*
+>  F: hw/timer/i8254*
+> -F: hw/timer/mc146818rtc*
+> +F: hw/rtc/mc146818rtc*
+>  F: hw/watchdog/wdt_ib700.c
+>  F: hw/watchdog/wdt_i6300esb.c
+>  F: include/hw/display/vga.h
+> @@ -1275,7 +1275,7 @@ F: include/hw/isa/i8259_internal.h
+>  F: include/hw/isa/superio.h
+>  F: include/hw/timer/hpet.h
+>  F: include/hw/timer/i8254*
+> -F: include/hw/timer/mc146818rtc*
+> +F: include/hw/rtc/mc146818rtc*
+>
+>  Machine core
+>  M: Eduardo Habkost <ehabkost@redhat.com>
+> diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+> index 51feee8558..51b3cf7a61 100644
+> --- a/hw/alpha/dp264.c
+> +++ b/hw/alpha/dp264.c
+> @@ -14,7 +14,7 @@
+>  #include "alpha_sys.h"
+>  #include "qemu/error-report.h"
+>  #include "sysemu/sysemu.h"
+> -#include "hw/timer/mc146818rtc.h"
+> +#include "hw/rtc/mc146818rtc.h"
+>  #include "hw/ide.h"
+>  #include "hw/timer/i8254.h"
+>  #include "hw/isa/superio.h"
+> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+> index 2736ce835e..6598e2469d 100644
+> --- a/hw/hppa/machine.c
+> +++ b/hw/hppa/machine.c
+> @@ -12,7 +12,7 @@
+>  #include "qemu/error-report.h"
+>  #include "sysemu/reset.h"
+>  #include "sysemu/sysemu.h"
+> -#include "hw/timer/mc146818rtc.h"
+> +#include "hw/rtc/mc146818rtc.h"
+>  #include "hw/ide.h"
+>  #include "hw/timer/i8254.h"
+>  #include "hw/char/serial.h"
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index e54e571a75..44a8073507 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -45,7 +45,7 @@
+>  #include "hw/acpi/vmgenid.h"
+>  #include "hw/boards.h"
+>  #include "sysemu/tpm_backend.h"
+> -#include "hw/timer/mc146818rtc_regs.h"
+> +#include "hw/rtc/mc146818rtc_regs.h"
+>  #include "migration/vmstate.h"
+>  #include "hw/mem/memory-device.h"
+>  #include "sysemu/numa.h"
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index bad866fe44..beef7a992d 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -42,7 +42,7 @@
+>  #include "elf.h"
+>  #include "migration/vmstate.h"
+>  #include "multiboot.h"
+> -#include "hw/timer/mc146818rtc.h"
+> +#include "hw/rtc/mc146818rtc.h"
+>  #include "hw/dma/i8257.h"
+>  #include "hw/timer/i8254.h"
+>  #include "hw/input/i8042.h"
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index d4e8a1cb9f..a976af9a2a 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -33,7 +33,7 @@
+>  #include "hw/loader.h"
+>  #include "sysemu/arch_init.h"
+>  #include "hw/i2c/smbus_eeprom.h"
+> -#include "hw/timer/mc146818rtc.h"
+> +#include "hw/rtc/mc146818rtc.h"
+>  #include "hw/xen/xen.h"
+>  #include "sysemu/kvm.h"
+>  #include "kvm_i386.h"
+> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+> index cf537dd7e6..03a27e1767 100644
+> --- a/hw/mips/mips_fulong2e.c
+> +++ b/hw/mips/mips_fulong2e.c
+> @@ -39,7 +39,7 @@
+>  #include "hw/ide.h"
+>  #include "elf.h"
+>  #include "hw/isa/vt82c686.h"
+> -#include "hw/timer/mc146818rtc.h"
+> +#include "hw/rtc/mc146818rtc.h"
+>  #include "hw/timer/i8254.h"
+>  #include "exec/address-spaces.h"
+>  #include "sysemu/qtest.h"
+> diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
+> index c967b97d80..2811a4bd90 100644
+> --- a/hw/mips/mips_jazz.c
+> +++ b/hw/mips/mips_jazz.c
+> @@ -39,7 +39,7 @@
+>  #include "hw/scsi/esp.h"
+>  #include "hw/mips/bios.h"
+>  #include "hw/loader.h"
+> -#include "hw/timer/mc146818rtc.h"
+> +#include "hw/rtc/mc146818rtc.h"
+>  #include "hw/timer/i8254.h"
+>  #include "hw/display/vga.h"
+>  #include "hw/audio/pcspk.h"
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index 4d9c64b36a..c1c8810e71 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -45,7 +45,7 @@
+>  #include "hw/irq.h"
+>  #include "hw/loader.h"
+>  #include "elf.h"
+> -#include "hw/timer/mc146818rtc.h"
+> +#include "hw/rtc/mc146818rtc.h"
+>  #include "hw/timer/i8254.h"
+>  #include "exec/address-spaces.h"
+>  #include "hw/sysbus.h"             /* SysBusDevice */
+> diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+> index bc0be26544..70024235ae 100644
+> --- a/hw/mips/mips_r4k.c
+> +++ b/hw/mips/mips_r4k.c
+> @@ -28,7 +28,7 @@
+>  #include "hw/ide.h"
+>  #include "hw/loader.h"
+>  #include "elf.h"
+> -#include "hw/timer/mc146818rtc.h"
+> +#include "hw/rtc/mc146818rtc.h"
+>  #include "hw/input/i8042.h"
+>  #include "hw/timer/i8254.h"
+>  #include "exec/address-spaces.h"
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 3f08db7b9e..4b2649d95b 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -48,7 +48,7 @@
+>  #include "hw/isa/isa.h"
+>  #include "hw/boards.h"
+>  #include "hw/char/serial.h"
+> -#include "hw/timer/mc146818rtc.h"
+> +#include "hw/rtc/mc146818rtc.h"
+>
+>  #include <libfdt.h>
+>
+> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+> index 4f3c6bf190..3a51536e1a 100644
+> --- a/hw/ppc/prep.c
+> +++ b/hw/ppc/prep.c
+> @@ -40,7 +40,7 @@
+>  #include "hw/ide.h"
+>  #include "hw/irq.h"
+>  #include "hw/loader.h"
+> -#include "hw/timer/mc146818rtc.h"
+> +#include "hw/rtc/mc146818rtc.h"
+>  #include "hw/isa/pc87312.h"
+>  #include "hw/net/ne2000-isa.h"
+>  #include "sysemu/arch_init.h"
+> diff --git a/hw/rtc/Kconfig b/hw/rtc/Kconfig
+> index 8a4383bca9..7ffd702268 100644
+> --- a/hw/rtc/Kconfig
+> +++ b/hw/rtc/Kconfig
+> @@ -1,2 +1,5 @@
+>  config PL031
+>      bool
+> +
+> +config MC146818RTC
+> +    bool
+> diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
+> index 3e1eb42563..3cac0d5a63 100644
+> --- a/hw/rtc/Makefile.objs
+> +++ b/hw/rtc/Makefile.objs
+> @@ -1 +1,2 @@
+>  common-obj-$(CONFIG_PL031) +=3D pl031.o
+> +obj-$(CONFIG_MC146818RTC) +=3D mc146818rtc.o
+> diff --git a/hw/timer/mc146818rtc.c b/hw/rtc/mc146818rtc.c
+> similarity index 99%
+> rename from hw/timer/mc146818rtc.c
+> rename to hw/rtc/mc146818rtc.c
+> index 6cb378751b..ced15f764f 100644
+> --- a/hw/timer/mc146818rtc.c
+> +++ b/hw/rtc/mc146818rtc.c
+> @@ -34,7 +34,7 @@
+>  #include "sysemu/replay.h"
+>  #include "sysemu/reset.h"
+>  #include "sysemu/runstate.h"
+> -#include "hw/timer/mc146818rtc.h"
+> +#include "hw/rtc/mc146818rtc.h"
+>  #include "migration/vmstate.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-commands-misc-target.h"
+> diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
+> index 27c5dce09e..af415c8ef8 100644
+> --- a/hw/timer/Kconfig
+> +++ b/hw/timer/Kconfig
+> @@ -35,9 +35,6 @@ config ALTERA_TIMER
+>      bool
+>      select PTIMER
+>
+> -config MC146818RTC
+> -    bool
+> -
+>  config ALLWINNER_A10_PIT
+>      bool
+>      select PTIMER
+> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+> index 9f64f6e11e..b0159189cf 100644
+> --- a/hw/timer/Makefile.objs
+> +++ b/hw/timer/Makefile.objs
+> @@ -35,8 +35,6 @@ common-obj-$(CONFIG_SH4) +=3D sh_timer.o
+>  common-obj-$(CONFIG_DIGIC) +=3D digic-timer.o
+>  common-obj-$(CONFIG_MIPS_CPS) +=3D mips_gictimer.o
+>
+> -obj-$(CONFIG_MC146818RTC) +=3D mc146818rtc.o
+> -
+>  common-obj-$(CONFIG_ALLWINNER_A10_PIT) +=3D allwinner-a10-pit.o
+>
+>  common-obj-$(CONFIG_STM32F2XX_TIMER) +=3D stm32f2xx_timer.o
+> diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
+> index 1ddae4e7d7..02bf8a8ce8 100644
+> --- a/hw/timer/hpet.c
+> +++ b/hw/timer/hpet.c
+> @@ -33,7 +33,7 @@
+>  #include "qemu/timer.h"
+>  #include "hw/timer/hpet.h"
+>  #include "hw/sysbus.h"
+> -#include "hw/timer/mc146818rtc.h"
+> +#include "hw/rtc/mc146818rtc.h"
+>  #include "migration/vmstate.h"
+>  #include "hw/timer/i8254.h"
+>
+> diff --git a/include/hw/rtc/mc146818rtc.h b/include/hw/rtc/mc146818rtc.h
+> new file mode 100644
+> index 0000000000..888e04f9ab
+> --- /dev/null
+> +++ b/include/hw/rtc/mc146818rtc.h
+> @@ -0,0 +1,38 @@
+> +/*
+> + * QEMU MC146818 RTC emulation
+> + *
+> + * Copyright (c) 2003-2004 Fabrice Bellard
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+> + * of this software and associated documentation files (the "Software"),=
+ to deal
+> + * in the Software without restriction, including without limitation the=
+ rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be includ=
+ed in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef MC146818RTC_H
+> +#define MC146818RTC_H
+> +
+> +#include "hw/isa/isa.h"
+> +#include "hw/rtc/mc146818rtc_regs.h"
+> +
+> +#define TYPE_MC146818_RTC "mc146818rtc"
+> +
+> +ISADevice *mc146818_rtc_init(ISABus *bus, int base_year,
+> +                             qemu_irq intercept_irq);
+> +void rtc_set_memory(ISADevice *dev, int addr, int val);
+> +int rtc_get_memory(ISADevice *dev, int addr);
+> +
+> +#endif /* MC146818RTC_H */
+> diff --git a/include/hw/timer/mc146818rtc_regs.h b/include/hw/rtc/mc14681=
+8rtc_regs.h
+> similarity index 98%
+> rename from include/hw/timer/mc146818rtc_regs.h
+> rename to include/hw/rtc/mc146818rtc_regs.h
+> index bfbb57e570..c4c6305473 100644
+> --- a/include/hw/timer/mc146818rtc_regs.h
+> +++ b/include/hw/rtc/mc146818rtc_regs.h
+> @@ -26,6 +26,7 @@
+>  #define MC146818RTC_REGS_H
+>
+>  #include "qemu/timer.h"
+> +#include "qemu/host-utils.h"
+>
+>  #define RTC_ISA_IRQ 8
+>
+> diff --git a/include/hw/timer/mc146818rtc.h b/include/hw/timer/mc146818rt=
+c.h
+> deleted file mode 100644
+> index fe6ed63f71..0000000000
+> --- a/include/hw/timer/mc146818rtc.h
+> +++ /dev/null
+> @@ -1,14 +0,0 @@
+> -#ifndef MC146818RTC_H
+> -#define MC146818RTC_H
+> -
+> -#include "hw/isa/isa.h"
+> -#include "hw/timer/mc146818rtc_regs.h"
+> -
+> -#define TYPE_MC146818_RTC "mc146818rtc"
+> -
+> -ISADevice *mc146818_rtc_init(ISABus *bus, int base_year,
+> -                             qemu_irq intercept_irq);
+> -void rtc_set_memory(ISADevice *dev, int addr, int val);
+> -int rtc_get_memory(ISADevice *dev, int addr);
+> -
+> -#endif /* MC146818RTC_H */
+> diff --git a/tests/rtc-test.c b/tests/rtc-test.c
+> index 6309b0ef6c..79a4ff1ed6 100644
+> --- a/tests/rtc-test.c
+> +++ b/tests/rtc-test.c
+> @@ -15,7 +15,7 @@
+>
+>  #include "libqtest-single.h"
+>  #include "qemu/timer.h"
+> -#include "hw/timer/mc146818rtc_regs.h"
+> +#include "hw/rtc/mc146818rtc_regs.h"
+>
+>  #define UIP_HOLD_LENGTH           (8 * NANOSECONDS_PER_SECOND / 32768)
+>
+> --
+> 2.20.1
+>
+>
 
