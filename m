@@ -2,87 +2,59 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC87C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:27:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5A44C49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:28:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0830C20830
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:27:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z6QiG4cz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0830C20830
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A995720830
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:28:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A995720830
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9ryf-0007Qb-8U
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 10:27:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49769)
+	id 1i9rzU-0008Ar-Ew
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 10:28:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46400)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1i9rnO-0004VM-V1
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:16:04 -0400
+ (envelope-from <david@redhat.com>) id 1i9rXR-0003oM-71
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 09:59:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1i9rnL-0006x9-Mr
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:16:02 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41185)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1i9rnL-0006we-7S
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:15:59 -0400
-Received: by mail-wr1-x443.google.com with SMTP id h7so38066956wrw.8
- for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 07:15:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=d79b3/60OcgZi0kSBOpUac2GXUI7BcbnkzcVSckh0N8=;
- b=z6QiG4cz5z1YPXxxfB10SFsVNe2Z7jRMcRTgkpEbQTpGvVB7zayX0K7NtcuhvWIOvN
- 8oLXTUJh2aGQc+F9+9tX/xBJDbqPV6eqJvGcU5NwWu2jjOhK+QA6AYEKgyR5uh743N3N
- RaGxXUZiSj9eWhut60RDy22D18jIOqhg4Vjs0syS3wQLxndoCG879Dwaimo2cCrOOqy9
- O81eJp0zmMLNuZPDx8QYqL0j5e51lcYb9CjNkttaJC0TcwmhSG4n+RXgwlt7siJQF1Ut
- iR43qwSZNkYUTbhc+V8VWsXLMjB66cIHG5kITHVOdSMoj9hvIrnnz9/ycZ3rw4vqsosY
- G3fA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=d79b3/60OcgZi0kSBOpUac2GXUI7BcbnkzcVSckh0N8=;
- b=LosfR1TeRhlrlkUneJlaZ7/DJQ38IBTbwDJaBOYuoAxAWS2SVP5T8bv2EmLoeGSTxH
- haG7vYnGg44V/pic357CeOztJV5r6mmhpWS6BA7+hLjZiBSC1KiFV71x+FUMnLoKoUNW
- WDmBctY03QPp7ooZOfYBufzxYvAwbkQeZwZ/cH97fX87yegqV4ENxBr+2lBVKf7vSSaM
- QXVHl3PaLgSKIdLPrwHCwtZDf5vetvwUkIUJXvNJ4hJLYMgVUZGaLWFF70e2SvFbQdTT
- YsQ2vESnkvRnJRukojIXuUvpsjE+hLVlnlsjipfyNSOkARt2b9iC9KmmXIXNXZfIqtDL
- hCLg==
-X-Gm-Message-State: APjAAAVGldEzO3TzX4T2xmtyPy3sC9MFB142sSwIXmbuP1232Q59CzHz
- PuQC4dl+5g+2fz4wqKZPdFRPpA==
-X-Google-Smtp-Source: APXvYqwtqQC2+RA5oqHQfLvTqxMY9Dozm/yeQNdACN+Z+mpU10ZGibo9mI3z1iVXRghRKplQJL4dEw==
-X-Received: by 2002:a5d:6ac8:: with SMTP id u8mr33141wrw.104.1568643358160;
- Mon, 16 Sep 2019 07:15:58 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s9sm15185884wme.36.2019.09.16.07.15.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Sep 2019 07:15:57 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Date: Mon, 16 Sep 2019 15:15:38 +0100
-Message-Id: <20190916141544.17540-10-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190916141544.17540-1-peter.maydell@linaro.org>
-References: <20190916141544.17540-1-peter.maydell@linaro.org>
+ (envelope-from <david@redhat.com>) id 1i9rXP-0000aM-Hk
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 09:59:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56294)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1i9rXP-0000Zn-2Q; Mon, 16 Sep 2019 09:59:31 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 178073083362;
+ Mon, 16 Sep 2019 13:59:30 +0000 (UTC)
+Received: from t460s.redhat.com (ovpn-117-103.ams2.redhat.com [10.36.117.103])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EE1FB10013A1;
+ Mon, 16 Sep 2019 13:59:27 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 16 Sep 2019 15:58:02 +0200
+Message-Id: <20190916135806.1269-26-david@redhat.com>
+In-Reply-To: <20190916135806.1269-1-david@redhat.com>
+References: <20190916135806.1269-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: [Qemu-devel] [PATCH v2 09/15] target/arm/arm-semi: Factor out
- implementation of SYS_READ
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Mon, 16 Sep 2019 13:59:30 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v3 25/29] s390x/tcg: MVN: Fault-safe handling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,120 +66,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Florian Weimer <fweimer@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ David Hildenbrand <david@redhat.com>,
+ =?UTF-8?q?Dan=20Hor=C3=A1k?= <dan@danny.cz>, Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Stefano Brivio <sbrivio@redhat.com>, qemu-s390x@nongnu.org,
+ Cole Robinson <crobinso@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Factor out the implementation of SYS_READ via the
-new function tables.
+We can process a maximum of 256 bytes, crossing two pages.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/arm/arm-semi.c | 55 +++++++++++++++++++++++++++----------------
- 1 file changed, 35 insertions(+), 20 deletions(-)
+ target/s390x/mem_helper.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-index c21cbb97bc1..958083a105c 100644
---- a/target/arm/arm-semi.c
-+++ b/target/arm/arm-semi.c
-@@ -386,6 +386,8 @@ static target_ulong arm_gdb_syscall(ARMCPU *cpu, gdb_syscall_complete_cb cb,
- typedef uint32_t sys_closefn(ARMCPU *cpu, GuestFD *gf);
- typedef uint32_t sys_writefn(ARMCPU *cpu, GuestFD *gf,
-                              target_ulong buf, uint32_t len);
-+typedef uint32_t sys_readfn(ARMCPU *cpu, GuestFD *gf,
-+                            target_ulong buf, uint32_t len);
- 
- static uint32_t host_closefn(ARMCPU *cpu, GuestFD *gf)
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 4f46d0be90..fbf65ac42b 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -494,13 +494,22 @@ void HELPER(mvcin)(CPUS390XState *env, uint32_t l, =
+uint64_t dest, uint64_t src)
+ /* move numerics  */
+ void HELPER(mvn)(CPUS390XState *env, uint32_t l, uint64_t dest, uint64_t=
+ src)
  {
-@@ -413,6 +415,27 @@ static uint32_t host_writefn(ARMCPU *cpu, GuestFD *gf,
-     return len - ret;
- }
- 
-+static uint32_t host_readfn(ARMCPU *cpu, GuestFD *gf,
-+                            target_ulong buf, uint32_t len)
-+{
-+    uint32_t ret;
-+    CPUARMState *env = &cpu->env;
-+    char *s = lock_user(VERIFY_WRITE, buf, len, 0);
-+    if (!s) {
-+        /* return bytes not read */
-+        return len;
-+    }
-+    do {
-+        ret = set_swi_errno(env, read(gf->hostfd, s, len));
-+    } while (ret == -1 && errno == EINTR);
-+    unlock_user(s, buf, len);
-+    if (ret == (uint32_t)-1) {
-+        ret = 0;
-+    }
-+    /* Return bytes not read */
-+    return len - ret;
-+}
++    const int mmu_idx =3D cpu_mmu_index(env, false);
++    S390Access srca1, srca2, desta;
+     uintptr_t ra =3D GETPC();
+     int i;
+=20
+-    for (i =3D 0; i <=3D l; i++) {
+-        uint8_t v =3D cpu_ldub_data_ra(env, dest + i, ra) & 0xf0;
+-        v |=3D cpu_ldub_data_ra(env, src + i, ra) & 0x0f;
+-        cpu_stb_data_ra(env, dest + i, v, ra);
++    /* MVN always copies one more byte than specified - maximum is 256 *=
+/
++    l++;
 +
- static uint32_t gdb_closefn(ARMCPU *cpu, GuestFD *gf)
- {
-     return arm_gdb_syscall(cpu, arm_semi_cb, "close,%x", gf->hostfd);
-@@ -426,19 +449,30 @@ static uint32_t gdb_writefn(ARMCPU *cpu, GuestFD *gf,
-                            gf->hostfd, buf, len);
- }
- 
-+static uint32_t gdb_readfn(ARMCPU *cpu, GuestFD *gf,
-+                           target_ulong buf, uint32_t len)
-+{
-+    arm_semi_syscall_len = len;
-+    return arm_gdb_syscall(cpu, arm_semi_cb, "read,%x,%x,%x",
-+                           gf->hostfd, buf, len);
-+}
++    srca1 =3D access_prepare(env, src, l, MMU_DATA_LOAD, mmu_idx, ra);
++    srca2 =3D access_prepare(env, dest, l, MMU_DATA_LOAD, mmu_idx, ra);
++    desta =3D access_prepare(env, dest, l, MMU_DATA_STORE, mmu_idx, ra);
++    for (i =3D 0; i < l; i++) {
++        const uint8_t x =3D (access_get_byte(env, &srca1, i, ra) & 0x0f)=
+ |
++                          (access_get_byte(env, &srca2, i, ra) & 0xf0);
 +
- typedef struct GuestFDFunctions {
-     sys_closefn *closefn;
-     sys_writefn *writefn;
-+    sys_readfn *readfn;
- } GuestFDFunctions;
- 
- static const GuestFDFunctions guestfd_fns[] = {
-     [GuestFDHost] = {
-         .closefn = host_closefn,
-         .writefn = host_writefn,
-+        .readfn = host_readfn,
-     },
-     [GuestFDGDB] = {
-         .closefn = gdb_closefn,
-         .writefn = gdb_writefn,
-+        .readfn = gdb_readfn,
-     },
- };
- 
-@@ -584,26 +618,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
-             return set_swi_errno(env, -1);
-         }
- 
--        if (use_gdb_syscalls()) {
--            arm_semi_syscall_len = len;
--            return arm_gdb_syscall(cpu, arm_semi_cb, "read,%x,%x,%x",
--                                   gf->hostfd, arg1, len);
--        } else {
--            s = lock_user(VERIFY_WRITE, arg1, len, 0);
--            if (!s) {
--                /* return bytes not read */
--                return len;
--            }
--            do {
--                ret = set_swi_errno(env, read(gf->hostfd, s, len));
--            } while (ret == -1 && errno == EINTR);
--            unlock_user(s, arg1, len);
--            if (ret == (uint32_t)-1) {
--                ret = 0;
--            }
--            /* Return bytes not read */
--            return len - ret;
--        }
-+        return guestfd_fns[gf->type].readfn(cpu, gf, arg1, len);
-     case TARGET_SYS_READC:
-         qemu_log_mask(LOG_UNIMP, "%s: SYS_READC not implemented", __func__);
-         return 0;
--- 
-2.20.1
++        access_set_byte(env, &desta, i, x, ra);
+     }
+ }
+=20
+--=20
+2.21.0
 
 
