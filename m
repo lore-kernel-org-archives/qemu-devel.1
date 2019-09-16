@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C776C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 21:55:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F15C49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 21:56:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54920214AF
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 21:55:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1089214AF
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 21:56:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HR9/yDBV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54920214AF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FgHr92e3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1089214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9yxi-0008P6-Gn
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 17:55:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36505)
+	id 1i9yyx-00016K-Vf
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 17:56:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36722)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1i9ytR-0004Ov-SJ
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 17:50:47 -0400
+ (envelope-from <alistair23@gmail.com>) id 1i9yuP-0005Q6-DE
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 17:51:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1i9ytQ-0004so-FD
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 17:50:45 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:37146)
+ (envelope-from <alistair23@gmail.com>) id 1i9yuO-0005Qa-CS
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 17:51:45 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:43925)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1i9ytQ-0004sN-7S; Mon, 16 Sep 2019 17:50:44 -0400
-Received: by mail-lf1-x141.google.com with SMTP id w67so1176282lff.4;
- Mon, 16 Sep 2019 14:50:44 -0700 (PDT)
+ id 1i9yuO-0005QG-4g; Mon, 16 Sep 2019 17:51:44 -0400
+Received: by mail-lj1-x244.google.com with SMTP id d5so1372045lja.10;
+ Mon, 16 Sep 2019 14:51:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=YoJRfBU5zcC9rebBXB1WKzYqvS9INh8kMdNQatVJ5kY=;
- b=HR9/yDBVYf8KwlYsfzsZHBvEj/XTkxWeRwWUrT6hujgezLXRanYnveYYmz84IxYTNf
- uqLRNTtXw22jhCQY9cgpCToUkoXk19Ypne+Xg/TMTLXOYdGpGZ9xH92YasceoYbHPyeT
- Mgsdav4hVVW+Qkvy480ZLattlHnwvq/0eWp8t9MSx6ZCrRe/EinMxlc3CsGi8zz38kla
- 2m0ywuCD+9R2o/bFuz6NVYy0GI1GzKP5ID0M3fZl654g4lIa75nWcSM8N3KoRZ/QQIp3
- fz7ira6gYDO08UGkfQ+Iy81hDlJy/Xi/zHaEv8brxcalDl5MSuZVkQFDVlLYbMMA3Neh
- HxQQ==
+ bh=dHV9MFS1O1cML6v2TCEuRoqITxao5npELaTL/5vjs70=;
+ b=FgHr92e3ijT7FCOJ/a8hwAmgbA6ELOQmGhgv5ibxF+p4CcO1hN1BCZAiouc9/c5QPC
+ P8vVShwEGbO5QtDh14fXIb5UljFRbMy0rqcw0WieFVxodMRnCiwFntQ3RJW8cvv0FdrU
+ DiHYJZKgbsivDI5wf+JdfrWJsAISfW1LKdGFQ/JTRtmyHmUAaUIyBLK1OpjOOV21jXtt
+ 2R/Gw9qE3WzSCH2Er0sGQs/s3wJBn/752fBdeyxBI7xuAJMY/D8MavIXKzRMD4qzEIdm
+ Ezpda2ZtPCR9N8i9mIF5AntIdJkLK/ljdLPEtWi4jQ+4MFwUh0gJ38qJZY/6N7MMjJBW
+ X9Gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=YoJRfBU5zcC9rebBXB1WKzYqvS9INh8kMdNQatVJ5kY=;
- b=XGn87vWUvh6QlCdptSOVKAQ42O60aRyWZmLEcY09XdyzXr9sB0moFnzXOpF5qf4hoL
- nJpZ6d7vYy7H6oRiyQRZalW8qD7M7anIh9/C5DHM2BKnH6mnXEonszHZ1bD8rzxX84T9
- z0TDGbjj8y+0W/46JQLbyjAXIby0R2xKhzrRxbPJ3fcg5pACI33l7+rRm+/5CliaefEM
- HUrj1JMqRue7L5glbqq30Sr5/nBd6YMdUoX6IDDqgK7uGM/g/TEJkHGV1SGSg2uo6Ox6
- dLB+jY5o02qWezG4mhOhc/z/TvahCmCsqG/sp8wD/q+xdoSFPSL4zmE4fsvugt6vw8/S
- vVQA==
-X-Gm-Message-State: APjAAAWi/8D72RGwTwCM/WSfAQkr79Q7plhrEfgqxtOL/DiW8CZKjbHi
- cM9FfC4OUTq+TTRkzZeqUNOPt2Uh17Cq2YKzoGk=
-X-Google-Smtp-Source: APXvYqw61Jf+aQSVBX5/swSVEBYPheP65uS9hs2E/VHzS0or0F/qHxxLRdDVvbaeFq4l3N8606k3m9m1k2QvL82F3rg=
-X-Received: by 2002:a19:f11c:: with SMTP id p28mr198168lfh.44.1568670643099;
- Mon, 16 Sep 2019 14:50:43 -0700 (PDT)
+ bh=dHV9MFS1O1cML6v2TCEuRoqITxao5npELaTL/5vjs70=;
+ b=frpBQejHPC+eibOVcttgjRMiI1yrmcGaZ+1ck5eE20wRVgYCR/u5kPDaiwwgd+Ls7i
+ SbMNfhxIPD3z7O0/UMCO6FtLdZP5lX173elCpaveTaNh+J1Be3paFkD0T1J1rVZS7HoJ
+ pAR6AgQv6VUU+kz26Shj1v6ExeEjGdvkUsYyR9a/lMhx5SYSxmRLD7142UiDdstrLyWw
+ wXWpF+5sX0U/mUek3qZfAvTA8yV4TbchAGyaNqob3Y6CxBBTF2fGlE0XxyKKCrEy85m+
+ jS6gHlE3CbWkgJ3538Y1bDFdbGKwYZ8Zn2oZZhIeu4uRchY8FPYskluCjEbHTvHl8+HJ
+ irHA==
+X-Gm-Message-State: APjAAAX1HRhr1adQBAz152E4v+0pVADSEuxIPowBZ8cqdNfZ7UIgab1u
+ 2BcA5F+GjASgFWFkAHgCWH18vPF6qmfkZ6RWBLQ=
+X-Google-Smtp-Source: APXvYqytQKBSfFLF1EvownTgtzirpKMW4GHWAj4YBz/BRi/fG2HYJVfZcjGcnSqQ+TOgHo/g6rtKCg5sdX6Rgsf1Vzs=
+X-Received: by 2002:a2e:81d1:: with SMTP id s17mr47515ljg.94.1568670702940;
+ Mon, 16 Sep 2019 14:51:42 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190916154847.28936-1-philmd@redhat.com>
- <20190916154847.28936-12-philmd@redhat.com>
-In-Reply-To: <20190916154847.28936-12-philmd@redhat.com>
+ <20190916154847.28936-14-philmd@redhat.com>
+In-Reply-To: <20190916154847.28936-14-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 16 Sep 2019 14:46:12 -0700
-Message-ID: <CAKmqyKNg_wofzFTLakKsq3mUiiQ0rn-or8x4mFcQHk1WN5P7Qw@mail.gmail.com>
+Date: Mon, 16 Sep 2019 14:47:11 -0700
+Message-ID: <CAKmqyKNgY8pR=U8rf7vMMDONSH2xRCz7_6ksNR0ZVupkpuKPAA@mail.gmail.com>
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::141
-Subject: Re: [Qemu-devel] [PATCH 11/13] hw: Move Aspeed RTC from hw/timer/
- to hw/rtc/ subdirectory
+X-Received-From: 2a00:1450:4864:20::244
+Subject: Re: [Qemu-devel] [PATCH 13/13] hw/rtc/xlnx-zynqmp-rtc: Remove
+ unused "ptimer.h" include
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,10 +110,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 16, 2019 at 9:17 AM Philippe Mathieu-Daud=C3=A9
+On Mon, Sep 16, 2019 at 9:46 AM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
 >
-> Move RTC devices under the hw/rtc/ subdirectory.
+> The "hw/ptimer.h" header is not used, remove it.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
@@ -122,122 +122,21 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/rtc/Makefile.objs                   | 1 +
->  hw/{timer =3D> rtc}/aspeed_rtc.c         | 2 +-
->  hw/rtc/trace-events                    | 4 ++++
->  hw/timer/Makefile.objs                 | 2 +-
->  hw/timer/trace-events                  | 4 ----
->  include/hw/arm/aspeed_soc.h            | 2 +-
->  include/hw/{timer =3D> rtc}/aspeed_rtc.h | 3 ---
->  7 files changed, 8 insertions(+), 10 deletions(-)
->  rename hw/{timer =3D> rtc}/aspeed_rtc.c (99%)
->  rename include/hw/{timer =3D> rtc}/aspeed_rtc.h (92%)
+>  hw/rtc/xlnx-zynqmp-rtc.c | 1 -
+>  1 file changed, 1 deletion(-)
 >
-> diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
-> index 3d4763fc26..8dc9fcd3a9 100644
-> --- a/hw/rtc/Makefile.objs
-> +++ b/hw/rtc/Makefile.objs
-> @@ -10,3 +10,4 @@ common-obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-zynqmp-rtc.o
->  common-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_rtc.o
->  obj-$(CONFIG_MC146818RTC) +=3D mc146818rtc.o
->  common-obj-$(CONFIG_SUN4V_RTC) +=3D sun4v-rtc.o
-> +common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_rtc.o
-> diff --git a/hw/timer/aspeed_rtc.c b/hw/rtc/aspeed_rtc.c
-> similarity index 99%
-> rename from hw/timer/aspeed_rtc.c
-> rename to hw/rtc/aspeed_rtc.c
-> index 5313017353..3ca1183558 100644
-> --- a/hw/timer/aspeed_rtc.c
-> +++ b/hw/rtc/aspeed_rtc.c
-> @@ -8,7 +8,7 @@
->
->  #include "qemu/osdep.h"
->  #include "qemu-common.h"
-> -#include "hw/timer/aspeed_rtc.h"
-> +#include "hw/rtc/aspeed_rtc.h"
->  #include "migration/vmstate.h"
+> diff --git a/hw/rtc/xlnx-zynqmp-rtc.c b/hw/rtc/xlnx-zynqmp-rtc.c
+> index f9f09b7296..2bcd14d779 100644
+> --- a/hw/rtc/xlnx-zynqmp-rtc.c
+> +++ b/hw/rtc/xlnx-zynqmp-rtc.c
+> @@ -32,7 +32,6 @@
 >  #include "qemu/log.h"
->  #include "qemu/timer.h"
-> diff --git a/hw/rtc/trace-events b/hw/rtc/trace-events
-> index 7f1945ad4c..d6749f4616 100644
-> --- a/hw/rtc/trace-events
-> +++ b/hw/rtc/trace-events
-> @@ -13,3 +13,7 @@ pl031_read(uint32_t addr, uint32_t value) "addr 0x%08x =
-value 0x%08x"
->  pl031_write(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
->  pl031_alarm_raised(void) "alarm raised"
->  pl031_set_alarm(uint32_t ticks) "alarm set for %u ticks"
-> +
-> +# aspeed-rtc.c
-> +aspeed_rtc_read(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " val=
-ue 0x%08" PRIx64
-> +aspeed_rtc_write(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " va=
-lue 0x%08" PRIx64
-> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-> index 33191d74cb..83091770df 100644
-> --- a/hw/timer/Makefile.objs
-> +++ b/hw/timer/Makefile.objs
-> @@ -29,7 +29,7 @@ common-obj-$(CONFIG_MIPS_CPS) +=3D mips_gictimer.o
->  common-obj-$(CONFIG_ALLWINNER_A10_PIT) +=3D allwinner-a10-pit.o
->
->  common-obj-$(CONFIG_STM32F2XX_TIMER) +=3D stm32f2xx_timer.o
-> -common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_timer.o aspeed_rtc.o
-> +common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_timer.o
->
->  common-obj-$(CONFIG_CMSDK_APB_TIMER) +=3D cmsdk-apb-timer.o
->  common-obj-$(CONFIG_CMSDK_APB_DUALTIMER) +=3D cmsdk-apb-dualtimer.o
-> diff --git a/hw/timer/trace-events b/hw/timer/trace-events
-> index 1459d07237..e18b87fc96 100644
-> --- a/hw/timer/trace-events
-> +++ b/hw/timer/trace-events
-> @@ -66,10 +66,6 @@ cmsdk_apb_dualtimer_read(uint64_t offset, uint64_t dat=
-a, unsigned size) "CMSDK A
->  cmsdk_apb_dualtimer_write(uint64_t offset, uint64_t data, unsigned size)=
- "CMSDK APB dualtimer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %=
-u"
->  cmsdk_apb_dualtimer_reset(void) "CMSDK APB dualtimer: reset"
->
-> -# hw/timer/aspeed-rtc.c
-> -aspeed_rtc_read(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " val=
-ue 0x%08" PRIx64
-> -aspeed_rtc_write(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " va=
-lue 0x%08" PRIx64
-> -
->  # nrf51_timer.c
->  nrf51_timer_read(uint64_t addr, uint32_t value, unsigned size) "read add=
-r 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
->  nrf51_timer_write(uint64_t addr, uint32_t value, unsigned size) "write a=
-ddr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
-> diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
-> index ab5052b12c..5a443006ed 100644
-> --- a/include/hw/arm/aspeed_soc.h
-> +++ b/include/hw/arm/aspeed_soc.h
-> @@ -17,7 +17,7 @@
->  #include "hw/misc/aspeed_sdmc.h"
->  #include "hw/misc/aspeed_xdma.h"
->  #include "hw/timer/aspeed_timer.h"
-> -#include "hw/timer/aspeed_rtc.h"
-> +#include "hw/rtc/aspeed_rtc.h"
->  #include "hw/i2c/aspeed_i2c.h"
->  #include "hw/ssi/aspeed_smc.h"
->  #include "hw/watchdog/wdt_aspeed.h"
-> diff --git a/include/hw/timer/aspeed_rtc.h b/include/hw/rtc/aspeed_rtc.h
-> similarity index 92%
-> rename from include/hw/timer/aspeed_rtc.h
-> rename to include/hw/rtc/aspeed_rtc.h
-> index 15ba42912b..156c8faee3 100644
-> --- a/include/hw/timer/aspeed_rtc.h
-> +++ b/include/hw/rtc/aspeed_rtc.h
-> @@ -8,9 +8,6 @@
->  #ifndef ASPEED_RTC_H
->  #define ASPEED_RTC_H
->
-> -#include <stdint.h>
-> -
-> -#include "hw/irq.h"
->  #include "hw/sysbus.h"
->
->  typedef struct AspeedRtcState {
+>  #include "qemu/module.h"
+>  #include "hw/irq.h"
+> -#include "hw/ptimer.h"
+>  #include "qemu/cutils.h"
+>  #include "sysemu/sysemu.h"
+>  #include "trace.h"
 > --
 > 2.20.1
 >
