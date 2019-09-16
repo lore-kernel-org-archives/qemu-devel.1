@@ -7,60 +7,59 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C76FC4CEC7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BB17C4CEC4
 	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 00:43:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50E75206A4
+	by mail.kernel.org (Postfix) with ESMTPS id 66445206C2
 	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 00:43:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="OP40yNVm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50E75206A4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="fWSvyqfL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66445206C2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57855 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9f6i-0006iM-Ch
+	id 1i9f6i-0006hw-Fw
 	for qemu-devel@archiver.kernel.org; Sun, 15 Sep 2019 20:43:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41656)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41655)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1i9f5W-0005ZJ-Hb
+ (envelope-from <dgibson@ozlabs.org>) id 1i9f5W-0005ZI-Hb
  for qemu-devel@nongnu.org; Sun, 15 Sep 2019 20:41:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1i9f5V-0005B0-7D
+ (envelope-from <dgibson@ozlabs.org>) id 1i9f5V-0005Av-6u
  for qemu-devel@nongnu.org; Sun, 15 Sep 2019 20:41:54 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:42083)
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:46723 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1i9f5U-0005AS-5O; Sun, 15 Sep 2019 20:41:53 -0400
+ id 1i9f5T-0005AP-VS; Sun, 15 Sep 2019 20:41:53 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46WnVy0DYkz9sP7; Mon, 16 Sep 2019 10:41:45 +1000 (AEST)
+ id 46WnVx68MCz9sP6; Mon, 16 Sep 2019 10:41:45 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1568594506;
- bh=m56W1yxJfNO7p4dTRcRMa/SsFj15wFdd3+lEIPlqDrM=;
+ d=gibson.dropbear.id.au; s=201602; t=1568594505;
+ bh=F+SKYAUtoXmOyCVb7aOZLPl8/ofr/GkoF83heURRA7c=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=OP40yNVmZztiJnTPbv0SVbeVv6qno2FC2wX8Hlw1EaI+FVWmJ01+vnOv6G+uuBlcl
- UteNUfE/BURYfRIHW0NcyYRomSpToSB5rYHHC4J+YS700VXg66garbDQR3xFM0c89v
- gg2l3xR9DDqqzjb66Seb1DBGMeJF7sBH5d6F9r3k=
-Date: Mon, 16 Sep 2019 10:38:49 +1000
+ b=fWSvyqfLZh+70EgsbY6W3A0GmFAbboLxoBjc2E4j0OaqVgK+m5NGS/Q7SGI6IG9qW
+ C3EStN+5ru8x0ZiLgLiLKTjw79IVHy6fB4MlxK3iwxzi1oF81ImYjorFxW62ON5+ru
+ taHlCMTicAsQGVmJGVMc6AQAJJnWLXEFbOBR0ODA=
+Date: Mon, 16 Sep 2019 10:25:07 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Message-ID: <20190916003849.GE2104@umbus.fritz.box>
-References: <20190911133937.2716-1-clg@kaod.org>
- <20190911133937.2716-2-clg@kaod.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <20190916002507.GC2104@umbus.fritz.box>
+References: <1568292868-5067-1-git-send-email-pc@us.ibm.com>
+ <c39334e3-46f9-1973-11d0-c862ce80cc8b@linaro.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Uwl7UQhJk99r8jnw"
+ protocol="application/pgp-signature"; boundary="Fig2xvG2VGoz8o/s"
 Content-Disposition: inline
-In-Reply-To: <20190911133937.2716-2-clg@kaod.org>
+In-Reply-To: <c39334e3-46f9-1973-11d0-c862ce80cc8b@linaro.org>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] spapr/irq: Introduce an
- ics_irq_free() helper
+Subject: Re: [Qemu-devel] [PATCH] ppc: Add support for 'mffsce' instruction
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,94 +71,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, "Paul A. Clarke" <pc@us.ibm.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---Uwl7UQhJk99r8jnw
-Content-Type: text/plain; charset=iso-8859-1
+--Fig2xvG2VGoz8o/s
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 11, 2019 at 03:39:36PM +0200, C=E9dric Le Goater wrote:
-> It will help us to discard interrupt numbers which have not been
-> claimed in the next patch.
+On Sat, Sep 14, 2019 at 01:00:21PM -0400, Richard Henderson wrote:
+> On 9/12/19 8:54 AM, Paul A. Clarke wrote:
+> > From: "Paul A. Clarke" <pc@us.ibm.com>
+> >=20
+> > ISA 3.0B added a set of Floating-Point Status and Control Register (FPS=
+CR)
+> > instructions: mffsce, mffscdrn, mffscdrni, mffscrn, mffscrni, mffsl.
+> > This patch adds support for 'mffsce' instruction.
+> >=20
+> > 'mffsce' is identical to 'mffs', except that it also clears the excepti=
+on
+> > enable bits in the FPSCR.
+> >=20
+> > On CPUs without support for 'mffsce' (below ISA 3.0), the
+> > instruction will execute identically to 'mffs'.
+> >=20
+> > Signed-off-by: Paul A. Clarke <pc@us.ibm.com>
+> > ---
+> >  target/ppc/translate/fp-impl.inc.c | 30 ++++++++++++++++++++++++++++++
+> >  target/ppc/translate/fp-ops.inc.c  |  2 ++
+> >  2 files changed, 32 insertions(+)
+> >=20
+> > diff --git a/target/ppc/translate/fp-impl.inc.c b/target/ppc/translate/=
+fp-impl.inc.c
+> > index 59a4faf..34edc45 100644
+> > --- a/target/ppc/translate/fp-impl.inc.c
+> > +++ b/target/ppc/translate/fp-impl.inc.c
+> > @@ -639,6 +639,36 @@ static void gen_mffsl(DisasContext *ctx)
+> >      tcg_temp_free_i64(t0);
+> >  }
+> > =20
+> > +/* mffsce */
+> > +static void gen_mffsce(DisasContext *ctx)
+> > +{
+> > +    TCGv_i64 t0;
+> > +    TCGv_i32 mask;
+> > +
+> > +    if (unlikely(!(ctx->insns_flags2 & PPC2_ISA300))) {
+> > +        return gen_mffs(ctx);
+> > +    }
+> > +
+> > +    if (unlikely(!ctx->fpu_enabled)) {
+> > +        gen_exception(ctx, POWERPC_EXCP_FPU);
+> > +        return;
+> > +    }
+> > +
+> > +    t0 =3D tcg_temp_new_i64();
+> > +
+> > +    gen_reset_fpstatus();
 >=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-Applied to ppc-for-4.2, thanks.
-
-> ---
->  include/hw/ppc/xics.h | 5 +++++
->  hw/ppc/spapr_irq.c    | 9 +++------
->  2 files changed, 8 insertions(+), 6 deletions(-)
+> Note for future cleanup: we should not need to sprinkle these all over.  =
+This
+> should be the steady-state condition after softfp exceptions have been
+> processed into powerpc exceptions, after every single fp instruction.
 >=20
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index f2a8d6a4b4f9..64a2c8862a72 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -179,6 +179,11 @@ void ics_simple_write_xive(ICSState *ics, int nr, in=
-t server,
->                             uint8_t priority, uint8_t saved_priority);
->  void ics_simple_set_irq(void *opaque, int srcno, int val);
-> =20
-> +static inline bool ics_irq_free(ICSState *ics, uint32_t srcno)
-> +{
-> +    return !(ics->irqs[srcno].flags & XICS_FLAGS_IRQ_MASK);
-> +}
-> +
->  void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
->  void icp_pic_print_info(ICPState *icp, Monitor *mon);
->  void ics_pic_print_info(ICSState *ics, Monitor *mon);
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 06fe2432bae5..d8f46b6797f8 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -114,9 +114,6 @@ static void spapr_irq_init_xics(SpaprMachineState *sp=
-apr, int nr_irqs,
->      xics_spapr_init(spapr);
->  }
-> =20
-> -#define ICS_IRQ_FREE(ics, srcno)   \
-> -    (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_MASK)))
-> -
->  static int spapr_irq_claim_xics(SpaprMachineState *spapr, int irq, bool =
-lsi,
->                                  Error **errp)
->  {
-> @@ -129,7 +126,7 @@ static int spapr_irq_claim_xics(SpaprMachineState *sp=
-apr, int irq, bool lsi,
->          return -1;
->      }
-> =20
-> -    if (!ICS_IRQ_FREE(ics, irq - ics->offset)) {
-> +    if (!ics_irq_free(ics, irq - ics->offset)) {
->          error_setg(errp, "IRQ %d is not free", irq);
->          return -1;
->      }
-> @@ -147,7 +144,7 @@ static void spapr_irq_free_xics(SpaprMachineState *sp=
-apr, int irq, int num)
->      if (ics_valid_irq(ics, irq)) {
->          trace_spapr_irq_free(0, irq, num);
->          for (i =3D srcno; i < srcno + num; ++i) {
-> -            if (ICS_IRQ_FREE(ics, i)) {
-> +            if (ics_irq_free(ics, i)) {
->                  trace_spapr_irq_free_warn(0, i);
->              }
->              memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
-> @@ -767,7 +764,7 @@ static int ics_find_free_block(ICSState *ics, int num=
-, int alignnum)
->              return -1;
->          }
->          for (i =3D first; i < first + num; ++i) {
-> -            if (!ICS_IRQ_FREE(ics, i)) {
-> +            if (!ics_irq_free(ics, i)) {
->                  break;
->              }
->          }
+> That said, you're mirroring gen_mffs here, and the cleanup should
+> happen globally.
+
+This doesn't apply, presuambly because it's on top of the other
+patch.  So I'll wait for the respin that includes the small update
+that rtc requested on that one.
+
+>=20
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>=20
+>=20
+> r~
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -167,25 +158,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Uwl7UQhJk99r8jnw
+--Fig2xvG2VGoz8o/s
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1+2ZkACgkQbDjKyiDZ
-s5I6tA//S12yz7zDmQpaswCmTerP7yZuji+Q5u0oc0/UXh+Bt5Emre1iH6s9O7Q1
-6IECz98nr3BKIw969McGvePvEquz0BXZgmVSF8EY71vAnIh3n3MdLnST87K4O0/x
-8uDhywDcKjeNyCrsAV/TIqrcQQg3NCHmTcVM+rRau/LrPhVpHd5/tAvqOrd/Yink
-puxxewKX5HGdMtO9oQ2C6Ze/aA//vi2nrx7qnkvT7jxJnQdTkBE5o+Dt/3//klMt
-CG4YjgMtDtWLoyvy7CDZ03R1kwIal9OLqQMIuziyg+izd4J1+GdVDOi0bzTnOKvx
-k5rp9JBX+SSHcJo6ku/drd2RDTR7b08Hk/7AA9W396RNV5fAYRFbQZjEfjZg3eoJ
-iYDN0p9xp1EDHHe+JI9EKCgo+FyYtOpraWiukKVePPa/k5U7CEZ6JGsogrfR46/I
-sdq7n4V7GKk0V5WTaq7TXgQotTQvDyJqjfmpmioPkWw8lG8MpihE06K5YtxqsCaT
-nTf2uiOsl4N/sKF2dAucApXA/ZiLBNV5bu8DBtzS5RwHJ687LWD4b06H9VlmY2Kg
-zLIQ8DGryisTlCbrErwSpYKEdFrsNcokGn9FteHwSf7HwsxCeW7L4XuXczmKPr9h
-x8TF5vOhL9aNkf7sboEZdisqzUAVc2oXMbPOKCTV9kNS4MZ/BXQ=
-=YXjy
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1+1mEACgkQbDjKyiDZ
+s5Iu6BAA4GDX0m6FS6W2UTg0c5uAslYcz2woT6z0dE5+Pg65B21x/xSc2Qw8QMxZ
+7SX14vZLZzAkqpjxbL/dMPIR9BYf9+qwQdnLPlb0QMxIVkAPisYhW6394dczyLg6
+XfQ3Z1dS71aLSw8uPWGzPF+hNsgrCW70W+SiPr1W0BCON64nFG5BNYVHPwubhSN4
+Fupj54igLxo7cWrU99FWWJAErb+Bn75/E47gdLtSyZei+/yZVFerv3Yy7rKsIFmi
+WOwWfb13PqKLLjZX8xWPYdNQI4tgXUXbBFqF+zoa8EXkSf6iAeNxje2iAWnyADo5
+kmroF5sHMIrrWi5+ZuIpeJpaQHiQPReDh9DFbpBl+YiHvCdy2Xp79ponwVmjYfkZ
+wLfKRB3UQBqxSWcMXA0SN9Sl8+qssxJrN82I26kAWNNRLKv4vT23eJDUIc3Ujpbh
+i4CO9U1tNHoEm7PmO6QRw3p2thc8ha0ozu2ib+bK9Z5qfFDJc4Vq0VnY8dqurHV8
+ooM5Xtqlmt7z31ZZ+NMhxwM5OJBIlUGZP+V7os8bnGm6hFlQ9rrpp8myQ4oM6xJM
+fT889HxvMZS8udbAArHTFimXOGjk+2dHzBMqCWd9xJypXDja1+u8quY6YTV1hstG
+PzZKUg+Y6njOfchna+w3wUF543WzHduGizCwrteusYJFIMF7SIc=
+=2xd5
 -----END PGP SIGNATURE-----
 
---Uwl7UQhJk99r8jnw--
+--Fig2xvG2VGoz8o/s--
 
