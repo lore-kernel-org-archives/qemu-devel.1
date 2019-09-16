@@ -2,62 +2,87 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFDB3C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:19:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF60EC49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:19:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8929721670
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:19:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8929721670
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8C49D21670
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:19:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sbvTCq9x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C49D21670
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9rqJ-0006GI-Sk
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 10:19:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46587)
+	id 1i9rqc-0006bn-H8
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 10:19:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49614)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1i9rXr-0004OM-Pg
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:00:01 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1i9rnG-0004MM-Dn
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:15:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1i9rXq-0000j9-B6
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 09:59:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38256)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1i9rXn-0000hO-Av; Mon, 16 Sep 2019 09:59:55 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9AB3618C8938;
- Mon, 16 Sep 2019 13:59:54 +0000 (UTC)
-Received: from dhcp-4-67.tlv.redhat.com (dhcp-4-67.tlv.redhat.com [10.35.4.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B60C3600C1;
- Mon, 16 Sep 2019 13:59:52 +0000 (UTC)
-Message-ID: <09fe1c9595b9435bd1f48e173c140edab5e96dc3.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Date: Mon, 16 Sep 2019 16:59:51 +0300
-In-Reply-To: <d2c07712-c292-1341-3dfb-2529e71e3744@redhat.com>
-References: <20190915203655.21638-1-mlevitsk@redhat.com>
- <d2c07712-c292-1341-3dfb-2529e71e3744@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Mon, 16 Sep 2019 13:59:54 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v7 0/3] Fix qcow2+luks corruption
- introduced by commit 8ac0f15f335
+ (envelope-from <peter.maydell@linaro.org>) id 1i9rnE-0006tT-7V
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:15:54 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33509)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1i9rnD-0006t3-O5
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:15:52 -0400
+Received: by mail-wr1-x443.google.com with SMTP id b9so5490514wrs.0
+ for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 07:15:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=QMiXNxopmp/Lfafa2rBITuXAv6CIJtSHxYMTRHI7jeA=;
+ b=sbvTCq9xJLnYTTXmU+ghUk3Ze9TNp67+MuZaKRNtNc/py54VOl3kf2F0CqwOxPR3ec
+ Nnn2nGdzip3bWKK/bzCyryi8VsVMCTfN5ceBagb2V+R5HKM8D21fFXjIpXjGML4mQXYH
+ z1tWHQL+TeHfJLnvQsf+1LxcpeTD2yNtilMN6Lc0oun+FJuQiVO4xOQCoF/kGmIXAOyM
+ NZ7XZfLko24omWFK3sDArecVfXyVT8iDDsCnsKn0U6sH7P/3+6DhdYV4CrZJCETWCRcT
+ XwrRyNyLSHYZKxIDY/WLMueSl41J4TFOSEFQaVafzZohsc6Wg/6trvZQDabxs0LbCLSH
+ /9Cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=QMiXNxopmp/Lfafa2rBITuXAv6CIJtSHxYMTRHI7jeA=;
+ b=WRpv1/jK2Te+rnhA8zgeq/l5XcbcR4dLqYRMdz6TU5xgkDwxZM7fLfMBa5pKwo5XzI
+ Tlp0bBeWF/W9MY4QuTbm/qU7s7+2CsXia4NMLbPStV+k0TCxd8w2lt77UUBCYRGIWCQ0
+ uSNrr3ufbJ2eMk80eBEOlB74Xff1FmzEoAMajxvjqpmfx2z1ZKOyfxqa+fnzg75l1JeZ
+ c5iQj54uOR27/k695Vui1h8l2tEI2Fbn9LZrjVLBHqlb3Q0eqdi6Bv1md/cCN6sFZQr/
+ Dsl8tqHY9aLgYzOzbs2pGcAh3OILwpNCn5DKp9OoFdDeIozA0T98+bQx1I5tk9j/tc6N
+ FErw==
+X-Gm-Message-State: APjAAAUbAN8mlqlYk/pbx87lrfH3d/w6lu7TbESzz8ogWFSRyNHPyS4t
+ WNTKfgi9IK4JyGrk6z4GSEomSw==
+X-Google-Smtp-Source: APXvYqyy04H7vlHdZW+qF+FUwmMKFWOPSrvWPU9/z0qU957EL/RiQ9xSxPjBdja+YcnAqursU5QUUA==
+X-Received: by 2002:a5d:4a84:: with SMTP id o4mr294643wrq.165.1568643350660;
+ Mon, 16 Sep 2019 07:15:50 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id s9sm15185884wme.36.2019.09.16.07.15.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Sep 2019 07:15:50 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Mon, 16 Sep 2019 15:15:32 +0100
+Message-Id: <20190916141544.17540-4-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190916141544.17540-1-peter.maydell@linaro.org>
+References: <20190916141544.17540-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PATCH v2 03/15] target/arm/arm-semi: Correct comment
+ about gdb syscall races
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,78 +94,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Daniel P . =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
- qemu-block@nongnu.org, qemu-stable <qemu-stable@nongnu.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2019-09-16 at 15:39 +0200, Max Reitz wrote:
-> On 15.09.19 22:36, Maxim Levitsky wrote:
-> > Commit 8ac0f15f335 accidently broke the COW of non changed areas
-> > of newly allocated clusters, when the write spans multiple clusters,
-> > and needs COW both prior and after the write.
-> > This results in 'after' COW area being encrypted with wrong
-> > sector address, which render it corrupted.
-> >=20
-> > Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=3D1745922
-> >=20
-> > CC: qemu-stable <qemu-stable@nongnu.org>
-> >=20
-> > V2: grammar, spelling and code style fixes.
-> > V3: more fixes after the review.
-> > V4: addressed review comments from Max Reitz,
-> >     and futher refactored the qcow2_co_encrypt to just take full host=
- and guest offset
-> >     which simplifies everything.
-> >=20
-> > V5: reworked the patches so one of them fixes the bug
-> >     only and other one is just refactoring
-> >=20
-> > V6: removed do_perform_cow_encrypt
-> >=20
-> > V7: removed do_perform_cow_encrypt take two, this
-> >     time I hopefully did that correctly :-)
-> >     Also updated commit names and messages a bit
->=20
-> Luckily for you (maybe), Vladimir=E2=80=99s series doesn=E2=80=98t quit=
-e pass the
-> iotests for me, so unfortunately (I find it unfortunate) I had to remov=
-e
-> it from my branch.  Thus, the conflicts are much more tame and I felt
-> comfortable taking the series to my branch (with the remaining trivial
-> conflicts resolved, and with Vladimir=E2=80=99s suggestion applied):
->=20
-> https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+In arm_gdb_syscall() we have a comment suggesting a race
+because the syscall completion callback might not happen
+before the gdb_do_syscallv() call returns. The comment is
+correct that the callback may not happen but incorrect about
+the effects. Correct it and note the important caveat that
+callers must never do any work of any kind after return from
+arm_gdb_syscall() that depends on its return value.
 
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+I'll come back to do the cleanup later, but I preferred
+not to tangle it up with the rest of the refactoring in
+this series; I also think it's probably easier done
+afterwards rather than before.
+---
+ target/arm/arm-semi.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
-First of all, Thanks!
-
-I don't know if this is luckily for me since I already rebased my series =
-on top of =20
-https://git.xanclic.moe/XanClic/qemu.git,
-and run all qcow2 iotests, and only tests=20
-162 169 194 196 234 262 failed, and I know that 162 always fails
-due to that kernel change I talked about here few days ago,
-and rest for the AF_UNIX path len, which I need to do something
-about in the long term. I sometimes do a separate build in=20
-directory which path doesn't trigger this, and sometimes,
-when I know that I haven't done significant changes to the patches,
-I just let these tests fail. In long term, maybe even in a few days
-I'll allocate some time to rethink the build environment here to
-fix that permanently.
-
-Now I am rerunning the iotests just for fun, in short enough directory
-to see if I can reproduce the failure that you had. After looking
-in your report, that iotest 026 fails, it does pass here, but
-then I am only running these iotests on my laptop so I probably
-don't trigger the race you were able to.
-
-So thanks again!
-Best regards,
-	Maxim Levitsky
-
+diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
+index 51b55816faf..302529f2278 100644
+--- a/target/arm/arm-semi.c
++++ b/target/arm/arm-semi.c
+@@ -217,10 +217,21 @@ static target_ulong arm_gdb_syscall(ARMCPU *cpu, gdb_syscall_complete_cb cb,
+     gdb_do_syscallv(cb, fmt, va);
+     va_end(va);
+ 
+-    /* FIXME: we are implicitly relying on the syscall completing
+-     * before this point, which is not guaranteed. We should
+-     * put in an explicit synchronization between this and
+-     * the callback function.
++    /*
++     * FIXME: in softmmu mode, the gdbstub will schedule our callback
++     * to occur, but will not actually call it to complete the syscall
++     * until after this function has returned and we are back in the
++     * CPU main loop. Therefore callers to this function must not
++     * do anything with its return value, because it is not necessarily
++     * the result of the syscall, but could just be the old value of X0.
++     * The only thing safe to do with this is that the callers of
++     * do_arm_semihosting() will write it straight back into X0.
++     * (In linux-user mode, the callback will have happened before
++     * gdb_do_syscallv() returns.)
++     *
++     * We should tidy this up so neither this function nor
++     * do_arm_semihosting() return a value, so the mistake of
++     * doing something with the return value is not possible to make.
+      */
+ 
+     return is_a64(env) ? env->xregs[0] : env->regs[0];
+-- 
+2.20.1
 
 
