@@ -4,74 +4,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E0BC49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 15:25:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C59FC49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 15:25:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2618214AF
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 15:25:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0804C206A4
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 15:25:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sf7JM9PU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2618214AF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AmyrUyQ6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0804C206A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9ssO-0006VZ-AS
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 11:25:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53828)
+	id 1i9ssd-0006rt-Fo
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 11:25:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53922)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1i9sD8-0006fM-1y
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:42:39 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1i9sDK-0006jR-P4
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:42:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1i9sD6-0007YE-3N
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:42:37 -0400
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:53562)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1i9sDI-0007bv-Ky
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:42:50 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37493)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1i9sD5-0007Xc-NT
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:42:36 -0400
-Received: by mail-wm1-x329.google.com with SMTP id i16so67873wmd.3
- for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 07:42:35 -0700 (PDT)
+ id 1i9sDI-0007Zz-7R
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 10:42:48 -0400
+Received: by mail-wr1-x441.google.com with SMTP id i1so38606996wro.4
+ for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 07:42:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=D4qmsiElKCvJ7YmXi8gkY9T9VEadqIQ5nlKcIn2oRS4=;
- b=sf7JM9PUZZ1w+Ggbi4daGN6FkFUNmKLHiQx/7jRT//W+PlamOjDQTjmB6r9OGGgajH
- M2ux7xQ6qqc8oL3H1qnKUeFA0CiqmqsIk0nsOGrfO+qWpAt6MvPqmbChZLOwq7rNG1dP
- k2ehW55oQAN6aYoGhJsKhuude9dwNxZA+mEs+vqmAHd1DBBzqRvwbQtbdrhepM2Cmldz
- B04qFcIyD33wxSqyGCFv7o3fiy2Gpfgqp85SbKpdexHYnyvvWnoM/ovqioUivMSg/0rv
- l3Bz1lAHgcj0qaYdiuNgMu3P/pDd6bNwdaNBikoYqnw9MnxEEWoTIXImWzML3YBD9FRR
- lSrA==
+ bh=yV/n/mgO1W/0/jiaPYcXrk5/ziKrwU2IWT+KPvHpW0I=;
+ b=AmyrUyQ6+2UsoDSk0L9O8hj9+k7/HFvVl2HZxaWSHAgVjvbGjiaDHOiTVq68F0BBbG
+ LCgXCp8FOkWH6SMvkJv2nkS43o3dd01bFoVf1MsI9/MNosi26YHsuzlU3iK23OpW5VRR
+ waN4tb9dvfY3B75BLp7z1JQBz58wRiIXxxVyIisUZUgkZDOQFs+E8PmwC2C6psdJiuRc
+ LkSdOmS9IV7yFvvX6l8OyXc7yoX8bg7gYGMEO7ZibLSGveloSrJsacvgVIos+1MDGuKb
+ SyTnN5XkVKqhECCEaSVrqGQRoKt+lmkyo4eoJf9R+9J8rXZu99sQ7zohLnsMzjevW4me
+ xItw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=D4qmsiElKCvJ7YmXi8gkY9T9VEadqIQ5nlKcIn2oRS4=;
- b=NYIyjDtmwXs9waFW6aDFHO8U1dDsdM3riUFZoFmgB+XWjWvfrEhMwyOTb3hK/b+Ol6
- aKbiiif6XaNpvs7G4tL7g1Fg0+Z7tKWG+zTBx2osRQlwRLDxv7AlT9wMYd8MjXiB/r5P
- sa3Y304EpVkX9EtbpYldOhygvf3+HSgxJLmBoPGTkjTnksqlNQDcYtVUxpAiu5LIu4Vy
- ffIVhHXdjqigqnhSTGZlueUAKkBMVTtUsY94JKTPPLEGUJS3D7cwAWkn1/1xTBcIkvFr
- 59t+3cf8emUsfoznwc6+135+0MLpZN13XltfTmVcQW4QhF0NZDh9BYkodzGSUB1vI8sr
- DzmA==
-X-Gm-Message-State: APjAAAU4vu5WlruksrQ7DXExQqu//YJWOLve1otxOyNFAUKFUj2JM5D1
- Ra+WG1PBhPvdq9s8HMVVnwXHbCHe
-X-Google-Smtp-Source: APXvYqx6Qv/0rlijM6rtXNuBgAqCYagOYVjLNHEOnKVUsYA88YIn2eQSi6hiJcJpld6OIryyttpTqg==
-X-Received: by 2002:a1c:c104:: with SMTP id r4mr74546wmf.64.1568644954351;
- Mon, 16 Sep 2019 07:42:34 -0700 (PDT)
+ bh=yV/n/mgO1W/0/jiaPYcXrk5/ziKrwU2IWT+KPvHpW0I=;
+ b=jfVgpWaWo67r4Z2/wWrKebX84Hpm+md8vabTdry0e8CO6GUXJWC0EAX1c0i9s6sY6G
+ ak9awoH+ePShSQY8X7teqPHAKqCh3sOnJHwseVQq4GPYx6gm686V3juFRXsCVvrH9Ub4
+ DY16uhBxkXfcN7GmCORb/k8gekhTBLvIn1Jn9FAiCaY0QsOEHwJHgP4JTisOBcM5tiRl
+ +hmKOXSnpwZb0doS6menuX8BDUxHPmUTfVK9tft9ipL4T9Gu2/wSBBa9nJvbkduNQ3y2
+ Mt8EqjCS+VgxFX8BDGkODA8vMD2bd4g+P8QiczKb3tphS1WkUCDS9UkDl56QI7Kz1+vv
+ 86rw==
+X-Gm-Message-State: APjAAAW6oyu2TE2a8cDeLDCOYGqQxf3rFNYHPVuETJ53H2DwtMxIL2qU
+ BHs2aIHpThGcGlUk4a9IdT6ErnTI
+X-Google-Smtp-Source: APXvYqz1RlbjPjekDVU5ssekGTOoK/61oqbFtQyny3WCbwpm+z/DXdSo5BpNfgx9Fs8jbwA0u3wo6g==
+X-Received: by 2002:a5d:694e:: with SMTP id r14mr153953wrw.34.1568644961459;
+ Mon, 16 Sep 2019 07:42:41 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id i14sm17024298wra.78.2019.09.16.07.42.33
+ by smtp.gmail.com with ESMTPSA id i14sm17024298wra.78.2019.09.16.07.42.40
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 16 Sep 2019 07:42:33 -0700 (PDT)
+ Mon, 16 Sep 2019 07:42:40 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 16 Sep 2019 16:42:01 +0200
-Message-Id: <1568644929-9124-22-git-send-email-pbonzini@redhat.com>
+Date: Mon, 16 Sep 2019 16:42:08 +0200
+Message-Id: <1568644929-9124-29-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1568644929-9124-1-git-send-email-pbonzini@redhat.com>
 References: <1568644929-9124-1-git-send-email-pbonzini@redhat.com>
@@ -80,9 +80,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::329
-Subject: [Qemu-devel] [PULL 21/29] hw/i386/pc: Pass the CPUArchIdList array
- by argument
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PULL 28/29] hw/i386/pc: Rename
+ pc_build_feature_control() as generic fw_cfg_build_*
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,96 +101,41 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Pass the CPUArchIdList array by argument, this will
-allow us to remove the PCMachineState argument later.
+Now that the pc_build_feature_control_file() function has been
+refactored to not depend of PC specific types, rename it to a
+more generic name.
 
 Suggested-by: Samuel Ortiz <sameo@linux.intel.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190818225414.22590-8-philmd@redhat.com>
+Message-Id: <20190818225414.22590-15-philmd@redhat.com>
 ---
- hw/i386/pc.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+ hw/i386/pc.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index c0e9d83..5b3f615 100644
+index 438c485..9446596 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -937,14 +937,13 @@ static void pc_build_smbios(PCMachineState *pcms)
+@@ -1623,8 +1623,8 @@ void pc_cpus_init(PCMachineState *pcms)
+     }
  }
  
- static FWCfgState *fw_cfg_arch_create(PCMachineState *pcms,
-+                                      const CPUArchIdList *cpus,
-                                       uint16_t boot_cpus,
-                                       uint16_t apic_id_limit)
+-static void pc_build_feature_control_file(MachineState *ms,
+-                                          FWCfgState *fw_cfg)
++static void fw_cfg_build_feature_control(MachineState *ms,
++                                         FWCfgState *fw_cfg)
  {
-     FWCfgState *fw_cfg;
-     uint64_t *numa_fw_cfg;
-     int i;
--    const CPUArchIdList *cpus;
--    MachineClass *mc = MACHINE_GET_CLASS(pcms);
-     MachineState *ms = MACHINE(pcms);
-     int nb_numa_nodes = ms->numa_state->num_nodes;
- 
-@@ -964,7 +963,7 @@ static FWCfgState *fw_cfg_arch_create(PCMachineState *pcms,
-      * So for compatibility reasons with old BIOSes we are stuck with
-      * "etc/max-cpus" actually being apic_id_limit
-      */
--    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)pcms->apic_id_limit);
-+    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, apic_id_limit);
-     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
-     fw_cfg_add_bytes(fw_cfg, FW_CFG_ACPI_TABLES,
-                      acpi_tables, acpi_tables_len);
-@@ -980,20 +979,19 @@ static FWCfgState *fw_cfg_arch_create(PCMachineState *pcms,
-      * of nodes, one word for each VCPU->node and one word for each node to
-      * hold the amount of memory.
-      */
--    numa_fw_cfg = g_new0(uint64_t, 1 + pcms->apic_id_limit + nb_numa_nodes);
-+    numa_fw_cfg = g_new0(uint64_t, 1 + apic_id_limit + nb_numa_nodes);
-     numa_fw_cfg[0] = cpu_to_le64(nb_numa_nodes);
--    cpus = mc->possible_cpu_arch_ids(MACHINE(pcms));
-     for (i = 0; i < cpus->len; i++) {
-         unsigned int apic_id = cpus->cpus[i].arch_id;
--        assert(apic_id < pcms->apic_id_limit);
-+        assert(apic_id < apic_id_limit);
-         numa_fw_cfg[apic_id + 1] = cpu_to_le64(cpus->cpus[i].props.node_id);
+     X86CPU *cpu = X86_CPU(ms->possible_cpus->cpus[0].cpu);
+     CPUX86State *env = &cpu->env;
+@@ -1695,7 +1695,7 @@ void pc_machine_done(Notifier *notifier, void *data)
+     acpi_setup();
+     if (pcms->fw_cfg) {
+         fw_cfg_build_smbios(MACHINE(pcms), pcms->fw_cfg);
+-        pc_build_feature_control_file(MACHINE(pcms), pcms->fw_cfg);
++        fw_cfg_build_feature_control(MACHINE(pcms), pcms->fw_cfg);
+         /* update FW_CFG_NB_CPUS to account for -device added CPUs */
+         fw_cfg_modify_i16(pcms->fw_cfg, FW_CFG_NB_CPUS, pcms->boot_cpus);
      }
-     for (i = 0; i < nb_numa_nodes; i++) {
--        numa_fw_cfg[pcms->apic_id_limit + 1 + i] =
-+        numa_fw_cfg[apic_id_limit + 1 + i] =
-             cpu_to_le64(ms->numa_state->nodes[i].node_mem);
-     }
-     fw_cfg_add_bytes(fw_cfg, FW_CFG_NUMA, numa_fw_cfg,
--                     (1 + pcms->apic_id_limit + nb_numa_nodes) *
-+                     (1 + apic_id_limit + nb_numa_nodes) *
-                      sizeof(*numa_fw_cfg));
- 
-     return fw_cfg;
-@@ -1775,6 +1773,7 @@ void pc_memory_init(PCMachineState *pcms,
-     MemoryRegion *ram_below_4g, *ram_above_4g;
-     FWCfgState *fw_cfg;
-     MachineState *machine = MACHINE(pcms);
-+    MachineClass *mc = MACHINE_GET_CLASS(machine);
-     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
- 
-     assert(machine->ram_size == pcms->below_4g_mem_size +
-@@ -1808,7 +1807,6 @@ void pc_memory_init(PCMachineState *pcms,
-     if (!pcmc->has_reserved_memory &&
-         (machine->ram_slots ||
-          (machine->maxram_size > machine->ram_size))) {
--        MachineClass *mc = MACHINE_GET_CLASS(machine);
- 
-         error_report("\"-memory 'slots|maxmem'\" is not supported by: %s",
-                      mc->name);
-@@ -1871,7 +1869,8 @@ void pc_memory_init(PCMachineState *pcms,
-                                         option_rom_mr,
-                                         1);
- 
--    fw_cfg = fw_cfg_arch_create(pcms, pcms->boot_cpus, pcms->apic_id_limit);
-+    fw_cfg = fw_cfg_arch_create(pcms, mc->possible_cpu_arch_ids(machine),
-+                                pcms->boot_cpus, pcms->apic_id_limit);
- 
-     rom_set_fw(fw_cfg);
- 
 -- 
 1.8.3.1
 
