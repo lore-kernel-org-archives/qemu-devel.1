@@ -2,110 +2,99 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B598C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 12:03:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6936EC4CECD
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 12:12:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7151820665
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 12:03:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7151820665
+	by mail.kernel.org (Postfix) with ESMTPS id 34F33214AF
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 12:12:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FfzlDVGw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34F33214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9pij-00057A-IY
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 08:03:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57898)
+	id 1i9psI-0007Px-CJ
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 08:12:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59258)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1i9phE-0004Nl-L2
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 08:01:33 -0400
+ (envelope-from <philmd@redhat.com>) id 1i9prN-0006n6-15
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 08:12:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1i9ph9-000644-67
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 08:01:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54810)
+ (envelope-from <philmd@redhat.com>) id 1i9prL-0002jR-Jj
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 08:12:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32773
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1i9ph8-00062D-UX; Mon, 16 Sep 2019 08:01:27 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A2F051DD1;
- Mon, 16 Sep 2019 12:01:22 +0000 (UTC)
-Received: from [10.36.117.103] (ovpn-117-103.ams2.redhat.com [10.36.117.103])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C65E15D9DC;
- Mon, 16 Sep 2019 12:01:20 +0000 (UTC)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190906075750.14791-1-david@redhat.com>
- <20190906075750.14791-21-david@redhat.com>
- <784a16dd-9ebf-5203-e31a-aead2c219c71@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <55805887-9528-4da4-45fd-397b696ca85a@redhat.com>
-Date: Mon, 16 Sep 2019 14:01:20 +0200
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i9prL-0002jC-CV
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 08:11:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1568635918;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=17WD0nVxljDzm3o40Oz2gLib+S4SFISJaDGPpRM5RJw=;
+ b=FfzlDVGwpIPHMOxAEfXuK/RU1ypN1GHmSthi7GxqFOCFbW/HqSRZFFqo1mNla1RNWeOQ3f
+ kba0SQAMSIE+VGuS954EJH4AwXfEe5yg83pnq3G6jMO8gvRJmfzoTpjWGOr1dhAfH8UQDu
+ vz6q5jtzyBubb1tXMl9hkHs03KQLp3g=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-202-gAcSoA0vN2yxyGjYkq0WFQ-1; Mon, 16 Sep 2019 08:11:57 -0400
+Received: by mail-wr1-f71.google.com with SMTP id z8so5960052wrs.14
+ for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 05:11:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=5DVTHvqOu6nKBfLneUjMAg25wAmlgg3qXoALvsCWNGg=;
+ b=a6OctcKdeiB5956Pvo1ZpnW7fL1OgDF9VjcKTBc2fr52TNOJ/PLE2ezSGqhBIr9SjP
+ iUxntivz3YY9BBywcj1osgJl7HVXbf2wCweYrFrrDwCRoQT1ofAybxFaAeQdCuE2/wWW
+ jnZzHHr35uxoc4i1BAl3U1lyW+sHc518juknDKdjduhmCJ9Jm8L4okQx+IvwSisyrc47
+ dXUfcBgu5AjcJc+wAdun7IQKImV6si01QkVtgR8mTLq3FiCeEGg5cB5HZbOg8C5SHuil
+ mvn7uvBemvav544v6YScmcjD8Dire+kXXQkx5ZkaGphMnsNLXxOQ0/sfUDBblwNqEJq6
+ LpNQ==
+X-Gm-Message-State: APjAAAW5sWiJiE/Ntm4xmZ7ofx+yaLwIwn9HBdI8NySdVH3DV25JWEEW
+ IDrhJY8rYH4ljwDy8npbS5SK15TrhxVL3sf/ikZL4Tps8JDGqgxOExzqZxgfGl3vH3Rh507F0Hn
+ c67vJniYskJFGJRo=
+X-Received: by 2002:adf:b3c1:: with SMTP id x1mr42485418wrd.33.1568635916442; 
+ Mon, 16 Sep 2019 05:11:56 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqw/dkJujENyM7EBUHlAmYwRrfpe9awj5BVfOC5np7cHa3yTJiVX16InvvhWl/lTbB4fUUEKWQ==
+X-Received: by 2002:adf:b3c1:: with SMTP id x1mr42485407wrd.33.1568635916270; 
+ Mon, 16 Sep 2019 05:11:56 -0700 (PDT)
+Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id t203sm14007205wmf.42.2019.09.16.05.11.55
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 16 Sep 2019 05:11:55 -0700 (PDT)
+To: James Le Cuirot <chewi@gentoo.org>, qemu-devel@nongnu.org
+References: <20190914145155.19360-1-chewi@gentoo.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <6f0b46b7-6e12-55bc-9e87-6919a124c1f3@redhat.com>
+Date: Mon, 16 Sep 2019 14:11:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <784a16dd-9ebf-5203-e31a-aead2c219c71@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190914145155.19360-1-chewi@gentoo.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Mon, 16 Sep 2019 12:01:22 +0000 (UTC)
+X-MC-Unique: gAcSoA0vN2yxyGjYkq0WFQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 20/28] s390x/tcg: OC: Fault-safe handling
+X-Received-From: 205.139.110.120
+Subject: Re: [Qemu-devel] [PATCH] configure: Add xkbcommon configure options
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,34 +106,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Florian Weimer <fweimer@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Stefano Brivio <sbrivio@redhat.com>,
- qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: qemu-trivial@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11.09.19 23:26, Richard Henderson wrote:
-> On 9/6/19 3:57 AM, David Hildenbrand wrote:
->> +    srca2 = access_prepare(env, dest, l, MMU_DATA_LOAD, ra);
->> +    desta = access_prepare(env, dest, l, MMU_DATA_STORE, ra);
-> 
-> We should find a way to perform this in one step.
-> RWM isn't uncommon...
+On 9/14/19 4:51 PM, James Le Cuirot wrote:
+> This dependency is currently "automagic", which is bad for distributions.
+>=20
 
-Yes, like converting MMU_* into flags we can then process in probe_access().
+Fixes: 6a021536e23
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-> 
-> That said,
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> 
-> r~
-> 
+> Signed-off-by: James Le Cuirot <chewi@gentoo.org>
+> ---
+>  configure | 5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+> diff --git a/configure b/configure
+> index 30aad233d1..30544f52e6 100755
+> --- a/configure
+> +++ b/configure
+> @@ -1521,6 +1521,10 @@ for opt do
+>    ;;
+>    --disable-libpmem) libpmem=3Dno
+>    ;;
+> +  --enable-xkbcommon) xkbcommon=3Dyes
+> +  ;;
+> +  --disable-xkbcommon) xkbcommon=3Dno
+> +  ;;
+>    *)
+>        echo "ERROR: unknown option $opt"
+>        echo "Try '$0 --help' for more information"
+> @@ -1804,6 +1808,7 @@ disabled with --disable-FEATURE, default is enabled=
+ if available:
+>    capstone        capstone disassembler support
+>    debug-mutex     mutex debugging support
+>    libpmem         libpmem support
+> +  xkbcommon       xkbcommon support
+> =20
+>  NOTE: The object files are built at the place where configure is launche=
+d
+>  EOF
+>=20
 
-
--- 
-
-Thanks,
-
-David / dhildenb
 
