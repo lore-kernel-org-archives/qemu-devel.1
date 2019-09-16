@@ -6,55 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA64C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:11:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E70A8C49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:12:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82C20214D9
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:11:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82C20214D9
+	by mail.kernel.org (Postfix) with ESMTPS id BBC3F214D9
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 14:12:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBC3F214D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9rjM-0007sb-Px
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 10:11:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46523)
+	id 1i9rkL-0000Mn-Jo
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 10:12:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46060)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1i9rXf-00047I-Ch
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 09:59:48 -0400
+ (envelope-from <david@redhat.com>) id 1i9rWv-00032O-8O
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 09:59:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1i9rXd-0000fJ-TF
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 09:59:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46249)
+ (envelope-from <david@redhat.com>) id 1i9rWu-0000Lc-28
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 09:59:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33194)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1i9rXd-0000ep-Ch; Mon, 16 Sep 2019 09:59:45 -0400
+ id 1i9rWt-0000LF-NV; Mon, 16 Sep 2019 09:58:59 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5F28A18CB8E2;
- Mon, 16 Sep 2019 13:59:44 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E677789F39E;
+ Mon, 16 Sep 2019 13:58:58 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-117-103.ams2.redhat.com [10.36.117.103])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6548310013A1;
- Mon, 16 Sep 2019 13:59:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EAD1110013A1;
+ Mon, 16 Sep 2019 13:58:56 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 16 Sep 2019 15:58:06 +0200
-Message-Id: <20190916135806.1269-30-david@redhat.com>
+Date: Mon, 16 Sep 2019 15:57:49 +0200
+Message-Id: <20190916135806.1269-13-david@redhat.com>
 In-Reply-To: <20190916135806.1269-1-david@redhat.com>
 References: <20190916135806.1269-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Mon, 16 Sep 2019 13:59:44 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.68]); Mon, 16 Sep 2019 13:58:58 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 29/29] tests/tcg: target/s390x: Test MVO
+Subject: [Qemu-devel] [PATCH v3 12/29] s390x/tcg: MVCS/MVCP: Properly wrap
+ the length
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,56 +76,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's add the simple test based on the example from the PoP.
+... and don't perform any move in case the length is zero.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- tests/tcg/s390x/Makefile.target |  1 +
- tests/tcg/s390x/mvo.c           | 25 +++++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
- create mode 100644 tests/tcg/s390x/mvo.c
+ target/s390x/mem_helper.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefile.t=
-arget
-index 151dc075aa..6a3bfa8b29 100644
---- a/tests/tcg/s390x/Makefile.target
-+++ b/tests/tcg/s390x/Makefile.target
-@@ -6,3 +6,4 @@ TESTS+=3Dipm
- TESTS+=3Dexrl-trt
- TESTS+=3Dexrl-trtr
- TESTS+=3Dpack
-+TESTS+=3Dmvo
-diff --git a/tests/tcg/s390x/mvo.c b/tests/tcg/s390x/mvo.c
-new file mode 100644
-index 0000000000..5546fe2a97
---- /dev/null
-+++ b/tests/tcg/s390x/mvo.c
-@@ -0,0 +1,25 @@
-+#include <stdint.h>
-+#include <stdio.h>
-+
-+int main(void)
-+{
-+    uint8_t dest[6] =3D {0xff, 0x77, 0x88, 0x99, 0x0c, 0xff};
-+    uint8_t src[5] =3D {0xee, 0x12, 0x34, 0x56, 0xee};
-+    uint8_t expected[6] =3D {0xff, 0x01, 0x23, 0x45, 0x6c, 0xff};
-+    int i;
-+
-+    asm volatile (
-+        "    mvo 0(4,%[dest]),0(3,%[src])\n"
-+        :
-+        : [dest] "d" (dest + 1),
-+          [src] "d" (src + 1)
-+        : "memory");
-+
-+    for (i =3D 0; i < sizeof(expected); i++) {
-+        if (dest[i] !=3D expected[i]) {
-+            fprintf(stderr, "bad data\n");
-+            return 1;
-+        }
-+    }
-+    return 0;
-+}
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 320e9ee65c..41d7336a1a 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -1980,10 +1980,13 @@ uint32_t HELPER(mvcs)(CPUS390XState *env, uint64_=
+t l, uint64_t a1, uint64_t a2)
+         s390_program_interrupt(env, PGM_SPECIAL_OP, ILEN_AUTO, ra);
+     }
+=20
++    l =3D wrap_length32(env, l);
+     if (l > 256) {
+         /* max 256 */
+         l =3D 256;
+         cc =3D 3;
++    } else if (!l) {
++        return cc;
+     }
+=20
+     /* XXX replace w/ memcpy */
+@@ -2009,10 +2012,13 @@ uint32_t HELPER(mvcp)(CPUS390XState *env, uint64_=
+t l, uint64_t a1, uint64_t a2)
+         s390_program_interrupt(env, PGM_SPECIAL_OP, ILEN_AUTO, ra);
+     }
+=20
++    l =3D wrap_length32(env, l);
+     if (l > 256) {
+         /* max 256 */
+         l =3D 256;
+         cc =3D 3;
++    } else if (!l) {
++        return cc;
+     }
+=20
+     /* XXX replace w/ memcpy */
 --=20
 2.21.0
 
