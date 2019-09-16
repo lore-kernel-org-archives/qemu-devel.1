@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE296C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:38:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C26EC49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:40:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A299C214D9
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:38:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A299C214D9
+	by mail.kernel.org (Postfix) with ESMTPS id D760A21852
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 16:40:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D760A21852
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9u19-0004bV-PH
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 12:38:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35615)
+	id 1i9u37-0006ej-Lo
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 12:40:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35663)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i9tHb-0001pG-R4
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:51:20 -0400
+ (envelope-from <philmd@redhat.com>) id 1i9tHq-0002BL-MQ
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:51:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i9tHa-0002DK-Jw
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:51:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27876)
+ (envelope-from <philmd@redhat.com>) id 1i9tHp-0002Hh-9l
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 11:51:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42018)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1i9tHY-0002CV-4W; Mon, 16 Sep 2019 11:51:16 -0400
+ id 1i9tHm-0002GI-Mh; Mon, 16 Sep 2019 11:51:30 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 38CBC3082145;
- Mon, 16 Sep 2019 15:51:15 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id BDB5A81DEC;
+ Mon, 16 Sep 2019 15:51:29 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-115.brq.redhat.com [10.40.204.115])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E644719C4F;
- Mon, 16 Sep 2019 15:50:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0526719C4F;
+ Mon, 16 Sep 2019 15:51:15 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 16 Sep 2019 17:48:41 +0200
-Message-Id: <20190916154847.28936-8-philmd@redhat.com>
+Date: Mon, 16 Sep 2019 17:48:42 +0200
+Message-Id: <20190916154847.28936-9-philmd@redhat.com>
 In-Reply-To: <20190916154847.28936-1-philmd@redhat.com>
 References: <20190916154847.28936-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Mon, 16 Sep 2019 15:51:15 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Mon, 16 Sep 2019 15:51:30 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 07/13] hw: Move TWL92230 device from hw/timer/
- to hw/rtc/ subdirectory
+Subject: [Qemu-devel] [PATCH 08/13] hw: Move DS1338 device from hw/timer/ to
+ hw/rtc/ subdirectory
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,91 +88,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The TWL92230 is an "energy management device" companion with
-a RTC. Since we mostly model the RTC, move it under the hw/rtc/
-subdirectory.
+The DS1338 is a Real Time Clock, not a timer.
+Move it under the hw/rtc/ subdirectory.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- MAINTAINERS                  | 2 +-
- hw/rtc/Kconfig               | 4 ++++
- hw/rtc/Makefile.objs         | 1 +
- hw/{timer =3D> rtc}/twl92230.c | 0
- hw/timer/Kconfig             | 4 ----
- hw/timer/Makefile.objs       | 1 -
- 6 files changed, 6 insertions(+), 6 deletions(-)
- rename hw/{timer =3D> rtc}/twl92230.c (100%)
+ hw/rtc/Kconfig             | 4 ++++
+ hw/rtc/Makefile.objs       | 1 +
+ hw/{timer =3D> rtc}/ds1338.c | 0
+ hw/timer/Kconfig           | 4 ----
+ hw/timer/Makefile.objs     | 1 -
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+ rename hw/{timer =3D> rtc}/ds1338.c (100%)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index fb9a1ed075..d17058264b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -663,7 +663,7 @@ F: hw/display/blizzard.c
- F: hw/input/lm832x.c
- F: hw/input/tsc2005.c
- F: hw/misc/cbus.c
--F: hw/timer/twl92230.c
-+F: hw/rtc/twl92230.c
- F: include/hw/display/blizzard.h
- F: include/hw/input/tsc2xxx.h
- F: include/hw/misc/cbus.h
 diff --git a/hw/rtc/Kconfig b/hw/rtc/Kconfig
-index cc7fead764..dff9d60946 100644
+index dff9d60946..45daa8d655 100644
 --- a/hw/rtc/Kconfig
 +++ b/hw/rtc/Kconfig
-@@ -8,6 +8,10 @@ config M48T59
- config PL031
-     bool
-=20
-+config TWL92230
+@@ -1,3 +1,7 @@
++config DS1338
 +    bool
 +    depends on I2C
 +
- config MC146818RTC
+ config M41T80
      bool
-=20
+     depends on I2C
 diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
-index 4621b37bc2..810a38ee7b 100644
+index 810a38ee7b..b195863291 100644
 --- a/hw/rtc/Makefile.objs
 +++ b/hw/rtc/Makefile.objs
-@@ -4,5 +4,6 @@ ifeq ($(CONFIG_ISA_BUS),y)
- common-obj-$(CONFIG_M48T59) +=3D m48t59-isa.o
- endif
- common-obj-$(CONFIG_PL031) +=3D pl031.o
-+common-obj-$(CONFIG_TWL92230) +=3D twl92230.o
- obj-$(CONFIG_MC146818RTC) +=3D mc146818rtc.o
- common-obj-$(CONFIG_SUN4V_RTC) +=3D sun4v-rtc.o
-diff --git a/hw/timer/twl92230.c b/hw/rtc/twl92230.c
+@@ -1,3 +1,4 @@
++common-obj-$(CONFIG_DS1338) +=3D ds1338.o
+ common-obj-$(CONFIG_M41T80) +=3D m41t80.o
+ common-obj-$(CONFIG_M48T59) +=3D m48t59.o
+ ifeq ($(CONFIG_ISA_BUS),y)
+diff --git a/hw/timer/ds1338.c b/hw/rtc/ds1338.c
 similarity index 100%
-rename from hw/timer/twl92230.c
-rename to hw/rtc/twl92230.c
+rename from hw/timer/ds1338.c
+rename to hw/rtc/ds1338.c
 diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
-index b04c928136..9357875f28 100644
+index 9357875f28..a990f9fe35 100644
 --- a/hw/timer/Kconfig
 +++ b/hw/timer/Kconfig
-@@ -20,10 +20,6 @@ config HPET
- config I8254
+@@ -9,10 +9,6 @@ config ARM_MPTIMER
+ config A9_GTIMER
      bool
 =20
--config TWL92230
+-config DS1338
 -    bool
 -    depends on I2C
 -
- config ALTERA_TIMER
+ config HPET
      bool
-     select PTIMER
+     default y if PC
 diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index 034bd30255..23be70b71d 100644
+index 23be70b71d..70b61b69c7 100644
 --- a/hw/timer/Makefile.objs
 +++ b/hw/timer/Makefile.objs
-@@ -7,7 +7,6 @@ common-obj-$(CONFIG_DS1338) +=3D ds1338.o
+@@ -3,7 +3,6 @@ common-obj-$(CONFIG_ARM_MPTIMER) +=3D arm_mptimer.o
+ common-obj-$(CONFIG_ARM_V7M) +=3D armv7m_systick.o
+ common-obj-$(CONFIG_A9_GTIMER) +=3D a9gtimer.o
+ common-obj-$(CONFIG_CADENCE) +=3D cadence_ttc.o
+-common-obj-$(CONFIG_DS1338) +=3D ds1338.o
  common-obj-$(CONFIG_HPET) +=3D hpet.o
  common-obj-$(CONFIG_I8254) +=3D i8254_common.o i8254.o
  common-obj-$(CONFIG_PUV3) +=3D puv3_ost.o
--common-obj-$(CONFIG_TWL92230) +=3D twl92230.o
- common-obj-$(CONFIG_XILINX) +=3D xilinx_timer.o
- common-obj-$(CONFIG_SLAVIO) +=3D slavio_timer.o
- common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_timer.o
 --=20
 2.20.1
 
