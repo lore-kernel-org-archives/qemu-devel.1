@@ -2,89 +2,90 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C71F8C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 09:29:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A738C49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 09:37:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C0B720678
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 09:29:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C0B720678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D0D67206C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 09:37:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0D67206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9nJo-0002aE-Oh
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 05:29:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39225)
+	id 1i9nRc-0007VI-8D
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 05:37:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40423)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i9nJ7-0002Af-W5
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 05:28:31 -0400
+ (envelope-from <bala24@linux.ibm.com>) id 1i9nPj-0005ml-Bq
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 05:35:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i9nJ6-0008R5-7r
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 05:28:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33908)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i9nJ5-0008Qp-Rl
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 05:28:28 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A809283F3C
- for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 09:28:26 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id o16so4059433wru.10
- for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 02:28:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=su84Z6hmzpc7w8nvN+8CaKj9CdVf1E8dnnHZjR7Vk8U=;
- b=YZhG09BZyTWvyEYpFbLtLVMTZSCrUQG1mAmcaAmUNVWEK2GRTGZyTafTT5N5DGpShU
- G/vW0OwmHGz1/rFaDQj2IYedDOaamsRICDR4fCJSSBYRaoLlYfOOMVVFcWDVgq0NBp68
- zDqeiJcRNkFdagr2kqnblgakhP7NeALxaAtp35iPIgzok5OGqToEMdcjrKk0O7R7Zet1
- dAJm1hs1QFqy/Nr2N6gNEWS4uctl61awmczaajqNkvBA1+i5TlShnvLvKKZ7U2VHAYcl
- ONYPvTn6VX6Mogl6GCfrUDAwq2iO1P+BqIj+t0LjLUKgPxiZgdSrlnd+44+1T9DGYkRx
- eoSw==
-X-Gm-Message-State: APjAAAXTbHmGZl8xloxUxmhV5c0DJULavIl2gZNgw4MEMK4eUmIJkDmk
- vNRqoW1p2hcbPkjQCfjM68OmbXcKk0ijmvhLRRISQUZM75R9rIctU7SpTGUbR+IUwDSkhoU0182
- kb363G015AgaYjFI=
-X-Received: by 2002:a5d:428c:: with SMTP id k12mr19214380wrq.196.1568626105291; 
- Mon, 16 Sep 2019 02:28:25 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxD4ep20EwoAa0OmwBy/D2QD+wdZPEitc/x6YcwP5wUXXYn5/vk4wyXB5OdwvK0v0RkTZ1xFQ==
-X-Received: by 2002:a5d:428c:: with SMTP id k12mr19214365wrq.196.1568626105101; 
- Mon, 16 Sep 2019 02:28:25 -0700 (PDT)
-Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id g201sm14914762wmg.34.2019.09.16.02.28.23
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 16 Sep 2019 02:28:24 -0700 (PDT)
-To: David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20190915211940.30427-1-f4bug@amsat.org>
- <20190916004242.GF2104@umbus.fritz.box>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <331a9dc2-d79c-3f29-d818-3df74222425b@redhat.com>
-Date: Mon, 16 Sep 2019 11:28:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20190916004242.GF2104@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] tests/acceptance: Add tests for the
- PReP/40p machine
+ (envelope-from <bala24@linux.ibm.com>) id 1i9nPi-0002uN-7M
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 05:35:19 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:29962)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <bala24@linux.ibm.com>)
+ id 1i9nPh-0002pK-Vl
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 05:35:18 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x8G9XPvr040020
+ for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 05:35:13 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2v26vtt76x-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 05:35:13 -0400
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <bala24@linux.ibm.com>;
+ Mon, 16 Sep 2019 10:35:10 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 16 Sep 2019 10:35:06 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x8G9Z5wr56950912
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 16 Sep 2019 09:35:05 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id BC7B4A405F;
+ Mon, 16 Sep 2019 09:35:05 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5987BA405C;
+ Mon, 16 Sep 2019 09:35:03 +0000 (GMT)
+Received: from dhcp-9-120-237-81.in.ibm.com (unknown [9.120.237.81])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon, 16 Sep 2019 09:35:03 +0000 (GMT)
+From: Balamuruhan S <bala24@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 16 Sep 2019 15:04:42 +0530
+X-Mailer: git-send-email 2.14.5
+X-TM-AS-GCONF: 00
+x-cbid: 19091609-0016-0000-0000-000002AC8277
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19091609-0017-0000-0000-0000330D1FBD
+Message-Id: <20190916093445.20507-1-bala24@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-16_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=61
+ priorityscore=1501
+ malwarescore=0 suspectscore=6 phishscore=0 bulkscore=0 spamscore=61
+ clxscore=1015 lowpriorityscore=0 mlxscore=61 impostorscore=0
+ mlxlogscore=-19 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909160102
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel]  [PATCH 0/3] Add acceptance test for migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,74 +97,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Cleber Rosa <crosa@redhat.com>, qemu-ppc@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: ehabkost@redhat.com, ccarrara@redhat.com, groug@kaod.org,
+ Balamuruhan S <bala24@linux.ibm.com>, sathnaga@linux.vnet.ibm.com,
+ clg@kaod.org, crosa@redhat.com, qemu-ppc@nongnu.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi David,
+Add new test for migration that bringup vm with different machine types
+and migrate it, introduce new API in avocado_qemu to query all the machine
+types supported by qemu.
 
-On 9/16/19 2:42 AM, David Gibson wrote:
-> On Sun, Sep 15, 2019 at 11:19:34PM +0200, Philippe Mathieu-Daud=E9 wrot=
-e:
->> Quick tests worth to avoid regressions with the 40p machine.
->> idea from the "Maintainers, please tell us how to boot your machines"
->> thread:
->> https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg04177.html
->>
->> v2: Split Travis job, added Herv=E9 R-b tag
->> v1: https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg05896.htm=
-l
->>
->> Regards,
->>
->> Phil.
->=20
-> I'm guessing you're expecting these to go in via the testing tree, in
-> which case
->=20
-> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Test run:
 
-Thanks, appreciated :)
+# avocado run migration.py
+JOB ID     : ef54f57a073eb267d2347e32225f2adbe27969de
+JOB LOG    : 
+/home/bala/avocado-fvt-wrapper/results/job-2019-08-05T13.54-ef54f57/job.log
+ (1/2) migration.py:Migration.test_migration_with_tcp_localhost: PASS
+(0.54 s)
+ (2/2) migration.py:Migration.test_migration_with_machine_types: PASS
+(5.21 s)
+RESULTS    : PASS 2 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 |
+CANCEL 0
+JOB TIME   : 5.86 s
 
-> Or do you want me to take them via the ppc tree?
+Currently acceptance test for migration error out as we check
+`query-migrate` in target after migration which is not appropriate.
 
-I think the 'testing tree' should focus on the CI/testing
-infrastructure, while each subsystem maintainers should care about the
-tests covering their subsystem (the testing tree maintainers might not
-have the required knowledge to be sure a test is correctly implemented).
+Balamuruhan S (3):
+  tests/acceptance/migration: fix post migration check
+  tests/acceptance/avocado_qemu: add method to get supported machine
+    types
+  tests/acceptance/migration: test to migrate will all machine types
 
-In this particular case I assume you don't have much knowledge of that
-PPC machine, which is a hobbyist one, but since you are the PPC
-maintainer, I'd rather see this going via your tree :)
+ tests/acceptance/avocado_qemu/__init__.py |  6 ++++++
+ tests/acceptance/migration.py             | 27 ++++++++++++++++++++++++++-
+ 2 files changed, 32 insertions(+), 1 deletion(-)
 
-Alex/Cleber/Eduardo, any comment on this position?
+-- 
+2.14.5
 
-Thanks,
-
-Phil.
-
->> Philippe Mathieu-Daud=E9 (6):
->>   tests/acceptance: Add test that runs NetBSD 4.0 installer on PRep/40=
-p
->>   tests/acceptance: Test Open Firmware on the PReP/40p
->>   tests/acceptance: Test OpenBIOS on the PReP/40p
->>   tests/acceptance: Test Sandalfoot initrd on the PReP/40p
->>   .travis.yml: Let the avocado job run the 40p tests
->>   .travis.yml: Split enterprise vs. hobbyist acceptance test job
->>
->>  .travis.yml                      |  18 +++-
->>  MAINTAINERS                      |   1 +
->>  tests/acceptance/ppc_prep_40p.py | 150 ++++++++++++++++++++++++++++++=
-+
->>  3 files changed, 167 insertions(+), 2 deletions(-)
->>  create mode 100644 tests/acceptance/ppc_prep_40p.py
->>
->=20
 
