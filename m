@@ -2,89 +2,65 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5025EC49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 09:57:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DAE5C49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 10:03:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28000206A4
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 09:57:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28000206A4
+	by mail.kernel.org (Postfix) with ESMTPS id 3112F2067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 10:03:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3112F2067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9nl3-0004h9-A2
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 05:57:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43770)
+	id 1i9nqv-0006rH-DD
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 06:03:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44376)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1i9njx-0003V4-5r
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 05:56:14 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1i9noR-0005oh-En
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 06:00:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1i9njv-0002vS-B9
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 05:56:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50982)
+ (envelope-from <dgilbert@redhat.com>) id 1i9noL-0004zK-1j
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 06:00:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41738)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1i9njv-0002v8-43
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 05:56:11 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1i9noK-0004z5-QG
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 06:00:44 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 33B2937E88
- for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 09:56:10 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id m14so4282671wru.17
- for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 02:56:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Ka1NNKZ9FyRyl5DdCkNNqBxZCHj3VNnYXG0utcjVjkU=;
- b=CT4fOLOMp3tT64ncCiHsncxqR5cNEb1ypUJ6WFkC9evpyq2XW4vJqZvf0MJudVwcDQ
- 949/k2fO4d9tMU2KEqMWyqcuMBwQC2/gRNJlbEzla3pnIB9xHRL3eF6OYY9R6hT1AMtt
- PSwMbc37fy/JFto3hbiu+QKy8Ruw+7/6NLor0MFc0oSn5FMYP+SwQhp+WBDGew464p5k
- YmpqbrSBR1inCTCYLpOQbej512s2XTwl0vdI6TRHTc4WmVGabhIf7weoubAFZKdgm0Ke
- QrHSdcPNpZtUV50upK6M/D6qGIZTjANBYY8qKpUCd5q13cge2VhyLmyvkWeJ4fiQsqdE
- t9dQ==
-X-Gm-Message-State: APjAAAWQPqUziC7x2JBTYDOjgj6cdB9vLNyl5lEQKvUMEx+zC08DMdV2
- dtyEDI9rB+DfRtYtVU11NuSjhozaaGOQkgakADBgLin1xD8bKR9lBYw84GifT78kEs1HWCVhvlv
- d7eTcoo/GLnCfUV8=
-X-Received: by 2002:a5d:6647:: with SMTP id f7mr49150740wrw.170.1568627768809; 
- Mon, 16 Sep 2019 02:56:08 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwi8PGh8Sc6+EQ4LN7O+fOBxnQvTqFVB1ARTvU95wiiIjo4TpUGc+0Q/epriREgOFIBJexJcQ==
-X-Received: by 2002:a5d:6647:: with SMTP id f7mr49150719wrw.170.1568627768602; 
- Mon, 16 Sep 2019 02:56:08 -0700 (PDT)
-Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id s9sm14067887wme.36.2019.09.16.02.56.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 16 Sep 2019 02:56:08 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20190915211940.30427-1-f4bug@amsat.org>
- <20190916004242.GF2104@umbus.fritz.box>
- <331a9dc2-d79c-3f29-d818-3df74222425b@redhat.com> <87lfuo1sbp.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <02b9bc89-eee6-493d-3e3c-ae75b6c24657@redhat.com>
-Date: Mon, 16 Sep 2019 11:56:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 15F3318C4278
+ for <qemu-devel@nongnu.org>; Mon, 16 Sep 2019 10:00:44 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.13])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EFEC45D9E1;
+ Mon, 16 Sep 2019 10:00:37 +0000 (UTC)
+Date: Mon, 16 Sep 2019 11:00:35 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ stefanha@redhat.com
+Message-ID: <20190916100035.GC2887@work-vm>
+References: <20190912122514.22504-1-marcandre.lureau@redhat.com>
+ <20190912122514.22504-6-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87lfuo1sbp.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190912122514.22504-6-marcandre.lureau@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Mon, 16 Sep 2019 10:00:44 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] tests/acceptance: Add tests for the
- PReP/40p machine
+Subject: Re: [Qemu-devel] [PATCH v3 5/6] docs: start a document to describe
+ D-Bus usage
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,93 +72,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Thomas Huth <huth@tuxfamily.org>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Kamil Rytarowski <kamil@netbsd.org>, qemu-ppc@nongnu.org,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: mprivozn@redhat.com, pbonzini@redhat.com, berrange@redhat.com,
+ qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/16/19 11:52 AM, Alex Benn=C3=A9e wrote:
->=20
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->=20
->> Hi David,
->>
->> On 9/16/19 2:42 AM, David Gibson wrote:
->>> On Sun, Sep 15, 2019 at 11:19:34PM +0200, Philippe Mathieu-Daud=C3=A9=
- wrote:
->>>> Quick tests worth to avoid regressions with the 40p machine.
->>>> idea from the "Maintainers, please tell us how to boot your machines=
-"
->>>> thread:
->>>> https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg04177.html
->>>>
->>>> v2: Split Travis job, added Herv=C3=A9 R-b tag
->>>> v1: https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg05896.h=
-tml
->>>>
->>>> Regards,
->>>>
->>>> Phil.
->>>
->>> I'm guessing you're expecting these to go in via the testing tree, in
->>> which case
->>>
->>> Acked-by: David Gibson <david@gibson.dropbear.id.au>
->>
->> Thanks, appreciated :)
->>
->>> Or do you want me to take them via the ppc tree?
->>
->> I think the 'testing tree' should focus on the CI/testing
->> infrastructure, while each subsystem maintainers should care about the
->> tests covering their subsystem (the testing tree maintainers might not
->> have the required knowledge to be sure a test is correctly implemented=
-).
->>
->> In this particular case I assume you don't have much knowledge of that
->> PPC machine, which is a hobbyist one, but since you are the PPC
->> maintainer, I'd rather see this going via your tree :)
->>
->> Alex/Cleber/Eduardo, any comment on this position?
->=20
-> Once we have a .travis.yml I'm happy with it can go in via another tree
-> no problem. See other thread....
+(Copying in Stefan since he was looking at DBus for virtiofs)
 
-Good :)
-
-David can take patches 1-5 (I tagged patch 6 as RFC but messed something
-with git-publish and lost it when I sent this series).
-
-Thanks!
-
->>>> Philippe Mathieu-Daud=C3=A9 (6):
->>>>   tests/acceptance: Add test that runs NetBSD 4.0 installer on PRep/=
-40p
->>>>   tests/acceptance: Test Open Firmware on the PReP/40p
->>>>   tests/acceptance: Test OpenBIOS on the PReP/40p
->>>>   tests/acceptance: Test Sandalfoot initrd on the PReP/40p
->>>>   .travis.yml: Let the avocado job run the 40p tests
->>>>   .travis.yml: Split enterprise vs. hobbyist acceptance test job
->>>>
->>>>  .travis.yml                      |  18 +++-
->>>>  MAINTAINERS                      |   1 +
->>>>  tests/acceptance/ppc_prep_40p.py | 150 ++++++++++++++++++++++++++++=
-+++
->>>>  3 files changed, 167 insertions(+), 2 deletions(-)
->>>>  create mode 100644 tests/acceptance/ppc_prep_40p.py
->>>>
->>>
+* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  docs/interop/dbus.rst  | 73 ++++++++++++++++++++++++++++++++++++++++++
+>  docs/interop/index.rst |  1 +
+>  2 files changed, 74 insertions(+)
+>  create mode 100644 docs/interop/dbus.rst
 >=20
+> diff --git a/docs/interop/dbus.rst b/docs/interop/dbus.rst
+> new file mode 100644
+> index 0000000000..c08f026edc
+> --- /dev/null
+> +++ b/docs/interop/dbus.rst
+> @@ -0,0 +1,73 @@
+> +=3D=3D=3D=3D=3D
+> +D-Bus
+> +=3D=3D=3D=3D=3D
+> +
+> +Introduction
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +QEMU may be running with various helper processes involved:
+> + - vhost-user* processes (gpu, virtfs, input, etc...)
+> + - TPM emulation (or other devices)
+> + - user networking (slirp)
+> + - network services (DHCP/DNS, samba/ftp etc)
+> + - background tasks (compression, streaming etc)
+> + - client UI
+> + - admin & cli
+> +
+> +Having several processes allows stricter security rules, as well as
+> +greater modularity.
+> +
+> +While QEMU itself uses QMP as primary IPC (and Spice/VNC for remote
+> +display), D-Bus is the de facto IPC of choice on Unix systems. The
+> +wire format is machine friendly, good bindings exist for various
+> +languages, and there are various tools available.
+> +
+> +Using a bus, helper processes can discover and communicate with each
+> +other easily, without going through QEMU. The bus topology is also
+> +easier to apprehend and debug than a mesh. However, it is wise to
+> +consider the security aspects of it.
+> +
+> +Security
+> +=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +A QEMU D-Bus bus should be private to a single VM. Thus, only
+> +cooperative tasks are running on the same bus to serve the VM.
+> +
+> +D-Bus, the protocol and standard, doesn't have mechanisms to enforce
+> +security between peers once the connection is established. Peers may
+> +have additional mechanisms to enforce security rules, based for
+> +example on UNIX credentials.
+> +
+> +dbus-daemon can enforce various policies based on the UID/GID of the
+> +processes that are connected to it. It is thus a good idea to run
+> +helpers as different UID from QEMU and set appropriate policies (so
+> +helper processes are only allowed to talk to qemu for example).
+> +
+> +For example, this allows only ``qemu`` user to talk to ``qemu-helper``
+> +``org.qemu.Helper1`` service:
+> +
+> +.. code:: xml
+> +
+> +  <policy user=3D"qemu">
+> +     <allow send_destination=3D"org.qemu.Helper1"/>
+> +     <allow receive_sender=3D"org.qemu.Helper1"/>
+> +  </policy>
+> +
+> +  <policy user=3D"qemu-helper">
+> +     <allow own=3D"org.qemu.Helper1"/>
+> +  </policy>
+> +
+> +
+> +dbus-daemon can also perfom SELinux checks based on the security
+> +context of the source and the target. For example, ``virtiofs_t``
+> +could be allowed to send a message to ``svirt_t``, but ``virtiofs_t``
+> +wouldn't be allowed to send a message to ``virtiofs_t``.
+
+I think we need to start thinking about this more now rather than
+'can'. .
+
+Dave
+
+> +Guidelines
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +When implementing new D-Bus interfaces, it is recommended to follow
+> +the "D-Bus API Design Guidelines":
+> +https://dbus.freedesktop.org/doc/dbus-api-design.html
+> +
+> +The "org.qemu*" prefix is reserved for the QEMU project.
+> diff --git a/docs/interop/index.rst b/docs/interop/index.rst
+> index b4bfcab417..fa4478ce2e 100644
+> --- a/docs/interop/index.rst
+> +++ b/docs/interop/index.rst
+> @@ -13,6 +13,7 @@ Contents:
+>     :maxdepth: 2
+> =20
+>     bitmaps
+> +   dbus
+>     live-block-operations
+>     pr-helper
+>     vhost-user
+> --=20
+> 2.23.0
 >=20
-> --
-> Alex Benn=C3=A9e
->=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
