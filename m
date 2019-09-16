@@ -2,61 +2,84 @@ Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E77C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 17:01:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFFCAC49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 17:04:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B69692067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 17:01:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B69692067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8F2A52067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 17:04:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F2A52067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9uNu-0002Tu-Uj
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 13:01:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45428)
+	id 1i9uQN-0003up-4q
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 13:04:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49424)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1i9u3A-0007Ji-9b
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 12:40:33 -0400
+ (envelope-from <pc@us.ibm.com>) id 1i9uOu-0002xW-JR
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 13:03:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1i9u33-0007D4-6o
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 12:40:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58072)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1i9u32-0007Cp-QF
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 12:40:21 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1FB7D3CA24;
- Mon, 16 Sep 2019 16:40:20 +0000 (UTC)
-Received: from dhcp-17-173.bos.redhat.com (dhcp-17-173.bos.redhat.com
- [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DF8014510;
- Mon, 16 Sep 2019 16:40:12 +0000 (UTC)
-From: Cleber Rosa <crosa@redhat.com>
+ (envelope-from <pc@us.ibm.com>) id 1i9uOq-00009y-GE
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 13:02:56 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46878)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pc@us.ibm.com>)
+ id 1i9uOa-0008TI-R6; Mon, 16 Sep 2019 13:02:37 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x8GGvXlI037216; Mon, 16 Sep 2019 13:02:27 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2v2e5ugmk3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 16 Sep 2019 13:02:27 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x8GH1PkV021606;
+ Mon, 16 Sep 2019 17:02:26 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
+ [9.57.198.23]) by ppma01dal.us.ibm.com with ESMTP id 2v0t5tx8v6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 16 Sep 2019 17:02:26 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
+ [9.57.199.111])
+ by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x8GH2Pha35062094
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 16 Sep 2019 17:02:25 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 668BDAC05B;
+ Mon, 16 Sep 2019 17:02:25 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4AB9DAC059;
+ Mon, 16 Sep 2019 17:02:25 +0000 (GMT)
+Received: from localhost (unknown [9.41.247.5])
+ by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+ Mon, 16 Sep 2019 17:02:25 +0000 (GMT)
+From: "Paul A. Clarke" <pc@us.ibm.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 16 Sep 2019 12:40:11 -0400
-Message-Id: <20190916164011.7653-1-crosa@redhat.com>
-In-Reply-To: <252b6e94-fe8f-f9a7-0d4b-4743b1809a06@redhat.com>
-References: <252b6e94-fe8f-f9a7-0d4b-4743b1809a06@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Mon, 16 Sep 2019 16:40:20 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] Acceptance tests: refactor
- wait_for_console_pattern
+Date: Mon, 16 Sep 2019 12:02:24 -0500
+Message-Id: <1568653344-16881-1-git-send-email-pc@us.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-16_07:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=949 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909160168
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [PATCH v2 2/2] ppc: Add support for 'mffsce'
+ instruction
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,291 +91,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: richard.henderson@linaro.org, qemu-ppc@nongnu.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The same utility method is already present in two different test
-files, so let's consolidate it into a single utility function.
+From: "Paul A. Clarke" <pc@us.ibm.com>
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
+ISA 3.0B added a set of Floating-Point Status and Control Register (FPSCR)
+instructions: mffsce, mffscdrn, mffscdrni, mffscrn, mffscrni, mffsl.
+This patch adds support for 'mffsce' instruction.
+
+'mffsce' is identical to 'mffs', except that it also clears the exception
+enable bits in the FPSCR.
+
+On CPUs without support for 'mffsce' (below ISA 3.0), the
+instruction will execute identically to 'mffs'.
+
+Signed-off-by: Paul A. Clarke <pc@us.ibm.com>
 ---
- tests/acceptance/avocado_qemu/__init__.py | 26 +++++++++++++
- tests/acceptance/boot_linux_console.py    | 47 +++++++----------------
- tests/acceptance/linux_ssh_mips_malta.py  | 18 ++-------
- 3 files changed, 42 insertions(+), 49 deletions(-)
+v2: no changes.
 
-diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance=
-/avocado_qemu/__init__.py
-index bd41e0443c..a0fe16e47f 100644
---- a/tests/acceptance/avocado_qemu/__init__.py
-+++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -8,6 +8,7 @@
- # This work is licensed under the terms of the GNU GPL, version 2 or
- # later.  See the COPYING file in the top-level directory.
-=20
-+import logging
- import os
- import sys
- import uuid
-@@ -53,6 +54,31 @@ def pick_default_qemu_bin(arch=3DNone):
-         return qemu_bin_from_src_dir_path
-=20
-=20
-+def wait_for_console_pattern(test, success_message,
-+                             failure_message=3D'Kernel panic - not synci=
-ng'):
-+    """
-+    Waits for messages to appear on the console, while logging the conte=
-nt
+ target/ppc/translate/fp-impl.inc.c | 30 ++++++++++++++++++++++++++++++
+ target/ppc/translate/fp-ops.inc.c  |  2 ++
+ 2 files changed, 32 insertions(+)
+
+diff --git a/target/ppc/translate/fp-impl.inc.c b/target/ppc/translate/fp-impl.inc.c
+index 59a4faf..34edc45 100644
+--- a/target/ppc/translate/fp-impl.inc.c
++++ b/target/ppc/translate/fp-impl.inc.c
+@@ -639,6 +639,36 @@ static void gen_mffsl(DisasContext *ctx)
+     tcg_temp_free_i64(t0);
+ }
+ 
++/* mffsce */
++static void gen_mffsce(DisasContext *ctx)
++{
++    TCGv_i64 t0;
++    TCGv_i32 mask;
 +
-+    :param test: an Avocado test containing a VM that will have its cons=
-ole
-+                 read and probed for a success or failure message
-+    :type test: :class:`avocado_qemu.Test`
-+    :param success_message: if this message appears, test succeeds
-+    :param failure_message: if this message appears, test fails
-+    """
-+    console =3D test.vm.console_socket.makefile()
-+    console_logger =3D logging.getLogger('console')
-+    while True:
-+        msg =3D console.readline().strip()
-+        if not msg:
-+            continue
-+        console_logger.debug(msg)
-+        if success_message in msg:
-+            break
-+        if failure_message in msg:
-+            fail =3D 'Failure message found in console: %s' % failure_me=
-ssage
-+            test.fail(fail)
++    if (unlikely(!(ctx->insns_flags2 & PPC2_ISA300))) {
++        return gen_mffs(ctx);
++    }
 +
++    if (unlikely(!ctx->fpu_enabled)) {
++        gen_exception(ctx, POWERPC_EXCP_FPU);
++        return;
++    }
 +
- class Test(avocado.Test):
-     def setUp(self):
-         self._vms =3D {}
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
-ot_linux_console.py
-index 8a9a314ab4..9ff2213874 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -9,12 +9,12 @@
- # later.  See the COPYING file in the top-level directory.
-=20
- import os
--import logging
- import lzma
- import gzip
- import shutil
-=20
- from avocado_qemu import Test
-+from avocado_qemu import wait_for_console_pattern
- from avocado.utils import process
- from avocado.utils import archive
-=20
-@@ -29,31 +29,10 @@ class BootLinuxConsole(Test):
-=20
-     KERNEL_COMMON_COMMAND_LINE =3D 'printk.time=3D0 '
-=20
--    def wait_for_console_pattern(self, success_message,
--                                 failure_message=3D'Kernel panic - not s=
-yncing'):
--        """
--        Waits for messages to appear on the console, while logging the c=
-ontent
--
--        :param success_message: if this message appears, test succeeds
--        :param failure_message: if this message appears, test fails
--        """
--        console =3D self.vm.console_socket.makefile()
--        console_logger =3D logging.getLogger('console')
--        while True:
--            msg =3D console.readline().strip()
--            if not msg:
--                continue
--            console_logger.debug(msg)
--            if success_message in msg:
--                break
--            if failure_message in msg:
--                fail =3D 'Failure message found in console: %s' % failur=
-e_message
--                self.fail(fail)
--
-     def exec_command_and_wait_for_pattern(self, command, success_message=
-):
-         command +=3D '\n'
-         self.vm.console_socket.sendall(command.encode())
--        self.wait_for_console_pattern(success_message)
-+        wait_for_console_pattern(self, success_message)
-=20
-     def extract_from_deb(self, deb, path):
-         """
-@@ -89,7 +68,7 @@ class BootLinuxConsole(Test):
-                          '-append', kernel_command_line)
-         self.vm.launch()
-         console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
-ine
--        self.wait_for_console_pattern(console_pattern)
-+        wait_for_console_pattern(self, console_pattern)
-=20
-     def test_mips_malta(self):
-         """
-@@ -112,7 +91,7 @@ class BootLinuxConsole(Test):
-                          '-append', kernel_command_line)
-         self.vm.launch()
-         console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
-ine
--        self.wait_for_console_pattern(console_pattern)
-+        wait_for_console_pattern(self, console_pattern)
-=20
-     def test_mips64el_malta(self):
-         """
-@@ -145,7 +124,7 @@ class BootLinuxConsole(Test):
-                          '-append', kernel_command_line)
-         self.vm.launch()
-         console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
-ine
--        self.wait_for_console_pattern(console_pattern)
-+        wait_for_console_pattern(self, console_pattern)
-=20
-     def test_mips_malta_cpio(self):
-         """
-@@ -181,7 +160,7 @@ class BootLinuxConsole(Test):
-                          '-append', kernel_command_line,
-                          '-no-reboot')
-         self.vm.launch()
--        self.wait_for_console_pattern('Boot successful.')
-+        wait_for_console_pattern(self, 'Boot successful.')
-=20
-         self.exec_command_and_wait_for_pattern('cat /proc/cpuinfo',
-                                                'BogoMIPS')
-@@ -208,7 +187,7 @@ class BootLinuxConsole(Test):
-                          '-append', kernel_command_line)
-         self.vm.launch()
-         console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
-ine
--        self.wait_for_console_pattern(console_pattern)
-+        wait_for_console_pattern(self, console_pattern)
-=20
-     def test_mips_malta32el_nanomips_4k(self):
-         """
-@@ -266,7 +245,7 @@ class BootLinuxConsole(Test):
-                          '-append', kernel_command_line)
-         self.vm.launch()
-         console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
-ine
--        self.wait_for_console_pattern(console_pattern)
-+        wait_for_console_pattern(self, console_pattern)
-=20
-     def test_arm_virt(self):
-         """
-@@ -287,7 +266,7 @@ class BootLinuxConsole(Test):
-                          '-append', kernel_command_line)
-         self.vm.launch()
-         console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
-ine
--        self.wait_for_console_pattern(console_pattern)
-+        wait_for_console_pattern(self, console_pattern)
-=20
-     def test_arm_emcraft_sf2(self):
-         """
-@@ -314,7 +293,7 @@ class BootLinuxConsole(Test):
-                          '-drive', 'file=3D' + spi_path + ',if=3Dmtd,for=
-mat=3Draw',
-                          '-no-reboot')
-         self.vm.launch()
--        self.wait_for_console_pattern('init started: BusyBox')
-+        wait_for_console_pattern(self, 'init started: BusyBox')
-=20
-     def test_s390x_s390_ccw_virtio(self):
-         """
-@@ -335,7 +314,7 @@ class BootLinuxConsole(Test):
-                          '-append', kernel_command_line)
-         self.vm.launch()
-         console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
-ine
--        self.wait_for_console_pattern(console_pattern)
-+        wait_for_console_pattern(self, console_pattern)
-=20
-     def test_alpha_clipper(self):
-         """
-@@ -357,7 +336,7 @@ class BootLinuxConsole(Test):
-                          '-append', kernel_command_line)
-         self.vm.launch()
-         console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
-ine
--        self.wait_for_console_pattern(console_pattern)
-+        wait_for_console_pattern(self, console_pattern)
-=20
-     def test_ppc64_pseries(self):
-         """
-@@ -377,4 +356,4 @@ class BootLinuxConsole(Test):
-                          '-append', kernel_command_line)
-         self.vm.launch()
-         console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
-ine
--        self.wait_for_console_pattern(console_pattern)
-+        wait_for_console_pattern(self, console_pattern)
-diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptance/=
-linux_ssh_mips_malta.py
-index 134f10cac3..da7a386117 100644
---- a/tests/acceptance/linux_ssh_mips_malta.py
-+++ b/tests/acceptance/linux_ssh_mips_malta.py
-@@ -14,6 +14,7 @@ import time
-=20
- from avocado import skipIf
- from avocado_qemu import Test
-+from avocado_qemu import wait_for_console_pattern
- from avocado.utils import process
- from avocado.utils import archive
-=20
-@@ -56,19 +57,6 @@ class LinuxSSH(Test):
-         },
-     }
-=20
--    def wait_for_console_pattern(self, success_message,
--                                 failure_message=3D'Oops'):
--        console =3D self.vm.console_socket.makefile()
--        console_logger =3D logging.getLogger('console')
--        while True:
--            msg =3D console.readline()
--            console_logger.debug(msg.strip())
--            if success_message in msg:
--                break
--            if failure_message in msg:
--                fail =3D 'Failure message found in console: %s' % failur=
-e_message
--                self.fail(fail)
--
-     def get_portfwd(self):
-         res =3D self.vm.command('human-monitor-command',
-                               command_line=3D'info usernet')
-@@ -135,7 +123,7 @@ class LinuxSSH(Test):
-=20
-         self.log.info('VM launched, waiting for sshd')
-         console_pattern =3D 'Starting OpenBSD Secure Shell server: sshd'
--        self.wait_for_console_pattern(console_pattern)
-+        wait_for_console_pattern(self, console_pattern, 'Oops')
-         self.log.info('sshd ready')
-=20
-         self.ssh_connect('root', 'root', rsa_hostkey_b64=3Drsa_hostkey_b=
-64)
-@@ -143,7 +131,7 @@ class LinuxSSH(Test):
-     def shutdown_via_ssh(self):
-         self.ssh_command('poweroff')
-         self.ssh_disconnect_vm()
--        self.wait_for_console_pattern('Power down')
-+        wait_for_console_pattern(self, 'Power down', 'Oops')
-=20
-     def run_common_commands(self):
-         stdout, stderr =3D self.ssh_command('lspci -d 11ab:4620')
---=20
-2.21.0
++    t0 = tcg_temp_new_i64();
++
++    gen_reset_fpstatus();
++    tcg_gen_extu_tl_i64(t0, cpu_fpscr);
++    set_fpr(rD(ctx->opcode), t0);
++
++    /* Clear exception enable bits in the FPSCR.  */
++    tcg_gen_andi_i64(t0, t0, ~FP_ENABLES);
++    mask = tcg_const_i32(0x0003);
++    gen_helper_store_fpscr(cpu_env, t0, mask);
++
++    tcg_temp_free_i32(mask);
++    tcg_temp_free_i64(t0);
++}
++
+ static void gen_helper_mffscrn(DisasContext *ctx, TCGv_i64 t1)
+ {
+     TCGv_i64 t0 = tcg_temp_new_i64();
+diff --git a/target/ppc/translate/fp-ops.inc.c b/target/ppc/translate/fp-ops.inc.c
+index f2bcf0e..88fab65 100644
+--- a/target/ppc/translate/fp-ops.inc.c
++++ b/target/ppc/translate/fp-ops.inc.c
+@@ -105,6 +105,8 @@ GEN_HANDLER_E(fmrgew, 0x3F, 0x06, 0x1E, 0x00000001, PPC_NONE, PPC2_VSX207),
+ GEN_HANDLER_E(fmrgow, 0x3F, 0x06, 0x1A, 0x00000001, PPC_NONE, PPC2_VSX207),
+ GEN_HANDLER(mcrfs, 0x3F, 0x00, 0x02, 0x0063F801, PPC_FLOAT),
+ GEN_HANDLER_E_2(mffs, 0x3F, 0x07, 0x12, 0x00, 0x00000000, PPC_FLOAT, PPC_NONE),
++GEN_HANDLER_E_2(mffsce, 0x3F, 0x07, 0x12, 0x01, 0x00000000, PPC_FLOAT,
++    PPC2_ISA300),
+ GEN_HANDLER_E_2(mffsl, 0x3F, 0x07, 0x12, 0x18, 0x00000000, PPC_FLOAT,
+     PPC2_ISA300),
+ GEN_HANDLER_E_2(mffscrn, 0x3F, 0x07, 0x12, 0x16, 0x00000000, PPC_FLOAT,
+-- 
+1.8.3.1
 
 
