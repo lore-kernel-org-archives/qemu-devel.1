@@ -2,60 +2,118 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDEDBC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 15:54:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91ACCC4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 15:57:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7669214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 15:54:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7669214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5DB6D2171F
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 15:57:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="irAhoaoA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DB6D2171F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAFof-0003X3-Pv
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 11:54:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37693)
+	id 1iAFr3-0005X1-1m
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 11:57:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37901)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pkrempa@redhat.com>) id 1iAFjn-0008Jm-5L
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:49:59 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iAFkW-0000RN-MZ
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:50:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pkrempa@redhat.com>) id 1iAFjj-00077X-IZ
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:49:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42544)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1iAFjh-00076M-4v
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:49:51 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 92136307D8BE;
- Tue, 17 Sep 2019 15:49:46 +0000 (UTC)
-Received: from angien.brq.redhat.com (unknown [10.43.2.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4833260BEC;
- Tue, 17 Sep 2019 15:49:45 +0000 (UTC)
-From: Peter Krempa <pkrempa@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 17 Sep 2019 17:49:42 +0200
-Message-Id: <61c6b9409ee33b88ba63eb781e6ab66be3bbf80d.1568735079.git.pkrempa@redhat.com>
-In-Reply-To: <cover.1568735079.git.pkrempa@redhat.com>
-References: <cover.1568735079.git.pkrempa@redhat.com>
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iAFkV-0007UL-Hf
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:50:40 -0400
+Received: from mail-eopbgr00122.outbound.protection.outlook.com
+ ([40.107.0.122]:42757 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1iAFkV-0007Tz-B3; Tue, 17 Sep 2019 11:50:39 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VtxmgMdQjpOaUdj7shUPWgTxQDhtZ1vj5VfFtvEswlCuzvyHAnvsvhkF8Vqt8Z60s1OJIQvZiRZnwA/t2wFThLATxAaMN5tZjGNMjv+pAHIXugD0SO68jkcfoU3Kn7nk5CXdiBvH1aZbIpf2ekKEBekX5Du0ldupKIp/U06ZNuccGwKc4ITFSVQcFKd7Rscp3t4proZ8LqMTXc0ZTZq/AnWgDd0aty3YM02p9wG3aplgLqqqyVT6G8dghjcKgEg1gE4tfbFK98jwLkTx3ra/is9JiYxzu7SGvpN1kVKLKaxib0XzYrKYK+bWGIr5Frha/+O5t1VDISx5RbwUJyR+Eg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KGyfQDsW64xfg3nyTW0Ed/7quI8fLeyYEQlqrcurhZ8=;
+ b=SDrltFTijL+o+2oWPESTiNYcjExG/SJE7G6XvLHNiAGOCQzNcpBqyylsFqma4ZkeDYIMIUi6Eene6gZNXAaqQ3+1IacNQ/XQRfkdrE2Wb/BWchUne/r1lWRpLw+2hKm8Ssxd6RKgYjbxqhk16x+En2T9655MapIFCvudrnJ8LSBFByPM59+1NmKN7DSrXM7q3jeBO3HDjApGP6PjVHH++isKLibtjXtmcQMqXp8RCUdFv8JESJUYiYcGaXVpBV6EqSnF1ib0zO7Ig3GmRjyfk23wimaY1BPx4qnwujaKpA4C9x5tZDbUkKDJ8VLliFg5xNgvnpPO7rOhhH9mDphH5A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KGyfQDsW64xfg3nyTW0Ed/7quI8fLeyYEQlqrcurhZ8=;
+ b=irAhoaoAnqYntItAO/FzIGYP6Fj3SFK772gIwSWLp2ydSn8AdIeS2F+TKDpDEClgW7gOONnCDPXxTs3o2jgLdBo2O2XoNwIQsKyWuz7ak/0linB5qIzoC5Agwx+4RYnc2bG8Ra358IBujiua3skk9USZPJynAmcOoQ5KHChncdg=
+Received: from HE1PR0802MB2460.eurprd08.prod.outlook.com (10.175.33.138) by
+ HE1PR0802MB2299.eurprd08.prod.outlook.com (10.172.125.13) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2263.24; Tue, 17 Sep 2019 15:50:36 +0000
+Received: from HE1PR0802MB2460.eurprd08.prod.outlook.com
+ ([fe80::4d31:70d0:5b10:7a10]) by HE1PR0802MB2460.eurprd08.prod.outlook.com
+ ([fe80::4d31:70d0:5b10:7a10%6]) with mapi id 15.20.2263.023; Tue, 17 Sep 2019
+ 15:50:36 +0000
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Thread-Topic: [PATCH v4 7/7] iotests: Cache supported_formats()
+Thread-Index: AQHVbTku1OAxQlhf90ScyQk+93qxLKcwBNUA
+Date: Tue, 17 Sep 2019 15:50:36 +0000
+Message-ID: <8036da01-4019-0ae9-bb68-dac7a9bfd8b9@virtuozzo.com>
+References: <20190917092004.999-1-mreitz@redhat.com>
+ <20190917092004.999-8-mreitz@redhat.com>
+In-Reply-To: <20190917092004.999-8-mreitz@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1P192CA0013.EURP192.PROD.OUTLOOK.COM (2603:10a6:3:fe::23)
+ To HE1PR0802MB2460.eurprd08.prod.outlook.com
+ (2603:10a6:3:dd::10)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 071faf65-7da6-42fb-9eec-08d73b86c7c5
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:HE1PR0802MB2299; 
+x-ms-traffictypediagnostic: HE1PR0802MB2299:
+x-microsoft-antispam-prvs: <HE1PR0802MB2299A70644EBB04AC846E25DF48F0@HE1PR0802MB2299.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4502;
+x-forefront-prvs: 01630974C0
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(346002)(39850400004)(366004)(136003)(396003)(199004)(189003)(486006)(7736002)(229853002)(31696002)(66446008)(6116002)(4326008)(6512007)(66476007)(3846002)(25786009)(26005)(102836004)(76176011)(71200400001)(256004)(2906002)(53546011)(6506007)(386003)(71190400001)(52116002)(6246003)(305945005)(6486002)(66556008)(6436002)(186003)(86362001)(99286004)(5660300002)(36756003)(2501003)(476003)(446003)(2616005)(54906003)(110136005)(31686004)(66066001)(64756008)(66946007)(478600001)(44832011)(81166006)(8676002)(81156014)(14454004)(316002)(11346002)(8936002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:HE1PR0802MB2299;
+ H:HE1PR0802MB2460.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: grtk1FM5ltdZ3qmLeeq8t7+u6NdC8wvHTAASBFmO2MiB9xwowJWBdaMwAKemqIY66uVHKe7OM8dZmoLi3Nt1OCcT7VbNCOeAdBtQogO6SZ6mr4FJGHqUbEPGrU9BIwHZwFAI7S5MaKK1dCwaAR53DJe2j6SePvcqvLIty8ucgQ9BlkRqbB+4G09CqvavvkzUmQs4TmYZVwkqSYICyfjOiz0Z6ptw/aDIcQm0lI7q8eqcJ1OTfCua+Dzwn45E1oXTAMeGkiT/u/1fuv+GNNwvl504GJfHWA68+R2ILmCl+Yx/zHt9CFdwbSymzALSAhAWp/gpYAjXgHIIaoMb1DXm8P7Mkq4E15s3jOfRsO61vIMrKTd7tAZoKLfZ5r+2QwBQqa/GB4GfS7tHyvEhzLubyGDUBJlf1tNDStz7N6hYAzI=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <DD46D5F7BECA884CBB9AD518533A314B@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Tue, 17 Sep 2019 15:49:46 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/2] qapi: Add feature flags to commands in
- qapi introspection
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 071faf65-7da6-42fb-9eec-08d73b86c7c5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Sep 2019 15:50:36.2877 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 3YtmrssqwIrhgMoMHU6d3RUyxsmrY1xA7Wk2h1qc9UuyFETEz+kSkXTJbAgH6mAflEsNes/PANx/HZhu1MvFYMhCgsruKEes7XdGZmpSJjE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2299
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.0.122
+Subject: Re: [Qemu-devel] [PATCH v4 7/7] iotests: Cache supported_formats()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,292 +125,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Similarly to features for struct types introduce the feature flags also
-for commands. This will allow notifying management layers of fixes and
-compatible changes in the behaviour of an command which may not be
-detectable any other way.
-
-The changes were heavily inspired by commit 6a8c0b51025.
-
-Signed-off-by: Peter Krempa <pkrempa@redhat.com>
----
- docs/devel/qapi-code-gen.txt   |  4 ++--
- qapi/introspect.json           |  6 ++++-
- scripts/qapi/commands.py       |  3 ++-
- scripts/qapi/common.py         | 40 +++++++++++++++++++++++++++++-----
- scripts/qapi/doc.py            |  3 ++-
- scripts/qapi/introspect.py     |  7 +++++-
- tests/qapi-schema/test-qapi.py |  7 +++++-
- 7 files changed, 58 insertions(+), 12 deletions(-)
-
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index e8ec8ac1de..38682daace 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -726,8 +726,8 @@ change in the QMP syntax (usually by allowing values =
-or operations that
- previously resulted in an error). QMP clients may still need to know
- whether the extension is available.
-
--For this purpose, a list of features can be specified for a struct type.
--This is exposed to the client as a list of string, where each string
-+For this purpose, a list of features can be specified for a command or s=
-truct
-+type. This is exposed to the client as a list of string, where each stri=
-ng
- signals that this build of QEMU shows a certain behaviour.
-
- In the schema, features can be specified as simple strings, for example:
-diff --git a/qapi/introspect.json b/qapi/introspect.json
-index 1843c1cb17..031a954fa9 100644
---- a/qapi/introspect.json
-+++ b/qapi/introspect.json
-@@ -266,13 +266,17 @@
- # @allow-oob: whether the command allows out-of-band execution,
- #             defaults to false (Since: 2.12)
- #
-+# @features: names of features associated with the command, in no partic=
-ular
-+#            order. (since 4.2)
-+#
- # TODO: @success-response (currently irrelevant, because it's QGA, not Q=
-MP)
- #
- # Since: 2.5
- ##
- { 'struct': 'SchemaInfoCommand',
-   'data': { 'arg-type': 'str', 'ret-type': 'str',
--            '*allow-oob': 'bool' } }
-+            '*allow-oob': 'bool',
-+            '*features': [ 'str' ] } }
-
- ##
- # @SchemaInfoEvent:
-diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-index b929e07be4..6cfe6cdd9e 100644
---- a/scripts/qapi/commands.py
-+++ b/scripts/qapi/commands.py
-@@ -276,7 +276,8 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmd=
-s);
-         genc.add(gen_registry(self._regy.get_content(), self._prefix))
-
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
--                      success_response, boxed, allow_oob, allow_preconfi=
-g):
-+                      success_response, boxed, allow_oob, allow_preconfi=
-g,
-+                      features):
-         if not gen:
-             return
-         # FIXME: If T is a user-defined type, the user is responsible
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index d61bfdc526..1502820f46 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -838,6 +838,7 @@ def check_type(info, source, value, allow_array=3DFal=
-se,
- def check_command(expr, info):
-     name =3D expr['command']
-     boxed =3D expr.get('boxed', False)
-+    features =3D expr.get('features')
-
-     args_meta =3D ['struct']
-     if boxed:
-@@ -852,6 +853,19 @@ def check_command(expr, info):
-                expr.get('returns'), allow_array=3DTrue,
-                allow_optional=3DTrue, allow_metas=3Dreturns_meta)
-
-+    if features:
-+        if not isinstance(features, list):
-+            raise QAPISemError(info,
-+                               "Command '%s' requires an array for 'feat=
-ures'" %
-+                               name)
-+        for f in features:
-+            assert isinstance(f, dict)
-+            check_known_keys(info, "feature of command %s" % name, f,
-+                             ['name'], ['if'])
-+
-+            check_if(f, info)
-+            check_name(info, "Feature of command %s" % name, f['name'])
-+
-
- def check_event(expr, info):
-     name =3D expr['event']
-@@ -1138,8 +1152,10 @@ def check_exprs(exprs):
-             meta =3D 'command'
-             check_keys(expr_elem, 'command', [],
-                        ['data', 'returns', 'gen', 'success-response',
--                        'boxed', 'allow-oob', 'allow-preconfig', 'if'])
-+                        'boxed', 'allow-oob', 'allow-preconfig', 'if',
-+                        'features'])
-             normalize_members(expr.get('data'))
-+            normalize_features(expr.get('features'))
-         elif 'event' in expr:
-             meta =3D 'event'
-             check_keys(expr_elem, 'event', [], ['data', 'boxed', 'if'])
-@@ -1283,7 +1299,8 @@ class QAPISchemaVisitor(object):
-         pass
-
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
--                      success_response, boxed, allow_oob, allow_preconfi=
-g):
-+                      success_response, boxed, allow_oob, allow_preconfi=
-g,
-+                      features):
-         pass
-
-     def visit_event(self, name, info, ifcond, arg_type, boxed):
-@@ -1697,10 +1714,14 @@ class QAPISchemaAlternateType(QAPISchemaType):
-
- class QAPISchemaCommand(QAPISchemaEntity):
-     def __init__(self, name, info, doc, ifcond, arg_type, ret_type,
--                 gen, success_response, boxed, allow_oob, allow_preconfi=
-g):
-+                 gen, success_response, boxed, allow_oob, allow_preconfi=
-g,
-+                 features):
-         QAPISchemaEntity.__init__(self, name, info, doc, ifcond)
-         assert not arg_type or isinstance(arg_type, str)
-         assert not ret_type or isinstance(ret_type, str)
-+        for f in features:
-+            assert isinstance(f, QAPISchemaFeature)
-+            f.set_owner(name)
-         self._arg_type_name =3D arg_type
-         self.arg_type =3D None
-         self._ret_type_name =3D ret_type
-@@ -1710,6 +1731,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
-         self.boxed =3D boxed
-         self.allow_oob =3D allow_oob
-         self.allow_preconfig =3D allow_preconfig
-+        self.features =3D features
-
-     def check(self, schema):
-         QAPISchemaEntity.check(self, schema)
-@@ -1731,12 +1753,18 @@ class QAPISchemaCommand(QAPISchemaEntity):
-             self.ret_type =3D schema.lookup_type(self._ret_type_name)
-             assert isinstance(self.ret_type, QAPISchemaType)
-
-+        # Features are in a name space separate from members
-+        seen =3D {}
-+        for f in self.features:
-+            f.check_clash(self.info, seen)
-+
-     def visit(self, visitor):
-         visitor.visit_command(self.name, self.info, self.ifcond,
-                               self.arg_type, self.ret_type,
-                               self.gen, self.success_response,
-                               self.boxed, self.allow_oob,
--                              self.allow_preconfig)
-+                              self.allow_preconfig,
-+                              self.features)
-
-
- class QAPISchemaEvent(QAPISchemaEntity):
-@@ -1989,6 +2017,7 @@ class QAPISchema(object):
-         allow_oob =3D expr.get('allow-oob', False)
-         allow_preconfig =3D expr.get('allow-preconfig', False)
-         ifcond =3D expr.get('if')
-+        features =3D expr.get('features', [])
-         if isinstance(data, OrderedDict):
-             data =3D self._make_implicit_object_type(
-                 name, info, doc, ifcond, 'arg', self._make_members(data,=
- info))
-@@ -1997,7 +2026,8 @@ class QAPISchema(object):
-             rets =3D self._make_array_type(rets[0], info)
-         self._def_entity(QAPISchemaCommand(name, info, doc, ifcond, data=
-, rets,
-                                            gen, success_response,
--                                           boxed, allow_oob, allow_preco=
-nfig))
-+                                           boxed, allow_oob, allow_preco=
-nfig,
-+                                           self._make_features(features)=
-))
-
-     def _def_event(self, expr, info, doc):
-         name =3D expr['event']
-diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
-index 5fc0fc7e06..aa4c557244 100755
---- a/scripts/qapi/doc.py
-+++ b/scripts/qapi/doc.py
-@@ -249,7 +249,8 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
-isitor):
-                                body=3Dtexi_entity(doc, 'Members', ifcond=
-)))
-
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
--                      success_response, boxed, allow_oob, allow_preconfi=
-g):
-+                      success_response, boxed, allow_oob, allow_preconfi=
-g,
-+                      features):
-         doc =3D self.cur_doc
-         if boxed:
-             body =3D texi_body(doc)
-diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-index f62cf0a2e1..36a5b195e5 100644
---- a/scripts/qapi/introspect.py
-+++ b/scripts/qapi/introspect.py
-@@ -206,13 +206,18 @@ const QLitObject %(c_name)s =3D %(c_string)s;
-                            for m in variants.variants]}, ifcond)
-
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
--                      success_response, boxed, allow_oob, allow_preconfi=
-g):
-+                      success_response, boxed, allow_oob, allow_preconfi=
-g,
-+                      features):
-         arg_type =3D arg_type or self._schema.the_empty_object_type
-         ret_type =3D ret_type or self._schema.the_empty_object_type
-         obj =3D {'arg-type': self._use_type(arg_type),
-                'ret-type': self._use_type(ret_type)}
-         if allow_oob:
-             obj['allow-oob'] =3D allow_oob
-+
-+        if features:
-+            obj['features'] =3D [(f.name, {'if': f.ifcond}) for f in fea=
-tures]
-+
-         self._gen_qlit(name, 'command', obj, ifcond)
-
-     def visit_event(self, name, info, ifcond, arg_type, boxed):
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
-.py
-index b0f770b9bd..def34aa489 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -60,13 +60,18 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-         self._print_if(ifcond)
-
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
--                      success_response, boxed, allow_oob, allow_preconfi=
-g):
-+                      success_response, boxed, allow_oob, allow_preconfi=
-g,
-+                      features):
-         print('command %s %s -> %s'
-               % (name, arg_type and arg_type.name,
-                  ret_type and ret_type.name))
-         print('   gen=3D%s success_response=3D%s boxed=3D%s oob=3D%s pre=
-config=3D%s'
-               % (gen, success_response, boxed, allow_oob, allow_preconfi=
-g))
-         self._print_if(ifcond)
-+        if features:
-+            for f in features:
-+                print('    feature %s' % f.name)
-+                self._print_if(f.ifcond, 8)
-
-     def visit_event(self, name, info, ifcond, arg_type, boxed):
-         print('event %s %s' % (name, arg_type and arg_type.name))
---=20
-2.21.0
-
+T24gMTcvMDkvMjAxOSAxMjoyMCwgTWF4IFJlaXR6IHdyb3RlOg0KPiBTaWduZWQtb2ZmLWJ5OiBN
+YXggUmVpdHogPG1yZWl0ekByZWRoYXQuY29tPg0KPiBSZXZpZXdlZC1ieTogSm9obiBTbm93IDxq
+c25vd0ByZWRoYXQuY29tPg0KPiAtLS0NCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5w
+eSB8IDE0ICsrKysrKysrKysrLS0tDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDExIGluc2VydGlvbnMo
+KyksIDMgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3Rz
+L2lvdGVzdHMucHkgYi90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weQ0KPiBpbmRleCBhNDI3
+MDJiNmI5Li5iMzAwNDRlMWNjIDEwMDY0NA0KPiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMvaW90
+ZXN0cy5weQ0KPiArKysgYi90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weQ0KPiBAQCAtODg1
+LDkgKzg4NSwxNyBAQCBkZWYgcWVtdV9waXBlKCphcmdzKToNCj4gICBkZWYgc3VwcG9ydGVkX2Zv
+cm1hdHMocmVhZF9vbmx5PUZhbHNlKToNCj4gICAgICAgJycnU2V0ICdyZWFkX29ubHknIHRvIFRy
+dWUgdG8gY2hlY2sgcm8td2hpdGVsaXN0DQo+ICAgICAgICAgIE90aGVyd2lzZSwgcnctd2hpdGVs
+aXN0IGlzIGNoZWNrZWQnJycNCj4gLSAgICBmb3JtYXRfbWVzc2FnZSA9IHFlbXVfcGlwZSgiLWRy
+aXZlIiwgImZvcm1hdD1oZWxwIikNCj4gLSAgICBsaW5lID0gMSBpZiByZWFkX29ubHkgZWxzZSAw
+DQo+IC0gICAgcmV0dXJuIGZvcm1hdF9tZXNzYWdlLnNwbGl0bGluZXMoKVtsaW5lXS5zcGxpdCgi
+OiIpWzFdLnNwbGl0KCkNCj4gKw0KPiArICAgIGlmIG5vdCBoYXNhdHRyKHN1cHBvcnRlZF9mb3Jt
+YXRzLCAiZm9ybWF0cyIpOg0KPiArICAgICAgICBzdXBwb3J0ZWRfZm9ybWF0cy5mb3JtYXRzID0g
+e30NCj4gKw0KPiArICAgIGlmIHJlYWRfb25seSBub3QgaW4gc3VwcG9ydGVkX2Zvcm1hdHMuZm9y
+bWF0czoNCj4gKyAgICAgICAgZm9ybWF0X21lc3NhZ2UgPSBxZW11X3BpcGUoIi1kcml2ZSIsICJm
+b3JtYXQ9aGVscCIpDQo+ICsgICAgICAgIGxpbmUgPSAxIGlmIHJlYWRfb25seSBlbHNlIDANCj4g
+KyAgICAgICAgc3VwcG9ydGVkX2Zvcm1hdHMuZm9ybWF0c1tyZWFkX29ubHldID0gXA0KPiArICAg
+ICAgICAgICAgZm9ybWF0X21lc3NhZ2Uuc3BsaXRsaW5lcygpW2xpbmVdLnNwbGl0KCI6IilbMV0u
+c3BsaXQoKQ0KPiArDQo+ICsgICAgcmV0dXJuIHN1cHBvcnRlZF9mb3JtYXRzLmZvcm1hdHNbcmVh
+ZF9vbmx5XQ0KPiAgIA0KPiAgIGRlZiBza2lwX2lmX3Vuc3VwcG9ydGVkKHJlcXVpcmVkX2Zvcm1h
+dHM9W10sIHJlYWRfb25seT1GYWxzZSk6DQo+ICAgICAgICcnJ1NraXAgVGVzdCBEZWNvcmF0b3IN
+Cj4gDQoNClJldmlld2VkLWJ5OiBBbmRyZXkgU2hpbmtldmljaCA8YW5kcmV5LnNoaW5rZXZpY2hA
+dmlydHVvenpvLmNvbT4NCi0tIA0KV2l0aCB0aGUgYmVzdCByZWdhcmRzLA0KQW5kcmV5IFNoaW5r
+ZXZpY2gNCg==
 
