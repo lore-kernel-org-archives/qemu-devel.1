@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36929C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 18:13:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA499C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 18:15:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13C8D21670
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 18:13:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13C8D21670
+	by mail.kernel.org (Postfix) with ESMTPS id 859D921670
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 18:15:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 859D921670
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAHyH-0003WS-03
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 14:13:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57666)
+	id 1iAI16-0005Ba-Nj
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 14:15:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58282)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iAHwF-0001eO-CZ
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:10:56 -0400
+ (envelope-from <eblake@redhat.com>) id 1iAI0B-0004d2-0T
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:14:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iAHwE-0004xM-DT
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:10:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60264)
+ (envelope-from <eblake@redhat.com>) id 1iAI09-0007ME-QU
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:14:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60066)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAHwE-0004x7-5B
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:10:54 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAI09-0007Ll-IX
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:14:57 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7B58C8980E0;
- Tue, 17 Sep 2019 18:10:53 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8D1368A1C8E;
+ Tue, 17 Sep 2019 18:14:56 +0000 (UTC)
 Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 250A519C7F;
- Tue, 17 Sep 2019 18:10:50 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 233A71001B11;
+ Tue, 17 Sep 2019 18:14:53 +0000 (UTC)
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20190914153506.2151-1-armbru@redhat.com>
- <20190914153506.2151-13-armbru@redhat.com>
+ <20190914153506.2151-14-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,22 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <d1b18dc8-920e-cc2d-d677-f63d278603f5@redhat.com>
-Date: Tue, 17 Sep 2019 13:10:50 -0500
+Message-ID: <60d81331-ea7b-a375-cb68-e2fff7d54ccb@redhat.com>
+Date: Tue, 17 Sep 2019 13:14:52 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190914153506.2151-13-armbru@redhat.com>
+In-Reply-To: <20190914153506.2151-14-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="CJxLERJFJnvFzhxRQ8XSaTDJio1IeS7T5"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+ boundary="f9ZAMfYyOVjIYGEUIjnoto6Tfh1plJlEI"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Tue, 17 Sep 2019 18:10:53 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.69]); Tue, 17 Sep 2019 18:14:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 12/19] qapi: Fix missing 'if' checks in
- struct, union, alternate 'data'
+Subject: Re: [Qemu-devel] [PATCH 13/19] qapi: Normalize 'if' in
+ check_exprs(), like other sugar
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,36 +103,57 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CJxLERJFJnvFzhxRQ8XSaTDJio1IeS7T5
-Content-Type: multipart/mixed; boundary="gSmPR42PHdcmOn84D15y6Fv8jzeIHTMkH";
+--f9ZAMfYyOVjIYGEUIjnoto6Tfh1plJlEI
+Content-Type: multipart/mixed; boundary="fn3n7u5K7Qz8qoVvRygJjuZdO9lhr8xzy";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <d1b18dc8-920e-cc2d-d677-f63d278603f5@redhat.com>
-Subject: Re: [PATCH 12/19] qapi: Fix missing 'if' checks in struct, union,
- alternate 'data'
+Message-ID: <60d81331-ea7b-a375-cb68-e2fff7d54ccb@redhat.com>
+Subject: Re: [PATCH 13/19] qapi: Normalize 'if' in check_exprs(), like other
+ sugar
 References: <20190914153506.2151-1-armbru@redhat.com>
- <20190914153506.2151-13-armbru@redhat.com>
-In-Reply-To: <20190914153506.2151-13-armbru@redhat.com>
+ <20190914153506.2151-14-armbru@redhat.com>
+In-Reply-To: <20190914153506.2151-14-armbru@redhat.com>
 
---gSmPR42PHdcmOn84D15y6Fv8jzeIHTMkH
+--fn3n7u5K7Qz8qoVvRygJjuZdO9lhr8xzy
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 9/14/19 10:34 AM, Markus Armbruster wrote:
-> Commit 87adbbffd4..3e270dcacc "qapi: Add 'if' to (implicit
-> struct|union|alternate) members" (v4.0.0) neglected test coverage, and
-> promptly failed to check the conditions.  Review fail.
+On 9/14/19 10:35 AM, Markus Armbruster wrote:
+> We normalize shorthand to longhand forms in check_expr(): enumeration
+> values with normalize_enum(), feature values with
+> normalize_features(), struct members, union branches and alternate
+> branches with normalize_members().  If conditions are an exception: we
+> normalize them in QAPISchemaEntity.check() and
+> QAPISchemaMember.__init(), with listify_cond().  The idea goes back to
+> commit 2cbc94376e "qapi: pass 'if' condition into QAPISchemaEntity
+> objects", v3.0.0.
 >=20
-> Recent commit "tests/qapi-schema: Demonstrate insufficient 'if'
-> checking" added test coverage, demonstrating the bug.  Fix it by add
-> the missing check_if().
+> Normalize in check_expr() instead, with new helper normalize_if().
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
+>  scripts/qapi/common.py | 26 +++++++++++++++-----------
+>  1 file changed, 15 insertions(+), 11 deletions(-)
+>=20
+
+Definitely more consistent.
+
+
+> @@ -904,6 +905,7 @@ def check_union(expr, info):
+>          check_known_keys(info, "member '%s' of union '%s'" % (key, nam=
+e),
+>                           value, ['type'], ['if'])
+>          check_if(value, info)
+> +        normalize_if(value)
+
+Is it worth combining check_if() and normalize_if() into a single helper
+function, since they always seem to be paired?
+
 Reviewed-by: Eric Blake <eblake@redhat.com>
+
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -140,24 +161,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---gSmPR42PHdcmOn84D15y6Fv8jzeIHTMkH--
+--fn3n7u5K7Qz8qoVvRygJjuZdO9lhr8xzy--
 
---CJxLERJFJnvFzhxRQ8XSaTDJio1IeS7T5
+--f9ZAMfYyOVjIYGEUIjnoto6Tfh1plJlEI
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2BIaoACgkQp6FrSiUn
-Q2qEoQgAjBbb5mI7276wWC+cVi0e4CZXwYHH7gbVfEthx/FOPIocBA2i9BNdFDoi
-dMoZy7rMw5Mj1PDNVA4bHpTmLQXi4R4FAK4Yc7Q6pgPIjlSReHKcN0y9O12vT4Am
-r1IPlyliLJwkslgWqpGKTMy3HSVvpo0XUtcCJTqrpbJJcA/Fu2aZaqEERYas397b
-dXTGKym5qkLlnbkUYtRfktY1GAq8pu0zORAsE7IycK6jKWTMIb3Ehi8bSJ3Zzs7J
-2s7Q7giJrpS3ntWIMRjY7guKYr6+BTOTuGuJ9t2S1O3p0cbxZL/4CkpYqZpXAVMF
-OySG1AdU5L/w1qA6aeZGDsOzaSXoCQ==
-=HQYn
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2BIp0ACgkQp6FrSiUn
+Q2pIqgf9HoJMkVbFW7VIisYciQa/VecAQd5g8OrJAJMCSuVpw2wFcgc19FatRN0C
+eMbnm3xIAaHmfWVIWiQxP1z3DS7rJjSX+EG1t1R4apgKMgavbQDkrpOaByDfeKe4
+FO0g+CXn/5/9Tq38Gu/kR+TRa5ZPBy89CxErbCd7KSAjeqC0+OOZJekbL8ECnekW
+bhWTaNIqRNOZ7JrHtEazgkAn78YzAi9+4+f75tt+yyDCkD5C3AutaWswn3cn8BYa
+fk+NAkPUQsSAq6D1AjWHPYdkQDBzC0rz1t9r40jYycGRWOXyvYBVWLqcn+8s9fgq
+Fk/71y0dcBSuxUyCD18p+uWHZ8XZ1Q==
+=+R0n
 -----END PGP SIGNATURE-----
 
---CJxLERJFJnvFzhxRQ8XSaTDJio1IeS7T5--
+--f9ZAMfYyOVjIYGEUIjnoto6Tfh1plJlEI--
 
