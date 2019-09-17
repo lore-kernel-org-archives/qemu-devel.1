@@ -2,52 +2,67 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C09A5C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 17:18:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FA6EC4CECE
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 17:19:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9677E2053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 17:18:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9677E2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id DAE1B2053B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 17:19:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAE1B2053B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAH7Y-0002Fx-Id
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 13:18:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50654)
+	id 1iAH8d-0003Ia-Nx
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 13:19:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50773)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iAH2h-0006ma-Fw
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 13:13:32 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iAH3D-0007VH-B9
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 13:14:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iAH2f-00033j-VT
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 13:13:31 -0400
-Received: from relay.sw.ru ([185.231.240.75]:55316)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iAH2c-000306-Mz; Tue, 17 Sep 2019 13:13:26 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iAH2Z-0003rq-UA; Tue, 17 Sep 2019 20:13:24 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Date: Tue, 17 Sep 2019 20:13:22 +0300
-Message-Id: <20190917171322.4127-4-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190917171322.4127-1-vsementsov@virtuozzo.com>
-References: <20190917171322.4127-1-vsementsov@virtuozzo.com>
+ (envelope-from <no-reply@patchew.org>) id 1iAH3B-0003WH-Rm
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 13:14:03 -0400
+Resent-Date: Tue, 17 Sep 2019 13:14:02 -0400
+Resent-Message-Id: <E1iAH3B-0003WH-Rm@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21438)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iAH3B-0003RK-Jz
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 13:14:01 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1568740422; cv=none; d=zoho.com; s=zohoarc; 
+ b=VyIUOe/FAWnKCaTvOfOmO67MRurUVGkSLaVYSO0FHh2jzxuypiRQMFT7ysmWWxnw/N+WF0C5ww8+VIzpf9qb46EmwiS0uM6xc4UphZZjuJxmFdqzLApQDpHw1mrECPcKX2T/R4u+W2hfjuSFk1Jq5uSzIxklkDaZozKPKNFLlzE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1568740422;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=XeHE4m+ToCnrX4GsQ+nk4uCfY5Hsxv/S5y+wxJP1I9g=; 
+ b=i+t1+HeYE3rvDOLXUZAeLxRPzhRPfHWYitkT7pzGa8fqRM9kHVl57LDAjGe4VZdpojLueXjUtaER++Fce/JK5mtukQP05RmuwShMb/55QNwkcuWA8CAKs1m0uo1mwz/BoXFQ1DxoNOgwi5gG3D3pyIVozhaJiZSPiCjK5yDdUgo=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1568740419857356.26365306637206;
+ Tue, 17 Sep 2019 10:13:39 -0700 (PDT)
+In-Reply-To: <20190917122559.15555-1-johannes@sipsolutions.net>
+Message-ID: <156874041879.17151.16130048479476261479@5dec9699b7de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v9 3/3] iotests: test nbd reconnect
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: johannes@sipsolutions.net
+Date: Tue, 17 Sep 2019 10:13:39 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.54
+Subject: Re: [Qemu-devel] [PATCH] libvhost-user: handle NOFD flag in
+ call/kick/err better
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,141 +74,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, johannes.berg@intel.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add test, which starts backup to nbd target and restarts nbd server
-during backup.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- tests/qemu-iotests/264        | 65 +++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/264.out    | 12 +++++++
- tests/qemu-iotests/group      |  1 +
- tests/qemu-iotests/iotests.py |  4 +++
- 4 files changed, 82 insertions(+)
- create mode 100755 tests/qemu-iotests/264
- create mode 100644 tests/qemu-iotests/264.out
-
-diff --git a/tests/qemu-iotests/264 b/tests/qemu-iotests/264
-new file mode 100755
-index 0000000000..e70f91c5ca
---- /dev/null
-+++ b/tests/qemu-iotests/264
-@@ -0,0 +1,65 @@
-+#!/usr/bin/env python
-+#
-+# Test nbd reconnect
-+#
-+# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import time
-+
-+import iotests
-+from iotests import qemu_img_create, file_path, qemu_nbd_popen, log
-+
-+disk_a, disk_b, nbd_sock = file_path('disk_a', 'disk_b', 'nbd-sock')
-+
-+qemu_img_create('-f', iotests.imgfmt, disk_a, '5M')
-+qemu_img_create('-f', iotests.imgfmt, disk_b, '5M')
-+srv = qemu_nbd_popen('-k', nbd_sock, '-f', iotests.imgfmt, disk_b)
-+time.sleep(1)
-+
-+vm = iotests.VM().add_drive(disk_a)
-+vm.launch()
-+vm.hmp_qemu_io('drive0', 'write 0 5M')
-+
-+vm.qmp_log('blockdev-add', filters=[iotests.filter_qmp_testfiles],
-+           **{'node_name': 'backup0',
-+              'driver': 'raw',
-+              'file': {'driver': 'nbd',
-+                       'server': {'type': 'unix', 'path': nbd_sock},
-+                       'reconnect-delay': 10}})
-+vm.qmp_log('blockdev-backup', device='drive0', sync='full', target='backup0',
-+           speed=(1 * 1024 * 1024))
-+
-+time.sleep(1)
-+log('Kill NBD server')
-+srv.kill()
-+
-+jobs = vm.qmp('query-block-jobs')['return']
-+if jobs and jobs[0]['offset'] < jobs[0]['len']:
-+    log('Backup job is still in progress')
-+
-+time.sleep(1)
-+
-+log('Start NBD server')
-+srv = qemu_nbd_popen('-k', nbd_sock, '-f', iotests.imgfmt, disk_b)
-+
-+vm.qmp_log('block-job-set-speed', device='drive0', speed=0)
-+e = vm.event_wait('BLOCK_JOB_COMPLETED')
-+log('Backup completed: {}'.format(e['data']['offset']))
-+
-+vm.qmp_log('blockdev-del', node_name='backup0')
-+srv.kill()
-+vm.shutdown()
-diff --git a/tests/qemu-iotests/264.out b/tests/qemu-iotests/264.out
-new file mode 100644
-index 0000000000..4a2f4aa509
---- /dev/null
-+++ b/tests/qemu-iotests/264.out
-@@ -0,0 +1,12 @@
-+{"execute": "blockdev-add", "arguments": {"driver": "raw", "file": {"driver": "nbd", "reconnect-delay": 10, "server": {"path": "TEST_DIR/PID-nbd-sock", "type": "unix"}}, "node-name": "backup0"}}
-+{"return": {}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "speed": 1048576, "sync": "full", "target": "backup0"}}
-+{"return": {}}
-+Kill NBD server
-+Backup job is still in progress
-+Start NBD server
-+{"execute": "block-job-set-speed", "arguments": {"device": "drive0", "speed": 0}}
-+{"return": {}}
-+Backup completed: 5242880
-+{"execute": "blockdev-del", "arguments": {"node-name": "backup0"}}
-+{"return": {}}
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 5d3da937e4..4f6dd6f153 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -275,5 +275,6 @@
- 258 rw quick
- 262 rw quick migration
- 263 rw quick
-+264 rw quick
- 265 rw auto quick
- 266 rw quick
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index b26271187c..a9c496dd7e 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -229,6 +229,10 @@ def qemu_nbd_early_pipe(*args):
-     else:
-         return exitcode, subp.communicate()[0]
- 
-+def qemu_nbd_popen(*args):
-+    '''Run qemu-nbd in daemon mode and return the parent's exit code'''
-+    return subprocess.Popen(qemu_nbd_args + ['--persistent'] + list(args))
-+
- def compare_images(img1, img2, fmt1=imgfmt, fmt2=imgfmt):
-     '''Return True if two image files are identical'''
-     return qemu_img('compare', '-f', fmt1,
--- 
-2.21.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxNzEyMjU1OS4xNTU1
+NS0xLWpvaGFubmVzQHNpcHNvbHV0aW9ucy5uZXQvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVk
+IHRoZSBhc2FuIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFu
+ZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBj
+YW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
+PT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRp
+bWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VUX0xJU1Q9eDg2XzY0LXNvZnRt
+bXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCi4vdGVzdHMvZG9ja2Vy
+L2RvY2tlci5weSAtLWVuZ2luZSBhdXRvIGJ1aWxkIHFlbXU6ZmVkb3JhIHRlc3RzL2RvY2tlci9k
+b2NrZXJmaWxlcy9mZWRvcmEuZG9ja2VyICAgLS1hZGQtY3VycmVudC11c2VyICAKSW1hZ2UgaXMg
+dXAgdG8gZGF0ZS4KICBMRCAgICAgIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYS5tbwpjYzogZmF0
+YWwgZXJyb3I6IG5vIGlucHV0IGZpbGVzCmNvbXBpbGF0aW9uIHRlcm1pbmF0ZWQuCm1ha2U6ICoq
+KiBbZG9ja2VyLXRlc3QtZGVidWdAZmVkb3JhLm1vXSBFcnJvciA0CgoKClRoZSBmdWxsIGxvZyBp
+cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA5MTcxMjI1NTkuMTU1
+NTUtMS1qb2hhbm5lc0BzaXBzb2x1dGlvbnMubmV0L3Rlc3RpbmcuYXNhbi8/dHlwZT1tZXNzYWdl
+LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+cmVkaGF0LmNvbQ==
 
 
