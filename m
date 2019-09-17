@@ -2,83 +2,95 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77D9CC4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:43:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC86BC4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:43:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D64321852
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:43:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B+yj1Smt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D64321852
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B166821852
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:43:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B166821852
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAAxF-00018f-I3
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 06:43:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46819)
+	id 1iAAxZ-0001Yj-0p
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 06:43:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43892)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iAAop-0001mh-8n
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:49 -0400
+ (envelope-from <groug@kaod.org>) id 1iAAcJ-0007Ui-Ip
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:21:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iAAon-0004xH-A7
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:47 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38459)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iAAon-0004wg-12
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:45 -0400
-Received: by mail-wr1-x444.google.com with SMTP id l11so2570889wrx.5
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 03:34:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=s6juWaeJdvbdYfQYOPZtIdvf+1dOdIoXW07/VCUIeko=;
- b=B+yj1SmtCGI/clemc6E3xUgJ5QKLA3T5NhFvCpWor2+JCztY+5LAP5uZUQg+0+52qh
- kfqRmcgzJDi3xXZ6bu1q/tkRJojc6D/x99w+g12QGrCPtAg2Egcn1iTT9+Ft8sEEYkbU
- l7XZvctacAMoxU2939hWxdeYCq0mwFQJ9J0xh1yZoJsx3vGyuY3dfz8DxvJO/rn3r0sO
- oSWS3YKL+Tigf7JYQNv0+KN6+BbWQ6BthttY+vi9Q5GRJLuiiV/DKjU0zjJhIqcO/+nc
- gWinqpwX88VPuhoJg3WEMp5LTaBR/61Hg8+3M+wHaW4EYImwTNg8BGT2oGltuL8HD+0f
- 2G9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=s6juWaeJdvbdYfQYOPZtIdvf+1dOdIoXW07/VCUIeko=;
- b=nb5Bm2lYYasWZWTfN505VvIRVXpdlYz5SZRH5XwoeZonJQZp7kuMbnCovi8FEbJZci
- ep7zgy4oPmPApz/ygRjQVWK+xrzro8qk9mBbCLl40jMU6/bluYPMnrqJC4eE00k8NXYb
- TcSYY7nRHQjyvFVtFS1cAKJtqDmJiyiBudykDF+1QIYaEU8M/Q/t0LALZS57/2VXAysb
- VG0rUlO1CNGmj6HYBhG8zvqebEm1FPOCQhVsT02ruPYsEZI+W3a+AV5JZz8bx+KR3EXT
- gWfjUfPcK2GgldwQCZ4Rf6RJid7j/bjTgLxSDQLbcvvEKFLysAzQbyRuFL/8AuwMDIuE
- B83w==
-X-Gm-Message-State: APjAAAWb+ZbjEoxaIEQXAQJeoGFY8+EmuQklTQkmi5es8oHO5kt4L+qE
- oajJeiv+lSxrUpLmDEGkssktoVh5
-X-Google-Smtp-Source: APXvYqw33fJqo93vWETnpnRY06pOLwDoSG7YDqAN5ll6QpFut9UPeXZLombmHVo86GiJUNNyHhg6rQ==
-X-Received: by 2002:adf:ead2:: with SMTP id o18mr2337793wrn.107.1568716483687; 
- Tue, 17 Sep 2019 03:34:43 -0700 (PDT)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id q3sm1985415wrm.86.2019.09.17.03.34.42
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 17 Sep 2019 03:34:43 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (envelope-from <groug@kaod.org>) id 1iAAcI-0003yx-F3
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:21:51 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:8836)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iAAcI-0003yF-6j
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:21:50 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x8HAHG8M069376
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 06:21:49 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2v2vv9t8np-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 06:21:48 -0400
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Tue, 17 Sep 2019 11:21:45 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 17 Sep 2019 11:21:37 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x8HALZSW59244632
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 17 Sep 2019 10:21:35 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3E2B0A404D;
+ Tue, 17 Sep 2019 10:21:35 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4F4EFA4053;
+ Tue, 17 Sep 2019 10:21:34 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.22.84])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Tue, 17 Sep 2019 10:21:34 +0000 (GMT)
+From: Greg Kurz <groug@kaod.org>
 To: qemu-devel@nongnu.org
-Date: Tue, 17 Sep 2019 12:34:34 +0200
-Message-Id: <1568716480-9973-2-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1568716480-9973-1-git-send-email-pbonzini@redhat.com>
-References: <1568716480-9973-1-git-send-email-pbonzini@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH 1/7] target/i386: handle filtered_features in a
- new function mark_unavailable_features
+Date: Tue, 17 Sep 2019 12:21:34 +0200
+In-Reply-To: <156871562997.196432.17776290406203122029.stgit@bahia.lan>
+References: <156871562997.196432.17776290406203122029.stgit@bahia.lan>
+User-Agent: StGit/unknown-version
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19091710-0016-0000-0000-000002AD13CF
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19091710-0017-0000-0000-0000330DB755
+Message-Id: <156871569396.196432.12307975838741351907.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-17_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=741 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909170106
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [PATCH 10/17] s390x/css: Pass local error object
+ pointer to error_append_hint()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,180 +102,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liran.alon@oracle.com, ehabkost@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <codyprime@gmail.com>,
+ "Daniel P. =?utf-8?q?Berrang=C3=A9=22?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ qemu-s390x@nongnu.org"@d06av23.portsmouth.uk.ibm.com,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+ Juan Quintela <quintela@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ =?utf-8?q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Eric Farman <farman@linux.ibm.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Yuval Shaia <yuval.shaia@oracle.com>,
+ Alex Williamson <alex.williamson@redhat.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The next patch will add a different reason for filtering features, unrelated
-to host feature support.  Extract a new function that takes care of disabling
-the features and optionally reporting them.
+Ensure that hints are added even if errp is &error_fatal or &error_abort.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- target/i386/cpu.c | 87 ++++++++++++++++++++++++++++++-------------------------
- 1 file changed, 48 insertions(+), 39 deletions(-)
+ hw/s390x/s390-ccw.c |    6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 9e0bac3..52b3f3e 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3096,17 +3096,41 @@ static char *feature_word_description(FeatureWordInfo *f, uint32_t bit)
-     return NULL;
- }
- 
--static void report_unavailable_features(FeatureWord w, uint32_t mask)
-+static bool x86_cpu_have_filtered_features(X86CPU *cpu)
+diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
+index 0c5a5b60bd6b..9566be800a3b 100644
+--- a/hw/s390x/s390-ccw.c
++++ b/hw/s390x/s390-ccw.c
+@@ -57,11 +57,13 @@ static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
  {
-+    FeatureWord w;
-+
-+    for (w = 0; w < FEATURE_WORDS; w++) {
-+         if (cpu->filtered_features[w]) {
-+             return true;
-+         }
-+    }
-+
-+    return false;
-+}
-+
-+static void mark_unavailable_features(X86CPU *cpu, FeatureWord w, uint32_t mask,
-+                                      const char *verbose_prefix)
-+{
-+    CPUX86State *env = &cpu->env;
-     FeatureWordInfo *f = &feature_word_info[w];
-     int i;
-     char *feat_word_str;
+     unsigned int cssid, ssid, devid;
+     char dev_path[PATH_MAX] = {0}, *tmp;
++    Error *err = NULL;
  
-+    if (!cpu->force_features) {
-+        env->features[w] &= ~mask;
-+    }
-+    cpu->filtered_features[w] |= mask;
-+
-+    if (!verbose_prefix) {
-+        return;
-+    }
-+
-     for (i = 0; i < 32; ++i) {
-         if ((1UL << i) & mask) {
-             feat_word_str = feature_word_description(f, i);
--            warn_report("%s doesn't support requested feature: %s%s%s [bit %d]",
--                        accel_uses_host_cpuid() ? "host" : "TCG",
-+            warn_report("%s: %s%s%s [bit %d]",
-+                        verbose_prefix,
-                         feat_word_str,
-                         f->feat_names[i] ? "." : "",
-                         f->feat_names[i] ? f->feat_names[i] : "", i);
-@@ -3511,7 +3535,7 @@ static void x86_cpu_parse_featurestr(const char *typename, char *features,
- }
- 
- static void x86_cpu_expand_features(X86CPU *cpu, Error **errp);
--static int x86_cpu_filter_features(X86CPU *cpu);
-+static void x86_cpu_filter_features(X86CPU *cpu, bool verbose);
- 
- /* Build a list with the name of all features on a feature word array */
- static void x86_cpu_list_feature_names(FeatureWordArray features,
-@@ -3576,7 +3600,7 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
-         next = &new->next;
+     if (!sysfsdev) {
+-        error_setg(errp, "No host device provided");
+-        error_append_hint(errp,
++        error_setg(&err, "No host device provided");
++        error_append_hint(&err,
+                           "Use -device vfio-ccw,sysfsdev=PATH_TO_DEVICE\n");
++        error_propagate(errp, err);
+         return;
      }
  
--    x86_cpu_filter_features(xc);
-+    x86_cpu_filter_features(xc, false);
- 
-     x86_cpu_list_feature_names(xc->filtered_features, next);
- 
-@@ -3784,15 +3808,6 @@ static uint32_t x86_cpu_get_supported_feature_word(FeatureWord w,
-     return r;
- }
- 
--static void x86_cpu_report_filtered_features(X86CPU *cpu)
--{
--    FeatureWord w;
--
--    for (w = 0; w < FEATURE_WORDS; w++) {
--        report_unavailable_features(w, cpu->filtered_features[w]);
--    }
--}
--
- static void x86_cpu_apply_props(X86CPU *cpu, PropValue *props)
- {
-     PropValue *pv;
-@@ -5154,24 +5169,24 @@ out:
-  *
-  * Returns: 0 if all flags are supported by the host, non-zero otherwise.
-  */
--static int x86_cpu_filter_features(X86CPU *cpu)
-+static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
- {
-     CPUX86State *env = &cpu->env;
-     FeatureWord w;
--    int rv = 0;
-+    const char *prefix = NULL;
-+
-+    if (verbose) {
-+        prefix = accel_uses_host_cpuid()
-+                 ? "host doesn't support requested feature"
-+                 : "TCG doesn't support requested feature";
-+    }
- 
-     for (w = 0; w < FEATURE_WORDS; w++) {
-         uint32_t host_feat =
-             x86_cpu_get_supported_feature_word(w, false);
-         uint32_t requested_features = env->features[w];
--        uint32_t available_features = requested_features & host_feat;
--        if (!cpu->force_features) {
--            env->features[w] = available_features;
--        }
--        cpu->filtered_features[w] = requested_features & ~available_features;
--        if (cpu->filtered_features[w]) {
--            rv = 1;
--        }
-+        uint32_t unavailable_features = requested_features & ~host_feat;
-+        mark_unavailable_features(cpu, w, unavailable_features, prefix);
-     }
- 
-     if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
-@@ -5197,13 +5212,9 @@ static int x86_cpu_filter_features(X86CPU *cpu)
-              * host can't emulate the capabilities we report on
-              * cpu_x86_cpuid(), intel-pt can't be enabled on the current host.
-              */
--            env->features[FEAT_7_0_EBX] &= ~CPUID_7_0_EBX_INTEL_PT;
--            cpu->filtered_features[FEAT_7_0_EBX] |= CPUID_7_0_EBX_INTEL_PT;
--            rv = 1;
-+            mark_unavailable_features(cpu, FEAT_7_0_EBX, CPUID_7_0_EBX_INTEL_PT, prefix);
-         }
-     }
--
--    return rv;
- }
- 
- static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-@@ -5244,16 +5255,14 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-         goto out;
-     }
- 
--    if (x86_cpu_filter_features(cpu) &&
--        (cpu->check_cpuid || cpu->enforce_cpuid)) {
--        x86_cpu_report_filtered_features(cpu);
--        if (cpu->enforce_cpuid) {
--            error_setg(&local_err,
--                       accel_uses_host_cpuid() ?
--                           "Host doesn't support requested features" :
--                           "TCG doesn't support requested features");
--            goto out;
--        }
-+    x86_cpu_filter_features(cpu, cpu->check_cpuid || cpu->enforce_cpuid);
-+
-+    if (cpu->enforce_cpuid && x86_cpu_have_filtered_features(cpu)) {
-+        error_setg(&local_err,
-+                   accel_uses_host_cpuid() ?
-+                       "Host doesn't support requested features" :
-+                       "TCG doesn't support requested features");
-+        goto out;
-     }
- 
-     /* On AMD CPUs, some CPUID[8000_0001].EDX bits must match the bits on
--- 
-1.8.3.1
-
 
 
