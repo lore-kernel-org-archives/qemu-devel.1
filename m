@@ -2,73 +2,81 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C90CC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:44:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A368FC4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:47:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2194A2053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:44:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2194A2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 68EDA20640
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:47:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="umhRwboE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68EDA20640
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iADmh-0005oU-1G
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 09:44:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46650)
+	id 1iADpi-0000Mf-C2
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 09:47:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46807)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iADko-0004Gb-0M
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:42:53 -0400
+ (envelope-from <liq3ea@gmail.com>) id 1iADlZ-0005B7-77
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:43:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iADkl-0008QE-NT
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:42:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:25941)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iADkf-0008OJ-Iq; Tue, 17 Sep 2019 09:42:41 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DF65A8A2195;
- Tue, 17 Sep 2019 13:42:40 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-202.ams2.redhat.com
- [10.36.116.202])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A63BE6012E;
- Tue, 17 Sep 2019 13:42:37 +0000 (UTC)
-Date: Tue, 17 Sep 2019 15:42:35 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Message-ID: <20190917134235.GC4824@localhost.localdomain>
-References: <20190819201851.24418-1-mreitz@redhat.com>
- <20190819201851.24418-7-mreitz@redhat.com>
- <44f97011-4a02-7832-c253-d43474f79d44@redhat.com>
- <a829185c-7c09-5afe-1479-15054ad59807@redhat.com>
- <33f60f4e-8156-e46f-8500-79b0982348b2@redhat.com>
- <c38acedf-d3db-384f-4aea-967ef3f87fdd@redhat.com>
- <20190917084012.GA4824@localhost.localdomain>
- <e9c8a9f5-80d9-b003-8036-0ba8df352ec3@redhat.com>
- <20190917112212.GB4824@localhost.localdomain>
- <1bed5587-63bf-2fe5-fe6a-4ac337058e2a@redhat.com>
+ (envelope-from <liq3ea@gmail.com>) id 1iADlX-0000SD-2I
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:43:37 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:42835)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1iADlW-0000Rk-T9
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:43:35 -0400
+Received: by mail-oi1-x241.google.com with SMTP id i185so2847282oif.9
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 06:43:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=fh0ZbYYidaK1w0KVDkBIcPA8wIL+RsxEomQqKOopJe8=;
+ b=umhRwboErMdtHS9x0zk5M4gDrZFZxhLGKvEABaAa4fyQr6w0IUrxa069QuGmgJXyR/
+ 4D2qyGCeWf0W8A1l1Zcj/iaO07p2dnpf2LWDzHhXhEKkvfjfneQ9Sqd/tZYTEdLuUEHv
+ DCrnKQH0tpwO6VRmhHVzFXCcebDT6aZMFDLQ3Ha/D+YLUM1BdKiy3WbxLxQ08qqXEGMs
+ frGGJif3fo0aE/k9YC+iS869i2OyE3IcptGEyGEVUnk9u17DbjKe94IvbBE+dQs/Nu8F
+ hwc2yqL3pSj0PILwD2ezHxhPN5FTxhXppFz6Njlm57rG9kNrTbXtWNlOeTvYQHGQ1TIR
+ 2vxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=fh0ZbYYidaK1w0KVDkBIcPA8wIL+RsxEomQqKOopJe8=;
+ b=lSRvXpGJWw3AUj2RPITiPFl+9zJZiEybTJcUZr70iGcA+XGJeXzouuYEtfkiRjqBbo
+ ac1rgn/D8LTwI3CT4ehBT3kEHlHojLbKJl59jNnV67BGHucQ1rjYCin0+90QnCbHgd2P
+ 0OJd7wNRdz+RgeDIWovt0FReHhOG5jjXpT0Vw8tOoJ+loI9DrJrE7DMvSKWH1T6d3Sl/
+ fS0k1Iz3a729CCELTnCHzei7WZSQszAEFP5pgcHl+pnm4wntu3kqYZL2bTrYfqasvtCt
+ XHTlieE2cG8gMUN+I1Wmuci5jSB8JKSBMgy6xestub2VafV7m9rQt9xuIeyL7ASn6R/7
+ xKIw==
+X-Gm-Message-State: APjAAAXZhXQLFsqCAFS3u98DH85tomJHgTbNUJVaMi8s0Z9q7VD/12Gu
+ hbVVYOikWHMuJ8pqMWP2dm78VHOK21/yhz2286g=
+X-Google-Smtp-Source: APXvYqxc/0BXdX95Cy8PzEpVZ6rU4VV/XeM3PYFfowZZD3i83JGnEggWXQ/CIBI31Fmw2GcYyT+mD78r7SfkrPg5WS4=
+X-Received: by 2002:aca:5a04:: with SMTP id o4mr3800679oib.97.1568727813758;
+ Tue, 17 Sep 2019 06:43:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1bed5587-63bf-2fe5-fe6a-4ac337058e2a@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Tue, 17 Sep 2019 13:42:40 +0000 (UTC)
+References: <20190831153922.121308-1-liq3ea@163.com>
+ <20190917114536.sh7xbekebne4pqox@sirius.home.kraxel.org>
+In-Reply-To: <20190917114536.sh7xbekebne4pqox@sirius.home.kraxel.org>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 17 Sep 2019 21:42:57 +0800
+Message-ID: <CAKXe6SJnHqwDA9qoGvz_9yF+HCTcctavdckLmWtuQYh_bd9-ow@mail.gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 6/8] iotests: Test driver whitelisting
- in 093
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH] vnc: fix memory leak when vnc disconnect
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,80 +88,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Ying Fang <fangying1@huawei.com>, Li Qiang <liq3ea@163.com>,
+ Qemu Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 17.09.2019 um 15:09 hat John Snow geschrieben:
-> On 9/17/19 7:22 AM, Kevin Wolf wrote:
-> > Am 17.09.2019 um 13:07 hat Max Reitz geschrieben:
-> >> On 17.09.19 10:40, Kevin Wolf wrote:
-> >>> Am 17.09.2019 um 10:18 hat Max Reitz geschrieben:
-> >>>> On 13.09.19 20:30, John Snow wrote:
-> >>>>> I'd still like to define func_wrapper with a nod to the type cons=
-traint
-> >>>>> it has:
-> >>>>>
-> >>>>> def func_wrapper(instance: iotests.QMPTestCase, *args, **kwargs):
-> >>>>>     [...]
-> >>>>>
-> >>>>>
-> >>>>> Then, you'd write:
-> >>>>>
-> >>>>> if callable(required_formats):
-> >>>>>     fmts =3D required_formats(instance)
-> >>>>> else:
-> >>>>>     fmts =3D required_formats
-> >>>>
-> >>>> Yep, that anyway.  (Although I didn=E2=80=99t know about the =E2=80=
-=9Cparam: type=E2=80=9D
-> >>>> syntax and put that constraint in a comment instead.  Thanks again=
- :-))
-> >>>
-> >>> Note that function annotations are Python 3 only, so we can't use t=
-hat
-> >>> syntax yet anyway. If you want to use type hints that are understoo=
-d by
-> >>> tools (like mypy) and compatible with Python 2, you have to use
-> >>> something like this (feel free to be more specific than Any):
-> >>
-> >> Do we really feel like staying compatible with Python 2, though?
-> >=20
-> > Feel like it? No.
-> >=20
-> > It's more that we are compelled to do so because we only deprecated i=
-t
-> > in 4.1.
->=20
-> Sorry for the impromptu lesson on type hints in 3.5! I added that in to
-> my suggestion as a demonstrative example and didn't mean for you to use
-> it as-is, sorry for not making that clear.
->=20
-> I'm confused about the Python3 deprecation timeline. Normally we'd
-> follow our standard approach, but it does hit EOL at the end of this
-> year, so do we drop support then, too? I have the memory of a goldfish =
-I
-> suppose, and can't quite remember our conclusions, if any, of previous
-> discussions on this subject.
+Gerd Hoffmann <kraxel@redhat.com> =E4=BA=8E2019=E5=B9=B49=E6=9C=8817=E6=97=
+=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=887:45=E5=86=99=E9=81=93=EF=BC=9A
 
-It shouldn't make a difference actually because deprecation in 4.1 means
-that 4.2 (in December) will be the last release that must still support
-Python 2, and we can switch to Python 3 for 5.0.
+> On Sat, Aug 31, 2019 at 08:39:22AM -0700, Li Qiang wrote:
+> > Currently when qemu receives a vnc connect, it creates a 'VncState' to
+> > represent this connection. In 'vnc_worker_thread_loop' it creates a
+> > local 'VncState'. The connection 'VcnState' and local 'VncState' exchan=
+ge
+> > data in 'vnc_async_encoding_start' and 'vnc_async_encoding_end'.
+> > In 'zrle_compress_data' it calls 'deflateInit2' to allocate the libz
+> library
+> > opaque data. The 'VncState' used in 'zrle_compress_data' is the local
+> > 'VncState'. In 'vnc_zrle_clear' it calls 'deflateEnd' to free the libz
+> > library opaque data. The 'VncState' used in 'vnc_zrle_clear' is the
+> connection
+> > 'VncState'. In currently implementation there will be a memory leak whe=
+n
+> the
+> > vnc disconnect. Following is the asan output backtrack:
+>
+> Added to ui patch queue.
+>
+>
+Shouldn't we care the race condition between main thread and the vnc thread=
+?
 
-> If we do drop python2 though, the new minimum version appears to be 3.5
-> because that's what ships in EPEL. That'd give us standardized type
-> hints that we can use for static analysis tools.
+Thanks,
+Li Qiang
 
-Actually I seem to remember I suggested that we should make 3.5 the
-minimum Python 3 version, and I thought a patch to this effect had been
-merged, but now I can't find any such check in configure. Maybe I should
-find the old thread again to see if there was any reason not to do this.
 
-Personally, I would have preferred 3.6 because it brings in variable
-annotations, but I think last time the conclusion was that it would be
-3.5 indeed.
 
-Kevin
-
+> thanks,
+>   Gerd
+>
+>
