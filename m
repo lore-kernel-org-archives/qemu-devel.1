@@ -2,90 +2,80 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27D70C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:53:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30523C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:57:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE47E21852
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:53:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE47E21852
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EEB1B2171F
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:57:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JBmFock1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEB1B2171F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iADv6-0004em-Ud
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 09:53:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48012)
+	id 1iADzN-0000Lb-1d
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 09:57:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48644)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iADtm-0003SB-TM
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:52:07 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iADy0-00080f-Eq
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:56:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iADtl-0004R4-PJ
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:52:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52068)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iADti-0004Ph-Va; Tue, 17 Sep 2019 09:52:03 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DFC85315C00D;
- Tue, 17 Sep 2019 13:52:01 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 53FB8196AE;
- Tue, 17 Sep 2019 13:52:01 +0000 (UTC)
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20190917110443.2029-1-kwolf@redhat.com>
- <20190917110443.2029-2-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <39e27987-e29b-570d-b7c5-970aed3028cf@redhat.com>
-Date: Tue, 17 Sep 2019 08:52:00 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <peter.maydell@linaro.org>) id 1iADxz-00070a-08
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:56:27 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:46696)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iADxy-00070I-RQ
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:56:26 -0400
+Received: by mail-ot1-x343.google.com with SMTP id g19so3068815otg.13
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 06:56:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=gwnUj7pw1NkDh/+EmcJUoBFPLtfBFys7kTec99iXX7A=;
+ b=JBmFock1Jdt75aWsqJyRf2krnkqbDbYNstR34HQerP+/UAi1PjjUyd0AsqLGht/ejb
+ 7VLgRHAF/ci8eEZKxhDy0ZxuwQUCZg5aN4Fg2mcX5W4UITfddKGrYy8bWiUvBVQ5b2YS
+ l6GYAfeP1m62JiW4nbKT4CQqdFPzxqrRfgvSFgVee14osH93Uuzf94m/GjLiormnCGmR
+ taHA+Ry+so5M9s0UMmObYYCdw6kbY0CKY8t8fkkLt3iHwjyxhxmCP03I90QV774ouZxb
+ RbgHtwceBOqSY5pxehUlNCiJQ99Nt208KlJckj10aFbYCjiafMs2CTD7GXL/Toh/AlXd
+ GVvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=gwnUj7pw1NkDh/+EmcJUoBFPLtfBFys7kTec99iXX7A=;
+ b=NRHisbcLR/4fCe00WaBXZCes5XzWerXuGeTgcgeoB4jvOPV6wXVZacq30KZCkNlt17
+ qUDYq0I68HsnvTcQq7MrVnG2jG5Wpti84Y+Vyr4fyZVJXE5ayVXuk4tBOZBFm6Dk8r+a
+ jxqRIujcl/8QYG9wj2cnwzSyXCudmM1ff9NFitTRoRFBCnwIHHVVxfdG4kAFjT4jwokC
+ C4hnTgjdzW+IyxRb2LdWdf6hLSMgTlR5V5oy89kd+8++RtDfS2I29wAhvE3oXkmMknr6
+ qFlCFDc42TSy/BE6B9nsE2lu1PY/rKpL10/9VSFcdzifnpROBAh8QOYEuSQwUGUAO0EC
+ DYmQ==
+X-Gm-Message-State: APjAAAVK0Fd/Dy2nGKkJgSFdzbyJ+bhPEnm681R5ceewcH+fB9zFXcQs
+ d7BLh6U2lCyoEWY9BEtR0kpZjmhU36WqlxLdgpeoXg==
+X-Google-Smtp-Source: APXvYqzZe2LXAnHGhaSoqPEnnAGcdSg1/fiBa5pWJaXSWTFzw0B1g6Yd9LKhoHILLFl9edBsnMH5HPNBlqMzmNaSLC4=
+X-Received: by 2002:a9d:5e11:: with SMTP id d17mr2876663oti.135.1568728585786; 
+ Tue, 17 Sep 2019 06:56:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190917110443.2029-2-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="uk3Knuw1z4rffy5A1QHXEyhBovfV1PlC5"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Tue, 17 Sep 2019 13:52:02 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] block/snapshot: Restrict set of
- snapshot nodes
+References: <20190801183012.17564-1-peter.maydell@linaro.org>
+ <25efcf4b-8b34-11a0-a6d5-992b363ce474@ilande.co.uk>
+In-Reply-To: <25efcf4b-8b34-11a0-a6d5-992b363ce474@ilande.co.uk>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Sep 2019 14:56:14 +0100
+Message-ID: <CAFEAcA9JAjv7f1f-=dgjw_7=iB+cr7L3yy7kDXbdECZCdep_ag@mail.gmail.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH 0/7] target/sparc: Convert to
+ do_transaction_failed hook
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,91 +87,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uk3Knuw1z4rffy5A1QHXEyhBovfV1PlC5
-Content-Type: multipart/mixed; boundary="sAMzMWuP0NKr7ckeYgTTeWlVteASuC0Y8";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
-Message-ID: <39e27987-e29b-570d-b7c5-970aed3028cf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] block/snapshot: Restrict set of snapshot
- nodes
-References: <20190917110443.2029-1-kwolf@redhat.com>
- <20190917110443.2029-2-kwolf@redhat.com>
-In-Reply-To: <20190917110443.2029-2-kwolf@redhat.com>
+On Fri, 6 Sep 2019 at 15:34, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+>
+> On 01/08/2019 19:30, Peter Maydell wrote:
+>
+> > This patchset converts the SPARC target away from the old
+> > broken do_unassigned_access hook to the new (added in 2017...)
+> > do_transaction_failed hook. In the process it fixes a number
+> > of bugs in corner cases.
 
---sAMzMWuP0NKr7ckeYgTTeWlVteASuC0Y8
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+> > Peter Maydell (7):
+> >   target/sparc: Factor out the body of sparc_cpu_unassigned_access()
+> >   target/sparc: Check for transaction failures in MMU passthrough ASIs
+> >   target/sparc: Check for transaction failures in MXCC stream ASI
+> >     accesses
+> >   target/sparc: Correctly handle bus errors in page table walks
+> >   target/sparc: Handle bus errors in mmu_probe()
+> >   target/sparc: Remove unused ldl_phys from dump_mmu()
+> >   target/sparc: Switch to do_transaction_failed() hook
+> >
+> >  target/sparc/cpu.h         |   8 +-
+> >  target/sparc/cpu.c         |   2 +-
+> >  target/sparc/ldst_helper.c | 319 +++++++++++++++++++++----------------
+> >  target/sparc/mmu_helper.c  |  57 +++++--
+> >  4 files changed, 238 insertions(+), 148 deletions(-)
+>
+> I've just run this through my SPARC test images with a fairly recent git master and I
+> don't see any obvious regressions so:
+>
+> Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>
+> Thanks for taking the time to do the conversion for the SPARC target.
 
-On 9/17/19 6:04 AM, Kevin Wolf wrote:
-> Nodes involved in internal snapshots were those that were returned by
-> bdrv_next(), inserted and not read-only. bdrv_next() in turn returns al=
-l
-> nodes that are either the root node of a BlockBackend or monitor-owned
-> nodes.
->=20
-> With the typical -drive use, this worked well enough. However, in the
-> typical -blockdev case, the user defines one node per option, making al=
-l
-> nodes monitor-owned nodes. This includes protocol nodes etc. which ofte=
-n
-> are not snapshottable, so "savevm" only returns an error.
->=20
-> Change the conditions so that internal snapshot still include all nodes=
+Thanks; I've applied the patchset to master.
 
-> that have a BlockBackend attached (we definitely want to snapshot
-> anything attached to a guest device and probably also the built-in NBD
-> server; snapshotting block job BlockBackends is more of an accident, bu=
-t
-> a preexisting one), but other monitor-owned nodes are only included if
-> they have no parents.
->=20
-> This makes internal snapshots usable again with typical -blockdev
-> configurations.
->=20
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/snapshot.c | 26 +++++++++++++++++++-------
->  1 file changed, 19 insertions(+), 7 deletions(-)
-
-Makes sense.  But you'll want Peter's review that it actually passes
-testing with libvirt, rather than relying solely on my:
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---sAMzMWuP0NKr7ckeYgTTeWlVteASuC0Y8--
-
---uk3Knuw1z4rffy5A1QHXEyhBovfV1PlC5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2A5QAACgkQp6FrSiUn
-Q2ocUwgAi3zYRb+53YjKPh7SYZIjo+8t8CetQYtYzRQFCjFD8hBvvneTUXp+9op3
-5E4ZbtKK/IYz6OQe1Q5siKswkt19Nb8rc3zS++/e3yUJCYvW9w61uvHvw4gMyEiL
-X6AZvBF/j134BFNknGoyUC+gnaKOUfR2vdOPUZuz5KFYn+Qwz12tQ0GwLKBNA33s
-0tP9RJokDCD13pgOYF/CEvCBZfkCqrs+uQ7sCP5GiDQ2KVb5rPbTUpcGFflbKTto
-kJfmLN6ZH+BjrFfAI1KInUII84AEvroep+pOX3Y3/vEc8Sgc7589SanU0GbWx1Yy
-Y9bkUguiPsdr+klqBYQHjvmDhgcRuw==
-=lJ26
------END PGP SIGNATURE-----
-
---uk3Knuw1z4rffy5A1QHXEyhBovfV1PlC5--
+-- PMM
 
