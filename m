@@ -2,59 +2,70 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D50C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:08:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB713C4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:09:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0D5F214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:08:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0D5F214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 765DA216C8
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:09:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="R3jqWC4A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 765DA216C8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iADDY-0000kI-DL
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 09:08:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41852)
+	id 1iADEa-0001wc-8K
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 09:09:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41915)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iADCW-00006r-DM
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:07:26 -0400
+ (envelope-from <kbastian@mail.uni-paderborn.de>) id 1iADCy-0000Vw-50
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:07:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iADCU-0002ZW-0L
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:07:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35292)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iADCT-0002ZO-PU
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:07:21 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 007E510F2E81;
- Tue, 17 Sep 2019 13:07:21 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8879519C4F;
- Tue, 17 Sep 2019 13:07:18 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 17 Sep 2019 09:07:08 -0400
-Message-Id: <20190917130708.10281-3-imammedo@redhat.com>
-In-Reply-To: <20190917130708.10281-1-imammedo@redhat.com>
-References: <20190917130708.10281-1-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Tue, 17 Sep 2019 13:07:21 +0000 (UTC)
+ (envelope-from <kbastian@mail.uni-paderborn.de>) id 1iADCv-0002hc-Bf
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:07:51 -0400
+Received: from zuban.uni-paderborn.de ([131.234.189.17]:41684)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+ id 1iADCu-0002gl-Oz; Tue, 17 Sep 2019 09:07:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=mail.uni-paderborn.de; s=20170601; h=Content-Transfer-Encoding:Content-Type
+ :In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:
+ Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+ Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+ List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=RLrzT76BGLWUQElAktBhQ8dZhxAWdzuSE2omautw7r4=; b=R3jqWC4AFwwxtojdDldUjSOJlQ
+ Ly2oHO65WwThONaRHPflLbv+2ug9i0SbY5Z7Ch9OGwSyirv8I2Eps7FkkiKH89kJXO2r5zRYPUlfM
+ ckr6rOVe6XvlzcbkuWIlzMgM59PUBHSUWcoyOGHsvZ4QN2Ji3oYd6iz57As0t3Ky4lXI=;
+To: Peter Maydell <peter.maydell@linaro.org>,
+ "Konopik, Andreas" <andreas.konopik@fau.de>
+References: <9cf47438fa943b28ee987cea7b76a459@fau.de>
+ <CAFEAcA-oP9QkYnQr1SQUvTks+9ySjDCn0G5yuULdOBepQi-PSw@mail.gmail.com>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <8ab962a1-e372-59bb-022a-9fff72841211@mail.uni-paderborn.de>
+Date: Tue, 17 Sep 2019 15:07:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-oP9QkYnQr1SQUvTks+9ySjDCn0G5yuULdOBepQi-PSw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US-large
+X-IMT-Spam-Score: 0.0 ()
+X-PMX-Version: 6.4.7.2805085, Antispam-Engine: 2.7.2.2107409,
+ Antispam-Data: 2019.9.17.130017, AntiVirus-Engine: 5.65.0,
+ AntiVirus-Data: 2019.9.9.5650001
+X-IMT-Authenticated-Sender: kbastian@UNI-PADERBORN.DE
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 2/2] tests: q35: MCH: add default SMBASE SMRAM
- lock test
+X-Received-From: 131.234.189.17
+Subject: Re: [Qemu-devel] [Qemu-discuss] Segmentation fault on target tricore
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,145 +77,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yingwen.chen@intel.com, devel@edk2.groups.io, phillip.goerl@oracle.com,
- alex.williamson@redhat.com, jiewen.yao@intel.com, jun.nakajima@intel.com,
- michael.d.kinney@intel.com, pbonzini@redhat.com, boris.ostrovsky@oracle.com,
- rfc@edk2.groups.io, lersek@redhat.com, joao.m.martins@oracle.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ qemu-discuss <qemu-discuss@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-test lockable SMRAM at default SMBASE feature introduced by
-commit "q35: implement 128K SMRAM at default SMBASE address"
+Hi Andreas,
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
- tests/q35-test.c | 105 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 105 insertions(+)
+On 9/17/19 2:32 PM, Peter Maydell wrote:
+> On Tue, 17 Sep 2019 at 13:24, Konopik, Andreas <andreas.konopik@fau.de> wrote:
+>> Hello,
+>>
+>> I am wondering why the "Hello world"-program available in TASKING
+>> (v6.2r1) generates a segfault.
+>>
+>> I compiled the program for the 'TC1796' Processor (Infineon TriCore 1
+>> Family -> AUDO NextGeneration Family).
+>> QEMU was built with gcc 9.1.0 and I added a memory region, that was
+>> necessary [1].
+>> Running QEMU with following options:
+>> `./qemu/build/tricore-softmmu/qemu-system-tricore -nographic -M
+>> tricore_testboard -cpu tc1796 -kernel hello.elf`
+>> led to a segfault in a short time
+> Hi -- I'm cc'ing the qemu-devel list and the TriCore maintainer;
+> not everybody reads the -discuss mailing list.
+>
+>> Using gdb and valgrind I found out that:
+>> - 'gen_mtcr()' and 'gen_mfcr()' access uninitialized values, i.e. CSFRs,
+>> which leads to the Segfault
+>> - The uninitialised values were created by stack allocation of
+>> DisasContext in 'gen_intermediate_code()'
 
-diff --git a/tests/q35-test.c b/tests/q35-test.c
-index a68183d513..dd02660303 100644
---- a/tests/q35-test.c
-+++ b/tests/q35-test.c
-@@ -186,6 +186,109 @@ static void test_tseg_size(const void *data)
-     qtest_quit(qts);
- }
- 
-+#define SMBASE 0x30000
-+#define SMRAM_TEST_PATTERN 0x32
-+#define SMRAM_TEST_RESET_PATTERN 0x23
-+
-+static void test_smram_smbase_lock(void)
-+{
-+    QPCIBus *pcibus;
-+    QPCIDevice *pcidev;
-+    QDict *response;
-+    QTestState *qts;
-+    int i;
-+
-+    qts = qtest_init("-M q35");
-+
-+    pcibus = qpci_new_pc(qts, NULL);
-+    g_assert(pcibus != NULL);
-+
-+    pcidev = qpci_device_find(pcibus, 0);
-+    g_assert(pcidev != NULL);
-+
-+    /* check that SMRAM is not enabled by default */
-+    g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) == 0);
-+    qtest_writeb(qts, SMBASE, SMRAM_TEST_PATTERN);
-+    g_assert_cmpint(qtest_readb(qts, SMBASE), ==, SMRAM_TEST_PATTERN);
-+
-+    /* check that writinng junk to 0x9c before before negotiating is ignorred */
-+    for (i = 0; i < 0xff; i++) {
-+        qpci_config_writeb(pcidev, MCH_HOST_BRIDGE_F_SMBASE, i);
-+        g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) == 0);
-+    }
-+
-+    /* enable SMRAM at SMBASE */
-+    qpci_config_writeb(pcidev, MCH_HOST_BRIDGE_F_SMBASE, 0xff);
-+    g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) == 0x01);
-+    /* lock SMRAM at SMBASE */
-+    qpci_config_writeb(pcidev, MCH_HOST_BRIDGE_F_SMBASE, 0x02);
-+    g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) == 0x02);
-+
-+    /* check that SMRAM at SMBASE is locked and can't be unlocked */
-+    g_assert_cmpint(qtest_readb(qts, SMBASE), ==, 0xff);
-+    for (i = 0; i <= 0xff; i++) {
-+        /* make sure register is immutable */
-+        qpci_config_writeb(pcidev, MCH_HOST_BRIDGE_F_SMBASE, i);
-+        g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) == 0x02);
-+
-+        /* RAM access should go inot black hole */
-+        qtest_writeb(qts, SMBASE, SMRAM_TEST_PATTERN);
-+        g_assert_cmpint(qtest_readb(qts, SMBASE), ==, 0xff);
-+    }
-+
-+    /* reset */
-+    response = qtest_qmp(qts, "{'execute': 'system_reset', 'arguments': {} }");
-+    g_assert(response);
-+    g_assert(!qdict_haskey(response, "error"));
-+    qobject_unref(response);
-+
-+    /* check RAM at SMBASE is available after reset */
-+    g_assert_cmpint(qtest_readb(qts, SMBASE), ==, SMRAM_TEST_PATTERN);
-+    g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) == 0);
-+    qtest_writeb(qts, SMBASE, SMRAM_TEST_RESET_PATTERN);
-+    g_assert_cmpint(qtest_readb(qts, SMBASE), ==, SMRAM_TEST_RESET_PATTERN);
-+
-+    g_free(pcidev);
-+    qpci_free_pc(pcibus);
-+
-+    qtest_quit(qts);
-+}
-+
-+static void test_without_smram_base(void)
-+{
-+    QPCIBus *pcibus;
-+    QPCIDevice *pcidev;
-+    QTestState *qts;
-+    int i;
-+
-+    qts = qtest_init("-M pc-q35-4.1");
-+
-+    pcibus = qpci_new_pc(qts, NULL);
-+    g_assert(pcibus != NULL);
-+
-+    pcidev = qpci_device_find(pcibus, 0);
-+    g_assert(pcidev != NULL);
-+
-+    /* check that RAM accessible */
-+    qtest_writeb(qts, SMBASE, SMRAM_TEST_PATTERN);
-+    g_assert_cmpint(qtest_readb(qts, SMBASE), ==, SMRAM_TEST_PATTERN);
-+
-+    /* check that writing to 0x9c succeeds */
-+    for (i = 0; i <= 0xff; i++) {
-+        qpci_config_writeb(pcidev, MCH_HOST_BRIDGE_F_SMBASE, i);
-+        g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) == i);
-+    }
-+
-+    /* check that RAM is still accessible */
-+    qtest_writeb(qts, SMBASE, SMRAM_TEST_PATTERN + 1);
-+    g_assert_cmpint(qtest_readb(qts, SMBASE), ==, (SMRAM_TEST_PATTERN + 1));
-+
-+    g_free(pcidev);
-+    qpci_free_pc(pcibus);
-+
-+    qtest_quit(qts);
-+}
-+
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
-@@ -197,5 +300,7 @@ int main(int argc, char **argv)
-     qtest_add_data_func("/q35/tseg-size/8mb", &tseg_8mb, test_tseg_size);
-     qtest_add_data_func("/q35/tseg-size/ext/16mb", &tseg_ext_16mb,
-                         test_tseg_size);
-+    qtest_add_func("/q35/smram/smbase_lock", test_smram_smbase_lock);
-+    qtest_add_func("/q35/smram/legacy_smbase", test_without_smram_base);
-     return g_test_run();
- }
--- 
-2.18.1
+
+Sounds like a thing we already fixed (see 
+https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg05496.html). 
+However, I see that you used a version already containing the fix.
+
+
+> This definitely sounds like a bug: do you have a stack
+> backtrace from valgrind or gdb of the bad access and the
+> segfault?
+
+
+Yes, or a small reproducer program.
+
+
+>>> diff --git a/hw/tricore/tricore_testboard.c
+>>> b/hw/tricore/tricore_testboard.c
+>>> index aef3289f8c..c287e0e7f5 100644
+>>> --- a/hw/tricore/tricore_testboard.c
+>>> +++ b/hw/tricore/tricore_testboard.c
+>>> @@ -59,6 +59,7 @@ static void tricore_testboard_init(MachineState
+>>> *machine, int board_id)
+>>>      CPUTriCoreState *env;
+>>>
+>>>      MemoryRegion *sysmem = get_system_memory();
+>>> +    MemoryRegion *pflash = g_new(MemoryRegion, 1);
+>>>      MemoryRegion *ext_cram = g_new(MemoryRegion, 1);
+>>>      MemoryRegion *ext_dram = g_new(MemoryRegion, 1);
+>>>      MemoryRegion *int_cram = g_new(MemoryRegion, 1);
+>>> @@ -68,6 +69,8 @@ static void tricore_testboard_init(MachineState
+>>> *machine, int board_id)
+>>>
+>>>      cpu = TRICORE_CPU(cpu_create(machine->cpu_type));
+>>>      env = &cpu->env;
+>>> +    memory_region_init_ram(pflash, NULL, "pflash",
+>>> +                           2 * MiB, &error_fatal);
+>>>      memory_region_init_ram(ext_cram, NULL, "powerlink_ext_c.ram",
+>>>                             2 * MiB, &error_fatal);
+>>>      memory_region_init_ram(ext_dram, NULL, "powerlink_ext_d.ram",
+>>> @@ -81,6 +84,7 @@ static void tricore_testboard_init(MachineState
+>>> *machine, int board_id)
+>>>      memory_region_init_ram(pcp_text, NULL, "powerlink_pcp_text.ram",
+>>>                             32 * KiB, &error_fatal);
+>>>
+>>> +    memory_region_add_subregion(sysmem, 0xa0000000, pflash);
+>>>      memory_region_add_subregion(sysmem, 0x80000000, ext_cram);
+>>>      memory_region_add_subregion(sysmem, 0xa1000000, ext_dram);
+>>>      memory_region_add_subregion(sysmem, 0xd4000000, int_cram);
+> I don't know enough about TriCore or the board QEMU is
+> emulating here to know whether this is the right thing;
+> Bastian?
+
+
+As the name suggest this is just a Testboard (and thus is not linked to 
+any real board) that initializes the minimal amount of memory that is 
+needed to run a binary. If you're interested you can implement a real 
+board. I'm happy to take such a patch :)
+
+
+Cheers,
+
+Bastian
 
 
