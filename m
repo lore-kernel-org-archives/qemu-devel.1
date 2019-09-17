@@ -2,67 +2,90 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 867B0C4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 18:11:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36929C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 18:13:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60ABC21670
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 18:11:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60ABC21670
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 13C8D21670
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 18:13:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13C8D21670
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAHx1-0002TR-Hd
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 14:11:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57655)
+	id 1iAHyH-0003WS-03
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 14:13:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57666)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iAHwD-0001cv-Rr
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:10:54 -0400
+ (envelope-from <eblake@redhat.com>) id 1iAHwF-0001eO-CZ
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:10:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iAHwC-0004wk-P1
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:10:53 -0400
-Resent-Date: Tue, 17 Sep 2019 14:10:53 -0400
-Resent-Message-Id: <E1iAHwC-0004wk-P1@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21421)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iAHwC-0004w5-HZ
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:10:52 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568743836; cv=none; d=zoho.com; s=zohoarc; 
- b=TYyIEtqBoZ+GTH4pT0I3dgyVtggB5l0wUGRy4GJ3QlaXudN21Qe1MoMhletXn/4hi57+xMZLsu97hmlYc6auQOCTnhUhbeWFoyXsT+vQevrVye8aLE+RbnQbfj0ycSLaAjY43Dju+51L88gIoZXcgdSR5UKI9NEzLPBR5Xp9st0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1568743836;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=C+1ohvCZYYB8OxXA6ak8hUcrtJMdFF0j6XWv9wg4+h4=; 
- b=BCzl91n6ghboRPPJwivsmPJnYGgdY/Oe9+xGa3JyRlorLal5oPUd8L4W2XSTkgPpEN6fJi46jrgKWVx7eGVKLnKdLSxQ70921DfCFZvPvhrIiyypZsOeWewepR9/mtnBOYNo/boKBpZ1LaLiv0v4/lpZKkcdYrVUYF4+8orFw3c=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1568743834491459.0097083817162;
- Tue, 17 Sep 2019 11:10:34 -0700 (PDT)
-In-Reply-To: <156872146565.1757.3033215873677512474.stgit@pasha-Precision-3630-Tower>
-Message-ID: <156874383189.17151.10736945008014961739@5dec9699b7de>
+ (envelope-from <eblake@redhat.com>) id 1iAHwE-0004xM-DT
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:10:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60264)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAHwE-0004x7-5B
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:10:54 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7B58C8980E0;
+ Tue, 17 Sep 2019 18:10:53 +0000 (UTC)
+Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 250A519C7F;
+ Tue, 17 Sep 2019 18:10:50 +0000 (UTC)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190914153506.2151-1-armbru@redhat.com>
+ <20190914153506.2151-13-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <d1b18dc8-920e-cc2d-d677-f63d278603f5@redhat.com>
+Date: Tue, 17 Sep 2019 13:10:50 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: pavel.dovgaluk@gmail.com
-Date: Tue, 17 Sep 2019 11:10:34 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <20190914153506.2151-13-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="CJxLERJFJnvFzhxRQ8XSaTDJio1IeS7T5"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Tue, 17 Sep 2019 18:10:53 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.54
-Subject: Re: [Qemu-devel] [for-4.2 PATCH 0/6] Block-related record/replay
- fixes
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 12/19] qapi: Fix missing 'if' checks in
+ struct, union, alternate 'data'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,36 +97,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com,
- artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com,
- jasowang@redhat.com, crosthwaite.peter@gmail.com, qemu-devel@nongnu.org,
- armbru@redhat.com, dovgaluk@ispras.ru, maria.klimushenkova@ispras.ru,
- mst@redhat.com, kraxel@redhat.com, pavel.dovgaluk@ispras.ru,
- thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com,
- alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTY4NzIxNDY1NjUuMTc1Ny4z
-MDMzMjE1ODczNjc3NTEyNDc0LnN0Z2l0QHBhc2hhLVByZWNpc2lvbi0zNjMwLVRvd2VyLwoKCgpI
-aSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0
-LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93
-LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVj
-ZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKbWFr
-ZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0
-LW1pbmd3QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKLi90
-ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IC0tZW5naW5lIGF1dG8gYnVpbGQgcWVtdTpmZWRvcmEgdGVz
-dHMvZG9ja2VyL2RvY2tlcmZpbGVzL2ZlZG9yYS5kb2NrZXIgICAtLWFkZC1jdXJyZW50LXVzZXIg
-IApJbWFnZSBpcyB1cCB0byBkYXRlLgogIExEICAgICAgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3Jh
-Lm1vCmNjOiBmYXRhbCBlcnJvcjogbm8gaW5wdXQgZmlsZXMKY29tcGlsYXRpb24gdGVybWluYXRl
-ZC4KbWFrZTogKioqIFtkb2NrZXItdGVzdC1taW5nd0BmZWRvcmEubW9dIEVycm9yIDQKCgoKVGhl
-IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTY4NzIx
-NDY1NjUuMTc1Ny4zMDMzMjE1ODczNjc3NTEyNDc0LnN0Z2l0QHBhc2hhLVByZWNpc2lvbi0zNjMw
-LVRvd2VyL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1h
-aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9y
-Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNv
-bQ==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--CJxLERJFJnvFzhxRQ8XSaTDJio1IeS7T5
+Content-Type: multipart/mixed; boundary="gSmPR42PHdcmOn84D15y6Fv8jzeIHTMkH";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+Message-ID: <d1b18dc8-920e-cc2d-d677-f63d278603f5@redhat.com>
+Subject: Re: [PATCH 12/19] qapi: Fix missing 'if' checks in struct, union,
+ alternate 'data'
+References: <20190914153506.2151-1-armbru@redhat.com>
+ <20190914153506.2151-13-armbru@redhat.com>
+In-Reply-To: <20190914153506.2151-13-armbru@redhat.com>
 
+--gSmPR42PHdcmOn84D15y6Fv8jzeIHTMkH
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 9/14/19 10:34 AM, Markus Armbruster wrote:
+> Commit 87adbbffd4..3e270dcacc "qapi: Add 'if' to (implicit
+> struct|union|alternate) members" (v4.0.0) neglected test coverage, and
+> promptly failed to check the conditions.  Review fail.
+>=20
+> Recent commit "tests/qapi-schema: Demonstrate insufficient 'if'
+> checking" added test coverage, demonstrating the bug.  Fix it by add
+> the missing check_if().
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--gSmPR42PHdcmOn84D15y6Fv8jzeIHTMkH--
+
+--CJxLERJFJnvFzhxRQ8XSaTDJio1IeS7T5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2BIaoACgkQp6FrSiUn
+Q2qEoQgAjBbb5mI7276wWC+cVi0e4CZXwYHH7gbVfEthx/FOPIocBA2i9BNdFDoi
+dMoZy7rMw5Mj1PDNVA4bHpTmLQXi4R4FAK4Yc7Q6pgPIjlSReHKcN0y9O12vT4Am
+r1IPlyliLJwkslgWqpGKTMy3HSVvpo0XUtcCJTqrpbJJcA/Fu2aZaqEERYas397b
+dXTGKym5qkLlnbkUYtRfktY1GAq8pu0zORAsE7IycK6jKWTMIb3Ehi8bSJ3Zzs7J
+2s7Q7giJrpS3ntWIMRjY7guKYr6+BTOTuGuJ9t2S1O3p0cbxZL/4CkpYqZpXAVMF
+OySG1AdU5L/w1qA6aeZGDsOzaSXoCQ==
+=HQYn
+-----END PGP SIGNATURE-----
+
+--CJxLERJFJnvFzhxRQ8XSaTDJio1IeS7T5--
 
