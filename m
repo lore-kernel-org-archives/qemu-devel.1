@@ -2,60 +2,62 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDCCCC4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:18:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59CD6C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:21:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD97F20665
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:18:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD97F20665
+	by mail.kernel.org (Postfix) with ESMTPS id 3052B20665
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:21:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3052B20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAGBb-0006D9-6p
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 12:18:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39556)
+	id 1iAGE4-0000Ux-1Y
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 12:21:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39620)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iAFuc-00007g-Gv
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:01:08 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iAFum-0000Eb-At
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:01:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iAFua-0004uq-Nx
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:01:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33058)
+ (envelope-from <dgilbert@redhat.com>) id 1iAFuk-0004yK-DE
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:01:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33134)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iAFua-0004uW-Ic
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:01:04 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iAFuk-0004xt-1E
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:01:14 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BA629A3D382
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 16:01:03 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3FA61A3D389
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 16:01:13 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-116-53.ams2.redhat.com
  [10.36.116.53])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E7CEF6012E;
- Tue, 17 Sep 2019 16:00:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E12E56012C;
+ Tue, 17 Sep 2019 16:01:11 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	cohuck@redhat.com,
 	mst@redhat.com
-Date: Tue, 17 Sep 2019 17:00:54 +0100
-Message-Id: <20190917160057.11847-1-dgilbert@redhat.com>
+Date: Tue, 17 Sep 2019 17:00:57 +0100
+Message-Id: <20190917160057.11847-4-dgilbert@redhat.com>
+In-Reply-To: <20190917160057.11847-1-dgilbert@redhat.com>
+References: <20190917160057.11847-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Tue, 17 Sep 2019 16:01:03 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.68]); Tue, 17 Sep 2019 16:01:13 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 0/3] Add virtio-fs (experimental)
+Subject: [Qemu-devel] [PATCH v3 3/3] virtio: add vhost-user-fs-pci device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,61 +76,132 @@ Sender: "Qemu-devel"
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Hi,
-  This set of patches adds the core of the virtio-fs support to qemu;
-it's marked experimental since the kernel patch isn't in yet; but
-it's nearly there;  the spec has passed the voting stage, and
-the kernel changes are queued in fuse-next.
+Add the PCI version of vhost-user-fs.
 
-  A future set of patches will add the optional DAX mapping support.
+Launch QEMU like this:
 
-  The actual qemu change is pretty minimal, since it's really only
-a virtio device with some queues.
+  qemu -chardev socket,path=3D/tmp/vhost-fs.sock,id=3Dchr0
+       -device x-vhost-user-fs-pci,tag=3Dmyfs,chardev=3Dchr0
 
-Some links:
-  Mailing list: https://www.redhat.com/mailman/listinfo/virtio-fs
-  Dev tree: Including filesystem daemon: https://gitlab.com/virtio-fs/qem=
-u
-  kernel:
-         dev world:
-            https://gitlab.com/virtio-fs/linux
-         fuse next:
-           https://git.kernel.org/pub/scm/linux/kernel/git/mszeredi/fuse.=
-git/log/?h=3Dfor-next
-  virtio spec changes:
-         https://lists.oasis-open.org/archives/virtio-dev/201908/msg00112=
-.html
-
-v3
-  Split the kernel header update out
-    The contents correspond to the fuse-next world+a patch Stefan just
-    sent to make that use the newer 'num_request_queues' name
-
-  Update copyright year,
-  Remove the assert in vuf_handle_output
-    the virtio core code sometimes calls it during cleanup if the
-    daemon dies first
-  (I've not changed the comment about guest_notifier_mask/virtio-pci
-   since that's copied in a bunch of virtio code going back ~5 years)
-
-Dr. David Alan Gilbert (3):
-  virtio: Add virito_fs linux headers
-  virtio: add vhost-user-fs base device
-  virtio: add vhost-user-fs-pci device
-
- configure                                   |  13 +
- hw/virtio/Makefile.objs                     |   2 +
- hw/virtio/vhost-user-fs-pci.c               |  85 ++++++
- hw/virtio/vhost-user-fs.c                   | 299 ++++++++++++++++++++
- include/hw/virtio/vhost-user-fs.h           |  45 +++
- include/standard-headers/linux/virtio_fs.h  |  41 +++
- include/standard-headers/linux/virtio_ids.h |   1 +
- 7 files changed, 486 insertions(+)
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/virtio/Makefile.objs       |  1 +
+ hw/virtio/vhost-user-fs-pci.c | 85 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 86 insertions(+)
  create mode 100644 hw/virtio/vhost-user-fs-pci.c
- create mode 100644 hw/virtio/vhost-user-fs.c
- create mode 100644 include/hw/virtio/vhost-user-fs.h
- create mode 100644 include/standard-headers/linux/virtio_fs.h
 
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index 47ffbf22c4..e2f70fbb89 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -15,6 +15,7 @@ obj-$(CONFIG_VHOST_USER_FS) +=3D vhost-user-fs.o
+ obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) +=3D virti=
+o-crypto-pci.o
+ obj-$(CONFIG_VIRTIO_PMEM) +=3D virtio-pmem.o
+ common-obj-$(call land,$(CONFIG_VIRTIO_PMEM),$(CONFIG_VIRTIO_PCI)) +=3D =
+virtio-pmem-pci.o
++obj-$(call land,$(CONFIG_VHOST_USER_FS),$(CONFIG_VIRTIO_PCI)) +=3D vhost=
+-user-fs-pci.o
+ obj-$(CONFIG_VHOST_VSOCK) +=3D vhost-vsock.o
+=20
+ ifeq ($(CONFIG_VIRTIO_PCI),y)
+diff --git a/hw/virtio/vhost-user-fs-pci.c b/hw/virtio/vhost-user-fs-pci.=
+c
+new file mode 100644
+index 0000000000..0e70985094
+--- /dev/null
++++ b/hw/virtio/vhost-user-fs-pci.c
+@@ -0,0 +1,85 @@
++/*
++ * Vhost-user filesystem virtio device PCI glue
++ *
++ * Copyright 2018-2019 Red Hat, Inc.
++ *
++ * Authors:
++ *  Dr. David Alan Gilbert <dgilbert@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/qdev-properties.h"
++#include "hw/virtio/vhost-user-fs.h"
++#include "virtio-pci.h"
++
++struct VHostUserFSPCI {
++    VirtIOPCIProxy parent_obj;
++    VHostUserFS vdev;
++};
++
++typedef struct VHostUserFSPCI VHostUserFSPCI;
++
++#define TYPE_VHOST_USER_FS_PCI "vhost-user-fs-pci-base"
++
++#define VHOST_USER_FS_PCI(obj) \
++        OBJECT_CHECK(VHostUserFSPCI, (obj), TYPE_VHOST_USER_FS_PCI)
++
++static Property vhost_user_fs_pci_properties[] =3D {
++    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
++                       DEV_NVECTORS_UNSPECIFIED),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vhost_user_fs_pci_realize(VirtIOPCIProxy *vpci_dev, Error **=
+errp)
++{
++    VHostUserFSPCI *dev =3D VHOST_USER_FS_PCI(vpci_dev);
++    DeviceState *vdev =3D DEVICE(&dev->vdev);
++
++    if (vpci_dev->nvectors =3D=3D DEV_NVECTORS_UNSPECIFIED) {
++        vpci_dev->nvectors =3D dev->vdev.conf.num_request_queues + 1;
++    }
++
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
++}
++
++static void vhost_user_fs_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++    VirtioPCIClass *k =3D VIRTIO_PCI_CLASS(klass);
++    PCIDeviceClass *pcidev_k =3D PCI_DEVICE_CLASS(klass);
++    k->realize =3D vhost_user_fs_pci_realize;
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    dc->props =3D vhost_user_fs_pci_properties;
++    pcidev_k->vendor_id =3D PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id =3D 0; /* Set by virtio-pci based on virtio id *=
+/
++    pcidev_k->revision =3D 0x00;
++    pcidev_k->class_id =3D PCI_CLASS_STORAGE_OTHER;
++}
++
++static void vhost_user_fs_pci_instance_init(Object *obj)
++{
++    VHostUserFSPCI *dev =3D VHOST_USER_FS_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VHOST_USER_FS);
++}
++
++static const VirtioPCIDeviceTypeInfo vhost_user_fs_pci_info =3D {
++    .base_name             =3D TYPE_VHOST_USER_FS_PCI,
++    .non_transitional_name =3D "x-vhost-user-fs-pci",
++    .instance_size =3D sizeof(VHostUserFSPCI),
++    .instance_init =3D vhost_user_fs_pci_instance_init,
++    .class_init    =3D vhost_user_fs_pci_class_init,
++};
++
++static void vhost_user_fs_pci_register(void)
++{
++    virtio_pci_types_register(&vhost_user_fs_pci_info);
++}
++
++type_init(vhost_user_fs_pci_register);
 --=20
 2.21.0
 
