@@ -2,93 +2,65 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-10.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFE99C4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 23:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 623B7C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 23:34:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A93C6206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 23:31:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Y9ZAc2WO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A93C6206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3A3FF206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 23:34:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A3FF206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAMwA-0007BH-PS
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 19:31:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50796)
+	id 1iAMzW-0001Dq-Ed
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 19:34:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51309)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=156d039a9=alistair.francis@wdc.com>)
- id 1iAMsL-0004D4-7c
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 19:27:14 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iAMwo-00086b-2k
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 19:31:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=156d039a9=alistair.francis@wdc.com>)
- id 1iAMsJ-0002eo-4e
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 19:27:12 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:35346)
+ (envelope-from <ehabkost@redhat.com>) id 1iAMwl-0006Pp-Ud
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 19:31:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51742)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=156d039a9=alistair.francis@wdc.com>)
- id 1iAMsI-0002eD-S6; Tue, 17 Sep 2019 19:27:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1568762830; x=1600298830;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=2aGksb+6wpuxxwZws3oCDFLqyYmlLrKjPA5jBwu9NTY=;
- b=Y9ZAc2WORRg+YpS00iCnYrCLOXUaZYszRigOv0t/30N/fwz3PSQXtkFa
- dAmCbQo7frp3ag16nX77JILrFdOJ4ysAbOmQmHuQ8LTvpJV4FTjuWoadH
- qkQPC0AFVip69w3dz8tmiWpmDRWWGqzLaZHSyAiF7yrs5/YG1gbfGUuxz
- rXS+L9GPNA2PK1+dwo0l0RFpByb/qgKaIITKYF3M7xHtQtDcNDhiYeWc7
- HhnSLp7PjdLRUoZX8rEsWgU+2FVtLsSRo40NjFEoVZB0PHZoP9TSJZ8p8
- oHOUhCIja8R/DJWjCgNu3C/F/rxfiQ4xZDZ0oHWoHj8SyEIz0CsYjNGse A==;
-IronPort-SDR: AI5nK1U84UGyIIDDEMf4RoB2X9DshPwcCtwhaI8eJNSuKCzsJekB5jOemkfb3MCVTcGW3JcBmx
- cHZhlnlYwK21sRO8EJ3FIr2FY4tCEEloQG/qdVZhG8mCi0hwS6mO4V3QuIcDi+wLDIrn/kbmep
- m1LZuTFuOlLEf0DapQj4vBAoSe2vaQBnI+MBkHQlKVGHHL5EI+5AwfzC8vS/k/iQYfsOyGBlNi
- S131maryacValclBeow1OaXiTZiigBQ5RIlGyKRkduvPqBleRfrkHGTO0RGy5Y1ibqr+DZHS+G
- ELk=
-X-IronPort-AV: E=Sophos;i="5.64,518,1559491200"; d="scan'208";a="225302172"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 18 Sep 2019 07:27:05 +0800
-IronPort-SDR: O5URhE8TvMq2t+Y4EKR9+nkGUtFsj6GOlGxNFWf//BFS9wfJXpgKWPs9j5QbOsYoLKeYeS/rfS
- G62onOETpyyX6L7VuiQTv+rg+OIzspTbcANxhKgnOLAuJWyxZJeb5Ds2W7dUQRqYqrD57Hqmgr
- vmr9n85TCCNqws8Jygem0/x/5W2wKTPRu20PN+SEvp1TpfpfHOXRFCwOeYoWS3hBigppRi2Lht
- BVZKKUnpWuznGsWbeARuu8FW6u7CCTByu6ArZOeX2Wfr0UZjEmeJVNBThUM0f2adaut732oUQ/
- kO3mxM9orwE3Jo/hcskdyqa+
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 17 Sep 2019 16:23:41 -0700
-IronPort-SDR: IRhbjgdMNR7UFyaMIsQfrocbBMmGagBFmaNQTNdjhZeYmn4NQXClG+1RcUtGI1hI7XCN8jsq1C
- HMfHtvKiXvehGoT71hWbQiOlZrtPMIL0zbUN9YWfO51ZaD58KXQi9MoPh09usI2YbE87RJuR7p
- T1AeS/YuMYY9YxsEHg0nHXbIRxAErX5NZr5nJMCpVNQlvg1DA/PBbZApFecEjtOGogjNVACiI4
- 6MO7XW08XC2hB+jew/ACUOv4tF8yOT4H0yKaFHdKu3BduKHqRRuqKhsDfr8GtX1y8iiYNZDeNB
- reQ=
-WDCIronportException: Internal
-Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
- risc6-mainframe.int.fusionio.com) ([10.196.157.58])
- by uls-op-cesaip01.wdc.com with ESMTP; 17 Sep 2019 16:27:05 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Date: Tue, 17 Sep 2019 16:22:59 -0700
-Message-Id: <dfb8bc9fb7cad494d53f89774a3a4a5f3e478792.1568762497.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <cover.1568762497.git.alistair.francis@wdc.com>
-References: <cover.1568762497.git.alistair.francis@wdc.com>
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iAMwl-0006PX-PA
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 19:31:47 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8EA4218C8900;
+ Tue, 17 Sep 2019 23:31:46 +0000 (UTC)
+Received: from localhost (ovpn-116-86.gru2.redhat.com [10.97.116.86])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E155A5C219;
+ Tue, 17 Sep 2019 23:31:41 +0000 (UTC)
+Date: Tue, 17 Sep 2019 20:31:40 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <20190917233140.GK4082@habkost.net>
+References: <20190607211544.7964-1-ehabkost@redhat.com>
+ <CAFEAcA-wCqppsi+gcrTqGjR3bSDOHs5btKKE8oHYxbAUDtu7Fw@mail.gmail.com>
+ <20190701222527.GJ5198@habkost.net>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 68.232.141.245
-Subject: [Qemu-devel] [PATCH v1 1/2] RISC-V: Handle bus errors in the page
- table walker
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190701222527.GJ5198@habkost.net>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Tue, 17 Sep 2019 23:31:46 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Python 2 in tests/vm (was Re: [PULL 0/8] Python
+ queue, 2019-06-07)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,59 +72,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, palmer@sifive.com, alistair.francis@wdc.com,
- alistair23@gmail.com
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Cleber Rosa <crosa@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Palmer Dabbelt <palmer@sifive.com>
+On Mon, Jul 01, 2019 at 07:25:27PM -0300, Eduardo Habkost wrote:
+> On Mon, Jun 10, 2019 at 01:58:50PM +0100, Peter Maydell wrote:
+> > On Fri, 7 Jun 2019 at 22:16, Eduardo Habkost <ehabkost@redhat.com> wr=
+ote:
+> > >
+> > > The following changes since commit 185b7ccc11354cbd69b6d53bf8d831dd=
+964f6c88:
+> > >
+> > >   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190607-=
+2' into staging (2019-06-07 15:24:13 +0100)
+> > >
+> > > are available in the Git repository at:
+> > >
+> > >   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
+> > >
+> > > for you to fetch changes up to 8297719709f1339506d6da93ec69e6118ace=
+8676:
+> > >
+> > >   travis: Make check-acceptance job more verbose (2019-06-07 18:11:=
+02 -0300)
+> > >
+> > > ----------------------------------------------------------------
+> > > Python queue, 2019-06-07
+> > >
+> > > * New boot_linux_console test cases (Philippe Mathieu-Daud=E9)
+> > > * Deprecate Python 2 support (Eduardo Habkost)
+> > > * Require python3 >=3D 3.5 (Eduardo Habkost)
+> > > * Make check-acceptance Travis job more verbose (Eduardo Habkost)
+> > >
+> > > ----------------------------------------------------------------
+> >=20
+> > Hi. This fails to build on one of my buildtest machines:
+> >=20
+> > ERROR: Cannot use 'python3', Python 2 >=3D 2.7 or Python 3 >=3D 3.5 i=
+s required.
+> >        Use --python=3D/path/to/python to specify a supported Python.
+> >=20
+> > The machine has python 2.7.6 and 3.4.3. (It's an Ubuntu trusty
+> > box; it's one of the gcc compile farm machines so upgrades to its
+> > OS are not really under my control.)
+> >=20
+> > The configure check also spits out deprecation warnings for
+> > the NetBSD/FreeBSD/OpenBSD tests/vm configurations. It would be nice
+> > to get those updated.
+>=20
+> CCing the test/vm maintainers.
+>=20
+> Fam, Alex, are you able to fix this and create new BSD VM images
+> with Python 3 available?  I thought the VM image configurations
+> were stored in the source tree, but they are downloaded from
+> download.patchew.org.
 
-We directly access physical memory while walking the page tables on
-RISC-V, but while doing so we were using cpu_ld*() which does not report
-bus errors.  This patch converts the page table walker over to use
-address_space_ld*(), which allows bus errors to be detected.
+Fam, Alex, can you help us on this?  Python 2 won't be supported
+anymore, so we need the VM images to be updated.
 
-Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/cpu_helper.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 87dd6a6ece..c82e7ed52b 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -169,7 +169,8 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
-     /* NOTE: the env->pc value visible here will not be
-      * correct, but the value visible to the exception handler
-      * (riscv_cpu_do_interrupt) is correct */
--
-+    MemTxResult res;
-+    MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
-     int mode = mmu_idx;
- 
-     if (mode == PRV_M && access_type != MMU_INST_FETCH) {
-@@ -256,11 +257,16 @@ restart:
-             1 << MMU_DATA_LOAD, PRV_S)) {
-             return TRANSLATE_PMP_FAIL;
-         }
-+
- #if defined(TARGET_RISCV32)
--        target_ulong pte = ldl_phys(cs->as, pte_addr);
-+        target_ulong pte = address_space_ldl(cs->as, pte_addr, attrs, &res);
- #elif defined(TARGET_RISCV64)
--        target_ulong pte = ldq_phys(cs->as, pte_addr);
-+        target_ulong pte = address_space_ldq(cs->as, pte_addr, attrs, &res);
- #endif
-+        if (res != MEMTX_OK) {
-+            return TRANSLATE_FAIL;
-+        }
-+
-         hwaddr ppn = pte >> PTE_PPN_SHIFT;
- 
-         if (!(pte & PTE_V)) {
--- 
-2.23.0
-
+--=20
+Eduardo
 
