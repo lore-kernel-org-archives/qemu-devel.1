@@ -2,48 +2,50 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97DADC4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:24:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADD7DC4CECE
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:24:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2588120665
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:24:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2588120665
+	by mail.kernel.org (Postfix) with ESMTPS id 8735820665
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:24:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8735820665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAGH6-00032t-R6
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 12:24:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44088)
+	id 1iAGH8-000355-9X
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 12:24:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42077)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iAGFD-0001dw-KV
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:22:25 -0400
+ (envelope-from <eblake@redhat.com>) id 1iAG58-0000V1-H1
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:11:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iAGFB-0004EC-83
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:22:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48377)
+ (envelope-from <eblake@redhat.com>) id 1iAG56-0008Kc-44
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:11:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47716)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAGF9-0004DI-7T
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:22:19 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAG55-0008KK-Rz
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:11:56 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 347DA18C8919;
- Tue, 17 Sep 2019 16:22:17 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id AF46B83F51;
+ Tue, 17 Sep 2019 16:11:54 +0000 (UTC)
 Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C6D9B60852;
- Tue, 17 Sep 2019 16:22:16 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190913201349.24332-1-armbru@redhat.com>
- <20190913201349.24332-14-armbru@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 13F1B19C70;
+ Tue, 17 Sep 2019 16:11:49 +0000 (UTC)
+To: Markus Armbruster <armbru@redhat.com>
+References: <20190910063724.28470-1-armbru@redhat.com>
+ <20190910063724.28470-14-armbru@redhat.com>
+ <60b61f7c-fe08-e78b-dd52-775959af99d9@redhat.com>
+ <87tv9g8cf4.fsf@dusky.pond.sub.org>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,21 +72,21 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <afbfd0e5-4441-e028-ec3e-ca7129fca342@redhat.com>
-Date: Tue, 17 Sep 2019 11:22:16 -0500
+Message-ID: <f71d6dd3-c9f5-7b89-a536-cf7e9baaff51@redhat.com>
+Date: Tue, 17 Sep 2019 11:11:48 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190913201349.24332-14-armbru@redhat.com>
+In-Reply-To: <87tv9g8cf4.fsf@dusky.pond.sub.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="SJL5DqLfPuSq2rFuolYLjeIxF0bVWZIP6"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Tue, 17 Sep 2019 16:22:17 +0000 (UTC)
+ boundary="oaCaXYtXBGz3ewlyyisayWwK8pGA9K71t"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Tue, 17 Sep 2019 16:11:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 13/16] docs/devel/qapi-code-gen: Rewrite
+Subject: Re: [Qemu-devel] [PATCH v2 13/16] docs/devel/qapi-code-gen: Rewrite
  compatibility considerations
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,75 +99,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
+ mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SJL5DqLfPuSq2rFuolYLjeIxF0bVWZIP6
-Content-Type: multipart/mixed; boundary="HTmI1tKvRSobzmG5Znobb7o5lrdokXFbV";
+--oaCaXYtXBGz3ewlyyisayWwK8pGA9K71t
+Content-Type: multipart/mixed; boundary="pEEv5b1rk8BdVXxtsMDT54gBLfcs6xBIz";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <afbfd0e5-4441-e028-ec3e-ca7129fca342@redhat.com>
-Subject: Re: [PATCH v3 13/16] docs/devel/qapi-code-gen: Rewrite compatibility
- considerations
-References: <20190913201349.24332-1-armbru@redhat.com>
- <20190913201349.24332-14-armbru@redhat.com>
-In-Reply-To: <20190913201349.24332-14-armbru@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com,
+ mdroth@linux.vnet.ibm.com
+Message-ID: <f71d6dd3-c9f5-7b89-a536-cf7e9baaff51@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 13/16] docs/devel/qapi-code-gen: Rewrite
+ compatibility considerations
+References: <20190910063724.28470-1-armbru@redhat.com>
+ <20190910063724.28470-14-armbru@redhat.com>
+ <60b61f7c-fe08-e78b-dd52-775959af99d9@redhat.com>
+ <87tv9g8cf4.fsf@dusky.pond.sub.org>
+In-Reply-To: <87tv9g8cf4.fsf@dusky.pond.sub.org>
 
---HTmI1tKvRSobzmG5Znobb7o5lrdokXFbV
+--pEEv5b1rk8BdVXxtsMDT54gBLfcs6xBIz
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 9/13/19 3:13 PM, Markus Armbruster wrote:
-> We have some compatibility advice buried in sections "Enumeration
-> types" and "Struct types".  Compatibility is actually about commands
-> and events.  It devolves to the types used there.  All kinds of types,
-> not just enumerations and structs.
+On 9/13/19 10:05 AM, Markus Armbruster wrote:
+
+>>> +Any change to a command definition's 'data' or one of the types used=
+
+>>> +there (recursively) needs to consider send direction compatibility.
+>>> +
+>>> +Any change to a command definition's 'return', an event definition's=
+
+>>> +'data', or one of the types used there (recursively) needs to consid=
+er
+>>> +receive direction compatibility.
+>>> +
+>>> +Any change to types used in both contexts need to consider both.
+>>> +
+>>> +Members of enumeration types, complex types and alternate types may =
+be
+>>> +reordered freely.  For enumerations and alternate types, this doesn'=
+t
+>>> +affect the wire encoding.  For complex types, this might make the
+>>> +implementation emit JSON object members in a different order, which
+>>> +the Client JSON Protocol permits.
+>>
+>> Worth mentioning that type names themselves are NOT part of the
+>> interface, and may be freely renamed?
 >=20
-> Replace the existing advice by a new section "Compatibility
-> considerations".
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
->  docs/devel/qapi-code-gen.txt | 95 +++++++++++++++++++++++-------------=
+> Care to suggest a suitable sentence?
 
->  1 file changed, 60 insertions(+), 35 deletions(-)
-
-You asked me a question on v2 about a possible sentence to add about
-renaming types. Up to you if you want to fold that one in here, or leave
-it for a separate patch.
-
-
-> +Incompatible changes include removing return and event data members.
-> +
-> +Any change to a command definition's 'data' or one of the types used
-> +there (recursively) needs to consider send direction compatibility.
-> +
-> +Any change to a command definition's 'return', an event definition's
-> +'data', or one of the types used there (recursively) needs to consider=
-
-> +receive direction compatibility.
-> +
-> +Any change to types used in both contexts need to consider both.
-> +
-> +Members of enumeration types, complex types and alternate types may be=
-
-> +reordered freely.  For enumerations and alternate types, this doesn't
-> +affect the wire encoding.  For complex types, this might make the
-> +implementation emit JSON object members in a different order, which
-> +the Client JSON Protocol permits.
-> +
-> +
->  =3D=3D Code generation =3D=3D
-> =20
->  The QAPI code generator qapi-gen.py generates code and documentation
->=20
+Although member names within a type cannot be changed without affecting
+compatibility, changes to type names themselves do not affect the
+protocol.  As such, complex types may be freely renamed or refactored,
+such as splitting members from one type into a common base type, as long
+as the resulting set of members remain compatible.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -173,24 +166,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---HTmI1tKvRSobzmG5Znobb7o5lrdokXFbV--
+--pEEv5b1rk8BdVXxtsMDT54gBLfcs6xBIz--
 
---SJL5DqLfPuSq2rFuolYLjeIxF0bVWZIP6
+--oaCaXYtXBGz3ewlyyisayWwK8pGA9K71t
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2BCDgACgkQp6FrSiUn
-Q2rh4gf/Rp6oxagg7BqZI/+f4BVzdBSd53Xc7N8F/u2aQJKqvWHmdMkZaN6sN3zl
-yZgTuFM6nXwObMMwZL8uuNEx/yOvs/FmXd56m9c4RvTUAAloBx9ni/2om3IaiYs3
-ocYh20zuC2+ZwiE2nBJDwX/yolcCj6gHQJD4X9dOcJMc7S2XfBZ9qt+UwZqP6w9Y
-zUCtLwo5HTZqRHTQULx9RU5WZ06Z/Qi1FE8IrjKjktELhKam4U/qZWZZd1Y8Qd3k
-gDvm2Poppkpz5uF+q9KWeNGymXgPA+cWPtsvepId9iwRASFwTCvct/4RVgV9622D
-I+xxwfjoBk7GfAXTSzIM2IzzKIJWWg==
-=TA1f
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2BBcQACgkQp6FrSiUn
+Q2oFzAf+Nuq9eNQoKA4S9XqQmLyI+cPVhgZED+b5yijBqb2kfCY6J9ZhxjZySWtS
+7cDdJEiD9IfHX2XwOux1/6dwInp/Sz5WdvkfBqESY5/nfDq6CxtQUyvX5vGkIMx9
+qxoNwdEKn90DKuZ0s/MbpSecoZKEXz3q5eClpNYU0d7IJlBfScW/36iSXJBGuHYl
+cm7eO085914Ut4/PWC/ejpaH96aKtnn4ckifrunI3hH40FDk+5mM6GMvpDyEPlJ2
+ESkefFsN09Pa1iTqpnT+o/bAN3/XOEhuU7SU15kub7zPl7rfbd9pdi4cqFcZ+SY+
+dyKUUdBQj15xOLCXGeic5OTcje4PhQ==
+=cPzG
 -----END PGP SIGNATURE-----
 
---SJL5DqLfPuSq2rFuolYLjeIxF0bVWZIP6--
+--oaCaXYtXBGz3ewlyyisayWwK8pGA9K71t--
 
