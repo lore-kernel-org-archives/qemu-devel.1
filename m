@@ -2,89 +2,109 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADE69C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:44:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF1DC4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:47:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8214421852
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:44:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8214421852
+	by mail.kernel.org (Postfix) with ESMTPS id BF10A21881
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:47:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF10A21881
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAAyM-0002DV-Sx
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 06:44:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45214)
+	id 1iAB0f-0004FD-Ml
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 06:47:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48015)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iAAiS-00050X-RA
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:28:14 -0400
+ (envelope-from <lvivier@redhat.com>) id 1iAAuF-0007Nk-8T
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:40:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iAAiQ-0000AC-Ev
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:28:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39632)
+ (envelope-from <lvivier@redhat.com>) id 1iAAuE-0008CA-6H
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:40:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42862)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iAAiQ-00009r-7r
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:28:10 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>)
+ id 1iAAuD-0008BY-UO; Tue, 17 Sep 2019 06:40:22 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4D8904E924
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 10:28:09 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id f11so1131719wrt.18
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 03:28:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=OAIO2nB+ybo/H9XjI3W4Br3K0hK/KnUOApJNbYvZkuQ=;
- b=fdetkmPTuaKGbWxhPB4OLbwV89NF1df8tsVrVfwvWaKL3UOD55qVZe86P2xkIOzXJ+
- JmMhoE+POAL/EeIgNIbKK83FAEDKlQNsCIdqYSRDVbjSp835rHWw0om2x872npZnkM2A
- eS6+5XVKK+57c0HnbmEy3oaVrrfVpJMx3Z6zxjMNPliqcwxPZRvYMDUdQwPDxo1Gej3M
- Ggb/LF0S/MtGJowV5uVe11ANZQWvYS9RVo8Ojr+fgbj+ZWlB5BulYb3YhyHOWYXeyrWO
- vqaSS4ItLhrxBtAu4NNaospRUZxPKGmTYMt42xKjQ5ifma/t/Coa453BcCfg/Lj449je
- bWHg==
-X-Gm-Message-State: APjAAAXPdpxG6ZypsRMp4SEjvU9PXSkxAkeRoUKbuqFFZ0NekXx3bYx4
- iaKbJ/MqbkQF46K7dlLnSnFMCnXegBEM3xBg+uap8APVzola01V5vC2GrRV4dlmyz+y248o4OFX
- EWajCSiX8lyheFsE=
-X-Received: by 2002:adf:ed8f:: with SMTP id c15mr2274876wro.83.1568716085602; 
- Tue, 17 Sep 2019 03:28:05 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyjB7j5DKXlyMufCT/sPEjp8EuB4FBlhyZw/AmBleju3+cediVMV7b0aBUJyF3eZ2zZbujjCw==
-X-Received: by 2002:adf:ed8f:: with SMTP id c15mr2274845wro.83.1568716085372; 
- Tue, 17 Sep 2019 03:28:05 -0700 (PDT)
-Received: from [192.168.1.40] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id a144sm2307006wme.13.2019.09.17.03.28.03
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Sep 2019 03:28:04 -0700 (PDT)
-To: Alistair Francis <alistair23@gmail.com>, Thomas Huth <thuth@redhat.com>
-References: <20190916154847.28936-1-philmd@redhat.com>
- <20190916154847.28936-10-philmd@redhat.com>
- <CAKmqyKPtRbU5X-72+HfNNbaV46LOD6D+JLQoGiBROB+zJczNgA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <7a48ec0e-c386-7022-b7ab-00f0cb53fa82@redhat.com>
-Date: Tue, 17 Sep 2019 12:28:03 +0200
+ by mx1.redhat.com (Postfix) with ESMTPS id 83E56190C025;
+ Tue, 17 Sep 2019 10:40:20 +0000 (UTC)
+Received: from [10.36.116.217] (ovpn-116-217.ams2.redhat.com [10.36.116.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DF5BD65EB6;
+ Tue, 17 Sep 2019 10:40:15 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ =?UTF-8?Q?Niccol=c3=b2_Belli?= <darkbasic@linuxsystems.it>,
+ qemu-devel@nongnu.org, "open list:sPAPR" <qemu-ppc@nongnu.org>
+References: <83f649c6482bf363c38e7f3778d866f4@linuxsystems.it>
+ <9d1ea4ff-a0df-f7c6-54ca-c03b010c5ff1@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
+ WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
+ SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
+ UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
+ Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
+ JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
+ q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
+ RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
+ 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
+ LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCNMYXVyZW50IFZp
+ dmllciA8bHZpdmllckByZWRoYXQuY29tPokCOAQTAQIAIgUCVgVQgAIbAwYLCQgHAwIGFQgC
+ CQoLBBYCAwECHgECF4AACgkQ8ww4vT8vvjwpgg//fSGy0Rs/t8cPFuzoY1cex4limJQfReLr
+ SJXCANg9NOWy/bFK5wunj+h/RCFxIFhZcyXveurkBwYikDPUrBoBRoOJY/BHK0iZo7/WQkur
+ 6H5losVZtrotmKOGnP/lJYZ3H6OWvXzdz8LL5hb3TvGOP68K8Bn8UsIaZJoeiKhaNR0sOJyI
+ YYbgFQPWMHfVwHD/U+/gqRhD7apVysxv5by/pKDln1I5v0cRRH6hd8M8oXgKhF2+rAOL7gvh
+ jEHSSWKUlMjC7YwwjSZmUkL+TQyE18e2XBk85X8Da3FznrLiHZFHQ/NzETYxRjnOzD7/kOVy
+ gKD/o7asyWQVU65mh/ECrtjfhtCBSYmIIVkopoLaVJ/kEbVJQegT2P6NgERC/31kmTF69vn8
+ uQyW11Hk8tyubicByL3/XVBrq4jZdJW3cePNJbTNaT0d/bjMg5zCWHbMErUib2Nellnbg6bc
+ 2HLDe0NLVPuRZhHUHM9hO/JNnHfvgiRQDh6loNOUnm9Iw2YiVgZNnT4soUehMZ7au8PwSl4I
+ KYE4ulJ8RRiydN7fES3IZWmOPlyskp1QMQBD/w16o+lEtY6HSFEzsK3o0vuBRBVp2WKnssVH
+ qeeV01ZHw0bvWKjxVNOksP98eJfWLfV9l9e7s6TaAeySKRRubtJ+21PRuYAxKsaueBfUE7ZT
+ 7ze5Ag0EVgUmGQEQALxSQRbl/QOnmssVDxWhHM5TGxl7oLNJms2zmBpcmlrIsn8nNz0rRyxT
+ 460k2niaTwowSRK8KWVDeAW6ZAaWiYjLlTunoKwvF8vP3JyWpBz0diTxL5o+xpvy/Q6YU3BN
+ efdq8Vy3rFsxgW7mMSrI/CxJ667y8ot5DVugeS2NyHfmZlPGE0Nsy7hlebS4liisXOrN3jFz
+ asKyUws3VXek4V65lHwB23BVzsnFMn/bw/rPliqXGcwl8CoJu8dSyrCcd1Ibs0/Inq9S9+t0
+ VmWiQWfQkz4rvEeTQkp/VfgZ6z98JRW7S6l6eophoWs0/ZyRfOm+QVSqRfFZdxdP2PlGeIFM
+ C3fXJgygXJkFPyWkVElr76JTbtSHsGWbt6xUlYHKXWo+xf9WgtLeby3cfSkEchACrxDrQpj+
+ Jt/JFP+q997dybkyZ5IoHWuPkn7uZGBrKIHmBunTco1+cKSuRiSCYpBIXZMHCzPgVDjk4viP
+ brV9NwRkmaOxVvye0vctJeWvJ6KA7NoAURplIGCqkCRwg0MmLrfoZnK/gRqVJ/f6adhU1oo6
+ z4p2/z3PemA0C0ANatgHgBb90cd16AUxpdEQmOCmdNnNJF/3Zt3inzF+NFzHoM5Vwq6rc1JP
+ jfC3oqRLJzqAEHBDjQFlqNR3IFCIAo4SYQRBdAHBCzkM4rWyRhuVABEBAAGJAh8EGAECAAkF
+ AlYFJhkCGwwACgkQ8ww4vT8vvjwg9w//VQrcnVg3TsjEybxDEUBm8dBmnKqcnTBFmxN5FFtI
+ WlEuY8+YMiWRykd8Ln9RJ/98/ghABHz9TN8TRo2b6WimV64FmlVn17Ri6FgFU3xNt9TTEChq
+ AcNg88eYryKsYpFwegGpwUlaUaaGh1m9OrTzcQy+klVfZWaVJ9Nw0keoGRGb8j4XjVpL8+2x
+ OhXKrM1fzzb8JtAuSbuzZSQPDwQEI5CKKxp7zf76J21YeRrEW4WDznPyVcDTa+tz++q2S/Bp
+ P4W98bXCBIuQgs2m+OflERv5c3Ojldp04/S4NEjXEYRWdiCxN7ca5iPml5gLtuvhJMSy36gl
+ U6IW9kn30IWuSoBpTkgV7rLUEhh9Ms82VWW/h2TxL8enfx40PrfbDtWwqRID3WY8jLrjKfTd
+ R3LW8BnUDNkG+c4FzvvGUs8AvuqxxyHbXAfDx9o/jXfPHVRmJVhSmd+hC3mcQ+4iX5bBPBPM
+ oDqSoLt5w9GoQQ6gDVP2ZjTWqwSRMLzNr37rJjZ1pt0DCMMTbiYIUcrhX8eveCJtY7NGWNyx
+ FCRkhxRuGcpwPmRVDwOl39MB3iTsRighiMnijkbLXiKoJ5CDVvX5yicNqYJPKh5MFXN1bvsB
+ kmYiStMRbrD0HoY1kx5/VozBtc70OU0EB8Wrv9hZD+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <e2292382-968a-106f-b10a-e6987a9c3db1@redhat.com>
+Date: Tue, 17 Sep 2019 12:40:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKPtRbU5X-72+HfNNbaV46LOD6D+JLQoGiBROB+zJczNgA@mail.gmail.com>
+In-Reply-To: <9d1ea4ff-a0df-f7c6-54ca-c03b010c5ff1@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Tue, 17 Sep 2019 10:40:20 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 09/13] hw: Move Xilinx ZynqMP RTC from
- hw/timer/ to hw/rtc/ subdirectory
+Subject: Re: [Qemu-devel] ELF load command alignment not page-aligned
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,212 +116,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Andrew Jeffery <andrew@aj.id.au>, "open list:New World" <qemu-ppc@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alistair,
-
-On 9/16/19 11:44 PM, Alistair Francis wrote:
-> On Mon, Sep 16, 2019 at 8:56 AM Philippe Mathieu-Daud=C3=A9
-> <philmd@redhat.com> wrote:
->>
->> Move RTC devices under the hw/rtc/ subdirectory.
->>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> ---
->>  hw/rtc/Makefile.objs                        | 1 +
->>  hw/rtc/trace-events                         | 3 +++
->>  hw/{timer =3D> rtc}/xlnx-zynqmp-rtc.c         | 2 +-
->>  hw/timer/Makefile.objs                      | 1 -
->>  hw/timer/trace-events                       | 3 ---
->>  include/hw/arm/xlnx-zynqmp.h                | 2 +-
->>  include/hw/{timer =3D> rtc}/xlnx-zynqmp-rtc.h | 6 +++---
->>  7 files changed, 9 insertions(+), 9 deletions(-)
->>  rename hw/{timer =3D> rtc}/xlnx-zynqmp-rtc.c (99%)
->>  rename include/hw/{timer =3D> rtc}/xlnx-zynqmp-rtc.h (95%)
->>
->> diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
->> index b195863291..543a550a0f 100644
->> --- a/hw/rtc/Makefile.objs
->> +++ b/hw/rtc/Makefile.objs
->> @@ -6,5 +6,6 @@ common-obj-$(CONFIG_M48T59) +=3D m48t59-isa.o
->>  endif
->>  common-obj-$(CONFIG_PL031) +=3D pl031.o
->>  common-obj-$(CONFIG_TWL92230) +=3D twl92230.o
->> +common-obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-zynqmp-rtc.o
->>  obj-$(CONFIG_MC146818RTC) +=3D mc146818rtc.o
->>  common-obj-$(CONFIG_SUN4V_RTC) +=3D sun4v-rtc.o
->> diff --git a/hw/rtc/trace-events b/hw/rtc/trace-events
->> index ac9e0e0fba..7f1945ad4c 100644
->> --- a/hw/rtc/trace-events
->> +++ b/hw/rtc/trace-events
->> @@ -4,6 +4,9 @@
->>  sun4v_rtc_read(uint64_t addr, uint64_t value) "read: addr 0x%" PRIx64=
- " value 0x%" PRIx64
->>  sun4v_rtc_write(uint64_t addr, uint64_t value) "write: addr 0x%" PRIx=
-64 " value 0x%" PRIx64
->>
->> +# xlnx-zynqmp-rtc.c
->> +xlnx_zynqmp_rtc_gettime(int year, int month, int day, int hour, int m=
-in, int sec) "Get time from host: %d-%d-%d %2d:%02d:%02d"
->> +
->>  # pl031.c
->>  pl031_irq_state(int level) "irq state %d"
->>  pl031_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
->> diff --git a/hw/timer/xlnx-zynqmp-rtc.c b/hw/rtc/xlnx-zynqmp-rtc.c
->> similarity index 99%
->> rename from hw/timer/xlnx-zynqmp-rtc.c
->> rename to hw/rtc/xlnx-zynqmp-rtc.c
->> index 5692db98c2..f9f09b7296 100644
->> --- a/hw/timer/xlnx-zynqmp-rtc.c
->> +++ b/hw/rtc/xlnx-zynqmp-rtc.c
->> @@ -36,7 +36,7 @@
->>  #include "qemu/cutils.h"
->>  #include "sysemu/sysemu.h"
->>  #include "trace.h"
->> -#include "hw/timer/xlnx-zynqmp-rtc.h"
->> +#include "hw/rtc/xlnx-zynqmp-rtc.h"
->>  #include "migration/vmstate.h"
->>
->>  #ifndef XLNX_ZYNQMP_RTC_ERR_DEBUG
->> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
->> index 70b61b69c7..294465ef47 100644
->> --- a/hw/timer/Makefile.objs
->> +++ b/hw/timer/Makefile.objs
->> @@ -14,7 +14,6 @@ common-obj-$(CONFIG_IMX) +=3D imx_epit.o
->>  common-obj-$(CONFIG_IMX) +=3D imx_gpt.o
->>  common-obj-$(CONFIG_LM32) +=3D lm32_timer.o
->>  common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-sysctl.o
->> -common-obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-zynqmp-rtc.o
->>  common-obj-$(CONFIG_NRF51_SOC) +=3D nrf51_timer.o
->>
->>  common-obj-$(CONFIG_ALTERA_TIMER) +=3D altera_timer.o
->> diff --git a/hw/timer/trace-events b/hw/timer/trace-events
->> index ce34b967db..1459d07237 100644
->> --- a/hw/timer/trace-events
->> +++ b/hw/timer/trace-events
->> @@ -70,9 +70,6 @@ cmsdk_apb_dualtimer_reset(void) "CMSDK APB dualtimer=
-: reset"
->>  aspeed_rtc_read(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " =
-value 0x%08" PRIx64
->>  aspeed_rtc_write(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 "=
- value 0x%08" PRIx64
->>
->> -# xlnx-zynqmp-rtc.c
->> -xlnx_zynqmp_rtc_gettime(int year, int month, int day, int hour, int m=
-in, int sec) "Get time from host: %d-%d-%d %2d:%02d:%02d"
->> -
->>  # nrf51_timer.c
->>  nrf51_timer_read(uint64_t addr, uint32_t value, unsigned size) "read =
-addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
->>  nrf51_timer_write(uint64_t addr, uint32_t value, unsigned size) "writ=
-e addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
->> diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp=
-.h
->> index d7483c3b42..53076fa29a 100644
->> --- a/include/hw/arm/xlnx-zynqmp.h
->> +++ b/include/hw/arm/xlnx-zynqmp.h
->> @@ -29,7 +29,7 @@
->>  #include "hw/dma/xlnx-zdma.h"
->>  #include "hw/display/xlnx_dp.h"
->>  #include "hw/intc/xlnx-zynqmp-ipi.h"
->> -#include "hw/timer/xlnx-zynqmp-rtc.h"
->> +#include "hw/rtc/xlnx-zynqmp-rtc.h"
->>  #include "hw/cpu/cluster.h"
->>  #include "target/arm/cpu.h"
->>
->> diff --git a/include/hw/timer/xlnx-zynqmp-rtc.h b/include/hw/rtc/xlnx-=
-zynqmp-rtc.h
->> similarity index 95%
->> rename from include/hw/timer/xlnx-zynqmp-rtc.h
->> rename to include/hw/rtc/xlnx-zynqmp-rtc.h
->> index 97e32322ed..6fa1cb2f43 100644
->> --- a/include/hw/timer/xlnx-zynqmp-rtc.h
->> +++ b/include/hw/rtc/xlnx-zynqmp-rtc.h
->> @@ -3,7 +3,7 @@
->>   *
->>   * Copyright (c) 2017 Xilinx Inc.
->>   *
->> - * Written-by: Alistair Francis <alistair.francis@xilinx.com>
->> + * Written-by: Alistair Francis
+On 17/09/2019 12:33, Philippe Mathieu-Daud=C3=A9 wrote:
+> Cc'ing PPC folks and Laurent.
 >=20
-> Why remove the email address?
+> On 9/16/19 11:06 PM, Niccol=C3=B2 Belli wrote:
+>> Hi,
+>> I'm trying to use qemu-user-static to chroot into a foreign amd64
+>> environment from my ppc64le host.
+>> The host has a 64k page size, while x86_64 uses 4k.
+>> I get those errors while loading shared libraries: "ELF load command
+>> alignment not page-aligned"
+>> Is there any way to fix this? I cannot simply switch to 4k page size
+>> because my btrfs filesystem won't mount anymore (it requires the
+>> sectorsize to be equal to the page size).
 
-In https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00759.html
-Thomas suggested to remove invalid email addresses:
+Which version of qemu do you use?
 
-  I don't think that this e-mail address is still valid since that
-  company has been bought up > 10 years ago... so it likely does not
-  make sense to mention it in new files anymore. So just mention the
-  name?
+Last time I tested that on my PoweMac G5 (ppc64, qemu-4.0), it worked.
 
-In your case Xilinx still exists, but you warned us it might bounce:
-
-$ git show c22e580c2ad
-commit c22e580c2ad1cccef582e1490e732f254d4ac064 (tag:
-pull-target-arm-20180301)
-Author: Alistair Francis <alistair.francis@xilinx.com>
-Date:   Thu Mar 1 11:05:58 2018 +0000
-
-    MAINTAINERS: Update my email address
-
-    I am leaving Xilinx, so to avoid having an email address that bounces
-    update my maintainer address to point to my personal email address.
-
-So I stripped your obsolete email.
-
-Since the line is not "(c) Name <email>" but simply "Written by" and the
-(C) remains to Xilinx, we could update the email by your personal one,
-that seems fair (so if someone want to contact you to ask you question
-about your code, he still can).
-
-What do you prefer?
-
->=20
-> Otherwise:
->=20
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-Thanks!
-
->=20
-> Alistair
->=20
->>   *
->>   * Permission is hereby granted, free of charge, to any person obtain=
-ing a copy
->>   * of this software and associated documentation files (the "Software=
-"), to deal
->> @@ -24,8 +24,8 @@
->>   * THE SOFTWARE.
->>   */
->>
->> -#ifndef HW_TIMER_XLNX_ZYNQMP_RTC_H
->> -#define HW_TIMER_XLNX_ZYNQMP_RTC_H
->> +#ifndef HW_RTC_XLNX_ZYNQMP_H
->> +#define HW_RTC_XLNX_ZYNQMP_H
->>
->>  #include "hw/register.h"
->>  #include "hw/sysbus.h"
->> --
->> 2.20.1
->>
->>
+Thanks,
+Laurent
 
