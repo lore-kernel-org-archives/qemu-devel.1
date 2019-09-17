@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F7FCC4CECE
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:51:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C25AC4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:52:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B5BE21670
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:51:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 337F721670
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:52:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KE952sdS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B5BE21670
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TEa3uMJ9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 337F721670
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAB5O-0000jc-L7
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 06:51:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46848)
+	id 1iAB5m-0001EE-QG
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 06:52:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46899)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iAAot-0001oz-24
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:52 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iAAox-0001qF-5A
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iAAor-0004zD-2v
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:50 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34653)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iAAou-00051A-TB
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:55 -0400
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:52673)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iAAop-0004xq-6Q
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:48 -0400
-Received: by mail-wr1-x444.google.com with SMTP id a11so2608334wrx.1
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 03:34:46 -0700 (PDT)
+ id 1iAAos-0004zS-VB
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:52 -0400
+Received: by mail-wm1-x329.google.com with SMTP id x2so2729004wmj.2
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 03:34:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=NnaErPzXThpQEqupywwj1kbSRYy+wBjcSB+cVdscC9E=;
- b=KE952sdSU0I/P/TR+9s/uEbVHjrSw2LdRdNjokrcgaKMM7au/SjefvSey8zbjwGSIP
- hFnCiUQAnRwmXLDZH0icwZU+MB7bIfqEiB+tfd4nPbEUALDyLROcFlHCvcqPuKfFJtA1
- zAA11I/POcYPTCT0Yo6Dg6u7aYY8F8m4+lF0gbU/AdFLFLxzRFlpJu1vj4qZNAlcyYhU
- GgYbVW6EOQLnwFM1AuGORBf9Yyf8e6tVN1Dj6CwGNCvDgM7OelzcieIQC6VUmiWwqh5h
- yYofyR2fbKqc5hIY30scQkd0P3ZuDeE0YMtla9jj6lAoAm7WcRfGimDGlAkNyJsE8IWS
- OvmA==
+ bh=kZoWofsyXbbkItKWVQLlPxojdB5yeiQiq06oYRBZF0U=;
+ b=TEa3uMJ93k7RS38LK8/W9gGamnLW7/CczMRHq+rTMuKA/l8WI9lqNBGTGE7GRJytVI
+ TKA7nLy655+NyhRnWXQJP2uHh+/eBbfPvEsvuMWMBx0LI8/zeAPTo57kw/ALkswi2SYE
+ f13mIMw6kCu3NyjqOoLgfrrUBhCePl2zm7EF7nfCZqBmkWyXP54J3W1psK6D9loTRA7J
+ onn4Ju+LOhaBxk+Vn7jvjs1jCLAVgdUz0bI8QPmKyu00TNivXOiHfW+aHipvARM3HI/5
+ +5ByEbYq97ogawWvLXZB9EwwfncP4QNn/JuU4aMbmpws3SrmnwmeB9NP4GmMiGH5AYTh
+ zRWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=NnaErPzXThpQEqupywwj1kbSRYy+wBjcSB+cVdscC9E=;
- b=aZFR6lgd7gS21Bu2BA+6oTS0jKcjQqoj39ExYwq0GKoEuoXvudRe0ROlGaUU1A4YMH
- s96udLhy6YgYuGBJMUpwq/f7BcIq9MLIeSYKQixMBFrsQmwP5GPGkPpciSobEys5ekZ/
- PH20bAloAgqmSnwTmLTQ6Odp8RLUuKC6wwhIukhK5eyf35CzA35e+D/T9Wpmwcq84iyn
- MBJp2KfD0dYR1Xg3PM0SE+xshI8/QNa3z4ArkhI1eqBCv8QE+rNC6gOrdEEXUbvcRrtE
- +jDjxOXlXDjv5r7B0ulvq7UM4Hldcyy+fhkWdNaAnCRYBtRq1ix4xvjkVa5JG8nbVyrC
- kwpg==
-X-Gm-Message-State: APjAAAVmrvzqbkV/jVrpjc1IvZwyq+l+9MwR2OrljDCE5OpIbLJC60oV
- FRhgpC8C5IjXgL8MVsJzsFCeGpMW
-X-Google-Smtp-Source: APXvYqz6Myiuk/iuIOkvojaR+ua0es9FWJhjXpLNV/hBXrT+j3C1St5j3I3CqBVVceHFrDxe9+5yJw==
-X-Received: by 2002:adf:ec91:: with SMTP id z17mr2561505wrn.346.1568716485555; 
- Tue, 17 Sep 2019 03:34:45 -0700 (PDT)
+ bh=kZoWofsyXbbkItKWVQLlPxojdB5yeiQiq06oYRBZF0U=;
+ b=Dfx3qka9vVzO6qT3dhxxFa+De2M+qLjbgMGC7FabHkAKytQ8ukZ8Pvke645CvTYJyh
+ npfluuAx0Qtaw86uekXaHlr2vGUZI/Q8mx18uA34DPRSrbmMtZ8z3nQaeHInCHcm1zdl
+ ItATizyZh1yWBqkKw3lKeZN8X1HcIovHhAY6rbZ6p1S8Vqd7qkW6V2gPdHqxxXjmiCtA
+ bLY5rmBs2YtqMmNifBdGZKjMWMMae3w1oLXbsqdOW42hGzUgf7qA5/h7LXHFZcUnpfnF
+ iUXceNWbcffw8mUeew/EYaLfyeJ685eFDKbS9/D1QlX723+ONzNlsCGcvEeMeV4Q+Ipa
+ YCaw==
+X-Gm-Message-State: APjAAAUkIs9HymbwzIxDW5CywEnR4cSGwEyXlxa0R1qOx7Ip2ZHxDgwX
+ p2P1A/n5ex+al+fmh+o1s1QsE52W
+X-Google-Smtp-Source: APXvYqwLHjZf//+3SGR2jIasDYkbm9eB5xBhoRMbF7qZYG5/WbTgldrZyczS97k2y4SgeaPYZgv0UA==
+X-Received: by 2002:a05:600c:22da:: with SMTP id
+ 26mr2775060wmg.177.1568716488512; 
+ Tue, 17 Sep 2019 03:34:48 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id q3sm1985415wrm.86.2019.09.17.03.34.44
+ by smtp.gmail.com with ESMTPSA id q3sm1985415wrm.86.2019.09.17.03.34.47
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 17 Sep 2019 03:34:44 -0700 (PDT)
+ Tue, 17 Sep 2019 03:34:47 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 17 Sep 2019 12:34:36 +0200
-Message-Id: <1568716480-9973-4-git-send-email-pbonzini@redhat.com>
+Date: Tue, 17 Sep 2019 12:34:39 +0200
+Message-Id: <1568716480-9973-7-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1568716480-9973-1-git-send-email-pbonzini@redhat.com>
 References: <1568716480-9973-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH 3/7] target/i386: expand feature words to 64
- bits
+X-Received-From: 2a00:1450:4864:20::329
+Subject: [Qemu-devel] [PATCH 6/7] target/i386: add VMX features
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,293 +95,481 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-VMX requires 64-bit feature words for the IA32_VMX_EPT_VPID_CAP
-and IA32_VMX_BASIC MSRs.  (The VMX control MSRs are 64-bit wide but
-actually have only 32 bits of information).
+Add code to convert the VMX feature words back into MSR values,
+allowing the user to enable/disable VMX features as they wish.  The same
+infrastructure enables support for limiting VMX features in named
+CPU models.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/sysemu/kvm.h |  2 +-
- target/i386/cpu.c    | 71 +++++++++++++++++++++++++++-------------------------
- target/i386/cpu.h    |  2 +-
- target/i386/kvm.c    |  2 +-
- 4 files changed, 40 insertions(+), 37 deletions(-)
+ target/i386/cpu.c | 225 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/i386/cpu.h |   9 +++
+ target/i386/kvm.c | 154 ++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 386 insertions(+), 2 deletions(-)
 
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 909bcd7..d691e45 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -462,7 +462,7 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension);
- 
- uint32_t kvm_arch_get_supported_cpuid(KVMState *env, uint32_t function,
-                                       uint32_t index, int reg);
--uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index);
-+uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index);
- 
- 
- void kvm_set_sigmask_len(KVMState *s, unsigned int sigmask_len);
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index fae458c..83a3692 100644
+index 83a3692..5b771f1 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -789,7 +789,7 @@ typedef struct FeatureWordInfo {
-      * In cases of disagreement between feature naming conventions,
-      * aliases may be added.
-      */
--    const char *feat_names[32];
-+    const char *feat_names[64];
-     union {
-         /* If type==CPUID_FEATURE_WORD */
-         struct {
-@@ -803,11 +803,11 @@ typedef struct FeatureWordInfo {
-             uint32_t index;
-         } msr;
-     };
--    uint32_t tcg_features; /* Feature flags supported by TCG */
--    uint32_t unmigratable_flags; /* Feature flags known to be unmigratable */
--    uint32_t migratable_flags; /* Feature flags known to be migratable */
-+    uint64_t tcg_features; /* Feature flags supported by TCG */
-+    uint64_t unmigratable_flags; /* Feature flags known to be unmigratable */
-+    uint64_t migratable_flags; /* Feature flags known to be migratable */
-     /* Features that shouldn't be auto-enabled by "-cpu host" */
--    uint32_t no_autoenable_flags;
-+    uint64_t no_autoenable_flags;
- } FeatureWordInfo;
- 
- static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-@@ -1236,7 +1236,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
- 
- typedef struct FeatureMask {
-     FeatureWord index;
--    uint32_t mask;
-+    uint64_t mask;
- } FeatureMask;
- 
- typedef struct FeatureDep {
-@@ -1246,11 +1246,11 @@ typedef struct FeatureDep {
- static FeatureDep feature_dependencies[] = {
-     {
-         .from = { FEAT_7_0_EDX,             CPUID_7_0_EDX_ARCH_CAPABILITIES },
--        .to = { FEAT_ARCH_CAPABILITIES,     ~0u },
-+        .to = { FEAT_ARCH_CAPABILITIES,     ~0ull },
+@@ -1232,6 +1232,163 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             .index = MSR_IA32_CORE_CAPABILITY,
+         },
      },
-     {
-         .from = { FEAT_7_0_EDX,             CPUID_7_0_EDX_CORE_CAPABILITY },
--        .to = { FEAT_CORE_CAPABILITY,       ~0u },
-+        .to = { FEAT_CORE_CAPABILITY,       ~0ull },
-     },
++
++    [FEAT_VMX_PROCBASED_CTLS] = {
++        .type = MSR_FEATURE_WORD,
++        .feat_names = {
++            NULL, NULL, "vmx-vintr-pending", "vmx-tsc-offset",
++            NULL, NULL, NULL, "vmx-hlt-exit",
++            NULL, "vmx-invlpg-exit", "vmx-mwait-exit", "vmx-rdpmc-exit",
++            "vmx-rdtsc-exit", NULL, NULL, "vmx-cr3-load-noexit",
++            "vmx-cr3-store-noexit", NULL, NULL, "vmx-cr8-load-exit",
++            "vmx-cr8-store-exit", "vmx-flexpriority", "vmx-vnmi-pending", "vmx-movdr-exit",
++            "vmx-io-exit", "vmx-io-bitmap", NULL, "vmx-mtf",
++            "vmx-msr-bitmap", "vmx-monitor-exit", "vmx-pause-exit", "vmx-secondary-ctls",
++        },
++        .msr = {
++            .index = MSR_IA32_VMX_TRUE_PROCBASED_CTLS,
++        }
++    },
++
++    [FEAT_VMX_SECONDARY_CTLS] = {
++        .type = MSR_FEATURE_WORD,
++        .feat_names = {
++            "vmx-apicv-xapic", "vmx-ept", "vmx-desc-exit", "vmx-rdtscp-exit",
++            "vmx-apicv-x2apic", "vmx-vpid", "vmx-wbinvd-exit", "vmx-unrestricted-guest",
++            "vmx-apicv-register", "vmx-apicv-vid", "vmx-ple", "vmx-rdrand-exit",
++            "vmx-invpcid-exit", "vmx-vmfunc", "vmx-shadow-vmcs", "vmx-encls-exit",
++            "vmx-rdseed-exit", "vmx-pml", NULL, NULL,
++            "vmx-xsaves", NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++        },
++        .msr = {
++            .index = MSR_IA32_VMX_PROCBASED_CTLS2,
++        }
++    },
++
++    [FEAT_VMX_PINBASED_CTLS] = {
++        .type = MSR_FEATURE_WORD,
++        .feat_names = {
++            "vmx-intr-exit", NULL, NULL, "vmx-nmi-exit",
++            NULL, "vmx-vnmi", "vmx-preemption-timer", "vmx-posted-intr",
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++        },
++        .msr = {
++            .index = MSR_IA32_VMX_TRUE_PINBASED_CTLS,
++        }
++    },
++
++    [FEAT_VMX_EXIT_CTLS] = {
++        .type = MSR_FEATURE_WORD,
++        /*
++         * VMX_VM_EXIT_HOST_ADDR_SPACE_SIZE is copied from
++         * the LM CPUID bit.
++         */
++        .feat_names = {
++            NULL, NULL, "vmx-exit-nosave-debugctl", NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL /* vmx-exit-host-addr-space-size */, NULL, NULL,
++            "vmx-exit-load-perf-global-ctrl", NULL, NULL, "vmx-exit-ack-intr",
++            NULL, NULL, "vmx-exit-save-pat", "vmx-exit-load-pat",
++            "vmx-exit-save-efer", "vmx-exit-load-efer",
++                "vmx-exit-save-preemption-timer", "vmx-exit-clear-bndcfgs",
++            NULL, "vmx-exit-clear-rtit-ctl", NULL, NULL,
++            NULL, NULL, NULL, NULL,
++        },
++        .msr = {
++            .index = MSR_IA32_VMX_TRUE_EXIT_CTLS,
++        }
++    },
++
++    [FEAT_VMX_ENTRY_CTLS] = {
++        .type = MSR_FEATURE_WORD,
++        .feat_names = {
++            NULL, NULL, "vmx-entry-noload-debugctl", NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, "vmx-entry-ia32e-mode", NULL, NULL,
++            NULL, "vmx-entry-load-perf-global-ctrl", "vmx-entry-load-pat", "vmx-entry-load-efer",
++            "vmx-entry-load-bndcfgs", NULL, "vmx-entry-load-rtit-ctl", NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++        },
++        .msr = {
++            .index = MSR_IA32_VMX_TRUE_ENTRY_CTLS,
++        }
++    },
++
++    [FEAT_VMX_MISC] = {
++        .type = MSR_FEATURE_WORD,
++        .feat_names = {
++            NULL, NULL, NULL, NULL,
++            NULL, "vmx-store-lma", "vmx-activity-hlt", "vmx-activity-shutdown",
++            "vmx-activity-wait-sipi", NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, "vmx-vmwrite-vmexit-fields", "vmx-zero-len-inject", NULL,
++        },
++        .msr = {
++            .index = MSR_IA32_VMX_MISC,
++        }
++    },
++
++    [FEAT_VMX_EPT_VPID_CAPS] = {
++        .type = MSR_FEATURE_WORD,
++        .feat_names = {
++            "vmx-ept-execonly", NULL, NULL, NULL,
++            NULL, NULL, "vmx-page-walk-4", "vmx-page-walk-5",
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            "vmx-ept-2mb", "vmx-ept-1gb", NULL, NULL,
++            "vmx-invept", "vmx-eptad", "vmx-ept-advanced-exitinfo", NULL,
++            NULL, "vmx-invept-single-context", "vmx-invept-all-context", NULL,
++            NULL, NULL, NULL, NULL,
++            "vmx-invvpid", NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            "vmx-invvpid-single-addr", "vmx-invept-single-context",
++                "vmx-invvpid-all-context", "vmx-invept-single-context-noglobals",
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++        },
++        .msr = {
++            .index = MSR_IA32_VMX_EPT_VPID_CAP,
++        }
++    },
++
++    [FEAT_VMX_BASIC] = {
++        .type = MSR_FEATURE_WORD,
++        .feat_names = {
++            [54] = "vmx-ins-outs",
++            [55] = "vmx-true-ctls",
++        },
++        .msr = {
++            .index = MSR_IA32_VMX_BASIC,
++        },
++        /* Just to be safe - we don't support setting the MSEG version field.  */
++        .no_autoenable_flags = MSR_VMX_BASIC_DUAL_MONITOR,
++    },
++
++    [FEAT_VMX_VMFUNC] = {
++        .type = MSR_FEATURE_WORD,
++        .feat_names = {
++            [0] = "vmx-eptp-switching",
++        },
++        .msr = {
++            .index = MSR_IA32_VMX_VMFUNC,
++        }
++    },
++
  };
  
-@@ -1362,14 +1362,14 @@ const char *get_register_name_32(unsigned int reg)
-  * Returns the set of feature flags that are supported and migratable by
-  * QEMU, for a given FeatureWord.
-  */
--static uint32_t x86_cpu_get_migratable_flags(FeatureWord w)
-+static uint64_t x86_cpu_get_migratable_flags(FeatureWord w)
- {
-     FeatureWordInfo *wi = &feature_word_info[w];
--    uint32_t r = 0;
-+    uint64_t r = 0;
-     int i;
+ typedef struct FeatureMask {
+@@ -1252,6 +1409,74 @@ static FeatureDep feature_dependencies[] = {
+         .from = { FEAT_7_0_EDX,             CPUID_7_0_EDX_CORE_CAPABILITY },
+         .to = { FEAT_CORE_CAPABILITY,       ~0ull },
+     },
++    {
++        .from = { FEAT_1_ECX,               CPUID_EXT_VMX },
++        .to = { FEAT_VMX_PROCBASED_CTLS,    ~0ull },
++    },
++    {
++        .from = { FEAT_1_ECX,               CPUID_EXT_VMX },
++        .to = { FEAT_VMX_PINBASED_CTLS,     ~0ull },
++    },
++    {
++        .from = { FEAT_1_ECX,               CPUID_EXT_VMX },
++        .to = { FEAT_VMX_EXIT_CTLS,         ~0ull },
++    },
++    {
++        .from = { FEAT_1_ECX,               CPUID_EXT_VMX },
++        .to = { FEAT_VMX_ENTRY_CTLS,        ~0ull },
++    },
++    {
++        .from = { FEAT_1_ECX,               CPUID_EXT_VMX },
++        .to = { FEAT_VMX_MISC,              ~0ull },
++    },
++    {
++        .from = { FEAT_1_ECX,               CPUID_EXT_VMX },
++        .to = { FEAT_VMX_BASIC,             ~0ull },
++    },
++    {
++        .from = { FEAT_8000_0001_EDX,       CPUID_EXT2_LM },
++        .to = { FEAT_VMX_ENTRY_CTLS,        VMX_VM_ENTRY_IA32E_MODE },
++    },
++    {
++        .from = { FEAT_VMX_PROCBASED_CTLS,  VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS },
++        .to = { FEAT_VMX_SECONDARY_CTLS,    ~0ull },
++    },
++    {
++        .from = { FEAT_XSAVE,               CPUID_XSAVE_XSAVES },
++        .to = { FEAT_VMX_SECONDARY_CTLS,    VMX_SECONDARY_EXEC_XSAVES },
++    },
++    {
++        .from = { FEAT_1_ECX,               CPUID_EXT_RDRAND },
++        .to = { FEAT_VMX_SECONDARY_CTLS,    VMX_SECONDARY_EXEC_RDRAND_EXITING },
++    },
++    {
++        .from = { FEAT_7_0_EBX,             CPUID_7_0_EBX_INVPCID },
++        .to = { FEAT_VMX_SECONDARY_CTLS,    VMX_SECONDARY_EXEC_ENABLE_INVPCID },
++    },
++    {
++        .from = { FEAT_7_0_EBX,             CPUID_7_0_EBX_RDSEED },
++        .to = { FEAT_VMX_SECONDARY_CTLS,    VMX_SECONDARY_EXEC_RDSEED_EXITING },
++    },
++    {
++        .from = { FEAT_8000_0001_EDX,       CPUID_EXT2_RDTSCP },
++        .to = { FEAT_VMX_SECONDARY_CTLS,    VMX_SECONDARY_EXEC_RDTSCP },
++    },
++    {
++        .from = { FEAT_VMX_SECONDARY_CTLS,  VMX_SECONDARY_EXEC_ENABLE_EPT },
++        .to = { FEAT_VMX_EPT_VPID_CAPS,     0xffffffffull },
++    },
++    {
++        .from = { FEAT_VMX_SECONDARY_CTLS,  VMX_SECONDARY_EXEC_ENABLE_EPT },
++        .to = { FEAT_VMX_SECONDARY_CTLS,    VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST },
++    },
++    {
++        .from = { FEAT_VMX_SECONDARY_CTLS,  VMX_SECONDARY_EXEC_ENABLE_VPID },
++        .to = { FEAT_VMX_EPT_VPID_CAPS,     0xffffffffull << 32 },
++    },
++    {
++        .from = { FEAT_VMX_SECONDARY_CTLS,  VMX_SECONDARY_EXEC_ENABLE_VMFUNC },
++        .to = { FEAT_VMX_VMFUNC,            ~0ull },
++    },
+ };
  
--    for (i = 0; i < 32; i++) {
--        uint32_t f = 1U << i;
-+    for (i = 0; i < 64; i++) {
-+        uint64_t f = 1ULL << i;
- 
-         /* If the feature name is known, it is implicitly considered migratable,
-          * unless it is explicitly set in unmigratable_flags */
-@@ -2931,7 +2931,7 @@ void x86_cpu_change_kvm_default(const char *prop, const char *value)
-     assert(pv->prop);
- }
- 
--static uint32_t x86_cpu_get_supported_feature_word(FeatureWord w,
-+static uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
-                                                    bool migratable_only);
- 
- static bool lmce_supported(void)
-@@ -3117,7 +3117,7 @@ static bool x86_cpu_have_filtered_features(X86CPU *cpu)
-     return false;
- }
- 
--static void mark_unavailable_features(X86CPU *cpu, FeatureWord w, uint32_t mask,
-+static void mark_unavailable_features(X86CPU *cpu, FeatureWord w, uint64_t mask,
-                                       const char *verbose_prefix)
- {
-     CPUX86State *env = &cpu->env;
-@@ -3134,8 +3134,8 @@ static void mark_unavailable_features(X86CPU *cpu, FeatureWord w, uint32_t mask,
-         return;
-     }
- 
--    for (i = 0; i < 32; ++i) {
--        if ((1UL << i) & mask) {
-+    for (i = 0; i < 64; ++i) {
-+        if ((1ULL << i) & mask) {
-             feat_word_str = feature_word_description(f, i);
-             warn_report("%s: %s%s%s [bit %d]",
-                         verbose_prefix,
-@@ -3378,7 +3378,7 @@ static void x86_cpu_get_feature_words(Object *obj, Visitor *v,
-                                       const char *name, void *opaque,
-                                       Error **errp)
- {
--    uint32_t *array = (uint32_t *)opaque;
-+    uint64_t *array = (uint64_t *)opaque;
-     FeatureWord w;
-     X86CPUFeatureWordInfo word_infos[FEATURE_WORDS] = { };
-     X86CPUFeatureWordInfoList list_entries[FEATURE_WORDS] = { };
-@@ -3422,6 +3422,7 @@ static inline void feat2prop(char *s)
- /* Return the feature property name for a feature flag bit */
- static const char *x86_cpu_feature_name(FeatureWord w, int bitnr)
- {
-+    const char *name;
-     /* XSAVE components are automatically enabled by other features,
-      * so return the original feature name instead
-      */
-@@ -3435,9 +3436,11 @@ static const char *x86_cpu_feature_name(FeatureWord w, int bitnr)
-         }
-     }
- 
--    assert(bitnr < 32);
-+    assert(bitnr < 64);
-     assert(w < FEATURE_WORDS);
--    return feature_word_info[w].feat_names[bitnr];
-+    name = feature_word_info[w].feat_names[bitnr];
-+    assert(bitnr < 32 || !(name && feature_word_info[w].type == CPUID_FEATURE_WORD));
-+    return name;
- }
- 
- /* Compatibily hack to maintain legacy +-feat semantic,
-@@ -3553,10 +3556,10 @@ static void x86_cpu_list_feature_names(FeatureWordArray features,
-     strList **next = feat_names;
- 
-     for (w = 0; w < FEATURE_WORDS; w++) {
--        uint32_t filtered = features[w];
-+        uint64_t filtered = features[w];
-         int i;
--        for (i = 0; i < 32; i++) {
--            if (filtered & (1UL << i)) {
-+        for (i = 0; i < 64; i++) {
-+            if (filtered & (1ULL << i)) {
-                 strList *new = g_new0(strList, 1);
-                 new->value = g_strdup(x86_cpu_feature_name(w, i));
-                 *next = new;
-@@ -3725,7 +3728,7 @@ void x86_cpu_list(void)
-     names = NULL;
-     for (i = 0; i < ARRAY_SIZE(feature_word_info); i++) {
-         FeatureWordInfo *fw = &feature_word_info[i];
--        for (j = 0; j < 32; j++) {
-+        for (j = 0; j < 64; j++) {
-             if (fw->feat_names[j]) {
-                 names = g_list_append(names, (gpointer)fw->feat_names[j]);
-             }
-@@ -3780,11 +3783,11 @@ CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
-     return cpu_list;
- }
- 
--static uint32_t x86_cpu_get_supported_feature_word(FeatureWord w,
-+static uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
-                                                    bool migratable_only)
- {
-     FeatureWordInfo *wi = &feature_word_info[w];
--    uint32_t r = 0;
-+    uint64_t r = 0;
- 
-     if (kvm_enabled()) {
-         switch (wi->type) {
-@@ -3955,7 +3958,7 @@ static QDict *x86_cpu_static_props(void)
-     for (w = 0; w < FEATURE_WORDS; w++) {
-         FeatureWordInfo *fi = &feature_word_info[w];
-         int bit;
--        for (bit = 0; bit < 32; bit++) {
-+        for (bit = 0; bit < 64; bit++) {
-             if (!fi->feat_names[bit]) {
-                 continue;
-             }
-@@ -5111,7 +5114,7 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
-     for (i = 0; i < ARRAY_SIZE(feature_dependencies); i++) {
-         FeatureDep *d = &feature_dependencies[i];
-         if (!(env->features[d->from.index] & d->from.mask)) {
--            uint32_t unavailable_features = env->features[d->to.index] & d->to.mask;
-+            uint64_t unavailable_features = env->features[d->to.index] & d->to.mask;
- 
-             /* Not an error unless the dependent feature was added explicitly.  */
-             mark_unavailable_features(cpu, d->to.index,
-@@ -5206,10 +5209,10 @@ static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
-     }
- 
-     for (w = 0; w < FEATURE_WORDS; w++) {
--        uint32_t host_feat =
-+        uint64_t host_feat =
-             x86_cpu_get_supported_feature_word(w, false);
--        uint32_t requested_features = env->features[w];
--        uint32_t unavailable_features = requested_features & ~host_feat;
-+        uint64_t requested_features = env->features[w];
-+        uint64_t unavailable_features = requested_features & ~host_feat;
-         mark_unavailable_features(cpu, w, unavailable_features, prefix);
-     }
- 
-@@ -5506,7 +5509,7 @@ static void x86_cpu_unrealizefn(DeviceState *dev, Error **errp)
- 
- typedef struct BitProperty {
-     FeatureWord w;
--    uint32_t mask;
-+    uint64_t mask;
- } BitProperty;
- 
- static void x86_cpu_get_bit_prop(Object *obj, Visitor *v, const char *name,
-@@ -5514,7 +5517,7 @@ static void x86_cpu_get_bit_prop(Object *obj, Visitor *v, const char *name,
- {
-     X86CPU *cpu = X86_CPU(obj);
-     BitProperty *fp = opaque;
--    uint32_t f = cpu->env.features[fp->w];
-+    uint64_t f = cpu->env.features[fp->w];
-     bool value = (f & fp->mask) == fp->mask;
-     visit_type_bool(v, name, &value, errp);
- }
-@@ -5567,7 +5570,7 @@ static void x86_cpu_register_bit_prop(X86CPU *cpu,
- {
-     BitProperty *fp;
-     ObjectProperty *op;
--    uint32_t mask = (1UL << bitnr);
-+    uint64_t mask = (1ULL << bitnr);
- 
-     op = object_property_find(OBJECT(cpu), prop_name, NULL);
-     if (op) {
-@@ -5701,7 +5704,7 @@ static void x86_cpu_initfn(Object *obj)
-     for (w = 0; w < FEATURE_WORDS; w++) {
-         int bitnr;
- 
--        for (bitnr = 0; bitnr < 32; bitnr++) {
-+        for (bitnr = 0; bitnr < 64; bitnr++) {
-             x86_cpu_register_feature_bit_props(cpu, w, bitnr);
-         }
-     }
+ typedef struct X86RegisterInfo32 {
 diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 5f6e3a0..c00cc35 100644
+index 7b7f062..8447ece 100644
 --- a/target/i386/cpu.h
 +++ b/target/i386/cpu.h
-@@ -502,7 +502,7 @@ typedef enum FeatureWord {
+@@ -518,6 +518,15 @@ typedef enum FeatureWord {
+     FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
+     FEAT_ARCH_CAPABILITIES,
+     FEAT_CORE_CAPABILITY,
++    FEAT_VMX_PROCBASED_CTLS,
++    FEAT_VMX_SECONDARY_CTLS,
++    FEAT_VMX_PINBASED_CTLS,
++    FEAT_VMX_EXIT_CTLS,
++    FEAT_VMX_ENTRY_CTLS,
++    FEAT_VMX_MISC,
++    FEAT_VMX_EPT_VPID_CAPS,
++    FEAT_VMX_BASIC,
++    FEAT_VMX_VMFUNC,
      FEATURE_WORDS,
  } FeatureWord;
  
--typedef uint32_t FeatureWordArray[FEATURE_WORDS];
-+typedef uint64_t FeatureWordArray[FEATURE_WORDS];
- 
- /* cpuid_features bits */
- #define CPUID_FP87 (1U << 0)
 diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 8023c67..52f98d7 100644
+index 52f98d7..bba1930 100644
 --- a/target/i386/kvm.c
 +++ b/target/i386/kvm.c
-@@ -441,7 +441,7 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
-     return ret;
+@@ -99,6 +99,7 @@ static bool has_msr_virt_ssbd;
+ static bool has_msr_smi_count;
+ static bool has_msr_arch_capabs;
+ static bool has_msr_core_capabs;
++static bool has_msr_vmx_vmfunc;
+ 
+ static uint32_t has_architectural_pmu_version;
+ static uint32_t num_architectural_pmu_gp_counters;
+@@ -447,7 +448,8 @@ uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
+         struct kvm_msrs info;
+         struct kvm_msr_entry entries[1];
+     } msr_data;
+-    uint32_t ret;
++    uint64_t value;
++    uint32_t ret, can_be_one, must_be_one;
+ 
+     if (kvm_feature_msrs == NULL) { /* Host doesn't support feature MSRs */
+         return 0;
+@@ -473,7 +475,25 @@ uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
+         exit(1);
+     }
+ 
+-    return msr_data.entries[0].data;
++    value = msr_data.entries[0].data;
++    switch (index) {
++    case MSR_IA32_VMX_PROCBASED_CTLS2:
++    case MSR_IA32_VMX_TRUE_PINBASED_CTLS:
++    case MSR_IA32_VMX_TRUE_PROCBASED_CTLS:
++    case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
++    case MSR_IA32_VMX_TRUE_EXIT_CTLS:
++        /*
++         * Return true for bits that can be one, but do not have to be one.
++         * The SDM tells us which bits could have a "must be one" setting,
++         * so we can do the opposite transformation in make_vmx_msr_value.
++         */
++        must_be_one = (uint32_t)value;
++        can_be_one = (uint32_t)(value >> 32);
++        return can_be_one & ~must_be_one;
++
++    default:
++        return value;
++    }
  }
  
--uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
-+uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
+ 
+@@ -1938,6 +1958,9 @@ static int kvm_get_supported_msrs(KVMState *s)
+             case MSR_IA32_CORE_CAPABILITY:
+                 has_msr_core_capabs = true;
+                 break;
++            case MSR_IA32_VMX_VMFUNC:
++                has_msr_vmx_vmfunc = true;
++                break;
+             }
+         }
+     }
+@@ -2411,6 +2434,126 @@ static int kvm_put_msr_feature_control(X86CPU *cpu)
+     return 0;
+ }
+ 
++static uint64_t make_vmx_msr_value(uint32_t index, uint32_t features)
++{
++    uint32_t default1, can_be_one, can_be_zero;
++    uint32_t must_be_one;
++
++    switch (index) {
++    case MSR_IA32_VMX_TRUE_PINBASED_CTLS:
++        default1 = 0x00000016;
++        break;
++    case MSR_IA32_VMX_TRUE_PROCBASED_CTLS:
++        default1 = 0x0401e172;
++        break;
++    case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
++        default1 = 0x000011ff;
++        break;
++    case MSR_IA32_VMX_TRUE_EXIT_CTLS:
++        default1 = 0x00036dff;
++        break;
++    case MSR_IA32_VMX_PROCBASED_CTLS2:
++        default1 = 0;
++        break;
++    default:
++        abort();
++    }
++
++    /* If a feature bit is set, the control can be either set or clear.
++     * Otherwise the value is limited to either 0 or 1 by default1.
++     */
++    can_be_one = features | default1;
++    can_be_zero = features | ~default1;
++    must_be_one = ~can_be_zero;
++
++    /*
++     * Bit 0:31 -> 0 if the control bit can be zero (i.e. 1 if it must be one).
++     * Bit 32:63 -> 1 if the control bit can be one.
++     */
++    return must_be_one | (((uint64_t)can_be_one) << 32);
++}
++
++#define VMCS12_MAX_FIELD_INDEX (0x17)
++
++static void kvm_msr_entry_add_vmx(X86CPU *cpu, FeatureWordArray f)
++{
++    uint64_t kvm_vmx_basic =
++        kvm_arch_get_supported_msr_feature(kvm_state,
++                                           MSR_IA32_VMX_BASIC);
++    uint64_t kvm_vmx_misc =
++        kvm_arch_get_supported_msr_feature(kvm_state,
++                                           MSR_IA32_VMX_MISC);
++    uint64_t kvm_vmx_ept_vpid =
++        kvm_arch_get_supported_msr_feature(kvm_state,
++                                           MSR_IA32_VMX_EPT_VPID_CAP);
++
++    /*
++     * If the guest is 64-bit, a value of 1 is allowed for the host address
++     * space size vmexit control.
++     */
++    uint64_t fixed_vmx_exit = f[FEAT_8000_0001_EDX] & CPUID_EXT2_LM
++        ? (uint64_t)VMX_VM_EXIT_HOST_ADDR_SPACE_SIZE << 32 : 0;
++
++    /*
++     * Bits 0-30, 32-44 and 50-53 come from the host.  KVM should
++     * not change them for backwards compatibility.
++     */
++    uint64_t fixed_vmx_basic = kvm_vmx_basic & 0x003c1fff7fffffffULL;
++
++    /*
++     * Same for bits 0-4 and 25-27.  Bits 16-24 (CR3 target count) can
++     * change in the future but are always zero for now, clear them to be
++     * future proof.  Bits 32-63 in theory could change, though KVM does
++     * not support dual-monitor treatment and probably never will; mask
++     * them out as well.
++     */
++    uint64_t fixed_vmx_misc = kvm_vmx_misc & 0x0e00001f;
++
++    /*
++     * EPT memory types should not change either, so we do not bother
++     * adding features for them.
++     */
++    uint64_t fixed_vmx_ept_mask =
++            (f[FEAT_VMX_SECONDARY_CTLS] & VMX_SECONDARY_EXEC_ENABLE_EPT ? 0x4100ull : 0);
++    uint64_t fixed_vmx_ept_vpid = kvm_vmx_ept_vpid & fixed_vmx_ept_mask;
++
++    kvm_msr_entry_add(cpu, MSR_IA32_VMX_TRUE_PROCBASED_CTLS,
++                      make_vmx_msr_value(MSR_IA32_VMX_TRUE_PROCBASED_CTLS,
++                                         f[FEAT_VMX_PROCBASED_CTLS]));
++    kvm_msr_entry_add(cpu, MSR_IA32_VMX_TRUE_PINBASED_CTLS,
++                      make_vmx_msr_value(MSR_IA32_VMX_TRUE_PINBASED_CTLS,
++                                         f[FEAT_VMX_PINBASED_CTLS]));
++    kvm_msr_entry_add(cpu, MSR_IA32_VMX_TRUE_EXIT_CTLS,
++                      make_vmx_msr_value(MSR_IA32_VMX_TRUE_EXIT_CTLS,
++                                         f[FEAT_VMX_EXIT_CTLS]) | fixed_vmx_exit);
++    kvm_msr_entry_add(cpu, MSR_IA32_VMX_TRUE_ENTRY_CTLS,
++                      make_vmx_msr_value(MSR_IA32_VMX_TRUE_ENTRY_CTLS,
++                                         f[FEAT_VMX_ENTRY_CTLS]));
++    kvm_msr_entry_add(cpu, MSR_IA32_VMX_PROCBASED_CTLS2,
++                      make_vmx_msr_value(MSR_IA32_VMX_PROCBASED_CTLS2,
++                                         f[FEAT_VMX_SECONDARY_CTLS]));
++    kvm_msr_entry_add(cpu, MSR_IA32_VMX_EPT_VPID_CAP,
++                      f[FEAT_VMX_EPT_VPID_CAPS] | fixed_vmx_ept_vpid);
++    kvm_msr_entry_add(cpu, MSR_IA32_VMX_BASIC,
++                      f[FEAT_VMX_BASIC] | fixed_vmx_basic);
++    kvm_msr_entry_add(cpu, MSR_IA32_VMX_MISC,
++                      f[FEAT_VMX_MISC] | fixed_vmx_misc);
++    if (has_msr_vmx_vmfunc) {
++        kvm_msr_entry_add(cpu, MSR_IA32_VMX_VMFUNC, f[FEAT_VMX_VMFUNC]);
++    }
++
++    /*
++     * Just to be safe, write these with constant values.  The CRn_FIXED1
++     * MSRs are generated by KVM based on the vCPU's CPUID.
++     */
++    kvm_msr_entry_add(cpu, MSR_IA32_VMX_CR0_FIXED0,
++                      CR0_PE_MASK | CR0_PG_MASK | CR0_NE_MASK);
++    kvm_msr_entry_add(cpu, MSR_IA32_VMX_CR4_FIXED0,
++                      CR4_VMXE_MASK);
++    kvm_msr_entry_add(cpu, MSR_IA32_VMX_VMCS_ENUM,
++                      VMCS12_MAX_FIELD_INDEX << 1);
++}
++
+ static int kvm_put_msrs(X86CPU *cpu, int level)
  {
-     struct {
-         struct kvm_msrs info;
+     CPUX86State *env = &cpu->env;
+@@ -2668,6 +2811,13 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+             kvm_msr_entry_add(cpu, MSR_MC0_CTL + i, env->mce_banks[i]);
+         }
+     }
++    /*
++     * Older kernels do not include VMX MSRs in KVM_GET_MSR_INDEX_LIST, but
++     * all kernels with MSR features should have them.
++     */
++    if (kvm_feature_msrs && cpu_has_vmx(env)) {
++        kvm_msr_entry_add_vmx(cpu, env->features);
++    }
+ 
+     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_SET_MSRS, cpu->kvm_msr_buf);
+     if (ret < 0) {
 -- 
 1.8.3.1
 
