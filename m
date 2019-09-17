@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 346B9C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 04:59:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E419FC4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 05:09:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 096A6216C8
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 04:59:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 096A6216C8
+	by mail.kernel.org (Postfix) with ESMTPS id B2B7D21670
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 05:09:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2B7D21670
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iA5aF-0000Z0-5x
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 00:59:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58507)
+	id 1iA5ju-0002nR-S8
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 01:09:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59059)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iA5Z9-0008T3-8T
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 00:58:16 -0400
+ (envelope-from <thuth@redhat.com>) id 1iA5iv-00029m-U2
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 01:08:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iA5Z8-0005zX-7i
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 00:58:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52630)
+ (envelope-from <thuth@redhat.com>) id 1iA5iu-000135-Tb
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 01:08:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57806)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iA5Z4-0005yC-GN; Tue, 17 Sep 2019 00:58:10 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1iA5ir-00011c-W6; Tue, 17 Sep 2019 01:08:18 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2B439307D90D;
- Tue, 17 Sep 2019 04:58:08 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B13475AFE9;
+ Tue, 17 Sep 2019 05:08:16 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-28.ams2.redhat.com [10.36.116.28])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7C38E60600;
- Tue, 17 Sep 2019 04:57:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CEC1C5D6A9;
+ Tue, 17 Sep 2019 05:07:56 +0000 (UTC)
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20190916154847.28936-1-philmd@redhat.com>
- <20190916154847.28936-2-philmd@redhat.com>
+ <20190916154847.28936-4-philmd@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -90,22 +90,22 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <1c79bc3a-740e-ed69-303f-3a53afaf48e3@redhat.com>
-Date: Tue, 17 Sep 2019 06:57:49 +0200
+Message-ID: <c5caa155-19d3-1b22-ea61-d8c17dca39e7@redhat.com>
+Date: Tue, 17 Sep 2019 07:07:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190916154847.28936-2-philmd@redhat.com>
+In-Reply-To: <20190916154847.28936-4-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Tue, 17 Sep 2019 04:58:08 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Tue, 17 Sep 2019 05:08:16 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 01/13] hw/timer: Compile devices not
- target-dependent as common object
+Subject: Re: [Qemu-devel] [PATCH 03/13] hw: Move MC146818 device from
+ hw/timer/ to hw/rtc/ subdirectory
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -137,59 +137,62 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 16/09/2019 17.48, Philippe Mathieu-Daud=C3=A9 wrote:
-> All these devices do not contain any target-specific. While most
-> of them are arch-specific, they are shared between different
-> targets of the same arch family (ARM and AArch64, MIPS32/MIPS64,
-> endianess, ...).
-> Put them into common-obj-y to compile them once for all targets.
+> The MC146818 is a Real Time Clock, not a timer.
+> Move it under the hw/rtc/ subdirectory.
 >=20
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  hw/timer/Makefile.objs | 22 +++++++++++-----------
->  1 file changed, 11 insertions(+), 11 deletions(-)
->=20
-> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-> index 123d92c969..f407523aa4 100644
-> --- a/hw/timer/Makefile.objs
-> +++ b/hw/timer/Makefile.objs
-> @@ -25,20 +25,20 @@ common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-sysct=
-l.o
->  common-obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-zynqmp-rtc.o
->  common-obj-$(CONFIG_NRF51_SOC) +=3D nrf51_timer.o
-> =20
-> -obj-$(CONFIG_ALTERA_TIMER) +=3D altera_timer.o
-> -obj-$(CONFIG_EXYNOS4) +=3D exynos4210_mct.o
-> -obj-$(CONFIG_EXYNOS4) +=3D exynos4210_pwm.o
-> -obj-$(CONFIG_EXYNOS4) +=3D exynos4210_rtc.o
-> -obj-$(CONFIG_OMAP) +=3D omap_gptimer.o
-> -obj-$(CONFIG_OMAP) +=3D omap_synctimer.o
-> -obj-$(CONFIG_PXA2XX) +=3D pxa2xx_timer.o
-> -obj-$(CONFIG_SH4) +=3D sh_timer.o
-> -obj-$(CONFIG_DIGIC) +=3D digic-timer.o
-> -obj-$(CONFIG_MIPS_CPS) +=3D mips_gictimer.o
-> +common-obj-$(CONFIG_ALTERA_TIMER) +=3D altera_timer.o
-> +common-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_mct.o
-> +common-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_pwm.o
-> +common-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_rtc.o
-> +common-obj-$(CONFIG_OMAP) +=3D omap_gptimer.o
-> +common-obj-$(CONFIG_OMAP) +=3D omap_synctimer.o
-> +common-obj-$(CONFIG_PXA2XX) +=3D pxa2xx_timer.o
-> +common-obj-$(CONFIG_SH4) +=3D sh_timer.o
-> +common-obj-$(CONFIG_DIGIC) +=3D digic-timer.o
-> +common-obj-$(CONFIG_MIPS_CPS) +=3D mips_gictimer.o
-> =20
->  obj-$(CONFIG_MC146818RTC) +=3D mc146818rtc.o
-> =20
-> -obj-$(CONFIG_ALLWINNER_A10_PIT) +=3D allwinner-a10-pit.o
-> +common-obj-$(CONFIG_ALLWINNER_A10_PIT) +=3D allwinner-a10-pit.o
-> =20
->  common-obj-$(CONFIG_STM32F2XX_TIMER) +=3D stm32f2xx_timer.o
->  common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_timer.o aspeed_rtc.o
->=20
+[...]
+> diff --git a/include/hw/rtc/mc146818rtc.h b/include/hw/rtc/mc146818rtc.=
+h
+> new file mode 100644
+> index 0000000000..888e04f9ab
+> --- /dev/null
+> +++ b/include/hw/rtc/mc146818rtc.h
+> @@ -0,0 +1,38 @@
+> +/*
+> + * QEMU MC146818 RTC emulation
+> + *
+> + * Copyright (c) 2003-2004 Fabrice Bellard
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaini=
+ng a copy
+> + * of this software and associated documentation files (the "Software"=
+), to deal
+> + * in the Software without restriction, including without limitation t=
+he rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/o=
+r sell
+> + * copies of the Software, and to permit persons to whom the Software =
+is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be incl=
+uded in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXP=
+RESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABI=
+LITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT S=
+HALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES O=
+R OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARI=
+SING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
+NGS IN
+> + * THE SOFTWARE.
+> + */
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+If you run "git blame" on the old header file, it does not seem like
+Fabrice wrote this header, so I'm not sure whether it makes sense to add
+his (c) statement here?
 
-FWIW, that change is also part of my "hw/*/Makefile.objs: Move many .o
-files to common-objs" patch ... but since it looks identical, it should
-not matter, which patch goes in first.
+Maybe rather use a one-line "SPDX-License-Identifier: GPL-2.0-or-later"
+here?
+
+ Thomas
+
+
 
