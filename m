@@ -2,109 +2,82 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF1DC4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD7BDC4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:48:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF10A21881
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:47:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF10A21881
+	by mail.kernel.org (Postfix) with ESMTPS id 5558221881
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:48:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uZBpXkJo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5558221881
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAB0f-0004FD-Ml
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 06:47:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48015)
+	id 1iAB1o-0005Bs-F3
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 06:48:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46873)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1iAAuF-0007Nk-8T
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:40:24 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iAAou-0001pL-UR
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1iAAuE-0008CA-6H
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:40:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42862)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>)
- id 1iAAuD-0008BY-UO; Tue, 17 Sep 2019 06:40:22 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 83E56190C025;
- Tue, 17 Sep 2019 10:40:20 +0000 (UTC)
-Received: from [10.36.116.217] (ovpn-116-217.ams2.redhat.com [10.36.116.217])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DF5BD65EB6;
- Tue, 17 Sep 2019 10:40:15 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- =?UTF-8?Q?Niccol=c3=b2_Belli?= <darkbasic@linuxsystems.it>,
- qemu-devel@nongnu.org, "open list:sPAPR" <qemu-ppc@nongnu.org>
-References: <83f649c6482bf363c38e7f3778d866f4@linuxsystems.it>
- <9d1ea4ff-a0df-f7c6-54ca-c03b010c5ff1@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <e2292382-968a-106f-b10a-e6987a9c3db1@redhat.com>
-Date: Tue, 17 Sep 2019 12:40:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <9d1ea4ff-a0df-f7c6-54ca-c03b010c5ff1@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Tue, 17 Sep 2019 10:40:20 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] ELF load command alignment not page-aligned
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iAAot-0004zv-08
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:52 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:37549)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iAAor-0004yL-2B
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:49 -0400
+Received: by mail-wm1-x344.google.com with SMTP id r195so2514010wme.2
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 03:34:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=vk/m1phy6P65dEIY6/BWJKvTh0rFIvdnyUtACfEL0CM=;
+ b=uZBpXkJoRNGLGeAUKlYnUpkJnKII70LmExPv/HnxUSqdHjbIk5peDVXAfi9DGMtgOZ
+ KmsX+qlwBYudYy6UCDyUt8dUc0UOzFWSSwnAcHh9Ko9CW/Vw6u3783SOXg3d/TKkng10
+ ExalqurOr60Sj/+6lEP1ivyZLri7Yc8B9PbzdYk0puGlL6s+ZUByUH2V7VzOKFClTek5
+ s9Va5NzfCHwoTwf1bL0x4MOW8eiW/3tey0tiG26LuFX4ZUrbUY1HfSv9Q1Wy5GMvKUmT
+ Q4iOD16HfI4Du/I9Gw+TmdlilmfjE7J+oVcMPBMSAcnSpg5yk30GWsyP0qhkxpJl8lBl
+ SpNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=vk/m1phy6P65dEIY6/BWJKvTh0rFIvdnyUtACfEL0CM=;
+ b=Mt9Jl0U5gf+5Lj1R17VY3bn3RssOS4shoNpRTux0ekX4E4zHsAmHaU69HGkw5DZwwy
+ QlW86t2Z1hidECrhn1Hr374ZdfAfU4Fw+WZrWUysgQ9J7/qQ1syRpnz9N9NRNWxAstj7
+ wtfzIFyMm8zQqrUUEj/0JTN4WWB9ns25ILX+j0aYZb1XeTDxW1yorfPReJjQlBPR/Tqr
+ sjBodgaZrx23sdW87XT3dJ4DsmuOV9l8UCEQc9Ze/HYV8THJyunTAz/fdgdmzDaan9MN
+ bxLnL8vRaHHg5vKVvixNxq7aOlpinJoBVwPb1ctMmegH/GtSq2Xd+YUDMyc6ba6XPivy
+ r3MQ==
+X-Gm-Message-State: APjAAAWRG4qcJCT7/bXsdO96VMT94KSNR8dQyPVJtWEO/h4+0F2DLCFm
+ g65sUuMo2FHwpzPiU2tXq6NPrefB
+X-Google-Smtp-Source: APXvYqw6Y2xYkdenC/OlPxomswmu4zLszhNF9+N2xfiedVBty893NGB1SwGhBoVf1EOf04CT2/B6rg==
+X-Received: by 2002:a7b:c34e:: with SMTP id l14mr2948608wmj.105.1568716486574; 
+ Tue, 17 Sep 2019 03:34:46 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id q3sm1985415wrm.86.2019.09.17.03.34.45
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 17 Sep 2019 03:34:45 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 17 Sep 2019 12:34:37 +0200
+Message-Id: <1568716480-9973-5-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1568716480-9973-1-git-send-email-pbonzini@redhat.com>
+References: <1568716480-9973-1-git-send-email-pbonzini@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
+Subject: [Qemu-devel] [PATCH 4/7] target/i386: add VMX definitions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,28 +89,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: liran.alon@oracle.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/09/2019 12:33, Philippe Mathieu-Daud=C3=A9 wrote:
-> Cc'ing PPC folks and Laurent.
->=20
-> On 9/16/19 11:06 PM, Niccol=C3=B2 Belli wrote:
->> Hi,
->> I'm trying to use qemu-user-static to chroot into a foreign amd64
->> environment from my ppc64le host.
->> The host has a 64k page size, while x86_64 uses 4k.
->> I get those errors while loading shared libraries: "ELF load command
->> alignment not page-aligned"
->> Is there any way to fix this? I cannot simply switch to 4k page size
->> because my btrfs filesystem won't mount anymore (it requires the
->> sectorsize to be equal to the page size).
+These will be used to compile the list of VMX features for named
+CPU models, and/or by the code that sets up the VMX MSRs.
 
-Which version of qemu do you use?
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ target/i386/cpu.h | 125 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 125 insertions(+)
 
-Last time I tested that on my PoweMac G5 (ppc64, qemu-4.0), it worked.
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index c00cc35..7b7f062 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -452,6 +452,25 @@ typedef enum X86Seg {
+ #define MSR_IA32_BNDCFGS                0x00000d90
+ #define MSR_IA32_XSS                    0x00000da0
+ 
++#define MSR_IA32_VMX_BASIC              0x00000480
++#define MSR_IA32_VMX_PINBASED_CTLS      0x00000481
++#define MSR_IA32_VMX_PROCBASED_CTLS     0x00000482
++#define MSR_IA32_VMX_EXIT_CTLS          0x00000483
++#define MSR_IA32_VMX_ENTRY_CTLS         0x00000484
++#define MSR_IA32_VMX_MISC               0x00000485
++#define MSR_IA32_VMX_CR0_FIXED0         0x00000486
++#define MSR_IA32_VMX_CR0_FIXED1         0x00000487
++#define MSR_IA32_VMX_CR4_FIXED0         0x00000488
++#define MSR_IA32_VMX_CR4_FIXED1         0x00000489
++#define MSR_IA32_VMX_VMCS_ENUM          0x0000048a
++#define MSR_IA32_VMX_PROCBASED_CTLS2    0x0000048b
++#define MSR_IA32_VMX_EPT_VPID_CAP       0x0000048c
++#define MSR_IA32_VMX_TRUE_PINBASED_CTLS  0x0000048d
++#define MSR_IA32_VMX_TRUE_PROCBASED_CTLS 0x0000048e
++#define MSR_IA32_VMX_TRUE_EXIT_CTLS      0x0000048f
++#define MSR_IA32_VMX_TRUE_ENTRY_CTLS     0x00000490
++#define MSR_IA32_VMX_VMFUNC             0x00000491
++
+ #define XSTATE_FP_BIT                   0
+ #define XSTATE_SSE_BIT                  1
+ #define XSTATE_YMM_BIT                  2
+@@ -750,6 +769,112 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+ 
+ #define MSR_CORE_CAP_SPLIT_LOCK_DETECT  (1U << 5)
+ 
++/* VMX MSR features */
++#define MSR_VMX_BASIC_DUAL_MONITOR                   (1ULL << 49)
++#define MSR_VMX_BASIC_INS_OUTS                       (1ULL << 54)
++#define MSR_VMX_BASIC_TRUE_CTLS                      (1ULL << 55)
++
++#define MSR_VMX_MISC_STORE_LMA                       (1ULL << 5)
++#define MSR_VMX_MISC_ACTIVITY_HLT                    (1ULL << 6)
++#define MSR_VMX_MISC_ACTIVITY_SHUTDOWN               (1ULL << 7)
++#define MSR_VMX_MISC_ACTIVITY_WAIT_SIPI              (1ULL << 8)
++#define MSR_VMX_MISC_VMWRITE_VMEXIT                  (1ULL << 29)
++#define MSR_VMX_MISC_ZERO_LEN_INJECT                 (1ULL << 30)
++
++#define MSR_VMX_EPT_EXECONLY                         (1ULL << 0)
++#define MSR_VMX_EPT_PAGE_WALK_LENGTH_4               (1ULL << 6)
++#define MSR_VMX_EPT_PAGE_WALK_LENGTH_5               (1ULL << 7)
++#define MSR_VMX_EPT_UC                               (1ULL << 8)
++#define MSR_VMX_EPT_WB                               (1ULL << 14)
++#define MSR_VMX_EPT_2MB                              (1ULL << 16)
++#define MSR_VMX_EPT_1GB                              (1ULL << 17)
++#define MSR_VMX_EPT_INVEPT                           (1ULL << 20)
++#define MSR_VMX_EPT_AD_BITS                          (1ULL << 21)
++#define MSR_VMX_EPT_ADVANCED_VMEXIT_INFO             (1ULL << 22)
++#define MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT            (1ULL << 25)
++#define MSR_VMX_EPT_INVEPT_ALL_CONTEXT               (1ULL << 26)
++#define MSR_VMX_EPT_INVVPID                          (1ULL << 32)
++#define MSR_VMX_EPT_INVVPID_SINGLE_ADDR              (1ULL << 40)
++#define MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT           (1ULL << 41)
++#define MSR_VMX_EPT_INVVPID_ALL_CONTEXT              (1ULL << 42)
++#define MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS (1ULL << 43)
++
++#define MSR_VMX_VMFUNC_EPT_SWITCHING                 (1ULL << 0)
++
++
++/* VMX controls */
++#define VMX_CPU_BASED_VIRTUAL_INTR_PENDING          0x00000004
++#define VMX_CPU_BASED_USE_TSC_OFFSETING             0x00000008
++#define VMX_CPU_BASED_HLT_EXITING                   0x00000080
++#define VMX_CPU_BASED_INVLPG_EXITING                0x00000200
++#define VMX_CPU_BASED_MWAIT_EXITING                 0x00000400
++#define VMX_CPU_BASED_RDPMC_EXITING                 0x00000800
++#define VMX_CPU_BASED_RDTSC_EXITING                 0x00001000
++#define VMX_CPU_BASED_CR3_LOAD_EXITING              0x00008000
++#define VMX_CPU_BASED_CR3_STORE_EXITING             0x00010000
++#define VMX_CPU_BASED_CR8_LOAD_EXITING              0x00080000
++#define VMX_CPU_BASED_CR8_STORE_EXITING             0x00100000
++#define VMX_CPU_BASED_TPR_SHADOW                    0x00200000
++#define VMX_CPU_BASED_VIRTUAL_NMI_PENDING           0x00400000
++#define VMX_CPU_BASED_MOV_DR_EXITING                0x00800000
++#define VMX_CPU_BASED_UNCOND_IO_EXITING             0x01000000
++#define VMX_CPU_BASED_USE_IO_BITMAPS                0x02000000
++#define VMX_CPU_BASED_MONITOR_TRAP_FLAG             0x08000000
++#define VMX_CPU_BASED_USE_MSR_BITMAPS               0x10000000
++#define VMX_CPU_BASED_MONITOR_EXITING               0x20000000
++#define VMX_CPU_BASED_PAUSE_EXITING                 0x40000000
++#define VMX_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS   0x80000000
++
++#define VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES 0x00000001
++#define VMX_SECONDARY_EXEC_ENABLE_EPT               0x00000002
++#define VMX_SECONDARY_EXEC_DESC                     0x00000004
++#define VMX_SECONDARY_EXEC_RDTSCP                   0x00000008
++#define VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE   0x00000010
++#define VMX_SECONDARY_EXEC_ENABLE_VPID              0x00000020
++#define VMX_SECONDARY_EXEC_WBINVD_EXITING           0x00000040
++#define VMX_SECONDARY_EXEC_UNRESTRICTED_GUEST       0x00000080
++#define VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT       0x00000100
++#define VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY    0x00000200
++#define VMX_SECONDARY_EXEC_PAUSE_LOOP_EXITING       0x00000400
++#define VMX_SECONDARY_EXEC_RDRAND_EXITING           0x00000800
++#define VMX_SECONDARY_EXEC_ENABLE_INVPCID           0x00001000
++#define VMX_SECONDARY_EXEC_ENABLE_VMFUNC            0x00002000
++#define VMX_SECONDARY_EXEC_SHADOW_VMCS              0x00004000
++#define VMX_SECONDARY_EXEC_ENCLS_EXITING            0x00008000
++#define VMX_SECONDARY_EXEC_RDSEED_EXITING           0x00010000
++#define VMX_SECONDARY_EXEC_ENABLE_PML               0x00020000
++#define VMX_SECONDARY_EXEC_XSAVES                   0x00100000
++
++#define VMX_PIN_BASED_EXT_INTR_MASK                 0x00000001
++#define VMX_PIN_BASED_NMI_EXITING                   0x00000008
++#define VMX_PIN_BASED_VIRTUAL_NMIS                  0x00000020
++#define VMX_PIN_BASED_VMX_PREEMPTION_TIMER          0x00000040
++#define VMX_PIN_BASED_POSTED_INTR                   0x00000080
++
++#define VMX_VM_EXIT_SAVE_DEBUG_CONTROLS             0x00000004
++#define VMX_VM_EXIT_HOST_ADDR_SPACE_SIZE            0x00000200
++#define VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL      0x00001000
++#define VMX_VM_EXIT_ACK_INTR_ON_EXIT                0x00008000
++#define VMX_VM_EXIT_SAVE_IA32_PAT                   0x00040000
++#define VMX_VM_EXIT_LOAD_IA32_PAT                   0x00080000
++#define VMX_VM_EXIT_SAVE_IA32_EFER                  0x00100000
++#define VMX_VM_EXIT_LOAD_IA32_EFER                  0x00200000
++#define VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER       0x00400000
++#define VMX_VM_EXIT_CLEAR_BNDCFGS                   0x00800000
++#define VMX_VM_EXIT_PT_CONCEAL_PIP                  0x01000000
++#define VMX_VM_EXIT_CLEAR_IA32_RTIT_CTL             0x02000000
++
++#define VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS            0x00000004
++#define VMX_VM_ENTRY_IA32E_MODE                     0x00000200
++#define VMX_VM_ENTRY_SMM                            0x00000400
++#define VMX_VM_ENTRY_DEACT_DUAL_MONITOR             0x00000800
++#define VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL     0x00002000
++#define VMX_VM_ENTRY_LOAD_IA32_PAT                  0x00004000
++#define VMX_VM_ENTRY_LOAD_IA32_EFER                 0x00008000
++#define VMX_VM_ENTRY_LOAD_BNDCFGS                   0x00010000
++#define VMX_VM_ENTRY_PT_CONCEAL_PIP                 0x00020000
++#define VMX_VM_ENTRY_LOAD_IA32_RTIT_CTL             0x00040000
++
+ /* Supported Hyper-V Enlightenments */
+ #define HYPERV_FEAT_RELAXED             0
+ #define HYPERV_FEAT_VAPIC               1
+-- 
+1.8.3.1
 
-Thanks,
-Laurent
+
 
