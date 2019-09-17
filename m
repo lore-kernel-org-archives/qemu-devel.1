@@ -6,67 +6,65 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38F80C4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:23:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D0C4C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:27:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09327214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:23:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09327214AF
+	by mail.kernel.org (Postfix) with ESMTPS id F063C21881
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:27:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F063C21881
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAAeH-0000GW-B9
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 06:23:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43682)
+	id 1iAAhK-0003G1-83
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 06:27:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43601)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iAAbg-0006iV-Cw
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:21:13 -0400
+ (envelope-from <groug@kaod.org>) id 1iAAbM-0006Lr-DI
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iAAbf-0003hh-1n
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:21:12 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62158)
+ (envelope-from <groug@kaod.org>) id 1iAAbL-0003ZE-4e
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:20:52 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25626)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iAAbe-0003hP-Pp
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:21:11 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iAAbK-0003Yc-So
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:20:51 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8HAI3ds034933
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 06:21:10 -0400
+ x8HAHFcg108804
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 06:20:50 -0400
 Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2v2v5vv5n5-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2v2tf7qr0n-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 06:21:09 -0400
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 06:20:49 -0400
 Received: from localhost
  by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Tue, 17 Sep 2019 11:21:06 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ Tue, 17 Sep 2019 11:20:46 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
  by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 17 Sep 2019 11:20:59 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x8HAKv0O56229996
+ Tue, 17 Sep 2019 11:20:40 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x8HAKcHP48300210
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 17 Sep 2019 10:20:57 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 510BB42045;
- Tue, 17 Sep 2019 10:20:57 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 59A8542041;
- Tue, 17 Sep 2019 10:20:56 +0000 (GMT)
+ Tue, 17 Sep 2019 10:20:38 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 480EA52054;
+ Tue, 17 Sep 2019 10:20:38 +0000 (GMT)
 Received: from bahia.lan (unknown [9.145.22.84])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 17 Sep 2019 10:20:56 +0000 (GMT)
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 54F195204E;
+ Tue, 17 Sep 2019 10:20:37 +0000 (GMT)
 From: Greg Kurz <groug@kaod.org>
 To: qemu-devel@nongnu.org
-Date: Tue, 17 Sep 2019 12:20:56 +0200
+Date: Tue, 17 Sep 2019 12:20:37 +0200
 In-Reply-To: <156871562997.196432.17776290406203122029.stgit@bahia.lan>
 References: <156871562997.196432.17776290406203122029.stgit@bahia.lan>
 User-Agent: StGit/unknown-version
@@ -74,22 +72,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19091710-4275-0000-0000-000003678A3C
+x-cbid: 19091710-4275-0000-0000-000003678A37
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19091710-4276-0000-0000-00003879EF6F
-Message-Id: <156871565600.196432.9246692833113774428.stgit@bahia.lan>
+x-cbparentid: 19091710-4276-0000-0000-00003879EF68
+Message-Id: <156871563702.196432.5964411202152101367.stgit@bahia.lan>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
  definitions=2019-09-17_05:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501
- malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ mlxlogscore=747 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1908290000 definitions=main-1909170106
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 148.163.156.1
-Subject: [Qemu-devel] [PATCH 04/17] ppc: Pass local error object pointer to
- error_append_hint()
+Subject: [Qemu-devel] [PATCH 01/17] error: Update error_append_hint()'s
+ documentation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,15 +104,15 @@ Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
  Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
  Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
  Subbaraya Sundeep <sundeep.lkml@gmail.com>,
- Juan Quintela <quintela@redhat.com>, David Hildenbrand <david@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?utf-8?q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
+ Juan Quintela <quintela@redhat.com>,
  "Daniel P. =?utf-8?q?Berrang=C3=A9=22?= <berrange@redhat.com>,
  qemu-block@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- qemu-s390x@nongnu.org"@d06av24.portsmouth.uk.ibm.com,
- Eric Farman <farman@linux.ibm.com>,
+ qemu-s390x@nongnu.org"@d06av21.portsmouth.uk.ibm.com,
+ David Hildenbrand <david@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ =?utf-8?q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Eric Farman <farman@linux.ibm.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
  Yuval Shaia <yuval.shaia@oracle.com>,
  Alex Williamson <alex.williamson@redhat.com>, John Snow <jsnow@redhat.com>,
@@ -125,117 +123,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ensure that hints are added even if errp is &error_fatal or &error_abort.
+error_setg() and error_propagate(), as well as their variants, cause
+QEMU to terminate when called with &error_fatal or &error_abort. This
+prevents to add hints since error_append_hint() isn't even called in
+this case.
+
+It means that error_append_hint() should only be used with a local
+error object, and then propagate this local error to the caller.
+
+Document this in <qapi/error.h> .
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/mac_newworld.c |    7 +++++--
- hw/ppc/spapr.c        |    7 +++++--
- hw/ppc/spapr_pci.c    |    9 +++++----
- target/ppc/kvm.c      |   13 +++++++++----
- 4 files changed, 24 insertions(+), 12 deletions(-)
+ include/qapi/error.h |   11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index c5bbcc743352..aca8c40bf395 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -618,8 +618,11 @@ static void core99_set_via_config(Object *obj, const char *value, Error **errp)
-     } else if (!strcmp(value, "pmu-adb")) {
-         cms->via_config = CORE99_VIA_CONFIG_PMU_ADB;
-     } else {
--        error_setg(errp, "Invalid via value");
--        error_append_hint(errp, "Valid values are cuda, pmu, pmu-adb.\n");
-+        Error *local_err = NULL;
-+
-+        error_setg(&local_err, "Invalid via value");
-+        error_append_hint(&local_err, "Valid values are cuda, pmu, pmu-adb.\n");
-+        error_propagate(errp, local_err);
-     }
- }
- 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 08a2a5a77092..39d6f57d014e 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4337,10 +4337,13 @@ void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu_index, Error **errp)
-     vcpu_id = spapr_vcpu_id(spapr, cpu_index);
- 
-     if (kvm_enabled() && !kvm_vcpu_id_is_valid(vcpu_id)) {
--        error_setg(errp, "Can't create CPU with id %d in KVM", vcpu_id);
--        error_append_hint(errp, "Adjust the number of cpus to %d "
-+        Error *local_err = NULL;
-+
-+        error_setg(&local_err, "Can't create CPU with id %d in KVM", vcpu_id);
-+        error_append_hint(&local_err, "Adjust the number of cpus to %d "
-                           "or try to raise the number of threads per core\n",
-                           vcpu_id * ms->smp.threads / spapr->vsmt);
-+        error_propagate(errp, local_err);
-         return;
-     }
- 
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 7b71ad7c74f1..4b7e9a1c8666 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1870,12 +1870,13 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
-     if (spapr_pci_find_phb(spapr, sphb->buid)) {
-         SpaprPhbState *s;
- 
--        error_setg(errp, "PCI host bridges must have unique indexes");
--        error_append_hint(errp, "The following indexes are already in use:");
-+        error_setg(&local_err, "PCI host bridges must have unique indexes");
-+        error_append_hint(&local_err, "The following indexes are already in use:");
-         QLIST_FOREACH(s, &spapr->phbs, list) {
--            error_append_hint(errp, " %d", s->index);
-+            error_append_hint(&local_err, " %d", s->index);
-         }
--        error_append_hint(errp, "\nTry another value for the index property\n");
-+        error_append_hint(&local_err, "\nTry another value for the index property\n");
-+        error_propagate(errp, local_err);
-         return;
-     }
- 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 8c5b1f25cc95..c6876b08c726 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -242,8 +242,11 @@ static void kvm_get_smmu_info(struct kvm_ppc_smmu_info *info, Error **errp)
-     assert(kvm_state != NULL);
- 
-     if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_GET_SMMU_INFO)) {
--        error_setg(errp, "KVM doesn't expose the MMU features it supports");
--        error_append_hint(errp, "Consider switching to a newer KVM\n");
-+        Error *local_err = NULL;
-+
-+        error_setg(&local_err, "KVM doesn't expose the MMU features it supports");
-+        error_append_hint(&local_err, "Consider switching to a newer KVM\n");
-+        error_propagate(errp, local_err);
-         return;
-     }
- 
-@@ -2076,6 +2079,7 @@ void kvmppc_hint_smt_possible(Error **errp)
-     int i;
-     GString *g;
-     char *s;
-+    Error *local_err = NULL;
- 
-     assert(kvm_enabled());
-     if (cap_ppc_smt_possible) {
-@@ -2086,12 +2090,13 @@ void kvmppc_hint_smt_possible(Error **errp)
-             }
-         }
-         s = g_string_free(g, false);
--        error_append_hint(errp, "%s.\n", s);
-+        error_append_hint(&local_err, "%s.\n", s);
-         g_free(s);
-     } else {
--        error_append_hint(errp,
-+        error_append_hint(&local_err,
-                           "This KVM seems to be too old to support VSMT.\n");
-     }
-+    error_propagate(errp, local_err);
- }
- 
- 
+diff --git a/include/qapi/error.h b/include/qapi/error.h
+index 3f95141a01a8..28174329ba71 100644
+--- a/include/qapi/error.h
++++ b/include/qapi/error.h
+@@ -27,6 +27,13 @@
+  *     error_setg(&err, "invalid quark\n"
+  *                "Valid quarks are up, down, strange, charm, top, bottom.");
+  *
++ * Dot *not* pass the errp parameter from the caller
++ *     error_setg(errp, "invalid quark");
++ *     error_append_hint(errp, "Valid quarks are up, down, strange, "
++ *                       "charm, top, bottom.\n");
++ * because error_setg() terminates QEMU if @errp is &error_fatal or
++ * &error_abort, and the hints are not even added.
++ *
+  * Report an error to the current monitor if we have one, else stderr:
+  *     error_report_err(err);
+  * This frees the error object.
+@@ -252,7 +259,9 @@ void error_prepend(Error **errp, const char *fmt, ...)
+  * error message.
+  * @errp may be NULL, but not &error_fatal or &error_abort.
+  * Trivially the case if you call it only after error_setg() or
+- * error_propagate().
++ * error_propagate(). CAUTION: error_setg() and error_propagate() do
++ * not return when passed &error_fatal. Always use a local error object
++ * and propagate it to the caller.
+  * May be called multiple times.  The resulting hint should end with a
+  * newline.
+  */
 
 
