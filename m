@@ -2,91 +2,91 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD43C4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 21:00:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE578C4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 21:04:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 532DE20862
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 21:00:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F9CF20862
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 21:04:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fwDbGFh6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 532DE20862
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b3Sp0sRw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F9CF20862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAKab-0002pH-Gu
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 17:00:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56818)
+	id 1iAKdm-0005qs-KT
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 17:04:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57181)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iAKXM-0000ff-9e
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 16:57:25 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iAKae-0003pC-Hj
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 17:00:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iAKXL-000287-7p
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 16:57:23 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34128)
+ (envelope-from <alex.bennee@linaro.org>) id 1iAKad-0003SC-45
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 17:00:48 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45874)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iAKXL-00027q-17
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 16:57:23 -0400
-Received: by mail-wm1-x341.google.com with SMTP id y135so3278513wmc.1
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 13:57:22 -0700 (PDT)
+ id 1iAKac-0003Rk-Tj
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 17:00:47 -0400
+Received: by mail-wr1-x443.google.com with SMTP id r5so4572833wrm.12
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 14:00:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=np129mybhd/vuVCXo5ULaQj+GDt3pkAqILKA3NJ0Bfc=;
- b=fwDbGFh6I0+v7PctVwJO5Et7VPKhrk69Bn8Pw0BeoD4oE1MZ1K+O1FQgX3uNjYeoix
- om5nTceBlIQWQmEhNZ2/446Xvh4Ee0AdFnlEmRlWo6RapaARVEwBAtNjKJH7FcVFs0g1
- iloCgnXuqv3RvSnYiNN50UWIqxHPq1RpEd1+uPkJvdEOp/fub3a43wW8/B7QGVue1pK7
- 6ZgesSvUKFb2R+2oJnsFOEmMXGnDbPdH9Y/zu34sYiexyW7HVKh/DKxcVHcQFuXCVy6E
- EfiP75tM7TBac2AT03z9qw95vv8Y8yd1sw/QRrvdsW0NcoClLG2/yHJ+J1gYvAY3kOi7
- fERA==
+ bh=LGy2cn9zLDHoNaJvOgkuVbYy/cSRwtirZsI1/TGsB2M=;
+ b=b3Sp0sRw3s4dK8/BOSaQ1Q7hNXB3t1F9Iw/EVkJ20dyM6e7WfYkgbxRgZo0JJCrsom
+ sOmwyXtC1+VitCPfeOz58wRrLNBcA5k93056HCSMd2wSO96AjnqzNPlCSjh0ObZdvltk
+ EKVAyLIkGVT0v9f6T6fnQ3X4GFW+XCmQhxtt/YOX1Gd4kFGE9LwoxkPwEa5no5eod9Ob
+ CSda7m51/vtKcbtgGOuJhBCD2GlcCbTA2Jrm45R2Bye31q0Z59RUNmt+KebXP598AkRO
+ S2P5UNEt0/bCB3p0gG9I7tbTYHAvD3LVXL6+OIo7IoBHHmg8lIyqem6cKR9ecdPIZUYu
+ dZOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=np129mybhd/vuVCXo5ULaQj+GDt3pkAqILKA3NJ0Bfc=;
- b=dfbDlrnb9IcCjLRdieQ3q2PPXCfTcWjA5BmyVifp0h1Sr1rSKRNV03UhK1pran0EYy
- SSU47iFKd8EvKW8uRWm/13OAe8gemyGDdqhf3ndcTzFY9goEF+DXWZNn5GrFFUYdWMxo
- 9qxkNOinIujxERRL4HG62XrouRLEEd1GsjAGKAsICCqNPpXeVTV85sHEgl7U6PmAIN+p
- dn8msUlWmYfatJ5dj0ixxInBlCV+0YHfXGunB9NzU2uCTOahwJvbz8QP1PfGr6z0gExp
- rSqJtAVIU5I6609VF96S1BWyYaBnQ7GMV569kH5llRog2DhHemj37A3uVFEwZd4GBwRZ
- kdSw==
-X-Gm-Message-State: APjAAAVRnKQhuMW78NdaO717xQGgyEY147kusEykr3z3JSF7F3JhGgCk
- pTZCslvmTG+K8VLqZv5L0X6Fvw==
-X-Google-Smtp-Source: APXvYqwoiUdhBKgFIYNRjdK/ekEcrJvqznkL3mxdmBAcwson8+7LFsnIPJDQ5yoCzIZRJ5IHTfqv1w==
-X-Received: by 2002:a1c:9615:: with SMTP id y21mr27704wmd.5.1568753841535;
- Tue, 17 Sep 2019 13:57:21 -0700 (PDT)
+ bh=LGy2cn9zLDHoNaJvOgkuVbYy/cSRwtirZsI1/TGsB2M=;
+ b=bDuy+FfG1GAQYP+BqgyMKoOWToi/XGhHXGkvzZ1eMli2GYRa2xgrXQZ+DoCX+JSGlF
+ LfnGa4EXO+/ttsl+xuBFIhLWI+B0y2qNCN6NiYPY2NahqDj+0yYegIOUNlkUqiE4Ie3D
+ D7be4bMTOpzSQO1Yw44W+C/yT1J7gAMewJSKFbu8jtFV5Bp95nc7K9SRrpW10x52VZUS
+ kpDX3vlDedfOaNAnnSJfp1f7YlATR6rfI3utr7iuXwOpf+GqM01D8Hbqa28u0uceK44z
+ yhQb3VAuvW1je9hQiZ+wLhKOOSYlPqVFsHTxvRCmecBgcK3eZTRMOyShzr6sYyHHjQti
+ yNTA==
+X-Gm-Message-State: APjAAAUnaOmaBvCBJGk2l2b31yZXuYhOMksBZgvWDqC246vr4LgREfhu
+ lSGTrMuU4GlHbZrA3kgy/kIjHw==
+X-Google-Smtp-Source: APXvYqze7iyOuzXW7xvPIUvKU2B9U52vCsizQTAVMaLTVT0yPx+a1Ld5ST03c2O0wpxQi8cm2coEVg==
+X-Received: by 2002:adf:e951:: with SMTP id m17mr409233wrn.154.1568754045622; 
+ Tue, 17 Sep 2019 14:00:45 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id u68sm42377wmu.12.2019.09.17.13.57.20
+ by smtp.gmail.com with ESMTPSA id b16sm5207408wrh.5.2019.09.17.14.00.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 17 Sep 2019 13:57:20 -0700 (PDT)
+ Tue, 17 Sep 2019 14:00:45 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 2FE211FF87;
- Tue, 17 Sep 2019 21:57:20 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 7AAFC1FF87;
+ Tue, 17 Sep 2019 22:00:44 +0100 (BST)
 References: <20190917184109.12564-1-alex.bennee@linaro.org>
- <20190917184109.12564-9-alex.bennee@linaro.org>
- <73df6b9e-d096-f58f-dfeb-aad0c8e50d39@linaro.org>
+ <20190917184109.12564-8-alex.bennee@linaro.org>
+ <afd9bc85-9c79-a456-73c1-fc19e97d1acd@linaro.org>
 User-agent: mu4e 1.3.4; emacs 27.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Richard Henderson <richard.henderson@linaro.org>
-In-reply-to: <73df6b9e-d096-f58f-dfeb-aad0c8e50d39@linaro.org>
-Date: Tue, 17 Sep 2019 21:57:20 +0100
-Message-ID: <878sqm1w0f.fsf@linaro.org>
+In-reply-to: <afd9bc85-9c79-a456-73c1-fc19e97d1acd@linaro.org>
+Date: Tue, 17 Sep 2019 22:00:44 +0100
+Message-ID: <877e661vur.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v1 8/9] tests/tcg: add generic version of
- float_convs
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH v1 7/9] tests/tcg: add float_madds test to
+ multiarch
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,7 +98,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -107,13 +109,57 @@ Sender: "Qemu-devel"
 Richard Henderson <richard.henderson@linaro.org> writes:
 
 > On 9/17/19 2:41 PM, Alex Benn=C3=A9e wrote:
->> +    for (i =3D 0; i < ARRAY_SIZE(round_flags); ++i) {
->> +        fesetround(round_flags[i].flag);
+>> +    /* From https://bugs.launchpad.net/qemu/+bug/1841491 */
+>> +    add_f32_const(0x1.ffffffffffffcp-1022);
+>> +    add_f32_const(0x1.0000000000001p-1);
+>> +    add_f32_const(0x0.0000000000001p-1022);
 >
-> If we're going to make this a generic test, perhaps
-> continue if fesetround fails?
+> These three constants do not fit in float32.
+>
+>> +    add_f32_const(0x8p-152);
+>> +    add_f32_const(0x8p-152);
+>> +    add_f32_const(0x8p-152);
+>
+> Why are you adding 3 of the same?
 
-I ifdef'ed the missing symbols? Can the symbol exits but not be settable?
+To replicate the 1841491 test case where the same number is used for
+a/b/c
+>
+>> +        for (j =3D 0; j < nums; j++) {
+>> +            for (k =3D 0; k < 3; k++) {
+>> +                a =3D get_f32(j + ((k)%3));
+>> +                b =3D get_f32(j + ((k+1)%3));
+>> +                c =3D get_f32(j + ((k+2)%3));
+>
+> How does this not overflow nums?
+> There does not appear to be an assert on overflow in get_f<N>.
+
+get_f<N> wraps the index with a mod op.
+
+>
+>> +#if defined(__arm__)
+>> +                r =3D __builtin_fmaf(a, b, c);
+>> +#else
+>> +                r =3D __builtin_fmaf(a, b, c);
+>> +#endif
+>
+> Eh?
+
+Ahh I was going to hardcode the arm madd instruction in as the builtin
+wasn't expanding. I tried setting -march in the CFLAGS but that didn't
+trigger it either on my buster arm-hf compiler. Any ideas how to get the
+compiler to do the right thing?
+
+>
+>> +/* Number of constants in each table */
+>> +int get_num_f16();
+>> +int get_num_f32();
+>> +int get_num_f64();
+>
+> This is not c++; you want (void) to indicate no arguments.
+
+ok.
+
 >
 >
 > r~
