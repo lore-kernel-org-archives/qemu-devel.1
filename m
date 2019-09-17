@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3019C4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 20:52:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2FA9C4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 20:54:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA512214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 20:52:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA512214AF
+	by mail.kernel.org (Postfix) with ESMTPS id A0EF5214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 20:54:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0EF5214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52525 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAKSI-0002hm-Iu
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 16:52:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55687)
+	id 1iAKUK-0004nP-1P
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 16:54:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55629)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iAKL7-0001Dd-3R
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 16:44:45 -0400
+ (envelope-from <eblake@redhat.com>) id 1iAKKy-00011q-6h
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 16:44:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iAKL6-00049J-37
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 16:44:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58300)
+ (envelope-from <eblake@redhat.com>) id 1iAKKx-00045h-7e
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 16:44:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34186)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAKL5-00048o-RD
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 16:44:44 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAKKw-00045V-W0
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 16:44:35 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2B528C04AC50;
- Tue, 17 Sep 2019 20:44:43 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 463AF10C0928;
+ Tue, 17 Sep 2019 20:44:34 +0000 (UTC)
 Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C718B5D9D5;
- Tue, 17 Sep 2019 20:44:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E46D019C70;
+ Tue, 17 Sep 2019 20:44:31 +0000 (UTC)
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20190914153506.2151-1-armbru@redhat.com>
- <20190914153506.2151-20-armbru@redhat.com>
+ <20190914153506.2151-16-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,22 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <05f455c4-a802-e9ed-eaf8-9391df2a87d8@redhat.com>
-Date: Tue, 17 Sep 2019 14:27:45 -0500
+Message-ID: <4ff67a75-86a5-3ddf-634a-34a66ab327af@redhat.com>
+Date: Tue, 17 Sep 2019 14:03:45 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190914153506.2151-20-armbru@redhat.com>
+In-Reply-To: <20190914153506.2151-16-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="WIRKZHah2ANFwD5wup5OE3ZtsY8MSL8sS"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Tue, 17 Sep 2019 20:44:43 +0000 (UTC)
+ boundary="AZ4xJYOINQRkVGdhapM8sdbsdCgkv45ib"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Tue, 17 Sep 2019 20:44:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 19/19] qapi: Assert .visit() and
- .check_clash() run only after .check()
+Subject: Re: [Qemu-devel] [PATCH 15/19] qapi: Clean up around
+ check_known_keys()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,31 +103,32 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WIRKZHah2ANFwD5wup5OE3ZtsY8MSL8sS
-Content-Type: multipart/mixed; boundary="RCQ7ITDGjhXfpYhDn7JFWp3kjlCfgx992";
+--AZ4xJYOINQRkVGdhapM8sdbsdCgkv45ib
+Content-Type: multipart/mixed; boundary="S8TXTjCMrk7cEOfwxHhi5w1HcDtItQkVo";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <05f455c4-a802-e9ed-eaf8-9391df2a87d8@redhat.com>
-Subject: Re: [PATCH 19/19] qapi: Assert .visit() and .check_clash() run only
- after .check()
+Message-ID: <4ff67a75-86a5-3ddf-634a-34a66ab327af@redhat.com>
+Subject: Re: [PATCH 15/19] qapi: Clean up around check_known_keys()
 References: <20190914153506.2151-1-armbru@redhat.com>
- <20190914153506.2151-20-armbru@redhat.com>
-In-Reply-To: <20190914153506.2151-20-armbru@redhat.com>
+ <20190914153506.2151-16-armbru@redhat.com>
+In-Reply-To: <20190914153506.2151-16-armbru@redhat.com>
 
---RCQ7ITDGjhXfpYhDn7JFWp3kjlCfgx992
+--S8TXTjCMrk7cEOfwxHhi5w1HcDtItQkVo
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 9/14/19 10:35 AM, Markus Armbruster wrote:
-> Easy since the previous commit provides .checked.
+> All callers pass a dict argument to @keys, except check_keys() passes
+> a dict's .keys().  Drop .keys() there, and rename parameter @keys to
+> @value.
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  scripts/qapi/common.py | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
+>  scripts/qapi/common.py | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 >=20
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
@@ -138,24 +139,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---RCQ7ITDGjhXfpYhDn7JFWp3kjlCfgx992--
+--S8TXTjCMrk7cEOfwxHhi5w1HcDtItQkVo--
 
---WIRKZHah2ANFwD5wup5OE3ZtsY8MSL8sS
+--AZ4xJYOINQRkVGdhapM8sdbsdCgkv45ib
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2BM7EACgkQp6FrSiUn
-Q2p37gf+JsNNUEzrZomdziS5788xA9U8vxK2HIQNPUt6p2IFFAzXAw+OXGNqThZ+
-6/2cml0hq15xhsS9kakjocAF0AOvdpCS9L81F6mS+I/n5C2mLqwS/iMj28uY5u72
-rD+PEHaC4IoHdA479tmTzSKxU7IpeJY4mXwQS+kJTWnZTdO/MazKJuRaOxUM5uYO
-d9ffdN00L9vBpALHoJE5EyIpba6ju0tzzhzBnDXpyn+udyoZ1iShAjk85vsZW/VD
-OI/ghWdzrk3bAhfWYs214pM/B2qzr94iBDoJdekG4gPK/GrB0NB9DBxxmo5f5OO/
-HpSQyZc/Pi4W/Clm4yxdMLiJwf1xcQ==
-=SElv
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2BLhEACgkQp6FrSiUn
+Q2pwTQf+OmdNwE0nETwf06GMQ6sUOsvun5FmSAST1WVwN6jCCDwmehjlpuaDT+hI
+uM+WAkVtqMlWosuDHnQrRrCHsxV7p8kF4fpHm21J8k3ZYerFDBRB4JMH3M+sNvX2
+PmbWqhtMey7QPyjkHsHxlJtzGmP8uGluBeNSW9+gmTcUy5v0wbWY/J7F7bb3g6cY
+NjWG29lTZZA0RPqvA7hm9w8VCHZXcxJIxEu8u0EsWbFOL2FKGrw6VcyxO10XJKLh
+Qd62X6GVdQuh7J9GYAOFL3uwk38/CdrzgrACc1eUNhzhESjqAmwJ4gixlctFgsyZ
+EoVATqtv8tO5hJ+wKZaYlVO1w8l1YQ==
+=cvi4
 -----END PGP SIGNATURE-----
 
---WIRKZHah2ANFwD5wup5OE3ZtsY8MSL8sS--
+--AZ4xJYOINQRkVGdhapM8sdbsdCgkv45ib--
 
