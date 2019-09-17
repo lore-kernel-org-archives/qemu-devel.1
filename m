@@ -2,101 +2,83 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EDFDC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F7FCC4CECE
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:51:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF18E21670
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:51:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B5BE21670
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:51:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aGmAjU16"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF18E21670
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KE952sdS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B5BE21670
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAB4h-0008FR-FQ
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 06:51:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48710)
+	id 1iAB5O-0000jc-L7
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 06:51:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46848)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iAAyR-000301-GN
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:44:44 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iAAot-0001oz-24
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iAAyQ-0002fO-A8
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:44:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41132
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iAAyP-0002cd-Or
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:44:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1568717080;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=GYRHiJ+owTPPegEv8FDm2efdl/frRhEQ1iE1eyQFru8=;
- b=aGmAjU1631piPQVTSVcFkszk0LKFsIXgYPY73wLEkYdEPO1KcfNLmOePTBNX/MVUMw/l5I
- 9TEiB9obV8NcXXtrElDOHD83i5ndTEtGVU94rS9nxBLlUufj71Sug5GO+LhNxbFpaBOLTS
- VRkHMkUejBEckFWKqAFm0f0AW/o2QPY=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189-qiUCPO0hMQ-6qu4Z16h0vw-1; Tue, 17 Sep 2019 06:44:39 -0400
-Received: by mail-wr1-f69.google.com with SMTP id n18so1156212wro.11
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 03:44:38 -0700 (PDT)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iAAor-0004zD-2v
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:50 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34653)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iAAop-0004xq-6Q
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:48 -0400
+Received: by mail-wr1-x444.google.com with SMTP id a11so2608334wrx.1
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 03:34:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=NnaErPzXThpQEqupywwj1kbSRYy+wBjcSB+cVdscC9E=;
+ b=KE952sdSU0I/P/TR+9s/uEbVHjrSw2LdRdNjokrcgaKMM7au/SjefvSey8zbjwGSIP
+ hFnCiUQAnRwmXLDZH0icwZU+MB7bIfqEiB+tfd4nPbEUALDyLROcFlHCvcqPuKfFJtA1
+ zAA11I/POcYPTCT0Yo6Dg6u7aYY8F8m4+lF0gbU/AdFLFLxzRFlpJu1vj4qZNAlcyYhU
+ GgYbVW6EOQLnwFM1AuGORBf9Yyf8e6tVN1Dj6CwGNCvDgM7OelzcieIQC6VUmiWwqh5h
+ yYofyR2fbKqc5hIY30scQkd0P3ZuDeE0YMtla9jj6lAoAm7WcRfGimDGlAkNyJsE8IWS
+ OvmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=CjcODW7E3h0WDqNOriOGUTFzt+pKCnYJPS20FUABpOI=;
- b=P4hd0yU+9TyIXjn5RXVQm7MUu3B+Mdlf3UwFzk2Cv3c9CMDBpk7xR89zOcnefN5fcK
- mxmOFVYNJnJlfh/4NEjIJMAcd02lPgI4SP5wk1bXz+8orkS2qzO7tbh+ZFTnJAj7iry9
- xd9zmCLsfw9pf0aNawTzIQQoKXE7EnmV8DWWq2CyBxYvgXIHptMEk6I7UjNtcF4tBE0D
- anwqonO/3TvdiYKSegKp4l1LjaWPOlrhgccDsOFdJkh073f8lZW1nnpLR7VYEmZuXiTs
- m+UPdR8BiJrDbIlnpual6n+mknOzOzGAgmqF0SltzvaY+1VIlwYiuqyK6aqfBW4LknFQ
- XbuQ==
-X-Gm-Message-State: APjAAAUr4XrVXY3fURAaE97euMDerRyOAaFaqjKbEmifVP9qcGBIpS8Q
- 6rKY87TbSI7wLr0EBz8Movqu7x3t1j/Qb6hIum1iTZthY9h8rq/vXsFmwjRPrSfFPOhJ+L8Ak84
- 2IAEncYZtFxByQb0=
-X-Received: by 2002:a05:600c:210b:: with SMTP id
- u11mr269546wml.29.1568717077443; 
- Tue, 17 Sep 2019 03:44:37 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxWiA5sBqWEJOz1cZa+oteKrrk8l7zd4fh/pjBqNiwuj+ncVluU/Z3hXksL+sxXmXysxNsJRQ==
-X-Received: by 2002:a05:600c:210b:: with SMTP id
- u11mr269523wml.29.1568717077155; 
- Tue, 17 Sep 2019 03:44:37 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8?
- ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
- by smtp.gmail.com with ESMTPSA id m11sm1750967wrn.59.2019.09.17.03.44.36
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Sep 2019 03:44:36 -0700 (PDT)
-To: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>, qemu-devel@nongnu.org
-References: <156871404669.31913.13609976778909645749.stgit@pasha-Precision-3630-Tower>
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=NnaErPzXThpQEqupywwj1kbSRYy+wBjcSB+cVdscC9E=;
+ b=aZFR6lgd7gS21Bu2BA+6oTS0jKcjQqoj39ExYwq0GKoEuoXvudRe0ROlGaUU1A4YMH
+ s96udLhy6YgYuGBJMUpwq/f7BcIq9MLIeSYKQixMBFrsQmwP5GPGkPpciSobEys5ekZ/
+ PH20bAloAgqmSnwTmLTQ6Odp8RLUuKC6wwhIukhK5eyf35CzA35e+D/T9Wpmwcq84iyn
+ MBJp2KfD0dYR1Xg3PM0SE+xshI8/QNa3z4ArkhI1eqBCv8QE+rNC6gOrdEEXUbvcRrtE
+ +jDjxOXlXDjv5r7B0ulvq7UM4Hldcyy+fhkWdNaAnCRYBtRq1ix4xvjkVa5JG8nbVyrC
+ kwpg==
+X-Gm-Message-State: APjAAAVmrvzqbkV/jVrpjc1IvZwyq+l+9MwR2OrljDCE5OpIbLJC60oV
+ FRhgpC8C5IjXgL8MVsJzsFCeGpMW
+X-Google-Smtp-Source: APXvYqz6Myiuk/iuIOkvojaR+ua0es9FWJhjXpLNV/hBXrT+j3C1St5j3I3CqBVVceHFrDxe9+5yJw==
+X-Received: by 2002:adf:ec91:: with SMTP id z17mr2561505wrn.346.1568716485555; 
+ Tue, 17 Sep 2019 03:34:45 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id q3sm1985415wrm.86.2019.09.17.03.34.44
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 17 Sep 2019 03:34:44 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <7ef051d7-8f92-3726-26b1-b62ae51ce432@redhat.com>
-Date: Tue, 17 Sep 2019 12:44:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <156871404669.31913.13609976778909645749.stgit@pasha-Precision-3630-Tower>
-Content-Language: en-US
-X-MC-Unique: qiUCPO0hMQ-6qu4Z16h0vw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
-Subject: Re: [Qemu-devel] [PATCH] replay: don't synchronize memory
- operations in replay mode
+To: qemu-devel@nongnu.org
+Date: Tue, 17 Sep 2019 12:34:36 +0200
+Message-Id: <1568716480-9973-4-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1568716480-9973-1-git-send-email-pbonzini@redhat.com>
+References: <1568716480-9973-1-git-send-email-pbonzini@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH 3/7] target/i386: expand feature words to 64
+ bits
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,56 +90,300 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dovgaluk@ispras.ru, richard.henderson@linaro.org, pavel.dovgaluk@ispras.ru
+Cc: liran.alon@oracle.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/09/19 11:54, Pavel Dovgalyuk wrote:
-> Commit 9458a9a1df1a4c719e24512394d548c1fc7abd22 added synchronization
-> of vCPU and migration operations through calling run_on_cpu operation.
-> However, in replay mode this synchronization is unneeded, because
-> I/O and vCPU threads are already synchronized.
-> This patch disables such synchronization for record/replay mode.
->=20
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> ---
->  exec.c |   13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
->=20
-> diff --git a/exec.c b/exec.c
-> index be8b2b7c06..a69745811f 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -3177,8 +3177,17 @@ static void tcg_log_global_after_sync(MemoryListen=
-er *listener)
->       * by pushing the migration thread's memory read after the vCPU thre=
-ad has
->       * written the memory.
->       */
-> -    cpuas =3D container_of(listener, CPUAddressSpace, tcg_as_listener);
-> -    run_on_cpu(cpuas->cpu, do_nothing, RUN_ON_CPU_NULL);
-> +    if (replay_mode =3D=3D REPLAY_MODE_NONE) {
-> +        /*
-> +         * VGA can make calls to this function while updating the screen=
-.
-> +         * In record/replay mode this causes a deadlock, because
-> +         * run_on_cpu waits for rr mutex. Therefore no races are possibl=
-e
-> +         * in this case and no need for making run_on_cpu when
-> +         * record/replay is not enabled.
-> +         */
-> +        cpuas =3D container_of(listener, CPUAddressSpace, tcg_as_listene=
-r);
-> +        run_on_cpu(cpuas->cpu, do_nothing, RUN_ON_CPU_NULL);
-> +    }
->  }
-> =20
->  static void tcg_commit(MemoryListener *listener)
->=20
+VMX requires 64-bit feature words for the IA32_VMX_EPT_VPID_CAP
+and IA32_VMX_BASIC MSRs.  (The VMX control MSRs are 64-bit wide but
+actually have only 32 bits of information).
 
-Looks good.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ include/sysemu/kvm.h |  2 +-
+ target/i386/cpu.c    | 71 +++++++++++++++++++++++++++-------------------------
+ target/i386/cpu.h    |  2 +-
+ target/i386/kvm.c    |  2 +-
+ 4 files changed, 40 insertions(+), 37 deletions(-)
 
-Paolo
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 909bcd7..d691e45 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -462,7 +462,7 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension);
+ 
+ uint32_t kvm_arch_get_supported_cpuid(KVMState *env, uint32_t function,
+                                       uint32_t index, int reg);
+-uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index);
++uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index);
+ 
+ 
+ void kvm_set_sigmask_len(KVMState *s, unsigned int sigmask_len);
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index fae458c..83a3692 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -789,7 +789,7 @@ typedef struct FeatureWordInfo {
+      * In cases of disagreement between feature naming conventions,
+      * aliases may be added.
+      */
+-    const char *feat_names[32];
++    const char *feat_names[64];
+     union {
+         /* If type==CPUID_FEATURE_WORD */
+         struct {
+@@ -803,11 +803,11 @@ typedef struct FeatureWordInfo {
+             uint32_t index;
+         } msr;
+     };
+-    uint32_t tcg_features; /* Feature flags supported by TCG */
+-    uint32_t unmigratable_flags; /* Feature flags known to be unmigratable */
+-    uint32_t migratable_flags; /* Feature flags known to be migratable */
++    uint64_t tcg_features; /* Feature flags supported by TCG */
++    uint64_t unmigratable_flags; /* Feature flags known to be unmigratable */
++    uint64_t migratable_flags; /* Feature flags known to be migratable */
+     /* Features that shouldn't be auto-enabled by "-cpu host" */
+-    uint32_t no_autoenable_flags;
++    uint64_t no_autoenable_flags;
+ } FeatureWordInfo;
+ 
+ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+@@ -1236,7 +1236,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+ 
+ typedef struct FeatureMask {
+     FeatureWord index;
+-    uint32_t mask;
++    uint64_t mask;
+ } FeatureMask;
+ 
+ typedef struct FeatureDep {
+@@ -1246,11 +1246,11 @@ typedef struct FeatureDep {
+ static FeatureDep feature_dependencies[] = {
+     {
+         .from = { FEAT_7_0_EDX,             CPUID_7_0_EDX_ARCH_CAPABILITIES },
+-        .to = { FEAT_ARCH_CAPABILITIES,     ~0u },
++        .to = { FEAT_ARCH_CAPABILITIES,     ~0ull },
+     },
+     {
+         .from = { FEAT_7_0_EDX,             CPUID_7_0_EDX_CORE_CAPABILITY },
+-        .to = { FEAT_CORE_CAPABILITY,       ~0u },
++        .to = { FEAT_CORE_CAPABILITY,       ~0ull },
+     },
+ };
+ 
+@@ -1362,14 +1362,14 @@ const char *get_register_name_32(unsigned int reg)
+  * Returns the set of feature flags that are supported and migratable by
+  * QEMU, for a given FeatureWord.
+  */
+-static uint32_t x86_cpu_get_migratable_flags(FeatureWord w)
++static uint64_t x86_cpu_get_migratable_flags(FeatureWord w)
+ {
+     FeatureWordInfo *wi = &feature_word_info[w];
+-    uint32_t r = 0;
++    uint64_t r = 0;
+     int i;
+ 
+-    for (i = 0; i < 32; i++) {
+-        uint32_t f = 1U << i;
++    for (i = 0; i < 64; i++) {
++        uint64_t f = 1ULL << i;
+ 
+         /* If the feature name is known, it is implicitly considered migratable,
+          * unless it is explicitly set in unmigratable_flags */
+@@ -2931,7 +2931,7 @@ void x86_cpu_change_kvm_default(const char *prop, const char *value)
+     assert(pv->prop);
+ }
+ 
+-static uint32_t x86_cpu_get_supported_feature_word(FeatureWord w,
++static uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
+                                                    bool migratable_only);
+ 
+ static bool lmce_supported(void)
+@@ -3117,7 +3117,7 @@ static bool x86_cpu_have_filtered_features(X86CPU *cpu)
+     return false;
+ }
+ 
+-static void mark_unavailable_features(X86CPU *cpu, FeatureWord w, uint32_t mask,
++static void mark_unavailable_features(X86CPU *cpu, FeatureWord w, uint64_t mask,
+                                       const char *verbose_prefix)
+ {
+     CPUX86State *env = &cpu->env;
+@@ -3134,8 +3134,8 @@ static void mark_unavailable_features(X86CPU *cpu, FeatureWord w, uint32_t mask,
+         return;
+     }
+ 
+-    for (i = 0; i < 32; ++i) {
+-        if ((1UL << i) & mask) {
++    for (i = 0; i < 64; ++i) {
++        if ((1ULL << i) & mask) {
+             feat_word_str = feature_word_description(f, i);
+             warn_report("%s: %s%s%s [bit %d]",
+                         verbose_prefix,
+@@ -3378,7 +3378,7 @@ static void x86_cpu_get_feature_words(Object *obj, Visitor *v,
+                                       const char *name, void *opaque,
+                                       Error **errp)
+ {
+-    uint32_t *array = (uint32_t *)opaque;
++    uint64_t *array = (uint64_t *)opaque;
+     FeatureWord w;
+     X86CPUFeatureWordInfo word_infos[FEATURE_WORDS] = { };
+     X86CPUFeatureWordInfoList list_entries[FEATURE_WORDS] = { };
+@@ -3422,6 +3422,7 @@ static inline void feat2prop(char *s)
+ /* Return the feature property name for a feature flag bit */
+ static const char *x86_cpu_feature_name(FeatureWord w, int bitnr)
+ {
++    const char *name;
+     /* XSAVE components are automatically enabled by other features,
+      * so return the original feature name instead
+      */
+@@ -3435,9 +3436,11 @@ static const char *x86_cpu_feature_name(FeatureWord w, int bitnr)
+         }
+     }
+ 
+-    assert(bitnr < 32);
++    assert(bitnr < 64);
+     assert(w < FEATURE_WORDS);
+-    return feature_word_info[w].feat_names[bitnr];
++    name = feature_word_info[w].feat_names[bitnr];
++    assert(bitnr < 32 || !(name && feature_word_info[w].type == CPUID_FEATURE_WORD));
++    return name;
+ }
+ 
+ /* Compatibily hack to maintain legacy +-feat semantic,
+@@ -3553,10 +3556,10 @@ static void x86_cpu_list_feature_names(FeatureWordArray features,
+     strList **next = feat_names;
+ 
+     for (w = 0; w < FEATURE_WORDS; w++) {
+-        uint32_t filtered = features[w];
++        uint64_t filtered = features[w];
+         int i;
+-        for (i = 0; i < 32; i++) {
+-            if (filtered & (1UL << i)) {
++        for (i = 0; i < 64; i++) {
++            if (filtered & (1ULL << i)) {
+                 strList *new = g_new0(strList, 1);
+                 new->value = g_strdup(x86_cpu_feature_name(w, i));
+                 *next = new;
+@@ -3725,7 +3728,7 @@ void x86_cpu_list(void)
+     names = NULL;
+     for (i = 0; i < ARRAY_SIZE(feature_word_info); i++) {
+         FeatureWordInfo *fw = &feature_word_info[i];
+-        for (j = 0; j < 32; j++) {
++        for (j = 0; j < 64; j++) {
+             if (fw->feat_names[j]) {
+                 names = g_list_append(names, (gpointer)fw->feat_names[j]);
+             }
+@@ -3780,11 +3783,11 @@ CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
+     return cpu_list;
+ }
+ 
+-static uint32_t x86_cpu_get_supported_feature_word(FeatureWord w,
++static uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
+                                                    bool migratable_only)
+ {
+     FeatureWordInfo *wi = &feature_word_info[w];
+-    uint32_t r = 0;
++    uint64_t r = 0;
+ 
+     if (kvm_enabled()) {
+         switch (wi->type) {
+@@ -3955,7 +3958,7 @@ static QDict *x86_cpu_static_props(void)
+     for (w = 0; w < FEATURE_WORDS; w++) {
+         FeatureWordInfo *fi = &feature_word_info[w];
+         int bit;
+-        for (bit = 0; bit < 32; bit++) {
++        for (bit = 0; bit < 64; bit++) {
+             if (!fi->feat_names[bit]) {
+                 continue;
+             }
+@@ -5111,7 +5114,7 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+     for (i = 0; i < ARRAY_SIZE(feature_dependencies); i++) {
+         FeatureDep *d = &feature_dependencies[i];
+         if (!(env->features[d->from.index] & d->from.mask)) {
+-            uint32_t unavailable_features = env->features[d->to.index] & d->to.mask;
++            uint64_t unavailable_features = env->features[d->to.index] & d->to.mask;
+ 
+             /* Not an error unless the dependent feature was added explicitly.  */
+             mark_unavailable_features(cpu, d->to.index,
+@@ -5206,10 +5209,10 @@ static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
+     }
+ 
+     for (w = 0; w < FEATURE_WORDS; w++) {
+-        uint32_t host_feat =
++        uint64_t host_feat =
+             x86_cpu_get_supported_feature_word(w, false);
+-        uint32_t requested_features = env->features[w];
+-        uint32_t unavailable_features = requested_features & ~host_feat;
++        uint64_t requested_features = env->features[w];
++        uint64_t unavailable_features = requested_features & ~host_feat;
+         mark_unavailable_features(cpu, w, unavailable_features, prefix);
+     }
+ 
+@@ -5506,7 +5509,7 @@ static void x86_cpu_unrealizefn(DeviceState *dev, Error **errp)
+ 
+ typedef struct BitProperty {
+     FeatureWord w;
+-    uint32_t mask;
++    uint64_t mask;
+ } BitProperty;
+ 
+ static void x86_cpu_get_bit_prop(Object *obj, Visitor *v, const char *name,
+@@ -5514,7 +5517,7 @@ static void x86_cpu_get_bit_prop(Object *obj, Visitor *v, const char *name,
+ {
+     X86CPU *cpu = X86_CPU(obj);
+     BitProperty *fp = opaque;
+-    uint32_t f = cpu->env.features[fp->w];
++    uint64_t f = cpu->env.features[fp->w];
+     bool value = (f & fp->mask) == fp->mask;
+     visit_type_bool(v, name, &value, errp);
+ }
+@@ -5567,7 +5570,7 @@ static void x86_cpu_register_bit_prop(X86CPU *cpu,
+ {
+     BitProperty *fp;
+     ObjectProperty *op;
+-    uint32_t mask = (1UL << bitnr);
++    uint64_t mask = (1ULL << bitnr);
+ 
+     op = object_property_find(OBJECT(cpu), prop_name, NULL);
+     if (op) {
+@@ -5701,7 +5704,7 @@ static void x86_cpu_initfn(Object *obj)
+     for (w = 0; w < FEATURE_WORDS; w++) {
+         int bitnr;
+ 
+-        for (bitnr = 0; bitnr < 32; bitnr++) {
++        for (bitnr = 0; bitnr < 64; bitnr++) {
+             x86_cpu_register_feature_bit_props(cpu, w, bitnr);
+         }
+     }
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 5f6e3a0..c00cc35 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -502,7 +502,7 @@ typedef enum FeatureWord {
+     FEATURE_WORDS,
+ } FeatureWord;
+ 
+-typedef uint32_t FeatureWordArray[FEATURE_WORDS];
++typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+ 
+ /* cpuid_features bits */
+ #define CPUID_FP87 (1U << 0)
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 8023c67..52f98d7 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -441,7 +441,7 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+     return ret;
+ }
+ 
+-uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
++uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
+ {
+     struct {
+         struct kvm_msrs info;
+-- 
+1.8.3.1
+
 
 
