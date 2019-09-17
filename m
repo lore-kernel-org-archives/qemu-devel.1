@@ -2,66 +2,87 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E3DCC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:51:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F6E7C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:55:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02F25206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:51:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02F25206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 398332171F
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:55:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="L3lfeq0d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 398332171F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iACxP-0008NV-5l
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 08:51:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38584)
+	id 1iAD12-0001q4-AY
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 08:55:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39399)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iACtL-0005v2-OB
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:47:37 -0400
+ (envelope-from <luc.michel@greensocs.com>) id 1iACy6-0000dK-Ap
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:52:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iACtI-0000at-AJ
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:47:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49344)
+ (envelope-from <luc.michel@greensocs.com>) id 1iACy4-0003rD-VE
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:52:30 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:45054)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iACtI-0000ZG-1I
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:47:32 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AB1AEC0495A3
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 12:47:30 +0000 (UTC)
-Received: from redhat.com (ovpn-112-41.ams2.redhat.com [10.36.112.41])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CA0FA6012E;
- Tue, 17 Sep 2019 12:47:23 +0000 (UTC)
-Date: Tue, 17 Sep 2019 13:47:21 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190917124721.GQ1069@redhat.com>
-References: <20190912122514.22504-1-marcandre.lureau@redhat.com>
- <20190912122514.22504-6-marcandre.lureau@redhat.com>
- <20190916100035.GC2887@work-vm>
+ (Exim 4.71) (envelope-from <luc.michel@greensocs.com>)
+ id 1iACy1-0003pB-P1; Tue, 17 Sep 2019 08:52:26 -0400
+Received: from [172.16.11.100] (tiramisu.bar.greensocs.com [172.16.11.100])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id D092E96F50;
+ Tue, 17 Sep 2019 12:52:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1568724743;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=82KG3T8RmQqxzA6umtmQhxyhHb4oDgZYrD7nSRrpadM=;
+ b=L3lfeq0dgDhj9ITGpVYuiruOwAC3akojCewImp0v/48r94bfO1nICDQgCrPnETNloOp7/s
+ ELwksHGIzxDhF221JN7yJL4DB+h0MeYBeAhZdyFcTJ25a1lWAF8CW7Fhg3zQRcaTV1P3Zt
+ xJy4w1/cB+F6HNEwjpu7C3pMq58AUtI=
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190912110103.1417887-1-luc.michel@greensocs.com>
+ <CAFEAcA-WO=O5zwRDQoNz2zT4sx61j8Jy5px0uFPiWgF_JUpa+A@mail.gmail.com>
+ <204007b1-1c1e-432b-399f-b3784f812710@greensocs.com>
+ <c3a22836-0435-e09b-6fe0-eff85124c0ca@greensocs.com>
+ <CAFEAcA8b1XUpwq-NefVL+BD0bNfDu6Rhxygbb3mfyV1t17NZUQ@mail.gmail.com>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <10f1309a-f788-7164-bc9e-51f5ecc7e841@greensocs.com>
+Date: Tue, 17 Sep 2019 14:52:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8b1XUpwq-NefVL+BD0bNfDu6Rhxygbb3mfyV1t17NZUQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190916100035.GC2887@work-vm>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Tue, 17 Sep 2019 12:47:30 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1568724744;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=82KG3T8RmQqxzA6umtmQhxyhHb4oDgZYrD7nSRrpadM=;
+ b=I2yT6SLoa0Hm14BB+NXHq2dAmcNmzvzTF7nPXo9IHsiuLvInH9Kaikl5Muo//bZajEpT8k
+ aj+XbL0GH2P/nHJ0ctVCVuMnqCa1YKW39K6TV8fAfmZmdybAMTEfbUZOpUSF1+/Amxvt+p
+ X9CnkDDc93sSYQuc4m0Fufrq0WU1tsA=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1568724744; a=rsa-sha256; cv=none;
+ b=KEIk5SOVjne0j1fH6pW1tCQh5dukDCFhNnwfTBr1sFLKB7cfUaxptYuGcaV4pxuXAPPscP
+ tmJUujcgcXH89r/lQBWt7t0PpRRNnqKAUj3ZbKxRYPr/1B0Wlwjmi7vzjqk898I6KK0G5Q
+ pxNuNYVvQHeoYtQfZBMV6fZM2djk5ps=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=luc smtp.mailfrom=luc.michel@greensocs.com
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 5/6] docs: start a document to describe
- D-Bus usage
+X-Received-From: 5.135.226.135
+Subject: Re: [Qemu-devel] [PATCH] target/arm: fix CBAR register for AArch64
+ CPUs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,154 +94,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: quintela@redhat.com, mprivozn@redhat.com, qemu-devel@nongnu.org,
- stefanha@redhat.com, pbonzini@redhat.com,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 16, 2019 at 11:00:35AM +0100, Dr. David Alan Gilbert wrote:
-> (Copying in Stefan since he was looking at DBus for virtiofs)
->=20
-> * Marc-Andr=C3=A9 Lureau (marcandre.lureau@redhat.com) wrote:
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  docs/interop/dbus.rst  | 73 ++++++++++++++++++++++++++++++++++++++++=
-++
-> >  docs/interop/index.rst |  1 +
-> >  2 files changed, 74 insertions(+)
-> >  create mode 100644 docs/interop/dbus.rst
-> >=20
-> > diff --git a/docs/interop/dbus.rst b/docs/interop/dbus.rst
-> > new file mode 100644
-> > index 0000000000..c08f026edc
-> > --- /dev/null
-> > +++ b/docs/interop/dbus.rst
-> > @@ -0,0 +1,73 @@
-> > +=3D=3D=3D=3D=3D
-> > +D-Bus
-> > +=3D=3D=3D=3D=3D
-> > +
-> > +Introduction
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > +
-> > +QEMU may be running with various helper processes involved:
-> > + - vhost-user* processes (gpu, virtfs, input, etc...)
-> > + - TPM emulation (or other devices)
-> > + - user networking (slirp)
-> > + - network services (DHCP/DNS, samba/ftp etc)
-> > + - background tasks (compression, streaming etc)
-> > + - client UI
-> > + - admin & cli
-> > +
-> > +Having several processes allows stricter security rules, as well as
-> > +greater modularity.
-> > +
-> > +While QEMU itself uses QMP as primary IPC (and Spice/VNC for remote
-> > +display), D-Bus is the de facto IPC of choice on Unix systems. The
-> > +wire format is machine friendly, good bindings exist for various
-> > +languages, and there are various tools available.
-> > +
-> > +Using a bus, helper processes can discover and communicate with each
-> > +other easily, without going through QEMU. The bus topology is also
-> > +easier to apprehend and debug than a mesh. However, it is wise to
-> > +consider the security aspects of it.
-> > +
-> > +Security
-> > +=3D=3D=3D=3D=3D=3D=3D=3D
-> > +
-> > +A QEMU D-Bus bus should be private to a single VM. Thus, only
-> > +cooperative tasks are running on the same bus to serve the VM.
-> > +
-> > +D-Bus, the protocol and standard, doesn't have mechanisms to enforce
-> > +security between peers once the connection is established. Peers may
-> > +have additional mechanisms to enforce security rules, based for
-> > +example on UNIX credentials.
-> > +
-> > +dbus-daemon can enforce various policies based on the UID/GID of the
-> > +processes that are connected to it. It is thus a good idea to run
-> > +helpers as different UID from QEMU and set appropriate policies (so
-> > +helper processes are only allowed to talk to qemu for example).
-> > +
-> > +For example, this allows only ``qemu`` user to talk to ``qemu-helper=
-``
-> > +``org.qemu.Helper1`` service:
-> > +
-> > +.. code:: xml
-> > +
-> > +  <policy user=3D"qemu">
-> > +     <allow send_destination=3D"org.qemu.Helper1"/>
-> > +     <allow receive_sender=3D"org.qemu.Helper1"/>
-> > +  </policy>
-> > +
-> > +  <policy user=3D"qemu-helper">
-> > +     <allow own=3D"org.qemu.Helper1"/>
-> > +  </policy>
-> > +
-> > +
-> > +dbus-daemon can also perfom SELinux checks based on the security
-> > +context of the source and the target. For example, ``virtiofs_t``
-> > +could be allowed to send a message to ``svirt_t``, but ``virtiofs_t`=
-`
-> > +wouldn't be allowed to send a message to ``virtiofs_t``.
->=20
-> I think we need to start thinking about this more now rather than
-> 'can'. .
-
-Thinking about DBus usage with helpers, as compared to the current state
-with monolithic QEMU, the top priority is to ensure no degradation in
-security vs current practice.
-
-That is fairly easy from libvirt's POV - we simply need to make sure
-that the dbus daemon and all helpers get given the same SELinux svirt_t
-content as used for QEMU, so each QEMU is still siloed to the same
-extent.
-
-If SELinux is not enabled, then currently an out of the box libvirt
-config only protects the host from QEMU, it doesn't protect QEMU
-from other QEMUs, since they all run the same user ID.
-
-It is possible to tell libvirt to run each QEMU as a separate user
-ID if the mgmt app has a range of user IDs avalable. In this case,
-we would simply run the helpers/dbus as the same per-QEMU user ID
-to ensure we don't regress.
 
 
-Getting an improved security model is obviously the ultimate goal,
-as this modularity needs to offer some benefit to outweight its
-costs.
+On 9/17/19 12:56 PM, Peter Maydell wrote:
+> On Tue, 17 Sep 2019 at 09:43, Luc Michel <luc.michel@greensocs.com> wrote:
+>>
+>> On 9/13/19 9:26 AM, Luc Michel wrote:
+>>> Hi Peter,
+>>>
+>>> On 9/12/19 6:03 PM, Peter Maydell wrote:
+>>>> I think we need to check through the TRMs to confirm which CPUs use
+>>>> which format for the CBAR, and have a different feature bit for the
+>>>> newer format/sysreg encoding, so we can provide the right sysregs for
+>>>> the right cores.
+>>> I checked all the AArch64 Cortex's TRMs, for those having a PERIPHBASE
+>>> signal and CBAR register (namely Cortex-A53, 57, 72, 73), they all match
+>>> the mapping I put in this patch, so I think we don't need to split the
+>>> CBAR feature further. I believe more recent Cortex's address the GIC
+>>> using coprocessor registers, and CBAR does not exist in those ones.
+>>
+>> Hi Peter,
+>>
+>> Do you want me to re-roll this patch with some modifications?
+> 
+> No, that's OK. Thanks for checking the TRMs. I think what I'll
+> do is squash in this comment to the patch:
+> 
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 755aa18a2dc..bc1130d989d 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -6733,6 +6733,19 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+>      }
+> 
+>      if (arm_feature(env, ARM_FEATURE_CBAR)) {
+> +        /*
+> +         * CBAR is IMPDEF, but common on Arm Cortex-A implementations.
+> +         * There are two flavours:
+> +         *  (1) older 32-bit only cores have a simple 32-bit CBAR
+> +         *  (2) 64-bit cores have a 64-bit CBAR visible to AArch64, plus a
+> +         *      32-bit register visible to AArch32 at a different encoding
+> +         *      to the "flavour 1" register and with the bits rearranged to
+> +         *      be able to squash a 64-bit address into the 32-bit view.
+> +         * We distinguish the two via the ARM_FEATURE_AARCH64 flag, but
+> +         * in future if we support AArch32-only configs of some of the
+> +         * AArch64 cores we might need to add a specific feature flag
+> +         * to indicate cores with "flavour 2" CBAR.
+> +         */
+>          if (arm_feature(env, ARM_FEATURE_AARCH64)) {
+>              /* 32 bit view is [31:18] 0...0 [43:32]. */
+>              uint32_t cbar32 = (extract64(cpu->reset_cbar, 18, 14) << 18)
+> 
+> 
+> and apply it to target-arm.next, if that's OK with you.
+Yes sure!
 
-In terms of SELinux, this will involve creating distinct SElinux
-contexts for each helper process. (svirt_slirp_t, svirt_swtpm_t,
-etc, etc).
+Thanks.
 
-In terms of DAC, in the per QEMU user ID scenario,  we would need
-to allocate at least 2 UIDs for each QEMU process, so that helpers
-would be separate from the QEMU. To be honest it would be better
-if we had 3 UIDs, to the dbus daemon was separated from both the
-helpers and QEMU.
+-- 
+Luc
 
-This starts to sound like alot of UIDs which is tedious to manage.
-Libvirt already puts QEMU in a separate mount namespace. From a
-DAC POV, to get meaninguful separation will probably want libvirt
-to consider the "user" namespace too. This is quite a bit of work
-to get everything labelled right for  different user namespace,
-but it may well simplify mgmt thereafter. We still have the same
-problem though, of needing to assign a range of user IDs for each
-user namespace.
-
-Overall, I can see the possible technical options for securing
-this use of DBus, so I'm not too concerned here.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> 
+> thanks
+> -- PMM
+> 
 
