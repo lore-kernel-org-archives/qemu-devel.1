@@ -4,86 +4,84 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53FCDC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:40:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5417CC4CECE
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:42:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27B6C206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:40:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27B6C206C2
+	by mail.kernel.org (Postfix) with ESMTPS id 2DBFF206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:42:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DBFF206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAGWb-0000Fs-8X
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 12:40:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45897)
+	id 1iAGYK-00020I-Ii
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 12:42:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46409)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iAGSA-0004Rm-Ug
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:35:49 -0400
+ (envelope-from <philmd@redhat.com>) id 1iAGWe-0000YV-Hc
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:40:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iAGS9-0002Fn-D2
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:35:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57350)
+ (envelope-from <philmd@redhat.com>) id 1iAGWd-0004Cz-Dk
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:40:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:62269)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iAGS9-0002FT-5B
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:35:45 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iAGWd-0004Cl-5L
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:40:23 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 290AA37E88
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 16:35:44 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id n3so1524047wrt.9
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 09:35:44 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3CB967FDFE
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 16:40:22 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id c188so1083313wmd.9
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 09:40:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=M90/9OazXVb0sRG6je51Qkw7bHLspARRGeQQDFL+khk=;
- b=K8xDlI+GYSpliJwBlSII4m6Zf9Ruw1Of0phQHiB36Z+zeureLZFjm+vXf3PL5fBsTC
- /k+Q6B4BJxwYveTc9NBDybud4RyaM4LpNVzeics1jop1JAVp89D3k0CQ/66tXzOd/9sd
- yhD//id2ogy2KK0q28Y4mOl3wt5WW2Exqbnxwx7fpEuveb1ObXXWAKqI+sZOToBOSp49
- HTk1m6enWHX4fNSdFsy5bLY4ppA5hPsDUDiZumye1/wFzj3eIWDkguLTlJMpDdRUKqWj
- 4ErFp6oJ28kMhuby3/XKBshd1JVZy1fjXsK3WMYnyIyjELCKVIV7xZha6oYZ43Sd34/z
- uOpQ==
-X-Gm-Message-State: APjAAAXEfiDAho85oe7rS5wcZLV65mQjdOpLl/Q+iWglcb7uGlhu0lYq
- ym++Dc9edqSVo+NKrHeFFJzgOiwS8ONp4VHcCqHy03XP4kSoZIXQfjYHNDh05XtfiVfPLHjowmj
- KGF4fyBJdNCyV57Y=
-X-Received: by 2002:a5d:4350:: with SMTP id u16mr3493883wrr.289.1568738142920; 
- Tue, 17 Sep 2019 09:35:42 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx7g2x22/L1E915Vhfg+lq4GTEuim5URUQIS66IbxqFjuYdwBxXgw28sbIaE729ycEEEpftrA==
-X-Received: by 2002:a5d:4350:: with SMTP id u16mr3493870wrr.289.1568738142708; 
- Tue, 17 Sep 2019 09:35:42 -0700 (PDT)
+ bh=4wtvlO/tQ7FyA51BwWL6zzSN1zQdVoJrzNT0mjLO29o=;
+ b=hNlScxMZivxbO9hdRwCT3zTMOWimNnCaKB+UR35OvYqD7XrW9IOW5ilBeit9Z8MFIL
+ YGGh45CcCzQOIMfufjQYWrDwHaUijRpuoWtXPIxIpByCJL0QDtMeYPRCIEP1aKrYvoxm
+ 7DlvTtKKVi6ZoRaWRVIvo3oPq4cpbx/imt1TFhqza4xAbVHfgeVCDjamelcNyVaBEmNq
+ daHRHBZEkxsOVUBj5W8HJOra/3USIqR0MvniUfEk/KbZEZD27v6HKyCOlk9l0oli3Bpv
+ uRm4Qop6XgS7nfEskVXrafaaoXgIEhjP0mESi/egHBJBe7XR5K98OErKygZ3UilnifCt
+ M3sQ==
+X-Gm-Message-State: APjAAAUUr5Nknsvs3HO2fRBsROYfgZxJ6qCSQNwzwoe5fgzXrn5ZLDIq
+ 5x2oKwedIB/zCsiD4CjTFr4pQbOjcEfOHZbX/qGA0hwNUp8SHlgg96C5cKGwR6D546y3Wj9Raqu
+ 5gniB9W1NqFG2h4I=
+X-Received: by 2002:a7b:c5ca:: with SMTP id n10mr4335025wmk.138.1568738420567; 
+ Tue, 17 Sep 2019 09:40:20 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzKVk2GUS85VsMGEShTLjefvwpfQ46QRuouJvHmco3TdyygX8XTE5r6PMV7s0ZtB77W3EhbvQ==
+X-Received: by 2002:a7b:c5ca:: with SMTP id n10mr4335014wmk.138.1568738420407; 
+ Tue, 17 Sep 2019 09:40:20 -0700 (PDT)
 Received: from [192.168.1.40] (240.red-88-21-68.staticip.rima-tde.net.
  [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id v64sm3669495wmf.12.2019.09.17.09.35.41
+ by smtp.gmail.com with ESMTPSA id v11sm4489645wrv.54.2019.09.17.09.40.19
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Sep 2019 09:35:42 -0700 (PDT)
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20190917111441.27405-1-kraxel@redhat.com>
- <20190917111441.27405-2-kraxel@redhat.com>
+ Tue, 17 Sep 2019 09:40:19 -0700 (PDT)
+To: Palmer Dabbelt <palmer@sifive.com>, pbonzini@redhat.com
+References: <20190915202011.30459-1-palmer@sifive.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <1d75be76-93b4-c14c-0347-bdaacf31b1f5@redhat.com>
-Date: Tue, 17 Sep 2019 18:35:41 +0200
+Message-ID: <00d5a1a7-5bbe-176b-6272-f5b015a8e13e@redhat.com>
+Date: Tue, 17 Sep 2019 18:40:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190917111441.27405-2-kraxel@redhat.com>
+In-Reply-To: <20190915202011.30459-1-palmer@sifive.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] vga: move access helpers to
- separate include file
+Subject: Re: [Qemu-devel] [PATCH] vl.c: Report unknown machines correctly
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,146 +93,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: flier_m@outlook.com, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/17/19 1:14 PM, Gerd Hoffmann wrote:
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/display/vga-access.h  | 49 ++++++++++++++++++++++++++++++++++++++++
->  hw/display/vga-helpers.h | 26 ---------------------
->  hw/display/vga.c         |  1 +
->  3 files changed, 50 insertions(+), 26 deletions(-)
->  create mode 100644 hw/display/vga-access.h
+On 9/15/19 10:20 PM, Palmer Dabbelt wrote:
+> I was recently typing in a QEMU command line, and ended up with
+> something like
 >=20
-> diff --git a/hw/display/vga-access.h b/hw/display/vga-access.h
-> new file mode 100644
-> index 000000000000..c0fbd9958b2e
-> --- /dev/null
-> +++ b/hw/display/vga-access.h
-> @@ -0,0 +1,49 @@
-> +/*
-> + * QEMU VGA Emulator templates
-> + *
-> + * Copyright (c) 2003 Fabrice Bellard
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaini=
-ng a copy
-> + * of this software and associated documentation files (the "Software"=
-), to deal
-> + * in the Software without restriction, including without limitation t=
-he rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/o=
-r sell
-> + * copies of the Software, and to permit persons to whom the Software =
-is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be incl=
-uded in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXP=
-RESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABI=
-LITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT S=
-HALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES O=
-R OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARI=
-SING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
-NGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +static inline uint8_t vga_read_byte(VGACommonState *vga, uint32_t addr=
-)
-> +{
-> +    return vga->vram_ptr[addr & vga->vbe_size_mask];
-> +}
-> +
-> +static inline uint16_t vga_read_word_le(VGACommonState *vga, uint32_t =
-addr)
-> +{
-> +    uint32_t offset =3D addr & vga->vbe_size_mask & ~1;
-> +    uint16_t *ptr =3D (uint16_t *)(vga->vram_ptr + offset);
-> +    return lduw_le_p(ptr);
-> +}
-> +
-> +static inline uint16_t vga_read_word_be(VGACommonState *vga, uint32_t =
-addr)
-> +{
-> +    uint32_t offset =3D addr & vga->vbe_size_mask & ~1;
-> +    uint16_t *ptr =3D (uint16_t *)(vga->vram_ptr + offset);
-> +    return lduw_be_p(ptr);
-> +}
-> +
-> +static inline uint32_t vga_read_dword_le(VGACommonState *vga, uint32_t=
- addr)
-> +{
-> +    uint32_t offset =3D addr & vga->vbe_size_mask & ~3;
-> +    uint32_t *ptr =3D (uint32_t *)(vga->vram_ptr + offset);
-> +    return ldl_le_p(ptr);
-> +}
-> diff --git a/hw/display/vga-helpers.h b/hw/display/vga-helpers.h
-> index 5a752b3f9efd..10e9cfd40a04 100644
-> --- a/hw/display/vga-helpers.h
-> +++ b/hw/display/vga-helpers.h
-> @@ -95,32 +95,6 @@ static void vga_draw_glyph9(uint8_t *d, int linesize=
-,
->      } while (--h);
->  }
+>     qemu-system-riscv64 -machine virt ... -M 8G
+>=20
+> which is, in retrospect, obviously incorrect: there is no "8G" machine.
+> I should have typed something like
+>=20
+>     qemu-system-riscv64 -machine virt ... -m 8G
+>=20
+> but since QEMU was giving me the excessively unhelpful error message
+>=20
+>     qemu-system-riscv64: -machine virt: unsupported machine type
+>     Use -machine help to list supported machines
+>=20
+> I had to spend a few minutes scratching my head to figure out what was
+> going on.  For some reason I felt like I'd done that before, so I
+> figured I'd take a whack at fixing the problem this time.  It turns out
+> the error reporting for non-existant machines is just wrong: the invali=
+d
+> machine is detected after we've lost the argument pointer, so it just
+> prints out the first instance of "-machine" instead of the one we're
+> actually looking for.
+>=20
+> I've fixed this by just printing out "-machine $NAME" directly, but I
+> feel like there's a better way to do this.  Specifically, my issue is
+> that it always prints out "-machine" instead of "-M" -- that's actually
+> a regression for users just passing a single invalid machine via "-M",
+> which I assume is the more common case.
+>=20
+> I'm not sure how to do this right, though, and my flight is boarding so
+> I figured I'd send this out as a way to ask the question.  I didn't hav=
+e
+> time to run the test suite or figure out how to add a test for this, as
+> I'm assuming there's a better way to do it.
+>=20
+> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+> ---
+>  vl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/vl.c b/vl.c
+> index 630f5c5e9c..821a5d91c8 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2487,7 +2487,7 @@ static MachineClass *machine_parse(const char *na=
+me, GSList *machines)
 > =20
-> -static inline uint8_t vga_read_byte(VGACommonState *vga, uint32_t addr=
-)
-> -{
-> -    return vga->vram_ptr[addr & vga->vbe_size_mask];
-> -}
-> -
-> -static inline uint16_t vga_read_word_le(VGACommonState *vga, uint32_t =
-addr)
-> -{
-> -    uint32_t offset =3D addr & vga->vbe_size_mask & ~1;
-> -    uint16_t *ptr =3D (uint16_t *)(vga->vram_ptr + offset);
-> -    return lduw_le_p(ptr);
-> -}
-> -
-> -static inline uint16_t vga_read_word_be(VGACommonState *vga, uint32_t =
-addr)
-> -{
-> -    uint32_t offset =3D addr & vga->vbe_size_mask & ~1;
-> -    uint16_t *ptr =3D (uint16_t *)(vga->vram_ptr + offset);
-> -    return lduw_be_p(ptr);
-> -}
-> -
-> -static inline uint32_t vga_read_dword_le(VGACommonState *vga, uint32_t=
- addr)
-> -{
-> -    uint32_t offset =3D addr & vga->vbe_size_mask & ~3;
-> -    uint32_t *ptr =3D (uint32_t *)(vga->vram_ptr + offset);
-> -    return ldl_le_p(ptr);
-> -}
-> -
->  /*
->   * 4 color mode
->   */
-> diff --git a/hw/display/vga.c b/hw/display/vga.c
-> index 573d223d46f0..82ebe5361096 100644
-> --- a/hw/display/vga.c
-> +++ b/hw/display/vga.c
-> @@ -1009,6 +1009,7 @@ void vga_mem_writeb(VGACommonState *s, hwaddr add=
-r, uint32_t val)
->  typedef void vga_draw_line_func(VGACommonState *s1, uint8_t *d,
->                                  uint32_t srcaddr, int width);
-> =20
-> +#include "vga-access.h"
->  #include "vga-helpers.h"
-> =20
->  /* return true if the palette was modified */
+>      mc =3D find_machine(name, machines);
+>      if (!mc) {
+> -        error_report("unsupported machine type");
+> +        error_printf("-machine %s: unsupported machine type\n", name);
+>          error_printf("Use -machine help to list supported machines\n")=
+;
+>          exit(1);
+>      }
 >=20
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
