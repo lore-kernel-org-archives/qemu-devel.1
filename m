@@ -1,94 +1,67 @@
-Return-Path: <SRS0=kH2x=XL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6556DC49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 22:32:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86393C49ED7
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 02:22:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36D82214AF
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Sep 2019 22:32:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36D82214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4EFAF206A1
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 02:22:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="SsLbkPUQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EFAF206A1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1i9zXp-0000kO-QA
-	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 18:32:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43039)
+	id 1iA38L-0002mF-HM
+	for qemu-devel@archiver.kernel.org; Mon, 16 Sep 2019 22:22:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40446)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1i9zWX-0000Gk-KZ
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 18:31:10 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iA376-0002B8-NQ
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 22:21:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1i9zWW-0000UG-Gg
- for qemu-devel@nongnu.org; Mon, 16 Sep 2019 18:31:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45724)
+ (envelope-from <dgibson@ozlabs.org>) id 1iA374-0007sI-Ti
+ for qemu-devel@nongnu.org; Mon, 16 Sep 2019 22:21:08 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:55559 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1i9zWS-0000R0-B9; Mon, 16 Sep 2019 18:31:04 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E25A018CB8E8;
- Mon, 16 Sep 2019 22:31:02 +0000 (UTC)
-Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 849B56012A;
- Mon, 16 Sep 2019 22:30:59 +0000 (UTC)
-To: Kevin Wolf <kwolf@redhat.com>, Sergio Lopez <slp@redhat.com>
-References: <20190911161521.59261-1-slp@redhat.com>
- <d47f7e67-2f6a-0dd6-3ab5-93626bfbb02d@redhat.com>
- <6755b34b-b412-9e63-8d25-b7662d0d3860@redhat.com>
- <20190912081414.GC5383@linux.fritz.box> <87y2ytx0wf.fsf@redhat.com>
- <20190912113111.GH5383@linux.fritz.box>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <13154181-ab02-3c81-f666-a3b995fe66b7@redhat.com>
-Date: Mon, 16 Sep 2019 17:30:58 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iA373-0007mO-Ud; Mon, 16 Sep 2019 22:21:06 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46XRfy6LXBz9sNf; Tue, 17 Sep 2019 12:20:58 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1568686858;
+ bh=rguvgPna7oX1gFj57iuJvztTRnDgs1ufFLjHuh7RDqc=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=SsLbkPUQI4XBQ1bymDq+R+nwfd5u1BE3plq3HlK0Rppbh3FMd8x6GD6tnoWaV9/a2
+ 09qTuPFqkIsqc1/T+CD6KNpCOUaGynRj7DVBGzMoFUmslqC8nZgzESdnZF7Dp4MjCc
+ zI6pyj91B0DFOpijQZoTybd4YCSA21LhdZzDfxv8=
+Date: Tue, 17 Sep 2019 12:19:52 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Message-ID: <20190917021952.GB8842@umbus.fritz.box>
+References: <20190915211940.30427-1-f4bug@amsat.org>
+ <20190916004242.GF2104@umbus.fritz.box>
+ <331a9dc2-d79c-3f29-d818-3df74222425b@redhat.com>
+ <87lfuo1sbp.fsf@linaro.org>
+ <02b9bc89-eee6-493d-3e3c-ae75b6c24657@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190912113111.GH5383@linux.fritz.box>
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="73K7uWr5fVV1Z5H5dNYMctAUVhPLTc5bV"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Mon, 16 Sep 2019 22:31:03 +0000 (UTC)
+ protocol="application/pgp-signature"; boundary="8GpibOaaTibBMecb"
+Content-Disposition: inline
+In-Reply-To: <02b9bc89-eee6-493d-3e3c-ae75b6c24657@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] nbd/server: attach client channel to the
- export's AioContext
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 0/6] tests/acceptance: Add
+ tests for the PReP/40p machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,127 +73,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>,
+ qemu-ppc@nongnu.org, Cleber Rosa <crosa@redhat.com>,
+ =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---73K7uWr5fVV1Z5H5dNYMctAUVhPLTc5bV
-Content-Type: multipart/mixed; boundary="seVuTYk5H1NS89XHKlEaji0lBimqKQgFV";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, Sergio Lopez <slp@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Message-ID: <13154181-ab02-3c81-f666-a3b995fe66b7@redhat.com>
-Subject: Re: [PATCH] nbd/server: attach client channel to the export's
- AioContext
-References: <20190911161521.59261-1-slp@redhat.com>
- <d47f7e67-2f6a-0dd6-3ab5-93626bfbb02d@redhat.com>
- <6755b34b-b412-9e63-8d25-b7662d0d3860@redhat.com>
- <20190912081414.GC5383@linux.fritz.box> <87y2ytx0wf.fsf@redhat.com>
- <20190912113111.GH5383@linux.fritz.box>
-In-Reply-To: <20190912113111.GH5383@linux.fritz.box>
 
---seVuTYk5H1NS89XHKlEaji0lBimqKQgFV
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+--8GpibOaaTibBMecb
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 9/12/19 6:31 AM, Kevin Wolf wrote:
+On Mon, Sep 16, 2019 at 11:56:06AM +0200, Philippe Mathieu-Daud=E9 wrote:
+> On 9/16/19 11:52 AM, Alex Benn=E9e wrote:
+> >=20
+> > Philippe Mathieu-Daud=E9 <philmd@redhat.com> writes:
+> >=20
+> >> Hi David,
+> >>
+> >> On 9/16/19 2:42 AM, David Gibson wrote:
+> >>> On Sun, Sep 15, 2019 at 11:19:34PM +0200, Philippe Mathieu-Daud=E9 wr=
+ote:
+> >>>> Quick tests worth to avoid regressions with the 40p machine.
+> >>>> idea from the "Maintainers, please tell us how to boot your machines"
+> >>>> thread:
+> >>>> https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg04177.html
+> >>>>
+> >>>> v2: Split Travis job, added Herv=E9 R-b tag
+> >>>> v1: https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg05896.h=
+tml
+> >>>>
+> >>>> Regards,
+> >>>>
+> >>>> Phil.
+> >>>
+> >>> I'm guessing you're expecting these to go in via the testing tree, in
+> >>> which case
+> >>>
+> >>> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+> >>
+> >> Thanks, appreciated :)
+> >>
+> >>> Or do you want me to take them via the ppc tree?
+> >>
+> >> I think the 'testing tree' should focus on the CI/testing
+> >> infrastructure, while each subsystem maintainers should care about the
+> >> tests covering their subsystem (the testing tree maintainers might not
+> >> have the required knowledge to be sure a test is correctly implemented=
+).
+> >>
+> >> In this particular case I assume you don't have much knowledge of that
+> >> PPC machine, which is a hobbyist one, but since you are the PPC
+> >> maintainer, I'd rather see this going via your tree :)
+> >>
+> >> Alex/Cleber/Eduardo, any comment on this position?
+> >=20
+> > Once we have a .travis.yml I'm happy with it can go in via another tree
+> > no problem. See other thread....
+>=20
+> Good :)
+>=20
+> David can take patches 1-5 (I tagged patch 6 as RFC but messed something
+> with git-publish and lost it when I sent this series).
 
->>
->> Yes, I think locking the context during the "if (exp->blk) {" block at=
-
->> nbd/server.c:1646 should do the trick.
-
-That line number has moved over time; which function are you referring to=
-?
+Ok, I've taken patches 1-5 into my ppc-for-4.2 tree.
 
 >=20
-> We need to be careful to avoid locking things twice, so maybe
-> nbd_export_put() is already too deep inside the NBD server.
+> Thanks!
 >=20
-> Its callers are:
+> >>>> Philippe Mathieu-Daud=E9 (6):
+> >>>>   tests/acceptance: Add test that runs NetBSD 4.0 installer on PRep/=
+40p
+> >>>>   tests/acceptance: Test Open Firmware on the PReP/40p
+> >>>>   tests/acceptance: Test OpenBIOS on the PReP/40p
+> >>>>   tests/acceptance: Test Sandalfoot initrd on the PReP/40p
+> >>>>   .travis.yml: Let the avocado job run the 40p tests
+> >>>>   .travis.yml: Split enterprise vs. hobbyist acceptance test job
+> >>>>
+> >>>>  .travis.yml                      |  18 +++-
+> >>>>  MAINTAINERS                      |   1 +
+> >>>>  tests/acceptance/ppc_prep_40p.py | 150 ++++++++++++++++++++++++++++=
++++
+> >>>>  3 files changed, 167 insertions(+), 2 deletions(-)
+> >>>>  create mode 100644 tests/acceptance/ppc_prep_40p.py
+> >>>>
+> >>>
+> >=20
+> >=20
 >=20
-> * qmp_nbd_server_add(). Like all other QMP handlers in blockdev-nbd.c i=
-t
->   neglects to lock the AioContext, but it should do so. The lock is not=
-
->   only needed for the nbd_export_put() call, but even before.
->=20
-> * nbd_export_close(), which in turn is called from:
->     * nbd_eject_notifier(): run in the main thread, not locked
->     * nbd_export_remove():
->         * qmp_nbd_server_remove(): see above
->     * nbd_export_close_all():
->         * bdrv_close_all()
->         * qmp_nbd_server_stop()
-
-Even weirder: nbd_export_put() calls nbd_export_close(), and
-nbd_export_close() calls nbd_export_put().  The mutual recursion is
-mind-numbing, and the fact that we use get/put instead of ref/unref like
-most other qemu code is not making it any easier to reason about.
-
->=20
-> There are also calls from qemu-nbd, but these can be ignored because we=
-
-> don't have iothreads there.
->=20
-> I think the cleanest would be to take the lock in the outermost callers=
-,
-> i.e. all QMP handlers that deal with a specific export, in the eject
-> notifier and in nbd_export_close_all().
-
-Okay, I'm trying that (I already tried grabbing the aio_context in
-nbd_export_close(), but as you predicted, that deadlocked when a nested
-call already encountered the lock taken from an outer call).
-
->=20
->> On the other hand, I wonder if there is any situation in which calling=
-
->> to blk_unref() without locking the context could be safe. If there isn=
-'t
->> any, perhaps we should assert that the lock is held if blk->ctx !=3D N=
-ULL
->> to catch this kind of bugs earlier?
->=20
-> blk_unref() must be called from the main thread, and if the BlockBacken=
-d
-> to be unreferenced is not in the main AioContext, the lock must be held=
-=2E
->=20
-> I'm not sure how to assert that locks are held, though. I once looked
-> for a way to do this, but it involved either looking at the internal
-> state of pthreads mutexes or hacking up QemuMutex with debug state.
-
-Even if we can only test that in a debug build but not during normal
-builds, could any of our CI builds set up that configuration?
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-
---seVuTYk5H1NS89XHKlEaji0lBimqKQgFV--
-
---73K7uWr5fVV1Z5H5dNYMctAUVhPLTc5bV
+--8GpibOaaTibBMecb
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2ADSIACgkQp6FrSiUn
-Q2pr8Qf8Cpyhum6yHuRIQ0aO7P6KjIblnXaet+DfQ/c1yUq1itjHYiWycwn+iwo9
-niuFMtnNwHMMuRZ9jbgLdMYw9fQ4hxYv86Ww/0r+1a+0elMI3X3DKa8YGoucZsu2
-TpLlUQlxdwVs+NVKDNsrgZOz5HnvYqkRDkbBciQFIuK+MltyFU0abZA/FtFBcm/1
-0OXq47UABFTFl7pBvQPzONLkywjCYyd8mFpVlIqVGbYx50HhbA1nmFcpfgateku5
-kPdYptVVoaSAQMS1XIGfpFsyemZTaJoTYJDWtlE1TOtBWB1k9v2mTz7ZY/WpB9q+
-OxasygWTyFFeE23F4jQXOV00OwTZ2A==
-=lEJD
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2AQsgACgkQbDjKyiDZ
+s5KROw/+JGD76EeTglxkrK18hlqWMm67BzjSGFYMLogHaoBK0stn8dc/dne5qtpR
+i7tb1fhclqH2QSBNgKEyUfjwFgL3XAsAmc+lIStXohIVbd66KM5pvlNJlCbyzdW9
+audjyj4ClYCFOsFKOO1BAL1H1oVGw8HglHyrR6hj47UXlpQafnEmz/4yeWDdI35R
++GjbffuAqfTbmwEnQLZihJTDLMRw4FU0gAGUfIv2sURmybTjZr4NHSFtHo7ETuU3
+tmv2k6c2zqtumaYvQv884hjGyrv98m2amuYw4DBc0R1UnlBSHbiWLJgEvzISD2ti
+NihTExyD+B+b+8OYh4TVoj6xlE+wSeYCELFvyV/plQrDho8+Kynf7CrgxMUl0Csf
+ZXeKQUrtPJlsemPm4xL+Wt0Pqej6YQ3NMK4hpEodQFDEPM2r6NzhnmJtHhm+gMkz
+EvxP621bpprIKxwke7XULn+kS2lE17A7F8eTz49GLWPHbZgibdTeElMXl8j8vLTU
+zTIXVBRpN4GbbXmQvql4oY3XPQQqXTbsth333VWgOFRTcvJ8qmKp97Abl1Cxo1vh
+dDWuu88WZUrvaK4iomEVn1w0xHyjWNQNlhVNbioO6Ux+7+8U14N75VkcX4b+NGxJ
+a2AiJTDsfBTD8vqWhQvIp68ICEgrb+KyVhkq0sq727Jy+QZcixM=
+=w849
 -----END PGP SIGNATURE-----
 
---73K7uWr5fVV1Z5H5dNYMctAUVhPLTc5bV--
+--8GpibOaaTibBMecb--
 
