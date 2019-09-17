@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B11C4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 17:53:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01E58C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 17:55:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D43E82067B
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 17:53:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D43E82067B
+	by mail.kernel.org (Postfix) with ESMTPS id D5BCD20640
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 17:55:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5BCD20640
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAHfM-0000xW-2n
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 13:53:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55680)
+	id 1iAHhB-00020r-2Q
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 13:55:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55784)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iAHee-0000XF-6F
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 13:52:45 -0400
+ (envelope-from <eblake@redhat.com>) id 1iAHg9-0001VP-7p
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 13:54:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iAHed-0006Xa-5p
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 13:52:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39802)
+ (envelope-from <eblake@redhat.com>) id 1iAHg8-0006wB-CL
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 13:54:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34486)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAHec-0006XP-U5
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 13:52:43 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAHg8-0006vv-4N
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 13:54:16 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 36BDB83F3C;
- Tue, 17 Sep 2019 17:52:42 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 428A618C4266;
+ Tue, 17 Sep 2019 17:54:15 +0000 (UTC)
 Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B339860BEC;
- Tue, 17 Sep 2019 17:52:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DC60219C70;
+ Tue, 17 Sep 2019 17:54:12 +0000 (UTC)
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20190914153506.2151-1-armbru@redhat.com>
- <20190914153506.2151-8-armbru@redhat.com>
+ <20190914153506.2151-9-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,22 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <5a159310-b9fd-834e-651b-a19129efef83@redhat.com>
-Date: Tue, 17 Sep 2019 12:52:38 -0500
+Message-ID: <b43ba6dd-936b-6ea6-acd9-8bddd4844a0f@redhat.com>
+Date: Tue, 17 Sep 2019 12:54:11 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190914153506.2151-8-armbru@redhat.com>
+In-Reply-To: <20190914153506.2151-9-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="QpicouARh5Xs42Mfq3Ys8fSoxHszzopTS"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 17 Sep 2019 17:52:42 +0000 (UTC)
+ boundary="YSmsplcWgYngrxnafUov5UZXgzcAU5YJb"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Tue, 17 Sep 2019 17:54:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 07/19] qapi: Use quotes more consistently
- in frontend error messages
+Subject: Re: [Qemu-devel] [PATCH 08/19] qapi: Improve reporting of lexical
+ errors
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,75 +103,34 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QpicouARh5Xs42Mfq3Ys8fSoxHszzopTS
-Content-Type: multipart/mixed; boundary="43bwG8m1UwGc8yrTfKgfPQrmuGGwwqPnL";
+--YSmsplcWgYngrxnafUov5UZXgzcAU5YJb
+Content-Type: multipart/mixed; boundary="Rl9F4tM4Xu08mko8nRqOfM9uxyDuwstP3";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <5a159310-b9fd-834e-651b-a19129efef83@redhat.com>
-Subject: Re: [PATCH 07/19] qapi: Use quotes more consistently in frontend
- error messages
+Message-ID: <b43ba6dd-936b-6ea6-acd9-8bddd4844a0f@redhat.com>
+Subject: Re: [PATCH 08/19] qapi: Improve reporting of lexical errors
 References: <20190914153506.2151-1-armbru@redhat.com>
- <20190914153506.2151-8-armbru@redhat.com>
-In-Reply-To: <20190914153506.2151-8-armbru@redhat.com>
+ <20190914153506.2151-9-armbru@redhat.com>
+In-Reply-To: <20190914153506.2151-9-armbru@redhat.com>
 
---43bwG8m1UwGc8yrTfKgfPQrmuGGwwqPnL
+--Rl9F4tM4Xu08mko8nRqOfM9uxyDuwstP3
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 9/14/19 10:34 AM, Markus Armbruster wrote:
-> Consistently enclose error messages in double quotes.  Use single
-> quotes within, except for one case of "'".
+> Show text up to next structural character, whitespace, or quote
+> character instead of just the first character.
+>=20
+> Forgotten quotes now get reported like "Stray 'command'" instead of
+> "Stray 'c'".
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
 
-> +++ b/scripts/qapi/common.py
-> @@ -214,7 +214,7 @@ class QAPIDoc(object):
->          # recognized, and get silently treated as ordinary text
->          if not self.symbol and not self.body.text and line.startswith(=
-'@'):
->              if not line.endswith(':'):
-> -                raise QAPIParseError(self._parser, "Line should end wi=
-th :")
-> +                raise QAPIParseError(self._parser, "Line should end wi=
-th ':'")
-
-Makes it more obvious what belongs in the .json file (where we DO want
-the use of ''), so this looks nicer.
-
-
-> @@ -522,7 +522,7 @@ class QAPISchemaParser(object):
->                      ch =3D self.src[self.cursor]
->                      self.cursor +=3D 1
->                      if ch =3D=3D '\n':
-> -                        raise QAPIParseError(self, 'Missing terminatin=
-g "\'"')
-> +                        raise QAPIParseError(self, "Missing terminatin=
-g \"'\"")
-
-And this would be the one exception mentioned in the commit message.
-
-
-> @@ -592,20 +592,20 @@ class QAPISchemaParser(object):
->              self.accept()
->              return expr
->          if self.tok not in "{['tfn":
-> -            raise QAPIParseError(self, 'Expected "{", "[", "]", string=
-, '
-> -                                 'boolean or "null"')
-> +            raise QAPIParseError(
-> +                self, "Expected '{', '[', ']', string, boolean or 'nul=
-l'")
-
-Definite improvement here.
-
 Reviewed-by: Eric Blake <eblake@redhat.com>
-
-And of course, you can correlate which tests changed output to a measure
-of how well we've covered the various error paths.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -179,24 +138,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---43bwG8m1UwGc8yrTfKgfPQrmuGGwwqPnL--
+--Rl9F4tM4Xu08mko8nRqOfM9uxyDuwstP3--
 
---QpicouARh5Xs42Mfq3Ys8fSoxHszzopTS
+--YSmsplcWgYngrxnafUov5UZXgzcAU5YJb
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2BHWYACgkQp6FrSiUn
-Q2q40Qf8DsvachcwM46IZhVXisz4aYouNkP700klAnM2SOMWi5WdSA9Rt2yc7RAg
-WbViNX+F+Egc6QFoTT87OA09nZ9NJ5Z/to+6QyzvJGF6VvqrwgrGNsUeQL1vWuPM
-T4XbRwtHNuQo2v9MsBxf1rs+UhrnZqJ9wwMLN18ih4hCUnvjP4YCSI5kh8rKWXc9
-kgcw+7CbeHhVRjFwtyV6ZLPv5EBF4rEtUpbmrWX9fCVJbKmBawby2gJjhuATNFe8
-5lLi/tbLacIQOSgkTiZgyG9Sq40CCgqUHNwQq0IAw8jCeoYvYoyj7dSItkfwL6PE
-m9nA4jSNxOeWafq2rrlaAjtw1ETzQA==
-=KKMl
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2BHcMACgkQp6FrSiUn
+Q2qDgQgAjH460bHZh2ATmitsB556w2Mn5fwxwGjBbx5wUof9IuDNUV6hoSyPSiw1
+zMhsIWInR8T+wsS1WZvARA0P2RrISjZT9yojqQXMzAvot2jmx6PvsDInjIfxDCc8
+IBBNWIpvjaNRKUpZ5ljgNTZ/U/eTsqD17I5dPDs7hFb0i6SkQkv8ihPt59EeG8Hp
+2prdDz/LLbD10DG6CnHdy4UAAQkAQQj+Cmu5guR4ir0cul8hIyw425uLztqvTtlf
+ZhCuRceRuS8yznqpjxJLPjws/HJ2LPCgGGivNI5EqP6ba1lVAyNViWv+h7l+5OIh
+SgoSlNzlNUtbVw4s9Ccwz8zrX0VbYA==
+=x0qK
 -----END PGP SIGNATURE-----
 
---QpicouARh5Xs42Mfq3Ys8fSoxHszzopTS--
+--YSmsplcWgYngrxnafUov5UZXgzcAU5YJb--
 
