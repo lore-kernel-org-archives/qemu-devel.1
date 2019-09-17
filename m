@@ -2,48 +2,47 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDFE2C4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55CE1C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:34:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2CD920665
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:33:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2CD920665
+	by mail.kernel.org (Postfix) with ESMTPS id 2CE3520665
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:34:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CE3520665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAGQC-0002C3-2J
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 12:33:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43899)
+	id 1iAGQa-0002Pq-2y
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 12:34:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45314)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iAGDZ-0000G3-W5
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:20:42 -0400
+ (envelope-from <eblake@redhat.com>) id 1iAGNq-00012f-1U
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:31:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iAGDY-0003aH-Vw
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:20:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51756)
+ (envelope-from <eblake@redhat.com>) id 1iAGNo-0008DQ-Id
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:31:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37466)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAGDY-0003a2-NT
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:20:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAGNo-0008Cz-AH
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:31:16 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 15EAD83F51;
- Tue, 17 Sep 2019 16:20:40 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 59E84306F4AB;
+ Tue, 17 Sep 2019 16:31:15 +0000 (UTC)
 Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B266F600C4;
- Tue, 17 Sep 2019 16:20:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0114E612B1;
+ Tue, 17 Sep 2019 16:31:09 +0000 (UTC)
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20190913201349.24332-1-armbru@redhat.com>
- <20190913201349.24332-11-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,22 +69,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <454671e9-480d-006b-cfb3-f17b19faf024@redhat.com>
-Date: Tue, 17 Sep 2019 11:20:36 -0500
+Message-ID: <32fcbd17-4500-0984-dec6-01598a02c541@redhat.com>
+Date: Tue, 17 Sep 2019 11:31:08 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190913201349.24332-11-armbru@redhat.com>
+In-Reply-To: <20190913201349.24332-1-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="9URgF3tNbtTRCcjr6CpH978q27BvTwPkD"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+ boundary="b7lXw1UnDnWOWr72V56LkEgePTZZRysfh"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 17 Sep 2019 16:20:40 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Tue, 17 Sep 2019 16:31:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 10/16] qapi: Permit omitting all flat
- union branches
+Subject: Re: [Qemu-devel] [PATCH v3 00/16] qapi: Schema language cleanups &
+ doc improvements
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,59 +102,69 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9URgF3tNbtTRCcjr6CpH978q27BvTwPkD
-Content-Type: multipart/mixed; boundary="xarLqqJIOQBnoZlxKTOkoztATC5wmQvux";
+--b7lXw1UnDnWOWr72V56LkEgePTZZRysfh
+Content-Type: multipart/mixed; boundary="M0aiqQPey8Zux4fCmTed8GFQgVl7nuQqH";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <454671e9-480d-006b-cfb3-f17b19faf024@redhat.com>
-Subject: Re: [PATCH v3 10/16] qapi: Permit omitting all flat union branches
+Message-ID: <32fcbd17-4500-0984-dec6-01598a02c541@redhat.com>
+Subject: Re: [PATCH v3 00/16] qapi: Schema language cleanups & doc
+ improvements
 References: <20190913201349.24332-1-armbru@redhat.com>
- <20190913201349.24332-11-armbru@redhat.com>
-In-Reply-To: <20190913201349.24332-11-armbru@redhat.com>
+In-Reply-To: <20190913201349.24332-1-armbru@redhat.com>
 
---xarLqqJIOQBnoZlxKTOkoztATC5wmQvux
+--M0aiqQPey8Zux4fCmTed8GFQgVl7nuQqH
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 9/13/19 3:13 PM, Markus Armbruster wrote:
-> Absent flat union branches default to the empty struct (since commit
-> 800877bb16 "qapi: allow empty branches in flat unions").  But am
+> v3:
+> * PATCH 05
+>   - Typo fixed [Eric]
+> * PATCH 06+07
+>   - Additional comments [Eric]
+> * PATCH 11
+>   - Replace one more QAPISchemaMember by QAPISchemaEnumMember
+> * PATCH 13+15
+>   - Doc phrasing tweaks [Eric]
+> * PATCH 14+15
+>   - Belatedly update for v2's restriction to printable ASCII [Eric]
+>   - Correct claim "order of top-level expression doesn't matter" [Eric]=
 
-s/am/an/
+> * PATCH 15
+>   - Fix EBNF for PRAGMA [Eric]
 
-> attempt to omit all of them is rejected with "Union 'FOO' has no
-> branches".  Harmless oddity, but it's easy to avoid, so do that.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
+Peter Krempa's proposal to add features to commands (for introspecting
+Kevin's recent savevm fix) slightly conflicts with this.
+
+https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg03586.html
+
 --=20
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---xarLqqJIOQBnoZlxKTOkoztATC5wmQvux--
+--M0aiqQPey8Zux4fCmTed8GFQgVl7nuQqH--
 
---9URgF3tNbtTRCcjr6CpH978q27BvTwPkD
+--b7lXw1UnDnWOWr72V56LkEgePTZZRysfh
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2BB9QACgkQp6FrSiUn
-Q2rw1Af+Kdmyt0yRWKkSQ6ZvTXOZg2udbCK4mu+YyZDF5bZA6eSVwm07jCOoSggA
-ByosobPhQCzL4eFZejNiHi1gpCDM+G7LT3RY7rnXZGTyaJSqaMaHQJkh4x3gPdMm
-t+0E5Aj8OrZ66dXUzfZjig6/4TjnHgvDCzToUKBJbJM89wYZehnwADeCMiok0fGB
-9eURM3f2SNOKH4HEC5+E2HD7mEjXii4u1LdFLHvkEYpPzhtiKJwv4a4iT1rkk3CY
-17g2NYPUb09nJ76P2M3N6/ZDxVLrv2zAzejPGxBYvecX/IGH7HZTKtDJ/uu52G+Y
-gRE+lti4SkyhAuu9YiyvuJ7bD0ql5w==
-=MyWE
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2BCkwACgkQp6FrSiUn
+Q2oeKgf9GVMki/pxQqBXT/a26KnymnshC+7XKlPQgpOM2ksueRpf4esMjozJdaJF
+2K3iPhvv5XARLCx1/M+NsDIEoUJ1LHuCFMyGXSFNUOANwAJ4wbMb9QbA4RBnA2kF
+zCuXip1DV/DQbM1JBS88PZx9GEuSh9n52dK4od+vpMXYzmmqut+BWT1j+OQspOeK
+RgblExY1pHQ/XvxAdgueCXCVSx3SJaGkbRvJCp1VzvG5D8kbPGSuHYWtgxfLcSHT
+8igpKXXsv0Hd+IMgG78ebAqC8bzrJwiQuqhT/qUvgNbA6ug6iar4tjKAY5qRjVXc
+o0ifMDGBwYfqZ9Qde8P9ZM4Q+QxHfQ==
+=Mrwu
 -----END PGP SIGNATURE-----
 
---9URgF3tNbtTRCcjr6CpH978q27BvTwPkD--
+--b7lXw1UnDnWOWr72V56LkEgePTZZRysfh--
 
