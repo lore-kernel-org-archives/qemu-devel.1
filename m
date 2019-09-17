@@ -2,86 +2,61 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90D23C4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 11:03:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95527C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 11:06:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6724421670
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 11:03:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6724421670
+	by mail.kernel.org (Postfix) with ESMTPS id 68A8B21670
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 11:06:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68A8B21670
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iABGz-00038T-D6
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 07:03:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51614)
+	id 1iABJr-0005io-1M
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 07:06:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52424)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iABDx-0001Z0-Nx
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 07:00:47 -0400
+ (envelope-from <kwolf@redhat.com>) id 1iABI6-0004Mk-P0
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 07:05:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iABDw-0004Sj-31
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 07:00:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60290)
+ (envelope-from <kwolf@redhat.com>) id 1iABI4-00078B-Vf
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 07:05:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56098)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iABDv-0004RU-NR
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 07:00:43 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1iABHx-00073l-5g; Tue, 17 Sep 2019 07:04:55 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 23EA23B558
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 11:00:42 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id b6so1186230wrx.0
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 04:00:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=wSzNTKefRTNv6dxVX888ROxgz8neOc/3d2LLBCrP1Zo=;
- b=P3RNO/p1G4vZBHls7+L8jaz9IkCwB/1ZL8Q1XzM800dif9JUr6dGGpJCzWY73SWPRZ
- 047/8ZAhSmDkIyGSDgX9j618g3uwVt/fpayZbgf1NRgHbpZ9xhK9ICmV43mzRdWFGCdQ
- 9BJlpE6hC8GLR5kW6ETERmrxIEEZthtpkoeUHaWaaiVJP4FAx0izD7vtu48VO1Oz0v2d
- 1aFYnniaoufaMzaG1Y6HdNrCowMf+wfVgnVWDNL5JvkV2eR+4+d2PFgrxxL4AViZXyaX
- aivViyoLvLmiAsTm2u+Q2Q7JvajqW0kY0X98LIjHyqoapanTGLChGjNd/oyqEly+rlr0
- YbFw==
-X-Gm-Message-State: APjAAAUcaiMfC35edcU24UTr9WAEG2UZCuc9paSMCQeHKxCfb3xr639b
- XkFW4gxfi0OWjcfxzATuCmbdwLjH14zd6OG1GSI+vxX4fYrFXsYSSHu96nFm1NcY8Nwb9qjLCmu
- zuMG4qPSvmpdiPSQ=
-X-Received: by 2002:a1c:7914:: with SMTP id l20mr3023777wme.155.1568718040920; 
- Tue, 17 Sep 2019 04:00:40 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxMls8xM/Rwo+j6jZMA4hI6gpE0ct/tqNdzBRB015ocXFc5YOG2Qc8GG1jk42vDrZiNlrUQEA==
-X-Received: by 2002:a1c:7914:: with SMTP id l20mr3023730wme.155.1568718040640; 
- Tue, 17 Sep 2019 04:00:40 -0700 (PDT)
-Received: from [192.168.1.40] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id h7sm2074263wrt.17.2019.09.17.04.00.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Sep 2019 04:00:39 -0700 (PDT)
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-References: <156871562997.196432.17776290406203122029.stgit@bahia.lan>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <551745c2-2579-9ce5-4aa4-536c37a1ce45@redhat.com>
-Date: Tue, 17 Sep 2019 13:00:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 6B0E0309175F;
+ Tue, 17 Sep 2019 11:04:52 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-116-202.ams2.redhat.com
+ [10.36.116.202])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 36E6860606;
+ Tue, 17 Sep 2019 11:04:51 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Date: Tue, 17 Sep 2019 13:04:42 +0200
+Message-Id: <20190917110443.2029-2-kwolf@redhat.com>
+In-Reply-To: <20190917110443.2029-1-kwolf@redhat.com>
+References: <20190917110443.2029-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <156871562997.196432.17776290406203122029.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Tue, 17 Sep 2019 11:04:52 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 00/17] Fix usage of error_append_hint()
+Subject: [Qemu-devel] [PATCH 1/2] block/snapshot: Restrict set of snapshot
+ nodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,46 +68,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <codyprime@gmail.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, David Hildenbrand <david@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, Eric Farman <farman@linux.ibm.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Yuval Shaia <yuval.shaia@oracle.com>,
- Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>,
- qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For some reason your email client escaped incorrectly Daniel's email:
+Nodes involved in internal snapshots were those that were returned by
+bdrv_next(), inserted and not read-only. bdrv_next() in turn returns all
+nodes that are either the root node of a BlockBackend or monitor-owned
+nodes.
 
-  "Daniel P. Berrang=C3=A9\" <berrange@redhat.com>
+With the typical -drive use, this worked well enough. However, in the
+typical -blockdev case, the user defines one node per option, making all
+nodes monitor-owned nodes. This includes protocol nodes etc. which often
+are not snapshottable, so "savevm" only returns an error.
 
-Which makes my email client very unhappy (Thunderbird):
+Change the conditions so that internal snapshot still include all nodes
+that have a BlockBackend attached (we definitely want to snapshot
+anything attached to a guest device and probably also the built-in NBD
+server; snapshotting block job BlockBackends is more of an accident, but
+a preexisting one), but other monitor-owned nodes are only included if
+they have no parents.
 
-There are non-ASCII characters in the local part of the recipient
-address "Daniel P. Berrang=C3=A9 <berrange@redhat.com>,
-qemu-block@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
-qemu-s390x@nongnu.org"@d06av23.portsmouth.uk.ibm.com. This is not yet
-supported. Please change this address and try again.
+This makes internal snapshots usable again with typical -blockdev
+configurations.
 
-Neither is MTA:
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/snapshot.c | 26 +++++++++++++++++++-------
+ 1 file changed, 19 insertions(+), 7 deletions(-)
 
-An error occurred while sending mail. The mail server responded:
-5.1.2 The recipient address <qemu-s390x@nongnu.org@d06av22.portsmouth.uk.=
-ibm
-5.1.2 .com> is not a valid RFC-5321 address. r28sm2465872wrr.94 - gsmtp.
- Please check the message recipient
-""qemu-s390x@nongnu.org"@d06av22.portsmouth.uk.ibm.com" and try again.
+diff --git a/block/snapshot.c b/block/snapshot.c
+index f2f48f926a..8081616ae9 100644
+--- a/block/snapshot.c
++++ b/block/snapshot.c
+@@ -31,6 +31,7 @@
+ #include "qapi/qmp/qerror.h"
+ #include "qapi/qmp/qstring.h"
+ #include "qemu/option.h"
++#include "sysemu/block-backend.h"
+=20
+ QemuOptsList internal_snapshot_opts =3D {
+     .name =3D "snapshot",
+@@ -384,6 +385,16 @@ int bdrv_snapshot_load_tmp_by_id_or_name(BlockDriver=
+State *bs,
+     return ret;
+ }
+=20
++static bool bdrv_all_snapshots_includes_bs(BlockDriverState *bs)
++{
++    if (!bdrv_is_inserted(bs) || bdrv_is_read_only(bs)) {
++        return false;
++    }
++
++    /* Include all nodes that are either in use by a BlockBackend, or th=
+at
++     * aren't attached to any node, but owned by the monitor. */
++    return bdrv_has_blk(bs) || QLIST_EMPTY(&bs->parents);
++}
+=20
+ /* Group operations. All block drivers are involved.
+  * These functions will properly handle dataplane (take aio_context_acqu=
+ire
+@@ -399,7 +410,7 @@ bool bdrv_all_can_snapshot(BlockDriverState **first_b=
+ad_bs)
+         AioContext *ctx =3D bdrv_get_aio_context(bs);
+=20
+         aio_context_acquire(ctx);
+-        if (bdrv_is_inserted(bs) && !bdrv_is_read_only(bs)) {
++        if (bdrv_all_snapshots_includes_bs(bs)) {
+             ok =3D bdrv_can_snapshot(bs);
+         }
+         aio_context_release(ctx);
+@@ -426,8 +437,9 @@ int bdrv_all_delete_snapshot(const char *name, BlockD=
+riverState **first_bad_bs,
+         AioContext *ctx =3D bdrv_get_aio_context(bs);
+=20
+         aio_context_acquire(ctx);
+-        if (bdrv_can_snapshot(bs) &&
+-                bdrv_snapshot_find(bs, snapshot, name) >=3D 0) {
++        if (bdrv_all_snapshots_includes_bs(bs) &&
++            bdrv_snapshot_find(bs, snapshot, name) >=3D 0)
++        {
+             ret =3D bdrv_snapshot_delete(bs, snapshot->id_str,
+                                        snapshot->name, err);
+         }
+@@ -455,7 +467,7 @@ int bdrv_all_goto_snapshot(const char *name, BlockDri=
+verState **first_bad_bs,
+         AioContext *ctx =3D bdrv_get_aio_context(bs);
+=20
+         aio_context_acquire(ctx);
+-        if (bdrv_can_snapshot(bs)) {
++        if (bdrv_all_snapshots_includes_bs(bs)) {
+             ret =3D bdrv_snapshot_goto(bs, name, errp);
+         }
+         aio_context_release(ctx);
+@@ -481,7 +493,7 @@ int bdrv_all_find_snapshot(const char *name, BlockDri=
+verState **first_bad_bs)
+         AioContext *ctx =3D bdrv_get_aio_context(bs);
+=20
+         aio_context_acquire(ctx);
+-        if (bdrv_can_snapshot(bs)) {
++        if (bdrv_all_snapshots_includes_bs(bs)) {
+             err =3D bdrv_snapshot_find(bs, &sn, name);
+         }
+         aio_context_release(ctx);
+@@ -512,7 +524,7 @@ int bdrv_all_create_snapshot(QEMUSnapshotInfo *sn,
+         if (bs =3D=3D vm_state_bs) {
+             sn->vm_state_size =3D vm_state_size;
+             err =3D bdrv_snapshot_create(bs, sn);
+-        } else if (bdrv_can_snapshot(bs)) {
++        } else if (bdrv_all_snapshots_includes_bs(bs)) {
+             sn->vm_state_size =3D 0;
+             err =3D bdrv_snapshot_create(bs, sn);
+         }
+@@ -538,7 +550,7 @@ BlockDriverState *bdrv_all_find_vmstate_bs(void)
+         bool found;
+=20
+         aio_context_acquire(ctx);
+-        found =3D bdrv_can_snapshot(bs);
++        found =3D bdrv_all_snapshots_includes_bs(bs) && bdrv_can_snapsho=
+t(bs);
+         aio_context_release(ctx);
+=20
+         if (found) {
+--=20
+2.20.1
+
 
