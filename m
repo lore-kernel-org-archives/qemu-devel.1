@@ -2,65 +2,59 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 041B8C4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:06:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D50C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:08:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D01172053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:06:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D01172053B
+	by mail.kernel.org (Postfix) with ESMTPS id D0D5F214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:08:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0D5F214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iADBH-0007Q6-JK
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 09:06:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41459)
+	id 1iADDY-0000kI-DL
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 09:08:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41852)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iAD8n-00062h-SZ
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:03:38 -0400
+ (envelope-from <imammedo@redhat.com>) id 1iADCW-00006r-DM
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:07:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iAD8h-0001EK-VB
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:03:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:6051)
+ (envelope-from <imammedo@redhat.com>) id 1iADCU-0002ZW-0L
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:07:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35292)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iAD8h-0001Dx-NN
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:03:27 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iADCT-0002ZO-PU
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:07:21 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6690C81F19
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 13:03:26 +0000 (UTC)
-Received: from work-vm (ovpn-116-53.ams2.redhat.com [10.36.116.53])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DD5395C1D8;
- Tue, 17 Sep 2019 13:03:24 +0000 (UTC)
-Date: Tue, 17 Sep 2019 14:03:22 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Message-ID: <20190917130322.GF3370@work-vm>
-References: <20190912122514.22504-1-marcandre.lureau@redhat.com>
- <20190912122514.22504-6-marcandre.lureau@redhat.com>
- <20190916100035.GC2887@work-vm> <20190917124721.GQ1069@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190917124721.GQ1069@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 17 Sep 2019 13:03:26 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ by mx1.redhat.com (Postfix) with ESMTPS id 007E510F2E81;
+ Tue, 17 Sep 2019 13:07:21 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8879519C4F;
+ Tue, 17 Sep 2019 13:07:18 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 17 Sep 2019 09:07:08 -0400
+Message-Id: <20190917130708.10281-3-imammedo@redhat.com>
+In-Reply-To: <20190917130708.10281-1-imammedo@redhat.com>
+References: <20190917130708.10281-1-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Tue, 17 Sep 2019 13:07:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 5/6] docs: start a document to describe
- D-Bus usage
+Subject: [Qemu-devel] [PATCH 2/2] tests: q35: MCH: add default SMBASE SMRAM
+ lock test
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,170 +66,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: quintela@redhat.com, mprivozn@redhat.com, qemu-devel@nongnu.org,
- stefanha@redhat.com, pbonzini@redhat.com,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: yingwen.chen@intel.com, devel@edk2.groups.io, phillip.goerl@oracle.com,
+ alex.williamson@redhat.com, jiewen.yao@intel.com, jun.nakajima@intel.com,
+ michael.d.kinney@intel.com, pbonzini@redhat.com, boris.ostrovsky@oracle.com,
+ rfc@edk2.groups.io, lersek@redhat.com, joao.m.martins@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> On Mon, Sep 16, 2019 at 11:00:35AM +0100, Dr. David Alan Gilbert wrote:
-> > (Copying in Stefan since he was looking at DBus for virtiofs)
-> >=20
-> > * Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
-> > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> > > ---
-> > >  docs/interop/dbus.rst  | 73 ++++++++++++++++++++++++++++++++++++++=
-++++
-> > >  docs/interop/index.rst |  1 +
-> > >  2 files changed, 74 insertions(+)
-> > >  create mode 100644 docs/interop/dbus.rst
-> > >=20
-> > > diff --git a/docs/interop/dbus.rst b/docs/interop/dbus.rst
-> > > new file mode 100644
-> > > index 0000000000..c08f026edc
-> > > --- /dev/null
-> > > +++ b/docs/interop/dbus.rst
-> > > @@ -0,0 +1,73 @@
-> > > +=3D=3D=3D=3D=3D
-> > > +D-Bus
-> > > +=3D=3D=3D=3D=3D
-> > > +
-> > > +Introduction
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +
-> > > +QEMU may be running with various helper processes involved:
-> > > + - vhost-user* processes (gpu, virtfs, input, etc...)
-> > > + - TPM emulation (or other devices)
-> > > + - user networking (slirp)
-> > > + - network services (DHCP/DNS, samba/ftp etc)
-> > > + - background tasks (compression, streaming etc)
-> > > + - client UI
-> > > + - admin & cli
-> > > +
-> > > +Having several processes allows stricter security rules, as well a=
-s
-> > > +greater modularity.
-> > > +
-> > > +While QEMU itself uses QMP as primary IPC (and Spice/VNC for remot=
-e
-> > > +display), D-Bus is the de facto IPC of choice on Unix systems. The
-> > > +wire format is machine friendly, good bindings exist for various
-> > > +languages, and there are various tools available.
-> > > +
-> > > +Using a bus, helper processes can discover and communicate with ea=
-ch
-> > > +other easily, without going through QEMU. The bus topology is also
-> > > +easier to apprehend and debug than a mesh. However, it is wise to
-> > > +consider the security aspects of it.
-> > > +
-> > > +Security
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +
-> > > +A QEMU D-Bus bus should be private to a single VM. Thus, only
-> > > +cooperative tasks are running on the same bus to serve the VM.
-> > > +
-> > > +D-Bus, the protocol and standard, doesn't have mechanisms to enfor=
-ce
-> > > +security between peers once the connection is established. Peers m=
-ay
-> > > +have additional mechanisms to enforce security rules, based for
-> > > +example on UNIX credentials.
-> > > +
-> > > +dbus-daemon can enforce various policies based on the UID/GID of t=
-he
-> > > +processes that are connected to it. It is thus a good idea to run
-> > > +helpers as different UID from QEMU and set appropriate policies (s=
-o
-> > > +helper processes are only allowed to talk to qemu for example).
-> > > +
-> > > +For example, this allows only ``qemu`` user to talk to ``qemu-help=
-er``
-> > > +``org.qemu.Helper1`` service:
-> > > +
-> > > +.. code:: xml
-> > > +
-> > > +  <policy user=3D"qemu">
-> > > +     <allow send_destination=3D"org.qemu.Helper1"/>
-> > > +     <allow receive_sender=3D"org.qemu.Helper1"/>
-> > > +  </policy>
-> > > +
-> > > +  <policy user=3D"qemu-helper">
-> > > +     <allow own=3D"org.qemu.Helper1"/>
-> > > +  </policy>
-> > > +
-> > > +
-> > > +dbus-daemon can also perfom SELinux checks based on the security
-> > > +context of the source and the target. For example, ``virtiofs_t``
-> > > +could be allowed to send a message to ``svirt_t``, but ``virtiofs_=
-t``
-> > > +wouldn't be allowed to send a message to ``virtiofs_t``.
-> >=20
-> > I think we need to start thinking about this more now rather than
-> > 'can'. .
->=20
-> Thinking about DBus usage with helpers, as compared to the current stat=
-e
-> with monolithic QEMU, the top priority is to ensure no degradation in
-> security vs current practice.
->=20
-> That is fairly easy from libvirt's POV - we simply need to make sure
-> that the dbus daemon and all helpers get given the same SELinux svirt_t
-> content as used for QEMU, so each QEMU is still siloed to the same
-> extent.
->=20
-> If SELinux is not enabled, then currently an out of the box libvirt
-> config only protects the host from QEMU, it doesn't protect QEMU
-> from other QEMUs, since they all run the same user ID.
->
-> It is possible to tell libvirt to run each QEMU as a separate user
-> ID if the mgmt app has a range of user IDs avalable. In this case,
-> we would simply run the helpers/dbus as the same per-QEMU user ID
-> to ensure we don't regress.
->=20
->=20
-> Getting an improved security model is obviously the ultimate goal,
-> as this modularity needs to offer some benefit to outweight its
-> costs.
->=20
-> In terms of SELinux, this will involve creating distinct SElinux
-> contexts for each helper process. (svirt_slirp_t, svirt_swtpm_t,
-> etc, etc).
->=20
-> In terms of DAC, in the per QEMU user ID scenario,  we would need
-> to allocate at least 2 UIDs for each QEMU process, so that helpers
-> would be separate from the QEMU. To be honest it would be better
-> if we had 3 UIDs, to the dbus daemon was separated from both the
-> helpers and QEMU.
->=20
-> This starts to sound like alot of UIDs which is tedious to manage.
-> Libvirt already puts QEMU in a separate mount namespace. From a
-> DAC POV, to get meaninguful separation will probably want libvirt
-> to consider the "user" namespace too. This is quite a bit of work
-> to get everything labelled right for  different user namespace,
-> but it may well simplify mgmt thereafter. We still have the same
-> problem though, of needing to assign a range of user IDs for each
-> user namespace.
+test lockable SMRAM at default SMBASE feature introduced by
+commit "q35: implement 128K SMRAM at default SMBASE address"
 
-A separate user namespace might cause problems for things like
-virtiofs where it's trying to access the files with particular perms,
-or with say a GPU where it needs access to a display.
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ tests/q35-test.c | 105 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 105 insertions(+)
 
-Dave
+diff --git a/tests/q35-test.c b/tests/q35-test.c
+index a68183d513..dd02660303 100644
+--- a/tests/q35-test.c
++++ b/tests/q35-test.c
+@@ -186,6 +186,109 @@ static void test_tseg_size(const void *data)
+     qtest_quit(qts);
+ }
+ 
++#define SMBASE 0x30000
++#define SMRAM_TEST_PATTERN 0x32
++#define SMRAM_TEST_RESET_PATTERN 0x23
++
++static void test_smram_smbase_lock(void)
++{
++    QPCIBus *pcibus;
++    QPCIDevice *pcidev;
++    QDict *response;
++    QTestState *qts;
++    int i;
++
++    qts = qtest_init("-M q35");
++
++    pcibus = qpci_new_pc(qts, NULL);
++    g_assert(pcibus != NULL);
++
++    pcidev = qpci_device_find(pcibus, 0);
++    g_assert(pcidev != NULL);
++
++    /* check that SMRAM is not enabled by default */
++    g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) == 0);
++    qtest_writeb(qts, SMBASE, SMRAM_TEST_PATTERN);
++    g_assert_cmpint(qtest_readb(qts, SMBASE), ==, SMRAM_TEST_PATTERN);
++
++    /* check that writinng junk to 0x9c before before negotiating is ignorred */
++    for (i = 0; i < 0xff; i++) {
++        qpci_config_writeb(pcidev, MCH_HOST_BRIDGE_F_SMBASE, i);
++        g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) == 0);
++    }
++
++    /* enable SMRAM at SMBASE */
++    qpci_config_writeb(pcidev, MCH_HOST_BRIDGE_F_SMBASE, 0xff);
++    g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) == 0x01);
++    /* lock SMRAM at SMBASE */
++    qpci_config_writeb(pcidev, MCH_HOST_BRIDGE_F_SMBASE, 0x02);
++    g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) == 0x02);
++
++    /* check that SMRAM at SMBASE is locked and can't be unlocked */
++    g_assert_cmpint(qtest_readb(qts, SMBASE), ==, 0xff);
++    for (i = 0; i <= 0xff; i++) {
++        /* make sure register is immutable */
++        qpci_config_writeb(pcidev, MCH_HOST_BRIDGE_F_SMBASE, i);
++        g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) == 0x02);
++
++        /* RAM access should go inot black hole */
++        qtest_writeb(qts, SMBASE, SMRAM_TEST_PATTERN);
++        g_assert_cmpint(qtest_readb(qts, SMBASE), ==, 0xff);
++    }
++
++    /* reset */
++    response = qtest_qmp(qts, "{'execute': 'system_reset', 'arguments': {} }");
++    g_assert(response);
++    g_assert(!qdict_haskey(response, "error"));
++    qobject_unref(response);
++
++    /* check RAM at SMBASE is available after reset */
++    g_assert_cmpint(qtest_readb(qts, SMBASE), ==, SMRAM_TEST_PATTERN);
++    g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) == 0);
++    qtest_writeb(qts, SMBASE, SMRAM_TEST_RESET_PATTERN);
++    g_assert_cmpint(qtest_readb(qts, SMBASE), ==, SMRAM_TEST_RESET_PATTERN);
++
++    g_free(pcidev);
++    qpci_free_pc(pcibus);
++
++    qtest_quit(qts);
++}
++
++static void test_without_smram_base(void)
++{
++    QPCIBus *pcibus;
++    QPCIDevice *pcidev;
++    QTestState *qts;
++    int i;
++
++    qts = qtest_init("-M pc-q35-4.1");
++
++    pcibus = qpci_new_pc(qts, NULL);
++    g_assert(pcibus != NULL);
++
++    pcidev = qpci_device_find(pcibus, 0);
++    g_assert(pcidev != NULL);
++
++    /* check that RAM accessible */
++    qtest_writeb(qts, SMBASE, SMRAM_TEST_PATTERN);
++    g_assert_cmpint(qtest_readb(qts, SMBASE), ==, SMRAM_TEST_PATTERN);
++
++    /* check that writing to 0x9c succeeds */
++    for (i = 0; i <= 0xff; i++) {
++        qpci_config_writeb(pcidev, MCH_HOST_BRIDGE_F_SMBASE, i);
++        g_assert(qpci_config_readb(pcidev, MCH_HOST_BRIDGE_F_SMBASE) == i);
++    }
++
++    /* check that RAM is still accessible */
++    qtest_writeb(qts, SMBASE, SMRAM_TEST_PATTERN + 1);
++    g_assert_cmpint(qtest_readb(qts, SMBASE), ==, (SMRAM_TEST_PATTERN + 1));
++
++    g_free(pcidev);
++    qpci_free_pc(pcibus);
++
++    qtest_quit(qts);
++}
++
+ int main(int argc, char **argv)
+ {
+     g_test_init(&argc, &argv, NULL);
+@@ -197,5 +300,7 @@ int main(int argc, char **argv)
+     qtest_add_data_func("/q35/tseg-size/8mb", &tseg_8mb, test_tseg_size);
+     qtest_add_data_func("/q35/tseg-size/ext/16mb", &tseg_ext_16mb,
+                         test_tseg_size);
++    qtest_add_func("/q35/smram/smbase_lock", test_smram_smbase_lock);
++    qtest_add_func("/q35/smram/legacy_smbase", test_without_smram_base);
+     return g_test_run();
+ }
+-- 
+2.18.1
 
-> Overall, I can see the possible technical options for securing
-> this use of DBus, so I'm not too concerned here.
->=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
