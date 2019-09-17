@@ -2,99 +2,86 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 264F2C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 14:56:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A858FC4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 14:56:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2AE221852
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 14:56:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="dxRvLs9j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2AE221852
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 818C721852
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 14:56:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 818C721852
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAEuK-0005Jt-W2
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 10:56:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57261)
+	id 1iAEuM-0005Nz-Ix
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 10:56:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57209)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuval.shaia@oracle.com>) id 1iAEtA-0004J7-K1
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 10:55:33 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iAEsz-00042a-IF
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 10:55:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuval.shaia@oracle.com>) id 1iAEt8-0003kg-DV
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 10:55:31 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:46990)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
- id 1iAEt8-0003jl-4A
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 10:55:30 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8HEpQhL119481;
- Tue, 17 Sep 2019 14:54:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=YHqVDSsx9EQCSrY3Q2E8hLs4+10jCjMw0ynITO3SXCQ=;
- b=dxRvLs9jYtbdhuCCOR3k0KBwY25mVw8SHZ1XCKLtfzO9jfwivTLKzh0pmpCjKE7cmKdI
- ecCnikqFijQP1YW6YRb8oKUcoYfFYEVw3oIvWiHydViZXG2iKlhKJNJwtkkZriUivrla
- e5RjYLPf7PJA5TRcxAt3Yn0/K3wthOmtqOUO6jvab+GLqDsj0n/6sG5hp4tAZnndQ7vt
- Cu8CurGuMndAk6ibOvNBxU7KVvFgWcL6Idx+foGNVYBRXiiGOLCfLlatbiB59ATOWDoy
- LpT3YLBxVliytiIK8Xr6EF9k4M4QEyAwspmJ36hFK18ic/xm5m9T+dbZReAcjVBD/j3K gg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by userp2120.oracle.com with ESMTP id 2v0ruqq0ck-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 17 Sep 2019 14:54:17 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8HEoedb102433;
- Tue, 17 Sep 2019 14:52:17 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by userp3020.oracle.com with ESMTP id 2v2nmv8fwn-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 17 Sep 2019 14:52:17 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x8HEq6gl029194;
- Tue, 17 Sep 2019 14:52:06 GMT
-Received: from lap1 (/77.138.183.59) by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 17 Sep 2019 07:52:05 -0700
-Date: Tue, 17 Sep 2019 17:51:57 +0300
-From: Yuval Shaia <yuval.shaia@oracle.com>
-To: Greg Kurz <groug@kaod.org>
-Message-ID: <20190917145157.GA16309@lap1>
-References: <156871562997.196432.17776290406203122029.stgit@bahia.lan>
- <156871568761.196432.13197720535866413065.stgit@bahia.lan>
+ (envelope-from <pbonzini@redhat.com>) id 1iAEsy-0003hy-8D
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 10:55:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42952)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iAEsx-0003hp-W1
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 10:55:20 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0AEF1796EE
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 14:55:19 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id 4so974562wmj.6
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 07:55:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=/2Shdsn099W/sEo3HTED06ZWSCUt8Vpi4IXtw4rjI8w=;
+ b=fNLg07+H9F4B6pCsEg5tjeCxw2eGQpq441ZnysmCIJ8X4nIodxYbG3IG9WzCgiYw8L
+ rSdQ+V814idKa/v/iA+RReg/lTG4rN4LULEWOqRKxD2k0qXKOoStA+4QHItWuckx+Iz6
+ JoRihLNNgydZTmvMGw6fHg/r6DSlFffzjY72ignfZfaZP2AeDDBi1C0ZWvhb5jko0CjM
+ IMyR4Nllh3VSfvUUdz0uw/fsQiDb4o8v/EIE8/LSgSaZD/KXvb5ppyxNZLMsVEVkANEQ
+ aQ2it095mOlXxX29sblmND7d86QIazjyEFtZz3uAiSP4FObI4M0a1Sw+4iwsfGIPYRoY
+ durA==
+X-Gm-Message-State: APjAAAUrcHExKZtMNfiYCTTfKu/hxSaLI+RfUie2UI7ZBeylmq6SXewx
+ rmi/mpysKQRdQzXUtcn98szlA3mKL/3s+B0YQ03MD0pFOWoymf9EOFVlpYPn42PHnQU5y7oxKCy
+ dokV+FuIAqEqDvME=
+X-Received: by 2002:a1c:7ecf:: with SMTP id z198mr3748845wmc.175.1568732117713; 
+ Tue, 17 Sep 2019 07:55:17 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxCmwhyeGPxXe45kWIevj8Yj0vPVP//9ul3XWqyvAJfelRVYkkntwhK5H2iJYE/CP7hya0mzg==
+X-Received: by 2002:a1c:7ecf:: with SMTP id z198mr3748832wmc.175.1568732117443; 
+ Tue, 17 Sep 2019 07:55:17 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8?
+ ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
+ by smtp.gmail.com with ESMTPSA id l18sm2854844wrc.18.2019.09.17.07.55.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 17 Sep 2019 07:55:16 -0700 (PDT)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20190911162900.8498-1-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <d5f64427-9687-ae62-54b7-9548d2152acf@redhat.com>
+Date: Tue, 17 Sep 2019 16:55:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <156871568761.196432.13197720535866413065.stgit@bahia.lan>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9383
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1909170144
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9383
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1909170145
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.85
-Subject: Re: [Qemu-devel] [PATCH 09/17] hw/rdma: Fix missing conversion to
- rdma_error_report()
+In-Reply-To: <20190911162900.8498-1-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] Makefile: Remove generated files when
+ doing 'distclean'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,65 +93,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <codyprime@gmail.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Juan Quintela <quintela@redhat.com>,
- David Hildenbrand <david@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, Eric Farman <farman@linux.ibm.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 17, 2019 at 12:21:27PM +0200, Greg Kurz wrote:
-> Commit 4d71b38ae8fa converted many error_setg() call sites to
-> rdma_error_report(), but it forgot to convert a companion
-> error_append_hint(). Since no guy doesn't set errp anymore in
-> pvrdma_realize(), errp remains NULL and error_append_hint() does
-> nothing.
+On 11/09/19 18:29, Thomas Huth wrote:
+> When running "make distclean" we currently leave a lot of generated
+> files in the build directory. Fix that.
 > 
-> Also error_append_hint() was a poor choice since its "intended use
-> is adding helpful hints on the human user interface" and "not for
-> clarifying a confusing error message".
-> 
-> Call rdma_error_report() instead.
-
-Thanks,
-So are you suggesting to replace all other error_setg calls with
-rdma_error_report instead?
-
-> 
-> Fixes: 4d71b38ae8fa "hw/rdma: Switch to generic error reporting way"
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  hw/rdma/vmw/pvrdma_main.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  Makefile               |  6 +++---
+>  tests/Makefile.include | 12 +++++++++++-
+>  2 files changed, 14 insertions(+), 4 deletions(-)
 > 
-> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-> index 3e36e130139c..d370ae07ca6a 100644
-> --- a/hw/rdma/vmw/pvrdma_main.c
-> +++ b/hw/rdma/vmw/pvrdma_main.c
-> @@ -667,7 +667,7 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
->  out:
->      if (rc) {
->          pvrdma_fini(pdev);
-> -        error_append_hint(errp, "Device failed to load\n");
-> +        rdma_error_report("Device failed to load");
-
-Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
-
->      }
->  }
+> diff --git a/Makefile b/Makefile
+> index ae17a83067..67e7e40e8c 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -681,14 +681,14 @@ clean: recurse-clean
+>  		-exec rm {} +
+>  	rm -f $(edk2-decompressed)
+>  	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) TAGS cscope.* *.pod *~ */*~
+> -	rm -f fsdev/*.pod scsi/*.pod
+> +	rm -f fsdev/*.pod scsi/*.pod docs/*.pod docs/*/*.pod docs/*/.buildinfo
+>  	rm -f qemu-img-cmds.h
+>  	rm -f ui/shader/*-vert.h ui/shader/*-frag.h
+>  	@# May not be present in generated-files-y
+>  	rm -f trace/generated-tracers-dtrace.dtrace*
+>  	rm -f trace/generated-tracers-dtrace.h*
+>  	rm -f $(foreach f,$(generated-files-y),$(f) $(f)-timestamp)
+> -	rm -f qapi-gen-timestamp
+> +	rm -f qapi-gen-timestamp vhost-user-input
+>  	rm -rf qga/qapi-generated
+>  	rm -f config-all-devices.mak
 >  
+> @@ -719,7 +719,7 @@ distclean: clean
+>  	rm -f config-host.mak config-host.h* config-host.ld $(DOCS) qemu-options.texi qemu-img-cmds.texi qemu-monitor.texi qemu-monitor-info.texi
+>  	rm -f config-all-devices.mak config-all-disas.mak config.status
+>  	rm -f $(SUBDIR_DEVICES_MAK)
+> -	rm -f po/*.mo tests/qemu-iotests/common.env
+> +	rm -f po/*.mo
+>  	rm -f roms/seabios/config.mak roms/vgabios/config.mak
+>  	rm -f qemu-doc.info qemu-doc.aux qemu-doc.cp qemu-doc.cps
+>  	rm -f qemu-doc.fn qemu-doc.fns qemu-doc.info qemu-doc.ky qemu-doc.kys
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index f5ac09549c..07f794b01f 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -1174,11 +1174,21 @@ check: check-block check-qapi-schema check-unit check-softfloat check-qtest chec
+>  check-clean:
+>  	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+>  	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+> -	rm -f tests/test-qapi-gen-timestamp
+>  	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
+> +	rm -f tests/qemu-iotests/common.env tests/qemu-iotests/check.*
+> +	rm -f tests/test-qapi-gen-timestamp tests/qht-bench$(EXESUF) \
+> +		tests/fp/fp-test tests/fp/*.out tests/qapi-schema/*.test.*
+>  
+>  clean: check-clean
+>  
+> +check-distclean:
+> +	rm -f tests/test-qapi-types*.c tests/test-qapi-visit*.c \
+> +		tests/test-qapi-commands*.c tests/test-qapi-events*.c \
+> +		tests/test-qapi-emit-events.[ch] tests/test-qapi-introspect.c \
+> +		tests/include/test-qapi-*.c
+> +
+> +distclean: check-distclean
+> +
+>  # Build the help program automatically
+>  
+>  all: $(QEMU_IOTESTS_HELPERS-y)
 > 
-> 
+
+Queued, thanks.
+
+Paolo
 
