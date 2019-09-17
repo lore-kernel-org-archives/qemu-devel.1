@@ -2,82 +2,84 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3894C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 15:24:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99ED2C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 15:26:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7089214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 15:24:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7089214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6304B206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 15:26:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VyuxBYCJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6304B206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAFL3-0005bt-Md
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 11:24:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60208)
+	id 1iAFN6-0007Ir-A8
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 11:26:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33826)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iAF8J-0002ej-Hu
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:11:12 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iAFKm-0005h2-BQ
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:24:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iAF8I-0000Sq-9o
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:11:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59688)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iAF8I-0000SN-1z
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:11:10 -0400
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4A690C004E8D
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 15:11:09 +0000 (UTC)
-Received: by mail-qt1-f198.google.com with SMTP id m6so4526365qtk.23
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 08:11:09 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1iAFKl-00060A-5Q
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:24:04 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:36765)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iAFKk-0005zp-Vd
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:24:03 -0400
+Received: by mail-oi1-x243.google.com with SMTP id k20so3221978oih.3
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 08:24:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=84lIvWS/UBsMxXislbD2ODOZlrUK175JaQEXmaCSesM=;
+ b=VyuxBYCJ2KNwV12/uG4HZD/u5uLeUGxkr74DYW9oM9d0oDr0wSnqaVN1cActBVuytv
+ vz+KFySUqUs0D49dzeWULto7cLPiqN6m3x+/Gc0kHuMUWjgaao+HHYhMzLFzWNMhpQNF
+ i7+plUpRbQmWPNacm4W0QjL03DAOVqJ6hA/XIm8Wn7rnc4x+lnhSUhazZX562L/T5L3z
+ P8UHrp5ArgxwzMvW445P8qGOc9prH/y/qtsYrBhvbLXKmYdkaioRZWp5yb3x2meUiZOz
+ HDMYAAg2LKVFibJqI2DkqthQvWVo932rNHwXBv/o0bqjSM+Al9loNKJ7PeMAst1Pr+/A
+ TEAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=0SUJxzhl2HyacdazgtJ5RZ46nr04RGwmTyfEsUsCRm0=;
- b=Z66VkE0yjMhn/5H2+JR/Fp7SO8TX8ZNmtl8ogQS+3Ab3eK6iRZv5LLto0Ci0fseLdj
- AikR6B9dlx+oVORec1lFy88GCWCBnBb/9k3FoVzrQ7W41PeFAc4hOvchQ1qYOan6/rGw
- JGglgxxsTnzd/R0WHdRwscnURSKlH/XNn37PNUhP8i+dFGpS5/IshcLj37y7tZcKerCL
- 3vzeNqzM4ZT7dLmacvzsH38u6/voMIjBhwE5SX9YZF8vEFqqLt5zZfWbQLQZlwYjkkKU
- 0Gj9yRQqyhY3US0jWO1kP2v2pr512dwMiKfg3L6VYuvMBMOxT3rr5XL7V2i9+BrCeKUv
- 2tjg==
-X-Gm-Message-State: APjAAAUvBLgBgj/V5Ybs25DPkEDb6/B1/HJA1VFwJFaGb67UM35Xb/yo
- KPOnt/tKoSLt0ozYtqff3/bmMaI2rT5VBp5zDw1psKtfXLPfeYyqE7akjjXDjPw2oCw8Prfc+lb
- F4yIwUyotMDII8Aw=
-X-Received: by 2002:ae9:f403:: with SMTP id y3mr4261430qkl.148.1568733068330; 
- Tue, 17 Sep 2019 08:11:08 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwJnaFs9GPFt1Dq4CfkEE+zoSqxbm7oEkfiZNWMXLgX+YnEz+NFh1vV0cMlXCVjmuan+XxE7A==
-X-Received: by 2002:ae9:f403:: with SMTP id y3mr4261411qkl.148.1568733068154; 
- Tue, 17 Sep 2019 08:11:08 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
- by smtp.gmail.com with ESMTPSA id d25sm1093070qtn.51.2019.09.17.08.11.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 17 Sep 2019 08:11:07 -0700 (PDT)
-Date: Tue, 17 Sep 2019 11:11:03 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20190916080718.3299-4-peterx@redhat.com>
-References: <20190917151011.24588-1-mst@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=84lIvWS/UBsMxXislbD2ODOZlrUK175JaQEXmaCSesM=;
+ b=XV/dhf7W3myMNmn9yVxwkqOSsaHdNv5CrD4/jYQHx2tbeIUDybOBH9Ei5a0B5axAel
+ C/w5U007tejhe4Z9cb9Y0ey+74TilmpoGYPfbIwKuXZ0XZNBFmWipG8uAyj6ueqjpjGT
+ Oo1hrQd+ZCE2/q06mcHsy+q8fK+rKrawIfZlASIcfhVvev6JnVBSfUuSmr9qjU4GRTK9
+ Lb6cN1NbzrF/x4gPNAiNKsqR8Jwhd/0hMFb+ZpM5Q+T0mnkf88+ej+3FgkK8OFBnBYcg
+ uHrCG25CEBpOCzR2Oz0v6TtV6BEIMaLGoKQbCfObkODjcVI6/wvNMe4k43+g91nRLqNY
+ TakA==
+X-Gm-Message-State: APjAAAVjGRtDgweo0c+Sa/GTbWTixMEceNvstiEOftonDYWiQR3ycMd9
+ eO11JN9uFIDYtp3/WRkSkiI6g1i1lA/7oGaD+vKNDw==
+X-Google-Smtp-Source: APXvYqwyPxWLUKO1tEIUKnFXksxAJ4JtJsyNq890bLSs9rFI8AUMc4IpUs4wpI+vn5nNkm3WT33L6V0ZvQKlOfI3fhg=
+X-Received: by 2002:aca:f54d:: with SMTP id t74mr4288531oih.170.1568733841674; 
+ Tue, 17 Sep 2019 08:24:01 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190904085629.13872-1-shameerali.kolothum.thodi@huawei.com>
+ <20190904085629.13872-11-shameerali.kolothum.thodi@huawei.com>
+ <CAFEAcA8sEhgOXnj-DGo04pSnpTObO+EeC94yrdGEikKq0=2QeA@mail.gmail.com>
+ <20190911155015.3627b072@redhat.com>
+ <20190911095332-mutt-send-email-mst@kernel.org>
+ <20190917111100-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190917111100-mutt-send-email-mst@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Sep 2019 16:23:49 +0100
+Message-ID: <CAFEAcA8S0SE9MtjwmErAfjLACbc8p3sXFPeFLwfOW9czTwDM9g@mail.gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190917151011.24588-1-mst@redhat.com>
-X-Mailer: git-send-email 2.22.0.678.g13338e74b8
-X-Mutt-Fcc: =sent
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 07/10] pc/q35: Disallow vfio-pci hotplug without
- VT-d caching mode
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
+Subject: Re: [Qemu-devel] [PATCH-for-4.2 v10 10/11] tests: add dummy ACPI
+ tables for arm/virt board
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,77 +91,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Samuel Ortiz <sameo@linux.intel.com>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Linuxarm <linuxarm@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Xu Wei <xuwei5@hisilicon.com>,
+ Eric Auger <eric.auger@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ sebastien.boeuf@intel.com, Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190917151103.QszxrNcT3PfOMqTPpliImpg1BjLQeKjNS1dXVFyVjwk@z>
 
-From: Peter Xu <peterx@redhat.com>
+On Tue, 17 Sep 2019 at 16:11, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Wed, Sep 11, 2019 at 09:55:34AM -0400, Michael S. Tsirkin wrote:
+> > On Wed, Sep 11, 2019 at 03:50:15PM +0200, Igor Mammedov wrote:
+> > > On Wed, 11 Sep 2019 13:57:06 +0100
+> > > Peter Maydell <peter.maydell@linaro.org> wrote:
+> > > > Do the tests pass with this patch and without the
+> > > > patch that adds the tests? (That is, can we keep the
+> > > > two patches separate without breaking bisection, or
+> > > > do we need to squash them together?)
+> > > >
+> > > > I'll leave it to somebody who understands the ACPI
+> > > > tests stuff to answer whether there's a better way to
+> > > I'd squash this patch into 11/11 test case,
+> >
+> >
+> > Pls don't - the way to add this is to add the files in question to
+> > tests/bios-tables-test-allowed-diff.h.
+> >
+> > Maintainer will create a separate commit updating
+> > the binaries and removing them from the whitelist.
 
-Instead of bailing out when trying to hotplug a vfio-pci device with
-below configuration:
+Who is "maintainer" in this part of the process? Why
+can't the submitter just create the patches and send them?
 
-  -device intel-iommu,caching-mode=off
+> > This way things like rebase work seemlessly.
+>
+>
+> OK?
+>
+> Can you post v11 like this? I'll ack then.
 
-With this we can return a warning message to the user via QMP/HMP and
-the VM will continue to work after failing the hotplug:
-
-  (qemu) device_add vfio-pci,bus=root.3,host=05:00.0,id=vfio1
-  Error: Device assignment is not allowed without enabling caching-mode=on for Intel IOMMU.
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20190916080718.3299-4-peterx@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/i386/pc.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
-
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index bad866fe44..0a6fa6e549 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2944,6 +2944,26 @@ static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
-     }
- }
- 
-+
-+static bool pc_hotplug_allowed(MachineState *ms, DeviceState *dev, Error **errp)
-+{
-+    X86IOMMUState *iommu = x86_iommu_get_default();
-+    IntelIOMMUState *intel_iommu;
-+
-+    if (iommu &&
-+        object_dynamic_cast((Object *)iommu, TYPE_INTEL_IOMMU_DEVICE) &&
-+        object_dynamic_cast((Object *)dev, "vfio-pci")) {
-+        intel_iommu = INTEL_IOMMU_DEVICE(iommu);
-+        if (!intel_iommu->caching_mode) {
-+            error_setg(errp, "Device assignment is not allowed without "
-+                       "enabling caching-mode=on for Intel IOMMU.");
-+            return false;
-+        }
-+    }
-+
-+    return true;
-+}
-+
- static void pc_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -2968,6 +2988,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     pcmc->pvh_enabled = true;
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler = pc_get_hotplug_handler;
-+    mc->hotplug_allowed = pc_hotplug_allowed;
-     mc->cpu_index_to_instance_props = pc_cpu_index_to_props;
-     mc->get_default_cpu_node_id = pc_get_default_cpu_node_id;
-     mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
--- 
-MST
-
+thanks
+-- PMM
 
