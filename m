@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E95C4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 18:11:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 867B0C4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 18:11:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4019221670
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 18:11:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4019221670
+	by mail.kernel.org (Postfix) with ESMTPS id 60ABC21670
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 18:11:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60ABC21670
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAHwL-0001Yn-9s
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 14:11:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57592)
+	id 1iAHx1-0002TR-Hd
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 14:11:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57655)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iAHvf-00011q-Cv
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:10:20 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iAHwD-0001cv-Rr
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:10:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iAHvd-0004W3-Q9
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:10:19 -0400
-Resent-Date: Tue, 17 Sep 2019 14:10:19 -0400
-Resent-Message-Id: <E1iAHvd-0004W3-Q9@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21595)
+ (envelope-from <no-reply@patchew.org>) id 1iAHwC-0004wk-P1
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:10:53 -0400
+Resent-Date: Tue, 17 Sep 2019 14:10:53 -0400
+Resent-Message-Id: <E1iAHwC-0004wk-P1@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21421)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iAHvc-0004SO-67
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:10:17 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568743792; cv=none; d=zoho.com; s=zohoarc; 
- b=fgi+xrEleb0VnkE6D+4B0wzCyObhuUcVrxzmPBiXO4nLNVvC9RVJGziFYNcFghyMdCqKbi5ctLgSbNr4bqCL1BsB/4tRaIbQ3T8GjuL43iElJgslaqw0pEM2/wop9KJVZg6QsN3OpgCmb2il3uMyXlgPG/WI+BBJoqajUmFsv1E=
+ id 1iAHwC-0004w5-HZ
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:10:52 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1568743836; cv=none; d=zoho.com; s=zohoarc; 
+ b=TYyIEtqBoZ+GTH4pT0I3dgyVtggB5l0wUGRy4GJ3QlaXudN21Qe1MoMhletXn/4hi57+xMZLsu97hmlYc6auQOCTnhUhbeWFoyXsT+vQevrVye8aLE+RbnQbfj0ycSLaAjY43Dju+51L88gIoZXcgdSR5UKI9NEzLPBR5Xp9st0=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1568743792;
+ s=zohoarc; t=1568743836;
  h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=N7oLRHg4rfJG8NQ7AWH6h2YReO4RvyuPrSZ+rPIeTeY=; 
- b=Bx8qFsBVOqnbn3bj68hxHqzSvlgTLTB6zxQy5Q2pk3QjoLrReNKoygV7DcuK0EzZ+0QZxnK1gC2Ojivsh5V0e3uOlDUpqehpWt9x1khBNEodpalLAH1W5VgsskFrGemfGeLgLGkz5YAy01xy7TUckwEJeaJ0L5soDIFini8uz88=
+ bh=C+1ohvCZYYB8OxXA6ak8hUcrtJMdFF0j6XWv9wg4+h4=; 
+ b=BCzl91n6ghboRPPJwivsmPJnYGgdY/Oe9+xGa3JyRlorLal5oPUd8L4W2XSTkgPpEN6fJi46jrgKWVx7eGVKLnKdLSxQ70921DfCFZvPvhrIiyypZsOeWewepR9/mtnBOYNo/boKBpZ1LaLiv0v4/lpZKkcdYrVUYF4+8orFw3c=
 ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
  spf=pass  smtp.mailfrom=no-reply@patchew.org;
  dmarc=pass header.from=<no-reply@patchew.org>
  header.from=<no-reply@patchew.org>
 Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1568743790242305.3360346097346;
- Tue, 17 Sep 2019 11:09:50 -0700 (PDT)
+ mx.zohomail.com with SMTPS id 1568743834491459.0097083817162;
+ Tue, 17 Sep 2019 11:10:34 -0700 (PDT)
 In-Reply-To: <156872146565.1757.3033215873677512474.stgit@pasha-Precision-3630-Tower>
-Message-ID: <156874378756.17151.16934104501272448361@5dec9699b7de>
+Message-ID: <156874383189.17151.10736945008014961739@5dec9699b7de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 Resent-From: 
 From: no-reply@patchew.org
 To: pavel.dovgaluk@gmail.com
-Date: Tue, 17 Sep 2019 11:09:50 -0700 (PDT)
+Date: Tue, 17 Sep 2019 11:10:34 -0700 (PDT)
 X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
+X-Received-From: 136.143.188.54
 Subject: Re: [Qemu-devel] [for-4.2 PATCH 0/6] Block-related record/replay
  fixes
 X-BeenThere: qemu-devel@nongnu.org
@@ -88,21 +88,22 @@ Sender: "Qemu-devel"
 
 UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTY4NzIxNDY1NjUuMTc1Ny4z
 MDMzMjE1ODczNjc3NTEyNDc0LnN0Z2l0QHBhc2hhLVByZWNpc2lvbi0zNjMwLVRvd2VyLwoKCgpI
-aSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgYXNhbiBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0
-aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBE
-b2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoK
-PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1m
-ZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtZGVidWdAZmVkb3JhIFRB
-UkdFVF9MSVNUPXg4Nl82NC1zb2Z0bW11IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgouL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkgLS1lbmdpbmUgYXV0byBidWlsZCBxZW11
-OmZlZG9yYSB0ZXN0cy9kb2NrZXIvZG9ja2VyZmlsZXMvZmVkb3JhLmRvY2tlciAgIC0tYWRkLWN1
-cnJlbnQtdXNlciAgCkltYWdlIGlzIHVwIHRvIGRhdGUuCiAgTEQgICAgICBkb2NrZXItdGVzdC1k
-ZWJ1Z0BmZWRvcmEubW8KY2M6IGZhdGFsIGVycm9yOiBubyBpbnB1dCBmaWxlcwpjb21waWxhdGlv
-biB0ZXJtaW5hdGVkLgptYWtlOiAqKiogW2RvY2tlci10ZXN0LWRlYnVnQGZlZG9yYS5tb10gRXJy
-b3IgNAoKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9s
-b2dzLzE1Njg3MjE0NjU2NS4xNzU3LjMwMzMyMTU4NzM2Nzc1MTI0NzQuc3RnaXRAcGFzaGEtUHJl
-Y2lzaW9uLTM2MzAtVG93ZXIvdGVzdGluZy5hc2FuLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+aSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0
+LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93
+LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVj
+ZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKbWFr
+ZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0
+LW1pbmd3QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKLi90
+ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IC0tZW5naW5lIGF1dG8gYnVpbGQgcWVtdTpmZWRvcmEgdGVz
+dHMvZG9ja2VyL2RvY2tlcmZpbGVzL2ZlZG9yYS5kb2NrZXIgICAtLWFkZC1jdXJyZW50LXVzZXIg
+IApJbWFnZSBpcyB1cCB0byBkYXRlLgogIExEICAgICAgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3Jh
+Lm1vCmNjOiBmYXRhbCBlcnJvcjogbm8gaW5wdXQgZmlsZXMKY29tcGlsYXRpb24gdGVybWluYXRl
+ZC4KbWFrZTogKioqIFtkb2NrZXItdGVzdC1taW5nd0BmZWRvcmEubW9dIEVycm9yIDQKCgoKVGhl
+IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTY4NzIx
+NDY1NjUuMTc1Ny4zMDMzMjE1ODczNjc3NTEyNDc0LnN0Z2l0QHBhc2hhLVByZWNpc2lvbi0zNjMw
+LVRvd2VyL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1h
+aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9y
+Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNv
+bQ==
 
 
