@@ -2,62 +2,54 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B72EC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:09:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0983C4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:12:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1103921881
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:09:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1103921881
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sipsolutions.net
+	by mail.kernel.org (Postfix) with ESMTPS id C5FE721897
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:12:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5FE721897
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iACID-00032W-KT
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 08:09:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59666)
+	id 1iACKy-0005vR-S3
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 08:12:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59210)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <johannes@sipsolutions.net>) id 1iACB4-00071Z-1C
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:01:51 -0400
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1iAC7m-0004G5-Jl
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 07:58:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <johannes@sipsolutions.net>) id 1iACB1-0003VH-P0
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:01:49 -0400
-Received: from s3.sipsolutions.net ([2a01:4f8:191:4433::2]:58944
- helo=sipsolutions.net)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <johannes@sipsolutions.net>)
- id 1iACAz-0003QU-UQ
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:01:46 -0400
-Received: by sipsolutions.net with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <johannes@sipsolutions.net>)
- id 1iACAt-0003KK-Um; Tue, 17 Sep 2019 14:01:40 +0200
-Message-ID: <0978f7296c9cb2da303ccae38941eb6fc9c4dbe1.camel@sipsolutions.net>
-From: Johannes Berg <johannes@sipsolutions.net>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Date: Tue, 17 Sep 2019 14:01:38 +0200
-In-Reply-To: <20190916112430-mutt-send-email-mst@kernel.org>
-References: <20190911134539.25650-1-johannes@sipsolutions.net>
- <20190911134539.25650-2-johannes@sipsolutions.net>
- <20190911095650-mutt-send-email-mst@kernel.org>
- <fedd74ed3e9cc554287b202e73b047a938515113.camel@sipsolutions.net>
- <674086baeed5fce100d0882e668d5e36f026bd71.camel@sipsolutions.net>
- <20190916112430-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1iAC7k-0001by-Lw
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 07:58:26 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:42268)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1iAC7f-0001Z5-JY
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 07:58:21 -0400
+Received: from [127.0.1.1] (unknown [85.142.117.226])
+ by mail.ispras.ru (Postfix) with ESMTPSA id C45CB5400BA;
+ Tue, 17 Sep 2019 14:58:13 +0300 (MSK)
+From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 17 Sep 2019 14:58:13 +0300
+Message-ID: <156872149361.1757.15396921385801554899.stgit@pasha-Precision-3630-Tower>
+In-Reply-To: <156872146565.1757.3033215873677512474.stgit@pasha-Precision-3630-Tower>
+References: <156872146565.1757.3033215873677512474.stgit@pasha-Precision-3630-Tower>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a01:4f8:191:4433::2
-Subject: Re: [Qemu-devel] [RFC v2 1/2] docs: vhost-user: add in-band
- kick/call messages
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 83.149.199.45
+Subject: [Qemu-devel] [for-4.2 PATCH 5/6] replay: finish record/replay
+ before closing the disks
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,36 +61,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru,
+ pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com,
+ jasowang@redhat.com, crosthwaite.peter@gmail.com, armbru@redhat.com,
+ mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru,
+ mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com,
+ thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com,
+ dgilbert@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2019-09-16 at 11:30 -0400, Michael S. Tsirkin wrote:
-> 
-> So first we really need to fix up Starting and stopping section,
-> explaining that if the FD is invalid, this means ring
-> is immediately started, right?
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-It actually does say that, and ... I even changed it already to say the
-ring is also started when receiving the new VHOST_USER_VRING_KICK
-message:
+After recent updates block devices cannot be closed on qemu exit.
+This happens due to the block request polling when replay is not finished.
+Therefore now we stop execution recording before closing the block devices.
 
-   Client must start ring upon receiving a kick (that is, detecting that
-   file descriptor is readable) on the descriptor specified by
-   ``VHOST_USER_SET_VRING_KICK`` (or receiving the in-band message
-   ``VHOST_USER_VRING_KICK`` if negotiated) and stop ring upon receiving
-   ``VHOST_USER_GET_VRING_BASE``.
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+---
+ replay/replay.c |    2 ++
+ vl.c            |    1 +
+ 2 files changed, 3 insertions(+)
 
-
-> If we want to keep it simple, my proposal is this, if
-> VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS is set then
-> VHOST_USER_SET_VRING_CALL and VHOST_USER_SET_VRING_KICK are not valid.
-> Starting/stopping ring needs to be updated, teaching it
-> that ring is started after it gets a kick.
-
-Makes sense, mostly I just need to actually *implement* that.
-
-johannes
+diff --git a/replay/replay.c b/replay/replay.c
+index 713395b33d..5cc25bd2f8 100644
+--- a/replay/replay.c
++++ b/replay/replay.c
+@@ -385,6 +385,8 @@ void replay_finish(void)
+     g_free(replay_snapshot);
+     replay_snapshot = NULL;
+ 
++    replay_mode = REPLAY_MODE_NONE;
++
+     replay_finish_events();
+ }
+ 
+diff --git a/vl.c b/vl.c
+index 0241446df9..bf9f7ddec4 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4514,6 +4514,7 @@ int main(int argc, char **argv, char **envp)
+ 
+     /* No more vcpu or device emulation activity beyond this point */
+     vm_shutdown();
++    replay_finish();
+ 
+     job_cancel_sync_all();
+     bdrv_close_all();
 
 
