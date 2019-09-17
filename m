@@ -2,65 +2,83 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC634C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:44:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D518FC4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:44:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83BEC2067B
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:44:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83BEC2067B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id A22362067B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:44:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K2UInnrp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A22362067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iACq9-0002uC-D2
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 08:44:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37548)
+	id 1iACqh-0003bj-Jp
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 08:44:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37853)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhengxiang9@huawei.com>) id 1iACmX-0000H0-VC
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:40:35 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iACox-0002J9-VL
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:43:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhengxiang9@huawei.com>) id 1iACmV-0005NV-3R
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:40:33 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2234 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
- id 1iACmQ-0005IB-T8; Tue, 17 Sep 2019 08:40:27 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id D6BF79037DC9BDF6755F;
- Tue, 17 Sep 2019 20:40:19 +0800 (CST)
-Received: from [127.0.0.1] (10.177.29.32) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Tue, 17 Sep 2019
- 20:40:10 +0800
-To: <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
- <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>, <lersek@redhat.com>,
- <james.morse@arm.com>, <gengdongjiu@huawei.com>, <mtosatti@redhat.com>,
- <rth@twiddle.net>, <ehabkost@redhat.com>, <jonathan.cameron@huawei.com>,
- <xuwei5@huawei.com>, <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
- <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
-References: <20190906083152.25716-1-zhengxiang9@huawei.com>
-From: Xiang Zheng <zhengxiang9@huawei.com>
-Message-ID: <997a7f78-9ade-a107-8f83-de5dde85e483@huawei.com>
-Date: Tue, 17 Sep 2019 20:39:54 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iACov-0006Jg-Mg
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:43:03 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51238)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1iACov-0006Iy-CY
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:43:01 -0400
+Received: by mail-wm1-x344.google.com with SMTP id 7so3257536wme.1
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 05:43:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=SG/WcaoGxaX7MGJKGkNPY8Ua4ajn7nVTz+0Zp24VhXI=;
+ b=K2UInnrpY9PdDvsvl3mWJSNsUVN9MDD7K5+UbNo2hQH+Jr4bxHpCKE9N061ArZP0F9
+ rjH7PmrZ82CDeDod38Rp03WTGrYWV51sPsNcjQqCLXW0DwWV+H90+V4g5BMJd1/lY4tR
+ U71yr+vAF+RJndHod3PJA+WUd+EEyC4Qnr8eVL/Wpy8Dbhn5rP53Z51IRS/4kpgJhujU
+ cdEUzLrN8RHbz1qvhQ2BzUl91wQUKwOPY45vx+FD5uW4bhkvwWAsBHSpWbv85OGwFHnX
+ fVIM0QsCqXK/dy0BzWPDBIaDImEs4spAhvROQ4KV6RGBaiR4ji1fUjjj1KH1HGo2BuJm
+ aHBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=SG/WcaoGxaX7MGJKGkNPY8Ua4ajn7nVTz+0Zp24VhXI=;
+ b=mb2G1LBxoCa2bLoS0tvqcxpqI93T6xcnM0ea95KWoNFYeHb+ScSGDIxPat3ueLtmPV
+ VKtFHos6qj3vBRpiirEbEVXFieUpkGwdDB2vyCcDMW68a5f7FLfu/SbNMz9uyx4pGOPx
+ JwpO8ye+w2MvmNa7d97IgestIq4nsZWLtYXj2KuKfJP8OY06c4g1MTrJlGkIPdm+YNCf
+ MotOdmlkt4a+hFFAz/EkPi4vSebALCFIF+oBmg26vkWtBR3LahVlIMKRSxVCktmZQxsf
+ P9buZtFq0gWD827ZJPXgQ60sEdQfxEIf+EwSf4CJlPyXFiF8rpXJhyCRpbXV9bg4FJqq
+ zPJQ==
+X-Gm-Message-State: APjAAAUQn85J/WtiowOfzKgkmM4rmE5V1fAxam7LotmyLI/ropH1ES9u
+ rtvyI784UYfcDDUPgu0MC8Ciu9DGZ9GUqLJdkJU=
+X-Google-Smtp-Source: APXvYqxVRhzyfQy+jwzgt7ROKuGTSgLM36VEvnWEhDoaC+E33PWHy8zaWG9LAL3JZApUCb234/aiQpP5+0FuDz5GV8g=
+X-Received: by 2002:a1c:2144:: with SMTP id h65mr3544906wmh.114.1568724179380; 
+ Tue, 17 Sep 2019 05:42:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190906083152.25716-1-zhengxiang9@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.177.29.32]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.191
-Subject: Re: [Qemu-devel] [PATCH v18 0/6] Add ARMv8 RAS virtualization
- support in QEMU
+References: <20190917122512.15320-1-johannes@sipsolutions.net>
+In-Reply-To: <20190917122512.15320-1-johannes@sipsolutions.net>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 17 Sep 2019 16:42:35 +0400
+Message-ID: <CAJ+F1CJb_82Ut3gH8PAvq4aQhyUAa5eP4J8iwRSPavCwX3HxVA@mail.gmail.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH] libvhost-user-glib: use
+ g_main_context_get_thread_default()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,162 +90,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wanghaibin.wang@huawei.com
+Cc: QEMU <qemu-devel@nongnu.org>, Johannes Berg <johannes.berg@intel.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi all,
+On Tue, Sep 17, 2019 at 4:26 PM Johannes Berg <johannes@sipsolutions.net> w=
+rote:
+>
+> From: Johannes Berg <johannes.berg@intel.com>
+>
+> If we use NULL, we just get the main program default mainloop
+> here. Using g_main_context_get_thread_default() has basically
+> the same effect, but it lets us start different devices in
+> different threads with different mainloops, which can be useful.
+>
+> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 
-This patch series has been tested for both TCG and KVM scenes.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-1) Test for TCG:
-   - Re-compile qemu after applying the patch refered to https://patchwork.kernel.org/cover/10942757/#22640271).
-   - Use command line shown below to start qemu:
-        ./qemu-system-aarch64 \
-                -name guest=ras \
-                -machine virt,gic-version=3,ras=on \
-                -cpu cortex-a57 \
-                -bios /usr/share/edk2/aarch64/QEMU_EFI.fd \
-                -nodefaults \
-                -kernel ${GUEST_KERNEL} \
-                -initrd ${GUEST_FS} \
-                -append "rdinit=init console=ttyAMA0 earlycon=pl011,0x9000000" \
-                -m 8192 \
-                -smp 4 \
-                -serial stdio \
-
-   - Send a signal to one of the VCPU threads:
-        kill -s SIGBUS 71571
-
-   - The result of test is shown below:
-
-    [   41.194753] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 0
-    [   41.197329] {1}[Hardware Error]: event severity: recoverable
-    [   41.199078] {1}[Hardware Error]:  Error 0, type: recoverable
-    [   41.200829] {1}[Hardware Error]:   section_type: memory error
-    [   41.202603] {1}[Hardware Error]:   physical_address: 0x00000000400a1000
-    [   41.204649] {1}[Hardware Error]:   error_type: 0, unknown
-    [   41.206328] EDAC MC0: 1 UE Unknown on unknown label ( page:0x400a1 offset:0x0 grain:0)
-    [   41.208788] Internal error: synchronous external abort: 96000410 [#1] SMP
-    [   41.210879] Modules linked in:
-    [   41.211823] CPU: 2 PID: 0 Comm: swapper/2 Not tainted 4.19.0+ #8
-    [   41.213698] Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/2015
-    [   41.215812] pstate: 60c00085 (nZCv daIf +PAN +UAO)
-    [   41.217296] pc : cpu_do_idle+0x8/0xc
-    [   41.218400] lr : arch_cpu_idle+0x2c/0x1b8
-    [   41.219629] sp : ffff000009f9bf00
-    [   41.220649] x29: ffff000009f9bf00 x28: 0000000000000000
-    [   41.222310] x27: 0000000000000000 x26: ffff8001fe471d80
-    [   41.223945] x25: 0000000000000000 x24: ffff00000937ba38
-    [   41.225581] x23: ffff0000090b3338 x22: ffff000009379000
-    [   41.227220] x21: ffff00000937b000 x20: 0000000000000004
-    [   41.228871] x19: ffff0000090a6000 x18: 0000000000000000
-    [   41.230517] x17: 0000000000000000 x16: 0000000000000000
-    [   41.232165] x15: 0000000000000000 x14: 0000000000000000
-    [   41.233810] x13: ffff0000089f4da8 x12: 000000000000000e
-    [   41.235448] x11: ffff0000089f4d80 x10: 0000000000000af0
-    [   41.237101] x9 : ffff000009f9be80 x8 : ffff8001fe4728d0
-    [   41.238738] x7 : 0000000000000004 x6 : ffff8001fffbaf30
-    [   41.240380] x5 : ffff00000c43b940 x4 : 00008001f6f0c000
-    [   41.242030] x3 : 0000000000000001 x2 : ffff000009f9bf00
-    [   41.243666] x1 : ffff8001fffb82c8 x0 : ffff0000090a6018
-    [   41.245306] Process swapper/2 (pid: 0, stack limit = 0x(____ptrval____))
-    [   41.247378] Call trace:
-    [   41.248117]  cpu_do_idle+0x8/0xc
-    [   41.249111]  do_idle+0x1dc/0x2a8
-    [   41.250111]  cpu_startup_entry+0x28/0x30
-    [   41.251319]  secondary_start_kernel+0x180/0x1c8
-    [   41.252725] Code: a8c17bfd d65f03c0 d5033f9f d503207f (d65f03c0)
-    [   41.254606] ---[ end trace 221bc8a614fb5a1d ]---
-    [   41.256030] Kernel panic - not syncing: Fatal exception
-    [   41.257644] SMP: stopping secondary CPUs
-    [   41.258912] Kernel Offset: disabled
-    [   41.260011] CPU features: 0x0,22a00238
-    [   41.261178] Memory Limit: none
-    [   41.262122] ---[ end Kernel panic - not syncing: Fatal exception ]---
-
-2) Test for KVM:
-   - Use command line shown below to start qemu:
-        ./qemu-system-aarch64 \
-            -name guest=ras \
-            -machine virt,accel=kvm,gic-version=3,ras=on \
-            -cpu host \
-            -bios /usr/share/edk2/aarch64/QEMU_EFI.fd \
-            -nodefaults \
-            -kernel ${GUEST_KERNEL} \
-            -initrd ${GUEST_FS} \
-            -append "rdinit=init console=ttyAMA0 earlycon=pl011,0x9000000" \
-            -m 8192 \
-            -smp 4 \
-            -serial stdio \
-
-   - Run mca-recover and get the GPA(IPA) of allocated page which would be corrupted on the later.
-   - Convert the GPA to HPA and corrupt this HPA via APEI/EINJ.
-   - Go back to guest and continue to read this page.
-
-   - The result of test is shown below:
-
-    root@genericarmv8:~/tools# ./mca-recover
-    pagesize: 0x1000
-    before clear cache
-    flags for page 0x2317b2: uptodate active mmap anon swapbacked
-    vtop(0xffff9c9e8000) = 0x2317b2000
-    Hit any key to access: before read
-
-    after read
-    Access at Tue Sep 17 01:41:14 2019
-
-    flags for page 0x2317b2: uptodate active mmap anon swapbacked
-    [  403.298539] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 0
-    [  403.301421] {1}[Hardware Error]: event severity: recoverable
-    [  403.303217] {1}[Hardware Error]:  Error 0, type: recoverable
-    [  403.304920] {1}[Hardware Error]:   section_type: memory error
-    [  403.306645] {1}[Hardware Error]:   physical_address: 0x00000002317b2000
-    [  403.308947] {1}[Hardware Error]:   error_type: 0, unknown
-    [  403.310630] WARNING: CPU: 0 PID: 510 at drivers/edac/ghes_edac.c:202 ghes_edac_report_mem_error+0x648/0xb20
-    [  403.310630] Modules linked in:
-    [  403.310631] CPU: 0 PID: 510 Comm: mca-recover Not tainted 4.19.0+ #8
-    [  403.310632] Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/2015
-    [  403.310632] pstate: 60000005 (nZCv daif -PAN -UAO)
-    [  403.310632] pc : ghes_edac_report_mem_error+0x648/0xb20
-    [  403.310633] lr : ghes_proc+0x3d8/0x950
-    [  403.310633] sp : ffff00000c543b20
-    [  403.310633] x29: ffff00000c543b50 x28: ffff8001f5918014
-    [  403.310634] x27: 0000000000000000 x26: b1837ced833e63b8
-    [  403.310635] x25: 430fbbc1d995e954 x24: 0000000000000002
-    [  403.310636] x23: 0000000000000002 x22: ffff0000096ec000
-    [  403.310637] x21: ffff000009379000 x20: ffff8001f591805c
-    [  403.310638] x19: ffff8001f591e71c x18: ffffffffffffffff
-    [  403.310638] x17: 0000000000000000 x16: 0000000000000000
-    [  403.310639] x15: ffff000009379708 x14: 0000000000000000
-    [  403.310640] x13: 0000000000000002 x12: 317b200000000000
-    [  403.310641] x11: 0000000000000000 x10: 0000400200000000
-    [  403.310642] x9 : 0000000000000000 x8 : 00000002540be3ff
-    [  403.310642] x7 : 0000000000000000 x6 : ffff0000096dce30
-    [  403.310643] x5 : 4ede6f64a5bc1114 x4 : 0000000000000000
-    [  403.310644] x3 : ffff0000096ec4f0 x2 : ffff8001f591805c
-    [  403.310645] x1 : 0000000000000000 x0 : 0000000000110000
-    [  403.310646] Call trace:
-    [  403.310646]  ghes_edac_report_mem_error+0x648/0xb20
-    [  403.310646]  ghes_proc+0x3d8/0x950
-    [  403.310647]  ghes_notify_sea+0x3c/0x68
-    [  403.310647]  do_sea+0x9c/0x188
-    [  403.310647]  do_mem_abort+0x74/0x140
-    [  403.310648]  el0_da+0x24/0x28
-    [  403.310648] ---[ end trace 651f1abaa6b1de2d ]---
-    Recover: sig=7 si=0xffffc9bc5640 v=0xffffc9bc56c0[  403.364295] Memory failure: 0x2317b2: recovery action for dirty LRU page: Recovered
-    [  403.364295] Memory failure: 0x2317b2: recovery action for dirty LRU page: Recovered
-
-    Platform memory error at 0x(nil)
-    Addr = (nil) lsb=0
-    Recovery allocated new page at physical 0x232563000
-    Got 2a2a2a2a
+> ---
+>  contrib/libvhost-user/libvhost-user-glib.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/contrib/libvhost-user/libvhost-user-glib.c b/contrib/libvhos=
+t-user/libvhost-user-glib.c
+> index 824c7780de61..53f1ca4cdd73 100644
+> --- a/contrib/libvhost-user/libvhost-user-glib.c
+> +++ b/contrib/libvhost-user/libvhost-user-glib.c
+> @@ -89,7 +89,7 @@ vug_source_new(VugDev *gdev, int fd, GIOCondition cond,
+>      src->gfd.events =3D cond;
+>
+>      g_source_add_poll(gsrc, &src->gfd);
+> -    id =3D g_source_attach(gsrc, NULL);
+> +    id =3D g_source_attach(gsrc, g_main_context_get_thread_default());
+>      g_assert(id);
+>
+>      return gsrc;
+> --
+> 2.20.1
+>
+>
 
 
--- 
-
-Thanks,
-Xiang
-
+--=20
+Marc-Andr=C3=A9 Lureau
 
