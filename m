@@ -2,85 +2,98 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E3EBC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 14:11:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39BB7C4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 14:13:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E755721852
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 14:11:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E755721852
+	by mail.kernel.org (Postfix) with ESMTPS id 0DD3D206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 14:13:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DD3D206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAEC6-0005it-15
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 10:11:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50211)
+	id 1iAEEw-0006wO-7v
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 10:13:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50572)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iAEBM-0005CL-Rv
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 10:10:17 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iAEE0-0006SN-W3
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 10:13:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iAEBL-00079m-Km
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 10:10:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47233)
+ (envelope-from <mreitz@redhat.com>) id 1iAEDw-00008M-1J
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 10:13:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56908)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iAEBL-00079I-CP
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 10:10:15 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iAEDt-0008Su-MO; Tue, 17 Sep 2019 10:12:53 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2AA8981F13
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 14:10:14 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id f63so920129wma.7
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 07:10:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=SyNqH6Cc1SGYjgaEDtrZWB1CcfZiTeRCqymf/LoB9Q8=;
- b=kgbuZFBHUziYD3Nw1AGE/lZ0ZLiQs6ItSf6fDm9rx0oCoYAuaiW4CM77YYcRUMmgaU
- K3cribFlAf8HG0w7/69Hhjr1E4VFdNeyEpEzhzmyysiSlpVu825LfekExqDWAeDPAHBQ
- pl+wyjeuyLcvUzK64P2wKKW1UIQkLozfpNp89MjqJZQY/tOX65f+y/yLwKsBEzPIEdMs
- vJHl+eWOHZB8he6O/iC+BJ/Wj5ffpck2XvN6SzYru+92f3El61E+JLDvTgTYueEg8yut
- yXxfUNTGHQd4ejRXX29TMnfd3e38roTUMLW6pPagZCbKJl7SvgOs0qwjqkveLm4af7r3
- UYrw==
-X-Gm-Message-State: APjAAAVh2RzFWwT42k9012Iqdeq150pvaRO33tU4DhFJ3vww3zNzxFQ0
- Y/Xj2Lk2eru14O+8qbYbRBkBwaJfWJKAMWYLcq7Ris4VXVTTH5gG7ZNvpvnUeG7aQs1cawKVsWg
- 3p21HkbQn7qDoPkA=
-X-Received: by 2002:adf:c504:: with SMTP id q4mr3428724wrf.266.1568729412676; 
- Tue, 17 Sep 2019 07:10:12 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyWX90Z+mRjq7IB5LlAELO3tncSNHo70JNB65Ytl9uF0eJSOJZtSZloi82AMz/jjJyrr2NM1g==
-X-Received: by 2002:adf:c504:: with SMTP id q4mr3428701wrf.266.1568729412412; 
- Tue, 17 Sep 2019 07:10:12 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8?
- ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
- by smtp.gmail.com with ESMTPSA id o3sm3016106wmh.38.2019.09.17.07.10.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Sep 2019 07:10:11 -0700 (PDT)
-To: Palmer Dabbelt <palmer@sifive.com>
-References: <20190915202011.30459-1-palmer@sifive.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id EDF1F308FBA6;
+ Tue, 17 Sep 2019 14:12:52 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-116-130.ams2.redhat.com
+ [10.36.116.130])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7295D19C58;
+ Tue, 17 Sep 2019 14:12:51 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20190819201851.24418-1-mreitz@redhat.com>
+ <20190819201851.24418-7-mreitz@redhat.com>
+ <44f97011-4a02-7832-c253-d43474f79d44@redhat.com>
+ <a829185c-7c09-5afe-1479-15054ad59807@redhat.com>
+ <33f60f4e-8156-e46f-8500-79b0982348b2@redhat.com>
+ <c38acedf-d3db-384f-4aea-967ef3f87fdd@redhat.com>
+ <20190917084012.GA4824@localhost.localdomain>
+ <e9c8a9f5-80d9-b003-8036-0ba8df352ec3@redhat.com>
+ <20190917112212.GB4824@localhost.localdomain>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <e96a4b7a-84c8-6293-14b1-bc5a33b52e75@redhat.com>
-Date: Tue, 17 Sep 2019 16:10:11 +0200
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <2ce4aa6a-8411-2362-51f3-25db50b4fed6@redhat.com>
+Date: Tue, 17 Sep 2019 16:12:49 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190915202011.30459-1-palmer@sifive.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20190917112212.GB4824@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="dcfmpdwHaz19k6MMO2NWq7Cxpb1HPicEG"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Tue, 17 Sep 2019 14:12:53 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] vl.c: Report unknown machines correctly
+Subject: Re: [Qemu-devel] [PATCH v3 6/8] iotests: Test driver whitelisting
+ in 093
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,68 +105,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-CCing Mr command line...
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--dcfmpdwHaz19k6MMO2NWq7Cxpb1HPicEG
+Content-Type: multipart/mixed; boundary="CKbNljZEZAH8zOIJeVydIBFseOab6DMlG";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org,
+ Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <2ce4aa6a-8411-2362-51f3-25db50b4fed6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 6/8] iotests: Test driver whitelisting in
+ 093
+References: <20190819201851.24418-1-mreitz@redhat.com>
+ <20190819201851.24418-7-mreitz@redhat.com>
+ <44f97011-4a02-7832-c253-d43474f79d44@redhat.com>
+ <a829185c-7c09-5afe-1479-15054ad59807@redhat.com>
+ <33f60f4e-8156-e46f-8500-79b0982348b2@redhat.com>
+ <c38acedf-d3db-384f-4aea-967ef3f87fdd@redhat.com>
+ <20190917084012.GA4824@localhost.localdomain>
+ <e9c8a9f5-80d9-b003-8036-0ba8df352ec3@redhat.com>
+ <20190917112212.GB4824@localhost.localdomain>
+In-Reply-To: <20190917112212.GB4824@localhost.localdomain>
 
-Paolo
+--CKbNljZEZAH8zOIJeVydIBFseOab6DMlG
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-On 15/09/19 22:20, Palmer Dabbelt wrote:
-> I was recently typing in a QEMU command line, and ended up with
-> something like
-> 
->     qemu-system-riscv64 -machine virt ... -M 8G
-> 
-> which is, in retrospect, obviously incorrect: there is no "8G" machine.
-> I should have typed something like
-> 
->     qemu-system-riscv64 -machine virt ... -m 8G
-> 
-> but since QEMU was giving me the excessively unhelpful error message
-> 
->     qemu-system-riscv64: -machine virt: unsupported machine type
->     Use -machine help to list supported machines
-> 
-> I had to spend a few minutes scratching my head to figure out what was
-> going on.  For some reason I felt like I'd done that before, so I
-> figured I'd take a whack at fixing the problem this time.  It turns out
-> the error reporting for non-existant machines is just wrong: the invalid
-> machine is detected after we've lost the argument pointer, so it just
-> prints out the first instance of "-machine" instead of the one we're
-> actually looking for.
-> 
-> I've fixed this by just printing out "-machine $NAME" directly, but I
-> feel like there's a better way to do this.  Specifically, my issue is
-> that it always prints out "-machine" instead of "-M" -- that's actually
-> a regression for users just passing a single invalid machine via "-M",
-> which I assume is the more common case.
-> 
-> I'm not sure how to do this right, though, and my flight is boarding so
-> I figured I'd send this out as a way to ask the question.  I didn't have
-> time to run the test suite or figure out how to add a test for this, as
-> I'm assuming there's a better way to do it.
-> 
-> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-> ---
->  vl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/vl.c b/vl.c
-> index 630f5c5e9c..821a5d91c8 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2487,7 +2487,7 @@ static MachineClass *machine_parse(const char *name, GSList *machines)
->  
->      mc = find_machine(name, machines);
->      if (!mc) {
-> -        error_report("unsupported machine type");
-> +        error_printf("-machine %s: unsupported machine type\n", name);
->          error_printf("Use -machine help to list supported machines\n");
->          exit(1);
->      }
-> 
+On 17.09.19 13:22, Kevin Wolf wrote:
+> Am 17.09.2019 um 13:07 hat Max Reitz geschrieben:
+>> On 17.09.19 10:40, Kevin Wolf wrote:
+>>> Am 17.09.2019 um 10:18 hat Max Reitz geschrieben:
+>>>> On 13.09.19 20:30, John Snow wrote:
+>>>>> I'd still like to define func_wrapper with a nod to the type constr=
+aint
+>>>>> it has:
+>>>>>
+>>>>> def func_wrapper(instance: iotests.QMPTestCase, *args, **kwargs):
+>>>>>     [...]
+>>>>>
+>>>>>
+>>>>> Then, you'd write:
+>>>>>
+>>>>> if callable(required_formats):
+>>>>>     fmts =3D required_formats(instance)
+>>>>> else:
+>>>>>     fmts =3D required_formats
+>>>>
+>>>> Yep, that anyway.  (Although I didn=E2=80=99t know about the =E2=80=9C=
+param: type=E2=80=9D
+>>>> syntax and put that constraint in a comment instead.  Thanks again :=
+-))
+>>>
+>>> Note that function annotations are Python 3 only, so we can't use tha=
+t
+>>> syntax yet anyway. If you want to use type hints that are understood =
+by
+>>> tools (like mypy) and compatible with Python 2, you have to use
+>>> something like this (feel free to be more specific than Any):
+>>
+>> Do we really feel like staying compatible with Python 2, though?
+>=20
+> Feel like it? No.
+>=20
+> It's more that we are compelled to do so because we only deprecated it
+> in 4.1.
 
+Hm, yes, that=E2=80=99s too bad. :-)
+
+Max
+
+
+--CKbNljZEZAH8zOIJeVydIBFseOab6DMlG--
+
+--dcfmpdwHaz19k6MMO2NWq7Cxpb1HPicEG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2A6eEACgkQ9AfbAGHV
+z0AcmQf/UkrWTKMl4d+zHl7d0Lny9/jhH5YeQpaEdRj3RZHWjTr05/Yf7s1Se2kr
+gENOCLrWq51ahVrOnhCB/KvCqc4/cYqMGyIqsvLdcJKh9dvDJdkbq+C0dm9LwHvk
+QKiB04ogXxFSKDF29EYjZz8gF5nidqyUwtpW/S7XFib6Fn1fvu0vg+g/gkR/xgel
+1ZzgWTh60/AofBn3xQrUzx/J35iv6Pg5aQughQwlQndKLUPd3CO40cPBTy784ycS
+WjYispDEzaw/v+iSWw2hTrh4MFY9W5Z/gw+APpCdLvGPpC+F4B+iBLDrv1E3JwVP
+PCMSeLWC5/nGGb6ZMaGSCIildDh8zw==
+=eYAv
+-----END PGP SIGNATURE-----
+
+--dcfmpdwHaz19k6MMO2NWq7Cxpb1HPicEG--
 
