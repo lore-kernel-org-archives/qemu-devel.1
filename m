@@ -2,78 +2,65 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E2EEC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:41:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC634C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:44:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88CB720678
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:41:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qAwFJboT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88CB720678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 83BEC2067B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:44:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83BEC2067B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iACn1-0008Na-Vd
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 08:41:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36447)
+	id 1iACq9-0002uC-D2
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 08:44:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37548)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iACf2-000303-1Q
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:32:50 -0400
+ (envelope-from <zhengxiang9@huawei.com>) id 1iACmX-0000H0-VC
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:40:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iACez-0002Be-6h
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:32:47 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:39179)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iACex-000292-65
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:32:43 -0400
-Received: by mail-oi1-x244.google.com with SMTP id w144so2668324oia.6
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 05:32:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=D0o0aUvbawcXJQPBbfWL5KuT4pQyujcBNucaqsPdCdc=;
- b=qAwFJboTskR9dtbTpDG4diihIB78sTcvHRDc+snYYgmvLbIHC5e9Rwkh8mCblDhj96
- lBFlZpHBlNGexb+sheSOKBE5f/HemqeNFr4rkSmvXNNzca0Qsha0X/ShjwVEUvj89eB8
- 19lgxdC2qaF4kJeGxcB0IktJEeoPUxFJdrar+IVrNaYcLIxVkmeWlwYsU0NxnLueoz/v
- IxLm8cXj/XdxqnCK3ZQdER8fc+EAvA6wwMaqFI92NSSu38kXM9Wz6LIwOmV6bz9rSLJt
- YKBNq/F4RPhfuCJ/J47Yn4WwyWleSl8t1ASXX1w1V+9Z1u7ez8A3rimrKcbFTluEeebB
- eFmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=D0o0aUvbawcXJQPBbfWL5KuT4pQyujcBNucaqsPdCdc=;
- b=i0rxbcOraln7x+HmMfd2mjxCqG6uWQnRx3E/jUQidzk9/S5XXaqgaAQMPLGZbpjGf1
- M+GnGVkdB6tVP120Cbim8W7GlHxEpoI/BfeJ+D0zHc31jyyAZBiTJaf3HvxwcSYkJRke
- qEhl/0BEJQOB7kfVTJ7UqJukXJlFpQDDPVABt5JYxeQzXWmCUS7k5LO98ftDpmvsytsM
- C0CdYW3w2zNHf5spAX6bxnDQaWqPUPzp294PmZj+YI/Z4d9ozL/rkx71C1D7+k/BNS1d
- LOSOY1CQwAQmOo+EHbhucjosGCK9Tmr1Y7MaS7D18gPKKLEcCHR42Dzc34ztlAQ0uL/D
- vgNw==
-X-Gm-Message-State: APjAAAXdmj98xGKbpocXaiViX8IvaN+NNubsHkzj7RionH5Z+GKJ81YN
- FxKtHmVOaRS/VXLaofIlaZ2UANKTMKydDqcMgvl7dA==
-X-Google-Smtp-Source: APXvYqyTyiFIpEbJx0z3mH204LsKgbgSqG+uWxk/ZKF9DqVDlpT4NOBkbrbdHXo0qXbD79gKPbsh/qv1oDdoVOX3+ag=
-X-Received: by 2002:aca:b646:: with SMTP id g67mr3426173oif.163.1568723557380; 
- Tue, 17 Sep 2019 05:32:37 -0700 (PDT)
+ (envelope-from <zhengxiang9@huawei.com>) id 1iACmV-0005NV-3R
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:40:33 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2234 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
+ id 1iACmQ-0005IB-T8; Tue, 17 Sep 2019 08:40:27 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id D6BF79037DC9BDF6755F;
+ Tue, 17 Sep 2019 20:40:19 +0800 (CST)
+Received: from [127.0.0.1] (10.177.29.32) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Tue, 17 Sep 2019
+ 20:40:10 +0800
+To: <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
+ <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>, <lersek@redhat.com>,
+ <james.morse@arm.com>, <gengdongjiu@huawei.com>, <mtosatti@redhat.com>,
+ <rth@twiddle.net>, <ehabkost@redhat.com>, <jonathan.cameron@huawei.com>,
+ <xuwei5@huawei.com>, <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+ <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
+References: <20190906083152.25716-1-zhengxiang9@huawei.com>
+From: Xiang Zheng <zhengxiang9@huawei.com>
+Message-ID: <997a7f78-9ade-a107-8f83-de5dde85e483@huawei.com>
+Date: Tue, 17 Sep 2019 20:39:54 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-References: <9cf47438fa943b28ee987cea7b76a459@fau.de>
-In-Reply-To: <9cf47438fa943b28ee987cea7b76a459@fau.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Sep 2019 13:32:26 +0100
-Message-ID: <CAFEAcA-oP9QkYnQr1SQUvTks+9ySjDCn0G5yuULdOBepQi-PSw@mail.gmail.com>
-To: "Konopik, Andreas" <andreas.konopik@fau.de>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
-Subject: Re: [Qemu-devel] [Qemu-discuss] Segmentation fault on target tricore
+In-Reply-To: <20190906083152.25716-1-zhengxiang9@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.177.29.32]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 45.249.212.191
+Subject: Re: [Qemu-devel] [PATCH v18 0/6] Add ARMv8 RAS virtualization
+ support in QEMU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,96 +72,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- QEMU Developers <qemu-devel@nongnu.org>,
- qemu-discuss <qemu-discuss@nongnu.org>
+Cc: wanghaibin.wang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 17 Sep 2019 at 13:24, Konopik, Andreas <andreas.konopik@fau.de> wrote:
->
-> Hello,
->
-> I am wondering why the "Hello world"-program available in TASKING
-> (v6.2r1) generates a segfault.
->
-> I compiled the program for the 'TC1796' Processor (Infineon TriCore 1
-> Family -> AUDO NextGeneration Family).
-> QEMU was built with gcc 9.1.0 and I added a memory region, that was
-> necessary [1].
-> Running QEMU with following options:
-> `./qemu/build/tricore-softmmu/qemu-system-tricore -nographic -M
-> tricore_testboard -cpu tc1796 -kernel hello.elf`
-> led to a segfault in a short time
+Hi all,
 
-Hi -- I'm cc'ing the qemu-devel list and the TriCore maintainer;
-not everybody reads the -discuss mailing list.
+This patch series has been tested for both TCG and KVM scenes.
 
-> Using gdb and valgrind I found out that:
-> - 'gen_mtcr()' and 'gen_mfcr()' access uninitialized values, i.e. CSFRs,
-> which leads to the Segfault
-> - The uninitialised values were created by stack allocation of
-> DisasContext in 'gen_intermediate_code()'
+1) Test for TCG:
+   - Re-compile qemu after applying the patch refered to https://patchwork.kernel.org/cover/10942757/#22640271).
+   - Use command line shown below to start qemu:
+        ./qemu-system-aarch64 \
+                -name guest=ras \
+                -machine virt,gic-version=3,ras=on \
+                -cpu cortex-a57 \
+                -bios /usr/share/edk2/aarch64/QEMU_EFI.fd \
+                -nodefaults \
+                -kernel ${GUEST_KERNEL} \
+                -initrd ${GUEST_FS} \
+                -append "rdinit=init console=ttyAMA0 earlycon=pl011,0x9000000" \
+                -m 8192 \
+                -smp 4 \
+                -serial stdio \
 
-This definitely sounds like a bug: do you have a stack
-backtrace from valgrind or gdb of the bad access and the
-segfault?
+   - Send a signal to one of the VCPU threads:
+        kill -s SIGBUS 71571
 
-> The segfault does not occur when configuring QEMU with '--enable-debug'
-> flag, so i suspect it might be a compiler error while building QEMU.
-> It did not come up before target/tricore implemented the
-> DisasContextBase API (commit d013d220c710054a6d755941460f88c186fef7b5).
->
-> Does anybody else have this problem?
->
->
-> Regards,
->
-> Andreas
->
->
->
-> [1] Memory-layout addition (according to TASKING memory-layout):
->
-> > diff --git a/hw/tricore/tricore_testboard.c
-> > b/hw/tricore/tricore_testboard.c
-> > index aef3289f8c..c287e0e7f5 100644
-> > --- a/hw/tricore/tricore_testboard.c
-> > +++ b/hw/tricore/tricore_testboard.c
-> > @@ -59,6 +59,7 @@ static void tricore_testboard_init(MachineState
-> > *machine, int board_id)
-> >     CPUTriCoreState *env;
-> >
-> >     MemoryRegion *sysmem = get_system_memory();
-> > +    MemoryRegion *pflash = g_new(MemoryRegion, 1);
-> >     MemoryRegion *ext_cram = g_new(MemoryRegion, 1);
-> >     MemoryRegion *ext_dram = g_new(MemoryRegion, 1);
-> >     MemoryRegion *int_cram = g_new(MemoryRegion, 1);
-> > @@ -68,6 +69,8 @@ static void tricore_testboard_init(MachineState
-> > *machine, int board_id)
-> >
-> >     cpu = TRICORE_CPU(cpu_create(machine->cpu_type));
-> >     env = &cpu->env;
-> > +    memory_region_init_ram(pflash, NULL, "pflash",
-> > +                           2 * MiB, &error_fatal);
-> >     memory_region_init_ram(ext_cram, NULL, "powerlink_ext_c.ram",
-> >                            2 * MiB, &error_fatal);
-> >     memory_region_init_ram(ext_dram, NULL, "powerlink_ext_d.ram",
-> > @@ -81,6 +84,7 @@ static void tricore_testboard_init(MachineState
-> > *machine, int board_id)
-> >     memory_region_init_ram(pcp_text, NULL, "powerlink_pcp_text.ram",
-> >                            32 * KiB, &error_fatal);
-> >
-> > +    memory_region_add_subregion(sysmem, 0xa0000000, pflash);
-> >     memory_region_add_subregion(sysmem, 0x80000000, ext_cram);
-> >     memory_region_add_subregion(sysmem, 0xa1000000, ext_dram);
-> >     memory_region_add_subregion(sysmem, 0xd4000000, int_cram);
+   - The result of test is shown below:
 
-I don't know enough about TriCore or the board QEMU is
-emulating here to know whether this is the right thing;
-Bastian?
+    [   41.194753] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 0
+    [   41.197329] {1}[Hardware Error]: event severity: recoverable
+    [   41.199078] {1}[Hardware Error]:  Error 0, type: recoverable
+    [   41.200829] {1}[Hardware Error]:   section_type: memory error
+    [   41.202603] {1}[Hardware Error]:   physical_address: 0x00000000400a1000
+    [   41.204649] {1}[Hardware Error]:   error_type: 0, unknown
+    [   41.206328] EDAC MC0: 1 UE Unknown on unknown label ( page:0x400a1 offset:0x0 grain:0)
+    [   41.208788] Internal error: synchronous external abort: 96000410 [#1] SMP
+    [   41.210879] Modules linked in:
+    [   41.211823] CPU: 2 PID: 0 Comm: swapper/2 Not tainted 4.19.0+ #8
+    [   41.213698] Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/2015
+    [   41.215812] pstate: 60c00085 (nZCv daIf +PAN +UAO)
+    [   41.217296] pc : cpu_do_idle+0x8/0xc
+    [   41.218400] lr : arch_cpu_idle+0x2c/0x1b8
+    [   41.219629] sp : ffff000009f9bf00
+    [   41.220649] x29: ffff000009f9bf00 x28: 0000000000000000
+    [   41.222310] x27: 0000000000000000 x26: ffff8001fe471d80
+    [   41.223945] x25: 0000000000000000 x24: ffff00000937ba38
+    [   41.225581] x23: ffff0000090b3338 x22: ffff000009379000
+    [   41.227220] x21: ffff00000937b000 x20: 0000000000000004
+    [   41.228871] x19: ffff0000090a6000 x18: 0000000000000000
+    [   41.230517] x17: 0000000000000000 x16: 0000000000000000
+    [   41.232165] x15: 0000000000000000 x14: 0000000000000000
+    [   41.233810] x13: ffff0000089f4da8 x12: 000000000000000e
+    [   41.235448] x11: ffff0000089f4d80 x10: 0000000000000af0
+    [   41.237101] x9 : ffff000009f9be80 x8 : ffff8001fe4728d0
+    [   41.238738] x7 : 0000000000000004 x6 : ffff8001fffbaf30
+    [   41.240380] x5 : ffff00000c43b940 x4 : 00008001f6f0c000
+    [   41.242030] x3 : 0000000000000001 x2 : ffff000009f9bf00
+    [   41.243666] x1 : ffff8001fffb82c8 x0 : ffff0000090a6018
+    [   41.245306] Process swapper/2 (pid: 0, stack limit = 0x(____ptrval____))
+    [   41.247378] Call trace:
+    [   41.248117]  cpu_do_idle+0x8/0xc
+    [   41.249111]  do_idle+0x1dc/0x2a8
+    [   41.250111]  cpu_startup_entry+0x28/0x30
+    [   41.251319]  secondary_start_kernel+0x180/0x1c8
+    [   41.252725] Code: a8c17bfd d65f03c0 d5033f9f d503207f (d65f03c0)
+    [   41.254606] ---[ end trace 221bc8a614fb5a1d ]---
+    [   41.256030] Kernel panic - not syncing: Fatal exception
+    [   41.257644] SMP: stopping secondary CPUs
+    [   41.258912] Kernel Offset: disabled
+    [   41.260011] CPU features: 0x0,22a00238
+    [   41.261178] Memory Limit: none
+    [   41.262122] ---[ end Kernel panic - not syncing: Fatal exception ]---
 
-thanks
--- PMM
+2) Test for KVM:
+   - Use command line shown below to start qemu:
+        ./qemu-system-aarch64 \
+            -name guest=ras \
+            -machine virt,accel=kvm,gic-version=3,ras=on \
+            -cpu host \
+            -bios /usr/share/edk2/aarch64/QEMU_EFI.fd \
+            -nodefaults \
+            -kernel ${GUEST_KERNEL} \
+            -initrd ${GUEST_FS} \
+            -append "rdinit=init console=ttyAMA0 earlycon=pl011,0x9000000" \
+            -m 8192 \
+            -smp 4 \
+            -serial stdio \
+
+   - Run mca-recover and get the GPA(IPA) of allocated page which would be corrupted on the later.
+   - Convert the GPA to HPA and corrupt this HPA via APEI/EINJ.
+   - Go back to guest and continue to read this page.
+
+   - The result of test is shown below:
+
+    root@genericarmv8:~/tools# ./mca-recover
+    pagesize: 0x1000
+    before clear cache
+    flags for page 0x2317b2: uptodate active mmap anon swapbacked
+    vtop(0xffff9c9e8000) = 0x2317b2000
+    Hit any key to access: before read
+
+    after read
+    Access at Tue Sep 17 01:41:14 2019
+
+    flags for page 0x2317b2: uptodate active mmap anon swapbacked
+    [  403.298539] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 0
+    [  403.301421] {1}[Hardware Error]: event severity: recoverable
+    [  403.303217] {1}[Hardware Error]:  Error 0, type: recoverable
+    [  403.304920] {1}[Hardware Error]:   section_type: memory error
+    [  403.306645] {1}[Hardware Error]:   physical_address: 0x00000002317b2000
+    [  403.308947] {1}[Hardware Error]:   error_type: 0, unknown
+    [  403.310630] WARNING: CPU: 0 PID: 510 at drivers/edac/ghes_edac.c:202 ghes_edac_report_mem_error+0x648/0xb20
+    [  403.310630] Modules linked in:
+    [  403.310631] CPU: 0 PID: 510 Comm: mca-recover Not tainted 4.19.0+ #8
+    [  403.310632] Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/2015
+    [  403.310632] pstate: 60000005 (nZCv daif -PAN -UAO)
+    [  403.310632] pc : ghes_edac_report_mem_error+0x648/0xb20
+    [  403.310633] lr : ghes_proc+0x3d8/0x950
+    [  403.310633] sp : ffff00000c543b20
+    [  403.310633] x29: ffff00000c543b50 x28: ffff8001f5918014
+    [  403.310634] x27: 0000000000000000 x26: b1837ced833e63b8
+    [  403.310635] x25: 430fbbc1d995e954 x24: 0000000000000002
+    [  403.310636] x23: 0000000000000002 x22: ffff0000096ec000
+    [  403.310637] x21: ffff000009379000 x20: ffff8001f591805c
+    [  403.310638] x19: ffff8001f591e71c x18: ffffffffffffffff
+    [  403.310638] x17: 0000000000000000 x16: 0000000000000000
+    [  403.310639] x15: ffff000009379708 x14: 0000000000000000
+    [  403.310640] x13: 0000000000000002 x12: 317b200000000000
+    [  403.310641] x11: 0000000000000000 x10: 0000400200000000
+    [  403.310642] x9 : 0000000000000000 x8 : 00000002540be3ff
+    [  403.310642] x7 : 0000000000000000 x6 : ffff0000096dce30
+    [  403.310643] x5 : 4ede6f64a5bc1114 x4 : 0000000000000000
+    [  403.310644] x3 : ffff0000096ec4f0 x2 : ffff8001f591805c
+    [  403.310645] x1 : 0000000000000000 x0 : 0000000000110000
+    [  403.310646] Call trace:
+    [  403.310646]  ghes_edac_report_mem_error+0x648/0xb20
+    [  403.310646]  ghes_proc+0x3d8/0x950
+    [  403.310647]  ghes_notify_sea+0x3c/0x68
+    [  403.310647]  do_sea+0x9c/0x188
+    [  403.310647]  do_mem_abort+0x74/0x140
+    [  403.310648]  el0_da+0x24/0x28
+    [  403.310648] ---[ end trace 651f1abaa6b1de2d ]---
+    Recover: sig=7 si=0xffffc9bc5640 v=0xffffc9bc56c0[  403.364295] Memory failure: 0x2317b2: recovery action for dirty LRU page: Recovered
+    [  403.364295] Memory failure: 0x2317b2: recovery action for dirty LRU page: Recovered
+
+    Platform memory error at 0x(nil)
+    Addr = (nil) lsb=0
+    Recovery allocated new page at physical 0x232563000
+    Got 2a2a2a2a
+
+
+-- 
+
+Thanks,
+Xiang
+
 
