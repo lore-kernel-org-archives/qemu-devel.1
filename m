@@ -4,92 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A27C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 08:19:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C00DFC4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 08:21:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D9B420678
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 08:19:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D9B420678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 95F1020678
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 08:21:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95F1020678
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iA8hv-0000eB-2K
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 04:19:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53506)
+	id 1iA8jd-0002F7-E3
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 04:21:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53577)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iA8gg-0008WJ-Qy
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 04:18:15 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1iA8hS-0000cc-4R
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 04:19:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iA8gf-0001sG-ML
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 04:18:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47358)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1iA8hQ-0002Sk-A4
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 04:19:01 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:42198)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iA8gc-0001p7-Qu; Tue, 17 Sep 2019 04:18:11 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 15C0B10C093B;
- Tue, 17 Sep 2019 08:18:09 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-116-130.ams2.redhat.com
- [10.36.116.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DF0510013A1;
- Tue, 17 Sep 2019 08:18:04 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-References: <20190819201851.24418-1-mreitz@redhat.com>
- <20190819201851.24418-7-mreitz@redhat.com>
- <44f97011-4a02-7832-c253-d43474f79d44@redhat.com>
- <a829185c-7c09-5afe-1479-15054ad59807@redhat.com>
- <33f60f4e-8156-e46f-8500-79b0982348b2@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <c38acedf-d3db-384f-4aea-967ef3f87fdd@redhat.com>
-Date: Tue, 17 Sep 2019 10:18:02 +0200
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1iA8hP-0002N0-Lm; Tue, 17 Sep 2019 04:19:00 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.04608306|-1; CH=green;
+ DM=CONTINUE|CONTINUE|true|0.120959-0.00373632-0.875304; FP=0|0|0|0|0|-1|-1|-1;
+ HT=e01a16384; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=11; RT=11; SR=0;
+ TI=SMTPD_---.FW9xxlT_1568708326; 
+Received: from 172.16.28.186(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.FW9xxlT_1568708326) by smtp.aliyun-inc.com(10.147.40.2);
+ Tue, 17 Sep 2019 16:18:48 +0800
+To: Chih-Min Chao <chihmin.chao@sifive.com>
+References: <1568183141-67641-1-git-send-email-zhiwei_liu@c-sky.com>
+ <1568183141-67641-2-git-send-email-zhiwei_liu@c-sky.com>
+ <CAEiOBXUveMJGpavU7_zK0UTdNniQvnXnw5MvE-hu7yHCSw8MPQ@mail.gmail.com>
+From: liuzhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <6c7b73cc-a4ae-8b0a-b6b1-c578549aa2f4@c-sky.com>
+Date: Tue, 17 Sep 2019 16:09:50 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <33f60f4e-8156-e46f-8500-79b0982348b2@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="NKWjWskCVQpdIip3ujLUXC9vfPx1wfF7H"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Tue, 17 Sep 2019 08:18:09 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 6/8] iotests: Test driver whitelisting
- in 093
+In-Reply-To: <CAEiOBXUveMJGpavU7_zK0UTdNniQvnXnw5MvE-hu7yHCSw8MPQ@mail.gmail.com>
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 121.197.200.217
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v2 01/17] RISC-V: add vfp field in
+ CPURISCVState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,142 +70,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Palmer Dabbelt <palmer@sifive.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, riku.voipio@iki.fi,
+ laurent@vivier.eu, wxy194768@alibaba-inc.com,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ wenmeng_zhang@c-sky.com, Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NKWjWskCVQpdIip3ujLUXC9vfPx1wfF7H
-Content-Type: multipart/mixed; boundary="XqBMYc1BqMpuMoI7hyggiNdYafl5VkH7X";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <c38acedf-d3db-384f-4aea-967ef3f87fdd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 6/8] iotests: Test driver whitelisting in
- 093
-References: <20190819201851.24418-1-mreitz@redhat.com>
- <20190819201851.24418-7-mreitz@redhat.com>
- <44f97011-4a02-7832-c253-d43474f79d44@redhat.com>
- <a829185c-7c09-5afe-1479-15054ad59807@redhat.com>
- <33f60f4e-8156-e46f-8500-79b0982348b2@redhat.com>
-In-Reply-To: <33f60f4e-8156-e46f-8500-79b0982348b2@redhat.com>
 
---XqBMYc1BqMpuMoI7hyggiNdYafl5VkH7X
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On 2019/9/11 下午10:51, Chih-Min Chao wrote:
+>
+>
+> On Wed, Sep 11, 2019 at 2:35 PM liuzhiwei <zhiwei_liu@c-sky.com 
+> <mailto:zhiwei_liu@c-sky.com>> wrote:
+>
+>     From: LIU Zhiwei <zhiwei_liu@c-sky.com <mailto:zhiwei_liu@c-sky.com>>
+>
+>     Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com
+>     <mailto:zhiwei_liu@c-sky.com>>
+>     ---
+>      target/riscv/cpu.h | 28 ++++++++++++++++++++++++++++
+>      1 file changed, 28 insertions(+)
+>
+>     diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+>     index 0adb307..c992b1d 100644
+>     --- a/target/riscv/cpu.h
+>     +++ b/target/riscv/cpu.h
+>     @@ -93,9 +93,37 @@ typedef struct CPURISCVState CPURISCVState;
+>
+>      #include "pmp.h"
+>
+>     +#define VLEN 128
+>     +#define VUNIT(x) (VLEN / x)
+>     +
+>      struct CPURISCVState {
+>          target_ulong gpr[32];
+>          uint64_t fpr[32]; /* assume both F and D extensions */
+>     +
+>     +    /* vector coprocessor state.  */
+>     +    struct {
+>     +        union VECTOR {
+>     +            float64  f64[VUNIT(64)];
+>     +            float32  f32[VUNIT(32)];
+>     +            float16  f16[VUNIT(16)];
+>     +            uint64_t u64[VUNIT(64)];
+>     +            int64_t  s64[VUNIT(64)];
+>     +            uint32_t u32[VUNIT(32)];
+>     +            int32_t  s32[VUNIT(32)];
+>     +            uint16_t u16[VUNIT(16)];
+>     +            int16_t  s16[VUNIT(16)];
+>     +            uint8_t  u8[VUNIT(8)];
+>     +            int8_t   s8[VUNIT(8)];
+>     +        } vreg[32];
+>     +        target_ulong vxrm;
+>     +        target_ulong vxsat;
+>     +        target_ulong vl;
+>     +        target_ulong vstart;
+>     +        target_ulong vtype;
+>     +        float_status fp_status;
+>     +    } vfp;
+>     +
+>     +    bool         foflag;
+>          target_ulong pc;
+>          target_ulong load_res;
+>          target_ulong load_val;
+>     -- 
+>     2.7.4
+>
+>
+> Could  the VLEN be configurable in cpu initialization but not fixed in 
+> compilation phase ?
 
-On 13.09.19 20:30, John Snow wrote:
->=20
->=20
-> On 9/13/19 8:47 AM, Max Reitz wrote:
->> On 20.08.19 23:32, John Snow wrote:
->>>
->>>
->>> On 8/19/19 4:18 PM, Max Reitz wrote:
->>>> null-aio may not be whitelisted.  Skip all test cases that require i=
-t.
->>>>
->>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>>> ---
->>>>  tests/qemu-iotests/093 | 12 +++++++++---
->>>>  1 file changed, 9 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
->>>> index 50c1e7f2ec..f03fa24a07 100755
->>>> --- a/tests/qemu-iotests/093
->>>> +++ b/tests/qemu-iotests/093
->>>> @@ -24,7 +24,7 @@ import iotests
->>>>  nsec_per_sec =3D 1000000000
->>>> =20
->>>>  class ThrottleTestCase(iotests.QMPTestCase):
->>>> -    test_img =3D "null-aio://"
->>>> +    test_driver =3D "null-aio"
->>>>      max_drives =3D 3
->>>> =20
->>>>      def blockstats(self, device):
->>>> @@ -35,10 +35,14 @@ class ThrottleTestCase(iotests.QMPTestCase):
->>>>                  return stat['rd_bytes'], stat['rd_operations'], sta=
-t['wr_bytes'], stat['wr_operations']
->>>>          raise Exception("Device not found for blockstats: %s" % dev=
-ice)
->>>> =20
->>>> +    def required_drivers(self):
->>>> +        return [self.test_driver]
->>>> +
->>>> +    @iotests.skip_if_unsupported(required_drivers)
->>>
->>> Oh, I see why you're passing args[0] back to the callback now. Why no=
-t
->>> just pass self.required_drivers and call it with no arguments instead=
-?
->>>
->>> You can get a bound version that way that doesn't need additional
->>> arguments, and then the callback is free to take generic callables of=
+Yes,  it's important that VLEN is configurable to support different 
+types of cpu.
 
->>> any kind.
->>
->> Am I doing something wrong?
->>
->> I just get
->>
->> +Traceback (most recent call last):
->> +  File "093", line 26, in <module>
->> +    class ThrottleTestCase(iotests.QMPTestCase):
->> +  File "093", line 41, in ThrottleTestCase
->> +    @iotests.skip_if_unsupported(self.required_drivers)
->> +NameError: name 'self' is not defined
->>
->> this way.
->>
->> Max
->>
-> What was I even talking about? :\ Well.
->=20
-> I'd still like to define func_wrapper with a nod to the type constraint=
+> Take the integer element as example  and the difference should be the 
+> stride of vfp.vreg[x] isn't continuous
+>
+>     struct {
+>         union VECTOR {
+>             uint64_t *u64;
+>             uint16_t *u16;
+>             uint8_t  *u8;
+>         } vreg[32];
+>     } vfp;
+>
+>    initialization
+>     int vlen = 256;  //parameter from cpu command line option
+>     int elem = vlen / 8;
+>     int size = elem * 32;
+>
+>     uint8_t *mem = malloc(size)
+>     for (int idx = 0; idx < 32; ++idx) {
+>         vfp.vreg[idx].u64 = (void *)&mem[idx * elem];
+>         vfp.vreg[idx].u32 = (void *)&mem[idx * elem];
+>         vfp.vreg[idx].u16 = (void *)&mem[idx * elem];
+>    }
+>
+>   chihmin
 
-> it has:
->=20
-> def func_wrapper(instance: iotests.QMPTestCase, *args, **kwargs):
->     [...]
->=20
->=20
-> Then, you'd write:
->=20
-> if callable(required_formats):
->     fmts =3D required_formats(instance)
-> else:
->     fmts =3D required_formats
+It's a good idea. I will accept it.
 
-Yep, that anyway.  (Although I didn=E2=80=99t know about the =E2=80=9Cpar=
-am: type=E2=80=9D
-syntax and put that constraint in a comment instead.  Thanks again :-))
+Thanks for review.
 
-Max
-
-
---XqBMYc1BqMpuMoI7hyggiNdYafl5VkH7X--
-
---NKWjWskCVQpdIip3ujLUXC9vfPx1wfF7H
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2AlroACgkQ9AfbAGHV
-z0Cp2gf+L4KmsZ8YeBXdaJh4h/e1VB7sRq54HbyVeotjPAJ11Hg957swdL3xLQFL
-DjczrOEW85pkVtzPHaw9N6KTybscgucCYZR/rTlLlLz6WIjJFrydsy2f3xVLn0rt
-PbZnl5s5ohMfhc0iyfe5367ZGqh3ShIxVQn+Sssb89QyLMg3zetEcZmGxtEh9yiM
-yPxiC3QNERh8sMeNG5QlbA7MPLYEdRD0w/Y/u+XS88snihi6CUsgP7YtcmxAQGV9
-IhZtv1A1lj1xo2WLpK/wlWz63jFb1gALGmUXT1alDD/TKlh0/ZxPOXYW7fiWxRua
-2bEuRS1Xtp0IFkjgJ1bimPynQ9B70w==
-=8KCz
------END PGP SIGNATURE-----
-
---NKWjWskCVQpdIip3ujLUXC9vfPx1wfF7H--
+Zhiwei
 
