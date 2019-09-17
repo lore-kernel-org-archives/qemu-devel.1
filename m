@@ -2,84 +2,82 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99ED2C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 15:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 874D3C4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 15:28:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6304B206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 15:26:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VyuxBYCJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6304B206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 60C41206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 15:28:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60C41206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAFN6-0007Ir-A8
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 11:26:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33826)
+	id 1iAFP0-0000AZ-9s
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 11:28:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60232)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iAFKm-0005h2-BQ
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:24:05 -0400
+ (envelope-from <mst@redhat.com>) id 1iAF8N-0002ke-R3
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:11:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iAFKl-00060A-5Q
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:24:04 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:36765)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iAFKk-0005zp-Vd
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:24:03 -0400
-Received: by mail-oi1-x243.google.com with SMTP id k20so3221978oih.3
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 08:24:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=84lIvWS/UBsMxXislbD2ODOZlrUK175JaQEXmaCSesM=;
- b=VyuxBYCJ2KNwV12/uG4HZD/u5uLeUGxkr74DYW9oM9d0oDr0wSnqaVN1cActBVuytv
- vz+KFySUqUs0D49dzeWULto7cLPiqN6m3x+/Gc0kHuMUWjgaao+HHYhMzLFzWNMhpQNF
- i7+plUpRbQmWPNacm4W0QjL03DAOVqJ6hA/XIm8Wn7rnc4x+lnhSUhazZX562L/T5L3z
- P8UHrp5ArgxwzMvW445P8qGOc9prH/y/qtsYrBhvbLXKmYdkaioRZWp5yb3x2meUiZOz
- HDMYAAg2LKVFibJqI2DkqthQvWVo932rNHwXBv/o0bqjSM+Al9loNKJ7PeMAst1Pr+/A
- TEAQ==
+ (envelope-from <mst@redhat.com>) id 1iAF8M-0000US-St
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:11:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43212)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iAF8M-0000UC-Nq
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:11:14 -0400
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0A9F82A09B3
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 15:11:14 +0000 (UTC)
+Received: by mail-qt1-f198.google.com with SMTP id c8so4527571qtd.20
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 08:11:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=84lIvWS/UBsMxXislbD2ODOZlrUK175JaQEXmaCSesM=;
- b=XV/dhf7W3myMNmn9yVxwkqOSsaHdNv5CrD4/jYQHx2tbeIUDybOBH9Ei5a0B5axAel
- C/w5U007tejhe4Z9cb9Y0ey+74TilmpoGYPfbIwKuXZ0XZNBFmWipG8uAyj6ueqjpjGT
- Oo1hrQd+ZCE2/q06mcHsy+q8fK+rKrawIfZlASIcfhVvev6JnVBSfUuSmr9qjU4GRTK9
- Lb6cN1NbzrF/x4gPNAiNKsqR8Jwhd/0hMFb+ZpM5Q+T0mnkf88+ej+3FgkK8OFBnBYcg
- uHrCG25CEBpOCzR2Oz0v6TtV6BEIMaLGoKQbCfObkODjcVI6/wvNMe4k43+g91nRLqNY
- TakA==
-X-Gm-Message-State: APjAAAVjGRtDgweo0c+Sa/GTbWTixMEceNvstiEOftonDYWiQR3ycMd9
- eO11JN9uFIDYtp3/WRkSkiI6g1i1lA/7oGaD+vKNDw==
-X-Google-Smtp-Source: APXvYqwyPxWLUKO1tEIUKnFXksxAJ4JtJsyNq890bLSs9rFI8AUMc4IpUs4wpI+vn5nNkm3WT33L6V0ZvQKlOfI3fhg=
-X-Received: by 2002:aca:f54d:: with SMTP id t74mr4288531oih.170.1568733841674; 
- Tue, 17 Sep 2019 08:24:01 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=7RdwU1BFDRkMHPHKf1AWwBU84oX8jYJL/6ib3XggkUM=;
+ b=c4MLhJRVGdWDIs55tyjVHk/MSh3SkTyeq5mUXm+v2+19XZ4EBPHCKH/vTPGhhL/STZ
+ IVFGUtTyGik1uFuFDEnpPvMx8M9rP5G8p2LL4FadzA1Ohe5ZmIz0rXqU7AnVwMBdcKBt
+ 8+Li7h5A5z+V4gTCiBz7aFc98DZzSuzSX6xT0SDHXUt+2tT6nlhL7zw089YP+62+dpoO
+ OAJ8T6Ny8YWq8t/2b5dzVeWWNNQn0OWNjJ4h/uBMJISrvhjom8CwHLZqmmz1LeVmCtMC
+ kkA8DHFOgvhHiM0NXKTuTcqH9qolXZhN+viCsWmHC2bYg9rgO+5exP0c3Epfcuk5kzLx
+ F9ng==
+X-Gm-Message-State: APjAAAVWIhHm3auJhHLwf1LMsx8IrsmVcQqp2gNEKQl8Q8YX9ewOg/x6
+ aInRBnP5xojUiCa8COcnrlNNWVD3ZKs7PYohTipkm43C2VJgHzHnbkk7gCCYB5Tttnu3kXapTKT
+ 0keTTNioakPdr/cc=
+X-Received: by 2002:a37:7402:: with SMTP id p2mr4361927qkc.457.1568733073078; 
+ Tue, 17 Sep 2019 08:11:13 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzUblc/p90jPuLhiQevBTqlKBWCPJk5l4Li7o5O+Kb8bVRID4BF3IxuojauX0GwMevV7Q3m4w==
+X-Received: by 2002:a37:7402:: with SMTP id p2mr4361900qkc.457.1568733072914; 
+ Tue, 17 Sep 2019 08:11:12 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
+ by smtp.gmail.com with ESMTPSA id v139sm1210628qkb.53.2019.09.17.08.11.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 17 Sep 2019 08:11:12 -0700 (PDT)
+Date: Tue, 17 Sep 2019 11:11:08 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Message-ID: <20190916080718.3299-5-peterx@redhat.com>
+References: <20190917151011.24588-1-mst@redhat.com>
 MIME-Version: 1.0
-References: <20190904085629.13872-1-shameerali.kolothum.thodi@huawei.com>
- <20190904085629.13872-11-shameerali.kolothum.thodi@huawei.com>
- <CAFEAcA8sEhgOXnj-DGo04pSnpTObO+EeC94yrdGEikKq0=2QeA@mail.gmail.com>
- <20190911155015.3627b072@redhat.com>
- <20190911095332-mutt-send-email-mst@kernel.org>
- <20190917111100-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190917111100-mutt-send-email-mst@kernel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Sep 2019 16:23:49 +0100
-Message-ID: <CAFEAcA8S0SE9MtjwmErAfjLACbc8p3sXFPeFLwfOW9czTwDM9g@mail.gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
-Subject: Re: [Qemu-devel] [PATCH-for-4.2 v10 10/11] tests: add dummy ACPI
- tables for arm/virt board
+Content-Disposition: inline
+In-Reply-To: <20190917151011.24588-1-mst@redhat.com>
+X-Mailer: git-send-email 2.22.0.678.g13338e74b8
+X-Mutt-Fcc: =sent
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 08/10] intel_iommu: Remove the caching-mode
+ check during flag change
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,50 +89,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Samuel Ortiz <sameo@linux.intel.com>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Linuxarm <linuxarm@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>,
- qemu-arm <qemu-arm@nongnu.org>, Xu Wei <xuwei5@hisilicon.com>,
- Eric Auger <eric.auger@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- sebastien.boeuf@intel.com, Laszlo Ersek <lersek@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20190917151108.Y3vOLwJjXsdEj8BX1LhMqzskf_-8DbPFkgd6Ma8uL7o@z>
 
-On Tue, 17 Sep 2019 at 16:11, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Wed, Sep 11, 2019 at 09:55:34AM -0400, Michael S. Tsirkin wrote:
-> > On Wed, Sep 11, 2019 at 03:50:15PM +0200, Igor Mammedov wrote:
-> > > On Wed, 11 Sep 2019 13:57:06 +0100
-> > > Peter Maydell <peter.maydell@linaro.org> wrote:
-> > > > Do the tests pass with this patch and without the
-> > > > patch that adds the tests? (That is, can we keep the
-> > > > two patches separate without breaking bisection, or
-> > > > do we need to squash them together?)
-> > > >
-> > > > I'll leave it to somebody who understands the ACPI
-> > > > tests stuff to answer whether there's a better way to
-> > > I'd squash this patch into 11/11 test case,
-> >
-> >
-> > Pls don't - the way to add this is to add the files in question to
-> > tests/bios-tables-test-allowed-diff.h.
-> >
-> > Maintainer will create a separate commit updating
-> > the binaries and removing them from the whitelist.
+From: Peter Xu <peterx@redhat.com>
 
-Who is "maintainer" in this part of the process? Why
-can't the submitter just create the patches and send them?
+That's never a good place to stop QEMU process... Since now we have
+both the machine done sanity check and also the hotplug handler, we
+can safely remove this to avoid that.
 
-> > This way things like rebase work seemlessly.
->
->
-> OK?
->
-> Can you post v11 like this? I'll ack then.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20190916080718.3299-5-peterx@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/i386/intel_iommu.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-thanks
--- PMM
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index bed8ffe446..f1de8fdb75 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -2936,10 +2936,6 @@ static void vtd_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
+     VTDAddressSpace *vtd_as = container_of(iommu, VTDAddressSpace, iommu);
+     IntelIOMMUState *s = vtd_as->iommu_state;
+ 
+-    if (!s->caching_mode && new & IOMMU_NOTIFIER_MAP) {
+-        vtd_panic_require_caching_mode();
+-    }
+-
+     /* Update per-address-space notifier flags */
+     vtd_as->notifier_flags = new;
+ 
+-- 
+MST
+
 
