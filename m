@@ -2,81 +2,80 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A368FC4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:47:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AE7CC4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:48:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68EDA20640
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:47:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA5E620640
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:48:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="umhRwboE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68EDA20640
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DVGgl5qc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA5E620640
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iADpi-0000Mf-C2
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 09:47:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46807)
+	id 1iADq2-0000ia-9b
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 09:48:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47033)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liq3ea@gmail.com>) id 1iADlZ-0005B7-77
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:43:39 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iADnZ-0007bD-IV
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:45:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liq3ea@gmail.com>) id 1iADlX-0000SD-2I
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:43:37 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:42835)
+ (envelope-from <peter.maydell@linaro.org>) id 1iADnY-0001Gr-1N
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:45:41 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:44814)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1iADlW-0000Rk-T9
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:43:35 -0400
-Received: by mail-oi1-x241.google.com with SMTP id i185so2847282oif.9
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 06:43:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iADnX-0001GI-QJ
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:45:39 -0400
+Received: by mail-ot1-x343.google.com with SMTP id 21so3042418otj.11
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 06:45:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=fh0ZbYYidaK1w0KVDkBIcPA8wIL+RsxEomQqKOopJe8=;
- b=umhRwboErMdtHS9x0zk5M4gDrZFZxhLGKvEABaAa4fyQr6w0IUrxa069QuGmgJXyR/
- 4D2qyGCeWf0W8A1l1Zcj/iaO07p2dnpf2LWDzHhXhEKkvfjfneQ9Sqd/tZYTEdLuUEHv
- DCrnKQH0tpwO6VRmhHVzFXCcebDT6aZMFDLQ3Ha/D+YLUM1BdKiy3WbxLxQ08qqXEGMs
- frGGJif3fo0aE/k9YC+iS869i2OyE3IcptGEyGEVUnk9u17DbjKe94IvbBE+dQs/Nu8F
- hwc2yqL3pSj0PILwD2ezHxhPN5FTxhXppFz6Njlm57rG9kNrTbXtWNlOeTvYQHGQ1TIR
- 2vxw==
+ :cc; bh=e8L3l8MYc3jZCPR6+Okj/XXq3KtErnI+ESS4l7lTs8A=;
+ b=DVGgl5qcuKTxBpnV/P3mS72eeJDDSXk4WkcHFFu4iP6ShGXzHGHO5bhJLlmMInbrhZ
+ xBILgI7V3xYV4AO0jknFWotYPZUkxShM9fLphFLxdyJ5txAd4qii3o+zIdplfj0ab/Cx
+ KlMz3Ibvj8MebIubx9xmrCXTeBQNIq8MIatO3f3Z3wBRdzgqGKUVMRzEtxYBQXIKZfxm
+ 9SYtv8IONg+oEVGGTM9cLPZ46Dgeb77UvlqG7ed2Tq26KigyxFlDHo4lg5N7FNkS0TTR
+ tODm1dgrIXXvjmgQKifCTI8sR6UQUGUzJlM2SHr8SFahhS8V5TkwVO5AUhC6JrY7NfXO
+ JKUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=fh0ZbYYidaK1w0KVDkBIcPA8wIL+RsxEomQqKOopJe8=;
- b=lSRvXpGJWw3AUj2RPITiPFl+9zJZiEybTJcUZr70iGcA+XGJeXzouuYEtfkiRjqBbo
- ac1rgn/D8LTwI3CT4ehBT3kEHlHojLbKJl59jNnV67BGHucQ1rjYCin0+90QnCbHgd2P
- 0OJd7wNRdz+RgeDIWovt0FReHhOG5jjXpT0Vw8tOoJ+loI9DrJrE7DMvSKWH1T6d3Sl/
- fS0k1Iz3a729CCELTnCHzei7WZSQszAEFP5pgcHl+pnm4wntu3kqYZL2bTrYfqasvtCt
- XHTlieE2cG8gMUN+I1Wmuci5jSB8JKSBMgy6xestub2VafV7m9rQt9xuIeyL7ASn6R/7
- xKIw==
-X-Gm-Message-State: APjAAAXZhXQLFsqCAFS3u98DH85tomJHgTbNUJVaMi8s0Z9q7VD/12Gu
- hbVVYOikWHMuJ8pqMWP2dm78VHOK21/yhz2286g=
-X-Google-Smtp-Source: APXvYqxc/0BXdX95Cy8PzEpVZ6rU4VV/XeM3PYFfowZZD3i83JGnEggWXQ/CIBI31Fmw2GcYyT+mD78r7SfkrPg5WS4=
-X-Received: by 2002:aca:5a04:: with SMTP id o4mr3800679oib.97.1568727813758;
- Tue, 17 Sep 2019 06:43:33 -0700 (PDT)
+ bh=e8L3l8MYc3jZCPR6+Okj/XXq3KtErnI+ESS4l7lTs8A=;
+ b=cpeXLFt7AysLiot2g/f4fQYfh5V/pQvesJ0ZgcXLU424QShTrCp6gey8JXE3A3l305
+ ApwDtzJ9TZZfSt0DM++PHLPQit5vOHlHBs7a2AzC3wn6uEMjJpCPjyvlmOGl5IQ0aM7a
+ C6vbDfct8v4bTIsi9DvD6RxczpxHcnOHchNAabzzTgA1Af20bem7cWkZ1D/EQm/BVWcO
+ ZRAebyYmUNDxFYEXbMoDB3Iukl/g+UzOQeFZtC/ff9pRVLgkSwHra8BWjP2UkqX5QRlw
+ o6NnpsfuLIbLjWKbel2SDPeBdyIg70EEk5D+PJKzHwH/jfxy4mE/R3HEN6J9Nn1yfUil
+ 9GNw==
+X-Gm-Message-State: APjAAAUyarZytXlLuj1io0sD/EtCQDd0h7cCUtsNYMhGBlxJ60rJaQPc
+ 4qbgIhn8Rw4Zgiw6Cg6NofsOM2w63tcDCyRxw9Q6wQ==
+X-Google-Smtp-Source: APXvYqypmtrTZnVgAvfBtCqilM+V2s7l4QFQjwTDBMrKsKHzD8h5o0PYLdfOuKDj1ijes84GV6Gl41v5E0B2GaHyPY4=
+X-Received: by 2002:a9d:5e11:: with SMTP id d17mr2837944oti.135.1568727938750; 
+ Tue, 17 Sep 2019 06:45:38 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190831153922.121308-1-liq3ea@163.com>
- <20190917114536.sh7xbekebne4pqox@sirius.home.kraxel.org>
-In-Reply-To: <20190917114536.sh7xbekebne4pqox@sirius.home.kraxel.org>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 17 Sep 2019 21:42:57 +0800
-Message-ID: <CAKXe6SJnHqwDA9qoGvz_9yF+HCTcctavdckLmWtuQYh_bd9-ow@mail.gmail.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
+References: <9cf47438fa943b28ee987cea7b76a459@fau.de>
+ <CAFEAcA-oP9QkYnQr1SQUvTks+9ySjDCn0G5yuULdOBepQi-PSw@mail.gmail.com>
+ <75c41dce4fe333c0304f5e80e3ea6f34@fau.de>
+In-Reply-To: <75c41dce4fe333c0304f5e80e3ea6f34@fau.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Sep 2019 14:45:27 +0100
+Message-ID: <CAFEAcA8q=QvwroUA3XQji5bqR5W4nXR=oUxbA16J0qP4Ch5sjA@mail.gmail.com>
+To: "Konopik, Andreas" <andreas.konopik@fau.de>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH] vnc: fix memory leak when vnc disconnect
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [Qemu-discuss] Segmentation fault on target tricore
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,44 +87,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ying Fang <fangying1@huawei.com>, Li Qiang <liq3ea@163.com>,
- Qemu Developers <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ qemu-discuss <qemu-discuss@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Gerd Hoffmann <kraxel@redhat.com> =E4=BA=8E2019=E5=B9=B49=E6=9C=8817=E6=97=
-=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=887:45=E5=86=99=E9=81=93=EF=BC=9A
-
-> On Sat, Aug 31, 2019 at 08:39:22AM -0700, Li Qiang wrote:
-> > Currently when qemu receives a vnc connect, it creates a 'VncState' to
-> > represent this connection. In 'vnc_worker_thread_loop' it creates a
-> > local 'VncState'. The connection 'VcnState' and local 'VncState' exchan=
-ge
-> > data in 'vnc_async_encoding_start' and 'vnc_async_encoding_end'.
-> > In 'zrle_compress_data' it calls 'deflateInit2' to allocate the libz
-> library
-> > opaque data. The 'VncState' used in 'zrle_compress_data' is the local
-> > 'VncState'. In 'vnc_zrle_clear' it calls 'deflateEnd' to free the libz
-> > library opaque data. The 'VncState' used in 'vnc_zrle_clear' is the
-> connection
-> > 'VncState'. In currently implementation there will be a memory leak whe=
-n
-> the
-> > vnc disconnect. Following is the asan output backtrack:
+On Tue, 17 Sep 2019 at 14:06, Konopik, Andreas <andreas.konopik@fau.de> wrote:
 >
-> Added to ui patch queue.
->
->
-Shouldn't we care the race condition between main thread and the vnc thread=
-?
+> >> Using gdb and valgrind I found out that:
+> >> - 'gen_mtcr()' and 'gen_mfcr()' access uninitialized values, i.e.
+> >> CSFRs,
+> >> which leads to the Segfault
+> >> - The uninitialised values were created by stack allocation of
+> >> DisasContext in 'gen_intermediate_code()'
+> >
+> > This definitely sounds like a bug: do you have a stack
+> > backtrace from valgrind or gdb of the bad access and the
+> > segfault?
+> >
+> > [...]
+> > Thread 3 "qemu-system-tri" received signal SIGSEGV, Segmentation fault.
+> > [Switching to Thread 0x7ffff10a4700 (LWP 146730)]
+> > 0x00005555556edb67 in gen_mfcr (ret=0xab0, offset=<optimized out>,
+> >    ctx=<optimized out>)
+> >    at /home/akonopik/qemu_src/target/tricore/cpu.h:274
+> > 274       return (env->features & (1ULL << feature)) != 0;
+> > (gdb) bt
+> > #0  0x00005555556edb67 in gen_mfcr
+> >    (ret=0xab0, offset=<optimized out>, ctx=<optimized out>)
+> >    at /home/akonopik/qemu_src/target/tricore/cpu.h:274
 
-Thanks,
-Li Qiang
+It looks like tricore_tr_init_disas_context() isn't
+initializing ctx->env. If this is the problem then this
+patch ought to fix it:
+
+diff --git a/target/tricore/translate.c b/target/tricore/translate.c
+index c574638c9f7..305d896cd2c 100644
+--- a/target/tricore/translate.c
++++ b/target/tricore/translate.c
+@@ -8793,6 +8793,7 @@ static void
+tricore_tr_init_disas_context(DisasContextBase *dcbase,
+     CPUTriCoreState *env = cs->env_ptr;
+     ctx->mem_idx = cpu_mmu_index(env, false);
+     ctx->hflags = (uint32_t)ctx->base.tb->flags;
++    ctx->env = env;
+ }
+
+ static void tricore_tr_tb_start(DisasContextBase *db, CPUState *cpu)
 
 
+Aside to Bastian: passing the CPU env pointer into the
+DisasContext isn't ideal, because it makes it quite easy
+for translate.c code to accidentally use fields of the
+env struct that aren't valid for use at translate time.
+I think the only uses of ctx->env you have are for checking
+feature bits -- I recommend following what target/arm does here:
+ * in tricore_tr_init_disas_context(), instead of copying the
+   env pointer, just copy env->features into ctx->features
+ * have a tricore_dc_feature(DisasContext *dc, int feature)
+   that checks for the feature bit in dc->features
 
-> thanks,
->   Gerd
->
->
+That way you only have access in translate.c code to
+information that's safe to bake into generated code, and
+it's harder to accidentally introduce bugs where generated
+code depends on CPU state that isn't kept in the TB flags.
+
+thanks
+-- PMM
+
