@@ -2,50 +2,48 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7785EC4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:27:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D6FAC4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:29:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C2F520665
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:27:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C2F520665
+	by mail.kernel.org (Postfix) with ESMTPS id 1ECDA20665
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 16:29:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ECDA20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAGKO-0005xs-1S
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 12:27:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42517)
+	id 1iAGLz-00085o-3g
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 12:29:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43498)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iAG80-0003ZZ-Sx
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:14:58 -0400
+ (envelope-from <eblake@redhat.com>) id 1iAGBn-000751-3I
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:18:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iAG7z-0000x5-RG
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:14:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58534)
+ (envelope-from <eblake@redhat.com>) id 1iAGBl-0002dw-Ki
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:18:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33594)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAG7z-0000vh-Io
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:14:55 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAGBl-0002de-CV
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 12:18:49 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E071B81DF1;
- Tue, 17 Sep 2019 16:14:54 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3DB2E10CC1EC;
+ Tue, 17 Sep 2019 16:18:48 +0000 (UTC)
 Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B60F860126;
- Tue, 17 Sep 2019 16:14:51 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>
-References: <20190910063724.28470-1-armbru@redhat.com>
- <20190910063724.28470-16-armbru@redhat.com>
- <1b10e16d-9377-38ae-08ce-3bc0f8fc39d2@redhat.com>
- <8736h08asx.fsf@dusky.pond.sub.org>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CC49C60606;
+ Tue, 17 Sep 2019 16:18:44 +0000 (UTC)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190913201349.24332-1-armbru@redhat.com>
+ <20190913201349.24332-8-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -72,22 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <a354d2d6-7633-f95c-eb86-45a60d28e43e@redhat.com>
-Date: Tue, 17 Sep 2019 11:14:50 -0500
+Message-ID: <e52242e8-8cb8-ee68-cf02-57eea53d571f@redhat.com>
+Date: Tue, 17 Sep 2019 11:18:44 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <8736h08asx.fsf@dusky.pond.sub.org>
+In-Reply-To: <20190913201349.24332-8-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="mryZz0rWAhSZ39AwagTHA8dyu3M1NDn9x"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Tue, 17 Sep 2019 16:14:54 +0000 (UTC)
+ boundary="pKYDztm6fAd2dRvt0MqYCnvEEhHMYSeIq"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Tue, 17 Sep 2019 16:18:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 15/16] docs/devel/qapi-code-gen: Improve
- QAPI schema language doc
+Subject: Re: [Qemu-devel] [PATCH v3 07/16] qapi: Drop support for escape
+ sequences other than \\
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,102 +97,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
- mdroth@linux.vnet.ibm.com
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mryZz0rWAhSZ39AwagTHA8dyu3M1NDn9x
-Content-Type: multipart/mixed; boundary="6JviPCnUfBR3spgo7gzADcxTDUD3vSzjn";
+--pKYDztm6fAd2dRvt0MqYCnvEEhHMYSeIq
+Content-Type: multipart/mixed; boundary="2atEdCWIxGvjigl6ZqtB9n2aOuQEv1mAl";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com,
- mdroth@linux.vnet.ibm.com
-Message-ID: <a354d2d6-7633-f95c-eb86-45a60d28e43e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 15/16] docs/devel/qapi-code-gen: Improve
- QAPI schema language doc
-References: <20190910063724.28470-1-armbru@redhat.com>
- <20190910063724.28470-16-armbru@redhat.com>
- <1b10e16d-9377-38ae-08ce-3bc0f8fc39d2@redhat.com>
- <8736h08asx.fsf@dusky.pond.sub.org>
-In-Reply-To: <8736h08asx.fsf@dusky.pond.sub.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+Message-ID: <e52242e8-8cb8-ee68-cf02-57eea53d571f@redhat.com>
+Subject: Re: [PATCH v3 07/16] qapi: Drop support for escape sequences other
+ than \\
+References: <20190913201349.24332-1-armbru@redhat.com>
+ <20190913201349.24332-8-armbru@redhat.com>
+In-Reply-To: <20190913201349.24332-8-armbru@redhat.com>
 
---6JviPCnUfBR3spgo7gzADcxTDUD3vSzjn
+--2atEdCWIxGvjigl6ZqtB9n2aOuQEv1mAl
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 9/13/19 10:39 AM, Markus Armbruster wrote:
+On 9/13/19 3:13 PM, Markus Armbruster wrote:
+> Since the previous commit restricted strings to printable ASCII,
+> \uXXXX's only use is obfuscation.  Drop it.
+>=20
+> This leaves \\, \/, \', and \".  Since QAPI schema strings are all
+> names, and names are restricted to ASCII letters, digits, hyphen, and
+> underscore, none of them is useful.
+>=20
+> The latter three have no test coverage.  Drop them.
+>=20
+> Keep \\ to avoid (more) gratuitous incompatibility with JSON.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
 
->>> +  expression A; expression A, ... likewise, but separated by ,
->>
->> worth calling out that trailing , are not allowed?
->=20
-> Doesn't "separated by" imply that?
->=20
->> Is the 'expression A;' a copy-paste from RFC text, irrelevant to our
->> usage here?
->=20
-> What about
->=20
->     * Repetition: Expression A... matches zero or more occurences of
->       expression A
->     * Repetition: Expression A, ... matches zero or more occurences of
->       expression A separated by ,
+> +++ b/scripts/qapi/common.py
+> @@ -524,29 +524,9 @@ class QAPISchemaParser(object):
+>                      if ch =3D=3D '\n':
+>                          raise QAPIParseError(self, 'Missing terminatin=
+g "\'"')
+>                      if esc:
 
-With the spelling of 'occurrences' fixed, that works.
+> -                        elif ch not in '\\/\'"':
+> +                        # Note: we recognize only \\ because we have
+> +                        # no use for funny characters in strings
+> +                        if ch !=3D '\\':
+>                              raise QAPIParseError(self,
+>                                                   "Unknown escape \\%s"=
+ % ch)
 
-
->>> +The top-level expressions are all JSON objects.  Their order does no=
-t
->>> +matter.
->>
->> Is that always true for all directives?
->=20
-> Yes from a purely semantic point of view.
->=20
-> No when you look at the generated text: that's in source order.  Should=
-
-> not matter for C.  Does matter for documentation.
->=20
-> See also discussion of previous patch.
->=20
->> Would it be worth reformulating as something like:
->>
->> SCHEMA =3D DIRECTIVE... DEFINITION...
->>
->> allowing zero-or-more of either, but where directives come first?
->=20
-> Language change.  Not sure anything outside tests would break.  But why=
-
-> bother?
-
-Fair enough.
-
-
->>> +Each BRANCH of the 'data' object defines a branch of the union.  A
->>> +union must have at least one branch.
->>
->> Is it worth trying to represent one-or-more in the grammar, in a
->> different manner than zero-or-more?
->=20
-> If we needed it multiple times, then something like
->=20
->     * Repetition: Expression A * matches zero or more occurences of
->       expression A
->     * Repetition: Expression A, * matches zero or more occurences of
->       expression A separated by ,
->     * Repetition: Expression A + matches one or more occurences of
->       expression A
->     * Repetition: Expression A, + matches one or more occurences of
->       expression A separated by ,
->=20
-> could be helpful.  But I can't see the need right now.
-
-Again with the typo. But I also agree that it's not needed right now.
+Thanks; that comment makes it better than it was in v2.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -202,24 +160,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---6JviPCnUfBR3spgo7gzADcxTDUD3vSzjn--
+--2atEdCWIxGvjigl6ZqtB9n2aOuQEv1mAl--
 
---mryZz0rWAhSZ39AwagTHA8dyu3M1NDn9x
+--pKYDztm6fAd2dRvt0MqYCnvEEhHMYSeIq
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2BBnoACgkQp6FrSiUn
-Q2rz1wgAnk5zhfPtqGH9eGoihO/hUJSOnYMziaVIwYkApO+GUukvfVfQeOOQuAjn
-ZkHo1WPaAfmoedkQ2rqfBG/F4jEjqDPVu5pE/soyZbHaLplolmWGMfS3SVfGzDp1
-km8Zw7jh7MADlsNF+K9KCz1jrsJzbhtbeos+ebD0emJhs/dWOAjIIb9gNb6xE4j7
-V/qCWEBhx1GpczeNm4hhaSNNilKKvbuQmI0GxA9Rni84bzjS0bLoDvAAomSyNrJX
-iIl5kTiujKlTC+lEBY5vHwFZMnmXycqGAJ5k3PwSILakJ2q7wZzaevMXCDZLuJ4o
-082nK9oiClsZAwxDuYImk4gndO3oHA==
-=NWEv
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2BB2QACgkQp6FrSiUn
+Q2r+Fgf/WEf9r6+1GH3CzOCvH5UItHqVTDfa2qTmCyiwYxPmuXIyslCvnVEurMLI
+MGayrsGWnzmek5eF+nDx+0F0KfzgXkaAc526zlST6UAkIMLqhBFVa8IkF/yvXI2I
+f1HWJ46x0wxkrj7YXQe5uyFgbaEqnXRRmnepDszBfBrue5UX+Pm9hJpFfZBwGPFa
+1ozBqv4WGc3SmWDYWKaOCVxn4B1NAoThsc7knbTo/zkgiCQv4i89ZqHq4GI4n6SC
+wlnCbn74gsHBgkxVtfivHpt5C+4lwBAYp4pqKpGhJe75qLvlfVmikEJNswm/1OSA
++qACu+mqzALLPz4WRMRutUYOap4/qw==
+=9nhk
 -----END PGP SIGNATURE-----
 
---mryZz0rWAhSZ39AwagTHA8dyu3M1NDn9x--
+--pKYDztm6fAd2dRvt0MqYCnvEEhHMYSeIq--
 
