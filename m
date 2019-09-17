@@ -2,60 +2,58 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C59C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 15:52:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA1A3C4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 15:54:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 088132171F
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 15:52:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 088132171F
+	by mail.kernel.org (Postfix) with ESMTPS id C332D214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 15:54:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C332D214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAFmK-0001GR-OL
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 11:52:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37687)
+	id 1iAFnk-0002qY-P9
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 11:54:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37664)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pkrempa@redhat.com>) id 1iAFjm-0008Jf-3d
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:49:55 -0400
+ (envelope-from <pkrempa@redhat.com>) id 1iAFjf-0008IU-3T
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:49:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pkrempa@redhat.com>) id 1iAFjj-00077f-MT
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:49:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42302)
+ (envelope-from <pkrempa@redhat.com>) id 1iAFjd-00075v-VB
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:49:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38514)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1iAFjj-00076c-HH
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:49:51 -0400
+ (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1iAFjd-00075f-LQ
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 11:49:45 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0A1CD3D955;
- Tue, 17 Sep 2019 15:49:48 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0054118C891D;
+ Tue, 17 Sep 2019 15:49:45 +0000 (UTC)
 Received: from angien.brq.redhat.com (unknown [10.43.2.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D9D0760BF7;
- Tue, 17 Sep 2019 15:49:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D346760BEC;
+ Tue, 17 Sep 2019 15:49:43 +0000 (UTC)
 From: Peter Krempa <pkrempa@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 17 Sep 2019 17:49:43 +0200
-Message-Id: <249a9ca557108397b313625593bc83f161f32a16.1568735079.git.pkrempa@redhat.com>
-In-Reply-To: <cover.1568735079.git.pkrempa@redhat.com>
-References: <cover.1568735079.git.pkrempa@redhat.com>
+Date: Tue, 17 Sep 2019 17:49:41 +0200
+Message-Id: <cover.1568735079.git.pkrempa@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Tue, 17 Sep 2019 15:49:48 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Tue, 17 Sep 2019 15:49:45 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 2/2] qapi: Allow introspecting fix for savevm's
- cooperation with blockdev
+Subject: [Qemu-devel] [PATCH 0/2] qapi: Add detection for the 'savevm' fix
+ for blockdev
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,48 +71,25 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-savevm was buggy as it considered all monitor owned block device nodes
-for snapshot. With introduction of -blockdev the common usage made all
-nodes including protocol nodes monitor owned and thus considered for
-snapshot. This was fixed but clients need to be able to detect whether
-this fix is present.
+Add 'features' field in the schema for commands and add a feature flag
+to advertise that the fix for savevm [1] is present.
 
-Since savevm does not have an QMP alternative add the feature for the
-'human-monitor-command' backdoor which is used to call this command in
-modern use.
+[1] https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg03487.html
 
-Signed-off-by: Peter Krempa <pkrempa@redhat.com>
----
- qapi/misc.json | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+Peter Krempa (2):
+  qapi: Add feature flags to commands in qapi introspection
+  qapi: Allow introspecting fix for savevm's cooperation with blockdev
 
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 6bd11f50e6..e2b33c3f8a 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -1020,6 +1020,11 @@
- #
- # @cpu-index: The CPU to use for commands that require an implicit CPU
- #
-+# Features:
-+# @savevm-blockdev-monitor-nodes: If present, the savevm monitor command
-+#                                 correctly handles monitor owned block =
-nodes
-+#                                 when taking a snapshot.
-+#
- # Returns: the output of the command as a string
- #
- # Since: 0.14.0
-@@ -1047,7 +1052,8 @@
- ##
- { 'command': 'human-monitor-command',
-   'data': {'command-line': 'str', '*cpu-index': 'int'},
--  'returns': 'str' }
-+  'returns': 'str',
-+  'features' : [ { 'name': 'savevm-blockdev-monitor-nodes' } ] }
+ docs/devel/qapi-code-gen.txt   |  4 ++--
+ qapi/introspect.json           |  6 ++++-
+ qapi/misc.json                 |  8 ++++++-
+ scripts/qapi/commands.py       |  3 ++-
+ scripts/qapi/common.py         | 40 +++++++++++++++++++++++++++++-----
+ scripts/qapi/doc.py            |  3 ++-
+ scripts/qapi/introspect.py     |  7 +++++-
+ tests/qapi-schema/test-qapi.py |  7 +++++-
+ 8 files changed, 65 insertions(+), 13 deletions(-)
 
- ##
- # @change:
 --=20
 2.21.0
 
