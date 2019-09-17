@@ -2,56 +2,64 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7859CC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:37:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 574E2C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:38:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 474372067B
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:37:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 474372067B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sipsolutions.net
+	by mail.kernel.org (Postfix) with ESMTPS id 2C24F2067B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 12:38:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C24F2067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iACje-0005bY-TD
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 08:37:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35507)
+	id 1iACkx-0006jo-MO
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 08:38:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36698)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <johannes@sipsolutions.net>) id 1iACYz-0006u2-Au
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:26:35 -0400
+ (envelope-from <berrange@redhat.com>) id 1iACgL-0003qf-Fz
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:34:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <johannes@sipsolutions.net>) id 1iACYx-0006ik-8e
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:26:32 -0400
-Received: from s3.sipsolutions.net ([2a01:4f8:191:4433::2]:59358
- helo=sipsolutions.net)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <johannes@sipsolutions.net>)
- id 1iACYx-0006h0-20
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:26:31 -0400
-Received: by sipsolutions.net with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <johannes@sipsolutions.net>)
- id 1iACYv-0003t8-VD; Tue, 17 Sep 2019 14:26:30 +0200
-From: Johannes Berg <johannes@sipsolutions.net>
-To: qemu-devel@nongnu.org
-Date: Tue, 17 Sep 2019 14:26:25 +0200
-Message-Id: <20190917122625.15614-2-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190917122625.15614-1-johannes@sipsolutions.net>
-References: <20190917122625.15614-1-johannes@sipsolutions.net>
+ (envelope-from <berrange@redhat.com>) id 1iACgK-0002g3-3h
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:34:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53450)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iACgJ-0002fl-UT
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 08:34:08 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4C5F181F19
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 12:34:07 +0000 (UTC)
+Received: from redhat.com (ovpn-112-41.ams2.redhat.com [10.36.112.41])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B66351001947;
+ Tue, 17 Sep 2019 12:34:00 +0000 (UTC)
+Date: Tue, 17 Sep 2019 13:33:57 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <20190917123357.GN1069@redhat.com>
+References: <20190912122514.22504-1-marcandre.lureau@redhat.com>
+ <20190912122514.22504-3-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a01:4f8:191:4433::2
-Subject: [Qemu-devel] [PATCH 2/2] libvhost-user: implement in-band
- notifications
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190912122514.22504-3-marcandre.lureau@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Tue, 17 Sep 2019 12:34:07 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 2/6] vmstate: add qom interface to get id
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,249 +71,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Johannes Berg <johannes.berg@intel.com>,
- "Michael S . Tsirkin" <mst@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: mprivozn@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Johannes Berg <johannes.berg@intel.com>
+On Thu, Sep 12, 2019 at 04:25:10PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> Add an interface to get the instance id, instead of depending on
+> Device and qdev_get_dev_path().
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  hw/core/Makefile.objs        |  1 +
+>  hw/core/qdev.c               | 14 ++++++++++++++
+>  hw/core/vmstate-if.c         | 23 +++++++++++++++++++++++
+>  include/hw/vmstate-if.h      | 32 ++++++++++++++++++++++++++++++++
 
-Add support for VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS, but
-as it's not desired by default, don't enable it unless the device
-implementation opts in by returning it from its protocol features
-callback.
+These two new files will want adding to some section of MAINTAINERS, sinc=
+e
+there's no wildcard rule matching for these dirs currently.
 
-Note that I updated vu_set_vring_err_exec(), but didn't add any
-sending of the VHOST_USER_SLAVE_VRING_ERR message as there's no
-write to the err_fd today either.
+>  include/migration/register.h |  2 ++
+>  include/migration/vmstate.h  |  2 ++
+>  tests/Makefile.include       |  1 +
+>  7 files changed, 75 insertions(+)
+>  create mode 100644 hw/core/vmstate-if.c
+>  create mode 100644 include/hw/vmstate-if.h
 
-This also adds vu_queue_notify_sync() which can be used to force
-a synchronous notification if inband notifications are supported.
-Previously, I had left out the slave->master direction handling
-of F_REPLY_ACK, this now adds some code to support it as well.
+> diff --git a/include/hw/vmstate-if.h b/include/hw/vmstate-if.h
+> new file mode 100644
+> index 0000000000..92682f5bc2
+> --- /dev/null
+> +++ b/include/hw/vmstate-if.h
+> @@ -0,0 +1,32 @@
 
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
----
- contrib/libvhost-user/libvhost-user.c | 103 +++++++++++++++++++++++++-
- contrib/libvhost-user/libvhost-user.h |  14 ++++
- 2 files changed, 114 insertions(+), 3 deletions(-)
+License header
 
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-index 17b7833d1f6b..1e1525c1c7de 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -136,6 +136,7 @@ vu_request_to_string(unsigned int req)
-         REQ(VHOST_USER_GET_INFLIGHT_FD),
-         REQ(VHOST_USER_SET_INFLIGHT_FD),
-         REQ(VHOST_USER_GPU_SET_SOCKET),
-+        REQ(VHOST_USER_VRING_KICK),
-         REQ(VHOST_USER_MAX),
-     };
- #undef REQ
-@@ -163,7 +164,10 @@ vu_panic(VuDev *dev, const char *msg, ...)
-     dev->panic(dev, buf);
-     free(buf);
- 
--    /* FIXME: find a way to call virtio_error? */
-+    /*
-+     * FIXME:
-+     * find a way to call virtio_error, or perhaps close the connection?
-+     */
- }
- 
- /* Translate guest physical address to our virtual address.  */
-@@ -1172,6 +1176,14 @@ vu_set_vring_err_exec(VuDev *dev, VhostUserMsg *vmsg)
- static bool
- vu_get_protocol_features_exec(VuDev *dev, VhostUserMsg *vmsg)
- {
-+    /*
-+     * Note that we support, but intentionally do not set,
-+     * VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS. This means that
-+     * a device implementation can return it in its callback
-+     * (get_protocol_features) if it wants to use this for
-+     * simulation, but it is otherwise not desirable (if even
-+     * implemented by the master.)
-+     */
-     uint64_t features = 1ULL << VHOST_USER_PROTOCOL_F_MQ |
-                         1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD |
-                         1ULL << VHOST_USER_PROTOCOL_F_SLAVE_REQ |
-@@ -1204,6 +1216,25 @@ vu_set_protocol_features_exec(VuDev *dev, VhostUserMsg *vmsg)
- 
-     dev->protocol_features = vmsg->payload.u64;
- 
-+    if (vu_has_protocol_feature(dev,
-+                                VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS) &&
-+        (!vu_has_protocol_feature(dev, VHOST_USER_PROTOCOL_F_SLAVE_REQ) ||
-+         !vu_has_protocol_feature(dev, VHOST_USER_PROTOCOL_F_REPLY_ACK))) {
-+        /*
-+         * The use case for using messages for kick/call is simulation, to make
-+         * the kick and call synchronous. To actually get that behaviour, both
-+         * of the other features are required.
-+         * Theoretically, one could use only kick messages, or do them without
-+         * having F_REPLY_ACK, but too many (possibly pending) messages on the
-+         * socket will eventually cause the master to hang, to avoid this in
-+         * scenarios where not desired enforce that the settings are in a way
-+         * that actually enables the simulation case.
-+         */
-+        vu_panic(dev,
-+                 "F_IN_BAND_NOTIFICATIONS requires F_SLAVE_REQ && F_REPLY_ACK");
-+        return false;
-+    }
-+
-     if (dev->iface->set_protocol_features) {
-         dev->iface->set_protocol_features(dev, features);
-     }
-@@ -1464,6 +1495,34 @@ vu_set_inflight_fd(VuDev *dev, VhostUserMsg *vmsg)
-     return false;
- }
- 
-+static bool
-+vu_handle_vring_kick(VuDev *dev, VhostUserMsg *vmsg)
-+{
-+    unsigned int index = vmsg->payload.state.index;
-+
-+    if (index >= dev->max_queues) {
-+        vu_panic(dev, "Invalid queue index: %u", index);
-+        return false;
-+    }
-+
-+    DPRINT("Got kick message: handler:%p idx:%d\n",
-+           dev->vq[index].handler, index);
-+
-+    if (!dev->vq[index].started) {
-+        dev->vq[index].started = true;
-+
-+        if (dev->iface->queue_set_started) {
-+            dev->iface->queue_set_started(dev, index, true);
-+        }
-+    }
-+
-+    if (dev->vq[index].handler) {
-+        dev->vq[index].handler(dev, index);
-+    }
-+
-+    return false;
-+}
-+
- static bool
- vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
- {
-@@ -1546,6 +1605,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
-         return vu_get_inflight_fd(dev, vmsg);
-     case VHOST_USER_SET_INFLIGHT_FD:
-         return vu_set_inflight_fd(dev, vmsg);
-+    case VHOST_USER_VRING_KICK:
-+        return vu_handle_vring_kick(dev, vmsg);
-     default:
-         vmsg_close_fds(vmsg);
-         vu_panic(dev, "Unhandled request: %d", vmsg->request);
-@@ -2005,8 +2066,7 @@ vring_notify(VuDev *dev, VuVirtq *vq)
-     return !v || vring_need_event(vring_get_used_event(vq), new, old);
- }
- 
--void
--vu_queue_notify(VuDev *dev, VuVirtq *vq)
-+static void _vu_queue_notify(VuDev *dev, VuVirtq *vq, bool sync)
- {
-     if (unlikely(dev->broken) ||
-         unlikely(!vq->vring.avail)) {
-@@ -2018,11 +2078,48 @@ vu_queue_notify(VuDev *dev, VuVirtq *vq)
-         return;
-     }
- 
-+    if (vq->call_fd < 0 &&
-+        vu_has_protocol_feature(dev,
-+                                VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS) &&
-+        vu_has_protocol_feature(dev, VHOST_USER_PROTOCOL_F_SLAVE_REQ)) {
-+        VhostUserMsg vmsg = {
-+            .request = VHOST_USER_SLAVE_VRING_CALL,
-+            .flags = VHOST_USER_VERSION,
-+            .size = sizeof(vmsg.payload.state),
-+            .payload.state = {
-+                .index = vq - dev->vq,
-+            },
-+        };
-+        bool ack = sync &&
-+                   vu_has_protocol_feature(dev,
-+                                           VHOST_USER_PROTOCOL_F_REPLY_ACK);
-+
-+        if (ack) {
-+            vmsg.flags |= VHOST_USER_NEED_REPLY_MASK;
-+        }
-+
-+        vu_message_write(dev, dev->slave_fd, &vmsg);
-+        if (ack) {
-+            vu_message_read(dev, dev->slave_fd, &vmsg);
-+        }
-+        return;
-+    }
-+
-     if (eventfd_write(vq->call_fd, 1) < 0) {
-         vu_panic(dev, "Error writing eventfd: %s", strerror(errno));
-     }
- }
- 
-+void vu_queue_notify(VuDev *dev, VuVirtq *vq)
-+{
-+    _vu_queue_notify(dev, vq, false);
-+}
-+
-+void vu_queue_notify_sync(VuDev *dev, VuVirtq *vq)
-+{
-+    _vu_queue_notify(dev, vq, true);
-+}
-+
- static inline void
- vring_used_flags_set_bit(VuVirtq *vq, int mask)
- {
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
-index 46b600799b2e..8e780444429f 100644
---- a/contrib/libvhost-user/libvhost-user.h
-+++ b/contrib/libvhost-user/libvhost-user.h
-@@ -53,6 +53,7 @@ enum VhostUserProtocolFeature {
-     VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD = 10,
-     VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 11,
-     VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD = 12,
-+    VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS = 13,
- 
-     VHOST_USER_PROTOCOL_F_MAX
- };
-@@ -94,6 +95,7 @@ typedef enum VhostUserRequest {
-     VHOST_USER_GET_INFLIGHT_FD = 31,
-     VHOST_USER_SET_INFLIGHT_FD = 32,
-     VHOST_USER_GPU_SET_SOCKET = 33,
-+    VHOST_USER_VRING_KICK = 34,
-     VHOST_USER_MAX
- } VhostUserRequest;
- 
-@@ -102,6 +104,8 @@ typedef enum VhostUserSlaveRequest {
-     VHOST_USER_SLAVE_IOTLB_MSG = 1,
-     VHOST_USER_SLAVE_CONFIG_CHANGE_MSG = 2,
-     VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG = 3,
-+    VHOST_USER_SLAVE_VRING_CALL = 4,
-+    VHOST_USER_SLAVE_VRING_ERR = 5,
-     VHOST_USER_SLAVE_MAX
- }  VhostUserSlaveRequest;
- 
-@@ -522,6 +526,16 @@ bool vu_queue_empty(VuDev *dev, VuVirtq *vq);
-  */
- void vu_queue_notify(VuDev *dev, VuVirtq *vq);
- 
-+/**
-+ * vu_queue_notify_sync:
-+ * @dev: a VuDev context
-+ * @vq: a VuVirtq queue
-+ *
-+ * Request to notify the queue via callfd (skipped if unnecessary)
-+ * or sync message if possible.
-+ */
-+void vu_queue_notify_sync(VuDev *dev, VuVirtq *vq);
-+
- /**
-  * vu_queue_pop:
-  * @dev: a VuDev context
--- 
-2.20.1
+> +#ifndef VMSTATE_IF_H
+> +#define VMSTATE_IF_H
+> +
+> +#include "qom/object.h"
+> +
+> +#define TYPE_VMSTATE_IF "vmstate-if"
+> +
+> +#define VMSTATE_IF_CLASS(klass)                                     \
+> +    OBJECT_CLASS_CHECK(VMStateIfClass, (klass), TYPE_VMSTATE_IF)
+> +#define VMSTATE_IF_GET_CLASS(obj)                           \
+> +    OBJECT_GET_CLASS(VMStateIfClass, (obj), TYPE_VMSTATE_IF)
+> +#define VMSTATE_IF(obj)                             \
+> +    INTERFACE_CHECK(VMStateIf, (obj), TYPE_VMSTATE_IF)
+> +
+> +typedef struct VMStateIf VMStateIf;
+> +
+> +typedef struct VMStateIfClass {
+> +    InterfaceClass parent_class;
+> +
+> +    char * (*get_id)(VMStateIf *obj);
+> +} VMStateIfClass;
+> +
+> +static inline char *vmstate_if_get_id(VMStateIf *vmif)
+> +{
+> +    if (!vmif) {
+> +        return NULL;
+> +    }
+> +
+> +    return VMSTATE_IF_GET_CLASS(vmif)->get_id(vmif);
+> +}
 
+With license header fixes
+
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
