@@ -2,96 +2,82 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA59EC4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:40:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC42C4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:42:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84D7A21852
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:40:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84D7A21852
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7627D21852
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:42:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s2oXNcRX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7627D21852
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAAuN-0006rr-TD
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 06:40:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44059)
+	id 1iAAwe-0000HB-Pl
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 06:42:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46871)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iAAcy-00085H-3f
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:22:34 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iAAou-0001pK-UT
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iAAcx-0004Ny-00
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:22:31 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:17940
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iAAcw-0004NM-QR
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:22:30 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8HAHlL0103506
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 06:22:30 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2v2tk275js-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 06:22:30 -0400
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Tue, 17 Sep 2019 11:22:27 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 17 Sep 2019 11:22:21 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id x8HAMJ9e46662000
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 17 Sep 2019 10:22:19 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id ACB81A4040;
- Tue, 17 Sep 2019 10:22:19 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id ABAAEA4053;
- Tue, 17 Sep 2019 10:22:18 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.22.84])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 17 Sep 2019 10:22:18 +0000 (GMT)
-From: Greg Kurz <groug@kaod.org>
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iAAot-00050A-2n
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:52 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33961)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iAAor-0004yp-8l
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:34:51 -0400
+Received: by mail-wm1-x342.google.com with SMTP id y135so2106976wmc.1
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 03:34:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=3dvmDFlr0gurTBYD4r1hBqQhpgoTuiAsAyqm2OCYvPs=;
+ b=s2oXNcRXs4zRm+Cg64jZiziq8miIDbQjK8Zgk1ibcADRGU/q5QBeApUuIQQSSqPUvD
+ Fk0pr79y+dLrFkh+oiu+WpyCJeoenRSOmeSLqpxi8L4d0kc4rjUL5QbwmVSi+//QHB8G
+ +y9+FWryVaZmB7RygOGJKhLfFNxYNxVpNN8vr0lXCSxDS0VgUCn/waQL19EjM1dJuFN8
+ zZbFZYrf/trpVGEG2oGE8zKhlIRIM/zqCgdrt7byl8S6ktsirOtaM7Re+ET0keYY5qvN
+ dOselpv0W/kTkqQoM1HaMWHm8QPWcxgD5mJwvT72vgBtFcFzR279D7ZatLPFCqnyyosR
+ /Ivw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=3dvmDFlr0gurTBYD4r1hBqQhpgoTuiAsAyqm2OCYvPs=;
+ b=NRoj7us2G3azrYTKO/CBWnvJW5QhCF/7d2ltwnh/zJ6h6Y1A3YbnfIdXcuu2c8T1X/
+ DoDquP3CUICrtqFRz9YXY7U1ofbtS5upZ/oM0tsrqcQzT9AIkd0TD1kJlWfoB3Ze7hIl
+ kjkz2pGg27rR4zVSJvwLZD8BZY6UKsaShBgjxynfVjv8peCaMOjfTXqdDOnHHA1Ubu1O
+ kizdl9XvasNdSrbLPoCX3ZZkP3wOfk+FZmI9+vjhBowXGkrTjieRijh/QSjLb/2p9ofR
+ aDN7x5cVoqmvYDa8xgB5bGCaRnkOOQ5qXJuPS7h5pl/tGlZyCOIekmu2NH7OchHhSITh
+ ZfBg==
+X-Gm-Message-State: APjAAAXHa8wGHvNDo9xQg0zDWMoemTw/mTqxX+fJXyjopP2saZO8wE7q
+ H2SeyNS9Q6+hTx7/tVPyE5WMhFNT
+X-Google-Smtp-Source: APXvYqyz/BWNyZgODxIXEpd034pMPbRh0Ny6gy5XkYYEY9juXVxtVwJtkPAxFDOXqINEP5C71nNHWQ==
+X-Received: by 2002:a1c:4102:: with SMTP id o2mr2844823wma.66.1568716487563;
+ Tue, 17 Sep 2019 03:34:47 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id q3sm1985415wrm.86.2019.09.17.03.34.46
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 17 Sep 2019 03:34:46 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 17 Sep 2019 12:22:18 +0200
-In-Reply-To: <156871562997.196432.17776290406203122029.stgit@bahia.lan>
-References: <156871562997.196432.17776290406203122029.stgit@bahia.lan>
-User-Agent: StGit/unknown-version
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19091710-0028-0000-0000-0000039E0F00
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19091710-0029-0000-0000-0000246087A9
-Message-Id: <156871573833.196432.7906362695920387537.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-09-17_05:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=445 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909170106
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: [Qemu-devel] [PATCH 17/17] checkpatch: Warn when errp is passed to
- error_append_hint()
+Date: Tue, 17 Sep 2019 12:34:38 +0200
+Message-Id: <1568716480-9973-6-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1568716480-9973-1-git-send-email-pbonzini@redhat.com>
+References: <1568716480-9973-1-git-send-email-pbonzini@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PATCH 5/7] vmxcap: correct the name of the variables
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,66 +89,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <codyprime@gmail.com>,
- "Daniel P. =?utf-8?q?Berrang=C3=A9=22?= <berrange@redhat.com>,
- qemu-block@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- qemu-s390x@nongnu.org"@d06av23.portsmouth.uk.ibm.com,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>,
- Juan Quintela <quintela@redhat.com>, David Hildenbrand <david@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?utf-8?q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, Eric Farman <farman@linux.ibm.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Yuval Shaia <yuval.shaia@oracle.com>,
- Alex Williamson <alex.williamson@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: liran.alon@oracle.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Passing errp from the argument list to error_append_hint()
-isn't recommended because it may cause unwanted behaviours
-when errp is equal to &error_fatal or &error_abort.
+The low bits are 1 if the control must be one, the high bits
+are 1 if the control can be one.  Correct the variable names
+as they are very confusing.
 
-First, error_append_hint() aborts QEMU when passed either of
-those.
-
-Second, consider the following:
-
-    void foo(Error **errp)
-    {
-         error_setg(errp, "foo");
-         error_append_hint(errp, "Try bar\n");
-    }
-
-error_setg() causes QEMU to exit or abort, and hints aren't
-added.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/checkpatch.pl |    4 ++++
- 1 file changed, 4 insertions(+)
+ scripts/kvm/vmxcap | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index aa9a354a0e7e..17ce026282a6 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -2902,6 +2902,10 @@ sub process {
- 		}
- 	}
- 
-+		if ($line =~ /error_append_hint\(errp/) {
-+		    WARN("suspicious errp passed to error_append_hint()\n" .
-+			 $herecurr);
-+		}
- # check for non-portable libc calls that have portable alternatives in QEMU
- 		if ($line =~ /\bffs\(/) {
- 			ERROR("use ctz32() instead of ffs()\n" . $herecurr);
+diff --git a/scripts/kvm/vmxcap b/scripts/kvm/vmxcap
+index d8c7d6d..5dfeb2e 100755
+--- a/scripts/kvm/vmxcap
++++ b/scripts/kvm/vmxcap
+@@ -51,15 +51,15 @@ class Control(object):
+         return (val & 0xffffffff, val >> 32)
+     def show(self):
+         print(self.name)
+-        mbz, mb1 = self.read2(self.cap_msr)
+-        tmbz, tmb1 = 0, 0
++        mb1, cb1 = self.read2(self.cap_msr)
++        tmb1, tcb1 = 0, 0
+         if self.true_cap_msr:
+-            tmbz, tmb1 = self.read2(self.true_cap_msr)
++            tmb1, tcb1 = self.read2(self.true_cap_msr)
+         for bit in sorted(self.bits.keys()):
+-            zero = not (mbz & (1 << bit))
+-            one = mb1 & (1 << bit)
+-            true_zero = not (tmbz & (1 << bit))
+-            true_one = tmb1 & (1 << bit)
++            zero = not (mb1 & (1 << bit))
++            one = cb1 & (1 << bit)
++            true_zero = not (tmb1 & (1 << bit))
++            true_one = tcb1 & (1 << bit)
+             s= '?'
+             if (self.true_cap_msr and true_zero and true_one
+                 and one and not zero):
+-- 
+1.8.3.1
+
 
 
