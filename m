@@ -2,60 +2,90 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DD16C4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:53:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27D70C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:53:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B6B62171F
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:53:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B6B62171F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id EE47E21852
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:53:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE47E21852
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iADup-0004Kt-L0
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 09:53:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47369)
+	id 1iADv6-0004em-Ud
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 09:53:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48012)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1iADqX-0001HO-CU
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:48:46 -0400
+ (envelope-from <eblake@redhat.com>) id 1iADtm-0003SB-TM
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:52:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1iADqV-0002dM-Je
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:48:44 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:42058)
+ (envelope-from <eblake@redhat.com>) id 1iADtl-0004R4-PJ
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:52:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52068)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1iADqV-0002Ye-73
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:48:43 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 1DBFA7456E3;
- Tue, 17 Sep 2019 15:48:34 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 012397456D5; Tue, 17 Sep 2019 15:48:33 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id EA28E7456CC;
- Tue, 17 Sep 2019 15:48:33 +0200 (CEST)
-Date: Tue, 17 Sep 2019 15:48:33 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Gerd Hoffmann <kraxel@redhat.com>
-In-Reply-To: <20190917111441.27405-3-kraxel@redhat.com>
-Message-ID: <alpine.BSF.2.21.9999.1909171547160.64192@zero.eik.bme.hu>
-References: <20190917111441.27405-1-kraxel@redhat.com>
- <20190917111441.27405-3-kraxel@redhat.com>
-User-Agent: Alpine 2.21.9999 (BSF 287 2018-06-16)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iADti-0004Ph-Va; Tue, 17 Sep 2019 09:52:03 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DFC85315C00D;
+ Tue, 17 Sep 2019 13:52:01 +0000 (UTC)
+Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 53FB8196AE;
+ Tue, 17 Sep 2019 13:52:01 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20190917110443.2029-1-kwolf@redhat.com>
+ <20190917110443.2029-2-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <39e27987-e29b-570d-b7c5-970aed3028cf@redhat.com>
+Date: Tue, 17 Sep 2019 08:52:00 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:738:2001:2001::2001
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] ati: use vga_read_byte in
- ati_cursor_define
+In-Reply-To: <20190917110443.2029-2-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="uk3Knuw1z4rffy5A1QHXEyhBovfV1PlC5"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Tue, 17 Sep 2019 13:52:02 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/2] block/snapshot: Restrict set of
+ snapshot nodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,92 +97,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, flier_m@outlook.com,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 17 Sep 2019, Gerd Hoffmann wrote:
-> This makes sure reads are confined to vga video memory.
->
-> v3: use uint32_t, fix cut+paste bug.
-> v2: fix ati_cursor_draw_line too.
->
-> Reported-by: xu hang <flier_m@outlook.com>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--uk3Knuw1z4rffy5A1QHXEyhBovfV1PlC5
+Content-Type: multipart/mixed; boundary="sAMzMWuP0NKr7ckeYgTTeWlVteASuC0Y8";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Message-ID: <39e27987-e29b-570d-b7c5-970aed3028cf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] block/snapshot: Restrict set of snapshot
+ nodes
+References: <20190917110443.2029-1-kwolf@redhat.com>
+ <20190917110443.2029-2-kwolf@redhat.com>
+In-Reply-To: <20190917110443.2029-2-kwolf@redhat.com>
 
-Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
+--sAMzMWuP0NKr7ckeYgTTeWlVteASuC0Y8
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Thank you,
-BALATON Zoltan
+On 9/17/19 6:04 AM, Kevin Wolf wrote:
+> Nodes involved in internal snapshots were those that were returned by
+> bdrv_next(), inserted and not read-only. bdrv_next() in turn returns al=
+l
+> nodes that are either the root node of a BlockBackend or monitor-owned
+> nodes.
+>=20
+> With the typical -drive use, this worked well enough. However, in the
+> typical -blockdev case, the user defines one node per option, making al=
+l
+> nodes monitor-owned nodes. This includes protocol nodes etc. which ofte=
+n
+> are not snapshottable, so "savevm" only returns an error.
+>=20
+> Change the conditions so that internal snapshot still include all nodes=
 
+> that have a BlockBackend attached (we definitely want to snapshot
+> anything attached to a guest device and probably also the built-in NBD
+> server; snapshotting block job BlockBackends is more of an accident, bu=
+t
+> a preexisting one), but other monitor-owned nodes are only included if
+> they have no parents.
+>=20
+> This makes internal snapshots usable again with typical -blockdev
+> configurations.
+>=20
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
-> hw/display/ati.c | 19 ++++++++++---------
-> 1 file changed, 10 insertions(+), 9 deletions(-)
->
-> diff --git a/hw/display/ati.c b/hw/display/ati.c
-> index 8f940eee221a..db3b2543163f 100644
-> --- a/hw/display/ati.c
-> +++ b/hw/display/ati.c
-> @@ -19,6 +19,7 @@
-> #include "qemu/osdep.h"
-> #include "ati_int.h"
-> #include "ati_regs.h"
-> +#include "vga-access.h"
-> #include "hw/qdev-properties.h"
-> #include "vga_regs.h"
-> #include "qemu/log.h"
-> @@ -135,19 +136,19 @@ static void ati_vga_switch_mode(ATIVGAState *s)
-> static void ati_cursor_define(ATIVGAState *s)
-> {
->     uint8_t data[1024];
-> -    uint8_t *src;
-> +    uint32_t srcoff;
->     int i, j, idx = 0;
->
->     if ((s->regs.cur_offset & BIT(31)) || s->cursor_guest_mode) {
->         return; /* Do not update cursor if locked or rendered by guest */
->     }
->     /* FIXME handle cur_hv_offs correctly */
-> -    src = s->vga.vram_ptr + s->regs.cur_offset -
-> -          (s->regs.cur_hv_offs >> 16) - (s->regs.cur_hv_offs & 0xffff) * 16;
-> +    srcoff = s->regs.cur_offset -
-> +        (s->regs.cur_hv_offs >> 16) - (s->regs.cur_hv_offs & 0xffff) * 16;
->     for (i = 0; i < 64; i++) {
->         for (j = 0; j < 8; j++, idx++) {
-> -            data[idx] = src[i * 16 + j];
-> -            data[512 + idx] = src[i * 16 + j + 8];
-> +            data[idx] = vga_read_byte(&s->vga, srcoff + i * 16 + j);
-> +            data[512 + idx] = vga_read_byte(&s->vga, srcoff + i * 16 + j + 8);
->         }
->     }
->     if (!s->cursor) {
-> @@ -189,7 +190,7 @@ static void ati_cursor_invalidate(VGACommonState *vga)
-> static void ati_cursor_draw_line(VGACommonState *vga, uint8_t *d, int scr_y)
-> {
->     ATIVGAState *s = container_of(vga, ATIVGAState, vga);
-> -    uint8_t *src;
-> +    uint32_t srcoff;
->     uint32_t *dp = (uint32_t *)d;
->     int i, j, h;
->
-> @@ -199,13 +200,13 @@ static void ati_cursor_draw_line(VGACommonState *vga, uint8_t *d, int scr_y)
->         return;
->     }
->     /* FIXME handle cur_hv_offs correctly */
-> -    src = s->vga.vram_ptr + s->cursor_offset + (scr_y - vga->hw_cursor_y) * 16;
-> +    srcoff = s->cursor_offset + (scr_y - vga->hw_cursor_y) * 16;
->     dp = &dp[vga->hw_cursor_x];
->     h = ((s->regs.crtc_h_total_disp >> 16) + 1) * 8;
->     for (i = 0; i < 8; i++) {
->         uint32_t color;
-> -        uint8_t abits = src[i];
-> -        uint8_t xbits = src[i + 8];
-> +        uint8_t abits = vga_read_byte(vga, srcoff + i);
-> +        uint8_t xbits = vga_read_byte(vga, srcoff + i + 8);
->         for (j = 0; j < 8; j++, abits <<= 1, xbits <<= 1) {
->             if (abits & BIT(7)) {
->                 if (xbits & BIT(7)) {
->
+>  block/snapshot.c | 26 +++++++++++++++++++-------
+>  1 file changed, 19 insertions(+), 7 deletions(-)
+
+Makes sense.  But you'll want Peter's review that it actually passes
+testing with libvirt, rather than relying solely on my:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--sAMzMWuP0NKr7ckeYgTTeWlVteASuC0Y8--
+
+--uk3Knuw1z4rffy5A1QHXEyhBovfV1PlC5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2A5QAACgkQp6FrSiUn
+Q2ocUwgAi3zYRb+53YjKPh7SYZIjo+8t8CetQYtYzRQFCjFD8hBvvneTUXp+9op3
+5E4ZbtKK/IYz6OQe1Q5siKswkt19Nb8rc3zS++/e3yUJCYvW9w61uvHvw4gMyEiL
+X6AZvBF/j134BFNknGoyUC+gnaKOUfR2vdOPUZuz5KFYn+Qwz12tQ0GwLKBNA33s
+0tP9RJokDCD13pgOYF/CEvCBZfkCqrs+uQ7sCP5GiDQ2KVb5rPbTUpcGFflbKTto
+kJfmLN6ZH+BjrFfAI1KInUII84AEvroep+pOX3Y3/vEc8Sgc7589SanU0GbWx1Yy
+Y9bkUguiPsdr+klqBYQHjvmDhgcRuw==
+=lJ26
+-----END PGP SIGNATURE-----
+
+--uk3Knuw1z4rffy5A1QHXEyhBovfV1PlC5--
 
