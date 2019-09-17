@@ -2,90 +2,91 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F375C4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 20:47:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2720CC4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 20:50:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0E15214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 20:47:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0E15214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 956CE214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 20:50:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vSCoHq0W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 956CE214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAKNW-0002R2-N1
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 16:47:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55640)
+	id 1iAKQA-0000D2-Qm
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 16:49:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55826)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iAKKz-00012o-8T
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 16:44:38 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iAKM1-0002Mk-9T
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 16:45:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iAKKy-00046F-6u
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 16:44:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48590)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAKKx-00045l-Tw
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 16:44:36 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3E2DC102BB36;
- Tue, 17 Sep 2019 20:44:35 +0000 (UTC)
-Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DBB6C5D9D5;
- Tue, 17 Sep 2019 20:44:34 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190914153506.2151-1-armbru@redhat.com>
- <20190914153506.2151-17-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1iAKLz-0004a0-Tb
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 16:45:40 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:43794)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iAKLz-0004Zh-N0
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 16:45:39 -0400
+Received: by mail-pl1-x642.google.com with SMTP id 4so2005688pld.10
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 13:45:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=j3S3FT/g8j42w7nyqeQTYQ9+mhXd4SLzvays0WaTKGk=;
+ b=vSCoHq0W1350Df+h9DNBFxK6GPl4PiUIye4aqGjpu3hKLsruMkEPDdzweM3xOMggEq
+ v/W47xZivAvZoRhqsPlcjJkX5ooes3SCqr3Q+ob7YoIcjfsTFj0YwZqYQatdfrD4/n/b
+ lD0Qdl2h8N2bjEAmdxjpb/b8sU/swQU/KZkS33swyM0UEMrgsKjKKI9zt8X5oYp5WttI
+ OszrElX3MvgwUflIAR89n7/nX+yeDI0TPdW8NwaOwbZD8f9G0ttsmmb7SJd7pZ/GW/mE
+ 1wA9SbA4ffjHjR9Hq2VQT6arSYowoQLVnUIHXgmHFo7pZWQITBJb64PaonCGNh0652/7
+ jaeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=j3S3FT/g8j42w7nyqeQTYQ9+mhXd4SLzvays0WaTKGk=;
+ b=pdzSJsVqTCelkC7qumrYzh5qt0p+nTD6xBQarAokVSQyBV7TL+NUuGVRLto0C8Tr1y
+ mmSOVDcv279z6P8x1ckAD7sNa8IynSpTYKC0KDw1nuSaQhMjMOzARisYXNFrNWk5GBkK
+ 92koVqrmxKeb6JPRt4bKfL7PA0zJxxD3kOxq0+ChamWGpB5bAlncn5OUTdgyfzi3tMjn
+ j+OY/1od3lslNpZ951NFSi1x9Y7mjIIoWKnE53kPfj7oLMsSPNkUQx3HqGIfPOSRfMEL
+ ObgS9oKl1aed3/AQo+LD1J+E7JYUyRuxFIsoU7+oQOPDEkP0+hBEu2aMpz5crwevVsmj
+ h09Q==
+X-Gm-Message-State: APjAAAWji+NcONKMYH8q2E6e3HszajHQ01F3+dmzv+yKvXHes17aXeo/
+ hZJsLW5nQOK82z6iPXFFvl23TQ==
+X-Google-Smtp-Source: APXvYqwz4gDdqUMQXj2iA9v5hGtqDe//5AA2veLu3jpzA0AYElE2U4O2DqInDeCO0Ripqp5QhWH+4Q==
+X-Received: by 2002:a17:902:8649:: with SMTP id
+ y9mr557879plt.252.1568753138461; 
+ Tue, 17 Sep 2019 13:45:38 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id r23sm2952882pjo.22.2019.09.17.13.45.37
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 17 Sep 2019 13:45:37 -0700 (PDT)
+To: "Paul A. Clarke" <pc@us.ibm.com>, qemu-devel@nongnu.org
+References: <1568653336-16819-1-git-send-email-pc@us.ibm.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <dd7449bd-abd1-783d-9cb5-b0e7823c3973@redhat.com>
-Date: Tue, 17 Sep 2019 14:05:21 -0500
+Message-ID: <a561c80e-68b0-bd56-2718-6c3325d27716@linaro.org>
+Date: Tue, 17 Sep 2019 13:45:35 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190914153506.2151-17-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="KX2k9hjFrCVXc8kGfZWtJFcUXp4uwjI4H"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Tue, 17 Sep 2019 20:44:35 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 16/19] qapi: Delete useless check_exprs()
- code for simple union kind
+In-Reply-To: <1568653336-16819-1-git-send-email-pc@us.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::642
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] ppc: Add support for 'mffscrn',
+ 'mffscrni' instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,69 +98,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KX2k9hjFrCVXc8kGfZWtJFcUXp4uwjI4H
-Content-Type: multipart/mixed; boundary="OCEtMhdKVAr93B46sG9yhbhr2DnlYXsVf";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <dd7449bd-abd1-783d-9cb5-b0e7823c3973@redhat.com>
-Subject: Re: [PATCH 16/19] qapi: Delete useless check_exprs() code for simple
- union kind
-References: <20190914153506.2151-1-armbru@redhat.com>
- <20190914153506.2151-17-armbru@redhat.com>
-In-Reply-To: <20190914153506.2151-17-armbru@redhat.com>
+On 9/16/19 1:02 PM, Paul A. Clarke wrote:
+> +#define FP_DRN2         (1ull << FPSCR_DRN2)
+> +#define FP_DRN1         (1ull << FPSCR_DRN1)
+> +#define FP_DRN0         (1ull << FPSCR_DRN0)
+> +#define FP_DRN          (FP_DRN2 | FP_DRN1 | FP_DRN0)
 
---OCEtMhdKVAr93B46sG9yhbhr2DnlYXsVf
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Why not just 7ull << FPSCR_DRN?
+Are the individual DRN bits separately useful?
+They don't appear to be...
 
-On 9/14/19 10:35 AM, Markus Armbruster wrote:
-> Commit bceae7697f "qapi script: support enum type as discriminator in
-> union" made check_exprs() add the implicit enum types of simple unions
-> to global @enum_types.  I'm not sure it was needed even then.  It's
-> certainly not needed now.  Delete it.
->=20
-> discriminator_find_enum_define() and add_name() parameter @implicit
-> are now dead.  Bury them.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  scripts/qapi/common.py | 39 ++-------------------------------------
->  1 file changed, 2 insertions(+), 37 deletions(-)
-Reviewed-by: Eric Blake <eblake@redhat.com>
+> -#define FP_MODE         FP_RN
+> +#define FP_MODE         (FP_DRN | FP_RN)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+This, I think, isn't helpful.
+
+> +static void gen_helper_mffscrn(DisasContext *ctx, TCGv_i64 t1)
+> +{
+> +    TCGv_i64 t0 = tcg_temp_new_i64();
+> +    TCGv_i32 mask = tcg_const_i32(0x0001);
+> +
+> +    gen_reset_fpstatus();
+> +    tcg_gen_extu_tl_i64(t0, cpu_fpscr);
+> +    tcg_gen_andi_i64(t0, t0, FP_MODE | FP_ENABLES);
+> +    set_fpr(rD(ctx->opcode), t0);
+> +
+> +    /* Mask FPSCR value to clear RN.  */
+> +    tcg_gen_andi_i64(t0, t0, ~FP_MODE);
+
+Because here,
+
+> +static void gen_mffscrn(DisasContext *ctx)
+> +{
+> +    TCGv_i64 t1;
+> +
+> +    if (unlikely(!(ctx->insns_flags2 & PPC2_ISA300))) {
+> +        return gen_mffs(ctx);
+> +    }
+> +
+> +    if (unlikely(!ctx->fpu_enabled)) {
+> +        gen_exception(ctx, POWERPC_EXCP_FPU);
+> +        return;
+> +    }
+> +
+> +    t1 = tcg_temp_new_i64();
+> +    get_fpr(t1, rB(ctx->opcode));
+> +    /* Mask FRB to get just RN.  */
+> +    tcg_gen_andi_i64(t1, t1, FP_MODE);
+
+and here, we're only interested in RN, not DRN.
+
+Possibly FP_MODE should itself be removed.  It's used
+exactly once, in mffsl, which could just as easily
+reference FP_RN | FP_DRN.
 
 
---OCEtMhdKVAr93B46sG9yhbhr2DnlYXsVf--
-
---KX2k9hjFrCVXc8kGfZWtJFcUXp4uwjI4H
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2BLnEACgkQp6FrSiUn
-Q2pz1AgAjDcqcAroTxrXtaFRuw/iL1v4AEH/U71vnW43dj8OjJPnFQfB5naFVryc
-iSyrAJmxbYIjlzealW/cQ374TN8D+wJ9fXrhPSEqgH02ngDrkSMLTX300VLoBxR5
-GEMZAEMuwOXAWJlLqs6QULVv71ugks8r7YxUNefeuU3fw0WzHpQkEWzlM6d9y5n6
-sUow3mxhLt3pllMgmFHbQL370Az5aNdEjAmLHHmNnTwQx3+J99DPy8CI10EFSNHD
-JMFX0wXLbdZtRm/5uq7UVG+4qdklsYcLd6jzCp22rk9uuTrK+ZI53Wz2ASHgV70r
-/SIPS6npQsQYJqLR3BMH0A/jBaTWSw==
-=N6kt
------END PGP SIGNATURE-----
-
---KX2k9hjFrCVXc8kGfZWtJFcUXp4uwjI4H--
+r~
 
