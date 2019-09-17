@@ -2,99 +2,88 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E08C8C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:57:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DECE2C4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:59:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAF5921670
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:57:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XRKg51eQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAF5921670
+	by mail.kernel.org (Postfix) with ESMTPS id B408A21670
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 10:59:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B408A21670
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iABAp-0006qF-Rf
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 06:57:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48765)
+	id 1iABCo-00008z-Tt
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 06:59:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50792)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iAAyv-0003ax-8u
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:45:14 -0400
+ (envelope-from <philmd@redhat.com>) id 1iAB9c-0005r7-JQ
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:56:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iAAyu-0002vJ-4n
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:45:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48106
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iAB9b-0001Mr-4e
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:56:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58942)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iAAyu-0002v1-0t
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:45:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1568717111;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=ZXnAAwDpoRm+8ePiNphj3+hz3hw4EQKkVK9lF56zImE=;
- b=XRKg51eQsp5pqJEih2OuOx+qmJIIpmYfIydsvlX3OHuf1x9BO26VLkyOSF5ec6j+6a9/mc
- m/ph1huhp/DPKiowqz/abdq+Nq7mDwQZ77ZLgeZPGYwsynhV7yyYcR2o9NRPcg5qw8kGUP
- llqxYghig1VpIEezfWT6FINJS758jBY=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-mfqKgyd7Pua3-Mgel-flBg-1; Tue, 17 Sep 2019 06:45:10 -0400
-Received: by mail-wr1-f69.google.com with SMTP id t11so1152094wrq.19
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 03:45:09 -0700 (PDT)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iAB9Y-0001KX-MB
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 06:56:13 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2431436899
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 10:56:10 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id 4so710146wmj.6
+ for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 03:56:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=MBl5Gw9CvcQqiym5eHRZo9rFz9hJ4bHK2/YeC61tE9w=;
- b=lHNitj2G3Lhs0HmpPEiSnxMpfV9RMOukI8g1/74stEiI01Nte8ZEQZZ3b83kBbGVfw
- LxlT03qEEqLFRtXBK6YcVXt5+gy/aHAYrtXMlBpBzA52PGpmbONDx4OMYqvSF0Co8aj0
- hy/GoN3sspOuyK30yUxxHvYwyQHYmcGkZtfxMhOyAOuAuVWPyMu/U/sX5+uD8qtdjlnj
- x/GGRQ1vCew8q9GRXSvSlAz/M1wl+U6Ik7SK7VK2nnXFjcI11Ucj41p7omiOQP8mNUlH
- KSfE3oKTIDNxUrNqt6q0Gsu3QI31Ek2o1aamfqEXqgFM07sV4/uAIbaAZ2dpMht1DaT3
- STRg==
-X-Gm-Message-State: APjAAAXh/wTCspOM0yJhrNEuMWnTRwVjUlRS0ueHeuq085/xod3UOjAj
- 3H35B1R0eId9YxlMsKVuGErrI9sQq53LHoSBBh19Akue7jxRwqBwgi5Tupe4OWwZba9qH+D0Bop
- ZtQFeE0Ciq6CimNg=
-X-Received: by 2002:a5d:6701:: with SMTP id o1mr2459340wru.6.1568717108606;
- Tue, 17 Sep 2019 03:45:08 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx3i8Ci3p8Hn/xtuyHdnviJVKbESegfW6XDJjzLqn6L+OTzVNXL+rOIWOwYPlIOq0URxZju8w==
-X-Received: by 2002:a5d:6701:: with SMTP id o1mr2459329wru.6.1568717108355;
- Tue, 17 Sep 2019 03:45:08 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8?
- ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
- by smtp.gmail.com with ESMTPSA id p85sm4971260wme.23.2019.09.17.03.45.07
+ bh=uvAxstmAnSwepwLQgLbc5Y236mFbSVtOAP2efXMrpHk=;
+ b=q7cFKnycKdWi3Tp3wuZ2ufdSmS7PEO5w5azb7BxKsDuVk1va2az+vVTRZTjpn4dY8B
+ Qn6z0rWpTfFZS8DJq032PZh20SPQZxZ1A24CL8sakVhrL5s1uiyqpSfD+I5oZ7aOcPdR
+ Ugx3Qg+4QUA8UB3ssuYd2XV++ksZNm6H7sHXgzbayIA3290QJVkE3e+32Bn7tMR6A/3o
+ F0JOAulwVFyw22qcEHClOVR8yUH2MJGPqEZW8AigJAVVPaHehyzLZCNPecPIVO9KjF3j
+ g/U8f/XxS2lxJYLWkIwUckXKK8QUqZDvhmPe0eO9rqU4t7x/hRb2B+a5JRjwSb4K+KQc
+ 0fxA==
+X-Gm-Message-State: APjAAAVdUcMFMX0rWW3F0/QGSqha8h5wCx3nMjktoUCBkMCdQUnCKnXZ
+ HzGnvtXUUaCVJB4PVqe61J/PZ6Xd2FW7nVbTo5X1neQYuDStXFR9dlWhce9bEu8GvduEA5h6dCP
+ A8JWLtOvExxLl71Q=
+X-Received: by 2002:a5d:63ca:: with SMTP id c10mr2323746wrw.314.1568717768908; 
+ Tue, 17 Sep 2019 03:56:08 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxt4Y85pN8WkAAYBNL3UGT90UEZTErSmzFzIMpOnxVAO6ufY6cMORCQjkdDXqQTg5farFxhFA==
+X-Received: by 2002:a5d:63ca:: with SMTP id c10mr2323722wrw.314.1568717768753; 
+ Tue, 17 Sep 2019 03:56:08 -0700 (PDT)
+Received: from [192.168.1.40] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id c6sm2636760wrb.60.2019.09.17.03.56.06
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Sep 2019 03:45:07 -0700 (PDT)
-To: Yury Kotov <yury-kotov@yandex-team.ru>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <1568646858-17065-1-git-send-email-pbonzini@redhat.com>
- <1330281568711811@sas1-fc7737ec834f.qloud-c.yandex.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <5c5d623e-55c6-9264-a72d-d3730328662d@redhat.com>
-Date: Tue, 17 Sep 2019 12:45:07 +0200
+ Tue, 17 Sep 2019 03:56:08 -0700 (PDT)
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+References: <156871562997.196432.17776290406203122029.stgit@bahia.lan>
+ <156871573833.196432.7906362695920387537.stgit@bahia.lan>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <6fe2e5bb-69bf-de52-75ba-cab918e86091@redhat.com>
+Date: Tue, 17 Sep 2019 12:56:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <1330281568711811@sas1-fc7737ec834f.qloud-c.yandex.net>
+In-Reply-To: <156871573833.196432.7906362695920387537.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-MC-Unique: mfqKgyd7Pua3-Mgel-flBg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
-Subject: Re: [Qemu-devel] [PULL v2 00/29] Misc patches for 2019-09-16
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 17/17] checkpatch: Warn when errp is passed
+ to error_append_hint()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,19 +95,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <codyprime@gmail.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ David Hildenbrand <david@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Eric Farman <farman@linux.ibm.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Yuval Shaia <yuval.shaia@oracle.com>,
+ Alex Williamson <alex.williamson@redhat.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/09/19 11:17, Yury Kotov wrote:
-> Sorry, it looks like that you've missed the 3rd patch in the
-> "High downtime with 95+ throttle pct" series:
->     tests/migration: Add a test for auto converge
+On 9/17/19 12:22 PM, Greg Kurz wrote:
+> Passing errp from the argument list to error_append_hint()
+> isn't recommended because it may cause unwanted behaviours
+> when errp is equal to &error_fatal or &error_abort.
 >=20
-> Or was there a reason for not adding it to PR?
+> First, error_append_hint() aborts QEMU when passed either of
+> those.
+>=20
+> Second, consider the following:
+>=20
+>     void foo(Error **errp)
+>     {
+>          error_setg(errp, "foo");
+>          error_append_hint(errp, "Try bar\n");
+>     }
+>=20
+> error_setg() causes QEMU to exit or abort, and hints aren't
+> added.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  scripts/checkpatch.pl |    4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index aa9a354a0e7e..17ce026282a6 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -2902,6 +2902,10 @@ sub process {
+>  		}
+>  	}
+> =20
+> +		if ($line =3D~ /error_append_hint\(errp/) {
 
-No, I just missed it.  I will add it to the next pull request.
+Checking for 'errp' variable name seems fragile, but all the codebase
+uses exactly this name, so it is sufficient.
 
-Paolo
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
+> +		    WARN("suspicious errp passed to error_append_hint()\n" .
+> +			 $herecurr);
+> +		}
+>  # check for non-portable libc calls that have portable alternatives in=
+ QEMU
+>  		if ($line =3D~ /\bffs\(/) {
+>  			ERROR("use ctz32() instead of ffs()\n" . $herecurr);
+>=20
+>=20
 
