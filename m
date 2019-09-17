@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14DACC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 18:06:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 587B6C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 18:07:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E39C4206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 18:06:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E39C4206C2
+	by mail.kernel.org (Postfix) with ESMTPS id 35DCF206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 18:07:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35DCF206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAHry-00064L-2t
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 14:06:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57000)
+	id 1iAHtB-00070N-0Q
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 14:07:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57103)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iAHrG-0005em-S0
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:05:47 -0400
+ (envelope-from <eblake@redhat.com>) id 1iAHsA-0006RY-ER
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:06:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iAHrF-0002B9-Sa
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:05:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56516)
+ (envelope-from <eblake@redhat.com>) id 1iAHs9-0002NG-JM
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:06:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35578)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAHrF-0002Ax-Kz
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:05:45 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAHs9-0002N5-BL
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 14:06:41 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E5BC8C049E32;
- Tue, 17 Sep 2019 18:05:44 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A56BE30860A5;
+ Tue, 17 Sep 2019 18:06:40 +0000 (UTC)
 Received: from [10.3.116.234] (ovpn-116-234.phx2.redhat.com [10.3.116.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E00F60BE1;
- Tue, 17 Sep 2019 18:05:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4B234600C8;
+ Tue, 17 Sep 2019 18:06:36 +0000 (UTC)
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20190914153506.2151-1-armbru@redhat.com>
- <20190914153506.2151-11-armbru@redhat.com>
+ <20190914153506.2151-12-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,22 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <9a28c542-b868-d9f1-3e35-c400e3b9bdf8@redhat.com>
-Date: Tue, 17 Sep 2019 13:05:41 -0500
+Message-ID: <6e014ae3-107c-6b7e-e551-e4e7e0e9445d@redhat.com>
+Date: Tue, 17 Sep 2019 13:06:35 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190914153506.2151-11-armbru@redhat.com>
+In-Reply-To: <20190914153506.2151-12-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="x55OxGfr6INyzumhcQkYpgJl4KQ1sFml4"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+ boundary="BRucrrUa5AAE5a7UWvtb9gXdCjL3aJaSU"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Tue, 17 Sep 2019 18:05:44 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Tue, 17 Sep 2019 18:06:40 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 10/19] qapi: Fix broken discriminator error
- messages
+Subject: Re: [Qemu-devel] [PATCH 11/19] qapi: Reject blank 'if' conditions
+ in addition to empty ones
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,39 +103,28 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---x55OxGfr6INyzumhcQkYpgJl4KQ1sFml4
-Content-Type: multipart/mixed; boundary="NGMSXYhzNBTSQTtMDqiycOIxUleeVaNbG";
+--BRucrrUa5AAE5a7UWvtb9gXdCjL3aJaSU
+Content-Type: multipart/mixed; boundary="S1M2xxKr8I0JTUr6TbQ3VykEOvCxLWPnR";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <9a28c542-b868-d9f1-3e35-c400e3b9bdf8@redhat.com>
-Subject: Re: [PATCH 10/19] qapi: Fix broken discriminator error messages
+Message-ID: <6e014ae3-107c-6b7e-e551-e4e7e0e9445d@redhat.com>
+Subject: Re: [PATCH 11/19] qapi: Reject blank 'if' conditions in addition to
+ empty ones
 References: <20190914153506.2151-1-armbru@redhat.com>
- <20190914153506.2151-11-armbru@redhat.com>
-In-Reply-To: <20190914153506.2151-11-armbru@redhat.com>
+ <20190914153506.2151-12-armbru@redhat.com>
+In-Reply-To: <20190914153506.2151-12-armbru@redhat.com>
 
---NGMSXYhzNBTSQTtMDqiycOIxUleeVaNbG
+--S1M2xxKr8I0JTUr6TbQ3VykEOvCxLWPnR
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 9/14/19 10:34 AM, Markus Armbruster wrote:
-> check_union() checks the discriminator exists in base and makes sense.
-> Two error messages mention the base.  These are broken for anonymous
-> bases, as demonstrated by tests flat-union-invalid-discriminator and
-> flat-union-invalid-if-discriminator.err.  The third one doesn't
-> bother.
->=20
-> First broken when commit ac4338f8eb "qapi: Allow anonymous base for
-> flat union" (v2.6.0) neglected to adjust the "not a member of base"
-> error message.  Commit ccadd6bcba "qapi: Add 'if' to implicit struct
-> members" (v4.0.0) then cloned the flawed error message.
->=20
-> Dumb them down not to mention the base.
-
-A trick for good error reporting: deciding when "less is more" :)
-
+> "'if': 'COND'" generates "#if COND".  We reject empty COND because it
+> won't compile.  Blank COND won't compile any better, so reject that,
+> too.
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
@@ -148,24 +137,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---NGMSXYhzNBTSQTtMDqiycOIxUleeVaNbG--
+--S1M2xxKr8I0JTUr6TbQ3VykEOvCxLWPnR--
 
---x55OxGfr6INyzumhcQkYpgJl4KQ1sFml4
+--BRucrrUa5AAE5a7UWvtb9gXdCjL3aJaSU
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2BIHUACgkQp6FrSiUn
-Q2rBEQgAkPrhXSQ1Ul1uMY8/JsOBs/t2kHMtOS0y9wJGuvvi9Q4nnZqeFgGH6nHh
-Nkt4Fafo/tkvkBjDY6IrVcxsgxvXlPs7QgHJvcMoOwnxnf/VACo+2ktYwOS4vlA8
-1VogkXSjeFTD6kH2JvayrgXwMy0cetDbgNJ+eyBnkkSPmPF4okW0mSVuNFim7N75
-RBvJUSXvnJTE3Mq5FaySif5F7wuhYpUxHH94899Lkwg3ALzEHq7GxaEAToQm8TSb
-s33h2AtOtYxYM1SY463qdwCwNOROvTWwDzxLujIYgkX4MeIJ3wRVZ+Ee6TLLqA7O
-Ot147DGYeml+Ym17sRiucxloWdqT/g==
-=Uyy0
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2BIKsACgkQp6FrSiUn
+Q2okDAf9Hw6m0OSsFcFCLKZqHs820A9dpIstVo8msFLvbG6/gwif5NG/ZTK0bvoA
+CwvffZ5mRB4yRLiCqbTBfKo0wktZpRF6WREzJEgZTWFWDGkUzs465A6n6+jGFg8O
+dg9CDC7RxIioOFglUtDAX515ew0pZE0mN5shtcAGFFoVgG6HcsmNtBn7s3vjnbn1
+rDx0ZQTlYIPFABRPLp/Dmv1zNv5B75I83Yif/duInvT0UqUj03usVqiFXIhDwfFY
+LvlEa92uM7RozHsRSv33TFrmeQqYXzkDevRiXEanbsKGNk5t7lP4C2WFLDWPurT7
+q8Lxn4X9JrCOxlbkBZ36+PaC9hQE3w==
+=A0d0
 -----END PGP SIGNATURE-----
 
---x55OxGfr6INyzumhcQkYpgJl4KQ1sFml4--
+--BRucrrUa5AAE5a7UWvtb9gXdCjL3aJaSU--
 
