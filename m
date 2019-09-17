@@ -2,65 +2,61 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1206DC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 11:18:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 957F0C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 11:19:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7419214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 11:18:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=linuxsystems.it header.i=@linuxsystems.it header.b="V8lFINM5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7419214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linuxsystems.it
+	by mail.kernel.org (Postfix) with ESMTPS id 69807214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 11:19:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69807214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iABVR-00048I-M5
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 07:18:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53871)
+	id 1iABWE-0004zA-9f
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 07:19:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53745)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <darkbasic@linuxsystems.it>) id 1iABSi-0002Xa-Uj
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 07:16:01 -0400
+ (envelope-from <kraxel@redhat.com>) id 1iABRa-0001Zt-RE
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 07:14:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <darkbasic@linuxsystems.it>) id 1iABSh-0007Cs-Rp
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 07:16:00 -0400
-Received: from mail.linuxsystems.it ([79.7.78.67]:56250)
+ (envelope-from <kraxel@redhat.com>) id 1iABRZ-00063F-MO
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 07:14:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37918)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <darkbasic@linuxsystems.it>)
- id 1iABSd-00079i-8r; Tue, 17 Sep 2019 07:15:55 -0400
-Received: by mail.linuxsystems.it (Postfix, from userid 33)
- id D21D520BBCD; Tue, 17 Sep 2019 13:09:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxsystems.it;
- s=linuxsystems.it; t=1568718598;
- bh=EVAGbLYhCJD18sjMflu0Rlza+eeoAOMUwL4Y7YSJWX0=;
- h=To:Subject:Date:From:Cc:In-Reply-To:References:From;
- b=V8lFINM5Ajkcevfb5Jek25qS0fpgeMKkY2e+JzxSk0HlEY7c5aXF8s+DxrEUYq9Dg
- AwkV33dP3F9l1kP5oVSSuS07Wqx5iXcFJHVkWGAvioSkr2aHeEw25koLRFfGR2EMEf
- 9y/QteaA2FA5dT3GGRKbQ/Sp/nsQVbwHaDto/6fA=
-To: Laurent Vivier <lvivier@redhat.com>
-X-PHP-Originating-Script: 0:rcube.php
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Tue, 17 Sep 2019 13:09:58 +0200
-From: =?UTF-8?Q?Niccol=C3=B2_Belli?= <darkbasic@linuxsystems.it>
-In-Reply-To: <e2292382-968a-106f-b10a-e6987a9c3db1@redhat.com>
-References: <83f649c6482bf363c38e7f3778d866f4@linuxsystems.it>
- <9d1ea4ff-a0df-f7c6-54ca-c03b010c5ff1@redhat.com>
- <e2292382-968a-106f-b10a-e6987a9c3db1@redhat.com>
-Message-ID: <0615af7328b99d4272e0734c5eb821fa@linuxsystems.it>
-X-Sender: darkbasic@linuxsystems.it
-User-Agent: Roundcube Webmail/1.1.5
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iABRZ-00062U-F9
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 07:14:49 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5C0B7877A64;
+ Tue, 17 Sep 2019 11:14:48 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-47.ams2.redhat.com
+ [10.36.116.47])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6C9375C219;
+ Tue, 17 Sep 2019 11:14:42 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 8597017536; Tue, 17 Sep 2019 13:14:41 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 17 Sep 2019 13:14:40 +0200
+Message-Id: <20190917111441.27405-2-kraxel@redhat.com>
+In-Reply-To: <20190917111441.27405-1-kraxel@redhat.com>
+References: <20190917111441.27405-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Tue, 17 Sep 2019 11:14:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 79.7.78.67
-Subject: Re: [Qemu-devel] ELF load command alignment not page-aligned
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v3 1/2] vga: move access helpers to separate
+ include file
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,30 +68,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:sPAPR" <qemu-ppc@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org,
- Qemu-devel <qemu-devel-bounces+darkbasic=linuxsystems.it@nongnu.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ flier_m@outlook.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Il 2019-09-17 12:40 Laurent Vivier ha scritto:
-> Which version of qemu do you use?
-> 
-> Last time I tested that on my PoweMac G5 (ppc64, qemu-4.0), it worked.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/vga-access.h  | 49 ++++++++++++++++++++++++++++++++++++++++
+ hw/display/vga-helpers.h | 26 ---------------------
+ hw/display/vga.c         |  1 +
+ 3 files changed, 50 insertions(+), 26 deletions(-)
+ create mode 100644 hw/display/vga-access.h
 
-I'm using 4.1, but I also tried 3.1.1.
+diff --git a/hw/display/vga-access.h b/hw/display/vga-access.h
+new file mode 100644
+index 000000000000..c0fbd9958b2e
+--- /dev/null
++++ b/hw/display/vga-access.h
+@@ -0,0 +1,49 @@
++/*
++ * QEMU VGA Emulator templates
++ *
++ * Copyright (c) 2003 Fabrice Bellard
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++static inline uint8_t vga_read_byte(VGACommonState *vga, uint32_t addr)
++{
++    return vga->vram_ptr[addr & vga->vbe_size_mask];
++}
++
++static inline uint16_t vga_read_word_le(VGACommonState *vga, uint32_t addr)
++{
++    uint32_t offset = addr & vga->vbe_size_mask & ~1;
++    uint16_t *ptr = (uint16_t *)(vga->vram_ptr + offset);
++    return lduw_le_p(ptr);
++}
++
++static inline uint16_t vga_read_word_be(VGACommonState *vga, uint32_t addr)
++{
++    uint32_t offset = addr & vga->vbe_size_mask & ~1;
++    uint16_t *ptr = (uint16_t *)(vga->vram_ptr + offset);
++    return lduw_be_p(ptr);
++}
++
++static inline uint32_t vga_read_dword_le(VGACommonState *vga, uint32_t addr)
++{
++    uint32_t offset = addr & vga->vbe_size_mask & ~3;
++    uint32_t *ptr = (uint32_t *)(vga->vram_ptr + offset);
++    return ldl_le_p(ptr);
++}
+diff --git a/hw/display/vga-helpers.h b/hw/display/vga-helpers.h
+index 5a752b3f9efd..10e9cfd40a04 100644
+--- a/hw/display/vga-helpers.h
++++ b/hw/display/vga-helpers.h
+@@ -95,32 +95,6 @@ static void vga_draw_glyph9(uint8_t *d, int linesize,
+     } while (--h);
+ }
+ 
+-static inline uint8_t vga_read_byte(VGACommonState *vga, uint32_t addr)
+-{
+-    return vga->vram_ptr[addr & vga->vbe_size_mask];
+-}
+-
+-static inline uint16_t vga_read_word_le(VGACommonState *vga, uint32_t addr)
+-{
+-    uint32_t offset = addr & vga->vbe_size_mask & ~1;
+-    uint16_t *ptr = (uint16_t *)(vga->vram_ptr + offset);
+-    return lduw_le_p(ptr);
+-}
+-
+-static inline uint16_t vga_read_word_be(VGACommonState *vga, uint32_t addr)
+-{
+-    uint32_t offset = addr & vga->vbe_size_mask & ~1;
+-    uint16_t *ptr = (uint16_t *)(vga->vram_ptr + offset);
+-    return lduw_be_p(ptr);
+-}
+-
+-static inline uint32_t vga_read_dword_le(VGACommonState *vga, uint32_t addr)
+-{
+-    uint32_t offset = addr & vga->vbe_size_mask & ~3;
+-    uint32_t *ptr = (uint32_t *)(vga->vram_ptr + offset);
+-    return ldl_le_p(ptr);
+-}
+-
+ /*
+  * 4 color mode
+  */
+diff --git a/hw/display/vga.c b/hw/display/vga.c
+index 573d223d46f0..82ebe5361096 100644
+--- a/hw/display/vga.c
++++ b/hw/display/vga.c
+@@ -1009,6 +1009,7 @@ void vga_mem_writeb(VGACommonState *s, hwaddr addr, uint32_t val)
+ typedef void vga_draw_line_func(VGACommonState *s1, uint8_t *d,
+                                 uint32_t srcaddr, int width);
+ 
++#include "vga-access.h"
+ #include "vga-helpers.h"
+ 
+ /* return true if the palette was modified */
+-- 
+2.18.1
 
-I can get some binaries to work, but lots of them won't.
-
-Even debootstrapping a Debian system proves to be an issue: 
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=940183
-
-So far I've managed to debootstrap only a "minbase" stretch.
-If I chroot and try to install something like qt5-default it won't work 
-anymore.
-
-Thanks,
-Niccolo'
 
