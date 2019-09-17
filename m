@@ -3,49 +3,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F0D8C4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 22:30:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0605C4CECE
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 23:11:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE1EB21897
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 22:30:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE1EB21897
+	by mail.kernel.org (Postfix) with ESMTPS id 7580520665
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 23:11:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7580520665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iALzB-0000QR-UY
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 18:30:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42739)
+	id 1iAMcw-0000ol-JQ
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 19:11:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47073)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iALyP-0008Hn-Ft
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 18:29:26 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iAMby-0000K2-SF
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 19:10:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iALyO-0005CE-5W
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 18:29:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58340)
+ (envelope-from <jsnow@redhat.com>) id 1iAMbw-00045S-8R
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 19:10:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49296)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iALyJ-0005AU-Az; Tue, 17 Sep 2019 18:29:19 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iAMbw-00045N-07
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 19:10:16 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8DF3A3083362;
- Tue, 17 Sep 2019 22:29:18 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 09EA318C8900;
+ Tue, 17 Sep 2019 23:10:15 +0000 (UTC)
 Received: from [10.18.17.165] (dhcp-17-165.bos.redhat.com [10.18.17.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 807765D6A5;
- Tue, 17 Sep 2019 22:29:17 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190912001633.11372-1-jsnow@redhat.com>
- <20190912001633.11372-2-jsnow@redhat.com>
- <974b64b8-a191-c529-4e77-6a38b372c4b8@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 323E01001B11;
+ Tue, 17 Sep 2019 23:10:14 +0000 (UTC)
+To: Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+References: <20190607211544.7964-1-ehabkost@redhat.com>
+ <CAFEAcA-wCqppsi+gcrTqGjR3bSDOHs5btKKE8oHYxbAUDtu7Fw@mail.gmail.com>
+ <CAFEAcA9ZeB1knLYYQLJG0d5McG2vo6w8P9+vOBWgtSVgPEG0jA@mail.gmail.com>
+ <20190611160329.GH5927@habkost.net>
+ <CAFEAcA-cv8vPT=7YraioJvW7-WnvGy9YoJXOc_E+UEWUehE+Bg@mail.gmail.com>
+ <20190611171257.GI5927@habkost.net>
+ <20190917135726.GD4824@localhost.localdomain>
+ <20190917214808.GH4082@habkost.net>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -122,21 +126,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <e5d871da-c5e1-1a5e-4714-387cbc93a055@redhat.com>
-Date: Tue, 17 Sep 2019 18:29:17 -0400
+Message-ID: <a6bc1eba-c088-43bf-fa90-e2139c6a6fef@redhat.com>
+Date: Tue, 17 Sep 2019 19:10:13 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <974b64b8-a191-c529-4e77-6a38b372c4b8@virtuozzo.com>
+In-Reply-To: <20190917214808.GH4082@habkost.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Tue, 17 Sep 2019 22:29:18 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Tue, 17 Sep 2019 23:10:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 1/4] iotests: add script_initialize
+Subject: Re: [Qemu-devel] [PULL 0/8] Python queue, 2019-06-07
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,129 +152,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, mreitz@redhat.com,
+ QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/16/19 10:56 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 12.09.2019 3:16, John Snow wrote:
->> Like script_main, but doesn't require a single point of entry.
->> Replace all existing initialization sections with this drop-in replacement.
+On 9/17/19 5:48 PM, Eduardo Habkost wrote:
+> On Tue, Sep 17, 2019 at 03:57:26PM +0200, Kevin Wolf wrote:
+>> Am 11.06.2019 um 19:12 hat Eduardo Habkost geschrieben:
+>>> On Tue, Jun 11, 2019 at 05:07:55PM +0100, Peter Maydell wrote:
+>>>> On Tue, 11 Jun 2019 at 17:03, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>>>>>
+>>>>> On Tue, Jun 11, 2019 at 04:50:34PM +0100, Peter Maydell wrote:
+>>>>>> On Mon, 10 Jun 2019 at 13:58, Peter Maydell <peter.maydell@linaro.org> wrote:
+>>>>>>> Hi. This fails to build on one of my buildtest machines:
+>>>>>>>
+>>>>>>> ERROR: Cannot use 'python3', Python 2 >= 2.7 or Python 3 >= 3.5 is required.
+>>>>>>>        Use --python=/path/to/python to specify a supported Python.
+>>>>>>>
+>>>>>>> The machine has python 2.7.6 and 3.4.3. (It's an Ubuntu trusty
+>>>>>>> box; it's one of the gcc compile farm machines so upgrades to its
+>>>>>>> OS are not really under my control.)
+>>>>>>
+>>>>>> Rereading this, I realise that either the check or the error
+>>>>>> message is wrong here. The machine has 2.7.6, which satisfies
+>>>>>> "python 2 >= 2.7", so we should be OK to build. The bug
+>>>>>> seems to be that we say "prefer python3 over plain python
+>>>>>> on python2" early, but don't revisit that decision if the
+>>>>>> python3 we found isn't actually good enough for us.
+>>>>>
+>>>>> Right.  The error message is technically correct, but misleading.
+>>>>> python3 is too old, but python2 would work.
+>>>>>
+>>>>> We can make configure not use python3 by default if it's too old,
+>>>>> and fall back to python2 in this case.
+>>>>
+>>>> Sounds good. Since I have now managed to get my alternate
+>>>> aarch64 box set up, how about I apply this pullreq and you
+>>>> send a followup patch which does the fallback to python/python2 ?
+>>>
+>>> I will remove the python2/python3 patches and send a new pull
+>>> request.
 >>
->> This brings debug support to all existing script-style iotests.
+>> What is the plan forward with this? Are the patches dropped for good?
 >>
->> Note: supported_oses=['linux'] was omitted, as it is a default argument.
+>> I think the plan was to drop Python 2 after QEMU 4.2, and then it
+>> becomes really relevant what our minimum Python 3 version is. We've just
+>> had another Python version discussion in the context of iotests (John
+>> suggested using function annotations, but these are >= 3.5 only).
+>>
+>> Also, the fallback to Python 2 obviously makes no sense any more then,
+>> so maybe it's not that important to add for a single QEMU release?
+>>
+>> As Peter seems to have indicated above that he found a replacement for
+>> the test machine with an OS that isn't out of support, can we just
+>> revive this patch as it is?
 > 
-> But after this patch all test which didn't check os start to check linux
-> (as it's default).. So all tests which worked on other platforms will now
-> be skipped on these other platforms?
+> My plan is to remove Python 2 support in QEMU 4.2 (making the
+> fallback to Python 2 a non-issue), and require Python >= 3.5.
 > 
-> Finally do we support something except linux for iotests?
-> for bash tests _supported_os also used only with "Linux" in 87 tests..
-> 
-> May be we'd better drop both _supported_os and supported_oses alltogether,
-> and don't care?
-> 
-> Anyway, if we support only linux, any reason to skip almost all tests,
-> if someone tries to run test on other platform? Let him run what he wants.
+> Now, even if my plan is rejected and we keep supporting Python 2
+> when building QEMU 4.2, my suggestion for the iotest maintainers
+> is to make it require Python 3.5+ immediately, just like we do
+> for tests/acceptance.  I don't see why we should keep wasting our
+> energy supporting ancient Python versions in a test suite that is
+> not a requirement for building QEMU.
 > 
 
-Currently, the following tests are python:
-
-030 040 041 044 045 055 056 057 065 093 096 118 124 129 132 136 139 147
-148 149 151 152 155 163 165 169 194 196 199 202 203 205 206 207 208 209
-210 211 212 213 216 218 219 222 224 228 234 235 236 237 238 242 245 246
-248 254 255 256 257 258 262 266
-
-And as it stands, none of the script-style python tests we've selected
-to run in `make check` fail on the FreeBSD platform.
-
-So as an experiment, I lifted the restriction on python tests. I kept
-running ./check until I found some invocation that they didn't skip.
-
-Failures: 045 147 149 169 194 199 211
-
-Not too bad...
-
-045: +qemu.machine.QEMUMachineError: socket_scm_helper does not exist
-149: Wants to use 'sudo', but our freebsd image doesn't have that.
-194: +OSError: AF_UNIX path too long
-211:
--[{ "start": 0, "length": 3072, "depth": 0, "zero": false, "data": true,
-"offset": 1024},
--{ "start": 3072, "length": 33551360, "depth": 0, "zero": true, "data":
-true, "offset": 4096}]
-+[{ "start": 0, "length": 31744, "depth": 0, "zero": false, "data":
-true, "offset": 1024},
-+{ "start": 31744, "length": 33522688, "depth": 0, "zero": true, "data":
-true, "offset": 32768}]
-
-
-149 can probably be fixed, and 194 and 211 I have fail in similar ways
-on my own Linux machine, so that's probably not BSD's fault.
-
-Interestingly, 169 and 199, bitmap migration related tests, cause a
-SIGSEGV in QEMU ...
-
-
-169:
-+EEEE....EEEE........
-+WARNING:qemu.machine:qemu received signal 6:
-/usr/home/qemu/qemu-test.IfsR68/build/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64
--chardev
-socket,id=mon,path=/usr/home/qemu/qemu-test.IfsR68/build/tests/qemu-iotests/scratch/tmprpc0idbx/qemub-26617-monitor.sock
--mon chardev=mon,mode=control -display none -vga none -qtest
-unix:path=/usr/home/qemu/qemu-test.IfsR68/build/tests/qemu-iotests/scratch/qemub-26617-qtest.sock
--machine accel=qtest -nodefaults -display none -machine accel=qtest
--incoming defer -drive
-if=virtio,id=drive0,file=/usr/home/qemu/qemu-test.IfsR68/build/tests/qemu-iotests/scratch/disk_b,format=qcow2,cache=writeback
-
-The common thread in 169 is the +migbitmap trait, which ... makes me a
-little nervous, of course!
-
-
-199:
-+WARNING:qemu.machine:qemu received signal 6:
-/usr/home/qemu/qemu-test.IfsR68/build/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64
--chardev
-socket,id=mon,path=/usr/home/qemu/qemu-test.IfsR68/build/tests/qemu-iotests/scratch/tmpvzpyc9j6/qemub-30170-monitor.sock
--mon chardev=mon,mode=control -display none -vga none -qtest
-unix:path=/usr/home/qemu/qemu-test.IfsR68/build/tests/qemu-iotests/scratch/qemub-30170-qtest.sock
--machine accel=qtest -nodefaults -display none -machine accel=qtest
--drive
-if=virtio,id=drive0,file=/usr/home/qemu/qemu-test.IfsR68/build/tests/qemu-iotests/scratch/disk_b,format=qcow2,cache=none
--incoming exec: cat
-'/usr/home/qemu/qemu-test.IfsR68/build/tests/qemu-iotests/scratch/mig_fifo'
-+E
-
-
-Vladimir, I was able to provoke this error by editing
-./tests/vm/Makefile.include and removing the --snapshot invocation, then
-using `make vm-build-freebsd` and finally typing `make vm-ssh-freebsd`
-to open up a shell.
-
-Then the tricks are the usual ones; navigate to iotests directory,
-./check -v -qcow2 169, etc. You'll need to create a build that allows
-Python tests to run; do it before you run the snapshot-less build.
-
-
-
-
-aaand lastly, running `make check` doesn't happen to call any of the
-tests that appear broken on FreeBSD right now, so I'm just going to go
-ahead and say we can open Pandora's box and make the default python test
-behavior to run on any OS, and start re-blacklisting the edge-cases as
-we find them.
-
-As far as iotests go, there are a few new broken ones that surface, but
-they won't gate Peter Maydell's build process because they don't get run
-by 'make check'.
-
-I think it's a safe move to make.
+It's unfortunately now part of the 'make check' target which we use in
+the vm tests as a default target ... but I think we can make the push to
+change the build requires to 3.5+.
 
 --js
 
