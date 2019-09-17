@@ -2,121 +2,83 @@ Return-Path: <SRS0=ES4k=XM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41051C4CECD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BECEC4CECD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:31:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09748206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:26:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C72D4206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Sep 2019 13:31:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="V64nRF7T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09748206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=fau.de header.i=@fau.de header.b="cswJ1LKk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C72D4206C2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fau.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iADVD-00044o-AV
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 09:26:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44478)
+	id 1iADZm-00075e-IA
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 09:31:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41710)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iADU2-0003Fu-MZ
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:25:32 -0400
+ (envelope-from <andreas.konopik@fau.de>) id 1iADBa-0007xQ-Qp
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:06:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iADU0-0006Pq-LP
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:25:30 -0400
-Received: from mail-ve1eur02on0708.outbound.protection.outlook.com
- ([2a01:111:f400:fe06::708]:15656
- helo=EUR02-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iADTf-00065c-1b; Tue, 17 Sep 2019 09:25:07 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fcBOoRunf+DERgb0unwconNBCjGJoDat5tybaOxbLYhcYSPlVDJCyG4IO82LecektYFuHMC9Dt3moJsfI1V6FxVrwQdv+S/D6tvxdzvZ7T4eMZUdDAZYpKKJ0dI51/mG5Z5Trpd91j6wKazll3mT3BEx/x0XFNejW5mjOXtNBO3Koe+gVoG/LOlgwbvrUDeotJTc5IKleJ7deJQ8tEPiyznveAVOVq+rR1pCCjdNBNT8XQ5JZITqYj2z4yJHcNJq5nSK9uIjeRGiGH5slDcMVJeDksEdwZVnQhWOyG9Bmd8C934ZsL7AFMvEivIpvQX51+rYJVoejvS+73dUF2ig/Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VXuWdDVs40TB3xfTNLIvUcHu7AMh+xydOxD//8KaFcs=;
- b=MyMKWY+VqRgYw7fQEs/qERfzLa4PhPOMQ8t6Fl8/3JYz8olmbOTe342xTId8fCP4eq521pPY7w0Iz5MbcRdBdwmDzHMwh9xCz4GzqzEOGoMYr9yf5mhGYWkJ4DDkM21XMsN3UPD9uCNIf1xC82Vam7v29uuksjYD178yHBfObDwTxiknqpVI8tVZqyHkP+wVLFDbNF2X/c1wB655VSJvulQdy+rEhAT6q0JQe9jbR1StvFooShHp5SCgrYKPFQw7a/l7PXxcz9c98fMJ+PRcVMPRt+YqXH/uJPyOVci7iFBG/DtZB5twpCGNVbFES4/jYrQxNl1Aa/rlZ8wIoXHUtQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VXuWdDVs40TB3xfTNLIvUcHu7AMh+xydOxD//8KaFcs=;
- b=V64nRF7TEi2nx0WV+BsBh/+pumUTFJyiRQnm0ErSwxCOJAV4/jC16BD8jxfvRTkeerkK9Jut4jjWv+fEogEmirBT06W9NORZRTdzqvMCMKQ3x+8IiUKr4557dPKxNhzZE/ep1GSPmObb+ytK6bYnRMp/TuysSVfT3iSVlLsRjV0=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5194.eurprd08.prod.outlook.com (10.255.18.19) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2263.26; Tue, 17 Sep 2019 13:25:03 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2263.023; Tue, 17 Sep 2019
- 13:25:03 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Greg Kurz <groug@kaod.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH 02/17] block: Pass local error object
- pointer to error_append_hint()
-Thread-Index: AQHVbUH6TzrJ58vIKEO+OGTVPIfvz6cv3BeA
-Date: Tue, 17 Sep 2019 13:25:03 +0000
-Message-ID: <5dba090e-8a59-6f42-a93a-eb676422211e@virtuozzo.com>
-References: <156871562997.196432.17776290406203122029.stgit@bahia.lan>
- <156871564329.196432.5930574495661947805.stgit@bahia.lan>
-In-Reply-To: <156871564329.196432.5930574495661947805.stgit@bahia.lan>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0501CA0032.eurprd05.prod.outlook.com
- (2603:10a6:3:1a::42) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190917162459382
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f9ed40e0-0611-464a-79ec-08d73b727272
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(5600167)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
- SRVR:DB8PR08MB5194; 
-x-ms-traffictypediagnostic: DB8PR08MB5194:
-x-microsoft-antispam-prvs: <DB8PR08MB51948E3D7A13AD975E9A606BC18F0@DB8PR08MB5194.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4714;
-x-forefront-prvs: 01630974C0
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(366004)(376002)(39850400004)(346002)(396003)(136003)(199004)(189003)(54906003)(66066001)(14454004)(76176011)(6116002)(186003)(7416002)(3846002)(316002)(6486002)(81166006)(102836004)(31696002)(8676002)(2616005)(66476007)(64756008)(386003)(26005)(478600001)(6506007)(81156014)(66446008)(11346002)(66556008)(99286004)(476003)(52116002)(446003)(86362001)(8936002)(71190400001)(71200400001)(256004)(110136005)(31686004)(66946007)(36756003)(305945005)(7736002)(7406005)(6246003)(2906002)(229853002)(6436002)(6512007)(486006)(2501003)(25786009)(5660300002)(4326008);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5194;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: E/cilThfA1f+GMAZknA8SvT5WRzDF4nIhgGal2lA5dIOgMkMGgobjSVGorFsQ+bQg7AOF15EGEll5eR2JCeycAO3v4wbwAzbXjk6PQL2OIAxIUsbISCRCQRf0O3/PERbkFV5J6lJewp2x8YO34l/4wfhHxrrkUidtW3hP2/Ca3jXBjBpSegFSpdMcAmvJlH6lPtFIcxIn63RdwERkeusr7IbHaOz/9YebQOh5O+hcK2Iv7el0VPuUt0cOPSAT1lMnHE5MQYN6cmKtagcfUpBrV0ieGmoxIYnkPqw2ZmH5nQd+gxueaV1WB0rEPSL3OeeHEd4Uhwl5NQg5CDFGbKR4ij/b1pAKdp294oNNqCo2ZP0hhXSjhe9/w58pROirC7jbpx7uP9DoGO7Ri9ziISvI6Avc1D7W6b4FfkQQKfh0gk=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B8B5FE710A208B46973C4FA1BAE14C85@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <andreas.konopik@fau.de>) id 1iADBX-0002Dl-Ie
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 09:06:26 -0400
+Received: from mx-rz-2.rrze.uni-erlangen.de ([131.188.11.21]:40323)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andreas.konopik@fau.de>)
+ id 1iADBW-0002AT-UM; Tue, 17 Sep 2019 09:06:23 -0400
+Received: from mx-rz-smart.rrze.uni-erlangen.de
+ (mx-rz-smart.rrze.uni-erlangen.de [IPv6:2001:638:a000:1025::1e])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mx-rz-2.rrze.uni-erlangen.de (Postfix) with ESMTPS id 46Xjzc2wQnzPnK9;
+ Tue, 17 Sep 2019 15:06:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fau.de; s=fau-2013;
+ t=1568725580; bh=+dxqkxRSK3oqr1+oIdiKBqxz4YNPLF/nQmx6MndBlPQ=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From:To:CC:
+ Subject;
+ b=cswJ1LKk2hhfwdylraRNPkGRzOPiKeM1PrDu92DC/ymqdJ9mijDnQ++4bxHOM3exU
+ buY6lk111B07Obd0XJXr8f7G28ynLBFEp8t3RsCNPFbkIgXP1TDRGblNCWDXv4hmAW
+ Jnfl3vjahGSxJafKllj7e3nGVj6QUPGJ60lYyPEddzMo4LzRW7/d763DWr9wqJnze4
+ 3cxOXxaVrQfXYOr6t1xh+4ZhI4ZxfE9h01h/c3SJSqknIHOCSXvrAH+DJ7CGSLYKRv
+ rH1C7ZqL28EvyO/dHntsFvqILmHwL6e2cSH1gC+2cWaIEYPeIEUJde8EIgGL2oLcoi
+ AZN++mqlXUuzA==
+X-Virus-Scanned: amavisd-new at boeck5.rrze.uni-erlangen.de (RRZE)
+X-RRZE-Flag: Not-Spam
+X-RRZE-Submit-IP: 131.188.11.37
+Received: from faumail.fau.de (smtp-auth.fau.de [131.188.11.37])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ (Authenticated sender: U2FsdGVkX19kqBELjgQqzUxaOdP147V72N6dzKEy3ls=)
+ by smtp-auth.uni-erlangen.de (Postfix) with ESMTPSA id 46XjzX0zbdzPkfS;
+ Tue, 17 Sep 2019 15:06:16 +0200 (CEST)
+Received: from JqnuTaqrV/hqxjKnOY3zlIp58VOes0D6Ihl08lDGJxw=
+ by faumail.uni-erlangen.de
+ with HTTP (HTTP/1.1 POST); Tue, 17 Sep 2019 15:06:16 +0200
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f9ed40e0-0611-464a-79ec-08d73b727272
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Sep 2019 13:25:03.1662 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: e4twgcrWcCTGKqa0A0exxy43yPP4gkGnNrq4i4l5hmRnGEINITUn4i1g+qKC0x9gpVhmYW3MlqMFUnWKTFHEfy2qYLuVpz5VFdbgyVLY+pQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5194
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe06::708
-Subject: Re: [Qemu-devel] [PATCH 02/17] block: Pass local error object
- pointer to error_append_hint()
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Tue, 17 Sep 2019 15:06:16 +0200
+From: "Konopik, Andreas" <andreas.konopik@fau.de>
+To: Peter Maydell <peter.maydell@linaro.org>
+In-Reply-To: <CAFEAcA-oP9QkYnQr1SQUvTks+9ySjDCn0G5yuULdOBepQi-PSw@mail.gmail.com>
+References: <9cf47438fa943b28ee987cea7b76a459@fau.de>
+ <CAFEAcA-oP9QkYnQr1SQUvTks+9ySjDCn0G5yuULdOBepQi-PSw@mail.gmail.com>
+Message-ID: <75c41dce4fe333c0304f5e80e3ea6f34@fau.de>
+X-Sender: andreas.konopik@fau.de
+User-Agent: Roundcube Webmail/1.2.9
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 131.188.11.21
+X-Mailman-Approved-At: Tue, 17 Sep 2019 09:26:56 -0400
+Subject: Re: [Qemu-devel] [Qemu-discuss] Segmentation fault on target tricore
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,86 +90,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <codyprime@gmail.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Juan Quintela <quintela@redhat.com>, David Hildenbrand <david@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- "\"qemu-s390x@nongnu.org\\\"\"@d06av22.portsmouth.uk.ibm.com"
- <"qemu-s390x@nongnu.org\""@d06av22.portsmouth.uk.ibm.com>,
- Eric Farman <farman@linux.ibm.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Yuval Shaia <yuval.shaia@oracle.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- "berrange@redhat.com" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-discuss@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTcuMDkuMjAxOSAxMzoyMCwgR3JlZyBLdXJ6IHdyb3RlOg0KPiBFbnN1cmUgdGhhdCBoaW50cyBh
-cmUgYWRkZWQgZXZlbiBpZiBlcnJwIGlzICZlcnJvcl9mYXRhbCBvciAmZXJyb3JfYWJvcnQuDQo+
-IA0KPiBTaWduZWQtb2ZmLWJ5OiBHcmVnIEt1cnogPGdyb3VnQGthb2Qub3JnPg0KPiAtLS0NCj4g
-ICBibG9jay9iYWNrdXAuYyAgICAgICB8ICAgIDcgKysrKystLQ0KPiAgIGJsb2NrL2RpcnR5LWJp
-dG1hcC5jIHwgICAgNyArKysrKy0tDQo+ICAgYmxvY2svZmlsZS1wb3NpeC5jICAgfCAgIDIwICsr
-KysrKysrKysrKystLS0tLS0tDQo+ICAgYmxvY2svZ2x1c3Rlci5jICAgICAgfCAgIDIzICsrKysr
-KysrKysrKysrKy0tLS0tLS0tDQo+ICAgYmxvY2svcWNvdy5jICAgICAgICAgfCAgIDEwICsrKysr
-Ky0tLS0NCj4gICBibG9jay9xY293Mi5jICAgICAgICB8ICAgIDcgKysrKystLQ0KPiAgIGJsb2Nr
-L3ZoZHgtbG9nLmMgICAgIHwgICAgNyArKysrKy0tDQo+ICAgYmxvY2svdnBjLmMgICAgICAgICAg
-fCAgICA3ICsrKysrLS0NCj4gICA4IGZpbGVzIGNoYW5nZWQsIDU5IGluc2VydGlvbnMoKyksIDI5
-IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2JhY2t1cC5jIGIvYmxvY2sv
-YmFja3VwLmMNCj4gaW5kZXggNzYzZjBkN2ZmNmRiLi5kOGM0MjJhMGUzYmMgMTAwNjQ0DQo+IC0t
-LSBhL2Jsb2NrL2JhY2t1cC5jDQo+ICsrKyBiL2Jsb2NrL2JhY2t1cC5jDQo+IEBAIC02MDIsMTEg
-KzYwMiwxNCBAQCBzdGF0aWMgaW50NjRfdCBiYWNrdXBfY2FsY3VsYXRlX2NsdXN0ZXJfc2l6ZShC
-bG9ja0RyaXZlclN0YXRlICp0YXJnZXQsDQo+ICAgICAgICAgICAgICAgICAgICAgICBCQUNLVVBf
-Q0xVU1RFUl9TSVpFX0RFRkFVTFQpOw0KPiAgICAgICAgICAgcmV0dXJuIEJBQ0tVUF9DTFVTVEVS
-X1NJWkVfREVGQVVMVDsNCj4gICAgICAgfSBlbHNlIGlmIChyZXQgPCAwICYmICF0YXJnZXQtPmJh
-Y2tpbmcpIHsNCj4gLSAgICAgICAgZXJyb3Jfc2V0Z19lcnJubyhlcnJwLCAtcmV0LA0KPiArICAg
-ICAgICBFcnJvciAqbG9jYWxfZXJyID0gTlVMTDsNCj4gKw0KPiArICAgICAgICBlcnJvcl9zZXRn
-X2Vycm5vKCZsb2NhbF9lcnIsIC1yZXQsDQo+ICAgICAgICAgICAgICAgIkNvdWxkbid0IGRldGVy
-bWluZSB0aGUgY2x1c3RlciBzaXplIG9mIHRoZSB0YXJnZXQgaW1hZ2UsICINCj4gICAgICAgICAg
-ICAgICAid2hpY2ggaGFzIG5vIGJhY2tpbmcgZmlsZSIpOw0KPiAtICAgICAgICBlcnJvcl9hcHBl
-bmRfaGludChlcnJwLA0KPiArICAgICAgICBlcnJvcl9hcHBlbmRfaGludCgmbG9jYWxfZXJyLA0K
-PiAgICAgICAgICAgICAgICJBYm9ydGluZywgc2luY2UgdGhpcyBtYXkgY3JlYXRlIGFuIHVudXNh
-YmxlIGRlc3RpbmF0aW9uIGltYWdlXG4iKTsNCj4gKyAgICAgICAgZXJyb3JfcHJvcGFnYXRlKGVy
-cnAsIGxvY2FsX2Vycik7DQo+ICAgICAgICAgICByZXR1cm4gcmV0Ow0KPiAgICAgICB9IGVsc2Ug
-aWYgKHJldCA8IDAgJiYgdGFyZ2V0LT5iYWNraW5nKSB7DQo+ICAgICAgICAgICAvKiBOb3QgZmF0
-YWw7IGp1c3QgdHJ1ZGdlIG9uIGFoZWFkLiAqLw0KDQoNClBhaW4uLiBEbyB3ZSBuZWVkIHRoZXNl
-IGhpbnRzLCBpZiB0aGV5IGFyZSBzbyBwYWluZnVsPw0KDQpBdCBsZWFzdCBmb3IgY2FzZXMgbGlr
-ZSB0aGlzLCB3ZSBjYW4gY3JlYXRlIGhlbHBlciBmdW5jdGlvbg0KDQplcnJvcl9zZXRnX2Vycm5v
-X2hpbnQoLi4uLCBlcnJvciwgaGludCkNCg0KQnV0IHdoYXQgY291bGQgYmUgZG9uZSB3aGVuIHdl
-IGNhbGwgZnVuY3Rpb24sIHdoaWNoIG1heSBvciBtYXkgbm90IHNldCBlcnJwPw0KDQpyZXQgPSBm
-KGVycnApOw0KaWYgKHJldCkgew0KICAgIGVycm9yX2FwcGVuZF9oaW50KGVycnAsIGhpbnQpOw0K
-fQ0KDQpIbW1tLi4NCg0KQ2FuIGl0IGxvb2sgbGlrZQ0KDQpyZXQgPSBmKC4uLiwgaGludF9oZWxw
-ZXIoZXJycCwgaGludCkpDQoNCj8NCg0KSSBjYW4ndCBpbWFnaW5lIGhvdyB0byBkbyBpdCwgYXMg
-c29tZW9uZSBzaG91bGQgcmVtb3ZlIGhpbnQgZnJvbSBlcnJvcl9hYm9ydCBvYmplY3Qgb24NCnN1
-Y2Nlc3MgcGF0aC4uDQoNCkJ1dCBzZWVtcywgdGhlIGZvbGxvd2luZyBpcyBwb3NzaWJsZSwgd2hp
-Y2ggc2VlbXMgYmV0dGVyIGZvciBtZSB0aGFuIGxvY2FsLWVycm9yIGFwcHJvYWNoOg0KDQplcnJv
-cl9wdXNoX2hpbnQoZXJycCwgaGludCk7DQpyZXQgPSBmKC4uLCBlcnJwKTsNCmVycm9yX3BvcF9o
-aW50KGVycnApOw0KDQo9PT0NCg0KQ29udGludWUgdGhpbmtpbmcgb24gdGhpczoNCg0KSXQgbWF5
-IGxvb2sgbGlrZSBqdXN0DQpyZXQgPSBmKC4uLiwgc2V0X2hpbnQoZXJycCwgaGludCkpOw0KDQpv
-ciAoanVzdCB0byBzcGxpdCBsb25nIGxpbmUpOg0Kc2V0X2hpbnQoZXJycCwgaGludCk7DQpyZXQg
-PSBmKC4uLiwgZXJycCk7DQoNCmlmIGluIGVhY2ggZnVuY3Rpb24gd2l0aCBlcnJwIGRvZXMgZXJy
-b3JfcHVzaF9oaW50KGVycnApIG9uIHN0YXJ0IGFuZCBlcnJvcl9wb3BfaGludChlcnJwKSBvbiBl
-eGl0LA0Kd2hpY2ggbWF5IGJlIGp1c3Qgb25lIGNhbGwgYXQgZnVuY3Rpb24gc3RhcnQgb2YgbWFj
-cm8sIHdoaWNoIHdpbGwgY2FsbCBlcnJvcl9wdXNoX2hpbnQoZXJycCkgYW5kDQpkZWZpbmUgbG9j
-YWwgdmFyaWFibGUgYnkgZ19hdXRvLCB3aXRoIGNsZWFudXAgd2hpY2ggd2lsbCBjYWxsIGVycm9y
-X3BvcF9oaW50KGVycnApIG9uIGZ1bmN0aW9uDQpleGl0Li4NCg0KT3IsIG1heSBiZSwgbW9yZSBk
-aXJlY3Qgd2F5IHRvIHNldCBjbGVhbnVwIGZvciBmdW5jdGlvbiBleGlzdHM/DQoNCj09PQ0KDQpB
-bHNvLCB3ZSBjYW4gaW1wbGVtZW50IHNvbWUgY29kZSBnZW5lcmF0aW9uLCB0byBnZW5lcmF0ZSBm
-b3IgZnVuY3Rpb25zIHdpdGggZXJycCBhcmd1bWVudA0Kd3JhcHBlcnMgd2l0aCBhZGRpdGlvbmFs
-IGhpbnQgcGFyYW1ldGVyLCBhbmQganVzdCB1c2UgdGhlc2Ugd3JhcHBlcnMuLg0KDQo9PT0NCg0K
-SWYgbm9ib2R5IGxpa2VzIGFueSBvZiBteSBzdWdnZXN0aW9ucywgdGhlbiBpZ25vcmUgdGhlbS4g
-SSB1bmRlcnN0YW5kIHRoYXQgdGhpcyBzZXJpZXMgZml4ZXMNCnJlYWwgaXNzdWUgYW5kIG11Y2gg
-ZWZmb3J0IGhhcyBhbHJlYWR5IGJlZW4gc3BlbnQuIE1heSBiZSBvbmUgZGF5IEknbGwgdHJ5IHRv
-IHJld3JpdGUgaXQuLi4NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+>> Using gdb and valgrind I found out that:
+>> - 'gen_mtcr()' and 'gen_mfcr()' access uninitialized values, i.e. 
+>> CSFRs,
+>> which leads to the Segfault
+>> - The uninitialised values were created by stack allocation of
+>> DisasContext in 'gen_intermediate_code()'
+> 
+> This definitely sounds like a bug: do you have a stack
+> backtrace from valgrind or gdb of the bad access and the
+> segfault?
+> 
+
+GDB:
+
+> [...]
+> Thread 3 "qemu-system-tri" received signal SIGSEGV, Segmentation fault.
+> [Switching to Thread 0x7ffff10a4700 (LWP 146730)]
+> 0x00005555556edb67 in gen_mfcr (ret=0xab0, offset=<optimized out>,
+>    ctx=<optimized out>)
+>    at /home/akonopik/qemu_src/target/tricore/cpu.h:274
+> 274	    return (env->features & (1ULL << feature)) != 0;
+> (gdb) bt
+> #0  0x00005555556edb67 in gen_mfcr
+>    (ret=0xab0, offset=<optimized out>, ctx=<optimized out>)
+>    at /home/akonopik/qemu_src/target/tricore/cpu.h:274
+> #1  0x000055555570bc30 in decode_rlc_opc (op1=<optimized out>, 
+> ctx=0x7ffff10a3540)
+>    at /home/akonopik/qemu_src/target/tricore/translate.c:6020
+> #2  0x000055555570bc30 in decode_32Bit_opc 
+> (ctx=ctx@entry=0x7ffff10a3540)
+>    at /home/akonopik/qemu_src/target/tricore/translate.c:8680
+> #3  0x000055555570bf77 in tricore_tr_translate_insn
+>    (dcbase=0x7ffff10a3540, cpu=<optimized out>)
+>    at /home/akonopik/qemu_src/target/tricore/translate.c:8856
+> #4  0x00005555556e15c9 in translator_loop (ops=
+>    0x555555c2b340 <tricore_tr_ops>, db=0x7ffff10a3540, 
+> cpu=0x555555dc0480, tb=<optimized out>, max_insns=<optimized out>)
+>    at /home/akonopik/qemu_src/accel/tcg/translator.c:94
+> #5  0x000055555570d96c in gen_intermediate_code
+>    (cs=cs@entry=0x555555dc0480, tb=tb@entry=0x7fffea000280 
+> <code_gen_buffer+595>, max_insns=max_insns@entry=512)
+>    at /home/akonopik/qemu_src/target/tricore/translate.c:8907
+> #6  0x00005555556e01f4 in tb_gen_code
+>    (cpu=cpu@entry=0x555555dc0480, pc=pc@entry=2147485022, 
+> cs_base=cs_base@entry=0, flags=flags@entry=0, cflags=-16777216, 
+> cflags@entry=0)
+>    at /home/akonopik/qemu_src/accel/tcg/translate-all.c:1738
+> #7  0x00005555556de474 in tb_find
+>    (cf_mask=0, tb_exit=0, last_tb=0x7fffea000140 <code_gen_buffer+275>, 
+> cpu=0x555555dc0758) at /home/akonopik/qemu_src/accel/tcg/cpu-exec.c:408
+> #8  0x00005555556de474 in cpu_exec (cpu=cpu@entry=0x555555dc0480)
+>    at /home/akonopik/qemu_src/accel/tcg/cpu-exec.c:730
+> #9  0x00005555556a59c0 in tcg_cpu_exec (cpu=0x555555dc0480)
+>    at /home/akonopik/qemu_src/cpus.c:1445
+> #10 0x00005555556a7831 in qemu_tcg_rr_cpu_thread_fn 
+> (arg=arg@entry=0x555555dc0480)
+>    at /home/akonopik/qemu_src/cpus.c:1547
+> #11 0x00005555558d540b in qemu_thread_start (args=<optimized out>)
+>    at /home/akonopik/qemu_src/util/qemu-thread-posix.c:502
+> #12 0x00007ffff5a1657f in start_thread () at /usr/lib/libpthread.so.0
+> #13 0x00007ffff59460e3 in clone () at /usr/lib/libc.so.6
+
+VALGRIND:
+
+> ==146846== Memcheck, a memory error detector
+> ==146846== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et 
+> al.
+> ==146846== Using Valgrind-3.14.0 and LibVEX; rerun with -h for 
+> copyright info
+> ==146846== Command:
+> /home/akonopik/qemu_src/build/tricore-softmmu/qemu-system-tricore 
+> -nographic -M
+> tricore_testboard -cpu tc1796 -kernel /home/akonopik/hello.elf
+> ==146846==
+> --146846-- WARNING: unhandled amd64-linux syscall: 317
+> --146846-- You may be able to write your own handler.
+> --146846-- Read the file README_MISSING_SYSCALL_OR_IOCTL.
+> --146846-- Nevertheless we consider this a bug.  Please report
+> --146846-- it at http://valgrind.org/support/bug_reports.html.
+> ==146846== Conditional jump or move depends on uninitialised value(s)
+> ==146846==    at 0x223D94: tcg_target_init (tcg-target.inc.c:3776)
+> ==146846==    by 0x223D94: tcg_context_init (tcg.c:961)
+> ==146846==    by 0x293E29: cpu_gen_init (translate-all.c:240)
+> ==146846==    by 0x293E29: tcg_exec_init (translate-all.c:1148)
+> ==146846==    by 0x275333: tcg_init (tcg-all.c:63)
+> ==146846==    by 0x274DE3: accel_init_machine (accel.c:63)
+> ==146846==    by 0x274DE3: configure_accelerator (accel.c:110)
+> ==146846==    by 0x210236: main (vl.c:4185)
+> ==146846==  Uninitialised value was created by a stack allocation
+> ==146846==    at 0x5E3E117: ??? (in /usr/lib/libglib-2.0.so.0.6200.0)
+> ==146846==
+> QEMU 4.1.50 monitor - type 'help' for more information
+> (qemu) ==146846== Thread 3:
+> ==146846== Use of uninitialised value of size 8
+> ==146846==    at 0x2A1B67: gen_mfcr.isra.0 (csfr.def:9)
+> ==146846==    by 0x2BFC2F: decode_rlc_opc (translate.c:6020)
+> ==146846==    by 0x2BFC2F: decode_32Bit_opc (translate.c:8680)
+> ==146846==    by 0x2BFF76: tricore_tr_translate_insn (translate.c:8856)
+> ==146846==    by 0x2955C8: translator_loop (translator.c:94)
+> ==146846==    by 0x2C196B: gen_intermediate_code (translate.c:8907)
+> ==146846==    by 0x2941F3: tb_gen_code (translate-all.c:1738)
+> ==146846==    by 0x292473: tb_find (cpu-exec.c:408)
+> ==146846==    by 0x292473: cpu_exec (cpu-exec.c:730)
+> ==146846==    by 0x2599BF: tcg_cpu_exec (cpus.c:1445)
+> ==146846==    by 0x25B830: qemu_tcg_rr_cpu_thread_fn (cpus.c:1547)
+> ==146846==    by 0x48940A: qemu_thread_start (qemu-thread-posix.c:502)
+> ==146846==    by 0x6DEE57E: start_thread (in 
+> /usr/lib/libpthread-2.29.so)
+> ==146846==    by 0x6F040E2: clone (in /usr/lib/libc-2.29.so)
+> ==146846==  Uninitialised value was created by a stack allocation
+> ==146846==    at 0x2C1940: gen_intermediate_code (translate.c:8905)
+> ==146846==
+> ==146846== Use of uninitialised value of size 8
+> ==146846==    at 0x2A302C: gen_mtcr.isra.0 (csfr.def:9)
+> ==146846==    by 0x2BFC9C: decode_rlc_opc (translate.c:6046)
+> ==146846==    by 0x2BFC9C: decode_32Bit_opc (translate.c:8680)
+> ==146846==    by 0x2BFF76: tricore_tr_translate_insn (translate.c:8856)
+> ==146846==    by 0x2955C8: translator_loop (translator.c:94)
+> ==146846==    by 0x2C196B: gen_intermediate_code (translate.c:8907)
+> ==146846==    by 0x2941F3: tb_gen_code (translate-all.c:1738)
+> ==146846==    by 0x292473: tb_find (cpu-exec.c:408)
+> ==146846==    by 0x292473: cpu_exec (cpu-exec.c:730)
+> ==146846==    by 0x2599BF: tcg_cpu_exec (cpus.c:1445)
+> ==146846==    by 0x25B830: qemu_tcg_rr_cpu_thread_fn (cpus.c:1547)
+> ==146846==    by 0x48940A: qemu_thread_start (qemu-thread-posix.c:502)
+> ==146846==    by 0x6DEE57E: start_thread (in 
+> /usr/lib/libpthread-2.29.so)
+> ==146846==    by 0x6F040E2: clone (in /usr/lib/libc-2.29.so)
+> ==146846==  Uninitialised value was created by a stack allocation
+> ==146846==    at 0x2C1940: gen_intermediate_code (translate.c:8905)
+> [...]
+
+
+Regards,
+
+Andreas
 
