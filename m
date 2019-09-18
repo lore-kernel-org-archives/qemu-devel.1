@@ -2,90 +2,61 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA43C4CEC4
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:29:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F45C4CEC4
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:30:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78DE8208C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:29:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cIDoOFEr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78DE8208C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id F3058208C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:30:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3058208C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAdly-00084h-LJ
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 13:29:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34514)
+	id 1iAdmP-0000Go-IG
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 13:30:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55723)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iAdHZ-0003wu-9E
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:58:22 -0400
+ (envelope-from <clg@kaod.org>) id 1iAcUq-00047g-Bb
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:08:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iAdHX-00022N-M1
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:58:21 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39407)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iAdHX-00021n-BJ
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:58:19 -0400
-Received: by mail-wr1-x442.google.com with SMTP id r3so183396wrj.6
- for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 09:58:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=ORDEN7jiztS7uczUBqCzJ8KnmEaF/pHAiuQlY+j2gcw=;
- b=cIDoOFErpym6c77BebgSvuRgwsxy5cu5Ov3FG9u2Tvazz62x0NSAn+BcZ5vtLBerRU
- cbHQ/dfhoF1YnlmvfRdyNjvCAoCBE5zVzbBhWBPVAgqSBWo7qU+DxoR4cxW4xm6iox02
- qct4asAFn43gWtPyU10TrtDTuwfRS9y4/b3+V+niZIVHU4CjykMAw3HE9zl75NZpWOiQ
- mhWdC3DyaqpclcoRLUhfCYNJWXNC6GICv6KZkABJL8YijRs7w+rC3u6CauCun2RIpg7J
- P+fX+akiqrSKXlgOEL/9W7tTT4AIxK0GlGFeBHCFaxZeBs0U0KxBYpHRtfKIy++7r4hA
- oe3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=ORDEN7jiztS7uczUBqCzJ8KnmEaF/pHAiuQlY+j2gcw=;
- b=lgGgtkkyaHx5MqYqTskbvWsidqBxRsCoNtPdmcI8sNArPkgg9jLSaftYvsEiUR0Suy
- ylIAWcEHxtOnVWuAnf3u4YiP7BLZgoi02sHKdzgBFGwUoM7/lId//A4j3wssMNl0qu4a
- UKNPXxpHmDBviC7eeT11BPHzNWQzFL7+SVbdiZJS33qKfpjYCm4Swr7t9A3GV8ErFGZn
- hGJNKBeFdGVwdeSvs+49XqY6rK/+3g8YKi5PRPL1J1EWIolK4/EjT+cWmee0TTqpRlXh
- oO6+wYmQCYAEQMKb2cRz1mGFW/YSRximIp3HCkoy4I9VmyqQHWXMDZE/QrwpCLNsPLKW
- ZYAA==
-X-Gm-Message-State: APjAAAWNd1NZwinpRN8y9BMqLGNfA7rIL5y6EeEy1rpKdJSTFtfuy98A
- BJijLEwkgA8fSRFloyvNaFD9+A==
-X-Google-Smtp-Source: APXvYqwrK3KMrgwinYPcTqRIIzoGLxUUAIA/lkkOVfLVOe75VI12xgrdCjQjOqIVCvVDFvyIAZPuQg==
-X-Received: by 2002:adf:eb4d:: with SMTP id u13mr3554846wrn.224.1568825897681; 
- Wed, 18 Sep 2019 09:58:17 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y13sm13204858wrg.8.2019.09.18.09.58.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 18 Sep 2019 09:58:17 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 497281FF87;
- Wed, 18 Sep 2019 17:58:16 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Wed, 18 Sep 2019 17:58:09 +0100
-Message-Id: <20190918165809.3719-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190918153335.20797-1-alex.bennee@linaro.org>
-References: <20190918153335.20797-1-alex.bennee@linaro.org>
+ (envelope-from <clg@kaod.org>) id 1iAcUo-0003Ie-O3
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:08:00 -0400
+Received: from 3.mo178.mail-out.ovh.net ([46.105.44.197]:53776)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iAcUo-0003Gk-I2
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:07:58 -0400
+Received: from player799.ha.ovh.net (unknown [10.108.54.87])
+ by mo178.mail-out.ovh.net (Postfix) with ESMTP id C3B7B795E5
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 18:07:56 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+ (Authenticated sender: clg@kaod.org)
+ by player799.ha.ovh.net (Postfix) with ESMTPSA id 524CA9F0E6E5;
+ Wed, 18 Sep 2019 16:07:51 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Wed, 18 Sep 2019 18:06:31 +0200
+Message-Id: <20190918160645.25126-12-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190918160645.25126-1-clg@kaod.org>
+References: <20190918160645.25126-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [RFC PATCH] tests/tcg: add time counter to memory test
- (WIP, aarch64 only)
+X-Ovh-Tracer-Id: 6222848788649642982
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudekgdeljecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.44.197
+Subject: [Qemu-devel] [PATCH v4 11/25] ppc/xive: Move the TIMA operations to
+ the controller model
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,99 +68,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To better support testing record/replay we should output something
-that would otherwise be variable had it not been pegged to icount.
+This also removes the need of the get_tctx() XiveRouter handler in the
+core XIVE framework.
 
-[AJB: needs a bit of work to nicely work across architectures although
-most have some sort of counter].
-
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- tests/tcg/aarch64/Makefile.softmmu-target | 1 +
- tests/tcg/aarch64/system/boot.S           | 6 ++++++
- tests/tcg/minilib/minilib.h               | 3 +++
- tests/tcg/multiarch/system/memory.c       | 6 +++++-
- 4 files changed, 15 insertions(+), 1 deletion(-)
+ include/hw/ppc/xive.h |  1 -
+ hw/intc/pnv_xive.c    | 35 ++++++++++++++++++++++++++++++++++-
+ hw/intc/spapr_xive.c  | 33 +++++++++++++++++++++++++++++++--
+ hw/intc/xive.c        | 29 -----------------------------
+ 4 files changed, 65 insertions(+), 33 deletions(-)
 
-diff --git a/tests/tcg/aarch64/Makefile.softmmu-target b/tests/tcg/aarch64/Makefile.softmmu-target
-index b4b39579634..698d9b26b63 100644
---- a/tests/tcg/aarch64/Makefile.softmmu-target
-+++ b/tests/tcg/aarch64/Makefile.softmmu-target
-@@ -51,5 +51,6 @@ run-memory-replay: memory-replay run-memory-record
- 		  -icount shift=5$(COMMA)rr=replay$(COMMA)rrfile=record.bin \
- 	   	  $(QEMU_OPTS) memory, \
- 	  "$< on $(TARGET_NAME)")
-+	$(call diff-out,memory-record,memory-replay.out)
- 
- TESTS+=memory-record memory-replay
-diff --git a/tests/tcg/aarch64/system/boot.S b/tests/tcg/aarch64/system/boot.S
-index b14e94f332d..fb7574e9c06 100644
---- a/tests/tcg/aarch64/system/boot.S
-+++ b/tests/tcg/aarch64/system/boot.S
-@@ -220,6 +220,12 @@ __sys_outc:
- 	ldp x0, x1, [sp], #16
- 	ret
- 
-+	/* return some sort of counter value */
-+	.global __sys_counter
-+__sys_counter:
-+	mrs x0, CNTV_TVAL_EL0
-+	ret
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 536deea8c622..9d9cd88dd17e 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -462,7 +462,6 @@ typedef struct XiveENDSource {
+ #define XIVE_TM_OS_PAGE         0x2
+ #define XIVE_TM_USER_PAGE       0x3
+=20
+-extern const MemoryRegionOps xive_tm_ops;
+ void xive_tctx_tm_write(XivePresenter *xptr, XiveTCTX *tctx, hwaddr offs=
+et,
+                         uint64_t value, unsigned size);
+ uint64_t xive_tctx_tm_read(XivePresenter *xptr, XiveTCTX *tctx, hwaddr o=
+ffset,
+diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+index 3d6fcf9ac139..40e18fb44811 100644
+--- a/hw/intc/pnv_xive.c
++++ b/hw/intc/pnv_xive.c
+@@ -1475,6 +1475,39 @@ static const MemoryRegionOps xive_tm_indirect_ops =
+=3D {
+     },
+ };
+=20
++static void pnv_xive_tm_write(void *opaque, hwaddr offset,
++                              uint64_t value, unsigned size)
++{
++    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
++    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
++    XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
 +
- 	.data
- 	.align	12
- 
-diff --git a/tests/tcg/minilib/minilib.h b/tests/tcg/minilib/minilib.h
-index e23361380ae..29c097c545b 100644
---- a/tests/tcg/minilib/minilib.h
-+++ b/tests/tcg/minilib/minilib.h
-@@ -12,10 +12,13 @@
- #ifndef _MINILIB_H_
- #define _MINILIB_H_
- 
-+#include <inttypes.h>
++    xive_tctx_tm_write(XIVE_PRESENTER(xive), tctx, offset, value, size);
++}
++
++static uint64_t pnv_xive_tm_read(void *opaque, hwaddr offset, unsigned s=
+ize)
++{
++    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
++    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
++    XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
++
++    return xive_tctx_tm_read(XIVE_PRESENTER(xive), tctx, offset, size);
++}
++
++const MemoryRegionOps pnv_xive_tm_ops =3D {
++    .read =3D pnv_xive_tm_read,
++    .write =3D pnv_xive_tm_write,
++    .endianness =3D DEVICE_BIG_ENDIAN,
++    .valid =3D {
++        .min_access_size =3D 1,
++        .max_access_size =3D 8,
++    },
++    .impl =3D {
++        .min_access_size =3D 1,
++        .max_access_size =3D 8,
++    },
++};
 +
  /*
-  * Provided by the individual arch
+  * Interrupt controller XSCOM region.
   */
- extern void __sys_outc(char c);
-+extern uint64_t __sys_counter(void);
- 
- /*
-  * Provided by the common minilib
-diff --git a/tests/tcg/multiarch/system/memory.c b/tests/tcg/multiarch/system/memory.c
-index d124502d730..fe32ed27bf8 100644
---- a/tests/tcg/multiarch/system/memory.c
-+++ b/tests/tcg/multiarch/system/memory.c
-@@ -454,6 +454,8 @@ int main(void)
- {
-     int i;
-     bool ok = true;
-+    uint64_t start = __sys_counter();
-+    uint64_t end;
- 
-     /* Run through the unsigned tests first */
-     for (i = 0; i < ARRAY_SIZE(init_ufns) && ok; i++) {
-@@ -470,6 +472,8 @@ int main(void)
-         ok = do_signed_reads(true);
-     }
- 
--    ml_printf("Test complete: %s\n", ok ? "PASSED" : "FAILED");
-+    end = __sys_counter();
-+
-+    ml_printf("Test complete in %" PRId64 ": %s\n", start - end, ok ? "PASSED" : "FAILED");
-     return ok ? 0 : -1;
+@@ -1832,7 +1865,7 @@ static void pnv_xive_realize(DeviceState *dev, Erro=
+r **errp)
+                           "xive-pc", PNV9_XIVE_PC_SIZE);
+=20
+     /* Thread Interrupt Management Area (Direct) */
+-    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops,
++    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &pnv_xive_tm_ops=
+,
+                           xive, "xive-tima", PNV9_XIVE_TM_SIZE);
+=20
+     qemu_register_reset(pnv_xive_reset, dev);
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index eefc0d4c36b9..e00a9bdd901b 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -222,6 +222,35 @@ void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx)
+     memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &nvt_cam, 4);
  }
--- 
-2.20.1
+=20
++static void spapr_xive_tm_write(void *opaque, hwaddr offset,
++                          uint64_t value, unsigned size)
++{
++    XiveTCTX *tctx =3D spapr_cpu_state(POWERPC_CPU(current_cpu))->tctx;
++
++    xive_tctx_tm_write(XIVE_PRESENTER(opaque), tctx, offset, value, size=
+);
++}
++
++static uint64_t spapr_xive_tm_read(void *opaque, hwaddr offset, unsigned=
+ size)
++{
++    XiveTCTX *tctx =3D spapr_cpu_state(POWERPC_CPU(current_cpu))->tctx;
++
++    return xive_tctx_tm_read(XIVE_PRESENTER(opaque), tctx, offset, size)=
+;
++}
++
++const MemoryRegionOps spapr_xive_tm_ops =3D {
++    .read =3D spapr_xive_tm_read,
++    .write =3D spapr_xive_tm_write,
++    .endianness =3D DEVICE_BIG_ENDIAN,
++    .valid =3D {
++        .min_access_size =3D 1,
++        .max_access_size =3D 8,
++    },
++    .impl =3D {
++        .min_access_size =3D 1,
++        .max_access_size =3D 8,
++    },
++};
++
+ static void spapr_xive_end_reset(XiveEND *end)
+ {
+     memset(end, 0, sizeof(*end));
+@@ -331,8 +360,8 @@ static void spapr_xive_realize(DeviceState *dev, Erro=
+r **errp)
+     qemu_register_reset(spapr_xive_reset, dev);
+=20
+     /* TIMA initialization */
+-    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops, xi=
+ve,
+-                          "xive.tima", 4ull << TM_SHIFT);
++    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &spapr_xive_tm_o=
+ps,
++                          xive, "xive.tima", 4ull << TM_SHIFT);
+     sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
+=20
+     /*
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 9bb09ed6ee7b..11432f04f5c3 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -483,35 +483,6 @@ uint64_t xive_tctx_tm_read(XivePresenter *xptr, Xive=
+TCTX *tctx, hwaddr offset,
+     return xive_tm_raw_read(tctx, offset, size);
+ }
+=20
+-static void xive_tm_write(void *opaque, hwaddr offset,
+-                          uint64_t value, unsigned size)
+-{
+-    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), current=
+_cpu);
+-
+-    xive_tctx_tm_write(XIVE_PRESENTER(opaque), tctx, offset, value, size=
+);
+-}
+-
+-static uint64_t xive_tm_read(void *opaque, hwaddr offset, unsigned size)
+-{
+-    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), current=
+_cpu);
+-
+-    return xive_tctx_tm_read(XIVE_PRESENTER(opaque), tctx, offset, size)=
+;
+-}
+-
+-const MemoryRegionOps xive_tm_ops =3D {
+-    .read =3D xive_tm_read,
+-    .write =3D xive_tm_write,
+-    .endianness =3D DEVICE_BIG_ENDIAN,
+-    .valid =3D {
+-        .min_access_size =3D 1,
+-        .max_access_size =3D 8,
+-    },
+-    .impl =3D {
+-        .min_access_size =3D 1,
+-        .max_access_size =3D 8,
+-    },
+-};
+-
+ static char *xive_tctx_ring_print(uint8_t *ring)
+ {
+     uint32_t w2 =3D xive_tctx_word2(ring);
+--=20
+2.21.0
 
 
