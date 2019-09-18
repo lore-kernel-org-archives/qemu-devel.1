@@ -2,59 +2,60 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24CE9C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 16:47:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF7A8C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 16:48:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F02A3218AE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 16:47:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F02A3218AE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id C658C21907
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 16:48:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C658C21907
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAd7F-000759-TF
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 12:47:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55363)
+	id 1iAd8R-0008Ty-10
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 12:48:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50882)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iAcTr-0002hQ-4J
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:07:00 -0400
+ (envelope-from <david@redhat.com>) id 1iAbvj-0002CE-Bq
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:31:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iAcTp-0002XA-8D
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:06:58 -0400
-Received: from 16.mo7.mail-out.ovh.net ([46.105.72.216]:44185)
+ (envelope-from <david@redhat.com>) id 1iAbvh-0000lV-8M
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:31:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48272)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iAcTp-0002Wi-2S
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:06:57 -0400
-Received: from player799.ha.ovh.net (unknown [10.109.143.201])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id 1826913368F
- for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 18:06:54 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
- (Authenticated sender: clg@kaod.org)
- by player799.ha.ovh.net (Postfix) with ESMTPSA id E28939F0E32F;
- Wed, 18 Sep 2019 16:06:49 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 18 Sep 2019 18:06:20 +0200
-Message-Id: <20190918160645.25126-1-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1iAbvh-0000l4-2d; Wed, 18 Sep 2019 11:31:41 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3C624306F4BE;
+ Wed, 18 Sep 2019 15:31:40 +0000 (UTC)
+Received: from t460s.redhat.com (ovpn-117-119.ams2.redhat.com [10.36.117.119])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8BD285D6A5;
+ Wed, 18 Sep 2019 15:31:38 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 18 Sep 2019 17:29:16 +0200
+Message-Id: <20190918152922.18949-24-david@redhat.com>
+In-Reply-To: <20190918152922.18949-1-david@redhat.com>
+References: <20190918152922.18949-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 6205397340791147494
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudekgdeliecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Wed, 18 Sep 2019 15:31:40 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.72.216
-Subject: [Qemu-devel] [PATCH v4 00/25] ppc/pnv: add XIVE support for KVM
- guests
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 23/29] s390x/tcg: NC: Fault-safe
+ handling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,108 +67,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
+We can process a maximum of 256 bytes, crossing two pages.
 
-The QEMU PowerNV machine emulates a baremetal OpenPOWER system and
-acts as an hypervisor (L0). Supporting emulation of KVM to run guests
-(L1) requires a few more extensions, among which guest support for the
-XIVE interrupt controller on POWER9 processor.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/mem_helper.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-The following changes add new per-CPU PowerNV machines and extend the
-XIVE models with the new XiveFabric and XivePresenter interfaces to
-provide support for XIVE escalations and interrupt resend. This
-mechanism is used by XIVE to notify the hypervisor that a vCPU is not
-dispatched on a HW thread. Tested on a QEMU PowerNV machine and a
-simple QEMU pseries guest doing network on a local bridge.
-
-The XIVE interrupt controller offers a way to increase the XIVE
-resources per chip by configuring multiple XIVE blocks on a chip. This
-is not currently supported by the model. However, some configurations,
-such as OPAL/skiboot, use one block-per-chip configuration with some
-optimizations. One of them is to override the hardwired chip ID by the
-block id in the PowerBUS operations and for CAM line compares. This
-patchset improves the support for this setup. Tested with 4 chips.
-
-A series from Suraj adding guest support in the Radix MMU model of the
-QEMU PowerNV machine is still required and will be send later. The
-whole patchset can be found under :
-
-  https://github.com/legoater/qemu/tree/powernv-4.2
-
-Thanks,
-
-C.
-
-Changes since v3:
-
- - reworked the patches introducing the XiveFabric and XivePresenter
-   interfaces
- - moved the get_block_id() handler to the XiveRouter
- - new small addons related to the format of the trigger data
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index a2118a82e3..20fc17d44d 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -323,17 +323,26 @@ static int mmu_idx_from_as(uint8_t as)
+ static uint32_t do_helper_nc(CPUS390XState *env, uint32_t l, uint64_t de=
+st,
+                              uint64_t src, uintptr_t ra)
+ {
++    const int mmu_idx =3D cpu_mmu_index(env, false);
++    S390Access srca1, srca2, desta;
+     uint32_t i;
+     uint8_t c =3D 0;
 =20
-Changes since v2:
-
- - introduced the XiveFabric and XivePresenter interfaces
- - removed the need of a XiveRouter pointer under XiveTCTX
-
-Changes since v1:
-
- - minor extra fixes=20
- - split the escalation support in different patches
- - kept the XiveRouter type for XiveTCTX back pointer (will address
-   this in P10)
- - removed pnv_xive_vst_size(). Really broken on indirect tables.
- - improved the dump of the NVT table
- - introduce pnv_xive_get_block_id()
-
-
-C=C3=A9dric Le Goater (25):
-  ppc/xive: Introduce a XivePresenter interface
-  ppc/xive: Implement the XivePresenter interface
-  ppc/pnv: Introduce a PNV_CHIP_CPU_FOREACH() helper
-  ppc/pnv: Introduce a pnv_xive_is_cpu_enabled() helper
-  ppc/xive: Introduce a XiveFabric interface
-  ppc/pnv: Implement the XiveFabric interface
-  ppc/spapr: Implement the XiveFabric interface
-  ppc/xive: Use the XiveFabric and XivePresenter interfaces
-  ppc/xive: Extend the TIMA operation with a XivePresenter parameter
-  ppc/pnv: Clarify how the TIMA is accessed on a multichip system
-  ppc/xive: Move the TIMA operations to the controller model
-  ppc/xive: Remove the get_tctx() XiveRouter handler
-  ppc/xive: Introduce a xive_tctx_ipb_update() helper
-  ppc/xive: Introduce helpers for the NVT id
-  ppc/xive: Synthesize interrupt from the saved IPB in the NVT
-  ppc/pnv: Remove pnv_xive_vst_size() routine
-  ppc/pnv: Dump the XIVE NVT table
-  ppc/pnv: Skip empty slots of the XIVE NVT table
-  ppc/pnv: Introduce a pnv_xive_block_id() helper
-  ppc/pnv: Extend XiveRouter with a get_block_id() handler
-  ppc/pnv: Quiesce some XIVE errors
-  ppc/xive: Introduce a xive_os_cam_decode() helper
-  ppc/xive: Check V bit in TM_PULL_POOL_CTX
-  ppc/pnv: Improve trigger data definition
-  ppc/pnv: Use the EAS trigger bit when triggering an interrupt from PSI
-
- include/hw/ppc/pnv.h       |  13 ++
- include/hw/ppc/pnv_xive.h  |   3 -
- include/hw/ppc/spapr_irq.h |   6 +
- include/hw/ppc/xive.h      |  72 ++++++--
- include/hw/ppc/xive_regs.h |  48 ++++-
- hw/intc/pnv_xive.c         | 370 +++++++++++++++++++++++++------------
- hw/intc/spapr_xive.c       |  80 +++++++-
- hw/intc/xive.c             | 328 +++++++++++++++++---------------
- hw/ppc/pnv.c               |  32 ++++
- hw/ppc/pnv_psi.c           |  15 +-
- hw/ppc/spapr.c             |  34 ++++
- hw/ppc/spapr_irq.c         |  25 +++
- 12 files changed, 730 insertions(+), 296 deletions(-)
-
+     HELPER_LOG("%s l %d dest %" PRIx64 " src %" PRIx64 "\n",
+                __func__, l, dest, src);
+=20
+-    for (i =3D 0; i <=3D l; i++) {
+-        uint8_t x =3D cpu_ldub_data_ra(env, src + i, ra);
+-        x &=3D cpu_ldub_data_ra(env, dest + i, ra);
++    /* NC always processes one more byte than specified - maximum is 256=
+ */
++    l++;
++
++    srca1 =3D access_prepare(env, src, l, MMU_DATA_LOAD, mmu_idx, ra);
++    srca2 =3D access_prepare(env, dest, l, MMU_DATA_LOAD, mmu_idx, ra);
++    desta =3D access_prepare(env, dest, l, MMU_DATA_STORE, mmu_idx, ra);
++    for (i =3D 0; i < l; i++) {
++        const uint8_t x =3D access_get_byte(env, &srca1, i, ra) &
++                          access_get_byte(env, &srca2, i, ra);
++
+         c |=3D x;
+-        cpu_stb_data_ra(env, dest + i, x, ra);
++        access_set_byte(env, &desta, i, x, ra);
+     }
+     return c !=3D 0;
+ }
 --=20
 2.21.0
 
