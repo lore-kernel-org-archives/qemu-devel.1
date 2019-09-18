@@ -6,61 +6,59 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62A04C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 18:48:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DAB6C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 18:52:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 358B821897
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 18:48:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 358B821897
+	by mail.kernel.org (Postfix) with ESMTPS id 0F47221A49
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 18:52:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F47221A49
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAezu-0007Fn-Bx
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 14:48:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55605)
+	id 1iAf3a-0002HW-43
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 14:52:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56124)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iAeyI-0006Wc-J4
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 14:46:35 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iAf1B-0008D2-3b
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 14:49:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iAeyH-0005XV-Dd
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 14:46:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58160)
+ (envelope-from <jsnow@redhat.com>) id 1iAf1A-0006go-3D
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 14:49:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36154)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iAeyE-0005Vm-MT; Wed, 18 Sep 2019 14:46:30 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1iAf15-0006f5-W2; Wed, 18 Sep 2019 14:49:28 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DEAE520E1;
- Wed, 18 Sep 2019 18:46:29 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D11FA3082E55;
+ Wed, 18 Sep 2019 18:49:26 +0000 (UTC)
 Received: from [10.10.124.73] (ovpn-124-73.rdu2.redhat.com [10.10.124.73])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3CA0B19C5B;
- Wed, 18 Sep 2019 18:46:29 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190912135632.13925-1-mreitz@redhat.com>
- <20190912135632.13925-5-mreitz@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 36736600C8;
+ Wed, 18 Sep 2019 18:49:26 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20190918085519.17290-1-kwolf@redhat.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <377314de-2a77-0fe7-e5ea-07f368c504ec@redhat.com>
-Date: Wed, 18 Sep 2019 14:46:28 -0400
+Message-ID: <b0f72b9f-69b1-4e1d-4321-d30c7d85355f@redhat.com>
+Date: Wed, 18 Sep 2019 14:49:25 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190912135632.13925-5-mreitz@redhat.com>
+In-Reply-To: <20190918085519.17290-1-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Wed, 18 Sep 2019 18:46:29 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Wed, 18 Sep 2019 18:49:26 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 4/4] iotests: Add test for failing mirror
- complete
+Subject: Re: [Qemu-devel] [PATCH] iotests: Require Python 3.5 or later
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,104 +70,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
+Cc: mreitz@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/12/19 9:56 AM, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+On 9/18/19 4:55 AM, Kevin Wolf wrote:
+> Running iotests is not required to build QEMU, so we can have stricter
+> version requirements for Python here and can make use of new features
+> and drop compatibility code earlier.
+> 
+> This makes qemu-iotests skip all Python tests if a Python version before
+> 3.5 is used for the build.
+> 
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->   tests/qemu-iotests/041     | 44 ++++++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/041.out |  4 ++--
->   2 files changed, 46 insertions(+), 2 deletions(-)
+>   tests/qemu-iotests/check | 14 +++++++++++++-
+>   1 file changed, 13 insertions(+), 1 deletion(-)
 > 
-> diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-> index 8568426311..84bc6d6581 100755
-> --- a/tests/qemu-iotests/041
-> +++ b/tests/qemu-iotests/041
-> @@ -1121,6 +1121,50 @@ class TestOrphanedSource(iotests.QMPTestCase):
->                                target='dest-ro')
->           self.assert_qmp(result, 'error/class', 'GenericError')
+> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+> index 875399d79f..a68f414d6c 100755
+> --- a/tests/qemu-iotests/check
+> +++ b/tests/qemu-iotests/check
+> @@ -633,6 +633,13 @@ then
+>       export SOCKET_SCM_HELPER="$build_iotests/socket_scm_helper"
+>   fi
 >   
-> +    def test_failing_permission_in_complete(self):
-> +        self.assert_no_active_block_jobs()
+> +# Note that if the Python conditional here evaluates True we will exit
+> +# with status 1 which is a shell 'false' value.
+> +python_usable=false
+> +if ! $PYTHON -c 'import sys; sys.exit(sys.version_info >= (3,5))'; then
+> +    python_usable=true
+> +fi
 > +
-> +        # Unshare consistent-read on the target
-> +        # (The mirror job does not care)
-> +        result = self.vm.qmp('blockdev-add',
-> +                             driver='blkdebug',
-> +                             node_name='dest-perm',
-> +                             image='dest',
-> +                             unshare_child_perms=['consistent-read'])
-> +        self.assert_qmp(result, 'return', {})
-> +
-> +        result = self.vm.qmp('blockdev-mirror', job_id='job', device='src',
-> +                             sync='full', target='dest',
-> +                             filter_node_name='mirror-filter')
-> +        self.assert_qmp(result, 'return', {})
-> +
-> +        # Require consistent-read on the source
-> +        # (We can only add this node once the job has started, or it
-> +        # will complain that it does not want to run on non-root nodes)
-> +        result = self.vm.qmp('blockdev-add',
-> +                             driver='blkdebug',
-> +                             node_name='src-perm',
-> +                             image='src',
-> +                             take_child_perms=['consistent-read'])
-> +        self.assert_qmp(result, 'return', {})
-> +
-> +        # While completing, mirror will attempt to replace src by
-> +        # dest, which must fail because src-perm requires
-> +        # consistent-read but dest-perm does not share it; thus
-> +        # aborting the job when it is supposed to complete
-> +        self.complete_and_wait('job',
-> +                               completion_error='Operation not permitted')
-> +
-> +        # Assert that all of our nodes are still there (except for the
-> +        # mirror filter, which should be gone despite the failure)
-> +        nodes = self.vm.qmp('query-named-block-nodes')['return']
-> +        nodes = list(map(lambda image: image['node-name'], nodes))
 
-Sadly, the list comprehension is a good suggestion. Squash it in if 
-you'd like.
+Do we want this as a temporary fix only until we can stipulate the same 
+version in the configure file?
 
-> +
-> +        for expect in ['src', 'src-perm', 'dest', 'dest-perm']:
-> +            self.assertTrue(expect in nodes, '%s disappeared' % expect)
+If so, leaving a comment with "python2" in it anywhere will help locate 
+this later.
 
-I could be a real weenie and say "why not use a tuple here?"
-
-but, I'll only pretend I didn't say that instead of couching it in a 
-self-deprecating wrapper to the same end effect.
-
-(I'm a weenie.)
-
-> +        self.assertFalse('mirror-filter' in nodes,
-> +                         'Mirror filter node did not disappear')
-> +
->   if __name__ == '__main__':
->       iotests.main(supported_fmts=['qcow2', 'qed'],
->                    supported_protocols=['file'])
-> diff --git a/tests/qemu-iotests/041.out b/tests/qemu-iotests/041.out
-> index 2c448b4239..f496be9197 100644
-> --- a/tests/qemu-iotests/041.out
-> +++ b/tests/qemu-iotests/041.out
-> @@ -1,5 +1,5 @@
-> -..........................................................................................
-> +...........................................................................................
->   ----------------------------------------------------------------------
-> -Ran 90 tests
-> +Ran 91 tests
+>   default_machine=$($QEMU_PROG -machine help | sed -n '/(default)/ s/ .*//p')
+>   default_alias_machine=$($QEMU_PROG -machine help | \
+>      sed -n "/(alias of $default_machine)/ { s/ .*//p; q; }")
+> @@ -809,7 +816,12 @@ do
+>           start=$(_wallclock)
 >   
->   OK
+>           if [ "$(head -n 1 "$source_iotests/$seq")" == "#!/usr/bin/env python" ]; then
+> -            run_command="$PYTHON $seq"
+> +            if $python_usable; then
+> +                run_command="$PYTHON $seq"
+> +            else
+> +                run_command="false"
+> +                echo "Unsupported Python version" > $seq.notrun
+> +            fi
+>           else
+>               run_command="./$seq"
+>           fi
 > 
 
-Or don't do anything, because I'm just being obnoxious, and I owe you 
-one for giving you bad advice last round.
+If you agree with my suggestion:
 
 Reviewed-by: John Snow <jsnow@redhat.com>
+
+If you don't, that's, like, your opinion, man.
 
