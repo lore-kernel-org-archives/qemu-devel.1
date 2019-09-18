@@ -2,110 +2,82 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78D18C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 14:08:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C90CC4CEC4
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 14:28:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48E0C218AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 14:08:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48E0C218AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6AB36218AE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 14:28:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j77RHnqf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AB36218AE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAadW-0000NY-DA
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 10:08:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37931)
+	id 1iAawG-0006Hp-IY
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 10:28:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40411)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iAac4-000889-Ht
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 10:07:21 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iAavN-0005cf-18
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 10:27:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iAac1-0001Hd-GB
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 10:07:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57252)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iAac1-0001Gr-8U; Wed, 18 Sep 2019 10:07:17 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 65E8818CB8FD;
- Wed, 18 Sep 2019 14:07:15 +0000 (UTC)
-Received: from [10.36.117.119] (ovpn-117-119.ams2.redhat.com [10.36.117.119])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9E2965D6A5;
- Wed, 18 Sep 2019 14:07:12 +0000 (UTC)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20190916135806.1269-1-david@redhat.com>
- <20190916135806.1269-30-david@redhat.com> <875zlq0wd4.fsf@linaro.org>
- <1f44e951-2b08-82b0-a7e7-7459b140731f@redhat.com> <871rwd26ez.fsf@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <b89d3cd9-07c5-879b-d4b4-6aa0cd1947e2@redhat.com>
-Date: Wed, 18 Sep 2019 16:07:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <alex.bennee@linaro.org>) id 1iAavL-0002vD-8v
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 10:27:16 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35956)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iAavL-0002uY-18
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 10:27:15 -0400
+Received: by mail-wr1-x442.google.com with SMTP id y19so7178158wrd.3
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 07:27:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=M0rwh9vsgamdFHoBBBtNFCYgmuc/OSe8teYV5KcbESY=;
+ b=j77RHnqfDMnja6nQGwyQwM+Qq9jmgcU2G0DmgpSgzPwmIh5kMaXaaKGi7LqDFsh9Sv
+ v/qbB8dSoBlVRqYqzSeM10wUM7Ov0jFn72DEOUyJVC/IqKUWS4GEt/zRhsiMxSePlcqz
+ LW1zkfRwlyDFU9IVJIedY6NsXa8bm5HV9vHQHnGt95vyZnLujL+3J2VjwIftu2KZEG3k
+ N3HsjJ6gu+xmQ0WZGmu8QT+f9w3N4QFzzECU+ekAjh1pxt4KpjX91fHsmf+HDyFQPT01
+ JeLMzr+UWW9TgA6ZYLzNsNgpwNCYdY6l1RO6F/Wz8Oq0YwaFj579DsGitbMB59TC0Z+V
+ NoNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=M0rwh9vsgamdFHoBBBtNFCYgmuc/OSe8teYV5KcbESY=;
+ b=PC9hAydWg4rdgse8gg+uXSWBAe3VPJ5sHV60szu/LvoVcNj6wkDBv8U3RrFroI/sUN
+ kSSRCdy155S/YGSvcrbX0fid/ee0obHNpCGoOzwAsAmuO+rR6HWR+lT8Gu+GbkBrx7Lg
+ RcRT1lRMLOe5xVmzl/xvPs5XsOgBLvGVX76bm5FqvrxD6//Smytr742jLcw31Een5ZqM
+ GacXsaefHpn42r/JmSKAb+g77tPd+0a7i1xF6RxgWFmC6mpGw6sAwRE7RJOq7aUjQoQx
+ mkTmh7sfvhsLrXi4AQpGMtf4yFeIWReousg2IYSsUkoe0E+XRPjUf1gV23ouOhyRTqKf
+ JUrw==
+X-Gm-Message-State: APjAAAUIE37sP761WxagdJc0QJ0Jj81CLSsT/RFyfER9SqyPv5ySxWbL
+ ZZqB9uMOS2R67NVe1MBTSCF9KPIMcHL2Mj9Zc8922A==
+X-Google-Smtp-Source: APXvYqxE87kAeDROkA+5usfvPPEs6knR6OCjFHG2Qq6t6wi+2GIylcnemotB8yLi/nWTJrMhpzp9QtZMACKIKjt4UE8=
+X-Received: by 2002:adf:e9c5:: with SMTP id l5mr3332649wrn.40.1568816833715;
+ Wed, 18 Sep 2019 07:27:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <871rwd26ez.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Wed, 18 Sep 2019 14:07:15 +0000 (UTC)
+References: <20190918121101.30690-1-philmd@redhat.com>
+In-Reply-To: <20190918121101.30690-1-philmd@redhat.com>
+From: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Date: Wed, 18 Sep 2019 15:27:03 +0100
+Message-ID: <CAHDbmO3tc49r9y8weBd_8F2GD7+ojPu_viqq3kH0k5zkokzqfg@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 29/29] tests/tcg: target/s390x: Test MVO
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH] target/i386: Fix broken build with WHPX
+ enabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,105 +89,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Florian Weimer <fweimer@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Dan_Hor=c3=a1k?= <dan@danny.cz>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, Stefano Brivio <sbrivio@redhat.com>,
- qemu-s390x@nongnu.org, Cole Robinson <crobinso@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Lucian Petrut <lpetrut@cloudbasesolutions.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ QEMU Developers <qemu-devel@nongnu.org>, Justin Terry <juterry@microsoft.com>,
+ Ilias Maratos <i.maratos@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18.09.19 13:24, Alex Benn=C3=A9e wrote:
->=20
-> David Hildenbrand <david@redhat.com> writes:
->=20
->> On 18.09.19 11:47, Alex Benn=C3=A9e wrote:
->>>
->>> David Hildenbrand <david@redhat.com> writes:
->>>
->>>> Let's add the simple test based on the example from the PoP.
->>>>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> ---
->>>>  tests/tcg/s390x/Makefile.target |  1 +
->>>>  tests/tcg/s390x/mvo.c           | 25 +++++++++++++++++++++++++
->>>>  2 files changed, 26 insertions(+)
->>>>  create mode 100644 tests/tcg/s390x/mvo.c
->>>>
->>>> diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makef=
-ile.target
->>>> index 151dc075aa..6a3bfa8b29 100644
->>>> --- a/tests/tcg/s390x/Makefile.target
->>>> +++ b/tests/tcg/s390x/Makefile.target
->>>> @@ -6,3 +6,4 @@ TESTS+=3Dipm
->>>>  TESTS+=3Dexrl-trt
->>>>  TESTS+=3Dexrl-trtr
->>>>  TESTS+=3Dpack
->>>> +TESTS+=3Dmvo
->>>> diff --git a/tests/tcg/s390x/mvo.c b/tests/tcg/s390x/mvo.c
->>>> new file mode 100644
->>>> index 0000000000..5546fe2a97
->>>> --- /dev/null
->>>> +++ b/tests/tcg/s390x/mvo.c
->>>> @@ -0,0 +1,25 @@
->>>> +#include <stdint.h>
->>>> +#include <stdio.h>
->>>> +
->>>> +int main(void)
->>>> +{
->>>> +    uint8_t dest[6] =3D {0xff, 0x77, 0x88, 0x99, 0x0c, 0xff};
->>>> +    uint8_t src[5] =3D {0xee, 0x12, 0x34, 0x56, 0xee};
->>>> +    uint8_t expected[6] =3D {0xff, 0x01, 0x23, 0x45, 0x6c, 0xff};
->>>> +    int i;
->>>> +
->>>> +    asm volatile (
->>>> +        "    mvo 0(4,%[dest]),0(3,%[src])\n"
->>>> +        :
->>>> +        : [dest] "d" (dest + 1),
->>>> +          [src] "d" (src + 1)
->>>> +        : "memory");
->>>> +
->>>> +    for (i =3D 0; i < sizeof(expected); i++) {
->>>> +        if (dest[i] !=3D expected[i]) {
->>>> +            fprintf(stderr, "bad data\n");
->>>> +            return 1;
->>>> +        }
->>>> +    }
->>>> +    return 0;
->>>> +}
->>>
->>> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>>
->>> but...
->>>
->>> can this test be expanded to check the page cross cases that caused y=
-ou
->>> so much trouble to track down?
->>
->> I might add a MVC test that tries to reproduce this. But with
->> speculative page faults and things like that it might not be very easy
->> to reproduce. However, I can give it a try.
->=20
-> I may not be fully understanding the correct behaviour but wouldn't the
-> test be:
->=20
->   * map two page's worth of address space
->   * mprot(!write) the top page
->   * attempt mvc based copy to mmap region (say p0+(PAGE_SIZE>>1) to p1+=
-(PAGE_SIZE>>1))
->   * catch the fault
->   * check the bottom page wasn't written to
+Ah I though these would be enabled by default for x86 hosts. I guess we
+need another build entry in .Travis even if we can't test it there.
 
-No, you are absolutely right, with memmap/mprot hackery + signal handler
-this can be tested just fine. I'll craft something for the MVC instructio=
-n!
+On Wed, 18 Sep 2019, 13:11 Philippe Mathieu-Daud=C3=A9, <philmd@redhat.com>
+wrote:
 
-Thanks!
-
---=20
-
-Thanks,
-
-David / dhildenb
-
+> The WHPX build is broken since commit 12e9493df92 which removed the
+> "hw/boards.h" where MachineState is declared:
+>
+>   $ ./configure \
+>      --enable-hax --enable-whpx
+>
+>   $ make x86_64-softmmu/all
+>   [...]
+>     CC      x86_64-softmmu/target/i386/whpx-all.o
+>   target/i386/whpx-all.c: In function 'whpx_accel_init':
+>   target/i386/whpx-all.c:1378:25: error: dereferencing pointer to
+>   incomplete type 'MachineState' {aka 'struct MachineState'}
+>        whpx->mem_quota =3D ms->ram_size;
+>                            ^~
+>   make[1]: *** [rules.mak:69: target/i386/whpx-all.o] Error 1
+>     CC      x86_64-softmmu/trace/generated-helpers.o
+>   make[1]: Target 'all' not remade because of errors.
+>   make: *** [Makefile:471: x86_64-softmmu/all] Error 2
+>
+> Restore this header, partially reverting commit 12e9493df92.
+>
+> Fixes: 12e9493df92
+> Reported-by: Ilias Maratos <i.maratos@gmail.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  target/i386/whpx-all.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+> index 0c15241ae4..def0c28480 100644
+> --- a/target/i386/whpx-all.c
+> +++ b/target/i386/whpx-all.c
+> @@ -18,6 +18,7 @@
+>  #include "sysemu/cpus.h"
+>  #include "sysemu/runstate.h"
+>  #include "qemu/main-loop.h"
+> +#include "hw/boards.h"
+>  #include "qemu/error-report.h"
+>  #include "qapi/error.h"
+>  #include "migration/blocker.h"
+> --
+> 2.20.1
+>
+>
+>
