@@ -2,68 +2,65 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.3 required=3.0 tests=DATE_IN_PAST_12_24,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0366C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 00:06:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9B40C4CECD
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 00:15:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61B3B21848
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 00:06:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7386121848
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 00:15:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="aET2hiH5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61B3B21848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="FUOUd5uV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7386121848
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iANUd-00016r-97
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 20:06:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55070)
+	id 1iANcb-0003Fi-KF
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 20:15:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56276)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iANTr-0000c3-T1
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 20:06:01 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iANbt-0002nF-Q7
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 20:14:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iANTq-0004jm-7U
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 20:05:59 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:52425 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1iANbs-0000hl-7F
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 20:14:17 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:41083 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iANTo-0004iF-RK; Tue, 17 Sep 2019 20:05:58 -0400
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1iANbr-0000gw-Hw
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 20:14:16 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46Y0cb4xLVz9sPD; Wed, 18 Sep 2019 10:05:51 +1000 (AEST)
+ id 46Y0p96MNlz9sPD; Wed, 18 Sep 2019 10:14:09 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1568765151;
- bh=nyrBVaWsTIRnt0QWIOhQR17zw+wnG3HC1a11A1iI59I=;
+ d=gibson.dropbear.id.au; s=201602; t=1568765649;
+ bh=HfeW0Hs5zO4JnXE9pmFCoU6KyxK+OKfnV8bXXdNqPPY=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=aET2hiH57ARy1vRKMklAx3Jk+n6V/r2hh+jh4ZaganBYyLjHg7Mo6DO2CmafznxL/
- G+FSAZAQM23T6SIvnvX5UUXYA3aevQF52APP7IkgD85q7VwKFmy5N8ve/Nwd5NlRw0
- lezaa80AUoqV+awkwZICSV+bssmsOaB620lgdIWk=
-Date: Tue, 17 Sep 2019 21:40:06 +1000
+ b=FUOUd5uV2UxQy0MOL3TH2k/GKRH+9UkkuUEI4QDzWF957b/0CizOHOJpU9sqgLe2H
+ yr6P1hjdNii9I5+UoM5dpnvThTB9U874FUj1n3i4W2M6lR0lKhpLIpe/KgW+BuhrNM
+ 6JA7/tigTkyVVrsYo32sdA2eidvVk7m16KRnFmSQ=
+Date: Wed, 18 Sep 2019 10:12:00 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190917114006.GA2440@umbus.fritz.box>
-References: <20190915211940.30427-1-f4bug@amsat.org>
- <20190916004242.GF2104@umbus.fritz.box>
- <331a9dc2-d79c-3f29-d818-3df74222425b@redhat.com>
- <87lfuo1sbp.fsf@linaro.org>
- <02b9bc89-eee6-493d-3e3c-ae75b6c24657@redhat.com>
- <20190917021952.GB8842@umbus.fritz.box>
+To: Greg Kurz <groug@kaod.org>
+Message-ID: <20190918001200.GB2440@umbus.fritz.box>
+References: <156871562997.196432.17776290406203122029.stgit@bahia.lan>
+ <156871565600.196432.9246692833113774428.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="gBBFr7Ir9EOA20Yy"
+ protocol="application/pgp-signature"; boundary="WhfpMioaduB5tiZL"
 Content-Disposition: inline
-In-Reply-To: <20190917021952.GB8842@umbus.fritz.box>
+In-Reply-To: <156871565600.196432.9246692833113774428.stgit@bahia.lan>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 0/6] tests/acceptance: Add
- tests for the PReP/40p machine
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [PATCH 04/17] ppc: Pass local error object pointer
+ to error_append_hint()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,117 +72,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>,
- qemu-ppc@nongnu.org, Cleber Rosa <crosa@redhat.com>,
- =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <codyprime@gmail.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+ Juan Quintela <quintela@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Eric Farman <farman@linux.ibm.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Yuval Shaia <yuval.shaia@oracle.com>,
+ Alex Williamson <alex.williamson@redhat.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---gBBFr7Ir9EOA20Yy
-Content-Type: text/plain; charset=iso-8859-1
+--WhfpMioaduB5tiZL
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 17, 2019 at 12:19:52PM +1000, David Gibson wrote:
-> On Mon, Sep 16, 2019 at 11:56:06AM +0200, Philippe Mathieu-Daud=E9 wrote:
-> > On 9/16/19 11:52 AM, Alex Benn=E9e wrote:
-> > >=20
-> > > Philippe Mathieu-Daud=E9 <philmd@redhat.com> writes:
-> > >=20
-> > >> Hi David,
-> > >>
-> > >> On 9/16/19 2:42 AM, David Gibson wrote:
-> > >>> On Sun, Sep 15, 2019 at 11:19:34PM +0200, Philippe Mathieu-Daud=E9 =
-wrote:
-> > >>>> Quick tests worth to avoid regressions with the 40p machine.
-> > >>>> idea from the "Maintainers, please tell us how to boot your machin=
-es"
-> > >>>> thread:
-> > >>>> https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg04177.html
-> > >>>>
-> > >>>> v2: Split Travis job, added Herv=E9 R-b tag
-> > >>>> v1: https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg05896=
-=2Ehtml
-> > >>>>
-> > >>>> Regards,
-> > >>>>
-> > >>>> Phil.
-> > >>>
-> > >>> I'm guessing you're expecting these to go in via the testing tree, =
-in
-> > >>> which case
-> > >>>
-> > >>> Acked-by: David Gibson <david@gibson.dropbear.id.au>
-> > >>
-> > >> Thanks, appreciated :)
-> > >>
-> > >>> Or do you want me to take them via the ppc tree?
-> > >>
-> > >> I think the 'testing tree' should focus on the CI/testing
-> > >> infrastructure, while each subsystem maintainers should care about t=
-he
-> > >> tests covering their subsystem (the testing tree maintainers might n=
-ot
-> > >> have the required knowledge to be sure a test is correctly implement=
-ed).
-> > >>
-> > >> In this particular case I assume you don't have much knowledge of th=
-at
-> > >> PPC machine, which is a hobbyist one, but since you are the PPC
-> > >> maintainer, I'd rather see this going via your tree :)
-> > >>
-> > >> Alex/Cleber/Eduardo, any comment on this position?
-> > >=20
-> > > Once we have a .travis.yml I'm happy with it can go in via another tr=
-ee
-> > > no problem. See other thread....
-> >=20
-> > Good :)
-> >=20
-> > David can take patches 1-5 (I tagged patch 6 as RFC but messed something
-> > with git-publish and lost it when I sent this series).
+On Tue, Sep 17, 2019 at 12:20:56PM +0200, Greg Kurz wrote:
+> Ensure that hints are added even if errp is &error_fatal or &error_abort.
 >=20
-> Ok, I've taken patches 1-5 into my ppc-for-4.2 tree.
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Hrm.  Judging by both the continued comments on this thread, and the
-fact it breaks the travis build, seems like this series needs a little
-more work.  I've pulled it out of ppc-for-4.2 again, and I'll wait for
-the next spin.
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
+> ---
+>  hw/ppc/mac_newworld.c |    7 +++++--
+>  hw/ppc/spapr.c        |    7 +++++--
+>  hw/ppc/spapr_pci.c    |    9 +++++----
+>  target/ppc/kvm.c      |   13 +++++++++----
+>  4 files changed, 24 insertions(+), 12 deletions(-)
 >=20
-> >=20
-> > Thanks!
-> >=20
-> > >>>> Philippe Mathieu-Daud=E9 (6):
-> > >>>>   tests/acceptance: Add test that runs NetBSD 4.0 installer on PRe=
-p/40p
-> > >>>>   tests/acceptance: Test Open Firmware on the PReP/40p
-> > >>>>   tests/acceptance: Test OpenBIOS on the PReP/40p
-> > >>>>   tests/acceptance: Test Sandalfoot initrd on the PReP/40p
-> > >>>>   .travis.yml: Let the avocado job run the 40p tests
-> > >>>>   .travis.yml: Split enterprise vs. hobbyist acceptance test job
-> > >>>>
-> > >>>>  .travis.yml                      |  18 +++-
-> > >>>>  MAINTAINERS                      |   1 +
-> > >>>>  tests/acceptance/ppc_prep_40p.py | 150 ++++++++++++++++++++++++++=
-+++++
-> > >>>>  3 files changed, 167 insertions(+), 2 deletions(-)
-> > >>>>  create mode 100644 tests/acceptance/ppc_prep_40p.py
-> > >>>>
-> > >>>
-> > >=20
-> > >=20
-> >=20
+> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+> index c5bbcc743352..aca8c40bf395 100644
+> --- a/hw/ppc/mac_newworld.c
+> +++ b/hw/ppc/mac_newworld.c
+> @@ -618,8 +618,11 @@ static void core99_set_via_config(Object *obj, const=
+ char *value, Error **errp)
+>      } else if (!strcmp(value, "pmu-adb")) {
+>          cms->via_config =3D CORE99_VIA_CONFIG_PMU_ADB;
+>      } else {
+> -        error_setg(errp, "Invalid via value");
+> -        error_append_hint(errp, "Valid values are cuda, pmu, pmu-adb.\n"=
+);
+> +        Error *local_err =3D NULL;
+> +
+> +        error_setg(&local_err, "Invalid via value");
+> +        error_append_hint(&local_err, "Valid values are cuda, pmu, pmu-a=
+db.\n");
+> +        error_propagate(errp, local_err);
+>      }
+>  }
+> =20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 08a2a5a77092..39d6f57d014e 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -4337,10 +4337,13 @@ void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu_i=
+ndex, Error **errp)
+>      vcpu_id =3D spapr_vcpu_id(spapr, cpu_index);
+> =20
+>      if (kvm_enabled() && !kvm_vcpu_id_is_valid(vcpu_id)) {
+> -        error_setg(errp, "Can't create CPU with id %d in KVM", vcpu_id);
+> -        error_append_hint(errp, "Adjust the number of cpus to %d "
+> +        Error *local_err =3D NULL;
+> +
+> +        error_setg(&local_err, "Can't create CPU with id %d in KVM", vcp=
+u_id);
+> +        error_append_hint(&local_err, "Adjust the number of cpus to %d "
+>                            "or try to raise the number of threads per cor=
+e\n",
+>                            vcpu_id * ms->smp.threads / spapr->vsmt);
+> +        error_propagate(errp, local_err);
+>          return;
+>      }
+> =20
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 7b71ad7c74f1..4b7e9a1c8666 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1870,12 +1870,13 @@ static void spapr_phb_realize(DeviceState *dev, E=
+rror **errp)
+>      if (spapr_pci_find_phb(spapr, sphb->buid)) {
+>          SpaprPhbState *s;
+> =20
+> -        error_setg(errp, "PCI host bridges must have unique indexes");
+> -        error_append_hint(errp, "The following indexes are already in us=
+e:");
+> +        error_setg(&local_err, "PCI host bridges must have unique indexe=
+s");
+> +        error_append_hint(&local_err, "The following indexes are already=
+ in use:");
+>          QLIST_FOREACH(s, &spapr->phbs, list) {
+> -            error_append_hint(errp, " %d", s->index);
+> +            error_append_hint(&local_err, " %d", s->index);
+>          }
+> -        error_append_hint(errp, "\nTry another value for the index prope=
+rty\n");
+> +        error_append_hint(&local_err, "\nTry another value for the index=
+ property\n");
+> +        error_propagate(errp, local_err);
+>          return;
+>      }
+> =20
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 8c5b1f25cc95..c6876b08c726 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -242,8 +242,11 @@ static void kvm_get_smmu_info(struct kvm_ppc_smmu_in=
+fo *info, Error **errp)
+>      assert(kvm_state !=3D NULL);
+> =20
+>      if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_GET_SMMU_INFO)) {
+> -        error_setg(errp, "KVM doesn't expose the MMU features it support=
+s");
+> -        error_append_hint(errp, "Consider switching to a newer KVM\n");
+> +        Error *local_err =3D NULL;
+> +
+> +        error_setg(&local_err, "KVM doesn't expose the MMU features it s=
+upports");
+> +        error_append_hint(&local_err, "Consider switching to a newer KVM=
+\n");
+> +        error_propagate(errp, local_err);
+>          return;
+>      }
+> =20
+> @@ -2076,6 +2079,7 @@ void kvmppc_hint_smt_possible(Error **errp)
+>      int i;
+>      GString *g;
+>      char *s;
+> +    Error *local_err =3D NULL;
+> =20
+>      assert(kvm_enabled());
+>      if (cap_ppc_smt_possible) {
+> @@ -2086,12 +2090,13 @@ void kvmppc_hint_smt_possible(Error **errp)
+>              }
+>          }
+>          s =3D g_string_free(g, false);
+> -        error_append_hint(errp, "%s.\n", s);
+> +        error_append_hint(&local_err, "%s.\n", s);
+>          g_free(s);
+>      } else {
+> -        error_append_hint(errp,
+> +        error_append_hint(&local_err,
+>                            "This KVM seems to be too old to support VSMT.=
+\n");
+>      }
+> +    error_propagate(errp, local_err);
+>  }
+> =20
+> =20
 >=20
-
-
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -193,25 +239,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---gBBFr7Ir9EOA20Yy
+--WhfpMioaduB5tiZL
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2AxhMACgkQbDjKyiDZ
-s5J/YBAA1qDE56Scm0dTtRTc3+koKzp2iQx+3XGDN3IVIgzpL22LummV2zfPMlfY
-+rTYDyiyOcL9h45NA8gAeO+ca1Bs0e5UN42FEwgJ3UjJZS32v/X4K+yEOuip8nZU
-QgcMul1uNHGBgMN9vOxL5HBKYYLH9BRk/8Rtvc8ufjNep0bEHvCl+VIbCuz3kops
-QhgWL3eXdv0KrPLxlK5Za5zgVayVbnuo+OYZYJfVW2R2dR1Jfwc0sEz0FlfpqZ2d
-L8+7ann32KTGLwjmAaNRnXz4W6hsJpju3aPmUgimYc6mRakqK63ZASMWiK22s3c0
-KTz8UuFVAlJgr0QB/N5BWecWsCBJrmhsgkJDs6RM8AMW0JgtjRk5JReG0NV1l4gN
-sIpgjm61sfIP5I7LbW2dWX3M6Cc4nU4I+e9crK17E3YHwiNFl5cOvq+oquBNxsia
-0Pvw0k+lBjx3hKdAW1B3fRi6mFG8mNGioEWs9tWdtjTERog2br2TiiFtoCDwqm68
-EWQxZvSWAZKJcqCEV50qQCLRWsg124Yb92S/XDplQXD+QrrHnIm6iY+jW+jgk7b5
-VcOiZkCESgjdzvgnuD7P8npv7AE3JCBpLtx8nzjNLOR3DzhQMLOy0S59JvzQ5BZV
-2F3BNjdEqDWTpFVaS2qEQJxvrpNHmQIfXDCmrTtmXscUSvcOjP8=
-=V3Fe
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2BdlAACgkQbDjKyiDZ
+s5IH7w/+IgnuloA+e1iBLmG/jfS/+D79or9aYJIC8QL3PWJGxqrS/aJTwIX5qYnS
+AZGuZEzrByAI3MZC6TYOu6Y3Hax4ttZJppwTjRsbm01jVpcNxZ6QEvTaMCyZeMhN
+P1fU4sejNt3RMFyjqgd8fE+oSNajmxLCJPIsHac2GImsg3Dm2bLmZ95Rx80RZi0u
+zivYt3YkrdJl3VZeVDq0Ihmb5BXUGcCQGe0UopuN/pflKiaMD5xW5pqRwFEqwZFT
+S9kZue50CBKfDaUh0n+Cd+a39HNaFf2gdYlENuOcv7awIHMnqwqsUbNmfA+mtBGW
+V+ghaFnfdYqirlaXmEFauZ7AMPNb6yN4uxAR0FXx3oFFskzyIMIAeUQ+w+kzQRgA
+94TRQtagg+xzbCDfFcZOzc2p0DyrWqwjlces7MLq0T1QQtUiDnSBMTtzVRszGuw5
+Er+QBHl3JBlVAei3aOZf2O97YqtaP7/sUWsomkEyMvT87m1KLmyXNghTjoL2Mlvh
+++fajUXhHKivVhtLmA6dWkorp5vXwnJLmmdS5qG4r6C7HzifgnSs2ZEngtWN3rxQ
+rECmfDsER8RudkW7+I07asH8pD3m7M6eSyiIvEFzQ0RwEIsgwlkDvMe9mDeaFEVe
+zw1pwDyxfOm+1bnJ+J2bdbdhOXckLdeFTyGvSECtzw13pRLYlM0=
+=sFDR
 -----END PGP SIGNATURE-----
 
---gBBFr7Ir9EOA20Yy--
+--WhfpMioaduB5tiZL--
 
