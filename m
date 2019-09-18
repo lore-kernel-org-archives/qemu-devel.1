@@ -2,60 +2,80 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D60D2C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 10:10:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C262AC4CEC9
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 10:10:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8EE8214AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 10:10:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8EE8214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8EB63214AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 10:10:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qpzYIFRw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EB63214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAWvD-0002Az-6R
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 06:10:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59444)
+	id 1iAWvK-0002HH-3M
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 06:10:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32863)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iAWdU-0001YP-27
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 05:52:33 -0400
+ (envelope-from <stefanha@gmail.com>) id 1iAWnj-0003B3-S4
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 06:03:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iAWdS-00065Y-Qf
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 05:52:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58970)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iAWdQ-00064O-Ea; Wed, 18 Sep 2019 05:52:28 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C3FA918C4266;
- Wed, 18 Sep 2019 09:52:27 +0000 (UTC)
-Received: from localhost (ovpn-116-168.ams2.redhat.com [10.36.116.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E01960603;
- Wed, 18 Sep 2019 09:52:21 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Wed, 18 Sep 2019 11:51:44 +0200
-Message-Id: <20190918095144.955-9-mreitz@redhat.com>
-In-Reply-To: <20190918095144.955-1-mreitz@redhat.com>
-References: <20190918095144.955-1-mreitz@redhat.com>
+ (envelope-from <stefanha@gmail.com>) id 1iAWnj-0004pz-09
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 06:03:07 -0400
+Received: from mail-qt1-x833.google.com ([2607:f8b0:4864:20::833]:38485)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iAWni-0004pQ-NF
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 06:03:06 -0400
+Received: by mail-qt1-x833.google.com with SMTP id j31so8170212qta.5
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 03:03:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=V2MFLc6nPWIQyl/mz789miBwMoFARwcqBDfpLGr0qdc=;
+ b=qpzYIFRwfLfZbcmnj4kEBFzXxGoKMoS+xwsrnHrYPof2O+EEmmrsBp6yEHfjhd4Q9U
+ giz+n4g6E3GoJ+tD3cMfUNH3ov1GCR4p87Ofqfy5EQ2bHeGfmdstqtAGj8Mx9mgYI46u
+ gmwwljwKCuf2Se6LVrdhJAlbZ/dQNaZB2JU7YNNQKC4pnK8zojajQD+5ADXY+lIJmNBY
+ iBdRD4xaNfwDfya7KaELNBtgJcEWlgok1un6vi1mTPW6Uw4B7NcApdLL4Js1dCm6Z2xv
+ M5oUyfuDm2Ws+0kJtw09yW4Xay9jyRZ0GcJmjphr4GXvALMjiv4HQry7yZ/iXw3wg55Z
+ GzSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=V2MFLc6nPWIQyl/mz789miBwMoFARwcqBDfpLGr0qdc=;
+ b=JSIv7f79qoufJizz8UWx2WkuhEgoGGtBetRjLFxrVoYzl62tzXI8DMbLN0ZGs5hhYs
+ phGJtcckUgWoEWC0BrGxqoWY7LF7pn8i14hHDXc7nGMYJ+ZUkiZLyYEl8aUNCglXRT42
+ s1PLz0JbDRDmEXqfoBKSbrvC6oyeIetZ2UGN2PxL6GHwaqw9RqDFAPiEN360JCKE7FUE
+ BlhfDiMj1gmFk34lGI3Q7m1HkuVlR3nJiWKBtso9cLwRkXIE7QD75YqvQ3vwG+b6Gwm7
+ xn+ur/K9R5GL3PwT1zrMNold+ZGlZtrFElNchTO7HEVtE9jFLdQD+JoHHuxlvWHQfURp
+ 4kkg==
+X-Gm-Message-State: APjAAAUAsfdAoe0bT0bvKX60veyUgZM1HmfokquosUc2mHPT6ukWex40
+ 5HXQ1EgQpgJMxu/+eTFuNI1nGVhjsJML2E77xGo=
+X-Google-Smtp-Source: APXvYqwIAe9iLoTZWujgzb4sW5oWY+Ned7c42fXCN7i2Z9Me4v5rKe8GI/oy03CWaMpFJ9g1N5ItcCbQQt/y65rQS5A=
+X-Received: by 2002:aed:3576:: with SMTP id b51mr3348078qte.378.1568800985464; 
+ Wed, 18 Sep 2019 03:03:05 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Wed, 18 Sep 2019 09:52:27 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 8/8] Revert "qemu-img: Check post-truncation
- size"
+References: <CAJSP0QVMjw_zm16MRo25Gq0J9w=9vrKDZtaH=WGwjSJiDAVm9Q@mail.gmail.com>
+ <20190918082825.nnrjqvicqwjg3jq6@steredhat>
+In-Reply-To: <20190918082825.nnrjqvicqwjg3jq6@steredhat>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Wed, 18 Sep 2019 11:02:54 +0100
+Message-ID: <CAJSP0QXCJY4+5P9zU4670dfwjmKEUagB9gFrqF3H9cCPZPbzbA@mail.gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::833
+Subject: Re: [Qemu-devel] [libvirt] Call for volunteers: LWN.net articles
+ about KVM Forum talks
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,84 +87,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: libvir-list@redhat.com, qemu-devel <qemu-devel@nongnu.org>,
+ kvm <kvm@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This reverts commit 5279b30392da7a3248b320c75f20c61e3a95863c.
+On Wed, Sep 18, 2019 at 9:28 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>
+> On Tue, Sep 17, 2019 at 02:02:59PM +0100, Stefan Hajnoczi wrote:
+> I volunteer for "Libvirt: Never too Late to Learn New Tricks" by
+> Daniel Berrange.
 
-We no longer need this check because exact=3Dtrue forces the block driver
-to give the image the exact size requested by the user.
+Hi Stefano,
+Paolo has already volunteered for that.  Is there another talk you are
+interested in covering?
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- qemu-img.c | 39 ++++-----------------------------------
- 1 file changed, 4 insertions(+), 35 deletions(-)
-
-diff --git a/qemu-img.c b/qemu-img.c
-index a3169b6113..148f6b8b0e 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -3648,7 +3648,7 @@ static int img_resize(int argc, char **argv)
-     Error *err =3D NULL;
-     int c, ret, relative;
-     const char *filename, *fmt, *size;
--    int64_t n, total_size, current_size, new_size;
-+    int64_t n, total_size, current_size;
-     bool quiet =3D false;
-     BlockBackend *blk =3D NULL;
-     PreallocMode prealloc =3D PREALLOC_MODE_OFF;
-@@ -3829,42 +3829,11 @@ static int img_resize(int argc, char **argv)
-      * success when the image has not actually been resized.
-      */
-     ret =3D blk_truncate(blk, total_size, true, prealloc, &err);
--    if (ret < 0) {
-+    if (!ret) {
-+        qprintf(quiet, "Image resized.\n");
-+    } else {
-         error_report_err(err);
--        goto out;
--    }
--
--    new_size =3D blk_getlength(blk);
--    if (new_size < 0) {
--        error_report("Failed to verify truncated image length: %s",
--                     strerror(-new_size));
--        ret =3D -1;
--        goto out;
-     }
--
--    /* Some block drivers implement a truncation method, but only so
--     * the user can cause qemu to refresh the image's size from disk.
--     * The idea is that the user resizes the image outside of qemu and
--     * then invokes block_resize to inform qemu about it.
--     * (This includes iscsi and file-posix for device files.)
--     * Of course, that is not the behavior someone invoking
--     * qemu-img resize would find useful, so we catch that behavior
--     * here and tell the user. */
--    if (new_size !=3D total_size && new_size =3D=3D current_size) {
--        error_report("Image was not resized; resizing may not be support=
-ed "
--                     "for this image");
--        ret =3D -1;
--        goto out;
--    }
--
--    if (new_size !=3D total_size) {
--        warn_report("Image should have been resized to %" PRIi64
--                    " bytes, but was resized to %" PRIi64 " bytes",
--                    total_size, new_size);
--    }
--
--    qprintf(quiet, "Image resized.\n");
--
- out:
-     blk_unref(blk);
-     if (ret) {
---=20
-2.21.0
-
+Stefan
 
