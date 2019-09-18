@@ -6,43 +6,45 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6E47C4CEC4
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 22:31:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F06C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 23:06:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80E4F20640
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 22:31:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80E4F20640
+	by mail.kernel.org (Postfix) with ESMTPS id A612E20644
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 23:06:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A612E20644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAiTj-0002u5-Lu
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 18:31:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56017)
+	id 1iAj1Y-0003lb-K0
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 19:06:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59430)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iAiSb-00023e-J9
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 18:30:07 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iAizm-0002qK-Db
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 19:04:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iAiSa-0003ou-4C
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 18:30:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48144)
+ (envelope-from <jsnow@redhat.com>) id 1iAizk-00026Q-Cb
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 19:04:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43222)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iAiSZ-0003oh-Si
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 18:30:04 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iAize-00025B-Dw; Wed, 18 Sep 2019 19:04:14 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 209A3302C08C
- for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 22:30:03 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D075AC057E9F;
+ Wed, 18 Sep 2019 23:04:12 +0000 (UTC)
 Received: from [10.10.124.73] (ovpn-124-73.rdu2.redhat.com [10.10.124.73])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B1DAF19C5B;
- Wed, 18 Sep 2019 22:29:59 +0000 (UTC)
-To: Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
-References: <20190918171141.15957-1-lersek@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 254145D9CC;
+ Wed, 18 Sep 2019 23:04:07 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20190916141911.5255-1-vsementsov@virtuozzo.com>
+ <20190916141911.5255-3-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -118,22 +120,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <c17e512f-0b02-a2e2-64ea-d1a04470b686@redhat.com>
-Date: Wed, 18 Sep 2019 18:29:59 -0400
+Message-ID: <fd4b72d5-1067-bb92-f489-23b666a4b175@redhat.com>
+Date: Wed, 18 Sep 2019 19:04:06 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190918171141.15957-1-lersek@redhat.com>
+In-Reply-To: <20190916141911.5255-3-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Wed, 18 Sep 2019 22:30:03 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Wed, 18 Sep 2019 23:04:13 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] edk2 build scripts: work around
- TianoCore#1607 without forcing Python 2
+Subject: Re: [Qemu-devel] [PATCH 2/4] block/dirty-bitmap: add bs link
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -145,163 +146,429 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: fam@euphon.net, kwolf@redhat.com, quintela@redhat.com,
+ qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, den@openvz.org,
+ mreitz@redhat.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/18/19 1:11 PM, Laszlo Ersek wrote:
-> It turns out that forcing python2 for running the edk2 "build" utility =
-is
-> neither necessary nor sufficient.
+On 9/16/19 10:19 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Add bs field to BdrvDirtyBitmap structure. Drop BlockDriverState
+> parameter from bitmap APIs where possible.
 >=20
-> Forcing python2 is not sufficient for two reasons:
->=20
-> - QEMU is moving away from python2, with python2 nearing EOL,
->=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Thank you :)
+I've thought about doing this before, but couldn't figure out if it was
+worth it.
 
-> - according to my most recent testing, the lacking dependency informati=
-on
->    in the makefiles that are generated by edk2's "build" utility can ca=
-use
->    parallel build failures even when "build" is executed by python2.
->=20
-> And forcing python2 is not necessary because we can still return to the
-> original idea of filtering out jobserver-related options from MAKEFLAGS=
-.
-> So do that.
->=20
-> With this patch, the guest UEFI binaries that are used as part of the B=
-IOS
-> tables test, and the OVMF and ArmVirtQemu platform firmwares, will be
-> built strictly in a single job, regardless of an outermost "-jN" make
-> option. Alas, there appears to be no reliable way to build edk2 in an
-> (outer make, inner make) environment, with a jobserver enabled.
->=20
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: John Snow <jsnow@redhat.com>
-> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reported-by: John Snow <jsnow@redhat.com>
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+So, let's do it.
 
-Looks good to me, given your explanation of the situation so far.
+makes any functions that take (bs, bitmap) pairs less error-prone.
 
 Reviewed-by: John Snow <jsnow@redhat.com>
 
 > ---
+>  include/block/dirty-bitmap.h   | 14 +++++---------
+>  block/backup.c                 | 14 ++++++--------
+>  block/dirty-bitmap.c           | 24 ++++++++++++------------
+>  block/mirror.c                 |  4 ++--
+>  block/qcow2-bitmap.c           |  6 +++---
+>  blockdev.c                     |  6 +++---
+>  migration/block-dirty-bitmap.c |  7 +++----
+>  migration/block.c              |  4 ++--
+>  8 files changed, 36 insertions(+), 43 deletions(-)
 >=20
-> Notes:
->      - Tested on RHEL7 (where the outer "make" sets the old-style
->        "--jobserver-fds" flag) and on Fedora 29 (where the outer "make"=
- sets
->        the new-style "--jobserver-auth" flag).
->     =20
->      - I've rebuilt all the edk2 binaries with this patch applied. Ever=
-ything
->        works fine. However, if you test this patch, you might notice th=
-at git
->        reports all the build products as modified. That's because when =
-using
->        the python3 code in edk2 BaseTools, the generated makefiles diff=
-er
->        greatly from the ones generated when running in python2 mode (e.=
-g. due
->        to different random seeds in python hashes / dictionaries). As a
->        result, parts of the firmware volumes / firmware filesystems cou=
-ld
->        appear in a different order than before. This is harmless, and d=
-oesn't
->        necessitate checking in the rebuilt binaries.
->=20
->   roms/edk2-build.sh             |  4 +---
->   roms/edk2-funcs.sh             | 17 +++++++++++++++++
->   tests/uefi-test-tools/build.sh |  6 +++---
->   3 files changed, 21 insertions(+), 6 deletions(-)
->=20
-> diff --git a/roms/edk2-build.sh b/roms/edk2-build.sh
-> index 4f46f8a6a217..8161c55ef507 100755
-> --- a/roms/edk2-build.sh
-> +++ b/roms/edk2-build.sh
-> @@ -27,9 +27,6 @@ shift $num_args
->  =20
->   cd edk2
->  =20
-> -# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>.
-> -export PYTHON_COMMAND=3Dpython2
-> -
->   # Source "edksetup.sh" carefully.
->   set +e +u +C
->   source ./edksetup.sh
-> @@ -43,6 +40,7 @@ fi
->   # any), for the edk2 "build" utility.
->   source ../edk2-funcs.sh
->   edk2_toolchain=3D$(qemu_edk2_get_toolchain "$emulation_target")
-> +MAKEFLAGS=3D$(qemu_edk2_quirk_tianocore_1607 "$MAKEFLAGS")
->   edk2_thread_count=3D$(qemu_edk2_get_thread_count "$MAKEFLAGS")
->   qemu_edk2_set_cross_env "$emulation_target"
->  =20
-> diff --git a/roms/edk2-funcs.sh b/roms/edk2-funcs.sh
-> index a9fae7ee891b..3f4485b201f1 100644
-> --- a/roms/edk2-funcs.sh
-> +++ b/roms/edk2-funcs.sh
-> @@ -251,3 +251,20 @@ qemu_edk2_get_thread_count()
->       printf '1\n'
->     fi
->   }
+> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.=
+h
+> index 848dfc6590..4c58d922e4 100644
+> --- a/include/block/dirty-bitmap.h
+> +++ b/include/block/dirty-bitmap.h
+> @@ -18,21 +18,18 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriv=
+erState *bs,
+>                                            uint32_t granularity,
+>                                            const char *name,
+>                                            Error **errp);
+> -int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
+> -                                       BdrvDirtyBitmap *bitmap,
+> +int bdrv_dirty_bitmap_create_successor(BdrvDirtyBitmap *bitmap,
+>                                         Error **errp);
+> -BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
+> -                                            BdrvDirtyBitmap *bitmap,
+> +BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BdrvDirtyBitmap *bitmap,
+>                                              Error **errp);
+> -BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
+> -                                           BdrvDirtyBitmap *bitmap,
+> +BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BdrvDirtyBitmap *bitmap,
+>                                             Error **errp);
+>  void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap);
+>  BdrvDirtyBitmap *bdrv_find_dirty_bitmap(BlockDriverState *bs,
+>                                          const char *name);
+>  int bdrv_dirty_bitmap_check(const BdrvDirtyBitmap *bitmap, uint32_t fl=
+ags,
+>                              Error **errp);
+> -void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *=
+bitmap);
+> +void bdrv_release_dirty_bitmap(BdrvDirtyBitmap *bitmap);
+>  void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs);
+>  void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+>                                           const char *name,
+> @@ -107,8 +104,7 @@ int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap=
+ *bitmap, uint64_t offset,
+>                                      uint64_t bytes);
+>  bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitmap *bitmap,
+>                                         uint64_t *offset, uint64_t *byt=
+es);
+> -BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs=
+,
+> -                                                  BdrvDirtyBitmap *bit=
+map,
+> +BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BdrvDirtyBitmap *bit=
+map,
+>                                                    Error **errp);
+> =20
+>  #endif
+> diff --git a/block/backup.c b/block/backup.c
+> index 763f0d7ff6..acb67da3a7 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -352,7 +352,6 @@ static int coroutine_fn backup_before_write_notify(
+>  static void backup_cleanup_sync_bitmap(BackupBlockJob *job, int ret)
+>  {
+>      BdrvDirtyBitmap *bm;
+> -    BlockDriverState *bs =3D blk_bs(job->common.blk);
+>      bool sync =3D (((ret =3D=3D 0) || (job->bitmap_mode =3D=3D BITMAP_=
+SYNC_MODE_ALWAYS)) \
+>                   && (job->bitmap_mode !=3D BITMAP_SYNC_MODE_NEVER));
+> =20
+> @@ -361,13 +360,13 @@ static void backup_cleanup_sync_bitmap(BackupBloc=
+kJob *job, int ret)
+>           * We succeeded, or we always intended to sync the bitmap.
+>           * Delete this bitmap and install the child.
+>           */
+> -        bm =3D bdrv_dirty_bitmap_abdicate(bs, job->sync_bitmap, NULL);
+> +        bm =3D bdrv_dirty_bitmap_abdicate(job->sync_bitmap, NULL);
+>      } else {
+>          /*
+>           * We failed, or we never intended to sync the bitmap anyway.
+>           * Merge the successor back into the parent, keeping all data.
+>           */
+> -        bm =3D bdrv_reclaim_dirty_bitmap(bs, job->sync_bitmap, NULL);
+> +        bm =3D bdrv_reclaim_dirty_bitmap(job->sync_bitmap, NULL);
+>      }
+> =20
+>      assert(bm);
+> @@ -398,10 +397,9 @@ static void backup_abort(Job *job)
+>  static void backup_clean(Job *job)
+>  {
+>      BackupBlockJob *s =3D container_of(job, BackupBlockJob, common.job=
+);
+> -    BlockDriverState *bs =3D blk_bs(s->common.blk);
+> =20
+>      if (s->copy_bitmap) {
+> -        bdrv_release_dirty_bitmap(bs, s->copy_bitmap);
+> +        bdrv_release_dirty_bitmap(s->copy_bitmap);
+>          s->copy_bitmap =3D NULL;
+>      }
+> =20
+> @@ -679,7 +677,7 @@ BlockJob *backup_job_create(const char *job_id, Blo=
+ckDriverState *bs,
+>          }
+> =20
+>          /* Create a new bitmap, and freeze/disable this one. */
+> -        if (bdrv_dirty_bitmap_create_successor(bs, sync_bitmap, errp) =
+< 0) {
+> +        if (bdrv_dirty_bitmap_create_successor(sync_bitmap, errp) < 0)=
+ {
+>              return NULL;
+>          }
+>      }
+> @@ -758,10 +756,10 @@ BlockJob *backup_job_create(const char *job_id, B=
+lockDriverState *bs,
+>   error:
+>      if (copy_bitmap) {
+>          assert(!job || !job->copy_bitmap);
+> -        bdrv_release_dirty_bitmap(bs, copy_bitmap);
+> +        bdrv_release_dirty_bitmap(copy_bitmap);
+>      }
+>      if (sync_bitmap) {
+> -        bdrv_reclaim_dirty_bitmap(bs, sync_bitmap, NULL);
+> +        bdrv_reclaim_dirty_bitmap(sync_bitmap, NULL);
+>      }
+>      if (job) {
+>          backup_clean(&job->common.job);
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index acfc3077f1..f3dc7b3ca5 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -29,6 +29,7 @@
+> =20
+>  struct BdrvDirtyBitmap {
+>      QemuMutex *mutex;
+> +    BlockDriverState *bs;
+>      HBitmap *bitmap;            /* Dirty bitmap implementation */
+>      bool busy;                  /* Bitmap is busy, it can't be used vi=
+a QMP */
+>      BdrvDirtyBitmap *successor; /* Anonymous child, if any. */
+> @@ -114,6 +115,7 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriv=
+erState *bs,
+>          return NULL;
+>      }
+>      bitmap =3D g_new0(BdrvDirtyBitmap, 1);
+> +    bitmap->bs =3D bs;
+>      bitmap->mutex =3D &bs->dirty_bitmap_mutex;
+>      bitmap->bitmap =3D hbitmap_alloc(bitmap_size, ctz32(granularity));
+>      bitmap->size =3D bitmap_size;
+> @@ -236,8 +238,7 @@ int bdrv_dirty_bitmap_check(const BdrvDirtyBitmap *=
+bitmap, uint32_t flags,
+>   * The successor will be enabled if the parent bitmap was.
+>   * Called with BQL taken.
+>   */
+> -int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
+> -                                       BdrvDirtyBitmap *bitmap, Error =
+**errp)
+> +int bdrv_dirty_bitmap_create_successor(BdrvDirtyBitmap *bitmap, Error =
+**errp)
+>  {
+>      uint64_t granularity;
+>      BdrvDirtyBitmap *child;
+> @@ -253,7 +254,7 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverS=
+tate *bs,
+> =20
+>      /* Create an anonymous successor */
+>      granularity =3D bdrv_dirty_bitmap_granularity(bitmap);
+> -    child =3D bdrv_create_dirty_bitmap(bs, granularity, NULL, errp);
+> +    child =3D bdrv_create_dirty_bitmap(bitmap->bs, granularity, NULL, =
+errp);
+>      if (!child) {
+>          return -1;
+>      }
+> @@ -299,8 +300,7 @@ static void bdrv_release_dirty_bitmap_locked(BdrvDi=
+rtyBitmap *bitmap)
+>   * delete the old bitmap, and return a handle to the new bitmap.
+>   * Called with BQL taken.
+>   */
+> -BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
+> -                                            BdrvDirtyBitmap *bitmap,
+> +BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BdrvDirtyBitmap *bitmap,
+>                                              Error **errp)
+>  {
+>      char *name;
+> @@ -319,7 +319,7 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDr=
+iverState *bs,
+>      successor->persistent =3D bitmap->persistent;
+>      bitmap->persistent =3D false;
+>      bitmap->busy =3D false;
+> -    bdrv_release_dirty_bitmap(bs, bitmap);
+> +    bdrv_release_dirty_bitmap(bitmap);
+> =20
+>      return successor;
+>  }
+> @@ -331,8 +331,7 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDr=
+iverState *bs,
+>   * The marged parent will be enabled if and only if the successor was =
+enabled.
+>   * Called within bdrv_dirty_bitmap_lock..unlock and with BQL taken.
+>   */
+> -BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs=
+,
+> -                                                  BdrvDirtyBitmap *par=
+ent,
+> +BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BdrvDirtyBitmap *par=
+ent,
+>                                                    Error **errp)
+>  {
+>      BdrvDirtyBitmap *successor =3D parent->successor;
+> @@ -356,14 +355,13 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked=
+(BlockDriverState *bs,
+>  }
+> =20
+>  /* Called with BQL taken. */
+> -BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
+> -                                           BdrvDirtyBitmap *parent,
+> +BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BdrvDirtyBitmap *parent,
+>                                             Error **errp)
+>  {
+>      BdrvDirtyBitmap *ret;
+> =20
+>      qemu_mutex_lock(parent->mutex);
+> -    ret =3D bdrv_reclaim_dirty_bitmap_locked(bs, parent, errp);
+> +    ret =3D bdrv_reclaim_dirty_bitmap_locked(parent, errp);
+>      qemu_mutex_unlock(parent->mutex);
+> =20
+>      return ret;
+> @@ -389,8 +387,10 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *=
+bs, int64_t bytes)
+>  }
+> =20
+>  /* Called with BQL taken.  */
+> -void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *=
+bitmap)
+> +void bdrv_release_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+>  {
+> +    BlockDriverState *bs =3D bitmap->bs;
 > +
-> +
-> +# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607> =
-by
-> +# filtering jobserver-related flags out of MAKEFLAGS. Print the result=
- to the
-> +# standard output.
-> +#
-> +# Parameters:
-> +#   $1: the value of the MAKEFLAGS variable
-> +qemu_edk2_quirk_tianocore_1607()
-> +{
-> +  local makeflags=3D"$1"
-> +
-> +  printf %s "$makeflags" \
-> +  | LC_ALL=3DC sed --regexp-extended \
-> +      --expression=3D's/--jobserver-(auth|fds)=3D[0-9]+,[0-9]+//' \
-> +      --expression=3D's/-j([0-9]+)?//'
-> +}
-> diff --git a/tests/uefi-test-tools/build.sh b/tests/uefi-test-tools/bui=
-ld.sh
-> index 8aa7935c43bb..eba7964a163b 100755
-> --- a/tests/uefi-test-tools/build.sh
-> +++ b/tests/uefi-test-tools/build.sh
-> @@ -29,9 +29,6 @@ export PACKAGES_PATH=3D$(realpath -- "$edk2_dir")
->   export WORKSPACE=3D$PWD
->   mkdir -p Conf
->  =20
-> -# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>.
-> -export PYTHON_COMMAND=3Dpython2
-> -
->   # Source "edksetup.sh" carefully.
->   set +e +u +C
->   source "$PACKAGES_PATH/edksetup.sh"
-> @@ -46,12 +43,15 @@ fi
->   source "$edk2_dir/../edk2-funcs.sh"
->   edk2_arch=3D$(qemu_edk2_get_arch "$emulation_target")
->   edk2_toolchain=3D$(qemu_edk2_get_toolchain "$emulation_target")
-> +MAKEFLAGS=3D$(qemu_edk2_quirk_tianocore_1607 "$MAKEFLAGS")
-> +edk2_thread_count=3D$(qemu_edk2_get_thread_count "$MAKEFLAGS")
->   qemu_edk2_set_cross_env "$emulation_target"
->  =20
->   # Build the UEFI binary
->   mkdir -p log
->   build \
->     --arch=3D"$edk2_arch" \
-> +  -n "$edk2_thread_count" \
->     --buildtarget=3DDEBUG \
->     --platform=3DUefiTestToolsPkg/UefiTestToolsPkg.dsc \
->     --tagname=3D"$edk2_toolchain" \
+>      bdrv_dirty_bitmaps_lock(bs);
+>      bdrv_release_dirty_bitmap_locked(bitmap);
+>      bdrv_dirty_bitmaps_unlock(bs);
+> diff --git a/block/mirror.c b/block/mirror.c
+> index fe984efb90..a6c50caea4 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -638,7 +638,7 @@ static int mirror_exit_common(Job *job)
+>          bdrv_unfreeze_backing_chain(mirror_top_bs, target_bs);
+>      }
+> =20
+> -    bdrv_release_dirty_bitmap(src, s->dirty_bitmap);
+> +    bdrv_release_dirty_bitmap(s->dirty_bitmap);
+> =20
+>      /* Make sure that the source BDS doesn't go away during bdrv_repla=
+ce_node,
+>       * before we can call bdrv_drained_end */
+> @@ -1709,7 +1709,7 @@ fail:
+>          blk_unref(s->target);
+>          bs_opaque->job =3D NULL;
+>          if (s->dirty_bitmap) {
+> -            bdrv_release_dirty_bitmap(bs, s->dirty_bitmap);
+> +            bdrv_release_dirty_bitmap(s->dirty_bitmap);
+>          }
+>          job_early_fail(&s->common.job);
+>      }
+> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+> index b2487101ed..6d795a2255 100644
+> --- a/block/qcow2-bitmap.c
+> +++ b/block/qcow2-bitmap.c
+> @@ -374,7 +374,7 @@ static BdrvDirtyBitmap *load_bitmap(BlockDriverStat=
+e *bs,
+>  fail:
+>      g_free(bitmap_table);
+>      if (bitmap !=3D NULL) {
+> -        bdrv_release_dirty_bitmap(bs, bitmap);
+> +        bdrv_release_dirty_bitmap(bitmap);
+>      }
+> =20
+>      return NULL;
+> @@ -941,7 +941,7 @@ fail:
+>  static void release_dirty_bitmap_helper(gpointer bitmap,
+>                                          gpointer bs)
+>  {
+> -    bdrv_release_dirty_bitmap(bs, bitmap);
+> +    bdrv_release_dirty_bitmap(bitmap);
+>  }
+> =20
+>  /* for g_slist_foreach for GSList of BdrvDirtyBitmap* elements */
+> @@ -1569,7 +1569,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDr=
+iverState *bs, Error **errp)
+>              continue;
+>          }
+> =20
+> -        bdrv_release_dirty_bitmap(bs, bm->dirty_bitmap);
+> +        bdrv_release_dirty_bitmap(bm->dirty_bitmap);
+>      }
+> =20
+>      bitmap_list_free(bm_list);
+> diff --git a/blockdev.c b/blockdev.c
+> index fbef6845c8..a8593fa0c1 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -2178,7 +2178,7 @@ static void block_dirty_bitmap_remove_commit(BlkA=
+ctionState *common)
+>                                               common, common);
+> =20
+>      bdrv_dirty_bitmap_set_busy(state->bitmap, false);
+> -    bdrv_release_dirty_bitmap(state->bs, state->bitmap);
+> +    bdrv_release_dirty_bitmap(state->bitmap);
+>  }
+> =20
+>  static void abort_prepare(BlkActionState *common, Error **errp)
+> @@ -2954,7 +2954,7 @@ static BdrvDirtyBitmap *do_block_dirty_bitmap_rem=
+ove(
+>      }
+> =20
+>      if (release) {
+> -        bdrv_release_dirty_bitmap(bs, bitmap);
+> +        bdrv_release_dirty_bitmap(bitmap);
+>      }
+> =20
+>      if (bitmap_bs) {
+> @@ -3086,7 +3086,7 @@ static BdrvDirtyBitmap *do_block_dirty_bitmap_mer=
+ge(
+>      bdrv_merge_dirty_bitmap(dst, anon, backup, errp);
+> =20
+>   out:
+> -    bdrv_release_dirty_bitmap(bs, anon);
+> +    bdrv_release_dirty_bitmap(anon);
+>      return dst;
+>  }
+> =20
+> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bit=
+map.c
+> index 5121f86d73..793f249aa5 100644
+> --- a/migration/block-dirty-bitmap.c
+> +++ b/migration/block-dirty-bitmap.c
+> @@ -474,7 +474,7 @@ static int dirty_bitmap_load_start(QEMUFile *f, Dir=
+tyBitmapLoadState *s)
+>      if (flags & DIRTY_BITMAP_MIG_START_FLAG_ENABLED) {
+>          DirtyBitmapLoadBitmapState *b;
+> =20
+> -        bdrv_dirty_bitmap_create_successor(s->bs, s->bitmap, &local_er=
+r);
+> +        bdrv_dirty_bitmap_create_successor(s->bitmap, &local_err);
+>          if (local_err) {
+>              error_report_err(local_err);
+>              return -EINVAL;
+> @@ -535,13 +535,12 @@ static void dirty_bitmap_load_complete(QEMUFile *=
+f, DirtyBitmapLoadState *s)
+>          bdrv_dirty_bitmap_lock(s->bitmap);
+>          if (enabled_bitmaps =3D=3D NULL) {
+>              /* in postcopy */
+> -            bdrv_reclaim_dirty_bitmap_locked(s->bs, s->bitmap, &error_=
+abort);
+> +            bdrv_reclaim_dirty_bitmap_locked(s->bitmap, &error_abort);
+>              bdrv_enable_dirty_bitmap_locked(s->bitmap);
+>          } else {
+>              /* target not started, successor must be empty */
+>              int64_t count =3D bdrv_get_dirty_count(s->bitmap);
+> -            BdrvDirtyBitmap *ret =3D bdrv_reclaim_dirty_bitmap_locked(=
+s->bs,
+> -                                                                    s-=
+>bitmap,
+> +            BdrvDirtyBitmap *ret =3D bdrv_reclaim_dirty_bitmap_locked(=
+s->bitmap,
+>                                                                      NU=
+LL);
+>              /* bdrv_reclaim_dirty_bitmap can fail only on no successor=
+ (it
+>               * must be) or on merge fail, but merge can't fail when se=
+cond
+> diff --git a/migration/block.c b/migration/block.c
+> index 0de9d84198..0496b9b66e 100644
+> --- a/migration/block.c
+> +++ b/migration/block.c
+> @@ -361,7 +361,7 @@ static int set_dirty_tracking(void)
+>  fail:
+>      QSIMPLEQ_FOREACH(bmds, &block_mig_state.bmds_list, entry) {
+>          if (bmds->dirty_bitmap) {
+> -            bdrv_release_dirty_bitmap(blk_bs(bmds->blk), bmds->dirty_b=
+itmap);
+> +            bdrv_release_dirty_bitmap(bmds->dirty_bitmap);
+>          }
+>      }
+>      return ret;
+> @@ -374,7 +374,7 @@ static void unset_dirty_tracking(void)
+>      BlkMigDevState *bmds;
+> =20
+>      QSIMPLEQ_FOREACH(bmds, &block_mig_state.bmds_list, entry) {
+> -        bdrv_release_dirty_bitmap(blk_bs(bmds->blk), bmds->dirty_bitma=
+p);
+> +        bdrv_release_dirty_bitmap(bmds->dirty_bitmap);
+>      }
+>  }
+> =20
 >=20
+
+--=20
+=E2=80=94js
 
