@@ -2,83 +2,64 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4092C4CEC4
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 05:35:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 871E9C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 05:46:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CC1A21848
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 05:35:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 513D5214AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 05:46:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P+wLyu+S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CC1A21848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="dac9nHQp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 513D5214AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAScG-0007Pq-Nr
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 01:35:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53570)
+	id 1iASnW-0002Ov-7U
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 01:46:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57018)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iASUM-0002LE-8E
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 01:26:52 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iASls-0001c8-Rj
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 01:44:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iASUK-00072F-9Y
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 01:26:50 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:39105)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iASUK-00071G-0O
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 01:26:48 -0400
-Received: by mail-pg1-x542.google.com with SMTP id u17so3301379pgi.6
- for <qemu-devel@nongnu.org>; Tue, 17 Sep 2019 22:26:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=ofyFRD9BzLQX+w/pf8Sdqdw8HjQ7Yrs4+r4WgJtUSDw=;
- b=P+wLyu+SuDRFMOpwlWZ3V0rbe8ckD4kt+H5JiZjGy/FL+1T2D5gbX9EIoMy/7R24L9
- oKTFjtKMZRc6L+V2psfC5xYijtBVX9nd0NuOUCHRlOANXzy9fNTrdX7sQGm/hp3DXdqZ
- +CdfRuOaJmkL1dHxXJ8EI36720S31ZepH1cd0muCpOigigv8w7ImeaM4lWevrJG4jfRS
- YdoCh4dNkg3QQbW15DJXT1HnQd2+JS03EOdQqhQDW1puUBN2IYDcuDJ64I4KmGoy6UuH
- uOTTBr7e1j9nvMrAHQi6CvDFERng9S7Xw2aQOrNH+cD0Bui9/o24W+g5UK4OKansxxzL
- skIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=ofyFRD9BzLQX+w/pf8Sdqdw8HjQ7Yrs4+r4WgJtUSDw=;
- b=iEz0Ihwme65JMPkaZY4n3yEn0wWn526JVVS81Mh0Hsjtb2nOIGE+Kdmr8B8CQVrJJI
- 4BzhKWK2ZX425NJSSh1ERdEI5KqqGrkx0VWc6dsAEOBVMSYxrL5S8gpgv0Hcv02wV+V1
- Zo/9ISBpeouJ5XVZxxDtTkROkCAEIQ54L+SNX0v/3mttRtvU28RTn0OSKMoJxdo9U8y1
- 02e0QsiWjLfjsKi7GeCV2HFZYQhUl7huZNy5waJJKnq13lpDzYIz6nVEJ73uyVYbwv1q
- m1m8YhQEwwoL6E6iSrEai3jdJNdqLvwjw52ujeIDCsT0hXsm8N8jo294yBY/6KRL69La
- c26g==
-X-Gm-Message-State: APjAAAWaGjCI2H8qC0RNaqsTghUVI2XhNybTACZgTMhrmutv572BH3Oc
- +NUk7Zgjb1CQ1af2fiviTlVXyCFCqoU=
-X-Google-Smtp-Source: APXvYqydj5yWU6CI4S+bctuCp/QqSK2LFmUWEx8gQnwsUq/nW2YdclF5mQ4l0+F3ZpYb9nzgruPLJA==
-X-Received: by 2002:a63:34cb:: with SMTP id b194mr2276638pga.446.1568784405343; 
- Tue, 17 Sep 2019 22:26:45 -0700 (PDT)
-Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
- [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id a1sm3457234pgd.74.2019.09.17.22.26.44
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 17 Sep 2019 22:26:44 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Tue, 17 Sep 2019 22:26:39 -0700
-Message-Id: <20190918052641.21300-2-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190918052641.21300-1-richard.henderson@linaro.org>
-References: <20190918052641.21300-1-richard.henderson@linaro.org>
+ (envelope-from <dgibson@ozlabs.org>) id 1iASlr-00018h-4z
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 01:44:56 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:38641)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iASlp-00013b-J7; Wed, 18 Sep 2019 01:44:55 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46Y87g2p5Jz9sNf; Wed, 18 Sep 2019 15:44:47 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1568785487;
+ bh=iVEqO8W5FVfGbJxtTdGkvq3y8guHqadQEdwfH1vREHQ=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=dac9nHQpWAFtZ4VGtmMU8WAGwq5lX1p+mF67oqUHNk0gPPRk/5139vUI36yucaKv6
+ Ze6zy0TZXKyT86ssgZOhBdTIFZ92gjC7edwIJqoW4krnSC64LuEiDcKVHaSh2a6OFa
+ upBKk7wVbChpKDa+YOMZfCsP5PDShxr3A0uaZBlw=
+Date: Wed, 18 Sep 2019 15:44:26 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Message-ID: <20190918054426.GI2440@umbus.fritz.box>
+References: <20190731141233.1340-1-clg@kaod.org>
+ <1a52b8c6-b29a-d223-0dfb-8aa24bf1d5aa@kaod.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="sl5MdczEF/OU2Miu"
+Content-Disposition: inline
+In-Reply-To: <1a52b8c6-b29a-d223-0dfb-8aa24bf1d5aa@kaod.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
-Subject: [Qemu-devel] [RFC 1/3] exec: Adjust notdirty tracing
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [PATCH v3 00/18] ppc/pnv: add XIVE support for KVM
+ guests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,107 +71,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, alex.bennee@linaro.org, stefanha@redhat.com
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The memory_region_tb_read tracepoint is unreachable, since notdirty
-is supposed to apply only to reads.  The memory_region_tb_write
-tracepoint is mis-named, because notdirty is not only used for TB
-invalidation.  It is also used for e.g. VGA RAM updates.
 
-Replace memory_region_tb_write with memory_notdirty_write, and
-place it in memory_notdirty_write_prepare where it can catch all
-of the instances.  Add memory_notdirty_dirty to log when we no
-longer intercept writes to a page.
+--sl5MdczEF/OU2Miu
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- exec.c       | 3 +++
- memory.c     | 4 ----
- trace-events | 4 ++--
- 3 files changed, 5 insertions(+), 6 deletions(-)
+On Tue, Sep 17, 2019 at 01:54:24PM +0200, C=E9dric Le Goater wrote:
+> On 31/07/2019 16:12, C=E9dric Le Goater wrote:
+> > Hello,
+> >=20
+> > The QEMU PowerNV machine emulates a baremetal OpenPOWER system and
+> > acts as an hypervisor (L0). Supporting emulation of KVM to run guests
+> > (L1) requires a few more extensions, among which guest support for the
+> > XIVE interrupt controller on POWER9 processor.
+> >=20
+> > The following changes add new per-CPU PowerNV machines and extend the
+> > XIVE models with the new XiveFabric and XivePresenter interfaces to
+> > provide support for XIVE escalations and interrupt resend. This
+> > mechanism is used by XIVE to notify the hypervisor that a vCPU is not
+> > dispatched on a HW thread. Tested on a QEMU PowerNV machine and a
+> > simple QEMU pseries guest doing network on a local bridge.
+> >=20
+> > The XIVE interrupt controller offers a way to increase the XIVE
+> > resources per chip by configuring multiple XIVE blocks on a chip. This
+> > is not currently supported by the model. However, some configurations,
+> > such as OPAL/skiboot, use one block-per-chip configuration with some
+> > optimizations. One of them is to override the hardwired chip ID by the
+> > block id in the PowerBUS operations and for CAM line compares. This
+> > patchset improves the support for this setup. Tested with 4 chips.
+>=20
+> David,
+>=20
+> Do you want me to resend this patchset ? or you just didn't have time
+> to look at it ? =20
 
-diff --git a/exec.c b/exec.c
-index 8b998974f8..9babe57615 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2755,6 +2755,8 @@ void memory_notdirty_write_prepare(NotDirtyInfo *ndi,
-     ndi->size = size;
-     ndi->pages = NULL;
- 
-+    trace_memory_notdirty_write(mem_vaddr, ram_addr, size);
-+
-     assert(tcg_enabled());
-     if (!cpu_physical_memory_get_dirty_flag(ram_addr, DIRTY_MEMORY_CODE)) {
-         ndi->pages = page_collection_lock(ram_addr, ram_addr + size);
-@@ -2779,6 +2781,7 @@ void memory_notdirty_write_complete(NotDirtyInfo *ndi)
-     /* we remove the notdirty callback only if the code has been
-        flushed */
-     if (!cpu_physical_memory_is_clean(ndi->ram_addr)) {
-+        trace_memory_notdirty_dirty(ndi->mem_vaddr);
-         tlb_set_dirty(ndi->cpu, ndi->mem_vaddr);
-     }
- }
-diff --git a/memory.c b/memory.c
-index b9dd6b94ca..57c44c97db 100644
---- a/memory.c
-+++ b/memory.c
-@@ -438,7 +438,6 @@ static MemTxResult  memory_region_read_accessor(MemoryRegion *mr,
-         /* Accesses to code which has previously been translated into a TB show
-          * up in the MMIO path, as accesses to the io_mem_notdirty
-          * MemoryRegion. */
--        trace_memory_region_tb_read(get_cpu_index(), addr, tmp, size);
-     } else if (TRACE_MEMORY_REGION_OPS_READ_ENABLED) {
-         hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
-         trace_memory_region_ops_read(get_cpu_index(), mr, abs_addr, tmp, size);
-@@ -465,7 +464,6 @@ static MemTxResult memory_region_read_with_attrs_accessor(MemoryRegion *mr,
-         /* Accesses to code which has previously been translated into a TB show
-          * up in the MMIO path, as accesses to the io_mem_notdirty
-          * MemoryRegion. */
--        trace_memory_region_tb_read(get_cpu_index(), addr, tmp, size);
-     } else if (TRACE_MEMORY_REGION_OPS_READ_ENABLED) {
-         hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
-         trace_memory_region_ops_read(get_cpu_index(), mr, abs_addr, tmp, size);
-@@ -490,7 +488,6 @@ static MemTxResult memory_region_write_accessor(MemoryRegion *mr,
-         /* Accesses to code which has previously been translated into a TB show
-          * up in the MMIO path, as accesses to the io_mem_notdirty
-          * MemoryRegion. */
--        trace_memory_region_tb_write(get_cpu_index(), addr, tmp, size);
-     } else if (TRACE_MEMORY_REGION_OPS_WRITE_ENABLED) {
-         hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
-         trace_memory_region_ops_write(get_cpu_index(), mr, abs_addr, tmp, size);
-@@ -515,7 +512,6 @@ static MemTxResult memory_region_write_with_attrs_accessor(MemoryRegion *mr,
-         /* Accesses to code which has previously been translated into a TB show
-          * up in the MMIO path, as accesses to the io_mem_notdirty
-          * MemoryRegion. */
--        trace_memory_region_tb_write(get_cpu_index(), addr, tmp, size);
-     } else if (TRACE_MEMORY_REGION_OPS_WRITE_ENABLED) {
-         hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
-         trace_memory_region_ops_write(get_cpu_index(), mr, abs_addr, tmp, size);
-diff --git a/trace-events b/trace-events
-index 823a4ae64e..5c9a1631e7 100644
---- a/trace-events
-+++ b/trace-events
-@@ -52,14 +52,14 @@ dma_map_wait(void *dbs) "dbs=%p"
- find_ram_offset(uint64_t size, uint64_t offset) "size: 0x%" PRIx64 " @ 0x%" PRIx64
- find_ram_offset_loop(uint64_t size, uint64_t candidate, uint64_t offset, uint64_t next, uint64_t mingap) "trying size: 0x%" PRIx64 " @ 0x%" PRIx64 ", offset: 0x%" PRIx64" next: 0x%" PRIx64 " mingap: 0x%" PRIx64
- ram_block_discard_range(const char *rbname, void *hva, size_t length, bool need_madvise, bool need_fallocate, int ret) "%s@%p + 0x%zx: madvise: %d fallocate: %d ret: %d"
-+memory_notdirty_write(uint64_t vaddr, uint64_t ram_addr, unsigned size) "0x%" PRIx64 " ram_addr 0x%" PRIx64 " size %u"
-+memory_notdirty_dirty(uint64_t vaddr) "0x%" PRIx64
- 
- # memory.c
- memory_region_ops_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
- memory_region_ops_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
- memory_region_subpage_read(int cpu_index, void *mr, uint64_t offset, uint64_t value, unsigned size) "cpu %d mr %p offset 0x%"PRIx64" value 0x%"PRIx64" size %u"
- memory_region_subpage_write(int cpu_index, void *mr, uint64_t offset, uint64_t value, unsigned size) "cpu %d mr %p offset 0x%"PRIx64" value 0x%"PRIx64" size %u"
--memory_region_tb_read(int cpu_index, uint64_t addr, uint64_t value, unsigned size) "cpu %d addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
--memory_region_tb_write(int cpu_index, uint64_t addr, uint64_t value, unsigned size) "cpu %d addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
- memory_region_ram_device_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
- memory_region_ram_device_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
- flatview_new(void *view, void *root) "%p (root %p)"
--- 
-2.17.1
+Mostly, I just haven't had time.  I'm also finding the patches pretty
+difficult to read and review.  I don't think that's an indication
+they're bad, just that what they're doing is necessarily complex, but
+it's still made it hard to tackle them.
 
+> Patch 16 has changed a little since. The get_block_id() handler has=20
+> moved to the XiveRouterClass.
+
+You, might as well repost, so I'm looking at the latest stuff.  I
+can't promise I'll be able to look at the new set terribly soon
+though.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--sl5MdczEF/OU2Miu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2BxDgACgkQbDjKyiDZ
+s5IGQRAAibMKjsrsupI88D/TtsinyUDwys3ONSiqv2ASjUVGYS6EBcCFyASGqQC1
+jLEgpTOhKnE8lFSlUoiAMrpj073AG0R7xbq87BG2efUoOUxCpELO3juvXwRHt2Wu
+q8+5F5SqL/Az/MBv4Pd5YnVs0WTXvGX33KGErtuVmUXT3ny1XNJK5/aeBdZBoyv0
+jcTd6ykm9el/F0OYX8mtU5O+ccZFY8DRSmEL0sKKBfxH+ub9OGW3I/qgzBExU+KT
+mRwlZe0RO7+14+o1zDw19Su9QxN5f+2/1hF8x704LqtrUNL6RzWQvo3tzcFBDfsB
+m6jNpVjHNTtW0UpCCpXj973qs+n2IeQ+SQnsKmnAwaEc0wbJP86N3d4oROvRyiHt
+l1eIjMQfBRqqydBU+k8fN66XQUkhIucobCp/R3vkrNTsYe/ZYG/gT2OFM3MruCfn
+yGmH2ZMAj87leWPHRTg9Fjz/ZRx7y6XUNU75sh+/0C0s19iJUGWRW9A9T4aQSO5z
+feaAObWjSfocStJOpAM1rgivJ2IYBxDt4WKH/U2hBEAbtmdxi7GIzAkgTxiwZwnK
+LWDZPyawipMF60w9eF/sj3uiZMe8czuXmHtovJj1YrjU4/ZnXEdq6BxFmIohTQFE
+jwmNLrSMwENp4JfNz3y+DXle7pevv7aZNXrp4jmwEPf1Ip99HT4=
+=Vj1F
+-----END PGP SIGNATURE-----
+
+--sl5MdczEF/OU2Miu--
 
