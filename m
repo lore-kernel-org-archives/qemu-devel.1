@@ -2,88 +2,61 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D59A1C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 01:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 273D9C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 01:33:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A99EB20665
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 01:33:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A99EB20665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id EE58E20665
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 01:33:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE58E20665
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAOqm-0007xS-LQ
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 21:33:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35754)
+	id 1iAOqz-0008F8-1z
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 21:33:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35823)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kevin.tian@intel.com>) id 1iAOp9-0006rr-PT
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 21:32:05 -0400
+ (envelope-from <piaojun@huawei.com>) id 1iAOpT-0006yo-SK
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 21:32:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kevin.tian@intel.com>) id 1iAOp7-0001Rf-0V
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 21:32:02 -0400
-Received: from mga12.intel.com ([192.55.52.136]:46753)
+ (envelope-from <piaojun@huawei.com>) id 1iAOpR-0001d0-Vb
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 21:32:23 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:41726 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kevin.tian@intel.com>)
- id 1iAOp6-0001Oz-HO
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 21:32:00 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 17 Sep 2019 18:31:55 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,518,1559545200"; d="scan'208";a="338173737"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
- by orsmga004.jf.intel.com with ESMTP; 17 Sep 2019 18:31:54 -0700
-Received: from fmsmsx605.amr.corp.intel.com (10.18.126.85) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 17 Sep 2019 18:31:54 -0700
-Received: from fmsmsx605.amr.corp.intel.com (10.18.126.85) by
- fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Tue, 17 Sep 2019 18:31:53 -0700
-Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
- fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Tue, 17 Sep 2019 18:31:53 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.32]) by
- SHSMSX101.ccr.corp.intel.com ([169.254.1.92]) with mapi id 14.03.0439.000;
- Wed, 18 Sep 2019 09:31:52 +0800
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Thread-Topic: [Qemu-devel] vhost, iova, and dirty page tracking
-Thread-Index: AdVsLg/AAnCsYtAES/qfxc77B9v7gf//8I+A//3tsaCABA8DAP/+1FBA
-Date: Wed, 18 Sep 2019 01:31:52 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D57AFBA@SHSMSX104.ccr.corp.intel.com>
-References: <AADFC41AFE54684AB9EE6CBC0274A5D19D577BEA@SHSMSX104.ccr.corp.intel.com>
- <60110ea3-9228-7e5d-ea32-05c72a95af0b@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D57A080@SHSMSX104.ccr.corp.intel.com>
- <20190917085404.3b063e53@x1.home>
-In-Reply-To: <20190917085404.3b063e53@x1.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNmVjYjE4NWUtODFjYS00MjFjLWI1MTUtMmU1NjEyZmIzMTExIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoicmZTNXNySUVtZk9nZWdNUDRPaW9KaEd1S0xSbWRJUndBTFZXR0w0eGw2cE5oQU5mNjJDUm1xNlI5ZFFRejZ1MCJ9
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <piaojun@huawei.com>) id 1iAOpR-0001as-BP
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 21:32:21 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 0BAC91074EBE71365BBD;
+ Wed, 18 Sep 2019 09:32:18 +0800 (CST)
+Received: from [10.177.253.249] (10.177.253.249) by smtp.huawei.com
+ (10.3.19.201) with Microsoft SMTP Server id 14.3.439.0; Wed, 18 Sep 2019
+ 09:32:13 +0800
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
+ <qemu-devel@nongnu.org>, <cohuck@redhat.com>, <mst@redhat.com>
+References: <20190917160057.11847-1-dgilbert@redhat.com>
+ <20190917160057.11847-3-dgilbert@redhat.com>
+From: piaojun <piaojun@huawei.com>
+Message-ID: <5D818908.4080508@huawei.com>
+Date: Wed, 18 Sep 2019 09:31:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
+ Thunderbird/38.2.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.136
-Subject: Re: [Qemu-devel] vhost, iova, and dirty page tracking
+In-Reply-To: <20190917160057.11847-3-dgilbert@redhat.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.177.253.249]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 45.249.212.35
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] virtio: add vhost-user-fs base
+ device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,100 +68,339 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: mszeredi@redhat.com, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiBGcm9tOiBBbGV4IFdpbGxpYW1zb24gW21haWx0bzphbGV4LndpbGxpYW1zb25AcmVkaGF0LmNv
-bV0NCj4gU2VudDogVHVlc2RheSwgU2VwdGVtYmVyIDE3LCAyMDE5IDEwOjU0IFBNDQo+IA0KPiBP
-biBUdWUsIDE3IFNlcCAyMDE5IDA4OjQ4OjM2ICswMDAwDQo+ICJUaWFuLCBLZXZpbiIgPGtldmlu
-LnRpYW5AaW50ZWwuY29tPiB3cm90ZToNCj4gDQo+ID4gPiBGcm9tOiBKYXNvbiBXYW5nIFttYWls
-dG86amFzb3dhbmdAcmVkaGF0LmNvbV0NCj4gPiA+IFNlbnQ6IE1vbmRheSwgU2VwdGVtYmVyIDE2
-LCAyMDE5IDQ6MzMgUE0NCj4gPiA+DQo+ID4gPg0KPiA+ID4gT24gMjAxOS85LzE2IOS4iuWNiDk6
-NTEsIFRpYW4sIEtldmluIHdyb3RlOg0KPiA+ID4gPiBIaSwgSmFzb24NCj4gPiA+ID4NCj4gPiA+
-ID4gV2UgaGFkIGEgZGlzY3Vzc2lvbiBhYm91dCBkaXJ0eSBwYWdlIHRyYWNraW5nIGluIFZGSU8s
-IHdoZW4gdklPTU1VDQo+ID4gPiA+IGlzIGVuYWJsZWQ6DQo+ID4gPiA+DQo+ID4gPiA+IGh0dHBz
-Oi8vbGlzdHMubm9uZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE5LQ0KPiA+ID4g
-MDkvbXNnMDI2OTAuaHRtbA0KPiA+ID4gPg0KPiA+ID4gPiBJdCdzIGFjdHVhbGx5IGEgc2ltaWxh
-ciBtb2RlbCBhcyB2aG9zdCAtIFFlbXUgY2Fubm90IGludGVycG9zZSB0aGUgZmFzdC0NCj4gPiA+
-IHBhdGgNCj4gPiA+ID4gRE1BcyB0aHVzIHJlbGllcyBvbiB0aGUga2VybmVsIHBhcnQgdG8gdHJh
-Y2sgYW5kIHJlcG9ydCBkaXJ0eSBwYWdlDQo+ID4gPiBpbmZvcm1hdGlvbi4NCj4gPiA+ID4gQ3Vy
-cmVudGx5IFFlbXUgdHJhY2tzIGRpcnR5IHBhZ2VzIGluIEdGTiBsZXZlbCwgdGh1cyBkZW1hbmRp
-bmcgYQ0KPiA+ID4gdHJhbnNsYXRpb24NCj4gPiA+ID4gZnJvbSBJT1ZBIHRvIEdQQS4gVGhlbiB0
-aGUgb3BlbiBpbiBvdXIgZGlzY3Vzc2lvbiBpcyB3aGVyZSB0aGlzDQo+ID4gPiB0cmFuc2xhdGlv
-bg0KPiA+ID4gPiBzaG91bGQgaGFwcGVuLiBEb2luZyB0aGUgdHJhbnNsYXRpb24gaW4ga2VybmVs
-IGltcGxpZXMgYSBkZXZpY2UgaW90bGINCj4gPiA+IGZsYXZvciwNCj4gPiA+ID4gd2hpY2ggaXMg
-d2hhdCB2aG9zdCBpbXBsZW1lbnRzIHRvZGF5LiBJdCByZXF1aXJlcyBwb3RlbnRpYWxseSBsYXJn
-ZQ0KPiA+ID4gdHJhY2tpbmcNCj4gPiA+ID4gc3RydWN0dXJlcyBpbiB0aGUgaG9zdCBrZXJuZWws
-IGJ1dCBsZXZlcmFnaW5nIHRoZSBleGlzdGluZyBsb2dfc3luYyBmbG93DQo+IGluDQo+ID4gPiBR
-ZW11Lg0KPiA+ID4gPiBPbiB0aGUgb3RoZXIgaGFuZCwgUWVtdSBtYXkgcGVyZm9ybSBsb2dfc3lu
-YyBmb3IgZXZlcnkgcmVtb3ZhbCBvZg0KPiA+ID4gSU9WQQ0KPiA+ID4gPiBtYXBwaW5nIGFuZCB0
-aGVuIGRvIHRoZSB0cmFuc2xhdGlvbiBpdHNlbGYsIHRoZW4gYXZvaWRpbmcgdGhlIEdQQQ0KPiA+
-ID4gYXdhcmVuZXNzDQo+ID4gPiA+IGluIHRoZSBrZXJuZWwgc2lkZS4gSXQgbmVlZHMgc29tZSBj
-aGFuZ2UgdG8gY3VycmVudCBRZW11IGxvZy1zeW5jDQo+IGZsb3csDQo+ID4gPiBhbmQNCj4gPiA+
-ID4gbWF5IGJyaW5nIG1vcmUgb3ZlcmhlYWQgaWYgSU9WQSBpcyBmcmVxdWVudGx5IHVubWFwcGVk
-Lg0KPiA+ID4gPg0KPiA+ID4gPiBTbyB3ZSdkIGxpa2UgdG8gaGVhciBhYm91dCB5b3VyIG9waW5p
-b25zLCBlc3BlY2lhbGx5IGFib3V0IGhvdyB5b3UNCj4gY2FtZQ0KPiA+ID4gPiBkb3duIHRvIHRo
-ZSBjdXJyZW50IGlvdGxiIGFwcHJvYWNoIGZvciB2aG9zdC4NCj4gPiA+DQo+ID4gPg0KPiA+ID4g
-V2UgZG9uJ3QgY29uc2lkZXIgdG9vIG11Y2ggaW4gdGhlIHBvaW50IHdoZW4gaW50cm9kdWNpbmcg
-dmhvc3QuIEFuZA0KPiA+ID4gYmVmb3JlIElPVExCLCB2aG9zdCBoYXMgYWxyZWFkeSBrbm93IEdQ
-QSB0aHJvdWdoIGl0cyBtZW0gdGFibGUNCj4gPiA+IChHUEEtPkhWQSkuIFNvIGl0J3MgbmF0dXJl
-IGFuZCBlYXNpZXIgdG8gdHJhY2sgZGlydHkgcGFnZXMgYXQgR1BBIGxldmVsDQo+ID4gPiB0aGVu
-IGl0IHdvbid0IGFueSBjaGFuZ2VzIGluIHRoZSBleGlzdGluZyBBQkkuDQo+ID4NCj4gPiBUaGlz
-IGlzIHRoZSBzYW1lIHNpdHVhdGlvbiBhcyBWRklPLg0KPiANCj4gSXQgaXM/ICBWRklPIGRvZXNu
-J3Qga25vdyBHUEFzLCBpdCBvbmx5IGtub3dzIEhWQSwgSFBBLCBhbmQgSU9WQS4gIEluDQo+IHNv
-bWUgY2FzZXMgSU9WQSBpcyBHUEEsIGJ1dCBub3QgYWxsLg0KDQpXZWxsLCBJIHRob3VnaHQgdmhv
-c3QgaGFzIGEgc2ltaWxhciBkZXNpZ24sIHRoYXQgdGhlIGluZGV4IG9mIGl0cyBtZW0gdGFibGUN
-CmlzIEdQQSB3aGVuIHZJT01NVSBpcyBvZmYgYW5kIHRoZW4gYmVjb21lcyBJT1ZBIHdoZW4gdklP
-TU1VIGlzIG9uLg0KQnV0IEkgbWF5IGJlIHdyb25nIGhlcmUuIEphc29uLCBjYW4geW91IGhlbHAg
-Y2xhcmlmeT8gSSBzYXcgdHdvIA0KaW50ZXJmYWNlcyB3aGljaCBwb2tlIHRoZSBtZW0gdGFibGU6
-IFZIT1NUX1NFVF9NRU1fVEFCTEUgKGZvciBHUEEpDQphbmQgVkhPU1RfSU9UTEJfVVBEQVRFIChm
-b3IgSU9WQSkuIEFyZSB0aGV5IHVzZWQgZXhjbHVzaXZlbHkgb3IgdG9nZXRoZXI/DQoNCj4gDQo+
-ID4gPiBGb3IgVkZJTyBjYXNlLCB0aGUgb25seSBhZHZhbnRhZ2VzIG9mIHVzaW5nIEdQQSBpcyB0
-aGF0IHRoZSBsb2cgY2FuIHRoZW4NCj4gPiA+IGJlIHNoYXJlZCBhbW9uZyBhbGwgdGhlIGRldmlj
-ZXMgdGhhdCBiZWxvbmdzIHRvIHRoZSBWTS4gT3RoZXJ3aXNlDQo+ID4gPiBzeW5jaW5nIHRocm91
-Z2ggSU9WQSBpcyBjbGVhbmVyLg0KPiA+DQo+ID4gSSBzdGlsbCB3b3JyeSBhYm91dCB0aGUgcG90
-ZW50aWFsIHBlcmZvcm1hbmNlIGltcGFjdCB3aXRoIHRoaXMgYXBwcm9hY2guDQo+ID4gSW4gY3Vy
-cmVudCBtZGV2IGxpdmUgbWlncmF0aW9uIHNlcmllcywgdGhlcmUgYXJlIG11bHRpcGxlIHN5c3Rl
-bSBjYWxscw0KPiA+IGludm9sdmVkIHdoZW4gcmV0cmlldmluZyB0aGUgZGlydHkgYml0bWFwIGlu
-Zm9ybWF0aW9uIGZvciBhIGdpdmVuIG1lbW9yeQ0KPiA+IHJhbmdlLiBJT1ZBIG1hcHBpbmdzIG1p
-Z2h0IGJlIGNoYW5nZWQgZnJlcXVlbnRseS4gVGhvdWdoIG9uZSBtYXkNCj4gPiBhcmd1ZSB0aGF0
-IGZyZXF1ZW50IElPVkEgY2hhbmdlIGFscmVhZHkgaGFzIGJhZCBwZXJmb3JtYW5jZSwgaXQncyBz
-dGlsbA0KPiA+IG5vdCBnb29kIHRvIGludHJvZHVjZSBmdXJ0aGVyIG5vbi1uZWdsaWdpYmxlIG92
-ZXJoZWFkIGluIHN1Y2ggc2l0dWF0aW9uLg0KPiA+DQo+ID4gT24gdGhlIG90aGVyIGhhbmQsIEkg
-cmVhbGl6ZWQgdGhhdCBhZGRpbmcgSU9WQSBhd2FyZW5lc3MgaW4gVkZJTyBpcw0KPiA+IGFjdHVh
-bGx5IGVhc3kuIFRvZGF5IFZGSU8gYWxyZWFkeSBtYWludGFpbnMgYSBmdWxsIGxpc3Qgb2YgSU9W
-QSBhbmQgaXRzDQo+ID4gYXNzb2NpYXRlZCBIVkEgaW4gdmZpb19kbWEgc3RydWN0dXJlLCBhY2Nv
-cmRpbmcgdG8gVkZJT19NQVAgYW5kDQo+ID4gVkZJT19VTk1BUC4gQXMgbG9uZyBhcyB3ZSBhbGxv
-dyB0aGUgbGF0dGVyIHR3byBvcGVyYXRpb25zIHRvIGFjY2VwdA0KPiA+IGFub3RoZXIgcGFyYW1l
-dGVyIChHUEEpLCBJT1ZBLT5HUEEgbWFwcGluZyBjYW4gYmUgbmF0dXJhbGx5IGNhY2hlZA0KPiA+
-IGluIGV4aXN0aW5nIHZmaW9fZG1hIG9iamVjdHMuIFRob3NlIG9iamVjdHMgYXJlIGFsd2F5cyB1
-cGRhdGVkIGFjY29yZGluZw0KPiA+IHRvIE1BUCBhbmQgVU5NQVAgaW9jdGxzIHRvIGJlIHVwLXRv
-LWRhdGUuIFFlbXUgdGhlbiB1bmlmb3JtbHkNCj4gPiByZXRyaWV2ZXMgdGhlIFZGSU8gZGlydHkg
-Yml0bWFwIGZvciB0aGUgZW50aXJlIEdQQSByYW5nZSBpbiBldmVyeSBwcmUtY29weQ0KPiA+IHJv
-dW5kLCByZWdhcmRsZXNzIG9mIHdoZXRoZXIgdklPTU1VIGlzIGVuYWJsZWQuIFRoZXJlIGlzIG5v
-IG5lZWQgb2YNCj4gPiBhbm90aGVyIElPVExCIGltcGxlbWVudGF0aW9uLCB3aXRoIHRoZSBtYWlu
-IGFzayBvbiBhIHYyIE1BUC9VTk1BUA0KPiA+IGludGVyZmFjZS4NCj4gPg0KPiA+IEFsZXgsIHlv
-dXIgdGhvdWdodHM/DQo+IA0KPiBTYW1lIGFzIGxhc3QgdGltZSwgeW91J3JlIGFza2luZyBWRklP
-IHRvIGJlIGF3YXJlIG9mIGFuIGVudGlyZWx5IG5ldw0KPiBhZGRyZXNzIHNwYWNlIGFuZCBpbXBs
-ZW1lbnQgdHJhY2tpbmcgc3RydWN0dXJlcyBvZiB0aGF0IGFkZHJlc3Mgc3BhY2UNCj4gdG8gbWFr
-ZSBsaWZlIGVhc2llciBmb3IgUUVNVS4gIERvbid0IHdlIHR5cGljYWxseSBwdXNoIHN1Y2ggY29t
-cGxleGl0eQ0KPiB0byB1c2Vyc3BhY2UgcmF0aGVyIHRoYW4gaW50byB0aGUga2VybmVsPyAgSSdt
-IG5vdCBjb252aW5jZWQuICBUaGFua3MsDQo+IA0KDQpJcyBpdCByZWFsbHkgY29tcGxleD8gTm8g
-bmVlZCBvZiBhIG5ldyB0cmFja2luZyBzdHJ1Y3R1cmUuIEp1c3QgYWxsb3dpbmcNCnRoZSBNQVAg
-aW50ZXJmYWNlIHRvIGNhcnJ5IGEgbmV3IHBhcmFtZXRlciBhbmQgdGhlbiByZWNvcmQgaXQgaW4g
-dGhlDQpleGlzdGluZyB2ZmlvX2RtYSBvYmplY3RzLg0KDQpOb3RlIHRoZSBmcmVxdWVuY3kgb2Yg
-Z3Vlc3QgRE1BIG1hcC91bm1hcCBjb3VsZCBiZSB2ZXJ5IGhpZ2guIFdlDQpzYXcgPjEwMEsgaW52
-b2NhdGlvbnMgcGVyIHNlY29uZCB3aXRoIGEgNDBHIE5JQy4gVG8gZG8gdGhlIHJpZ2h0DQp0cmFu
-c2xhdGlvbiBRZW11IHJlcXVpcmVzIGxvZ19zeW5jIGZvciBldmVyeSB1bm1hcCwgYmVmb3JlIHRo
-ZQ0KbWFwcGluZyBmb3IgbG9nZ2VkIGRpcnR5IElPVkEgYmVjb21lcyBzdGFsZS4gSW4gY3VycmVu
-dCBLaXJ0aSdzIHBhdGNoLA0KZWFjaCBsb2dfc3luYyByZXF1aXJlcyBzZXZlcmFsIHN5c3RlbV9j
-YWxscyB0aHJvdWdoIHRoZSBtaWdyYXRpb24NCmluZm8sIGUuZy4gc2V0dGluZyBzdGFydF9wZm4v
-cGFnZV9zaXplL3RvdGFsX3BmbnMgYW5kIHRoZW4gcmVhZGluZw0KZGF0YV9vZmZzZXQvZGF0YV9z
-aXplLiBUaGF0IGRlc2lnbiBpcyBmaW5lIGZvciBkb2luZyBsb2dfc3luYyBpbiBldmVyeQ0KcHJl
-LWNvcHkgcm91bmQsIGJ1dCB0b28gY29zdGx5IGlmIGRvaW5nIHNvIGZvciBldmVyeSBJT1ZBIHVu
-bWFwLiBJZg0Kc21hbGwgZXh0ZW5zaW9uIGluIGtlcm5lbCBjYW4gbGVhZCB0byBncmVhdCBvdmVy
-aGVhZCByZWR1Y3Rpb24sDQp3aHkgbm90Pw0KDQpUaGFua3MNCktldmluDQo=
+
+
+On 2019/9/18 0:00, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> The virtio-fs virtio device provides shared file system access using
+> the FUSE protocol carried over virtio.
+> The actual file server is implemented in an external vhost-user-fs device
+> backend process.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  configure                         |  13 ++
+>  hw/virtio/Makefile.objs           |   1 +
+>  hw/virtio/vhost-user-fs.c         | 299 ++++++++++++++++++++++++++++++
+>  include/hw/virtio/vhost-user-fs.h |  45 +++++
+>  4 files changed, 358 insertions(+)
+>  create mode 100644 hw/virtio/vhost-user-fs.c
+>  create mode 100644 include/hw/virtio/vhost-user-fs.h
+> 
+> diff --git a/configure b/configure
+> index 30aad233d1..1bd7b40d49 100755
+> --- a/configure
+> +++ b/configure
+> @@ -382,6 +382,7 @@ vhost_crypto=""
+>  vhost_scsi=""
+>  vhost_vsock=""
+>  vhost_user=""
+> +vhost_user_fs=""
+>  kvm="no"
+>  hax="no"
+>  hvf="no"
+> @@ -1294,6 +1295,10 @@ for opt do
+>    ;;
+>    --enable-vhost-vsock) vhost_vsock="yes"
+>    ;;
+> +  --disable-vhost-user-fs) vhost_user_fs="no"
+> +  ;;
+> +  --enable-vhost-user-fs) vhost_user_fs="yes"
+> +  ;;
+>    --disable-opengl) opengl="no"
+>    ;;
+>    --enable-opengl) opengl="yes"
+> @@ -2232,6 +2237,10 @@ test "$vhost_crypto" = "" && vhost_crypto=$vhost_user
+>  if test "$vhost_crypto" = "yes" && test "$vhost_user" = "no"; then
+>    error_exit "--enable-vhost-crypto requires --enable-vhost-user"
+>  fi
+> +test "$vhost_user_fs" = "" && vhost_user_fs=$vhost_user
+> +if test "$vhost_user_fs" = "yes" && test "$vhost_user" = "no"; then
+> +  error_exit "--enable-vhost-user-fs requires --enable-vhost-user"
+> +fi
+>  
+>  # OR the vhost-kernel and vhost-user values for simplicity
+>  if test "$vhost_net" = ""; then
+> @@ -6374,6 +6383,7 @@ echo "vhost-crypto support $vhost_crypto"
+>  echo "vhost-scsi support $vhost_scsi"
+>  echo "vhost-vsock support $vhost_vsock"
+>  echo "vhost-user support $vhost_user"
+> +echo "vhost-user-fs support $vhost_user_fs"
+>  echo "Trace backends    $trace_backends"
+>  if have_backend "simple"; then
+>  echo "Trace output file $trace_file-<pid>"
+> @@ -6873,6 +6883,9 @@ fi
+>  if test "$vhost_user" = "yes" ; then
+>    echo "CONFIG_VHOST_USER=y" >> $config_host_mak
+>  fi
+> +if test "$vhost_user_fs" = "yes" ; then
+> +  echo "CONFIG_VHOST_USER_FS=y" >> $config_host_mak
+> +fi
+>  if test "$blobs" = "yes" ; then
+>    echo "INSTALL_BLOBS=yes" >> $config_host_mak
+>  fi
+> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+> index 964ce78607..47ffbf22c4 100644
+> --- a/hw/virtio/Makefile.objs
+> +++ b/hw/virtio/Makefile.objs
+> @@ -11,6 +11,7 @@ common-obj-$(CONFIG_VIRTIO_PCI) += virtio-pci.o
+>  common-obj-$(CONFIG_VIRTIO_MMIO) += virtio-mmio.o
+>  obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon.o
+>  obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-crypto.o
+> +obj-$(CONFIG_VHOST_USER_FS) += vhost-user-fs.o
+>  obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-pci.o
+>  obj-$(CONFIG_VIRTIO_PMEM) += virtio-pmem.o
+>  common-obj-$(call land,$(CONFIG_VIRTIO_PMEM),$(CONFIG_VIRTIO_PCI)) += virtio-pmem-pci.o
+> diff --git a/hw/virtio/vhost-user-fs.c b/hw/virtio/vhost-user-fs.c
+> new file mode 100644
+> index 0000000000..f0df7f4746
+> --- /dev/null
+> +++ b/hw/virtio/vhost-user-fs.c
+> @@ -0,0 +1,299 @@
+> +/*
+> + * Vhost-user filesystem virtio device
+> + *
+> + * Copyright 2018-2019 Red Hat, Inc.
+> + *
+> + * Authors:
+> + *  Stefan Hajnoczi <stefanha@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or
+> + * (at your option) any later version.  See the COPYING file in the
+> + * top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include <sys/ioctl.h>
+> +#include "standard-headers/linux/virtio_fs.h"
+> +#include "qapi/error.h"
+> +#include "hw/qdev-properties.h"
+> +#include "hw/virtio/virtio-bus.h"
+> +#include "hw/virtio/virtio-access.h"
+> +#include "qemu/error-report.h"
+> +#include "hw/virtio/vhost-user-fs.h"
+> +#include "monitor/monitor.h"
+> +
+> +static void vuf_get_config(VirtIODevice *vdev, uint8_t *config)
+> +{
+> +    VHostUserFS *fs = VHOST_USER_FS(vdev);
+> +    struct virtio_fs_config fscfg = {};
+> +
+> +    memcpy((char *)fscfg.tag, fs->conf.tag,
+> +           MIN(strlen(fs->conf.tag) + 1, sizeof(fscfg.tag)));
+> +
+> +    virtio_stl_p(vdev, &fscfg.num_request_queues, fs->conf.num_request_queues);
+> +
+> +    memcpy(config, &fscfg, sizeof(fscfg));
+> +}
+> +
+> +static void vuf_start(VirtIODevice *vdev)
+> +{
+> +    VHostUserFS *fs = VHOST_USER_FS(vdev);
+> +    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
+> +    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
+> +    int ret;
+> +    int i;
+> +
+> +    if (!k->set_guest_notifiers) {
+> +        error_report("binding does not support guest notifiers");
+> +        return;
+> +    }
+> +
+> +    ret = vhost_dev_enable_notifiers(&fs->vhost_dev, vdev);
+> +    if (ret < 0) {
+> +        error_report("Error enabling host notifiers: %d", -ret);
+> +        return;
+> +    }
+> +
+> +    ret = k->set_guest_notifiers(qbus->parent, fs->vhost_dev.nvqs, true);
+> +    if (ret < 0) {
+> +        error_report("Error binding guest notifier: %d", -ret);
+> +        goto err_host_notifiers;
+> +    }
+> +
+> +    fs->vhost_dev.acked_features = vdev->guest_features;
+> +    ret = vhost_dev_start(&fs->vhost_dev, vdev);
+> +    if (ret < 0) {
+> +        error_report("Error starting vhost: %d", -ret);
+> +        goto err_guest_notifiers;
+> +    }
+> +
+> +    /*
+> +     * guest_notifier_mask/pending not used yet, so just unmask
+> +     * everything here.  virtio-pci will do the right thing by
+> +     * enabling/disabling irqfd.
+> +     */
+> +    for (i = 0; i < fs->vhost_dev.nvqs; i++) {
+> +        vhost_virtqueue_mask(&fs->vhost_dev, vdev, i, false);
+> +    }
+> +
+> +    return;
+> +
+> +err_guest_notifiers:
+> +    k->set_guest_notifiers(qbus->parent, fs->vhost_dev.nvqs, false);
+> +err_host_notifiers:
+> +    vhost_dev_disable_notifiers(&fs->vhost_dev, vdev);
+> +}
+> +
+> +static void vuf_stop(VirtIODevice *vdev)
+> +{
+> +    VHostUserFS *fs = VHOST_USER_FS(vdev);
+> +    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
+> +    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
+> +    int ret;
+> +
+> +    if (!k->set_guest_notifiers) {
+> +        return;
+> +    }
+> +
+> +    vhost_dev_stop(&fs->vhost_dev, vdev);
+> +
+> +    ret = k->set_guest_notifiers(qbus->parent, fs->vhost_dev.nvqs, false);
+> +    if (ret < 0) {
+> +        error_report("vhost guest notifier cleanup failed: %d", ret);
+> +        return;
+> +    }
+> +
+> +    vhost_dev_disable_notifiers(&fs->vhost_dev, vdev);
+> +}
+> +
+> +static void vuf_set_status(VirtIODevice *vdev, uint8_t status)
+> +{
+> +    VHostUserFS *fs = VHOST_USER_FS(vdev);
+> +    bool should_start = status & VIRTIO_CONFIG_S_DRIVER_OK;
+> +
+> +    if (!vdev->vm_running) {
+> +        should_start = false;
+> +    }
+> +
+> +    if (fs->vhost_dev.started == should_start) {
+> +        return;
+> +    }
+> +
+> +    if (should_start) {
+> +        vuf_start(vdev);
+> +    } else {
+> +        vuf_stop(vdev);
+> +    }
+> +}
+> +
+> +static uint64_t vuf_get_features(VirtIODevice *vdev,
+> +                                      uint64_t requested_features,
+> +                                      Error **errp)
+> +{
+> +    /* No feature bits used yet */
+> +    return requested_features;
+> +}
+> +
+> +static void vuf_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+> +{
+> +    /*
+> +     * Not normally called; it's the daemon that handles the queue;
+> +     * however virtio's cleanup path can call this.
+> +     */
+> +}
+> +
+> +static void vuf_guest_notifier_mask(VirtIODevice *vdev, int idx,
+> +                                            bool mask)
+> +{
+> +    VHostUserFS *fs = VHOST_USER_FS(vdev);
+> +
+> +    vhost_virtqueue_mask(&fs->vhost_dev, vdev, idx, mask);
+> +}
+> +
+> +static bool vuf_guest_notifier_pending(VirtIODevice *vdev, int idx)
+> +{
+> +    VHostUserFS *fs = VHOST_USER_FS(vdev);
+> +
+> +    return vhost_virtqueue_pending(&fs->vhost_dev, idx);
+> +}
+> +
+> +static void vuf_device_realize(DeviceState *dev, Error **errp)
+> +{
+> +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+> +    VHostUserFS *fs = VHOST_USER_FS(dev);
+> +    unsigned int i;
+> +    size_t len;
+> +    int ret;
+> +
+> +    if (!fs->conf.chardev.chr) {
+> +        error_setg(errp, "missing chardev");
+> +        return;
+> +    }
+> +
+> +    if (!fs->conf.tag) {
+> +        error_setg(errp, "missing tag property");
+> +        return;
+> +    }
+> +    len = strlen(fs->conf.tag);
+> +    if (len == 0) {
+> +        error_setg(errp, "tag property cannot be empty");
+> +        return;
+> +    }
+> +    if (len > sizeof_field(struct virtio_fs_config, tag)) {
+> +        error_setg(errp, "tag property must be %zu bytes or less",
+> +                   sizeof_field(struct virtio_fs_config, tag));
+> +        return;
+> +    }
+> +
+> +    if (fs->conf.num_request_queues == 0) {
+> +        error_setg(errp, "num-request-queues property must be larger than 0");
+> +        return;
+> +    }
+> +
+> +    if (!is_power_of_2(fs->conf.queue_size)) {
+> +        error_setg(errp, "queue-size property must be a power of 2");
+> +        return;
+> +    }
+> +
+> +    if (fs->conf.queue_size > VIRTQUEUE_MAX_SIZE) {
+> +        error_setg(errp, "queue-size property must be %u or smaller",
+> +                   VIRTQUEUE_MAX_SIZE);
+> +        return;
+> +    }
+> +
+> +    if (!vhost_user_init(&fs->vhost_user, &fs->conf.chardev, errp)) {
+> +        return;
+> +    }
+> +
+> +    virtio_init(vdev, "vhost-user-fs", VIRTIO_ID_FS,
+> +                sizeof(struct virtio_fs_config));
+> +
+> +    /* Hiprio queue */
+> +    virtio_add_queue(vdev, fs->conf.queue_size, vuf_handle_output);
+> +
+> +    /* Request queues */
+> +    for (i = 0; i < fs->conf.num_request_queues; i++) {
+> +        virtio_add_queue(vdev, fs->conf.queue_size, vuf_handle_output);
+> +    }
+> +
+> +    /* 1 high prio queue, plus the number configured */
+> +    fs->vhost_dev.nvqs = 1 + fs->conf.num_request_queues;
+> +    fs->vhost_dev.vqs = g_new0(struct vhost_virtqueue, fs->vhost_dev.nvqs);
+> +    ret = vhost_dev_init(&fs->vhost_dev, &fs->vhost_user,
+> +                         VHOST_BACKEND_TYPE_USER, 0);
+> +    if (ret < 0) {
+> +        error_setg_errno(errp, -ret, "vhost_dev_init failed");
+> +        goto err_virtio;
+> +    }
+> +
+> +    return;
+> +
+> +err_virtio:
+> +    vhost_user_cleanup(&fs->vhost_user);
+> +    virtio_cleanup(vdev);
+> +    g_free(fs->vhost_dev.vqs);
+
+Adding 'fs->vhost_dev.vqs = NULL;' looks better.
+
+Jun
 
