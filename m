@@ -2,62 +2,77 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-11.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FE65C4CEC4
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 21:00:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86E33C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 21:58:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 197E020665
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 21:00:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 197E020665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 586BE21848
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 21:58:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 586BE21848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAh3q-00063R-9O
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 17:00:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47093)
+	id 1iAhxd-0001nZ-I8
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 17:58:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53398)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iAgw0-0006HI-M3
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 16:52:21 -0400
+ (envelope-from <dan.streetman@canonical.com>) id 1iAhwi-0001Lj-PT
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 17:57:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iAgvz-0008N9-9F
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 16:52:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:23091)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1iAgvw-0008Lu-4U; Wed, 18 Sep 2019 16:52:16 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 713E23082E55;
- Wed, 18 Sep 2019 20:52:15 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.53])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5195B1001281;
- Wed, 18 Sep 2019 20:52:11 +0000 (UTC)
-Message-ID: <0cda25dcff5e74358c304111fd31e3c9859d1a52.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Wed, 18 Sep 2019 23:52:09 +0300
-In-Reply-To: <20190918095144.955-8-mreitz@redhat.com>
-References: <20190918095144.955-1-mreitz@redhat.com>
- <20190918095144.955-8-mreitz@redhat.com>
+ (envelope-from <dan.streetman@canonical.com>) id 1iAhwh-0003vq-Dt
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 17:57:08 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:53307)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <dan.streetman@canonical.com>)
+ id 1iAhwh-0003uB-8d
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 17:57:07 -0400
+Received: from mail-io1-f72.google.com ([209.85.166.72])
+ by youngberry.canonical.com with esmtps
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.86_2)
+ (envelope-from <dan.streetman@canonical.com>) id 1iAhwf-00020v-4V
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:57:05 +0000
+Received: by mail-io1-f72.google.com with SMTP id e6so1903701ios.8
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 14:57:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=70jwlhXsk8hW6JRjE/2NrhQaUp6LGL9oV7Kgj7o79MM=;
+ b=DflQq4CkrCL+xwf+gX7seMXnmFivrrLqHhyXGhlrpulJSo074DQ4dyyY5lDIShuahc
+ SyKkA1uCYCZMbm18I/hz+he8ZO6u1OCWBl8+I6ecYLo8MobBFiFJOiz7xiapieGhwlGf
+ VfBPi7ZjVgg8NC158ukjSX4qn/ty8y9NAmlPM7aCVL42p1Dd061oTA4zzaGWZsk/3Hj0
+ qhPHk8qq+wiO3JtPKhm6M9mc9d2IIUY8MySR5eVK4CCnyofYLIVZ2LKqrU0bmoY3WxnA
+ eNd/h9fy1RK5qYVexwoQq9TTFYpa3iyPuanSKPeke16pniZJ7X30iZ+9C6peV2H4jiRt
+ mbDA==
+X-Gm-Message-State: APjAAAVR6wm5LWZ0b/rfwDEuNlfY0hLitklDl95cXKjH4ZpOyuvAC+p7
+ UDzJlPPhbHMt58mSSU4fKQLJmplN754E0/kfN2oP7qCfYAC6xLcek0LZ/+GUaA3tRZKN7E2X4k1
+ QqwNKCVwnPigj62bnmbTreeH8TpTebyZnDfM70MzKCIc+SFcd
+X-Received: by 2002:a5d:9557:: with SMTP id a23mr7974822ios.165.1568843824006; 
+ Wed, 18 Sep 2019 14:57:04 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzEBfp3GPIcqYPSPjZduHykqfK9X0OIEp250r5DBbLqley50LjmH/EHQDV2fFea5atu4kj6RZ1acMK2FDlTt8k=
+X-Received: by 2002:a5d:9557:: with SMTP id a23mr7974791ios.165.1568843823671; 
+ Wed, 18 Sep 2019 14:57:03 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190917172422.5134-1-dan.streetman@canonical.com>
+ <87woe5z6mi.fsf@linaro.org>
+In-Reply-To: <87woe5z6mi.fsf@linaro.org>
+From: Dan Streetman <dan.streetman@canonical.com>
+Date: Wed, 18 Sep 2019 17:56:27 -0400
+Message-ID: <CAOZ2QJNgiB0ZoLAOUGjdFfWa+Hwkbqe=E+KQeOaUMEdvU0-ofw@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Wed, 18 Sep 2019 20:52:15 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 7/8] block: Pass truncate exact=true where
- reasonable
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 91.189.89.112
+Subject: Re: [Qemu-devel] [PATCH] hw/arm: set machine 'virt' as default
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,149 +84,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 2019-09-18 at 11:51 +0200, Max Reitz wrote:
-> This is a change in behavior, so all instances need a good
-> justification.  The comments added here should explain my reasoning.
-> 
-> qed already had a comment that suggests it always expected
-> bdrv_truncate()/blk_truncate() to behave as if exact=true were passed
-> (c743849bee7 came eight months before 55b949c8476), so it was simply
-> broken until now.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block/parallels.c | 11 +++++++++--
->  block/qcow2.c     |  6 +++++-
->  block/qed.c       |  2 +-
->  qemu-img.c        |  7 ++++++-
->  qemu-io-cmds.c    |  7 ++++++-
->  5 files changed, 27 insertions(+), 6 deletions(-)
-> 
-> diff --git a/block/parallels.c b/block/parallels.c
-> index a1a92c97a4..603211f83c 100644
-> --- a/block/parallels.c
-> +++ b/block/parallels.c
-> @@ -487,7 +487,12 @@ static int coroutine_fn parallels_co_check(BlockDriverState *bs,
->          res->leaks += count;
->          if (fix & BDRV_FIX_LEAKS) {
->              Error *local_err = NULL;
-> -            ret = bdrv_truncate(bs->file, res->image_end_offset, false,
-> +
-> +            /*
-> +             * In order to really repair the image, we must shrink it.
-> +             * That means we have to pass exact=true.
-> +             */
-> +            ret = bdrv_truncate(bs->file, res->image_end_offset, true,
->                                  PREALLOC_MODE_OFF, &local_err);
+On Wed, Sep 18, 2019 at 4:34 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>
+>
+> Dan Streetman <dan.streetman@canonical.com> writes:
+>
+> > From: Dan Streetman <ddstreet@canonical.com>
+> >
+> > There is currently no default machine type for arm so one must be speci=
+fied
+> > with --machine.  This sets the 'virt' machine type as default.
+>
+> We should really have a FAQ entry for why we don't have a default for
+> ARM. In short unlike PC's every ARM device is different so it pays to be
+> precise about what you want when you invoke QEMU. Because any given
+> kernel/image is only likely to work on the machine it's built for.
 
-I am not familiar with the parallels format, but in theory,
-a partial fix is better that nothing.
+well, that's the problem, I have no idea at all what I want; and "I"
+doesn't really apply completely in this situation, as the call to run
+qemu comes from deep inside a test suite, and can run on multiple
+archs, and could even be run by other people on other systems/archs.
 
->              if (ret < 0) {
->                  error_report_err(local_err);
-> @@ -880,7 +885,9 @@ static void parallels_close(BlockDriverState *bs)
->      if ((bs->open_flags & BDRV_O_RDWR) && !(bs->open_flags & BDRV_O_INACTIVE)) {
->          s->header->inuse = 0;
->          parallels_update_header(bs);
-> -        bdrv_truncate(bs->file, s->data_end << BDRV_SECTOR_BITS, false,
-> +
-> +        /* errors are ignored, so we might as well pass exact=true */
-> +        bdrv_truncate(bs->file, s->data_end << BDRV_SECTOR_BITS, true,
->                        PREALLOC_MODE_OFF, NULL);
-Fair enough.
+This is what I have (tentatively) come up with to handle this in the test s=
+uite:
+https://github.com/systemd/systemd/pull/13409/files#diff-2ea30ffea3b108e0f9=
+c50846cfdcd4e5R197
 
->      }
->  
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 4ef19dd29a..eba165de7f 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -5057,7 +5057,11 @@ static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
->              return ret;
->          }
->  
-> -        ret = blk_truncate(blk, new_size, false, PREALLOC_MODE_OFF, errp);
-> +        /*
-> +         * Amending image options should ensure that the image has
-> +         * exactly the given new values, so pass exact=true here.
-> +         */
-Agree.
+To be fair, it's unlikely that other people would run this on an arm
+system, unless they were a bit more familiar with arm, and maybe would
+know what machine type to pick.  Similarly for the testbeds that I
+handle for this test suite, I know that 'virt' seems to work.
 
-> +        ret = blk_truncate(blk, new_size, true, PREALLOC_MODE_OFF, errp);
->          blk_unref(blk);
->          if (ret < 0) {
->              return ret;
-> diff --git a/block/qed.c b/block/qed.c
-> index 7c2a65af40..8005cfc305 100644
-> --- a/block/qed.c
-> +++ b/block/qed.c
-> @@ -674,7 +674,7 @@ static int coroutine_fn bdrv_qed_co_create(BlockdevCreateOptions *opts,
->      l1_size = header.cluster_size * header.table_size;
->  
->      /* File must start empty and grow, check truncate is supported */
-I would update the above comment, with something like
+>
+> Why is virt special? It's just one of the many machines we emulate and
+> while it's probably the most popular these days for "something that
+> boots a Linux distro" why not -machine sba (when that comes)?
 
-"QED format requires the underlying file to have the exact expected length,
-which is 0 on creation"
-Or something similar.
+I am certainly not the right person to pick what the default should
+be, but I do think there should be *some* default.  If 'virt' is the
+most popular and/or has the widest kernel support, then it probably
+makes sense to make that the default.
 
-> -    ret = blk_truncate(blk, 0, false, PREALLOC_MODE_OFF, errp);
-> +    ret = blk_truncate(blk, 0, true, PREALLOC_MODE_OFF, errp);
->      if (ret < 0) {
->          goto out;
->      }
-> diff --git a/qemu-img.c b/qemu-img.c
-> index f8694f4f72..a3169b6113 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -3823,7 +3823,12 @@ static int img_resize(int argc, char **argv)
->          }
->      }
->  
-> -    ret = blk_truncate(blk, total_size, false, prealloc, &err);
-> +    /*
-> +     * The user expects the image to have the desired size after
-> +     * resizing, so pass @exact=true.  It is of no use to report
-> +     * success when the image has not actually been resized.
-> +     */
-Agree.
+I would guess that users of qemu-system-aarch64 (or -arm) fall into 2 group=
+s:
 
-> +    ret = blk_truncate(blk, total_size, true, prealloc, &err);
->      if (ret < 0) {
->          error_report_err(err);
->          goto out;
-> diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-> index 5e9017c979..1b7e700020 100644
-> --- a/qemu-io-cmds.c
-> +++ b/qemu-io-cmds.c
-> @@ -1710,7 +1710,12 @@ static int truncate_f(BlockBackend *blk, int argc, char **argv)
->          return offset;
->      }
->  
-> -    ret = blk_truncate(blk, offset, false, PREALLOC_MODE_OFF, &local_err);
-> +    /*
-> +     * qemu-io is a debugging tool, so let us be strict here and pass
-> +     * exact=true.  It is better to err on the "emit more errors" side
-> +     * than to be overly permissive.
-> +     */
-Also agree.
+1. people who know about arm and know exactly what machine they want to use
+2. people who don't know about arm and have no idea what machine to use
 
-> +    ret = blk_truncate(blk, offset, true, PREALLOC_MODE_OFF, &local_err);
->      if (ret < 0) {
->          error_report_err(local_err);
->          return ret;
+group #1 of course can still pick whatever machine they want.  I'm in
+group #2, and I suspect that like most others in the group, I did:
+
+$ qemu-system-aarch64 ...
+qemu-system-aarch64: No machine specified, and there is no default
+Use -machine help to list supported machines
+$ qemu-system-aarch64 -M ?
+...shows long list of machines that i'm unfamiliar with...
+virt-2.10            QEMU 2.10 ARM Virtual Machine
+virt-2.11            QEMU 2.11 ARM Virtual Machine
+virt-2.12            QEMU 2.12 ARM Virtual Machine
+virt-2.6             QEMU 2.6 ARM Virtual Machine
+virt-2.7             QEMU 2.7 ARM Virtual Machine
+virt-2.8             QEMU 2.8 ARM Virtual Machine
+virt-2.9             QEMU 2.9 ARM Virtual Machine
+virt-3.0             QEMU 3.0 ARM Virtual Machine
+virt                 QEMU 3.1 ARM Virtual Machine (alias of virt-3.1)
+virt-3.1             QEMU 3.1 ARM Virtual Machine
+
+(aha! those "virt" machines look generic enough that they'll work...)
+$ qemu-system-aarch64 -M virt ...
+
+I honestly don't know if it would be better to have a FAQ on why there
+is no default, or just to set a default.  Personally, I'd prefer just
+having a default.
+
+If you do decide against a default, I would suggest at least printing
+the url to the FAQ entry on why arm doesn't have a default, instead of
+just asking users to pick one out of the -M ? list.
 
 
-Other than few nitpicks which probably aren't important,
-Reviewed-by: Maxim Levitsky <mlevitsky@redhat.com>
-
-Best regards,
-	Maxim Levitsky
-
+>
+> >
+> > Signed-off-by: Dan Streetman <ddstreet@canonical.com>
+> > ---
+> >  hw/arm/virt.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > index d74538b021..e9fe888ca2 100644
+> > --- a/hw/arm/virt.c
+> > +++ b/hw/arm/virt.c
+> > @@ -78,6 +78,7 @@
+> >          mc->desc =3D "QEMU " # major "." # minor " ARM Virtual Machine=
+"; \
+> >          if (latest) { \
+> >              mc->alias =3D "virt"; \
+> > +            mc->is_default =3D 1; \
+> >          } \
+> >      } \
+> >      static const TypeInfo machvirt_##major##_##minor##_info =3D { \
+>
+>
+> --
+> Alex Benn=C3=A9e
+>
 
