@@ -2,84 +2,61 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9699CC4CEC4
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 18:08:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7340EC4CEC9
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 18:09:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F2CE208C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 18:08:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AFAPrM0p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F2CE208C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4A202208C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 18:09:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A202208C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAeNr-0006iz-4G
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 14:08:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45886)
+	id 1iAe2x-0007i0-7p
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 13:47:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56116)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iAeIC-00022S-Rs
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 14:03:06 -0400
+ (envelope-from <clg@kaod.org>) id 1iAcW0-0005ax-Ri
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:09:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iAeI8-0000T1-I9
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 14:03:02 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:44257)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iAeI8-0000Sb-CL
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 14:03:00 -0400
-Received: by mail-pl1-x641.google.com with SMTP id q15so303191pll.11
- for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 11:03:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=0As7gB6KKU9NL64qrnl7+jEEiK3R3QPZ3EzF2mVrRe8=;
- b=AFAPrM0pPH8ESex+gy/AqU0FMEmGTp3q4xlC75z7dg/HBbHpV+jHURa5omqxuNmQqs
- mRT/8AH+kApx+llQ37YUijo87FqkandZlwIRLwhzB02az24ybzFMvXlajlSNE5qeTnQO
- KD/p7ibsGV27JHWa1xOT6z55LMYKCQb9e3r3dOWFeF24FcTBDZ38fPVGGgdhVjWnVv2c
- 0vmXXANGYR0Ks/j8uimqYidQLmG0QYdcsjn8JNxiLa/M60jyPp/5c7Cvg9OF+KnLVjN0
- jixp1qc7bDuvT6EtrzqSTZhPM4ojvSr7kBVIzH89Fdax4Sg5Srkc3crK1+ZUogMCYios
- Ui2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=0As7gB6KKU9NL64qrnl7+jEEiK3R3QPZ3EzF2mVrRe8=;
- b=thu64Nr3ifDU9irw9fa+RwGGKNGFKGt4pGe13uplO/LCLMWEe8VDFFGmmBHUohgGct
- Hl+q6zhmHmS9FGIRiAF0eydcUP0UhuKInTQT2WKUCQj0/t1Af6yOwIgxfkaH2CrBMzxD
- /+9ggt/f6Wv6XW7naJZsIqV5Wn43g1fbw1xoTY3vHzaJaP2gf3VZnDrP5KcGL+VE++2T
- AJjI2Ly3Gt1OalfzsRFRPTVlT9CKkkQlj2IfeQva9XUrIbGroCzJrO/DlyaB38Z+AhfL
- GPddKr6qDG6x324UM9YXl+CLmkDyND5G1/hzXLpfnkVstvwnB5zO0a9DYjH4Wv+SQ3in
- 14xQ==
-X-Gm-Message-State: APjAAAWDA2zWwMOY+imN8EPiuWtdyMWWctJaAq5BDCqLh96a7kbph+K1
- +kZiJsTuYtb5f9qjPDQGZIqVVM9juB0=
-X-Google-Smtp-Source: APXvYqwGkcvzRFfL+7l5sIWLFjnqNZV14Bgg7OQ7ISw4p/Meq2vlAQlA6zMYs/6Rxjeo2e8MIeiJNQ==
-X-Received: by 2002:a17:902:aa43:: with SMTP id
- c3mr5290659plr.11.1568829778950; 
- Wed, 18 Sep 2019 11:02:58 -0700 (PDT)
-Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
- [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id b16sm13319518pfb.54.2019.09.18.11.02.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 18 Sep 2019 11:02:58 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Wed, 18 Sep 2019 11:02:50 -0700
-Message-Id: <20190918180251.32003-5-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190918180251.32003-1-richard.henderson@linaro.org>
-References: <20190918180251.32003-1-richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::641
-Subject: [Qemu-devel] [RFC v2 4/5] exec: Adjust notdirty tracing
+ (envelope-from <clg@kaod.org>) id 1iAcVz-00042f-Bm
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:09:12 -0400
+Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:49365)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iAcVz-00041q-6c
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:09:11 -0400
+Received: from player799.ha.ovh.net (unknown [10.109.143.216])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id BB6EE1AD3E9
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 18:09:09 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+ (Authenticated sender: clg@kaod.org)
+ by player799.ha.ovh.net (Postfix) with ESMTPSA id 552AF9F0EB3D;
+ Wed, 18 Sep 2019 16:09:04 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Wed, 18 Sep 2019 18:06:44 +0200
+Message-Id: <20190918160645.25126-25-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190918160645.25126-1-clg@kaod.org>
+References: <20190918160645.25126-1-clg@kaod.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 6243396460226907110
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudekgdeljecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 87.98.172.75
+Subject: [Qemu-devel] [PATCH v4 24/25] ppc/pnv: Improve trigger data
+ definition
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,110 +68,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, alex.bennee@linaro.org, stefanha@redhat.com,
- david@redhat.com
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The memory_region_tb_read tracepoint is unreachable, since notdirty
-is supposed to apply only to writes.  The memory_region_tb_write
-tracepoint is mis-named, because notdirty is not only used for TB
-invalidation.  It is also used for e.g. VGA RAM updates and migration.
+The trigger definition is used for triggers both for HW source
+interrupts, PHB, PSI, as well as for rerouting interrupts between
+Interrupt Controller.
 
-Replace memory_region_tb_write with memory_notdirty_write_access,
-and place it in memory_notdirty_write_prepare where it can catch
-all of the instances.  Add memory_notdirty_set_dirty to log when
-we no longer intercept writes to a page.
+HW source controllers set bit0 of word0 to =E2=80=980=E2=80=99 as they pr=
+ovide EAS
+information (EAS block + EAS index) in the 8 byte data and not END
+information, and bit1 of word0 to =E2=80=981=E2=80=99 to signal that the =
+state bit
+check has been performed.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Introduce these new trigger bits and rename the XIVE_SRCNO macros in
+XIVE_EAS to reflect better the nature of the data. This is breaking
+the notification for the PSI model which will be fixed in the next
+patch.
+
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
-v2: Rename new tracepoints as suggested (David)
----
- exec.c       | 3 +++
- memory.c     | 4 ----
- trace-events | 4 ++--
- 3 files changed, 5 insertions(+), 6 deletions(-)
+ include/hw/ppc/xive_regs.h | 24 +++++++++++++++++++++---
+ hw/intc/pnv_xive.c         | 16 ++++++++++++----
+ hw/intc/xive.c             |  4 ++--
+ 3 files changed, 35 insertions(+), 9 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 8b998974f8..5f2587b621 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2755,6 +2755,8 @@ void memory_notdirty_write_prepare(NotDirtyInfo *ndi,
-     ndi->size = size;
-     ndi->pages = NULL;
- 
-+    trace_memory_notdirty_write_access(mem_vaddr, ram_addr, size);
+diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
+index dd42c33cef35..83a2f2cc1318 100644
+--- a/include/hw/ppc/xive_regs.h
++++ b/include/hw/ppc/xive_regs.h
+@@ -22,9 +22,27 @@
+ /*
+  * Interrupt source number encoding on PowerBUS
+  */
+-#define XIVE_SRCNO_BLOCK(srcno) (((srcno) >> 28) & 0xf)
+-#define XIVE_SRCNO_INDEX(srcno) ((srcno) & 0x0fffffff)
+-#define XIVE_SRCNO(blk, idx)    ((uint32_t)(blk) << 28 | (idx))
++/*
++ * Trigger data definition
++ *
++ * The trigger definition is used for triggers both for HW source
++ * interrupts (PHB, PSI), as well as for rerouting interrupts between
++ * Interrupt Controller.
++ *
++ * HW source controllers set bit0 of word0 to =E2=80=980=E2=80=99 as the=
+y provide EAS
++ * information (EAS block + EAS index) in the 8 byte data and not END
++ * information, and bit1 of word0 to =E2=80=981=E2=80=99 to signal that =
+the state bit
++ * check has been performed.
++ */
++#define XIVE_TRIGGER_END        PPC_BIT(0)
++#define XIVE_TRIGGER_EAS        PPC_BIT(1)
 +
-     assert(tcg_enabled());
-     if (!cpu_physical_memory_get_dirty_flag(ram_addr, DIRTY_MEMORY_CODE)) {
-         ndi->pages = page_collection_lock(ram_addr, ram_addr + size);
-@@ -2779,6 +2781,7 @@ void memory_notdirty_write_complete(NotDirtyInfo *ndi)
-     /* we remove the notdirty callback only if the code has been
-        flushed */
-     if (!cpu_physical_memory_is_clean(ndi->ram_addr)) {
-+        trace_memory_notdirty_set_dirty(ndi->mem_vaddr);
-         tlb_set_dirty(ndi->cpu, ndi->mem_vaddr);
++/*
++ * QEMU macros to manipulate the trigger payload in native endian
++ */
++#define XIVE_EAS_BLOCK(n)       (((n) >> 28) & 0xf)
++#define XIVE_EAS_INDEX(n)       ((n) & 0x0fffffff)
++#define XIVE_EAS(blk, idx)      ((uint32_t)(blk) << 28 | (idx))
+=20
+ #define TM_SHIFT                16
+=20
+diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+index 4c1fa024cdf5..61af3f23000f 100644
+--- a/hw/intc/pnv_xive.c
++++ b/hw/intc/pnv_xive.c
+@@ -385,7 +385,7 @@ static int pnv_xive_get_eas(XiveRouter *xrtr, uint8_t=
+ blk, uint32_t idx,
+      * EAT lookups should be local to the IC
+      */
+     if (pnv_xive_block_id(xive) !=3D blk) {
+-        xive_error(xive, "VST: EAS %x is remote !?", XIVE_SRCNO(blk, idx=
+));
++        xive_error(xive, "VST: EAS %x is remote !?", XIVE_EAS(blk, idx))=
+;
+         return -1;
      }
+=20
+@@ -502,7 +502,7 @@ static void pnv_xive_notify(XiveNotifier *xn, uint32_=
+t srcno)
+     PnvXive *xive =3D PNV_XIVE(xn);
+     uint8_t blk =3D pnv_xive_block_id(xive);
+=20
+-    xive_router_notify(xn, XIVE_SRCNO(blk, srcno));
++    xive_router_notify(xn, XIVE_EAS(blk, srcno));
  }
-diff --git a/memory.c b/memory.c
-index b9dd6b94ca..57c44c97db 100644
---- a/memory.c
-+++ b/memory.c
-@@ -438,7 +438,6 @@ static MemTxResult  memory_region_read_accessor(MemoryRegion *mr,
-         /* Accesses to code which has previously been translated into a TB show
-          * up in the MMIO path, as accesses to the io_mem_notdirty
-          * MemoryRegion. */
--        trace_memory_region_tb_read(get_cpu_index(), addr, tmp, size);
-     } else if (TRACE_MEMORY_REGION_OPS_READ_ENABLED) {
-         hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
-         trace_memory_region_ops_read(get_cpu_index(), mr, abs_addr, tmp, size);
-@@ -465,7 +464,6 @@ static MemTxResult memory_region_read_with_attrs_accessor(MemoryRegion *mr,
-         /* Accesses to code which has previously been translated into a TB show
-          * up in the MMIO path, as accesses to the io_mem_notdirty
-          * MemoryRegion. */
--        trace_memory_region_tb_read(get_cpu_index(), addr, tmp, size);
-     } else if (TRACE_MEMORY_REGION_OPS_READ_ENABLED) {
-         hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
-         trace_memory_region_ops_read(get_cpu_index(), mr, abs_addr, tmp, size);
-@@ -490,7 +488,6 @@ static MemTxResult memory_region_write_accessor(MemoryRegion *mr,
-         /* Accesses to code which has previously been translated into a TB show
-          * up in the MMIO path, as accesses to the io_mem_notdirty
-          * MemoryRegion. */
--        trace_memory_region_tb_write(get_cpu_index(), addr, tmp, size);
-     } else if (TRACE_MEMORY_REGION_OPS_WRITE_ENABLED) {
-         hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
-         trace_memory_region_ops_write(get_cpu_index(), mr, abs_addr, tmp, size);
-@@ -515,7 +512,6 @@ static MemTxResult memory_region_write_with_attrs_accessor(MemoryRegion *mr,
-         /* Accesses to code which has previously been translated into a TB show
-          * up in the MMIO path, as accesses to the io_mem_notdirty
-          * MemoryRegion. */
--        trace_memory_region_tb_write(get_cpu_index(), addr, tmp, size);
-     } else if (TRACE_MEMORY_REGION_OPS_WRITE_ENABLED) {
-         hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
-         trace_memory_region_ops_write(get_cpu_index(), mr, abs_addr, tmp, size);
-diff --git a/trace-events b/trace-events
-index 823a4ae64e..20821ba545 100644
---- a/trace-events
-+++ b/trace-events
-@@ -52,14 +52,14 @@ dma_map_wait(void *dbs) "dbs=%p"
- find_ram_offset(uint64_t size, uint64_t offset) "size: 0x%" PRIx64 " @ 0x%" PRIx64
- find_ram_offset_loop(uint64_t size, uint64_t candidate, uint64_t offset, uint64_t next, uint64_t mingap) "trying size: 0x%" PRIx64 " @ 0x%" PRIx64 ", offset: 0x%" PRIx64" next: 0x%" PRIx64 " mingap: 0x%" PRIx64
- ram_block_discard_range(const char *rbname, void *hva, size_t length, bool need_madvise, bool need_fallocate, int ret) "%s@%p + 0x%zx: madvise: %d fallocate: %d ret: %d"
-+memory_notdirty_write_access(uint64_t vaddr, uint64_t ram_addr, unsigned size) "0x%" PRIx64 " ram_addr 0x%" PRIx64 " size %u"
-+memory_notdirty_set_dirty(uint64_t vaddr) "0x%" PRIx64
- 
- # memory.c
- memory_region_ops_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
- memory_region_ops_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
- memory_region_subpage_read(int cpu_index, void *mr, uint64_t offset, uint64_t value, unsigned size) "cpu %d mr %p offset 0x%"PRIx64" value 0x%"PRIx64" size %u"
- memory_region_subpage_write(int cpu_index, void *mr, uint64_t offset, uint64_t value, unsigned size) "cpu %d mr %p offset 0x%"PRIx64" value 0x%"PRIx64" size %u"
--memory_region_tb_read(int cpu_index, uint64_t addr, uint64_t value, unsigned size) "cpu %d addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
--memory_region_tb_write(int cpu_index, uint64_t addr, uint64_t value, unsigned size) "cpu %d addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
- memory_region_ram_device_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
- memory_region_ram_device_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
- flatview_new(void *view, void *root) "%p (root %p)"
--- 
-2.17.1
+=20
+ /*
+@@ -1287,12 +1287,20 @@ static const MemoryRegionOps pnv_xive_ic_reg_ops =
+=3D {
+=20
+ static void pnv_xive_ic_hw_trigger(PnvXive *xive, hwaddr addr, uint64_t =
+val)
+ {
++    uint8_t blk =3D XIVE_EAS_BLOCK(val);
++    uint32_t idx =3D XIVE_EAS_INDEX(val);
++
+     /*
+      * Forward the source event notification directly to the Router.
+      * The source interrupt number should already be correctly encoded
+      * with the chip block id by the sending device (PHB, PSI).
+      */
+-    xive_router_notify(XIVE_NOTIFIER(xive), val);
++    if (val & XIVE_TRIGGER_EAS) {
++        xive_router_notify(XIVE_NOTIFIER(xive), XIVE_EAS(blk, idx));
++    } else {
++        xive_error(xive, "IC: END trigger at @0x%"HWADDR_PRIx" data 0x%"=
+PRIx64,
++                   addr, val);
++    }
+ }
+=20
+ static void pnv_xive_ic_notify_write(void *opaque, hwaddr addr, uint64_t=
+ val,
+@@ -1683,7 +1691,7 @@ void pnv_xive_pic_print_info(PnvXive *xive, Monitor=
+ *mon)
+     XiveRouter *xrtr =3D XIVE_ROUTER(xive);
+     uint8_t blk =3D pnv_xive_block_id(xive);
+     uint8_t chip_id =3D xive->chip->chip_id;
+-    uint32_t srcno0 =3D XIVE_SRCNO(blk, 0);
++    uint32_t srcno0 =3D XIVE_EAS(blk, 0);
+     uint32_t nr_ipis =3D pnv_xive_nr_ipis(xive, blk);
+     XiveEAS eas;
+     XiveEND end;
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 07b7c3586c12..6702f32be601 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -1652,8 +1652,8 @@ do_escalation:
+ void xive_router_notify(XiveNotifier *xn, uint32_t lisn)
+ {
+     XiveRouter *xrtr =3D XIVE_ROUTER(xn);
+-    uint8_t eas_blk =3D XIVE_SRCNO_BLOCK(lisn);
+-    uint32_t eas_idx =3D XIVE_SRCNO_INDEX(lisn);
++    uint8_t eas_blk =3D XIVE_EAS_BLOCK(lisn);
++    uint32_t eas_idx =3D XIVE_EAS_INDEX(lisn);
+     XiveEAS eas;
+=20
+     /* EAS cache lookup */
+--=20
+2.21.0
 
 
