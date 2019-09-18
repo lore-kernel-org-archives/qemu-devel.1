@@ -2,112 +2,69 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B772C4CEC4
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 07:44:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 456BEC4CEC4
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 07:54:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21CC020640
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 07:44:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21CC020640
+	by mail.kernel.org (Postfix) with ESMTPS id 1B2072067B
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 07:54:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B2072067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAUdk-0007kg-5G
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 03:44:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42227)
+	id 1iAUnd-0004x8-6V
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 03:54:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43061)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iAUct-00075G-OV
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 03:43:48 -0400
+ (envelope-from <kwolf@redhat.com>) id 1iAUjf-00030S-9w
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 03:50:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iAUcs-0005ft-GZ
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 03:43:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34952)
+ (envelope-from <kwolf@redhat.com>) id 1iAUjd-0008LA-R5
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 03:50:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55836)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iAUcp-0005f6-LH; Wed, 18 Sep 2019 03:43:44 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iAUjd-0008KY-IW
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 03:50:45 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B255D10CC1EC;
- Wed, 18 Sep 2019 07:43:42 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-90.ams2.redhat.com [10.36.116.90])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D572810018FF;
- Wed, 18 Sep 2019 07:43:31 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190916154847.28936-1-philmd@redhat.com>
- <20190916154847.28936-4-philmd@redhat.com>
- <c5caa155-19d3-1b22-ea61-d8c17dca39e7@redhat.com>
- <6f9f0932-5420-c67f-b6f7-2a7ceb4e99a4@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <24d0eebd-5bb2-8da9-d6e6-4a5938b0f6cc@redhat.com>
-Date: Wed, 18 Sep 2019 09:43:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 82A653082145;
+ Wed, 18 Sep 2019 07:50:44 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-230.ams2.redhat.com
+ [10.36.116.230])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A8753600C8;
+ Wed, 18 Sep 2019 07:50:40 +0000 (UTC)
+Date: Wed, 18 Sep 2019 09:50:39 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190918075039.GB5207@localhost.localdomain>
+References: <20190607211544.7964-1-ehabkost@redhat.com>
+ <CAFEAcA-wCqppsi+gcrTqGjR3bSDOHs5btKKE8oHYxbAUDtu7Fw@mail.gmail.com>
+ <CAFEAcA9ZeB1knLYYQLJG0d5McG2vo6w8P9+vOBWgtSVgPEG0jA@mail.gmail.com>
+ <20190611160329.GH5927@habkost.net>
+ <CAFEAcA-cv8vPT=7YraioJvW7-WnvGy9YoJXOc_E+UEWUehE+Bg@mail.gmail.com>
+ <20190611171257.GI5927@habkost.net>
+ <20190917135726.GD4824@localhost.localdomain>
+ <20190917214808.GH4082@habkost.net>
 MIME-Version: 1.0
-In-Reply-To: <6f9f0932-5420-c67f-b6f7-2a7ceb4e99a4@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Wed, 18 Sep 2019 07:43:43 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190917214808.GH4082@habkost.net>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Wed, 18 Sep 2019 07:50:44 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 03/13] hw: Move MC146818 device from
- hw/timer/ to hw/rtc/ subdirectory
+Subject: Re: [Qemu-devel] [PULL 0/8] Python queue, 2019-06-07
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,110 +76,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Andrew Jeffery <andrew@aj.id.au>, qemu-ppc@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, mreitz@redhat.com,
+ jsnow@redhat.com, QEMU Developers <qemu-devel@nongnu.org>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/09/2019 12.03, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 9/17/19 7:07 AM, Thomas Huth wrote:
->> On 16/09/2019 17.48, Philippe Mathieu-Daud=C3=A9 wrote:
->>> The MC146818 is a Real Time Clock, not a timer.
->>> Move it under the hw/rtc/ subdirectory.
->>>
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> [...]
->>> diff --git a/include/hw/rtc/mc146818rtc.h b/include/hw/rtc/mc146818rt=
-c.h
->>> new file mode 100644
->>> index 0000000000..888e04f9ab
->>> --- /dev/null
->>> +++ b/include/hw/rtc/mc146818rtc.h
->>> @@ -0,0 +1,38 @@
->>> +/*
->>> + * QEMU MC146818 RTC emulation
->>> + *
->>> + * Copyright (c) 2003-2004 Fabrice Bellard
->>> + *
->>> + * Permission is hereby granted, free of charge, to any person obtai=
-ning a copy
->>> + * of this software and associated documentation files (the "Softwar=
-e"), to deal
->>> + * in the Software without restriction, including without limitation=
- the rights
->>> + * to use, copy, modify, merge, publish, distribute, sublicense, and=
-/or sell
->>> + * copies of the Software, and to permit persons to whom the Softwar=
-e is
->>> + * furnished to do so, subject to the following conditions:
->>> + *
->>> + * The above copyright notice and this permission notice shall be in=
-cluded in
->>> + * all copies or substantial portions of the Software.
->>> + *
->>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, E=
-XPRESS OR
->>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTA=
-BILITY,
->>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT=
- SHALL
->>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES=
- OR OTHER
->>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, A=
-RISING FROM,
->>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEA=
-LINGS IN
->>> + * THE SOFTWARE.
->>> + */
->>
->> If you run "git blame" on the old header file, it does not seem like
->> Fabrice wrote this header, so I'm not sure whether it makes sense to a=
-dd
->> his (c) statement here?
->>
->> Maybe rather use a one-line "SPDX-License-Identifier: GPL-2.0-or-later=
-"
->> here?
->=20
-> It was first added by Fabrice here:
->=20
-> $ git show 80cabfad163
-[...]
-> diff --git a/vl.h b/vl.h
-> index 35962d1985..026a5dee5a 100644
-> --- a/vl.h
-> +++ b/vl.h
-> +/* mc146818rtc.c */
-> +
-> +typedef struct RTCState {
-> +    uint8_t cmos_data[128];
-> +    uint8_t cmos_index;
-> +    int irq;
-> +} RTCState;
-> +
-> +extern RTCState rtc_state;
-> +
-> +void rtc_init(int base, int irq);
-> +void rtc_timer(void);
+Am 17.09.2019 um 23:48 hat Eduardo Habkost geschrieben:
+> On Tue, Sep 17, 2019 at 03:57:26PM +0200, Kevin Wolf wrote:
+> > Am 11.06.2019 um 19:12 hat Eduardo Habkost geschrieben:
+> > > On Tue, Jun 11, 2019 at 05:07:55PM +0100, Peter Maydell wrote:
+> > > > On Tue, 11 Jun 2019 at 17:03, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > > > >
+> > > > > On Tue, Jun 11, 2019 at 04:50:34PM +0100, Peter Maydell wrote:
+> > > > > > On Mon, 10 Jun 2019 at 13:58, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > > > > > > Hi. This fails to build on one of my buildtest machines:
+> > > > > > >
+> > > > > > > ERROR: Cannot use 'python3', Python 2 >= 2.7 or Python 3 >= 3.5 is required.
+> > > > > > >        Use --python=/path/to/python to specify a supported Python.
+> > > > > > >
+> > > > > > > The machine has python 2.7.6 and 3.4.3. (It's an Ubuntu trusty
+> > > > > > > box; it's one of the gcc compile farm machines so upgrades to its
+> > > > > > > OS are not really under my control.)
+> > > > > >
+> > > > > > Rereading this, I realise that either the check or the error
+> > > > > > message is wrong here. The machine has 2.7.6, which satisfies
+> > > > > > "python 2 >= 2.7", so we should be OK to build. The bug
+> > > > > > seems to be that we say "prefer python3 over plain python
+> > > > > > on python2" early, but don't revisit that decision if the
+> > > > > > python3 we found isn't actually good enough for us.
+> > > > >
+> > > > > Right.  The error message is technically correct, but misleading.
+> > > > > python3 is too old, but python2 would work.
+> > > > >
+> > > > > We can make configure not use python3 by default if it's too old,
+> > > > > and fall back to python2 in this case.
+> > > > 
+> > > > Sounds good. Since I have now managed to get my alternate
+> > > > aarch64 box set up, how about I apply this pullreq and you
+> > > > send a followup patch which does the fallback to python/python2 ?
+> > > 
+> > > I will remove the python2/python3 patches and send a new pull
+> > > request.
+> > 
+> > What is the plan forward with this? Are the patches dropped for good?
+> > 
+> > I think the plan was to drop Python 2 after QEMU 4.2, and then it
+> > becomes really relevant what our minimum Python 3 version is. We've just
+> > had another Python version discussion in the context of iotests (John
+> > suggested using function annotations, but these are >= 3.5 only).
+> > 
+> > Also, the fallback to Python 2 obviously makes no sense any more then,
+> > so maybe it's not that important to add for a single QEMU release?
+> > 
+> > As Peter seems to have indicated above that he found a replacement for
+> > the test machine with an OS that isn't out of support, can we just
+> > revive this patch as it is?
+> 
+> My plan is to remove Python 2 support in QEMU 4.2 (making the
+> fallback to Python 2 a non-issue), and require Python >= 3.5.
 
-Ok, fair. But vl.h had a slightly different copyright statement than
-vl.c, so I think you should rather use the one from vl.h.
-But IMHO you could at least drop the "THE SOFTWARE IS PROVIDED ..."
-paragraph and add a SPDX tag instead?
+Then I think it would be best to make (or propose at least) that change
+early in the release cycle. In other words, now. :-)
 
- Thomas
+> Now, even if my plan is rejected and we keep supporting Python 2
+> when building QEMU 4.2, my suggestion for the iotest maintainers
+> is to make it require Python 3.5+ immediately, just like we do
+> for tests/acceptance.  I don't see why we should keep wasting our
+> energy supporting ancient Python versions in a test suite that is
+> not a requirement for building QEMU.
+
+Okay, if you as the Python maintainer say so, I'll gladly follow your
+advice.
+
+Maybe we can modify iotests so that it just skips Python tests if the
+minimum version isn't available to keep the impact of deviating from the
+global minimum version as small as possible. Of course, this will only
+be necessary if your proposal to make 3.5 the minimum for all of QEMU is
+rejected.
+
+Kevin
 
