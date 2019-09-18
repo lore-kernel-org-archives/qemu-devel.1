@@ -2,63 +2,73 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78945C4CECE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 13:33:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8965CC4CED0
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 13:35:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5221820856
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 13:33:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5221820856
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5A23421D79
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 13:35:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A23421D79
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAa5W-0002Bk-6m
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 09:33:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60457)
+	id 1iAa6r-0003H5-Av
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 09:35:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33599)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iAZts-0008Lg-EZ
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 09:21:41 -0400
+ (envelope-from <bounces@canonical.com>) id 1iAa3a-0001b3-EN
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 09:31:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iAZtm-0002Xi-T9
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 09:21:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36681)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>)
- id 1iAZtg-0002UB-Um; Wed, 18 Sep 2019 09:21:30 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3A1ADA3D3A3;
- Wed, 18 Sep 2019 13:21:27 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7B19A600C8;
- Wed, 18 Sep 2019 13:21:24 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 18 Sep 2019 14:21:11 +0100
-Message-Id: <20190918132112.10418-3-stefanha@redhat.com>
-In-Reply-To: <20190918132112.10418-1-stefanha@redhat.com>
-References: <20190918132112.10418-1-stefanha@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1iAa3Y-0007yF-Rt
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 09:31:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60574)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iAa3Y-0007wR-MD
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 09:31:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iAa3V-00088H-RY
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 13:31:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 7281A2E8206
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 13:31:30 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Wed, 18 Sep 2019 13:21:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Wed, 18 Sep 2019 13:17:02 -0000
+From: Stefan Hajnoczi <1839428@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: maxujun philmd stefanha
+X-Launchpad-Bug-Reporter: Xujun Ma (maxujun)
+X-Launchpad-Bug-Modifier: Stefan Hajnoczi (stefanha)
+References: <156524772160.13996.4537778553837159229.malonedeb@wampee.canonical.com>
+Message-Id: <156881262235.26802.14516008768132357659.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19048";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 4489f30e5a67fe804460592e5d725bf16c56e551
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 2/3] trace: Remove trailing newline in events
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1839428] Re: qemu core dumped when repeat
+ "system_reset" multiple times during guest boot
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -67,166 +77,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Jason Wang <jasowang@redhat.com>, John Snow <jsnow@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
+Reply-To: Bug 1839428 <1839428@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Please check if this commit has solved the issue:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Debb6ff25cd888a52a64a9adc3=
+692541c6d1d9a42
 
-While the tracing framework does not forbid trailing newline in
-events format string, using them lead to confuse output.
-It is the responsibility of the backend to properly end an event
-line.
+-- =
 
-Some of our formats have trailing newlines, remove them.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1839428
 
-[Fixed typo in commit description reported by Eric Blake
-<eblake@redhat.com>
---Stefan]
+Title:
+   qemu core dumped when repeat "system_reset" multiple times during
+  guest boot
 
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-id: 20190916095121.29506-2-philmd@redhat.com
-Message-Id: <20190916095121.29506-2-philmd@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- hw/misc/trace-events | 10 +++++-----
- hw/scsi/trace-events |  2 +-
- hw/sd/trace-events   |  2 +-
- nbd/trace-events     |  4 ++--
- net/trace-events     |  6 +++---
- 5 files changed, 12 insertions(+), 12 deletions(-)
+Status in QEMU:
+  Confirmed
 
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index c1ea1aa437..74276225f8 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -118,11 +118,11 @@ iotkit_secctl_ns_read(uint32_t offset, uint64_t dat=
-a, unsigned size) "IoTKit Sec
- iotkit_secctl_ns_write(uint32_t offset, uint64_t data, unsigned size) "I=
-oTKit SecCtl NS regs write: offset 0x%x data 0x%" PRIx64 " size %u"
-=20
- # imx6ul_ccm.c
--ccm_entry(void) "\n"
--ccm_freq(uint32_t freq) "freq =3D %d\n"
--ccm_clock_freq(uint32_t clock, uint32_t freq) "(Clock =3D %d) =3D %d\n"
--ccm_read_reg(const char *reg_name, uint32_t value) "reg[%s] <=3D 0x%" PR=
-Ix32 "\n"
--ccm_write_reg(const char *reg_name, uint32_t value) "reg[%s] =3D> 0x%" P=
-RIx32 "\n"
-+ccm_entry(void) ""
-+ccm_freq(uint32_t freq) "freq =3D %d"
-+ccm_clock_freq(uint32_t clock, uint32_t freq) "(Clock =3D %d) =3D %d"
-+ccm_read_reg(const char *reg_name, uint32_t value) "reg[%s] <=3D 0x%" PR=
-Ix32
-+ccm_write_reg(const char *reg_name, uint32_t value) "reg[%s] =3D> 0x%" P=
-RIx32
-=20
- # iotkit-sysinfo.c
- iotkit_sysinfo_read(uint64_t offset, uint64_t data, unsigned size) "IoTK=
-it SysInfo read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
-diff --git a/hw/scsi/trace-events b/hw/scsi/trace-events
-index 452b5994e6..b0820052f8 100644
---- a/hw/scsi/trace-events
-+++ b/hw/scsi/trace-events
-@@ -28,7 +28,7 @@ mptsas_mmio_read(void *dev, uint32_t addr, uint32_t val=
-) "dev %p addr 0x%08x val
- mptsas_mmio_unhandled_read(void *dev, uint32_t addr) "dev %p addr 0x%08x=
-"
- mptsas_mmio_unhandled_write(void *dev, uint32_t addr, uint32_t val) "dev=
- %p addr 0x%08x value 0x%x"
- mptsas_mmio_write(void *dev, uint32_t addr, uint32_t val) "dev %p addr 0=
-x%08x value 0x%x"
--mptsas_process_message(void *dev, int msg, uint32_t ctx) "dev %p cmd %d =
-context 0x%08x\n"
-+mptsas_process_message(void *dev, int msg, uint32_t ctx) "dev %p cmd %d =
-context 0x%08x"
- mptsas_process_scsi_io_request(void *dev, int bus, int target, int lun, =
-uint64_t len) "dev %p dev %d:%d:%d length %"PRIu64""
- mptsas_reset(void *dev) "dev %p "
- mptsas_scsi_overflow(void *dev, uint32_t ctx, uint64_t req, uint64_t fou=
-nd) "dev %p context 0x%08x: %"PRIu64"/%"PRIu64""
-diff --git a/hw/sd/trace-events b/hw/sd/trace-events
-index 52971dc033..efcff666a2 100644
---- a/hw/sd/trace-events
-+++ b/hw/sd/trace-events
-@@ -4,7 +4,7 @@
- bcm2835_sdhost_read(uint64_t offset, uint64_t data, unsigned size) "offs=
-et 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
- bcm2835_sdhost_write(uint64_t offset, uint64_t data, unsigned size) "off=
-set 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
- bcm2835_sdhost_edm_change(const char *why, uint32_t edm) "(%s) EDM now 0=
-x%x"
--bcm2835_sdhost_update_irq(uint32_t irq) "IRQ bits 0x%x\n"
-+bcm2835_sdhost_update_irq(uint32_t irq) "IRQ bits 0x%x"
-=20
- # core.c
- sdbus_command(const char *bus_name, uint8_t cmd, uint32_t arg) "@%s CMD%=
-02d arg 0x%08x"
-diff --git a/nbd/trace-events b/nbd/trace-events
-index f6cde96790..a955918e97 100644
---- a/nbd/trace-events
-+++ b/nbd/trace-events
-@@ -61,8 +61,8 @@ nbd_negotiate_begin(void) "Beginning negotiation"
- nbd_negotiate_new_style_size_flags(uint64_t size, unsigned flags) "adver=
-tising size %" PRIu64 " and flags 0x%x"
- nbd_negotiate_success(void) "Negotiation succeeded"
- nbd_receive_request(uint32_t magic, uint16_t flags, uint16_t type, uint6=
-4_t from, uint32_t len) "Got request: { magic =3D 0x%" PRIx32 ", .flags =3D=
- 0x%" PRIx16 ", .type =3D 0x%" PRIx16 ", from =3D %" PRIu64 ", len =3D %"=
- PRIu32 " }"
--nbd_blk_aio_attached(const char *name, void *ctx) "Export %s: Attaching =
-clients to AIO context %p\n"
--nbd_blk_aio_detach(const char *name, void *ctx) "Export %s: Detaching cl=
-ients from AIO context %p\n"
-+nbd_blk_aio_attached(const char *name, void *ctx) "Export %s: Attaching =
-clients to AIO context %p"
-+nbd_blk_aio_detach(const char *name, void *ctx) "Export %s: Detaching cl=
-ients from AIO context %p"
- nbd_co_send_simple_reply(uint64_t handle, uint32_t error, const char *er=
-rname, int len) "Send simple reply: handle =3D %" PRIu64 ", error =3D %" =
-PRIu32 " (%s), len =3D %d"
- nbd_co_send_structured_done(uint64_t handle) "Send structured reply done=
-: handle =3D %" PRIu64
- nbd_co_send_structured_read(uint64_t handle, uint64_t offset, void *data=
-, size_t size) "Send structured read data reply: handle =3D %" PRIu64 ", =
-offset =3D %" PRIu64 ", data =3D %p, len =3D %zu"
-diff --git a/net/trace-events b/net/trace-events
-index ac57056497..02c13fd0ba 100644
---- a/net/trace-events
-+++ b/net/trace-events
-@@ -17,9 +17,9 @@ colo_compare_icmp_miscompare(const char *sta, int size)=
- ": %s =3D %d"
- colo_compare_ip_info(int psize, const char *sta, const char *stb, int ss=
-ize, const char *stc, const char *std) "ppkt size =3D %d, ip_src =3D %s, =
-ip_dst =3D %s, spkt size =3D %d, ip_src =3D %s, ip_dst =3D %s"
- colo_old_packet_check_found(int64_t old_time) "%" PRId64
- colo_compare_miscompare(void) ""
--colo_compare_tcp_info(const char *pkt, uint32_t seq, uint32_t ack, int h=
-dlen, int pdlen, int offset, int flags) "%s: seq/ack=3D %u/%u hdlen=3D %d=
- pdlen=3D %d offset=3D %d flags=3D%d\n"
-+colo_compare_tcp_info(const char *pkt, uint32_t seq, uint32_t ack, int h=
-dlen, int pdlen, int offset, int flags) "%s: seq/ack=3D %u/%u hdlen=3D %d=
- pdlen=3D %d offset=3D %d flags=3D%d"
-=20
- # filter-rewriter.c
- colo_filter_rewriter_debug(void) ""
--colo_filter_rewriter_pkt_info(const char *func, const char *src, const c=
-har *dst, uint32_t seq, uint32_t ack, uint32_t flag) "%s: src/dst: %s/%s =
-p: seq/ack=3D%u/%u  flags=3D0x%x\n"
--colo_filter_rewriter_conn_offset(uint32_t offset) ": offset=3D%u\n"
-+colo_filter_rewriter_pkt_info(const char *func, const char *src, const c=
-har *dst, uint32_t seq, uint32_t ack, uint32_t flag) "%s: src/dst: %s/%s =
-p: seq/ack=3D%u/%u  flags=3D0x%x"
-+colo_filter_rewriter_conn_offset(uint32_t offset) ": offset=3D%u"
---=20
-2.21.0
+Bug description:
+  commit 864ab314f1d924129d06ac7b571f105a2b76a4b2 (HEAD, tag: v4.1.0-rc4, o=
+rigin/master, origin/HEAD, master)
+  Test arch:x86 and power
 
+  Steps:
+  1.Boot up guest with command
+  power cmdline:
+  /usr/libexec/backup/qemu-kvm \
+   -smp 8 \
+   -m 4096 \
+   -nodefaults \
+   -device virtio-blk-pci,id=3Dimage1,drive=3Ddrive_image1,bootindex=3D1,bu=
+s=3Dpci.0,addr=3D0x7 \
+   -drive file=3Drhel77-ppc64le-virtio.qcow2,if=3Dnone,id=3Ddrive_image1,fo=
+rmat=3Dqcow2,cache=3Dnone \
+   -chardev stdio,mux=3Don,id=3Dserial_id_serial0,server,nowait,signal=3Dof=
+f \
+   -device spapr-vty,id=3Dserial111,chardev=3Dserial_id_serial0 \
+   -mon chardev=3Dserial_id_serial0,mode=3Dreadline \
+  x86 cmdline:
+  /usr/libexec/qemu-kvm \
+   -m 4096 -smp 8 \
+   -boot menu=3Don \
+   -device virtio-blk-pci,id=3Dimage1,drive=3Ddrive_image1\
+   -drive file=3Drhel77-64-virtio.qcow2,if=3Dnone,id=3Ddrive_image1,format=
+=3Dqcow2,cache=3Dnone \
+   -vga std \
+   -vnc :9 \
+   -nographic \
+   -device virtio-net-pci,netdev=3Dnet0,id=3Dnic0,mac=3D52:54:00:c4:e7:84 \
+   -netdev tap,id=3Dnet0,script=3D/etc/qemu-ifup,downscript=3D/etc/qemu-ifd=
+own,vhost=3Don \
+
+  2.when guest start to boot up kernel(when no output infomation),run
+  hmp command "system_reset"
+
+  =
+
+  Result:
+
+  Sometimes,qemu core dumped with error as following:
+  system_reset
+  (qemu) qemu-system-ppc64: /root/qemu/hw/virtio/virtio.c:225: vring_get_re=
+gion_caches: Assertion `caches !=3D NULL' failed.
+  b.sh: line 11: 73679 Aborted                 (core dumped) /usr/local/bin=
+/qemu-system-ppc64 -enable-kvm -smp 8 -m 4096 -nodefaults -device virtio-bl=
+k-pci,id=3Dimage1,drive=3Ddrive_image1,bootindex=3D1,bus=3Dpci.0,addr=3D0x7=
+ -drive file=3Drhel77-ppc64le-virtio.qcow2,if=3Dnone,id=3Ddrive_image1,form=
+at=3Dqcow2,cache=3Dnone -chardev stdio,mux=3Don,id=3Dserial_id_serial0,serv=
+er,nowait,signal=3Doff -device spapr-vty,id=3Dserial111,chardev=3Dserial_id=
+_serial0 -mon chardev=3Dserial_id_serial0,mode=3Dreadline
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1839428/+subscriptions
 
