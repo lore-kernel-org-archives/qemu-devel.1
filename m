@@ -2,90 +2,93 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EB33C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 15:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95F1EC4CEC4
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 15:17:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A3DA218AE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 15:11:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61220218AE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 15:17:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZBQGPxP7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A3DA218AE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aeHzWnA0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61220218AE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAbbs-00084U-8A
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 11:11:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46534)
+	id 1iAbhi-0001zf-6r
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 11:17:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47203)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iAbaa-0006yS-IF
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:09:53 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iAbfX-00017L-NU
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:15:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iAbaY-0003X2-CQ
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:09:52 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:36005)
+ (envelope-from <richard.henderson@linaro.org>) id 1iAbfW-000725-AJ
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:14:59 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:47084)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iAbaS-0003RS-8P
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:09:44 -0400
-Received: by mail-pg1-x544.google.com with SMTP id m29so26275pgc.3
- for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 08:09:43 -0700 (PDT)
+ id 1iAbfW-00071i-3Z
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:14:58 -0400
+Received: by mail-pl1-x644.google.com with SMTP id q24so75719plr.13
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 08:14:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=z+IsGNwzXWZ3nCeFtv4S2oivecUVMyJE4X+eIHtkKPw=;
- b=ZBQGPxP7zrdIT80gkis3WuQ0y79tZhwJApHpskzseUCZWcTilxrDJ4B7tf/iVMtSpD
- UQ8Yv4r9MHxFCcD4Z2zLxa5p3sGYtzyZnvK1o+LVV5KEFvP9Af1HwxOjpav6zqkILxnl
- leyxQ5pKFTjfsVy0gDKbpOYd9rHSKjUceJBXfeq7JG++xuRSPNsOEucNmNgsklmkkiPF
- MRqo+zzc/T3Z6zCbaKcVU6N4ypwOObPyUH2kIlD+L/Lpxl/bdDVQYGD6t7LeJIb1pvuq
- DPvqhNxTbcVvnJR6aNEd33PVlgBZHotDrlu0joVjmkJGhF59ngvoqQHVuLSCUNCgtKur
- O62A==
+ bh=Di15xSXEP0WmQsLld3RE8DinlTNvuPQEmbqDRqfW5Xs=;
+ b=aeHzWnA0JJRn5sNo+yIGoj6PGOMB1ftQqkNpWEZvg0yKDeLgRa0iGK/eXchJol+GDx
+ ukLgYJHgs+AsMZEzU4Vd7FpxbpefZHEU0vgmxJnfm92wyl88GAhQ2H/TRrTo+bIkncm+
+ 1Ja2te7ApDEzvdIZ6LUfAF33TDEQiOkX01WHg0OrWXuqg1KacBJTIv8p39UvJHQe6cYI
+ Th2hBNyMaXnR/+4ClhsZbRgOgBCPO3QlB/umc4NXISweGM4qVyjJs5xJIE0DnKpR4/ze
+ pAXe9rWX9bFf09HLECiaQqLHDITD7Pc8nFFaq/b7np5iYswpBYMENHm1+0pXk2OUIeQs
+ CxJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=z+IsGNwzXWZ3nCeFtv4S2oivecUVMyJE4X+eIHtkKPw=;
- b=tXUQLQAtQK+cjCmSh3IjozzvTuQzEKJn1VxK8eBH/f+AKaFSn1PKsH4UdTCkGAxxt0
- cT3TLamVFuFQp6E/vJiNW5CPpEOtwFBFO8B01vilevfRQ8HRiVpcBxUXUuFXWmv1fcBf
- VTWRQBD9dD/PisSHBKq9KGhTss+qRIFlJQP/CucWx5gt8mcjrSAWUIyH2E+Aqn2LCXCC
- kpI9pqNYrXrG4WrjFECCWgnamjmaDatiK4UuDMU566nC5oyWAM5TY2FTB4a/elWTgSTz
- MzUnI5wDuJWc3JPfUXHWgC1Df3BF0L4WOdRW5QYT03qJiK0mZjCevSL/tmQ0R2xGJOLO
- kirA==
-X-Gm-Message-State: APjAAAXomxJKLULF7TUfjr9Jn2BNnyAUOM6m0vkPv0jG1wBHHf5bBGSa
- y1nt3UjIJS6d/B3YfalJhOgijw==
-X-Google-Smtp-Source: APXvYqz8zBEh8/nzZGEsTVia4oU/coO7S5SkWmwpN8rIMeS/5vkl5B5HLY6dX5MNAhr3Tomy+SeCPg==
-X-Received: by 2002:a63:eb52:: with SMTP id b18mr2001436pgk.71.1568819382284; 
- Wed, 18 Sep 2019 08:09:42 -0700 (PDT)
+ bh=Di15xSXEP0WmQsLld3RE8DinlTNvuPQEmbqDRqfW5Xs=;
+ b=p9FT7Cl9SuHXKn69nVO7bB/BCVrYWFuV2h8BI2GwlgxhUO/K9bXJhWyAOh4PNIP7AU
+ FE2M361tqGGfxcQgfwMPiQiRNjaMoUBO+Qcqu0daUV53jG3aJAq759WNuDWrR/W0mc3a
+ FiLwFiuvE5qQa8zu6Zghv/fTv2uZY+d4qaWW2c1o3Xk7bNyg87OZPzAjZ0JBQnj4o0U2
+ JzjQ3p5RW87Dr21DU8TQqkHLd93ILRwTr3v0x9QsYHdvusOWlyvkV5XQa/DtPwwAZYkZ
+ 2ahFlZ1Qgx+X74VIUs5QZHvdWCrSG4gL3/VFqqB0k6HoFkW3Skgc1iYGs0ps/YY4YlDH
+ spNA==
+X-Gm-Message-State: APjAAAXUBgaFOU2e8aoKX1Id4JsX3CIpvp/LsvxXHu3iqRcv3iMrqnIA
+ nmyFfJz6v397vY0xk5XnqJnFMVZvycs=
+X-Google-Smtp-Source: APXvYqxYSNm5HOy8xa1HnJ1KQcjSRm7CwksxWbiumKLeYrNNFxjtIehL7jA1GI/12+sF1+vCm29DgA==
+X-Received: by 2002:a17:902:36a:: with SMTP id 97mr4477110pld.75.1568819696682; 
+ Wed, 18 Sep 2019 08:14:56 -0700 (PDT)
 Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id t14sm7387325pgb.33.2019.09.18.08.09.40
+ by smtp.gmail.com with ESMTPSA id e127sm9928468pfe.37.2019.09.18.08.14.55
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 18 Sep 2019 08:09:41 -0700 (PDT)
-To: "Paul A. Clarke" <pc@us.ibm.com>, qemu-devel@nongnu.org
-References: <1568817169-1721-1-git-send-email-pc@us.ibm.com>
+ Wed, 18 Sep 2019 08:14:55 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20190917184109.12564-1-alex.bennee@linaro.org>
+ <20190917184109.12564-8-alex.bennee@linaro.org>
+ <afd9bc85-9c79-a456-73c1-fc19e97d1acd@linaro.org> <877e661vur.fsf@linaro.org>
+ <93ff7174-77c0-d2eb-eac2-d3eef7e88a14@linaro.org> <87zhj1zvnl.fsf@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <6d7f7fd1-b0be-a944-f558-ca5d788f728c@linaro.org>
-Date: Wed, 18 Sep 2019 08:09:39 -0700
+Message-ID: <376bc2c5-b5c7-b35a-1adb-460b37cd4a6a@linaro.org>
+Date: Wed, 18 Sep 2019 08:14:53 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1568817169-1721-1-git-send-email-pc@us.ibm.com>
+In-Reply-To: <87zhj1zvnl.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: Re: [Qemu-devel] [PATCH] ppc: Use FPSCR defines instead of constants
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: Re: [Qemu-devel] [PATCH v1 7/9] tests/tcg: add float_madds test to
+ multiarch
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,28 +100,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/18/19 7:32 AM, Paul A. Clarke wrote:
-> From: "Paul A. Clarke" <pc@us.ibm.com>
+On 9/18/19 4:33 AM, Alex Bennée wrote:
+>>> Ahh I was going to hardcode the arm madd instruction in as the builtin
+>>> wasn't expanding. I tried setting -march in the CFLAGS but that didn't
+>>> trigger it either on my buster arm-hf compiler. Any ideas how to get the
+>>> compiler to do the right thing?
+>>
+>> I think you want -mfpu=neon-vfpv4.
 > 
-> There are FPSCR-related defines in target/ppc/cpu.h which can be used in
-> place of constants and explicit shifts which arguably improve the code a
-> bit in places.
-> 
-> Signed-off-by: Paul A. Clarke <pc@us.ibm.com>
-> ---
-> I confirmed that the generated assembly is identical before and after
-> the patch.
-> 
->  target/ppc/dfp_helper.c |   8 ++--
->  target/ppc/fpu_helper.c | 122 ++++++++++++++++++++++++------------------------
->  2 files changed, 65 insertions(+), 65 deletions(-)
+> Ahh that worked. I would have hoped that v8 would be enough to spit out
+> aarch32 code which has to have VFPv4 for A profile right?
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I would have thought so.  I'm not sure why -march=armv8-a wouldn't work.
 
 
 r~
