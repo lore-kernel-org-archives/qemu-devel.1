@@ -2,92 +2,65 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BA70C4CEC4
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 18:35:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7A63C4CEC4
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 18:38:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02B5821897
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 18:35:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02B5821897
+	by mail.kernel.org (Postfix) with ESMTPS id B790B21920
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 18:38:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B790B21920
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAene-0007jy-RR
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 14:35:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52236)
+	id 1iAeqi-0002Y0-RH
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 14:38:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53889)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iAelK-00069p-C2
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 14:33:11 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iAeq2-0001jK-C5
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 14:38:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iAelJ-0006wO-Bh
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 14:33:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40250)
+ (envelope-from <jsnow@redhat.com>) id 1iAeq1-0002F3-81
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 14:38:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58651)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iAelD-0006l8-UG; Wed, 18 Sep 2019 14:33:04 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iAepy-0002DR-TM; Wed, 18 Sep 2019 14:37:59 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BD577309BDA2;
- Wed, 18 Sep 2019 18:33:02 +0000 (UTC)
-Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F1545D6D0;
- Wed, 18 Sep 2019 18:32:42 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190918130244.24257-1-vsementsov@virtuozzo.com>
- <abb14088-6af2-5db2-da0d-0948fd4ac81c@redhat.com>
- <0497ac1e-c841-39cd-9944-48dd54c5b0f0@virtuozzo.com>
- <9450fbfd-0f8b-d10f-7577-64805917f67a@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <26217614-77cf-9519-f94b-d606864f4d46@redhat.com>
-Date: Wed, 18 Sep 2019 13:32:41 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 31C0730860CB;
+ Wed, 18 Sep 2019 18:37:58 +0000 (UTC)
+Received: from [10.10.124.73] (ovpn-124-73.rdu2.redhat.com [10.10.124.73])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6C1AC19C5B;
+ Wed, 18 Sep 2019 18:37:57 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20190917092004.999-1-mreitz@redhat.com>
+ <20190917092004.999-6-mreitz@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <bc98f0b2-4b6e-5d7d-efe1-b2eb740ade31@redhat.com>
+Date: Wed, 18 Sep 2019 14:37:57 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <9450fbfd-0f8b-d10f-7577-64805917f67a@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190917092004.999-6-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Wed, 18 Sep 2019 18:33:03 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Wed, 18 Sep 2019 18:37:58 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC] error: auto propagated local_err
+Subject: Re: [Qemu-devel] [PATCH v4 5/7] iotests: Test driver whitelisting
+ in 093
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,76 +72,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "mst@redhat.com" <mst@redhat.com>, "codyprime@gmail.com" <codyprime@gmail.com>,
- "mark.cave-ayland@ilande.co.uk" <mark.cave-ayland@ilande.co.uk>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "kraxel@redhat.com" <kraxel@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "david@redhat.com" <david@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
- "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
- "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>,
- "farman@linux.ibm.com" <farman@linux.ibm.com>,
- "groug@kaod.org" <groug@kaod.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
- "kwolf@redhat.com" <kwolf@redhat.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
- "sundeep.lkml@gmail.com" <sundeep.lkml@gmail.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/18/19 1:05 PM, Eric Blake wrote:
 
->>> #define MAKE_ERRP_SAFE() \
->>> g_auto(ErrorPropagationStruct) (__auto_errp_prop) = {.errp = errp}; \
->>> errp = &__auto_errp_prop.local_err
->>>
 
-I tried to see if this could be done with just a single declaration
-line, as in:
+On 9/17/19 5:20 AM, Max Reitz wrote:
+> null-aio may not be whitelisted.  Skip all test cases that require it.
+>=20
+> (And skip the whole test if null-co is not whitelisted.)
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-typedef struct ErrorPropagator {
-    Error **errp;
-    Error *local_err;
-} ErrorPropagator;
+Sorry for the goose chase on v(n-1).
 
-#define MAKE_ERRP_SAFE() \
-  g_auto(ErrorPropagator) __auto_errp_prop = { \
-    errp, ((errp = &__auto_errp_prop.local_err), NULL) }
+I feel like maybe there's a nicer way to do this, but I can't figure out=20
+what it is, so ... my mistake.
 
-But sadly, C17 paragraph 6.7.9P23 states:
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-"The evaluations of the initialization list expressions are
-indeterminately sequenced with respect to one another and thus the order
-in which any side effects occur is unspecified."
+> ---
+>   tests/qemu-iotests/093 | 12 +++++++++---
+>   1 file changed, 9 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
+> index 50c1e7f2ec..f03fa24a07 100755
+> --- a/tests/qemu-iotests/093
+> +++ b/tests/qemu-iotests/093
+> @@ -24,7 +24,7 @@ import iotests
+>   nsec_per_sec =3D 1000000000
+>  =20
+>   class ThrottleTestCase(iotests.QMPTestCase):
+> -    test_img =3D "null-aio://"
+> +    test_driver =3D "null-aio"
+>       max_drives =3D 3
+>  =20
+>       def blockstats(self, device):
+> @@ -35,10 +35,14 @@ class ThrottleTestCase(iotests.QMPTestCase):
+>                   return stat['rd_bytes'], stat['rd_operations'], stat[=
+'wr_bytes'], stat['wr_operations']
+>           raise Exception("Device not found for blockstats: %s" % devic=
+e)
+>  =20
+> +    def required_drivers(self):
+> +        return [self.test_driver]
+> +
+> +    @iotests.skip_if_unsupported(required_drivers)
+>       def setUp(self):
+>           self.vm =3D iotests.VM()
+>           for i in range(0, self.max_drives):
+> -            self.vm.add_drive(self.test_img, "file.read-zeroes=3Don")
+> +            self.vm.add_drive(self.test_driver + "://", "file.read-zer=
+oes=3Don")
+>           self.vm.launch()
+>  =20
+>       def tearDown(self):
+> @@ -264,7 +268,7 @@ class ThrottleTestCase(iotests.QMPTestCase):
+>           self.assertEqual(self.blockstats('drive1')[0], 4096)
+>  =20
+>   class ThrottleTestCoroutine(ThrottleTestCase):
+> -    test_img =3D "null-co://"
+> +    test_driver =3D "null-co"
+>  =20
+>   class ThrottleTestGroupNames(iotests.QMPTestCase):
+>       max_drives =3D 3
+> @@ -425,4 +429,6 @@ class ThrottleTestRemovableMedia(iotests.QMPTestCas=
+e):
+>  =20
+>  =20
+>   if __name__ =3D=3D '__main__':
+> +    if 'null-co' not in iotests.supported_formats():
+> +        iotests.notrun('null-co driver support missing')
+>       iotests.main(supported_fmts=3D["raw"])
+>=20
 
-which does not bode well for the assignment to __auto_errp_prop.errp.
-All changes to errp would have to be within the same initializer.  Maybe:
-
-#define MAKE_ERRP_SAFE() \
-  g_auto(ErrorPropagator) __auto_errp_prop = { \
-    .local_err = (__auto_errp_prop.err = errp, \
-        (errp = &__auto_errp_prop.local_err), NULL) }
-
-but by the time you get that complicated, just using a statement is
-easier to read.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+--=20
+=E2=80=94js
 
