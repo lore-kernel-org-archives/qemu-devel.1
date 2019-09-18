@@ -2,89 +2,121 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12550C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:54:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 343ADC4CEC4
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:56:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 857F3207FC
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:54:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 857F3207FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E60E0207FC
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:56:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Kf+6Rnu0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E60E0207FC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAeAA-0004nu-Ge
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 13:54:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36270)
+	id 1iAeBd-0005wm-2V
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 13:56:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60639)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iAdTo-0007ZE-JS
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 13:11:03 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iAd4b-0005rK-VU
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:44:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iAdTl-00079O-Sd
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 13:11:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52246)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iAdTZ-00074X-Qr; Wed, 18 Sep 2019 13:10:46 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 57652316D791;
- Wed, 18 Sep 2019 17:10:44 +0000 (UTC)
-Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CADD5D6B2;
- Wed, 18 Sep 2019 17:10:20 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20190918130244.24257-1-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <abb14088-6af2-5db2-da0d-0948fd4ac81c@redhat.com>
-Date: Wed, 18 Sep 2019 12:10:19 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190918130244.24257-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iAd4a-0001bk-DT
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:44:57 -0400
+Received: from mail-eopbgr00128.outbound.protection.outlook.com
+ ([40.107.0.128]:51816 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iAd4W-0001Yx-J1; Wed, 18 Sep 2019 12:44:52 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lLD1TCahOOt0Qdg8KLCiB5SfIZT82VcTz39NE6C7UsKcKwtZc4RUncEAEfTPYqiu22+rV8O/16y4ZHltnOemLIYZVzyoZpKK32bs46C27EDwZwoG3G97dWi2JABN/XnvI5nRsHIAVW8vK+X5KyPHIhKgwj90n9GbqrpZmPrMFTze3UViQ2k2+UaJIPXrHq2d+OYHbLc2q3iUMSHbftAvL4m8l+EbMoub2ilo7TJsehLMDFbvktmSafJD6s+Q7SGoyma6Id7Ku58zcIAUQIwrImnjaX3xwt4vNg36DaHZlv5UX7Rj7tfki5Nb+f403MIsMA5TrHxSxIvxAP1oB2NMsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=x79o1YqZbtA36oHlig53b3xwBxt5DU/OP/yf+ZWImA0=;
+ b=bzxctwW/P6LcLLtj34OOnzOAhBSzk+jW+6T8o1iPg2mkg5aNlvAv3CR2q2rjCMPbYxZOSduDPDydjVO+fZhUNY0U4KSShK75jCkXPtTcn10DvgFOYdS+FlN5J36khilHakIuhrelVTIl+uEs/jieDRP2zdif36iIrLIf6rhID/hNkk3P35aQ9evPfHft02z1P0fwFu83KKbUrW5mW87EvUMC8ArAA2Errr6xua0CKGeH9QGqwYdRRN6NvgoVy8VSRjX4WragYrSXB52O9fp2ZY5SRdYl+lbHIv8QWfF2PWRDkTB6jTlCxy5WT6Eo+XNAC8L3WDjkvS7j2raMI3Y6VA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=x79o1YqZbtA36oHlig53b3xwBxt5DU/OP/yf+ZWImA0=;
+ b=Kf+6Rnu0+6DZhbnjbuSWq3caMiyGbW/ild9rjejE9ny5oHhxlBIcGI/nDXyenjjpFHY8nQYZU+0ZFGsZv2U+8X6XJq1gaOr2hnpEXo/+7swlDghoUfvsrjJK3ORHrKZUmJ30fy8fsRonQgEzTBh0ILWZLluXjC78RPJS0dV8UDE=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB4204.eurprd08.prod.outlook.com (20.179.12.85) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2263.23; Wed, 18 Sep 2019 16:44:49 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2263.023; Wed, 18 Sep 2019
+ 16:44:49 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Thread-Topic: [Qemu-devel] [PATCH v4 1/4] iotests: add script_initialize
+Thread-Index: AQHVaP+sHvXQg5mIX0qbfLdZwy5qOKcua+GAgAIQzoCAAMmFgIAAaI+A
+Date: Wed, 18 Sep 2019 16:44:49 +0000
+Message-ID: <8b13be25-1536-7890-6ff4-0eef2fa104d8@virtuozzo.com>
+References: <20190912001633.11372-1-jsnow@redhat.com>
+ <20190912001633.11372-2-jsnow@redhat.com>
+ <974b64b8-a191-c529-4e77-6a38b372c4b8@virtuozzo.com>
+ <e5d871da-c5e1-1a5e-4714-387cbc93a055@redhat.com>
+ <66bdafc2-cbdb-8e41-d4c6-5142729ef7a9@virtuozzo.com>
+In-Reply-To: <66bdafc2-cbdb-8e41-d4c6-5142729ef7a9@virtuozzo.com>
+Accept-Language: ru-RU, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Wed, 18 Sep 2019 17:10:44 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC] error: auto propagated local_err
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0502CA0018.eurprd05.prod.outlook.com
+ (2603:10a6:3:e3::28) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190918194447616
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 31638f25-b86d-4605-624f-08d73c578579
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(5600167)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
+ SRVR:DB8PR08MB4204; 
+x-ms-traffictypediagnostic: DB8PR08MB4204:
+x-microsoft-antispam-prvs: <DB8PR08MB420421CD68D8C00A96D5D37CC18E0@DB8PR08MB4204.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 01644DCF4A
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(39850400004)(396003)(346002)(366004)(376002)(136003)(199004)(189003)(52314003)(7736002)(8936002)(316002)(81156014)(71200400001)(71190400001)(81166006)(486006)(478600001)(256004)(6486002)(25786009)(36756003)(4326008)(66476007)(6436002)(14454004)(31686004)(8676002)(99286004)(110136005)(6246003)(66556008)(229853002)(6512007)(2501003)(14444005)(31696002)(446003)(386003)(6506007)(305945005)(54906003)(66946007)(64756008)(86362001)(3846002)(66066001)(6116002)(52116002)(66446008)(5660300002)(53546011)(186003)(76176011)(476003)(26005)(11346002)(2616005)(102836004)(2906002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4204;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: c2GDlID1g5K4InryQHa+7ajnDl1aa5gTfIXJkiPeAMEv0ynMXkGZHUrzo1Tu42so9Ov0qRGsVdqTEOM4OyyonF42ns49ct+vX4nFPfu6Ctqncuk962QBjBInxevESqsrDbz42A5uNmU4c8BaX2G/p2uqA/uColjU8UmcEPwg7Ei15hxkxp7tSx48PHHT/f6Ah82krS9KV8wtFW2ZhITRdPptdp8sfhSeC0qUt3g4VRXXC9w2AJh4hWoXqmbkCrRkyz8YwXvScic4wb5BQx8HzuLd8N0dtoBUMZDkruObFAQi6j1fFB2V013MLbl9IMJsQHkyDdPKxn3LgG/BUhRpFJL7jbDc28JyM6PTYJxgUwW8ZGlNXj8eeVQyrA8yiRsQLl0Tew8rOZ7ZLSpXyta7kATlntu2daMmftGtbRNx3hs=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CEFDE36FC7196A459426EAD17D7A3DA2@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 31638f25-b86d-4605-624f-08d73c578579
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Sep 2019 16:44:49.6641 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vSpWHNZJMXf78SSI+tOZnKb8F9RMIwqrstGc/HOJUrAsQUeeMCWKT83fIFuLPUkEc6e6OIDHD0H2izsKenW7xemk6Bgic2z6iWBO1MrpIZ0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4204
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.0.128
+Subject: Re: [Qemu-devel] [PATCH v4 1/4] iotests: add script_initialize
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,496 +128,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.maydell@linaro.org, mst@redhat.com,
- codyprime@gmail.com, mark.cave-ayland@ilande.co.uk, mdroth@linux.vnet.ibm.com,
- kraxel@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org,
- quintela@redhat.com, david@redhat.com, armbru@redhat.com, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, marcandre.lureau@redhat.com, rth@twiddle.net,
- farman@linux.ibm.com, groug@kaod.org, dgilbert@redhat.com,
- alex.williamson@redhat.com, qemu-arm@nongnu.org, stefanha@redhat.com,
- jsnow@redhat.com, david@gibson.dropbear.id.au, kwolf@redhat.com,
- berrange@redhat.com, cohuck@redhat.com, qemu-s390x@nongnu.org,
- sundeep.lkml@gmail.com, qemu-ppc@nongnu.org, pbonzini@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/18/19 8:02 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Hi all!
-> 
-> Here is a proposal (three of them, actually) of auto propagation for
-> local_err, to not call error_propagate on every exit point, when we
-> deal with local_err.
-> 
-> It also may help make Greg's series[1] about error_append_hint smaller.
-> 
-> See definitions and examples below.
-> 
-> I'm cc-ing to this RFC everyone from series[1] CC list, as if we like
-> it, the idea will touch same code (and may be more).
-
-It might have been nice to do a patch series of one proposal per patch,
-rather than cramming three in one, if only to see...
-
-> 
-> [1]: https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg03449.html
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/qapi/error.h | 102 +++++++++++++++++++++++++++++++++++++++++++
->  block.c              |  63 ++++++++++++--------------
->  block/backup.c       |   8 +++-
->  block/gluster.c      |   7 +++
->  4 files changed, 144 insertions(+), 36 deletions(-)
-
-...relative diffstat sizing differences between them.
-
-Of course, adding the framework requires growth in error.h.  The real
-question, then, is how many lines do we save elsewhere by getting rid of
-boilerplate that is replaced by auto cleanup, and how many lines are
-mechanically churned to change variable names.  And how much of that
-churn can itself be automated with Coccinelle.
-
-But I think the idea is worth pursuing!
-
-> 
-> diff --git a/include/qapi/error.h b/include/qapi/error.h
-> index 3f95141a01..083e061014 100644
-> --- a/include/qapi/error.h
-> +++ b/include/qapi/error.h
-> @@ -322,6 +322,108 @@ void error_set_internal(Error **errp,
->                          ErrorClass err_class, const char *fmt, ...)
->      GCC_FMT_ATTR(6, 7);
->  
-> +typedef struct ErrorPropagator {
-> +    Error **errp;
-> +    Error *local_err;
-> +} ErrorPropagator;
-> +
-> +static inline void error_propagator_cleanup(ErrorPropagator *prop)
-> +{
-> +    if (prop->local_err) {
-> +        error_propagate(prop->errp, prop->local_err);
-> +    }
-
-Technically, you don't need the 'if' here, since error_propogate() works
-just fine when prop->local_err is NULL.
-
-> +}
-> +
-> +G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagator, error_propagator_cleanup);
-> +
-
-Looks reasonable.
-
-> +/*
-> + * ErrorPropagationPair
-> + *
-> + * [Error *local_err, Error **errp]
-> + *
-> + * First element is local_err, second is original errp, which is propagation
-> + * target. Yes, errp has a bit another type, so it should be converted.
-> + *
-> + * ErrorPropagationPair may be used as errp, which points to local_err,
-> + * as it's type is compatible.
-
-s/it's/its/  ("it's" is only appropriate if "it is" can be substituted)
-
-> + */
-> +typedef Error *ErrorPropagationPair[2];
-> +
-> +static inline void error_propagation_pair_cleanup(ErrorPropagationPair *arr)
-> +{
-> +    Error *local_err = (*arr)[0];
-> +    Error **errp = (Error **)(*arr)[1];
-> +
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +    }
-> +}
-
-I don't like the type-punning.
-
-> +
-> +G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagationPair,
-> +                                 error_propagation_pair_cleanup);
-> +
-> +/*
-> + * DEF_AUTO_ERRP
-> + *
-> + * Define auto_errp variable, which may be used instead of errp, and
-> + * *auto_errp may be safely checked to be zero or not, and may be safely
-> + * used for error_append_hint(). auto_errp is automatically propagated
-> + * to errp at function exit.
-> + */
-> +#define DEF_AUTO_ERRP(auto_errp, errp) \
-> +    g_auto(ErrorPropagationPair) (auto_errp) = {NULL, (Error *)(errp)}
-
-Again, more type-punning.  Ends up declaring the equivalent of 'Error
-*auto_errp[2]' which devolves to 'Error **auto_errp'.
-
-So, using this macro requires me to pass in the name of my local
-variable (which auto-propagates when it goes out of scope) and the errp
-parameter.  Can we shortcut by declaring that the variable it propagates
-to MUST be named 'errp' rather than having that as a parameter name
-(doing so would force us to be consistent at using an Error **errp
-parameter).
-
-> +
-> +
-> +/*
-> + * Another variant:
-> + *   Pros:
-> + *     - normal structure instead of cheating with array
-> + *     - we can directly use errp, if it's not NULL and don't point to
-> + *       error_abort or error_fatal
-> + *   Cons:
-> + *     - we need to define two variables instead of one
-> + */
-> +typedef struct ErrorPropagationStruct {
-> +    Error *local_err;
-> +    Error **errp;
-> +} ErrorPropagationStruct;
-
-No real difference from ErrorPropagator above.
-
-> +
-> +static inline void error_propagation_struct_cleanup(ErrorPropagationStruct *prop)
-> +{
-> +    if (prop->local_err) {
-> +        error_propagate(prop->errp, prop->local_err);
-> +    }
-
-Another useless if.
-
-> +}
-> +
-> +G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagationStruct,
-> +                                 error_propagation_struct_cleanup);
-> +
-> +#define DEF_AUTO_ERRP_V2(auto_errp, errp) \
-> +    g_auto(ErrorPropagationStruct) (__auto_errp_prop) = {.errp = (errp)}; \
-> +    Error **auto_errp = \
-> +        ((errp) == NULL || *(errp) == error_abort || *(errp) == error_fatal) ? \
-> +        &__auto_errp_prop.local_err : \
-> +        (errp);
-
-
-Not written to take a trailing semicolon in the caller.
-
-Less type-punning, and and tries to reuse errp where possible.
-
-> +
-> +/*
-> + * Third variant:
-> + *   Pros:
-> + *     - simpler movement for functions which don't have local_err yet
-> + *       the only thing to do is to call one macro at function start.
-> + *       This extremely simplifies Greg's series
-> + *   Cons:
-> + *     - looks like errp shadowing.. Still seems safe.
-> + *     - must be after all definitions of local variables and before any
-> + *       code.
-
-Why?  I see no reason why it can't be hoisted earlier than other
-declarations, and the only reason to not sink it after earlier code that
-doesn't touch errp would be our coding standards that frowns on
-declaration after code.
-
-> + *     - like v2, several statements in one open macro
-
-Not a drawback in my mind.
-
-> + */
-> +#define MAKE_ERRP_SAFE(errp) \
-> +g_auto(ErrorPropagationStruct) (__auto_errp_prop) = {.errp = (errp)}; \
-> +if ((errp) == NULL || *(errp) == error_abort || *(errp) == error_fatal) { \
-> +    (errp) = &__auto_errp_prop.local_err; \
-> +}
-
-Not written to take a trailing semicolon in the caller.
-
-You could even set __auto_errp_prop unconditionally rather than trying
-to reuse incoming errp (the difference being that error_propagate() gets
-called more frequently).
-
-This is actually quite cool.  And if you get rid of your insistence that
-it must occur after other variable declarations, you could instead
-easily automate that any function that has a parameter 'Error **errp'
-then has a MAKE_ERRP_SAFE(errp); as the first line of its function body
-(that becomes something that you could grep for, rather than having to
-use the smarts of coccinelle).
-
-Or if we want to enforce consistency on the parameter naming, even go with:
-
-#define MAKE_ERRP_SAFE() \
-g_auto(ErrorPropagationStruct) (__auto_errp_prop) = {.errp = errp}; \
-errp = &__auto_errp_prop.local_err
-
-> +
-> +
->  /*
->   * Special error destination to abort on error.
->   * See error_setg() and error_propagate() for details.
-> diff --git a/block.c b/block.c
-> index 5944124845..5253663329 100644
-> --- a/block.c
-> +++ b/block.c
-
-So the above was the proposed implementations (I'm leaning towards
-option 3); the below is a demonstration of their use.
-
-> @@ -1275,12 +1275,11 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
->                              const char *node_name, QDict *options,
->                              int open_flags, Error **errp)
->  {
-> -    Error *local_err = NULL;
-> +    DEF_AUTO_ERRP_V2(auto_errp, errp);
-
-This is option 2. Basically, you replace any declaration of local_err to
-instead use the magic macro...
-
->      int i, ret;
->  
-> -    bdrv_assign_node_name(bs, node_name, &local_err);
-> -    if (local_err) {
-> -        error_propagate(errp, local_err);
-> +    bdrv_assign_node_name(bs, node_name, auto_errp);
-> +    if (*auto_errp) {
-
-then s/local_err/*auto_errp/ and delete resulting &* pairs and
-error_propagate() calls in the rest of the function.  Coccinelle could
-make this type of conversion easy.
-
->          return -EINVAL;
->      }
->  
-> @@ -1290,20 +1289,21 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
->  
->      if (drv->bdrv_file_open) {
->          assert(!drv->bdrv_needs_filename || bs->filename[0]);
-> -        ret = drv->bdrv_file_open(bs, options, open_flags, &local_err);
-> +        ret = drv->bdrv_file_open(bs, options, open_flags, auto_errp);
->      } else if (drv->bdrv_open) {
-> -        ret = drv->bdrv_open(bs, options, open_flags, &local_err);
-> +        ret = drv->bdrv_open(bs, options, open_flags, auto_errp);
->      } else {
->          ret = 0;
->      }
->  
->      if (ret < 0) {
-> -        if (local_err) {
-> -            error_propagate(errp, local_err);
-> -        } else if (bs->filename[0]) {
-> -            error_setg_errno(errp, -ret, "Could not open '%s'", bs->filename);
-> -        } else {
-> -            error_setg_errno(errp, -ret, "Could not open image");
-> +        if (!*auto_errp) {
-> +            if (bs->filename[0]) {
-> +                error_setg_errno(errp, -ret, "Could not open '%s'",
-> +                                 bs->filename);
-
-You reflowed the logic a bit here, but it is still worth pointing out
-that you still call error_setg*(errp) as before (no changing to
-auto_errp, although that would also have worked).
-
-> +            } else {
-> +                error_setg_errno(errp, -ret, "Could not open image");
-> +            }
->          }
->          goto open_failed;
->      }
-> @@ -1314,9 +1314,8 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
->          return ret;
->      }
->  
-> -    bdrv_refresh_limits(bs, &local_err);
-> -    if (local_err) {
-> -        error_propagate(errp, local_err);
-> +    bdrv_refresh_limits(bs, auto_errp);
-> +    if (*auto_errp) {
->          return -EINVAL;
->      }
->  
-> @@ -4238,17 +4237,17 @@ out:
->  void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top,
->                   Error **errp)
->  {
-> -    Error *local_err = NULL;
-> +    g_auto(ErrorPropagator) prop = {.errp = errp};
-
-This is option 1.  It's rather open-coded, rather than having a nice
-wrapper macro.
-
->  
-> -    bdrv_set_backing_hd(bs_new, bs_top, &local_err);
-> -    if (local_err) {
-> -        error_propagate(errp, local_err);
-> +    errp = &prop.local_err;
-
-And by re-assigning errp manually,
-
-> +
-> +    bdrv_set_backing_hd(bs_new, bs_top, errp);
-> +    if (*errp) {
-
-you can now safely use it in the rest of the function without worrying
-about NULL.
-
->          goto out;
->      }
->  
-> -    bdrv_replace_node(bs_top, bs_new, &local_err);
-> -    if (local_err) {
-> -        error_propagate(errp, local_err);
-> +    bdrv_replace_node(bs_top, bs_new, errp);
-> +    if (*errp) {
->          bdrv_set_backing_hd(bs_new, NULL, &error_abort);
->          goto out;
-
-Not too bad (we'd probably want a coccinelle script to prove that you
-don't dereference *errp without first using the magic reassignment).
-
->      }
-> @@ -5309,9 +5308,9 @@ void bdrv_init_with_whitelist(void)
->  static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
->                                                    Error **errp)
->  {
-> +    DEF_AUTO_ERRP(auto_errp, errp);
-
-Option 1 again, but this time with a macro.
-
->      BdrvChild *child, *parent;
->      uint64_t perm, shared_perm;
-> -    Error *local_err = NULL;
->      int ret;
->      BdrvDirtyBitmap *bm;
->  
-> @@ -5324,9 +5323,8 @@ static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
->      }
->  
->      QLIST_FOREACH(child, &bs->children, next) {
-> -        bdrv_co_invalidate_cache(child->bs, &local_err);
-> -        if (local_err) {
-> -            error_propagate(errp, local_err);
-> +        bdrv_co_invalidate_cache(child->bs, auto_errp);
-> +        if (*auto_errp) {
->              return;
->          }
->      }
-> @@ -5346,19 +5344,17 @@ static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
->       */
->      bs->open_flags &= ~BDRV_O_INACTIVE;
->      bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
-> -    ret = bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, NULL, &local_err);
-> +    ret = bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, NULL, auto_errp);
->      if (ret < 0) {
->          bs->open_flags |= BDRV_O_INACTIVE;
-> -        error_propagate(errp, local_err);
->          return;
->      }
->      bdrv_set_perm(bs, perm, shared_perm);
->  
->      if (bs->drv->bdrv_co_invalidate_cache) {
-> -        bs->drv->bdrv_co_invalidate_cache(bs, &local_err);
-> -        if (local_err) {
-> +        bs->drv->bdrv_co_invalidate_cache(bs, auto_errp);
-> +        if (*auto_errp) {
->              bs->open_flags |= BDRV_O_INACTIVE;
-> -            error_propagate(errp, local_err);
->              return;
->          }
->      }
-> @@ -5378,10 +5374,9 @@ static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
->  
->      QLIST_FOREACH(parent, &bs->parents, next_parent) {
->          if (parent->role->activate) {
-> -            parent->role->activate(parent, &local_err);
-> -            if (local_err) {
-> +            parent->role->activate(parent, auto_errp);
-> +            if (*auto_errp) {
->                  bs->open_flags |= BDRV_O_INACTIVE;
-> -                error_propagate(errp, local_err);
->                  return;
->              }
->          }
-> diff --git a/block/backup.c b/block/backup.c
-> index 89f7f89200..462dea4fbb 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -583,6 +583,10 @@ static const BlockJobDriver backup_job_driver = {
->  static int64_t backup_calculate_cluster_size(BlockDriverState *target,
->                                               Error **errp)
->  {
-> +    /*
-> +     * Example of using DEF_AUTO_ERRP to make error_append_hint safe
-> +     */
-> +    DEF_AUTO_ERRP(auto_errp, errp);
-
-Option 1 again.  Requires renaming errp to auto_errp in the rest of the
-function.
-
->      int ret;
->      BlockDriverInfo bdi;
->  
-> @@ -602,10 +606,10 @@ static int64_t backup_calculate_cluster_size(BlockDriverState *target,
->                      BACKUP_CLUSTER_SIZE_DEFAULT);
->          return BACKUP_CLUSTER_SIZE_DEFAULT;
->      } else if (ret < 0 && !target->backing) {
-> -        error_setg_errno(errp, -ret,
-> +        error_setg_errno(auto_errp, -ret,
->              "Couldn't determine the cluster size of the target image, "
->              "which has no backing file");
-> -        error_append_hint(errp,
-> +        error_append_hint(auto_errp,
->              "Aborting, since this may create an unusable destination image\n");
->          return ret;
->      } else if (ret < 0 && target->backing) {
-> diff --git a/block/gluster.c b/block/gluster.c
-> index 64028b2cba..799a2dbeca 100644
-> --- a/block/gluster.c
-> +++ b/block/gluster.c
-> @@ -695,6 +695,13 @@ static int qemu_gluster_parse(BlockdevOptionsGluster *gconf,
->                                QDict *options, Error **errp)
->  {
->      int ret;
-> +    /*
-> +     * Example of using MAKE_ERRP_SAFE to make error_append_hint safe. We
-> +     * only need to add one macro call.
-
-Option 3.  By far my favorite, whether or not we decide to take a macro
-parameter for the variable name to protect, or hard-code for consistency
-that 'errp' must be in scope when it is used.
-
-> Note, it must be placed exactly after
-> +     * all local variables defenition.
-
-definition
-
-Why do you think this limitation is necessary?  Do you have an actual
-code sequence that misbehaves if the compiler-unwind cleanup is
-performed in a different order when the macro is used before other
-variable declarations?
-
-> +     */
-> +    MAKE_ERRP_SAFE(errp);
-> +
->      if (filename) {
->          ret = qemu_gluster_parse_uri(gconf, filename);
->          if (ret < 0) {
-> 
-
-This is sweet - you can safely use '*errp' in the rest of the function,
-without having to remember a second error name - while the caller can
-still pass NULL or error_abort as desired.
-
-And I still think we can probably get Coccinelle to help make the
-conversions, both of using this macro in any function that has an Error
-**errp parameter, as well as getting rid of local_err declarations and
-error_propagate() calls rendered redundant once this macro is used.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+MTguMDkuMjAxOSAxMzozMCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
+MTguMDkuMjAxOSAxOjI5LCBKb2huIFNub3cgd3JvdGU6DQo+Pg0KPj4NCj4+IE9uIDkvMTYvMTkg
+MTA6NTYgQU0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4gMTIuMDku
+MjAxOSAzOjE2LCBKb2huIFNub3cgd3JvdGU6DQo+Pj4+IExpa2Ugc2NyaXB0X21haW4sIGJ1dCBk
+b2Vzbid0IHJlcXVpcmUgYSBzaW5nbGUgcG9pbnQgb2YgZW50cnkuDQo+Pj4+IFJlcGxhY2UgYWxs
+IGV4aXN0aW5nIGluaXRpYWxpemF0aW9uIHNlY3Rpb25zIHdpdGggdGhpcyBkcm9wLWluIHJlcGxh
+Y2VtZW50Lg0KPj4+Pg0KPj4+PiBUaGlzIGJyaW5ncyBkZWJ1ZyBzdXBwb3J0IHRvIGFsbCBleGlz
+dGluZyBzY3JpcHQtc3R5bGUgaW90ZXN0cy4NCj4+Pj4NCj4+Pj4gTm90ZTogc3VwcG9ydGVkX29z
+ZXM9WydsaW51eCddIHdhcyBvbWl0dGVkLCBhcyBpdCBpcyBhIGRlZmF1bHQgYXJndW1lbnQuDQo+
+Pj4NCj4+PiBCdXQgYWZ0ZXIgdGhpcyBwYXRjaCBhbGwgdGVzdCB3aGljaCBkaWRuJ3QgY2hlY2sg
+b3Mgc3RhcnQgdG8gY2hlY2sgbGludXgNCj4+PiAoYXMgaXQncyBkZWZhdWx0KS4uIFNvIGFsbCB0
+ZXN0cyB3aGljaCB3b3JrZWQgb24gb3RoZXIgcGxhdGZvcm1zIHdpbGwgbm93DQo+Pj4gYmUgc2tp
+cHBlZCBvbiB0aGVzZSBvdGhlciBwbGF0Zm9ybXM/DQo+Pj4NCj4+PiBGaW5hbGx5IGRvIHdlIHN1
+cHBvcnQgc29tZXRoaW5nIGV4Y2VwdCBsaW51eCBmb3IgaW90ZXN0cz8NCj4+PiBmb3IgYmFzaCB0
+ZXN0cyBfc3VwcG9ydGVkX29zIGFsc28gdXNlZCBvbmx5IHdpdGggIkxpbnV4IiBpbiA4NyB0ZXN0
+cy4uDQo+Pj4NCj4+PiBNYXkgYmUgd2UnZCBiZXR0ZXIgZHJvcCBib3RoIF9zdXBwb3J0ZWRfb3Mg
+YW5kIHN1cHBvcnRlZF9vc2VzIGFsbHRvZ2V0aGVyLA0KPj4+IGFuZCBkb24ndCBjYXJlPw0KPj4+
+DQo+Pj4gQW55d2F5LCBpZiB3ZSBzdXBwb3J0IG9ubHkgbGludXgsIGFueSByZWFzb24gdG8gc2tp
+cCBhbG1vc3QgYWxsIHRlc3RzLA0KPj4+IGlmIHNvbWVvbmUgdHJpZXMgdG8gcnVuIHRlc3Qgb24g
+b3RoZXIgcGxhdGZvcm0/IExldCBoaW0gcnVuIHdoYXQgaGUgd2FudHMuDQo+Pj4NCj4+DQo+PiBD
+dXJyZW50bHksIHRoZSBmb2xsb3dpbmcgdGVzdHMgYXJlIHB5dGhvbjoNCj4+DQo+PiAwMzAgMDQw
+IDA0MSAwNDQgMDQ1IDA1NSAwNTYgMDU3IDA2NSAwOTMgMDk2IDExOCAxMjQgMTI5IDEzMiAxMzYg
+MTM5IDE0Nw0KPj4gMTQ4IDE0OSAxNTEgMTUyIDE1NSAxNjMgMTY1IDE2OSAxOTQgMTk2IDE5OSAy
+MDIgMjAzIDIwNSAyMDYgMjA3IDIwOCAyMDkNCj4+IDIxMCAyMTEgMjEyIDIxMyAyMTYgMjE4IDIx
+OSAyMjIgMjI0IDIyOCAyMzQgMjM1IDIzNiAyMzcgMjM4IDI0MiAyNDUgMjQ2DQo+PiAyNDggMjU0
+IDI1NSAyNTYgMjU3IDI1OCAyNjIgMjY2DQo+Pg0KPj4gQW5kIGFzIGl0IHN0YW5kcywgbm9uZSBv
+ZiB0aGUgc2NyaXB0LXN0eWxlIHB5dGhvbiB0ZXN0cyB3ZSd2ZSBzZWxlY3RlZA0KPj4gdG8gcnVu
+IGluIGBtYWtlIGNoZWNrYCBmYWlsIG9uIHRoZSBGcmVlQlNEIHBsYXRmb3JtLg0KPj4NCj4+IFNv
+IGFzIGFuIGV4cGVyaW1lbnQsIEkgbGlmdGVkIHRoZSByZXN0cmljdGlvbiBvbiBweXRob24gdGVz
+dHMuIEkga2VwdA0KPj4gcnVubmluZyAuL2NoZWNrIHVudGlsIEkgZm91bmQgc29tZSBpbnZvY2F0
+aW9uIHRoYXQgdGhleSBkaWRuJ3Qgc2tpcC4NCj4+DQo+PiBGYWlsdXJlczogMDQ1IDE0NyAxNDkg
+MTY5IDE5NCAxOTkgMjExDQo+Pg0KPj4gTm90IHRvbyBiYWQuLi4NCj4+DQo+PiAwNDU6ICtxZW11
+Lm1hY2hpbmUuUUVNVU1hY2hpbmVFcnJvcjogc29ja2V0X3NjbV9oZWxwZXIgZG9lcyBub3QgZXhp
+c3QNCj4+IDE0OTogV2FudHMgdG8gdXNlICdzdWRvJywgYnV0IG91ciBmcmVlYnNkIGltYWdlIGRv
+ZXNuJ3QgaGF2ZSB0aGF0Lg0KPj4gMTk0OiArT1NFcnJvcjogQUZfVU5JWCBwYXRoIHRvbyBsb25n
+DQo+PiAyMTE6DQo+PiAtW3sgInN0YXJ0IjogMCwgImxlbmd0aCI6IDMwNzIsICJkZXB0aCI6IDAs
+ICJ6ZXJvIjogZmFsc2UsICJkYXRhIjogdHJ1ZSwNCj4+ICJvZmZzZXQiOiAxMDI0fSwNCj4+IC17
+ICJzdGFydCI6IDMwNzIsICJsZW5ndGgiOiAzMzU1MTM2MCwgImRlcHRoIjogMCwgInplcm8iOiB0
+cnVlLCAiZGF0YSI6DQo+PiB0cnVlLCAib2Zmc2V0IjogNDA5Nn1dDQo+PiArW3sgInN0YXJ0Ijog
+MCwgImxlbmd0aCI6IDMxNzQ0LCAiZGVwdGgiOiAwLCAiemVybyI6IGZhbHNlLCAiZGF0YSI6DQo+
+PiB0cnVlLCAib2Zmc2V0IjogMTAyNH0sDQo+PiAreyAic3RhcnQiOiAzMTc0NCwgImxlbmd0aCI6
+IDMzNTIyNjg4LCAiZGVwdGgiOiAwLCAiemVybyI6IHRydWUsICJkYXRhIjoNCj4+IHRydWUsICJv
+ZmZzZXQiOiAzMjc2OH1dDQo+Pg0KPj4NCj4+IDE0OSBjYW4gcHJvYmFibHkgYmUgZml4ZWQsIGFu
+ZCAxOTQgYW5kIDIxMSBJIGhhdmUgZmFpbCBpbiBzaW1pbGFyIHdheXMNCj4+IG9uIG15IG93biBM
+aW51eCBtYWNoaW5lLCBzbyB0aGF0J3MgcHJvYmFibHkgbm90IEJTRCdzIGZhdWx0Lg0KPj4NCj4+
+IEludGVyZXN0aW5nbHksIDE2OSBhbmQgMTk5LCBiaXRtYXAgbWlncmF0aW9uIHJlbGF0ZWQgdGVz
+dHMsIGNhdXNlIGENCj4+IFNJR1NFR1YgaW4gUUVNVSAuLi4NCj4+DQo+Pg0KPj4gMTY5Og0KPj4g
+K0VFRUUuLi4uRUVFRS4uLi4uLi4uDQo+PiArV0FSTklORzpxZW11Lm1hY2hpbmU6cWVtdSByZWNl
+aXZlZCBzaWduYWwgNjoNCj4+IC91c3IvaG9tZS9xZW11L3FlbXUtdGVzdC5JZnNSNjgvYnVpbGQv
+dGVzdHMvcWVtdS1pb3Rlc3RzLy4uLy4uL3g4Nl82NC1zb2Z0bW11L3FlbXUtc3lzdGVtLXg4Nl82
+NA0KPj4gLWNoYXJkZXYNCj4+IHNvY2tldCxpZD1tb24scGF0aD0vdXNyL2hvbWUvcWVtdS9xZW11
+LXRlc3QuSWZzUjY4L2J1aWxkL3Rlc3RzL3FlbXUtaW90ZXN0cy9zY3JhdGNoL3RtcHJwYzBpZGJ4
+L3FlbXViLTI2NjE3LW1vbml0b3Iuc29jaw0KPj4gLW1vbiBjaGFyZGV2PW1vbixtb2RlPWNvbnRy
+b2wgLWRpc3BsYXkgbm9uZSAtdmdhIG5vbmUgLXF0ZXN0DQo+PiB1bml4OnBhdGg9L3Vzci9ob21l
+L3FlbXUvcWVtdS10ZXN0Lklmc1I2OC9idWlsZC90ZXN0cy9xZW11LWlvdGVzdHMvc2NyYXRjaC9x
+ZW11Yi0yNjYxNy1xdGVzdC5zb2NrDQo+PiAtbWFjaGluZSBhY2NlbD1xdGVzdCAtbm9kZWZhdWx0
+cyAtZGlzcGxheSBub25lIC1tYWNoaW5lIGFjY2VsPXF0ZXN0DQo+PiAtaW5jb21pbmcgZGVmZXIg
+LWRyaXZlDQo+PiBpZj12aXJ0aW8saWQ9ZHJpdmUwLGZpbGU9L3Vzci9ob21lL3FlbXUvcWVtdS10
+ZXN0Lklmc1I2OC9idWlsZC90ZXN0cy9xZW11LWlvdGVzdHMvc2NyYXRjaC9kaXNrX2IsZm9ybWF0
+PXFjb3cyLGNhY2hlPXdyaXRlYmFjaw0KPj4NCj4+IFRoZSBjb21tb24gdGhyZWFkIGluIDE2OSBp
+cyB0aGUgK21pZ2JpdG1hcCB0cmFpdCwgd2hpY2ggLi4uIG1ha2VzIG1lIGENCj4+IGxpdHRsZSBu
+ZXJ2b3VzLCBvZiBjb3Vyc2UhDQo+Pg0KPj4NCj4+IDE5OToNCj4+ICtXQVJOSU5HOnFlbXUubWFj
+aGluZTpxZW11IHJlY2VpdmVkIHNpZ25hbCA2Og0KPj4gL3Vzci9ob21lL3FlbXUvcWVtdS10ZXN0
+Lklmc1I2OC9idWlsZC90ZXN0cy9xZW11LWlvdGVzdHMvLi4vLi4veDg2XzY0LXNvZnRtbXUvcWVt
+dS1zeXN0ZW0teDg2XzY0DQo+PiAtY2hhcmRldg0KPj4gc29ja2V0LGlkPW1vbixwYXRoPS91c3Iv
+aG9tZS9xZW11L3FlbXUtdGVzdC5JZnNSNjgvYnVpbGQvdGVzdHMvcWVtdS1pb3Rlc3RzL3NjcmF0
+Y2gvdG1wdnpweWM5ajYvcWVtdWItMzAxNzAtbW9uaXRvci5zb2NrDQo+PiAtbW9uIGNoYXJkZXY9
+bW9uLG1vZGU9Y29udHJvbCAtZGlzcGxheSBub25lIC12Z2Egbm9uZSAtcXRlc3QNCj4+IHVuaXg6
+cGF0aD0vdXNyL2hvbWUvcWVtdS9xZW11LXRlc3QuSWZzUjY4L2J1aWxkL3Rlc3RzL3FlbXUtaW90
+ZXN0cy9zY3JhdGNoL3FlbXViLTMwMTcwLXF0ZXN0LnNvY2sNCj4+IC1tYWNoaW5lIGFjY2VsPXF0
+ZXN0IC1ub2RlZmF1bHRzIC1kaXNwbGF5IG5vbmUgLW1hY2hpbmUgYWNjZWw9cXRlc3QNCj4+IC1k
+cml2ZQ0KPj4gaWY9dmlydGlvLGlkPWRyaXZlMCxmaWxlPS91c3IvaG9tZS9xZW11L3FlbXUtdGVz
+dC5JZnNSNjgvYnVpbGQvdGVzdHMvcWVtdS1pb3Rlc3RzL3NjcmF0Y2gvZGlza19iLGZvcm1hdD1x
+Y293MixjYWNoZT1ub25lDQo+PiAtaW5jb21pbmcgZXhlYzogY2F0DQo+PiAnL3Vzci9ob21lL3Fl
+bXUvcWVtdS10ZXN0Lklmc1I2OC9idWlsZC90ZXN0cy9xZW11LWlvdGVzdHMvc2NyYXRjaC9taWdf
+ZmlmbycNCj4+ICtFDQo+Pg0KPj4NCj4+IFZsYWRpbWlyLCBJIHdhcyBhYmxlIHRvIHByb3Zva2Ug
+dGhpcyBlcnJvciBieSBlZGl0aW5nDQo+PiAuL3Rlc3RzL3ZtL01ha2VmaWxlLmluY2x1ZGUgYW5k
+IHJlbW92aW5nIHRoZSAtLXNuYXBzaG90IGludm9jYXRpb24sIHRoZW4NCj4+IHVzaW5nIGBtYWtl
+IHZtLWJ1aWxkLWZyZWVic2RgIGFuZCBmaW5hbGx5IHR5cGluZyBgbWFrZSB2bS1zc2gtZnJlZWJz
+ZGANCj4+IHRvIG9wZW4gdXAgYSBzaGVsbC4NCj4+DQo+PiBUaGVuIHRoZSB0cmlja3MgYXJlIHRo
+ZSB1c3VhbCBvbmVzOyBuYXZpZ2F0ZSB0byBpb3Rlc3RzIGRpcmVjdG9yeSwNCj4+IC4vY2hlY2sg
+LXYgLXFjb3cyIDE2OSwgZXRjLiBZb3UnbGwgbmVlZCB0byBjcmVhdGUgYSBidWlsZCB0aGF0IGFs
+bG93cw0KPj4gUHl0aG9uIHRlc3RzIHRvIHJ1bjsgZG8gaXQgYmVmb3JlIHlvdSBydW4gdGhlIHNu
+YXBzaG90LWxlc3MgYnVpbGQuDQo+Pg0KPj4NCj4gDQo+IEludGVyZXN0aW5nLCBJJ2xsIHRyeSB0
+byByZXByb2R1Y2UuDQoNCkNvdWxkIHlvdSBwcm92aWRlIG1vcmUgZGV0YWlsZWQgc3RlcHM/DQoN
+CiMgbWFrZSB2bS1idWlsZC1mcmVlYnNkDQogICAgIFZNLUlNQUdFIGZyZWVic2QNCiMjIyBEb3du
+bG9hZGluZyBpbnN0YWxsIGlzbyAuLi4NCiMjIyBQcmVwYXJpbmcgaXNvIGFuZCBkaXNrIGltYWdl
+IC4uLg0KL3Jvb3QvLmNhY2hlL3FlbXUtdm0vaW1hZ2VzL2ZyZWVic2QuaW1nLmluc3RhbGwuaXNv
+Lnh6ICgxLzEpDQogICAxMDAgJSAgICAgICA1OTUsMCBNaUIgLyA4NTEsMSBNaUIgPSAwLDY5OSAg
+IDE1MyBNaUIvcyAgICAgICAwOjA1DQpGYWlsZWQgdG8gcHJlcGFyZSBndWVzdCBlbnZpcm9ubWVu
+dA0KVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOg0KICAgRmlsZSAiL3dvcmsvc3Jj
+L3FlbXUvbWFzdGVyL3Rlc3RzL3ZtL2Jhc2V2bS5weSIsIGxpbmUgMzUzLCBpbiBtYWluDQogICAg
+IHJldHVybiB2bS5idWlsZF9pbWFnZShhcmdzLmltYWdlKQ0KICAgRmlsZSAiL3dvcmsvc3JjL3Fl
+bXUvbWFzdGVyL3Rlc3RzL3ZtL2ZyZWVic2QiLCBsaW5lIDg2LCBpbiBidWlsZF9pbWFnZQ0KICAg
+ICBpbWdfdG1wLCBzZWxmLnNpemVdKQ0KICAgRmlsZSAiL3Vzci9saWI2NC9weXRob24zLjcvc3Vi
+cHJvY2Vzcy5weSIsIGxpbmUgMzQyLCBpbiBjaGVja19jYWxsDQogICAgIHJldGNvZGUgPSBjYWxs
+KCpwb3BlbmFyZ3MsICoqa3dhcmdzKQ0KICAgRmlsZSAiL3Vzci9saWI2NC9weXRob24zLjcvc3Vi
+cHJvY2Vzcy5weSIsIGxpbmUgMzIzLCBpbiBjYWxsDQogICAgIHdpdGggUG9wZW4oKnBvcGVuYXJn
+cywgKiprd2FyZ3MpIGFzIHA6DQogICBGaWxlICIvdXNyL2xpYjY0L3B5dGhvbjMuNy9zdWJwcm9j
+ZXNzLnB5IiwgbGluZSA3NzUsIGluIF9faW5pdF9fDQogICAgIHJlc3RvcmVfc2lnbmFscywgc3Rh
+cnRfbmV3X3Nlc3Npb24pDQogICBGaWxlICIvdXNyL2xpYjY0L3B5dGhvbjMuNy9zdWJwcm9jZXNz
+LnB5IiwgbGluZSAxNTIyLCBpbiBfZXhlY3V0ZV9jaGlsZA0KICAgICByYWlzZSBjaGlsZF9leGNl
+cHRpb25fdHlwZShlcnJub19udW0sIGVycl9tc2csIGVycl9maWxlbmFtZSkNCkZpbGVOb3RGb3Vu
+ZEVycm9yOiBbRXJybm8gMl0gTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeTogJ3FlbXUtaW1nJzog
+J3FlbXUtaW1nJw0KbWFrZTogKioqIFsvd29yay9zcmMvcWVtdS9tYXN0ZXIvdGVzdHMvdm0vTWFr
+ZWZpbGUuaW5jbHVkZTo0NzogL3Jvb3QvLmNhY2hlL3FlbXUtdm0vaW1hZ2VzL2ZyZWVic2QuaW1n
+XSBFcnJvciAyDQojIGxzIHFlbXUtaW1nDQpxZW11LWltZw0KDQpXaGF0IGl0IHdhbnRzPyBJJ3Zl
+IG5ldmVyIGRvbmUgc3VjaCBjcm9zcy1idWlsZHMgYmVmb3JlLi4NCg0KLS0gDQpCZXN0IHJlZ2Fy
+ZHMsDQpWbGFkaW1pcg0K
 
