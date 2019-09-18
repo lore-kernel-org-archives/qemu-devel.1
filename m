@@ -4,59 +4,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C56C4CEC4
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11393C4CEC4
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:27:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AB8E21907
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:26:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AB8E21907
+	by mail.kernel.org (Postfix) with ESMTPS id DD047208C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:27:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD047208C0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAdib-0004Xv-La
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 13:26:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55674)
+	id 1iAdjO-0004xt-QV
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 13:27:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55604)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iAcUk-0003zw-LR
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:07:55 -0400
+ (envelope-from <clg@kaod.org>) id 1iAcUZ-0003ln-HG
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:07:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iAcUj-0003D8-29
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:07:54 -0400
-Received: from 2.mo173.mail-out.ovh.net ([178.33.251.49]:46029)
+ (envelope-from <clg@kaod.org>) id 1iAcUY-00033I-6e
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:07:43 -0400
+Received: from 2.mo1.mail-out.ovh.net ([178.32.119.250]:51040)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iAcUi-0003C5-TI
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:07:53 -0400
-Received: from player799.ha.ovh.net (unknown [10.109.160.253])
- by mo173.mail-out.ovh.net (Postfix) with ESMTP id 67D5C119FF0
- for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 18:07:51 +0200 (CEST)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iAcUY-000321-0c
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:07:42 -0400
+Received: from player799.ha.ovh.net (unknown [10.109.160.11])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id 330451901F4
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 18:07:40 +0200 (CEST)
 Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
  (Authenticated sender: clg@kaod.org)
- by player799.ha.ovh.net (Postfix) with ESMTPSA id CC2B39F0E68D;
- Wed, 18 Sep 2019 16:07:45 +0000 (UTC)
+ by player799.ha.ovh.net (Postfix) with ESMTPSA id A82B79F0E5EE;
+ Wed, 18 Sep 2019 16:07:34 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 18 Sep 2019 18:06:30 +0200
-Message-Id: <20190918160645.25126-11-clg@kaod.org>
+Date: Wed, 18 Sep 2019 18:06:28 +0200
+Message-Id: <20190918160645.25126-9-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190918160645.25126-1-clg@kaod.org>
 References: <20190918160645.25126-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 6221441411813182438
+X-Ovh-Tracer-Id: 6218345189355129830
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudekgdeliecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.251.49
-Subject: [Qemu-devel] [PATCH v4 10/25] ppc/pnv: Clarify how the TIMA is
- accessed on a multichip system
+X-Received-From: 178.32.119.250
+Subject: [Qemu-devel] [PATCH v4 08/25] ppc/xive: Use the XiveFabric and
+ XivePresenter interfaces
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,108 +74,104 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The TIMA MMIO space is shared among the chips. To identify the chip
-from which the access is being done, the PowerBUS uses a 'chip' field
-in the load/store messages. QEMU does not model these messages,
-instead, we extract the chip id from the CPU PIR and do a lookup at
-the machine level to fetch the targeted interrupt controller.
-
-Introduce pnv_get_chip() and pnv_xive_tm_get_xive() helpers to clarify
-this process in pnv_xive_get_tctx(). The latter will be removed in the
-subsequent patches but the same principle will be kept.
+Now that the machines have handlers implementing the XiveFabric and
+XivePresenter interfaces, remove xive_presenter_match() and make use
+of the 'match_nvt' handler of the machine.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/ppc/pnv.h | 13 +++++++++++++
- hw/intc/pnv_xive.c   | 40 +++++++++++++++++++++++-----------------
- 2 files changed, 36 insertions(+), 17 deletions(-)
+ hw/intc/xive.c | 48 +++++++++++++++++-------------------------------
+ 1 file changed, 17 insertions(+), 31 deletions(-)
 
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 1cdbe55bf86c..5e01a9f3df95 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -185,6 +185,19 @@ static inline bool pnv_is_power9(PnvMachineState *pn=
-v)
-     return pnv_chip_is_power9(pnv->chips[0]);
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 7a15a64ed7fe..f951ad8cb08d 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -1376,30 +1376,6 @@ int xive_presenter_tctx_match(XivePresenter *xptr,=
+ XiveTCTX *tctx,
+     return -1;
  }
 =20
-+static inline PnvChip *pnv_get_chip(PnvMachineState *pnv, uint32_t chip_=
-id)
-+{
-+    int i;
-+
-+    for (i =3D 0; i < pnv->num_chips; i++) {
-+        PnvChip *chip =3D pnv->chips[i];
-+        if (chip->chip_id =3D=3D chip_id) {
-+            return chip;
-+        }
-+    }
-+    return NULL;
-+}
-+
- #define PNV_FDT_ADDR          0x01000000
- #define PNV_TIMEBASE_FREQ     512000000ULL
-=20
-diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-index 5c9483b394ab..3d6fcf9ac139 100644
---- a/hw/intc/pnv_xive.c
-+++ b/hw/intc/pnv_xive.c
-@@ -464,31 +464,37 @@ static int pnv_xive_match_nvt(XivePresenter *xptr, =
-uint8_t format,
-     return count;
- }
-=20
-+/*
-+ * The TIMA MMIO space is shared among the chips and to identify the
-+ * chip from which the access is being done, we extract the chip id
-+ * from the PIR.
-+ */
-+static PnvXive *pnv_xive_tm_get_xive(PowerPCCPU *cpu)
-+{
-+    PnvMachineState *pnv =3D PNV_MACHINE(qdev_get_machine());
-+    PnvChip *chip;
-+    PnvXive *xive;
-+
-+    chip =3D pnv_get_chip(pnv, cpu_chip_id(cpu));
-+    assert(chip);
-+    xive =3D &PNV9_CHIP(chip)->xive;
-+
-+    if (!pnv_xive_is_cpu_enabled(xive, cpu)) {
-+        xive_error(xive, "IC: CPU %x is not enabled", cpu_pir(cpu));
-+    }
-+    return xive;
-+}
-+
- static XiveTCTX *pnv_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
- {
-     PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--    XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
--    PnvXive *xive =3D NULL;
--    CPUPPCState *env =3D &cpu->env;
--    int pir =3D env->spr_cb[SPR_PIR].default_value;
-+    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
-=20
--    /*
--     * Perform an extra check on the HW thread enablement.
--     *
--     * The TIMA is shared among the chips and to identify the chip
--     * from which the access is being done, we extract the chip id
--     * from the PIR.
--     */
--    xive =3D pnv_xive_get_ic((pir >> 8) & 0xf);
-     if (!xive) {
-         return NULL;
-     }
-=20
--    if (!(xive->regs[PC_THREAD_EN_REG0 >> 3] & PPC_BIT(pir & 0x3f))) {
--        xive_error(PNV_XIVE(xrtr), "IC: CPU %x is not enabled", pir);
+-static bool xive_presenter_match(XiveRouter *xrtr, uint8_t format,
+-                                 uint8_t nvt_blk, uint32_t nvt_idx,
+-                                 bool cam_ignore, uint8_t priority,
+-                                 uint32_t logic_serv, XiveTCTXMatch *mat=
+ch)
+-{
+-    XivePresenter *xptr =3D XIVE_PRESENTER(xrtr);
+-    XivePresenterClass *xpc =3D XIVE_PRESENTER_GET_CLASS(xptr);
+-    int count;
+-
+-    count =3D xpc->match_nvt(xptr, format, nvt_blk, nvt_idx, cam_ignore,
+-                           priority, logic_serv, match);
+-    if (count < 0) {
+-        return false;
 -    }
 -
--    return tctx;
-+    return XIVE_TCTX(pnv_cpu_state(cpu)->intc);
+-    if (!match->tctx) {
+-        qemu_log_mask(LOG_UNIMP, "XIVE: NVT %x/%x is not dispatched\n",
+-                      nvt_blk, nvt_idx);
+-        return false;
+-    }
+-
+-    return true;
+-}
+-
+ /*
+  * This is our simple Xive Presenter Engine model. It is merged in the
+  * Router as it does not require an extra object.
+@@ -1415,22 +1391,32 @@ static bool xive_presenter_match(XiveRouter *xrtr=
+, uint8_t format,
+  *
+  * The parameters represent what is sent on the PowerBus
+  */
+-static bool xive_presenter_notify(XiveRouter *xrtr, uint8_t format,
++static bool xive_presenter_notify(uint8_t format,
+                                   uint8_t nvt_blk, uint32_t nvt_idx,
+                                   bool cam_ignore, uint8_t priority,
+                                   uint32_t logic_serv)
+ {
++    XiveFabric *xfb =3D XIVE_FABRIC(qdev_get_machine());
++    XiveFabricClass *xfc =3D XIVE_FABRIC_GET_CLASS(xfb);
+     XiveTCTXMatch match =3D { .tctx =3D NULL, .ring =3D 0 };
+-    bool found;
++    int count;
+=20
+-    found =3D xive_presenter_match(xrtr, format, nvt_blk, nvt_idx, cam_i=
+gnore,
+-                                 priority, logic_serv, &match);
+-    if (found) {
++    /*
++     * Ask the machine to scan the interrupt controllers for a match
++     */
++    count =3D xfc->match_nvt(xfb, format, nvt_blk, nvt_idx, cam_ignore,
++                           priority, logic_serv, &match);
++    if (count < 0) {
++        return false;
++    }
++
++    /* handle CPU exception delivery */
++    if (count) {
+         ipb_update(&match.tctx->regs[match.ring], priority);
+         xive_tctx_notify(match.tctx, match.ring);
+     }
+=20
+-    return found;
++    return count;
  }
 =20
  /*
+@@ -1543,7 +1529,7 @@ static void xive_router_end_notify(XiveRouter *xrtr=
+, uint8_t end_blk,
+         return;
+     }
+=20
+-    found =3D xive_presenter_notify(xrtr, format, nvt_blk, nvt_idx,
++    found =3D xive_presenter_notify(format, nvt_blk, nvt_idx,
+                           xive_get_field32(END_W7_F0_IGNORE, end.w7),
+                           priority,
+                           xive_get_field32(END_W7_F1_LOG_SERVER_ID, end.=
+w7));
 --=20
 2.21.0
 
