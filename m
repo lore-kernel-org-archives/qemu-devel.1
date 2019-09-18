@@ -2,75 +2,66 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DATE_IN_PAST_03_06,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A83ADC4CECD
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 02:39:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66986C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 03:57:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7268C2189D
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 02:39:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3704620856
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 03:57:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=euphon.net header.i=fam@euphon.net header.b="SaLLf0iJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7268C2189D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=euphon.net
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="jejDG0iP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3704620856
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAPsb-0007Ez-Jy
-	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 22:39:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41205)
+	id 1iAR5m-0004G2-75
+	for qemu-devel@archiver.kernel.org; Tue, 17 Sep 2019 23:57:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46075)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fam@euphon.net>) id 1iAPrq-0006nt-0t
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 22:38:55 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iAR4C-0003HP-Sy
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 23:55:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fam@euphon.net>) id 1iAPrn-0004X5-Ra
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 22:38:52 -0400
-Received: from sender3-op-o12.zoho.com.cn ([124.251.121.243]:17807)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <fam@euphon.net>) id 1iAPrm-0004St-Cw
- for qemu-devel@nongnu.org; Tue, 17 Sep 2019 22:38:51 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568774310; cv=none; d=zoho.com.cn; s=zohoarc; 
- b=g1WTDuxJr3GPmnvbe0qo+SMbkdq/KqoVEMAg8+8swerEiSo3EYdS9FawuOS9XC4DYm8AnQ6mZ0lIH2WkVzc3bOmPbCFhuNSFQvOjtfpCRFb8mhdk+excPBoEPdY5O4RNhsaYY6fzZdIajNDbQrp2aH9W+OavruHSKhGh1JdjQ80=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com.cn;
- s=zohoarc; t=1568774310;
- h=Content-Type:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To:ARC-Authentication-Results;
- bh=8DiG6a8Xd6gRVOV3MBYVEjvkWs6LbpJD8/sLf5bGR5w=; 
- b=C+wElI05P7P45kT+7FVwZu9CbMXjJ5SAcgq2GtX8x9w95DVsGKv1fPf7FEEKdjr8NT/eqtBpyAysO0aU+PveW9WM21TyQ9fyvOOsfRdzeuUIOM4/oc5e7+LIxJrJezbkYKpy4z+jVlAc9HS/9M04eYUpJstOOk39it5Y7SdJgOU=
-ARC-Authentication-Results: i=1; mx.zoho.com.cn;
- dkim=pass  header.i=euphon.net;
- spf=pass  smtp.mailfrom=fam@euphon.net;
- dmarc=pass header.from=<fam@euphon.net> header.from=<fam@euphon.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1568774310; 
- s=zoho; d=euphon.net; i=fam@euphon.net;
- h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To;
- l=1647; bh=8DiG6a8Xd6gRVOV3MBYVEjvkWs6LbpJD8/sLf5bGR5w=;
- b=SaLLf0iJrmbRP3X4JEFQp4NqWuKGI8Zc3FXpfYpJxePox30NdaToh3XarcuErmOQ
- 9XKypSou9km/K2++Dl9GLZa4xrocJPxqQue2qCEMoigwiA3kf+of8198NiWTS41j4/i
- aJ7xz+/PPPrESfMyCDZS0xSpH+me6BlYgkdZrDao=
-Received: from localhost (120.52.147.46 [120.52.147.46]) by mx.zoho.com.cn
- with SMTPS id 1568774308339255.02150867556645;
- Wed, 18 Sep 2019 10:38:28 +0800 (CST)
-Date: Wed, 18 Sep 2019 10:38:26 +0800
-From: Fam Zheng <fam@euphon.net>
-To: John Snow <jsnow@redhat.com>
-Message-ID: <20190918023826.GA28483@magic>
-References: <156825315333.21839.4459418365355602992@5dec9699b7de>
- <06e01dd7-d464-729d-3cc6-b9440dd5e18e@redhat.com>
+ (envelope-from <dgibson@ozlabs.org>) id 1iAR4B-0001yK-CK
+ for qemu-devel@nongnu.org; Tue, 17 Sep 2019 23:55:44 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:46703 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iAR49-0001ub-TX; Tue, 17 Sep 2019 23:55:43 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46Y5jc3LpTz9s4Y; Wed, 18 Sep 2019 13:55:32 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1568778932;
+ bh=CFeJ4b8lb2/Ku9xnv6dhbFzheR7iIW6M4eA110XcxNw=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=jejDG0iP4uRwxkCE9HM6MvFJoMOQaBPNEBruvMWfsaB2cfpXL1Dz0K5qvekR2Kigs
+ M8pL3t2UPdR2rPQKyxcT1SqJFUSxqQu+HIsz/BY4wCVvaun2/TXq7lWl6ok15jueTX
+ GE9PFX0UVLglh16ENvOUKs/7b2a5VNE3SRGCAjl8=
+Date: Wed, 18 Sep 2019 10:47:50 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Paul Clarke <pc@us.ibm.com>
+Message-ID: <20190918004750.GD2440@umbus.fritz.box>
+References: <1568653344-16881-1-git-send-email-pc@us.ibm.com>
+ <77049b6d-92cd-014f-6151-fb8dc4b032c9@linaro.org>
+ <d38484cb-8a78-c58c-6ab4-921c9450a346@us.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="tEFtbjk+mNEviIIX"
 Content-Disposition: inline
-In-Reply-To: <06e01dd7-d464-729d-3cc6-b9440dd5e18e@redhat.com>
+In-Reply-To: <d38484cb-8a78-c58c-6ab4-921c9450a346@us.ibm.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-ZohoCNMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 124.251.121.243
-Subject: Re: [Qemu-devel] [PATCH] docker: add sanitizers back to clang build
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] ppc: Add support for 'mffsce'
+ instruction
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,62 +73,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, alex.bennee@linaro.org, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 09/12 19:07, John Snow wrote:
-> 
-> 
-> On 9/11/19 9:52 PM, no-reply@patchew.org wrote:
-> > Patchew URL: https://patchew.org/QEMU/20190912014442.5757-1-jsnow@redhat.com/
-> > 
-> > 
-> > 
-> > Hi,
-> > 
-> > This series seems to have some coding style problems. See output below for
-> > more information:
-> > 
-> > Subject: [Qemu-devel] [PATCH] docker: add sanitizers back to clang build
-> > Message-id: 20190912014442.5757-1-jsnow@redhat.com
-> > Type: series
-> > 
-> > === TEST SCRIPT BEGIN ===
-> > #!/bin/bash
-> > git rev-parse base > /dev/null || exit 0
-> > git config --local diff.renamelimit 0
-> > git config --local diff.renames True
-> > git config --local diff.algorithm histogram
-> > ./scripts/checkpatch.pl --mailback base..
-> > === TEST SCRIPT END ===
-> > 
-> > From https://github.com/patchew-project/qemu
-> >  * [new tag]         patchew/20190912014442.5757-1-jsnow@redhat.com -> patchew/20190912014442.5757-1-jsnow@redhat.com
-> > Switched to a new branch 'test'
-> > 96d44b9 docker: add sanitizers back to clang build
-> > 
-> > === OUTPUT BEGIN ===
-> > ERROR: Missing Signed-off-by: line(s)
-> 
-> GDI.
-> 
-> I keep adding this to my configuration files, but it keeps "falling
-> off", somehow.
-> 
-> I have some patches in the works for stgit where I'm going to work
-> through some test cases for setting profile variables and try to fix this.
-> 
-> In the meantime:
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
 
-Isn't this because you inserted a '---' line in the middle of the commit
-message so the part after it is ditched by 'git am'?
+--tEFtbjk+mNEviIIX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This feels a bit hard to catch, wondering what is in the works. :)
+On Tue, Sep 17, 2019 at 04:49:56PM -0500, Paul Clarke wrote:
+> On 9/17/19 3:46 PM, Richard Henderson wrote:
+> > On 9/16/19 1:02 PM, Paul A. Clarke wrote:
+> >> From: "Paul A. Clarke" <pc@us.ibm.com>
+> >>
+> >> ISA 3.0B added a set of Floating-Point Status and Control Register (FP=
+SCR)
+> >> instructions: mffsce, mffscdrn, mffscdrni, mffscrn, mffscrni, mffsl.
+> >> This patch adds support for 'mffsce' instruction.
+> >>
+> >> 'mffsce' is identical to 'mffs', except that it also clears the except=
+ion
+> >> enable bits in the FPSCR.
+> >>
+> >> On CPUs without support for 'mffsce' (below ISA 3.0), the
+> >> instruction will execute identically to 'mffs'.
+> >>
+> >> Signed-off-by: Paul A. Clarke <pc@us.ibm.com>
+> >> ---
+> >> v2: no changes.
+> >>
+> >>  target/ppc/translate/fp-impl.inc.c | 30 ++++++++++++++++++++++++++++++
+> >>  target/ppc/translate/fp-ops.inc.c  |  2 ++
+> >>  2 files changed, 32 insertions(+)
+> >=20
+> > Didn't I already give a
+> > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> >=20
+> > for this?
+>=20
+> You did.  Sorry for the confusion.  I wasn't sure whether to resend
+> or not, given the dependence on the other patch and David said he
+> would be waiting for the respin.
 
-Fam
+Please resend for my convenience, but you can fold in the previously
+received R-b lines, assuming the patch isn't changing.
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--tEFtbjk+mNEviIIX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2BfrYACgkQbDjKyiDZ
+s5L95RAA0RQdhSl3t1ZgI+1UEOp40CWLzP41SrRiQHLx1IGlK4hiAu+zEBANaHmC
+olNbdkkH77p/osiuLaUpB5DvJGQaH5404orUxiogYJ/SCRodqQC1z2o6BFtGqDme
+k286j5AgrImy12ZWx0mZb+vUp/NY6AnLmC6hnAGiP0QLRVwIOiMFXM46swlo5n9R
+3HZ07Kc/fyawPNh/8KRiGK7GCJRQL+L3IjwR9P816pamZ3dco019hQgP3py5z4Xt
+pn9gQLc9Aqt6HGe2BP9c53MgXIqru61VLecDkIsIvcLPUBLbgyf3l35bYa34iBgE
+62hOmwDxeaBFGv6ybUb5pSuBb66MIHCQd7BOAbfri1FqReEOQfAH/50IeR25qbuv
+K3WgrSkOy2Wmso2vBS4nAP6kD0tweGwL8Ae4io6aUZIDuGQAiSN5uodYRybZQR1k
+CwKqhAFr3LksYRAy5vvhNqpEA84W/ZYl5j2CAdUCHiHqcSwLlY8a8b2qqrIr3lFl
+BlyqQEX0zAXsvKo4ykB0oA3UGqdJnfsHgr7wyMTbOf26YkH9KB8vot2bqDDcLAgi
+18+vOyqytO4fwvvmfaFxjw2VB0SrLNk9vezI2b+4gnAFDPPh+ifaooh+B5X6B3ub
+d/6rF3ge/Uq5JP+XhVEjzLsz2+8nkWu4I8/R2uMIDbbye8k8fww=
+=byNs
+-----END PGP SIGNATURE-----
+
+--tEFtbjk+mNEviIIX--
 
