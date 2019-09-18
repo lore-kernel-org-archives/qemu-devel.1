@@ -2,60 +2,72 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79A44C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 16:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1555EC4CECE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 16:20:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A72EF218AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 16:20:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A72EF218AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E314F218AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 16:20:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E314F218AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAcgX-0008HB-28
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 12:20:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50253)
+	id 1iAcgg-0008VJ-Bl
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 12:20:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50095)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iAbtj-0000Ay-9K
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:29:40 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1iAbsz-0007y7-Di
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:28:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iAbth-0007bz-TX
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:29:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44294)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iAbth-0007bB-O2; Wed, 18 Sep 2019 11:29:37 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1282F8980EF;
- Wed, 18 Sep 2019 15:29:37 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-117-119.ams2.redhat.com [10.36.117.119])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 80D535D6B2;
- Wed, 18 Sep 2019 15:29:35 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 18 Sep 2019 17:28:56 +0200
-Message-Id: <20190918152922.18949-4-david@redhat.com>
-In-Reply-To: <20190918152922.18949-1-david@redhat.com>
-References: <20190918152922.18949-1-david@redhat.com>
+ (envelope-from <palmer@dabbelt.com>) id 1iAbsy-0007FA-0R
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:28:53 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:47040)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1iAbsx-0007EX-PA
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:28:51 -0400
+Received: by mail-pg1-f193.google.com with SMTP id a3so20814pgm.13
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 08:28:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding:cc:from:to;
+ bh=s35F55O2Em8wHwXR9VPPU+OtN5AgatRpyAF6CF2QIKI=;
+ b=iVGpj6fZlMGqHm89PH5x2MQXYZMTP9ioiM3dz+zoMat/FMBTm8GteGYvByZsH4iD0p
+ UNYqE+EOIXgnRRp8qtjbVHlv/cSRsC6HZSMEScMOyGa/qDJacEbbhTOPMk0jYfrAapma
+ DvRl1om+KKC93jt8ZFuOERN30QRppGFYtAF3aez1Mv9UnLNCSQ36XN7fV0ebl2daPoQL
+ 8a/7IbBMOwhuaMQ2X+w5lwu0i6c3SCVKxJchb+rn5tt9N3xC2vMdtHUq0ysiwKzi0glf
+ w21d/aNgnvgr9dF/1kRQjxFwZe0bss8/XM3SfjUYZGAiQ3daqKXEj61mfn5nRpr93iA7
+ YzMw==
+X-Gm-Message-State: APjAAAXyJC4IAsX5TCcA3goyB82Os3dbA0I8XCrXJxGwANTWLXo7s7XI
+ r58B4xrh0SFT1YnhPExSFrbtGKtgfgU=
+X-Google-Smtp-Source: APXvYqzfy1VAvBWF50RP0rDWtfaHd15KCdWTqLI6sI18eWmoectT8vFWQSUyCS2r5ByGoB1WXU/NGw==
+X-Received: by 2002:a63:2a46:: with SMTP id q67mr4587738pgq.108.1568820530572; 
+ Wed, 18 Sep 2019 08:28:50 -0700 (PDT)
+Received: from localhost ([12.206.222.5])
+ by smtp.gmail.com with ESMTPSA id i6sm10705310pfq.20.2019.09.18.08.28.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 18 Sep 2019 08:28:50 -0700 (PDT)
+Date: Wed, 18 Sep 2019 07:56:39 -0700
+Message-Id: <20190918145640.17349-48-palmer@sifive.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190918145640.17349-1-palmer@sifive.com>
+References: <20190918145640.17349-1-palmer@sifive.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Wed, 18 Sep 2019 15:29:37 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 03/29] s390x/tcg: MVCL: Detect
- destructive overlaps
+ [fuzzy]
+X-Received-From: 209.85.215.193
+Subject: [Qemu-devel] [PULL 47/48] target/riscv: Use TB_FLAGS_MSTATUS_FS for
+ floating point
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,64 +79,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We'll have to zero-out unused bit positions, so make sure to write the
-addresses back.
+From: Alistair Francis <alistair.francis@wdc.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Use the TB_FLAGS_MSTATUS_FS macro when enabling floating point in the tb
+flags.
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/s390x/mem_helper.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+ target/riscv/cpu.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index b02ad148e5..223312a4b1 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -52,6 +52,19 @@ static inline bool psw_key_valid(CPUS390XState *env, u=
-int8_t psw_key)
-     return true;
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 16efe8c860..124ed33ee4 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -301,7 +301,7 @@ static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
+ #else
+     *flags = cpu_mmu_index(env, 0);
+     if (riscv_cpu_fp_enabled(env)) {
+-        *flags |= env->mstatus & MSTATUS_FS;
++        *flags |= TB_FLAGS_MSTATUS_FS;
+     }
+ #endif
  }
-=20
-+static bool is_destructive_overlap(CPUS390XState *env, uint64_t dest,
-+                                   uint64_t src, uint32_t len)
-+{
-+    if (!len || src =3D=3D dest) {
-+        return false;
-+    }
-+    /* Take care of wrapping at the end of address space. */
-+    if (unlikely(wrap_address(env, src + len - 1) < src)) {
-+        return dest > src || dest <=3D wrap_address(env, src + len - 1);
-+    }
-+    return dest > src && dest <=3D src + len - 1;
-+}
-+
- /* Reduce the length so that addr + len doesn't cross a page boundary.  =
-*/
- static inline uint32_t adj_len_to_page(uint32_t len, uint64_t addr)
- {
-@@ -787,7 +800,11 @@ uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t r=
-1, uint32_t r2)
-     uint8_t pad =3D env->regs[r2 + 1] >> 24;
-     uint32_t cc;
-=20
--    cc =3D do_mvcl(env, &dest, &destlen, &src, &srclen, pad, 1, ra);
-+    if (is_destructive_overlap(env, dest, src, MIN(srclen, destlen))) {
-+        cc =3D 3;
-+    } else {
-+        cc =3D do_mvcl(env, &dest, &destlen, &src, &srclen, pad, 1, ra);
-+    }
-=20
-     env->regs[r1 + 1] =3D deposit64(env->regs[r1 + 1], 0, 24, destlen);
-     env->regs[r2 + 1] =3D deposit64(env->regs[r2 + 1], 0, 24, srclen);
---=20
+-- 
 2.21.0
 
 
