@@ -2,61 +2,120 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F45C4CEC4
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:30:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E9DBC4CEC9
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:31:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3058208C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:30:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3058208C0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1F731208C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:31:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Gs/FzBIP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F731208C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAdmP-0000Go-IG
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 13:30:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55723)
+	id 1iAdo5-0002M7-7l
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 13:31:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33225)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iAcUq-00047g-Bb
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:08:01 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iAdAR-0003UV-HG
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:51:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iAcUo-0003Ie-O3
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:08:00 -0400
-Received: from 3.mo178.mail-out.ovh.net ([46.105.44.197]:53776)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iAcUo-0003Gk-I2
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:07:58 -0400
-Received: from player799.ha.ovh.net (unknown [10.108.54.87])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id C3B7B795E5
- for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 18:07:56 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
- (Authenticated sender: clg@kaod.org)
- by player799.ha.ovh.net (Postfix) with ESMTPSA id 524CA9F0E6E5;
- Wed, 18 Sep 2019 16:07:51 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 18 Sep 2019 18:06:31 +0200
-Message-Id: <20190918160645.25126-12-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190918160645.25126-1-clg@kaod.org>
-References: <20190918160645.25126-1-clg@kaod.org>
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iAdAQ-0005Y1-26
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:50:58 -0400
+Received: from mail-eopbgr00117.outbound.protection.outlook.com
+ ([40.107.0.117]:21924 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1iAdAP-0005W1-9L; Wed, 18 Sep 2019 12:50:58 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cvCWC5A6Bus+HE6GoTxr0BWyNt5R79kKJcSmoE9UprKyZWKD9xBLhr6FhT5CgEVcHeWkwkfr+8DpIXXlBn/ut9KLqdyJ+v1k6DcMBFpdLbf5fcwBuvf6YtJa/H5QZ8dj2/M1q5BZ3sHFax+MoBE2f4Ld+Njk6t+KtCfKm0ly2ohDokWgTk1bCqs1byGz8EkwWa/AFYDl0Wamhy4hwXL55YiRBrSpGYaLoklEotLAIHCZUxfaQvQ7iS+/20R4F5OBpDhdY+dqqXtt71IiW+atvB4Gqa9ZoaeqZRPbc/cktzb7ylJXtDoFs7CP4wcUiVQ491KprAzuMiohJfr1tkGX1w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZzbWEp8M8LDGVF+dJi+ic1DEDgKH70tsPimSBpadjNo=;
+ b=Dl9a7gyl4n3L7QoV14feRa7HnFLgNgdWQ4FHqYQxGlPhYoCDVB970tVw8LxvixQ43afbtYFhmmptGBhfZoMCsERH11HBd0MLwXBTXmv3wlHkYLtZB1+1Qi9iQ61sRJKHe8HkNgCdb4bHhpxziVMWq4GcJoOTnMh2N9c9KIRMGiWEYL0M19Pq46oQ2sGEjpnkTnbAr57ettegfx4x1GxhlYkbEk8zdt+E77CKgR4xvBb8/SNuenscxHsvlLJtZU/Gjn8o7y82NcTOUnze+HjzBTLQGQ+YFxrPmFFr04s1ID2RqWibDOegwMzkmktlmzw2B0CZysSm7d86xyrTFdEfrQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZzbWEp8M8LDGVF+dJi+ic1DEDgKH70tsPimSBpadjNo=;
+ b=Gs/FzBIPxXX6lXnFT/WYLb7d+cPJHmDv4doVhaa9Q3ePbePcZommZo0swjtrARrRBw3zPB394t9NJ7XFMRU1sCw7ASzLg9ukPz3epdCdiTQarxEoslm08/z1GoRxVEg6jRovGArCjCpcz/zrMvK1krrox8ZuwJQyPEJYTyqM93c=
+Received: from HE1PR0802MB2460.eurprd08.prod.outlook.com (10.175.33.138) by
+ HE1PR0802MB2507.eurprd08.prod.outlook.com (10.175.35.136) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2241.18; Wed, 18 Sep 2019 16:50:53 +0000
+Received: from HE1PR0802MB2460.eurprd08.prod.outlook.com
+ ([fe80::4d31:70d0:5b10:7a10]) by HE1PR0802MB2460.eurprd08.prod.outlook.com
+ ([fe80::4d31:70d0:5b10:7a10%6]) with mapi id 15.20.2263.023; Wed, 18 Sep 2019
+ 16:50:53 +0000
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Thread-Topic: [PATCH v4 5/7] iotests: Test driver whitelisting in 093
+Thread-Index: AQHVbTkpPYQu7ydmKEWdRwl8TyK6I6cwH0sAgADa+oCAAK29gA==
+Date: Wed, 18 Sep 2019 16:50:53 +0000
+Message-ID: <03b66802-79f2-2027-e0aa-b7f25308d623@virtuozzo.com>
+References: <20190917092004.999-1-mreitz@redhat.com>
+ <20190917092004.999-6-mreitz@redhat.com>
+ <fb3673f7-8694-2be1-f843-8786167049c4@virtuozzo.com>
+ <0cf07aa2-d17c-5ad8-0bb4-828215136cb5@redhat.com>
+In-Reply-To: <0cf07aa2-d17c-5ad8-0bb4-828215136cb5@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0501CA0010.eurprd05.prod.outlook.com
+ (2603:10a6:3:1a::20) To HE1PR0802MB2460.eurprd08.prod.outlook.com
+ (2603:10a6:3:dd::10)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e2e7cdc2-c037-4387-fcf7-08d73c585e5c
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(5600167)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
+ SRVR:HE1PR0802MB2507; 
+x-ms-traffictypediagnostic: HE1PR0802MB2507:
+x-microsoft-antispam-prvs: <HE1PR0802MB25074D833CD2D871C4031287F48E0@HE1PR0802MB2507.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 01644DCF4A
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(366004)(39850400004)(396003)(346002)(376002)(189003)(199004)(26005)(52116002)(316002)(229853002)(186003)(66446008)(31696002)(7736002)(31686004)(446003)(53546011)(81156014)(2616005)(11346002)(44832011)(478600001)(386003)(305945005)(14454004)(8676002)(8936002)(86362001)(476003)(6506007)(6512007)(102836004)(256004)(99286004)(64756008)(66476007)(66946007)(66556008)(36756003)(3846002)(4326008)(71200400001)(110136005)(6116002)(71190400001)(486006)(76176011)(81166006)(2501003)(2906002)(66066001)(25786009)(6246003)(6486002)(54906003)(6436002)(4744005)(5660300002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:HE1PR0802MB2507;
+ H:HE1PR0802MB2460.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: a0z7OTO8whNb4yktVXEr56ijd+T7KTf+1kRdGbrVVV+yg38yfqEUYpOgbeXnJH+bDMugO5Q2fZJk2qWL8IVFd1shZZImiHMZy/j2D3hFonuoTW/ChZyWeIHhd+L3ce60GXZW41xhStKPzpZT/udzAwwl/yGENFaB4YVjlZgI88AUH9nTlEWg3S7NcSmkLZJU6xjXPgySaMLFkQANsgfOeaDuM6du5nl3idTDTUXM3k/r2u6hWz1Ck3kAW+oTzEUa0AJMDqGMT4LqHg0s6XeJ6h7RTPyxXNEt7ivrGiSaz6qHb/jtnB04jQaHLRlQCWlcb9mdnqiFG4EIXnEAki/ZwPd7MGVxz3oyLb401P/wJOtT4p6KovUo9H4NqorHvYxdsgZqgPII2ee/uIgJfh4fM/3TISt7pY/RJWALgmohjiQ=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E9E669F9EDF0614FAF9937608634CB1B@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 6222848788649642982
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudekgdeljecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.44.197
-Subject: [Qemu-devel] [PATCH v4 11/25] ppc/xive: Move the TIMA operations to
- the controller model
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e2e7cdc2-c037-4387-fcf7-08d73c585e5c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Sep 2019 16:50:53.6564 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: pKJIXfLDMbIKRDYuvrWmwiskOE3SDdY06KtadAeyF3qBMAOoHbJ3TgkXv1GAHczd5n+GUatDRfndmQfiwDwi6SueHNZjct3tcu2ARhhFt3U=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2507
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.0.117
+Subject: Re: [Qemu-devel] [PATCH v4 5/7] iotests: Test driver whitelisting
+ in 093
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,197 +127,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This also removes the need of the get_tctx() XiveRouter handler in the
-core XIVE framework.
-
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- include/hw/ppc/xive.h |  1 -
- hw/intc/pnv_xive.c    | 35 ++++++++++++++++++++++++++++++++++-
- hw/intc/spapr_xive.c  | 33 +++++++++++++++++++++++++++++++--
- hw/intc/xive.c        | 29 -----------------------------
- 4 files changed, 65 insertions(+), 33 deletions(-)
-
-diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index 536deea8c622..9d9cd88dd17e 100644
---- a/include/hw/ppc/xive.h
-+++ b/include/hw/ppc/xive.h
-@@ -462,7 +462,6 @@ typedef struct XiveENDSource {
- #define XIVE_TM_OS_PAGE         0x2
- #define XIVE_TM_USER_PAGE       0x3
-=20
--extern const MemoryRegionOps xive_tm_ops;
- void xive_tctx_tm_write(XivePresenter *xptr, XiveTCTX *tctx, hwaddr offs=
-et,
-                         uint64_t value, unsigned size);
- uint64_t xive_tctx_tm_read(XivePresenter *xptr, XiveTCTX *tctx, hwaddr o=
-ffset,
-diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-index 3d6fcf9ac139..40e18fb44811 100644
---- a/hw/intc/pnv_xive.c
-+++ b/hw/intc/pnv_xive.c
-@@ -1475,6 +1475,39 @@ static const MemoryRegionOps xive_tm_indirect_ops =
-=3D {
-     },
- };
-=20
-+static void pnv_xive_tm_write(void *opaque, hwaddr offset,
-+                              uint64_t value, unsigned size)
-+{
-+    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
-+    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
-+    XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
-+
-+    xive_tctx_tm_write(XIVE_PRESENTER(xive), tctx, offset, value, size);
-+}
-+
-+static uint64_t pnv_xive_tm_read(void *opaque, hwaddr offset, unsigned s=
-ize)
-+{
-+    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
-+    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
-+    XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
-+
-+    return xive_tctx_tm_read(XIVE_PRESENTER(xive), tctx, offset, size);
-+}
-+
-+const MemoryRegionOps pnv_xive_tm_ops =3D {
-+    .read =3D pnv_xive_tm_read,
-+    .write =3D pnv_xive_tm_write,
-+    .endianness =3D DEVICE_BIG_ENDIAN,
-+    .valid =3D {
-+        .min_access_size =3D 1,
-+        .max_access_size =3D 8,
-+    },
-+    .impl =3D {
-+        .min_access_size =3D 1,
-+        .max_access_size =3D 8,
-+    },
-+};
-+
- /*
-  * Interrupt controller XSCOM region.
-  */
-@@ -1832,7 +1865,7 @@ static void pnv_xive_realize(DeviceState *dev, Erro=
-r **errp)
-                           "xive-pc", PNV9_XIVE_PC_SIZE);
-=20
-     /* Thread Interrupt Management Area (Direct) */
--    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops,
-+    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &pnv_xive_tm_ops=
-,
-                           xive, "xive-tima", PNV9_XIVE_TM_SIZE);
-=20
-     qemu_register_reset(pnv_xive_reset, dev);
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index eefc0d4c36b9..e00a9bdd901b 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -222,6 +222,35 @@ void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx)
-     memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &nvt_cam, 4);
- }
-=20
-+static void spapr_xive_tm_write(void *opaque, hwaddr offset,
-+                          uint64_t value, unsigned size)
-+{
-+    XiveTCTX *tctx =3D spapr_cpu_state(POWERPC_CPU(current_cpu))->tctx;
-+
-+    xive_tctx_tm_write(XIVE_PRESENTER(opaque), tctx, offset, value, size=
-);
-+}
-+
-+static uint64_t spapr_xive_tm_read(void *opaque, hwaddr offset, unsigned=
- size)
-+{
-+    XiveTCTX *tctx =3D spapr_cpu_state(POWERPC_CPU(current_cpu))->tctx;
-+
-+    return xive_tctx_tm_read(XIVE_PRESENTER(opaque), tctx, offset, size)=
-;
-+}
-+
-+const MemoryRegionOps spapr_xive_tm_ops =3D {
-+    .read =3D spapr_xive_tm_read,
-+    .write =3D spapr_xive_tm_write,
-+    .endianness =3D DEVICE_BIG_ENDIAN,
-+    .valid =3D {
-+        .min_access_size =3D 1,
-+        .max_access_size =3D 8,
-+    },
-+    .impl =3D {
-+        .min_access_size =3D 1,
-+        .max_access_size =3D 8,
-+    },
-+};
-+
- static void spapr_xive_end_reset(XiveEND *end)
- {
-     memset(end, 0, sizeof(*end));
-@@ -331,8 +360,8 @@ static void spapr_xive_realize(DeviceState *dev, Erro=
-r **errp)
-     qemu_register_reset(spapr_xive_reset, dev);
-=20
-     /* TIMA initialization */
--    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops, xi=
-ve,
--                          "xive.tima", 4ull << TM_SHIFT);
-+    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &spapr_xive_tm_o=
-ps,
-+                          xive, "xive.tima", 4ull << TM_SHIFT);
-     sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
-=20
-     /*
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 9bb09ed6ee7b..11432f04f5c3 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -483,35 +483,6 @@ uint64_t xive_tctx_tm_read(XivePresenter *xptr, Xive=
-TCTX *tctx, hwaddr offset,
-     return xive_tm_raw_read(tctx, offset, size);
- }
-=20
--static void xive_tm_write(void *opaque, hwaddr offset,
--                          uint64_t value, unsigned size)
--{
--    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), current=
-_cpu);
--
--    xive_tctx_tm_write(XIVE_PRESENTER(opaque), tctx, offset, value, size=
-);
--}
--
--static uint64_t xive_tm_read(void *opaque, hwaddr offset, unsigned size)
--{
--    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), current=
-_cpu);
--
--    return xive_tctx_tm_read(XIVE_PRESENTER(opaque), tctx, offset, size)=
-;
--}
--
--const MemoryRegionOps xive_tm_ops =3D {
--    .read =3D xive_tm_read,
--    .write =3D xive_tm_write,
--    .endianness =3D DEVICE_BIG_ENDIAN,
--    .valid =3D {
--        .min_access_size =3D 1,
--        .max_access_size =3D 8,
--    },
--    .impl =3D {
--        .min_access_size =3D 1,
--        .max_access_size =3D 8,
--    },
--};
--
- static char *xive_tctx_ring_print(uint8_t *ring)
- {
-     uint32_t w2 =3D xive_tctx_word2(ring);
---=20
-2.21.0
-
+DQoNCk9uIDE4LzA5LzIwMTkgMDk6MjksIE1heCBSZWl0eiB3cm90ZToNCj4gT24gMTcuMDkuMTkg
+MTY6MjUsIEFuZHJleSBTaGlua2V2aWNoIHdyb3RlOg0KPj4NCj4+DQo+PiBPbiAxNy8wOS8yMDE5
+IDEyOjIwLCBNYXggUmVpdHogd3JvdGU6DQo+Pj4gbnVsbC1haW8gbWF5IG5vdCBiZSB3aGl0ZWxp
+c3RlZC4gIFNraXAgYWxsIHRlc3QgY2FzZXMgdGhhdCByZXF1aXJlIGl0Lg0KPj4+DQo+Pj4gKEFu
+ZCBza2lwIHRoZSB3aG9sZSB0ZXN0IGlmIG51bGwtY28gaXMgbm90IHdoaXRlbGlzdGVkLikNCj4+
+IFRoaXMgc29sdXRpb24gaGFzIGJlZW4gcGVyc2lzdGluZyBzaW5jZSB2MS4gTmV2ZXJ0aGVsZXNz
+LCBJIGFtIHN0aWxsIG5vdA0KPj4gY2xlYXIgd2h5IG5vdCB0byBydW4gdGhlIHRlc3QgaWYgdGhl
+IG51bGwtYWlvIGlzIHRoZSBvbmx5IHdoaXRlbGlzdGVkDQo+PiBkcml2ZXI/IFdpbGwgdGhlIG51
+bGwtYWlvIGJlIHN1cHBvcnRlZCBpbiBmdXR1cmU/DQo+IA0KPiBJIGRvbuKAmXQgc2VlIGEgcmVh
+c29uIHdoeSB3ZeKAmWQgcmVtb3ZlIGl0LiAgQnV0IGNoYW5jZXMgYXJlLCBpZiBhbnkgb2YgdGhl
+DQo+IG51bGwqIGRyaXZlcnMgaXMgd2hpdGVsaXN0ZWQsIGl04oCZbGwgYmUgbnVsbC1jbyAoYmVj
+YXVzZSB3ZSBiYXJlbHkgdXNlDQo+IHRoZSBBSU8gYmxvY2sgZHJpdmVyIGludGVyZmFjZSBhbnlt
+b3JlKS4NCj4gDQo+IE1heA0KPiANCg0KVGhhbmsgeW91IE1heC4NCg0KQW5kcmV5DQotLSANCldp
+dGggdGhlIGJlc3QgcmVnYXJkcywNCkFuZHJleSBTaGlua2V2aWNoDQoNCg==
 
