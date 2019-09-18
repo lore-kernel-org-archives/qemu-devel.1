@@ -2,88 +2,63 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A77ECC4CEC4
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 11:36:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50F0CC4CEC4
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 11:39:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7421F21907
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 11:36:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A79121920
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 11:39:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XmD8geoD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7421F21907
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="cl0whDE4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A79121920
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAYGJ-0003gx-DY
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 07:36:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47173)
+	id 1iAYJC-0005qo-3z
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 07:39:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47588)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iAYEk-0002kF-MV
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:35:07 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iAYI1-0005Oj-15
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:38:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iAYEj-0002LO-My
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:35:06 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50955)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iAYEj-0002Kl-Du
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:35:05 -0400
-Received: by mail-wm1-x342.google.com with SMTP id 5so2219223wmg.0
- for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 04:35:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=NMCP6vDcIAkOcXQMmqhpcPAXIgHQNkSeyKtYiQJ7OeI=;
- b=XmD8geoDjJ0FA95jtw1xX73WiXYXAGJfsq0SiqQSv8ipadFihOJ2cU+sLQ8yaAah7s
- LjSrBz4xjwEgRyCv6WZQUQnhMPSlvwfWP/TPI1VVRGQnp0zjnrj/Xz5RDqjTc8L0cIb8
- NTHhshc/cs1f5tSWe2O4fiNxn0QA0k4QCUosFZiM9D5p/lBMYacdmejWuzS4SxlUDpen
- IxUWYCCKpC6uWckh1+IEIQQH1IGFkInzQC8OMMvvgagbw5G4tz3MNQaE7zUk1GDrap03
- ilnG8ua5leg95tgTRN5RGowD9srkScNH69hpBjrB7cgweIOJK54SFIy3uuHGFiHZeNNS
- ltPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=NMCP6vDcIAkOcXQMmqhpcPAXIgHQNkSeyKtYiQJ7OeI=;
- b=TkWLfxYxQaohAnWqH5lyIHODNBdeI48IvgIM0+cxmpnslDoBgv817emMfMjPaKILgy
- 0PSFfXeDTkja1582P/1lG35E8XQQndhue/r8Ypo04hKffa4z0dcco4JLeuPgGp9C8o7z
- VuU9FxW1ceUcvG7KppDIttP28jP76TcHo8QIoLq+CzecWJuXHAMoCItn214nCpWNDrWQ
- IJ/ifJ6b3spfF/xDZulGHjeSgZQpre6Fkp+gD56xEX4/evak7n0mxaHciZDUzBfkCeph
- ZfS2GNPBdCLNA9GA0EdSm1LZtAcYGPJ3ch97lXKqGXMn8yJVY79z7Q3gjZ5jVbKsMF8s
- umNA==
-X-Gm-Message-State: APjAAAWmNXrqqGBcU1qLQJHPEgRcUtetsk58sp8Eam5UQhmKyjZzlgrB
- QinziOe5HWFdZHQYHr1D5zJXRw==
-X-Google-Smtp-Source: APXvYqwZDXiuC+ZoXw5GmfDQIFyxCY+SCvD/BX80srjZ3COvA9lnbl4+CnNoHlyQSE/z9TA251EnvQ==
-X-Received: by 2002:a7b:cb4e:: with SMTP id v14mr2428422wmj.159.1568806504055; 
- Wed, 18 Sep 2019 04:35:04 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id o188sm3626579wma.14.2019.09.18.04.35.03
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 18 Sep 2019 04:35:03 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 82BE31FF87;
- Wed, 18 Sep 2019 12:35:02 +0100 (BST)
-References: <20190917185537.25417-1-jsnow@redhat.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: John Snow <jsnow@redhat.com>
-In-reply-to: <20190917185537.25417-1-jsnow@redhat.com>
-Date: Wed, 18 Sep 2019 12:35:02 +0100
-Message-ID: <87y2ylzvkp.fsf@linaro.org>
+ (envelope-from <dgibson@ozlabs.org>) id 1iAYHz-0005QZ-A5
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:38:28 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:47555 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1iAYHy-0005OC-2K
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:38:27 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46YHzd1BQVz9sCJ; Wed, 18 Sep 2019 21:38:21 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1568806701;
+ bh=6Nwt09VfVyVm2ho+9H0Rj58ZZThHNPimNKBgwF1CZ4w=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=cl0whDE4gxpQ/BUr6GbWgm0CYZrFDtCaQ4HEo0C7z71Rvdo+joBNYuxaZzx7uMOLe
+ RxiU7fdM20Yo6iKV7K/bR76Rp5nXo8MrBXq6mb9J5NE4TOqjRQ8M1xxxUYEqEwUG0P
+ U0GLnj5DwRvvbLXf6F21OYl1gmBNfW1aE2V5527A=
+Date: Wed, 18 Sep 2019 21:37:16 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Message-ID: <20190918113716.GB22790@umbus.fritz.box>
+References: <20190918071654.GK2440@umbus.fritz.box>
+ <75f4117b-5c87-bd7c-25e9-c7777e51b298@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH] tests/docker: fix typo for debian9-mxe
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="5I6of5zJg18YgZEa"
+Content-Disposition: inline
+In-Reply-To: <75f4117b-5c87-bd7c-25e9-c7777e51b298@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] Problems with MIPS Malta SSH tests in make
+ check-acceptance
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,45 +70,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, ehabkost@redhat.com, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-John Snow <jsnow@redhat.com> writes:
+--5I6of5zJg18YgZEa
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> We spelled it debian-9-mxe, but the image is debian9-mxe.
->
-> Signed-off-by: John Snow <jsnow@redhat.com>
+On Wed, Sep 18, 2019 at 01:13:29PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> On 9/18/19 9:16 AM, David Gibson wrote:
+> > Hi,
+> >=20
+> > I'm finding make check-acceptance is currently useless for me as a
+> > pre-pull test, because a bunch of the tests are not at all reliable.
+> > There are a bunch which I'm still investigating, but for now I'm
+> > looking at the MIPS Malta SSH tests.
+> >=20
+> > There seem to be at least two problems here.  First, the test includes
+> > a download of a pretty big guest disk image.  This can easily exhaust
+> > the 2m30 timeout on its own.
+>=20
+> Gerd raised this issue few months ago:
+>=20
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg615619.html
 
-I'll merge this fix with the other typo fix while I'm at it. Thanks.
+Ah, yes indeed.
 
-> ---
->  tests/docker/Makefile.include | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-> index 50a400b573..7eac1516f6 100644
-> --- a/tests/docker/Makefile.include
-> +++ b/tests/docker/Makefile.include
-> @@ -7,7 +7,7 @@ DOCKER_FILES_DIR :=3D $(SRC_PATH)/tests/docker/dockerfiles
->  DOCKER_DEPRECATED_IMAGES :=3D debian
->  # we don't run tests on intermediate images (used as base by another ima=
-ge)
->  DOCKER_PARTIAL_IMAGES :=3D debian debian8 debian9 debian10 debian-sid
-> -DEBIAN_PARTIAL_IMAGES +=3D debian8-mxe debian-9-mxe debian-ports debian-=
-bootstrap
-> +DEBIAN_PARTIAL_IMAGES +=3D debian8-mxe debian9-mxe debian-ports debian-b=
-ootstrap
->  DOCKER_IMAGES :=3D $(filter-out $(DOCKER_DEPRECATED_IMAGES),$(sort $(not=
-dir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker)))))
->  DOCKER_TARGETS :=3D $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
->  # Use a global constant ccache directory to speed up repetitive builds
+> > Even without the timeout, it makes the test really slow, even on
+> > repeated runs.  Is there some way we can make the image download part
+> > of "building" the tests rather than actually running the testsuite, so
+> > that a) the test themselves go faster and b) we don't include the
+> > download in the test timeout - obviously the download speed is hugely
+> > dependent on factors that aren't really related to what we're testing
+> > here.
+> >=20
+> > In the meantime, I tried hacking it by just increasing the timeout to
+> > 10m.  That got several of the tests working for me, but one still
+> > failed.  Specifically 'LinuxSSH.test_mips_malta32eb_kernel3_2_0' still
+> > timed out for me, but now after booting the guest, rather than during
+> > the image download.  Looking at the avocado log file I'm seeing a
+> > bunch of soft lockup messages from the guest console, AFAICT.  So it
+> > looks like we have a real bug here, which I suspect has been
+> > overlooked precisely because the download problems mean this test
+> > isn't reliable.
+> >=20
+> > Any thoughts on how to improve the situation?
+>=20
+> Maybe we should disable this test and run it manually...
 
+Until we can fix it better, I really think we should.  A test this
+unreliable verges on worse than useless.
 
---
-Alex Benn=C3=A9e
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--5I6of5zJg18YgZEa
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2CFuoACgkQbDjKyiDZ
+s5KLOxAAvnXc2Bg5O45jgSAMBgr3jGD+S+O9qCB5WEtHdfCu5CUKvy0I3MYwkeDK
+oe1WLeHoU3krGt0brhNwh9K0+Sg0KP+skfYfF80deyNe0lOL4afeYNYTHf/xfdET
+MSNi3V+yMZcB7DrJn9eac4Pz1rfDuhjWQDg9uJx1Gbir+AkpNmhZnMfV9Hy6n/WB
+BzQHQGth2EGYxPHah9gAL7xP+yG6p697tYn0LpB4swlKsqqO6AsEFd3r2niB/914
+vHen5YxqCCUQDa4XU0UNHoVkxkzvkMEl0dk4ibioQpzO7pyaYTfCnylS4+cAe8HQ
+YF04BrW/wmtIebvvY7zCB5nJ79JDX2U5I/4MeaeddnEj2+M3t0YkVe6R8EWK2Amt
+tR+dc9w0vmRGhCxBkSnl5ZvtZB5CFga0E9w3hea5nao/exqh0Dw3kSNBtI/bO5E8
+XPz0gh/9SWdSQmrwHPea3kSSc2nCigvRyrllqUzCIfk5/wMHkWoY3iIW6+vfEi+P
+lmlrT8CxlTZmSIkfyVPC7eVkAKzEGMuRntZrTy7hujTJGkSaNFgaDxfdvUPcprXA
+snCmKM0YXB7z4FoBX7vQ6PkyJkgi/aXd0Waq9zpVeCTUlPhu22Rc4/XTFiycBsnY
+JZDAI9NPY/Hh9fvYygWEMfm79V/UFTRFQaCNOtdw4S8UeJeThxA=
+=I3V/
+-----END PGP SIGNATURE-----
+
+--5I6of5zJg18YgZEa--
 
