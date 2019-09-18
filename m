@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A6F7C4CEC4
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:16:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 847A7C4CEC4
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:16:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D660E20665
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:16:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D660E20665
+	by mail.kernel.org (Postfix) with ESMTPS id 5A2EB207FC
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:16:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A2EB207FC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAdYq-0003g1-6N
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 13:16:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55396)
+	id 1iAdZI-0004Ae-Tq
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 13:16:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55476)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iAcTw-0002oT-11
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:07:05 -0400
+ (envelope-from <clg@kaod.org>) id 1iAcUC-0003BB-8E
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:07:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iAcTu-0002ZH-Ln
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:07:03 -0400
-Received: from 5.mo178.mail-out.ovh.net ([46.105.51.53]:42419)
+ (envelope-from <clg@kaod.org>) id 1iAcUB-0002hF-7s
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:07:20 -0400
+Received: from 17.mo5.mail-out.ovh.net ([46.105.56.132]:50293)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iAcTu-0002YX-G8
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:07:02 -0400
-Received: from player799.ha.ovh.net (unknown [10.109.159.68])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id 04D677951E
- for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 18:07:00 +0200 (CEST)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iAcUB-0002gC-2O
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:07:19 -0400
+Received: from player799.ha.ovh.net (unknown [10.109.143.201])
+ by mo5.mail-out.ovh.net (Postfix) with ESMTP id C57AF24EF87
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 18:07:17 +0200 (CEST)
 Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
  (Authenticated sender: clg@kaod.org)
- by player799.ha.ovh.net (Postfix) with ESMTPSA id B6E919F0E345;
- Wed, 18 Sep 2019 16:06:54 +0000 (UTC)
+ by player799.ha.ovh.net (Postfix) with ESMTPSA id 3CF3E9F0E44F;
+ Wed, 18 Sep 2019 16:07:12 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 18 Sep 2019 18:06:21 +0200
-Message-Id: <20190918160645.25126-2-clg@kaod.org>
+Date: Wed, 18 Sep 2019 18:06:24 +0200
+Message-Id: <20190918160645.25126-5-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190918160645.25126-1-clg@kaod.org>
 References: <20190918160645.25126-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 6207086187017243622
+X-Ovh-Tracer-Id: 6211871264849103846
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudekgdeljecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudekgdeliecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.51.53
-Subject: [Qemu-devel] [PATCH v4 01/25] ppc/xive: Introduce a XivePresenter
- interface
+X-Received-From: 46.105.56.132
+Subject: [Qemu-devel] [PATCH v4 04/25] ppc/pnv: Introduce a
+ pnv_xive_is_cpu_enabled() helper
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,151 +74,46 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When the XIVE IVRE sub-engine (XiveRouter) looks for a Notification
-Virtual Target (NVT) to notify, it broadcasts a message on the
-PowerBUS to find an XIVE IVPE sub-engine (Presenter) with the NVT
-dispatched on one of its HW threads, and then forwards the
-notification if any response was received.
-
-The current XIVE presenter model is sufficient for the pseries machine
-because it has a single interrupt controller device, but the PowerNV
-machine can have multiple chips each having its own interrupt
-controller. In this case, the XIVE presenter model is too simple and
-the CAM line matching should scan all chips of the system.
-
-To start fixing this issue, we first extend the XIVE Router model with
-a new XivePresenter QOM interface representing the XIVE IVPE
-sub-engine. This interface exposes a 'match_nvt' handler which the
-sPAPR and PowerNV XIVE Router models will need to implement to perform
-the CAM line matching.
+and use this helper to exclude CPUs which were not enabled by the XIVE
+controller.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/ppc/xive.h | 32 ++++++++++++++++++++++++++++++++
- hw/intc/xive.c        | 26 +++++++++++++++++---------
- 2 files changed, 49 insertions(+), 9 deletions(-)
+ hw/intc/pnv_xive.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index 6d38755f8459..39de45b87cb9 100644
---- a/include/hw/ppc/xive.h
-+++ b/include/hw/ppc/xive.h
-@@ -367,6 +367,38 @@ int xive_router_write_nvt(XiveRouter *xrtr, uint8_t =
-nvt_blk, uint32_t nvt_idx,
- XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs);
- void xive_router_notify(XiveNotifier *xn, uint32_t lisn);
-=20
-+/*
-+ * XIVE Presenter
-+ */
-+
-+typedef struct XiveTCTXMatch {
-+    XiveTCTX *tctx;
-+    uint8_t ring;
-+} XiveTCTXMatch;
-+
-+typedef struct XivePresenter XivePresenter;
-+
-+#define TYPE_XIVE_PRESENTER "xive-presenter"
-+#define XIVE_PRESENTER(obj)                                     \
-+    INTERFACE_CHECK(XivePresenter, (obj), TYPE_XIVE_PRESENTER)
-+#define XIVE_PRESENTER_CLASS(klass)                                     =
+diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+index e1c15b6b5b71..5c97ccda1cad 100644
+--- a/hw/intc/pnv_xive.c
++++ b/hw/intc/pnv_xive.c
+@@ -408,6 +408,14 @@ static int cpu_chip_id(PowerPCCPU *cpu)
+     CPU_FOREACH(cs)                                                     =
 \
-+    OBJECT_CLASS_CHECK(XivePresenterClass, (klass), TYPE_XIVE_PRESENTER)
-+#define XIVE_PRESENTER_GET_CLASS(obj)                                   =
-\
-+    OBJECT_GET_CLASS(XivePresenterClass, (obj), TYPE_XIVE_PRESENTER)
-+
-+typedef struct XivePresenterClass {
-+    InterfaceClass parent;
-+    int (*match_nvt)(XivePresenter *xptr, uint8_t format,
-+                     uint8_t nvt_blk, uint32_t nvt_idx,
-+                     bool cam_ignore, uint8_t priority,
-+                     uint32_t logic_serv, XiveTCTXMatch *match);
-+} XivePresenterClass;
-+
-+int xive_presenter_tctx_match(XivePresenter *xptr, XiveTCTX *tctx,
-+                              uint8_t format,
-+                              uint8_t nvt_blk, uint32_t nvt_idx,
-+                              bool cam_ignore, uint32_t logic_serv);
-+
- /*
-  * XIVE END ESBs
-  */
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index b7417210d817..aa45ac2e06cb 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -1316,9 +1316,10 @@ static uint32_t xive_tctx_hw_cam_line(XiveTCTX *tc=
-tx)
- /*
-  * The thread context register words are in big-endian format.
-  */
--static int xive_presenter_tctx_match(XiveTCTX *tctx, uint8_t format,
--                                     uint8_t nvt_blk, uint32_t nvt_idx,
--                                     bool cam_ignore, uint32_t logic_ser=
-v)
-+int xive_presenter_tctx_match(XivePresenter *xptr, XiveTCTX *tctx,
-+                              uint8_t format,
-+                              uint8_t nvt_blk, uint32_t nvt_idx,
-+                              bool cam_ignore, uint32_t logic_serv)
- {
-     uint32_t cam =3D xive_nvt_cam_line(nvt_blk, nvt_idx);
-     uint32_t qw3w2 =3D xive_tctx_word2(&tctx->regs[TM_QW3_HV_PHYS]);
-@@ -1375,11 +1376,6 @@ static int xive_presenter_tctx_match(XiveTCTX *tct=
-x, uint8_t format,
-     return -1;
- }
+         if (chip->chip_id !=3D cpu_chip_id(POWERPC_CPU(cs))) {} else
 =20
--typedef struct XiveTCTXMatch {
--    XiveTCTX *tctx;
--    uint8_t ring;
--} XiveTCTXMatch;
--
- static bool xive_presenter_match(XiveRouter *xrtr, uint8_t format,
-                                  uint8_t nvt_blk, uint32_t nvt_idx,
-                                  bool cam_ignore, uint8_t priority,
-@@ -1405,7 +1401,8 @@ static bool xive_presenter_match(XiveRouter *xrtr, =
-uint8_t format,
-          * Check the thread context CAM lines and record matches. We
-          * will handle CPU exception delivery later
-          */
--        ring =3D xive_presenter_tctx_match(tctx, format, nvt_blk, nvt_id=
-x,
-+        ring =3D xive_presenter_tctx_match(XIVE_PRESENTER(xrtr), tctx, f=
-ormat,
-+                                         nvt_blk, nvt_idx,
-                                          cam_ignore, logic_serv);
++static bool pnv_xive_is_cpu_enabled(PnvXive *xive, PowerPCCPU *cpu)
++{
++    int pir =3D cpu_pir(cpu);
++    int thrd_id =3D pir & 0x7f;
++
++    return xive->regs[PC_THREAD_EN_REG0 >> 3] & PPC_BIT(thrd_id);
++}
++
+ static int pnv_xive_match_nvt(XivePresenter *xptr, uint8_t format,
+                               uint8_t nvt_blk, uint32_t nvt_idx,
+                               bool cam_ignore, uint8_t priority,
+@@ -426,6 +434,10 @@ static int pnv_xive_match_nvt(XivePresenter *xptr, u=
+int8_t format,
+         XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
+         int ring;
+=20
++        if (!pnv_xive_is_cpu_enabled(xive, cpu)) {
++            continue;
++        }
++
          /*
-          * Save the context and follow on to catch duplicates, that we
-@@ -1692,6 +1689,7 @@ static const TypeInfo xive_router_info =3D {
-     .class_init    =3D xive_router_class_init,
-     .interfaces    =3D (InterfaceInfo[]) {
-         { TYPE_XIVE_NOTIFIER },
-+        { TYPE_XIVE_PRESENTER },
-         { }
-     }
- };
-@@ -1863,10 +1861,20 @@ static const TypeInfo xive_notifier_info =3D {
-     .class_size =3D sizeof(XiveNotifierClass),
- };
-=20
-+/*
-+ * XIVE Presenter
-+ */
-+static const TypeInfo xive_presenter_info =3D {
-+    .name =3D TYPE_XIVE_PRESENTER,
-+    .parent =3D TYPE_INTERFACE,
-+    .class_size =3D sizeof(XivePresenterClass),
-+};
-+
- static void xive_register_types(void)
- {
-     type_register_static(&xive_source_info);
-     type_register_static(&xive_notifier_info);
-+    type_register_static(&xive_presenter_info);
-     type_register_static(&xive_router_info);
-     type_register_static(&xive_end_source_info);
-     type_register_static(&xive_tctx_info);
+          * Check the thread context CAM lines and record matches.
+          */
 --=20
 2.21.0
 
