@@ -2,60 +2,60 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36926C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A7AC4CEC4
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:45:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03A5221848
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:42:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03A5221848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D20AE21848
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 17:45:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D20AE21848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAdyD-0003tc-Hi
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 13:42:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36474)
+	id 1iAe0m-0006Rk-D6
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 13:45:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56008)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iAdUl-0000OV-7U
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 13:12:01 -0400
+ (envelope-from <clg@kaod.org>) id 1iAcVi-0005Ep-O5
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:08:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iAdUh-0007qt-Nx
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 13:11:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37080)
+ (envelope-from <clg@kaod.org>) id 1iAcVh-0003t8-Mq
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:08:54 -0400
+Received: from 12.mo1.mail-out.ovh.net ([87.98.162.229]:47571)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iAdUg-0007nv-S2
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 13:11:55 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DD16611A03
- for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 17:11:51 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-125-22.rdu2.redhat.com
- [10.10.125.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3BC695C219;
- Wed, 18 Sep 2019 17:11:44 +0000 (UTC)
-From: Laszlo Ersek <lersek@redhat.com>
-To: qemu devel list <qemu-devel@nongnu.org>
-Date: Wed, 18 Sep 2019 19:11:41 +0200
-Message-Id: <20190918171141.15957-1-lersek@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iAcVh-0003sk-HO
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 12:08:53 -0400
+Received: from player799.ha.ovh.net (unknown [10.109.143.209])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id A926F19022E
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 18:08:52 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+ (Authenticated sender: clg@kaod.org)
+ by player799.ha.ovh.net (Postfix) with ESMTPSA id 40D949F0EA94;
+ Wed, 18 Sep 2019 16:08:47 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Wed, 18 Sep 2019 18:06:41 +0200
+Message-Id: <20190918160645.25126-22-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190918160645.25126-1-clg@kaod.org>
+References: <20190918160645.25126-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Wed, 18 Sep 2019 17:11:51 +0000 (UTC)
+X-Ovh-Tracer-Id: 6238611387565378534
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudekgdeliecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] edk2 build scripts: work around TianoCore#1607
- without forcing Python 2
+X-Received-From: 87.98.162.229
+Subject: [Qemu-devel] [PATCH v4 21/25] ppc/pnv: Quiesce some XIVE errors
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,147 +67,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It turns out that forcing python2 for running the edk2 "build" utility is
-neither necessary nor sufficient.
+When dumping the END and NVT tables, the error logging is too noisy.
 
-Forcing python2 is not sufficient for two reasons:
-
-- QEMU is moving away from python2, with python2 nearing EOL,
-
-- according to my most recent testing, the lacking dependency information
-  in the makefiles that are generated by edk2's "build" utility can cause
-  parallel build failures even when "build" is executed by python2.
-
-And forcing python2 is not necessary because we can still return to the
-original idea of filtering out jobserver-related options from MAKEFLAGS.
-So do that.
-
-With this patch, the guest UEFI binaries that are used as part of the BIO=
-S
-tables test, and the OVMF and ArmVirtQemu platform firmwares, will be
-built strictly in a single job, regardless of an outermost "-jN" make
-option. Alas, there appears to be no reliable way to build edk2 in an
-(outer make, inner make) environment, with a jobserver enabled.
-
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: John Snow <jsnow@redhat.com>
-Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reported-by: John Snow <jsnow@redhat.com>
-Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
+ hw/intc/pnv_xive.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Notes:
-    - Tested on RHEL7 (where the outer "make" sets the old-style
-      "--jobserver-fds" flag) and on Fedora 29 (where the outer "make" se=
-ts
-      the new-style "--jobserver-auth" flag).
-   =20
-    - I've rebuilt all the edk2 binaries with this patch applied. Everyth=
-ing
-      works fine. However, if you test this patch, you might notice that =
-git
-      reports all the build products as modified. That's because when usi=
-ng
-      the python3 code in edk2 BaseTools, the generated makefiles differ
-      greatly from the ones generated when running in python2 mode (e.g. =
-due
-      to different random seeds in python hashes / dictionaries). As a
-      result, parts of the firmware volumes / firmware filesystems could
-      appear in a different order than before. This is harmless, and does=
-n't
-      necessitate checking in the rebuilt binaries.
-
- roms/edk2-build.sh             |  4 +---
- roms/edk2-funcs.sh             | 17 +++++++++++++++++
- tests/uefi-test-tools/build.sh |  6 +++---
- 3 files changed, 21 insertions(+), 6 deletions(-)
-
-diff --git a/roms/edk2-build.sh b/roms/edk2-build.sh
-index 4f46f8a6a217..8161c55ef507 100755
---- a/roms/edk2-build.sh
-+++ b/roms/edk2-build.sh
-@@ -27,9 +27,6 @@ shift $num_args
+diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+index 8fa78e1c6cd9..4c1fa024cdf5 100644
+--- a/hw/intc/pnv_xive.c
++++ b/hw/intc/pnv_xive.c
+@@ -29,7 +29,7 @@
 =20
- cd edk2
+ #include "pnv_xive_regs.h"
 =20
--# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>.
--export PYTHON_COMMAND=3Dpython2
--
- # Source "edksetup.sh" carefully.
- set +e +u +C
- source ./edksetup.sh
-@@ -43,6 +40,7 @@ fi
- # any), for the edk2 "build" utility.
- source ../edk2-funcs.sh
- edk2_toolchain=3D$(qemu_edk2_get_toolchain "$emulation_target")
-+MAKEFLAGS=3D$(qemu_edk2_quirk_tianocore_1607 "$MAKEFLAGS")
- edk2_thread_count=3D$(qemu_edk2_get_thread_count "$MAKEFLAGS")
- qemu_edk2_set_cross_env "$emulation_target"
+-#define XIVE_DEBUG
++#undef XIVE_DEBUG
 =20
-diff --git a/roms/edk2-funcs.sh b/roms/edk2-funcs.sh
-index a9fae7ee891b..3f4485b201f1 100644
---- a/roms/edk2-funcs.sh
-+++ b/roms/edk2-funcs.sh
-@@ -251,3 +251,20 @@ qemu_edk2_get_thread_count()
-     printf '1\n'
-   fi
- }
-+
-+
-+# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607> by
-+# filtering jobserver-related flags out of MAKEFLAGS. Print the result t=
-o the
-+# standard output.
-+#
-+# Parameters:
-+#   $1: the value of the MAKEFLAGS variable
-+qemu_edk2_quirk_tianocore_1607()
-+{
-+  local makeflags=3D"$1"
-+
-+  printf %s "$makeflags" \
-+  | LC_ALL=3DC sed --regexp-extended \
-+      --expression=3D's/--jobserver-(auth|fds)=3D[0-9]+,[0-9]+//' \
-+      --expression=3D's/-j([0-9]+)?//'
-+}
-diff --git a/tests/uefi-test-tools/build.sh b/tests/uefi-test-tools/build=
-.sh
-index 8aa7935c43bb..eba7964a163b 100755
---- a/tests/uefi-test-tools/build.sh
-+++ b/tests/uefi-test-tools/build.sh
-@@ -29,9 +29,6 @@ export PACKAGES_PATH=3D$(realpath -- "$edk2_dir")
- export WORKSPACE=3D$PWD
- mkdir -p Conf
+ /*
+  * Virtual structures table (VST)
+@@ -174,7 +174,9 @@ static uint64_t pnv_xive_vst_addr_indirect(PnvXive *x=
+ive, uint32_t type,
+     vsd =3D ldq_be_dma(&address_space_memory, vsd_addr);
 =20
--# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>.
--export PYTHON_COMMAND=3Dpython2
--
- # Source "edksetup.sh" carefully.
- set +e +u +C
- source "$PACKAGES_PATH/edksetup.sh"
-@@ -46,12 +43,15 @@ fi
- source "$edk2_dir/../edk2-funcs.sh"
- edk2_arch=3D$(qemu_edk2_get_arch "$emulation_target")
- edk2_toolchain=3D$(qemu_edk2_get_toolchain "$emulation_target")
-+MAKEFLAGS=3D$(qemu_edk2_quirk_tianocore_1607 "$MAKEFLAGS")
-+edk2_thread_count=3D$(qemu_edk2_get_thread_count "$MAKEFLAGS")
- qemu_edk2_set_cross_env "$emulation_target"
+     if (!(vsd & VSD_ADDRESS_MASK)) {
++#ifdef XIVE_DEBUG
+         xive_error(xive, "VST: invalid %s entry %x !?", info->name, idx)=
+;
++#endif
+         return 0;
+     }
 =20
- # Build the UEFI binary
- mkdir -p log
- build \
-   --arch=3D"$edk2_arch" \
-+  -n "$edk2_thread_count" \
-   --buildtarget=3DDEBUG \
-   --platform=3DUefiTestToolsPkg/UefiTestToolsPkg.dsc \
-   --tagname=3D"$edk2_toolchain" \
+@@ -195,7 +197,9 @@ static uint64_t pnv_xive_vst_addr_indirect(PnvXive *x=
+ive, uint32_t type,
+         vsd =3D ldq_be_dma(&address_space_memory, vsd_addr);
+=20
+         if (!(vsd & VSD_ADDRESS_MASK)) {
++#ifdef XIVE_DEBUG
+             xive_error(xive, "VST: invalid %s entry %x !?", info->name, =
+idx);
++#endif
+             return 0;
+         }
+=20
 --=20
-2.19.1.3.g30247aa5d201
+2.21.0
 
 
