@@ -2,82 +2,110 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E92FC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 08:38:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5155C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 08:41:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E29EF214AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 08:38:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E29EF214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 92446218AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 08:41:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92446218AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAVTX-0006BR-63
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 04:38:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48417)
+	id 1iAVWx-00084d-NJ
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 04:41:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48856)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kevin.tian@intel.com>) id 1iAVSa-0005k1-UK
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 04:37:13 -0400
+ (envelope-from <amorenoz@redhat.com>) id 1iAVW2-0007fb-Dx
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 04:40:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kevin.tian@intel.com>) id 1iAVSZ-0006N6-4C
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 04:37:12 -0400
-Received: from mga06.intel.com ([134.134.136.31]:57429)
+ (envelope-from <amorenoz@redhat.com>) id 1iAVW1-0000I1-2I
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 04:40:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36088)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kevin.tian@intel.com>)
- id 1iAVSY-0006Js-TF
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 04:37:11 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 18 Sep 2019 01:37:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,520,1559545200"; d="scan'208";a="189201102"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
- by orsmga003.jf.intel.com with ESMTP; 18 Sep 2019 01:37:05 -0700
-Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 18 Sep 2019 01:37:05 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.32]) by
- SHSMSX105.ccr.corp.intel.com ([169.254.11.23]) with mapi id 14.03.0439.000;
- Wed, 18 Sep 2019 16:37:02 +0800
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Jason Wang <jasowang@redhat.com>
-Thread-Topic: [Qemu-devel] vhost, iova, and dirty page tracking
-Thread-Index: AdVsLg/AAnCsYtAES/qfxc77B9v7gf//8I+A//3tsaCAA8b/gP/+jHxggAK7doD//1RiwA==
-Date: Wed, 18 Sep 2019 08:37:02 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D57B90C@SHSMSX104.ccr.corp.intel.com>
-References: <AADFC41AFE54684AB9EE6CBC0274A5D19D577BEA@SHSMSX104.ccr.corp.intel.com>
- <60110ea3-9228-7e5d-ea32-05c72a95af0b@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D57A080@SHSMSX104.ccr.corp.intel.com>
- <8302a4ae-1914-3046-b3b5-b3234d7dda02@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D57B1D1@SHSMSX104.ccr.corp.intel.com>
- <6d73572e-1e89-b04a-bdd6-98ac73798083@redhat.com>
-In-Reply-To: <6d73572e-1e89-b04a-bdd6-98ac73798083@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNmY5YTczYWMtNDcyMy00MzBhLTkzODMtNGQxNzM4OTc4ZjNlIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiYnlwK3MyK3FYN3VtZk1VXC9hcTl5b2RIQjFRcTRic0JLanBlV0t1cnVoVlpMVnNLcEx1djFLVFEzZGFOS3ZraUoifQ==
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <amorenoz@redhat.com>) id 1iAVW0-0000Hi-Rc
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 04:40:45 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BD5FC3680A
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 08:40:43 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id j2so2097389wre.1
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 01:40:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=gwUNK0lxSCcFdPr+jcJr+0NEqsMVkwJIZW5RrLXRxuo=;
+ b=i0eNfKhpMH6PQCGDrbYi+dFxPOuYdQOYYZyU/GSjIz6dZuPA+xSIyLZuSVl0GgPuMi
+ dJLObRpq1/ytNLJd4yVbGJoolg1AreMk55lqLSGJqKaUWFbDauaHew2BGjcnwy1g/R65
+ 4aqhohtlm3tC4PV7M8k6h1P9Cc8+Rdo74gE3oqqKaiFB2y6AYHDNW1FfpO9pWlKrQUMQ
+ 7jvzASVzTLECiq4t96USwdfiCvYI+tBvwC4JP1+N9+q3U4WpxQ5nYoQRw9sJWRSmH1Yi
+ gE19uNGZvIFcxFr+1ZYf4HW4aoJL+nmf/XeEQv/PM7rSI6ylf7rYNLof3b+q3A+NxeC7
+ sVbA==
+X-Gm-Message-State: APjAAAVNmyQDEFu2oRAIRJ6OSsoRfM57Fzguufz2cKs2uN3jEd/Lm2x1
+ qtG+mSEf5VA8DSIAGRcdDBtu6wC1D2kWYLv5bAd1dHTdpGkuogZL9s7ICGqxT5TrYZdypFSUawV
+ 5BSRFHuG57MfrpU0=
+X-Received: by 2002:a5d:4590:: with SMTP id p16mr1965896wrq.82.1568796042487; 
+ Wed, 18 Sep 2019 01:40:42 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy4MYQazdYRQPwg8GHZW0Kxgy7O0jI06zvBfsdHGWnWXmJMNld4bTfp9cyTEOUkytmLXq1ttA==
+X-Received: by 2002:a5d:4590:: with SMTP id p16mr1965877wrq.82.1568796042225; 
+ Wed, 18 Sep 2019 01:40:42 -0700 (PDT)
+Received: from amorenoz.users.ipa.redhat.com ([81.0.4.169])
+ by smtp.gmail.com with ESMTPSA id t6sm2132812wmf.8.2019.09.18.01.40.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 18 Sep 2019 01:40:41 -0700 (PDT)
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20190917191901.28348-1-amorenoz@redhat.com>
+ <20190917173941-mutt-send-email-mst@kernel.org>
+From: Adrian Moreno <amorenoz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=amorenoz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBF1syNUBCADQ9dk3fDMxOZ/+OQpmbanpodYxEv8IRtDz8PXw8YX7UyGfozOpLjQ8Fftj
+ ZxuubYNbt2QVbSgviFilFdNWu2eTnN/JaGtfhmTOLPVoakkPHZF8lbgImMoch7L0fH8wN2IM
+ KPxQyPNlX+K9FD5brHsV1lfe1TwAxmhcvLW8yNrVq+9eDIDykxc7tH4exIqXgZroahGxMHKy
+ c8Ti2kJka/t6pDfRaY0J+6J7I1nrn6GXXSMNA45EH8+0N/QlcXhP3rfftnoPeVmpjswzvJqY
+ FNjf/Q5VPLx7RX0Qx+y8mMB2JcChV5Bl7D7x5EUbItj6+Sy7QfOgCtPegk9HSrBCNYaLABEB
+ AAG0I0FkcmlhbiBNb3Jlbm8gPGFtb3Jlbm96QHJlZGhhdC5jb20+iQFUBBMBCAA+FiEEogUD
+ gihhmbOPHy26d5C5fbYeFsUFAl1syNUCGwMFCQHhM4AFCwkIBwIGFQoJCAsCBBYCAwECHgEC
+ F4AACgkQd5C5fbYeFsX7qwgArGHSkX+ILNcujkVzjTG4OtkpJMPFlkn/1PxSEKD0jLuzx14B
+ COzpg/Mqj3Re/QBuOas+ci9bsUA0/2nORtmmEBvzDOJpR5FH1jaGCx8USlY4WM6QqEDNZgTw
+ hsy9KhjFzFjMk+oo3HyItXA+Uq9yrRBTjNBGTXxezMRcMuUZ4MIAfY0IRBglL2BufiuL43jD
+ BvTENNFLoQ/wFV7qkFWSkv+8IjTsxr7M6XUo1QLd29Hn0dvwssN579HL1+BP46i2REpzeBEG
+ L75iVChi+YnIQQNMJ9NYarVabZx4Y1Gn8+7B/1SNArDV+IDgnYgt7E58otoV2Ap310dmtuvE
+ VbxGpbkBDQRdbMjVAQgAqyp9oA7WDu7/Y9T4Ommt69iZx8os7shUIfdgPEy5xrcPn6qGwN1/
+ HQ4j8nWfBG9uuX1X0RXUZIUEtYTxtED4yaCQMTqDUf9cBAwAA2mYxBfoiNYx8YqxM+sT0/J4
+ 2qmDd+y+20UR4yzHE8AmIbspTzDFIJDAi+jKSR8F355z0sfW7CIMDC4ZWrPsskjEy1YN/U10
+ r6tRRH1kNyrCSbTG0d9MtcQO58h7DLXuzUhErB+BtG52A04t5cweIJTJC+koV5XPeilzlHnm
+ RFoj0ncruGa9Odns21BNt3cy9wLfK+aUnWuAB1uc6bJGQPiAwjkilz7g7MBRUuIQ2Zt7HGLc
+ SwARAQABiQE8BBgBCAAmFiEEogUDgihhmbOPHy26d5C5fbYeFsUFAl1syNUCGwwFCQHhM4AA
+ CgkQd5C5fbYeFsUlSwf8CH+u/IXaE7WeWxwFkMaORfW8cM4q0xrL3M6yRGuQNW+kMjnrvK9U
+ J9G+L1/5uTRbDQ/4LdoKqize8LjehA+iF6ba4t9Npikh8fLKWgaJfQ/hPhH4C3O5gWPOLTW6
+ ylGxiuER4CdFwQIoAMMslhFA7G+teeOKBq36E+1+zrybI6Xy1UBSlpDK9j4CtTnMQejjuSQb
+ Qhle+l8VroaUHq869wjAhRHHhqmtJKggI+OvzgQpDIwfHIDypb1BuKydi2W6cVYEALUYyCLS
+ dTBDhzj8zR5tPCsga8J7+TclQzkWOiI2C6ZtiWrMsL/Uym3uXk5nsoc7lSj7yLd/MrBRhYfP JQ==
+Message-ID: <a9cf2607-9384-ec12-e3d9-86b2aeb69660@redhat.com>
+Date: Wed, 18 Sep 2019 10:40:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.31
-Subject: Re: [Qemu-devel] vhost, iova, and dirty page tracking
+In-Reply-To: <20190917173941-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] vhost-user: save features if the char dev
+ is closed
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,28 +117,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: 'Alex Williamson' <alex.williamson@redhat.com>, "Zhao,
- Yan Y" <yan.y.zhao@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: ddstreet@canonical.com, Pei Zhang <pezhang@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiBGcm9tOiBKYXNvbiBXYW5nIFttYWlsdG86amFzb3dhbmdAcmVkaGF0LmNvbV0NCj4gU2VudDog
-V2VkbmVzZGF5LCBTZXB0ZW1iZXIgMTgsIDIwMTkgMjoxMCBQTQ0KPiANCj4gPj4NCj4gPj4gTm90
-ZSB0aGF0IHRoZSBIVkEgdG8gR1BBIG1hcHBpbmcgaXMgbm90IGFuIDE6MSBtYXBwaW5nLiBPbmUg
-SFZBDQo+IHJhbmdlDQo+ID4+IGNvdWxkIGJlIG1hcHBlZCB0byBzZXZlcmFsIEdQQSByYW5nZXMu
-DQo+ID4gVGhpcyBpcyBmaW5lLiBDdXJyZW50bHkgdmZpb19kbWEgbWFpbnRhaW5zIElPVkEtPkhW
-QSBtYXBwaW5nLg0KPiA+DQo+ID4gYnR3IHVuZGVyIHdoYXQgY29uZGl0aW9uIEhWQS0+R1BBIGlz
-IG5vdCAxOjEgbWFwcGluZz8gSSBkaWRuJ3QgcmVhbGl6ZSBpdC4NCj4gDQo+IA0KPiBJIGRvbid0
-IHJlbWVtYmVyIHRoZSBkZXRhaWxzIGUuZyBtZW1vcnkgcmVnaW9uIGFsaWFzPyBBbmQgbmVpdGhl
-ciBrdm0NCj4gbm9yIGt2bSBBUEkgZG9lcyBmb3JiaWQgdGhpcyBpZiBteSBtZW1vcnkgaXMgY29y
-cmVjdC4NCj4gDQoNCkkgY2hlY2tlZCBodHRwczovL3FlbXUud2VpbG5ldHouZGUvZG9jL2RldmVs
-L21lbW9yeS5odG1sLCB3aGljaA0KcHJvdmlkZXMgYW4gZXhhbXBsZSBvZiBhbGlhc2VkIGxheW91
-dC4gSG93ZXZlciwgaXRzIGFsaWFzaW5nIGlzIGFsbA0KMToxLCBpbnN0ZWFkIG9mIE46MS4gRnJv
-bSBndWVzdCBwLm8udiBldmVyeSB3cml0YWJsZSBHUEEgaW1wbGllcyBhbg0KdW5pcXVlIGxvY2F0
-aW9uLiBXaHkgd291bGQgd2UgaGl0IHRoZSBzaXR1YXRpb24gd2hlcmUgbXVsdGlwbGUNCndyaXRl
-LWFibGUgR1BBcyBhcmUgbWFwcGVkIHRvIHRoZSBzYW1lIEhWQSAoaS5lLiBzYW1lIHBoeXNpY2Fs
-DQptZW1vcnkgbG9jYXRpb24pPyBJcyBRZW11IGRvaW5nIGl0cyBvd24gc2FtZS1jb250ZW50IG1l
-bW9yeQ0KbWVyZ2luZyBpbiBHUEEgbGV2ZWwsIHNpbWlsYXIgdG8gS1NNPw0KDQpUaGFua3MNCktl
-dmluDQo=
+On 9/17/19 11:40 PM, Michael S. Tsirkin wrote:
+> On Tue, Sep 17, 2019 at 09:19:01PM +0200, Adrian Moreno wrote:
+>> That way the state can be correctly restored when the device is opened
+>> again. This might happen if the backend is restarted.
+>>
+>> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1738768
+>> Reported-by: Pei Zhang <pezhang@redhat.com>
+>> Fixes: 6ab79a20af3a (do not call vhost_net_cleanup() on running net fr=
+om char user event)
+>> Cc: ddstreet@canonical.com
+>> Cc: Michael S. Tsirkin <mst@redhat.com>
+>>
+>> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+>> ---
+>>  net/vhost-user.c | 7 +++++++
+>>  1 file changed, 7 insertions(+)
+>>
+>> diff --git a/net/vhost-user.c b/net/vhost-user.c
+>> index 51921de443..acf20cb9e0 100644
+>> --- a/net/vhost-user.c
+>> +++ b/net/vhost-user.c
+>> @@ -235,6 +235,13 @@ static void chr_closed_bh(void *opaque)
+>> =20
+>>      s =3D DO_UPCAST(NetVhostUserState, nc, ncs[0]);
+>> =20
+>> +    if (s->vhost_net) {
+>> +        uint64_t features =3D vhost_net_get_acked_features(s->vhost_n=
+et);
+>> +        if (features) {
+>> +            s->acked_features =3D features;
+>> +         }
+>=20
+> why does it make sense to check if (features)?
+> 0x0 is a valid feature bitmap, isn't it?
+You're right. It doesn't.
+I'll remove the check.
+
+>=20
+>> +    }
+>> +
+>>      qmp_set_link(name, false, &err);
+>> =20
+>>      qemu_chr_fe_set_handlers(&s->chr, NULL, NULL, net_vhost_user_even=
+t,
+>> --=20
+>> 2.21.0
+
+Thanks.
 
