@@ -2,59 +2,63 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD199C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 12:29:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 188D4C4CEC4
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 12:43:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A200B205F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 12:29:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A200B205F4
+	by mail.kernel.org (Postfix) with ESMTPS id E10B620665
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 12:43:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E10B620665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAZ5F-0000os-Q2
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 08:29:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53213)
+	id 1iAZIi-0000MZ-RS
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 08:43:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55687)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iAZ41-0000NJ-B6
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 08:28:06 -0400
+ (envelope-from <cohuck@redhat.com>) id 1iAZGd-0007Vo-T7
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 08:41:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iAZ3y-0007zE-U5
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 08:28:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50994)
+ (envelope-from <cohuck@redhat.com>) id 1iAZGa-0005br-Ab
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 08:41:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37761)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iAZ3y-0007yv-PB
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 08:28:02 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iAZGa-0005b1-39
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 08:41:04 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BFE4118CB903;
- Wed, 18 Sep 2019 12:28:01 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-247.brq.redhat.com [10.40.204.247])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 92B1B5D6C8;
- Wed, 18 Sep 2019 12:27:51 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 18 Sep 2019 14:27:48 +0200
-Message-Id: <20190918122748.2144-1-philmd@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 968E065F4B
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 12:41:02 +0000 (UTC)
+Received: from gondolin (dhcp-192-230.str.redhat.com [10.33.192.230])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8F4EBA222;
+ Wed, 18 Sep 2019 12:41:00 +0000 (UTC)
+Date: Wed, 18 Sep 2019 14:40:58 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Message-ID: <20190918144058.15151a60.cohuck@redhat.com>
+In-Reply-To: <20190917160057.11847-3-dgilbert@redhat.com>
+References: <20190917160057.11847-1-dgilbert@redhat.com>
+ <20190917160057.11847-3-dgilbert@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Wed, 18 Sep 2019 12:28:02 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Wed, 18 Sep 2019 12:41:02 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] BootLinuxSshTest: Only run the tests when
- explicitly requested
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] virtio: add vhost-user-fs base
+ device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,89 +70,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: vgoyal@redhat.com, mszeredi@redhat.com, qemu-devel@nongnu.org,
+ stefanha@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently the Avocado framework does not distinct the time spent
-downloading assets vs. the time spent running a test. With big
-assets (like a full VM image) the tests likely fail.
+On Tue, 17 Sep 2019 17:00:56 +0100
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
 
-This is a limitation known by the Avocado team.
-Until this issue get fixed, do not run this tests automatically.
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> The virtio-fs virtio device provides shared file system access using
+> the FUSE protocol carried over virtio.
+> The actual file server is implemented in an external vhost-user-fs device
+> backend process.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  configure                         |  13 ++
+>  hw/virtio/Makefile.objs           |   1 +
+>  hw/virtio/vhost-user-fs.c         | 299 ++++++++++++++++++++++++++++++
+>  include/hw/virtio/vhost-user-fs.h |  45 +++++
+>  4 files changed, 358 insertions(+)
+>  create mode 100644 hw/virtio/vhost-user-fs.c
+>  create mode 100644 include/hw/virtio/vhost-user-fs.h
 
-Tests can still be run setting the AVOCADO_TIMEOUT_EXPECTED
-environment variable.
-
-Reported-by: Gerd Hoffmann <kraxel@redhat.com>
-Reported-by: David Gibson <david@gibson.dropbear.id.au>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- tests/acceptance/linux_ssh_mips_malta.py | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptance/=
-linux_ssh_mips_malta.py
-index 134f10cac3..7200507a3a 100644
---- a/tests/acceptance/linux_ssh_mips_malta.py
-+++ b/tests/acceptance/linux_ssh_mips_malta.py
-@@ -12,7 +12,7 @@ import logging
- import paramiko
- import time
-=20
--from avocado import skipIf
-+from avocado import skipUnless
- from avocado_qemu import Test
- from avocado.utils import process
- from avocado.utils import archive
-@@ -171,7 +171,7 @@ class LinuxSSH(Test):
-         self.run_common_commands()
-         self.shutdown_via_ssh()
-=20
--    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
-+    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might timeo=
-ut')
-     def test_mips_malta32eb_kernel3_2_0(self):
-         """
-         :avocado: tags=3Darch:mips
-@@ -186,7 +186,7 @@ class LinuxSSH(Test):
-=20
-         self.check_mips_malta('be', kernel_path, 'mips')
-=20
--    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
-+    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might timeo=
-ut')
-     def test_mips_malta32el_kernel3_2_0(self):
-         """
-         :avocado: tags=3Darch:mipsel
-@@ -201,7 +201,7 @@ class LinuxSSH(Test):
-=20
-         self.check_mips_malta('le', kernel_path, 'mips')
-=20
--    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
-+    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might timeo=
-ut')
-     def test_mips_malta64eb_kernel3_2_0(self):
-         """
-         :avocado: tags=3Darch:mips64
-@@ -215,7 +215,7 @@ class LinuxSSH(Test):
-         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-         self.check_mips_malta('be', kernel_path, 'mips64')
-=20
--    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
-+    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might timeo=
-ut')
-     def test_mips_malta64el_kernel3_2_0(self):
-         """
-         :avocado: tags=3Darch:mips64el
---=20
-2.20.1
-
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
