@@ -6,45 +6,49 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7D6DC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 20:25:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACCB7C4CEC4
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 20:33:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB0E221925
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 20:25:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB0E221925
+	by mail.kernel.org (Postfix) with ESMTPS id 6C76E21897
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 20:33:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C76E21897
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAgVo-0001h8-M6
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 16:25:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41292)
+	id 1iAgdc-0005Fx-Du
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 16:33:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42635)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iAgUi-00010k-Mo
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 16:24:10 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iAgbV-0004Eu-Ry
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 16:31:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iAgUg-0003Pq-6R
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 16:24:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57844)
+ (envelope-from <jsnow@redhat.com>) id 1iAgbU-0005mw-Co
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 16:31:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55484)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iAgUd-0003OK-2i; Wed, 18 Sep 2019 16:24:03 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1iAgbQ-0005lu-NT; Wed, 18 Sep 2019 16:31:04 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 585BC317529C;
- Wed, 18 Sep 2019 20:24:02 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0732588134F;
+ Wed, 18 Sep 2019 20:31:04 +0000 (UTC)
 Received: from [10.10.124.73] (ovpn-124-73.rdu2.redhat.com [10.10.124.73])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6A70060872;
- Wed, 18 Sep 2019 20:24:01 +0000 (UTC)
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20190913133627.28450-1-mlevitsk@redhat.com>
- <20190913133627.28450-3-mlevitsk@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D06E510013A1;
+ Wed, 18 Sep 2019 20:31:02 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+References: <20190809201333.29033-1-jsnow@redhat.com>
+ <b85698e6-cd79-a9c5-554c-c92487060280@virtuozzo.com>
+ <154bc276-d782-443f-3db6-38d87992d609@redhat.com>
+ <20190910081942.GA23976@stefanha-x1.localdomain>
+ <9bf835d7-8bfa-feba-c2f7-acd6cda4a81e@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
  IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
@@ -119,21 +123,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <43af6ea3-9b08-d605-ea58-26f8023cc9ee@redhat.com>
-Date: Wed, 18 Sep 2019 16:24:01 -0400
+Message-ID: <0abc4992-9322-010a-118b-62e79cbc5b58@redhat.com>
+Date: Wed, 18 Sep 2019 16:31:02 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190913133627.28450-3-mlevitsk@redhat.com>
+In-Reply-To: <9bf835d7-8bfa-feba-c2f7-acd6cda4a81e@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Wed, 18 Sep 2019 20:24:02 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Wed, 18 Sep 2019 20:31:04 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] block/nvme: add support for discard
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/backup: install
+ notifier during creation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -145,168 +150,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/13/19 9:36 AM, Maxim Levitsky wrote:
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-Same comments as 1/2; but not worth holding anything up. We'll find out
-from users if there are problems, but I wish we had a nicer way to test i=
+On 9/10/19 9:23 AM, John Snow wrote:
+>=20
+>=20
+> On 9/10/19 4:19 AM, Stefan Hajnoczi wrote:
+>> On Wed, Aug 21, 2019 at 04:01:52PM -0400, John Snow wrote:
+>>>
+>>>
+>>> On 8/21/19 10:41 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 09.08.2019 23:13, John Snow wrote:
+>>>>> Backup jobs may yield prior to installing their handler, because of=
+ the
+>>>>> job_co_entry shim which guarantees that a job won't begin work unti=
+l
+>>>>> we are ready to start an entire transaction.
+>>>>>
+>>>>> Unfortunately, this makes proving correctness about transactional
+>>>>> points-in-time for backup hard to reason about. Make it explicitly =
+clear
+>>>>> by moving the handler registration to creation time, and changing t=
+he
+>>>>> write notifier to a no-op until the job is started.
+>>>>>
+>>>>> Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+>
+>>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>>> ---
+>>>>>   block/backup.c     | 32 +++++++++++++++++++++++---------
+>>>>>   include/qemu/job.h |  5 +++++
+>>>>>   job.c              |  2 +-
+>>>>>   3 files changed, 29 insertions(+), 10 deletions(-)
+>>>>>
+>>>>> diff --git a/block/backup.c b/block/backup.c
+>>>>> index 07d751aea4..4df5b95415 100644
+>>>>> --- a/block/backup.c
+>>>>> +++ b/block/backup.c
+>>>>> @@ -344,6 +344,13 @@ static int coroutine_fn backup_before_write_no=
+tify(
+>>>>>       assert(QEMU_IS_ALIGNED(req->offset, BDRV_SECTOR_SIZE));
+>>>>>       assert(QEMU_IS_ALIGNED(req->bytes, BDRV_SECTOR_SIZE));
+>>>>>  =20
+>>>>> +    /* The handler is installed at creation time; the actual point=
+-in-time
+>>>>> +     * starts at job_start(). Transactions guarantee those two poi=
+nts are
+>>>>> +     * the same point in time. */
+>>>>> +    if (!job_started(&job->common.job)) {
+>>>>> +        return 0;
+>>>>> +    }
+>>>>
+>>>> Hmm, sorry if it is a stupid question, I'm not good in multiprocessi=
+ng and in
+>>>> Qemu iothreads..
+>>>>
+>>>> job_started just reads job->co. If bs runs in iothread, and therefor=
+e write-notifier
+>>>> is in iothread, when job_start is called from main thread.. Is it gu=
+aranteed that
+>>>> write-notifier will see job->co variable change early enough to not =
+miss guest write?
+>>>> Should not job->co be volatile for example or something like this?
+>>>>
+>>>> If not think about this patch looks good for me.
+>>>>
+>>>
+>>> You know, it's a really good question.
+>>> So good, in fact, that I have no idea.
+>>>
+>>> =C2=AF\_(=E3=83=84)_/=C2=AF
+>>>
+>>> I'm fairly certain that IO will not come in until the .clean phase of=
+ a
+>>> qmp_transaction, because bdrv_drained_begin(bs) is called during
+>>> .prepare, and we activate the handler (by starting the job) in .commi=
 t.
-
-Reviewed-by: John Snow <jsnow@redhat.com>
-
-> ---
->  block/nvme.c       | 83 ++++++++++++++++++++++++++++++++++++++++++++++
->  block/trace-events |  2 ++
->  2 files changed, 85 insertions(+)
+>>> We do not end the drained section until .clean.
+>>>
+>>> I'm not fully clear on what threading guarantees we have otherwise,
+>>> though; is it possible that "Thread A" would somehow lift the bdrv_dr=
+ain
+>>> on an IO thread ("Thread B") and, after that, "Thread B" would someho=
+w
+>>> still be able to see an outdated version of job->co that was set by
+>>> "Thread A"?
+>>>
+>>> I doubt it; but I can't prove it.
+>>
+>> In the qmp_backup() case (not qmp_transaction()) there is:
+>>
+>>   void qmp_drive_backup(DriveBackup *arg, Error **errp)
+>>   {
+>>
+>>       BlockJob *job;
+>>       job =3D do_drive_backup(arg, NULL, errp);
+>>       if (job) {
+>>           job_start(&job->job);
+>>       }
+>>   }
+>>
+>> job_start() is called without any thread synchronization, which is
+>> usually fine because the coroutine doesn't run until job_start() calls
+>> aio_co_enter().
+>>
+>> Now that the before write notifier has been installed early, there is
+>> indeed a race between job_start() and the write notifier accessing
+>> job->co from an IOThread.
+>>
+>> The write before notifier might see job->co !=3D NULL before job_start=
+()
+>> has finished.  This could lead to issues if job_*() APIs are invoked b=
+y
+>> the write notifier and access an in-between job state.
+>>
 >=20
-> diff --git a/block/nvme.c b/block/nvme.c
-> index d95265fae4..c17edd6aae 100644
-> --- a/block/nvme.c
-> +++ b/block/nvme.c
-> @@ -112,6 +112,7 @@ typedef struct {
->      bool plugged;
-> =20
->      bool supports_write_zeroes;
-> +    bool supports_discard;
-> =20
->      CoMutex dma_map_lock;
->      CoQueue dma_flush_queue;
-> @@ -463,6 +464,7 @@ static void nvme_identify(BlockDriverState *bs, int=
- namespace, Error **errp)
-> =20
->      oncs =3D le16_to_cpu(idctrl->oncs);
->      s->supports_write_zeroes =3D !!(oncs & NVME_ONCS_WRITE_ZEROS);
-> +    s->supports_discard =3D !!(oncs & NVME_ONCS_DSM);
-> =20
->      memset(resp, 0, 4096);
-> =20
-> @@ -1153,6 +1155,86 @@ static coroutine_fn int nvme_co_pwrite_zeroes(Bl=
-ockDriverState *bs,
->  }
-> =20
-> =20
-> +static int coroutine_fn nvme_co_pdiscard(BlockDriverState *bs,
-> +                                         int64_t offset,
-> +                                         int bytes)
-> +{
-> +    BDRVNVMeState *s =3D bs->opaque;
-> +    NVMeQueuePair *ioq =3D s->queues[1];
-> +    NVMeRequest *req;
-> +    NvmeDsmRange *buf;
-> +    QEMUIOVector local_qiov;
-> +    int ret;
-> +
-> +    NvmeCmd cmd =3D {
-> +        .opcode =3D NVME_CMD_DSM,
-> +        .nsid =3D cpu_to_le32(s->nsid),
-> +        .cdw10 =3D cpu_to_le32(0), /*number of ranges - 0 based*/
-> +        .cdw11 =3D cpu_to_le32(1 << 2), /*deallocate bit*/
-> +    };
-> +
-> +    NVMeCoData data =3D {
-> +        .ctx =3D bdrv_get_aio_context(bs),
-> +        .ret =3D -EINPROGRESS,
-> +    };
-> +
-> +    if (!s->supports_discard) {
-> +        return -ENOTSUP;
-> +    }
-> +
-> +    assert(s->nr_queues > 1);
-> +
-> +    buf =3D qemu_try_blockalign0(bs, s->page_size);
-> +    if (!buf) {
-> +        return -ENOMEM;
-> +    }
-> +
-> +    buf->nlb =3D cpu_to_le32(bytes >> s->blkshift);
-> +    buf->slba =3D cpu_to_le64(offset >> s->blkshift);
-> +    buf->cattr =3D 0;
-> +
-> +    qemu_iovec_init(&local_qiov, 1);
-> +    qemu_iovec_add(&local_qiov, buf, 4096);
-> +
-> +    req =3D nvme_get_free_req(ioq);
-> +    assert(req);
-> +
-> +    qemu_co_mutex_lock(&s->dma_map_lock);
-> +    ret =3D nvme_cmd_map_qiov(bs, &cmd, req, &local_qiov);
-> +    qemu_co_mutex_unlock(&s->dma_map_lock);
-> +
-> +    if (ret) {
-> +        req->busy =3D false;
-> +        goto out;
-> +    }
-> +
-> +    trace_nvme_dsm(s, offset, bytes);
-> +
-> +    nvme_submit_command(s, ioq, req, &cmd, nvme_rw_cb, &data);
-> +
-> +    data.co =3D qemu_coroutine_self();
-> +    while (data.ret =3D=3D -EINPROGRESS) {
-> +        qemu_coroutine_yield();
-> +    }
-> +
-> +    qemu_co_mutex_lock(&s->dma_map_lock);
-> +    ret =3D nvme_cmd_unmap_qiov(bs, &local_qiov);
-> +    qemu_co_mutex_unlock(&s->dma_map_lock);
-> +
-> +    if (ret) {
-> +        goto out;
-> +    }
-> +
-> +    ret =3D data.ret;
-> +    trace_nvme_dsm_done(s, offset, bytes, ret);
-> +out:
-> +    qemu_iovec_destroy(&local_qiov);
-> +    qemu_vfree(buf);
-> +    return ret;
-> +
-> +}
-> +
-> +
->  static int nvme_reopen_prepare(BDRVReopenState *reopen_state,
->                                 BlockReopenQueue *queue, Error **errp)
->  {
-> @@ -1259,6 +1341,7 @@ static BlockDriver bdrv_nvme =3D {
->      .bdrv_co_pwritev          =3D nvme_co_pwritev,
-> =20
->      .bdrv_co_pwrite_zeroes    =3D nvme_co_pwrite_zeroes,
-> +    .bdrv_co_pdiscard         =3D nvme_co_pdiscard,
-> =20
->      .bdrv_co_flush_to_disk    =3D nvme_co_flush,
->      .bdrv_reopen_prepare      =3D nvme_reopen_prepare,
-> diff --git a/block/trace-events b/block/trace-events
-> index 651aa461d5..c61553b4b8 100644
-> --- a/block/trace-events
-> +++ b/block/trace-events
-> @@ -153,6 +153,8 @@ nvme_write_zeroes(void *s, uint64_t offset, uint64_=
-t bytes, int flags) "s %p off
->  nvme_qiov_unaligned(const void *qiov, int n, void *base, size_t size, =
-int align) "qiov %p n %d base %p size 0x%zx align 0x%x"
->  nvme_prw_buffered(void *s, uint64_t offset, uint64_t bytes, int niov, =
-int is_write) "s %p offset %"PRId64" bytes %"PRId64" niov %d is_write %d"
->  nvme_rw_done(void *s, int is_write, uint64_t offset, uint64_t bytes, i=
-nt ret) "s %p is_write %d offset %"PRId64" bytes %"PRId64" ret %d"
-> +nvme_dsm(void *s, uint64_t offset, uint64_t bytes) "s %p offset %"PRId=
-64" bytes %"PRId64""
-> +nvme_dsm_done(void *s, uint64_t offset, uint64_t bytes, int ret) "s %p=
- offset %"PRId64" bytes %"PRId64" ret %d"
->  nvme_dma_map_flush(void *s) "s %p"
->  nvme_free_req_queue_wait(void *q) "q %p"
->  nvme_cmd_map_qiov(void *s, void *cmd, void *req, void *qiov, int entri=
-es) "s %p cmd %p req %p qiov %p entries %d"
+> I see. I think in this case, as long as it sees !=3D NULL, that the
+> notifier is actually safe to run. I agree that this might be confusing
+> to verify and could bite us in the future. The worry we had, too, is
+> more the opposite: will it see NULL for too long? We want to make sure
+> that it is registering as true *before the first yield*.
+>=20
+>> A safer approach is to set a BackupBlockJob variable at the beginning =
+of
+>> backup_run() and check it from the before write notifier.
+>>
+>=20
+> That's too late, for reasons below.
+>=20
+>> That said, I don't understand the benefit of this patch and IMO it mak=
+es
+>> the code harder to understand because now we need to think about the
+>> created but not started state too.
+>>
+>> Stefan
+>>
+>=20
+> It's always possible I've hyped myself up into believing there's a
+> problem where there isn't one, but the fear is this:
+>=20
+> The point in time from a QMP transaction covers the job creation and th=
+e
+> job start, but when we start the job it will actually yield before we
+> get to backup_run -- and there is no guarantee that the handler will ge=
+t
+> installed synchronously, so the point in time ends before the handler
+> activates.
 >=20
 
---=20
-=E2=80=94js
+i.e., the handler might get installed AFTER the critical region of a
+transaction. We could drop initial writes if we were unlucky.
+
+(I think.)
+
+> The yield occurs in job_co_entry as an intentional feature of forcing a
+> yield and pause point at run time -- so it's harder to write a job that
+> accidentally hogs the thread during initialization.
+>=20
+> This is an attempt to get the handler installed earlier to ensure the
+> point of time stays synchronized with creation time to provide a
+> stronger transactional guarantee.
+>=20
+
+Squeaky wheel gets the grease. Any comment?
 
