@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF289C4CECE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 16:18:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79A44C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 16:20:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98F18218AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 16:18:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98F18218AF
+	by mail.kernel.org (Postfix) with ESMTPS id A72EF218AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 16:20:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A72EF218AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAcem-0006EP-FA
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 12:18:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50408)
+	id 1iAcgX-0008HB-28
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 12:20:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50253)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iAbtz-0000UR-BY
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:29:56 -0400
+ (envelope-from <david@redhat.com>) id 1iAbtj-0000Ay-9K
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:29:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iAbty-0007oM-1d
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:29:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44324)
+ (envelope-from <david@redhat.com>) id 1iAbth-0007bz-TX
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:29:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44294)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iAbtx-0007nF-SW; Wed, 18 Sep 2019 11:29:53 -0400
+ id 1iAbth-0007bB-O2; Wed, 18 Sep 2019 11:29:37 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 06717A3D397;
- Wed, 18 Sep 2019 15:29:52 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1282F8980EF;
+ Wed, 18 Sep 2019 15:29:37 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-117-119.ams2.redhat.com [10.36.117.119])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 095DF5D6A5;
- Wed, 18 Sep 2019 15:29:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 80D535D6B2;
+ Wed, 18 Sep 2019 15:29:35 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 18 Sep 2019 17:29:00 +0200
-Message-Id: <20190918152922.18949-8-david@redhat.com>
+Date: Wed, 18 Sep 2019 17:28:56 +0200
+Message-Id: <20190918152922.18949-4-david@redhat.com>
 In-Reply-To: <20190918152922.18949-1-david@redhat.com>
 References: <20190918152922.18949-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Wed, 18 Sep 2019 15:29:52 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.67]); Wed, 18 Sep 2019 15:29:37 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 07/29] s390x/tcg: MVPG: Check
- for specification exceptions
+Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 03/29] s390x/tcg: MVCL: Detect
+ destructive overlaps
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,35 +75,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Perform the checks documented in the PoP.
+We'll have to zero-out unused bit positions, so make sure to write the
+addresses back.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/mem_helper.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ target/s390x/mem_helper.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index c31cf49593..7dfa848744 100644
+index b02ad148e5..223312a4b1 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -672,6 +672,13 @@ uint64_t HELPER(clst)(CPUS390XState *env, uint64_t c=
-, uint64_t s1, uint64_t s2)
- /* move page */
- uint32_t HELPER(mvpg)(CPUS390XState *env, uint64_t r0, uint64_t r1, uint=
-64_t r2)
- {
-+    const bool f =3D extract64(r0, 11, 1);
-+    const bool s =3D extract64(r0, 10, 1);
-+
-+    if ((f && s) || extract64(r0, 12, 4)) {
-+        s390_program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO, GETPC(=
-));
+@@ -52,6 +52,19 @@ static inline bool psw_key_valid(CPUS390XState *env, u=
+int8_t psw_key)
+     return true;
+ }
+=20
++static bool is_destructive_overlap(CPUS390XState *env, uint64_t dest,
++                                   uint64_t src, uint32_t len)
++{
++    if (!len || src =3D=3D dest) {
++        return false;
 +    }
++    /* Take care of wrapping at the end of address space. */
++    if (unlikely(wrap_address(env, src + len - 1) < src)) {
++        return dest > src || dest <=3D wrap_address(env, src + len - 1);
++    }
++    return dest > src && dest <=3D src + len - 1;
++}
 +
-     /* ??? missing r0 handling, which includes access keys, but more
-        importantly optional suppression of the exception!  */
-     fast_memmove(env, r1, r2, TARGET_PAGE_SIZE, GETPC());
+ /* Reduce the length so that addr + len doesn't cross a page boundary.  =
+*/
+ static inline uint32_t adj_len_to_page(uint32_t len, uint64_t addr)
+ {
+@@ -787,7 +800,11 @@ uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t r=
+1, uint32_t r2)
+     uint8_t pad =3D env->regs[r2 + 1] >> 24;
+     uint32_t cc;
+=20
+-    cc =3D do_mvcl(env, &dest, &destlen, &src, &srclen, pad, 1, ra);
++    if (is_destructive_overlap(env, dest, src, MIN(srclen, destlen))) {
++        cc =3D 3;
++    } else {
++        cc =3D do_mvcl(env, &dest, &destlen, &src, &srclen, pad, 1, ra);
++    }
+=20
+     env->regs[r1 + 1] =3D deposit64(env->regs[r1 + 1], 0, 24, destlen);
+     env->regs[r2 + 1] =3D deposit64(env->regs[r2 + 1], 0, 24, srclen);
 --=20
 2.21.0
 
