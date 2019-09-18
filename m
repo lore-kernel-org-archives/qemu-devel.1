@@ -6,57 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D4F7C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 13:31:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78945C4CECE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 13:33:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3F8420856
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 13:31:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3F8420856
+	by mail.kernel.org (Postfix) with ESMTPS id 5221820856
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 13:33:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5221820856
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAa3J-0000zH-Mk
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 09:31:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60476)
+	id 1iAa5W-0002Bk-6m
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 09:33:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60457)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iAZtu-0008O9-El
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 09:21:43 -0400
+ (envelope-from <stefanha@redhat.com>) id 1iAZts-0008Lg-EZ
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 09:21:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iAZtt-0002bz-7f
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 09:21:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:5854)
+ (envelope-from <stefanha@redhat.com>) id 1iAZtm-0002Xi-T9
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 09:21:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36681)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <stefanha@redhat.com>)
- id 1iAZtq-0002aL-0l; Wed, 18 Sep 2019 09:21:38 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1iAZtg-0002UB-Um; Wed, 18 Sep 2019 09:21:30 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4B60610CC203;
- Wed, 18 Sep 2019 13:21:37 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3A1ADA3D3A3;
+ Wed, 18 Sep 2019 13:21:27 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9260A5D6A5;
- Wed, 18 Sep 2019 13:21:28 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7B19A600C8;
+ Wed, 18 Sep 2019 13:21:24 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 18 Sep 2019 14:21:12 +0100
-Message-Id: <20190918132112.10418-4-stefanha@redhat.com>
+Date: Wed, 18 Sep 2019 14:21:11 +0100
+Message-Id: <20190918132112.10418-3-stefanha@redhat.com>
 In-Reply-To: <20190918132112.10418-1-stefanha@redhat.com>
 References: <20190918132112.10418-1-stefanha@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Wed, 18 Sep 2019 13:21:37 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.68]); Wed, 18 Sep 2019 13:21:27 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 3/3] trace: Forbid event format ending with
- newline character
+Subject: [Qemu-devel] [PULL 2/3] trace: Remove trailing newline in events
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,71 +79,153 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Event format ending with newlines confuse the trace reports.
-Forbid them.
+While the tracing framework does not forbid trailing newline in
+events format string, using them lead to confuse output.
+It is the responsibility of the backend to properly end an event
+line.
 
-Add a check to refuse new format added with trailing newline:
+Some of our formats have trailing newlines, remove them.
 
-  $ make
-  [...]
-    GEN     hw/misc/trace.h
-  Traceback (most recent call last):
-    File "scripts/tracetool.py", line 152, in <module>
-      main(sys.argv)
-    File "scripts/tracetool.py", line 143, in main
-      events.extend(tracetool.read_events(fh, arg))
-    File "scripts/tracetool/__init__.py", line 367, in read_events
-      event =3D Event.build(line)
-    File "scripts/tracetool/__init__.py", line 281, in build
-      raise ValueError("Event format can not end with a newline character=
-")
-  ValueError: Error at hw/misc/trace-events:121: Event format can not end=
- with a newline character
+[Fixed typo in commit description reported by Eric Blake
+<eblake@redhat.com>
+--Stefan]
 
 Reviewed-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-id: 20190916095121.29506-3-philmd@redhat.com
-Message-Id: <20190916095121.29506-3-philmd@redhat.com>
+Message-id: 20190916095121.29506-2-philmd@redhat.com
+Message-Id: <20190916095121.29506-2-philmd@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- docs/devel/tracing.txt        | 2 ++
- scripts/tracetool/__init__.py | 3 +++
- 2 files changed, 5 insertions(+)
+ hw/misc/trace-events | 10 +++++-----
+ hw/scsi/trace-events |  2 +-
+ hw/sd/trace-events   |  2 +-
+ nbd/trace-events     |  4 ++--
+ net/trace-events     |  6 +++---
+ 5 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/docs/devel/tracing.txt b/docs/devel/tracing.txt
-index 76e492a489..8231bbf5d1 100644
---- a/docs/devel/tracing.txt
-+++ b/docs/devel/tracing.txt
-@@ -112,6 +112,8 @@ Trace events should use types as follows:
- Format strings should reflect the types defined in the trace event.  Tak=
-e
- special care to use PRId64 and PRIu64 for int64_t and uint64_t types,
- respectively.  This ensures portability between 32- and 64-bit platforms=
-.
-+Format strings must not end with a newline character.  It is the respons=
-ibility
-+of backends to adapt line ending for proper logging.
+diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+index c1ea1aa437..74276225f8 100644
+--- a/hw/misc/trace-events
++++ b/hw/misc/trace-events
+@@ -118,11 +118,11 @@ iotkit_secctl_ns_read(uint32_t offset, uint64_t dat=
+a, unsigned size) "IoTKit Sec
+ iotkit_secctl_ns_write(uint32_t offset, uint64_t data, unsigned size) "I=
+oTKit SecCtl NS regs write: offset 0x%x data 0x%" PRIx64 " size %u"
 =20
- Each event declaration will start with the event name, then its argument=
-s,
- finally a format string for pretty-printing. For example:
-diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.p=
-y
-index 6fca674936..04279fa62e 100644
---- a/scripts/tracetool/__init__.py
-+++ b/scripts/tracetool/__init__.py
-@@ -277,6 +277,9 @@ class Event(object):
-         if fmt.find("%m") !=3D -1 or fmt_trans.find("%m") !=3D -1:
-             raise ValueError("Event format '%m' is forbidden, pass the e=
-rror "
-                              "as an explicit trace argument")
-+        if fmt.endswith(r'\n"'):
-+            raise ValueError("Event format must not end with a newline "
-+                             "character")
+ # imx6ul_ccm.c
+-ccm_entry(void) "\n"
+-ccm_freq(uint32_t freq) "freq =3D %d\n"
+-ccm_clock_freq(uint32_t clock, uint32_t freq) "(Clock =3D %d) =3D %d\n"
+-ccm_read_reg(const char *reg_name, uint32_t value) "reg[%s] <=3D 0x%" PR=
+Ix32 "\n"
+-ccm_write_reg(const char *reg_name, uint32_t value) "reg[%s] =3D> 0x%" P=
+RIx32 "\n"
++ccm_entry(void) ""
++ccm_freq(uint32_t freq) "freq =3D %d"
++ccm_clock_freq(uint32_t clock, uint32_t freq) "(Clock =3D %d) =3D %d"
++ccm_read_reg(const char *reg_name, uint32_t value) "reg[%s] <=3D 0x%" PR=
+Ix32
++ccm_write_reg(const char *reg_name, uint32_t value) "reg[%s] =3D> 0x%" P=
+RIx32
 =20
-         if len(fmt_trans) > 0:
-             fmt =3D [fmt_trans, fmt]
+ # iotkit-sysinfo.c
+ iotkit_sysinfo_read(uint64_t offset, uint64_t data, unsigned size) "IoTK=
+it SysInfo read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+diff --git a/hw/scsi/trace-events b/hw/scsi/trace-events
+index 452b5994e6..b0820052f8 100644
+--- a/hw/scsi/trace-events
++++ b/hw/scsi/trace-events
+@@ -28,7 +28,7 @@ mptsas_mmio_read(void *dev, uint32_t addr, uint32_t val=
+) "dev %p addr 0x%08x val
+ mptsas_mmio_unhandled_read(void *dev, uint32_t addr) "dev %p addr 0x%08x=
+"
+ mptsas_mmio_unhandled_write(void *dev, uint32_t addr, uint32_t val) "dev=
+ %p addr 0x%08x value 0x%x"
+ mptsas_mmio_write(void *dev, uint32_t addr, uint32_t val) "dev %p addr 0=
+x%08x value 0x%x"
+-mptsas_process_message(void *dev, int msg, uint32_t ctx) "dev %p cmd %d =
+context 0x%08x\n"
++mptsas_process_message(void *dev, int msg, uint32_t ctx) "dev %p cmd %d =
+context 0x%08x"
+ mptsas_process_scsi_io_request(void *dev, int bus, int target, int lun, =
+uint64_t len) "dev %p dev %d:%d:%d length %"PRIu64""
+ mptsas_reset(void *dev) "dev %p "
+ mptsas_scsi_overflow(void *dev, uint32_t ctx, uint64_t req, uint64_t fou=
+nd) "dev %p context 0x%08x: %"PRIu64"/%"PRIu64""
+diff --git a/hw/sd/trace-events b/hw/sd/trace-events
+index 52971dc033..efcff666a2 100644
+--- a/hw/sd/trace-events
++++ b/hw/sd/trace-events
+@@ -4,7 +4,7 @@
+ bcm2835_sdhost_read(uint64_t offset, uint64_t data, unsigned size) "offs=
+et 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+ bcm2835_sdhost_write(uint64_t offset, uint64_t data, unsigned size) "off=
+set 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+ bcm2835_sdhost_edm_change(const char *why, uint32_t edm) "(%s) EDM now 0=
+x%x"
+-bcm2835_sdhost_update_irq(uint32_t irq) "IRQ bits 0x%x\n"
++bcm2835_sdhost_update_irq(uint32_t irq) "IRQ bits 0x%x"
+=20
+ # core.c
+ sdbus_command(const char *bus_name, uint8_t cmd, uint32_t arg) "@%s CMD%=
+02d arg 0x%08x"
+diff --git a/nbd/trace-events b/nbd/trace-events
+index f6cde96790..a955918e97 100644
+--- a/nbd/trace-events
++++ b/nbd/trace-events
+@@ -61,8 +61,8 @@ nbd_negotiate_begin(void) "Beginning negotiation"
+ nbd_negotiate_new_style_size_flags(uint64_t size, unsigned flags) "adver=
+tising size %" PRIu64 " and flags 0x%x"
+ nbd_negotiate_success(void) "Negotiation succeeded"
+ nbd_receive_request(uint32_t magic, uint16_t flags, uint16_t type, uint6=
+4_t from, uint32_t len) "Got request: { magic =3D 0x%" PRIx32 ", .flags =3D=
+ 0x%" PRIx16 ", .type =3D 0x%" PRIx16 ", from =3D %" PRIu64 ", len =3D %"=
+ PRIu32 " }"
+-nbd_blk_aio_attached(const char *name, void *ctx) "Export %s: Attaching =
+clients to AIO context %p\n"
+-nbd_blk_aio_detach(const char *name, void *ctx) "Export %s: Detaching cl=
+ients from AIO context %p\n"
++nbd_blk_aio_attached(const char *name, void *ctx) "Export %s: Attaching =
+clients to AIO context %p"
++nbd_blk_aio_detach(const char *name, void *ctx) "Export %s: Detaching cl=
+ients from AIO context %p"
+ nbd_co_send_simple_reply(uint64_t handle, uint32_t error, const char *er=
+rname, int len) "Send simple reply: handle =3D %" PRIu64 ", error =3D %" =
+PRIu32 " (%s), len =3D %d"
+ nbd_co_send_structured_done(uint64_t handle) "Send structured reply done=
+: handle =3D %" PRIu64
+ nbd_co_send_structured_read(uint64_t handle, uint64_t offset, void *data=
+, size_t size) "Send structured read data reply: handle =3D %" PRIu64 ", =
+offset =3D %" PRIu64 ", data =3D %p, len =3D %zu"
+diff --git a/net/trace-events b/net/trace-events
+index ac57056497..02c13fd0ba 100644
+--- a/net/trace-events
++++ b/net/trace-events
+@@ -17,9 +17,9 @@ colo_compare_icmp_miscompare(const char *sta, int size)=
+ ": %s =3D %d"
+ colo_compare_ip_info(int psize, const char *sta, const char *stb, int ss=
+ize, const char *stc, const char *std) "ppkt size =3D %d, ip_src =3D %s, =
+ip_dst =3D %s, spkt size =3D %d, ip_src =3D %s, ip_dst =3D %s"
+ colo_old_packet_check_found(int64_t old_time) "%" PRId64
+ colo_compare_miscompare(void) ""
+-colo_compare_tcp_info(const char *pkt, uint32_t seq, uint32_t ack, int h=
+dlen, int pdlen, int offset, int flags) "%s: seq/ack=3D %u/%u hdlen=3D %d=
+ pdlen=3D %d offset=3D %d flags=3D%d\n"
++colo_compare_tcp_info(const char *pkt, uint32_t seq, uint32_t ack, int h=
+dlen, int pdlen, int offset, int flags) "%s: seq/ack=3D %u/%u hdlen=3D %d=
+ pdlen=3D %d offset=3D %d flags=3D%d"
+=20
+ # filter-rewriter.c
+ colo_filter_rewriter_debug(void) ""
+-colo_filter_rewriter_pkt_info(const char *func, const char *src, const c=
+har *dst, uint32_t seq, uint32_t ack, uint32_t flag) "%s: src/dst: %s/%s =
+p: seq/ack=3D%u/%u  flags=3D0x%x\n"
+-colo_filter_rewriter_conn_offset(uint32_t offset) ": offset=3D%u\n"
++colo_filter_rewriter_pkt_info(const char *func, const char *src, const c=
+har *dst, uint32_t seq, uint32_t ack, uint32_t flag) "%s: src/dst: %s/%s =
+p: seq/ack=3D%u/%u  flags=3D0x%x"
++colo_filter_rewriter_conn_offset(uint32_t offset) ": offset=3D%u"
 --=20
 2.21.0
 
