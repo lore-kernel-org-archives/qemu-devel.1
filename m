@@ -2,57 +2,82 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 654CFC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 08:27:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11603C4CEC4
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 08:29:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3ACD720640
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 08:27:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ACD720640
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id DA6C020640
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 08:29:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA6C020640
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAVIx-0008KC-CZ
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 04:27:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47240)
+	id 1iAVL3-0000qX-0c
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 04:29:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47512)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dovgaluk@ispras.ru>) id 1iAVI4-0007ZI-TY
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 04:26:22 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1iAVKD-0000Oq-A0
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 04:28:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1iAVI3-0001bI-K0
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 04:26:20 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:47758)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1iAVI3-0001Yk-8t
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 04:26:19 -0400
-Received: from PASHAISP (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id 87FD854012D;
- Wed, 18 Sep 2019 11:26:15 +0300 (MSK)
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
-References: <156872146565.1757.3033215873677512474.stgit@pasha-Precision-3630-Tower>
- <87blvi21cz.fsf@linaro.org>
-In-Reply-To: <87blvi21cz.fsf@linaro.org>
-Date: Wed, 18 Sep 2019 11:26:18 +0300
-Message-ID: <001101d56dfa$bef4e630$3cdeb290$@ru>
+ (envelope-from <sgarzare@redhat.com>) id 1iAVKC-00035h-47
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 04:28:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54228)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1iAVKB-00034w-Up
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 04:28:32 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 62ED34E926
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 08:28:30 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id a15so1389471wrq.4
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 01:28:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=5AiFkSR+jG9zbymZlmVuttvGFZdHdAkDLP8ZlJh9phk=;
+ b=VSmiuJeeGYdg3NL9uinpCO9xfCFFToTMTVkbAVYm0DGJ4zTXSkY2OQgZsz9dXLZAmM
+ dhrhvmcVWGCLbrM8nhfM8lFlsDh79byKHUoETR+0F0xYAYnrXqjOc+W9Y/pIfCofcn2+
+ 8t8blY37C/2+mkU/sp53IlavJxzQJKfh59rm0iOvXssCRlFu6rIH5LBE+GAmerKY70sz
+ R0wzUL6EUs68rXEiLVpEnZpP9GnEuGFruzbbyxA46cZV+vSq/mKjQQ+eAyi5lPO6jS3f
+ ox1dTDR8HPLZUBPd2CFVyaceHyotWaoFb+0WKcoUvuC30ZkHQ5HD9LZT1L9J2vTJ9Fqi
+ hoYg==
+X-Gm-Message-State: APjAAAUd8BDl6EVq3I7sglc3bYZgJwWC2eVN6kysKNvB4Bx40po1snNq
+ rGdXjUjCh34PZ3e7tWwJKypUdiwEebRHbYE2IHxBjfNNeirkk1wXiajSliAT0lZ8C2dH2Fcme/V
+ B8m0Vv/nEvQdAHTc=
+X-Received: by 2002:a1c:4c12:: with SMTP id z18mr1740460wmf.45.1568795308929; 
+ Wed, 18 Sep 2019 01:28:28 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxyFjZ2wQiW9cu/cZKg0dWX+RfVfeje3y9q9jB5BgB6PWXxd8MWI1Sw6eqIsqzKzFph4xBAmA==
+X-Received: by 2002:a1c:4c12:: with SMTP id z18mr1740437wmf.45.1568795308590; 
+ Wed, 18 Sep 2019 01:28:28 -0700 (PDT)
+Received: from steredhat (host170-61-dynamic.36-79-r.retail.telecomitalia.it.
+ [79.36.61.170])
+ by smtp.gmail.com with ESMTPSA id h17sm2864501wme.6.2019.09.18.01.28.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 18 Sep 2019 01:28:28 -0700 (PDT)
+Date: Wed, 18 Sep 2019 10:28:25 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20190918082825.nnrjqvicqwjg3jq6@steredhat>
+References: <CAJSP0QVMjw_zm16MRo25Gq0J9w=9vrKDZtaH=WGwjSJiDAVm9Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Office Outlook 12.0
-Thread-Index: AdVtil2R+dstBAqZSny80qx+0hd+0AAcABRg
-Content-Language: ru
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 83.149.199.45
-Subject: Re: [Qemu-devel] [for-4.2 PATCH 0/6] Block-related record/replay
- fixes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJSP0QVMjw_zm16MRo25Gq0J9w=9vrKDZtaH=WGwjSJiDAVm9Q@mail.gmail.com>
+User-Agent: NeoMutt/20180716
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [libvirt] Call for volunteers: LWN.net articles
+ about KVM Forum talks
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,103 +89,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru,
- crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com,
- quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com,
- boost.lists@gmail.com, thomas.dullien@googlemail.com, pbonzini@redhat.com,
- mreitz@redhat.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com,
- rth@twiddle.net
+Cc: libvir-list@redhat.com, qemu-devel <qemu-devel@nongnu.org>,
+ kvm <kvm@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, Sep 17, 2019 at 02:02:59PM +0100, Stefan Hajnoczi wrote:
+> Hi,
+> LWN.net is a popular open source news site that covers Linux and other
+> open source communities (Python, GNOME, Debian, etc).  It has published
+> a few KVM articles in the past too.
+> 
+> Let's raise awareness of QEMU, KVM, and libvirt by submitting articles covering
+> KVM Forum.
+> 
+> I am looking for ~5 volunteers who are attending KVM Forum to write an article
+> about a talk they find interesting.
+> 
+> Please pick a talk you'd like to cover and reply to this email thread.
+> I will then send an email to LWN with a heads-up so they can let us know
+> if they are interested in publishing a KVM Forum special.  I will not
+> ask LWN.net for money.
+> 
+> KVM Forum schedule:
+> https://events.linuxfoundation.org/events/kvm-forum-2019/program/schedule/
+> 
+> LWN.net guidelines:
+> https://lwn.net/op/AuthorGuide.lwn
+> "Our general guideline is for articles to be around 1500 words in
+> length, though somewhat longer or shorter can work too. The best
+> articles cover a fairly narrow topic completely, without any big
+> omissions or any extra padding."
+> 
+> I volunteer to cover Michael Tsirkin's "VirtIO without the Virt -
+> Towards Implementations in Hardware" talk.
 
+I volunteer for "Libvirt: Never too Late to Learn New Tricks" by
+Daniel Berrange.
 
-> -----Original Message-----
-> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> Sent: Tuesday, September 17, 2019 10:02 PM
-> To: Pavel Dovgalyuk
-> Cc: qemu-devel@nongnu.org; kwolf@redhat.com; peter.maydell@linaro.org;
-> crosthwaite.peter@gmail.com; boost.lists@gmail.com; =
-artem.k.pisarenko@gmail.com;
-> quintela@redhat.com; ciro.santilli@gmail.com; jasowang@redhat.com; =
-mst@redhat.com;
-> armbru@redhat.com; mreitz@redhat.com; maria.klimushenkova@ispras.ru; =
-dovgaluk@ispras.ru;
-> kraxel@redhat.com; pavel.dovgaluk@ispras.ru; =
-thomas.dullien@googlemail.com;
-> pbonzini@redhat.com; dgilbert@redhat.com; rth@twiddle.net
-> Subject: Re: [for-4.2 PATCH 0/6] Block-related record/replay fixes
->=20
->=20
-> Pavel Dovgalyuk <pavel.dovgaluk@gmail.com> writes:
->=20
-> > The set of patches include the block-related updates
-> > of the record/replay icount feature:
-> >  - application of 'snapshot' option on the file layer instead of
-> >    the top one: command line and documentation fix
-> >  - implementation of bdrv_snapshot_goto for blkreplay driver
-> >  - start/stop fix in replay mode with attached block devices
-> >  - record/replay of bh oneshot events, used in the block layer
->=20
-> Can we come up with a reasonable smoke test to verify record/replay is
-> functional? AIUI we don't need a full OS but we do need a block device
-> to store the replay data. Could we use one of the simple system tests
-> like "memory" and run that through a record and replay cycle?
-
-That's would be great.
-I'm not familiar with testing framework and couldn't find "memory" test =
-that you refer to.
-Replay test must at least the following:
-1. record some execution
-2. replay that execution
-
-And there could be several endings:
-1. record stalled
-2. record crashed
-3. replay stalled
-4. replay crashed
-5. all executions finished successfully
-
-Pavel Dovgalyuk
-
->=20
-> >
-> > ---
-> >
-> > Pavel Dovgaluk (6):
-> >       block: implement bdrv_snapshot_goto for blkreplay
-> >       replay: disable default snapshot for record/replay
-> >       replay: update docs for record/replay with block devices
-> >       replay: don't drain/flush bdrv queue while RR is working
-> >       replay: finish record/replay before closing the disks
-> >       replay: add BH oneshot event for block layer
-> >
-> >
-> >  block/blkreplay.c        |    8 ++++++++
-> >  block/block-backend.c    |    9 ++++++---
-> >  block/io.c               |   32 ++++++++++++++++++++++++++++++--
-> >  block/iscsi.c            |    5 +++--
-> >  block/nfs.c              |    6 ++++--
-> >  block/null.c             |    4 +++-
-> >  block/nvme.c             |    6 ++++--
-> >  block/rbd.c              |    5 +++--
-> >  block/vxhs.c             |    5 +++--
-> >  cpus.c                   |    2 --
-> >  docs/replay.txt          |   12 +++++++++---
-> >  include/sysemu/replay.h  |    4 ++++
-> >  replay/replay-events.c   |   16 ++++++++++++++++
-> >  replay/replay-internal.h |    1 +
-> >  replay/replay.c          |    2 ++
-> >  stubs/Makefile.objs      |    1 +
-> >  stubs/replay-user.c      |    9 +++++++++
-> >  vl.c                     |   11 +++++++++--
-> >  18 files changed, 115 insertions(+), 23 deletions(-)
-> >  create mode 100644 stubs/replay-user.c
->=20
->=20
-> --
-> Alex Benn=C3=A9e
+Cheers,
+Stefano
 
 
