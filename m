@@ -2,90 +2,62 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4290FC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 20:35:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78526C4CEC4
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 20:51:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A6F521897
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 20:35:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="at6/8+u0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A6F521897
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 461DA20882
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 20:51:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 461DA20882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAgfL-0006R7-3s
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 16:35:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42905)
+	id 1iAgv7-0004n1-AX
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 16:51:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46746)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iAgeI-0005yL-4R
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 16:34:03 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1iAgta-0003hN-Lg
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 16:49:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iAgeG-0006wH-Ub
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 16:34:01 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55677)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iAgeG-0006ve-NM
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 16:34:00 -0400
-Received: by mail-wm1-x344.google.com with SMTP id a6so1620403wma.5
- for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 13:34:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:subject:in-reply-to:date:message-id
- :mime-version:content-transfer-encoding;
- bh=rxsK/uL8SAziIpZWmRH1ZT9nd3QUzm6vizZNol24XZE=;
- b=at6/8+u0xllCMbIPkyK4nk1USg/Gj4WPSza8dHek12wthtfN2GoVaRnhrCWvTeux86
- zKQAAuWqPFLquBLmNHVWxKvc4eIyQl4BRaFXRKS+ONd/TjFl7yrY07WLXrIiHvXj/hPg
- 6RxNHtf2Bqqc+3Yub1+eq526BJnQIRN6mDrQDHrpiaka6F0rgrXo2Ke3HOkfmhLqHvbf
- fKWlmDriHO1oyIQPSdt8mXwjkg+zgDLLV6jvDP7SryOz+Xx1qmLEF1T/WGtugW5QbS2Y
- jmJE/5umfzwh8ys7EAiCx/+wM+7+3CAaDvUlrZH0trSixheG2WCWsvkSgVNE2zecW6Yc
- dO0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=rxsK/uL8SAziIpZWmRH1ZT9nd3QUzm6vizZNol24XZE=;
- b=OOL51iMtd17rJ0wAPaLA59eajGP1k9dhP6lM3E+9YWyOi4RC3eZgfgkzcCFTbXFtyR
- T6JLUzz5l9hIbWQuRLUlgSL5Rm5gGF+vqtHAtqt3G+Qjjinnro18u3Z2KqNAVk+2wdE+
- jxsf+AWO0Jg6SvAPWZew8rj3Z9zff2MhGFPSp8H6Lr0fqM1mBpPFMLVrwOt8nijJECrf
- R0FozgfTboxtDEyTsXwCMTFVAcqdItly1ZYsc6TCKJvYglWC+znYEXUleMwyWM80pVWX
- ehV0MXDvJgnXR7gyJhQWwR3w1i62B7oksHKqQbFq93z+C4341ojm/neIQTMLDeem3DUV
- XWhQ==
-X-Gm-Message-State: APjAAAWidMfzbsr4Z/Xz+XcIM44Zpmf0q4Rzl5uRC65FxqNx4wH8UJRB
- pf9j+4RpjU6aECSLkCWz0i/hPLKxye0=
-X-Google-Smtp-Source: APXvYqyys5og+wt2PjH1UeyuczlNkPqGgnOftDQO4JfdNEEi1jsXVapP0+sPNLDOBIntL2lu7+Nplw==
-X-Received: by 2002:a7b:cc97:: with SMTP id p23mr4502635wma.111.1568838838789; 
- Wed, 18 Sep 2019 13:33:58 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a3sm605373wmc.3.2019.09.18.13.33.58
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 18 Sep 2019 13:33:58 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 787551FF87
- for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 21:33:57 +0100 (BST)
-References: <20190917172422.5134-1-dan.streetman@canonical.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190917172422.5134-1-dan.streetman@canonical.com>
-Date: Wed, 18 Sep 2019 21:33:57 +0100
-Message-ID: <87woe5z6mi.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH] hw/arm: set machine 'virt' as default
+ (envelope-from <mlevitsk@redhat.com>) id 1iAgtZ-00073v-L6
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 16:49:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32954)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1iAgtV-00072Q-Uc; Wed, 18 Sep 2019 16:49:46 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8EAB780038D;
+ Wed, 18 Sep 2019 20:49:44 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.53])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3D5CF60C05;
+ Wed, 18 Sep 2019 20:49:40 +0000 (UTC)
+Message-ID: <b3fe9d8f513ae1bf7312f1024b72e1fd83403ac8.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Date: Wed, 18 Sep 2019 23:49:39 +0300
+In-Reply-To: <20190918095144.955-2-mreitz@redhat.com>
+References: <20190918095144.955-1-mreitz@redhat.com>
+ <20190918095144.955-2-mreitz@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Wed, 18 Sep 2019 20:49:44 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/8] block: Handle filter truncation like
+ native impl.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,49 +69,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Dan Streetman <dan.streetman@canonical.com> writes:
-
-> From: Dan Streetman <ddstreet@canonical.com>
->
-> There is currently no default machine type for arm so one must be specifi=
-ed
-> with --machine.  This sets the 'virt' machine type as default.
-
-We should really have a FAQ entry for why we don't have a default for
-ARM. In short unlike PC's every ARM device is different so it pays to be
-precise about what you want when you invoke QEMU. Because any given
-kernel/image is only likely to work on the machine it's built for.
-
-Why is virt special? It's just one of the many machines we emulate and
-while it's probably the most popular these days for "something that
-boots a Linux distro" why not -machine sba (when that comes)?
-
->
-> Signed-off-by: Dan Streetman <ddstreet@canonical.com>
+On Wed, 2019-09-18 at 11:51 +0200, Max Reitz wrote:
+> Make the filter truncation (passing it through to bs->file) a
+> first-class citizen and handle it exactly as if it was the filter
+> driver's native implementation of .bdrv_co_truncate().
+> 
+> I do not see a reason not to, it makes the code a bit shorter, and may
+> be even more correct because this gets us to finish the write_req that
+> we prepared before (may be important to e.g. bring dirty bitmaps to the
+> correct size).
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  hw/arm/virt.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index d74538b021..e9fe888ca2 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -78,6 +78,7 @@
->          mc->desc =3D "QEMU " # major "." # minor " ARM Virtual Machine";=
- \
->          if (latest) { \
->              mc->alias =3D "virt"; \
-> +            mc->is_default =3D 1; \
->          } \
->      } \
->      static const TypeInfo machvirt_##major##_##minor##_info =3D { \
+>  block/io.c | 13 ++++++-------
+>  1 file changed, 6 insertions(+), 7 deletions(-)
+> 
+> diff --git a/block/io.c b/block/io.c
+> index f8c3596131..723655c792 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -3299,20 +3299,19 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset,
+>          goto out;
+>      }
+>  
+> -    if (!drv->bdrv_co_truncate) {
+> -        if (bs->file && drv->is_filter) {
+> -            ret = bdrv_co_truncate(bs->file, offset, prealloc, errp);
+> -            goto out;
+> -        }
+> +    if (drv->bdrv_co_truncate) {
+> +        ret = drv->bdrv_co_truncate(bs, offset, prealloc, errp);
+> +    } else if (bs->file && drv->is_filter) {
+> +        ret = bdrv_co_truncate(bs->file, offset, prealloc, errp);
+> +    } else {
+>          error_setg(errp, "Image format driver does not support resize");
+>          ret = -ENOTSUP;
+>          goto out;
+>      }
+> -
+> -    ret = drv->bdrv_co_truncate(bs, offset, prealloc, errp);
+>      if (ret < 0) {
+>          goto out;
+>      }
+> +
+> 
+I would say that those are unrelated whitespace changes, but I myself
+don't mind this :-)
 
 
---
-Alex Benn=C3=A9e
+>      ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
+>      if (ret < 0) {
+>          error_setg_errno(errp, -ret, "Could not refresh total sector count");
+
+Looks all right to me, although I don't know the block filters well yet.
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Best regards,
+	Maxim Levitsky
+
+
 
