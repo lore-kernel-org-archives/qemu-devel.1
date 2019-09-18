@@ -2,90 +2,88 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6A2BC4CEC4
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 10:43:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B5CC4CEC9
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 10:53:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EDD3214AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 10:43:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kjefUP0M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EDD3214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3407D218AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 10:53:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3407D218AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAXQb-0005Bo-FX
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 06:43:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38150)
+	id 1iAXaN-0008DE-DG
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 06:53:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39555)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iAXPr-0004hZ-Bn
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 06:42:32 -0400
+ (envelope-from <philmd@redhat.com>) id 1iAXZM-0007V3-II
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 06:52:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iAXPp-0005GV-Oy
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 06:42:31 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42415)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iAXPp-0005G8-HB
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 06:42:29 -0400
-Received: by mail-wr1-x442.google.com with SMTP id n14so5466310wrw.9
- for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 03:42:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=004wkyAyw5kt9LMTEOWsclWWolBnx7Z9+qMK4Qt0XFo=;
- b=kjefUP0MnoW0z+YDPTpaCVoSS+wq6CQwoixG7dUCk332qp5VSs9fucypv+o1DWbfh8
- eak+g/6msrp4vumakgqamNrYVh385KDY9Yy32K4VSLoKyKdLVU3nJjOk0FShRsKPSchH
- a2b5j/D7ZQNJBlOfEZjXLh9HEM/9yrMSfsVAbxNH51lJtnaESxB4kFW/eR+7LtdnxWeZ
- 7LUT7zT5pmhCajDWIxQ5I61YUzspqKmc608VVN5iYCBZSnXR7NdUYa3mfMdwwVq6h+vd
- GpNlkKVdgQGq1l/H6eyGr775VIi39v03CDketTEZka8nLGETkKPitn8rmHU1saDoWujS
- 1AIg==
+ (envelope-from <philmd@redhat.com>) id 1iAXZK-0002Cy-Db
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 06:52:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47846)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iAXZK-0002CF-5a
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 06:52:18 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 336797FDE5
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 10:52:16 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id k184so932010wmk.1
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 03:52:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=004wkyAyw5kt9LMTEOWsclWWolBnx7Z9+qMK4Qt0XFo=;
- b=ruNXfTUO5gNRBlUckGsRX68REATR+aXpe0e5blkxHtact0+ZcYANoNcaEkH0G6QDBL
- uTXqsYp8ssQTkqvDsFqFiI/Y+rXVAtSb0Wx81A+47Mj4saU9K9kzAacLPSA9Ta1njYCa
- she/K66op8ZHB3Q0u/OEhmgfUS68HrWtD434/m3s4cP8GBOUUUvzZakWscZ2jzpavPgN
- rdr+POJPEH9PdZiKjHzTTVj4rhlCPKMwgyCg0uzTEkTjeP8DGb6VKO4IpE6vL+IM40Sm
- s7ixA6ZHq+9qQhsKRY4YHz9fe0tAyg+L689p4e2F4DCf6nh2ap7edPM7ZHQJpywjzPcw
- ntPA==
-X-Gm-Message-State: APjAAAVpjaLDM3459oWWLYkQn1Fg1A6BlamZn7iBLghimlzznesvt1ge
- povLrCX3RCtsNduLKUgWEbHlEg==
-X-Google-Smtp-Source: APXvYqyr8Bhggyfs75EjLckn/A9/bFVe/4+k17ncYDSCyiuQ7GwEpaKBGV68NTTqUaRD9rkeHoBkPg==
-X-Received: by 2002:adf:f150:: with SMTP id y16mr2347159wro.71.1568803348019; 
- Wed, 18 Sep 2019 03:42:28 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b16sm8252104wrh.5.2019.09.18.03.42.27
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 18 Sep 2019 03:42:27 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 787731FF87;
- Wed, 18 Sep 2019 11:42:26 +0100 (BST)
-References: <156872146565.1757.3033215873677512474.stgit@pasha-Precision-3630-Tower>
- <87blvi21cz.fsf@linaro.org> <001101d56dfa$bef4e630$3cdeb290$@ru>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-In-reply-to: <001101d56dfa$bef4e630$3cdeb290$@ru>
-Date: Wed, 18 Sep 2019 11:42:26 +0100
-Message-ID: <8736gt28dp.fsf@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=UQ2Y6VQpqh/1DWGeGRRgQsyoDgxpXOFSiVOtuKw+2sk=;
+ b=e3r7JRwaYmI5e06cVBrb77o2JfZd6piIqU/gE6TxaE0A9xERYk6oyO/xz6v0PpHRdf
+ wiUqQ4vzXYMS935cfo+RbrJRFRKBKYro/HR4HJoadaOjsii/MaHY5uFtDourJu/waVt4
+ PRPLE5DrApmcN1byGyfA1Y5mof6AFO32JCuoBIC6pKv+YbkvGr+Q05D03dcuY+jebeRp
+ NX2N6ggAJh99ZY3C2jJBrg+Vng/PWEGGQbNxKNVDMo2538dNWwkRRbvJZkvj+HkDnNWg
+ gMOBxydmIZsaS+w9U6AU7aLdDUrQDt2SSbzQP1b014xs3cOb/ftOwA7EBvs05S5J4j6W
+ Ehrg==
+X-Gm-Message-State: APjAAAVAcb3tWmapH6o2iBtC6NARAXsLZkpj9EltqsbrGRPxAijUNe3s
+ AOGOTxnBFvZtJFKAVEebbYq3tKxPoj5Z1RloajIXt34vM36e6A9rxsdVV58SEYUO0umYxmMiNCD
+ cHD3IOSc2XEQQeqY=
+X-Received: by 2002:a5d:6951:: with SMTP id r17mr2488708wrw.208.1568803934953; 
+ Wed, 18 Sep 2019 03:52:14 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzlyH/ASzn2pfs4cumr7vwMvs28X3d0MPHc8IpbU0l3C3NnGZG6CidznXOZgbLuZtOXYCLmAg==
+X-Received: by 2002:a5d:6951:: with SMTP id r17mr2488695wrw.208.1568803934779; 
+ Wed, 18 Sep 2019 03:52:14 -0700 (PDT)
+Received: from [10.201.33.84] ([195.166.127.210])
+ by smtp.gmail.com with ESMTPSA id l18sm4773752wrc.18.2019.09.18.03.52.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 18 Sep 2019 03:52:13 -0700 (PDT)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190916154847.28936-1-philmd@redhat.com>
+ <20190916154847.28936-4-philmd@redhat.com>
+ <dd8bdcd6-9e43-3721-7b39-f53d906988b3@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <221be2fe-f55b-1197-a477-eb503d99930d@redhat.com>
+Date: Wed, 18 Sep 2019 12:52:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <dd8bdcd6-9e43-3721-7b39-f53d906988b3@linaro.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [for-4.2 PATCH 0/6] Block-related record/replay
- fixes
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 03/13] hw: Move MC146818 device from
+ hw/timer/ to hw/rtc/ subdirectory
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,126 +95,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru,
- crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com,
- quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com,
- boost.lists@gmail.com, thomas.dullien@googlemail.com, pbonzini@redhat.com,
- mreitz@redhat.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com,
- rth@twiddle.net
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Andrew Jeffery <andrew@aj.id.au>, qemu-ppc@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 9/17/19 10:32 PM, Richard Henderson wrote:
+> On 9/16/19 11:48 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>  include/hw/rtc/mc146818rtc.h                 | 38 +++++++++++++++++++=
++
+>=20
+> Same rebase failure as for patch 4?
 
-Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+This one is actually correct, it got moved from:
 
->> -----Original Message-----
->> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
->> Sent: Tuesday, September 17, 2019 10:02 PM
->> To: Pavel Dovgalyuk
->> Cc: qemu-devel@nongnu.org; kwolf@redhat.com; peter.maydell@linaro.org;
->> crosthwaite.peter@gmail.com; boost.lists@gmail.com; artem.k.pisarenko@gm=
-ail.com;
->> quintela@redhat.com; ciro.santilli@gmail.com; jasowang@redhat.com; mst@r=
-edhat.com;
->> armbru@redhat.com; mreitz@redhat.com; maria.klimushenkova@ispras.ru; dov=
-galuk@ispras.ru;
->> kraxel@redhat.com; pavel.dovgaluk@ispras.ru; thomas.dullien@googlemail.c=
-om;
->> pbonzini@redhat.com; dgilbert@redhat.com; rth@twiddle.net
->> Subject: Re: [for-4.2 PATCH 0/6] Block-related record/replay fixes
->>
->>
->> Pavel Dovgalyuk <pavel.dovgaluk@gmail.com> writes:
->>
->> > The set of patches include the block-related updates
->> > of the record/replay icount feature:
->> >  - application of 'snapshot' option on the file layer instead of
->> >    the top one: command line and documentation fix
->> >  - implementation of bdrv_snapshot_goto for blkreplay driver
->> >  - start/stop fix in replay mode with attached block devices
->> >  - record/replay of bh oneshot events, used in the block layer
->>
->> Can we come up with a reasonable smoke test to verify record/replay is
->> functional? AIUI we don't need a full OS but we do need a block device
->> to store the replay data. Could we use one of the simple system tests
->> like "memory" and run that through a record and replay cycle?
->
-> That's would be great.
-> I'm not familiar with testing framework and couldn't find "memory"
-> test that you refer to.
+ include/hw/timer/mc146818rtc.h               | 14 --------
 
-The memory test code is in tests/tcg/multiarch/system and gets combined
-with the boot code for whichever target can build it. For example on
-aarch64 it is run like:
-
-  timeout 15  $BLD/aarch64-softmmu/qemu-system-aarch64 -monitor none -displ=
-ay none -chardev file,path=3Dmemory.out,id=3Doutput  -M virt -cpu max -disp=
-lay none -semihosting-config enable=3Don,target=3Dnative,chardev=3Doutput -=
-kernel memory
-
-The test binaries will be in $BLD/tests/tcg/aarch64-softmmu and are
-built when you run "make check-tcg" and have either the appropriate
-cross compilers installed on your system or docker enabled and setup
-(see docs/devel/testing.rst).
-
-> Replay test must at least the following:
-> 1. record some execution
-> 2. replay that execution
->
-> And there could be several endings:
-> 1. record stalled
-> 2. record crashed
-> 3. replay stalled
-> 4. replay crashed
-> 5. all executions finished successfully
-
-If you can provide an appropriate set of invocations I can plumb them
-into the Makefiles for you.
-
->
-> Pavel Dovgalyuk
->
->>
->> >
->> > ---
->> >
->> > Pavel Dovgaluk (6):
->> >       block: implement bdrv_snapshot_goto for blkreplay
->> >       replay: disable default snapshot for record/replay
->> >       replay: update docs for record/replay with block devices
->> >       replay: don't drain/flush bdrv queue while RR is working
->> >       replay: finish record/replay before closing the disks
->> >       replay: add BH oneshot event for block layer
->> >
->> >
->> >  block/blkreplay.c        |    8 ++++++++
->> >  block/block-backend.c    |    9 ++++++---
->> >  block/io.c               |   32 ++++++++++++++++++++++++++++++--
->> >  block/iscsi.c            |    5 +++--
->> >  block/nfs.c              |    6 ++++--
->> >  block/null.c             |    4 +++-
->> >  block/nvme.c             |    6 ++++--
->> >  block/rbd.c              |    5 +++--
->> >  block/vxhs.c             |    5 +++--
->> >  cpus.c                   |    2 --
->> >  docs/replay.txt          |   12 +++++++++---
->> >  include/sysemu/replay.h  |    4 ++++
->> >  replay/replay-events.c   |   16 ++++++++++++++++
->> >  replay/replay-internal.h |    1 +
->> >  replay/replay.c          |    2 ++
->> >  stubs/Makefile.objs      |    1 +
->> >  stubs/replay-user.c      |    9 +++++++++
->> >  vl.c                     |   11 +++++++++--
->> >  18 files changed, 115 insertions(+), 23 deletions(-)
->> >  create mode 100644 stubs/replay-user.c
->>
->>
->> --
->> Alex Benn=C3=A9e
-
-
---
-Alex Benn=C3=A9e
+The difference is the addition of missing copyright/license.
 
