@@ -2,93 +2,88 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60766C4CEC4
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 11:36:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A77ECC4CEC4
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 11:36:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2892F21907
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 11:36:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7421F21907
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 11:36:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OfPFOBxA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2892F21907
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XmD8geoD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7421F21907
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAYFc-0003Dy-90
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 07:36:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46959)
+	id 1iAYGJ-0003gx-DY
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 07:36:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47173)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iAYD5-0001UR-7x
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:33:24 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iAYEk-0002kF-MV
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:35:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iAYD3-000177-WF
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:33:22 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40135)
+ (envelope-from <alex.bennee@linaro.org>) id 1iAYEj-0002LO-My
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:35:06 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50955)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iAYD3-00016W-N8
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:33:21 -0400
-Received: by mail-wr1-x442.google.com with SMTP id l3so6502379wru.7
- for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 04:33:21 -0700 (PDT)
+ id 1iAYEj-0002Kl-Du
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:35:05 -0400
+Received: by mail-wm1-x342.google.com with SMTP id 5so2219223wmg.0
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 04:35:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=OD6zMBBBA2SPvg+dgmK0PnpVRUNPk5uQqjsyJ0wj+CQ=;
- b=OfPFOBxAaFgn6Zx/jtn0nLAwWGOKLn14+axTDFlUUpGHBMlnlwGzOGG1IDa6GoU0Qd
- +siKHbiEBQZQZ5BECCM/z1EexrlpLY/3dbhoToYB4QNDfQDSH6bud1g5HqZvGyPqvaGC
- 1ByOTSIvue6OrPnmvJhw2GWWFtcE9yvDNor2DZyTQ8loMaQDCQzWxqLOBSGtaUdcDEhz
- 1jErD6rPusnv4QXpvZSbd/adCe8G6N387/XLimi9UKBZzmWRpT0TlUaH0oJkgwutmbpa
- EC8WYHZe44SlWZqGfxK5rZcHpEXFFtpLC5vspdttdHabsdD6UNB1V5iXle8xXa2Y7PzS
- OQ9w==
+ bh=NMCP6vDcIAkOcXQMmqhpcPAXIgHQNkSeyKtYiQJ7OeI=;
+ b=XmD8geoDjJ0FA95jtw1xX73WiXYXAGJfsq0SiqQSv8ipadFihOJ2cU+sLQ8yaAah7s
+ LjSrBz4xjwEgRyCv6WZQUQnhMPSlvwfWP/TPI1VVRGQnp0zjnrj/Xz5RDqjTc8L0cIb8
+ NTHhshc/cs1f5tSWe2O4fiNxn0QA0k4QCUosFZiM9D5p/lBMYacdmejWuzS4SxlUDpen
+ IxUWYCCKpC6uWckh1+IEIQQH1IGFkInzQC8OMMvvgagbw5G4tz3MNQaE7zUk1GDrap03
+ ilnG8ua5leg95tgTRN5RGowD9srkScNH69hpBjrB7cgweIOJK54SFIy3uuHGFiHZeNNS
+ ltPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=OD6zMBBBA2SPvg+dgmK0PnpVRUNPk5uQqjsyJ0wj+CQ=;
- b=CXMAV98dlul9yR83X2u91Gvw4ihkNE8zfRDPA8OUtpdQZsGILEr2ZMIjDediE5SPnj
- 7et9iJd/mvTT7KEHwbma8mVB1wKLzjYtTkt0lGTYs+DuK2Z7F0sHYkISY/KubHFU90+Q
- EoBiNryGs97i6VCAhHBt/khTN68qbpkH4HnSIxQt7QbaUY/qOjVVzDk75YpaKKIVqCrR
- b7etEibpp+EbxgJDB0BnmXspBRRpw69ZNYpCJd9qrsqjLm5BRxs9ODDGkbJIUFGQG9Bt
- N+Xtv1NMMLjWXnaHz6rXR/tFyAdH8rg1B6QiO8gLvbmFbtBDKToZUyfLmtKNyPWIJD5I
- BOjA==
-X-Gm-Message-State: APjAAAU9480HT4P6oQG8m4KOEibCYtd5zg9y9GF8oLf0rFGOLIpk9x22
- HiiwQ1zMxDiE98wnfze2u8LG5w==
-X-Google-Smtp-Source: APXvYqwzmgIreP409JKpBJEGpDwojmE2v9JGCOhv1HEIrQI7je9JFN85N+/ZPBudw10ZbqfhPAnpmg==
-X-Received: by 2002:adf:ee50:: with SMTP id w16mr2800501wro.93.1568806400301; 
- Wed, 18 Sep 2019 04:33:20 -0700 (PDT)
+ bh=NMCP6vDcIAkOcXQMmqhpcPAXIgHQNkSeyKtYiQJ7OeI=;
+ b=TkWLfxYxQaohAnWqH5lyIHODNBdeI48IvgIM0+cxmpnslDoBgv817emMfMjPaKILgy
+ 0PSFfXeDTkja1582P/1lG35E8XQQndhue/r8Ypo04hKffa4z0dcco4JLeuPgGp9C8o7z
+ VuU9FxW1ceUcvG7KppDIttP28jP76TcHo8QIoLq+CzecWJuXHAMoCItn214nCpWNDrWQ
+ IJ/ifJ6b3spfF/xDZulGHjeSgZQpre6Fkp+gD56xEX4/evak7n0mxaHciZDUzBfkCeph
+ ZfS2GNPBdCLNA9GA0EdSm1LZtAcYGPJ3ch97lXKqGXMn8yJVY79z7Q3gjZ5jVbKsMF8s
+ umNA==
+X-Gm-Message-State: APjAAAWmNXrqqGBcU1qLQJHPEgRcUtetsk58sp8Eam5UQhmKyjZzlgrB
+ QinziOe5HWFdZHQYHr1D5zJXRw==
+X-Google-Smtp-Source: APXvYqwZDXiuC+ZoXw5GmfDQIFyxCY+SCvD/BX80srjZ3COvA9lnbl4+CnNoHlyQSE/z9TA251EnvQ==
+X-Received: by 2002:a7b:cb4e:: with SMTP id v14mr2428422wmj.159.1568806504055; 
+ Wed, 18 Sep 2019 04:35:04 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id l1sm5586160wrb.1.2019.09.18.04.33.19
+ by smtp.gmail.com with ESMTPSA id o188sm3626579wma.14.2019.09.18.04.35.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 18 Sep 2019 04:33:19 -0700 (PDT)
+ Wed, 18 Sep 2019 04:35:03 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C90DB1FF87;
- Wed, 18 Sep 2019 12:33:18 +0100 (BST)
-References: <20190917184109.12564-1-alex.bennee@linaro.org>
- <20190917184109.12564-8-alex.bennee@linaro.org>
- <afd9bc85-9c79-a456-73c1-fc19e97d1acd@linaro.org>
- <877e661vur.fsf@linaro.org>
- <93ff7174-77c0-d2eb-eac2-d3eef7e88a14@linaro.org>
+ by zen.linaroharston (Postfix) with ESMTP id 82BE31FF87;
+ Wed, 18 Sep 2019 12:35:02 +0100 (BST)
+References: <20190917185537.25417-1-jsnow@redhat.com>
 User-agent: mu4e 1.3.4; emacs 27.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-In-reply-to: <93ff7174-77c0-d2eb-eac2-d3eef7e88a14@linaro.org>
-Date: Wed, 18 Sep 2019 12:33:18 +0100
-Message-ID: <87zhj1zvnl.fsf@linaro.org>
+To: John Snow <jsnow@redhat.com>
+In-reply-to: <20190917185537.25417-1-jsnow@redhat.com>
+Date: Wed, 18 Sep 2019 12:35:02 +0100
+Message-ID: <87y2ylzvkp.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH v1 7/9] tests/tcg: add float_madds test to
- multiarch
+X-Received-From: 2a00:1450:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH] tests/docker: fix typo for debian9-mxe
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,7 +95,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org,
+Cc: Fam Zheng <fam@euphon.net>,
  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
@@ -108,59 +103,35 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+John Snow <jsnow@redhat.com> writes:
 
-> On 9/17/19 5:00 PM, Alex Benn=C3=A9e wrote:
->>>> +    add_f32_const(0x8p-152);
->>>> +    add_f32_const(0x8p-152);
->>>> +    add_f32_const(0x8p-152);
->>>
->>> Why are you adding 3 of the same?
->>
->> To replicate the 1841491 test case where the same number is used for
->> a/b/c
+> We spelled it debian-9-mxe, but the image is debian9-mxe.
 >
-> Then we really ought to be more explicit about that.
+> Signed-off-by: John Snow <jsnow@redhat.com>
 
-I guess - I was hoping to piggy back on the general case. Maybe we
-should just split that into a separate test case. We can at least re-use
-the format and flag printing code and drop the behind the scenes magic
-to "join" the constant table with extra test values.
+I'll merge this fix with the other typo fix while I'm at it. Thanks.
 
-> You're not doing full permutations on the sets of numbers, so does increm=
-enting
-> a random index really test what you intended?
-
-I did initially do the full permutation but for madds it all adds up
-quite quickly. The shuffle we do here is a bit of a comprise, so it
-shuffles the various nan forms before nans with -inf and -large and
-finally a bunch of real numbers (subnormals in the middle). It gives a
-reasonably broad coverage without going nuts.
-
+> ---
+>  tests/docker/Makefile.include | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
->>>> +#if defined(__arm__)
->>>> +                r =3D __builtin_fmaf(a, b, c);
->>>> +#else
->>>> +                r =3D __builtin_fmaf(a, b, c);
->>>> +#endif
->>>
->>> Eh?
->>
->> Ahh I was going to hardcode the arm madd instruction in as the builtin
->> wasn't expanding. I tried setting -march in the CFLAGS but that didn't
->> trigger it either on my buster arm-hf compiler. Any ideas how to get the
->> compiler to do the right thing?
->
-> I think you want -mfpu=3Dneon-vfpv4.
-
-Ahh that worked. I would have hoped that v8 would be enough to spit out
-aarch32 code which has to have VFPv4 for A profile right?
-
-Anyway I'll use that for now.
-
->
->
-> r~
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+> index 50a400b573..7eac1516f6 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -7,7 +7,7 @@ DOCKER_FILES_DIR :=3D $(SRC_PATH)/tests/docker/dockerfiles
+>  DOCKER_DEPRECATED_IMAGES :=3D debian
+>  # we don't run tests on intermediate images (used as base by another ima=
+ge)
+>  DOCKER_PARTIAL_IMAGES :=3D debian debian8 debian9 debian10 debian-sid
+> -DEBIAN_PARTIAL_IMAGES +=3D debian8-mxe debian-9-mxe debian-ports debian-=
+bootstrap
+> +DEBIAN_PARTIAL_IMAGES +=3D debian8-mxe debian9-mxe debian-ports debian-b=
+ootstrap
+>  DOCKER_IMAGES :=3D $(filter-out $(DOCKER_DEPRECATED_IMAGES),$(sort $(not=
+dir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker)))))
+>  DOCKER_TARGETS :=3D $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
+>  # Use a global constant ccache directory to speed up repetitive builds
 
 
 --
