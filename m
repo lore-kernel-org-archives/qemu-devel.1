@@ -2,67 +2,58 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2457EC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 07:34:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7958CC4CEC4
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 07:37:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2A3921906
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 07:34:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2A3921906
+	by mail.kernel.org (Postfix) with ESMTPS id 483DC21906
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 07:37:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 483DC21906
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAUU3-0002Bq-3w
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 03:34:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41338)
+	id 1iAUWu-0003Xy-Af
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 03:37:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41602)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iAUT7-0001Lg-Rb
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 03:33:42 -0400
+ (envelope-from <quintela@redhat.com>) id 1iAUVq-000358-Id
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 03:36:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iAUT6-0001Zz-Pi
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 03:33:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40520)
+ (envelope-from <quintela@redhat.com>) id 1iAUVm-0002dF-Fv
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 03:36:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56088)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iAUT2-0001Yr-FJ; Wed, 18 Sep 2019 03:33:36 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iAUVm-0002cx-AS
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 03:36:26 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0C3528980EA;
- Wed, 18 Sep 2019 07:33:35 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-230.ams2.redhat.com
- [10.36.116.230])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4A08D60606;
- Wed, 18 Sep 2019 07:33:13 +0000 (UTC)
-Date: Wed, 18 Sep 2019 09:33:12 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Message-ID: <20190918073312.GA5207@localhost.localdomain>
-References: <156871562997.196432.17776290406203122029.stgit@bahia.lan>
- <156871564329.196432.5930574495661947805.stgit@bahia.lan>
- <19e78ae8-96dc-6154-6572-d7176057eeb7@redhat.com>
- <20190917144631.GF4824@localhost.localdomain>
- <8cbb8459-a4bb-2efc-c9f8-d9e95230b3ac@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id E264E308427C;
+ Wed, 18 Sep 2019 07:36:24 +0000 (UTC)
+Received: from redhat.com (ovpn-117-227.ams2.redhat.com [10.36.117.227])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 29DF85C1B2;
+ Wed, 18 Sep 2019 07:36:20 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org, kvm-devel <kvm@vger.kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+Date: Wed, 18 Sep 2019 09:36:13 +0200
+Message-ID: <87r24exdhu.fsf@trasno.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8cbb8459-a4bb-2efc-c9f8-d9e95230b3ac@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Wed, 18 Sep 2019 07:33:35 +0000 (UTC)
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Wed, 18 Sep 2019 07:36:24 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 02/17] block: Pass local error object
- pointer to error_append_hint()
+Subject: [Qemu-devel] KVM call for 2019-09-24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,72 +65,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <codyprime@gmail.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, David Hildenbrand <david@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, Eric Farman <farman@linux.ibm.com>,
- Greg Kurz <groug@kaod.org>, Yuval Shaia <yuval.shaia@oracle.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org,
- Richard Henderson <rth@twiddle.net>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org,
- Max Reitz <mreitz@redhat.com>, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 17.09.2019 um 21:10 hat John Snow geschrieben:
-> 
-> 
-> On 9/17/19 10:46 AM, Kevin Wolf wrote:
-> > Am 17.09.2019 um 16:39 hat Eric Blake geschrieben:
-> >> On 9/17/19 5:20 AM, Greg Kurz wrote:
-> >>> Ensure that hints are added even if errp is &error_fatal or &error_abort.
-> >>>
-> >>> Signed-off-by: Greg Kurz <groug@kaod.org>
-> >>> ---
-> >>>  block/backup.c       |    7 +++++--
-> >>>  block/dirty-bitmap.c |    7 +++++--
-> >>>  block/file-posix.c   |   20 +++++++++++++-------
-> >>>  block/gluster.c      |   23 +++++++++++++++--------
-> >>>  block/qcow.c         |   10 ++++++----
-> >>>  block/qcow2.c        |    7 +++++--
-> >>>  block/vhdx-log.c     |    7 +++++--
-> >>>  block/vpc.c          |    7 +++++--
-> >>>  8 files changed, 59 insertions(+), 29 deletions(-)
-> >>>
-> >>> diff --git a/block/backup.c b/block/backup.c
-> >>> index 763f0d7ff6db..d8c422a0e3bc 100644
-> >>> --- a/block/backup.c
-> >>> +++ b/block/backup.c
-> >>> @@ -602,11 +602,14 @@ static int64_t backup_calculate_cluster_size(BlockDriverState *target,
-> >>>                      BACKUP_CLUSTER_SIZE_DEFAULT);
-> >>>          return BACKUP_CLUSTER_SIZE_DEFAULT;
-> >>>      } else if (ret < 0 && !target->backing) {
-> >>> -        error_setg_errno(errp, -ret,
-> >>> +        Error *local_err = NULL;
-> >>
-> >> Can we go with the shorter name 'err' instead of 'local_err'?  I know,
-> >> we aren't consistent (both styles appear throughout the tree), but the
-> >> shorter style is more appealing to me.
-> > 
-> > I like local_err better because it's easier to distinguish from errp.
-> > The compiler might catch it if you use the wrong one because one is
-> > Error* and the other is Error**, but as a reviewer, I can still get
-> > confused.
-> 
-> Doesn't that sound like a striking reason for condemnation of this
-> entire model?
 
-Might be, but do you have a better idea?
+Hi
 
-Kevin
+Please, send any topic that you are interested in covering.
+
+At the end of Monday I will send an email with the agenda or the
+cancellation of the call, so hurry up.
+
+After discussions on the QEMU Summit, we are going to have always open a
+KVM call where you can add topics.
+
+ Call details:
+
+By popular demand, a google calendar public entry with it
+
+  https://www.google.com/calendar/embed?src=dG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
+
+(Let me know if you have any problems with the calendar entry.  I just
+gave up about getting right at the same time CEST, CET, EDT and DST).
+
+If you need phone number details,  contact me privately
+
+Thanks, Juan.
 
