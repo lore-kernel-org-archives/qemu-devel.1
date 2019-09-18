@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95C5EC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 16:16:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A41C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 16:17:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BE6C218AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 16:16:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BE6C218AF
+	by mail.kernel.org (Postfix) with ESMTPS id D0713218AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 16:17:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0713218AF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAccf-0004Nr-Fn
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 12:16:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50061)
+	id 1iAceP-0005sS-D9
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 12:17:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49997)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1iAbsx-0007vp-Lc
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:28:52 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1iAbsu-0007r2-SQ
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:28:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1iAbsw-0007E4-GX
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:28:51 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:34482)
+ (envelope-from <palmer@dabbelt.com>) id 1iAbst-0007Bp-Mr
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:28:48 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:43487)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1iAbsw-0007Dc-Af
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:28:50 -0400
-Received: by mail-pf1-f196.google.com with SMTP id b128so225386pfa.1
- for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 08:28:50 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1iAbst-0007BO-Ha
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:28:47 -0400
+Received: by mail-pf1-f196.google.com with SMTP id a2so185095pfo.10
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 08:28:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=QB4DlvulPZzUlgaey1nZw8B8imJR4kB3iDL99emwfxg=;
- b=iblMYP5H7oH7N+/wPNfRLNLw+4fguvgcQD3kGOQT6zhSnYmlUcJMIj38ACrgCdWdJA
- LOyQ9ELc2e/Dhls/YGxDDrvpm2FLzZetmgroPyYLoApEkbhYkw4HuUQ33JHiCpRLkNN9
- QGrwtqVGRxRWU7BrBJQ+J69qFiiZXAGfy8yZHFHTr2l1H1svACw8HHFGn54ZUufLSG5z
- +trAUmrMg+d6Rr8sLEB9YiCATgdfgryJRHET7GeDNZDhOwQCi+IEjT502Vgk5puvj0ye
- v5qoQF0vnucaKMjqDd/J+i4kwn9CYd7woe1/iGeSNfyhlGb0apScGEfYkZHWY8FouyYc
- TvzA==
-X-Gm-Message-State: APjAAAUN+2pVxWvKffy460Uy7ufJ7rlpQ+Vh3ZA3l/tcRojfqTur3uqm
- yktkCv7ivCs6CUECijJZw8g6dA==
-X-Google-Smtp-Source: APXvYqyh4Tei9pFzhVxmZxH3vuFBwYLPZFN5hoNNnLrh2rbOH/VMC/CRzUnsyu6X+HTl32Q52CoOJQ==
-X-Received: by 2002:a17:90a:983:: with SMTP id 3mr4473226pjo.57.1568820529141; 
- Wed, 18 Sep 2019 08:28:49 -0700 (PDT)
+ bh=oPwMt36c+qjgfMs2sORHI/jyAZMzpgus3H9ildbbPVw=;
+ b=CgQpSGo6LfF95LAoTMhiA4XjRzYIm8e3na0ee7YXtjfA9W9lTZC5V2c1pN0uVtq4pd
+ OcG36aMRqvUvFrKoKuOSIt1ahokZkcAe+GVg50/zjq4iwZUK1oatPoy8nNBMMV45Fx1/
+ 6KMxkMHXVFkn/nsYylCbE4AJVqxvCInvdPFLNygey+aSSBlFOQsF9Sib6OeD6Wq4odLU
+ SuZJF2cfkt/nG0TMDT3rM1GSLIzs3WAkCymi37liWOq1h3Y9+9SZm5nHT7AqOt06yPyY
+ w1KBxEfhHsA9su5nR8tAvbkBScqcfdCyuCCEXJIiUfMPLKdFJXBgKWYWdc+QNPcDaW8D
+ nLJQ==
+X-Gm-Message-State: APjAAAXIW+V0w/zg8iJT6djDWlI7Tda4/+I/Mlecv/UvI1TGYFyaXYyf
+ wuBcXcfHwZdY/wwYIEuAPU63YoFtd8s=
+X-Google-Smtp-Source: APXvYqy54FRPgOoq321R1y28p5bMKtWiDdHc9O/jShzz6Mn+b5D+avw3d0oiHP7PPLnoKtdFkNzrSw==
+X-Received: by 2002:a17:90a:aa82:: with SMTP id
+ l2mr4552715pjq.73.1568820526378; 
+ Wed, 18 Sep 2019 08:28:46 -0700 (PDT)
 Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id 193sm8474716pfc.59.2019.09.18.08.28.48
+ by smtp.gmail.com with ESMTPSA id o42sm3331187pjo.32.2019.09.18.08.28.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 18 Sep 2019 08:28:48 -0700 (PDT)
-Date: Wed, 18 Sep 2019 07:56:38 -0700
-Message-Id: <20190918145640.17349-47-palmer@sifive.com>
+ Wed, 18 Sep 2019 08:28:45 -0700 (PDT)
+Date: Wed, 18 Sep 2019 07:56:36 -0700
+Message-Id: <20190918145640.17349-45-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190918145640.17349-1-palmer@sifive.com>
 References: <20190918145640.17349-1-palmer@sifive.com>
@@ -66,7 +67,8 @@ To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.85.210.196
-Subject: [Qemu-devel] [PULL 46/48] target/riscv: Fix mstatus dirty mask
+Subject: [Qemu-devel] [PULL 44/48] riscv: sifive_u: Update model and
+ compatible strings in device tree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,31 +87,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alistair Francis <alistair.francis@wdc.com>
+From: Bin Meng <bmeng.cn@gmail.com>
 
-This is meant to mask off the hypervisor bits, but a typo caused it to
-mask MPP instead.
+This updates model and compatible strings to use the same strings
+as used in the Linux kernel device tree (hifive-unleashed-a00.dts).
 
-Fixes: 1f0419cb04 ("target/riscv: Allow setting mstatus virtulisation bits")
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
+Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/riscv/csr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/riscv/sifive_u.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index 2789215b5e..f767ad24be 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -335,7 +335,7 @@ static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
-              * RV32: MPV and MTL are not in mstatus. The current plan is to
-              * add them to mstatush. For now, we just don't support it.
-              */
--            mask |= MSTATUS_MPP | MSTATUS_MPV;
-+            mask |= MSTATUS_MTL | MSTATUS_MPV;
- #endif
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 444c699f49..9f8e84bf2e 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -96,8 +96,9 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+         exit(1);
      }
+ 
+-    qemu_fdt_setprop_string(fdt, "/", "model", "ucbbar,spike-bare,qemu");
+-    qemu_fdt_setprop_string(fdt, "/", "compatible", "ucbbar,spike-bare-dev");
++    qemu_fdt_setprop_string(fdt, "/", "model", "SiFive HiFive Unleashed A00");
++    qemu_fdt_setprop_string(fdt, "/", "compatible",
++                            "sifive,hifive-unleashed-a00");
+     qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
+     qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
  
 -- 
 2.21.0
