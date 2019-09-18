@@ -2,89 +2,89 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4937BC4CEC4
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 09:22:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8102C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 09:23:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F584214AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 09:22:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F584214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 74072214AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 09:23:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QDnokD4b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74072214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAWAE-0007zu-6d
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 05:22:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55339)
+	id 1iAWBC-0000Yj-Ke
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 05:23:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55522)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iAW8X-0006ha-Vn
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 05:20:35 -0400
+ (envelope-from <stefanha@gmail.com>) id 1iAW9n-0007ri-4e
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 05:21:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iAW8W-00057j-Sj
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 05:20:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47756)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iAW8Q-00055i-GU; Wed, 18 Sep 2019 05:20:27 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 988CF316E535;
- Wed, 18 Sep 2019 09:20:23 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-116-168.ams2.redhat.com
- [10.36.116.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 75B9460C05;
- Wed, 18 Sep 2019 09:20:14 +0000 (UTC)
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20190918085519.17290-1-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <726ed3db-fe67-98ff-5829-344dc6e04278@redhat.com>
-Date: Wed, 18 Sep 2019 11:20:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <stefanha@gmail.com>) id 1iAW9m-0005g6-61
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 05:21:51 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45053)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>)
+ id 1iAW9l-0005fV-VB; Wed, 18 Sep 2019 05:21:50 -0400
+Received: by mail-wr1-x441.google.com with SMTP id i18so6038006wru.11;
+ Wed, 18 Sep 2019 02:21:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=mpLWiORolXcg2AC+7bGIrO5UBG7wuQ0MQP49c2wu588=;
+ b=QDnokD4b9APx/XGp6dhZMQ+v34ELgFvA/XGxNXpVKajUtLH1GcBCA9iInPQ+L+1c6o
+ OOIZ1GSZsVv5hb8mvQzBMKkAb4LOJEyXw1ayu9+ZizqO/Y0RFVkZ2HWqIXYiJRYIYy4d
+ uZ4m14UYW23zbcSpA8xfLD/ZT+SljVFcUV1dycizDyNAPzTF5kpKc+N9vxEDVOmOjnp9
+ Cs6CRam8ekMxj5R0ebGf1R6+qn0RI5wa8FZ7fVDOaW6Sw8bC0Fltr7vLIJ1mUYomgDzV
+ cRCXO8vPcj5bDZoQznX1bd1QwIXcF/fWxannF9Hz6yNTktsOsZyS0wKrpcQGuLgJ0do0
+ hzYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=mpLWiORolXcg2AC+7bGIrO5UBG7wuQ0MQP49c2wu588=;
+ b=Pq6UFh+kvc1kIQDyqdcdDAp4wO6MDbq2h5BYvRcit3IsQn/t0MyODgqrf0EL+7Zfzv
+ PoWwLt1DG5HOK9Fvq+ufuxpGN7HCDMVuJIdm9NrCVVr7E8bPpT0Ztc4735C6umhOZze+
+ YqtFxhCQzqiwylSGAryCqL3WfT2Fgh3pptM4KF2wlGHjEiet8nYZzbz4i2vKRIZZnS2L
+ D6JiSy79b+fyLl+QJXE1R+cJ8KLMM6PgG4IMp3V4nb7CknMQwS8ISAWZNi3t9cpz5RRs
+ FQJ9GgR+kRyHCYK4NAXJLlb5ruDCagsenDKtOLjpAlUTayAoQRGYyx9KC68+mQu0hHiu
+ Jj0w==
+X-Gm-Message-State: APjAAAURDL9NqJxi12BlRkKAUNT4hpnp+I2iziZQ3Pd0eODIKy89M/Q5
+ 4ZnY2ZoTgWshtF+3vkww86nUXo7WlCU=
+X-Google-Smtp-Source: APXvYqzR/IX1o2VC+WznTJfFfX29nPocRx1Is5BtV8De4PRdEbFQKxu7tzrkrKQWCURZJuJnxgBJJQ==
+X-Received: by 2002:a05:6000:45:: with SMTP id
+ k5mr2291798wrx.259.1568798509036; 
+ Wed, 18 Sep 2019 02:21:49 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id w8sm7572068wmc.1.2019.09.18.02.21.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 18 Sep 2019 02:21:48 -0700 (PDT)
+Date: Wed, 18 Sep 2019 10:21:47 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Message-ID: <20190918092147.GB26027@stefanha-x1.localdomain>
+References: <20190916095121.29506-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190918085519.17290-1-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Ei7LQwYpI96SJNKR7ZIzTAox4XZC7qscW"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Wed, 18 Sep 2019 09:20:23 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] iotests: Require Python 3.5 or later
+ protocol="application/pgp-signature"; boundary="DBIVS5p969aUjpLe"
+Content-Disposition: inline
+In-Reply-To: <20190916095121.29506-1-philmd@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 0/2] trace: Forbid trailing
+ newline in event format
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,111 +96,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jsnow@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ei7LQwYpI96SJNKR7ZIzTAox4XZC7qscW
-Content-Type: multipart/mixed; boundary="xBtHbp0kzXvNLb1rWlWNz0IaWNb83WfC9";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jsnow@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org
-Message-ID: <726ed3db-fe67-98ff-5829-344dc6e04278@redhat.com>
-Subject: Re: [PATCH] iotests: Require Python 3.5 or later
-References: <20190918085519.17290-1-kwolf@redhat.com>
-In-Reply-To: <20190918085519.17290-1-kwolf@redhat.com>
 
---xBtHbp0kzXvNLb1rWlWNz0IaWNb83WfC9
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+--DBIVS5p969aUjpLe
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 18.09.19 10:55, Kevin Wolf wrote:
-> Running iotests is not required to build QEMU, so we can have stricter
-> version requirements for Python here and can make use of new features
-> and drop compatibility code earlier.
+On Mon, Sep 16, 2019 at 11:51:19AM +0200, Philippe Mathieu-Daud=E9 wrote:
+> Hi Stefan,
 >=20
-> This makes qemu-iotests skip all Python tests if a Python version befor=
-e
-> 3.5 is used for the build.
+> I'v been confused by trailing newline in trace reports,
+> so this series aims to fix this, by cleaning current
+> formats and add a check to catch new one introduced.
 >=20
-> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/check | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
+> v2:
+> - Use regex format (easier to review)
+> - Added R-b
 >=20
-> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-> index 875399d79f..a68f414d6c 100755
-> --- a/tests/qemu-iotests/check
-> +++ b/tests/qemu-iotests/check
-> @@ -633,6 +633,13 @@ then
->      export SOCKET_SCM_HELPER=3D"$build_iotests/socket_scm_helper"
->  fi
-> =20
-> +# Note that if the Python conditional here evaluates True we will exit=
+> Regards,
+>=20
+> Phil.
+>=20
+> Philippe Mathieu-Daud=E9 (2):
+>   trace: Remove trailing newline in events
+>   trace: Forbid event format ending with newline character
+>=20
+>  docs/devel/tracing.txt        |  2 ++
+>  hw/misc/trace-events          | 10 +++++-----
+>  hw/scsi/trace-events          |  2 +-
+>  hw/sd/trace-events            |  2 +-
+>  nbd/trace-events              |  4 ++--
+>  net/trace-events              |  6 +++---
+>  scripts/tracetool/__init__.py |  3 +++
+>  7 files changed, 17 insertions(+), 12 deletions(-)
 
-> +# with status 1 which is a shell 'false' value.
+We can continue the broader discussion about whether trace events may
+contain newlines in string arguments (John's AHCI case) or in
+non-trailing position in the format string.  These patches look fine
+though and are ready to go.
 
-I=E2=80=99d expect everything to exit with 1 if something does not work. =
- Thus,
-I find the short script confusing (I think you do, too, or you wouldn=E2=80=
-=99t
-have written this comment).  Why not make it =E2=80=9Csys.exit(0 if
-sys.version_info >=3D (3, 5) else 1)=E2=80=9D?
+Thanks, applied (with Eric's typo fix) to my tracing tree:
+https://github.com/stefanha/qemu/commits/tracing
 
-> +python_usable=3Dfalse
-> +if ! $PYTHON -c 'import sys; sys.exit(sys.version_info >=3D (3,5))'; t=
-hen
-> +    python_usable=3Dtrue
-> +fi
-> +
->  default_machine=3D$($QEMU_PROG -machine help | sed -n '/(default)/ s/ =
-=2E*//p')
->  default_alias_machine=3D$($QEMU_PROG -machine help | \
->     sed -n "/(alias of $default_machine)/ { s/ .*//p; q; }")
-> @@ -809,7 +816,12 @@ do
->          start=3D$(_wallclock)
-> =20
->          if [ "$(head -n 1 "$source_iotests/$seq")" =3D=3D "#!/usr/bin/=
-env python" ]; then
-> -            run_command=3D"$PYTHON $seq"
-> +            if $python_usable; then
-> +                run_command=3D"$PYTHON $seq"
-> +            else
-> +                run_command=3D"false"
-> +                echo "Unsupported Python version" > $seq.notrun
-> +            fi
->          else
->              run_command=3D"./$seq"
->          fi
+Stefan
 
-But it isn=E2=80=99t wrong, so I suppose:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---xBtHbp0kzXvNLb1rWlWNz0IaWNb83WfC9--
-
---Ei7LQwYpI96SJNKR7ZIzTAox4XZC7qscW
+--DBIVS5p969aUjpLe
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2B9swACgkQ9AfbAGHV
-z0B+xQf9G00ynIdl1oEQSOTwnk/oouUeyAnDwOturAom7b9HC1mf7lHK3Omg6Nmy
-qYCCh3C5LxkU+g9Jla4uJVyDoGCac4Fascv8VOo32aTPbpEXXeCDn+vEf4Zatpfa
-fC4O5MRGtcg/285Gxf1PAt1S+aQOIevTzzpqOcmGWpzOq8PgR0V4vbKaJQrvlNHw
-DYjjLRfZV4Qt0Jzks7oxjVYK9hKmBuEalFHjcvZeRciEcpgYPmFSNHxwdZXlvinG
-vlSJVDjhLAiA0qz9LUZuIy3zC7KNeRdBVrXVBP2qQAAuoFpzxmO8vlBRYmv8V6US
-PISkhBKZv4VTGMfVsKXDhMxW0/XINQ==
-=VBb+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2B9ysACgkQnKSrs4Gr
+c8gfLAgAuAxzkRz1M/ZAvq3svNEwW6mBGGxS477rS1kZyE/5ccjMovmKDmnbEng/
+fUPnteQSoP8bp7LFWcTXAAmPa9qOxIdNuxrUcQGDKsWYn4HSsD4zOY3Bwjk8nL/k
+4g/vgGOI3g6o5E9jEzlTqUEqzIM0KRNdVuXVcVsJStSNJwQoM3DFiLxXg0ZWhoT4
+9b6sZjL74WbZ/HVDlGfJlw8oPEgiA3L2MmfyxXqzHYqp1LElSH0GjNLzGg8MdJsw
+crEZdzGvUy4ppIYMjnqJqVRkK95/6/g/49WEql5+9CcjqZpRgNMZZjUjgTXhvN4j
+3eZV2O28Q/AQooUmQI5tbF9hxNZhlg==
+=37RP
 -----END PGP SIGNATURE-----
 
---Ei7LQwYpI96SJNKR7ZIzTAox4XZC7qscW--
+--DBIVS5p969aUjpLe--
 
