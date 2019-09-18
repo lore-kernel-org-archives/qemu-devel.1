@@ -2,58 +2,93 @@ Return-Path: <SRS0=w+gu=XN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64DDCC4CEC9
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 11:34:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60766C4CEC4
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 11:36:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3974B214AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 11:34:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3974B214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 2892F21907
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 11:36:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OfPFOBxA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2892F21907
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAYDx-0001lC-9z
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 07:34:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46700)
+	id 1iAYFc-0003Dy-90
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 07:36:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46959)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dovgaluk@ispras.ru>) id 1iAYCY-0001AO-Ks
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:32:54 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iAYD5-0001UR-7x
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:33:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1iAYCW-0000oF-IC
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:32:50 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:45724)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1iAYCV-0000mS-6I
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:32:48 -0400
-Received: from PASHAISP (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id D457054011C;
- Wed, 18 Sep 2019 14:32:43 +0300 (MSK)
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
-References: <156872146565.1757.3033215873677512474.stgit@pasha-Precision-3630-Tower>
- <87blvi21cz.fsf@linaro.org> <001101d56dfa$bef4e630$3cdeb290$@ru>
- <8736gt28dp.fsf@linaro.org>
-In-Reply-To: <8736gt28dp.fsf@linaro.org>
-Date: Wed, 18 Sep 2019 14:32:46 +0300
-Message-ID: <001c01d56e14$cbccb710$63662530$@ru>
+ (envelope-from <alex.bennee@linaro.org>) id 1iAYD3-000177-WF
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:33:22 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40135)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iAYD3-00016W-N8
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 07:33:21 -0400
+Received: by mail-wr1-x442.google.com with SMTP id l3so6502379wru.7
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 04:33:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=OD6zMBBBA2SPvg+dgmK0PnpVRUNPk5uQqjsyJ0wj+CQ=;
+ b=OfPFOBxAaFgn6Zx/jtn0nLAwWGOKLn14+axTDFlUUpGHBMlnlwGzOGG1IDa6GoU0Qd
+ +siKHbiEBQZQZ5BECCM/z1EexrlpLY/3dbhoToYB4QNDfQDSH6bud1g5HqZvGyPqvaGC
+ 1ByOTSIvue6OrPnmvJhw2GWWFtcE9yvDNor2DZyTQ8loMaQDCQzWxqLOBSGtaUdcDEhz
+ 1jErD6rPusnv4QXpvZSbd/adCe8G6N387/XLimi9UKBZzmWRpT0TlUaH0oJkgwutmbpa
+ EC8WYHZe44SlWZqGfxK5rZcHpEXFFtpLC5vspdttdHabsdD6UNB1V5iXle8xXa2Y7PzS
+ OQ9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=OD6zMBBBA2SPvg+dgmK0PnpVRUNPk5uQqjsyJ0wj+CQ=;
+ b=CXMAV98dlul9yR83X2u91Gvw4ihkNE8zfRDPA8OUtpdQZsGILEr2ZMIjDediE5SPnj
+ 7et9iJd/mvTT7KEHwbma8mVB1wKLzjYtTkt0lGTYs+DuK2Z7F0sHYkISY/KubHFU90+Q
+ EoBiNryGs97i6VCAhHBt/khTN68qbpkH4HnSIxQt7QbaUY/qOjVVzDk75YpaKKIVqCrR
+ b7etEibpp+EbxgJDB0BnmXspBRRpw69ZNYpCJd9qrsqjLm5BRxs9ODDGkbJIUFGQG9Bt
+ N+Xtv1NMMLjWXnaHz6rXR/tFyAdH8rg1B6QiO8gLvbmFbtBDKToZUyfLmtKNyPWIJD5I
+ BOjA==
+X-Gm-Message-State: APjAAAU9480HT4P6oQG8m4KOEibCYtd5zg9y9GF8oLf0rFGOLIpk9x22
+ HiiwQ1zMxDiE98wnfze2u8LG5w==
+X-Google-Smtp-Source: APXvYqwzmgIreP409JKpBJEGpDwojmE2v9JGCOhv1HEIrQI7je9JFN85N+/ZPBudw10ZbqfhPAnpmg==
+X-Received: by 2002:adf:ee50:: with SMTP id w16mr2800501wro.93.1568806400301; 
+ Wed, 18 Sep 2019 04:33:20 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id l1sm5586160wrb.1.2019.09.18.04.33.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 18 Sep 2019 04:33:19 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id C90DB1FF87;
+ Wed, 18 Sep 2019 12:33:18 +0100 (BST)
+References: <20190917184109.12564-1-alex.bennee@linaro.org>
+ <20190917184109.12564-8-alex.bennee@linaro.org>
+ <afd9bc85-9c79-a456-73c1-fc19e97d1acd@linaro.org>
+ <877e661vur.fsf@linaro.org>
+ <93ff7174-77c0-d2eb-eac2-d3eef7e88a14@linaro.org>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+In-reply-to: <93ff7174-77c0-d2eb-eac2-d3eef7e88a14@linaro.org>
+Date: Wed, 18 Sep 2019 12:33:18 +0100
+Message-ID: <87zhj1zvnl.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Office Outlook 12.0
-Thread-Index: AdVuDcU84dkeosxXRBOPH+KCLOi5rAABMZ1Q
-Content-Language: ru
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 83.149.199.45
-Subject: Re: [Qemu-devel] [for-4.2 PATCH 0/6] Block-related record/replay
- fixes
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH v1 7/9] tests/tcg: add float_madds test to
+ multiarch
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,103 +100,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru,
- crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com,
- quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com,
- boost.lists@gmail.com, thomas.dullien@googlemail.com, pbonzini@redhat.com,
- mreitz@redhat.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com,
- rth@twiddle.net
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
->=20
-> >> -----Original Message-----
-> >> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> >> Sent: Tuesday, September 17, 2019 10:02 PM
-> >> To: Pavel Dovgalyuk
-> >> Cc: qemu-devel@nongnu.org; kwolf@redhat.com; =
-peter.maydell@linaro.org;
-> >> crosthwaite.peter@gmail.com; boost.lists@gmail.com; =
-artem.k.pisarenko@gmail.com;
-> >> quintela@redhat.com; ciro.santilli@gmail.com; jasowang@redhat.com; =
-mst@redhat.com;
-> >> armbru@redhat.com; mreitz@redhat.com; =
-maria.klimushenkova@ispras.ru; dovgaluk@ispras.ru;
-> >> kraxel@redhat.com; pavel.dovgaluk@ispras.ru; =
-thomas.dullien@googlemail.com;
-> >> pbonzini@redhat.com; dgilbert@redhat.com; rth@twiddle.net
-> >> Subject: Re: [for-4.2 PATCH 0/6] Block-related record/replay fixes
-> >>
-> >>
-> >> Pavel Dovgalyuk <pavel.dovgaluk@gmail.com> writes:
-> >>
-> >> > The set of patches include the block-related updates
-> >> > of the record/replay icount feature:
-> >> >  - application of 'snapshot' option on the file layer instead of
-> >> >    the top one: command line and documentation fix
-> >> >  - implementation of bdrv_snapshot_goto for blkreplay driver
-> >> >  - start/stop fix in replay mode with attached block devices
-> >> >  - record/replay of bh oneshot events, used in the block layer
-> >>
-> >> Can we come up with a reasonable smoke test to verify record/replay =
-is
-> >> functional? AIUI we don't need a full OS but we do need a block =
-device
-> >> to store the replay data. Could we use one of the simple system =
-tests
-> >> like "memory" and run that through a record and replay cycle?
-> >
-> > That's would be great.
-> > I'm not familiar with testing framework and couldn't find "memory"
-> > test that you refer to.
->=20
-> The memory test code is in tests/tcg/multiarch/system and gets =
-combined
-> with the boot code for whichever target can build it. For example on
-> aarch64 it is run like:
->=20
->   timeout 15  $BLD/aarch64-softmmu/qemu-system-aarch64 -monitor none =
--display none -chardev
-> file,path=3Dmemory.out,id=3Doutput  -M virt -cpu max -display none =
--semihosting-config
-> enable=3Don,target=3Dnative,chardev=3Doutput -kernel memory
 
-Yes, rr testing could be that simple, but in full system emulation mode.
-Simplest tests may be run even without the block devices:
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-qemu-system-aarch64 -monitor none -display none -chardev =
-file,path=3Dmemory.out,id=3Doutput
--M virt -cpu max -kernel memory -net none -icount =
-shift=3D5,rr=3Drecord,rrfile=3Drecord.bin
+> On 9/17/19 5:00 PM, Alex Benn=C3=A9e wrote:
+>>>> +    add_f32_const(0x8p-152);
+>>>> +    add_f32_const(0x8p-152);
+>>>> +    add_f32_const(0x8p-152);
+>>>
+>>> Why are you adding 3 of the same?
+>>
+>> To replicate the 1841491 test case where the same number is used for
+>> a/b/c
+>
+> Then we really ought to be more explicit about that.
 
-Better testing must include some block device like Linux boot image or =
-something similar.
+I guess - I was hoping to piggy back on the general case. Maybe we
+should just split that into a separate test case. We can at least re-use
+the format and flag printing code and drop the behind the scenes magic
+to "join" the constant table with extra test values.
 
-> The test binaries will be in $BLD/tests/tcg/aarch64-softmmu and are
-> built when you run "make check-tcg" and have either the appropriate
-> cross compilers installed on your system or docker enabled and setup
-> (see docs/devel/testing.rst).
->=20
-> > Replay test must at least the following:
-> > 1. record some execution
-> > 2. replay that execution
-> >
-> > And there could be several endings:
-> > 1. record stalled
-> > 2. record crashed
-> > 3. replay stalled
-> > 4. replay crashed
-> > 5. all executions finished successfully
->=20
-> If you can provide an appropriate set of invocations I can plumb them
-> into the Makefiles for you.
+> You're not doing full permutations on the sets of numbers, so does increm=
+enting
+> a random index really test what you intended?
 
-That will be great, thank you.
+I did initially do the full permutation but for madds it all adds up
+quite quickly. The shuffle we do here is a bit of a comprise, so it
+shuffles the various nan forms before nans with -inf and -large and
+finally a bunch of real numbers (subnormals in the middle). It gives a
+reasonably broad coverage without going nuts.
 
-Pavel Dovgalyuk
+>
+>>>> +#if defined(__arm__)
+>>>> +                r =3D __builtin_fmaf(a, b, c);
+>>>> +#else
+>>>> +                r =3D __builtin_fmaf(a, b, c);
+>>>> +#endif
+>>>
+>>> Eh?
+>>
+>> Ahh I was going to hardcode the arm madd instruction in as the builtin
+>> wasn't expanding. I tried setting -march in the CFLAGS but that didn't
+>> trigger it either on my buster arm-hf compiler. Any ideas how to get the
+>> compiler to do the right thing?
+>
+> I think you want -mfpu=3Dneon-vfpv4.
 
+Ahh that worked. I would have hoped that v8 would be enough to spit out
+aarch32 code which has to have VFPv4 for A profile right?
+
+Anyway I'll use that for now.
+
+>
+>
+> r~
+
+
+--
+Alex Benn=C3=A9e
 
