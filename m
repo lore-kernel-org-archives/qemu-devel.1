@@ -6,58 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78526C4CEC4
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 20:51:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65893C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 20:51:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 461DA20882
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 20:51:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 461DA20882
+	by mail.kernel.org (Postfix) with ESMTPS id 37C6020665
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 20:51:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37C6020665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAgv7-0004n1-AX
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 16:51:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46746)
+	id 1iAgvY-0005Bc-B0
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 16:51:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46797)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iAgta-0003hN-Lg
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 16:49:51 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1iAgtv-0003u0-EL
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 16:50:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iAgtZ-00073v-L6
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 16:49:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32954)
+ (envelope-from <mlevitsk@redhat.com>) id 1iAgtu-0007FA-E1
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 16:50:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33876)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1iAgtV-00072Q-Uc; Wed, 18 Sep 2019 16:49:46 -0400
+ id 1iAgts-0007Cc-97; Wed, 18 Sep 2019 16:50:08 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8EAB780038D;
- Wed, 18 Sep 2019 20:49:44 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9AA1E85537;
+ Wed, 18 Sep 2019 20:50:07 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.53])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3D5CF60C05;
- Wed, 18 Sep 2019 20:49:40 +0000 (UTC)
-Message-ID: <b3fe9d8f513ae1bf7312f1024b72e1fd83403ac8.camel@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 402F560C18;
+ Wed, 18 Sep 2019 20:49:57 +0000 (UTC)
+Message-ID: <eea7d7f61e886a5eaa0277986acbe8f9a0a46d16.camel@redhat.com>
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Wed, 18 Sep 2019 23:49:39 +0300
-In-Reply-To: <20190918095144.955-2-mreitz@redhat.com>
+Date: Wed, 18 Sep 2019 23:49:57 +0300
+In-Reply-To: <20190918095144.955-3-mreitz@redhat.com>
 References: <20190918095144.955-1-mreitz@redhat.com>
- <20190918095144.955-2-mreitz@redhat.com>
+ <20190918095144.955-3-mreitz@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Wed, 18 Sep 2019 20:49:44 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Wed, 18 Sep 2019 20:50:07 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/8] block: Handle filter truncation like
- native impl.
+Subject: Re: [Qemu-devel] [PATCH 2/8] block/cor: Drop cor_co_truncate()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,63 +75,46 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On Wed, 2019-09-18 at 11:51 +0200, Max Reitz wrote:
-> Make the filter truncation (passing it through to bs->file) a
-> first-class citizen and handle it exactly as if it was the filter
-> driver's native implementation of .bdrv_co_truncate().
-> 
-> I do not see a reason not to, it makes the code a bit shorter, and may
-> be even more correct because this gets us to finish the write_req that
-> we prepared before (may be important to e.g. bring dirty bitmaps to the
-> correct size).
+> No other filter driver has a .bdrv_co_truncate() implementation, and
+> there is no need to because the general block layer code can handle it
+> just as well.
 > 
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  block/io.c | 13 ++++++-------
->  1 file changed, 6 insertions(+), 7 deletions(-)
+>  block/copy-on-read.c | 8 --------
+>  1 file changed, 8 deletions(-)
 > 
-> diff --git a/block/io.c b/block/io.c
-> index f8c3596131..723655c792 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -3299,20 +3299,19 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset,
->          goto out;
->      }
+> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
+> index 6631f30205..e95223d3cb 100644
+> --- a/block/copy-on-read.c
+> +++ b/block/copy-on-read.c
+> @@ -73,13 +73,6 @@ static int64_t cor_getlength(BlockDriverState *bs)
+>  }
 >  
-> -    if (!drv->bdrv_co_truncate) {
-> -        if (bs->file && drv->is_filter) {
-> -            ret = bdrv_co_truncate(bs->file, offset, prealloc, errp);
-> -            goto out;
-> -        }
-> +    if (drv->bdrv_co_truncate) {
-> +        ret = drv->bdrv_co_truncate(bs, offset, prealloc, errp);
-> +    } else if (bs->file && drv->is_filter) {
-> +        ret = bdrv_co_truncate(bs->file, offset, prealloc, errp);
-> +    } else {
->          error_setg(errp, "Image format driver does not support resize");
->          ret = -ENOTSUP;
->          goto out;
->      }
+>  
+> -static int coroutine_fn cor_co_truncate(BlockDriverState *bs, int64_t offset,
+> -                                        PreallocMode prealloc, Error **errp)
+> -{
+> -    return bdrv_co_truncate(bs->file, offset, prealloc, errp);
+> -}
 > -
-> -    ret = drv->bdrv_co_truncate(bs, offset, prealloc, errp);
->      if (ret < 0) {
->          goto out;
->      }
-> +
-> 
-I would say that those are unrelated whitespace changes, but I myself
-don't mind this :-)
-
-
->      ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
->      if (ret < 0) {
->          error_setg_errno(errp, -ret, "Could not refresh total sector count");
-
-Looks all right to me, although I don't know the block filters well yet.
-
+> -
+>  static int coroutine_fn cor_co_preadv(BlockDriverState *bs,
+>                                        uint64_t offset, uint64_t bytes,
+>                                        QEMUIOVector *qiov, int flags)
+> @@ -139,7 +132,6 @@ static BlockDriver bdrv_copy_on_read = {
+>      .bdrv_child_perm                    = cor_child_perm,
+>  
+>      .bdrv_getlength                     = cor_getlength,
+> -    .bdrv_co_truncate                   = cor_co_truncate,
+>  
+>      .bdrv_co_preadv                     = cor_co_preadv,
+>      .bdrv_co_pwritev                    = cor_co_pwritev,
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 Best regards,
 	Maxim Levitsky
+
 
 
 
