@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E45C4CEC4
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 15:46:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F726C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 15:50:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F49F206C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 15:46:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F49F206C2
+	by mail.kernel.org (Postfix) with ESMTPS id EA2D521907
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Sep 2019 15:49:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA2D521907
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAc9Y-0005mw-BZ
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 11:46:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49090)
+	id 1iAcDO-0000v3-2U
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 11:49:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49464)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1iAbrx-0006Mv-7p
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:27:50 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1iAbsR-00076A-0m
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:28:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1iAbrw-0006TJ-1n
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:27:49 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:39788)
+ (envelope-from <palmer@dabbelt.com>) id 1iAbsP-0006od-QY
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:28:18 -0400
+Received: from mail-pl1-f177.google.com ([209.85.214.177]:34973)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1iAbrv-0006Se-SB
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:27:47 -0400
-Received: by mail-pf1-f195.google.com with SMTP id i1so201368pfa.6
- for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 08:27:47 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1iAbsP-0006nT-J4
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 11:28:17 -0400
+Received: by mail-pl1-f177.google.com with SMTP id s17so128044plp.2
+ for <qemu-devel@nongnu.org>; Wed, 18 Sep 2019 08:28:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=ObpRu4yWGJ56Lce0E8Qj/S0MZ1B/JMtbNndq30ymwo0=;
- b=p7XPQSH5Os1bX+o6AqGLinhM0Zlm1qdmm4ZKAl38xk8DzAd1PGBjlYNQD64qzS7bxS
- Jz+tpZMxfoWF3iXHx+S1glErefKpQywR4ByRMghPxC0levi5paSdOVTT0A+v1jRA0i/3
- Vuu5of1FTSWmPEkJdULWn1OLqw5u1Hj4L7asg4R2bgkc1lOqs7K5Dv03HqnltdHnYi2n
- 0SpwnfLArwn1xACho05aOGiteLx+wQsmTrg7G4LHIaIHhWZJHlp3jTI0DCnaAXN58whu
- /YIw0R0IvDDD/GiB39uRK4mOWrH4eyL6r7DX6JR2GgHilv6Sc1Cv2LTACq6ESltzN3hu
- G0ZQ==
-X-Gm-Message-State: APjAAAUmR4LVY85KnaTmF5mK2cNN1J2vF/1sujyPGa+5o+1ROx8hauCG
- 07SMKVP0Q0q1JbcjfNTTJqSZVg==
-X-Google-Smtp-Source: APXvYqzalaVF/UtW5QClUcNY5hqPSb6pUDyth2/zz1ByScXYulkSUxKELM8zmC6Pw7G/ixHGpbS7Fg==
-X-Received: by 2002:a63:eb52:: with SMTP id b18mr2090909pgk.71.1568820466587; 
- Wed, 18 Sep 2019 08:27:46 -0700 (PDT)
+ bh=xpkGcRJRYadCT6ocDlVxXul15aD8WH0BAO94YOt7Pqc=;
+ b=IU5Y8+a7EFo/ITjcCmVBz8fdF/4a0Np6xdYabLZyXk/NUOyPw9GjegopwCGPvKpJMl
+ WvLS1+CN5aLoQk2d7gDwr/4P2acp6sM/SjuSicwZSM6dfWjZl18vCOwDUeieRKkSc4XP
+ sWnA0KLha7VKuxjlezNbkQyPOvTrR+HCFm6Dt3Mc4bIjivq6GIrt1ot68FRXt0PjxW9x
+ gb7U4qd0XQXrU8entfTB+LeOAPmf87r+6vFeOvoiEsV2+7g9S9hvZA5qkaD3g8aVRCAy
+ a0C4OELWOvRndJFOZbfVnFJoKEDec7bObvBThsuu3TOImMPHs7I+DfTHh778sIVHgVYO
+ B5Ag==
+X-Gm-Message-State: APjAAAW2uzwdLzkBNUMIuYg+3Q6R6VxteJsd1G/rnrrVZALF9v45grJM
+ ZyTWF8mnTLPFqJlQHIDosKY3oA==
+X-Google-Smtp-Source: APXvYqxiUJaoP6chcZoXKqQu9MwlV1dyNJvg0+aOvok3WF+W+DaW7MHkF0Jvw/qULcVkMuubbNPo6A==
+X-Received: by 2002:a17:902:6545:: with SMTP id
+ d5mr4877277pln.333.1568820496321; 
+ Wed, 18 Sep 2019 08:28:16 -0700 (PDT)
 Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id l124sm6998219pgl.54.2019.09.18.08.27.45
+ by smtp.gmail.com with ESMTPSA id i1sm13119473pfg.2.2019.09.18.08.28.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 18 Sep 2019 08:27:45 -0700 (PDT)
-Date: Wed, 18 Sep 2019 07:56:01 -0700
-Message-Id: <20190918145640.17349-10-palmer@sifive.com>
+ Wed, 18 Sep 2019 08:28:15 -0700 (PDT)
+Date: Wed, 18 Sep 2019 07:56:14 -0700
+Message-Id: <20190918145640.17349-23-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190918145640.17349-1-palmer@sifive.com>
 References: <20190918145640.17349-1-palmer@sifive.com>
@@ -65,9 +66,9 @@ From: Palmer Dabbelt <palmer@sifive.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.210.195
-Subject: [Qemu-devel] [PULL 09/48] riscv: rv32: Root page table address can
- be larger than 32-bit
+X-Received-From: 209.85.214.177
+Subject: [Qemu-devel] [PULL 22/48] riscv: sifive_u: Remove the unnecessary
+ include of prci header
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,63 +89,28 @@ Sender: "Qemu-devel"
 
 From: Bin Meng <bmeng.cn@gmail.com>
 
-For RV32, the root page table's PPN has 22 bits hence its address
-bits could be larger than the maximum bits that target_ulong is
-able to represent. Use hwaddr instead.
+sifive_u machine does not use PRCI as of today. Remove the prci
+header inclusion.
 
 Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/riscv/cpu_helper.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/riscv/sifive_u.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 96373b67d8..87dd6a6ece 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -186,12 +186,12 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
- 
-     *prot = 0;
- 
--    target_ulong base;
-+    hwaddr base;
-     int levels, ptidxbits, ptesize, vm, sum;
-     int mxr = get_field(env->mstatus, MSTATUS_MXR);
- 
-     if (env->priv_ver >= PRIV_VERSION_1_10_0) {
--        base = get_field(env->satp, SATP_PPN) << PGSHIFT;
-+        base = (hwaddr)get_field(env->satp, SATP_PPN) << PGSHIFT;
-         sum = get_field(env->mstatus, MSTATUS_SUM);
-         vm = get_field(env->satp, SATP_MODE);
-         switch (vm) {
-@@ -211,7 +211,7 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
-           g_assert_not_reached();
-         }
-     } else {
--        base = env->sptbr << PGSHIFT;
-+        base = (hwaddr)(env->sptbr) << PGSHIFT;
-         sum = !get_field(env->mstatus, MSTATUS_PUM);
-         vm = get_field(env->mstatus, MSTATUS_VM);
-         switch (vm) {
-@@ -249,7 +249,7 @@ restart:
-                            ((1 << ptidxbits) - 1);
- 
-         /* check that physical address of PTE is legal */
--        target_ulong pte_addr = base + idx * ptesize;
-+        hwaddr pte_addr = base + idx * ptesize;
- 
-         if (riscv_feature(env, RISCV_FEATURE_PMP) &&
-             !pmp_hart_has_privs(env, pte_addr, sizeof(target_ulong),
-@@ -261,7 +261,7 @@ restart:
- #elif defined(TARGET_RISCV64)
-         target_ulong pte = ldq_phys(cs->as, pte_addr);
- #endif
--        target_ulong ppn = pte >> PTE_PPN_SHIFT;
-+        hwaddr ppn = pte >> PTE_PPN_SHIFT;
- 
-         if (!(pte & PTE_V)) {
-             /* Invalid PTE */
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 32d8cee335..2947e06f71 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -38,7 +38,6 @@
+ #include "hw/riscv/sifive_plic.h"
+ #include "hw/riscv/sifive_clint.h"
+ #include "hw/riscv/sifive_uart.h"
+-#include "hw/riscv/sifive_prci.h"
+ #include "hw/riscv/sifive_u.h"
+ #include "hw/riscv/boot.h"
+ #include "chardev/char.h"
 -- 
 2.21.0
 
