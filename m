@@ -2,66 +2,73 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 714F7C4CEC4
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 12:12:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB08C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 12:16:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03A5721929
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 12:12:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03A5721929
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id A14D9205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 12:16:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A14D9205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAvHz-00016S-Sn
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 08:11:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36439)
+	id 1iAvM4-00040g-LK
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 08:16:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37055)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dovgaluk@ispras.ru>) id 1iAvGm-0008Q9-4b
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 08:10:45 -0400
+ (envelope-from <jasowang@redhat.com>) id 1iAvL2-0003Le-Hl
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 08:15:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1iAvGk-0002xe-Mv
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 08:10:43 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:54758)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1iAvGk-0002wM-BN
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 08:10:42 -0400
-Received: from PASHAISP (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id BB86C54006B;
- Thu, 19 Sep 2019 15:10:39 +0300 (MSK)
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-To: "'Kevin Wolf'" <kwolf@redhat.com>
-References: <156872146565.1757.3033215873677512474.stgit@pasha-Precision-3630-Tower>
- <156872148244.1757.2888672921697745021.stgit@pasha-Precision-3630-Tower>
- <20190918091831.GD5207@localhost.localdomain>
- <001201d56e02$9d88b5f0$d89a21d0$@ru>
- <20190918093305.GF5207@localhost.localdomain>
- <001401d56e04$b93c02a0$2bb407e0$@ru>
- <20190918094436.GG5207@localhost.localdomain>
- <001501d56e06$bbd7aa30$3386fe90$@ru>
- <20190919085302.GA10163@localhost.localdomain>
- <001901d56ec9$620ae260$2620a720$@ru>
- <20190919112702.GC10163@localhost.localdomain>
-In-Reply-To: <20190919112702.GC10163@localhost.localdomain>
-Date: Thu, 19 Sep 2019 15:10:43 +0300
-Message-ID: <001a01d56ee3$4354a530$c9fdef90$@ru>
+ (envelope-from <jasowang@redhat.com>) id 1iAvKy-0007kG-TH
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 08:15:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42634)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1iAvKy-0007i4-Kg
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 08:15:04 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AC05D309BF13;
+ Thu, 19 Sep 2019 12:15:02 +0000 (UTC)
+Received: from [10.72.12.81] (ovpn-12-81.pek2.redhat.com [10.72.12.81])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 78D0C60872;
+ Thu, 19 Sep 2019 12:14:54 +0000 (UTC)
+To: Yan Zhao <yan.y.zhao@intel.com>
+References: <AADFC41AFE54684AB9EE6CBC0274A5D19D57B1D1@SHSMSX104.ccr.corp.intel.com>
+ <6d73572e-1e89-b04a-bdd6-98ac73798083@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57B90C@SHSMSX104.ccr.corp.intel.com>
+ <204219fa-ee72-ca60-52a4-fb4bbc887773@redhat.com>
+ <20190919052819.GA18391@joy-OptiPlex-7040>
+ <7b6d6343-33de-ebd7-9846-af54a45a82a2@redhat.com>
+ <20190919061756.GB18391@joy-OptiPlex-7040>
+ <e0efbdc0-aad9-0d17-ec68-36460865501f@redhat.com>
+ <20190919062954.GC18391@joy-OptiPlex-7040>
+ <297143e5-a0b5-4873-77bf-7d2a97ec3c7c@redhat.com>
+ <20190919101611.GF18391@joy-OptiPlex-7040>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <57013ec8-59ad-b6d2-5a53-6696c9850401@redhat.com>
+Date: Thu, 19 Sep 2019 20:14:44 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Office Outlook 12.0
-Thread-Index: AdVu3TCh99HaQPpZRl+PLQNFGURpMgABc84g
-Content-Language: ru
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 83.149.199.45
-Subject: Re: [Qemu-devel] [for-4.2 PATCH 3/6] replay: update docs for
- record/replay with block devices
+In-Reply-To: <20190919101611.GF18391@joy-OptiPlex-7040>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Thu, 19 Sep 2019 12:15:02 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] vhost, iova, and dirty page tracking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,118 +80,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru, quintela@redhat.com,
- ciro.santilli@gmail.com, jasowang@redhat.com, crosthwaite.peter@gmail.com,
- qemu-devel@nongnu.org, armbru@redhat.com, alex.bennee@linaro.org,
- maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com,
- boost.lists@gmail.com, thomas.dullien@googlemail.com, pbonzini@redhat.com,
- mreitz@redhat.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com,
- rth@twiddle.net
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ 'Alex Williamson' <alex.williamson@redhat.com>, Peter Xu <peterx@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Kevin Wolf [mailto:kwolf@redhat.com]
-> Am 19.09.2019 um 11:05 hat Pavel Dovgalyuk geschrieben:
-> > > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > > > >
-> > > > > However, global -snapshot is just a convenient shortcut for specifying
-> > > > > snapshot=on for all -drive arguments. So if -snapshot is incompatible
-> > > > > with replay, shouldn't manually marking all drives as snapshot=on be
-> > > > > incompatible as well?
-> > > > >
-> > > > > Maybe you're really interested in some specific drive not having
-> > > > > snapshot=on? But then it might be better to check that specific drive
-> > > > > instad of forbidding just the shortcut for setting it.
-> > > >
-> > > > -snapshot adds the flag for top-level drive, making driver operations
-> > > > dependent on temporary file structure.
-> > > >
-> > > > Moving this overlay beneath blkreplay driver makes drive operations
-> > > > deterministic for the top-level device.
-> > >
-> > > So the real requirement is that blkreplay is the top-level node of any
-> > > guest device, right? And only because of this, you can't use -snapshot
-> > > (or snapshot=on on the blkreplay driver).
-> > >
-> > > If we instead check e.g. in blk_insert_bs() or blk_attach_dev() that in
-> > > record/replay mode, the root node of the BlockBackend is blkreplay,
-> > > wouldn't we catch many more incorrect setups?
-> >
-> > That sounds interesting.
-> > Will it help to check that every backend is connected to blkreplay?
-> 
-> Yes, it would return an error when you try to attach a non-blkreplay
-> node to a BlockBackend (and every guest device uses a BlockBackend).
-> 
-> Note that this restriction would currently make block jobs unavailable
-> on non-blkreplay nodes as they also use BlockBackends internally (though
-> this is going to change in the long run). I believe this restriction is
-> harmless and the typical replay use case doesn't involve any block jobs,
-> but if you do think it's a problem, blk_attach_dev() would be the place
-> that affects only devices.
-> 
-> > How then this check has to be done?
-> 
-> Only compile-tested, but maybe something like below?
-> 
-> Kevin
-> 
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 0422acdf1c..9fa72bea51 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -955,6 +955,7 @@ static inline BlockDriverState *backing_bs(BlockDriverState *bs)
->  extern BlockDriver bdrv_file;
->  extern BlockDriver bdrv_raw;
->  extern BlockDriver bdrv_qcow2;
-> +extern BlockDriver bdrv_blkreplay;
-> 
->  int coroutine_fn bdrv_co_preadv(BdrvChild *child,
->      int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
-> diff --git a/block/blkreplay.c b/block/blkreplay.c
-> index 2b7931b940..16a4f1df6a 100644
-> --- a/block/blkreplay.c
-> +++ b/block/blkreplay.c
-> @@ -126,7 +126,7 @@ static int coroutine_fn blkreplay_co_flush(BlockDriverState *bs)
->      return ret;
->  }
-> 
-> -static BlockDriver bdrv_blkreplay = {
-> +BlockDriver bdrv_blkreplay = {
->      .format_name            = "blkreplay",
->      .instance_size          = 0,
-> 
-> diff --git a/block/block-backend.c b/block/block-backend.c
-> index 1c605d5444..c57d3d9fdf 100644
-> --- a/block/block-backend.c
-> +++ b/block/block-backend.c
-> @@ -17,6 +17,7 @@
->  #include "block/throttle-groups.h"
->  #include "hw/qdev-core.h"
->  #include "sysemu/blockdev.h"
-> +#include "sysemu/replay.h"
->  #include "sysemu/runstate.h"
->  #include "qapi/error.h"
->  #include "qapi/qapi-events-block.h"
-> @@ -808,6 +809,12 @@ void blk_remove_bs(BlockBackend *blk)
->  int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp)
->  {
->      ThrottleGroupMember *tgm = &blk->public.throttle_group_member;
-> +
-> +    if (replay_mode != REPLAY_MODE_NONE && bs->drv != &bdrv_blkreplay) {
-> +        error_setg(errp, "Root node must be blkreplay");
-> +        return -ENOTSUP;
-> +    }
 
-I guess this is opposite direction - bs->drv is bdrv_file.
-And we should check its parent.
+On 2019/9/19 =E4=B8=8B=E5=8D=886:16, Yan Zhao wrote:
+> On Thu, Sep 19, 2019 at 06:06:52PM +0800, Jason Wang wrote:
+>> On 2019/9/19 =E4=B8=8B=E5=8D=882:29, Yan Zhao wrote:
+>>> On Thu, Sep 19, 2019 at 02:32:03PM +0800, Jason Wang wrote:
+>>>> On 2019/9/19 =E4=B8=8B=E5=8D=882:17, Yan Zhao wrote:
+>>>>> On Thu, Sep 19, 2019 at 02:09:53PM +0800, Jason Wang wrote:
+>>>>>> On 2019/9/19 =E4=B8=8B=E5=8D=881:28, Yan Zhao wrote:
+>>>>>>> On Thu, Sep 19, 2019 at 09:05:12AM +0800, Jason Wang wrote:
+>>>>>>>> On 2019/9/18 =E4=B8=8B=E5=8D=884:37, Tian, Kevin wrote:
+>>>>>>>>>> From: Jason Wang [mailto:jasowang@redhat.com]
+>>>>>>>>>> Sent: Wednesday, September 18, 2019 2:10 PM
+>>>>>>>>>>
+>>>>>>>>>>>> Note that the HVA to GPA mapping is not an 1:1 mapping. One =
+HVA
+>>>>>>>>>> range
+>>>>>>>>>>>> could be mapped to several GPA ranges.
+>>>>>>>>>>> This is fine. Currently vfio_dma maintains IOVA->HVA mapping.
+>>>>>>>>>>>
+>>>>>>>>>>> btw under what condition HVA->GPA is not 1:1 mapping? I didn'=
+t realize it.
+>>>>>>>>>> I don't remember the details e.g memory region alias? And neit=
+her kvm
+>>>>>>>>>> nor kvm API does forbid this if my memory is correct.
+>>>>>>>>>>
+>>>>>>>>> I checkedhttps://qemu.weilnetz.de/doc/devel/memory.html, which
+>>>>>>>>> provides an example of aliased layout. However, its aliasing is=
+ all
+>>>>>>>>> 1:1, instead of N:1. From guest p.o.v every writable GPA implie=
+s an
+>>>>>>>>> unique location. Why would we hit the situation where multiple
+>>>>>>>>> write-able GPAs are mapped to the same HVA (i.e. same physical
+>>>>>>>>> memory location)?
+>>>>>>>> I don't know, just want to say current API does not forbid this.=
+ So we
+>>>>>>>> probably need to take care it.
+>>>>>>>>
+>>>>>>> yes, in KVM API level, it does not forbid two slots to have the s=
+ame HVA(slot->userspace_addr).
+>>>>>>> But
+>>>>>>> (1) there's only one kvm instance for each vm for each qemu proce=
+ss.
+>>>>>>> (2) all ramblock->host (corresponds to HVA and slot->userspace_ad=
+dr) in one qemu
+>>>>>>> process is non-overlapping as it's obtained from mmmap().
+>>>>>>> (3) qemu ensures two kvm slots will not point to the same section=
+ of one ramblock.
+>>>>>>>
+>>>>>>> So, as long as kvm instance is not shared in two processes, and
+>>>>>>> there's no bug in qemu, we can assure that HVA to GPA is 1:1.
+>>>>>> Well, you leave this API for userspace, so you can't assume qemu i=
+s the
+>>>>>> only user or any its behavior. If you had you should limit it in t=
+he API
+>>>>>> level instead of open window for them.
+>>>>>>
+>>>>>>
+>>>>>>> But even if there are two processes operating on the same kvm ins=
+tance
+>>>>>>> and manipulating on memory slots, adding an extra GPA along side =
+current
+>>>>>>> IOVA & HVA to ioctl VFIO_IOMMU_MAP_DMA can still let driver knows=
+ the
+>>>>>>> right IOVA->GPA mapping, right?
+>>>>>> It looks fragile. Consider HVA was mapped to both GPA1 and GPA2. G=
+uest
+>>>>>> maps IOVA to GPA2, so we have IOVA GPA2 HVA in the new ioctl and t=
+hen
+>>>>>> log through GPA2. If userspace is trying to sync through GPA1, it =
+will
+>>>>>> miss the dirty page. So for safety we need log both GPA1 and GPA2.=
+ (See
+>>>>>> what has been done in log_write_hva() in vhost.c). The only way to=
+ do
+>>>>>> that is to maintain an independent HVA to GPA mapping like what KV=
+M or
+>>>>>> vhost did.
+>>>>>>
+>>>>> why GPA1 and GPA2 should be both dirty?
+>>>>> even they have the same HVA due to overlaping virtual address space=
+ in
+>>>>> two processes, they still correspond to two physical pages.
+>>>>> don't get what's your meaning:)
+>>>> The point is not leave any corner case that is hard to debug or fix =
+in
+>>>> the future.
+>>>>
+>>>> Let's just start by a single process, the API allows userspace to ma=
+ps
+>>>> HVA to both GPA1 and GPA2. Since it knows GPA1 and GPA2 are equivale=
+nt,
+>>>> it's ok to sync just through GPA1. That means if you only log GPA2, =
+it
+>>>> won't work.
+>>>>
+>>> In that case, cannot log dirty according to HPA.
+>>> because kvm cannot tell whether it's an valid case (the two GPAs are =
+equivalent)
+>>> or an invalid case (the two GPAs are not equivalent, but with the sam=
+e
+>>> HVA value).
+>>>
+>>> Right?
+>>
+>> There no need any examination on whether it was 'valid' or not. It's a=
+s
+>> simple as logging both GPA1 and GPA2. Then you won't need to care any
+>> corner case.
+>>
+> But, if GPA1 and GPA2 point to the same HVA, it means they point to the
+> same page. Then if you only log GPA2, and send GPA2 to target,  it
+> should still works, unless in the target side GPA1 and GPA2 do not poin=
+t to
+> the same HVA?
 
-> +
->      bdrv_ref(bs);
->      blk->root = bdrv_root_attach_child(bs, "root", &child_root, blk->ctx,
->                                         blk->perm, blk->shared_perm, blk, errp);
 
-Pavel Dovgalyuk
+The problem is whether userspace can just sync GPA1 instead of both GPA1=20
+and GPA2. If userspace can sync through GPA1 only, the dirty pages was=20
+lost. Paolo has pointed out that userspace can not have that assumption.
 
+
+>
+> In what condition you met it in reality?
+> Please kindly point it out :)
+
+
+It's not about reality, it's about possibility. Again, we don't want to=20
+leave any corner case that is hard to debug or fix in the future.
+
+Thanks
+
+
+>
+>
+>> Thanks
+>>
+>>
+>>> Thanks
+>>> Yan
+>>>
+>>>
 
