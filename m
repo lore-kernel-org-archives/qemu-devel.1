@@ -2,87 +2,79 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E84C49ED7
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 16:24:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BEA0C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 16:25:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD0B321907
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 16:24:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD0B321907
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 627772053B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 16:25:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mhqxMM8r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 627772053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAzE3-0005kb-Mf
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 12:24:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42438)
+	id 1iAzFB-0006oA-Bj
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 12:25:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iAz9m-00023C-E9
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:19:47 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iAz6A-0007gd-16
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:16:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iAz9k-0003jG-PE
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:19:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37483)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iAz9k-0003iX-Hi
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:19:44 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 75D7DC04BD33
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 16:19:43 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id c1so1260609wrb.12
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 09:19:43 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1iAz68-00023b-Ok
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:16:01 -0400
+Received: from mail-ot1-x32a.google.com ([2607:f8b0:4864:20::32a]:44073)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iAz67-00022N-B0
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:15:59 -0400
+Received: by mail-ot1-x32a.google.com with SMTP id 21so3566039otj.11
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 09:15:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=C+I7RLBzTI4PSzd9zpKqL+nyJnGhVYjBLB9/dulrPGM=;
+ b=mhqxMM8r4J5m35L4zymtX8mWnckyUm7KaEVCEd6SRrzC80q6OaJoRDcB9FQU8hZXkI
+ XaN6TprP5+8p0q3jBFC7f3xDqCKsSwDu5iO4ytOYdqJm7osTZHYL+R7a+/hdvxYJRaGG
+ HVwBlrQDkgYI/Ux3nZxJlrGVSby3Nt0bNy4pGgsMMMzUFcU5AbsxZEbTHqQmX8u1u5V5
+ 4wPrl74ud+d2krankSmJyS6uQJ3L8VS9OomlGC8vklD15v7uY2BRnXaEZb80mcV8jjva
+ 1J3zmZgRn0U2DXZyjAH3sa2v9+d9DDVxBcniNLm7eCEuXRMVi/BdGsluM6EydyH8+Zt1
+ Faww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=qkXAkFUJb4I5HOf7gs6usTH4iUfcPF2Y0LAfRm/Tdr4=;
- b=SoOMwYKE8de2AMtrkQENVt/cgo3wWWyAtVvmzu2uPZIhgI9J/yqVeW51o5fqQSvUZj
- AiaoWS1c+PdANApoMxt+hs2T6rcKRcQe6td7sO4e3O5r+CeLcD3bP7inJj51c1Y4hNkw
- tL5bqxHPNZpjnTcgEjARt39/tCgIrl5PU9kjEaaEuzxuB9tVuaOsDvDQgPLP3Wm3/kro
- TZLcq+/tt/8rgztIbS2LGZPuJIgVv983DsANomxPTOZU1Sdq1abrL2jmOe5vuLoq5L2e
- MAS4p7sc9scIReQsCkuJm3vHPa4ILQr1l/KTOFmKeQJKqMuPriy4+Qd0wgiyyk68k6Nn
- aOsg==
-X-Gm-Message-State: APjAAAUr+3IXafvN7KJihgCaD2P7vG0TlZIe7iohTRq48I43F8dnOq5J
- 5MzeZf1hjYaf4sZydLz88CM3o8Y9Qzm/xXdCS5qNTbn7wed+Xv7ZwVkokp4fao97tLCZxY8Rq60
- lS+d3Zd+BDKbqINE=
-X-Received: by 2002:adf:dbce:: with SMTP id e14mr8384919wrj.56.1568909982280; 
- Thu, 19 Sep 2019 09:19:42 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxZ28nY8kyQqx/SmMUXaI84HAQWy0gc85nWYV/eU3v7qu+qsjAnLlNR8dvhCjlV/+MsRuhz6Q==
-X-Received: by 2002:adf:dbce:: with SMTP id e14mr8384906wrj.56.1568909982103; 
- Thu, 19 Sep 2019 09:19:42 -0700 (PDT)
-Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id v11sm15194337wrv.54.2019.09.19.09.19.41
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 19 Sep 2019 09:19:41 -0700 (PDT)
-Subject: Re: [PATCH] Acceptance test machine_m68k_nextcube.py: relax the error
- code pattern
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-References: <20190919161400.26399-1-crosa@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <8a087ca1-cdae-20ee-d939-a47be4f25235@redhat.com>
-Date: Thu, 19 Sep 2019 18:19:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=C+I7RLBzTI4PSzd9zpKqL+nyJnGhVYjBLB9/dulrPGM=;
+ b=mJD20SUEZ3AUs3UTXFaiMOABjIJdhyoLA0pX/oB5N73QdnH0zoU/iwx6Vu0amOLN0J
+ 7p5mUaCc6EsjL4W9K1Atnl0p4BBGtEPdI73C1l3Ip+K2eM/GnloqOoDcGhini8d802vn
+ zIQMwX1zh4x2Y3iZE94xlMEUCyDsVk/GEAKxwGdg8RS4mJMdr/+L+vfVj9O2YKU0MtE6
+ yXmAfb5ER5sV0V/2Yk9l+9MUO2XTd2+M3EVJc+jUFsoMm7AIVowuYZOyrPB6DIQo1tow
+ J+C8iUTbYhxpQwNeYYKNYlECB3LOsh9BFA54ccBD+P/DydnrGN2EV4p34ssXOYum0+yq
+ +Ccg==
+X-Gm-Message-State: APjAAAU9rkWH4Og/HigQisMRWjWtWjnswpog1A4SQ30AxLMeaqJowhQ/
+ 1N0ee9BpX1UBnrOyfES7kSlgzbSNczssxsNT6osECg==
+X-Google-Smtp-Source: APXvYqyhnRLzNjD1EiTf35CWrbTddQXo9lPO35V8oXDQhggD5Xj2yupMPh+7LyYHQEWXSZ3oIO7Cg2nx8Jg0dm5aluA=
+X-Received: by 2002:a9d:5e11:: with SMTP id d17mr7642884oti.135.1568909757234; 
+ Thu, 19 Sep 2019 09:15:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190919161400.26399-1-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+References: <20190919091043.24503-1-kraxel@redhat.com>
+In-Reply-To: <20190919091043.24503-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 19 Sep 2019 17:15:46 +0100
+Message-ID: <CAFEAcA9O1KMctjisS1FVrK4u08=gCzgrXbHnFRR+LYdajNZtGw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 0/2] Ati 20190919 patches
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,43 +86,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <huth@tuxfamily.org>, Willian Rampazzo <wrampazz@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing Thomas
+On Thu, 19 Sep 2019 at 10:17, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> The following changes since commit f8c3db33a5e863291182f8862ddf81618a7c6194:
+>
+>   target/sparc: Switch to do_transaction_failed() hook (2019-09-17 12:01:00 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kraxel.org/qemu tags/ati-20190919-pull-request
+>
+> for you to fetch changes up to aab0e2a661b2b6bf7915c0aefe807fb60d6d9d13:
+>
+>   ati: use vga_read_byte in ati_cursor_define (2019-09-19 10:37:46 +0200)
+>
+> ----------------------------------------------------------------
+> vga: fix cursor code in ati-vga.
+>
+> ----------------------------------------------------------------
+>
+> Gerd Hoffmann (2):
+>   vga: move access helpers to separate include file
+>   ati: use vga_read_byte in ati_cursor_define
 
-On 9/19/19 6:14 PM, Cleber Rosa wrote:
-> Instead of looking for a specific error, let's relax the pattern
-> because different errors have been seen (I'm consistenly getting 52)
-> and the real goal of this test is to validate the framebuffer
-> operation, and not to reproduce one specific error.
+Applied, thanks.
 
-This might be because I wrote this test before Thomas added the serial
-controller (commit b17bed5b1727e3aa9e37fc8e8c3222130ceab22f).
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->  tests/acceptance/machine_m68k_nextcube.py | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/tests/acceptance/machine_m68k_nextcube.py b/tests/acceptan=
-ce/machine_m68k_nextcube.py
-> index e09cab9f20..fcd2c58ee7 100644
-> --- a/tests/acceptance/machine_m68k_nextcube.py
-> +++ b/tests/acceptance/machine_m68k_nextcube.py
-> @@ -116,6 +116,6 @@ class NextCubeMachine(Test):
->              if len(line):
->                  console_logger.debug(line)
->          self.assertIn('Testing the FPU, SCC', text)
-> -        self.assertIn('System test failed. Error code 51', text)
-> +        self.assertIn('System test failed. Error code', text)
->          self.assertIn('Boot command', text)
->          self.assertIn('Next>', text)
->=20
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+-- PMM
 
