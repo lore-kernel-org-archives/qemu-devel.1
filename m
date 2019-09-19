@@ -2,91 +2,87 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA826C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:28:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB0B4C4CEC4
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:29:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3D092053B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:28:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3D092053B
+	by mail.kernel.org (Postfix) with ESMTPS id 904C22053B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:29:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 904C22053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAxPm-00078W-Jz
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 10:28:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55945)
+	id 1iAxRM-0000D6-RH
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 10:29:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iAxOQ-0005x3-DP
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:26:47 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iAxPP-000701-Vz
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:27:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iAxOO-00080F-Vy
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:26:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44015)
+ (envelope-from <pbonzini@redhat.com>) id 1iAxPO-00007M-Sd
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:27:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57488)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iAxOH-0007sd-T9; Thu, 19 Sep 2019 10:26:38 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iAxPO-000060-Mw
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:27:46 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1D72B3082137;
- Thu, 19 Sep 2019 14:26:36 +0000 (UTC)
-Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BE54219C7F;
- Thu, 19 Sep 2019 14:26:12 +0000 (UTC)
-Subject: Re: [RFC] error: auto propagated local_err
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Kevin Wolf <kwolf@redhat.com>
-References: <20190918130244.24257-1-vsementsov@virtuozzo.com>
- <abb14088-6af2-5db2-da0d-0948fd4ac81c@redhat.com>
- <20190919091720.GB10163@localhost.localdomain>
- <57483252-273c-4606-47a8-eddeb840109a@redhat.com>
- <35c972e1-bdb5-cbcb-ed45-6a51f19af98c@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id E063211A07
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 14:27:45 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id t11so1145883wro.10
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 07:27:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=lKzcvFrFvsuwnxzjekpKEEzUuyIDEDYX7lbIC2J4SSc=;
+ b=YEwM9EkoGZFFBF7Gr0EqTpTo7LB3+SxGup8an+FjTHc3byNfWNbC4NDQ6blcZgGqgM
+ zoDQ6t9DDM453UAr9YeqERU9EGRVC0REnYds5/vmkrrzCn0Vw6pH7I8P91wPCpPQZuvF
+ bEC7i3qmSRqktAaqBBrtNTBqM0uScoInhywmIU1cXuE65R8TN42TMX+GrMUJ+7ggzw3m
+ aqk6wEPhrP9Yb8E9DrdqZf5jtmtEtmMj80FF4I4Yun23KkvcTAP+/2SfE7WRcl33Mp1V
+ EyFfd7AVHpEQ9cG9wVLaZHQLs55HbW5swq++gKxl/g4pJ5MayGBhR4uSc5Z9apyQB2FF
+ qiSg==
+X-Gm-Message-State: APjAAAWAtP+fQLDf7yx5h/7QWjNKbl3qCkFiX2BD5fb2Db1MQrejRfjt
+ EQUiOq+Xp8yaSc8ggN5R2x4SPQ0/jWa93vyKdU8GRcUYfozbsixWwJfoCfIaeUAVRqt8ZsJqX6x
+ 1Cmr91GltIvXaauo=
+X-Received: by 2002:a1c:49d4:: with SMTP id w203mr2963695wma.132.1568903264611; 
+ Thu, 19 Sep 2019 07:27:44 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwWHpid1hKmrP9o9mnI8qIsygxO0YvM00EZKuMQe4PeOB9ufNP3dV/JP7ovlKx3DrL8Qj4aFw==
+X-Received: by 2002:a1c:49d4:: with SMTP id w203mr2963668wma.132.1568903264364; 
+ Thu, 19 Sep 2019 07:27:44 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8?
+ ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
+ by smtp.gmail.com with ESMTPSA id s9sm8060432wme.36.2019.09.19.07.27.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 19 Sep 2019 07:27:43 -0700 (PDT)
+Subject: Re: [PATCH v3 05/22] libqtest: Add a layer of abstraciton to send/recv
+To: "Oleinik, Alexander" <alxndr@bu.edu>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20190918231846.22538-1-alxndr@bu.edu>
+ <20190918231846.22538-6-alxndr@bu.edu>
+ <a2ac1b44-8a93-8b81-c44d-133f7eefe944@redhat.com>
+ <60437a730d3df6a3248cd944eacd4555b40d00bc.camel@bu.edu>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <7ad7fa9f-59fe-808a-31eb-d3bdb1456bbb@redhat.com>
-Date: Thu, 19 Sep 2019 09:26:12 -0500
+Message-ID: <d07eebbd-2c4d-3f0a-790e-72d1965f6ca0@redhat.com>
+Date: Thu, 19 Sep 2019 16:27:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <35c972e1-bdb5-cbcb-ed45-6a51f19af98c@virtuozzo.com>
+In-Reply-To: <60437a730d3df6a3248cd944eacd4555b40d00bc.camel@bu.edu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Thu, 19 Sep 2019 14:26:36 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,102 +96,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "mst@redhat.com" <mst@redhat.com>, "codyprime@gmail.com" <codyprime@gmail.com>,
- "mark.cave-ayland@ilande.co.uk" <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "kraxel@redhat.com" <kraxel@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "david@redhat.com" <david@redhat.com>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
- "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
- "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>,
- "farman@linux.ibm.com" <farman@linux.ibm.com>,
- "groug@kaod.org" <groug@kaod.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
- "sundeep.lkml@gmail.com" <sundeep.lkml@gmail.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: "lvivier@redhat.com" <lvivier@redhat.com>,
+ "bsd@redhat.com" <bsd@redhat.com>, "thuth@redhat.com" <thuth@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/19/19 9:13 AM, Vladimir Sementsov-Ogievskiy wrote:
-
+On 19/09/19 15:27, Oleinik, Alexander wrote:
+> On Thu, 2019-09-19 at 13:18 +0200, Paolo Bonzini wrote:
+>> I think you can pass "s" to the tx handler as well, and remove the
+>> send_opaque and recv_opaque fields?
 > 
-> With my plan of two different macro, I at least messed the case when we need
-> both dereferencing and hints, which means third macro, or one macro with parameters,
-> saying what to wrap.
-> 
-> And my aim was to follow the idea of "do propagation only if it really necessary in this case".
-> 
-> But may be you are right, and we shouldn't care so much.
-> 
-> 1. What is bad, if we wrap NULL, when we only want to use hints?
-> Seems nothing. Some extra actions on error path, but who cares about it?
-> 
-> 2. What is bad, if we wrap error_fatal, when we only want to dereference, and don't use hints?
-> Seems nothing again, on error path we will return from higher level, and a bit of extra work, but nothing worse..
-> 
-> So I tend to agree. But honestly, I didn't understand first part of Kevin's paragraph against propagation,
-> so, may be he have more reasons to minimize number of cases when we propagate.
+> Qtest also uses this function to communicate over qmp  (different fd).
+> I can probably make the tx handler a wrapper which accepts "s", and
+> passes s->fd to the real socket_send.
 
-Here's the problem.
+Yes, exactly.
 
-error_propagate(&error_abort, ...)
+Thanks,
 
-produces an abort() with a stack trace tied to your CURRENT location,
-not the location at which the error was first detected.  We DO copy the
-function name and line number from the original detection, but we have
-moved on since that point in time, so the backtrace does not match the
-reported location in the error struct.  So for error_abort, you want to
-abort as soon as possible, without any intermediate error_propagate - we
-use this to flag programmer errors, and want to make life easy for the
-programmer.
+Paolo
 
-But for error_propagate(&error_fatal, ...), we WANT to delay things to
-as late as possible, in order to gather up as many additional
-append_hints as possible, before finally telling the user their problem.
- In that case, we don't care about the stack trace or even the function
-and line number of the failure, but about giving the user as much as we
-can to help them fix their command-line problem.
-
-> 
-> To the same topic, of minimization: should we always call MAKE_ERRP_SAFE at function top, or only
-> in block, where it is needed (assume, we dereference it only inside some "if" or "while"?
-> Kevin, is something bad in propagation, when it not related to error_abort?
-
-error_propagate() serves two purposes:
-
-It is a crutch to make it easier to paper over passing NULL as errp (in
-that case, we substitute a non-NULL pointer, then we can use 'if
-(local_error)', and error_propagate() then frees local_error).  Hiding
-this crutch behind a macro is desirable (less boilerplate).
-
-It helps transfer from one error to another.  In this form, we are fine
-using it for error_fatal (because we WANT the transfer to happen as late
-as possible, because once we transfer the program exits so we can't add
-any more hints), but not for error_abort (because we don't want to lose
-context by transferring), and wasteful at other times (write directly to
-the original error, instead of having to transfer).  So again, hiding it
-in a macro means we no longer have to call it directly, but only in the
-places where it helps.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
 
