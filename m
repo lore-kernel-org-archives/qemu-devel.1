@@ -2,49 +2,50 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A983FC49ED7
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 15:28:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2506C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 15:29:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80F2020665
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 15:28:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80F2020665
+	by mail.kernel.org (Postfix) with ESMTPS id A18DA20665
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 15:29:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A18DA20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAyLn-0005Ps-ID
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 11:28:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35509)
+	id 1iAyMz-0006Yh-Ld
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 11:29:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35565)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iAyL5-0004xr-QR
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:27:24 -0400
+ (envelope-from <eblake@redhat.com>) id 1iAyLu-0005gA-Js
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:28:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iAyL4-0002wC-Jt
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:27:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:5670)
+ (envelope-from <eblake@redhat.com>) id 1iAyLt-0003G7-6L
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:28:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58350)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAyL4-0002vv-Bw
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:27:22 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAyLs-0003Fz-UC
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:28:13 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4CFB387630;
- Thu, 19 Sep 2019 15:27:21 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 405333B77;
+ Thu, 19 Sep 2019 15:28:12 +0000 (UTC)
 Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 42BCD1001938;
- Thu, 19 Sep 2019 15:27:18 +0000 (UTC)
-Subject: Re: [PULL 15/26] audio: add mixeng option (documentation)
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 868B15D6B0;
+ Thu, 19 Sep 2019 15:28:09 +0000 (UTC)
+Subject: Re: [Qemu-devel] [PULL 00/26] Audio 20190919 patches
+To: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
 References: <20190919083629.29998-1-kraxel@redhat.com>
- <20190919083629.29998-16-kraxel@redhat.com>
+ <CAFEAcA96outvEdRasZM-LdTSs7QCRZracTvWUZ3gG5x23kh+1w@mail.gmail.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -71,18 +72,18 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <051bc473-f0b3-1ef5-1fef-6fe945dd9db3@redhat.com>
-Date: Thu, 19 Sep 2019 10:27:17 -0500
+Message-ID: <6691e81f-3122-a13c-d3bf-7f1762b2d69e@redhat.com>
+Date: Thu, 19 Sep 2019 10:28:08 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190919083629.29998-16-kraxel@redhat.com>
+In-Reply-To: <CAFEAcA96outvEdRasZM-LdTSs7QCRZracTvWUZ3gG5x23kh+1w@mail.gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="RIdYIAvZZf2vRxvGGi6U3VGfI0qea9GDy"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+ boundary="kZlalgDGlQnJ9FOETFRu3AzzF2TExC2g3"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Thu, 19 Sep 2019 15:27:21 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Thu, 19 Sep 2019 15:28:12 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,71 +97,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RIdYIAvZZf2vRxvGGi6U3VGfI0qea9GDy
-Content-Type: multipart/mixed; boundary="2PHc1oizA3W57TgVM9HegQHaOKhyqJmCi";
+--kZlalgDGlQnJ9FOETFRu3AzzF2TExC2g3
+Content-Type: multipart/mixed; boundary="beZdl7GUS7EA8LZzSOPGfpEstS1u0euwG";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
-Message-ID: <051bc473-f0b3-1ef5-1fef-6fe945dd9db3@redhat.com>
-Subject: Re: [PULL 15/26] audio: add mixeng option (documentation)
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <6691e81f-3122-a13c-d3bf-7f1762b2d69e@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 00/26] Audio 20190919 patches
 References: <20190919083629.29998-1-kraxel@redhat.com>
- <20190919083629.29998-16-kraxel@redhat.com>
-In-Reply-To: <20190919083629.29998-16-kraxel@redhat.com>
+ <CAFEAcA96outvEdRasZM-LdTSs7QCRZracTvWUZ3gG5x23kh+1w@mail.gmail.com>
+In-Reply-To: <CAFEAcA96outvEdRasZM-LdTSs7QCRZracTvWUZ3gG5x23kh+1w@mail.gmail.com>
 
---2PHc1oizA3W57TgVM9HegQHaOKhyqJmCi
+--beZdl7GUS7EA8LZzSOPGfpEstS1u0euwG
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 9/19/19 3:36 AM, Gerd Hoffmann wrote:
-> From: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.ice.hu@gmail.com>
+On 9/19/19 10:15 AM, Peter Maydell wrote:
+> On Thu, 19 Sep 2019 at 09:38, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>>
+>> The following changes since commit f8c3db33a5e863291182f8862ddf81618a7=
+c6194:
+>>
+>>   target/sparc: Switch to do_transaction_failed() hook (2019-09-17 12:=
+01:00 +0100)
+>>
+>> are available in the Git repository at:
+>>
+>>   git://git.kraxel.org/qemu tags/audio-20190919-pull-request
+>>
+>> for you to fetch changes up to cf0c1c2aa32db5d658c3c797ad995a6d571bad9=
+6:
+>>
+>>   audio: fix ALSA period-length typo in documentation (2019-09-19 10:3=
+2:48 +0200)
+>>
+>> ----------------------------------------------------------------
+>> audio: make mixeng optional.
+>> audio: add surround sound support.
+>> audio: documentation fixes.
+>>
 >=20
-> This will allow us to disable mixeng when we use a decent backend.
+> Hi; I'm afraid this fails to build on OSX/FreeBSD/OpenBSD/Windows,
+> with format string issues:
 >=20
-> Disabling mixeng have a few advantages:
-> * we no longer convert the audio output from one format to another, whe=
-n
->   the underlying audio system would just convert it to a third format.
->   We no longer convert, only the underlying system, when needed.
-> * the underlying system probably has better resampling and sample forma=
-t
->   converting methods anyway...
-> * we may support formats that the mixeng currently does not support (S2=
-4
->   or float samples, more than two channels)
-> * when using an audio server (like pulseaudio) different sound card
->   outputs will show up as separate streams, even if we use only one
->   backend
->=20
-> Disadvantages:
-> * audio capturing no longer works (wavcapture, and vnc audio extension)=
+> /Users/pm215/src/qemu-for-merges/audio/wavaudio.c:50:15: error: format
+> specifies type 'size_t' (aka 'unsigned long') but the argument has
+> type 'int64_t' (aka 'long long') [-Werror,-Wformat]
+>               bytes, strerror(errno));
+>               ^~~~~
 
-> * some backends only support a single playback stream or very picky
->   about the audio format.  In this case we can't disable mixeng.
->=20
-> However mixeng is not removed, only made optional, so this shouldn't be=
+As long as you spin a v2, it's also worth fixing a typo I found in 15/26.=
 
-> a big concern.
->=20
-
-> +++ b/qemu-options.hx
-> @@ -433,6 +433,7 @@ DEF("audiodev", HAS_ARG, QEMU_OPTION_audiodev,
->      "                specifies the audio backend to use\n"
->      "                id=3D identifier of the backend\n"
->      "                timer-period=3D timer period in microseconds\n"
-> +    "                in|out.mixing-engineeng=3D use mixing engine to m=
-ix streams inside QEMU\n"
-
-s/engineeng/engine/
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -168,24 +166,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---2PHc1oizA3W57TgVM9HegQHaOKhyqJmCi--
+--beZdl7GUS7EA8LZzSOPGfpEstS1u0euwG--
 
---RIdYIAvZZf2vRxvGGi6U3VGfI0qea9GDy
+--kZlalgDGlQnJ9FOETFRu3AzzF2TExC2g3
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2DnlUACgkQp6FrSiUn
-Q2pYkwgAlnXvg8uFP9f+Ms5NnpKplxofLGzZmycbrsAEy2pt9nmeJgGHDa1m9exu
-XcdRPO9q/M+GPfyZsbezVsPdNchqKhwTDXtMueGB05FtNv5mirkn/RoFfRXlPLl4
-/dGfSn7lBsmsrailQJQyVLWaZRoATNL4b4pjj6bETPicfFYhNC1FA282AsXBY+Oa
-RiHLqU6+GQTqfF9sbSaetc96DE6VG0yP8GZKNQYzYuT2DFbGPkXCtfVX3A3gpdC+
-vMuhv45j5MaX+kP+qB7Lj9x6jC0DvPsWDIEjlsqQZw5a8v6jLc7gFIgMtuWLBy92
-m9MxfV9hzdU5HmEjFjexzMQ99vaCgQ==
-=u9gO
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2DnogACgkQp6FrSiUn
+Q2otPgf/SUUkJdEah/484ZJ1oFIk2x4HvBl66YYkXdnHyUES3irMQCTE8NTy+4VZ
+A4ZuU8cTANwNxieQuxWd5UCmPP8kNKt5vHlBIJPKeMQ3M3MDkq+7diPbsvB0/rde
+gvclsYcqcAojKrYhPzgkbUudVTW6moCcxNKGV5x6bCPwXKNsjZxSs5EBuINj+jP1
+f32zggsfl1pjJDqfCXYI/1pW4n70Wkm8ZQe4XjbH0UuheVbckHSH35mLO62s1hAa
+RYLlKdtBYLMhun83JroWsvHSBGJCq4fk2DN2jtxEe5SCLG0zOqEuFvpUJYR4UVPH
+ZCqzOwF4605Mxn7gDZL8ij1cmHlmlA==
+=hE78
 -----END PGP SIGNATURE-----
 
---RIdYIAvZZf2vRxvGGi6U3VGfI0qea9GDy--
+--kZlalgDGlQnJ9FOETFRu3AzzF2TExC2g3--
 
