@@ -6,60 +6,60 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F4DAC4CEC4
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 08:55:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9019FC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 08:56:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBCBB21907
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 08:55:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBCBB21907
+	by mail.kernel.org (Postfix) with ESMTPS id 6401421924
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 08:56:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6401421924
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAsE9-0002Fp-Gh
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 04:55:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35828)
+	id 1iAsEj-0002ye-2E
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 04:56:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35831)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1iArvj-00058p-Vu
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:36:50 -0400
+ (envelope-from <kraxel@redhat.com>) id 1iArvk-000595-4r
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:36:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1iArve-0000G4-RT
+ (envelope-from <kraxel@redhat.com>) id 1iArvg-0000H1-Af
  for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:36:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59976)
+Received: from mx1.redhat.com ([209.132.183.28]:41100)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iArve-0000E3-Bq
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:36:42 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iArvf-0000GL-UK
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:36:44 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 369253C928;
- Thu, 19 Sep 2019 08:36:41 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E2CB630832C8;
+ Thu, 19 Sep 2019 08:36:42 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-47.ams2.redhat.com
  [10.36.116.47])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D68671001947;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D904360C18;
  Thu, 19 Sep 2019 08:36:40 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 7D9BB1747D; Thu, 19 Sep 2019 10:36:30 +0200 (CEST)
+ id 915981FCC2; Thu, 19 Sep 2019 10:36:30 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 19 Sep 2019 10:36:25 +0200
-Message-Id: <20190919083629.29998-23-kraxel@redhat.com>
+Date: Thu, 19 Sep 2019 10:36:27 +0200
+Message-Id: <20190919083629.29998-25-kraxel@redhat.com>
 In-Reply-To: <20190919083629.29998-1-kraxel@redhat.com>
 References: <20190919083629.29998-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Thu, 19 Sep 2019 08:36:41 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Thu, 19 Sep 2019 08:36:42 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 22/26] usb-audio: do not count on avail bytes
- actually available
+Subject: [Qemu-devel] [PULL 24/26] usbaudio: change playback counters to 64
+ bit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,89 +78,76 @@ Sender: "Qemu-devel"
 
 From: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.ice.hu@gmail.com>
 
-This assumption is no longer true when mixeng is turned off.
+With stereo playback, they need about 375 minutes of continuous audio
+playback to overflow, which is usually not a problem (as stopping and
+later resuming playback resets the counters).  But with 7.1 audio, they
+only need about 95 minutes to overflow.
+
+After the overflow, the buf->prod % USBAUDIO_PACKET_SIZE(channels)
+assertion no longer holds true, which will result in overflowing the
+buffer.  With 64 bit variables, it would take about 762000 years to
+overflow.
 
 Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.com=
 >
-Message-id: 90b5ec62109a69ee7c28d95b367e40dc41ad658a.1568574965.git.DirtY=
+Message-id: c0a8d934c145bab55506e0623cc0206e2632a196.1568574965.git.DirtY=
 .iCE.hu@gmail.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/dev-audio.c | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+ hw/usb/dev-audio.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/hw/usb/dev-audio.c b/hw/usb/dev-audio.c
-index ae42e5a2f1d0..74c99b1f1204 100644
+index e42bdfbdc101..ea604bbb8e4a 100644
 --- a/hw/usb/dev-audio.c
 +++ b/hw/usb/dev-audio.c
-@@ -319,30 +319,31 @@ static int streambuf_put(struct streambuf *buf, USB=
-Packet *p)
- {
-     uint32_t free =3D buf->size - (buf->prod - buf->cons);
+@@ -578,9 +578,9 @@ static const USBDesc desc_audio_multi =3D {
 =20
--    if (!free) {
-+    if (free < USBAUDIO_PACKET_SIZE) {
+ struct streambuf {
+     uint8_t *data;
+-    uint32_t size;
+-    uint32_t prod;
+-    uint32_t cons;
++    size_t size;
++    uint64_t prod;
++    uint64_t cons;
+ };
+=20
+ static void streambuf_init(struct streambuf *buf, uint32_t size,
+@@ -601,7 +601,7 @@ static void streambuf_fini(struct streambuf *buf)
+=20
+ static int streambuf_put(struct streambuf *buf, USBPacket *p, uint32_t c=
+hannels)
+ {
+-    uint32_t free =3D buf->size - (buf->prod - buf->cons);
++    int64_t free =3D buf->size - (buf->prod - buf->cons);
+=20
+     if (free < USBAUDIO_PACKET_SIZE(channels)) {
+         return 0;
+@@ -610,6 +610,8 @@ static int streambuf_put(struct streambuf *buf, USBPa=
+cket *p, uint32_t channels)
          return 0;
      }
-     if (p->iov.size !=3D USBAUDIO_PACKET_SIZE) {
-         return 0;
-     }
--    assert(free >=3D USBAUDIO_PACKET_SIZE);
-+
+=20
++    /* can happen if prod overflows */
++    assert(buf->prod % USBAUDIO_PACKET_SIZE(channels) =3D=3D 0);
      usb_packet_copy(p, buf->data + (buf->prod % buf->size),
-                     USBAUDIO_PACKET_SIZE);
-     buf->prod +=3D USBAUDIO_PACKET_SIZE;
-     return USBAUDIO_PACKET_SIZE;
- }
+                     USBAUDIO_PACKET_SIZE(channels));
+     buf->prod +=3D USBAUDIO_PACKET_SIZE(channels);
+@@ -618,10 +620,10 @@ static int streambuf_put(struct streambuf *buf, USB=
+Packet *p, uint32_t channels)
 =20
--static uint8_t *streambuf_get(struct streambuf *buf)
-+static uint8_t *streambuf_get(struct streambuf *buf, size_t *len)
+ static uint8_t *streambuf_get(struct streambuf *buf, size_t *len)
  {
-     uint32_t used =3D buf->prod - buf->cons;
+-    uint32_t used =3D buf->prod - buf->cons;
++    int64_t used =3D buf->prod - buf->cons;
      uint8_t *data;
 =20
-     if (!used) {
-+        *len =3D 0;
+-    if (!used) {
++    if (used <=3D 0) {
+         *len =3D 0;
          return NULL;
      }
--    assert(used >=3D USBAUDIO_PACKET_SIZE);
-     data =3D buf->data + (buf->cons % buf->size);
--    buf->cons +=3D USBAUDIO_PACKET_SIZE;
-+    *len =3D MIN(buf->prod - buf->cons,
-+               buf->size - (buf->cons % buf->size));
-     return data;
- }
-=20
-@@ -374,16 +375,21 @@ static void output_callback(void *opaque, int avail=
-)
-     USBAudioState *s =3D opaque;
-     uint8_t *data;
-=20
--    for (;;) {
--        if (avail < USBAUDIO_PACKET_SIZE) {
--            return;
--        }
--        data =3D streambuf_get(&s->out.buf);
-+    while (avail) {
-+        size_t written, len;
-+
-+        data =3D streambuf_get(&s->out.buf, &len);
-         if (!data) {
-             return;
-         }
--        AUD_write(s->out.voice, data, USBAUDIO_PACKET_SIZE);
--        avail -=3D USBAUDIO_PACKET_SIZE;
-+
-+        written =3D AUD_write(s->out.voice, data, len);
-+        avail -=3D written;
-+        s->out.buf.cons +=3D written;
-+
-+        if (written < len) {
-+            return;
-+        }
-     }
- }
-=20
 --=20
 2.18.1
 
