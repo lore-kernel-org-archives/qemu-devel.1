@@ -2,63 +2,73 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A5D6C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:09:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B557C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:11:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2D0921924
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:08:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2D0921924
+	by mail.kernel.org (Postfix) with ESMTPS id 4F02521848
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:11:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F02521848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAtMw-0006sP-IQ
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 06:08:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49541)
+	id 1iAtP2-0001G6-Cm
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 06:11:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49804)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1iAtJW-0002fK-5i
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:05:27 -0400
+ (envelope-from <jasowang@redhat.com>) id 1iAtLC-0005IF-GC
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:07:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1iAtJU-0007S2-Pa
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:05:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40211)
+ (envelope-from <jasowang@redhat.com>) id 1iAtLB-00088h-3t
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:07:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34328)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1iAtJU-0007Ro-Jg; Thu, 19 Sep 2019 06:05:24 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1iAtLA-00088S-Rv
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:07:09 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E6D10C057EC0;
- Thu, 19 Sep 2019 10:05:23 +0000 (UTC)
-Received: from gondolin (dhcp-192-230.str.redhat.com [10.33.192.230])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2F2285D6B0;
- Thu, 19 Sep 2019 10:05:23 +0000 (UTC)
-Date: Thu, 19 Sep 2019 12:05:21 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Message-ID: <20190919120521.1d93a9b3.cohuck@redhat.com>
-In-Reply-To: <20190918161514.15575-1-thuth@redhat.com>
-References: <20190918161514.15575-1-thuth@redhat.com>
-Organization: Red Hat GmbH
+ by mx1.redhat.com (Postfix) with ESMTPS id 31D343084037;
+ Thu, 19 Sep 2019 10:07:08 +0000 (UTC)
+Received: from [10.72.12.81] (ovpn-12-81.pek2.redhat.com [10.72.12.81])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7382119C6A;
+ Thu, 19 Sep 2019 10:07:00 +0000 (UTC)
+To: Yan Zhao <yan.y.zhao@intel.com>
+References: <AADFC41AFE54684AB9EE6CBC0274A5D19D57A080@SHSMSX104.ccr.corp.intel.com>
+ <8302a4ae-1914-3046-b3b5-b3234d7dda02@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57B1D1@SHSMSX104.ccr.corp.intel.com>
+ <6d73572e-1e89-b04a-bdd6-98ac73798083@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57B90C@SHSMSX104.ccr.corp.intel.com>
+ <204219fa-ee72-ca60-52a4-fb4bbc887773@redhat.com>
+ <20190919052819.GA18391@joy-OptiPlex-7040>
+ <7b6d6343-33de-ebd7-9846-af54a45a82a2@redhat.com>
+ <20190919061756.GB18391@joy-OptiPlex-7040>
+ <e0efbdc0-aad9-0d17-ec68-36460865501f@redhat.com>
+ <20190919062954.GC18391@joy-OptiPlex-7040>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <297143e5-a0b5-4873-77bf-7d2a97ec3c7c@redhat.com>
+Date: Thu, 19 Sep 2019 18:06:52 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20190919062954.GC18391@joy-OptiPlex-7040>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Thu, 19 Sep 2019 10:05:23 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Thu, 19 Sep 2019 10:07:08 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL SUBSYSTEM s390x 0/3] Minor fixes for the
- s390-ccw firmware
+Subject: Re: [Qemu-devel] vhost, iova, and dirty page tracking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,49 +80,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ 'Alex Williamson' <alex.williamson@redhat.com>, Peter Xu <peterx@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 18 Sep 2019 18:15:11 +0200
-Thomas Huth <thuth@redhat.com> wrote:
 
-> This pull request is not for master !
-> 
->  Hi Cornelia,
-> 
-> the following changes since commit f8c3db33a5e863291182f8862ddf81618a7c6194:
-> 
->   target/sparc: Switch to do_transaction_failed() hook (2019-09-17 12:01:00 +0100)
-> 
-> are available in the Git repository at:
-> 
->   https://gitlab.com/huth/qemu.git tags/s390-ccw-bios-2019-09-18
-> 
-> for you to fetch changes up to 6b2a203579068127d7e93cb6f45d828ca04a2153:
-> 
->   pc-bios/s390-ccw: Rebuild the s390-netboot.img firmware image (2019-09-18 17:47:27 +0200)
-> 
-> ----------------------------------------------------------------
-> - Small fixes for the s390-ccw firmware
-> - I did *not* rebuild the s390-ccw.img since the patch did not
->   make a difference at all - seems like GCC was smart enough
->   already to put the zeroed array into the BSS before
-> ----------------------------------------------------------------
-> 
-> Thomas Huth (2):
->       pc-bios/s390-ccw: Do not pre-initialize empty array
->       pc-bios/s390-ccw: Rebuild the s390-netboot.img firmware image
-> 
-> Yifan Luo (1):
->       pc-bios/s390-ccw/net: fix a possible memory leak in get_uuid()
-> 
->  pc-bios/s390-ccw/main.c    |   2 +-
->  pc-bios/s390-ccw/netmain.c |   1 +
->  pc-bios/s390-netboot.img   | Bin 67232 -> 67232 bytes
->  3 files changed, 2 insertions(+), 1 deletion(-)
+On 2019/9/19 =E4=B8=8B=E5=8D=882:29, Yan Zhao wrote:
+> On Thu, Sep 19, 2019 at 02:32:03PM +0800, Jason Wang wrote:
+>> On 2019/9/19 =E4=B8=8B=E5=8D=882:17, Yan Zhao wrote:
+>>> On Thu, Sep 19, 2019 at 02:09:53PM +0800, Jason Wang wrote:
+>>>> On 2019/9/19 =E4=B8=8B=E5=8D=881:28, Yan Zhao wrote:
+>>>>> On Thu, Sep 19, 2019 at 09:05:12AM +0800, Jason Wang wrote:
+>>>>>> On 2019/9/18 =E4=B8=8B=E5=8D=884:37, Tian, Kevin wrote:
+>>>>>>>> From: Jason Wang [mailto:jasowang@redhat.com]
+>>>>>>>> Sent: Wednesday, September 18, 2019 2:10 PM
+>>>>>>>>
+>>>>>>>>>> Note that the HVA to GPA mapping is not an 1:1 mapping. One HV=
+A
+>>>>>>>> range
+>>>>>>>>>> could be mapped to several GPA ranges.
+>>>>>>>>> This is fine. Currently vfio_dma maintains IOVA->HVA mapping.
+>>>>>>>>>
+>>>>>>>>> btw under what condition HVA->GPA is not 1:1 mapping? I didn't =
+realize it.
+>>>>>>>> I don't remember the details e.g memory region alias? And neithe=
+r kvm
+>>>>>>>> nor kvm API does forbid this if my memory is correct.
+>>>>>>>>
+>>>>>>> I checkedhttps://qemu.weilnetz.de/doc/devel/memory.html, which
+>>>>>>> provides an example of aliased layout. However, its aliasing is a=
+ll
+>>>>>>> 1:1, instead of N:1. From guest p.o.v every writable GPA implies =
+an
+>>>>>>> unique location. Why would we hit the situation where multiple
+>>>>>>> write-able GPAs are mapped to the same HVA (i.e. same physical
+>>>>>>> memory location)?
+>>>>>> I don't know, just want to say current API does not forbid this. S=
+o we
+>>>>>> probably need to take care it.
+>>>>>>
+>>>>> yes, in KVM API level, it does not forbid two slots to have the sam=
+e HVA(slot->userspace_addr).
+>>>>> But
+>>>>> (1) there's only one kvm instance for each vm for each qemu process=
+.
+>>>>> (2) all ramblock->host (corresponds to HVA and slot->userspace_addr=
+) in one qemu
+>>>>> process is non-overlapping as it's obtained from mmmap().
+>>>>> (3) qemu ensures two kvm slots will not point to the same section o=
+f one ramblock.
+>>>>>
+>>>>> So, as long as kvm instance is not shared in two processes, and
+>>>>> there's no bug in qemu, we can assure that HVA to GPA is 1:1.
+>>>> Well, you leave this API for userspace, so you can't assume qemu is =
+the
+>>>> only user or any its behavior. If you had you should limit it in the=
+ API
+>>>> level instead of open window for them.
+>>>>
+>>>>
+>>>>> But even if there are two processes operating on the same kvm insta=
+nce
+>>>>> and manipulating on memory slots, adding an extra GPA along side cu=
+rrent
+>>>>> IOVA & HVA to ioctl VFIO_IOMMU_MAP_DMA can still let driver knows t=
+he
+>>>>> right IOVA->GPA mapping, right?
+>>>> It looks fragile. Consider HVA was mapped to both GPA1 and GPA2. Gue=
+st
+>>>> maps IOVA to GPA2, so we have IOVA GPA2 HVA in the new ioctl and the=
+n
+>>>> log through GPA2. If userspace is trying to sync through GPA1, it wi=
+ll
+>>>> miss the dirty page. So for safety we need log both GPA1 and GPA2. (=
+See
+>>>> what has been done in log_write_hva() in vhost.c). The only way to d=
+o
+>>>> that is to maintain an independent HVA to GPA mapping like what KVM =
+or
+>>>> vhost did.
+>>>>
+>>> why GPA1 and GPA2 should be both dirty?
+>>> even they have the same HVA due to overlaping virtual address space i=
+n
+>>> two processes, they still correspond to two physical pages.
+>>> don't get what's your meaning:)
+>> The point is not leave any corner case that is hard to debug or fix in
+>> the future.
+>>
+>> Let's just start by a single process, the API allows userspace to maps
+>> HVA to both GPA1 and GPA2. Since it knows GPA1 and GPA2 are equivalent=
+,
+>> it's ok to sync just through GPA1. That means if you only log GPA2, it
+>> won't work.
+>>
+> In that case, cannot log dirty according to HPA.
+> because kvm cannot tell whether it's an valid case (the two GPAs are eq=
+uivalent)
+> or an invalid case (the two GPAs are not equivalent, but with the same
+> HVA value).
+>
+> Right?
 
-Thanks, pulled.
+
+There no need any examination on whether it was 'valid' or not. It's as=20
+simple as logging both GPA1 and GPA2. Then you won't need to care any=20
+corner case.
+
+Thanks
+
+
+>
+> Thanks
+> Yan
+>
+>
 
