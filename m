@@ -2,91 +2,78 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41750C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:35:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63EF9C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:37:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 101F221929
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:35:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3287B2053B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:37:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JjNW3GJj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 101F221929
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eiWyH2rf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3287B2053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB0L6-0005nx-Hz
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 13:35:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50079)
+	id 1iB0Mr-00084a-C6
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 13:37:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50174)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iB06t-0008Kv-5M
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:20:52 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iB07S-0008UJ-18
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:21:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iB05m-0000Oy-Uv
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:19:44 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51649)
+ (envelope-from <peter.maydell@linaro.org>) id 1iAzvN-0003pJ-Nx
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:08:58 -0400
+Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:42659)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iB05m-0000OX-NN
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:19:42 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 7so5580577wme.1
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 10:19:42 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iAzvN-0003ow-GF
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:08:57 -0400
+Received: by mail-oi1-x22d.google.com with SMTP id i185so3338005oif.9
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 10:08:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=9KzFKDieUQ0ZocRaEPSFD2NAIupLGWoORjl8U1JZy58=;
- b=JjNW3GJjd7o4+WlIbaiGLZfdMPRuwsOPRbOE/dILPFjnjCA+xUhajV/gk0RnJjKRu4
- BeorQ5tYCCB7ozP9g+JHrgQzUXfXlGm5LLTM7ygD9ymIHglJARq2qNt84Oo+p0Zn5gvw
- yhKl4jPhhjD/ITzHRVWpuG1s5BEyfQUWc0hImXFrlPVjFcHHLRuwmn1pr6s/CORob0nW
- h0L3keq2bYf1uS+HxYoGR8PRPnsFiNYYfLczl2blHT5gHNMmZpEAPlzSBjXlfb1XwzAx
- 6ZcCXLgyAGSk6gsM01V5vwK04OIR47Q1a+XWMQS8BwPjlq1mkkpHOkYU9KdSvhR6Yfe/
- zu7Q==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=aTRi6tT55RAkYx7Li11LL7xBS9tOOOaLa888zMSma7E=;
+ b=eiWyH2rfvPL1hfDMJTJftugwJ6VKg4MAuOiAd7uncY3Ch9mHI6nO3OuywZPCwGhppX
+ Vf/m/D7L/3vDy3PyCeZBTO2x0sqGlrTwrFqFpTP2KG3LuIspx3v4AnicVlYfpkIWx+Zi
+ luxA6ExRi1pzu/419JGpzH1p0EybTEm4BeYf35Q0o3kMsz7mL2R8re0Z5/mJKeo/3rC5
+ tFp81SHm+sVCi61kWmmX+xTx4fKPWN1lE8wFsc5jLEuH8TEqHHvJITzftFaFROvTnduS
+ ZgOv4NL3YLNf8THQQ7tkgqanfoCjiEWeCu/5+3TJmHMHO7o61qx48Nzi41mrLDTRM35E
+ jTkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=9KzFKDieUQ0ZocRaEPSFD2NAIupLGWoORjl8U1JZy58=;
- b=MtUI88rI4r2cZx0QyA5DmnjQbsXevEFsrIAA9uAXo9VUdfU9HT+LQosPVuOZDYUWrk
- tR9fUcfuKMaungVOcOFTCSs2XmfqwFZIOVHIL0rfMAerWQrUW7DJm4yrwgUAYYYeGwOk
- G1R/XwQrSQw64FDK087kwX1sTJcnd+mzpmseXIniRxp32x6qT3l6zHBIpCsvIumr/yXg
- a92JgDWAszUE6FY44Ca9c4hTL5pyb4IrBTYoNY/u61GXB16CdPXUi/AG+WziRb7vZzFo
- jqDQjSMXyaPQtLx+kK501BCVn9jLRT4NdyIjgbHF6KRiBsbcYeyVW+dc+bXPTEcrsD/b
- Ivjw==
-X-Gm-Message-State: APjAAAXrnD0RdF67j+G/5/H8rhiWfCJZgIrHhqSTJ3bzj1IFDlPXZh+r
- RgoQ9P365AS8XrSepJwjYUGuwfFyzFM=
-X-Google-Smtp-Source: APXvYqyvashH4wJKjB8lrKIEttfiI5bDbWGrp085lEOxhE/co9aOnMaeYvuYqVZzd+zH2c9I95Lc9g==
-X-Received: by 2002:a05:600c:204a:: with SMTP id
- p10mr3977039wmg.175.1568913581547; 
- Thu, 19 Sep 2019 10:19:41 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id j26sm16970160wrd.2.2019.09.19.10.19.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Sep 2019 10:19:40 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 3D8211FF9F;
- Thu, 19 Sep 2019 18:10:17 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 16/16] Makefile: fix-up qemu-ga.8 paths to take in-src
- builds into account
-Date: Thu, 19 Sep 2019 18:10:15 +0100
-Message-Id: <20190919171015.12681-17-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190919171015.12681-1-alex.bennee@linaro.org>
-References: <20190919171015.12681-1-alex.bennee@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=aTRi6tT55RAkYx7Li11LL7xBS9tOOOaLa888zMSma7E=;
+ b=CtNoxwfnuLh1do8ni/mRz6cCj5vTZVH+Np5Y1upwZRxZJDmpLE9IgwhC3YKEpw7DT5
+ uVIJJ5lg8XgJfjX3mgWon4cHCNtbtb/1j+oxfeQzDDfrMupOtoq6GPr9i1n2N/+yZHN0
+ 1ExxYnoZSMp7rD+et2e5cXDXzFU1MT+rbZDmvAxircNEfvb7pIfRRyMELbkAnMrZl7Oc
+ DXFznSA9aJSpUpkK+n1ZAqaXTekXQwj6hpzCh4ldlWqQg+w9UNdIhjxMW+SGQKmE/qhO
+ 54ZVS95luenUeXohgqsXu7r2GdtIuO67Up+5QzIpac8CAWX6K+Q/H7k1K2XGz5+z/V/+
+ tQsQ==
+X-Gm-Message-State: APjAAAUWYGy5DZSd8Ifm/OJhxLMYgMUku5ktArXL+tZoDtmteAE+Mfev
+ r/y7WJ4Zl6a3CNI2MbNuKPcOZw6ujFCa22tZ69Kii2wNhXU=
+X-Google-Smtp-Source: APXvYqx2kaJxDOXY/rkLtND6vROE3hSq9/ZGuX3y7hKZ+t3+Ujsv63AJk0DrG+zwkkX5ke7r0704oiFRpm/vNk1vf1g=
+X-Received: by 2002:aca:50d8:: with SMTP id e207mr3023103oib.48.1568912936471; 
+ Thu, 19 Sep 2019 10:08:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <9c6bf92a-0869-cf5d-222b-305e55393ebb@schrodt.org>
+In-Reply-To: <9c6bf92a-0869-cf5d-222b-305e55393ebb@schrodt.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 19 Sep 2019 18:08:45 +0100
+Message-ID: <CAFEAcA-GdcL+4yOnn1-SbD-8F8THA1TN5japT6Sk27GwtwBNnA@mail.gmail.com>
+Subject: Re: Will the qemu-devel prefix in the mails come back?
+To: Martin Schrodt <martin@schrodt.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2607:f8b0:4864:20::22d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,75 +85,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We tweak MANUAL_BUILDIR for in-src builds because sphinx won't build
-documents inside a source tree. This was causing the document build to
-fail on things like shippable which were using in-tree builds.
+On Thu, 19 Sep 2019 at 18:06, Martin Schrodt <martin@schrodt.org> wrote:
+>
+> Does anybody know?
+>
+> My mail filter would appreciate :)
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- Makefile | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+Sorry, no. See the announcement sent out last week:
+https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg01645.html
 
-diff --git a/Makefile b/Makefile
-index 3cf5b1e7539..8da33595edd 100644
---- a/Makefile
-+++ b/Makefile
-@@ -324,8 +324,19 @@ endif
- endif
- endif
- 
-+# Sphinx does not allow building manuals into the same directory as
-+# the source files, so if we're doing an in-tree QEMU build we must
-+# build the manuals into a subdirectory (and then install them from
-+# there for 'make install'). For an out-of-tree build we can just
-+# use the docs/ subdirectory in the build tree as normal.
-+ifeq ($(realpath $(SRC_PATH)),$(realpath .))
-+MANUAL_BUILDDIR := docs/built
-+else
-+MANUAL_BUILDDIR := docs
-+endif
-+
- ifdef BUILD_DOCS
--DOCS=qemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 qemu-nbd.8 docs/interop/qemu-ga.8
-+DOCS=qemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 qemu-nbd.8 $(MANUAL_BUILDDIR)/interop/qemu-ga.8
- DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7
- DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7
- DOCS+=docs/qemu-block-drivers.7
-@@ -703,17 +714,6 @@ dist: qemu-$(VERSION).tar.bz2
- qemu-%.tar.bz2:
- 	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar.bz2,%,$@)"
- 
--# Sphinx does not allow building manuals into the same directory as
--# the source files, so if we're doing an in-tree QEMU build we must
--# build the manuals into a subdirectory (and then install them from
--# there for 'make install'). For an out-of-tree build we can just
--# use the docs/ subdirectory in the build tree as normal.
--ifeq ($(realpath $(SRC_PATH)),$(realpath .))
--MANUAL_BUILDDIR := docs/built
--else
--MANUAL_BUILDDIR := docs
--endif
--
- define clean-manual =
- rm -rf $(MANUAL_BUILDDIR)/$1/_static
- rm -f $(MANUAL_BUILDDIR)/$1/objects.inv $(MANUAL_BUILDDIR)/$1/searchindex.js $(MANUAL_BUILDDIR)/$1/*.html
-@@ -823,7 +823,7 @@ ifdef CONFIG_TRACE_SYSTEMTAP
- 	$(INSTALL_DATA) scripts/qemu-trace-stap.1 "$(DESTDIR)$(mandir)/man1"
- endif
- ifneq (,$(findstring qemu-ga,$(TOOLS)))
--	$(INSTALL_DATA) docs/interop/qemu-ga.8 "$(DESTDIR)$(mandir)/man8"
-+	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/interop/qemu-ga.8 "$(DESTDIR)$(mandir)/man8"
- 	$(INSTALL_DATA) docs/interop/qemu-ga-ref.html "$(DESTDIR)$(qemu_docdir)"
- 	$(INSTALL_DATA) docs/interop/qemu-ga-ref.txt "$(DESTDIR)$(qemu_docdir)"
- 	$(INSTALL_DATA) docs/interop/qemu-ga-ref.7 "$(DESTDIR)$(mandir)/man7"
--- 
-2.20.1
+We recommend you filter using the List-Id: header instead.
 
+thanks
+-- PMM
 
