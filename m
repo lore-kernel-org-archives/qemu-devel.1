@@ -2,63 +2,64 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F06AC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 18:55:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC64FC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 18:56:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6C7020640
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 18:55:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6C7020640
+	by mail.kernel.org (Postfix) with ESMTPS id B303C20640
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 18:56:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B303C20640
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB1au-0004oJ-SJ
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 14:55:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36928)
+	id 1iB1bH-0005EZ-Pm
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 14:56:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36950)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1iB1Zg-00040N-7f
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 14:54:41 -0400
+ (envelope-from <lersek@redhat.com>) id 1iB1Zv-0004DS-RM
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 14:54:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1iB1Zc-0006qn-S7
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 14:54:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53418)
+ (envelope-from <lersek@redhat.com>) id 1iB1Zt-0006x2-SE
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 14:54:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59312)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iB1Zc-0006qX-JF
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 14:54:36 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iB1Zt-0006wZ-KG
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 14:54:53 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 76D9B8A1C97;
- Thu, 19 Sep 2019 18:54:35 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-123-8.rdu2.redhat.com [10.10.123.8])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 63B8F19C7F;
- Thu, 19 Sep 2019 18:54:31 +0000 (UTC)
-Date: Thu, 19 Sep 2019 14:54:29 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: Problems with MIPS Malta SSH tests in make check-acceptance
-Message-ID: <20190919185429.GA11935@localhost.localdomain>
-References: <20190918071654.GK2440@umbus.fritz.box>
- <20190919011452.GA23168@localhost.localdomain>
- <20190919165632.GA5821@localhost.localdomain>
- <8bc26c85-253e-ff20-c3e0-1ecdb56d60c0@redhat.com>
- <20190919171444.GA6495@localhost.localdomain>
+ by mx1.redhat.com (Postfix) with ESMTPS id 58A2787648;
+ Thu, 19 Sep 2019 18:54:52 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-121-45.rdu2.redhat.com
+ [10.10.121.45])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 11A9C60606;
+ Thu, 19 Sep 2019 18:54:45 +0000 (UTC)
+Subject: Re: [PATCH] edk2 build scripts: work around TianoCore#1607 without
+ forcing Python 2
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu devel list <qemu-devel@nongnu.org>
+References: <20190918171141.15957-1-lersek@redhat.com>
+ <f2cf7004-5bc0-93ad-fe09-2bb6cfbbe116@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <6f100c98-cc55-b570-93eb-4db807810a06@redhat.com>
+Date: Thu, 19 Sep 2019 20:54:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190919171444.GA6495@localhost.localdomain>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Thu, 19 Sep 2019 18:54:35 +0000 (UTC)
+In-Reply-To: <f2cf7004-5bc0-93ad-fe09-2bb6cfbbe116@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Thu, 19 Sep 2019 18:54:52 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -73,185 +74,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 19, 2019 at 01:14:50PM -0400, Cleber Rosa wrote:
-> On Thu, Sep 19, 2019 at 07:00:49PM +0200, Philippe Mathieu-Daud=E9 wrot=
-e:
-> > On 9/19/19 6:56 PM, Cleber Rosa wrote:
-> > > On Wed, Sep 18, 2019 at 09:14:58PM -0400, Cleber Rosa wrote:
-> > >> On Wed, Sep 18, 2019 at 05:16:54PM +1000, David Gibson wrote:
-> > >>> Hi,
-> > >>>
-> > >>> I'm finding make check-acceptance is currently useless for me as =
-a
-> > >>> pre-pull test, because a bunch of the tests are not at all reliab=
-le.
-> > >>> There are a bunch which I'm still investigating, but for now I'm
-> > >>> looking at the MIPS Malta SSH tests.
-> > >>>
-> > >>> There seem to be at least two problems here.  First, the test inc=
-ludes
-> > >>> a download of a pretty big guest disk image.  This can easily exh=
-aust
-> > >>> the 2m30 timeout on its own.
-> > >>>
-> > >>
-> > >> You're correct that successes and failures on those tests depend
-> > >> largely on bandwith.  On a shared environment I used for tests
-> > >> the download of those images take roughly 400 seconds, resulting
-> > >> in failures.  On my own machine, around 60, and the tests pass.
-> > >>
-> > >> There's a conceptual and conflicting problem in that the environme=
-nt
-> > >> for tests to run should be prepared beforehand.  The conflicting
-> > >> solutions can be:
-> > >>
-> > >>  * extensive bootstrapping of the test execution environment, such
-> > >>    as the installation of guests from ISOs or installation trees, =
-or
-> > >>    the download of "default" images wether the tests will use it o=
-r
-> > >>    not (this is what Avocado-VT does/requires)
-> > >>
-> > >>  * keeping test assets in the tree (Avocado allows this if you hav=
+On 09/19/19 15:41, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Laszlo,
+>=20
+> On 9/18/19 7:11 PM, Laszlo Ersek wrote:
+>> It turns out that forcing python2 for running the edk2 "build" utility=
+ is
+>> neither necessary nor sufficient.
+>>
+>> Forcing python2 is not sufficient for two reasons:
+>>
+>> - QEMU is moving away from python2, with python2 nearing EOL,
+>>
+>> - according to my most recent testing, the lacking dependency informat=
+ion
+>>   in the makefiles that are generated by edk2's "build" utility can ca=
+use
+>>   parallel build failures even when "build" is executed by python2.
+>>
+>> And forcing python2 is not necessary because we can still return to th=
 e
-> > >>    a your_test.py.data/ directory), but it's not practical for lar=
-ge
-> > >>    files or files that can't or shouldn't be redistributed
-> > >>
-> > >>> Even without the timeout, it makes the test really slow, even on
-> > >>> repeated runs.  Is there some way we can make the image download =
-part
-> > >>> of "building" the tests rather than actually running the testsuit=
-e, so
-> > >>> that a) the test themselves go faster and b) we don't include the
-> > >>> download in the test timeout - obviously the download speed is hu=
-gely
-> > >>> dependent on factors that aren't really related to what we're tes=
-ting
-> > >>> here.
-> > >>>
-> > >>
-> > >> On Avocado version 72.0 we attempted to minimize the isse by
-> > >> implementing a "vmimage" command.  So, if you expect to use Fedora=
- 30
-> > >> aarch64 images, you could run before your tests:
-> > >>
-> > >>  $ avocado vmimage get --distro fedora --distro-version 30 --arch =
-aarch64
-> > >>
-> > >> And to list the images on your cache:
-> > >>
-> > >>  $ avocado vmimage list
-> > >>
-> > >> Unfortunately, this test doesn't use the vmimage API.  Actually th=
-at
-> > >> is fine because not all test assets map nicely to the vmimage goal=
-,
-> > >> and should keep using the more generic (and lower level) fetch_ass=
-et().
-> > >>
-> > >> We're now working on various "asset fetcher" improvements that sho=
-uld
-> > >> allow us to check/cache all assets before a test is executed.  Als=
-o,
-> > >> we're adding a mode in which the "fetch_asset()" API will default =
-to
-> > >> cancel (aka SKIP) a test if the asset could not be downloaded.
-> > >>
-> > >> If you're interested in the card we're using to track that new fea=
-ture:
-> > >>
-> > >>   https://trello.com/c/T3SC1sZs/1521-implement-fetch-assets-comman=
-d-line-parameter
-> > >>
-> > >> Another possibility that we've prototyped, and we'll be working on
-> > >> further, is to make a specific part of the "test" code execution
-> > >> (really a pre-test phase) to be executed without a timeout and eve=
-n be
-> > >> tried a number of times before bailing out and skipping the test.
-> > >>
-> > >>> In the meantime, I tried hacking it by just increasing the timeou=
-t to
-> > >>> 10m.  That got several of the tests working for me, but one still
-> > >>> failed.  Specifically 'LinuxSSH.test_mips_malta32eb_kernel3_2_0' =
-still
-> > >>> timed out for me, but now after booting the guest, rather than du=
-ring
-> > >>> the image download.  Looking at the avocado log file I'm seeing a
-> > >>> bunch of soft lockup messages from the guest console, AFAICT.  So=
- it
-> > >>> looks like we have a real bug here, which I suspect has been
-> > >>> overlooked precisely because the download problems mean this test
-> > >>> isn't reliable.
-> > >>>
-> > >>
-> > >> I've schedulled a 100 executions of `make check-acceptance` builds=
-, with
-> > >> the linux_ssh_mips_malta.py tests having a 1500 seconds timeout.  =
-The
-> > >> very first execution already brought interesting results:
-> > >>
-> > >>  ...
-> > >>  (15/39) /home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_mal=
-ta.py:LinuxSSH.test_mips_malta32eb_kernel3_2_0: PASS (198.38 s)
-> > >>  (16/39) /home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_mal=
-ta.py:LinuxSSH.test_mips_malta64el_kernel3_2_0: FAIL: Failure message fou=
-nd in console: Oops (22.83 s)
-> > >>
-> > >> I'll let you know about my full results.  This should also serve a=
-s a
-> > >> starting point to a discussion about the reliability of other test=
-s,
-> > >> as you mentioned before.
-> > >=20
-> > > Out of the 100 executions on a ppc64le host, the results that conta=
-in
-> > > failures and errors:
-> > >=20
-> > > 15-/home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_malta.py:L=
-inuxSSH.test_mips_malta32eb_kernel3_2_0
-> > >   - PASS: 92
-> > >   - INTERRUPTED: 4
-> > >   - FAIL: 4
-> > > 16-/home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_malta.py:L=
-inuxSSH.test_mips_malta64el_kernel3_2_0
-> > >   - PASS: 95
-> > >   - FAIL: 5
-> > >=20
-> > > FAIL means that self.fail() was called, which means 'Oops' was foun=
-d
-> > > in the console.  INTERRUPTED here means that the test timeout kicke=
-d
-> > > in, and I can back David's statements about soft lockups.
-> > >=20
-> > > Let me know if anyone wants access to the full logs/results.
-> >=20
-> > Can you check if the FAIL case are this bug please?
-> >=20
-> > https://bugs.launchpad.net/qemu/+bug/1833661
-> >
+>> original idea of filtering out jobserver-related options from MAKEFLAG=
+S.
+>> So do that.
+>>
+>> With this patch, the guest UEFI binaries that are used as part of the =
+BIOS
+>> tables test, and the OVMF and ArmVirtQemu platform firmwares, will be
+>> built strictly in a single job, regardless of an outermost "-jN" make
+>> option. Alas, there appears to be no reliable way to build edk2 in an
+>> (outer make, inner make) environment, with a jobserver enabled.
+>>
+>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>> Cc: John Snow <jsnow@redhat.com>
+>> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> Reported-by: John Snow <jsnow@redhat.com>
+>> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+>> ---
+>>
+>> Notes:
+>>     - Tested on RHEL7 (where the outer "make" sets the old-style
+>>       "--jobserver-fds" flag) and on Fedora 29 (where the outer "make"=
+ sets
+>>       the new-style "--jobserver-auth" flag).
+>>    =20
+>>     - I've rebuilt all the edk2 binaries with this patch applied. Ever=
+ything
+>>       works fine. However, if you test this patch, you might notice th=
+at git
+>>       reports all the build products as modified. That's because when =
+using
+>>       the python3 code in edk2 BaseTools, the generated makefiles diff=
+er
+>>       greatly from the ones generated when running in python2 mode (e.=
+g. due
+>>       to different random seeds in python hashes / dictionaries). As a
+>>       result, parts of the firmware volumes / firmware filesystems cou=
+ld
+>>       appear in a different order than before. This is harmless, and d=
+oesn't
+>>       necessitate checking in the rebuilt binaries.
+>>
+>>  roms/edk2-build.sh             |  4 +---
+>>  roms/edk2-funcs.sh             | 17 +++++++++++++++++
+>>  tests/uefi-test-tools/build.sh |  6 +++---
+>>  3 files changed, 21 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/roms/edk2-build.sh b/roms/edk2-build.sh
+>> index 4f46f8a6a217..8161c55ef507 100755
+>> --- a/roms/edk2-build.sh
+>> +++ b/roms/edk2-build.sh
+>> @@ -27,9 +27,6 @@ shift $num_args
+>> =20
+>>  cd edk2
+>> =20
+>> -# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>=
+.
+>> -export PYTHON_COMMAND=3Dpython2
+>> -
+>>  # Source "edksetup.sh" carefully.
+>>  set +e +u +C
+>>  source ./edksetup.sh
+>> @@ -43,6 +40,7 @@ fi
+>>  # any), for the edk2 "build" utility.
+>>  source ../edk2-funcs.sh
+>>  edk2_toolchain=3D$(qemu_edk2_get_toolchain "$emulation_target")
+>> +MAKEFLAGS=3D$(qemu_edk2_quirk_tianocore_1607 "$MAKEFLAGS")
+>>  edk2_thread_count=3D$(qemu_edk2_get_thread_count "$MAKEFLAGS")
+>>  qemu_edk2_set_cross_env "$emulation_target"
+>> =20
+>> diff --git a/roms/edk2-funcs.sh b/roms/edk2-funcs.sh
+>> index a9fae7ee891b..3f4485b201f1 100644
+>> --- a/roms/edk2-funcs.sh
+>> +++ b/roms/edk2-funcs.sh
+>> @@ -251,3 +251,20 @@ qemu_edk2_get_thread_count()
+>>      printf '1\n'
+>>    fi
+>>  }
+>> +
+>> +
+>> +# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>=
+ by
+>> +# filtering jobserver-related flags out of MAKEFLAGS. Print the resul=
+t to the
+>> +# standard output.
+>> +#
+>> +# Parameters:
+>> +#   $1: the value of the MAKEFLAGS variable
+>> +qemu_edk2_quirk_tianocore_1607()
+>> +{
+>> +  local makeflags=3D"$1"
+>> +
+>> +  printf %s "$makeflags" \
+>> +  | LC_ALL=3DC sed --regexp-extended \
+>> +      --expression=3D's/--jobserver-(auth|fds)=3D[0-9]+,[0-9]+//' \
+>> +      --expression=3D's/-j([0-9]+)?//'
+>> +}
+>> diff --git a/tests/uefi-test-tools/build.sh b/tests/uefi-test-tools/bu=
+ild.sh
+>> index 8aa7935c43bb..eba7964a163b 100755
+>> --- a/tests/uefi-test-tools/build.sh
+>> +++ b/tests/uefi-test-tools/build.sh
+>> @@ -29,9 +29,6 @@ export PACKAGES_PATH=3D$(realpath -- "$edk2_dir")
+>>  export WORKSPACE=3D$PWD
+>>  mkdir -p Conf
+>> =20
+>> -# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>=
+.
+>> -export PYTHON_COMMAND=3Dpython2
+>> -
+>>  # Source "edksetup.sh" carefully.
+>>  set +e +u +C
+>>  source "$PACKAGES_PATH/edksetup.sh"
+>> @@ -46,12 +43,15 @@ fi
+>>  source "$edk2_dir/../edk2-funcs.sh"
+>>  edk2_arch=3D$(qemu_edk2_get_arch "$emulation_target")
+>>  edk2_toolchain=3D$(qemu_edk2_get_toolchain "$emulation_target")
+>> +MAKEFLAGS=3D$(qemu_edk2_quirk_tianocore_1607 "$MAKEFLAGS")
+>> +edk2_thread_count=3D$(qemu_edk2_get_thread_count "$MAKEFLAGS")
+>>  qemu_edk2_set_cross_env "$emulation_target"
+>> =20
+>>  # Build the UEFI binary
+>>  mkdir -p log
+>>  build \
+>>    --arch=3D"$edk2_arch" \
+>> +  -n "$edk2_thread_count" \
+>>    --buildtarget=3DDEBUG \
+>>    --platform=3DUefiTestToolsPkg/UefiTestToolsPkg.dsc \
+>>    --tagname=3D"$edk2_toolchain" \
+>>
 >=20
-> Yes, the errors do match.  I posted an updated there:
+> Very clear explanation, thanks.
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+Thanks!
+
 >=20
->   https://bugs.launchpad.net/qemu/+bug/1833661/comments/3
->
-
-What if we tag tests like this as "knownbug" (or a better name),
-disabling execution by default?
-
-- Cleber.
-
-> Cheers,
-> - Cleber.
+> Hmm this failed on Ubuntu Xenial which is the image we use for Travis-C=
+I:
 >=20
-> > Thanks,
-> >=20
-> > Phil.
-> >=20
+> $ lsb_release -a
+> Distributor ID:	Ubuntu
+> Description:	Ubuntu 16.04.6 LTS
+> Release:	16.04
+> Codename:	xenial
+>=20
+> make -f Makefile.edk2
+> make[1]: Entering directory '/home/phil/qemu/roms'
+> if test -d edk2/.git; then \
+> 	cd edk2 && git submodule update --init --force; \
+> fi
+> ./edk2-build.sh \
+> 	aarch64 \
+> 	--arch=3DAARCH64 \
+> 	--platform=3DArmVirtPkg/ArmVirtQemu.dsc \
+> 	-D NETWORK_IP6_ENABLE \
+> 	-D NETWORK_HTTP_BOOT_ENABLE
+> WORKSPACE: /home/phil/qemu/roms/edk2
+> EDK_TOOLS_PATH: /home/phil/qemu/roms/edk2/BaseTools
+> CONF_PATH: /home/phil/qemu/roms/edk2/Conf
+> Copying $EDK_TOOLS_PATH/Conf/build_rule.template
+>      to /home/phil/qemu/roms/edk2/Conf/build_rule.txt
+> Copying $EDK_TOOLS_PATH/Conf/tools_def.template
+>      to /home/phil/qemu/roms/edk2/Conf/tools_def.txt
+> Copying $EDK_TOOLS_PATH/Conf/target.template
+>      to /home/phil/qemu/roms/edk2/Conf/target.txt
+> pyenv: python3.7: command not found
+> The `python3.7' command exists in these Python versions:
+>   3.7
+>   3.7.1
+
+... I don't have the slightest idea what this error message means. Edk2
+contains no reference to "pyenv".
+
+>=20
+> Makefile.edk2:62: recipe for target '../pc-bios/edk2-aarch64-code.fd' f=
+ailed
+> make[1]: *** [../pc-bios/edk2-aarch64-code.fd] Error 127
+> make[1]: Leaving directory '/home/phil/qemu/roms'
+> Makefile:168: recipe for target 'efi' failed
+> make: *** [efi] Error 2
+> make: Leaving directory '/home/phil/qemu/roms'
+> The command "make -C roms efi -j2" exited with 2.
+>=20
+> The local Python3 version is:
+>=20
+> $ apt-cache show python3-minimal
+> Package: python3-minimal
+> Version: 3.5.1-3
+>=20
+> Any idea which script is choosing python3.7?
+>=20
+
+It's the SetupPython() function in "edksetup.sh".
+
+If there is a universal pathname (or just filename) that refers to
+python3 on all build hosts where "make efi" is expected to run, I can
+assign that to PYTHON_COMMAND. Otherwise, I'm out of ideas.
+
+Thanks
+Laszlo
 
