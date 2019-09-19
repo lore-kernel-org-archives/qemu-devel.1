@@ -2,66 +2,93 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD3F2C49ED7
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 22:18:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94DF4C49ED7
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 22:19:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 855B021924
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 22:18:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 855B021924
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5E7DF217D6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 22:19:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ljq7lKhP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E7DF217D6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB4ka-0000GY-TZ
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 18:18:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56773)
+	id 1iB4mM-0002ZZ-BF
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 18:19:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59557)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iB4Bm-0003ZO-D2
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:42:11 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iB4cG-0000AN-7m
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 18:09:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iB4Bl-0006oE-8D
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:42:10 -0400
-Resent-Date: Thu, 19 Sep 2019 17:42:10 -0400
-Resent-Message-Id: <E1iB4Bl-0006oE-8D@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21438)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iB4Bk-0006nz-VK
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:42:09 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568926590; cv=none; d=zoho.com; s=zohoarc; 
- b=Cx1cPNtbpLRfP3eYsgIQlXFYwO6JbumwNmdKZJ6IWRtm9bLrhULgQPgubqGMDFU3zZbqA2DXfAdSqZldNL+o42WEOZFUC6iTlf+IyAfuixmVjtS3cFJBL+iiR5PpA1y/1DhzwiBS6lS0tLoIpoOtPfXvwSveMncetpT68OiZveU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1568926590;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=auxqEA3Xv+6y9bwyggt/NLM33WfUILlFKF+pZ8fHsIQ=; 
- b=VFz+TkAWHL7wE3hkA/j0QIH/E3ceop3HbWG8NtQubsqwHfnLNaQ+Vg96azRur7SFVAIvi5rdD/Oik8A+jbDOsIsFtuVwWjAJn6tKcLilVtIR6UvFys+NOQzicx1dYifvTZjuTzadZUFn3HfvkkLG8f4wyBjOqJIALs8mFkml5s8=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1568926588938354.4897800261799;
- Thu, 19 Sep 2019 13:56:28 -0700 (PDT)
-In-Reply-To: <20190919055002.6729-1-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 00/21] aspeed: Add support for the AST2600 SoC
-Message-ID: <156892658765.2125.17871103047730488122@1c8ae44fe5c0>
+ (envelope-from <richard.henderson@linaro.org>) id 1iB4cF-0002wX-2z
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 18:09:32 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:39276)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iB4cE-0002w9-Rt
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 18:09:30 -0400
+Received: by mail-pg1-x543.google.com with SMTP id u17so2644983pgi.6
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 15:09:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=DkZVL945NAnYHjWuiXZVXLZifIDxk/sIZLtif3ChFoE=;
+ b=Ljq7lKhP5vhf0x3PV29onNMfkxqUiSH44ZvtKQz6ZkLngzVNTZC5k0cvtLMK5j8Kab
+ k5I5ODe731GeEu1TF8vrDVwhGl+KNTqr7xbGl6Gh0iwroi4BHBrr9IWVoYZ2Myqj7PtG
+ SBBQZWbZ8uTGdfiBpJCwYd43E+MRVod15lYLHzhQeU+wJC8rxUg8P5DjX8bpKCPblIGd
+ cl9Gv1Isl09P06Q5PM7jSmqjdn0KS1XY6noF7qfTeiQZMkv/GqCiHKz0uQeFzQd/L+x9
+ y5kh7flp5bdjnVg3VxDsFnCfWcfy7fAMf1s87KZCBq30JRaLd2RClyCEnrdH5mXJiGT5
+ K7MQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=DkZVL945NAnYHjWuiXZVXLZifIDxk/sIZLtif3ChFoE=;
+ b=m2sL+QCrB/Yon2lsipG+J4Nv8nbG9O6m642J4KQX4Bofhk++Qh6yHVUtoaOeVtE3NW
+ OxvlGL0ZlrBr13MJRTPeFrjgEAOud2gdP/sqauNxLD0oc8rdA43obPK1RwqP5B4fRnTA
+ +bEUTJ+U2gGZekO0nvBHI1I00Ivyifag1nI6W+0afikXJpS5HfyIxvkSejrQDYKsiwbg
+ te/oPA0wWfNeadqwOgLmwneqwGwFKd9WefbDVOE0Ixth0zH87vQvavGD2sgKNotsPGXo
+ dBuuT2Oczdg5W2rJcG8+5EkxlR3blBut8tLLv3/dcP9ue70TGyiL1VciKmqYjRLNsjTR
+ Y3bg==
+X-Gm-Message-State: APjAAAVPOt5XM81XtSB9zqupVvgl9xuYQRLaCVaID9qitNVmuTxS1m6D
+ cJxwQsdvZiZws782fuuAjT+ZwQ==
+X-Google-Smtp-Source: APXvYqwZGF9/EjxGtzE7GXn0x31jpAMryJ8X8zyBtjNDW9E3/1eENt8tj4Gyjm+tUcPtsEKH3z7ZvQ==
+X-Received: by 2002:a17:90a:de0f:: with SMTP id
+ m15mr128386pjv.107.1568930969517; 
+ Thu, 19 Sep 2019 15:09:29 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id v68sm4052pfv.47.2019.09.19.15.09.28
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 19 Sep 2019 15:09:28 -0700 (PDT)
+Subject: Re: [PATCH v2 10/16] tests/tcg: add generic version of float_convs
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20190919171015.12681-1-alex.bennee@linaro.org>
+ <20190919171015.12681-11-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <c6cd971c-e84c-c5c9-b313-2e454e02a1da@linaro.org>
+Date: Thu, 19 Sep 2019 15:09:26 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: clg@kaod.org
-Date: Thu, 19 Sep 2019 13:56:28 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.54
+In-Reply-To: <20190919171015.12681-11-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,34 +100,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, andrew@aj.id.au, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, joel@jms.id.au, clg@kaod.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxOTA1NTAwMi42NzI5
-LTEtY2xnQGthb2Qub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9ja2VyLXF1
-aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMg
-YW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91
-IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJ
-TiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVUV09SSz0x
-CnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0xNCBORVRX
-T1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCmxpYnVkZXYgICAgICAgICAgIG5vCmRlZmF1
-bHQgZGV2aWNlcyAgIHllcwoKd2FybmluZzogUHl0aG9uIDIgc3VwcG9ydCBpcyBkZXByZWNhdGVk
-Cndhcm5pbmc6IFB5dGhvbiAzIHdpbGwgYmUgcmVxdWlyZWQgZm9yIGJ1aWxkaW5nIGZ1dHVyZSB2
-ZXJzaW9ucyBvZiBRRU1VCmNyb3NzIGNvbnRhaW5lcnMgIG5vCgpOT1RFOiBndWVzdCBjcm9zcy1j
-b21waWxlcnMgZW5hYmxlZDogY2MKLS0tClByb3BlcnR5ICcuY250ZnJxJyBub3QgZm91bmQKQnJv
-a2VuIHBpcGUKL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL2xpYnF0ZXN0LmM6MTQ5OiBraWxsX3Fl
-bXUoKSBkZXRlY3RlZCBRRU1VIGRlYXRoIGZyb20gc2lnbmFsIDYgKEFib3J0ZWQpIChjb3JlIGR1
-bXBlZCkKRVJST1IgLSB0b28gZmV3IHRlc3RzIHJ1biAoZXhwZWN0ZWQgNiwgZ290IDUpCm1ha2U6
-ICoqKiBbY2hlY2stcXRlc3QtYWFyY2g2NF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3Ig
-dW5maW5pc2hlZCBqb2JzLi4uLgogIFRFU1QgICAgY2hlY2stcXRlc3QteDg2XzY0OiB0ZXN0cy9x
-MzUtdGVzdAoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
-L2xvZ3MvMjAxOTA5MTkwNTUwMDIuNjcyOS0xLWNsZ0BrYW9kLm9yZy90ZXN0aW5nLmRvY2tlci1x
-dWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
-YWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 9/19/19 10:10 AM, Alex Bennée wrote:
+> This is broadly similar to the existing fcvt test for ARM but using
+> the generic float testing framework. We should be able to pare down
+> the ARM fcvt test case to purely half-precision with or without the
+> Alt HP provision.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
 
