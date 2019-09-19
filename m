@@ -2,49 +2,51 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B81C2C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 19:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8326DC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 19:19:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B8AB2053B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 19:16:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B8AB2053B
+	by mail.kernel.org (Postfix) with ESMTPS id 5407C2053B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 19:19:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5407C2053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB1vD-0000xk-49
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 15:16:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39670)
+	id 1iB1xa-0003sN-Be
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 15:19:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39914)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iB1tP-0000MR-G8
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 15:15:04 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iB1v7-0001jg-Q7
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 15:16:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iB1tO-0001Dz-3q
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 15:15:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55780)
+ (envelope-from <jsnow@redhat.com>) id 1iB1v6-00028I-1G
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 15:16:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50304)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iB1tL-0001Cz-CR; Thu, 19 Sep 2019 15:14:59 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iB1v5-00027C-Ob
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 15:16:47 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7C93210CBCED;
- Thu, 19 Sep 2019 19:14:58 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A937CA26673;
+ Thu, 19 Sep 2019 19:16:46 +0000 (UTC)
 Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2E1B85D6B0;
- Thu, 19 Sep 2019 19:14:54 +0000 (UTC)
-Subject: Re: [PATCH v2 2/2] iotests: Remove Python 2 compatibility code
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20190919162905.21830-1-kwolf@redhat.com>
- <20190919162905.21830-3-kwolf@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 272505D9D3;
+ Thu, 19 Sep 2019 19:16:43 +0000 (UTC)
+Subject: Re: [Qemu-devel] [PATCH] docker: add sanitizers back to clang build
+To: Fam Zheng <fam@euphon.net>
+References: <156825315333.21839.4459418365355602992@5dec9699b7de>
+ <06e01dd7-d464-729d-3cc6-b9440dd5e18e@redhat.com>
+ <20190918023826.GA28483@magic>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -120,18 +122,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <7d296a36-a03f-0af5-b539-4984d9012ba3@redhat.com>
-Date: Thu, 19 Sep 2019 15:14:54 -0400
+Message-ID: <371d715a-dfba-2535-cb16-c3bc08f90d97@redhat.com>
+Date: Thu, 19 Sep 2019 15:16:43 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190919162905.21830-3-kwolf@redhat.com>
+In-Reply-To: <20190918023826.GA28483@magic>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Thu, 19 Sep 2019 19:14:58 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.68]); Thu, 19 Sep 2019 19:16:46 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -145,114 +147,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com, philmd@redhat.com,
- ehabkost@redhat.com, mreitz@redhat.com
+Cc: philmd@redhat.com, alex.bennee@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/19/19 12:29 PM, Kevin Wolf wrote:
-> Some scripts check the Python version number and have two code paths to
-> accomodate both Python 2 and 3. Remove the code specific to Python 2 and
-> assert the minimum version of 3.6 instead (check skips Python tests in
-> this case, so the assertion would only ever trigger if a Python script
-> is executed manually).
+On 9/17/19 10:38 PM, Fam Zheng wrote:
+> On Thu, 09/12 19:07, John Snow wrote:
+>>
+>>
+>> On 9/11/19 9:52 PM, no-reply@patchew.org wrote:
+>>> Patchew URL: https://patchew.org/QEMU/20190912014442.5757-1-jsnow@redhat.com/
+>>>
+>>>
+>>>
+>>> Hi,
+>>>
+>>> This series seems to have some coding style problems. See output below for
+>>> more information:
+>>>
+>>> Subject: [Qemu-devel] [PATCH] docker: add sanitizers back to clang build
+>>> Message-id: 20190912014442.5757-1-jsnow@redhat.com
+>>> Type: series
+>>>
+>>> === TEST SCRIPT BEGIN ===
+>>> #!/bin/bash
+>>> git rev-parse base > /dev/null || exit 0
+>>> git config --local diff.renamelimit 0
+>>> git config --local diff.renames True
+>>> git config --local diff.algorithm histogram
+>>> ./scripts/checkpatch.pl --mailback base..
+>>> === TEST SCRIPT END ===
+>>>
+>>> From https://github.com/patchew-project/qemu
+>>>  * [new tag]         patchew/20190912014442.5757-1-jsnow@redhat.com -> patchew/20190912014442.5757-1-jsnow@redhat.com
+>>> Switched to a new branch 'test'
+>>> 96d44b9 docker: add sanitizers back to clang build
+>>>
+>>> === OUTPUT BEGIN ===
+>>> ERROR: Missing Signed-off-by: line(s)
+>>
+>> GDI.
+>>
+>> I keep adding this to my configuration files, but it keeps "falling
+>> off", somehow.
+>>
+>> I have some patches in the works for stgit where I'm going to work
+>> through some test cases for setting profile variables and try to fix this.
+>>
+>> In the meantime:
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
 > 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/044                   |  3 ---
->  tests/qemu-iotests/163                   |  3 ---
->  tests/qemu-iotests/iotests.py            | 13 +++----------
->  tests/qemu-iotests/nbd-fault-injector.py |  7 +++----
->  4 files changed, 6 insertions(+), 20 deletions(-)
+> Isn't this because you inserted a '---' line in the middle of the commit
+> message so the part after it is ditched by 'git am'?
 > 
-> diff --git a/tests/qemu-iotests/044 b/tests/qemu-iotests/044
-> index 05ea1f49c5..8b2afa2a11 100755
-> --- a/tests/qemu-iotests/044
-> +++ b/tests/qemu-iotests/044
-> @@ -28,9 +28,6 @@ import struct
->  import subprocess
->  import sys
->  
-> -if sys.version_info.major == 2:
-> -    range = xrange
-> -
->  test_img = os.path.join(iotests.test_dir, 'test.img')
->  
->  class TestRefcountTableGrowth(iotests.QMPTestCase):
-> diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
-> index 081ccc8ac1..d94728e080 100755
-> --- a/tests/qemu-iotests/163
-> +++ b/tests/qemu-iotests/163
-> @@ -21,9 +21,6 @@
->  import os, random, iotests, struct, qcow2, sys
->  from iotests import qemu_img, qemu_io, image_size
->  
-> -if sys.version_info.major == 2:
-> -    range = xrange
-> -
->  test_img = os.path.join(iotests.test_dir, 'test.img')
->  check_img = os.path.join(iotests.test_dir, 'check.img')
->  
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index b26271187c..9fb5181c3d 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -35,6 +35,7 @@ from collections import OrderedDict
->  sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
->  from qemu import qtest
->  
-> +assert sys.version_info >= (3,6)
->  
->  # This will not work if arguments contain spaces but is necessary if we
->  # want to support the override options that ./check supports.
-> @@ -250,10 +251,7 @@ def image_size(img):
->      return json.loads(r)['virtual-size']
->  
->  def is_str(val):
-> -    if sys.version_info.major >= 3:
-> -        return isinstance(val, str)
-> -    else:
-> -        return isinstance(val, str) or isinstance(val, unicode)
-> +    return isinstance(val, str)
->  
->  test_dir_re = re.compile(r"%s" % test_dir)
->  def filter_test_dir(msg):
-> @@ -935,12 +933,7 @@ def execute_test(test_function=None,
->      else:
->          # We need to filter out the time taken from the output so that
->          # qemu-iotest can reliably diff the results against master output.
-> -        if sys.version_info.major >= 3:
-> -            output = io.StringIO()
-> -        else:
-> -            # io.StringIO is for unicode strings, which is not what
-> -            # 2.x's test runner emits.
-> -            output = io.BytesIO()
-> +        output = io.StringIO()
->  
->      logging.basicConfig(level=(logging.DEBUG if debug else logging.WARN))
->  
-> diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
-> index 6b2d659dee..43f095ceef 100755
-> --- a/tests/qemu-iotests/nbd-fault-injector.py
-> +++ b/tests/qemu-iotests/nbd-fault-injector.py
-> @@ -48,10 +48,9 @@ import sys
->  import socket
->  import struct
->  import collections
-> -if sys.version_info.major >= 3:
-> -    import configparser
-> -else:
-> -    import ConfigParser as configparser
-> +import configparser
-> +
-> +assert sys.version_info >= (3,6)
->  
->  FAKE_DISK_SIZE = 8 * 1024 * 1024 * 1024 # 8 GB
->  
+> This feels a bit hard to catch, wondering what is in the works. :)
 > 
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+gah, you're right -- I blamed it on the script failing, because it has
+been a little unreliable for me lately :)
+
+Hm, how do I accommodate putting in notes to my commit messages while
+keeping tooling happy ...
+
+--js
 
