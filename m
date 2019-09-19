@@ -2,64 +2,60 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE7FBC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:13:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A96CFC49ED7
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:13:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B486C208C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:13:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B486C208C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7409F208C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:13:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7409F208C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAsUw-0006Up-3A
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:13:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39828)
+	id 1iAsUx-0006Vf-Vk
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:13:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38380)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1iAsSg-0003sM-43
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:10:51 -0400
+ (envelope-from <groug@kaod.org>) id 1iAsIE-00087U-5z
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:00:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1iAsSe-0003RU-HB
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:10:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42076)
+ (envelope-from <groug@kaod.org>) id 1iAsIA-0001LR-9e
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:00:01 -0400
+Received: from 8.mo178.mail-out.ovh.net ([46.105.74.227]:56402)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iAsSe-0003Qo-9c
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:10:48 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9F8B03175288
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 09:10:47 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-47.ams2.redhat.com
- [10.36.116.47])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 337E85D6C8;
- Thu, 19 Sep 2019 09:10:44 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 7862917536; Thu, 19 Sep 2019 11:10:43 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 19 Sep 2019 11:10:42 +0200
-Message-Id: <20190919091043.24503-2-kraxel@redhat.com>
-In-Reply-To: <20190919091043.24503-1-kraxel@redhat.com>
-References: <20190919091043.24503-1-kraxel@redhat.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iAsIA-0001DL-1N
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:59:58 -0400
+Received: from player732.ha.ovh.net (unknown [10.108.42.88])
+ by mo178.mail-out.ovh.net (Postfix) with ESMTP id 178397982E
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 10:59:48 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player732.ha.ovh.net (Postfix) with ESMTPSA id 6E6CF9E07865;
+ Thu, 19 Sep 2019 08:59:11 +0000 (UTC)
+Date: Thu, 19 Sep 2019 10:59:09 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <20190919105909.4d3456f6@bahia.lan>
+In-Reply-To: <20190918130244.24257-1-vsementsov@virtuozzo.com>
+References: <20190918130244.24257-1-vsementsov@virtuozzo.com>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Thu, 19 Sep 2019 09:10:47 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 4865013497976297811
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvddtgdduudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 1/2] vga: move access helpers to separate
- include file
+X-Received-From: 46.105.74.227
+Subject: Re: [Qemu-devel] [RFC] error: auto propagated local_err
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,144 +67,375 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: fam@euphon.net, peter.maydell@linaro.org, mst@redhat.com,
+ codyprime@gmail.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
+ mdroth@linux.vnet.ibm.com, kraxel@redhat.com, mreitz@redhat.com,
+ qemu-block@nongnu.org, quintela@redhat.com, david@redhat.com,
+ armbru@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ marcandre.lureau@redhat.com, rth@twiddle.net, farman@linux.ibm.com,
+ dgilbert@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org,
+ stefanha@redhat.com, jsnow@redhat.com, david@gibson.dropbear.id.au,
+ kwolf@redhat.com, berrange@redhat.com, cohuck@redhat.com,
+ qemu-s390x@nongnu.org, sundeep.lkml@gmail.com, qemu-ppc@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-id: 20190917111441.27405-2-kraxel@redhat.com
----
- hw/display/vga-access.h  | 49 ++++++++++++++++++++++++++++++++++++++++
- hw/display/vga-helpers.h | 26 ---------------------
- hw/display/vga.c         |  1 +
- 3 files changed, 50 insertions(+), 26 deletions(-)
- create mode 100644 hw/display/vga-access.h
+On Wed, 18 Sep 2019 16:02:44 +0300
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
 
-diff --git a/hw/display/vga-access.h b/hw/display/vga-access.h
-new file mode 100644
-index 000000000000..c0fbd9958b2e
---- /dev/null
-+++ b/hw/display/vga-access.h
-@@ -0,0 +1,49 @@
-+/*
-+ * QEMU VGA Emulator templates
-+ *
-+ * Copyright (c) 2003 Fabrice Bellard
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-+ * of this software and associated documentation files (the "Software"),=
- to deal
-+ * in the Software without restriction, including without limitation the=
- rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be includ=
-ed in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-+ * THE SOFTWARE.
-+ */
-+
-+static inline uint8_t vga_read_byte(VGACommonState *vga, uint32_t addr)
-+{
-+    return vga->vram_ptr[addr & vga->vbe_size_mask];
-+}
-+
-+static inline uint16_t vga_read_word_le(VGACommonState *vga, uint32_t ad=
-dr)
-+{
-+    uint32_t offset =3D addr & vga->vbe_size_mask & ~1;
-+    uint16_t *ptr =3D (uint16_t *)(vga->vram_ptr + offset);
-+    return lduw_le_p(ptr);
-+}
-+
-+static inline uint16_t vga_read_word_be(VGACommonState *vga, uint32_t ad=
-dr)
-+{
-+    uint32_t offset =3D addr & vga->vbe_size_mask & ~1;
-+    uint16_t *ptr =3D (uint16_t *)(vga->vram_ptr + offset);
-+    return lduw_be_p(ptr);
-+}
-+
-+static inline uint32_t vga_read_dword_le(VGACommonState *vga, uint32_t a=
-ddr)
-+{
-+    uint32_t offset =3D addr & vga->vbe_size_mask & ~3;
-+    uint32_t *ptr =3D (uint32_t *)(vga->vram_ptr + offset);
-+    return ldl_le_p(ptr);
-+}
-diff --git a/hw/display/vga-helpers.h b/hw/display/vga-helpers.h
-index 5a752b3f9efd..10e9cfd40a04 100644
---- a/hw/display/vga-helpers.h
-+++ b/hw/display/vga-helpers.h
-@@ -95,32 +95,6 @@ static void vga_draw_glyph9(uint8_t *d, int linesize,
-     } while (--h);
- }
-=20
--static inline uint8_t vga_read_byte(VGACommonState *vga, uint32_t addr)
--{
--    return vga->vram_ptr[addr & vga->vbe_size_mask];
--}
--
--static inline uint16_t vga_read_word_le(VGACommonState *vga, uint32_t ad=
-dr)
--{
--    uint32_t offset =3D addr & vga->vbe_size_mask & ~1;
--    uint16_t *ptr =3D (uint16_t *)(vga->vram_ptr + offset);
--    return lduw_le_p(ptr);
--}
--
--static inline uint16_t vga_read_word_be(VGACommonState *vga, uint32_t ad=
-dr)
--{
--    uint32_t offset =3D addr & vga->vbe_size_mask & ~1;
--    uint16_t *ptr =3D (uint16_t *)(vga->vram_ptr + offset);
--    return lduw_be_p(ptr);
--}
--
--static inline uint32_t vga_read_dword_le(VGACommonState *vga, uint32_t a=
-ddr)
--{
--    uint32_t offset =3D addr & vga->vbe_size_mask & ~3;
--    uint32_t *ptr =3D (uint32_t *)(vga->vram_ptr + offset);
--    return ldl_le_p(ptr);
--}
--
- /*
-  * 4 color mode
-  */
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index 573d223d46f0..82ebe5361096 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -1009,6 +1009,7 @@ void vga_mem_writeb(VGACommonState *s, hwaddr addr,=
- uint32_t val)
- typedef void vga_draw_line_func(VGACommonState *s1, uint8_t *d,
-                                 uint32_t srcaddr, int width);
-=20
-+#include "vga-access.h"
- #include "vga-helpers.h"
-=20
- /* return true if the palette was modified */
---=20
-2.18.1
+> Hi all!
+> 
+> Here is a proposal (three of them, actually) of auto propagation for
+> local_err, to not call error_propagate on every exit point, when we
+> deal with local_err.
+> 
+> It also may help make Greg's series[1] about error_append_hint smaller.
+> 
+
+This will depend on whether we reach a consensus soon enough (soft
+freeze for 4.2 is 2019-10-29). Otherwise, I think my series should
+be merged as is, and auto-propagation to be delayed to 4.3.
+
+> See definitions and examples below.
+> 
+> I'm cc-ing to this RFC everyone from series[1] CC list, as if we like
+> it, the idea will touch same code (and may be more).
+> 
+
+When we have a good auto-propagation mechanism available, I guess
+this can be beneficial for most of the code, not only the places
+where we add hints (or prepend something, see below).
+
+> [1]: https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg03449.html
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  include/qapi/error.h | 102 +++++++++++++++++++++++++++++++++++++++++++
+>  block.c              |  63 ++++++++++++--------------
+>  block/backup.c       |   8 +++-
+>  block/gluster.c      |   7 +++
+>  4 files changed, 144 insertions(+), 36 deletions(-)
+> 
+> diff --git a/include/qapi/error.h b/include/qapi/error.h
+> index 3f95141a01..083e061014 100644
+> --- a/include/qapi/error.h
+> +++ b/include/qapi/error.h
+> @@ -322,6 +322,108 @@ void error_set_internal(Error **errp,
+>                          ErrorClass err_class, const char *fmt, ...)
+>      GCC_FMT_ATTR(6, 7);
+>  
+> +typedef struct ErrorPropagator {
+> +    Error **errp;
+> +    Error *local_err;
+> +} ErrorPropagator;
+> +
+> +static inline void error_propagator_cleanup(ErrorPropagator *prop)
+> +{
+> +    if (prop->local_err) {
+> +        error_propagate(prop->errp, prop->local_err);
+
+We also have error_propagate_prepend(), which is basically a variant of
+error_prepend()+error_propagate() that can cope with &error_fatal. This
+was introduced by Markus in commit 4b5766488fd3, for similar reasons that
+motivated my series. It has ~30 users in the tree.
+
+There's no such thing a generic cleanup function with a printf-like
+interface, so all of these should be converted back to error_prepend()
+if we go for auto-propagation.
+
+Aside from propagation, one can sometime choose to call things like
+error_free() or error_free_or_abort()... Auto-propagation should
+detect that and not call error_propagate() in this case.
+
+> +    }
+> +}
+> +
+> +G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagator, error_propagator_cleanup);
+> +
+> +/*
+> + * ErrorPropagationPair
+> + *
+> + * [Error *local_err, Error **errp]
+> + *
+> + * First element is local_err, second is original errp, which is propagation
+> + * target. Yes, errp has a bit another type, so it should be converted.
+> + *
+> + * ErrorPropagationPair may be used as errp, which points to local_err,
+> + * as it's type is compatible.
+> + */
+> +typedef Error *ErrorPropagationPair[2];
+> +
+> +static inline void error_propagation_pair_cleanup(ErrorPropagationPair *arr)
+> +{
+> +    Error *local_err = (*arr)[0];
+> +    Error **errp = (Error **)(*arr)[1];
+> +
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +    }
+> +}
+> +
+> +G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagationPair,
+> +                                 error_propagation_pair_cleanup);
+> +
+> +/*
+> + * DEF_AUTO_ERRP
+> + *
+> + * Define auto_errp variable, which may be used instead of errp, and
+> + * *auto_errp may be safely checked to be zero or not, and may be safely
+> + * used for error_append_hint(). auto_errp is automatically propagated
+> + * to errp at function exit.
+> + */
+> +#define DEF_AUTO_ERRP(auto_errp, errp) \
+> +    g_auto(ErrorPropagationPair) (auto_errp) = {NULL, (Error *)(errp)}
+> +
+> +
+> +/*
+> + * Another variant:
+> + *   Pros:
+> + *     - normal structure instead of cheating with array
+> + *     - we can directly use errp, if it's not NULL and don't point to
+> + *       error_abort or error_fatal
+> + *   Cons:
+> + *     - we need to define two variables instead of one
+> + */
+> +typedef struct ErrorPropagationStruct {
+> +    Error *local_err;
+> +    Error **errp;
+> +} ErrorPropagationStruct;
+> +
+> +static inline void error_propagation_struct_cleanup(ErrorPropagationStruct *prop)
+> +{
+> +    if (prop->local_err) {
+> +        error_propagate(prop->errp, prop->local_err);
+> +    }
+> +}
+> +
+> +G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagationStruct,
+> +                                 error_propagation_struct_cleanup);
+> +
+> +#define DEF_AUTO_ERRP_V2(auto_errp, errp) \
+> +    g_auto(ErrorPropagationStruct) (__auto_errp_prop) = {.errp = (errp)}; \
+> +    Error **auto_errp = \
+> +        ((errp) == NULL || *(errp) == error_abort || *(errp) == error_fatal) ? \
+> +        &__auto_errp_prop.local_err : \
+> +        (errp);
+> +
+> +/*
+> + * Third variant:
+> + *   Pros:
+> + *     - simpler movement for functions which don't have local_err yet
+> + *       the only thing to do is to call one macro at function start.
+> + *       This extremely simplifies Greg's series
+> + *   Cons:
+> + *     - looks like errp shadowing.. Still seems safe.
+> + *     - must be after all definitions of local variables and before any
+> + *       code.
+> + *     - like v2, several statements in one open macro
+> + */
+> +#define MAKE_ERRP_SAFE(errp) \
+> +g_auto(ErrorPropagationStruct) (__auto_errp_prop) = {.errp = (errp)}; \
+> +if ((errp) == NULL || *(errp) == error_abort || *(errp) == error_fatal) { \
+> +    (errp) = &__auto_errp_prop.local_err; \
+> +}
+> +
+> +
+>  /*
+>   * Special error destination to abort on error.
+>   * See error_setg() and error_propagate() for details.
+> diff --git a/block.c b/block.c
+> index 5944124845..5253663329 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -1275,12 +1275,11 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
+>                              const char *node_name, QDict *options,
+>                              int open_flags, Error **errp)
+>  {
+> -    Error *local_err = NULL;
+> +    DEF_AUTO_ERRP_V2(auto_errp, errp);
+>      int i, ret;
+>  
+> -    bdrv_assign_node_name(bs, node_name, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +    bdrv_assign_node_name(bs, node_name, auto_errp);
+> +    if (*auto_errp) {
+>          return -EINVAL;
+>      }
+>  
+> @@ -1290,20 +1289,21 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
+>  
+>      if (drv->bdrv_file_open) {
+>          assert(!drv->bdrv_needs_filename || bs->filename[0]);
+> -        ret = drv->bdrv_file_open(bs, options, open_flags, &local_err);
+> +        ret = drv->bdrv_file_open(bs, options, open_flags, auto_errp);
+>      } else if (drv->bdrv_open) {
+> -        ret = drv->bdrv_open(bs, options, open_flags, &local_err);
+> +        ret = drv->bdrv_open(bs, options, open_flags, auto_errp);
+>      } else {
+>          ret = 0;
+>      }
+>  
+>      if (ret < 0) {
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> -        } else if (bs->filename[0]) {
+> -            error_setg_errno(errp, -ret, "Could not open '%s'", bs->filename);
+> -        } else {
+> -            error_setg_errno(errp, -ret, "Could not open image");
+> +        if (!*auto_errp) {
+> +            if (bs->filename[0]) {
+> +                error_setg_errno(errp, -ret, "Could not open '%s'",
+> +                                 bs->filename);
+> +            } else {
+> +                error_setg_errno(errp, -ret, "Could not open image");
+> +            }
+>          }
+>          goto open_failed;
+>      }
+> @@ -1314,9 +1314,8 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
+>          return ret;
+>      }
+>  
+> -    bdrv_refresh_limits(bs, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +    bdrv_refresh_limits(bs, auto_errp);
+> +    if (*auto_errp) {
+>          return -EINVAL;
+>      }
+>  
+> @@ -4238,17 +4237,17 @@ out:
+>  void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top,
+>                   Error **errp)
+>  {
+> -    Error *local_err = NULL;
+> +    g_auto(ErrorPropagator) prop = {.errp = errp};
+>  
+> -    bdrv_set_backing_hd(bs_new, bs_top, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +    errp = &prop.local_err;
+> +
+> +    bdrv_set_backing_hd(bs_new, bs_top, errp);
+> +    if (*errp) {
+>          goto out;
+>      }
+>  
+> -    bdrv_replace_node(bs_top, bs_new, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +    bdrv_replace_node(bs_top, bs_new, errp);
+> +    if (*errp) {
+>          bdrv_set_backing_hd(bs_new, NULL, &error_abort);
+>          goto out;
+>      }
+> @@ -5309,9 +5308,9 @@ void bdrv_init_with_whitelist(void)
+>  static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
+>                                                    Error **errp)
+>  {
+> +    DEF_AUTO_ERRP(auto_errp, errp);
+>      BdrvChild *child, *parent;
+>      uint64_t perm, shared_perm;
+> -    Error *local_err = NULL;
+>      int ret;
+>      BdrvDirtyBitmap *bm;
+>  
+> @@ -5324,9 +5323,8 @@ static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
+>      }
+>  
+>      QLIST_FOREACH(child, &bs->children, next) {
+> -        bdrv_co_invalidate_cache(child->bs, &local_err);
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> +        bdrv_co_invalidate_cache(child->bs, auto_errp);
+> +        if (*auto_errp) {
+>              return;
+>          }
+>      }
+> @@ -5346,19 +5344,17 @@ static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
+>       */
+>      bs->open_flags &= ~BDRV_O_INACTIVE;
+>      bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
+> -    ret = bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, NULL, &local_err);
+> +    ret = bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, NULL, auto_errp);
+>      if (ret < 0) {
+>          bs->open_flags |= BDRV_O_INACTIVE;
+> -        error_propagate(errp, local_err);
+>          return;
+>      }
+>      bdrv_set_perm(bs, perm, shared_perm);
+>  
+>      if (bs->drv->bdrv_co_invalidate_cache) {
+> -        bs->drv->bdrv_co_invalidate_cache(bs, &local_err);
+> -        if (local_err) {
+> +        bs->drv->bdrv_co_invalidate_cache(bs, auto_errp);
+> +        if (*auto_errp) {
+>              bs->open_flags |= BDRV_O_INACTIVE;
+> -            error_propagate(errp, local_err);
+>              return;
+>          }
+>      }
+> @@ -5378,10 +5374,9 @@ static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
+>  
+>      QLIST_FOREACH(parent, &bs->parents, next_parent) {
+>          if (parent->role->activate) {
+> -            parent->role->activate(parent, &local_err);
+> -            if (local_err) {
+> +            parent->role->activate(parent, auto_errp);
+> +            if (*auto_errp) {
+>                  bs->open_flags |= BDRV_O_INACTIVE;
+> -                error_propagate(errp, local_err);
+>                  return;
+>              }
+>          }
+> diff --git a/block/backup.c b/block/backup.c
+> index 89f7f89200..462dea4fbb 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -583,6 +583,10 @@ static const BlockJobDriver backup_job_driver = {
+>  static int64_t backup_calculate_cluster_size(BlockDriverState *target,
+>                                               Error **errp)
+>  {
+> +    /*
+> +     * Example of using DEF_AUTO_ERRP to make error_append_hint safe
+> +     */
+> +    DEF_AUTO_ERRP(auto_errp, errp);
+>      int ret;
+>      BlockDriverInfo bdi;
+>  
+> @@ -602,10 +606,10 @@ static int64_t backup_calculate_cluster_size(BlockDriverState *target,
+>                      BACKUP_CLUSTER_SIZE_DEFAULT);
+>          return BACKUP_CLUSTER_SIZE_DEFAULT;
+>      } else if (ret < 0 && !target->backing) {
+> -        error_setg_errno(errp, -ret,
+> +        error_setg_errno(auto_errp, -ret,
+>              "Couldn't determine the cluster size of the target image, "
+>              "which has no backing file");
+> -        error_append_hint(errp,
+> +        error_append_hint(auto_errp,
+>              "Aborting, since this may create an unusable destination image\n");
+>          return ret;
+>      } else if (ret < 0 && target->backing) {
+> diff --git a/block/gluster.c b/block/gluster.c
+> index 64028b2cba..799a2dbeca 100644
+> --- a/block/gluster.c
+> +++ b/block/gluster.c
+> @@ -695,6 +695,13 @@ static int qemu_gluster_parse(BlockdevOptionsGluster *gconf,
+>                                QDict *options, Error **errp)
+>  {
+>      int ret;
+> +    /*
+> +     * Example of using MAKE_ERRP_SAFE to make error_append_hint safe. We
+> +     * only need to add one macro call. Note, it must be placed exactly after
+> +     * all local variables defenition.
+> +     */
+> +    MAKE_ERRP_SAFE(errp);
+> +
+>      if (filename) {
+>          ret = qemu_gluster_parse_uri(gconf, filename);
+>          if (ret < 0) {
 
 
