@@ -2,60 +2,125 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3527BC4CEC4
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 07:13:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79CADC49ED7
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 07:14:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1EA920678
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 07:13:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1EA920678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 310D221907
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 07:14:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="VaEr7usP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 310D221907
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAqcr-0005ht-1z
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 03:13:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53436)
+	id 1iAqeK-0007aK-Am
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 03:14:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53797)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1iAqZG-0001HO-Mt
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 03:09:37 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iAqbi-0004e9-Ls
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 03:12:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1iAqZA-0004zC-6u
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 03:09:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55832)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iAqZ9-0004xz-Ot
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 03:09:24 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 11BA810CBC4B;
- Thu, 19 Sep 2019 07:09:23 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-47.ams2.redhat.com
- [10.36.116.47])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4EBD060872;
- Thu, 19 Sep 2019 07:09:19 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id A193B9D75; Thu, 19 Sep 2019 09:09:18 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 19 Sep 2019 09:09:18 +0200
-Message-Id: <20190919070918.16059-5-kraxel@redhat.com>
-In-Reply-To: <20190919070918.16059-1-kraxel@redhat.com>
-References: <20190919070918.16059-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Thu, 19 Sep 2019 07:09:23 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 4/4] vnc: fix memory leak when vnc disconnect
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iAqbh-0006co-1j
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 03:12:02 -0400
+Received: from mail-eopbgr50132.outbound.protection.outlook.com
+ ([40.107.5.132]:6819 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iAqba-0006Wx-GU; Thu, 19 Sep 2019 03:11:54 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=k9HpjpbWgGMLMLv5x3J4zxUN7yjKZn7c5BJ7u6KxfQ3Jd/Drodvn3k3HtPuQXauF95nmLaAWUhu7G8r37TSepeAV4qu4dWGsYWyStJES+bkSuN7p535CGWrMWW2EVPnea5gxmDYYWSrvz8bR0SHkI6bmhhNgiV8CX4IL0q/TDh/ddWuEX9lTzV3eY1PTH5oGjf115ksfwAu0/0BIlezXHbpXtGlqfQCrs52zBGaEF02gnWg2tknLMauXTbQ/xjmXwfu0tnc6IlUZYh1HLRebhGSuM12MJtqsVzdS3QxzsE0a1QXYe1gHMf/M7LT6o+kJeddX5C9jTLvDnD3iWAgaNg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7pEZiHGtfmpAaScziVnoBmL/kltJ9+Zlm40h2DS0BPE=;
+ b=BeC2aHasE6kPwZW6kHt99qo+RmOUNfRHhD73IznsANAA16huoArh0HdynHouxTxHaxMnb65oISaGc+MNCWjRPCm68MDJQMCMhtrGvRY+brvnn9n8bQDCDLIzuJCLGz4Kuv+GFYHZl0p9jqMK61v/c261Wg2+NknSIs+J1wx7mSMfd192MNmVcVIBX4oBjkO/KNb4nUT2JIBjH4HOdrKbbCECCNhyTYRO0OBpn0a2mn2ww1+z4KKNsKEoBmv9Ys2imVpAKlJkhtIyIrnVYNLdNunN7oH78vhUVQtjsP+me059HuFBblpV97sc53oeuLiaZycvt5RMHdgbM5At2E/9zg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7pEZiHGtfmpAaScziVnoBmL/kltJ9+Zlm40h2DS0BPE=;
+ b=VaEr7usP8eUkas6MzrpXyQk6wuFpBqpM8zcyhuNlWAlj34jcuV7uUVDmLZt0yL/vcaXYjGNsJXBsS+HkdqtBOEkxqNPtU+25djw2XwYCDBOR39R7iweql9DvdFWUyaxHp0CqGbZEg0XtVeKkpJMaUR22CW3ATsTGw8Vgii0YUI8=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB4985.eurprd08.prod.outlook.com (20.179.15.214) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2284.19; Thu, 19 Sep 2019 07:11:52 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2284.009; Thu, 19 Sep 2019
+ 07:11:52 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Paolo
+ Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Thread-Topic: [Qemu-block] [Qemu-devel] [PATCH] block/backup: install notifier
+ during creation
+Thread-Index: AQHVTu7v5GJB5n7vl0itOMdQhozpxacFvxkAgABZlQCAHqpyAIAAVPIAgA0KCQCAALMJgA==
+Date: Thu, 19 Sep 2019 07:11:51 +0000
+Message-ID: <6e3c1b53-c104-2b05-418e-d44f45a82be8@virtuozzo.com>
+References: <20190809201333.29033-1-jsnow@redhat.com>
+ <b85698e6-cd79-a9c5-554c-c92487060280@virtuozzo.com>
+ <154bc276-d782-443f-3db6-38d87992d609@redhat.com>
+ <20190910081942.GA23976@stefanha-x1.localdomain>
+ <9bf835d7-8bfa-feba-c2f7-acd6cda4a81e@redhat.com>
+ <0abc4992-9322-010a-118b-62e79cbc5b58@redhat.com>
+In-Reply-To: <0abc4992-9322-010a-118b-62e79cbc5b58@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR08CA0062.eurprd08.prod.outlook.com
+ (2603:10a6:7:2a::33) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190919101149784
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: db69babd-2af8-4bde-98f9-08d73cd0a52e
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DB8PR08MB4985; 
+x-ms-traffictypediagnostic: DB8PR08MB4985:
+x-microsoft-antispam-prvs: <DB8PR08MB4985E1F633250B7BD921CE80C1890@DB8PR08MB4985.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 016572D96D
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(346002)(136003)(366004)(39850400004)(396003)(189003)(199004)(305945005)(5660300002)(6506007)(316002)(486006)(7736002)(36756003)(76176011)(102836004)(386003)(186003)(26005)(53546011)(54906003)(446003)(110136005)(3846002)(2616005)(476003)(52116002)(2906002)(14454004)(8936002)(11346002)(25786009)(478600001)(81166006)(81156014)(6486002)(229853002)(8676002)(6512007)(6116002)(4326008)(6246003)(31686004)(6436002)(64756008)(14444005)(86362001)(99286004)(31696002)(66066001)(256004)(66556008)(71200400001)(66446008)(71190400001)(66476007)(66946007);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4985;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: mFhkUHhKLKFctnegTFHCEWSyqLTY/EBlXGEQOYIu6gTkmDTuwztwAPhD3HbeKSk5Vu9flF2t3spEg7E13Hn1KGPDMoXnxVIRi5Pr2ptJxrgYDcj7I37ghqLFDgsYmWRA0ugvpJ7w1WlFmBdrLCRH8yw1goZg03eqNloH6iYS4A45obvGFMbZOciRtmZ4pFVCjH2+epRtHNGmaI5b1fG7WJHCbdcrgNTeFcbM40aXaiW9u5Dvqdq4SMSMRjqCsqLZ8hTSc7fFaekvpMzGqLKUlJRIlCj5jehgxBG7O1/TA0NWj6c5d9Qbs0Y5hNDxMoX8Pa/1YnYkDb1cFVTZJQBogg+Xf19VxBdAXPqZeZgrVKeQ5hVhrsHZBoxRxxo9Ub4kkTnI0jV96QneDyRNe2IUz/Bpxn53dFFvJZ5rUtNvKKM=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <19DF1D11C4A84644BF355CA69BFE7A83@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: db69babd-2af8-4bde-98f9-08d73cd0a52e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Sep 2019 07:11:52.0524 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: stRHU3lr5FiEhqz26BO6J28PcdpxdDbbvOIAhSy3is/mbdAtaLrJRXYcSdcsQE2Xz6tuUoHkhnQUy7nN6b10Ba6vuNagHQ6WObh8xF1RqMg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4985
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.5.132
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/backup: install
+ notifier during creation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,1020 +132,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Qiang <liq3ea@163.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Li Qiang <liq3ea@163.com>
-
-Currently when qemu receives a vnc connect, it creates a 'VncState' to
-represent this connection. In 'vnc_worker_thread_loop' it creates a
-local 'VncState'. The connection 'VcnState' and local 'VncState' exchange
-data in 'vnc_async_encoding_start' and 'vnc_async_encoding_end'.
-In 'zrle_compress_data' it calls 'deflateInit2' to allocate the libz library
-opaque data. The 'VncState' used in 'zrle_compress_data' is the local
-'VncState'. In 'vnc_zrle_clear' it calls 'deflateEnd' to free the libz
-library opaque data. The 'VncState' used in 'vnc_zrle_clear' is the connection
-'VncState'. In currently implementation there will be a memory leak when the
-vnc disconnect. Following is the asan output backtrack:
-
-Direct leak of 29760 byte(s) in 5 object(s) allocated from:
-    0 0xffffa67ef3c3 in __interceptor_calloc (/lib64/libasan.so.4+0xd33c3)
-    1 0xffffa65071cb in g_malloc0 (/lib64/libglib-2.0.so.0+0x571cb)
-    2 0xffffa5e968f7 in deflateInit2_ (/lib64/libz.so.1+0x78f7)
-    3 0xaaaacec58613 in zrle_compress_data ui/vnc-enc-zrle.c:87
-    4 0xaaaacec58613 in zrle_send_framebuffer_update ui/vnc-enc-zrle.c:344
-    5 0xaaaacec34e77 in vnc_send_framebuffer_update ui/vnc.c:919
-    6 0xaaaacec5e023 in vnc_worker_thread_loop ui/vnc-jobs.c:271
-    7 0xaaaacec5e5e7 in vnc_worker_thread ui/vnc-jobs.c:340
-    8 0xaaaacee4d3c3 in qemu_thread_start util/qemu-thread-posix.c:502
-    9 0xffffa544e8bb in start_thread (/lib64/libpthread.so.0+0x78bb)
-    10 0xffffa53965cb in thread_start (/lib64/libc.so.6+0xd55cb)
-
-This is because the opaque allocated in 'deflateInit2' is not freed in
-'deflateEnd'. The reason is that the 'deflateEnd' calls 'deflateStateCheck'
-and in the latter will check whether 's->strm != strm'(libz's data structure).
-This check will be true so in 'deflateEnd' it just return 'Z_STREAM_ERROR' and
-not free the data allocated in 'deflateInit2'.
-
-The reason this happens is that the 'VncState' contains the whole 'VncZrle',
-so when calling 'deflateInit2', the 's->strm' will be the local address.
-So 's->strm != strm' will be true.
-
-To fix this issue, we need to make 'zrle' of 'VncState' to be a pointer.
-Then the connection 'VncState' and local 'VncState' exchange mechanism will
-work as expection. The 'tight' of 'VncState' has the same issue, let's also turn
-it to a pointer.
-
-Reported-by: Ying Fang <fangying1@huawei.com>
-Signed-off-by: Li Qiang <liq3ea@163.com>
-Message-id: 20190831153922.121308-1-liq3ea@163.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/vnc.h              |   4 +-
- ui/vnc-enc-tight.c    | 219 +++++++++++++++++++++---------------------
- ui/vnc-enc-zlib.c     |  11 ++-
- ui/vnc-enc-zrle.c     |  68 ++++++-------
- ui/vnc-enc-zrle.inc.c |   2 +-
- ui/vnc.c              |  28 +++---
- 6 files changed, 170 insertions(+), 162 deletions(-)
-
-diff --git a/ui/vnc.h b/ui/vnc.h
-index 86438609673a..fea79c2fc998 100644
---- a/ui/vnc.h
-+++ b/ui/vnc.h
-@@ -338,10 +338,10 @@ struct VncState
-     /* Encoding specific, if you add something here, don't forget to
-      *  update vnc_async_encoding_start()
-      */
--    VncTight tight;
-+    VncTight *tight;
-     VncZlib zlib;
-     VncHextile hextile;
--    VncZrle zrle;
-+    VncZrle *zrle;
-     VncZywrle zywrle;
- 
-     Notifier mouse_mode_notifier;
-diff --git a/ui/vnc-enc-tight.c b/ui/vnc-enc-tight.c
-index 9084c2201b31..1e0851826a84 100644
---- a/ui/vnc-enc-tight.c
-+++ b/ui/vnc-enc-tight.c
-@@ -116,7 +116,7 @@ static int send_png_rect(VncState *vs, int x, int y, int w, int h,
- 
- static bool tight_can_send_png_rect(VncState *vs, int w, int h)
- {
--    if (vs->tight.type != VNC_ENCODING_TIGHT_PNG) {
-+    if (vs->tight->type != VNC_ENCODING_TIGHT_PNG) {
-         return false;
-     }
- 
-@@ -144,7 +144,7 @@ tight_detect_smooth_image24(VncState *vs, int w, int h)
-     int pixels = 0;
-     int pix, left[3];
-     unsigned int errors;
--    unsigned char *buf = vs->tight.tight.buffer;
-+    unsigned char *buf = vs->tight->tight.buffer;
- 
-     /*
-      * If client is big-endian, color samples begin from the second
-@@ -215,7 +215,7 @@ tight_detect_smooth_image24(VncState *vs, int w, int h)
-         int pixels = 0;                                                 \
-         int sample, sum, left[3];                                       \
-         unsigned int errors;                                            \
--        unsigned char *buf = vs->tight.tight.buffer;                    \
-+        unsigned char *buf = vs->tight->tight.buffer;                    \
-                                                                         \
-         endian = 0; /* FIXME */                                         \
-                                                                         \
-@@ -296,8 +296,8 @@ static int
- tight_detect_smooth_image(VncState *vs, int w, int h)
- {
-     unsigned int errors;
--    int compression = vs->tight.compression;
--    int quality = vs->tight.quality;
-+    int compression = vs->tight->compression;
-+    int quality = vs->tight->quality;
- 
-     if (!vs->vd->lossy) {
-         return 0;
-@@ -309,7 +309,7 @@ tight_detect_smooth_image(VncState *vs, int w, int h)
-         return 0;
-     }
- 
--    if (vs->tight.quality != (uint8_t)-1) {
-+    if (vs->tight->quality != (uint8_t)-1) {
-         if (w * h < VNC_TIGHT_JPEG_MIN_RECT_SIZE) {
-             return 0;
-         }
-@@ -320,9 +320,9 @@ tight_detect_smooth_image(VncState *vs, int w, int h)
-     }
- 
-     if (vs->client_pf.bytes_per_pixel == 4) {
--        if (vs->tight.pixel24) {
-+        if (vs->tight->pixel24) {
-             errors = tight_detect_smooth_image24(vs, w, h);
--            if (vs->tight.quality != (uint8_t)-1) {
-+            if (vs->tight->quality != (uint8_t)-1) {
-                 return (errors < tight_conf[quality].jpeg_threshold24);
-             }
-             return (errors < tight_conf[compression].gradient_threshold24);
-@@ -352,7 +352,7 @@ tight_detect_smooth_image(VncState *vs, int w, int h)
-         uint##bpp##_t c0, c1, ci;                                       \
-         int i, n0, n1;                                                  \
-                                                                         \
--        data = (uint##bpp##_t *)vs->tight.tight.buffer;                 \
-+        data = (uint##bpp##_t *)vs->tight->tight.buffer;                \
-                                                                         \
-         c0 = data[0];                                                   \
-         i = 1;                                                          \
-@@ -423,9 +423,9 @@ static int tight_fill_palette(VncState *vs, int x, int y,
- {
-     int max;
- 
--    max = count / tight_conf[vs->tight.compression].idx_max_colors_divisor;
-+    max = count / tight_conf[vs->tight->compression].idx_max_colors_divisor;
-     if (max < 2 &&
--        count >= tight_conf[vs->tight.compression].mono_min_rect_size) {
-+        count >= tight_conf[vs->tight->compression].mono_min_rect_size) {
-         max = 2;
-     }
-     if (max >= 256) {
-@@ -558,7 +558,7 @@ tight_filter_gradient24(VncState *vs, uint8_t *buf, int w, int h)
-     int x, y, c;
- 
-     buf32 = (uint32_t *)buf;
--    memset(vs->tight.gradient.buffer, 0, w * 3 * sizeof(int));
-+    memset(vs->tight->gradient.buffer, 0, w * 3 * sizeof(int));
- 
-     if (1 /* FIXME */) {
-         shift[0] = vs->client_pf.rshift;
-@@ -575,7 +575,7 @@ tight_filter_gradient24(VncState *vs, uint8_t *buf, int w, int h)
-             upper[c] = 0;
-             here[c] = 0;
-         }
--        prev = (int *)vs->tight.gradient.buffer;
-+        prev = (int *)vs->tight->gradient.buffer;
-         for (x = 0; x < w; x++) {
-             pix32 = *buf32++;
-             for (c = 0; c < 3; c++) {
-@@ -615,7 +615,7 @@ tight_filter_gradient24(VncState *vs, uint8_t *buf, int w, int h)
-         int prediction;                                                 \
-         int x, y, c;                                                    \
-                                                                         \
--        memset (vs->tight.gradient.buffer, 0, w * 3 * sizeof(int));     \
-+        memset(vs->tight->gradient.buffer, 0, w * 3 * sizeof(int));     \
-                                                                         \
-         endian = 0; /* FIXME */                                         \
-                                                                         \
-@@ -631,7 +631,7 @@ tight_filter_gradient24(VncState *vs, uint8_t *buf, int w, int h)
-                 upper[c] = 0;                                           \
-                 here[c] = 0;                                            \
-             }                                                           \
--            prev = (int *)vs->tight.gradient.buffer;                    \
-+            prev = (int *)vs->tight->gradient.buffer;                    \
-             for (x = 0; x < w; x++) {                                   \
-                 pix = *buf;                                             \
-                 if (endian) {                                           \
-@@ -785,7 +785,7 @@ static void extend_solid_area(VncState *vs, int x, int y, int w, int h,
- static int tight_init_stream(VncState *vs, int stream_id,
-                              int level, int strategy)
- {
--    z_streamp zstream = &vs->tight.stream[stream_id];
-+    z_streamp zstream = &vs->tight->stream[stream_id];
- 
-     if (zstream->opaque == NULL) {
-         int err;
-@@ -803,15 +803,15 @@ static int tight_init_stream(VncState *vs, int stream_id,
-             return -1;
-         }
- 
--        vs->tight.levels[stream_id] = level;
-+        vs->tight->levels[stream_id] = level;
-         zstream->opaque = vs;
-     }
- 
--    if (vs->tight.levels[stream_id] != level) {
-+    if (vs->tight->levels[stream_id] != level) {
-         if (deflateParams(zstream, level, strategy) != Z_OK) {
-             return -1;
-         }
--        vs->tight.levels[stream_id] = level;
-+        vs->tight->levels[stream_id] = level;
-     }
-     return 0;
- }
-@@ -839,11 +839,11 @@ static void tight_send_compact_size(VncState *vs, size_t len)
- static int tight_compress_data(VncState *vs, int stream_id, size_t bytes,
-                                int level, int strategy)
- {
--    z_streamp zstream = &vs->tight.stream[stream_id];
-+    z_streamp zstream = &vs->tight->stream[stream_id];
-     int previous_out;
- 
-     if (bytes < VNC_TIGHT_MIN_TO_COMPRESS) {
--        vnc_write(vs, vs->tight.tight.buffer, vs->tight.tight.offset);
-+        vnc_write(vs, vs->tight->tight.buffer, vs->tight->tight.offset);
-         return bytes;
-     }
- 
-@@ -852,13 +852,13 @@ static int tight_compress_data(VncState *vs, int stream_id, size_t bytes,
-     }
- 
-     /* reserve memory in output buffer */
--    buffer_reserve(&vs->tight.zlib, bytes + 64);
-+    buffer_reserve(&vs->tight->zlib, bytes + 64);
- 
-     /* set pointers */
--    zstream->next_in = vs->tight.tight.buffer;
--    zstream->avail_in = vs->tight.tight.offset;
--    zstream->next_out = vs->tight.zlib.buffer + vs->tight.zlib.offset;
--    zstream->avail_out = vs->tight.zlib.capacity - vs->tight.zlib.offset;
-+    zstream->next_in = vs->tight->tight.buffer;
-+    zstream->avail_in = vs->tight->tight.offset;
-+    zstream->next_out = vs->tight->zlib.buffer + vs->tight->zlib.offset;
-+    zstream->avail_out = vs->tight->zlib.capacity - vs->tight->zlib.offset;
-     previous_out = zstream->avail_out;
-     zstream->data_type = Z_BINARY;
- 
-@@ -868,14 +868,14 @@ static int tight_compress_data(VncState *vs, int stream_id, size_t bytes,
-         return -1;
-     }
- 
--    vs->tight.zlib.offset = vs->tight.zlib.capacity - zstream->avail_out;
-+    vs->tight->zlib.offset = vs->tight->zlib.capacity - zstream->avail_out;
-     /* ...how much data has actually been produced by deflate() */
-     bytes = previous_out - zstream->avail_out;
- 
-     tight_send_compact_size(vs, bytes);
--    vnc_write(vs, vs->tight.zlib.buffer, bytes);
-+    vnc_write(vs, vs->tight->zlib.buffer, bytes);
- 
--    buffer_reset(&vs->tight.zlib);
-+    buffer_reset(&vs->tight->zlib);
- 
-     return bytes;
- }
-@@ -927,16 +927,17 @@ static int send_full_color_rect(VncState *vs, int x, int y, int w, int h)
- 
-     vnc_write_u8(vs, stream << 4); /* no flushing, no filter */
- 
--    if (vs->tight.pixel24) {
--        tight_pack24(vs, vs->tight.tight.buffer, w * h, &vs->tight.tight.offset);
-+    if (vs->tight->pixel24) {
-+        tight_pack24(vs, vs->tight->tight.buffer, w * h,
-+                     &vs->tight->tight.offset);
-         bytes = 3;
-     } else {
-         bytes = vs->client_pf.bytes_per_pixel;
-     }
- 
-     bytes = tight_compress_data(vs, stream, w * h * bytes,
--                                tight_conf[vs->tight.compression].raw_zlib_level,
--                                Z_DEFAULT_STRATEGY);
-+                            tight_conf[vs->tight->compression].raw_zlib_level,
-+                            Z_DEFAULT_STRATEGY);
- 
-     return (bytes >= 0);
- }
-@@ -947,14 +948,14 @@ static int send_solid_rect(VncState *vs)
- 
-     vnc_write_u8(vs, VNC_TIGHT_FILL << 4); /* no flushing, no filter */
- 
--    if (vs->tight.pixel24) {
--        tight_pack24(vs, vs->tight.tight.buffer, 1, &vs->tight.tight.offset);
-+    if (vs->tight->pixel24) {
-+        tight_pack24(vs, vs->tight->tight.buffer, 1, &vs->tight->tight.offset);
-         bytes = 3;
-     } else {
-         bytes = vs->client_pf.bytes_per_pixel;
-     }
- 
--    vnc_write(vs, vs->tight.tight.buffer, bytes);
-+    vnc_write(vs, vs->tight->tight.buffer, bytes);
-     return 1;
- }
- 
-@@ -963,7 +964,7 @@ static int send_mono_rect(VncState *vs, int x, int y,
- {
-     ssize_t bytes;
-     int stream = 1;
--    int level = tight_conf[vs->tight.compression].mono_zlib_level;
-+    int level = tight_conf[vs->tight->compression].mono_zlib_level;
- 
- #ifdef CONFIG_VNC_PNG
-     if (tight_can_send_png_rect(vs, w, h)) {
-@@ -991,26 +992,26 @@ static int send_mono_rect(VncState *vs, int x, int y,
-         uint32_t buf[2] = {bg, fg};
-         size_t ret = sizeof (buf);
- 
--        if (vs->tight.pixel24) {
-+        if (vs->tight->pixel24) {
-             tight_pack24(vs, (unsigned char*)buf, 2, &ret);
-         }
-         vnc_write(vs, buf, ret);
- 
--        tight_encode_mono_rect32(vs->tight.tight.buffer, w, h, bg, fg);
-+        tight_encode_mono_rect32(vs->tight->tight.buffer, w, h, bg, fg);
-         break;
-     }
-     case 2:
-         vnc_write(vs, &bg, 2);
-         vnc_write(vs, &fg, 2);
--        tight_encode_mono_rect16(vs->tight.tight.buffer, w, h, bg, fg);
-+        tight_encode_mono_rect16(vs->tight->tight.buffer, w, h, bg, fg);
-         break;
-     default:
-         vnc_write_u8(vs, bg);
-         vnc_write_u8(vs, fg);
--        tight_encode_mono_rect8(vs->tight.tight.buffer, w, h, bg, fg);
-+        tight_encode_mono_rect8(vs->tight->tight.buffer, w, h, bg, fg);
-         break;
-     }
--    vs->tight.tight.offset = bytes;
-+    vs->tight->tight.offset = bytes;
- 
-     bytes = tight_compress_data(vs, stream, bytes, level, Z_DEFAULT_STRATEGY);
-     return (bytes >= 0);
-@@ -1040,7 +1041,7 @@ static void write_palette(int idx, uint32_t color, void *opaque)
- static bool send_gradient_rect(VncState *vs, int x, int y, int w, int h)
- {
-     int stream = 3;
--    int level = tight_conf[vs->tight.compression].gradient_zlib_level;
-+    int level = tight_conf[vs->tight->compression].gradient_zlib_level;
-     ssize_t bytes;
- 
-     if (vs->client_pf.bytes_per_pixel == 1) {
-@@ -1050,23 +1051,23 @@ static bool send_gradient_rect(VncState *vs, int x, int y, int w, int h)
-     vnc_write_u8(vs, (stream | VNC_TIGHT_EXPLICIT_FILTER) << 4);
-     vnc_write_u8(vs, VNC_TIGHT_FILTER_GRADIENT);
- 
--    buffer_reserve(&vs->tight.gradient, w * 3 * sizeof (int));
-+    buffer_reserve(&vs->tight->gradient, w * 3 * sizeof(int));
- 
--    if (vs->tight.pixel24) {
--        tight_filter_gradient24(vs, vs->tight.tight.buffer, w, h);
-+    if (vs->tight->pixel24) {
-+        tight_filter_gradient24(vs, vs->tight->tight.buffer, w, h);
-         bytes = 3;
-     } else if (vs->client_pf.bytes_per_pixel == 4) {
--        tight_filter_gradient32(vs, (uint32_t *)vs->tight.tight.buffer, w, h);
-+        tight_filter_gradient32(vs, (uint32_t *)vs->tight->tight.buffer, w, h);
-         bytes = 4;
-     } else {
--        tight_filter_gradient16(vs, (uint16_t *)vs->tight.tight.buffer, w, h);
-+        tight_filter_gradient16(vs, (uint16_t *)vs->tight->tight.buffer, w, h);
-         bytes = 2;
-     }
- 
--    buffer_reset(&vs->tight.gradient);
-+    buffer_reset(&vs->tight->gradient);
- 
-     bytes = w * h * bytes;
--    vs->tight.tight.offset = bytes;
-+    vs->tight->tight.offset = bytes;
- 
-     bytes = tight_compress_data(vs, stream, bytes,
-                                 level, Z_FILTERED);
-@@ -1077,7 +1078,7 @@ static int send_palette_rect(VncState *vs, int x, int y,
-                              int w, int h, VncPalette *palette)
- {
-     int stream = 2;
--    int level = tight_conf[vs->tight.compression].idx_zlib_level;
-+    int level = tight_conf[vs->tight->compression].idx_zlib_level;
-     int colors;
-     ssize_t bytes;
- 
-@@ -1104,12 +1105,12 @@ static int send_palette_rect(VncState *vs, int x, int y,
-         palette_iter(palette, write_palette, &priv);
-         vnc_write(vs, header, sizeof(header));
- 
--        if (vs->tight.pixel24) {
-+        if (vs->tight->pixel24) {
-             tight_pack24(vs, vs->output.buffer + old_offset, colors, &offset);
-             vs->output.offset = old_offset + offset;
-         }
- 
--        tight_encode_indexed_rect32(vs->tight.tight.buffer, w * h, palette);
-+        tight_encode_indexed_rect32(vs->tight->tight.buffer, w * h, palette);
-         break;
-     }
-     case 2:
-@@ -1119,7 +1120,7 @@ static int send_palette_rect(VncState *vs, int x, int y,
- 
-         palette_iter(palette, write_palette, &priv);
-         vnc_write(vs, header, sizeof(header));
--        tight_encode_indexed_rect16(vs->tight.tight.buffer, w * h, palette);
-+        tight_encode_indexed_rect16(vs->tight->tight.buffer, w * h, palette);
-         break;
-     }
-     default:
-@@ -1127,7 +1128,7 @@ static int send_palette_rect(VncState *vs, int x, int y,
-         break;
-     }
-     bytes = w * h;
--    vs->tight.tight.offset = bytes;
-+    vs->tight->tight.offset = bytes;
- 
-     bytes = tight_compress_data(vs, stream, bytes,
-                                 level, Z_DEFAULT_STRATEGY);
-@@ -1146,7 +1147,7 @@ static int send_palette_rect(VncState *vs, int x, int y,
- static void jpeg_init_destination(j_compress_ptr cinfo)
- {
-     VncState *vs = cinfo->client_data;
--    Buffer *buffer = &vs->tight.jpeg;
-+    Buffer *buffer = &vs->tight->jpeg;
- 
-     cinfo->dest->next_output_byte = (JOCTET *)buffer->buffer + buffer->offset;
-     cinfo->dest->free_in_buffer = (size_t)(buffer->capacity - buffer->offset);
-@@ -1156,7 +1157,7 @@ static void jpeg_init_destination(j_compress_ptr cinfo)
- static boolean jpeg_empty_output_buffer(j_compress_ptr cinfo)
- {
-     VncState *vs = cinfo->client_data;
--    Buffer *buffer = &vs->tight.jpeg;
-+    Buffer *buffer = &vs->tight->jpeg;
- 
-     buffer->offset = buffer->capacity;
-     buffer_reserve(buffer, 2048);
-@@ -1168,7 +1169,7 @@ static boolean jpeg_empty_output_buffer(j_compress_ptr cinfo)
- static void jpeg_term_destination(j_compress_ptr cinfo)
- {
-     VncState *vs = cinfo->client_data;
--    Buffer *buffer = &vs->tight.jpeg;
-+    Buffer *buffer = &vs->tight->jpeg;
- 
-     buffer->offset = buffer->capacity - cinfo->dest->free_in_buffer;
- }
-@@ -1187,7 +1188,7 @@ static int send_jpeg_rect(VncState *vs, int x, int y, int w, int h, int quality)
-         return send_full_color_rect(vs, x, y, w, h);
-     }
- 
--    buffer_reserve(&vs->tight.jpeg, 2048);
-+    buffer_reserve(&vs->tight->jpeg, 2048);
- 
-     cinfo.err = jpeg_std_error(&jerr);
-     jpeg_create_compress(&cinfo);
-@@ -1222,9 +1223,9 @@ static int send_jpeg_rect(VncState *vs, int x, int y, int w, int h, int quality)
- 
-     vnc_write_u8(vs, VNC_TIGHT_JPEG << 4);
- 
--    tight_send_compact_size(vs, vs->tight.jpeg.offset);
--    vnc_write(vs, vs->tight.jpeg.buffer, vs->tight.jpeg.offset);
--    buffer_reset(&vs->tight.jpeg);
-+    tight_send_compact_size(vs, vs->tight->jpeg.offset);
-+    vnc_write(vs, vs->tight->jpeg.buffer, vs->tight->jpeg.offset);
-+    buffer_reset(&vs->tight->jpeg);
- 
-     return 1;
- }
-@@ -1240,7 +1241,7 @@ static void write_png_palette(int idx, uint32_t pix, void *opaque)
-     VncState *vs = priv->vs;
-     png_colorp color = &priv->png_palette[idx];
- 
--    if (vs->tight.pixel24)
-+    if (vs->tight->pixel24)
-     {
-         color->red = (pix >> vs->client_pf.rshift) & vs->client_pf.rmax;
-         color->green = (pix >> vs->client_pf.gshift) & vs->client_pf.gmax;
-@@ -1267,10 +1268,10 @@ static void png_write_data(png_structp png_ptr, png_bytep data,
- {
-     VncState *vs = png_get_io_ptr(png_ptr);
- 
--    buffer_reserve(&vs->tight.png, vs->tight.png.offset + length);
--    memcpy(vs->tight.png.buffer + vs->tight.png.offset, data, length);
-+    buffer_reserve(&vs->tight->png, vs->tight->png.offset + length);
-+    memcpy(vs->tight->png.buffer + vs->tight->png.offset, data, length);
- 
--    vs->tight.png.offset += length;
-+    vs->tight->png.offset += length;
- }
- 
- static void png_flush_data(png_structp png_ptr)
-@@ -1295,8 +1296,8 @@ static int send_png_rect(VncState *vs, int x, int y, int w, int h,
-     png_infop info_ptr;
-     png_colorp png_palette = NULL;
-     pixman_image_t *linebuf;
--    int level = tight_png_conf[vs->tight.compression].png_zlib_level;
--    int filters = tight_png_conf[vs->tight.compression].png_filters;
-+    int level = tight_png_conf[vs->tight->compression].png_zlib_level;
-+    int filters = tight_png_conf[vs->tight->compression].png_filters;
-     uint8_t *buf;
-     int dy;
- 
-@@ -1340,21 +1341,23 @@ static int send_png_rect(VncState *vs, int x, int y, int w, int h,
-         png_set_PLTE(png_ptr, info_ptr, png_palette, palette_size(palette));
- 
-         if (vs->client_pf.bytes_per_pixel == 4) {
--            tight_encode_indexed_rect32(vs->tight.tight.buffer, w * h, palette);
-+            tight_encode_indexed_rect32(vs->tight->tight.buffer, w * h,
-+                                        palette);
-         } else {
--            tight_encode_indexed_rect16(vs->tight.tight.buffer, w * h, palette);
-+            tight_encode_indexed_rect16(vs->tight->tight.buffer, w * h,
-+                                        palette);
-         }
-     }
- 
-     png_write_info(png_ptr, info_ptr);
- 
--    buffer_reserve(&vs->tight.png, 2048);
-+    buffer_reserve(&vs->tight->png, 2048);
-     linebuf = qemu_pixman_linebuf_create(PIXMAN_BE_r8g8b8, w);
-     buf = (uint8_t *)pixman_image_get_data(linebuf);
-     for (dy = 0; dy < h; dy++)
-     {
-         if (color_type == PNG_COLOR_TYPE_PALETTE) {
--            memcpy(buf, vs->tight.tight.buffer + (dy * w), w);
-+            memcpy(buf, vs->tight->tight.buffer + (dy * w), w);
-         } else {
-             qemu_pixman_linebuf_fill(linebuf, vs->vd->server, w, x, y + dy);
-         }
-@@ -1372,27 +1375,27 @@ static int send_png_rect(VncState *vs, int x, int y, int w, int h,
- 
-     vnc_write_u8(vs, VNC_TIGHT_PNG << 4);
- 
--    tight_send_compact_size(vs, vs->tight.png.offset);
--    vnc_write(vs, vs->tight.png.buffer, vs->tight.png.offset);
--    buffer_reset(&vs->tight.png);
-+    tight_send_compact_size(vs, vs->tight->png.offset);
-+    vnc_write(vs, vs->tight->png.buffer, vs->tight->png.offset);
-+    buffer_reset(&vs->tight->png);
-     return 1;
- }
- #endif /* CONFIG_VNC_PNG */
- 
- static void vnc_tight_start(VncState *vs)
- {
--    buffer_reset(&vs->tight.tight);
-+    buffer_reset(&vs->tight->tight);
- 
-     // make the output buffer be the zlib buffer, so we can compress it later
--    vs->tight.tmp = vs->output;
--    vs->output = vs->tight.tight;
-+    vs->tight->tmp = vs->output;
-+    vs->output = vs->tight->tight;
- }
- 
- static void vnc_tight_stop(VncState *vs)
- {
-     // switch back to normal output/zlib buffers
--    vs->tight.tight = vs->output;
--    vs->output = vs->tight.tmp;
-+    vs->tight->tight = vs->output;
-+    vs->output = vs->tight->tmp;
- }
- 
- static int send_sub_rect_nojpeg(VncState *vs, int x, int y, int w, int h,
-@@ -1426,9 +1429,9 @@ static int send_sub_rect_jpeg(VncState *vs, int x, int y, int w, int h,
-     int ret;
- 
-     if (colors == 0) {
--        if (force || (tight_jpeg_conf[vs->tight.quality].jpeg_full &&
-+        if (force || (tight_jpeg_conf[vs->tight->quality].jpeg_full &&
-                       tight_detect_smooth_image(vs, w, h))) {
--            int quality = tight_conf[vs->tight.quality].jpeg_quality;
-+            int quality = tight_conf[vs->tight->quality].jpeg_quality;
- 
-             ret = send_jpeg_rect(vs, x, y, w, h, quality);
-         } else {
-@@ -1440,9 +1443,9 @@ static int send_sub_rect_jpeg(VncState *vs, int x, int y, int w, int h,
-         ret = send_mono_rect(vs, x, y, w, h, bg, fg);
-     } else if (colors <= 256) {
-         if (force || (colors > 96 &&
--                      tight_jpeg_conf[vs->tight.quality].jpeg_idx &&
-+                      tight_jpeg_conf[vs->tight->quality].jpeg_idx &&
-                       tight_detect_smooth_image(vs, w, h))) {
--            int quality = tight_conf[vs->tight.quality].jpeg_quality;
-+            int quality = tight_conf[vs->tight->quality].jpeg_quality;
- 
-             ret = send_jpeg_rect(vs, x, y, w, h, quality);
-         } else {
-@@ -1480,20 +1483,20 @@ static int send_sub_rect(VncState *vs, int x, int y, int w, int h)
-         qemu_thread_atexit_add(&vnc_tight_cleanup_notifier);
-     }
- 
--    vnc_framebuffer_update(vs, x, y, w, h, vs->tight.type);
-+    vnc_framebuffer_update(vs, x, y, w, h, vs->tight->type);
- 
-     vnc_tight_start(vs);
-     vnc_raw_send_framebuffer_update(vs, x, y, w, h);
-     vnc_tight_stop(vs);
- 
- #ifdef CONFIG_VNC_JPEG
--    if (!vs->vd->non_adaptive && vs->tight.quality != (uint8_t)-1) {
-+    if (!vs->vd->non_adaptive && vs->tight->quality != (uint8_t)-1) {
-         double freq = vnc_update_freq(vs, x, y, w, h);
- 
--        if (freq < tight_jpeg_conf[vs->tight.quality].jpeg_freq_min) {
-+        if (freq < tight_jpeg_conf[vs->tight->quality].jpeg_freq_min) {
-             allow_jpeg = false;
-         }
--        if (freq >= tight_jpeg_conf[vs->tight.quality].jpeg_freq_threshold) {
-+        if (freq >= tight_jpeg_conf[vs->tight->quality].jpeg_freq_threshold) {
-             force_jpeg = true;
-             vnc_sent_lossy_rect(vs, x, y, w, h);
-         }
-@@ -1503,7 +1506,7 @@ static int send_sub_rect(VncState *vs, int x, int y, int w, int h)
-     colors = tight_fill_palette(vs, x, y, w * h, &bg, &fg, color_count_palette);
- 
- #ifdef CONFIG_VNC_JPEG
--    if (allow_jpeg && vs->tight.quality != (uint8_t)-1) {
-+    if (allow_jpeg && vs->tight->quality != (uint8_t)-1) {
-         ret = send_sub_rect_jpeg(vs, x, y, w, h, bg, fg, colors,
-                                  color_count_palette, force_jpeg);
-     } else {
-@@ -1520,7 +1523,7 @@ static int send_sub_rect(VncState *vs, int x, int y, int w, int h)
- 
- static int send_sub_rect_solid(VncState *vs, int x, int y, int w, int h)
- {
--    vnc_framebuffer_update(vs, x, y, w, h, vs->tight.type);
-+    vnc_framebuffer_update(vs, x, y, w, h, vs->tight->type);
- 
-     vnc_tight_start(vs);
-     vnc_raw_send_framebuffer_update(vs, x, y, w, h);
-@@ -1538,8 +1541,8 @@ static int send_rect_simple(VncState *vs, int x, int y, int w, int h,
-     int rw, rh;
-     int n = 0;
- 
--    max_size = tight_conf[vs->tight.compression].max_rect_size;
--    max_width = tight_conf[vs->tight.compression].max_rect_width;
-+    max_size = tight_conf[vs->tight->compression].max_rect_size;
-+    max_width = tight_conf[vs->tight->compression].max_rect_width;
- 
-     if (split && (w > max_width || w * h > max_size)) {
-         max_sub_width = (w > max_width) ? max_width : w;
-@@ -1648,16 +1651,16 @@ static int tight_send_framebuffer_update(VncState *vs, int x, int y,
- 
-     if (vs->client_pf.bytes_per_pixel == 4 && vs->client_pf.rmax == 0xFF &&
-         vs->client_pf.bmax == 0xFF && vs->client_pf.gmax == 0xFF) {
--        vs->tight.pixel24 = true;
-+        vs->tight->pixel24 = true;
-     } else {
--        vs->tight.pixel24 = false;
-+        vs->tight->pixel24 = false;
-     }
- 
- #ifdef CONFIG_VNC_JPEG
--    if (vs->tight.quality != (uint8_t)-1) {
-+    if (vs->tight->quality != (uint8_t)-1) {
-         double freq = vnc_update_freq(vs, x, y, w, h);
- 
--        if (freq > tight_jpeg_conf[vs->tight.quality].jpeg_freq_threshold) {
-+        if (freq > tight_jpeg_conf[vs->tight->quality].jpeg_freq_threshold) {
-             return send_rect_simple(vs, x, y, w, h, false);
-         }
-     }
-@@ -1669,8 +1672,8 @@ static int tight_send_framebuffer_update(VncState *vs, int x, int y,
- 
-     /* Calculate maximum number of rows in one non-solid rectangle. */
- 
--    max_rows = tight_conf[vs->tight.compression].max_rect_size;
--    max_rows /= MIN(tight_conf[vs->tight.compression].max_rect_width, w);
-+    max_rows = tight_conf[vs->tight->compression].max_rect_size;
-+    max_rows /= MIN(tight_conf[vs->tight->compression].max_rect_width, w);
- 
-     return find_large_solid_color_rect(vs, x, y, w, h, max_rows);
- }
-@@ -1678,33 +1681,33 @@ static int tight_send_framebuffer_update(VncState *vs, int x, int y,
- int vnc_tight_send_framebuffer_update(VncState *vs, int x, int y,
-                                       int w, int h)
- {
--    vs->tight.type = VNC_ENCODING_TIGHT;
-+    vs->tight->type = VNC_ENCODING_TIGHT;
-     return tight_send_framebuffer_update(vs, x, y, w, h);
- }
- 
- int vnc_tight_png_send_framebuffer_update(VncState *vs, int x, int y,
-                                           int w, int h)
- {
--    vs->tight.type = VNC_ENCODING_TIGHT_PNG;
-+    vs->tight->type = VNC_ENCODING_TIGHT_PNG;
-     return tight_send_framebuffer_update(vs, x, y, w, h);
- }
- 
- void vnc_tight_clear(VncState *vs)
- {
-     int i;
--    for (i=0; i<ARRAY_SIZE(vs->tight.stream); i++) {
--        if (vs->tight.stream[i].opaque) {
--            deflateEnd(&vs->tight.stream[i]);
-+    for (i = 0; i < ARRAY_SIZE(vs->tight->stream); i++) {
-+        if (vs->tight->stream[i].opaque) {
-+            deflateEnd(&vs->tight->stream[i]);
-         }
-     }
- 
--    buffer_free(&vs->tight.tight);
--    buffer_free(&vs->tight.zlib);
--    buffer_free(&vs->tight.gradient);
-+    buffer_free(&vs->tight->tight);
-+    buffer_free(&vs->tight->zlib);
-+    buffer_free(&vs->tight->gradient);
- #ifdef CONFIG_VNC_JPEG
--    buffer_free(&vs->tight.jpeg);
-+    buffer_free(&vs->tight->jpeg);
- #endif
- #ifdef CONFIG_VNC_PNG
--    buffer_free(&vs->tight.png);
-+    buffer_free(&vs->tight->png);
- #endif
- }
-diff --git a/ui/vnc-enc-zlib.c b/ui/vnc-enc-zlib.c
-index 33e9df2f6ade..900ae5b30f6b 100644
---- a/ui/vnc-enc-zlib.c
-+++ b/ui/vnc-enc-zlib.c
-@@ -76,7 +76,8 @@ static int vnc_zlib_stop(VncState *vs)
-         zstream->zalloc = vnc_zlib_zalloc;
-         zstream->zfree = vnc_zlib_zfree;
- 
--        err = deflateInit2(zstream, vs->tight.compression, Z_DEFLATED, MAX_WBITS,
-+        err = deflateInit2(zstream, vs->tight->compression, Z_DEFLATED,
-+                           MAX_WBITS,
-                            MAX_MEM_LEVEL, Z_DEFAULT_STRATEGY);
- 
-         if (err != Z_OK) {
-@@ -84,16 +85,16 @@ static int vnc_zlib_stop(VncState *vs)
-             return -1;
-         }
- 
--        vs->zlib.level = vs->tight.compression;
-+        vs->zlib.level = vs->tight->compression;
-         zstream->opaque = vs;
-     }
- 
--    if (vs->tight.compression != vs->zlib.level) {
--        if (deflateParams(zstream, vs->tight.compression,
-+    if (vs->tight->compression != vs->zlib.level) {
-+        if (deflateParams(zstream, vs->tight->compression,
-                           Z_DEFAULT_STRATEGY) != Z_OK) {
-             return -1;
-         }
--        vs->zlib.level = vs->tight.compression;
-+        vs->zlib.level = vs->tight->compression;
-     }
- 
-     // reserve memory in output buffer
-diff --git a/ui/vnc-enc-zrle.c b/ui/vnc-enc-zrle.c
-index 7493a8472306..17fd28a2e2b0 100644
---- a/ui/vnc-enc-zrle.c
-+++ b/ui/vnc-enc-zrle.c
-@@ -37,18 +37,18 @@ static const int bits_per_packed_pixel[] = {
- 
- static void vnc_zrle_start(VncState *vs)
- {
--    buffer_reset(&vs->zrle.zrle);
-+    buffer_reset(&vs->zrle->zrle);
- 
-     /* make the output buffer be the zlib buffer, so we can compress it later */
--    vs->zrle.tmp = vs->output;
--    vs->output = vs->zrle.zrle;
-+    vs->zrle->tmp = vs->output;
-+    vs->output = vs->zrle->zrle;
- }
- 
- static void vnc_zrle_stop(VncState *vs)
- {
-     /* switch back to normal output/zlib buffers */
--    vs->zrle.zrle = vs->output;
--    vs->output = vs->zrle.tmp;
-+    vs->zrle->zrle = vs->output;
-+    vs->output = vs->zrle->tmp;
- }
- 
- static void *zrle_convert_fb(VncState *vs, int x, int y, int w, int h,
-@@ -56,24 +56,24 @@ static void *zrle_convert_fb(VncState *vs, int x, int y, int w, int h,
- {
-     Buffer tmp;
- 
--    buffer_reset(&vs->zrle.fb);
--    buffer_reserve(&vs->zrle.fb, w * h * bpp + bpp);
-+    buffer_reset(&vs->zrle->fb);
-+    buffer_reserve(&vs->zrle->fb, w * h * bpp + bpp);
- 
-     tmp = vs->output;
--    vs->output = vs->zrle.fb;
-+    vs->output = vs->zrle->fb;
- 
-     vnc_raw_send_framebuffer_update(vs, x, y, w, h);
- 
--    vs->zrle.fb = vs->output;
-+    vs->zrle->fb = vs->output;
-     vs->output = tmp;
--    return vs->zrle.fb.buffer;
-+    return vs->zrle->fb.buffer;
- }
- 
- static int zrle_compress_data(VncState *vs, int level)
- {
--    z_streamp zstream = &vs->zrle.stream;
-+    z_streamp zstream = &vs->zrle->stream;
- 
--    buffer_reset(&vs->zrle.zlib);
-+    buffer_reset(&vs->zrle->zlib);
- 
-     if (zstream->opaque != vs) {
-         int err;
-@@ -93,13 +93,13 @@ static int zrle_compress_data(VncState *vs, int level)
-     }
- 
-     /* reserve memory in output buffer */
--    buffer_reserve(&vs->zrle.zlib, vs->zrle.zrle.offset + 64);
-+    buffer_reserve(&vs->zrle->zlib, vs->zrle->zrle.offset + 64);
- 
-     /* set pointers */
--    zstream->next_in = vs->zrle.zrle.buffer;
--    zstream->avail_in = vs->zrle.zrle.offset;
--    zstream->next_out = vs->zrle.zlib.buffer + vs->zrle.zlib.offset;
--    zstream->avail_out = vs->zrle.zlib.capacity - vs->zrle.zlib.offset;
-+    zstream->next_in = vs->zrle->zrle.buffer;
-+    zstream->avail_in = vs->zrle->zrle.offset;
-+    zstream->next_out = vs->zrle->zlib.buffer + vs->zrle->zlib.offset;
-+    zstream->avail_out = vs->zrle->zlib.capacity - vs->zrle->zlib.offset;
-     zstream->data_type = Z_BINARY;
- 
-     /* start encoding */
-@@ -108,8 +108,8 @@ static int zrle_compress_data(VncState *vs, int level)
-         return -1;
-     }
- 
--    vs->zrle.zlib.offset = vs->zrle.zlib.capacity - zstream->avail_out;
--    return vs->zrle.zlib.offset;
-+    vs->zrle->zlib.offset = vs->zrle->zlib.capacity - zstream->avail_out;
-+    return vs->zrle->zlib.offset;
- }
- 
- /* Try to work out whether to use RLE and/or a palette.  We do this by
-@@ -259,14 +259,14 @@ static int zrle_send_framebuffer_update(VncState *vs, int x, int y,
-     size_t bytes;
-     int zywrle_level;
- 
--    if (vs->zrle.type == VNC_ENCODING_ZYWRLE) {
--        if (!vs->vd->lossy || vs->tight.quality == (uint8_t)-1
--            || vs->tight.quality == 9) {
-+    if (vs->zrle->type == VNC_ENCODING_ZYWRLE) {
-+        if (!vs->vd->lossy || vs->tight->quality == (uint8_t)-1
-+            || vs->tight->quality == 9) {
-             zywrle_level = 0;
--            vs->zrle.type = VNC_ENCODING_ZRLE;
--        } else if (vs->tight.quality < 3) {
-+            vs->zrle->type = VNC_ENCODING_ZRLE;
-+        } else if (vs->tight->quality < 3) {
-             zywrle_level = 3;
--        } else if (vs->tight.quality < 6) {
-+        } else if (vs->tight->quality < 6) {
-             zywrle_level = 2;
-         } else {
-             zywrle_level = 1;
-@@ -337,30 +337,30 @@ static int zrle_send_framebuffer_update(VncState *vs, int x, int y,
- 
-     vnc_zrle_stop(vs);
-     bytes = zrle_compress_data(vs, Z_DEFAULT_COMPRESSION);
--    vnc_framebuffer_update(vs, x, y, w, h, vs->zrle.type);
-+    vnc_framebuffer_update(vs, x, y, w, h, vs->zrle->type);
-     vnc_write_u32(vs, bytes);
--    vnc_write(vs, vs->zrle.zlib.buffer, vs->zrle.zlib.offset);
-+    vnc_write(vs, vs->zrle->zlib.buffer, vs->zrle->zlib.offset);
-     return 1;
- }
- 
- int vnc_zrle_send_framebuffer_update(VncState *vs, int x, int y, int w, int h)
- {
--    vs->zrle.type = VNC_ENCODING_ZRLE;
-+    vs->zrle->type = VNC_ENCODING_ZRLE;
-     return zrle_send_framebuffer_update(vs, x, y, w, h);
- }
- 
- int vnc_zywrle_send_framebuffer_update(VncState *vs, int x, int y, int w, int h)
- {
--    vs->zrle.type = VNC_ENCODING_ZYWRLE;
-+    vs->zrle->type = VNC_ENCODING_ZYWRLE;
-     return zrle_send_framebuffer_update(vs, x, y, w, h);
- }
- 
- void vnc_zrle_clear(VncState *vs)
- {
--    if (vs->zrle.stream.opaque) {
--        deflateEnd(&vs->zrle.stream);
-+    if (vs->zrle->stream.opaque) {
-+        deflateEnd(&vs->zrle->stream);
-     }
--    buffer_free(&vs->zrle.zrle);
--    buffer_free(&vs->zrle.fb);
--    buffer_free(&vs->zrle.zlib);
-+    buffer_free(&vs->zrle->zrle);
-+    buffer_free(&vs->zrle->fb);
-+    buffer_free(&vs->zrle->zlib);
- }
-diff --git a/ui/vnc-enc-zrle.inc.c b/ui/vnc-enc-zrle.inc.c
-index abf6b86e4eba..c107d8affcff 100644
---- a/ui/vnc-enc-zrle.inc.c
-+++ b/ui/vnc-enc-zrle.inc.c
-@@ -96,7 +96,7 @@ static void ZRLE_ENCODE(VncState *vs, int x, int y, int w, int h,
- static void ZRLE_ENCODE_TILE(VncState *vs, ZRLE_PIXEL *data, int w, int h,
-                              int zywrle_level)
- {
--    VncPalette *palette = &vs->zrle.palette;
-+    VncPalette *palette = &vs->zrle->palette;
- 
-     int runs = 0;
-     int single_pixels = 0;
-diff --git a/ui/vnc.c b/ui/vnc.c
-index bc43c4ca16bf..87b8045afec2 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -1307,6 +1307,8 @@ void vnc_disconnect_finish(VncState *vs)
-     object_unref(OBJECT(vs->sioc));
-     vs->sioc = NULL;
-     vs->magic = 0;
-+    g_free(vs->zrle);
-+    g_free(vs->tight);
-     g_free(vs);
- }
- 
-@@ -2058,8 +2060,8 @@ static void set_encodings(VncState *vs, int32_t *encodings, size_t n_encodings)
- 
-     vs->features = 0;
-     vs->vnc_encoding = 0;
--    vs->tight.compression = 9;
--    vs->tight.quality = -1; /* Lossless by default */
-+    vs->tight->compression = 9;
-+    vs->tight->quality = -1; /* Lossless by default */
-     vs->absolute = -1;
- 
-     /*
-@@ -2127,11 +2129,11 @@ static void set_encodings(VncState *vs, int32_t *encodings, size_t n_encodings)
-             vs->features |= VNC_FEATURE_LED_STATE_MASK;
-             break;
-         case VNC_ENCODING_COMPRESSLEVEL0 ... VNC_ENCODING_COMPRESSLEVEL0 + 9:
--            vs->tight.compression = (enc & 0x0F);
-+            vs->tight->compression = (enc & 0x0F);
-             break;
-         case VNC_ENCODING_QUALITYLEVEL0 ... VNC_ENCODING_QUALITYLEVEL0 + 9:
-             if (vs->vd->lossy) {
--                vs->tight.quality = (enc & 0x0F);
-+                vs->tight->quality = (enc & 0x0F);
-             }
-             break;
-         default:
-@@ -3034,6 +3036,8 @@ static void vnc_connect(VncDisplay *vd, QIOChannelSocket *sioc,
-     int i;
- 
-     trace_vnc_client_connect(vs, sioc);
-+    vs->zrle = g_new0(VncZrle, 1);
-+    vs->tight = g_new0(VncTight, 1);
-     vs->magic = VNC_MAGIC;
-     vs->sioc = sioc;
-     object_ref(OBJECT(vs->sioc));
-@@ -3045,19 +3049,19 @@ static void vnc_connect(VncDisplay *vd, QIOChannelSocket *sioc,
-     buffer_init(&vs->output,         "vnc-output/%p", sioc);
-     buffer_init(&vs->jobs_buffer,    "vnc-jobs_buffer/%p", sioc);
- 
--    buffer_init(&vs->tight.tight,    "vnc-tight/%p", sioc);
--    buffer_init(&vs->tight.zlib,     "vnc-tight-zlib/%p", sioc);
--    buffer_init(&vs->tight.gradient, "vnc-tight-gradient/%p", sioc);
-+    buffer_init(&vs->tight->tight,    "vnc-tight/%p", sioc);
-+    buffer_init(&vs->tight->zlib,     "vnc-tight-zlib/%p", sioc);
-+    buffer_init(&vs->tight->gradient, "vnc-tight-gradient/%p", sioc);
- #ifdef CONFIG_VNC_JPEG
--    buffer_init(&vs->tight.jpeg,     "vnc-tight-jpeg/%p", sioc);
-+    buffer_init(&vs->tight->jpeg,     "vnc-tight-jpeg/%p", sioc);
- #endif
- #ifdef CONFIG_VNC_PNG
--    buffer_init(&vs->tight.png,      "vnc-tight-png/%p", sioc);
-+    buffer_init(&vs->tight->png,      "vnc-tight-png/%p", sioc);
- #endif
-     buffer_init(&vs->zlib.zlib,      "vnc-zlib/%p", sioc);
--    buffer_init(&vs->zrle.zrle,      "vnc-zrle/%p", sioc);
--    buffer_init(&vs->zrle.fb,        "vnc-zrle-fb/%p", sioc);
--    buffer_init(&vs->zrle.zlib,      "vnc-zrle-zlib/%p", sioc);
-+    buffer_init(&vs->zrle->zrle,      "vnc-zrle/%p", sioc);
-+    buffer_init(&vs->zrle->fb,        "vnc-zrle-fb/%p", sioc);
-+    buffer_init(&vs->zrle->zlib,      "vnc-zrle-zlib/%p", sioc);
- 
-     if (skipauth) {
-         vs->auth = VNC_AUTH_NONE;
--- 
-2.18.1
-
+MTguMDkuMjAxOSAyMzozMSwgSm9obiBTbm93IHdyb3RlOg0KPiANCj4gDQo+IE9uIDkvMTAvMTkg
+OToyMyBBTSwgSm9obiBTbm93IHdyb3RlOg0KPj4NCj4+DQo+PiBPbiA5LzEwLzE5IDQ6MTkgQU0s
+IFN0ZWZhbiBIYWpub2N6aSB3cm90ZToNCj4+PiBPbiBXZWQsIEF1ZyAyMSwgMjAxOSBhdCAwNDow
+MTo1MlBNIC0wNDAwLCBKb2huIFNub3cgd3JvdGU6DQo+Pj4+DQo+Pj4+DQo+Pj4+IE9uIDgvMjEv
+MTkgMTA6NDEgQU0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4+PiAw
+OS4wOC4yMDE5IDIzOjEzLCBKb2huIFNub3cgd3JvdGU6DQo+Pj4+Pj4gQmFja3VwIGpvYnMgbWF5
+IHlpZWxkIHByaW9yIHRvIGluc3RhbGxpbmcgdGhlaXIgaGFuZGxlciwgYmVjYXVzZSBvZiB0aGUN
+Cj4+Pj4+PiBqb2JfY29fZW50cnkgc2hpbSB3aGljaCBndWFyYW50ZWVzIHRoYXQgYSBqb2Igd29u
+J3QgYmVnaW4gd29yayB1bnRpbA0KPj4+Pj4+IHdlIGFyZSByZWFkeSB0byBzdGFydCBhbiBlbnRp
+cmUgdHJhbnNhY3Rpb24uDQo+Pj4+Pj4NCj4+Pj4+PiBVbmZvcnR1bmF0ZWx5LCB0aGlzIG1ha2Vz
+IHByb3ZpbmcgY29ycmVjdG5lc3MgYWJvdXQgdHJhbnNhY3Rpb25hbA0KPj4+Pj4+IHBvaW50cy1p
+bi10aW1lIGZvciBiYWNrdXAgaGFyZCB0byByZWFzb24gYWJvdXQuIE1ha2UgaXQgZXhwbGljaXRs
+eSBjbGVhcg0KPj4+Pj4+IGJ5IG1vdmluZyB0aGUgaGFuZGxlciByZWdpc3RyYXRpb24gdG8gY3Jl
+YXRpb24gdGltZSwgYW5kIGNoYW5naW5nIHRoZQ0KPj4+Pj4+IHdyaXRlIG5vdGlmaWVyIHRvIGEg
+bm8tb3AgdW50aWwgdGhlIGpvYiBpcyBzdGFydGVkLg0KPj4+Pj4+DQo+Pj4+Pj4gUmVwb3J0ZWQt
+Ynk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNv
+bT4NCj4+Pj4+PiBTaWduZWQtb2ZmLWJ5OiBKb2huIFNub3cgPGpzbm93QHJlZGhhdC5jb20+DQo+
+Pj4+Pj4gLS0tDQo+Pj4+Pj4gICAgYmxvY2svYmFja3VwLmMgICAgIHwgMzIgKysrKysrKysrKysr
+KysrKysrKysrKystLS0tLS0tLS0NCj4+Pj4+PiAgICBpbmNsdWRlL3FlbXUvam9iLmggfCAgNSAr
+KysrKw0KPj4+Pj4+ICAgIGpvYi5jICAgICAgICAgICAgICB8ICAyICstDQo+Pj4+Pj4gICAgMyBm
+aWxlcyBjaGFuZ2VkLCAyOSBpbnNlcnRpb25zKCspLCAxMCBkZWxldGlvbnMoLSkNCj4+Pj4+Pg0K
+Pj4+Pj4+IGRpZmYgLS1naXQgYS9ibG9jay9iYWNrdXAuYyBiL2Jsb2NrL2JhY2t1cC5jDQo+Pj4+
+Pj4gaW5kZXggMDdkNzUxYWVhNC4uNGRmNWI5NTQxNSAxMDA2NDQNCj4+Pj4+PiAtLS0gYS9ibG9j
+ay9iYWNrdXAuYw0KPj4+Pj4+ICsrKyBiL2Jsb2NrL2JhY2t1cC5jDQo+Pj4+Pj4gQEAgLTM0NCw2
+ICszNDQsMTMgQEAgc3RhdGljIGludCBjb3JvdXRpbmVfZm4gYmFja3VwX2JlZm9yZV93cml0ZV9u
+b3RpZnkoDQo+Pj4+Pj4gICAgICAgIGFzc2VydChRRU1VX0lTX0FMSUdORUQocmVxLT5vZmZzZXQs
+IEJEUlZfU0VDVE9SX1NJWkUpKTsNCj4+Pj4+PiAgICAgICAgYXNzZXJ0KFFFTVVfSVNfQUxJR05F
+RChyZXEtPmJ5dGVzLCBCRFJWX1NFQ1RPUl9TSVpFKSk7DQo+Pj4+Pj4gICAgDQo+Pj4+Pj4gKyAg
+ICAvKiBUaGUgaGFuZGxlciBpcyBpbnN0YWxsZWQgYXQgY3JlYXRpb24gdGltZTsgdGhlIGFjdHVh
+bCBwb2ludC1pbi10aW1lDQo+Pj4+Pj4gKyAgICAgKiBzdGFydHMgYXQgam9iX3N0YXJ0KCkuIFRy
+YW5zYWN0aW9ucyBndWFyYW50ZWUgdGhvc2UgdHdvIHBvaW50cyBhcmUNCj4+Pj4+PiArICAgICAq
+IHRoZSBzYW1lIHBvaW50IGluIHRpbWUuICovDQo+Pj4+Pj4gKyAgICBpZiAoIWpvYl9zdGFydGVk
+KCZqb2ItPmNvbW1vbi5qb2IpKSB7DQo+Pj4+Pj4gKyAgICAgICAgcmV0dXJuIDA7DQo+Pj4+Pj4g
+KyAgICB9DQo+Pj4+Pg0KPj4+Pj4gSG1tLCBzb3JyeSBpZiBpdCBpcyBhIHN0dXBpZCBxdWVzdGlv
+biwgSSdtIG5vdCBnb29kIGluIG11bHRpcHJvY2Vzc2luZyBhbmQgaW4NCj4+Pj4+IFFlbXUgaW90
+aHJlYWRzLi4NCj4+Pj4+DQo+Pj4+PiBqb2Jfc3RhcnRlZCBqdXN0IHJlYWRzIGpvYi0+Y28uIElm
+IGJzIHJ1bnMgaW4gaW90aHJlYWQsIGFuZCB0aGVyZWZvcmUgd3JpdGUtbm90aWZpZXINCj4+Pj4+
+IGlzIGluIGlvdGhyZWFkLCB3aGVuIGpvYl9zdGFydCBpcyBjYWxsZWQgZnJvbSBtYWluIHRocmVh
+ZC4uIElzIGl0IGd1YXJhbnRlZWQgdGhhdA0KPj4+Pj4gd3JpdGUtbm90aWZpZXIgd2lsbCBzZWUg
+am9iLT5jbyB2YXJpYWJsZSBjaGFuZ2UgZWFybHkgZW5vdWdoIHRvIG5vdCBtaXNzIGd1ZXN0IHdy
+aXRlPw0KPj4+Pj4gU2hvdWxkIG5vdCBqb2ItPmNvIGJlIHZvbGF0aWxlIGZvciBleGFtcGxlIG9y
+IHNvbWV0aGluZyBsaWtlIHRoaXM/DQo+Pj4+Pg0KPj4+Pj4gSWYgbm90IHRoaW5rIGFib3V0IHRo
+aXMgcGF0Y2ggbG9va3MgZ29vZCBmb3IgbWUuDQo+Pj4+Pg0KPj4+Pg0KPj4+PiBZb3Uga25vdywg
+aXQncyBhIHJlYWxseSBnb29kIHF1ZXN0aW9uLg0KPj4+PiBTbyBnb29kLCBpbiBmYWN0LCB0aGF0
+IEkgaGF2ZSBubyBpZGVhLg0KPj4+Pg0KPj4+PiDCr1xfKOODhClfL8KvDQo+Pj4+DQo+Pj4+IEkn
+bSBmYWlybHkgY2VydGFpbiB0aGF0IElPIHdpbGwgbm90IGNvbWUgaW4gdW50aWwgdGhlIC5jbGVh
+biBwaGFzZSBvZiBhDQo+Pj4+IHFtcF90cmFuc2FjdGlvbiwgYmVjYXVzZSBiZHJ2X2RyYWluZWRf
+YmVnaW4oYnMpIGlzIGNhbGxlZCBkdXJpbmcNCj4+Pj4gLnByZXBhcmUsIGFuZCB3ZSBhY3RpdmF0
+ZSB0aGUgaGFuZGxlciAoYnkgc3RhcnRpbmcgdGhlIGpvYikgaW4gLmNvbW1pdC4NCj4+Pj4gV2Ug
+ZG8gbm90IGVuZCB0aGUgZHJhaW5lZCBzZWN0aW9uIHVudGlsIC5jbGVhbi4NCj4+Pj4NCj4+Pj4g
+SSdtIG5vdCBmdWxseSBjbGVhciBvbiB3aGF0IHRocmVhZGluZyBndWFyYW50ZWVzIHdlIGhhdmUg
+b3RoZXJ3aXNlLA0KPj4+PiB0aG91Z2g7IGlzIGl0IHBvc3NpYmxlIHRoYXQgIlRocmVhZCBBIiB3
+b3VsZCBzb21laG93IGxpZnQgdGhlIGJkcnZfZHJhaW4NCj4+Pj4gb24gYW4gSU8gdGhyZWFkICgi
+VGhyZWFkIEIiKSBhbmQsIGFmdGVyIHRoYXQsICJUaHJlYWQgQiIgd291bGQgc29tZWhvdw0KPj4+
+PiBzdGlsbCBiZSBhYmxlIHRvIHNlZSBhbiBvdXRkYXRlZCB2ZXJzaW9uIG9mIGpvYi0+Y28gdGhh
+dCB3YXMgc2V0IGJ5DQo+Pj4+ICJUaHJlYWQgQSI/DQo+Pj4+DQo+Pj4+IEkgZG91YnQgaXQ7IGJ1
+dCBJIGNhbid0IHByb3ZlIGl0Lg0KPj4+DQo+Pj4gSW4gdGhlIHFtcF9iYWNrdXAoKSBjYXNlIChu
+b3QgcW1wX3RyYW5zYWN0aW9uKCkpIHRoZXJlIGlzOg0KPj4+DQo+Pj4gICAgdm9pZCBxbXBfZHJp
+dmVfYmFja3VwKERyaXZlQmFja3VwICphcmcsIEVycm9yICoqZXJycCkNCj4+PiAgICB7DQo+Pj4N
+Cj4+PiAgICAgICAgQmxvY2tKb2IgKmpvYjsNCj4+PiAgICAgICAgam9iID0gZG9fZHJpdmVfYmFj
+a3VwKGFyZywgTlVMTCwgZXJycCk7DQo+Pj4gICAgICAgIGlmIChqb2IpIHsNCj4+PiAgICAgICAg
+ICAgIGpvYl9zdGFydCgmam9iLT5qb2IpOw0KPj4+ICAgICAgICB9DQo+Pj4gICAgfQ0KPj4+DQo+
+Pj4gam9iX3N0YXJ0KCkgaXMgY2FsbGVkIHdpdGhvdXQgYW55IHRocmVhZCBzeW5jaHJvbml6YXRp
+b24sIHdoaWNoIGlzDQo+Pj4gdXN1YWxseSBmaW5lIGJlY2F1c2UgdGhlIGNvcm91dGluZSBkb2Vz
+bid0IHJ1biB1bnRpbCBqb2Jfc3RhcnQoKSBjYWxscw0KPj4+IGFpb19jb19lbnRlcigpLg0KPj4+
+DQo+Pj4gTm93IHRoYXQgdGhlIGJlZm9yZSB3cml0ZSBub3RpZmllciBoYXMgYmVlbiBpbnN0YWxs
+ZWQgZWFybHksIHRoZXJlIGlzDQo+Pj4gaW5kZWVkIGEgcmFjZSBiZXR3ZWVuIGpvYl9zdGFydCgp
+IGFuZCB0aGUgd3JpdGUgbm90aWZpZXIgYWNjZXNzaW5nDQo+Pj4gam9iLT5jbyBmcm9tIGFuIElP
+VGhyZWFkLg0KPj4+DQo+Pj4gVGhlIHdyaXRlIGJlZm9yZSBub3RpZmllciBtaWdodCBzZWUgam9i
+LT5jbyAhPSBOVUxMIGJlZm9yZSBqb2Jfc3RhcnQoKQ0KPj4+IGhhcyBmaW5pc2hlZC4gIFRoaXMg
+Y291bGQgbGVhZCB0byBpc3N1ZXMgaWYgam9iXyooKSBBUElzIGFyZSBpbnZva2VkIGJ5DQo+Pj4g
+dGhlIHdyaXRlIG5vdGlmaWVyIGFuZCBhY2Nlc3MgYW4gaW4tYmV0d2VlbiBqb2Igc3RhdGUuDQo+
+Pj4NCj4+DQo+PiBJIHNlZS4gSSB0aGluayBpbiB0aGlzIGNhc2UsIGFzIGxvbmcgYXMgaXQgc2Vl
+cyAhPSBOVUxMLCB0aGF0IHRoZQ0KPj4gbm90aWZpZXIgaXMgYWN0dWFsbHkgc2FmZSB0byBydW4u
+IEkgYWdyZWUgdGhhdCB0aGlzIG1pZ2h0IGJlIGNvbmZ1c2luZw0KPj4gdG8gdmVyaWZ5IGFuZCBj
+b3VsZCBiaXRlIHVzIGluIHRoZSBmdXR1cmUuIFRoZSB3b3JyeSB3ZSBoYWQsIHRvbywgaXMNCj4+
+IG1vcmUgdGhlIG9wcG9zaXRlOiB3aWxsIGl0IHNlZSBOVUxMIGZvciB0b28gbG9uZz8gV2Ugd2Fu
+dCB0byBtYWtlIHN1cmUNCj4+IHRoYXQgaXQgaXMgcmVnaXN0ZXJpbmcgYXMgdHJ1ZSAqYmVmb3Jl
+IHRoZSBmaXJzdCB5aWVsZCouDQo+Pg0KPj4+IEEgc2FmZXIgYXBwcm9hY2ggaXMgdG8gc2V0IGEg
+QmFja3VwQmxvY2tKb2IgdmFyaWFibGUgYXQgdGhlIGJlZ2lubmluZyBvZg0KPj4+IGJhY2t1cF9y
+dW4oKSBhbmQgY2hlY2sgaXQgZnJvbSB0aGUgYmVmb3JlIHdyaXRlIG5vdGlmaWVyLg0KPj4+DQo+
+Pg0KPj4gVGhhdCdzIHRvbyBsYXRlLCBmb3IgcmVhc29ucyBiZWxvdy4NCj4+DQo+Pj4gVGhhdCBz
+YWlkLCBJIGRvbid0IHVuZGVyc3RhbmQgdGhlIGJlbmVmaXQgb2YgdGhpcyBwYXRjaCBhbmQgSU1P
+IGl0IG1ha2VzDQo+Pj4gdGhlIGNvZGUgaGFyZGVyIHRvIHVuZGVyc3RhbmQgYmVjYXVzZSBub3cg
+d2UgbmVlZCB0byB0aGluayBhYm91dCB0aGUNCj4+PiBjcmVhdGVkIGJ1dCBub3Qgc3RhcnRlZCBz
+dGF0ZSB0b28uDQo+Pj4NCj4+PiBTdGVmYW4NCj4+Pg0KPj4NCj4+IEl0J3MgYWx3YXlzIHBvc3Np
+YmxlIEkndmUgaHlwZWQgbXlzZWxmIHVwIGludG8gYmVsaWV2aW5nIHRoZXJlJ3MgYQ0KPj4gcHJv
+YmxlbSB3aGVyZSB0aGVyZSBpc24ndCBvbmUsIGJ1dCB0aGUgZmVhciBpcyB0aGlzOg0KPj4NCj4+
+IFRoZSBwb2ludCBpbiB0aW1lIGZyb20gYSBRTVAgdHJhbnNhY3Rpb24gY292ZXJzIHRoZSBqb2Ig
+Y3JlYXRpb24gYW5kIHRoZQ0KPj4gam9iIHN0YXJ0LCBidXQgd2hlbiB3ZSBzdGFydCB0aGUgam9i
+IGl0IHdpbGwgYWN0dWFsbHkgeWllbGQgYmVmb3JlIHdlDQo+PiBnZXQgdG8gYmFja3VwX3J1biAt
+LSBhbmQgdGhlcmUgaXMgbm8gZ3VhcmFudGVlIHRoYXQgdGhlIGhhbmRsZXIgd2lsbCBnZXQNCj4+
+IGluc3RhbGxlZCBzeW5jaHJvbm91c2x5LCBzbyB0aGUgcG9pbnQgaW4gdGltZSBlbmRzIGJlZm9y
+ZSB0aGUgaGFuZGxlcg0KPj4gYWN0aXZhdGVzLg0KPj4NCj4gDQo+IGkuZS4sIHRoZSBoYW5kbGVy
+IG1pZ2h0IGdldCBpbnN0YWxsZWQgQUZURVIgdGhlIGNyaXRpY2FsIHJlZ2lvbiBvZiBhDQo+IHRy
+YW5zYWN0aW9uLiBXZSBjb3VsZCBkcm9wIGluaXRpYWwgd3JpdGVzIGlmIHdlIHdlcmUgdW5sdWNr
+eS4NCj4gDQo+IChJIHRoaW5rLikNCj4gDQo+PiBUaGUgeWllbGQgb2NjdXJzIGluIGpvYl9jb19l
+bnRyeSBhcyBhbiBpbnRlbnRpb25hbCBmZWF0dXJlIG9mIGZvcmNpbmcgYQ0KPj4geWllbGQgYW5k
+IHBhdXNlIHBvaW50IGF0IHJ1biB0aW1lIC0tIHNvIGl0J3MgaGFyZGVyIHRvIHdyaXRlIGEgam9i
+IHRoYXQNCj4+IGFjY2lkZW50YWxseSBob2dzIHRoZSB0aHJlYWQgZHVyaW5nIGluaXRpYWxpemF0
+aW9uLg0KPj4NCj4+IFRoaXMgaXMgYW4gYXR0ZW1wdCB0byBnZXQgdGhlIGhhbmRsZXIgaW5zdGFs
+bGVkIGVhcmxpZXIgdG8gZW5zdXJlIHRoZQ0KPj4gcG9pbnQgb2YgdGltZSBzdGF5cyBzeW5jaHJv
+bml6ZWQgd2l0aCBjcmVhdGlvbiB0aW1lIHRvIHByb3ZpZGUgYQ0KPj4gc3Ryb25nZXIgdHJhbnNh
+Y3Rpb25hbCBndWFyYW50ZWUuDQo+Pg0KPiANCj4gU3F1ZWFreSB3aGVlbCBnZXRzIHRoZSBncmVh
+c2UuIEFueSBjb21tZW50Pw0KPiANCg0KSG1tLCB0aGlzIGFsbCBiZWNvbWVzIGRpZmZpY3VsdCwg
+SSdkIHByZWZlciB0byBub3Qgd29ycnkgYW5kIHdhaXQgZm9yIGJhY2t1cC10b3ANCmZpbHRlciBh
+cHBsaWVkLg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
 
