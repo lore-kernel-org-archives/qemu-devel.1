@@ -2,89 +2,90 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20B78C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:07:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 849A8C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:08:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF932218AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:07:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="um3f5ql5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF932218AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 53F7C218AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:08:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53F7C218AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAsPt-0007bc-KB
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:07:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36473)
+	id 1iAsQH-00080m-Vz
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:08:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38332)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iAs0H-0002Ts-7B
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:41:30 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iAsI6-00085S-Lo
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:59:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iAs0G-0001sG-0W
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:41:28 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40847)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iAs0F-0001s7-Nx
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:41:27 -0400
-Received: by mail-wm1-x344.google.com with SMTP id b24so2903647wmj.5
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 01:41:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=vXsoGHNUZZQbFoVEmo5YhF6fjxUVggvhJv3xcfyMLIw=;
- b=um3f5ql5YxEXUM4Sd/m47l0J7ijl2SFww42xP98tJZ7bzL3+4Qs+jLPIXAfR9M9vbn
- WD8R0E4F7Yy8nBwbcLulYUI06XnBQ5DTW4/ZVMa4QC4CBWR7CkSgBRyuXqjTQCshKXLi
- J2klHxGYQCnCRN+qtcGfStsFFokKkIQNcqPGhx+OywkZgQZM/MVM7hq1je/kmBuVlZ27
- EOI4vZ5ekUpWkhPgNyyA9CY5tP6IjRrxEUpoZlHfumnK7oe5ZYaq3pESxGjNGIoQRi9C
- 7OAgjARxIUjDUgftRVXNtBUJ98w5NOz+4HBKdBR75TIPwBhKP8R2NZIQMoBlEpp+YnrL
- IGSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=vXsoGHNUZZQbFoVEmo5YhF6fjxUVggvhJv3xcfyMLIw=;
- b=Pu8pIqu1JdZkgQyNqoZRa/maRzUTWv9TF2XyI2KpgmRedbWiKVQv/5fGcEzUNf9Qu3
- I2kAvF3KqBb64U0dmcaWxxOiKUqtINkqoMU3cGDPwGir34R+XAIZRGPD+TKlO4TKfUSr
- edFfF87lEjOptDTjtJu0HmJGhAT/cPvHsfgND4sDC7CbVNHUoUB01jr6/kfk9ng6olx4
- 7ZspRfLVmMj3iC0mOR2KPoFkR3K/lkfqE/Tytc1oEZ1QxxLMPn9u+TmcWIBhsjedKPRt
- d7naQe7uk3bgICDrAKIiF4GIocTo84s8A7CUbOVCHlMI4FrP1hKTnGRiC1ntg6qp2ihr
- 0rEw==
-X-Gm-Message-State: APjAAAUbxBC9HUuG4M7cyOBFy6aqn5OpeSN0Mo/tB9mvBLx06ob8Q3LV
- ndrGjQ7x9FfelrEPmi3HPke/cKLnOHw=
-X-Google-Smtp-Source: APXvYqzhF66VPMOKD/YKncDX/1JZ9zv6c2RQhuzZsb5xj9oW24ANGND1Il863qqocfMLUMkqPBZjTQ==
-X-Received: by 2002:a1c:9a94:: with SMTP id c142mr1739904wme.172.1568882486204; 
- Thu, 19 Sep 2019 01:41:26 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id l13sm3792939wmj.25.2019.09.19.01.41.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Sep 2019 01:41:25 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id BA3D51FF87;
- Thu, 19 Sep 2019 09:41:24 +0100 (BST)
-References: <20190918222546.11696-1-jsnow@redhat.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: John Snow <jsnow@redhat.com>
-In-reply-to: <20190918222546.11696-1-jsnow@redhat.com>
-Date: Thu, 19 Sep 2019 09:41:24 +0100
-Message-ID: <87v9toznij.fsf@linaro.org>
+ (envelope-from <mreitz@redhat.com>) id 1iAsI5-0001Gx-IV
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:59:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59342)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iAsHy-00019Y-Df; Thu, 19 Sep 2019 04:59:46 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3D0A13175282;
+ Thu, 19 Sep 2019 08:59:45 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-52.brq.redhat.com
+ [10.40.204.52])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 58E4F1001947;
+ Thu, 19 Sep 2019 08:59:26 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20190918130244.24257-1-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <d2a793c1-aae7-6e22-8baa-0c403c111e5c@redhat.com>
+Date: Thu, 19 Sep 2019 10:59:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20190918130244.24257-1-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Thu, 19 Sep 2019 08:59:45 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH] docker: remove python2.7 from docker9-mxe
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC] error: auto propagated local_err
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,46 +97,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: fam@euphon.net, peter.maydell@linaro.org, mst@redhat.com,
+ codyprime@gmail.com, mark.cave-ayland@ilande.co.uk, mdroth@linux.vnet.ibm.com,
+ kraxel@redhat.com, qemu-block@nongnu.org, quintela@redhat.com,
+ david@redhat.com, armbru@redhat.com, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, marcandre.lureau@redhat.com, rth@twiddle.net,
+ farman@linux.ibm.com, groug@kaod.org, dgilbert@redhat.com,
+ alex.williamson@redhat.com, qemu-arm@nongnu.org, stefanha@redhat.com,
+ jsnow@redhat.com, david@gibson.dropbear.id.au, kwolf@redhat.com,
+ berrange@redhat.com, cohuck@redhat.com, qemu-s390x@nongnu.org,
+ sundeep.lkml@gmail.com, qemu-ppc@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-John Snow <jsnow@redhat.com> writes:
-
-> When it was based on docker8 which uses python-minimal, it needed this.
-> It no longer does.
-
-Queued to testing/next, thanks.
->
-> Goodbye, python2.7.
->
-> Signed-off-by: John Snow <jsnow@redhat.com>
+On 18.09.19 15:02, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all!
+>=20
+> Here is a proposal (three of them, actually) of auto propagation for
+> local_err, to not call error_propagate on every exit point, when we
+> deal with local_err.
+>=20
+> It also may help make Greg's series[1] about error_append_hint smaller.
+>=20
+> See definitions and examples below.
+>=20
+> I'm cc-ing to this RFC everyone from series[1] CC list, as if we like
+> it, the idea will touch same code (and may be more).
+>=20
+> [1]: https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg03449.htm=
+l
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  tests/docker/dockerfiles/debian9-mxe.docker | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/tests/docker/dockerfiles/debian9-mxe.docker b/tests/docker/d=
-ockerfiles/debian9-mxe.docker
-> index 7431168dad..62ff1cecf2 100644
-> --- a/tests/docker/dockerfiles/debian9-mxe.docker
-> +++ b/tests/docker/dockerfiles/debian9-mxe.docker
-> @@ -16,7 +16,6 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv=
--keys C6BF758A33A3A276 &&
->  RUN apt-get update && \
->      DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
->      apt-get install -y --no-install-recommends \
-> -        libpython2.7-stdlib \
->          $(apt-get -s install -y --no-install-recommends gw32.shared-ming=
-w-w64 | egrep "^Inst mxe-x86-64-unknown-" | cut -d\  -f2)
->
-> -ENV PATH $PATH:/usr/lib/mxe/usr/bin/
-> +ENV PATH $PATH:/usr/lib/mxe/usr/bin/
+>  include/qapi/error.h | 102 +++++++++++++++++++++++++++++++++++++++++++
+>  block.c              |  63 ++++++++++++--------------
+>  block/backup.c       |   8 +++-
+>  block/gluster.c      |   7 +++
+>  4 files changed, 144 insertions(+), 36 deletions(-)
 
+If the combination of =E2=80=9Cif (local_err) { error_propagate(...); ...=
+ }=E2=80=9D is
+what=E2=80=99s cumbersome, can=E2=80=99t this be done simpler by adding a=
+n
+error_propagate() variant with a return value?
 
---
-Alex Benn=C3=A9e
+i.e.
+
+bool has_error_then_propagate(Error **errp, Error *err)
+{
+    if (!err) {
+        return false;
+    }
+    error_propagate(errp, err);
+    return true;
+}
+
+And then turn all instances of
+
+if (local_err) {
+    error_propagate(errp, local_err);
+    ...
+}
+
+into
+
+if (has_error_then_propagate(errp, local_err)) {
+    ...
+}
+
+?
+
+Max
 
