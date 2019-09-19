@@ -2,67 +2,88 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9295BC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:05:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1271FC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:05:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68387218AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:05:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68387218AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D1D33218AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:05:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GH8kLnjs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1D33218AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40450 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAsN5-0003NX-6p
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:05:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36062)
+	id 1iAsNM-0003o1-Po
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:05:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37959)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1iArw8-0005Rk-W4
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:37:14 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iAsDp-0002Ss-Md
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:55:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1iArw7-0000PZ-16
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:37:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39822)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>)
- id 1iArw6-0000PR-Rw; Thu, 19 Sep 2019 04:37:10 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B112E81DF7;
- Thu, 19 Sep 2019 08:37:09 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-47.ams2.redhat.com
- [10.36.116.47])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6990A60A9F;
- Thu, 19 Sep 2019 08:37:09 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id BB7071FCC0; Thu, 19 Sep 2019 10:37:08 +0200 (CEST)
-Date: Thu, 19 Sep 2019 10:37:08 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <20190919083708.mwqjq6qzyemqlxpq@sirius.home.kraxel.org>
-References: <20190914145155.19360-1-chewi@gentoo.org>
- <457c3a3c-d1b3-9f73-e156-24add1347e07@vivier.eu>
+ (envelope-from <alex.bennee@linaro.org>) id 1iAsDn-00063p-Pt
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:55:29 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:33539)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iAsDl-00061D-Q3
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:55:27 -0400
+Received: by mail-wr1-x429.google.com with SMTP id b9so2237229wrs.0
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 01:55:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=moOYIlwVv2orNBoRZOLsxJ1gRHB+D+sr3AXlvcuI33M=;
+ b=GH8kLnjs3SMJAj8lfDNLf49b0KX8hGUhblzK4E8hSBYvQ9RnWkv758Re4iYM8UgEQT
+ 3OcO6vfOWXa3e55zgsCw+fBrcrM6wXS+KuJj97ST505WPuzXadwzCeQCP5JqZF9y9ujG
+ 9erKnQ7xZx7c7ivTkjVLk72GG0Zo5dpuAGrPemoeGTA7mGrKxBq1EK3eAw4S+ugLUxeH
+ AJWrNt4XFBhQcSrZ16h3BXGWfjgi4XoLg68xuf3WpbbU38C1D1rHPw8uxtJQO1Hqli9+
+ 0lCh+zzCl9RB2cdkz/sMfmRGCDhRO8Y7FGIFnSsCIG603IfUSYsyoj5rCDYcl3kziB6d
+ BdKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=moOYIlwVv2orNBoRZOLsxJ1gRHB+D+sr3AXlvcuI33M=;
+ b=Wavvn1xQodjJatX/pFQOWae/yO4xWQyf7zF15O7KZZMz4IHz+7X41PUNH6eLNd2dil
+ C8RU7/NWtdd6pqKPsZi8KhDuJH3Q3O5kuDdNkjXWbVMFGrrxMO3Kv7Bs4lR/ce+b0tGM
+ JwTaVzGppdqX+80xPftx8uCh5YQj0cDyMUXci38lM9zYYYFnpANDpaWVhOAnpi+RKKeP
+ XVbjFLEDF+fEdd8GtOlqY0KjW13uGOiU9gage8e5GRziRsVCvDImQNIhXhel0KRxQF+o
+ k5V30U/x06k0sQP6SMa1jlxSXJ/O7xDqlrEpYqyhUxxXn1dOGK0XMkO/VKmtxwvn/yzF
+ P5tA==
+X-Gm-Message-State: APjAAAVVyizfhRMW+C2/tjbI0yZsVT3bwV40Adf2cSRPsLwmRA8OKHvB
+ khVCn23/pU/gcG0YLn/eFeypOqbPwxw=
+X-Google-Smtp-Source: APXvYqx7u+wJ03S8ycFL/IDWI3hFvWncLiVVyXfvmpDvFevpGnxsRpZnChwKojbfF4ITMxfQP5XMPg==
+X-Received: by 2002:a5d:46c4:: with SMTP id g4mr5759543wrs.189.1568883321913; 
+ Thu, 19 Sep 2019 01:55:21 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id s9sm6915869wme.36.2019.09.19.01.55.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 19 Sep 2019 01:55:21 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 2C9B31FF87;
+ Thu, 19 Sep 2019 09:55:20 +0100 (BST)
+References: <db0d4563-2cc0-fe20-f9ee-3c73766e489f@redhat.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: John Snow <jsnow@redhat.com>
+In-reply-to: <db0d4563-2cc0-fe20-f9ee-3c73766e489f@redhat.com>
+Date: Thu, 19 Sep 2019 09:55:20 +0100
+Message-ID: <87tv98zmvb.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <457c3a3c-d1b3-9f73-e156-24add1347e07@vivier.eu>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Thu, 19 Sep 2019 08:37:09 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] configure: Add xkbcommon
- configure options
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::429
+Subject: Re: [Qemu-devel] Docker Tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,52 +95,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, James Le Cuirot <chewi@gentoo.org>,
- qemu-devel@nongnu.org
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 16, 2019 at 10:15:15AM +0200, Laurent Vivier wrote:
-> Le 14/09/2019 =E0 16:51, James Le Cuirot a =E9crit=A0:
-> > This dependency is currently "automagic", which is bad for distributi=
-ons.
-> >=20
-> > Signed-off-by: James Le Cuirot <chewi@gentoo.org>
-> > ---
-> >  configure | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> >=20
-> > diff --git a/configure b/configure
-> > index 30aad233d1..30544f52e6 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -1521,6 +1521,10 @@ for opt do
-> >    ;;
-> >    --disable-libpmem) libpmem=3Dno
-> >    ;;
-> > +  --enable-xkbcommon) xkbcommon=3Dyes
-> > +  ;;
-> > +  --disable-xkbcommon) xkbcommon=3Dno
-> > +  ;;
-> >    *)
-> >        echo "ERROR: unknown option $opt"
-> >        echo "Try '$0 --help' for more information"
-> > @@ -1804,6 +1808,7 @@ disabled with --disable-FEATURE, default is ena=
-bled if available:
-> >    capstone        capstone disassembler support
-> >    debug-mutex     mutex debugging support
-> >    libpmem         libpmem support
-> > +  xkbcommon       xkbcommon support
-> > =20
-> >  NOTE: The object files are built at the place where configure is lau=
-nched
-> >  EOF
-> >=20
->=20
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
->=20
-> cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+John Snow <jsnow@redhat.com> writes:
+
+> Hi, I'm having a regular trainwreck here w/ the Docker test suite and I
+> have a few questions;
+>
+> 1. Which tests should I expect to work by default? for instance,
+> make-debug doesn't but I think that might be normal. Is that the only
+> one?
+
+test-build is the only one that just builds. As a lot of the docker
+images are cross compilers you generally can't run tests with them which
+limits the use of tests that run make check.
+
+> 2. Should all tests work for all targets?
+
+No for reasons of cross compilers. However we should be at the point
+that:
+
+  make docker-test-build
+
+should run and complete all the builds it can (with non-x86 systems
+skipping a whole chunk). There is some re-factoring work to be done to
+make the whole system a bit more friendly to multiple host architectures.
+
+> 3. Which images can I use to run tests? e.g. make docker-test-quick@XXXX
+> .. the help output shows me ALL images, including your partial ones.
+
+It does? It filters out the partial ones for me. Broadly the mainline OS
+ones are all capable of building and running tests
+(centos/debian-amd64/fedora/ubuntu/travis).
+
+> I
+> think we only want to see non-partial images for help output, or make
+> clear which ones are for tests and which ones are just images.
+>
+> 4. docker8 is listed as a partial image, but doesn't appear to be
+> consumed by anything. Can it be removed?
+
+Yes.
+
+>
+> - Ditto for debian-sid.
+
+Probably - I almost removed it last time but Phillipe convinced me to
+keep it in. I think now buster is out and has packaged gcc's for all the
+old arches (alpha etc) we can probably get rid of it.
+
+> - Ditto for debian-ports.
+
+This was useful for compilers for old arches but I think it can be got
+rid of now. It's basically sid with a different repo URL.
+
+> (should debian-sid and debian-ports actually be promoted to non-partial
+> images? or, how do I configure the other debian targets to use these as
+> a base instead?)
+
+For true any Debian you want you can use Debian bootstrap - although
+it's main use case is for setting up binfmt_misc foreign arch images.
+
+--
+Alex Benn=C3=A9e
 
