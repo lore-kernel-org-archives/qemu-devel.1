@@ -2,65 +2,108 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0C95C49ED7
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:57:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 464CFC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:59:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 992F920882
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:57:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 992F920882
+	by mail.kernel.org (Postfix) with ESMTPS id 1853720882
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:59:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1853720882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAxsW-000866-QQ
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 10:57:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59144)
+	id 1iAxtu-00015f-8o
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 10:59:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59732)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iAxlX-0001cP-7M
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:50:41 -0400
+ (envelope-from <david@redhat.com>) id 1iAxo4-0003y8-DN
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:53:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iAxlU-0002TT-7g
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:50:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42442)
+ (envelope-from <david@redhat.com>) id 1iAxo3-0004qT-0a
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:53:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39898)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>)
- id 1iAxlL-0002NK-NN; Thu, 19 Sep 2019 10:50:27 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iAxo2-0004qI-NJ
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:53:14 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 842C42A09A0;
- Thu, 19 Sep 2019 14:50:25 +0000 (UTC)
-Received: from redhat.com (ovpn-112-51.ams2.redhat.com [10.36.112.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A0C3D60872;
- Thu, 19 Sep 2019 14:49:50 +0000 (UTC)
-Date: Thu, 19 Sep 2019 15:49:48 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [RFC] error: auto propagated local_err
-Message-ID: <20190919144948.GR20217@redhat.com>
-References: <20190918130244.24257-1-vsementsov@virtuozzo.com>
- <abb14088-6af2-5db2-da0d-0948fd4ac81c@redhat.com>
- <20190919091720.GB10163@localhost.localdomain>
- <57483252-273c-4606-47a8-eddeb840109a@redhat.com>
- <35c972e1-bdb5-cbcb-ed45-6a51f19af98c@virtuozzo.com>
- <696673be-95c8-3f75-551c-26fccd230eb1@virtuozzo.com>
- <152afb5b-8efb-d968-d595-94f58ad02a04@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 0019C308AA11;
+ Thu, 19 Sep 2019 14:53:13 +0000 (UTC)
+Received: from [10.36.118.9] (unknown [10.36.118.9])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B7A6B60167;
+ Thu, 19 Sep 2019 14:53:10 +0000 (UTC)
+Subject: Re: [RFC v2 2/5] cputlb: Replace switches in load/store_helper with
+ callback
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190918180251.32003-1-richard.henderson@linaro.org>
+ <20190918180251.32003-3-richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <b11701c0-63cd-f313-fc0b-f66cb6d2f10a@redhat.com>
+Date: Thu, 19 Sep 2019 16:53:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20190918180251.32003-3-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <152afb5b-8efb-d968-d595-94f58ad02a04@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Thu, 19 Sep 2019 14:50:25 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Thu, 19 Sep 2019 14:53:14 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -74,91 +117,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: "fam@euphon.net" <fam@euphon.net>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "mst@redhat.com" <mst@redhat.com>, "codyprime@gmail.com" <codyprime@gmail.com>,
- "mark.cave-ayland@ilande.co.uk" <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "kraxel@redhat.com" <kraxel@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "david@redhat.com" <david@redhat.com>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
- "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
- "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>,
- "farman@linux.ibm.com" <farman@linux.ibm.com>,
- "groug@kaod.org" <groug@kaod.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
- Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
- "sundeep.lkml@gmail.com" <sundeep.lkml@gmail.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: pbonzini@redhat.com, alex.bennee@linaro.org, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 19, 2019 at 09:44:14AM -0500, Eric Blake wrote:
-> On 9/19/19 9:30 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 
-> >>
-> >> To the same topic, of minimization: should we always call MAKE_ERRP_SAFE at function top, or only
-> >> in block, where it is needed (assume, we dereference it only inside some "if" or "while"?
-> >> Kevin, is something bad in propagation, when it not related to error_abort?
-> >>
-> >>
-> > 
-> > Or, even, we may use MAKE_ERRP_SAFE on every function, which have Error **errp argument, even if we neither
-> > dereference it nor append hints? Is it what you propose by "SINGLE paradigm"? It's of course simpler to script,
-> > to check in checkpatch and to maintain.
-> 
-> Yes. The simpler we make the rules, and the less boilerplate it entails,
-> the more likely that we can:
-> 
-> a) avoid exceptions and corner cases that cost review time
-> b) automate the conversion into complying with the rule
-> c) codify those rules in syntax check to ensure they are followed
-> post-conversion
-> 
-> ALWAYS using MAKE_ERRP_SAFE() on entry to any function that has an Error
-> **errp parameter is dirt-simple to explain.  It has no performance
-> penalty if the user passed in a normal error or error_abort (the cost of
-> an 'if' hidden in the macro is probably negligible compared to
-> everything else we do), and has no semantic penalty if the user passed
-> in NULL or error_fatal (we now get the behavior we want with less
-> boilerplate).
-> 
-> Having to think 'does this method require me to use MAKE_ERRP_SAFE, or
-> can I omit it?' does not provide the same simplicity.
+On 18.09.19 20:02, Richard Henderson wrote:
+> Add a function parameter to perform the actual load/store to ram.
+> With optimization, this results in identical code.
+>=20
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  accel/tcg/cputlb.c | 159 +++++++++++++++++++++++----------------------
+>  1 file changed, 83 insertions(+), 76 deletions(-)
 
-The flipside is that MAKE_ERRP_SAFE hides a bunch of logic, so you don't
-really know what its doing without looking at it, and this is QEMU
-custom concept so one more thing to learn for new contributors.
+I would have guessed the compiler propagates the constant and eliminates
+the switch completely for the variants. After all, we now have more LOC .=
+..
 
-While I think it is a nice trick, personally I think we would be better
-off if we simply used a code pattern which does not require de-referencing
-'errp' at all, aside from exceptional cases. IOW, no added macro in 95%
-of all our methods using Error **errp.
+I would have moved the actual read/write to a separate function
+containing the switch statement instead.
 
-There are lots of neat things we could do with auto-cleanup functions we
-I think we need to be wary of hiding too much cleverness behind macros
-when doing so overall.
+But I am pretty sure you know what you're doing here :)
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+>=20
+> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> index 2222b87764..b4a63d3928 100644
+> --- a/accel/tcg/cputlb.c
+> +++ b/accel/tcg/cputlb.c
+> @@ -1280,11 +1280,38 @@ static void *atomic_mmu_lookup(CPUArchState *en=
+v, target_ulong addr,
+> =20
+>  typedef uint64_t FullLoadHelper(CPUArchState *env, target_ulong addr,
+>                                  TCGMemOpIdx oi, uintptr_t retaddr);
+> +typedef uint64_t LoadHelper(const void *);
+> +
+> +/* Wrap the unaligned load helpers to that they have a common signatur=
+e.  */
+> +static inline uint64_t wrap_ldub(const void *haddr)
+> +{
+> +    return ldub_p(haddr);
+
+I wonder if you should just add proper type cast to all of the <
+uint64_t accessors (e.g., here (uint8_t) ). Shouldn't hurt and makes
+people wonder less how the conversion from the int these accessors
+return to uint64_t will turn out.
+
+But yeah, you're simply moving code here.
+
+> +}
+> +
+> +static inline uint64_t wrap_lduw_be(const void *haddr)
+> +{
+> +    return lduw_be_p(haddr);
+> +}
+> +
+> +static inline uint64_t wrap_lduw_le(const void *haddr)
+> +{
+> +    return lduw_le_p(haddr);
+> +}
+> +
+> +static inline uint64_t wrap_ldul_be(const void *haddr)
+> +{
+> +    return (uint32_t)ldl_be_p(haddr);
+> +}
+> +
+> +static inline uint64_t wrap_ldul_le(const void *haddr)
+> +{
+> +    return (uint32_t)ldl_le_p(haddr);
+> +}
+
+Looks sane to me!
+
+
+--=20
+
+Thanks,
+
+David / dhildenb
 
