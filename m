@@ -8,78 +8,77 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7609BC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 21:33:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F942C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 21:33:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C76921907
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 21:33:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 668BE21920
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 21:33:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kl7AawCn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C76921907
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NAL27pcH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 668BE21920
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB43B-00011s-Ca
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 17:33:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53498)
+	id 1iB43J-00018u-AR
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 17:33:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53469)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iB3ug-0002gP-Le
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1iB3uf-0002en-4N
  for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:24:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iB3ue-0000Yx-TR
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:24:30 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36228)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1iB3uc-0000XI-Gc
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:24:28 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53744)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1iB3ue-0000YN-Ky
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:24:28 -0400
-Received: by mail-wr1-x442.google.com with SMTP id y19so4640842wrd.3
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 14:24:28 -0700 (PDT)
+ id 1iB3uc-0000Wu-8t
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:24:26 -0400
+Received: by mail-wm1-x342.google.com with SMTP id i16so6337711wmd.3
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 14:24:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=aJOgLJbUU33d0sFNF8d3VZOVm5JVuSp9jkJ/aPDzPik=;
- b=kl7AawCnYB5geqEpJnk7wWBcA4LtB+XIaptOZDGNPT+NLXmPKa6rmv+WgkxWiOigL8
- TgPQiGSSep7Vkb4D8moXtAz9Ze6cpUPKCRUJ4pKv2UmGazAieM7gjq4jAT/8aQR+UZeH
- 1t2KhAtXklEvSwOpjEo2xqQs+uNF7lrBqzHITSPjdTymT554+gm8RfeWIkSNmSWDv5ws
- /thkB2R9NQU5xA7x+u1uHuSwGi+10uZEw3lRrb4n1He5sygqLKz3lhr+26DTlHWTDj3d
- QNozvN6DN2eFTHI/JMK/sDeor41V6rDQOPsjGrrT5Z5LGn/a0S0yay5p5CWS+bflYoSY
- ajoQ==
+ bh=P1Yx/dZ4rieO/0gJLGQ3xdgMx3pyBcyEnZuiP7yaO78=;
+ b=NAL27pcHuyj1Ca6I8XB9JqJUnaxAX4dcdab+dhyAVw6k6iFERyO3PmrfQNy2YbDO59
+ Rz6E7nN95hAYKidOm/YPtw78hIFeqollNaSsktCKdacnUW2ise8grUm/M4CFeHoXgHao
+ LO8Wa/xjIx0z++DlB62+91pAF+xJrWQpoPO1Z33lnYk3xFkoe8TzB2BZBn+wSnkkggAR
+ 0X/tVxqNGrQqXSCxWHhVBB2iHr0KeFDknSwegf8fThLqy17LSEOQ2ExgfSp1nU6UzUCw
+ Xx2yj66PcbvHJqpzDDDetMbI7EBvDHqmrAEXYvYg5Vrzj5pHdhXv7sblFga96sMin0v1
+ V3Og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=aJOgLJbUU33d0sFNF8d3VZOVm5JVuSp9jkJ/aPDzPik=;
- b=KcqYpuKu8Fl8Td7ZiX9Rhnt2AQzLdeHMaeEa4D59xUsN7mtMSfZHiPBMASLE1bjoy8
- 5uL1fxwDr1kkEMQTH2OtpLJwaE9ndPR1tFVvyj51NmDo14ZsDZKSnLZfp1uqOSAitijG
- ctoqHZcIiW4b9aL4HqKSUXg+CEdOMaq3SWWemCPUrdlDbSeN8x0zCt8u9E5rg4LdB21K
- /XXQlWI9y4fCKPVVM+PBurImMcFaKmK3EAB1ACPyUhn6AnFTz9NJrerlEtJPyS6YQKDY
- xm07zE/F15qnLwUtxi/gjpOicynV4OfBsEjrckhM+c7cFsAyQycT6hajmzOrFgegx78n
- wJHA==
-X-Gm-Message-State: APjAAAW3ENxkphfCvmvBW3udEi8vyaDKOo/8VOYhWjKXVs4orkoUNDOx
- mlniN7PdN6L+jWtILbhz8pAxQL1c
-X-Google-Smtp-Source: APXvYqxAqP7Tthxp9pGMcTNLy2HT9/Z2CcjlSTrk9dj7gmuZsUXVdJDaUx8FfTxirK9ZZQKz7kP8Ag==
-X-Received: by 2002:a05:6000:188:: with SMTP id
- p8mr6279571wrx.220.1568928267271; 
- Thu, 19 Sep 2019 14:24:27 -0700 (PDT)
+ bh=P1Yx/dZ4rieO/0gJLGQ3xdgMx3pyBcyEnZuiP7yaO78=;
+ b=lkTKQw4WKHSk4EqzUYr05xlYo/Z48Sonyt7x4rW4cZUbUe7Mk6ajygSCkhgbT6wPbF
+ hsh7rLq+nWLwEOngfMNSEsXoaWWzoHLQzCN9K6Lh4dfKTJHL/75f4rzZLm3wc3j6zePE
+ aWH3NZif76gCoSdqteHd5rxkTiIcSsArCgWIesp0aMtfUHmJWSR4+lsZDdtKFEV7/SsL
+ fVljBzFa1VqUxyXyN4ChgR8a9vV8tQapJyKueHZc4NWOpH+Wo08zpi7Z5sB49l5BjbxB
+ 87pUgAD1pbKKb/p1h5+Btbvpj4RkPo5eX30DEUH9MyD1qULjDQeJVwPWY66fquTaS/sf
+ 5bqw==
+X-Gm-Message-State: APjAAAWKzPFar3SUjI2TABn9Cw/5Waxu85wmrnwffKv5LN4q4n8iQh+k
+ h2C86O93M4Rq1E4+rY56ykVk77ny
+X-Google-Smtp-Source: APXvYqyMlcASVh2KybuR4v7YwxGBcPb3CSwj1ie6OGEuBPsikmMIRTaKUDPDcaptSiw2hm3hVqdQrQ==
+X-Received: by 2002:a05:600c:241:: with SMTP id 1mr74170wmj.162.1568928264840; 
+ Thu, 19 Sep 2019 14:24:24 -0700 (PDT)
 Received: from nullptr.home.dirty-ice.org
  (2a01-036c-0113-74ef-0000-0000-0000-0005.pool6.digikabel.hu.
  [2a01:36c:113:74ef::5])
- by smtp.gmail.com with ESMTPSA id w125sm13191292wmg.32.2019.09.19.14.24.25
+ by smtp.gmail.com with ESMTPSA id w125sm13191292wmg.32.2019.09.19.14.24.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Sep 2019 14:24:26 -0700 (PDT)
+ Thu, 19 Sep 2019 14:24:24 -0700 (PDT)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
  <dirty.ice.hu@gmail.com>
 X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
  <DirtY.iCE.hu@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 05/24] noaudio: port to the new audio backend api
-Date: Thu, 19 Sep 2019 23:24:13 +0200
-Message-Id: <10eebdd2e1529c2bd403ef98dd9d346c6d4ca3d1.1568927990.git.DirtY.iCE.hu@gmail.com>
+Subject: [PATCH v4 03/24] coreaudio: port to the new audio backend api
+Date: Thu, 19 Sep 2019 23:24:11 +0200
+Message-Id: <586a1e66de5cbc6c5234f9ae556d24befb6afada.1568927990.git.DirtY.iCE.hu@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <cover.1568927990.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1568927990.git.DirtY.iCE.hu@gmail.com>
@@ -88,7 +87,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,92 +106,200 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/noaudio.c | 43 +++++++++++++++++--------------------------
- 1 file changed, 17 insertions(+), 26 deletions(-)
+ audio/coreaudio.c | 130 ++++++++++++++++++++++++----------------------
+ 1 file changed, 69 insertions(+), 61 deletions(-)
 
-diff --git a/audio/noaudio.c b/audio/noaudio.c
-index 0fb2629cf2..b054fd225b 100644
---- a/audio/noaudio.c
-+++ b/audio/noaudio.c
-@@ -41,10 +41,9 @@ typedef struct NoVoiceIn {
-     int64_t old_ticks;
- } NoVoiceIn;
+diff --git a/audio/coreaudio.c b/audio/coreaudio.c
+index d1be58b40a..5cde42f982 100644
+--- a/audio/coreaudio.c
++++ b/audio/coreaudio.c
+@@ -43,9 +43,6 @@ typedef struct coreaudioVoiceOut {
+     UInt32 audioDevicePropertyBufferFrameSize;
+     AudioStreamBasicDescription outputStreamBasicDescription;
+     AudioDeviceIOProcID ioprocid;
+-    size_t live;
+-    size_t decr;
+-    size_t rpos;
+ } coreaudioVoiceOut;
  
--static size_t no_run_out(HWVoiceOut *hw, size_t live)
-+static size_t no_write(HWVoiceOut *hw, void *buf, size_t len)
- {
-     NoVoiceOut *no = (NoVoiceOut *) hw;
--    size_t decr, samples;
-     int64_t now;
-     int64_t ticks;
-     int64_t bytes;
-@@ -52,13 +51,9 @@ static size_t no_run_out(HWVoiceOut *hw, size_t live)
-     now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-     ticks = now - no->old_ticks;
-     bytes = muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
--    bytes = MIN(bytes, SIZE_MAX);
--    samples = bytes >> hw->info.shift;
- 
-     no->old_ticks = now;
--    decr = MIN (live, samples);
--    hw->rpos = (hw->rpos + decr) % hw->samples;
--    return decr;
-+    return MIN(len, bytes);
+ #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
+@@ -397,31 +394,29 @@ static int coreaudio_unlock (coreaudioVoiceOut *core, const char *fn_name)
+     return 0;
  }
  
- static int no_init_out(HWVoiceOut *hw, struct audsettings *as, void *drv_opaque)
-@@ -92,25 +87,21 @@ static void no_fini_in (HWVoiceIn *hw)
-     (void) hw;
- }
- 
--static size_t no_run_in(HWVoiceIn *hw)
-+static size_t no_read(HWVoiceIn *hw, void *buf, size_t size)
- {
-+    size_t to_clear;
-     NoVoiceIn *no = (NoVoiceIn *) hw;
--    size_t live = audio_pcm_hw_get_live_in(hw);
--    size_t dead = hw->samples - live;
--    size_t samples = 0;
+-static size_t coreaudio_run_out(HWVoiceOut *hw, size_t live)
+-{
+-    size_t decr;
+-    coreaudioVoiceOut *core = (coreaudioVoiceOut *) hw;
 -
--    if (dead) {
--        int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
--        int64_t ticks = now - no->old_ticks;
--        int64_t bytes =
--            muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
+-    if (coreaudio_lock (core, "coreaudio_run_out")) {
+-        return 0;
++#define COREAUDIO_WRAPPER_FUNC(name, ret_type, args_decl, args) \
++    static ret_type glue(coreaudio_, name)args_decl             \
++    {                                                           \
++        coreaudioVoiceOut *core = (coreaudioVoiceOut *) hw;     \
++        ret_type ret;                                           \
++                                                                \
++        if (coreaudio_lock(core, "coreaudio_" #name)) {         \
++            return 0;                                           \
++        }                                                       \
++                                                                \
++        ret = glue(audio_generic_, name)args;                   \
++                                                                \
++        coreaudio_unlock(core, "coreaudio_" #name);             \
++        return ret;                                             \
+     }
 -
--        no->old_ticks = now;
--        bytes = MIN (bytes, SIZE_MAX);
--        samples = bytes >> hw->info.shift;
--        samples = MIN (samples, dead);
+-    if (core->decr > live) {
+-        ldebug ("core->decr %d live %d core->live %d\n",
+-                core->decr,
+-                live,
+-                core->live);
 -    }
--    return samples;
-+
-+    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    int64_t ticks = now - no->old_ticks;
-+    int64_t bytes =
-+        muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
-+
-+    no->old_ticks = now;
-+    to_clear = MIN(bytes, size);
-+
-+    audio_pcm_info_clear_buf(&hw->info, buf, to_clear >> hw->info.shift);
-+    return to_clear;
+-
+-    decr = MIN (core->decr, live);
+-    core->decr -= decr;
+-
+-    core->live = live - decr;
+-    hw->rpos = core->rpos;
+-
+-    coreaudio_unlock (core, "coreaudio_run_out");
+-    return decr;
+-}
++COREAUDIO_WRAPPER_FUNC(get_buffer_out, void *, (HWVoiceOut *hw, size_t *size),
++                       (hw, size))
++COREAUDIO_WRAPPER_FUNC(put_buffer_out_nowrite, size_t,
++                       (HWVoiceOut *hw, void *buf, size_t size),
++                       (hw, buf, size))
++COREAUDIO_WRAPPER_FUNC(write, size_t, (HWVoiceOut *hw, void *buf, size_t size),
++                       (hw, buf, size))
++#undef COREAUDIO_WRAPPER_FUNC
+ 
+ /* callback to feed audiooutput buffer */
+ static OSStatus audioDeviceIOProc(
+@@ -433,19 +428,11 @@ static OSStatus audioDeviceIOProc(
+     const AudioTimeStamp* inOutputTime,
+     void* hwptr)
+ {
+-    UInt32 frame, frameCount;
+-    float *out = outOutputData->mBuffers[0].mData;
++    UInt32 frameCount, pending_frames;
++    void *out = outOutputData->mBuffers[0].mData;
+     HWVoiceOut *hw = hwptr;
+     coreaudioVoiceOut *core = (coreaudioVoiceOut *) hwptr;
+-    int rpos, live;
+-    struct st_sample *src;
+-#ifndef FLOAT_MIXENG
+-#ifdef RECIPROCAL
+-    const float scale = 1.f / UINT_MAX;
+-#else
+-    const float scale = UINT_MAX;
+-#endif
+-#endif
++    size_t len;
+ 
+     if (coreaudio_lock (core, "audioDeviceIOProc")) {
+         inInputTime = 0;
+@@ -453,42 +440,51 @@ static OSStatus audioDeviceIOProc(
+     }
+ 
+     frameCount = core->audioDevicePropertyBufferFrameSize;
+-    live = core->live;
++    pending_frames = hw->pending_emul >> hw->info.shift;
+ 
+     /* if there are not enough samples, set signal and return */
+-    if (live < frameCount) {
++    if (pending_frames < frameCount) {
+         inInputTime = 0;
+         coreaudio_unlock (core, "audioDeviceIOProc(empty)");
+         return 0;
+     }
+ 
+-    rpos = core->rpos;
+-    src = hw->mix_buf + rpos;
++    len = frameCount << hw->info.shift;
++    while (len) {
++        size_t write_len;
++        ssize_t start = ((ssize_t) hw->pos_emul) - hw->pending_emul;
++        if (start < 0) {
++            start += hw->size_emul;
++        }
++        assert(start >= 0 && start < hw->size_emul);
+ 
+-    /* fill buffer */
+-    for (frame = 0; frame < frameCount; frame++) {
+-#ifdef FLOAT_MIXENG
+-        *out++ = src[frame].l; /* left channel */
+-        *out++ = src[frame].r; /* right channel */
+-#else
+-#ifdef RECIPROCAL
+-        *out++ = src[frame].l * scale; /* left channel */
+-        *out++ = src[frame].r * scale; /* right channel */
+-#else
+-        *out++ = src[frame].l / scale; /* left channel */
+-        *out++ = src[frame].r / scale; /* right channel */
+-#endif
+-#endif
+-    }
++        write_len = MIN(MIN(hw->pending_emul, len),
++                        hw->size_emul - start);
+ 
+-    rpos = (rpos + frameCount) % hw->samples;
+-    core->decr += frameCount;
+-    core->rpos = rpos;
++        memcpy(out, hw->buf_emul + start, write_len);
++        hw->pending_emul -= write_len;
++        len -= write_len;
++        out += write_len;
++    }
+ 
+     coreaudio_unlock (core, "audioDeviceIOProc");
+     return 0;
  }
  
- static int no_ctl_in (HWVoiceIn *hw, int cmd, ...)
-@@ -133,12 +124,12 @@ static void no_audio_fini (void *opaque)
- static struct audio_pcm_ops no_pcm_ops = {
-     .init_out = no_init_out,
-     .fini_out = no_fini_out,
--    .run_out  = no_run_out,
-+    .write    = no_write,
-     .ctl_out  = no_ctl_out,
++static UInt32 coreaudio_get_flags(struct audio_pcm_info *info,
++                                  struct audsettings *as)
++{
++    UInt32 flags = info->sign ? kAudioFormatFlagIsSignedInteger : 0;
++    if (as->endianness) { /* 0 = little, 1 = big */
++        flags |= kAudioFormatFlagIsBigEndian;
++    }
++
++    if (flags == 0) { /* must not be 0 */
++        flags = kAudioFormatFlagsAreAllClear;
++    }
++    return flags;
++}
++
+ static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
+                               void *drv_opaque)
+ {
+@@ -576,6 +572,16 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
  
-     .init_in  = no_init_in,
-     .fini_in  = no_fini_in,
--    .run_in   = no_run_in,
-+    .read     = no_read,
-     .ctl_in   = no_ctl_in
+     /* set Samplerate */
+     core->outputStreamBasicDescription.mSampleRate = (Float64) as->freq;
++    core->outputStreamBasicDescription.mFormatID = kAudioFormatLinearPCM;
++    core->outputStreamBasicDescription.mFormatFlags =
++        coreaudio_get_flags(&hw->info, as);
++    core->outputStreamBasicDescription.mBytesPerPacket =
++        core->outputStreamBasicDescription.mBytesPerFrame =
++        hw->info.nchannels * hw->info.bits / 8;
++    core->outputStreamBasicDescription.mFramesPerPacket = 1;
++    core->outputStreamBasicDescription.mChannelsPerFrame = hw->info.nchannels;
++    core->outputStreamBasicDescription.mBitsPerChannel = hw->info.bits;
++
+     status = coreaudio_set_streamformat(core->outputDeviceID,
+                                         &core->outputStreamBasicDescription);
+     if (status != kAudioHardwareNoError) {
+@@ -686,7 +692,9 @@ static void coreaudio_audio_fini (void *opaque)
+ static struct audio_pcm_ops coreaudio_pcm_ops = {
+     .init_out = coreaudio_init_out,
+     .fini_out = coreaudio_fini_out,
+-    .run_out  = coreaudio_run_out,
++    .write    = coreaudio_write,
++    .get_buffer_out = coreaudio_get_buffer_out,
++    .put_buffer_out = coreaudio_put_buffer_out_nowrite,
+     .ctl_out  = coreaudio_ctl_out
  };
  
 -- 
