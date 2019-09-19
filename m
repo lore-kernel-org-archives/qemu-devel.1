@@ -2,64 +2,143 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C77F2C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 19:09:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F6DFC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 19:12:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E6CA20717
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 19:09:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E6CA20717
+	by mail.kernel.org (Postfix) with ESMTPS id 3E5A620717
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 19:12:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E5A620717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB1na-0004xi-R7
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 15:09:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38526)
+	id 1iB1ql-0007Mn-7N
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 15:12:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39275)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iB1mp-0004Op-Se
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 15:08:17 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iB1po-0006Zl-MX
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 15:11:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iB1mo-0003ws-M9
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 15:08:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35726)
+ (envelope-from <jsnow@redhat.com>) id 1iB1pn-0005oc-5u
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 15:11:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58768)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iB1mo-0003we-Eo
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 15:08:14 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iB1pj-0005jM-Eb; Thu, 19 Sep 2019 15:11:15 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B222A18CB8EF
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 19:08:13 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-121-45.rdu2.redhat.com
- [10.10.121.45])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 60F1660872;
- Thu, 19 Sep 2019 19:08:07 +0000 (UTC)
-Subject: Re: [PATCH] edk2 build scripts: work around TianoCore#1607 without
- forcing Python 2
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu devel list <qemu-devel@nongnu.org>
-References: <20190918171141.15957-1-lersek@redhat.com>
- <2d02cb02-27ce-081b-c9ec-4c4430503749@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <6a5b3a61-0d52-6866-9fb9-4d71e5f01483@redhat.com>
-Date: Thu, 19 Sep 2019 21:08:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ by mx1.redhat.com (Postfix) with ESMTPS id BAD938A1C9C;
+ Thu, 19 Sep 2019 19:11:14 +0000 (UTC)
+Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D7F435D6B0;
+ Thu, 19 Sep 2019 19:11:13 +0000 (UTC)
+Subject: Re: [Qemu-block] [Qemu-devel] [PATCH] block/backup: install notifier
+ during creation
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>
+References: <20190809201333.29033-1-jsnow@redhat.com>
+ <b85698e6-cd79-a9c5-554c-c92487060280@virtuozzo.com>
+ <154bc276-d782-443f-3db6-38d87992d609@redhat.com>
+ <20190910081942.GA23976@stefanha-x1.localdomain>
+ <9bf835d7-8bfa-feba-c2f7-acd6cda4a81e@redhat.com>
+ <0abc4992-9322-010a-118b-62e79cbc5b58@redhat.com>
+ <6e3c1b53-c104-2b05-418e-d44f45a82be8@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <0453fab7-6b2b-6caa-86d1-8db64b1cc9da@redhat.com>
+Date: Thu, 19 Sep 2019 15:11:13 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <2d02cb02-27ce-081b-c9ec-4c4430503749@redhat.com>
+In-Reply-To: <6e3c1b53-c104-2b05-418e-d44f45a82be8@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Thu, 19 Sep 2019 19:08:13 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.69]); Thu, 19 Sep 2019 19:11:14 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -74,119 +153,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/19/19 18:39, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 9/18/19 7:11 PM, Laszlo Ersek wrote:
->> It turns out that forcing python2 for running the edk2 "build" utility=
- is
->> neither necessary nor sufficient.
+
+
+On 9/19/19 3:11 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 18.09.2019 23:31, John Snow wrote:
 >>
->> Forcing python2 is not sufficient for two reasons:
 >>
->> - QEMU is moving away from python2, with python2 nearing EOL,
->>
->> - according to my most recent testing, the lacking dependency informat=
-ion
->>   in the makefiles that are generated by edk2's "build" utility can ca=
-use
->>   parallel build failures even when "build" is executed by python2.
->>
->> And forcing python2 is not necessary because we can still return to th=
+>> On 9/10/19 9:23 AM, John Snow wrote:
+>>>
+>>>
+>>> On 9/10/19 4:19 AM, Stefan Hajnoczi wrote:
+>>>> On Wed, Aug 21, 2019 at 04:01:52PM -0400, John Snow wrote:
+>>>>>
+>>>>>
+>>>>> On 8/21/19 10:41 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>> 09.08.2019 23:13, John Snow wrote:
+>>>>>>> Backup jobs may yield prior to installing their handler, because =
+of the
+>>>>>>> job_co_entry shim which guarantees that a job won't begin work un=
+til
+>>>>>>> we are ready to start an entire transaction.
+>>>>>>>
+>>>>>>> Unfortunately, this makes proving correctness about transactional
+>>>>>>> points-in-time for backup hard to reason about. Make it explicitl=
+y clear
+>>>>>>> by moving the handler registration to creation time, and changing=
+ the
+>>>>>>> write notifier to a no-op until the job is started.
+>>>>>>>
+>>>>>>> Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.c=
+om>
+>>>>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>>>>> ---
+>>>>>>>    block/backup.c     | 32 +++++++++++++++++++++++---------
+>>>>>>>    include/qemu/job.h |  5 +++++
+>>>>>>>    job.c              |  2 +-
+>>>>>>>    3 files changed, 29 insertions(+), 10 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/block/backup.c b/block/backup.c
+>>>>>>> index 07d751aea4..4df5b95415 100644
+>>>>>>> --- a/block/backup.c
+>>>>>>> +++ b/block/backup.c
+>>>>>>> @@ -344,6 +344,13 @@ static int coroutine_fn backup_before_write_=
+notify(
+>>>>>>>        assert(QEMU_IS_ALIGNED(req->offset, BDRV_SECTOR_SIZE));
+>>>>>>>        assert(QEMU_IS_ALIGNED(req->bytes, BDRV_SECTOR_SIZE));
+>>>>>>>   =20
+>>>>>>> +    /* The handler is installed at creation time; the actual poi=
+nt-in-time
+>>>>>>> +     * starts at job_start(). Transactions guarantee those two p=
+oints are
+>>>>>>> +     * the same point in time. */
+>>>>>>> +    if (!job_started(&job->common.job)) {
+>>>>>>> +        return 0;
+>>>>>>> +    }
+>>>>>>
+>>>>>> Hmm, sorry if it is a stupid question, I'm not good in multiproces=
+sing and in
+>>>>>> Qemu iothreads..
+>>>>>>
+>>>>>> job_started just reads job->co. If bs runs in iothread, and theref=
+ore write-notifier
+>>>>>> is in iothread, when job_start is called from main thread.. Is it =
+guaranteed that
+>>>>>> write-notifier will see job->co variable change early enough to no=
+t miss guest write?
+>>>>>> Should not job->co be volatile for example or something like this?
+>>>>>>
+>>>>>> If not think about this patch looks good for me.
+>>>>>>
+>>>>>
+>>>>> You know, it's a really good question.
+>>>>> So good, in fact, that I have no idea.
+>>>>>
+>>>>> =C2=AF\_(=E3=83=84)_/=C2=AF
+>>>>>
+>>>>> I'm fairly certain that IO will not come in until the .clean phase =
+of a
+>>>>> qmp_transaction, because bdrv_drained_begin(bs) is called during
+>>>>> .prepare, and we activate the handler (by starting the job) in .com=
+mit.
+>>>>> We do not end the drained section until .clean.
+>>>>>
+>>>>> I'm not fully clear on what threading guarantees we have otherwise,
+>>>>> though; is it possible that "Thread A" would somehow lift the bdrv_=
+drain
+>>>>> on an IO thread ("Thread B") and, after that, "Thread B" would some=
+how
+>>>>> still be able to see an outdated version of job->co that was set by
+>>>>> "Thread A"?
+>>>>>
+>>>>> I doubt it; but I can't prove it.
+>>>>
+>>>> In the qmp_backup() case (not qmp_transaction()) there is:
+>>>>
+>>>>    void qmp_drive_backup(DriveBackup *arg, Error **errp)
+>>>>    {
+>>>>
+>>>>        BlockJob *job;
+>>>>        job =3D do_drive_backup(arg, NULL, errp);
+>>>>        if (job) {
+>>>>            job_start(&job->job);
+>>>>        }
+>>>>    }
+>>>>
+>>>> job_start() is called without any thread synchronization, which is
+>>>> usually fine because the coroutine doesn't run until job_start() cal=
+ls
+>>>> aio_co_enter().
+>>>>
+>>>> Now that the before write notifier has been installed early, there i=
+s
+>>>> indeed a race between job_start() and the write notifier accessing
+>>>> job->co from an IOThread.
+>>>>
+>>>> The write before notifier might see job->co !=3D NULL before job_sta=
+rt()
+>>>> has finished.  This could lead to issues if job_*() APIs are invoked=
+ by
+>>>> the write notifier and access an in-between job state.
+>>>>
+>>>
+>>> I see. I think in this case, as long as it sees !=3D NULL, that the
+>>> notifier is actually safe to run. I agree that this might be confusin=
+g
+>>> to verify and could bite us in the future. The worry we had, too, is
+>>> more the opposite: will it see NULL for too long? We want to make sur=
 e
->> original idea of filtering out jobserver-related options from MAKEFLAG=
-S.
->> So do that.
+>>> that it is registering as true *before the first yield*.
+>>>
+>>>> A safer approach is to set a BackupBlockJob variable at the beginnin=
+g of
+>>>> backup_run() and check it from the before write notifier.
+>>>>
+>>>
+>>> That's too late, for reasons below.
+>>>
+>>>> That said, I don't understand the benefit of this patch and IMO it m=
+akes
+>>>> the code harder to understand because now we need to think about the
+>>>> created but not started state too.
+>>>>
+>>>> Stefan
+>>>>
+>>>
+>>> It's always possible I've hyped myself up into believing there's a
+>>> problem where there isn't one, but the fear is this:
+>>>
+>>> The point in time from a QMP transaction covers the job creation and =
+the
+>>> job start, but when we start the job it will actually yield before we
+>>> get to backup_run -- and there is no guarantee that the handler will =
+get
+>>> installed synchronously, so the point in time ends before the handler
+>>> activates.
+>>>
+>>
+>> i.e., the handler might get installed AFTER the critical region of a
+>> transaction. We could drop initial writes if we were unlucky.
+>>
+>> (I think.)
+>>
+>>> The yield occurs in job_co_entry as an intentional feature of forcing=
+ a
+>>> yield and pause point at run time -- so it's harder to write a job th=
+at
+>>> accidentally hogs the thread during initialization.
+>>>
+>>> This is an attempt to get the handler installed earlier to ensure the
+>>> point of time stays synchronized with creation time to provide a
+>>> stronger transactional guarantee.
+>>>
+>>
+>> Squeaky wheel gets the grease. Any comment?
+>>
 >=20
-> FYI I tried uninstalling python2 on Fedora 29,
->=20
-> $ make -C roms efi -j8
-> make: Entering directory '/home/phil/source/qemu/roms'
-> make -C edk2/BaseTools \
->         EXTRA_OPTFLAGS=3D'' \
->         EXTRA_LDFLAGS=3D''
-> make[1]: Entering directory '/home/phil/source/qemu/roms/edk2/BaseTools=
-'
-> [...]
-> make -C Tests
-> make[2]: Entering directory
-> '/home/phil/source/qemu/roms/edk2/BaseTools/Tests'
-> /bin/sh: python: command not found
-> make[2]: *** [GNUmakefile:11: test] Error 127
->=20
-> 'python' seems to be provided by python-unversioned-command which is
-> wired to Python2:
->=20
-> $ dnf info python-unversioned-command
-> Last metadata expiration check: 0:03:08 ago on Thu 19 Sep 2019 04:21:21
-> PM UTC.
-> Available Packages
-> Name         : python-unversioned-command
-> Version      : 2.7.16
-> Release      : 2.fc29
-> Arch         : noarch
-> Size         : 13 k
-> Source       : python2-2.7.16-2.fc29.src.rpm
-> Repo         : updates
-> Summary      : The "python" command that runs Python 2
-> URL          : https://www.python.org/
-> License      : Python
-> Description  : This package contains /usr/bin/python - the "python"
-> command that runs Python 2.
->=20
-> I had to manually run update-alternatives to continue:
->=20
-> $ sudo update-alternatives --install /usr/bin/python python
-> /usr/bin/python3 69
->=20
-> Not sure this is the expected behavior, it is confusing.
+> Hmm, this all becomes difficult, I'd prefer to not worry and wait for b=
+ackup-top
+> filter applied.
 >=20
 
-The python detection is not fool-proof in edk2. A description is given at=
-:
+If it goes into 4.2, then OK, but I'd still like to understand what's
+going on here, actually.
 
-https://github.com/tianocore/tianocore.github.io/wiki/BaseTools-Support-P=
-ython2-Python3
-
-To summarize that, it works like this, on Linux:
-
-- if you set PYTHON_COMMAND, then the binary pointed to by
-PYTHON_COMMAND will be used. The edk2 build infrastructure will
-determine whether the pointed-to binary is python 2 or python 3, and
-branch to the corresponding implementation of the build tools.
-
-- Otherwise, *minor* version auto-detection is attempted. With
-PYTHON3_ENABLE unset, or set to "TRUE", this minor version autodetection
-will aim at minor versions of python3.
-
-- Otherwise (=3D PYTHON3_ENABLE set to a string different from "TRUE"),
-the minor version auto-detection will focus on python2.
-
-With this patch applied, the middle case is active. Apparently it fails,
-because the edk2 build tools developers could not foresee the situations
-that you've exposed the auto-detection to, on Ubuntu and Fedora. Back
-when I tested the python3 enablement in edk2, I checked the patches in
-the following environments:
-
-- on RHEL-7 with the system python 2,
-- on RHEL-7 with python3.4 from EPEL-7,
-- on RHEL-8 with python3.6,
-- on RHEL-8 with platform-python.
-
-Everything worked fine for me. I have no clue what's going on in Ubuntu
-and in Fedora.
-
-Can we require all build host installations -- where we expect to run
-"make efi" -- to provide a Python 3 binary on $PATH that is plainly
-called "python3"?
-
-Then I think this patch should work. (If necessary, I could set
-"PYTHON_COMMAND=3Dpython3", too.)
-
-Thanks!
-Laszlo
+--js
 
