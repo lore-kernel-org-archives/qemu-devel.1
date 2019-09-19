@@ -8,77 +8,78 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A3B7C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 21:38:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E526C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 21:38:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51648208C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 21:38:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E8F37208C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 21:38:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SLWRQjRf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51648208C0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qYG/PH9T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8F37208C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB485-0006hl-UT
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 17:38:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53572)
+	id 1iB488-0006mv-B9
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 17:38:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53656)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iB3uq-0002oz-KN
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:24:42 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1iB3uv-0002tD-91
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:24:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iB3uo-0000ex-9O
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:24:40 -0400
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:40962)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1iB3us-0000jH-Lg
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:24:44 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44247)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1iB3um-0000bf-5o
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:24:37 -0400
-Received: by mail-wr1-x42f.google.com with SMTP id h7so4600542wrw.8
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 14:24:33 -0700 (PDT)
+ id 1iB3uq-0000h9-IW
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:24:42 -0400
+Received: by mail-wr1-x442.google.com with SMTP id i18so4581957wru.11
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 14:24:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=I1lTNtGdmCXDaEAxgrssEq6HlR95R7rdwP0M4w4IEEo=;
- b=SLWRQjRfTBl2M1TNSdQ4dKVNKSadRdGd+XpCibc1dpzIi5FfTtJ/ULTJn4fjhsvEs3
- uzTKHeQ2fL0RRmoXHYy+HNbFOgNRHhodDXoBJ2Dfok4q9GZsFkC5OlgHhTD9OiDFq+mv
- C4RcvvJzRSktwEuF8hiQ78zgftN/R7iIPX0HQsy6F76Rf35J96k7rqUyd6+sVySAso0S
- c+D93kxq06GvJ9V9mbEhIcRZoVKRMgU3WinQhRnlngAUqn1skdNhXBMPZokW/WR7LWck
- yOfsRx0pqhjmowZimLz94L0O2lUIJj79QppziDTuPPm+BGgxr2k4TglgBLUs8vAAwA8l
- /0Zg==
+ bh=hBNbSNYdRxpi4YPwJzeBrQcOF4eLYJl4drOoaIZgmh0=;
+ b=qYG/PH9TAJA2E3I9z14eo1AM0NVKw0EoWcxBq/VOw4CBOyly+wSPNYG6VmNBkavyre
+ +fzp+avRUTYVP2/eDn4+xCF7GpB2XI2bn+f9FYXiNrhLl07/7aPKnTrJjJucyqxLIthZ
+ B5/ymK4ywvnqoQgoeCCMvO2UTbQ/x7lYWaADUeSh05kKfCHWZzLwQgU2tmSpnO+LVx50
+ uavtMFGpft8W4UKGcB/z1BfcIIth+vmpIsL1vRPR08xoerarXUWvAxae8/Rq1Jxjamx2
+ MWJ34N0z7hQpY185bgG9wsVozmwxtMJ7bSAUyGgf+oPt8i0UXMgg2f8TInPiG+j2vB1I
+ bFjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=I1lTNtGdmCXDaEAxgrssEq6HlR95R7rdwP0M4w4IEEo=;
- b=BY8Ea6ujYBATKGKiCt5kIDz0oLiOffQfPjAKnR7DOKLozGBh8M58QBbj9wIVJFFHsZ
- KsoqT9Edc0UVOkYax8AjVoloe65SU5bM0a6Dgikg8L/DiL3g1b0JuEcSV/FtN4GA/oLS
- 3uTFOiWdbbylb9Tk3vR15NuC4LFRrlXZ6dkgisxbhAjg28AXhFWaCvkLrla++0sfYNlc
- 1IdgYu0hbmL+CXToqaQGAMaugeEMuYV9nuhKXQ2wbwexSwWoZJuLH3+qVYWaaILGC7Fe
- 3V7dQSJ6rmZ7kaMumdHBZIGKxV7m2TGEr98W2lTTKTfxPiXi5Ha8ZaE+jvZkkFKUo/ny
- V4fw==
-X-Gm-Message-State: APjAAAVh+geQuuAiLzkd31HfnhbiofVPAxW/4ZiV7CDsAdikpqzOxiZY
- x7ktVZMaWq20euv3GonnWBDa81sd
-X-Google-Smtp-Source: APXvYqx2l8reSeyBKZTu2QZYuXmUiH6QPK6syP7WnrUufcjbh2Jp4OP7CSVONRUGLYxiS4jRjxX0WA==
-X-Received: by 2002:a5d:620d:: with SMTP id y13mr7861038wru.86.1568928272515; 
- Thu, 19 Sep 2019 14:24:32 -0700 (PDT)
+ bh=hBNbSNYdRxpi4YPwJzeBrQcOF4eLYJl4drOoaIZgmh0=;
+ b=fs6hQuDZLOfmBmrt1lZv6g9YTmyluBzqUbfMZ7UJPQUrNAXJzurpMZfhmzUcGKPBs/
+ BA9GCc4NgdAl0zwWT0VgRM3u7skCbj46nHLvJTuA1674JF9OubJkgrIlMprgPUVKQcIX
+ HJaLop0CfH8G2gAXJnPHv5KCFyAXC4vvnON9umi0mI2ZdsPIjbfHP1Pl4wA7m5cpCyep
+ 5WIfPLJKAbzM3E979YsSnOlVPN1euIWvQgP7WI2yLyUDfCogPRQmc/S/5nUcUfErYyEq
+ S9yARN28+cTCXWu27kUwigVfKT9tF4hj+4rggk+EhLWZyDn07GHlARr3GqUM6pFp7z4R
+ eIXA==
+X-Gm-Message-State: APjAAAXYWKJLipGt0ZsYGe/rct0PaKbJV89tL7/hK8azcZuY9mH8u4JL
+ +nQ9wzbVgxN7HdgHN83T/coHLl5a
+X-Google-Smtp-Source: APXvYqw5xuUIwvXtnTghIehZQONtnXxXl2zaK3tNNehqdEzVbXDfrCg626EwAhctGH/QPgYGr/ki4w==
+X-Received: by 2002:a5d:4745:: with SMTP id o5mr8418666wrs.125.1568928279259; 
+ Thu, 19 Sep 2019 14:24:39 -0700 (PDT)
 Received: from nullptr.home.dirty-ice.org
  (2a01-036c-0113-74ef-0000-0000-0000-0005.pool6.digikabel.hu.
  [2a01:36c:113:74ef::5])
- by smtp.gmail.com with ESMTPSA id w125sm13191292wmg.32.2019.09.19.14.24.31
+ by smtp.gmail.com with ESMTPSA id w125sm13191292wmg.32.2019.09.19.14.24.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Sep 2019 14:24:31 -0700 (PDT)
+ Thu, 19 Sep 2019 14:24:38 -0700 (PDT)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
  <dirty.ice.hu@gmail.com>
 X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
  <DirtY.iCE.hu@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 10/24] wavaudio: port to the new audio backend api
-Date: Thu, 19 Sep 2019 23:24:18 +0200
-Message-Id: <eede77aeb9c17b379948b0b6d2ac10f45d74fa62.1568927990.git.DirtY.iCE.hu@gmail.com>
+Subject: [PATCH v4 18/24] audio: support more than two channels in volume
+ setting
+Date: Thu, 19 Sep 2019 23:24:26 +0200
+Message-Id: <554e7d54424036e01ac0be8d5baccd2ccc8393cc.1568927990.git.DirtY.iCE.hu@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <cover.1568927990.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1568927990.git.DirtY.iCE.hu@gmail.com>
@@ -87,7 +88,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42f
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,122 +107,212 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
+ audio/audio.c      | 30 ++++++++++++++++++++++--------
+ audio/audio.h      | 10 ++++++++++
+ audio/audio_int.h  |  4 ++--
+ audio/paaudio.c    | 20 ++++++++++++--------
+ audio/spiceaudio.c | 14 ++++++++------
+ 5 files changed, 54 insertions(+), 24 deletions(-)
 
-Notes:
-    Changes from v3:
-    
-    * fix compilation on 32-bit targets
-
- audio/wavaudio.c | 54 ++++++++----------------------------------------
- 1 file changed, 9 insertions(+), 45 deletions(-)
-
-diff --git a/audio/wavaudio.c b/audio/wavaudio.c
-index b6eeeb4e26..78af2f1338 100644
---- a/audio/wavaudio.c
-+++ b/audio/wavaudio.c
-@@ -36,52 +36,28 @@ typedef struct WAVVoiceOut {
-     HWVoiceOut hw;
-     FILE *f;
-     int64_t old_ticks;
--    void *pcm_buf;
-     int total_samples;
- } WAVVoiceOut;
+diff --git a/audio/audio.c b/audio/audio.c
+index d616a4af98..f1c145dfcd 100644
+--- a/audio/audio.c
++++ b/audio/audio.c
+@@ -1891,31 +1891,45 @@ void AUD_del_capture (CaptureVoiceOut *cap, void *cb_opaque)
+ }
  
--static size_t wav_run_out(HWVoiceOut *hw, size_t live)
-+static size_t wav_write_out(HWVoiceOut *hw, void *buf, size_t len)
+ void AUD_set_volume_out (SWVoiceOut *sw, int mute, uint8_t lvol, uint8_t rvol)
++{
++    Volume vol = { .mute = mute, .channels = 2, .vol = { lvol, rvol } };
++    audio_set_volume_out(sw, &vol);
++}
++
++void audio_set_volume_out(SWVoiceOut *sw, Volume *vol)
  {
-     WAVVoiceOut *wav = (WAVVoiceOut *) hw;
--    size_t rpos, decr, samples;
--    uint8_t *dst;
--    struct st_sample *src;
-     int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-     int64_t ticks = now - wav->old_ticks;
-     int64_t bytes =
-         muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECOND);
+     if (sw) {
+         HWVoiceOut *hw = sw->hw;
  
--    if (bytes > INT_MAX) {
--        samples = INT_MAX >> hw->info.shift;
--    }
--    else {
--        samples = bytes >> hw->info.shift;
--    }
--
-+    bytes = MIN(bytes, len);
-+    bytes = bytes >> hw->info.shift << hw->info.shift;
-     wav->old_ticks = now;
--    decr = MIN (live, samples);
--    samples = decr;
--    rpos = hw->rpos;
--    while (samples) {
--        int left_till_end_samples = hw->samples - rpos;
--        int convert_samples = MIN (samples, left_till_end_samples);
--
--        src = hw->mix_buf + rpos;
--        dst = advance (wav->pcm_buf, rpos << hw->info.shift);
--
--        hw->clip (dst, src, convert_samples);
--        if (fwrite (dst, convert_samples << hw->info.shift, 1, wav->f) != 1) {
--            dolog ("wav_run_out: fwrite of %d bytes failed\nReaons: %s\n",
--                   convert_samples << hw->info.shift, strerror (errno));
--        }
+-        sw->vol.mute = mute;
+-        sw->vol.l = nominal_volume.l * lvol / 255;
+-        sw->vol.r = nominal_volume.r * rvol / 255;
++        sw->vol.mute = vol->mute;
++        sw->vol.l = nominal_volume.l * vol->vol[0] / 255;
++        sw->vol.r = nominal_volume.l * vol->vol[vol->channels > 1 ? 1 : 0] /
++            255;
  
--        rpos = (rpos + convert_samples) % hw->samples;
--        samples -= convert_samples;
--        wav->total_samples += convert_samples;
-+    if (bytes && fwrite(buf, bytes, 1, wav->f) != 1) {
-+        dolog("wav_write_out: fwrite of %" PRId64 " bytes failed\nReason: %s\n",
-+              bytes, strerror(errno));
+         if (hw->pcm_ops->volume_out) {
+-            hw->pcm_ops->volume_out(hw, &sw->vol);
++            hw->pcm_ops->volume_out(hw, vol);
+         }
      }
- 
--    hw->rpos = rpos;
--    return decr;
-+    wav->total_samples += bytes >> hw->info.shift;
-+    return bytes;
  }
  
- /* VICE code: Store number as little endian. */
-@@ -137,13 +113,6 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
-     audio_pcm_init_info (&hw->info, &wav_as);
+ void AUD_set_volume_in (SWVoiceIn *sw, int mute, uint8_t lvol, uint8_t rvol)
++{
++    Volume vol = { .mute = mute, .channels = 2, .vol = { lvol, rvol } };
++    audio_set_volume_in(sw, &vol);
++}
++
++void audio_set_volume_in(SWVoiceIn *sw, Volume *vol)
+ {
+     if (sw) {
+         HWVoiceIn *hw = sw->hw;
  
-     hw->samples = 1024;
--    wav->pcm_buf = audio_calloc(__func__, hw->samples, 1 << hw->info.shift);
--    if (!wav->pcm_buf) {
--        dolog("Could not allocate buffer (%zu bytes)\n",
--              hw->samples << hw->info.shift);
--        return -1;
--    }
--
-     le_store (hdr + 22, hw->info.nchannels, 2);
-     le_store (hdr + 24, hw->info.freq, 4);
-     le_store (hdr + 28, hw->info.freq << (bits16 + stereo), 4);
-@@ -153,8 +122,6 @@ static int wav_init_out(HWVoiceOut *hw, struct audsettings *as,
-     if (!wav->f) {
-         dolog ("Failed to open wave file `%s'\nReason: %s\n",
-                wav_path, strerror(errno));
--        g_free (wav->pcm_buf);
--        wav->pcm_buf = NULL;
-         return -1;
-     }
+-        sw->vol.mute = mute;
+-        sw->vol.l = nominal_volume.l * lvol / 255;
+-        sw->vol.r = nominal_volume.r * rvol / 255;
++        sw->vol.mute = vol->mute;
++        sw->vol.l = nominal_volume.l * vol->vol[0] / 255;
++        sw->vol.r = nominal_volume.r * vol->vol[vol->channels > 1 ? 1 : 0] /
++            255;
  
-@@ -208,9 +175,6 @@ static void wav_fini_out (HWVoiceOut *hw)
-                wav->f, strerror (errno));
+         if (hw->pcm_ops->volume_in) {
+-            hw->pcm_ops->volume_in(hw, &sw->vol);
++            hw->pcm_ops->volume_in(hw, vol);
+         }
      }
-     wav->f = NULL;
--
--    g_free (wav->pcm_buf);
--    wav->pcm_buf = NULL;
  }
+diff --git a/audio/audio.h b/audio/audio.h
+index c74abb8c47..0db3c7dd5e 100644
+--- a/audio/audio.h
++++ b/audio/audio.h
+@@ -124,6 +124,16 @@ uint64_t AUD_get_elapsed_usec_out (SWVoiceOut *sw, QEMUAudioTimeStamp *ts);
+ void AUD_set_volume_out (SWVoiceOut *sw, int mute, uint8_t lvol, uint8_t rvol);
+ void AUD_set_volume_in (SWVoiceIn *sw, int mute, uint8_t lvol, uint8_t rvol);
  
- static int wav_ctl_out (HWVoiceOut *hw, int cmd, ...)
-@@ -234,7 +198,7 @@ static void wav_audio_fini (void *opaque)
- static struct audio_pcm_ops wav_pcm_ops = {
-     .init_out = wav_init_out,
-     .fini_out = wav_fini_out,
--    .run_out  = wav_run_out,
-+    .write    = wav_write_out,
-     .ctl_out  = wav_ctl_out,
++#define AUDIO_MAX_CHANNELS 16
++typedef struct Volume {
++    bool mute;
++    int channels;
++    uint8_t vol[AUDIO_MAX_CHANNELS];
++} Volume;
++
++void audio_set_volume_out(SWVoiceOut *sw, Volume *vol);
++void audio_set_volume_in(SWVoiceIn *sw, Volume *vol);
++
+ SWVoiceIn *AUD_open_in (
+     QEMUSoundCard *card,
+     SWVoiceIn *sw,
+diff --git a/audio/audio_int.h b/audio/audio_int.h
+index 22a703c13e..9176db249b 100644
+--- a/audio/audio_int.h
++++ b/audio/audio_int.h
+@@ -166,7 +166,7 @@ struct audio_pcm_ops {
+      */
+     size_t (*put_buffer_out)(HWVoiceOut *hw, void *buf, size_t size);
+     void   (*enable_out)(HWVoiceOut *hw, bool enable);
+-    void   (*volume_out)(HWVoiceOut *hw, struct mixeng_volume *vol);
++    void   (*volume_out)(HWVoiceOut *hw, Volume *vol);
+ 
+     int    (*init_in) (HWVoiceIn *hw, audsettings *as, void *drv_opaque);
+     void   (*fini_in) (HWVoiceIn *hw);
+@@ -174,7 +174,7 @@ struct audio_pcm_ops {
+     void  *(*get_buffer_in)(HWVoiceIn *hw, size_t *size);
+     void   (*put_buffer_in)(HWVoiceIn *hw, void *buf, size_t size);
+     void   (*enable_in)(HWVoiceIn *hw, bool enable);
+-    void   (*volume_in)(HWVoiceIn *hw, struct mixeng_volume *vol);
++    void   (*volume_in)(HWVoiceIn *hw, Volume *vol);
  };
  
+ void *audio_generic_get_buffer_in(HWVoiceIn *hw, size_t *size);
+diff --git a/audio/paaudio.c b/audio/paaudio.c
+index 6ccdf31415..d195b1caa8 100644
+--- a/audio/paaudio.c
++++ b/audio/paaudio.c
+@@ -531,20 +531,22 @@ static void qpa_fini_in (HWVoiceIn *hw)
+     }
+ }
+ 
+-static void qpa_volume_out(HWVoiceOut *hw, struct mixeng_volume *vol)
++static void qpa_volume_out(HWVoiceOut *hw, Volume *vol)
+ {
+     PAVoiceOut *pa = (PAVoiceOut *) hw;
+     pa_operation *op;
+     pa_cvolume v;
+     PAConnection *c = pa->g->conn;
++    int i;
+ 
+ #ifdef PA_CHECK_VERSION    /* macro is present in 0.9.16+ */
+     pa_cvolume_init (&v);  /* function is present in 0.9.13+ */
+ #endif
+ 
+-    v.channels = 2;
+-    v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->l) / UINT32_MAX;
+-    v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->r) / UINT32_MAX;
++    v.channels = vol->channels;
++    for (i = 0; i < vol->channels; ++i) {
++        v.values[i] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->vol[i]) / 255;
++    }
+ 
+     pa_threaded_mainloop_lock(c->mainloop);
+ 
+@@ -571,20 +573,22 @@ static void qpa_volume_out(HWVoiceOut *hw, struct mixeng_volume *vol)
+     pa_threaded_mainloop_unlock(c->mainloop);
+ }
+ 
+-static void qpa_volume_in(HWVoiceIn *hw, struct mixeng_volume *vol)
++static void qpa_volume_in(HWVoiceIn *hw, Volume *vol)
+ {
+     PAVoiceIn *pa = (PAVoiceIn *) hw;
+     pa_operation *op;
+     pa_cvolume v;
+     PAConnection *c = pa->g->conn;
++    int i;
+ 
+ #ifdef PA_CHECK_VERSION
+     pa_cvolume_init (&v);
+ #endif
+ 
+-    v.channels = 2;
+-    v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->l) / UINT32_MAX;
+-    v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->r) / UINT32_MAX;
++    v.channels = vol->channels;
++    for (i = 0; i < vol->channels; ++i) {
++        v.values[i] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->vol[i]) / 255;
++    }
+ 
+     pa_threaded_mainloop_lock(c->mainloop);
+ 
+diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
+index 9860f9c5e1..6ed7f7a79e 100644
+--- a/audio/spiceaudio.c
++++ b/audio/spiceaudio.c
+@@ -179,13 +179,14 @@ static void line_out_enable(HWVoiceOut *hw, bool enable)
+ }
+ 
+ #if ((SPICE_INTERFACE_PLAYBACK_MAJOR >= 1) && (SPICE_INTERFACE_PLAYBACK_MINOR >= 2))
+-static void line_out_volume(HWVoiceOut *hw, struct mixeng_volume *vol)
++static void line_out_volume(HWVoiceOut *hw, Volume *vol)
+ {
+     SpiceVoiceOut *out = container_of(hw, SpiceVoiceOut, hw);
+     uint16_t svol[2];
+ 
+-    svol[0] = vol->l / ((1ULL << 16) + 1);
+-    svol[1] = vol->r / ((1ULL << 16) + 1);
++    assert(vol->channels == 2);
++    svol[0] = vol->vol[0] * 257;
++    svol[1] = vol->vol[1] * 257;
+     spice_server_playback_set_volume(&out->sin, 2, svol);
+     spice_server_playback_set_mute(&out->sin, vol->mute);
+ }
+@@ -262,13 +263,14 @@ static void line_in_enable(HWVoiceIn *hw, bool enable)
+ }
+ 
+ #if ((SPICE_INTERFACE_RECORD_MAJOR >= 2) && (SPICE_INTERFACE_RECORD_MINOR >= 2))
+-static void line_in_volume(HWVoiceIn *hw, struct mixeng_volume *vol)
++static void line_in_volume(HWVoiceIn *hw, Volume *vol)
+ {
+     SpiceVoiceIn *in = container_of(hw, SpiceVoiceIn, hw);
+     uint16_t svol[2];
+ 
+-    svol[0] = vol->l / ((1ULL << 16) + 1);
+-    svol[1] = vol->r / ((1ULL << 16) + 1);
++    assert(vol->channels == 2);
++    svol[0] = vol->vol[0] * 257;
++    svol[1] = vol->vol[1] * 257;
+     spice_server_record_set_volume(&in->sin, 2, svol);
+     spice_server_record_set_mute(&in->sin, vol->mute);
+ }
 -- 
 2.23.0
 
