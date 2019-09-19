@@ -2,98 +2,71 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AEF8C49ED7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B025DC3A5A6
 	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 11:29:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3438A21929
+	by mail.kernel.org (Postfix) with ESMTPS id 895BF21929
 	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 11:29:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3438A21929
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 895BF21929
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAucr-0003ui-HX
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 07:29:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59148)
+	id 1iAucs-0003xW-8o
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 07:29:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59777)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iAuY1-0005rL-Ii
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 07:24:30 -0400
+ (envelope-from <kwolf@redhat.com>) id 1iAuaj-0001Pu-1I
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 07:27:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iAuO0-0003eu-Vw
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 07:14:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48438)
+ (envelope-from <kwolf@redhat.com>) id 1iAuah-0002bl-OJ
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 07:27:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42676)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iAuO0-0003e9-OI
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 07:14:08 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iAuah-0002bP-Go
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 07:27:15 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3BCB7C04B940
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 11:14:07 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id l6so906691wrn.2
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 04:14:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ksW9OAKIwlqoKZgEZg5+dj3rDJ+7uCseXlk3mec/F8A=;
- b=Mqk2kIZs+3SCRU2K3PwCGgiV935jAR15ZUKrWQS1n7Cu/0gReYcsMiiO+PaZg1cU8R
- vsM7td47DqJnXITh2E5x9CMXP8PHwi03zLN/rj/9swrhO4V8Hn3V7gz7gxXS7RfOz/eK
- dxl2jMX3ia+71GY4qOyo2UbxGU26kcX5iZd96Z3mMEgtTRcG19KcNvFqhgJXx2co+KDd
- 1J/KpIiBo8ddwXBxrrjUV3KH35EUZp23hjxXdUP6UETdZEjissT1mrdM0XBSiT0xFBSL
- GI8l0mEDQI+WA38ADZo/b7AcOdzJLq2a8TRZlX0RP8DPur57KomsDmLjuaRF2YjYGp3q
- Z7Pg==
-X-Gm-Message-State: APjAAAUpaCMMFmWVXAQynU1oK4FNp0M6o1PKmHGSLHjPHLhZo0Lb/d6N
- FQt28/FV6lmfS1YCCqQqMgP6o9NU6ObllWClV4YMJNZPHBMb0/jsKBuD8LZWCY/cA3z6PdAQYa4
- RDmAdUvNfFBVd4Oc=
-X-Received: by 2002:adf:de03:: with SMTP id b3mr6316916wrm.14.1568891645650;
- Thu, 19 Sep 2019 04:14:05 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwXrYCumNAY0fVfgMJAEcbTYIyAAwlm5LqPAfabqrxFAUQpT/zfdctgCljn6ro/hRe3goQXCA==
-X-Received: by 2002:adf:de03:: with SMTP id b3mr6316900wrm.14.1568891645403;
- Thu, 19 Sep 2019 04:14:05 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8?
- ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
- by smtp.gmail.com with ESMTPSA id c132sm7555037wme.27.2019.09.19.04.14.04
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 19 Sep 2019 04:14:04 -0700 (PDT)
-To: "Tian, Kevin" <kevin.tian@intel.com>, Jason Wang <jasowang@redhat.com>,
- "Zhao, Yan Y" <yan.y.zhao@intel.com>
-References: <AADFC41AFE54684AB9EE6CBC0274A5D19D577BEA@SHSMSX104.ccr.corp.intel.com>
- <60110ea3-9228-7e5d-ea32-05c72a95af0b@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D57A080@SHSMSX104.ccr.corp.intel.com>
- <8302a4ae-1914-3046-b3b5-b3234d7dda02@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D57B1D1@SHSMSX104.ccr.corp.intel.com>
- <6d73572e-1e89-b04a-bdd6-98ac73798083@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D57B90C@SHSMSX104.ccr.corp.intel.com>
- <204219fa-ee72-ca60-52a4-fb4bbc887773@redhat.com>
- <20190919052819.GA18391@joy-OptiPlex-7040>
- <7b6d6343-33de-ebd7-9846-af54a45a82a2@redhat.com>
- <20190919061756.GB18391@joy-OptiPlex-7040>
- <e0efbdc0-aad9-0d17-ec68-36460865501f@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D57DD2A@SHSMSX104.ccr.corp.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <1ec55b2e-6a59-f1df-0604-5b524da0f001@redhat.com>
-Date: Thu, 19 Sep 2019 13:14:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 9E42F10CC1E6;
+ Thu, 19 Sep 2019 11:27:14 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.36.116.255])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 549E660872;
+ Thu, 19 Sep 2019 11:27:04 +0000 (UTC)
+Date: Thu, 19 Sep 2019 13:27:02 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Message-ID: <20190919112702.GC10163@localhost.localdomain>
+References: <156872146565.1757.3033215873677512474.stgit@pasha-Precision-3630-Tower>
+ <156872148244.1757.2888672921697745021.stgit@pasha-Precision-3630-Tower>
+ <20190918091831.GD5207@localhost.localdomain>
+ <001201d56e02$9d88b5f0$d89a21d0$@ru>
+ <20190918093305.GF5207@localhost.localdomain>
+ <001401d56e04$b93c02a0$2bb407e0$@ru>
+ <20190918094436.GG5207@localhost.localdomain>
+ <001501d56e06$bbd7aa30$3386fe90$@ru>
+ <20190919085302.GA10163@localhost.localdomain>
+ <001901d56ec9$620ae260$2620a720$@ru>
 MIME-Version: 1.0
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D57DD2A@SHSMSX104.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <001901d56ec9$620ae260$2620a720$@ru>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Thu, 19 Sep 2019 11:27:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] vhost, iova, and dirty page tracking
+Subject: Re: [Qemu-devel] [for-4.2 PATCH 3/6] replay: update docs for
+ record/replay with block devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,50 +78,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: 'Alex Williamson' <alex.williamson@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru, quintela@redhat.com,
+ ciro.santilli@gmail.com, jasowang@redhat.com, crosthwaite.peter@gmail.com,
+ qemu-devel@nongnu.org, armbru@redhat.com, alex.bennee@linaro.org,
+ maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com,
+ boost.lists@gmail.com, thomas.dullien@googlemail.com, pbonzini@redhat.com,
+ mreitz@redhat.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/09/19 09:16, Tian, Kevin wrote:
->>> why GPA1 and GPA2 should be both dirty?
->>> even they have the same HVA due to overlaping virtual address space in
->>> two processes, they still correspond to two physical pages.
->>> don't get what's your meaning :)
->>
->> The point is not leave any corner case that is hard to debug or fix in
->> the future.
->>
->> Let's just start by a single process, the API allows userspace to maps
->> HVA to both GPA1 and GPA2. Since it knows GPA1 and GPA2 are equivalent,
->> it's ok to sync just through GPA1. That means if you only log GPA2, it
->> won't work.
+Am 19.09.2019 um 11:05 hat Pavel Dovgalyuk geschrieben:
+> > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > > >
+> > > > However, global -snapshot is just a convenient shortcut for specifying
+> > > > snapshot=on for all -drive arguments. So if -snapshot is incompatible
+> > > > with replay, shouldn't manually marking all drives as snapshot=on be
+> > > > incompatible as well?
+> > > >
+> > > > Maybe you're really interested in some specific drive not having
+> > > > snapshot=on? But then it might be better to check that specific drive
+> > > > instad of forbidding just the shortcut for setting it.
+> > >
+> > > -snapshot adds the flag for top-level drive, making driver operations
+> > > dependent on temporary file structure.
+> > >
+> > > Moving this overlay beneath blkreplay driver makes drive operations
+> > > deterministic for the top-level device.
+> > 
+> > So the real requirement is that blkreplay is the top-level node of any
+> > guest device, right? And only because of this, you can't use -snapshot
+> > (or snapshot=on on the blkreplay driver).
+> > 
+> > If we instead check e.g. in blk_insert_bs() or blk_attach_dev() that in
+> > record/replay mode, the root node of the BlockBackend is blkreplay,
+> > wouldn't we catch many more incorrect setups?
 > 
-> I noted KVM itself doesn't consider such situation (one HVA is mapped
-> to multiple GPAs), when doing its dirty page tracking. If you look at
-> kvm_vcpu_mark_page_dirty, it simply finds the unique memslot which
-> contains the dirty gfn and then set the dirty bit within that slot. It
-> doesn't attempt to walk all memslots to find out any other GPA which
-> may be mapped to the same HVA. 
-> 
-> So there must be some disconnect here. let's hear from Paolo first and
-> understand the rationale behind such situation.
+> That sounds interesting.
+> Will it help to check that every backend is connected to blkreplay?
 
-In general, userspace cannot assume that it's okay to sync just through
-GPA1.  It must sync the host page if *either* GPA1 or GPA2 are marked dirty.
+Yes, it would return an error when you try to attach a non-blkreplay
+node to a BlockBackend (and every guest device uses a BlockBackend).
 
-The situation really only arises in special cases.  For example,
-0xfffe0000..0xffffffff and 0xe0000..0xfffff might be the same memory.
-From "info mtree" before the guest boots:
+Note that this restriction would currently make block jobs unavailable
+on non-blkreplay nodes as they also use BlockBackends internally (though
+this is going to change in the long run). I believe this restriction is
+harmless and the typical replay use case doesn't involve any block jobs,
+but if you do think it's a problem, blk_attach_dev() would be the place
+that affects only devices.
 
-    0000000000000000-ffffffffffffffff (prio -1, i/o): pci
-      00000000000e0000-00000000000fffff (prio 1, i/o): alias isa-bios
-@pc.bios 0000000000020000-000000000003ffff
-      00000000fffc0000-00000000ffffffff (prio 0, rom): pc.bios
+> How then this check has to be done?
 
-However, non-x86 machines may have other cases of aliased memory so it's
-a case that you should cover.
+Only compile-tested, but maybe something like below?
 
-Paolo
+Kevin
+
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 0422acdf1c..9fa72bea51 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -955,6 +955,7 @@ static inline BlockDriverState *backing_bs(BlockDriverState *bs)
+ extern BlockDriver bdrv_file;
+ extern BlockDriver bdrv_raw;
+ extern BlockDriver bdrv_qcow2;
++extern BlockDriver bdrv_blkreplay;
+ 
+ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+     int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
+diff --git a/block/blkreplay.c b/block/blkreplay.c
+index 2b7931b940..16a4f1df6a 100644
+--- a/block/blkreplay.c
++++ b/block/blkreplay.c
+@@ -126,7 +126,7 @@ static int coroutine_fn blkreplay_co_flush(BlockDriverState *bs)
+     return ret;
+ }
+ 
+-static BlockDriver bdrv_blkreplay = {
++BlockDriver bdrv_blkreplay = {
+     .format_name            = "blkreplay",
+     .instance_size          = 0,
+ 
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 1c605d5444..c57d3d9fdf 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -17,6 +17,7 @@
+ #include "block/throttle-groups.h"
+ #include "hw/qdev-core.h"
+ #include "sysemu/blockdev.h"
++#include "sysemu/replay.h"
+ #include "sysemu/runstate.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-events-block.h"
+@@ -808,6 +809,12 @@ void blk_remove_bs(BlockBackend *blk)
+ int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp)
+ {
+     ThrottleGroupMember *tgm = &blk->public.throttle_group_member;
++
++    if (replay_mode != REPLAY_MODE_NONE && bs->drv != &bdrv_blkreplay) {
++        error_setg(errp, "Root node must be blkreplay");
++        return -ENOTSUP;
++    }
++
+     bdrv_ref(bs);
+     blk->root = bdrv_root_attach_child(bs, "root", &child_root, blk->ctx,
+                                        blk->perm, blk->shared_perm, blk, errp);
 
