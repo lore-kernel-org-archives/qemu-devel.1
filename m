@@ -2,94 +2,87 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0FCEC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 13:55:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45DA3C4CEC4
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 13:56:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85ECE21D6C
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 13:55:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85ECE21D6C
+	by mail.kernel.org (Postfix) with ESMTPS id 1F60E21D6C
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 13:56:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F60E21D6C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAwuA-0003QN-NI
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 09:55:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47096)
+	id 1iAwvZ-0005GV-7z
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 09:56:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49629)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iAwVJ-0007Nx-Hc
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:29:50 -0400
+ (envelope-from <philmd@redhat.com>) id 1iAwgO-0004Hy-RD
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:41:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iAwVI-0002eR-EX
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:29:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47694)
+ (envelope-from <philmd@redhat.com>) id 1iAwgI-0003UI-Vd
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:41:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38160)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iAwVD-0002ap-88; Thu, 19 Sep 2019 09:29:43 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iAwgI-0003Sk-3x
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:41:10 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1E76C2D6A04;
- Thu, 19 Sep 2019 13:29:42 +0000 (UTC)
-Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8126E60C18;
- Thu, 19 Sep 2019 13:29:14 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190918130244.24257-1-vsementsov@virtuozzo.com>
- <abb14088-6af2-5db2-da0d-0948fd4ac81c@redhat.com>
- <0497ac1e-c841-39cd-9944-48dd54c5b0f0@virtuozzo.com>
- <9450fbfd-0f8b-d10f-7577-64805917f67a@redhat.com>
- <26217614-77cf-9519-f94b-d606864f4d46@redhat.com>
- <1c82faa5-9443-bc3d-6df2-dbfd82a7b830@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <f10d759b-58b0-f3f8-5250-9b4f11f10433@redhat.com>
-Date: Thu, 19 Sep 2019 08:29:13 -0500
+ by mx1.redhat.com (Postfix) with ESMTPS id 45AF53C919
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 13:41:08 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id t185so1664933wmg.4
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 06:41:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=JyVcq6QNd+Ibgp+/I6fPLr0QMJpfD1F2fjpsmJKmmSI=;
+ b=HQWKtjS/yR+RtBIL5wGGQNJGNPj6O5ZrPBrWeg+BjMhFaJZnv3M9YWcM+97m9J6Jv2
+ 9/2tZF5Z9b/HcHY6iDtP5i8ejGzONR2D3n/6cWGwS7yU3cUym1g5aA2XB6f1R1Zf3ssp
+ Ll5Pbtse1J79awwrfGne0W1mRupANMHuP5nBmsFZYTJoE9pPT2j3Aq5lETxBUNfE/xTT
+ zx5Noy5IJ5BgANhJMZe2xoF0lL5aVZFa9jFNI4NGZjJVf9P5ly+HNbm+OaT/3rDhiHrk
+ yEcXSmqE652lJscbw6dMlJWaCsasMupPRqnV8lxauN4rEOSzAtiGjwhGuo9K/VQ/DNku
+ jJZw==
+X-Gm-Message-State: APjAAAVm3opI/ERigL9F/c7NmJxFlJP4tkjFwkgrMogtjGB0W2Rzepzd
+ kcTg5dnunDsQKZuqCpEjvKuoc4KB+Fe1myec2nwD0hwxSgzPSTsVSrMagabiUgqR1dbEjb34zRU
+ l7HXa8VSO5gYNu3U=
+X-Received: by 2002:a1c:4946:: with SMTP id w67mr2918589wma.131.1568900467013; 
+ Thu, 19 Sep 2019 06:41:07 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy5Y29PcwfKZJJY6v6ootWBFyNiz3SHmYG+J0Ro2QS6awZvyaNnAqKMC3eBB5VZufbmfPboUg==
+X-Received: by 2002:a1c:4946:: with SMTP id w67mr2918573wma.131.1568900466745; 
+ Thu, 19 Sep 2019 06:41:06 -0700 (PDT)
+Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id c132sm8095513wme.27.2019.09.19.06.41.05
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 19 Sep 2019 06:41:06 -0700 (PDT)
+To: Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
+References: <20190918171141.15957-1-lersek@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <f2cf7004-5bc0-93ad-fe09-2bb6cfbbe116@redhat.com>
+Date: Thu, 19 Sep 2019 15:41:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <1c82faa5-9443-bc3d-6df2-dbfd82a7b830@virtuozzo.com>
+In-Reply-To: <20190918171141.15957-1-lersek@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Thu, 19 Sep 2019 13:29:42 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC] error: auto propagated local_err
+Subject: Re: [Qemu-devel] [PATCH] edk2 build scripts: work around
+ TianoCore#1607 without forcing Python 2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,69 +94,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "mst@redhat.com" <mst@redhat.com>, "codyprime@gmail.com" <codyprime@gmail.com>,
- "mark.cave-ayland@ilande.co.uk" <mark.cave-ayland@ilande.co.uk>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "kraxel@redhat.com" <kraxel@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "david@redhat.com" <david@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
- "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
- "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>,
- "farman@linux.ibm.com" <farman@linux.ibm.com>,
- "groug@kaod.org" <groug@kaod.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
- "kwolf@redhat.com" <kwolf@redhat.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
- "sundeep.lkml@gmail.com" <sundeep.lkml@gmail.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/19/19 1:47 AM, Vladimir Sementsov-Ogievskiy wrote:
+Hi Laszlo,
 
->> "The evaluations of the initialization list expressions are
->> indeterminately sequenced with respect to one another and thus the order
->> in which any side effects occur is unspecified."
->>
->> which does not bode well for the assignment to __auto_errp_prop.errp.
->> All changes to errp would have to be within the same initializer.  Maybe:
->>
->> #define MAKE_ERRP_SAFE() \
->>    g_auto(ErrorPropagator) __auto_errp_prop = { \
->>      .local_err = (__auto_errp_prop.err = errp, \
->>          (errp = &__auto_errp_prop.local_err), NULL) }
-> 
-> Is it guaranteed that .errp will not be initialized to NULL after evaluating of
-> .local_err initializer?
+On 9/18/19 7:11 PM, Laszlo Ersek wrote:
+> It turns out that forcing python2 for running the edk2 "build" utility =
+is
+> neither necessary nor sufficient.
+>=20
+> Forcing python2 is not sufficient for two reasons:
+>=20
+> - QEMU is moving away from python2, with python2 nearing EOL,
+>=20
+> - according to my most recent testing, the lacking dependency informati=
+on
+>   in the makefiles that are generated by edk2's "build" utility can cau=
+se
+>   parallel build failures even when "build" is executed by python2.
+>=20
+> And forcing python2 is not necessary because we can still return to the
+> original idea of filtering out jobserver-related options from MAKEFLAGS=
+.
+> So do that.
+>=20
+> With this patch, the guest UEFI binaries that are used as part of the B=
+IOS
+> tables test, and the OVMF and ArmVirtQemu platform firmwares, will be
+> built strictly in a single job, regardless of an outermost "-jN" make
+> option. Alas, there appears to be no reliable way to build edk2 in an
+> (outer make, inner make) environment, with a jobserver enabled.
+>=20
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: John Snow <jsnow@redhat.com>
+> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reported-by: John Snow <jsnow@redhat.com>
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> ---
+>=20
+> Notes:
+>     - Tested on RHEL7 (where the outer "make" sets the old-style
+>       "--jobserver-fds" flag) and on Fedora 29 (where the outer "make" =
+sets
+>       the new-style "--jobserver-auth" flag).
+>    =20
+>     - I've rebuilt all the edk2 binaries with this patch applied. Every=
+thing
+>       works fine. However, if you test this patch, you might notice tha=
+t git
+>       reports all the build products as modified. That's because when u=
+sing
+>       the python3 code in edk2 BaseTools, the generated makefiles diffe=
+r
+>       greatly from the ones generated when running in python2 mode (e.g=
+. due
+>       to different random seeds in python hashes / dictionaries). As a
+>       result, parts of the firmware volumes / firmware filesystems coul=
+d
+>       appear in a different order than before. This is harmless, and do=
+esn't
+>       necessitate checking in the rebuilt binaries.
+>=20
+>  roms/edk2-build.sh             |  4 +---
+>  roms/edk2-funcs.sh             | 17 +++++++++++++++++
+>  tests/uefi-test-tools/build.sh |  6 +++---
+>  3 files changed, 21 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/roms/edk2-build.sh b/roms/edk2-build.sh
+> index 4f46f8a6a217..8161c55ef507 100755
+> --- a/roms/edk2-build.sh
+> +++ b/roms/edk2-build.sh
+> @@ -27,9 +27,6 @@ shift $num_args
+> =20
+>  cd edk2
+> =20
+> -# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>.
+> -export PYTHON_COMMAND=3Dpython2
+> -
+>  # Source "edksetup.sh" carefully.
+>  set +e +u +C
+>  source ./edksetup.sh
+> @@ -43,6 +40,7 @@ fi
+>  # any), for the edk2 "build" utility.
+>  source ../edk2-funcs.sh
+>  edk2_toolchain=3D$(qemu_edk2_get_toolchain "$emulation_target")
+> +MAKEFLAGS=3D$(qemu_edk2_quirk_tianocore_1607 "$MAKEFLAGS")
+>  edk2_thread_count=3D$(qemu_edk2_get_thread_count "$MAKEFLAGS")
+>  qemu_edk2_set_cross_env "$emulation_target"
+> =20
+> diff --git a/roms/edk2-funcs.sh b/roms/edk2-funcs.sh
+> index a9fae7ee891b..3f4485b201f1 100644
+> --- a/roms/edk2-funcs.sh
+> +++ b/roms/edk2-funcs.sh
+> @@ -251,3 +251,20 @@ qemu_edk2_get_thread_count()
+>      printf '1\n'
+>    fi
+>  }
+> +
+> +
+> +# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607> =
+by
+> +# filtering jobserver-related flags out of MAKEFLAGS. Print the result=
+ to the
+> +# standard output.
+> +#
+> +# Parameters:
+> +#   $1: the value of the MAKEFLAGS variable
+> +qemu_edk2_quirk_tianocore_1607()
+> +{
+> +  local makeflags=3D"$1"
+> +
+> +  printf %s "$makeflags" \
+> +  | LC_ALL=3DC sed --regexp-extended \
+> +      --expression=3D's/--jobserver-(auth|fds)=3D[0-9]+,[0-9]+//' \
+> +      --expression=3D's/-j([0-9]+)?//'
+> +}
+> diff --git a/tests/uefi-test-tools/build.sh b/tests/uefi-test-tools/bui=
+ld.sh
+> index 8aa7935c43bb..eba7964a163b 100755
+> --- a/tests/uefi-test-tools/build.sh
+> +++ b/tests/uefi-test-tools/build.sh
+> @@ -29,9 +29,6 @@ export PACKAGES_PATH=3D$(realpath -- "$edk2_dir")
+>  export WORKSPACE=3D$PWD
+>  mkdir -p Conf
+> =20
+> -# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>.
+> -export PYTHON_COMMAND=3Dpython2
+> -
+>  # Source "edksetup.sh" carefully.
+>  set +e +u +C
+>  source "$PACKAGES_PATH/edksetup.sh"
+> @@ -46,12 +43,15 @@ fi
+>  source "$edk2_dir/../edk2-funcs.sh"
+>  edk2_arch=3D$(qemu_edk2_get_arch "$emulation_target")
+>  edk2_toolchain=3D$(qemu_edk2_get_toolchain "$emulation_target")
+> +MAKEFLAGS=3D$(qemu_edk2_quirk_tianocore_1607 "$MAKEFLAGS")
+> +edk2_thread_count=3D$(qemu_edk2_get_thread_count "$MAKEFLAGS")
+>  qemu_edk2_set_cross_env "$emulation_target"
+> =20
+>  # Build the UEFI binary
+>  mkdir -p log
+>  build \
+>    --arch=3D"$edk2_arch" \
+> +  -n "$edk2_thread_count" \
+>    --buildtarget=3DDEBUG \
+>    --platform=3DUefiTestToolsPkg/UefiTestToolsPkg.dsc \
+>    --tagname=3D"$edk2_toolchain" \
+>=20
 
-Probably not.
+Very clear explanation, thanks.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-> 
->>
->> but by the time you get that complicated, just using a statement is
->> easier to read.
+Hmm this failed on Ubuntu Xenial which is the image we use for Travis-CI:
 
-Either two declarations (the second being an unused dummy variable
-declared solely for its initializer's side-effects) or a declaration and
-a statement are the only sane ways I can see to provide guaranteed
-ordering.  It's hidden behind a macro, so I don't care which.
+$ lsb_release -a
+Distributor ID:	Ubuntu
+Description:	Ubuntu 16.04.6 LTS
+Release:	16.04
+Codename:	xenial
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+make -f Makefile.edk2
+make[1]: Entering directory '/home/phil/qemu/roms'
+if test -d edk2/.git; then \
+	cd edk2 && git submodule update --init --force; \
+fi
+./edk2-build.sh \
+	aarch64 \
+	--arch=3DAARCH64 \
+	--platform=3DArmVirtPkg/ArmVirtQemu.dsc \
+	-D NETWORK_IP6_ENABLE \
+	-D NETWORK_HTTP_BOOT_ENABLE
+WORKSPACE: /home/phil/qemu/roms/edk2
+EDK_TOOLS_PATH: /home/phil/qemu/roms/edk2/BaseTools
+CONF_PATH: /home/phil/qemu/roms/edk2/Conf
+Copying $EDK_TOOLS_PATH/Conf/build_rule.template
+     to /home/phil/qemu/roms/edk2/Conf/build_rule.txt
+Copying $EDK_TOOLS_PATH/Conf/tools_def.template
+     to /home/phil/qemu/roms/edk2/Conf/tools_def.txt
+Copying $EDK_TOOLS_PATH/Conf/target.template
+     to /home/phil/qemu/roms/edk2/Conf/target.txt
+pyenv: python3.7: command not found
+The `python3.7' command exists in these Python versions:
+  3.7
+  3.7.1
+
+Makefile.edk2:62: recipe for target '../pc-bios/edk2-aarch64-code.fd' fai=
+led
+make[1]: *** [../pc-bios/edk2-aarch64-code.fd] Error 127
+make[1]: Leaving directory '/home/phil/qemu/roms'
+Makefile:168: recipe for target 'efi' failed
+make: *** [efi] Error 2
+make: Leaving directory '/home/phil/qemu/roms'
+The command "make -C roms efi -j2" exited with 2.
+
+The local Python3 version is:
+
+$ apt-cache show python3-minimal
+Package: python3-minimal
+Version: 3.5.1-3
+
+Any idea which script is choosing python3.7?
 
