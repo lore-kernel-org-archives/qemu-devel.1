@@ -2,90 +2,69 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 849A8C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:08:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0DADC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:10:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53F7C218AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:08:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53F7C218AF
+	by mail.kernel.org (Postfix) with ESMTPS id 85702218AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:10:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85702218AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAsQH-00080m-Vz
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:08:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38332)
+	id 1iAsRv-0001vw-H3
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:10:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37668)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iAsI6-00085S-Lo
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:59:56 -0400
+ (envelope-from <kwolf@redhat.com>) id 1iAsC3-0000Aj-9w
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:53:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iAsI5-0001Gx-IV
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:59:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59342)
+ (envelope-from <kwolf@redhat.com>) id 1iAsBz-0005Xp-53
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:53:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46484)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iAsHy-00019Y-Df; Thu, 19 Sep 2019 04:59:46 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iAsBe-0005U9-CB
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:53:34 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3D0A13175282;
- Thu, 19 Sep 2019 08:59:45 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-52.brq.redhat.com
- [10.40.204.52])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 58E4F1001947;
- Thu, 19 Sep 2019 08:59:26 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20190918130244.24257-1-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d2a793c1-aae7-6e22-8baa-0c403c111e5c@redhat.com>
-Date: Thu, 19 Sep 2019 10:59:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 739B14E4E6;
+ Thu, 19 Sep 2019 08:53:13 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.36.116.255])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D98D45D9CD;
+ Thu, 19 Sep 2019 08:53:03 +0000 (UTC)
+Date: Thu, 19 Sep 2019 10:53:02 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Message-ID: <20190919085302.GA10163@localhost.localdomain>
+References: <156872146565.1757.3033215873677512474.stgit@pasha-Precision-3630-Tower>
+ <156872148244.1757.2888672921697745021.stgit@pasha-Precision-3630-Tower>
+ <20190918091831.GD5207@localhost.localdomain>
+ <001201d56e02$9d88b5f0$d89a21d0$@ru>
+ <20190918093305.GF5207@localhost.localdomain>
+ <001401d56e04$b93c02a0$2bb407e0$@ru>
+ <20190918094436.GG5207@localhost.localdomain>
+ <001501d56e06$bbd7aa30$3386fe90$@ru>
 MIME-Version: 1.0
-In-Reply-To: <20190918130244.24257-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <001501d56e06$bbd7aa30$3386fe90$@ru>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Thu, 19 Sep 2019 08:59:45 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.38]); Thu, 19 Sep 2019 08:53:13 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC] error: auto propagated local_err
+Subject: Re: [Qemu-devel] [for-4.2 PATCH 3/6] replay: update docs for
+ record/replay with block devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,76 +76,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.maydell@linaro.org, mst@redhat.com,
- codyprime@gmail.com, mark.cave-ayland@ilande.co.uk, mdroth@linux.vnet.ibm.com,
- kraxel@redhat.com, qemu-block@nongnu.org, quintela@redhat.com,
- david@redhat.com, armbru@redhat.com, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, marcandre.lureau@redhat.com, rth@twiddle.net,
- farman@linux.ibm.com, groug@kaod.org, dgilbert@redhat.com,
- alex.williamson@redhat.com, qemu-arm@nongnu.org, stefanha@redhat.com,
- jsnow@redhat.com, david@gibson.dropbear.id.au, kwolf@redhat.com,
- berrange@redhat.com, cohuck@redhat.com, qemu-s390x@nongnu.org,
- sundeep.lkml@gmail.com, qemu-ppc@nongnu.org, pbonzini@redhat.com
+Cc: peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru,
+ crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com,
+ quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ alex.bennee@linaro.org, 'Pavel Dovgalyuk' <pavel.dovgaluk@gmail.com>,
+ maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com,
+ boost.lists@gmail.com, thomas.dullien@googlemail.com, pbonzini@redhat.com,
+ mreitz@redhat.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18.09.19 15:02, Vladimir Sementsov-Ogievskiy wrote:
-> Hi all!
->=20
-> Here is a proposal (three of them, actually) of auto propagation for
-> local_err, to not call error_propagate on every exit point, when we
-> deal with local_err.
->=20
-> It also may help make Greg's series[1] about error_append_hint smaller.
->=20
-> See definitions and examples below.
->=20
-> I'm cc-ing to this RFC everyone from series[1] CC list, as if we like
-> it, the idea will touch same code (and may be more).
->=20
-> [1]: https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg03449.htm=
-l
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/qapi/error.h | 102 +++++++++++++++++++++++++++++++++++++++++++
->  block.c              |  63 ++++++++++++--------------
->  block/backup.c       |   8 +++-
->  block/gluster.c      |   7 +++
->  4 files changed, 144 insertions(+), 36 deletions(-)
+Am 18.09.2019 um 11:52 hat Pavel Dovgalyuk geschrieben:
+> > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > Am 18.09.2019 um 11:37 hat Pavel Dovgalyuk geschrieben:
+> > > > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > > > Am 18.09.2019 um 11:22 hat Pavel Dovgalyuk geschrieben:
+> > > > > > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > > > > > Am 17.09.2019 um 13:58 hat Pavel Dovgalyuk geschrieben:
+> > > > > > > From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> > > > > > >
+> > > > > > > This patch updates the description of the command lines for using
+> > > > > > > record/replay with attached block devices.
+> > > > > > >
+> > > > > > > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> > > > > > > ---
+> > > > > > >  docs/replay.txt |   12 +++++++++---
+> > > > > > >  1 file changed, 9 insertions(+), 3 deletions(-)
+> > > > > > >
+> > > > > > > diff --git a/docs/replay.txt b/docs/replay.txt
+> > > > > > > index ee6aee9861..ce97c3f72f 100644
+> > > > > > > --- a/docs/replay.txt
+> > > > > > > +++ b/docs/replay.txt
+> > > > > > > @@ -27,7 +27,7 @@ Usage of the record/replay:
+> > > > > > >   * First, record the execution with the following command line:
+> > > > > > >      qemu-system-i386 \
+> > > > > > >       -icount shift=7,rr=record,rrfile=replay.bin \
+> > > > > > > -     -drive file=disk.qcow2,if=none,id=img-direct \
+> > > > > > > +     -drive file=disk.qcow2,if=none,snapshot,id=img-direct \
+> > > > > > >       -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
+> > > > > > >       -device ide-hd,drive=img-blkreplay \
+> > > > > > >       -netdev user,id=net1 -device rtl8139,netdev=net1 \
+> > > > > > > @@ -35,7 +35,7 @@ Usage of the record/replay:
+> > > > > > >   * After recording, you can replay it by using another command line:
+> > > > > > >      qemu-system-i386 \
+> > > > > > >       -icount shift=7,rr=replay,rrfile=replay.bin \
+> > > > > > > -     -drive file=disk.qcow2,if=none,id=img-direct \
+> > > > > > > +     -drive file=disk.qcow2,if=none,snapshot,id=img-direct \
+> > > > > > >       -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
+> > > > > > >       -device ide-hd,drive=img-blkreplay \
+> > > > > > >       -netdev user,id=net1 -device rtl8139,netdev=net1 \
+> > > > > > > @@ -223,7 +223,7 @@ Block devices record/replay module intercepts calls of
+> > > > > > >  bdrv coroutine functions at the top of block drivers stack.
+> > > > > > >  To record and replay block operations the drive must be configured
+> > > > > > >  as following:
+> > > > > > > - -drive file=disk.qcow2,if=none,id=img-direct
+> > > > > > > + -drive file=disk.qcow2,if=none,snapshot,id=img-direct
+> > > > > > >   -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay
+> > > > > > >   -device ide-hd,drive=img-blkreplay
+> > > > > > >
+> > > > > > > @@ -252,6 +252,12 @@ This snapshot is created at start of recording and restored at
+> > > > start
+> > > > > > >  of replaying. It also can be loaded while replaying to roll back
+> > > > > > >  the execution.
+> > > > > > >
+> > > > > > > +'snapshot' flag of the disk image must be removed to save the snapshots
+> > > > > > > +in the overlay (or original image) instead of using the temporary overlay.
+> > > > > > > + -drive file=disk.ovl,if=none,id=img-direct
+> > > > > > > + -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay
+> > > > > > > + -device ide-hd,drive=img-blkreplay
+> > > > > >
+> > > > > > Wait, didn't patch 2 just make -snapshot unconditionally incompatible
+> > > > > > with replay? So isn't saving the snapshot in the original image the only
+> > > > > > supported mode now?
+> > > > >
+> > > > > There are two ways to run record/replay:
+> > > > > 1. Disk with snapshot option and any image to make it unchanged
+> > > > > 2. Disk with overlay without snapshot option to save VM snapshots on it
+> > > >
+> > > > Yes, I think I understand the two options that you intend to make
+> > > > available, but when -snapshot sets a replay blocker, how can 1. still
+> > > > work? Is there some code that ignores replay blockers?
+> > >
+> > > I checked the text and don't see anything about global "-snapshot" option.
+> > > All references are about drive snapshot flag.
+> > > Can you point me where did I missed that?
+> > 
+> > Oh, sorry, you're right and I misread.
+> > 
+> > However, global -snapshot is just a convenient shortcut for specifying
+> > snapshot=on for all -drive arguments. So if -snapshot is incompatible
+> > with replay, shouldn't manually marking all drives as snapshot=on be
+> > incompatible as well?
+> > 
+> > Maybe you're really interested in some specific drive not having
+> > snapshot=on? But then it might be better to check that specific drive
+> > instad of forbidding just the shortcut for setting it.
+> 
+> -snapshot adds the flag for top-level drive, making driver operations
+> dependent on temporary file structure.
+> 
+> Moving this overlay beneath blkreplay driver makes drive operations
+> deterministic for the top-level device.
 
-If the combination of =E2=80=9Cif (local_err) { error_propagate(...); ...=
- }=E2=80=9D is
-what=E2=80=99s cumbersome, can=E2=80=99t this be done simpler by adding a=
-n
-error_propagate() variant with a return value?
+So the real requirement is that blkreplay is the top-level node of any
+guest device, right? And only because of this, you can't use -snapshot
+(or snapshot=on on the blkreplay driver).
 
-i.e.
+If we instead check e.g. in blk_insert_bs() or blk_attach_dev() that in
+record/replay mode, the root node of the BlockBackend is blkreplay,
+wouldn't we catch many more incorrect setups?
 
-bool has_error_then_propagate(Error **errp, Error *err)
-{
-    if (!err) {
-        return false;
-    }
-    error_propagate(errp, err);
-    return true;
-}
-
-And then turn all instances of
-
-if (local_err) {
-    error_propagate(errp, local_err);
-    ...
-}
-
-into
-
-if (has_error_then_propagate(errp, local_err)) {
-    ...
-}
-
-?
-
-Max
+Kevin
 
