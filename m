@@ -2,73 +2,62 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B557C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5250CC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:11:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F02521848
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:11:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F02521848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 171C221924
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:11:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 171C221924
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAtP2-0001G6-Cm
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 06:11:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49804)
+	id 1iAtPU-0001Xx-Bk
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 06:11:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50059)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1iAtLC-0005IF-GC
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:07:11 -0400
+ (envelope-from <groug@kaod.org>) id 1iAtNF-0007hz-UP
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:09:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1iAtLB-00088h-3t
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:07:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34328)
+ (envelope-from <groug@kaod.org>) id 1iAtND-0000bE-BX
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:09:17 -0400
+Received: from 2.mo177.mail-out.ovh.net ([178.33.109.80]:34371)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1iAtLA-00088S-Rv
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:07:09 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 31D343084037;
- Thu, 19 Sep 2019 10:07:08 +0000 (UTC)
-Received: from [10.72.12.81] (ovpn-12-81.pek2.redhat.com [10.72.12.81])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7382119C6A;
- Thu, 19 Sep 2019 10:07:00 +0000 (UTC)
-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <AADFC41AFE54684AB9EE6CBC0274A5D19D57A080@SHSMSX104.ccr.corp.intel.com>
- <8302a4ae-1914-3046-b3b5-b3234d7dda02@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D57B1D1@SHSMSX104.ccr.corp.intel.com>
- <6d73572e-1e89-b04a-bdd6-98ac73798083@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D57B90C@SHSMSX104.ccr.corp.intel.com>
- <204219fa-ee72-ca60-52a4-fb4bbc887773@redhat.com>
- <20190919052819.GA18391@joy-OptiPlex-7040>
- <7b6d6343-33de-ebd7-9846-af54a45a82a2@redhat.com>
- <20190919061756.GB18391@joy-OptiPlex-7040>
- <e0efbdc0-aad9-0d17-ec68-36460865501f@redhat.com>
- <20190919062954.GC18391@joy-OptiPlex-7040>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <297143e5-a0b5-4873-77bf-7d2a97ec3c7c@redhat.com>
-Date: Thu, 19 Sep 2019 18:06:52 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iAtNC-0000a8-T8
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:09:15 -0400
+Received: from player759.ha.ovh.net (unknown [10.108.42.145])
+ by mo177.mail-out.ovh.net (Postfix) with ESMTP id 811351094B0
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 12:09:12 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player759.ha.ovh.net (Postfix) with ESMTPSA id 1B21AA062F2E;
+ Thu, 19 Sep 2019 10:08:36 +0000 (UTC)
+Date: Thu, 19 Sep 2019 12:08:34 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <20190919120834.0ef0470b@bahia.lan>
+In-Reply-To: <4234506a-171e-bff4-3edb-8c50ed9ec722@virtuozzo.com>
+References: <20190918130244.24257-1-vsementsov@virtuozzo.com>
+ <20190919105909.4d3456f6@bahia.lan>
+ <4234506a-171e-bff4-3edb-8c50ed9ec722@virtuozzo.com>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20190919062954.GC18391@joy-OptiPlex-7040>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Thu, 19 Sep 2019 10:07:08 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 6036793827346651475
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvddtgddviecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] vhost, iova, and dirty page tracking
+X-Received-From: 178.33.109.80
+Subject: Re: [Qemu-devel] [RFC] error: auto propagated local_err
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,122 +69,411 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- 'Alex Williamson' <alex.williamson@redhat.com>, Peter Xu <peterx@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "fam@euphon.net" <fam@euphon.net>,
+ "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "mst@redhat.com" <mst@redhat.com>, "codyprime@gmail.com" <codyprime@gmail.com>,
+ "mark.cave-ayland@ilande.co.uk" <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
+ "kraxel@redhat.com" <kraxel@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "quintela@redhat.com" <quintela@redhat.com>,
+ "david@redhat.com" <david@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+ "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
+ "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>,
+ "farman@linux.ibm.com" <farman@linux.ibm.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+ "kwolf@redhat.com" <kwolf@redhat.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
+ "sundeep.lkml@gmail.com" <sundeep.lkml@gmail.com>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, 19 Sep 2019 09:28:11 +0000
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
 
-On 2019/9/19 =E4=B8=8B=E5=8D=882:29, Yan Zhao wrote:
-> On Thu, Sep 19, 2019 at 02:32:03PM +0800, Jason Wang wrote:
->> On 2019/9/19 =E4=B8=8B=E5=8D=882:17, Yan Zhao wrote:
->>> On Thu, Sep 19, 2019 at 02:09:53PM +0800, Jason Wang wrote:
->>>> On 2019/9/19 =E4=B8=8B=E5=8D=881:28, Yan Zhao wrote:
->>>>> On Thu, Sep 19, 2019 at 09:05:12AM +0800, Jason Wang wrote:
->>>>>> On 2019/9/18 =E4=B8=8B=E5=8D=884:37, Tian, Kevin wrote:
->>>>>>>> From: Jason Wang [mailto:jasowang@redhat.com]
->>>>>>>> Sent: Wednesday, September 18, 2019 2:10 PM
->>>>>>>>
->>>>>>>>>> Note that the HVA to GPA mapping is not an 1:1 mapping. One HV=
-A
->>>>>>>> range
->>>>>>>>>> could be mapped to several GPA ranges.
->>>>>>>>> This is fine. Currently vfio_dma maintains IOVA->HVA mapping.
->>>>>>>>>
->>>>>>>>> btw under what condition HVA->GPA is not 1:1 mapping? I didn't =
-realize it.
->>>>>>>> I don't remember the details e.g memory region alias? And neithe=
-r kvm
->>>>>>>> nor kvm API does forbid this if my memory is correct.
->>>>>>>>
->>>>>>> I checkedhttps://qemu.weilnetz.de/doc/devel/memory.html, which
->>>>>>> provides an example of aliased layout. However, its aliasing is a=
-ll
->>>>>>> 1:1, instead of N:1. From guest p.o.v every writable GPA implies =
-an
->>>>>>> unique location. Why would we hit the situation where multiple
->>>>>>> write-able GPAs are mapped to the same HVA (i.e. same physical
->>>>>>> memory location)?
->>>>>> I don't know, just want to say current API does not forbid this. S=
-o we
->>>>>> probably need to take care it.
->>>>>>
->>>>> yes, in KVM API level, it does not forbid two slots to have the sam=
-e HVA(slot->userspace_addr).
->>>>> But
->>>>> (1) there's only one kvm instance for each vm for each qemu process=
-.
->>>>> (2) all ramblock->host (corresponds to HVA and slot->userspace_addr=
-) in one qemu
->>>>> process is non-overlapping as it's obtained from mmmap().
->>>>> (3) qemu ensures two kvm slots will not point to the same section o=
-f one ramblock.
->>>>>
->>>>> So, as long as kvm instance is not shared in two processes, and
->>>>> there's no bug in qemu, we can assure that HVA to GPA is 1:1.
->>>> Well, you leave this API for userspace, so you can't assume qemu is =
-the
->>>> only user or any its behavior. If you had you should limit it in the=
- API
->>>> level instead of open window for them.
->>>>
->>>>
->>>>> But even if there are two processes operating on the same kvm insta=
-nce
->>>>> and manipulating on memory slots, adding an extra GPA along side cu=
-rrent
->>>>> IOVA & HVA to ioctl VFIO_IOMMU_MAP_DMA can still let driver knows t=
-he
->>>>> right IOVA->GPA mapping, right?
->>>> It looks fragile. Consider HVA was mapped to both GPA1 and GPA2. Gue=
-st
->>>> maps IOVA to GPA2, so we have IOVA GPA2 HVA in the new ioctl and the=
-n
->>>> log through GPA2. If userspace is trying to sync through GPA1, it wi=
-ll
->>>> miss the dirty page. So for safety we need log both GPA1 and GPA2. (=
-See
->>>> what has been done in log_write_hva() in vhost.c). The only way to d=
-o
->>>> that is to maintain an independent HVA to GPA mapping like what KVM =
-or
->>>> vhost did.
->>>>
->>> why GPA1 and GPA2 should be both dirty?
->>> even they have the same HVA due to overlaping virtual address space i=
-n
->>> two processes, they still correspond to two physical pages.
->>> don't get what's your meaning:)
->> The point is not leave any corner case that is hard to debug or fix in
->> the future.
->>
->> Let's just start by a single process, the API allows userspace to maps
->> HVA to both GPA1 and GPA2. Since it knows GPA1 and GPA2 are equivalent=
-,
->> it's ok to sync just through GPA1. That means if you only log GPA2, it
->> won't work.
->>
-> In that case, cannot log dirty according to HPA.
-> because kvm cannot tell whether it's an valid case (the two GPAs are eq=
-uivalent)
-> or an invalid case (the two GPAs are not equivalent, but with the same
-> HVA value).
->
-> Right?
+> 19.09.2019 11:59, Greg Kurz wrote:
+> > On Wed, 18 Sep 2019 16:02:44 +0300
+> > Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
+> > 
+> >> Hi all!
+> >>
+> >> Here is a proposal (three of them, actually) of auto propagation for
+> >> local_err, to not call error_propagate on every exit point, when we
+> >> deal with local_err.
+> >>
+> >> It also may help make Greg's series[1] about error_append_hint smaller.
+> >>
+> > 
+> > This will depend on whether we reach a consensus soon enough (soft
+> > freeze for 4.2 is 2019-10-29). Otherwise, I think my series should
+> > be merged as is, and auto-propagation to be delayed to 4.3.
+> > 
+> >> See definitions and examples below.
+> >>
+> >> I'm cc-ing to this RFC everyone from series[1] CC list, as if we like
+> >> it, the idea will touch same code (and may be more).
+> >>
+> > 
+> > When we have a good auto-propagation mechanism available, I guess
+> > this can be beneficial for most of the code, not only the places
+> > where we add hints (or prepend something, see below).
+> > 
+> >> [1]: https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg03449.html
+> >>
+> >> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> >> ---
+> >>   include/qapi/error.h | 102 +++++++++++++++++++++++++++++++++++++++++++
+> >>   block.c              |  63 ++++++++++++--------------
+> >>   block/backup.c       |   8 +++-
+> >>   block/gluster.c      |   7 +++
+> >>   4 files changed, 144 insertions(+), 36 deletions(-)
+> >>
+> >> diff --git a/include/qapi/error.h b/include/qapi/error.h
+> >> index 3f95141a01..083e061014 100644
+> >> --- a/include/qapi/error.h
+> >> +++ b/include/qapi/error.h
+> >> @@ -322,6 +322,108 @@ void error_set_internal(Error **errp,
+> >>                           ErrorClass err_class, const char *fmt, ...)
+> >>       GCC_FMT_ATTR(6, 7);
+> >>   
+> >> +typedef struct ErrorPropagator {
+> >> +    Error **errp;
+> >> +    Error *local_err;
+> >> +} ErrorPropagator;
+> >> +
+> >> +static inline void error_propagator_cleanup(ErrorPropagator *prop)
+> >> +{
+> >> +    if (prop->local_err) {
+> >> +        error_propagate(prop->errp, prop->local_err);
+> > 
+> > We also have error_propagate_prepend(), which is basically a variant of
+> > error_prepend()+error_propagate() that can cope with &error_fatal. This
+> > was introduced by Markus in commit 4b5766488fd3, for similar reasons that
+> > motivated my series. It has ~30 users in the tree.
+> > 
+> > There's no such thing a generic cleanup function with a printf-like
+> > interface, so all of these should be converted back to error_prepend()
+> > if we go for auto-propagation.
+> > 
+> > Aside from propagation, one can sometime choose to call things like
+> > error_free() or error_free_or_abort()... Auto-propagation should
+> > detect that and not call error_propagate() in this case.
+> 
+> Hmm, for example, qmp_eject, which error_free or error_propagate..
+> We can leave such cases as is, not many of them. Or introduce
+> safe_errp_free(Error **errp), which will zero pointer after freeing.
+> 
 
+Maybe even turning error_free() to take an Error ** ? It looks
+safe to zero out a dangling pointer. Of course the API change
+would need to be propagated to all error_* functions that
+explicitly call error_free().
 
-There no need any examination on whether it was 'valid' or not. It's as=20
-simple as logging both GPA1 and GPA2. Then you won't need to care any=20
-corner case.
+> > 
+> >> +    }
+> >> +}
+> >> +
+> >> +G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagator, error_propagator_cleanup);
+> >> +
+> >> +/*
+> >> + * ErrorPropagationPair
+> >> + *
+> >> + * [Error *local_err, Error **errp]
+> >> + *
+> >> + * First element is local_err, second is original errp, which is propagation
+> >> + * target. Yes, errp has a bit another type, so it should be converted.
+> >> + *
+> >> + * ErrorPropagationPair may be used as errp, which points to local_err,
+> >> + * as it's type is compatible.
+> >> + */
+> >> +typedef Error *ErrorPropagationPair[2];
+> >> +
+> >> +static inline void error_propagation_pair_cleanup(ErrorPropagationPair *arr)
+> >> +{
+> >> +    Error *local_err = (*arr)[0];
+> >> +    Error **errp = (Error **)(*arr)[1];
+> >> +
+> >> +    if (local_err) {
+> >> +        error_propagate(errp, local_err);
+> >> +    }
+> >> +}
+> >> +
+> >> +G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagationPair,
+> >> +                                 error_propagation_pair_cleanup);
+> >> +
+> >> +/*
+> >> + * DEF_AUTO_ERRP
+> >> + *
+> >> + * Define auto_errp variable, which may be used instead of errp, and
+> >> + * *auto_errp may be safely checked to be zero or not, and may be safely
+> >> + * used for error_append_hint(). auto_errp is automatically propagated
+> >> + * to errp at function exit.
+> >> + */
+> >> +#define DEF_AUTO_ERRP(auto_errp, errp) \
+> >> +    g_auto(ErrorPropagationPair) (auto_errp) = {NULL, (Error *)(errp)}
+> >> +
+> >> +
+> >> +/*
+> >> + * Another variant:
+> >> + *   Pros:
+> >> + *     - normal structure instead of cheating with array
+> >> + *     - we can directly use errp, if it's not NULL and don't point to
+> >> + *       error_abort or error_fatal
+> >> + *   Cons:
+> >> + *     - we need to define two variables instead of one
+> >> + */
+> >> +typedef struct ErrorPropagationStruct {
+> >> +    Error *local_err;
+> >> +    Error **errp;
+> >> +} ErrorPropagationStruct;
+> >> +
+> >> +static inline void error_propagation_struct_cleanup(ErrorPropagationStruct *prop)
+> >> +{
+> >> +    if (prop->local_err) {
+> >> +        error_propagate(prop->errp, prop->local_err);
+> >> +    }
+> >> +}
+> >> +
+> >> +G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagationStruct,
+> >> +                                 error_propagation_struct_cleanup);
+> >> +
+> >> +#define DEF_AUTO_ERRP_V2(auto_errp, errp) \
+> >> +    g_auto(ErrorPropagationStruct) (__auto_errp_prop) = {.errp = (errp)}; \
+> >> +    Error **auto_errp = \
+> >> +        ((errp) == NULL || *(errp) == error_abort || *(errp) == error_fatal) ? \
+> >> +        &__auto_errp_prop.local_err : \
+> >> +        (errp);
+> >> +
+> >> +/*
+> >> + * Third variant:
+> >> + *   Pros:
+> >> + *     - simpler movement for functions which don't have local_err yet
+> >> + *       the only thing to do is to call one macro at function start.
+> >> + *       This extremely simplifies Greg's series
+> >> + *   Cons:
+> >> + *     - looks like errp shadowing.. Still seems safe.
+> >> + *     - must be after all definitions of local variables and before any
+> >> + *       code.
+> >> + *     - like v2, several statements in one open macro
+> >> + */
+> >> +#define MAKE_ERRP_SAFE(errp) \
+> >> +g_auto(ErrorPropagationStruct) (__auto_errp_prop) = {.errp = (errp)}; \
+> >> +if ((errp) == NULL || *(errp) == error_abort || *(errp) == error_fatal) { \
+> >> +    (errp) = &__auto_errp_prop.local_err; \
+> >> +}
+> >> +
+> >> +
+> >>   /*
+> >>    * Special error destination to abort on error.
+> >>    * See error_setg() and error_propagate() for details.
+> >> diff --git a/block.c b/block.c
+> >> index 5944124845..5253663329 100644
+> >> --- a/block.c
+> >> +++ b/block.c
+> >> @@ -1275,12 +1275,11 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
+> >>                               const char *node_name, QDict *options,
+> >>                               int open_flags, Error **errp)
+> >>   {
+> >> -    Error *local_err = NULL;
+> >> +    DEF_AUTO_ERRP_V2(auto_errp, errp);
+> >>       int i, ret;
+> >>   
+> >> -    bdrv_assign_node_name(bs, node_name, &local_err);
+> >> -    if (local_err) {
+> >> -        error_propagate(errp, local_err);
+> >> +    bdrv_assign_node_name(bs, node_name, auto_errp);
+> >> +    if (*auto_errp) {
+> >>           return -EINVAL;
+> >>       }
+> >>   
+> >> @@ -1290,20 +1289,21 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
+> >>   
+> >>       if (drv->bdrv_file_open) {
+> >>           assert(!drv->bdrv_needs_filename || bs->filename[0]);
+> >> -        ret = drv->bdrv_file_open(bs, options, open_flags, &local_err);
+> >> +        ret = drv->bdrv_file_open(bs, options, open_flags, auto_errp);
+> >>       } else if (drv->bdrv_open) {
+> >> -        ret = drv->bdrv_open(bs, options, open_flags, &local_err);
+> >> +        ret = drv->bdrv_open(bs, options, open_flags, auto_errp);
+> >>       } else {
+> >>           ret = 0;
+> >>       }
+> >>   
+> >>       if (ret < 0) {
+> >> -        if (local_err) {
+> >> -            error_propagate(errp, local_err);
+> >> -        } else if (bs->filename[0]) {
+> >> -            error_setg_errno(errp, -ret, "Could not open '%s'", bs->filename);
+> >> -        } else {
+> >> -            error_setg_errno(errp, -ret, "Could not open image");
+> >> +        if (!*auto_errp) {
+> >> +            if (bs->filename[0]) {
+> >> +                error_setg_errno(errp, -ret, "Could not open '%s'",
+> >> +                                 bs->filename);
+> >> +            } else {
+> >> +                error_setg_errno(errp, -ret, "Could not open image");
+> >> +            }
+> >>           }
+> >>           goto open_failed;
+> >>       }
+> >> @@ -1314,9 +1314,8 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
+> >>           return ret;
+> >>       }
+> >>   
+> >> -    bdrv_refresh_limits(bs, &local_err);
+> >> -    if (local_err) {
+> >> -        error_propagate(errp, local_err);
+> >> +    bdrv_refresh_limits(bs, auto_errp);
+> >> +    if (*auto_errp) {
+> >>           return -EINVAL;
+> >>       }
+> >>   
+> >> @@ -4238,17 +4237,17 @@ out:
+> >>   void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top,
+> >>                    Error **errp)
+> >>   {
+> >> -    Error *local_err = NULL;
+> >> +    g_auto(ErrorPropagator) prop = {.errp = errp};
+> >>   
+> >> -    bdrv_set_backing_hd(bs_new, bs_top, &local_err);
+> >> -    if (local_err) {
+> >> -        error_propagate(errp, local_err);
+> >> +    errp = &prop.local_err;
+> >> +
+> >> +    bdrv_set_backing_hd(bs_new, bs_top, errp);
+> >> +    if (*errp) {
+> >>           goto out;
+> >>       }
+> >>   
+> >> -    bdrv_replace_node(bs_top, bs_new, &local_err);
+> >> -    if (local_err) {
+> >> -        error_propagate(errp, local_err);
+> >> +    bdrv_replace_node(bs_top, bs_new, errp);
+> >> +    if (*errp) {
+> >>           bdrv_set_backing_hd(bs_new, NULL, &error_abort);
+> >>           goto out;
+> >>       }
+> >> @@ -5309,9 +5308,9 @@ void bdrv_init_with_whitelist(void)
+> >>   static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
+> >>                                                     Error **errp)
+> >>   {
+> >> +    DEF_AUTO_ERRP(auto_errp, errp);
+> >>       BdrvChild *child, *parent;
+> >>       uint64_t perm, shared_perm;
+> >> -    Error *local_err = NULL;
+> >>       int ret;
+> >>       BdrvDirtyBitmap *bm;
+> >>   
+> >> @@ -5324,9 +5323,8 @@ static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
+> >>       }
+> >>   
+> >>       QLIST_FOREACH(child, &bs->children, next) {
+> >> -        bdrv_co_invalidate_cache(child->bs, &local_err);
+> >> -        if (local_err) {
+> >> -            error_propagate(errp, local_err);
+> >> +        bdrv_co_invalidate_cache(child->bs, auto_errp);
+> >> +        if (*auto_errp) {
+> >>               return;
+> >>           }
+> >>       }
+> >> @@ -5346,19 +5344,17 @@ static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
+> >>        */
+> >>       bs->open_flags &= ~BDRV_O_INACTIVE;
+> >>       bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
+> >> -    ret = bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, NULL, &local_err);
+> >> +    ret = bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, NULL, auto_errp);
+> >>       if (ret < 0) {
+> >>           bs->open_flags |= BDRV_O_INACTIVE;
+> >> -        error_propagate(errp, local_err);
+> >>           return;
+> >>       }
+> >>       bdrv_set_perm(bs, perm, shared_perm);
+> >>   
+> >>       if (bs->drv->bdrv_co_invalidate_cache) {
+> >> -        bs->drv->bdrv_co_invalidate_cache(bs, &local_err);
+> >> -        if (local_err) {
+> >> +        bs->drv->bdrv_co_invalidate_cache(bs, auto_errp);
+> >> +        if (*auto_errp) {
+> >>               bs->open_flags |= BDRV_O_INACTIVE;
+> >> -            error_propagate(errp, local_err);
+> >>               return;
+> >>           }
+> >>       }
+> >> @@ -5378,10 +5374,9 @@ static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
+> >>   
+> >>       QLIST_FOREACH(parent, &bs->parents, next_parent) {
+> >>           if (parent->role->activate) {
+> >> -            parent->role->activate(parent, &local_err);
+> >> -            if (local_err) {
+> >> +            parent->role->activate(parent, auto_errp);
+> >> +            if (*auto_errp) {
+> >>                   bs->open_flags |= BDRV_O_INACTIVE;
+> >> -                error_propagate(errp, local_err);
+> >>                   return;
+> >>               }
+> >>           }
+> >> diff --git a/block/backup.c b/block/backup.c
+> >> index 89f7f89200..462dea4fbb 100644
+> >> --- a/block/backup.c
+> >> +++ b/block/backup.c
+> >> @@ -583,6 +583,10 @@ static const BlockJobDriver backup_job_driver = {
+> >>   static int64_t backup_calculate_cluster_size(BlockDriverState *target,
+> >>                                                Error **errp)
+> >>   {
+> >> +    /*
+> >> +     * Example of using DEF_AUTO_ERRP to make error_append_hint safe
+> >> +     */
+> >> +    DEF_AUTO_ERRP(auto_errp, errp);
+> >>       int ret;
+> >>       BlockDriverInfo bdi;
+> >>   
+> >> @@ -602,10 +606,10 @@ static int64_t backup_calculate_cluster_size(BlockDriverState *target,
+> >>                       BACKUP_CLUSTER_SIZE_DEFAULT);
+> >>           return BACKUP_CLUSTER_SIZE_DEFAULT;
+> >>       } else if (ret < 0 && !target->backing) {
+> >> -        error_setg_errno(errp, -ret,
+> >> +        error_setg_errno(auto_errp, -ret,
+> >>               "Couldn't determine the cluster size of the target image, "
+> >>               "which has no backing file");
+> >> -        error_append_hint(errp,
+> >> +        error_append_hint(auto_errp,
+> >>               "Aborting, since this may create an unusable destination image\n");
+> >>           return ret;
+> >>       } else if (ret < 0 && target->backing) {
+> >> diff --git a/block/gluster.c b/block/gluster.c
+> >> index 64028b2cba..799a2dbeca 100644
+> >> --- a/block/gluster.c
+> >> +++ b/block/gluster.c
+> >> @@ -695,6 +695,13 @@ static int qemu_gluster_parse(BlockdevOptionsGluster *gconf,
+> >>                                 QDict *options, Error **errp)
+> >>   {
+> >>       int ret;
+> >> +    /*
+> >> +     * Example of using MAKE_ERRP_SAFE to make error_append_hint safe. We
+> >> +     * only need to add one macro call. Note, it must be placed exactly after
+> >> +     * all local variables defenition.
+> >> +     */
+> >> +    MAKE_ERRP_SAFE(errp);
+> >> +
+> >>       if (filename) {
+> >>           ret = qemu_gluster_parse_uri(gconf, filename);
+> >>           if (ret < 0) {
+> > 
+> 
+> 
 
-Thanks
-
-
->
-> Thanks
-> Yan
->
->
 
