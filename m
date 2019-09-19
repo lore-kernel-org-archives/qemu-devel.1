@@ -2,87 +2,109 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 242F7C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 15:41:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3184C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 15:42:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E134021907
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 15:41:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rFpu34aL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E134021907
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 47E4C21907
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 15:42:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47E4C21907
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAyYh-0006lE-2t
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 11:41:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37151)
+	id 1iAyZl-0007wb-GJ
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 11:42:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37413)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iAyWY-0004Tp-0f
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:39:14 -0400
+ (envelope-from <david@redhat.com>) id 1iAyXj-0005sp-TO
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:40:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iAyWW-0000rv-K4
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:39:13 -0400
-Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:35560)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iAyWW-0000rd-F3
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:39:12 -0400
-Received: by mail-ot1-x333.google.com with SMTP id z6so3503938otb.2
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 08:39:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Y5B/GOqMJ71PwInQuQozQR2zkvMueHRZHDn470otJe0=;
- b=rFpu34aLTVZuG3gGNpIuNCPFlzrTJHHvmB5FDXbc58Xnn+7dni0mnqFeW0e+I2E77v
- +yxrCrlMBFsvrMBel8z9n9UMP+I/tO/21DuvFo4gxlLjL33UbZ7cWgxoySwRtg3XCJZu
- tiVF/FmorQsSxW8uv0L67PNlZGhE/On/l6J+gxDMu+16i9Fk9aPbGVV7n6BkLb9nexsy
- i+esYnJxvZOA8xasKzDgreJfLjr2+LwPFqAmYi1dE3tAWDDsp4CaAvA2hynKHbUUDpc+
- KROxseveq95vHiu+q10QshrkQlVY3+4V2tRM1YMzXQ4eWykzPKUQT383FwJL278fk8bn
- o9nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Y5B/GOqMJ71PwInQuQozQR2zkvMueHRZHDn470otJe0=;
- b=i2/oSGY+Fd0eOSRqfhfiboCgQ9saxvdSnb9V0/TU2m5Ob948aH91bcayMvJDstpjBa
- gCFEQZCEOncK1ERoLlcdYotSbyf/78uaw+NB8qq3Rgqm2oIRrorbBNTgfTKM/s2WTF1K
- MP0634IxaPYRGPFm8qyPmdwhGfty4KQRg876NGgR8HFIuXzd9rjaf60Pj7cnUkeX8zsA
- HffZiZqV2UShYfhKoW8RR96MPzwj7chiHRbJeIVf08832nw2Afq8oE3LlAODsaQ3jQvM
- 7/KVctm533OGqs2gbwdXnkirKJ08G2utux77c+aes5rk9ZVOx5MCscQw6v8LVLDQcdXt
- hRkQ==
-X-Gm-Message-State: APjAAAVIqvPTNNiZJ9wKTxIEdEzT+Wq0MUmh0zZpqD9jvCpsvQk6GLmr
- iKWeJ3mgCAv92omIkrJZ21HRgqHq2pmo+X3cY6U/Wg==
-X-Google-Smtp-Source: APXvYqyRV37Ar7VH8j3x5XvMCosn14U8QrvxgBvT94qqJ0tL3M618+T/VtNxq26ISsbElRQT4BcKXowR330uRygUEDY=
-X-Received: by 2002:a9d:5e11:: with SMTP id d17mr7481281oti.135.1568907551484; 
- Thu, 19 Sep 2019 08:39:11 -0700 (PDT)
+ (envelope-from <david@redhat.com>) id 1iAyXi-0001Th-Cx
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:40:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55526)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iAyXi-0001T8-5A
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:40:26 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 73F504705B;
+ Thu, 19 Sep 2019 15:40:25 +0000 (UTC)
+Received: from [10.36.118.9] (unknown [10.36.118.9])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 002025C1D4;
+ Thu, 19 Sep 2019 15:40:17 +0000 (UTC)
+Subject: Re: [RFC v2 4/5] exec: Adjust notdirty tracing
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190918180251.32003-1-richard.henderson@linaro.org>
+ <20190918180251.32003-5-richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <9b5b5f92-4e3b-480f-351a-8070ab17a9f2@redhat.com>
+Date: Thu, 19 Sep 2019 17:40:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190913154952.27724-1-peter.maydell@linaro.org>
- <20190913154952.27724-13-peter.maydell@linaro.org>
- <9ede7068-7f92-3e1a-c1f8-c0994eddf671@redhat.com>
- <CAFEAcA8nj27YwR3F0NA8JiV2yqqLcBzZ6T42Ue5FV2cUcmRoaQ@mail.gmail.com>
- <4324a9d9-6070-d014-27c9-77187cea1dfa@redhat.com>
- <CAFEAcA_P8H4=-tnKLrm+YTqH_p7x2oVjHq1Sg03m6ssrWnKsjw@mail.gmail.com>
- <07b8a4b8-79d2-a2f6-721d-e4a14917c808@redhat.com>
- <CAFEAcA9notWQ9JjZ87v3e19dEYeUpGhoZEGLUmf80XFEAcsegw@mail.gmail.com>
- <e5956649-c691-c7f1-de33-afa2bb272a20@redhat.com>
-In-Reply-To: <e5956649-c691-c7f1-de33-afa2bb272a20@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Sep 2019 16:39:00 +0100
-Message-ID: <CAFEAcA90=bpsPhYyoYMzxCnnr8V+_dDuGXPLn5B_VqQFEu3Dvw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 12/12] qemu-ga: Convert invocation
- documentation to rST
-To: Eric Blake <eblake@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::333
+In-Reply-To: <20190918180251.32003-5-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Thu, 19 Sep 2019 15:40:25 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,29 +116,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: pbonzini@redhat.com, alex.bennee@linaro.org, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 19 Sep 2019 at 16:37, Eric Blake <eblake@redhat.com> wrote:
->
-> On 9/19/19 10:22 AM, Peter Maydell wrote:
->
-> > Alex looked at this and suggests the problem is probably because
-> > you're doing an in-tree build.
->
-> Bingo.  I thought we wanted to get rid of that, though.  What's the
-> status on forcing out-of-tree builds?  (I'll adapt, but only once
-> patches are in that force me to).
+On 18.09.19 20:02, Richard Henderson wrote:
+> The memory_region_tb_read tracepoint is unreachable, since notdirty
+> is supposed to apply only to writes.  The memory_region_tb_write
+> tracepoint is mis-named, because notdirty is not only used for TB
+> invalidation.  It is also used for e.g. VGA RAM updates and migration.
+> 
+> Replace memory_region_tb_write with memory_notdirty_write_access,
+> and place it in memory_notdirty_write_prepare where it can catch
+> all of the instances.  Add memory_notdirty_set_dirty to log when
+> we no longer intercept writes to a page.
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+> v2: Rename new tracepoints as suggested (David)
+> ---
+>  exec.c       | 3 +++
+>  memory.c     | 4 ----
+>  trace-events | 4 ++--
+>  3 files changed, 5 insertions(+), 6 deletions(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index 8b998974f8..5f2587b621 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -2755,6 +2755,8 @@ void memory_notdirty_write_prepare(NotDirtyInfo *ndi,
+>      ndi->size = size;
+>      ndi->pages = NULL;
+>  
+> +    trace_memory_notdirty_write_access(mem_vaddr, ram_addr, size);
+> +
+>      assert(tcg_enabled());
+>      if (!cpu_physical_memory_get_dirty_flag(ram_addr, DIRTY_MEMORY_CODE)) {
+>          ndi->pages = page_collection_lock(ram_addr, ram_addr + size);
+> @@ -2779,6 +2781,7 @@ void memory_notdirty_write_complete(NotDirtyInfo *ndi)
+>      /* we remove the notdirty callback only if the code has been
+>         flushed */
+>      if (!cpu_physical_memory_is_clean(ndi->ram_addr)) {
+> +        trace_memory_notdirty_set_dirty(ndi->mem_vaddr);
+>          tlb_set_dirty(ndi->cpu, ndi->mem_vaddr);
+>      }
+>  }
+> diff --git a/memory.c b/memory.c
+> index b9dd6b94ca..57c44c97db 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -438,7 +438,6 @@ static MemTxResult  memory_region_read_accessor(MemoryRegion *mr,
+>          /* Accesses to code which has previously been translated into a TB show
+>           * up in the MMIO path, as accesses to the io_mem_notdirty
+>           * MemoryRegion. */
+> -        trace_memory_region_tb_read(get_cpu_index(), addr, tmp, size);
+>      } else if (TRACE_MEMORY_REGION_OPS_READ_ENABLED) {
+>          hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
+>          trace_memory_region_ops_read(get_cpu_index(), mr, abs_addr, tmp, size);
+> @@ -465,7 +464,6 @@ static MemTxResult memory_region_read_with_attrs_accessor(MemoryRegion *mr,
+>          /* Accesses to code which has previously been translated into a TB show
+>           * up in the MMIO path, as accesses to the io_mem_notdirty
+>           * MemoryRegion. */
+> -        trace_memory_region_tb_read(get_cpu_index(), addr, tmp, size);
+>      } else if (TRACE_MEMORY_REGION_OPS_READ_ENABLED) {
+>          hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
+>          trace_memory_region_ops_read(get_cpu_index(), mr, abs_addr, tmp, size);
+> @@ -490,7 +488,6 @@ static MemTxResult memory_region_write_accessor(MemoryRegion *mr,
+>          /* Accesses to code which has previously been translated into a TB show
+>           * up in the MMIO path, as accesses to the io_mem_notdirty
+>           * MemoryRegion. */
+> -        trace_memory_region_tb_write(get_cpu_index(), addr, tmp, size);
+>      } else if (TRACE_MEMORY_REGION_OPS_WRITE_ENABLED) {
+>          hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
+>          trace_memory_region_ops_write(get_cpu_index(), mr, abs_addr, tmp, size);
+> @@ -515,7 +512,6 @@ static MemTxResult memory_region_write_with_attrs_accessor(MemoryRegion *mr,
+>          /* Accesses to code which has previously been translated into a TB show
+>           * up in the MMIO path, as accesses to the io_mem_notdirty
+>           * MemoryRegion. */
+> -        trace_memory_region_tb_write(get_cpu_index(), addr, tmp, size);
+>      } else if (TRACE_MEMORY_REGION_OPS_WRITE_ENABLED) {
+>          hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
+>          trace_memory_region_ops_write(get_cpu_index(), mr, abs_addr, tmp, size);
+> diff --git a/trace-events b/trace-events
+> index 823a4ae64e..20821ba545 100644
+> --- a/trace-events
+> +++ b/trace-events
+> @@ -52,14 +52,14 @@ dma_map_wait(void *dbs) "dbs=%p"
+>  find_ram_offset(uint64_t size, uint64_t offset) "size: 0x%" PRIx64 " @ 0x%" PRIx64
+>  find_ram_offset_loop(uint64_t size, uint64_t candidate, uint64_t offset, uint64_t next, uint64_t mingap) "trying size: 0x%" PRIx64 " @ 0x%" PRIx64 ", offset: 0x%" PRIx64" next: 0x%" PRIx64 " mingap: 0x%" PRIx64
+>  ram_block_discard_range(const char *rbname, void *hva, size_t length, bool need_madvise, bool need_fallocate, int ret) "%s@%p + 0x%zx: madvise: %d fallocate: %d ret: %d"
+> +memory_notdirty_write_access(uint64_t vaddr, uint64_t ram_addr, unsigned size) "0x%" PRIx64 " ram_addr 0x%" PRIx64 " size %u"
+> +memory_notdirty_set_dirty(uint64_t vaddr) "0x%" PRIx64
+>  
+>  # memory.c
+>  memory_region_ops_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+>  memory_region_ops_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+>  memory_region_subpage_read(int cpu_index, void *mr, uint64_t offset, uint64_t value, unsigned size) "cpu %d mr %p offset 0x%"PRIx64" value 0x%"PRIx64" size %u"
+>  memory_region_subpage_write(int cpu_index, void *mr, uint64_t offset, uint64_t value, unsigned size) "cpu %d mr %p offset 0x%"PRIx64" value 0x%"PRIx64" size %u"
+> -memory_region_tb_read(int cpu_index, uint64_t addr, uint64_t value, unsigned size) "cpu %d addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+> -memory_region_tb_write(int cpu_index, uint64_t addr, uint64_t value, unsigned size) "cpu %d addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+>  memory_region_ram_device_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+>  memory_region_ram_device_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+>  flatview_new(void *view, void *root) "%p (root %p)"
+> 
 
-I think the general consensus was that it would probably
-be a good idea, but nobody's actually written any code :-)
-(Among other things, various bits of CI infra, probably
-the tests/vm code, etc, need updating to not try to do
-an in-tree build.)
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-thanks
--- PMM
+-- 
+
+Thanks,
+
+David / dhildenb
 
