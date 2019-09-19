@@ -2,86 +2,64 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31AEEC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:03:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38E17C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:06:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 054CE20644
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:03:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 054CE20644
+	by mail.kernel.org (Postfix) with ESMTPS id EE05B20644
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:06:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE05B20644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAzqX-00089Y-Oc
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 13:03:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47886)
+	id 1iAzsb-0001KC-Em
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 13:06:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48125)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iAznc-0005vc-7w
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:00:58 -0400
+ (envelope-from <lersek@redhat.com>) id 1iAzoy-00077I-N7
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:02:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iAzna-0007Br-6y
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:00:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36834)
+ (envelope-from <lersek@redhat.com>) id 1iAzow-0008KN-Ch
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:02:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44052)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iAznZ-0007Au-Um
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:00:54 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iAzow-0008KF-3r
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:02:18 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CF688796FF
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 17:00:52 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id r21so1905174wme.5
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 10:00:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=PNhoJ2bi0DzHGZLCyE+58JDcigW3fph7J2zFvGmhtro=;
- b=n/UfMpxuEQ4rOEIEVGC2yP85W4iVGs8HhjbgMuTAsYfVW2E/xZSyD6cbGPmJD/R7Bf
- ZV47kR2yiPDNWNXOLjbN7UyOWPxcqg8pkxLrxDyR/qB3p3sGaLdTnjy020+3Mis8R1wi
- vpa4j1br/VJJ3j0EjxxgV7pE7TIG6dHstbCTFpTrd/I9JwhydbWwa0m33RyQUgKwMYNF
- w7Y8j/weCWIdmoZmny1Q/8YncEqJceJls/d6gOPp1KgqOgGpIEvdXfyj6DWxdfB0NWF3
- db0Qnod7iT+zawoiddn3Dc1BTjO9o9SCLOPKtqSj+XJEahhu0F0FZ+YXJCo4AGkoMvg4
- r3Uw==
-X-Gm-Message-State: APjAAAVfGKlG9KX9OsKzUYiqIlk6vxNy1AnkdhEw+zQOjGrXkxnXqwYL
- G7ZDuyxgrSWR00wIn3armyXBb0OPzx1pENKm/Pe7hHOab0ojSRxDNUSB0jF1YlAd1maMa+dkEup
- BcvH4OuBnwjMXRrQ=
-X-Received: by 2002:adf:e591:: with SMTP id l17mr8267508wrm.199.1568912451179; 
- Thu, 19 Sep 2019 10:00:51 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwN6KLiNRBdq6TboyiY2TRxrlr9HnFnvhM0algC6aAax2lb84wMr4HKljiyHaUuPhzsT8Sm8Q==
-X-Received: by 2002:adf:e591:: with SMTP id l17mr8267498wrm.199.1568912450969; 
- Thu, 19 Sep 2019 10:00:50 -0700 (PDT)
-Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id d193sm9942589wmd.0.2019.09.19.10.00.50
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 19 Sep 2019 10:00:50 -0700 (PDT)
-Subject: Re: Problems with MIPS Malta SSH tests in make check-acceptance
-To: Cleber Rosa <crosa@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
-References: <20190918071654.GK2440@umbus.fritz.box>
- <20190919011452.GA23168@localhost.localdomain>
- <20190919165632.GA5821@localhost.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <8bc26c85-253e-ff20-c3e0-1ecdb56d60c0@redhat.com>
-Date: Thu, 19 Sep 2019 19:00:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 238B410CC1F8;
+ Thu, 19 Sep 2019 17:02:17 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-121-45.rdu2.redhat.com
+ [10.10.121.45])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4A29A5C1D4;
+ Thu, 19 Sep 2019 17:02:08 +0000 (UTC)
+Subject: Re: [Qemu-devel] [PATCH 1/2] q35: implement 128K SMRAM at default
+ SMBASE address
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+References: <20190917130708.10281-1-imammedo@redhat.com>
+ <20190917130708.10281-2-imammedo@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <561f4440-7c06-10d7-80ce-bbfa810fec59@redhat.com>
+Date: Thu, 19 Sep 2019 19:02:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <20190919165632.GA5821@localhost.localdomain>
+In-Reply-To: <20190917130708.10281-2-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Thu, 19 Sep 2019 17:02:17 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,126 +73,361 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-devel@nongnu.org
+Cc: yingwen.chen@intel.com, Brijesh Singh <brijesh.singh@amd.com>,
+ devel@edk2.groups.io, phillip.goerl@oracle.com, alex.williamson@redhat.com,
+ jiewen.yao@intel.com, jun.nakajima@intel.com, michael.d.kinney@intel.com,
+ pbonzini@redhat.com, boris.ostrovsky@oracle.com, rfc@edk2.groups.io,
+ joao.m.martins@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/19/19 6:56 PM, Cleber Rosa wrote:
-> On Wed, Sep 18, 2019 at 09:14:58PM -0400, Cleber Rosa wrote:
->> On Wed, Sep 18, 2019 at 05:16:54PM +1000, David Gibson wrote:
->>> Hi,
->>>
->>> I'm finding make check-acceptance is currently useless for me as a
->>> pre-pull test, because a bunch of the tests are not at all reliable.
->>> There are a bunch which I'm still investigating, but for now I'm
->>> looking at the MIPS Malta SSH tests.
->>>
->>> There seem to be at least two problems here.  First, the test includes
->>> a download of a pretty big guest disk image.  This can easily exhaust
->>> the 2m30 timeout on its own.
->>>
->>
->> You're correct that successes and failures on those tests depend
->> largely on bandwith.  On a shared environment I used for tests
->> the download of those images take roughly 400 seconds, resulting
->> in failures.  On my own machine, around 60, and the tests pass.
->>
->> There's a conceptual and conflicting problem in that the environment
->> for tests to run should be prepared beforehand.  The conflicting
->> solutions can be:
->>
->>  * extensive bootstrapping of the test execution environment, such
->>    as the installation of guests from ISOs or installation trees, or
->>    the download of "default" images wether the tests will use it or
->>    not (this is what Avocado-VT does/requires)
->>
->>  * keeping test assets in the tree (Avocado allows this if you have
->>    a your_test.py.data/ directory), but it's not practical for large
->>    files or files that can't or shouldn't be redistributed
->>
->>> Even without the timeout, it makes the test really slow, even on
->>> repeated runs.  Is there some way we can make the image download part
->>> of "building" the tests rather than actually running the testsuite, so
->>> that a) the test themselves go faster and b) we don't include the
->>> download in the test timeout - obviously the download speed is hugely
->>> dependent on factors that aren't really related to what we're testing
->>> here.
->>>
->>
->> On Avocado version 72.0 we attempted to minimize the isse by
->> implementing a "vmimage" command.  So, if you expect to use Fedora 30
->> aarch64 images, you could run before your tests:
->>
->>  $ avocado vmimage get --distro fedora --distro-version 30 --arch aarch64
->>
->> And to list the images on your cache:
->>
->>  $ avocado vmimage list
->>
->> Unfortunately, this test doesn't use the vmimage API.  Actually that
->> is fine because not all test assets map nicely to the vmimage goal,
->> and should keep using the more generic (and lower level) fetch_asset().
->>
->> We're now working on various "asset fetcher" improvements that should
->> allow us to check/cache all assets before a test is executed.  Also,
->> we're adding a mode in which the "fetch_asset()" API will default to
->> cancel (aka SKIP) a test if the asset could not be downloaded.
->>
->> If you're interested in the card we're using to track that new feature:
->>
->>   https://trello.com/c/T3SC1sZs/1521-implement-fetch-assets-command-line-parameter
->>
->> Another possibility that we've prototyped, and we'll be working on
->> further, is to make a specific part of the "test" code execution
->> (really a pre-test phase) to be executed without a timeout and even be
->> tried a number of times before bailing out and skipping the test.
->>
->>> In the meantime, I tried hacking it by just increasing the timeout to
->>> 10m.  That got several of the tests working for me, but one still
->>> failed.  Specifically 'LinuxSSH.test_mips_malta32eb_kernel3_2_0' still
->>> timed out for me, but now after booting the guest, rather than during
->>> the image download.  Looking at the avocado log file I'm seeing a
->>> bunch of soft lockup messages from the guest console, AFAICT.  So it
->>> looks like we have a real bug here, which I suspect has been
->>> overlooked precisely because the download problems mean this test
->>> isn't reliable.
->>>
->>
->> I've schedulled a 100 executions of `make check-acceptance` builds, with
->> the linux_ssh_mips_malta.py tests having a 1500 seconds timeout.  The
->> very first execution already brought interesting results:
->>
->>  ...
->>  (15/39) /home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mips_malta32eb_kernel3_2_0: PASS (198.38 s)
->>  (16/39) /home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mips_malta64el_kernel3_2_0: FAIL: Failure message found in console: Oops (22.83 s)
->>
->> I'll let you know about my full results.  This should also serve as a
->> starting point to a discussion about the reliability of other tests,
->> as you mentioned before.
-> 
-> Out of the 100 executions on a ppc64le host, the results that contain
-> failures and errors:
-> 
-> 15-/home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mips_malta32eb_kernel3_2_0
->   - PASS: 92
->   - INTERRUPTED: 4
->   - FAIL: 4
-> 16-/home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mips_malta64el_kernel3_2_0
->   - PASS: 95
->   - FAIL: 5
-> 
-> FAIL means that self.fail() was called, which means 'Oops' was found
-> in the console.  INTERRUPTED here means that the test timeout kicked
-> in, and I can back David's statements about soft lockups.
-> 
-> Let me know if anyone wants access to the full logs/results.
+Hi Igor,
 
-Can you check if the FAIL case are this bug please?
+(+Brijesh)
 
-https://bugs.launchpad.net/qemu/+bug/1833661
+long-ish pondering ahead, with a question at the end.
 
-Thanks,
+On 09/17/19 15:07, Igor Mammedov wrote:
+> Use commit (2f295167e0 q35/mch: implement extended TSEG sizes) for
+> inspiration and (ab)use reserved register in config space at 0x9c
+> offset [*] to extend q35 pci-host with ability to use 128K at
+> 0x30000 as SMRAM and hide it (like TSEG) from non-SMM context.
+>
+> Usage:
+>   1: write 0xff in the register
+>   2: if the feature is supported, follow up read from the register
+>      should return 0x01. At this point RAM at 0x30000 is still
+>      available for SMI handler configuration from non-SMM context
+>   3: writing 0x02 in the register, locks SMBASE area, making its contents
+>      available only from SMM context. In non-SMM context, reads return
+>      0xff and writes are ignored. Further writes into the register are
+>      ignored until the system reset.
 
-Phil.
+I haven't written any OVMF code for this yet, but I've spent a few hours
+thinking about it. Progress! :)
+
+So, this looks really promising.
+
+I'm commenting now for summarizing my thoughts before I write the --
+initially minimal -- counterpart patches in OVMF.
+
+There is one complication that deserves this separate email, and that's
+SEV's effect on the SMM save state map. It is the topic of the following
+edk2 commit range:
+
+  1  61a044c6c15f OvmfPkg/MemEncryptSevLib: find pages of initial SMRAM
+                  save state map
+  2  86defc2c2575 OvmfPkg/PlatformPei: SEV: allocate pages of initial
+                  SMRAM save state map
+  3  5ef3b66fec13 OvmfPkg/SmmCpuFeaturesLib: SEV: encrypt+free pages of
+                  init. save state map
+  4  5e2e5647b9fb OvmfPkg/AmdSevDxe: decrypt the pages of the initial
+                  SMRAM save state map
+
+For performing the initial SMBASE relocation, QEMU+KVM have to read the
+save state map from guest RAM. For that, under SEV, the guest RAM has to
+be decrypted before, and re-encrypted after. Meanwhile, the guest RAM
+(while decrypted) should not leak other (unrelated) information to the
+hypervisor.
+
+Therefore the above edk2 commits implement the following procedure:
+
+(a.1) in OvmfPkg/PlatformPei, the page in which the save state map
+      exists, is allocated away from other firmware components
+
+(a.2) in AmdSevDxe, which runs early in the DXE phase (via APRIORI DXE
+      file), we decrypt the page in question
+
+(a.3) PiSmmCpuDxeSmm, after it performs the initial SMBASE relocation,
+      calls a hook in SmmCpuFeaturesLib -- and in that hook, we
+      re-encrypt the page, and also release (free) it for other uses
+      (firmware and OS both)
+
+Clearly, the above conflicts (or at least intersects) with reserving
+128KB (32 pages) at 0x3_0000, i.e. at [0x3_0000..0x4_FFFF], forever,
+from the OS. (That area is going to be locked to SMM, and so the OS
+should see from the UEFI memmap that it should not touch it.) The
+conflict exists because the save state map is in the last kilobyte of
+page#15 (from said pages #0..#31) -- the save state map is at
+[0x3_FC00..0x3_FFFF].
+
+So here's my plan:
+
+(b.1) In PlatformPei, probe the QEMU feature by writing 0xFF to register
+      0x9C, and reading back 0x01. If the feature is available, then:
+
+(b.1.1) set a new dynamic PCD to TRUE
+
+(b.1.2) allocate away (as reserved memory) the range
+        [0x3_0000..0x4_FFFF]
+
+(b.2) In PlatformPei, conditionalize the current, SEV-specific,
+      allocation of the save state map, on the PCD being FALSE.
+      (Modifying (a.1).) This will prevent a conflicting
+      double-allocation (double coverage by memory allocation HOBs)
+
+(b.3) In AmdSevDxe, don't touch the decryption of the save state map
+      (a.2)
+
+(b.4) in the SmmCpuFeaturesLib hook, preserve the re-encryption of the
+      save state map (part of (a.3))
+
+(b.5) in the SmmCpuFeaturesLib hook, conditionalize the freeing of the
+      save state map, on the PCD being FALSE. (Modifying (a.3).) This
+      will prevent a hole from being punched in the allocation that
+      covers [0x3_0000..0x4_FFFF], and the entire allocation will
+      survive into OS runtime.
+
+The above steps ensure that, while the decrypt/encrypt steps prevail,
+the save state map allocations will be ingested by the larger, and
+longer-term,  [0x3_0000..0x4_FFFF] allocation.
+
+Furthermore:
+
+(b.6) Extend SmmAccessDxe to write 0x02 to register 0x9C, in an
+      EFI_DXE_MM_READY_TO_LOCK_PROTOCOL notification callback, if the
+      PCD is true. This will cause the [0x3_0000..0x4_FFFF] area to be
+      locked down at the same time with the rest of SMRAM (i.e., TSEG).
+
+(b.7) Extend SmmAccessDxe to save S3 boot script opcodes for writing
+      0x02 to register 0x9C, if the PCD is true. This makes sure that
+      the above lockdown will occur also during S3 resume, before the OS
+      is reached. (The S3 boot script is executed *after* SMBASE
+      relocation and TSEG locking, during S3 resume.)
+
+Considering (b.6) and (b.7), the "lockdown on normal boot" (from (b.6))
+could actually be merged into (b.5) -- we don't necessarily have to
+delay the normal boot lockdown of [0x3_0000..0x4_FFFF] until platform
+BDS signals EFI_DXE_MM_READY_TO_LOCK_PROTOCOL; we could do it right
+after initial SMBASE relocation.
+
+However: I'd really like to keep (b.6) and (b.7) together, in the same
+driver, and (b.7) is really inappropriate for PiSmmCpuDxeSmm (into which
+SmmCpuFeaturesLib is linked). For writing S3 boot script opcodes in
+(b.7), we need another protocol notify (on EFI_S3_SAVE_STATE_PROTOCOL),
+and sneaking that kind of callback into PiSmmCpuDxeSmm sounds really
+bad. Hence I plan to add both (b.6) and (b.7) to SmmAccessDxe.
+
+I'll report back with my findings; just wanted to give a heads-up (to
+myself as well :))
+
+Finally: can you please remind me why we lock down 128KB (32 pages) at
+0x3_0000, and not just half of that? What do we need the range at
+[0x4_0000..0x4_FFFF] for?
+
+Thanks!
+Laszlo
+
+
+>
+> *) https://www.mail-archive.com/qemu-devel@nongnu.org/msg455991.html
+>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  include/hw/pci-host/q35.h | 10 +++++
+>  hw/i386/pc.c              |  4 +-
+>  hw/pci-host/q35.c         | 80 +++++++++++++++++++++++++++++++++++----
+>  3 files changed, 86 insertions(+), 8 deletions(-)
+>
+> diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
+> index b3bcf2e632..976fbae599 100644
+> --- a/include/hw/pci-host/q35.h
+> +++ b/include/hw/pci-host/q35.h
+> @@ -32,6 +32,7 @@
+>  #include "hw/acpi/ich9.h"
+>  #include "hw/pci-host/pam.h"
+>  #include "hw/i386/intel_iommu.h"
+> +#include "qemu/units.h"
+>
+>  #define TYPE_Q35_HOST_DEVICE "q35-pcihost"
+>  #define Q35_HOST_DEVICE(obj) \
+> @@ -54,6 +55,8 @@ typedef struct MCHPCIState {
+>      MemoryRegion smram_region, open_high_smram;
+>      MemoryRegion smram, low_smram, high_smram;
+>      MemoryRegion tseg_blackhole, tseg_window;
+> +    MemoryRegion smbase_blackhole, smbase_window;
+> +    bool has_smram_at_smbase;
+>      Range pci_hole;
+>      uint64_t below_4g_mem_size;
+>      uint64_t above_4g_mem_size;
+> @@ -97,6 +100,13 @@ typedef struct Q35PCIHost {
+>  #define MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_QUERY  0xffff
+>  #define MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_MAX    0xfff
+>
+> +#define MCH_HOST_BRIDGE_SMBASE_SIZE            (128 * KiB)
+> +#define MCH_HOST_BRIDGE_SMBASE_ADDR            0x30000
+> +#define MCH_HOST_BRIDGE_F_SMBASE               0x9c
+> +#define MCH_HOST_BRIDGE_F_SMBASE_QUERY         0xff
+> +#define MCH_HOST_BRIDGE_F_SMBASE_IN_RAM        0x01
+> +#define MCH_HOST_BRIDGE_F_SMBASE_LCK           0x02
+> +
+>  #define MCH_HOST_BRIDGE_PCIEXBAR               0x60    /* 64bit register */
+>  #define MCH_HOST_BRIDGE_PCIEXBAR_SIZE          8       /* 64bit register */
+>  #define MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT       0xb0000000
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index bad866fe44..288d28358a 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -119,7 +119,9 @@ struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
+>  /* Physical Address of PVH entry point read from kernel ELF NOTE */
+>  static size_t pvh_start_addr;
+>
+> -GlobalProperty pc_compat_4_1[] = {};
+> +GlobalProperty pc_compat_4_1[] = {
+> +    { "mch", "smbase-smram", "off" },
+> +};
+>  const size_t pc_compat_4_1_len = G_N_ELEMENTS(pc_compat_4_1);
+>
+>  GlobalProperty pc_compat_4_0[] = {};
+> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> index 158d270b9f..c1bd9f78ae 100644
+> --- a/hw/pci-host/q35.c
+> +++ b/hw/pci-host/q35.c
+> @@ -275,20 +275,20 @@ static const TypeInfo q35_host_info = {
+>   * MCH D0:F0
+>   */
+>
+> -static uint64_t tseg_blackhole_read(void *ptr, hwaddr reg, unsigned size)
+> +static uint64_t blackhole_read(void *ptr, hwaddr reg, unsigned size)
+>  {
+>      return 0xffffffff;
+>  }
+>
+> -static void tseg_blackhole_write(void *opaque, hwaddr addr, uint64_t val,
+> -                                 unsigned width)
+> +static void blackhole_write(void *opaque, hwaddr addr, uint64_t val,
+> +                            unsigned width)
+>  {
+>      /* nothing */
+>  }
+>
+> -static const MemoryRegionOps tseg_blackhole_ops = {
+> -    .read = tseg_blackhole_read,
+> -    .write = tseg_blackhole_write,
+> +static const MemoryRegionOps blackhole_ops = {
+> +    .read = blackhole_read,
+> +    .write = blackhole_write,
+>      .endianness = DEVICE_NATIVE_ENDIAN,
+>      .valid.min_access_size = 1,
+>      .valid.max_access_size = 4,
+> @@ -430,6 +430,46 @@ static void mch_update_ext_tseg_mbytes(MCHPCIState *mch)
+>      }
+>  }
+>
+> +static void mch_update_smbase_smram(MCHPCIState *mch)
+> +{
+> +    PCIDevice *pd = PCI_DEVICE(mch);
+> +    uint8_t *reg = pd->config + MCH_HOST_BRIDGE_F_SMBASE;
+> +    bool lck;
+> +
+> +    if (!mch->has_smram_at_smbase) {
+> +        return;
+> +    }
+> +
+> +    if (*reg == MCH_HOST_BRIDGE_F_SMBASE_QUERY) {
+> +        pd->wmask[MCH_HOST_BRIDGE_F_SMBASE] =
+> +            MCH_HOST_BRIDGE_F_SMBASE_LCK;
+> +        *reg = MCH_HOST_BRIDGE_F_SMBASE_IN_RAM;
+> +        return;
+> +    }
+> +
+> +    /*
+> +     * default/reset state, discard written value
+> +     * which will disable SMRAM balackhole at SMBASE
+> +     */
+> +    if (pd->wmask[MCH_HOST_BRIDGE_F_SMBASE] == 0xff) {
+> +        *reg = 0x00;
+> +    }
+> +
+> +    memory_region_transaction_begin();
+> +    if (*reg & MCH_HOST_BRIDGE_F_SMBASE_LCK) {
+> +        /* disable all writes */
+> +        pd->wmask[MCH_HOST_BRIDGE_F_SMBASE] &=
+> +            ~MCH_HOST_BRIDGE_F_SMBASE_LCK;
+> +        *reg = MCH_HOST_BRIDGE_F_SMBASE_LCK;
+> +        lck = true;
+> +    } else {
+> +        lck = false;
+> +    }
+> +    memory_region_set_enabled(&mch->smbase_blackhole, lck);
+> +    memory_region_set_enabled(&mch->smbase_window, lck);
+> +    memory_region_transaction_commit();
+> +}
+> +
+>  static void mch_write_config(PCIDevice *d,
+>                                uint32_t address, uint32_t val, int len)
+>  {
+> @@ -456,6 +496,10 @@ static void mch_write_config(PCIDevice *d,
+>                         MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_SIZE)) {
+>          mch_update_ext_tseg_mbytes(mch);
+>      }
+> +
+> +    if (ranges_overlap(address, len, MCH_HOST_BRIDGE_F_SMBASE, 1)) {
+> +        mch_update_smbase_smram(mch);
+> +    }
+>  }
+>
+>  static void mch_update(MCHPCIState *mch)
+> @@ -464,6 +508,7 @@ static void mch_update(MCHPCIState *mch)
+>      mch_update_pam(mch);
+>      mch_update_smram(mch);
+>      mch_update_ext_tseg_mbytes(mch);
+> +    mch_update_smbase_smram(mch);
+>
+>      /*
+>       * pci hole goes from end-of-low-ram to io-apic.
+> @@ -514,6 +559,9 @@ static void mch_reset(DeviceState *qdev)
+>                       MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_QUERY);
+>      }
+>
+> +    d->config[MCH_HOST_BRIDGE_F_SMBASE] = 0;
+> +    d->wmask[MCH_HOST_BRIDGE_F_SMBASE] = 0xff;
+> +
+>      mch_update(mch);
+>  }
+>
+> @@ -563,7 +611,7 @@ static void mch_realize(PCIDevice *d, Error **errp)
+>      memory_region_add_subregion(&mch->smram, 0xfeda0000, &mch->high_smram);
+>
+>      memory_region_init_io(&mch->tseg_blackhole, OBJECT(mch),
+> -                          &tseg_blackhole_ops, NULL,
+> +                          &blackhole_ops, NULL,
+>                            "tseg-blackhole", 0);
+>      memory_region_set_enabled(&mch->tseg_blackhole, false);
+>      memory_region_add_subregion_overlap(mch->system_memory,
+> @@ -575,6 +623,23 @@ static void mch_realize(PCIDevice *d, Error **errp)
+>      memory_region_set_enabled(&mch->tseg_window, false);
+>      memory_region_add_subregion(&mch->smram, mch->below_4g_mem_size,
+>                                  &mch->tseg_window);
+> +
+> +    memory_region_init_io(&mch->smbase_blackhole, OBJECT(mch), &blackhole_ops,
+> +                          NULL, "smbase-blackhole",
+> +                          MCH_HOST_BRIDGE_SMBASE_SIZE);
+> +    memory_region_set_enabled(&mch->smbase_blackhole, false);
+> +    memory_region_add_subregion_overlap(mch->system_memory,
+> +                                        MCH_HOST_BRIDGE_SMBASE_ADDR,
+> +                                        &mch->smbase_blackhole, 1);
+> +
+> +    memory_region_init_alias(&mch->smbase_window, OBJECT(mch),
+> +                             "smbase-window", mch->ram_memory,
+> +                             MCH_HOST_BRIDGE_SMBASE_ADDR,
+> +                             MCH_HOST_BRIDGE_SMBASE_SIZE);
+> +    memory_region_set_enabled(&mch->smbase_window, false);
+> +    memory_region_add_subregion(&mch->smram, MCH_HOST_BRIDGE_SMBASE_ADDR,
+> +                                &mch->smbase_window);
+> +
+>      object_property_add_const_link(qdev_get_machine(), "smram",
+>                                     OBJECT(&mch->smram), &error_abort);
+>
+> @@ -601,6 +666,7 @@ uint64_t mch_mcfg_base(void)
+>  static Property mch_props[] = {
+>      DEFINE_PROP_UINT16("extended-tseg-mbytes", MCHPCIState, ext_tseg_mbytes,
+>                         16),
+> +    DEFINE_PROP_BOOL("smbase-smram", MCHPCIState, has_smram_at_smbase, true),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>
+>
+
 
