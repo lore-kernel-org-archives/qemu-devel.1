@@ -2,110 +2,100 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86A7EC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:49:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B405C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:50:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B037205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:49:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B037205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 63B4A205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:50:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="mjnhySDW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63B4A205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAxkQ-0008Bn-TM
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 10:49:30 -0400
+	id 1iAxlR-0000l8-Vj
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 10:50:34 -0400
 Received: from eggs.gnu.org ([2001:470:142:3::10]:58035)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iAxgZ-0004ue-9G
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:45:32 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1iAxgp-0004ue-NB
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:45:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iAxY5-000636-VW
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:36:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34002)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iAxY5-00062X-Nw
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:36:45 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 610608A1C94;
- Thu, 19 Sep 2019 14:36:44 +0000 (UTC)
-Received: from [10.36.118.9] (unknown [10.36.118.9])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 379445D9CD;
- Thu, 19 Sep 2019 14:36:36 +0000 (UTC)
-Subject: Re: [RFC v2 1/5] cputlb: Disable __always_inline__ without
- optimization
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190918180251.32003-1-richard.henderson@linaro.org>
- <20190918180251.32003-2-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <7fe2ef2e-6401-1db4-23ce-6189ea68763c@redhat.com>
-Date: Thu, 19 Sep 2019 16:36:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190918180251.32003-2-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Thu, 19 Sep 2019 14:36:44 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+ (envelope-from <liran.alon@oracle.com>) id 1iAxUP-0003DV-U7
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:32:58 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:58730)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1iAxUP-0003Ch-Jk
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:32:57 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8JETcXX106650;
+ Thu, 19 Sep 2019 14:32:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=LSuAbkBFezedcCQlhqnSdMYTUe6oMicT4male1uRfTA=;
+ b=mjnhySDWbqDO2i2SA3kA3pM4ecsSHDL5qCslgV8wHHf6OGfphXvJ1IohRau01zkommSw
+ ALXvCYlOFhWkU6EWIeK9hgWlN0DmsOzmHR3tVrefF59hWY4TPgzLaRYqRCJLzmymMLfX
+ NDgoBfXdV6YQuqQmb0XZKbrE2a6ocr6sXvFIzaeI6TcWy+kVdlylq6MQ5iuF0za56oKx
+ 8fJ8eAihNxDdbmd9SYZAXLlcFndwnO9Tp3uZvCnChrRsk3KvV7bwF9TPm7zEjlv98QG+
+ vo4NWPyqUictUvH+H7GRd8Fhqo60GG2f6waRleMBftMxyq5W4j7EiJw8YlgTg6N6y9Lr zw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2130.oracle.com with ESMTP id 2v3vb54dsq-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 19 Sep 2019 14:32:54 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8JEOIdP122133;
+ Thu, 19 Sep 2019 14:32:53 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3020.oracle.com with ESMTP id 2v3vbg7mt3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 19 Sep 2019 14:32:53 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x8JEWped002779;
+ Thu, 19 Sep 2019 14:32:52 GMT
+Received: from [192.168.14.112] (/79.183.239.52)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 19 Sep 2019 07:32:51 -0700
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH 6/7] target/i386: add VMX features
+From: Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <1568716480-9973-7-git-send-email-pbonzini@redhat.com>
+Date: Thu, 19 Sep 2019 17:32:48 +0300
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A0C3DD36-966F-46CC-8705-903112BECBC2@oracle.com>
+References: <1568716480-9973-1-git-send-email-pbonzini@redhat.com>
+ <1568716480-9973-7-git-send-email-pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9385
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=678
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1909190136
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9385
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=749 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1909190137
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,73 +107,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, alex.bennee@linaro.org, stefanha@redhat.com
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18.09.19 20:02, Richard Henderson wrote:
-> This forced inlining can result in missing symbols,
-> which makes a debugging build harder to follow.
-> 
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+> On 17 Sep 2019, at 13:34, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> Add code to convert the VMX feature words back into MSR values,
+> allowing the user to enable/disable VMX features as they wish.  The =
+same
+> infrastructure enables support for limiting VMX features in named
+> CPU models.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  include/qemu/compiler.h | 11 +++++++++++
->  accel/tcg/cputlb.c      |  4 ++--
->  2 files changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
-> index 09fc44cca4..d6d400c523 100644
-> --- a/include/qemu/compiler.h
-> +++ b/include/qemu/compiler.h
-> @@ -170,6 +170,17 @@
->  # define QEMU_NONSTRING
->  #endif
->  
-> +/*
-> + * Forced inlining may be desired to encourage constant propagation
-> + * of function parameters.  However, it can also make debugging harder,
-> + * so disable it for a non-optimizing build.
-> + */
-> +#if defined(__OPTIMIZE__) && __has_attribute(always_inline)
-> +#define QEMU_ALWAYS_INLINE  __attribute__((always_inline))
-> +#else
-> +#define QEMU_ALWAYS_INLINE
-> +#endif
+> +static uint64_t make_vmx_msr_value(uint32_t index, uint32_t features)
+> +{
+> +    uint32_t default1, can_be_one, can_be_zero;
+> +    uint32_t must_be_one;
 > +
->  /* Implement C11 _Generic via GCC builtins.  Example:
->   *
->   *    QEMU_GENERIC(x, (float, sinf), (long double, sinl), sin) (x)
-> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index abae79650c..2222b87764 100644
-> --- a/accel/tcg/cputlb.c
-> +++ b/accel/tcg/cputlb.c
-> @@ -1281,7 +1281,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
->  typedef uint64_t FullLoadHelper(CPUArchState *env, target_ulong addr,
->                                  TCGMemOpIdx oi, uintptr_t retaddr);
->  
-> -static inline uint64_t __attribute__((always_inline))
-> +static inline uint64_t QEMU_ALWAYS_INLINE
->  load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
->              uintptr_t retaddr, MemOp op, bool code_read,
->              FullLoadHelper *full_load)
-> @@ -1530,7 +1530,7 @@ tcg_target_ulong helper_be_ldsl_mmu(CPUArchState *env, target_ulong addr,
->   * Store Helpers
->   */
->  
-> -static inline void __attribute__((always_inline))
-> +static inline void QEMU_ALWAYS_INLINE
->  store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
->               TCGMemOpIdx oi, uintptr_t retaddr, MemOp op)
->  {
-> 
+> +    switch (index) {
+> +    case MSR_IA32_VMX_TRUE_PINBASED_CTLS:
+> +        default1 =3D 0x00000016;
+> +        break;
+> +    case MSR_IA32_VMX_TRUE_PROCBASED_CTLS:
+> +        default1 =3D 0x0401e172;
+> +        break;
+> +    case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
+> +        default1 =3D 0x000011ff;
+> +        break;
+> +    case MSR_IA32_VMX_TRUE_EXIT_CTLS:
+> +        default1 =3D 0x00036dff;
+> +        break;
+> +    case MSR_IA32_VMX_PROCBASED_CTLS2:
+> +        default1 =3D 0;
+> +        break;
+> +    default:
+> +        abort();
+> +    }
+> +
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+See below.
 
--- 
+> +    /*
+> +     * Bits 0-30, 32-44 and 50-53 come from the host.  KVM should
+> +     * not change them for backwards compatibility.
+> +     */
+> +    uint64_t fixed_vmx_basic =3D kvm_vmx_basic & =
+0x003c1fff7fffffffULL;
+> +
+> +    /*
+> +     * Same for bits 0-4 and 25-27.  Bits 16-24 (CR3 target count) =
+can
+> +     * change in the future but are always zero for now, clear them =
+to be
+> +     * future proof.  Bits 32-63 in theory could change, though KVM =
+does
+> +     * not support dual-monitor treatment and probably never will; =
+mask
+> +     * them out as well.
+> +     */
+> +    uint64_t fixed_vmx_misc =3D kvm_vmx_misc & 0x0e00001f;
 
-Thanks,
+I haven=E2=80=99t yet read deeply entire patch-series but I=E2=80=99m =
+definitely against having
+these hard-coded values in code instead of explicitly building proper =
+bitmap
+with well-defined bit names. This is error-prone and less readable.
+(E.g. Am I suppose as a reader to convert 0x0401e172 to which =
+processor-based controls it represents?)
 
-David / dhildenb
+-Liran
+
+
 
