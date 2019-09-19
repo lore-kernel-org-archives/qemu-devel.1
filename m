@@ -2,60 +2,137 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A2D0C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 16:57:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FE4CC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 16:59:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D41F214AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 16:57:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D41F214AF
+	by mail.kernel.org (Postfix) with ESMTPS id 1D0FA214AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 16:59:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D0FA214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAzkS-0002Ci-I4
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 12:57:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47199)
+	id 1iAzmQ-0004X1-4B
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 12:59:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47422)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1iAzjW-0001a4-3X
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:56:43 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iAzkX-00030t-G8
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:57:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1iAzjU-0004HB-BL
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:56:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38454)
+ (envelope-from <jsnow@redhat.com>) id 1iAzkW-0004hr-8J
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:57:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39406)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iAzjU-0004GY-2A
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:56:40 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iAzkT-0004fx-2c; Thu, 19 Sep 2019 12:57:41 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 612AE8A1C92;
- Thu, 19 Sep 2019 16:56:39 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-123-8.rdu2.redhat.com [10.10.123.8])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E1085D9CD;
- Thu, 19 Sep 2019 16:56:34 +0000 (UTC)
-Date: Thu, 19 Sep 2019 12:56:32 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: Problems with MIPS Malta SSH tests in make check-acceptance
-Message-ID: <20190919165632.GA5821@localhost.localdomain>
-References: <20190918071654.GK2440@umbus.fritz.box>
- <20190919011452.GA23168@localhost.localdomain>
+ by mx1.redhat.com (Postfix) with ESMTPS id 5C59730603AA;
+ Thu, 19 Sep 2019 16:57:40 +0000 (UTC)
+Received: from [10.10.125.66] (ovpn-125-66.rdu2.redhat.com [10.10.125.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9B08E6013A;
+ Thu, 19 Sep 2019 16:57:39 +0000 (UTC)
+Subject: Re: [Qemu-devel] [PATCH] iotests: Require Python 3.5 or later
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20190918085519.17290-1-kwolf@redhat.com>
+ <b0f72b9f-69b1-4e1d-4321-d30c7d85355f@redhat.com>
+ <20190919083530.GC6645@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <3ee2f3b2-ea41-571d-0e56-c28d35046d95@redhat.com>
+Date: Thu, 19 Sep 2019 12:57:39 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190919011452.GA23168@localhost.localdomain>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Thu, 19 Sep 2019 16:56:39 +0000 (UTC)
+In-Reply-To: <20190919083530.GC6645@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Thu, 19 Sep 2019 16:57:40 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -69,139 +146,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 18, 2019 at 09:14:58PM -0400, Cleber Rosa wrote:
-> On Wed, Sep 18, 2019 at 05:16:54PM +1000, David Gibson wrote:
-> > Hi,
-> > 
-> > I'm finding make check-acceptance is currently useless for me as a
-> > pre-pull test, because a bunch of the tests are not at all reliable.
-> > There are a bunch which I'm still investigating, but for now I'm
-> > looking at the MIPS Malta SSH tests.
-> > 
-> > There seem to be at least two problems here.  First, the test includes
-> > a download of a pretty big guest disk image.  This can easily exhaust
-> > the 2m30 timeout on its own.
-> >
-> 
-> You're correct that successes and failures on those tests depend
-> largely on bandwith.  On a shared environment I used for tests
-> the download of those images take roughly 400 seconds, resulting
-> in failures.  On my own machine, around 60, and the tests pass.
-> 
-> There's a conceptual and conflicting problem in that the environment
-> for tests to run should be prepared beforehand.  The conflicting
-> solutions can be:
-> 
->  * extensive bootstrapping of the test execution environment, such
->    as the installation of guests from ISOs or installation trees, or
->    the download of "default" images wether the tests will use it or
->    not (this is what Avocado-VT does/requires)
-> 
->  * keeping test assets in the tree (Avocado allows this if you have
->    a your_test.py.data/ directory), but it's not practical for large
->    files or files that can't or shouldn't be redistributed
-> 
-> > Even without the timeout, it makes the test really slow, even on
-> > repeated runs.  Is there some way we can make the image download part
-> > of "building" the tests rather than actually running the testsuite, so
-> > that a) the test themselves go faster and b) we don't include the
-> > download in the test timeout - obviously the download speed is hugely
-> > dependent on factors that aren't really related to what we're testing
-> > here.
-> >
-> 
-> On Avocado version 72.0 we attempted to minimize the isse by
-> implementing a "vmimage" command.  So, if you expect to use Fedora 30
-> aarch64 images, you could run before your tests:
-> 
->  $ avocado vmimage get --distro fedora --distro-version 30 --arch aarch64
-> 
-> And to list the images on your cache:
-> 
->  $ avocado vmimage list
-> 
-> Unfortunately, this test doesn't use the vmimage API.  Actually that
-> is fine because not all test assets map nicely to the vmimage goal,
-> and should keep using the more generic (and lower level) fetch_asset().
-> 
-> We're now working on various "asset fetcher" improvements that should
-> allow us to check/cache all assets before a test is executed.  Also,
-> we're adding a mode in which the "fetch_asset()" API will default to
-> cancel (aka SKIP) a test if the asset could not be downloaded.
-> 
-> If you're interested in the card we're using to track that new feature:
-> 
->   https://trello.com/c/T3SC1sZs/1521-implement-fetch-assets-command-line-parameter
-> 
-> Another possibility that we've prototyped, and we'll be working on
-> further, is to make a specific part of the "test" code execution
-> (really a pre-test phase) to be executed without a timeout and even be
-> tried a number of times before bailing out and skipping the test.
-> 
-> > In the meantime, I tried hacking it by just increasing the timeout to
-> > 10m.  That got several of the tests working for me, but one still
-> > failed.  Specifically 'LinuxSSH.test_mips_malta32eb_kernel3_2_0' still
-> > timed out for me, but now after booting the guest, rather than during
-> > the image download.  Looking at the avocado log file I'm seeing a
-> > bunch of soft lockup messages from the guest console, AFAICT.  So it
-> > looks like we have a real bug here, which I suspect has been
-> > overlooked precisely because the download problems mean this test
-> > isn't reliable.
-> >
-> 
-> I've schedulled a 100 executions of `make check-acceptance` builds, with
-> the linux_ssh_mips_malta.py tests having a 1500 seconds timeout.  The
-> very first execution already brought interesting results:
-> 
->  ...
->  (15/39) /home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mips_malta32eb_kernel3_2_0: PASS (198.38 s)
->  (16/39) /home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mips_malta64el_kernel3_2_0: FAIL: Failure message found in console: Oops (22.83 s)
-> 
-> I'll let you know about my full results.  This should also serve as a
-> starting point to a discussion about the reliability of other tests,
-> as you mentioned before.
 
-Out of the 100 executions on a ppc64le host, the results that contain
-failures and errors:
 
-15-/home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mips_malta32eb_kernel3_2_0
-  - PASS: 92
-  - INTERRUPTED: 4
-  - FAIL: 4
-16-/home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mips_malta64el_kernel3_2_0
-  - PASS: 95
-  - FAIL: 5
-
-FAIL means that self.fail() was called, which means 'Oops' was found
-in the console.  INTERRUPTED here means that the test timeout kicked
-in, and I can back David's statements about soft lockups.
-
-Let me know if anyone wants access to the full logs/results.
-
-- Cleber.
-
+On 9/19/19 4:35 AM, Kevin Wolf wrote:
+> Am 18.09.2019 um 20:49 hat John Snow geschrieben:
+>>
+>>
+>> On 9/18/19 4:55 AM, Kevin Wolf wrote:
+>>> Running iotests is not required to build QEMU, so we can have stricter
+>>> version requirements for Python here and can make use of new features
+>>> and drop compatibility code earlier.
+>>>
+>>> This makes qemu-iotests skip all Python tests if a Python version before
+>>> 3.5 is used for the build.
+>>>
+>>> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>>> ---
+>>>   tests/qemu-iotests/check | 14 +++++++++++++-
+>>>   1 file changed, 13 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+>>> index 875399d79f..a68f414d6c 100755
+>>> --- a/tests/qemu-iotests/check
+>>> +++ b/tests/qemu-iotests/check
+>>> @@ -633,6 +633,13 @@ then
+>>>       export SOCKET_SCM_HELPER="$build_iotests/socket_scm_helper"
+>>>   fi
+>>> +# Note that if the Python conditional here evaluates True we will exit
+>>> +# with status 1 which is a shell 'false' value.
+>>> +python_usable=false
+>>> +if ! $PYTHON -c 'import sys; sys.exit(sys.version_info >= (3,5))'; then
+>>> +    python_usable=true
+>>> +fi
+>>> +
+>>
+>> Do we want this as a temporary fix only until we can stipulate the same
+>> version in the configure file?
 > 
-> In my experience, and backed by the executions on Travis, most tests
-> have been really stable on x86_64 hosts.  Last week I've worked in
-> ppc64 and aarch64 hosts, and posted a number of patches addressing
-> the failures I found.  I'll compile a list of the posted patches and
-> their status.
+> I thought that maybe we should leave the code around so that at some
+> later point, we could upgrade it to 3.6 (or something else) before QEMU
+> as a whole does so.
 > 
-> Thanks for reporting those issues.
-> - Cleber.
+
+Sorry for the double-post. Do we want the iotest dependencies to
+formally diverge from QEMU as a whole? It's part of the default `make
+check` target and it's nice that it only skips instead of failing
+outright, but ... I would like to somehow centrally express our
+dependencies instead of hard-coding them in various individual places.
+Python can be just one example of this.
+
+Ideally, in my software utopia; configure expresses these dependencies
+in a central location where they are easy to verify and maintain.
+
+(And easy for downstream maintainers to verify and adjust their package
+dependencies as-needed, too.)
+
+I don't think it's a good idea to make testing run far ahead of the
+build requirements in case we see more re-use and interdependence of
+Python code in the future. Or, in general, to allow situations where you
+can build but not test, especially on older platforms where that testing
+might be even more important.
+
+I think we're being good about that so far, but fracturing the
+requirements seems like a step we maybe ought not take if we don't have to.
+
+But, well, maybe it is a good idea and I am wrong, but I still think it
+gets confusing to have one-off dependencies expressed in various places.
+
+> In fact... Could we already require 3.6 now instead of using 3.5, which
+> I think we only chose because of Debian Stretch (oldstable)?
 > 
-> > Any thoughts on how to improve the situation?
-> > 
-> > -- 
-> > David Gibson			| I'll have my music baroque, and my code
-> > david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-> > 				| _way_ _around_!
-> > http://www.ozlabs.org/~dgibson
-> 
+> Kevin
 > 
 
