@@ -2,123 +2,64 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A93CC49ED7
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 06:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42EEFC49ED7
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 06:52:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D763A21924
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 06:52:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 12F5821924
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 06:52:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="owF8ja6U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D763A21924
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="eKV7g9FJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12F5821924
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAqIm-0001qJ-Hr
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 02:52:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48647)
+	id 1iAqIp-0001th-0N
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 02:52:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48761)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iAqGl-00007I-Cj
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 02:50:24 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iAqGy-0000SW-Tk
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 02:50:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iAqGk-0000ea-7K
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 02:50:23 -0400
-Received: from mail-vi1eur04on0705.outbound.protection.outlook.com
- ([2a01:111:f400:fe0e::705]:44465
- helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iAqGh-0000aS-8u; Thu, 19 Sep 2019 02:50:19 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZLZdipfurvIlvQyk4YucY+JvctAlc00vhGxB6WJfXXm8miZEo7wA9iL0yWx4Dt1UJD7DoYE/QfVKfMlFcPqalXYLI043JXZ5NhGtZEYgjfFa6nG1VlPgfwh56C9oY0w1eSqCuDKBjV8TU94tm2ZEKQc8Swje6ArKdPfkjn2B1Oh+Voh9QrFnWULlvmb8LfOwfrflXPfrcDG7tjjUonwuvcXVzffkKR6ls/7HYPSyuvoGH+347RKqqDlboCNQP0grUo1zBOp97qbZE9xZ0izYOYacwU8X5lRVNcZt4SZ9ViRE5aUGliO8cqtP8WoB5H6k/j//dvi52M0EkkbBGu3npQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gc51InVgKv/kSTI23+jEmRjLrB7LyYT32ji47mRFFx8=;
- b=hRORh4GPUFKrvBMeXwwcgL7wpNobOFakSo+s2ldzHuU1Sv/Ma/lz/KI14z7jnVQpi3nxIHtPp4imfHS55WMBxTOe1N4WLUS6TJptndbGy5siN9lCvruimQlCDX7Ks24jZr40LWKjv2kP7/FbSCXe9+wI7QgfycvTdlfTQRzgPL5xBS1zk1KRnglNR/0Bm78Gd30ErftAi8tfq6EzpTpmBLCtGS2PcGwkEvatfII6uf5yRGZbRrqLMfprYA37+C8X2HV0B16Wf5KfEUsQ/2VnCeNOwiDxqVnUocDYld4QvnWfZsm3nACH+t+z1OERGjGVtTO0NbX8pSgrh3g3QsGyKA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gc51InVgKv/kSTI23+jEmRjLrB7LyYT32ji47mRFFx8=;
- b=owF8ja6UKq2+t9GAsJhOwnvYmNuYDewkYnjwPNrmyHe2OUFa13ssihIclJ4x34Ffd6piLI9uY73Q8Ych2xY0eHhtuYa0TNKaor4iHWOOWXgc6Vutv0wy1Y2zoBidKWrV2u5mFtWyGuetQNMk6ja1j3njRPy9Qga7SNAif9Zq1BM=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5482.eurprd08.prod.outlook.com (52.133.241.73) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2284.20; Thu, 19 Sep 2019 06:50:16 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2284.009; Thu, 19 Sep 2019
- 06:50:16 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v12 1/2] block/backup: fix max_transfer
- handling for copy_range
-Thread-Index: AQHVbXIGXsS3qVTuXkS042Ce+aUetqcx27qAgAC2W4A=
-Date: Thu, 19 Sep 2019 06:50:16 +0000
-Message-ID: <c1e597ab-5a27-c484-36f8-43734f54bc80@virtuozzo.com>
-References: <20190917160731.10895-1-vsementsov@virtuozzo.com>
- <20190917160731.10895-2-vsementsov@virtuozzo.com>
- <4122264a-f7db-8b76-6930-87e2287c49b8@redhat.com>
-In-Reply-To: <4122264a-f7db-8b76-6930-87e2287c49b8@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0301CA0013.eurprd03.prod.outlook.com
- (2603:10a6:3:76::23) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190919095013822
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b682cba4-ef14-477a-436b-08d73ccda0df
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB5482; 
-x-ms-traffictypediagnostic: DB8PR08MB5482:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DB8PR08MB54820B1A8596B79B0C4F4F74C1890@DB8PR08MB5482.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6108;
-x-forefront-prvs: 016572D96D
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(346002)(366004)(136003)(376002)(396003)(39840400004)(189003)(199004)(6436002)(478600001)(81156014)(4326008)(66446008)(8676002)(8936002)(110136005)(2501003)(7736002)(5660300002)(54906003)(6486002)(14454004)(305945005)(6512007)(386003)(2906002)(25786009)(102836004)(11346002)(31686004)(186003)(53546011)(256004)(6506007)(26005)(446003)(81166006)(66066001)(36756003)(66476007)(229853002)(66556008)(66946007)(64756008)(3846002)(6116002)(316002)(52116002)(6246003)(76176011)(86362001)(71200400001)(71190400001)(486006)(476003)(99286004)(107886003)(31696002)(2616005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5482;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 88WVGheA3QApQxZW1Jj2LcrKai3ntBzVUSU1gwxQR8qkDkSW68ht2suqlhR4JVCv8ATpkyaKMb6ivF+ceHFsmj986arNn5WMvhGdmKE8+NHl9497V8L252GSi6eM4s4eqQ1cuHYq5ukT63kXc4kxiDioxLDDuFHQabCqODpAJUOvo/SFq9pa2PGKnYCKBLmo7Qg6fOOl2b7qlSJkriWglB5a1p9L/XTUbF9BWJTkfURF98OZl5EbPvmUd0fZWSdi2xQF3fi8/U6VSj0yQyEyNPAlBAPAqip+F6LQMMGxlmQM/CHL9luFyz637T/5Muz9iuSKVkqBPqeMmVJSCQoBDsATrCadJ6X+MO4Tm7WGbhXwoS5mrqV6j5T+7NiMPUGamXhS7hA87pwqQcSGkVv6slCUBPAg2mrT9oIAQZtplp8=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D03A5E48E281294BAA23B7958B66B765@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <dgibson@ozlabs.org>) id 1iAqGw-0000ly-Sn
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 02:50:36 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:53951)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iAqGv-0000id-WB; Thu, 19 Sep 2019 02:50:34 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46YnXz2s6Tz9sN1; Thu, 19 Sep 2019 16:50:27 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1568875827;
+ bh=GJsiqyoqUtbGSB3n50A0E121onT4qQT7wmlXKyrx/a0=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=eKV7g9FJ2533yt/9JY2bJYUIbL7RAkf6Qm+szznYovXrCGMiP+L914E0n03jd1nIg
+ PEtvok4uifCpAI/TW6l/irUZFq/QjRfArKUdxHKjOZFhERI3ErItlro6rUoKJeNwsl
+ H7Enn/FTeEpRzKVfHurV2YckRczrgORrL70ldVAc=
+Date: Thu, 19 Sep 2019 16:29:04 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: "Paul A. Clarke" <pc@us.ibm.com>
+Message-ID: <20190919062904.GC22790@umbus.fritz.box>
+References: <1568817081-1345-1-git-send-email-pc@us.ibm.com>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b682cba4-ef14-477a-436b-08d73ccda0df
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Sep 2019 06:50:16.2814 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 77YLXacP2WLHqK3ZZHNMJ63spjpVt6lhwRbYntJ67lO1hfigWfs0ztI8S580AIwCS/VK61rMWnOvaZFPEbt34TUblKREJjhx/sA9nni52T0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5482
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe0e::705
-Subject: Re: [Qemu-devel] [PATCH v12 1/2] block/backup: fix max_transfer
- handling for copy_range
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="RIYY1s2vRbPFwWeW"
+Content-Disposition: inline
+In-Reply-To: <1568817081-1345-1-git-send-email-pc@us.ibm.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] ppc: Add support for 'mffscrn',
+ 'mffscrni' instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -130,61 +71,263 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
+Cc: richard.henderson@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTguMDkuMjAxOSAyMjo1NywgSm9obiBTbm93IHdyb3RlOg0KPiANCj4gDQo+IE9uIDkvMTcvMTkg
-MTI6MDcgUE0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiBPZiBjb3Vy
-c2UsIFFFTVVfQUxJR05fVVAgaXMgYSB0eXBvLCBpdCBzaG91bGQgYmUgUUVNVV9BTElHTl9ET1dO
-LCBhcyB3ZQ0KPj4gYXJlIHRyeWluZyB0byBmaW5kIGFsaWduZWQgc2l6ZSB3aGljaCBzYXRpc2Z5
-IGJvdGggc291cmNlIGFuZCB0YXJnZXQuDQo+PiBBbHNvLCBkb24ndCBpZ25vcmUgdG9vIHNtYWxs
-IG1heF90cmFuc2Zlci4gSW4gdGhpcyBjYXNlIHNlZW1zIHNhZmVyIHRvDQo+PiBkaXNhYmxlIGNv
-cHlfcmFuZ2UuDQo+Pg0KPj4gRml4ZXM6IDlkZWQ0YTAxMTQ5NjhlDQo+PiBTaWduZWQtb2ZmLWJ5
-OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+
-DQo+PiAtLS0NCj4+IMKgIGJsb2NrL2JhY2t1cC5jIHwgMTIgKysrKysrKystLS0tDQo+PiDCoCAx
-IGZpbGUgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQ0KPj4NCj4+IGRp
-ZmYgLS1naXQgYS9ibG9jay9iYWNrdXAuYyBiL2Jsb2NrL2JhY2t1cC5jDQo+PiBpbmRleCA3NjNm
-MGQ3ZmY2Li5kOGZkYmZhZGZlIDEwMDY0NA0KPj4gLS0tIGEvYmxvY2svYmFja3VwLmMNCj4+ICsr
-KyBiL2Jsb2NrL2JhY2t1cC5jDQo+PiBAQCAtNzQxLDEyICs3NDEsMTYgQEAgQmxvY2tKb2IgKmJh
-Y2t1cF9qb2JfY3JlYXRlKGNvbnN0IGNoYXIgKmpvYl9pZCwgQmxvY2tEcml2ZXJTdGF0ZSAqYnMs
-DQo+PiDCoMKgwqDCoMKgIGpvYi0+Y2x1c3Rlcl9zaXplID0gY2x1c3Rlcl9zaXplOw0KPj4gwqDC
-oMKgwqDCoCBqb2ItPmNvcHlfYml0bWFwID0gY29weV9iaXRtYXA7DQo+PiDCoMKgwqDCoMKgIGNv
-cHlfYml0bWFwID0gTlVMTDsNCj4+IC3CoMKgwqAgam9iLT51c2VfY29weV9yYW5nZSA9ICFjb21w
-cmVzczsgLyogY29tcHJlc3Npb24gaXNuJ3Qgc3VwcG9ydGVkIGZvciBpdCAqLw0KPj4gwqDCoMKg
-wqDCoCBqb2ItPmNvcHlfcmFuZ2Vfc2l6ZSA9IE1JTl9OT05fWkVSTyhibGtfZ2V0X21heF90cmFu
-c2Zlcihqb2ItPmNvbW1vbi5ibGspLA0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBibGtf
-Z2V0X21heF90cmFuc2Zlcihqb2ItPnRhcmdldCkpOw0KPj4gLcKgwqDCoCBqb2ItPmNvcHlfcmFu
-Z2Vfc2l6ZSA9IE1BWChqb2ItPmNsdXN0ZXJfc2l6ZSwNCj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgUUVNVV9BTElHTl9VUChq
-b2ItPmNvcHlfcmFuZ2Vfc2l6ZSwNCj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IGpvYi0+Y2x1c3Rlcl9zaXplKSk7DQo+PiArwqDCoMKgIGpvYi0+Y29weV9yYW5nZV9zaXplID0g
-UUVNVV9BTElHTl9ET1dOKGpvYi0+Y29weV9yYW5nZV9zaXplLA0KPj4gK8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCBqb2ItPmNsdXN0ZXJfc2l6ZSk7DQo+PiArwqDCoMKgIC8qDQo+PiArwqDC
-oMKgwqAgKiBDb21wcmVzc2lvbiBpcyBub3Qgc3VwcG9ydGVkIGZvciBjb3B5X3JhbmdlLiBBbHNv
-LCB3ZSBkb24ndCB3YW50IHRvDQo+PiArwqDCoMKgwqAgKiBoYW5kbGUgc21hbGwgbWF4X3RyYW5z
-ZmVyIGZvciBjb3B5X3JhbmdlICh3aGljaCBjdXJyZW50bHkgZG9uJ3QNCj4+ICvCoMKgwqDCoCAq
-IGhhbmRsZSBtYXhfdHJhbnNmZXIgYXQgYWxsKS4NCj4+ICvCoMKgwqDCoCAqLw0KPj4gK8KgwqDC
-oCBqb2ItPnVzZV9jb3B5X3JhbmdlID0gIWNvbXByZXNzICYmIGpvYi0+Y29weV9yYW5nZV9zaXpl
-ID4gMDsNCj4+IMKgwqDCoMKgwqAgLyogUmVxdWlyZWQgcGVybWlzc2lvbnMgYXJlIGFscmVhZHkg
-dGFrZW4gd2l0aCB0YXJnZXQncyBibGtfbmV3KCkgKi8NCj4+IMKgwqDCoMKgwqAgYmxvY2tfam9i
-X2FkZF9iZHJ2KCZqb2ItPmNvbW1vbiwgInRhcmdldCIsIHRhcmdldCwgMCwgQkxLX1BFUk1fQUxM
-LA0KPj4NCj4gDQo+IEknbSBjbGVhciBvbiB0aGUgYWxpZ25tZW50IGZpeCwgSSdtIG5vdCBjbGVh
-ciBvbiB0aGUgY29tbWVudCBhYm91dCBtYXhfdHJhbnNmZXIgYW5kIGhvdyBpdCByZWxhdGVzIHRv
-IGNvcHlfcmFuZ2Vfc2l6ZSBiZWluZyBub24temVyby4NCj4gDQo+ICJzbWFsbCBtYXggdHJhbnNm
-ZXIiIC0tIHdoYXQgaGFwcGVucyB3aGVuIGl0J3MgemVybz8gd2UncmUgYXBwYXJlbnRseSBPSyB3
-aXRoIGEgc2luZ2xlIGNsdXN0ZXIsIGJ1dCB3aGVuIGl0J3MgemVybywgd2hhdCBoYXBwZW5zPw0K
-DQppZiBpdCB6ZXJvIGl0IG1lYW5zIHRoYXQgc291cmNlIG9yIHRhcmdldCByZXF1aXJlcyBtYXhf
-dHJhbnNmZXIgbGVzcyB0aGFuIGNsdXN0ZXJfc2l6ZS4gSXQgc2VlbXMgbm90IHZhbGlkIHRvIGNh
-bGwgY29weV9yYW5nZSBpbiB0aGlzIGNhc2UuDQpTdGlsbCBpdCdzIE9LIHRvIHVzZSBub3JtYWwg
-cmVhZC93cml0ZSwgYXMgdGhleSBoYW5kbGUgbWF4X3RyYW5zZmVyIGludGVybmFsbHkgaW4gYSBs
-b29wIChjb3B5X3JhbmdlIGRvZXNuJ3QgZG8gaXQpLg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZs
-YWRpbWlyDQo=
+
+--RIYY1s2vRbPFwWeW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Sep 18, 2019 at 09:31:21AM -0500, Paul A. Clarke wrote:
+> From: "Paul A. Clarke" <pc@us.ibm.com>
+>=20
+> ISA 3.0B added a set of Floating-Point Status and Control Register (FPSCR)
+> instructions: mffsce, mffscdrn, mffscdrni, mffscrn, mffscrni, mffsl.
+> This patch adds support for 'mffscrn' and 'mffscrni' instructions.
+>=20
+> 'mffscrn' and 'mffscrni' are similar to 'mffsl', except they do not return
+> the status bits (FI, FR, FPRF) and they also set the rounding mode in the
+> FPSCR.
+>=20
+> On CPUs without support for 'mffscrn'/'mffscrni' (below ISA 3.0), the
+> instructions will execute identically to 'mffs'.
+>=20
+> Signed-off-by: Paul A. Clarke <pc@us.ibm.com>
+
+Applied to ppc-for-4.2, thanks.
+
+> ---
+> v3:
+> - Fix v2 change which cleared inadvertently clearned DRN.
+> - Remove FP_MODE, use FP_DRN and FP_RN explicitly instead.
+> - I did not remove the FPSCR_DRN[012] or FP_DRN[012] defines, as it's
+>   clearer to me that it's a 3-bit field, but am happy to respin if that
+>   is preferred.
+> v2:
+> - Add DRN to returned FPSCR value.
+> - Add DRN defines to target/ppc/cpu.h.
+>=20
+>  target/ppc/cpu.h                   |  9 ++++-
+>  target/ppc/dfp_helper.c            |  2 +-
+>  target/ppc/internal.h              |  3 ++
+>  target/ppc/translate/fp-impl.inc.c | 69 ++++++++++++++++++++++++++++++++=
++++++-
+>  target/ppc/translate/fp-ops.inc.c  |  4 +++
+>  5 files changed, 84 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index eaee1a5..a23c645 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -559,6 +559,9 @@ enum {
+> =20
+>  /***********************************************************************=
+******/
+>  /* Floating point status and control register                           =
+     */
+> +#define FPSCR_DRN2   34 /* Decimal Floating-Point rounding control      =
+     */
+> +#define FPSCR_DRN1   33 /* Decimal Floating-Point rounding control      =
+     */
+> +#define FPSCR_DRN0   32 /* Decimal Floating-Point rounding control      =
+     */
+>  #define FPSCR_FX     31 /* Floating-point exception summary             =
+     */
+>  #define FPSCR_FEX    30 /* Floating-point enabled exception summary     =
+     */
+>  #define FPSCR_VX     29 /* Floating-point invalid operation exception su=
+mm.  */
+> @@ -592,6 +595,7 @@ enum {
+>  #define FPSCR_NI     2  /* Floating-point non-IEEE mode                 =
+     */
+>  #define FPSCR_RN1    1
+>  #define FPSCR_RN0    0  /* Floating-point rounding control              =
+     */
+> +#define fpscr_drn    (((env->fpscr) & FP_DRN) >> FPSCR_DRN0)
+>  #define fpscr_fex    (((env->fpscr) >> FPSCR_FEX)    & 0x1)
+>  #define fpscr_vx     (((env->fpscr) >> FPSCR_VX)     & 0x1)
+>  #define fpscr_ox     (((env->fpscr) >> FPSCR_OX)     & 0x1)
+> @@ -627,6 +631,10 @@ enum {
+>  #define fpscr_eex (((env->fpscr) >> FPSCR_XX) & ((env->fpscr) >> FPSCR_X=
+E) &  \
+>                     0x1F)
+> =20
+> +#define FP_DRN2         (1ull << FPSCR_DRN2)
+> +#define FP_DRN1         (1ull << FPSCR_DRN1)
+> +#define FP_DRN0         (1ull << FPSCR_DRN0)
+> +#define FP_DRN          (FP_DRN2 | FP_DRN1 | FP_DRN0)
+>  #define FP_FX           (1ull << FPSCR_FX)
+>  #define FP_FEX          (1ull << FPSCR_FEX)
+>  #define FP_VX           (1ull << FPSCR_VX)
+> @@ -662,7 +670,6 @@ enum {
+>  #define FP_RN0          (1ull << FPSCR_RN0)
+>  #define FP_RN           (FP_RN1 | FP_RN0)
+> =20
+> -#define FP_MODE         FP_RN
+>  #define FP_ENABLES      (FP_VE | FP_OE | FP_UE | FP_ZE | FP_XE)
+>  #define FP_STATUS       (FP_FR | FP_FI | FP_FPRF)
+> =20
+> diff --git a/target/ppc/dfp_helper.c b/target/ppc/dfp_helper.c
+> index f102177..da8e08a 100644
+> --- a/target/ppc/dfp_helper.c
+> +++ b/target/ppc/dfp_helper.c
+> @@ -48,7 +48,7 @@ static void dfp_prepare_rounding_mode(decContext *conte=
+xt, uint64_t fpscr)
+>  {
+>      enum rounding rnd;
+> =20
+> -    switch ((fpscr >> 32) & 0x7) {
+> +    switch ((fpscr & FP_DRN) >> FPSCR_DRN0) {
+>      case 0:
+>          rnd =3D DEC_ROUND_HALF_EVEN;
+>          break;
+> diff --git a/target/ppc/internal.h b/target/ppc/internal.h
+> index d3d327e..15d655b 100644
+> --- a/target/ppc/internal.h
+> +++ b/target/ppc/internal.h
+> @@ -157,6 +157,9 @@ EXTRACT_HELPER(FPL, 25, 1);
+>  EXTRACT_HELPER(FPFLM, 17, 8);
+>  EXTRACT_HELPER(FPW, 16, 1);
+> =20
+> +/* mffscrni */
+> +EXTRACT_HELPER(RM, 11, 2);
+> +
+>  /* addpcis */
+>  EXTRACT_HELPER_SPLIT_3(DX, 10, 6, 6, 5, 16, 1, 1, 0, 0)
+>  #if defined(TARGET_PPC64)
+> diff --git a/target/ppc/translate/fp-impl.inc.c b/target/ppc/translate/fp=
+-impl.inc.c
+> index 7cd9d8d..75f9523 100644
+> --- a/target/ppc/translate/fp-impl.inc.c
+> +++ b/target/ppc/translate/fp-impl.inc.c
+> @@ -634,11 +634,78 @@ static void gen_mffsl(DisasContext *ctx)
+>      gen_reset_fpstatus();
+>      tcg_gen_extu_tl_i64(t0, cpu_fpscr);
+>      /* Mask everything except mode, status, and enables.  */
+> -    tcg_gen_andi_i64(t0, t0, FP_MODE | FP_STATUS | FP_ENABLES);
+> +    tcg_gen_andi_i64(t0, t0, FP_DRN | FP_STATUS | FP_ENABLES | FP_RN);
+>      set_fpr(rD(ctx->opcode), t0);
+>      tcg_temp_free_i64(t0);
+>  }
+> =20
+> +static void gen_helper_mffscrn(DisasContext *ctx, TCGv_i64 t1)
+> +{
+> +    TCGv_i64 t0 =3D tcg_temp_new_i64();
+> +    TCGv_i32 mask =3D tcg_const_i32(0x0001);
+> +
+> +    gen_reset_fpstatus();
+> +    tcg_gen_extu_tl_i64(t0, cpu_fpscr);
+> +    tcg_gen_andi_i64(t0, t0, FP_DRN | FP_ENABLES | FP_RN);
+> +    set_fpr(rD(ctx->opcode), t0);
+> +
+> +    /* Mask FPSCR value to clear RN.  */
+> +    tcg_gen_andi_i64(t0, t0, ~FP_RN);
+> +
+> +    /* Merge RN into FPSCR value.  */
+> +    tcg_gen_or_i64(t0, t0, t1);
+> +
+> +    gen_helper_store_fpscr(cpu_env, t0, mask);
+> +
+> +    tcg_temp_free_i32(mask);
+> +    tcg_temp_free_i64(t0);
+> +}
+> +
+> +/* mffscrn */
+> +static void gen_mffscrn(DisasContext *ctx)
+> +{
+> +    TCGv_i64 t1;
+> +
+> +    if (unlikely(!(ctx->insns_flags2 & PPC2_ISA300))) {
+> +        return gen_mffs(ctx);
+> +    }
+> +
+> +    if (unlikely(!ctx->fpu_enabled)) {
+> +        gen_exception(ctx, POWERPC_EXCP_FPU);
+> +        return;
+> +    }
+> +
+> +    t1 =3D tcg_temp_new_i64();
+> +    get_fpr(t1, rB(ctx->opcode));
+> +    /* Mask FRB to get just RN.  */
+> +    tcg_gen_andi_i64(t1, t1, FP_RN);
+> +
+> +    gen_helper_mffscrn(ctx, t1);
+> +
+> +    tcg_temp_free_i64(t1);
+> +}
+> +
+> +/* mffscrni */
+> +static void gen_mffscrni(DisasContext *ctx)
+> +{
+> +    TCGv_i64 t1;
+> +
+> +    if (unlikely(!(ctx->insns_flags2 & PPC2_ISA300))) {
+> +        return gen_mffs(ctx);
+> +    }
+> +
+> +    if (unlikely(!ctx->fpu_enabled)) {
+> +        gen_exception(ctx, POWERPC_EXCP_FPU);
+> +        return;
+> +    }
+> +
+> +    t1 =3D tcg_const_i64((uint64_t)RM(ctx->opcode));
+> +
+> +    gen_helper_mffscrn(ctx, t1);
+> +
+> +    tcg_temp_free_i64(t1);
+> +}
+> +
+>  /* mtfsb0 */
+>  static void gen_mtfsb0(DisasContext *ctx)
+>  {
+> diff --git a/target/ppc/translate/fp-ops.inc.c b/target/ppc/translate/fp-=
+ops.inc.c
+> index 88ebc25..f2bcf0e 100644
+> --- a/target/ppc/translate/fp-ops.inc.c
+> +++ b/target/ppc/translate/fp-ops.inc.c
+> @@ -107,6 +107,10 @@ GEN_HANDLER(mcrfs, 0x3F, 0x00, 0x02, 0x0063F801, PPC=
+_FLOAT),
+>  GEN_HANDLER_E_2(mffs, 0x3F, 0x07, 0x12, 0x00, 0x00000000, PPC_FLOAT, PPC=
+_NONE),
+>  GEN_HANDLER_E_2(mffsl, 0x3F, 0x07, 0x12, 0x18, 0x00000000, PPC_FLOAT,
+>      PPC2_ISA300),
+> +GEN_HANDLER_E_2(mffscrn, 0x3F, 0x07, 0x12, 0x16, 0x00000000, PPC_FLOAT,
+> +    PPC_NONE),
+> +GEN_HANDLER_E_2(mffscrni, 0x3F, 0x07, 0x12, 0x17, 0x00000000, PPC_FLOAT,
+> +    PPC_NONE),
+>  GEN_HANDLER(mtfsb0, 0x3F, 0x06, 0x02, 0x001FF800, PPC_FLOAT),
+>  GEN_HANDLER(mtfsb1, 0x3F, 0x06, 0x01, 0x001FF800, PPC_FLOAT),
+>  GEN_HANDLER(mtfsf, 0x3F, 0x07, 0x16, 0x00000000, PPC_FLOAT),
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--RIYY1s2vRbPFwWeW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2DICoACgkQbDjKyiDZ
+s5L3JA/8DVJB0KYzhG75tnj7HOzk67Z/idyVMY0HGcornKmytIiPZPoF5rr2szYW
+RTFOyjyqnlhf6+KkB/fdRfBXwaxyCbdW5BFl2xgwF5XXx8Gds6n4UCw3LV6nWKq5
+TFar9oQ+jVDSaXoZjBQoSBMU9idG0EfRWrsPRxxCqPVfRy/NB5c8ymycFhVUi2b6
+72ac6p4FcRitxKyhU0QKvK83DxrEF2KrAwp6LUYXCbicS5pOKw+nZYQkn31TqEAH
+D4HnRLvBkew+dd24xNGVLL3e3zYQ4G8uncwF5Yu+AAgw0foCcyFXiCFX6zdoS4+G
+htoroeT18oS89NVmgK4gCrqgpBOf+o2xg/3FCHWz9oACcZ4Sg2qdidLDS8FCFsNN
+ESXQbjB/H7Glcfi/U2YCUTh4yPsLoG25VESP9WPy6hzoAwM6d+3FCPfpBlMrcP8Z
+IXVvauZmApvMeUQ/KHFk6dXJ7ryLfU49JquTR6U+8RDUJkHG63pCdM4goUo04BVq
+skJIEy5EALYxSKXW4A2ASidplPxDtFzQS4fVfxFVOX+x/r9BgoMvIMLdoTaDSLMn
+k0/2ZdZJgBLnaPM9vlPSs0TBcdSBqQumWnywebvlH1hErPx0iebr4G1EmpI+Slza
+mfdPdixSK6+JRzloWmi3vbnWPvamPSGdkvd3/VrlS1jK9leiVGA=
+=TeOQ
+-----END PGP SIGNATURE-----
+
+--RIYY1s2vRbPFwWeW--
 
