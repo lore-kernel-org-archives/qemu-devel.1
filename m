@@ -2,62 +2,72 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A34EFC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:50:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1412EC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:57:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 784FA207FC
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:50:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 784FA207FC
+	by mail.kernel.org (Postfix) with ESMTPS id D969C217D6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:57:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D969C217D6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAu0g-0006Ah-NU
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 06:50:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55576)
+	id 1iAu7Z-0000ao-2G
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 06:57:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56235)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iAtzw-0005ht-Sc
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:49:17 -0400
+ (envelope-from <bounces@canonical.com>) id 1iAu6Z-0008WV-CZ
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:56:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iAtzv-0004Yg-Q4
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:49:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55128)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iAtzv-0004YL-KS
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:49:15 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ADF7C4E4E6
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 10:49:14 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-74.brq.redhat.com [10.40.204.74])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 44589608C2;
- Thu, 19 Sep 2019 10:49:09 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 19 Sep 2019 12:49:07 +0200
-Message-Id: <20190919104907.18005-1-philmd@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1iAu6P-0002OK-3o
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:56:07 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33914)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iAu6O-0002No-Ub
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:55:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iAu6M-0006s7-P6
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 10:55:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 015652E80E7
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 10:55:53 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Thu, 19 Sep 2019 10:49:14 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 19 Sep 2019 10:44:35 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h jamespharvey20
+X-Launchpad-Bug-Reporter: James Harvey (jamespharvey20)
+X-Launchpad-Bug-Modifier: Dr. David Alan Gilbert (dgilbert-h)
+References: <156790812963.29382.11232177290822294099.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156888987520.13774.8853461177485194875.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19048";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 35f68fbbcf8a74532cbf16be8519f4e249a095c0
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] util/qemu-option: Document the get_opt_value()
- function
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1843151] Re: Regression: QEMU 4.1.0 qxl and KMS
+ resoluiton only 4x10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -66,57 +76,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Reply-To: Bug 1843151 <1843151@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Coverity noticed commit 950c4e6c94 introduced a dereference before
-null check in get_opt_value (CID1391003):
+James:  Freedy proposed a fix for the bug I was looking at with a spice fix:
+   https://lists.freedesktop.org/archives/spice-devel/2019-September/050859=
+.html
+That's in the spice-server package.
 
-  In get_opt_value: All paths that lead to this null pointer
-  comparison already dereference the pointer earlier (CWE-476)
+If you can check that it also fixes your bug that would be great.
 
-We fixed this in commit 6e3ad3f0e31, but relaxed the check in commit
-0c2f6e7ee99 because "No callers of get_opt_value() pass in a NULL
-for the 'value' parameter".
+-- =
 
-Since this function is publicly exposed, it risks new users to do
-the same error again. Avoid that documenting the 'value' argument
-must not be NULL.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1843151
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- include/qemu/option.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+Title:
+  Regression: QEMU 4.1.0 qxl and KMS resoluiton only 4x10
 
-diff --git a/include/qemu/option.h b/include/qemu/option.h
-index 844587cab3..141d6a883d 100644
---- a/include/qemu/option.h
-+++ b/include/qemu/option.h
-@@ -28,6 +28,18 @@
-=20
- #include "qemu/queue.h"
-=20
-+/**
-+ * get_opt_value
-+ * @p: a pointer to the option name, delimited by commas
-+ * @value: a non-NULL pointer that will received the delimited options
-+ *
-+ * The @value char pointer will be allocated and filled with
-+ * the delimited options.
-+ * It is an error to pass a non-NULL @value parameter.
-+ *
-+ * Returns the position of the comma delimiter/zero byte after the
-+ * option name in @p.
-+ */
- const char *get_opt_value(const char *p, char **value);
-=20
- void parse_option_size(const char *name, const char *value,
---=20
-2.20.1
+Status in QEMU:
+  New
 
+Bug description:
+  Host is Arch Linux.  linux 5.2.13, qemu 4.1.0.  virt-viewer 8.0.
+
+  Guest is Arch Linux Sept 2019 ISO.  linux 5.2.11.
+
+  Have replicated this both on a system using amdgpu and one using
+  integrated ASPEED graphics.
+
+  Downgrading from 4.1.0 to 4.0.0 works as usual, see:
+  https://www.youtube.com/watch?v=3DNyMdcYwOCvY
+
+  Going back to 4.1.0 reproduces, see:
+  https://www.youtube.com/watch?v=3DH3nGG2Mk6i0
+
+  4.1.0 displays fine until KMS kicks in.
+
+  Using 4.1.0 with virtio-vga doesn't cause this.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1843151/+subscriptions
 
