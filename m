@@ -2,89 +2,68 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F41C3A5A6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 622D6C4CEC4
 	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:28:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C32A421928
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:28:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fO/EGBtg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C32A421928
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 38D5F21928
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:28:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38D5F21928
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB0EY-0007He-8I
+	id 1iB0EY-0007Ke-ND
 	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 13:28:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50079)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50174)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iB06m-0008Kv-Dg
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:20:45 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1iB06w-0008UJ-8p
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:20:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iB05p-0000Qp-Je
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:19:46 -0400
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:38307)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iB05p-0000QL-Dh
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:19:45 -0400
-Received: by mail-wr1-x42b.google.com with SMTP id l11so3959499wrx.5
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 10:19:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=ViSX4enI+dJcwOYnkvEKIVP5m0g4W0h9r7phsHaVvOg=;
- b=fO/EGBtg+Hgg5YwmmBS5OjMtmY/zofAdKarO8oZqAaMzN6VAtXZnHqRU7lgWW3oZ3c
- aE6rgrAyRSwlmSpgv336tEKQIwy1wZzwYblEPg/y9ucGLKr/TMf7BJTLaq6TmXMdytSt
- /8wM68ByqWkNNR7GXZEzUiU65XpIIu+SaSO6xAczar18JnsB/nu7sMsGKHSULrs0E8AO
- Zq8XeJBsc4dI33A3c68CRAaRT/57/+dhH3fXDQ0XoNqHmP/o9knjFZ2sKRh2BbJoH/uV
- IFPpP0KMO4lPPNYpfbn/oZKcGt9XnEl0TyDw/xeo+im16QX8ponworjvY2wJAWqv/rbJ
- SkRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=ViSX4enI+dJcwOYnkvEKIVP5m0g4W0h9r7phsHaVvOg=;
- b=SIb2TEV0ZaexJFHTojvgIywHrt3icZ4z9vBNZUl9pifdsijYE+HfMXfOlUe4GOlGWa
- robo8E3hem2wOartLudqLZYtFTKJAYX69EmAR2hxtkQk8tKCU4PhWGCv0ScgNcbwhWo1
- u33D+pHpjPWBl/4jR8W+HEEUYN3BH3oUNDDRyH2kMNRD7HseLZkns3R4xkXrstAMMa4C
- 6VIVT9Pl4O7PhH+a87HCkfxPOVw2rpbFDC0fboz82jz+1gd/rYSn3o7iZhzWgoePVbmb
- N1GdFK60queTPBf0G9FUAfWjDzjqUXFOVjQJ3ffhkSi06XA2szqShQH2zKsM4TYzk9Ng
- dBgg==
-X-Gm-Message-State: APjAAAWkVZeY+joYMU4KrPLL4jsTR+D6mJqM2PmYmkvHHrPbpQUiy2KQ
- 7iegmktDOLpw1xthetEarO4trQ==
-X-Google-Smtp-Source: APXvYqxPP2dGkV4DQSqmEOfzk3v8eqeQ6mzlMX6jFVRe5kZ18pgqTHxSvwC2RYtCNCTrVDdu+wQwpg==
-X-Received: by 2002:a5d:40c4:: with SMTP id b4mr8666185wrq.214.1568913584283; 
- Thu, 19 Sep 2019 10:19:44 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id v64sm8979316wmf.12.2019.09.19.10.19.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Sep 2019 10:19:40 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E179F1FF9C;
- Thu, 19 Sep 2019 18:10:16 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v2 12/16] tests/docker: Add fedora-win10sdk-cross image
-Date: Thu, 19 Sep 2019 18:10:11 +0100
-Message-Id: <20190919171015.12681-13-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190919171015.12681-1-alex.bennee@linaro.org>
-References: <20190919171015.12681-1-alex.bennee@linaro.org>
+ (envelope-from <alex.williamson@redhat.com>) id 1iB06s-0000rN-VX
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:20:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44610)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1iB06s-0000qn-O0
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:20:50 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 538D43022465;
+ Thu, 19 Sep 2019 17:20:49 +0000 (UTC)
+Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DB45660872;
+ Thu, 19 Sep 2019 17:20:48 +0000 (UTC)
+Date: Thu, 19 Sep 2019 11:20:48 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Subject: Re: [Qemu-devel] vhost, iova, and dirty page tracking
+Message-ID: <20190919112048.09b3edaa@x1.home>
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D57B785@SHSMSX104.ccr.corp.intel.com>
+References: <AADFC41AFE54684AB9EE6CBC0274A5D19D577BEA@SHSMSX104.ccr.corp.intel.com>
+ <60110ea3-9228-7e5d-ea32-05c72a95af0b@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57A080@SHSMSX104.ccr.corp.intel.com>
+ <20190917085404.3b063e53@x1.home>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57AFBA@SHSMSX104.ccr.corp.intel.com>
+ <a82101bf-f8a7-5ddd-5abe-6060762d9abe@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57B785@SHSMSX104.ccr.corp.intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42b
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Thu, 19 Sep 2019 17:20:49 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,64 +75,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- peter.maydell@linaro.org, Fam Zheng <fam@euphon.net>, qemu-arm@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Wed, 18 Sep 2019 07:21:05 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190919105932.19412-2-philmd@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/docker/Makefile.include                 |  1 +
- .../dockerfiles/fedora-win10sdk-cross.docker  | 21 +++++++++++++++++++
- 2 files changed, 22 insertions(+)
- create mode 100644 tests/docker/dockerfiles/fedora-win10sdk-cross.docker
+> > From: Jason Wang [mailto:jasowang@redhat.com]
+> > Sent: Wednesday, September 18, 2019 2:04 PM
+> >=20
+> > On 2019/9/18 =E4=B8=8A=E5=8D=889:31, Tian, Kevin wrote: =20
+> > >> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > >> Sent: Tuesday, September 17, 2019 10:54 PM
+> > >>
+> > >> On Tue, 17 Sep 2019 08:48:36 +0000
+> > >> "Tian, Kevin"<kevin.tian@intel.com>  wrote:
+> > >> =20
+> > >>>> From: Jason Wang [mailto:jasowang@redhat.com]
+> > >>>> Sent: Monday, September 16, 2019 4:33 PM
+> > >>>>
+> > >>>>
+> > >>>> On 2019/9/16 =E4=B8=8A=E5=8D=889:51, Tian, Kevin wrote: =20
+> > >>>>> Hi, Jason
+> > >>>>>
+> > >>>>> We had a discussion about dirty page tracking in VFIO, when =20
+> > vIOMMU =20
+> > >>>>> is enabled:
+> > >>>>>
+> > >>>>> https://lists.nongnu.org/archive/html/qemu-devel/2019- =20
+> > >>>> 09/msg02690.html =20
+> > >>>>> It's actually a similar model as vhost - Qemu cannot interpose th=
+e =20
+> > fast- =20
+> > >>>> path =20
+> > >>>>> DMAs thus relies on the kernel part to track and report dirty pag=
+e =20
+> > >>>> information. =20
+> > >>>>> Currently Qemu tracks dirty pages in GFN level, thus demanding a =
+=20
+> > >>>> translation =20
+> > >>>>> from IOVA to GPA. Then the open in our discussion is where this =
+=20
+> > >>>> translation =20
+> > >>>>> should happen. Doing the translation in kernel implies a device i=
+otlb =20
+> > >>>> flavor, =20
+> > >>>>> which is what vhost implements today. It requires potentially lar=
+ge =20
+> > >>>> tracking =20
+> > >>>>> structures in the host kernel, but leveraging the existing log_sy=
+nc =20
+> > flow =20
+> > >> in =20
+> > >>>> Qemu. =20
+> > >>>>> On the other hand, Qemu may perform log_sync for every removal =20
+> > of =20
+> > >>>> IOVA =20
+> > >>>>> mapping and then do the translation itself, then avoiding the GPA=
+ =20
+> > >>>> awareness =20
+> > >>>>> in the kernel side. It needs some change to current Qemu log-sync=
+ =20
+> > >> flow, =20
+> > >>>> and =20
+> > >>>>> may bring more overhead if IOVA is frequently unmapped.
+> > >>>>>
+> > >>>>> So we'd like to hear about your opinions, especially about how yo=
+u =20
+> > >> came =20
+> > >>>>> down to the current iotlb approach for vhost. =20
+> > >>>> We don't consider too much in the point when introducing vhost. And
+> > >>>> before IOTLB, vhost has already know GPA through its mem table
+> > >>>> (GPA->HVA). So it's nature and easier to track dirty pages at GPA =
+level
+> > >>>> then it won't any changes in the existing ABI. =20
+> > >>> This is the same situation as VFIO. =20
+> > >> It is?  VFIO doesn't know GPAs, it only knows HVA, HPA, and IOVA.  In
+> > >> some cases IOVA is GPA, but not all. =20
+> > > Well, I thought vhost has a similar design, that the index of its mem=
+ table
+> > > is GPA when vIOMMU is off and then becomes IOVA when vIOMMU is on.
+> > > But I may be wrong here. Jason, can you help clarify? I saw two
+> > > interfaces which poke the mem table: VHOST_SET_MEM_TABLE (for GPA)
+> > > and VHOST_IOTLB_UPDATE (for IOVA). Are they used exclusively or =20
+> > together? =20
+> > > =20
+> >=20
+> > Actually, vhost maintains two interval trees, mem table GPA->HVA, and
+> > device IOTLB IOVA->HVA. Device IOTLB is only used when vIOMMU is
+> > enabled, and in that case mem table is used only when vhost need to
+> > track dirty pages (do reverse lookup of memtable to get HVA->GPA). So in
+> > conclusion, for datapath, they are used exclusively, but they need
+> > cowork for logging dirty pages when device IOTLB is enabled.
+> >  =20
+>=20
+> OK. Then it's different from current VFIO design, which maintains only
+> one tree which is indexed by either GPA or IOVA exclusively, upon=20
+> whether vIOMMU is in use.=20
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 3fc7a863e51..d796f71b63a 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -125,6 +125,7 @@ docker-image-debian-ppc64-cross: docker-image-debian10
- docker-image-debian-riscv64-cross: docker-image-debian10
- docker-image-debian-sh4-cross: docker-image-debian10
- docker-image-debian-sparc64-cross: docker-image-debian10
-+docker-image-fedora-win10sdk-cross: docker-image-fedora
- 
- docker-image-travis: NOUSER=1
- 
-diff --git a/tests/docker/dockerfiles/fedora-win10sdk-cross.docker b/tests/docker/dockerfiles/fedora-win10sdk-cross.docker
-new file mode 100644
-index 00000000000..1aafdad483c
---- /dev/null
-+++ b/tests/docker/dockerfiles/fedora-win10sdk-cross.docker
-@@ -0,0 +1,21 @@
-+#
-+# Docker MinGW64 cross-compiler target with WHPX header installed
-+#
-+# This docker target builds on the Fedora 30 base image.
-+#
-+# SPDX-License-Identifier: GPL-2.0-or-later
-+#
-+FROM qemu:fedora
-+
-+# Install headers extracted by the Android folks from the win10sdk.iso:
-+# https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk
-+ENV WIN10SDK_INCDIR /usr/local/include/win10sdk
-+RUN mkdir ${WIN10SDK_INCDIR} && \
-+    for hdr in WinHvEmulation.h WinHvPlatformDefs.h WinHvPlatform.h; do \
-+        curl -s "https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/host/x86_64-w64-mingw32-4.8/+/1bde9c3b14f3a3b081ada6e32da9f2870671b46f/x86_64-w64-mingw32/include/${hdr}?format=TEXT" | base64 --decode > ${WIN10SDK_INCDIR}/${hdr}; \
-+    done
-+
-+ENV QEMU_CONFIGURE_OPTS ${QEMU_CONFIGURE_OPTS} \
-+    --cross-prefix=x86_64-w64-mingw32- \
-+    --extra-cflags="-I ${WIN10SDK_INCDIR}" --disable-werror \
-+    --enable-hax --enable-whpx
--- 
-2.20.1
+Nit, the VFIO tree is only ever indexed by IOVA.  The MAP_DMA ioctl is
+only ever performed with an IOVA.  Userspace decides how that IOVA maps
+to GPA, VFIO only needs to know how the IOVA maps to HPA via the HVA.
+Thanks,
 
+Alex
 
