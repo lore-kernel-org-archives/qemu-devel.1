@@ -2,89 +2,108 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD032C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:42:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8CF0C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:42:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50F3E21927
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:42:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50F3E21927
+	by mail.kernel.org (Postfix) with ESMTPS id 9D61921907
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:42:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D61921907
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAsxA-000472-8F
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:42:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46160)
+	id 1iAsxi-000519-Qv
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:42:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46217)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iAswN-0003Yc-GM
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:41:32 -0400
+ (envelope-from <david@redhat.com>) id 1iAswm-0003ve-4A
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:41:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iAswM-0002I0-CW
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:41:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49622)
+ (envelope-from <david@redhat.com>) id 1iAswl-0002Ra-0q
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:41:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41698)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iAswM-0002HS-4A
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:41:30 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1iAswk-0002RO-P6; Thu, 19 Sep 2019 05:41:54 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3296F36955
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 09:41:29 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id h6so817700wrh.6
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 02:41:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=h9HHlig8dLzd5KxA/tK1sT4QqAGLjioELXR/YMG0H8c=;
- b=NydJmn7FmQ+9KGqEBIIq/GzQSulwTg/rRHCWtMhh0FaUESpZsVDOtdYvWuyrI4bX5f
- k+MkQPN11QN6e6P093wsEMo9hu+OA6xcOrQbof2sdYN8VFPUsuxC5rSFowv150vGTCz0
- 47njXWD5ERqfAzVfdGkxQ4+uwNpWwWAJFHYMLZkbD8xRdXxntMsltRzmlKrIO7ldw725
- X7UekBE1Qviq5PLc6HwaCpSa6a1hJk9PjeIOAAIdoa+nuZNr+hk9Be/B9OUGOPG1Xt00
- LO/xfhJJPWr7Y8nHIRF9ehdHChDYPOvjIUWBJ06GYwiTcsKn8ci4HGTMrVx25wLCTOlh
- AtRg==
-X-Gm-Message-State: APjAAAVmCRFy6Za8KxzPIvXgkCaHD0Bsm6wLSnzEWeZ8y1ITlU+TWXAk
- L1OX87SUMMUExZ/XZMolnIyo/6kG13LH8mujPHLtPaO0i52kvWTNyZSOTAfhPc4N98S+0sttg1J
- k4L0z0mVjY3UJDqs=
-X-Received: by 2002:a1c:cf8c:: with SMTP id f134mr2075401wmg.174.1568886087605; 
- Thu, 19 Sep 2019 02:41:27 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwR4d4UUFagd2m9KLtuCOJ423ElWzu9ebmSPfhC7lkrUfrC1hbtznNfC2ls17/GS9hXOwABYA==
-X-Received: by 2002:a1c:cf8c:: with SMTP id f134mr2075346wmg.174.1568886086656; 
- Thu, 19 Sep 2019 02:41:26 -0700 (PDT)
-Received: from [192.168.1.40] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id b62sm8491520wmc.13.2019.09.19.02.41.25
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 19 Sep 2019 02:41:25 -0700 (PDT)
-To: Tao Xu <tao3.xu@intel.com>, pbonzini@redhat.com, rth@twiddle.net,
- ehabkost@redhat.com
-References: <20190919020629.26530-1-tao3.xu@intel.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <03994df5-69b7-8663-fc19-0f551a9b29d6@redhat.com>
-Date: Thu, 19 Sep 2019 11:41:25 +0200
+ by mx1.redhat.com (Postfix) with ESMTPS id 190907FDE5;
+ Thu, 19 Sep 2019 09:41:54 +0000 (UTC)
+Received: from [10.36.117.104] (ovpn-117-104.ams2.redhat.com [10.36.117.104])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6821260872;
+ Thu, 19 Sep 2019 09:41:52 +0000 (UTC)
+To: qemu-devel@nongnu.org
+References: <20190919092829.15393-1-david@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <7995a66a-b1c6-2332-dd12-28ff69efa612@redhat.com>
+Date: Thu, 19 Sep 2019 11:41:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190919020629.26530-1-tao3.xu@intel.com>
+In-Reply-To: <20190919092829.15393-1-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Thu, 19 Sep 2019 09:41:54 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] target/i386: Correct extra enter and
- spaces in comment
+Subject: Re: [Qemu-devel] [PATCH v1] tests/tcg: target/s390x: Test MVC
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,63 +115,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Tao,
-
-On 9/19/19 4:06 AM, Tao Xu wrote:
-> There is an extra line in comment of CPUID_8000_0008_EBX_WBNOINVD,
-> remove the extra enter and spaces.
-> 
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+On 19.09.19 11:28, David Hildenbrand wrote:
+> Let's add a test that especially verifies that no data will be touched
+> in case we cross page boundaries and one page access triggers a fault.
+>=20
+> Before the fault-safe handling fixes, the test failes with:
+>       TEST    mvc on s390x
+>     data modified during a fault
+>     make[2]: *** [../Makefile.target:116: run-mvc] Error 1
+>=20
+> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  target/i386/cpu.h | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 5f6e3a029a..71b6193390 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -695,8 +695,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->  
->  #define CPUID_7_1_EAX_AVX512_BF16 (1U << 5) /* AVX512 BFloat16 Instruction */
->  
-> -#define CPUID_8000_0008_EBX_WBNOINVD  (1U << 9)  /* Write back and
-> -                                                                             do not invalidate cache */
-> +#define CPUID_8000_0008_EBX_WBNOINVD (1U << 9) /* Write back and do not invalidate cache */
+>  tests/tcg/s390x/Makefile.target |   1 +
+>  tests/tcg/s390x/mvc.c           | 109 ++++++++++++++++++++++++++++++++
+>  2 files changed, 110 insertions(+)
+>  create mode 100644 tests/tcg/s390x/mvc.c
+>=20
+> diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefile=
+.target
+> index 6a3bfa8b29..241ef28f61 100644
+> --- a/tests/tcg/s390x/Makefile.target
+> +++ b/tests/tcg/s390x/Makefile.target
+> @@ -7,3 +7,4 @@ TESTS+=3Dexrl-trt
+>  TESTS+=3Dexrl-trtr
+>  TESTS+=3Dpack
+>  TESTS+=3Dmvo
+> +TESTS+=3Dmvc
+> diff --git a/tests/tcg/s390x/mvc.c b/tests/tcg/s390x/mvc.c
+> new file mode 100644
+> index 0000000000..aa552d52e5
+> --- /dev/null
+> +++ b/tests/tcg/s390x/mvc.c
+> @@ -0,0 +1,109 @@
+> +#include <stdint.h>
+> +#include <stdlib.h>
+> +#include <stdio.h>
+> +#include <string.h>
+> +#include <sys/mman.h>
+> +#include <signal.h>
+> +#include <setjmp.h>
+> +
+> +jmp_buf jmp_env;
+> +
+> +static void handle_sigsegv(int sig)
+> +{
+> +    siglongjmp(jmp_env, 1);
+> +}
+> +
+> +#define ALLOC_SIZE (2 * 4096)
+> +
+> +static inline void mvc_256(const char *dst, const char *src)
+> +{
+> +    asm volatile (
+> +        "    mvc 0(256,%[dst]),0(%[src])\n"
+> +        :
+> +        : [dst] "d" (dst),
+> +          [src] "d" (src)
+> +        : "memory");
+> +}
+> +
+> +int main(void)
+> +{
+> +    char *src, *dst;
+> +    int i;
+> +
+> +    /* register the SIGSEGV handler */
+> +    if (signal(SIGSEGV, handle_sigsegv) =3D=3D SIG_ERR) {
+> +        fprintf(stderr, "SIGSEGV not registered\n");
+> +        return 1;
+> +    }
+> +
+> +    /* prepare the buffers - two consecutive pages */
+> +    src =3D valloc(ALLOC_SIZE);
+> +    dst =3D valloc(ALLOC_SIZE);
 
-The QEMU CODING_STYLE [*] recommend a 80 chars per line limit:
+If anybody cares, I can convert the obsolete valloc into a
+posix_memalign(&src, 4096, ALLOC_SIZE) etc.
 
-Line width
-==========
+> +    memset(src, 0xff, ALLOC_SIZE);
+> +    memset(dst, 0x0, ALLOC_SIZE);
+> +
 
-Lines should be 80 characters; try not to make them longer.
 
-Sometimes it is hard to do, especially when dealing with QEMU subsystems
-that use long function or symbol names.  Even in that case, do not make
-lines much longer than 80 characters.
+--=20
 
-Rationale:
+Thanks,
 
-* Some people like to tile their 24" screens with a 6x4 matrix of 80x24
-  xterms and use vi in all of them.  The best way to punish them is to
-  let them keep doing it.
-* Code and especially patches is much more readable if limited to a sane
-  line length.  Eighty is traditional.
-* The four-space indentation makes the most common excuse ("But look
-  at all that white space on the left!") moot.
-* It is the QEMU coding style.
-
-[*]
-https://git.qemu.org/?p=qemu.git;a=blob;f=CODING_STYLE.rst;h=427699e0e425431ea99d4046e40543bdcc22e9c5;hb=HEAD#l82
-
-Can you repost using correct lenght comments?
-
->  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
->  
->  #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
-> 
+David / dhildenb
 
