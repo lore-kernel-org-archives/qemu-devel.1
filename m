@@ -2,102 +2,73 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71E53C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:35:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95F01C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:36:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D53720578
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:35:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f2+nXNKF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D53720578
+	by mail.kernel.org (Postfix) with ESMTPS id 689F921907
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:36:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 689F921907
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAsqw-0000QJ-1c
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:35:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44485)
+	id 1iAsrt-0001Yt-F5
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:36:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44848)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iAspI-0007cN-Vx
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:34:15 -0400
+ (envelope-from <jasowang@redhat.com>) id 1iAsqb-0000Yx-5a
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:35:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iAspH-0006Wr-DV
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:34:12 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30891
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <jasowang@redhat.com>) id 1iAsqZ-0007DD-E6
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:35:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49024)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iAspG-0006WZ-Uk
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:34:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1568885650;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=5dwYcTBkOPj+bSGejxMzGg5pIIImeWzH0jVxCFPvPh8=;
- b=f2+nXNKFs0suInqqjGd06XRan1WoCWw9m6M0bTeWoB78+LOULYHs2vE0LPvjat7aiFH7SH
- r43ueQ7q5kIFOPUn1N5CaqmcoVsCDqKVhvjoM+4TNFMg+ufHZw91+065QIT4NV9AlQAqMs
- z+rGR5CV0V9n/LpqbnVoFtORKeTi4KM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-353-eiMq9zsgM-ScfR_hfRRKLQ-1; Thu, 19 Sep 2019 05:34:09 -0400
-Received: by mail-wr1-f69.google.com with SMTP id n18so800350wro.11
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 02:34:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=n8JEz9fxOdZkaLKvjodEKMVK5kdAC1E1R+iijd76PA8=;
- b=kt6E1r3JWdt7BpE9sIRnV/yjyIbt05QhjnfAnsv5O8/YlMYF5BDi1wUooSUB4fumn3
- yBvscHBIsTUWO19jrzCcMGv3xryaTKE94BhoR7Ht53ZP8y0tthbu5J9ELhlVhLOW6Hd9
- dsq5j97FG4z7a7/PsO4X5KDn3xU89J/ra+4dxhro3igQKpOCgvC4pYzIB5GUSCML918t
- 3rCjTirxnRv9q5yoip7umMK7CFMfKqQz6ToRIPqT+xHJc2By1K3abGh3r3jP5jZ552CP
- Xwcrwm6TKnGAcd+ozkw/3Zu4nkbh0yeerX2HvyrUCvs2/R5KCi1nNzPJxmV7NCibmI4E
- cVSw==
-X-Gm-Message-State: APjAAAXMRgk6NKhEXIcUxdJDskTzDw9t8Qg89GrIFGCBTprsWVREl4Nr
- HonjedsAhdhdyJi9H3Fsa1aqD0v0ZEJ76Q0gkYcP6CwnAP0dAMiCK9bNis6CicfI+PTf1YAUCU1
- xjLYgRucqM3k5zVE=
-X-Received: by 2002:a1c:a796:: with SMTP id q144mr2005743wme.15.1568885647508; 
- Thu, 19 Sep 2019 02:34:07 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqw7HbUBsORa2tJTqx3dk6vyKvatf3AyfHlBKpgQxQTkdiAmU34bZeBxkt9EV4ahPbn6TrArRA==
-X-Received: by 2002:a1c:a796:: with SMTP id q144mr2005724wme.15.1568885647276; 
- Thu, 19 Sep 2019 02:34:07 -0700 (PDT)
-Received: from [192.168.1.40] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id q10sm16895703wrd.39.2019.09.19.02.34.06
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 19 Sep 2019 02:34:06 -0700 (PDT)
-To: Dan Streetman <dan.streetman@canonical.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20190917172422.5134-1-dan.streetman@canonical.com>
- <87woe5z6mi.fsf@linaro.org>
- <CAOZ2QJNgiB0ZoLAOUGjdFfWa+Hwkbqe=E+KQeOaUMEdvU0-ofw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <bb9bf110-1e5d-22e2-16d5-40a495c7ee84@redhat.com>
-Date: Thu, 19 Sep 2019 11:34:06 +0200
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1iAsqZ-0007Cg-68
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:35:31 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4683B10CBC4B;
+ Thu, 19 Sep 2019 09:35:30 +0000 (UTC)
+Received: from [10.72.12.81] (ovpn-12-81.pek2.redhat.com [10.72.12.81])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C18BA5C1B5;
+ Thu, 19 Sep 2019 09:35:18 +0000 (UTC)
+To: Yan Zhao <yan.y.zhao@intel.com>
+References: <8302a4ae-1914-3046-b3b5-b3234d7dda02@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57B1D1@SHSMSX104.ccr.corp.intel.com>
+ <6d73572e-1e89-b04a-bdd6-98ac73798083@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57B90C@SHSMSX104.ccr.corp.intel.com>
+ <204219fa-ee72-ca60-52a4-fb4bbc887773@redhat.com>
+ <20190919052819.GA18391@joy-OptiPlex-7040>
+ <7b6d6343-33de-ebd7-9846-af54a45a82a2@redhat.com>
+ <20190919061756.GB18391@joy-OptiPlex-7040>
+ <e0efbdc0-aad9-0d17-ec68-36460865501f@redhat.com>
+ <20190919062954.GC18391@joy-OptiPlex-7040>
+ <20190919063249.GD18391@joy-OptiPlex-7040>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <98e04514-f807-ba7d-6bd4-8872fcc96c76@redhat.com>
+Date: Thu, 19 Sep 2019 17:35:05 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAOZ2QJNgiB0ZoLAOUGjdFfWa+Hwkbqe=E+KQeOaUMEdvU0-ofw@mail.gmail.com>
+In-Reply-To: <20190919063249.GD18391@joy-OptiPlex-7040>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-MC-Unique: eiMq9zsgM-ScfR_hfRRKLQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Thu, 19 Sep 2019 09:35:30 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
-Subject: Re: [Qemu-devel] [PATCH] hw/arm: set machine 'virt' as default
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] vhost, iova, and dirty page tracking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,124 +80,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ 'Alex Williamson' <alex.williamson@redhat.com>, Peter Xu <peterx@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/18/19 11:56 PM, Dan Streetman wrote:
-> On Wed, Sep 18, 2019 at 4:34 PM Alex Benn=C3=A9e <alex.bennee@linaro.org>=
- wrote:
->>
->> Dan Streetman <dan.streetman@canonical.com> writes:
->>
->>> From: Dan Streetman <ddstreet@canonical.com>
+
+On 2019/9/19 =E4=B8=8B=E5=8D=882:32, Yan Zhao wrote:
+> On Thu, Sep 19, 2019 at 02:29:54PM +0800, Yan Zhao wrote:
+>> On Thu, Sep 19, 2019 at 02:32:03PM +0800, Jason Wang wrote:
+>>> On 2019/9/19 =E4=B8=8B=E5=8D=882:17, Yan Zhao wrote:
+>>>> On Thu, Sep 19, 2019 at 02:09:53PM +0800, Jason Wang wrote:
+>>>>> On 2019/9/19 =E4=B8=8B=E5=8D=881:28, Yan Zhao wrote:
+>>>>>> On Thu, Sep 19, 2019 at 09:05:12AM +0800, Jason Wang wrote:
+>>>>>>> On 2019/9/18 =E4=B8=8B=E5=8D=884:37, Tian, Kevin wrote:
+>>>>>>>>> From: Jason Wang [mailto:jasowang@redhat.com]
+>>>>>>>>> Sent: Wednesday, September 18, 2019 2:10 PM
+>>>>>>>>>
+>>>>>>>>>>> Note that the HVA to GPA mapping is not an 1:1 mapping. One H=
+VA
+>>>>>>>>> range
+>>>>>>>>>>> could be mapped to several GPA ranges.
+>>>>>>>>>> This is fine. Currently vfio_dma maintains IOVA->HVA mapping.
+>>>>>>>>>>
+>>>>>>>>>> btw under what condition HVA->GPA is not 1:1 mapping? I didn't=
+ realize it.
+>>>>>>>>> I don't remember the details e.g memory region alias? And neith=
+er kvm
+>>>>>>>>> nor kvm API does forbid this if my memory is correct.
+>>>>>>>>>
+>>>>>>>> I checked https://qemu.weilnetz.de/doc/devel/memory.html, which
+>>>>>>>> provides an example of aliased layout. However, its aliasing is =
+all
+>>>>>>>> 1:1, instead of N:1. From guest p.o.v every writable GPA implies=
+ an
+>>>>>>>> unique location. Why would we hit the situation where multiple
+>>>>>>>> write-able GPAs are mapped to the same HVA (i.e. same physical
+>>>>>>>> memory location)?
+>>>>>>> I don't know, just want to say current API does not forbid this. =
+So we
+>>>>>>> probably need to take care it.
+>>>>>>>
+>>>>>> yes, in KVM API level, it does not forbid two slots to have the sa=
+me HVA(slot->userspace_addr).
+>>>>>> But
+>>>>>> (1) there's only one kvm instance for each vm for each qemu proces=
+s.
+>>>>>> (2) all ramblock->host (corresponds to HVA and slot->userspace_add=
+r) in one qemu
+>>>>>> process is non-overlapping as it's obtained from mmmap().
+>>>>>> (3) qemu ensures two kvm slots will not point to the same section =
+of one ramblock.
+>>>>>>
+>>>>>> So, as long as kvm instance is not shared in two processes, and
+>>>>>> there's no bug in qemu, we can assure that HVA to GPA is 1:1.
+>>>>> Well, you leave this API for userspace, so you can't assume qemu is=
+ the
+>>>>> only user or any its behavior. If you had you should limit it in th=
+e API
+>>>>> level instead of open window for them.
+>>>>>
+>>>>>
+>>>>>> But even if there are two processes operating on the same kvm inst=
+ance
+>>>>>> and manipulating on memory slots, adding an extra GPA along side c=
+urrent
+>>>>>> IOVA & HVA to ioctl VFIO_IOMMU_MAP_DMA can still let driver knows =
+the
+>>>>>> right IOVA->GPA mapping, right?
+>>>>> It looks fragile. Consider HVA was mapped to both GPA1 and GPA2. Gu=
+est
+>>>>> maps IOVA to GPA2, so we have IOVA GPA2 HVA in the new ioctl and th=
+en
+>>>>> log through GPA2. If userspace is trying to sync through GPA1, it w=
+ill
+>>>>> miss the dirty page. So for safety we need log both GPA1 and GPA2. =
+(See
+>>>>> what has been done in log_write_hva() in vhost.c). The only way to =
+do
+>>>>> that is to maintain an independent HVA to GPA mapping like what KVM=
+ or
+>>>>> vhost did.
+>>>>>
+>>>> why GPA1 and GPA2 should be both dirty?
+>>>> even they have the same HVA due to overlaping virtual address space =
+in
+>>>> two processes, they still correspond to two physical pages.
+>>>> don't get what's your meaning :)
 >>>
->>> There is currently no default machine type for arm so one must be speci=
-fied
->>> with --machine.  This sets the 'virt' machine type as default.
->>
->> We should really have a FAQ entry for why we don't have a default for
->> ARM. In short unlike PC's every ARM device is different so it pays to be
->> precise about what you want when you invoke QEMU. Because any given
->> kernel/image is only likely to work on the machine it's built for.
->=20
-> well, that's the problem, I have no idea at all what I want; and "I"
-> doesn't really apply completely in this situation, as the call to run
-> qemu comes from deep inside a test suite, and can run on multiple
-> archs, and could even be run by other people on other systems/archs.
->=20
-> This is what I have (tentatively) come up with to handle this in the test=
- suite:
-> https://github.com/systemd/systemd/pull/13409/files#diff-2ea30ffea3b108e0=
-f9c50846cfdcd4e5R197
->=20
-> To be fair, it's unlikely that other people would run this on an arm
-> system, unless they were a bit more familiar with arm, and maybe would
-> know what machine type to pick.  Similarly for the testbeds that I
-> handle for this test suite, I know that 'virt' seems to work.
->=20
->>
->> Why is virt special? It's just one of the many machines we emulate and
->> while it's probably the most popular these days for "something that
->> boots a Linux distro" why not -machine sba (when that comes)?
-
-This was my first reaction too, why not use the SBSA machine as default?
-
-> I am certainly not the right person to pick what the default should
-> be, but I do think there should be *some* default.  If 'virt' is the
-> most popular and/or has the widest kernel support, then it probably
-> makes sense to make that the default.
->=20
-> I would guess that users of qemu-system-aarch64 (or -arm) fall into 2 gro=
-ups:
->=20
-> 1. people who know about arm and know exactly what machine they want to u=
-se
-> 2. people who don't know about arm and have no idea what machine to use
->=20
-> group #1 of course can still pick whatever machine they want.  I'm in
-> group #2, and I suspect that like most others in the group, I did:
->=20
-> $ qemu-system-aarch64 ...
-> qemu-system-aarch64: No machine specified, and there is no default
-> Use -machine help to list supported machines
-> $ qemu-system-aarch64 -M ?
-> ...shows long list of machines that i'm unfamiliar with...
-> virt-2.10            QEMU 2.10 ARM Virtual Machine
-> virt-2.11            QEMU 2.11 ARM Virtual Machine
-> virt-2.12            QEMU 2.12 ARM Virtual Machine
-> virt-2.6             QEMU 2.6 ARM Virtual Machine
-> virt-2.7             QEMU 2.7 ARM Virtual Machine
-> virt-2.8             QEMU 2.8 ARM Virtual Machine
-> virt-2.9             QEMU 2.9 ARM Virtual Machine
-> virt-3.0             QEMU 3.0 ARM Virtual Machine
-> virt                 QEMU 3.1 ARM Virtual Machine (alias of virt-3.1)
-> virt-3.1             QEMU 3.1 ARM Virtual Machine
->=20
-> (aha! those "virt" machines look generic enough that they'll work...)
-> $ qemu-system-aarch64 -M virt ...
->=20
-> I honestly don't know if it would be better to have a FAQ on why there
-> is no default, or just to set a default.  Personally, I'd prefer just
-> having a default.
->=20
-> If you do decide against a default, I would suggest at least printing
-> the url to the FAQ entry on why arm doesn't have a default, instead of
-> just asking users to pick one out of the -M ? list.
-
-We can also go all the way around to educate users to use the -M flag,
-by killing the 'default machine' on all targets.
-
-Personally I also find the default ppc64 machine confusing.
-
-On the X86 side there is a long discussion/debt about when to change the
-default i440fx to q35, so having no default at all would fix this other
-issue.
-
->>> Signed-off-by: Dan Streetman <ddstreet@canonical.com>
->>> ---
->>>  hw/arm/virt.c | 1 +
->>>  1 file changed, 1 insertion(+)
+>>> The point is not leave any corner case that is hard to debug or fix i=
+n
+>>> the future.
 >>>
->>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->>> index d74538b021..e9fe888ca2 100644
->>> --- a/hw/arm/virt.c
->>> +++ b/hw/arm/virt.c
->>> @@ -78,6 +78,7 @@
->>>          mc->desc =3D "QEMU " # major "." # minor " ARM Virtual Machine=
-"; \
->>>          if (latest) { \
->>>              mc->alias =3D "virt"; \
->>> +            mc->is_default =3D 1; \
->>>          } \
->>>      } \
->>>      static const TypeInfo machvirt_##major##_##minor##_info =3D { \
->>
->>
->> --
->> Alex Benn=C3=A9e
->>
->=20
+>>> Let's just start by a single process, the API allows userspace to map=
+s
+>>> HVA to both GPA1 and GPA2. Since it knows GPA1 and GPA2 are equivalen=
+t,
+>>> it's ok to sync just through GPA1. That means if you only log GPA2, i=
+t
+>>> won't work.
+>>>
+>> In that case, cannot log dirty according to HPA.
+> sorry, it should be "cannot log dirty according to HVA".
 
+
+I think we are discussing the choice between GPA and IOVA, not HVA?
+
+Thanks
+
+
+>
+>> because kvm cannot tell whether it's an valid case (the two GPAs are e=
+quivalent)
+>> or an invalid case (the two GPAs are not equivalent, but with the same
+>> HVA value).
+>>
+>> Right?
+>>
+>> Thanks
+>> Yan
+>>
+>>
+>>> Thanks
+>>>
+>>>
+>>>> Thanks
+>>>> Yan
+>>>>
+>>>>
+>>>>> Thanks
+>>>>>
+>>>>>
+>>>>>> Thanks
+>>>>>> Yan
+>>>>>>
+>>>>>>>> Is Qemu doing its own same-content memory
+>>>>>>>> merging in GPA level, similar to KSM?
+>>>>>>> AFAIK, it doesn't.
+>>>>>>>
+>>>>>>> Thanks
+>>>>>>>
+>>>>>>>
+>>>>>>>> Thanks
+>>>>>>>> Kevin
 
