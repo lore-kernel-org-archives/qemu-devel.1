@@ -6,53 +6,45 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F6DFC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 19:12:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B81C2C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 19:16:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E5A620717
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 19:12:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E5A620717
+	by mail.kernel.org (Postfix) with ESMTPS id 8B8AB2053B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 19:16:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B8AB2053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB1ql-0007Mn-7N
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 15:12:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39275)
+	id 1iB1vD-0000xk-49
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 15:16:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39670)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iB1po-0006Zl-MX
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 15:11:22 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iB1tP-0000MR-G8
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 15:15:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iB1pn-0005oc-5u
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 15:11:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58768)
+ (envelope-from <jsnow@redhat.com>) id 1iB1tO-0001Dz-3q
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 15:15:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55780)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iB1pj-0005jM-Eb; Thu, 19 Sep 2019 15:11:15 -0400
+ id 1iB1tL-0001Cz-CR; Thu, 19 Sep 2019 15:14:59 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BAD938A1C9C;
- Thu, 19 Sep 2019 19:11:14 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7C93210CBCED;
+ Thu, 19 Sep 2019 19:14:58 +0000 (UTC)
 Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D7F435D6B0;
- Thu, 19 Sep 2019 19:11:13 +0000 (UTC)
-Subject: Re: [Qemu-block] [Qemu-devel] [PATCH] block/backup: install notifier
- during creation
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-References: <20190809201333.29033-1-jsnow@redhat.com>
- <b85698e6-cd79-a9c5-554c-c92487060280@virtuozzo.com>
- <154bc276-d782-443f-3db6-38d87992d609@redhat.com>
- <20190910081942.GA23976@stefanha-x1.localdomain>
- <9bf835d7-8bfa-feba-c2f7-acd6cda4a81e@redhat.com>
- <0abc4992-9322-010a-118b-62e79cbc5b58@redhat.com>
- <6e3c1b53-c104-2b05-418e-d44f45a82be8@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2E1B85D6B0;
+ Thu, 19 Sep 2019 19:14:54 +0000 (UTC)
+Subject: Re: [PATCH v2 2/2] iotests: Remove Python 2 compatibility code
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20190919162905.21830-1-kwolf@redhat.com>
+ <20190919162905.21830-3-kwolf@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -128,18 +120,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <0453fab7-6b2b-6caa-86d1-8db64b1cc9da@redhat.com>
-Date: Thu, 19 Sep 2019 15:11:13 -0400
+Message-ID: <7d296a36-a03f-0af5-b539-4984d9012ba3@redhat.com>
+Date: Thu, 19 Sep 2019 15:14:54 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <6e3c1b53-c104-2b05-418e-d44f45a82be8@virtuozzo.com>
+In-Reply-To: <20190919162905.21830-3-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Thu, 19 Sep 2019 19:11:14 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.66]); Thu, 19 Sep 2019 19:14:58 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -153,196 +145,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Max Reitz <mreitz@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com, philmd@redhat.com,
+ ehabkost@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/19/19 3:11 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 18.09.2019 23:31, John Snow wrote:
->>
->>
->> On 9/10/19 9:23 AM, John Snow wrote:
->>>
->>>
->>> On 9/10/19 4:19 AM, Stefan Hajnoczi wrote:
->>>> On Wed, Aug 21, 2019 at 04:01:52PM -0400, John Snow wrote:
->>>>>
->>>>>
->>>>> On 8/21/19 10:41 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>>>> 09.08.2019 23:13, John Snow wrote:
->>>>>>> Backup jobs may yield prior to installing their handler, because =
-of the
->>>>>>> job_co_entry shim which guarantees that a job won't begin work un=
-til
->>>>>>> we are ready to start an entire transaction.
->>>>>>>
->>>>>>> Unfortunately, this makes proving correctness about transactional
->>>>>>> points-in-time for backup hard to reason about. Make it explicitl=
-y clear
->>>>>>> by moving the handler registration to creation time, and changing=
- the
->>>>>>> write notifier to a no-op until the job is started.
->>>>>>>
->>>>>>> Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.c=
-om>
->>>>>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>>>>> ---
->>>>>>>    block/backup.c     | 32 +++++++++++++++++++++++---------
->>>>>>>    include/qemu/job.h |  5 +++++
->>>>>>>    job.c              |  2 +-
->>>>>>>    3 files changed, 29 insertions(+), 10 deletions(-)
->>>>>>>
->>>>>>> diff --git a/block/backup.c b/block/backup.c
->>>>>>> index 07d751aea4..4df5b95415 100644
->>>>>>> --- a/block/backup.c
->>>>>>> +++ b/block/backup.c
->>>>>>> @@ -344,6 +344,13 @@ static int coroutine_fn backup_before_write_=
-notify(
->>>>>>>        assert(QEMU_IS_ALIGNED(req->offset, BDRV_SECTOR_SIZE));
->>>>>>>        assert(QEMU_IS_ALIGNED(req->bytes, BDRV_SECTOR_SIZE));
->>>>>>>   =20
->>>>>>> +    /* The handler is installed at creation time; the actual poi=
-nt-in-time
->>>>>>> +     * starts at job_start(). Transactions guarantee those two p=
-oints are
->>>>>>> +     * the same point in time. */
->>>>>>> +    if (!job_started(&job->common.job)) {
->>>>>>> +        return 0;
->>>>>>> +    }
->>>>>>
->>>>>> Hmm, sorry if it is a stupid question, I'm not good in multiproces=
-sing and in
->>>>>> Qemu iothreads..
->>>>>>
->>>>>> job_started just reads job->co. If bs runs in iothread, and theref=
-ore write-notifier
->>>>>> is in iothread, when job_start is called from main thread.. Is it =
-guaranteed that
->>>>>> write-notifier will see job->co variable change early enough to no=
-t miss guest write?
->>>>>> Should not job->co be volatile for example or something like this?
->>>>>>
->>>>>> If not think about this patch looks good for me.
->>>>>>
->>>>>
->>>>> You know, it's a really good question.
->>>>> So good, in fact, that I have no idea.
->>>>>
->>>>> =C2=AF\_(=E3=83=84)_/=C2=AF
->>>>>
->>>>> I'm fairly certain that IO will not come in until the .clean phase =
-of a
->>>>> qmp_transaction, because bdrv_drained_begin(bs) is called during
->>>>> .prepare, and we activate the handler (by starting the job) in .com=
-mit.
->>>>> We do not end the drained section until .clean.
->>>>>
->>>>> I'm not fully clear on what threading guarantees we have otherwise,
->>>>> though; is it possible that "Thread A" would somehow lift the bdrv_=
-drain
->>>>> on an IO thread ("Thread B") and, after that, "Thread B" would some=
-how
->>>>> still be able to see an outdated version of job->co that was set by
->>>>> "Thread A"?
->>>>>
->>>>> I doubt it; but I can't prove it.
->>>>
->>>> In the qmp_backup() case (not qmp_transaction()) there is:
->>>>
->>>>    void qmp_drive_backup(DriveBackup *arg, Error **errp)
->>>>    {
->>>>
->>>>        BlockJob *job;
->>>>        job =3D do_drive_backup(arg, NULL, errp);
->>>>        if (job) {
->>>>            job_start(&job->job);
->>>>        }
->>>>    }
->>>>
->>>> job_start() is called without any thread synchronization, which is
->>>> usually fine because the coroutine doesn't run until job_start() cal=
-ls
->>>> aio_co_enter().
->>>>
->>>> Now that the before write notifier has been installed early, there i=
-s
->>>> indeed a race between job_start() and the write notifier accessing
->>>> job->co from an IOThread.
->>>>
->>>> The write before notifier might see job->co !=3D NULL before job_sta=
-rt()
->>>> has finished.  This could lead to issues if job_*() APIs are invoked=
- by
->>>> the write notifier and access an in-between job state.
->>>>
->>>
->>> I see. I think in this case, as long as it sees !=3D NULL, that the
->>> notifier is actually safe to run. I agree that this might be confusin=
-g
->>> to verify and could bite us in the future. The worry we had, too, is
->>> more the opposite: will it see NULL for too long? We want to make sur=
-e
->>> that it is registering as true *before the first yield*.
->>>
->>>> A safer approach is to set a BackupBlockJob variable at the beginnin=
-g of
->>>> backup_run() and check it from the before write notifier.
->>>>
->>>
->>> That's too late, for reasons below.
->>>
->>>> That said, I don't understand the benefit of this patch and IMO it m=
-akes
->>>> the code harder to understand because now we need to think about the
->>>> created but not started state too.
->>>>
->>>> Stefan
->>>>
->>>
->>> It's always possible I've hyped myself up into believing there's a
->>> problem where there isn't one, but the fear is this:
->>>
->>> The point in time from a QMP transaction covers the job creation and =
-the
->>> job start, but when we start the job it will actually yield before we
->>> get to backup_run -- and there is no guarantee that the handler will =
-get
->>> installed synchronously, so the point in time ends before the handler
->>> activates.
->>>
->>
->> i.e., the handler might get installed AFTER the critical region of a
->> transaction. We could drop initial writes if we were unlucky.
->>
->> (I think.)
->>
->>> The yield occurs in job_co_entry as an intentional feature of forcing=
- a
->>> yield and pause point at run time -- so it's harder to write a job th=
-at
->>> accidentally hogs the thread during initialization.
->>>
->>> This is an attempt to get the handler installed earlier to ensure the
->>> point of time stays synchronized with creation time to provide a
->>> stronger transactional guarantee.
->>>
->>
->> Squeaky wheel gets the grease. Any comment?
->>
->=20
-> Hmm, this all becomes difficult, I'd prefer to not worry and wait for b=
-ackup-top
-> filter applied.
->=20
+On 9/19/19 12:29 PM, Kevin Wolf wrote:
+> Some scripts check the Python version number and have two code paths to
+> accomodate both Python 2 and 3. Remove the code specific to Python 2 and
+> assert the minimum version of 3.6 instead (check skips Python tests in
+> this case, so the assertion would only ever trigger if a Python script
+> is executed manually).
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  tests/qemu-iotests/044                   |  3 ---
+>  tests/qemu-iotests/163                   |  3 ---
+>  tests/qemu-iotests/iotests.py            | 13 +++----------
+>  tests/qemu-iotests/nbd-fault-injector.py |  7 +++----
+>  4 files changed, 6 insertions(+), 20 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/044 b/tests/qemu-iotests/044
+> index 05ea1f49c5..8b2afa2a11 100755
+> --- a/tests/qemu-iotests/044
+> +++ b/tests/qemu-iotests/044
+> @@ -28,9 +28,6 @@ import struct
+>  import subprocess
+>  import sys
+>  
+> -if sys.version_info.major == 2:
+> -    range = xrange
+> -
+>  test_img = os.path.join(iotests.test_dir, 'test.img')
+>  
+>  class TestRefcountTableGrowth(iotests.QMPTestCase):
+> diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
+> index 081ccc8ac1..d94728e080 100755
+> --- a/tests/qemu-iotests/163
+> +++ b/tests/qemu-iotests/163
+> @@ -21,9 +21,6 @@
+>  import os, random, iotests, struct, qcow2, sys
+>  from iotests import qemu_img, qemu_io, image_size
+>  
+> -if sys.version_info.major == 2:
+> -    range = xrange
+> -
+>  test_img = os.path.join(iotests.test_dir, 'test.img')
+>  check_img = os.path.join(iotests.test_dir, 'check.img')
+>  
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> index b26271187c..9fb5181c3d 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -35,6 +35,7 @@ from collections import OrderedDict
+>  sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
+>  from qemu import qtest
+>  
+> +assert sys.version_info >= (3,6)
+>  
+>  # This will not work if arguments contain spaces but is necessary if we
+>  # want to support the override options that ./check supports.
+> @@ -250,10 +251,7 @@ def image_size(img):
+>      return json.loads(r)['virtual-size']
+>  
+>  def is_str(val):
+> -    if sys.version_info.major >= 3:
+> -        return isinstance(val, str)
+> -    else:
+> -        return isinstance(val, str) or isinstance(val, unicode)
+> +    return isinstance(val, str)
+>  
+>  test_dir_re = re.compile(r"%s" % test_dir)
+>  def filter_test_dir(msg):
+> @@ -935,12 +933,7 @@ def execute_test(test_function=None,
+>      else:
+>          # We need to filter out the time taken from the output so that
+>          # qemu-iotest can reliably diff the results against master output.
+> -        if sys.version_info.major >= 3:
+> -            output = io.StringIO()
+> -        else:
+> -            # io.StringIO is for unicode strings, which is not what
+> -            # 2.x's test runner emits.
+> -            output = io.BytesIO()
+> +        output = io.StringIO()
+>  
+>      logging.basicConfig(level=(logging.DEBUG if debug else logging.WARN))
+>  
+> diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
+> index 6b2d659dee..43f095ceef 100755
+> --- a/tests/qemu-iotests/nbd-fault-injector.py
+> +++ b/tests/qemu-iotests/nbd-fault-injector.py
+> @@ -48,10 +48,9 @@ import sys
+>  import socket
+>  import struct
+>  import collections
+> -if sys.version_info.major >= 3:
+> -    import configparser
+> -else:
+> -    import ConfigParser as configparser
+> +import configparser
+> +
+> +assert sys.version_info >= (3,6)
+>  
+>  FAKE_DISK_SIZE = 8 * 1024 * 1024 * 1024 # 8 GB
+>  
+> 
 
-If it goes into 4.2, then OK, but I'd still like to understand what's
-going on here, actually.
-
---js
+Reviewed-by: John Snow <jsnow@redhat.com>
 
