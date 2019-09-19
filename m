@@ -2,60 +2,61 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FF57C49ED7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8027DC4CECE
 	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 05:52:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB359218AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 05:52:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB359218AF
+	by mail.kernel.org (Postfix) with ESMTPS id 49AFB218AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 05:52:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49AFB218AF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iApN8-0002Vm-LT
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 01:52:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42370)
+	id 1iApN9-0002Xb-1V
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 01:52:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42344)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iApKw-0000cz-I0
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:50:40 -0400
+ (envelope-from <clg@kaod.org>) id 1iApKq-0000Ve-5f
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:50:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iApKu-0007if-L4
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:50:38 -0400
-Received: from 3.mo1.mail-out.ovh.net ([46.105.60.232]:35367)
+ (envelope-from <clg@kaod.org>) id 1iApKo-0007af-4b
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:50:32 -0400
+Received: from 3.mo69.mail-out.ovh.net ([188.165.52.203]:49435)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iApKu-0007hd-BR
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:50:36 -0400
-Received: from player788.ha.ovh.net (unknown [10.109.143.109])
- by mo1.mail-out.ovh.net (Postfix) with ESMTP id E956118F90F
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 07:50:34 +0200 (CEST)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iApKn-0007ZC-TG
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:50:30 -0400
+Received: from player788.ha.ovh.net (unknown [10.109.143.72])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 4FB5D69D55
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 07:50:28 +0200 (CEST)
 Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
  (Authenticated sender: clg@kaod.org)
- by player788.ha.ovh.net (Postfix) with ESMTPSA id 3F2269F1734A;
- Thu, 19 Sep 2019 05:50:28 +0000 (UTC)
+ by player788.ha.ovh.net (Postfix) with ESMTPSA id 7C1199F172E4;
+ Thu, 19 Sep 2019 05:50:20 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Sep 2019 07:49:44 +0200
-Message-Id: <20190919055002.6729-4-clg@kaod.org>
+Date: Thu, 19 Sep 2019 07:49:43 +0200
+Message-Id: <20190919055002.6729-3-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190919055002.6729-1-clg@kaod.org>
 References: <20190919055002.6729-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 1669146614895905553
+X-Ovh-Tracer-Id: 1667457765884791569
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudelgdelhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.60.232
-Subject: [Qemu-devel] [PATCH 03/21] hw: aspeed_scu: Add AST2600 support
+X-Received-From: 188.165.52.203
+Subject: [Qemu-devel] [PATCH 02/21] hw/sd/aspeed_sdhci: New device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,366 +68,447 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Eddie James <eajames@linux.ibm.com>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Joel Stanley <joel@jms.id.au>
+From: Eddie James <eajames@linux.ibm.com>
 
-The SCU controller on the AST2600 SoC has extra registers. Increase
-the number of regs of the model and introduce a new field in the class
-to customize the MemoryRegion operations depending on the SoC model.
+The Aspeed SOCs have two SD/MMC controllers. Add a device that
+encapsulates both of these controllers and models the Aspeed-specific
+registers and behavior.
 
-Signed-off-by: Joel Stanley <joel@jms.id.au>
-[clg: - improved commit log
-      - changed vmstate version
-      - reworked model integration into new objet class ]
+Tested by reading from mmcblk0 in Linux:
+qemu-system-arm -machine romulus-bmc -nographic \
+ -drive file=3Dflash-romulus,format=3Draw,if=3Dmtd \
+ -device sd-card,drive=3Dsd0 -drive file=3D_tmp/kernel,format=3Draw,if=3D=
+sd,id=3Dsd0
+
+Signed-off-by: Eddie James <eajames@linux.ibm.com>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+[clg: - changed the controller MMIO window size to 0x1000
+      - moved the MMIO mapping of the SDHCI slots at the SoC level
+      - merged code to add SD drives on the SD buses at the machine level=
+ ]
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/misc/aspeed_scu.h |   7 +-
- hw/misc/aspeed_scu.c         | 190 +++++++++++++++++++++++++++++++++--
- 2 files changed, 189 insertions(+), 8 deletions(-)
+ include/hw/arm/aspeed_soc.h  |   3 +
+ include/hw/sd/aspeed_sdhci.h |  34 ++++++
+ hw/arm/aspeed.c              |  15 ++-
+ hw/arm/aspeed_soc.c          |  23 ++++
+ hw/sd/aspeed_sdhci.c         | 198 +++++++++++++++++++++++++++++++++++
+ hw/sd/Makefile.objs          |   1 +
+ 6 files changed, 273 insertions(+), 1 deletion(-)
+ create mode 100644 include/hw/sd/aspeed_sdhci.h
+ create mode 100644 hw/sd/aspeed_sdhci.c
 
-diff --git a/include/hw/misc/aspeed_scu.h b/include/hw/misc/aspeed_scu.h
-index 239e94fe2c47..1d7f7ffc1598 100644
---- a/include/hw/misc/aspeed_scu.h
-+++ b/include/hw/misc/aspeed_scu.h
-@@ -17,8 +17,10 @@
- #define ASPEED_SCU(obj) OBJECT_CHECK(AspeedSCUState, (obj), TYPE_ASPEED_=
-SCU)
- #define TYPE_ASPEED_2400_SCU TYPE_ASPEED_SCU "-ast2400"
- #define TYPE_ASPEED_2500_SCU TYPE_ASPEED_SCU "-ast2500"
-+#define TYPE_ASPEED_2600_SCU TYPE_ASPEED_SCU "-ast2600"
+diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
+index ab5052b12cb5..ba5bbb53e1a1 100644
+--- a/include/hw/arm/aspeed_soc.h
++++ b/include/hw/arm/aspeed_soc.h
+@@ -24,6 +24,7 @@
+ #include "hw/net/ftgmac100.h"
+ #include "target/arm/cpu.h"
+ #include "hw/gpio/aspeed_gpio.h"
++#include "hw/sd/aspeed_sdhci.h"
 =20
- #define ASPEED_SCU_NR_REGS (0x1A8 >> 2)
-+#define ASPEED_AST2600_SCU_NR_REGS (0xE20 >> 2)
+ #define ASPEED_SPIS_NUM  2
+ #define ASPEED_WDTS_NUM  3
+@@ -50,6 +51,7 @@ typedef struct AspeedSoCState {
+     AspeedWDTState wdt[ASPEED_WDTS_NUM];
+     FTGMAC100State ftgmac100[ASPEED_MACS_NUM];
+     AspeedGPIOState gpio;
++    AspeedSDHCIState sdhci;
+ } AspeedSoCState;
 =20
- typedef struct AspeedSCUState {
-     /*< private >*/
-@@ -27,7 +29,7 @@ typedef struct AspeedSCUState {
-     /*< public >*/
-     MemoryRegion iomem;
-=20
--    uint32_t regs[ASPEED_SCU_NR_REGS];
-+    uint32_t regs[ASPEED_AST2600_SCU_NR_REGS];
-     uint32_t silicon_rev;
-     uint32_t hw_strap1;
-     uint32_t hw_strap2;
-@@ -38,6 +40,7 @@ typedef struct AspeedSCUState {
- #define AST2400_A1_SILICON_REV   0x02010303U
- #define AST2500_A0_SILICON_REV   0x04000303U
- #define AST2500_A1_SILICON_REV   0x04010303U
-+#define AST2600_A0_SILICON_REV   0x05000303U
-=20
- #define ASPEED_IS_AST2500(si_rev)     ((((si_rev) >> 24) & 0xff) =3D=3D =
-0x04)
-=20
-@@ -54,6 +57,8 @@ typedef struct  AspeedSCUClass {
-     const uint32_t *resets;
-     uint32_t (*calc_hpll)(AspeedSCUState *s, uint32_t hpll_reg);
-     uint32_t apb_divider;
-+    uint32_t nr_regs;
-+    const MemoryRegionOps *ops;
- }  AspeedSCUClass;
-=20
- #define ASPEED_SCU_PROT_KEY      0x1688A8A8
-diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
-index 620b25c20476..27df6d6e3001 100644
---- a/hw/misc/aspeed_scu.c
-+++ b/hw/misc/aspeed_scu.c
-@@ -88,6 +88,34 @@
- #define BMC_REV              TO_REG(0x19C)
- #define BMC_DEV_ID           TO_REG(0x1A4)
-=20
-+#define AST2600_PROT_KEY          TO_REG(0x00)
-+#define AST2600_SILICON_REV       TO_REG(0x04)
-+#define AST2600_SILICON_REV2      TO_REG(0x14)
-+#define AST2600_SYS_RST_CTRL      TO_REG(0x40)
-+#define AST2600_SYS_RST_CTRL_CLR  TO_REG(0x44)
-+#define AST2600_SYS_RST_CTRL2     TO_REG(0x50)
-+#define AST2600_SYS_RST_CTRL2_CLR TO_REG(0x54)
-+#define AST2600_CLK_STOP_CTRL     TO_REG(0x80)
-+#define AST2600_CLK_STOP_CTRL_CLR TO_REG(0x84)
-+#define AST2600_CLK_STOP_CTRL2     TO_REG(0x90)
-+#define AST2600_CLK_STOP_CTR2L_CLR TO_REG(0x94)
-+#define AST2600_HPLL_EXT          TO_REG(0x204)
-+#define AST2600_MPLL_EXT          TO_REG(0x224)
-+#define AST2600_EPLL_EXT          TO_REG(0x244)
-+#define AST2600_CLK_SEL           TO_REG(0x300)
-+#define AST2600_CLK_SEL2          TO_REG(0x304)
-+#define AST2600_CLK_SEL3          TO_REG(0x310)
-+#define AST2600_HW_STRAP1         TO_REG(0x500)
-+#define AST2600_HW_STRAP1_CLR     TO_REG(0x504)
-+#define AST2600_HW_STRAP1_PROT    TO_REG(0x508)
-+#define AST2600_HW_STRAP2         TO_REG(0x510)
-+#define AST2600_HW_STRAP2_CLR     TO_REG(0x514)
-+#define AST2600_HW_STRAP2_PROT    TO_REG(0x518)
-+#define AST2600_RNG_CTRL          TO_REG(0x524)
-+#define AST2600_RNG_DATA          TO_REG(0x540)
+ #define TYPE_ASPEED_SOC "aspeed-soc"
+@@ -93,6 +95,7 @@ enum {
+     ASPEED_SCU,
+     ASPEED_ADC,
+     ASPEED_SRAM,
++    ASPEED_SDHCI,
+     ASPEED_GPIO,
+     ASPEED_RTC,
+     ASPEED_TIMER1,
+diff --git a/include/hw/sd/aspeed_sdhci.h b/include/hw/sd/aspeed_sdhci.h
+new file mode 100644
+index 000000000000..dfdab4379021
+--- /dev/null
++++ b/include/hw/sd/aspeed_sdhci.h
+@@ -0,0 +1,34 @@
++/*
++ * Aspeed SD Host Controller
++ * Eddie James <eajames@linux.ibm.com>
++ *
++ * Copyright (C) 2019 IBM Corp
++ * SPDX-License-Identifer: GPL-2.0-or-later
++ */
 +
-+#define AST2600_CLK TO_REG(0x40)
++#ifndef ASPEED_SDHCI_H
++#define ASPEED_SDHCI_H
 +
- #define SCU_IO_REGION_SIZE 0x1000
++#include "hw/sd/sdhci.h"
++
++#define TYPE_ASPEED_SDHCI "aspeed.sdhci"
++#define ASPEED_SDHCI(obj) OBJECT_CHECK(AspeedSDHCIState, (obj), \
++                                       TYPE_ASPEED_SDHCI)
++
++#define ASPEED_SDHCI_CAPABILITIES 0x01E80080
++#define ASPEED_SDHCI_NUM_SLOTS    2
++#define ASPEED_SDHCI_NUM_REGS     (ASPEED_SDHCI_REG_SIZE / sizeof(uint32=
+_t))
++#define ASPEED_SDHCI_REG_SIZE     0x100
++
++typedef struct AspeedSDHCIState {
++    SysBusDevice parent;
++
++    SDHCIState slots[ASPEED_SDHCI_NUM_SLOTS];
++
++    MemoryRegion iomem;
++    qemu_irq irq;
++
++    uint32_t regs[ASPEED_SDHCI_NUM_REGS];
++} AspeedSDHCIState;
++
++#endif /* ASPEED_SDHCI_H */
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index aa72be309da4..30e280484262 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -170,6 +170,7 @@ static void aspeed_board_init(MachineState *machine,
+     AspeedSoCClass *sc;
+     DriveInfo *drive0 =3D drive_get(IF_MTD, 0, 0);
+     ram_addr_t max_ram_size;
++    int i;
 =20
- static const uint32_t ast2400_a0_resets[ASPEED_SCU_NR_REGS] =3D {
-@@ -178,7 +206,7 @@ static uint64_t aspeed_scu_read(void *opaque, hwaddr =
-offset, unsigned size)
-     AspeedSCUState *s =3D ASPEED_SCU(opaque);
-     int reg =3D TO_REG(offset);
+     bmc =3D g_new0(AspeedBoardState, 1);
 =20
--    if (reg >=3D ARRAY_SIZE(s->regs)) {
-+    if (reg >=3D ASPEED_SCU_NR_REGS) {
-         qemu_log_mask(LOG_GUEST_ERROR,
-                       "%s: Out-of-bounds read at offset 0x%" HWADDR_PRIx=
- "\n",
-                       __func__, offset);
-@@ -208,7 +236,7 @@ static void aspeed_scu_write(void *opaque, hwaddr off=
-set, uint64_t data,
-     AspeedSCUState *s =3D ASPEED_SCU(opaque);
-     int reg =3D TO_REG(offset);
-=20
--    if (reg >=3D ARRAY_SIZE(s->regs)) {
-+    if (reg >=3D ASPEED_SCU_NR_REGS) {
-         qemu_log_mask(LOG_GUEST_ERROR,
-                       "%s: Out-of-bounds write at offset 0x%" HWADDR_PRI=
-x "\n",
-                       __func__, offset);
-@@ -346,7 +374,7 @@ static void aspeed_scu_reset(DeviceState *dev)
-     AspeedSCUState *s =3D ASPEED_SCU(dev);
-     AspeedSCUClass *asc =3D ASPEED_SCU_GET_CLASS(dev);
-=20
--    memcpy(s->regs, asc->resets, sizeof(s->regs));
-+    memcpy(s->regs, asc->resets, asc->nr_regs * 4);
-     s->regs[SILICON_REV] =3D s->silicon_rev;
-     s->regs[HW_STRAP1] =3D s->hw_strap1;
-     s->regs[HW_STRAP2] =3D s->hw_strap2;
-@@ -358,6 +386,7 @@ static uint32_t aspeed_silicon_revs[] =3D {
-     AST2400_A1_SILICON_REV,
-     AST2500_A0_SILICON_REV,
-     AST2500_A1_SILICON_REV,
-+    AST2600_A0_SILICON_REV,
- };
-=20
- bool is_supported_silicon_rev(uint32_t silicon_rev)
-@@ -377,6 +406,7 @@ static void aspeed_scu_realize(DeviceState *dev, Erro=
-r **errp)
- {
-     SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-     AspeedSCUState *s =3D ASPEED_SCU(dev);
-+    AspeedSCUClass *asc =3D ASPEED_SCU_GET_CLASS(dev);
-=20
-     if (!is_supported_silicon_rev(s->silicon_rev)) {
-         error_setg(errp, "Unknown silicon revision: 0x%" PRIx32,
-@@ -384,7 +414,7 @@ static void aspeed_scu_realize(DeviceState *dev, Erro=
-r **errp)
-         return;
+@@ -252,6 +253,19 @@ static void aspeed_board_init(MachineState *machine,
+         cfg->i2c_init(bmc);
      }
 =20
--    memory_region_init_io(&s->iomem, OBJECT(s), &aspeed_scu_ops, s,
-+    memory_region_init_io(&s->iomem, OBJECT(s), asc->ops, s,
-                           TYPE_ASPEED_SCU, SCU_IO_REGION_SIZE);
-=20
-     sysbus_init_mmio(sbd, &s->iomem);
-@@ -392,10 +422,10 @@ static void aspeed_scu_realize(DeviceState *dev, Er=
-ror **errp)
-=20
- static const VMStateDescription vmstate_aspeed_scu =3D {
-     .name =3D "aspeed.scu",
--    .version_id =3D 1,
--    .minimum_version_id =3D 1,
-+    .version_id =3D 2,
-+    .minimum_version_id =3D 2,
-     .fields =3D (VMStateField[]) {
--        VMSTATE_UINT32_ARRAY(regs, AspeedSCUState, ASPEED_SCU_NR_REGS),
-+        VMSTATE_UINT32_ARRAY(regs, AspeedSCUState, ASPEED_AST2600_SCU_NR=
-_REGS),
-         VMSTATE_END_OF_LIST()
-     }
- };
-@@ -436,6 +466,8 @@ static void aspeed_2400_scu_class_init(ObjectClass *k=
-lass, void *data)
-     asc->resets =3D ast2400_a0_resets;
-     asc->calc_hpll =3D aspeed_2400_scu_calc_hpll;
-     asc->apb_divider =3D 2;
-+    asc->nr_regs =3D ASPEED_SCU_NR_REGS;
-+    asc->ops =3D &aspeed_scu_ops;
- }
-=20
- static const TypeInfo aspeed_2400_scu_info =3D {
-@@ -454,6 +486,8 @@ static void aspeed_2500_scu_class_init(ObjectClass *k=
-lass, void *data)
-     asc->resets =3D ast2500_a1_resets;
-     asc->calc_hpll =3D aspeed_2500_scu_calc_hpll;
-     asc->apb_divider =3D 4;
-+    asc->nr_regs =3D ASPEED_SCU_NR_REGS;
-+    asc->ops =3D &aspeed_scu_ops;
- }
-=20
- static const TypeInfo aspeed_2500_scu_info =3D {
-@@ -463,11 +497,153 @@ static const TypeInfo aspeed_2500_scu_info =3D {
-     .class_init =3D aspeed_2500_scu_class_init,
- };
-=20
-+static uint64_t aspeed_ast2600_scu_read(void *opaque, hwaddr offset,
-+                                        unsigned size)
-+{
-+    AspeedSCUState *s =3D ASPEED_SCU(opaque);
-+    int reg =3D TO_REG(offset);
++    for (i =3D 0; i < ARRAY_SIZE(bmc->soc.sdhci.slots); i++) {
++        SDHCIState *sdhci =3D &bmc->soc.sdhci.slots[i];
++        DriveInfo *dinfo =3D drive_get_next(IF_SD);
++        BlockBackend *blk;
++        DeviceState *card;
 +
-+    if (reg >=3D ASPEED_AST2600_SCU_NR_REGS) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: Out-of-bounds read at offset 0x%" HWADDR_PRIx=
- "\n",
-+                      __func__, offset);
-+        return 0;
++        blk =3D dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
++        card =3D qdev_create(qdev_get_child_bus(DEVICE(sdhci), "sd-bus")=
+,
++                           TYPE_SD_CARD);
++        qdev_prop_set_drive(card, "drive", blk, &error_fatal);
++        object_property_set_bool(OBJECT(card), true, "realized", &error_=
+fatal);
 +    }
 +
-+    switch (reg) {
-+    case AST2600_HPLL_EXT:
-+    case AST2600_EPLL_EXT:
-+    case AST2600_MPLL_EXT:
-+        /* PLLs are always "locked" */
-+        return s->regs[reg] | BIT(31);
-+    case AST2600_RNG_DATA:
-+        /*
-+         * On hardware, RNG_DATA works regardless of the state of the
-+         * enable bit in RNG_CTRL
-+         *
-+         * TODO: Check this is true for ast2600
-+         */
-+        s->regs[AST2600_RNG_DATA] =3D aspeed_scu_get_random();
+     arm_load_kernel(ARM_CPU(first_cpu), machine, &aspeed_board_binfo);
+ }
+=20
+@@ -373,7 +387,6 @@ static void aspeed_machine_class_init(ObjectClass *oc=
+, void *data)
+     mc->desc =3D board->desc;
+     mc->init =3D aspeed_machine_init;
+     mc->max_cpus =3D ASPEED_CPUS_NUM;
+-    mc->no_sdcard =3D 1;
+     mc->no_floppy =3D 1;
+     mc->no_cdrom =3D 1;
+     mc->no_parallel =3D 1;
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index cf1d0cf921ba..c3821a562733 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -36,6 +36,7 @@ static const hwaddr aspeed_soc_ast2400_memmap[] =3D {
+     [ASPEED_XDMA]   =3D 0x1E6E7000,
+     [ASPEED_ADC]    =3D 0x1E6E9000,
+     [ASPEED_SRAM]   =3D 0x1E720000,
++    [ASPEED_SDHCI]  =3D 0x1E740000,
+     [ASPEED_GPIO]   =3D 0x1E780000,
+     [ASPEED_RTC]    =3D 0x1E781000,
+     [ASPEED_TIMER1] =3D 0x1E782000,
+@@ -63,6 +64,7 @@ static const hwaddr aspeed_soc_ast2500_memmap[] =3D {
+     [ASPEED_XDMA]   =3D 0x1E6E7000,
+     [ASPEED_ADC]    =3D 0x1E6E9000,
+     [ASPEED_SRAM]   =3D 0x1E720000,
++    [ASPEED_SDHCI]  =3D 0x1E740000,
+     [ASPEED_GPIO]   =3D 0x1E780000,
+     [ASPEED_RTC]    =3D 0x1E781000,
+     [ASPEED_TIMER1] =3D 0x1E782000,
+@@ -108,6 +110,7 @@ static const int aspeed_soc_ast2400_irqmap[] =3D {
+     [ASPEED_ETH1]   =3D 2,
+     [ASPEED_ETH2]   =3D 3,
+     [ASPEED_XDMA]   =3D 6,
++    [ASPEED_SDHCI]  =3D 26,
+ };
+=20
+ #define aspeed_soc_ast2500_irqmap aspeed_soc_ast2400_irqmap
+@@ -230,6 +233,15 @@ static void aspeed_soc_init(Object *obj)
+     snprintf(typename, sizeof(typename), "aspeed.gpio-%s", socname);
+     sysbus_init_child_obj(obj, "gpio", OBJECT(&s->gpio), sizeof(s->gpio)=
+,
+                           typename);
++
++    sysbus_init_child_obj(obj, "sdc", OBJECT(&s->sdhci), sizeof(s->sdhci=
+),
++                          TYPE_ASPEED_SDHCI);
++
++    /* Init sd card slot class here so that they're under the correct pa=
+rent */
++    for (i =3D 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
++        sysbus_init_child_obj(obj, "sdhci[*]", OBJECT(&s->sdhci.slots[i]=
+),
++                              sizeof(s->sdhci.slots[i]), TYPE_SYSBUS_SDH=
+CI);
++    }
+ }
+=20
+ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+@@ -419,6 +431,17 @@ static void aspeed_soc_realize(DeviceState *dev, Err=
+or **errp)
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpio), 0, sc->info->memmap[ASPEED=
+_GPIO]);
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->gpio), 0,
+                        aspeed_soc_get_irq(s, ASPEED_GPIO));
++
++    /* SDHCI */
++    object_property_set_bool(OBJECT(&s->sdhci), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sdhci), 0,
++                    sc->info->memmap[ASPEED_SDHCI]);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->sdhci), 0,
++                       aspeed_soc_get_irq(s, ASPEED_SDHCI));
+ }
+ static Property aspeed_soc_properties[] =3D {
+     DEFINE_PROP_UINT32("num-cpus", AspeedSoCState, num_cpus, 0),
+diff --git a/hw/sd/aspeed_sdhci.c b/hw/sd/aspeed_sdhci.c
+new file mode 100644
+index 000000000000..cff3eb7dd21e
+--- /dev/null
++++ b/hw/sd/aspeed_sdhci.c
+@@ -0,0 +1,198 @@
++/*
++ * Aspeed SD Host Controller
++ * Eddie James <eajames@linux.ibm.com>
++ *
++ * Copyright (C) 2019 IBM Corp
++ * SPDX-License-Identifer: GPL-2.0-or-later
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qemu/error-report.h"
++#include "hw/sd/aspeed_sdhci.h"
++#include "qapi/error.h"
++#include "hw/irq.h"
++#include "migration/vmstate.h"
++
++#define ASPEED_SDHCI_INFO            0x00
++#define  ASPEED_SDHCI_INFO_RESET     0x00030000
++#define ASPEED_SDHCI_DEBOUNCE        0x04
++#define  ASPEED_SDHCI_DEBOUNCE_RESET 0x00000005
++#define ASPEED_SDHCI_BUS             0x08
++#define ASPEED_SDHCI_SDIO_140        0x10
++#define ASPEED_SDHCI_SDIO_148        0x18
++#define ASPEED_SDHCI_SDIO_240        0x20
++#define ASPEED_SDHCI_SDIO_248        0x28
++#define ASPEED_SDHCI_WP_POL          0xec
++#define ASPEED_SDHCI_CARD_DET        0xf0
++#define ASPEED_SDHCI_IRQ_STAT        0xfc
++
++#define TO_REG(addr) ((addr) / sizeof(uint32_t))
++
++static uint64_t aspeed_sdhci_read(void *opaque, hwaddr addr, unsigned in=
+t size)
++{
++    uint32_t val =3D 0;
++    AspeedSDHCIState *sdhci =3D opaque;
++
++    switch (addr) {
++    case ASPEED_SDHCI_SDIO_140:
++        val =3D (uint32_t)sdhci->slots[0].capareg;
 +        break;
-+    }
-+
-+    return s->regs[reg];
-+}
-+
-+static void aspeed_ast2600_scu_write(void *opaque, hwaddr offset, uint64=
-_t data,
-+                                     unsigned size)
-+{
-+    AspeedSCUState *s =3D ASPEED_SCU(opaque);
-+    int reg =3D TO_REG(offset);
-+
-+    if (reg >=3D ASPEED_AST2600_SCU_NR_REGS) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: Out-of-bounds write at offset 0x%" HWADDR_PRI=
-x "\n",
-+                      __func__, offset);
-+        return;
-+    }
-+
-+    if (reg > PROT_KEY && !s->regs[PROT_KEY]) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: SCU is locked!\n", __func__)=
-;
-+    }
-+
-+    trace_aspeed_scu_write(offset, size, data);
-+
-+    switch (reg) {
-+    case AST2600_PROT_KEY:
-+        s->regs[reg] =3D (data =3D=3D ASPEED_SCU_PROT_KEY) ? 1 : 0;
-+        return;
-+    case AST2600_HW_STRAP1:
-+    case AST2600_HW_STRAP2:
-+        if (s->regs[reg + 2]) {
-+            return;
-+        }
-+        /* fall through */
-+    case AST2600_SYS_RST_CTRL:
-+    case AST2600_SYS_RST_CTRL2:
-+        /* W1S (Write 1 to set) registers */
-+        s->regs[reg] |=3D data;
-+        return;
-+    case AST2600_SYS_RST_CTRL_CLR:
-+    case AST2600_SYS_RST_CTRL2_CLR:
-+    case AST2600_HW_STRAP1_CLR:
-+    case AST2600_HW_STRAP2_CLR:
-+        /* W1C (Write 1 to clear) registers */
-+        s->regs[reg] &=3D ~data;
-+        return;
-+
-+    case AST2600_RNG_DATA:
-+    case AST2600_SILICON_REV:
-+    case AST2600_SILICON_REV2:
-+        /* Add read only registers here */
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: Write to read-only offset 0x%" HWADDR_PRIx "\=
++    case ASPEED_SDHCI_SDIO_148:
++        val =3D (uint32_t)sdhci->slots[0].maxcurr;
++        break;
++    case ASPEED_SDHCI_SDIO_240:
++        val =3D (uint32_t)sdhci->slots[1].capareg;
++        break;
++    case ASPEED_SDHCI_SDIO_248:
++        val =3D (uint32_t)sdhci->slots[1].maxcurr;
++        break;
++    default:
++        if (addr < ASPEED_SDHCI_REG_SIZE) {
++            val =3D sdhci->regs[TO_REG(addr)];
++        } else {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: Out-of-bounds read at 0x%" HWADDR_PRIx "\=
 n",
-+                      __func__, offset);
-+        return;
++                          __func__, addr);
++        }
 +    }
 +
-+    s->regs[reg] =3D data;
++    return (uint64_t)val;
 +}
 +
-+static const MemoryRegionOps aspeed_ast2600_scu_ops =3D {
-+    .read =3D aspeed_ast2600_scu_read,
-+    .write =3D aspeed_ast2600_scu_write,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
++static void aspeed_sdhci_write(void *opaque, hwaddr addr, uint64_t val,
++                               unsigned int size)
++{
++    AspeedSDHCIState *sdhci =3D opaque;
++
++    switch (addr) {
++    case ASPEED_SDHCI_SDIO_140:
++        sdhci->slots[0].capareg =3D (uint64_t)(uint32_t)val;
++        break;
++    case ASPEED_SDHCI_SDIO_148:
++        sdhci->slots[0].maxcurr =3D (uint64_t)(uint32_t)val;
++        break;
++    case ASPEED_SDHCI_SDIO_240:
++        sdhci->slots[1].capareg =3D (uint64_t)(uint32_t)val;
++        break;
++    case ASPEED_SDHCI_SDIO_248:
++        sdhci->slots[1].maxcurr =3D (uint64_t)(uint32_t)val;
++        break;
++    default:
++        if (addr < ASPEED_SDHCI_REG_SIZE) {
++            sdhci->regs[TO_REG(addr)] =3D (uint32_t)val;
++        } else {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: Out-of-bounds write at 0x%" HWADDR_PRIx "=
+\n",
++                          __func__, addr);
++        }
++    }
++}
++
++static const MemoryRegionOps aspeed_sdhci_ops =3D {
++    .read =3D aspeed_sdhci_read,
++    .write =3D aspeed_sdhci_write,
++    .endianness =3D DEVICE_NATIVE_ENDIAN,
 +    .valid.min_access_size =3D 4,
 +    .valid.max_access_size =3D 4,
-+    .valid.unaligned =3D false,
 +};
 +
-+static const uint32_t ast2600_a0_resets[ASPEED_AST2600_SCU_NR_REGS] =3D =
-{
-+    [AST2600_SILICON_REV]       =3D AST2600_SILICON_REV,
-+    [AST2600_SILICON_REV2]      =3D AST2600_SILICON_REV,
-+    [AST2600_SYS_RST_CTRL]      =3D 0xF7CFFEDC | 0x100,
-+    [AST2600_SYS_RST_CTRL2]     =3D 0xFFFFFFFC,
-+    [AST2600_CLK_STOP_CTRL]     =3D 0xEFF43E8B,
-+    [AST2600_CLK_STOP_CTRL2]    =3D 0xFFF0FFF0,
-+};
-+
-+static void aspeed_ast2600_scu_reset(DeviceState *dev)
++static void aspeed_sdhci_set_irq(void *opaque, int n, int level)
 +{
-+    AspeedSCUState *s =3D ASPEED_SCU(dev);
-+    AspeedSCUClass *asc =3D ASPEED_SCU_GET_CLASS(dev);
++    AspeedSDHCIState *sdhci =3D opaque;
 +
-+    memcpy(s->regs, asc->resets, asc->nr_regs * 4);
++    if (level) {
++        sdhci->regs[TO_REG(ASPEED_SDHCI_IRQ_STAT)] |=3D BIT(n);
 +
-+    s->regs[AST2600_SILICON_REV] =3D s->silicon_rev;
-+    s->regs[AST2600_SILICON_REV2] =3D s->silicon_rev;
-+    s->regs[AST2600_HW_STRAP1] =3D s->hw_strap1;
-+    s->regs[AST2600_HW_STRAP2] =3D s->hw_strap2;
-+    s->regs[PROT_KEY] =3D s->hw_prot_key;
++        qemu_irq_raise(sdhci->irq);
++    } else {
++        sdhci->regs[TO_REG(ASPEED_SDHCI_IRQ_STAT)] &=3D ~BIT(n);
++
++        qemu_irq_lower(sdhci->irq);
++    }
 +}
 +
-+static void aspeed_2600_scu_class_init(ObjectClass *klass, void *data)
++static void aspeed_sdhci_realize(DeviceState *dev, Error **errp)
 +{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    AspeedSCUClass *asc =3D ASPEED_SCU_CLASS(klass);
++    Error *err =3D NULL;
++    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
++    AspeedSDHCIState *sdhci =3D ASPEED_SDHCI(dev);
 +
-+    dc->desc =3D "ASPEED 2600 System Control Unit";
-+    dc->reset =3D aspeed_ast2600_scu_reset;
-+    asc->resets =3D ast2600_a0_resets;
-+    asc->calc_hpll =3D aspeed_2500_scu_calc_hpll; /* No change since AST=
-2500 */
-+    asc->apb_divider =3D 4;
-+    asc->nr_regs =3D ASPEED_AST2600_SCU_NR_REGS;
-+    asc->ops =3D &aspeed_ast2600_scu_ops;
++    /* Create input irqs for the slots */
++    qdev_init_gpio_in_named_with_opaque(DEVICE(sbd), aspeed_sdhci_set_ir=
+q,
++                                        sdhci, NULL, ASPEED_SDHCI_NUM_SL=
+OTS);
++
++    sysbus_init_irq(sbd, &sdhci->irq);
++    memory_region_init_io(&sdhci->iomem, OBJECT(sdhci), &aspeed_sdhci_op=
+s,
++                          sdhci, TYPE_ASPEED_SDHCI, 0x1000);
++    sysbus_init_mmio(sbd, &sdhci->iomem);
++
++    for (int i =3D 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
++        Object *sdhci_slot =3D OBJECT(&sdhci->slots[i]);
++        SysBusDevice *sbd_slot =3D SYS_BUS_DEVICE(&sdhci->slots[i]);
++
++        object_property_set_int(sdhci_slot, 2, "sd-spec-version", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
++
++        object_property_set_uint(sdhci_slot, ASPEED_SDHCI_CAPABILITIES,
++                                 "capareg", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
++
++        object_property_set_bool(sdhci_slot, true, "realized", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
++
++        sysbus_connect_irq(sbd_slot, 0, qdev_get_gpio_in(DEVICE(sbd), i)=
+);
++        memory_region_add_subregion(&sdhci->iomem, (i + 1) * 0x100,
++                                    &sdhci->slots[i].iomem);
++    }
 +}
 +
-+static const TypeInfo aspeed_2600_scu_info =3D {
-+    .name =3D TYPE_ASPEED_2600_SCU,
-+    .parent =3D TYPE_ASPEED_SCU,
-+    .instance_size =3D sizeof(AspeedSCUState),
-+    .class_init =3D aspeed_2600_scu_class_init,
++static void aspeed_sdhci_reset(DeviceState *dev)
++{
++    AspeedSDHCIState *sdhci =3D ASPEED_SDHCI(dev);
++
++    memset(sdhci->regs, 0, ASPEED_SDHCI_REG_SIZE);
++    sdhci->regs[TO_REG(ASPEED_SDHCI_INFO)] =3D ASPEED_SDHCI_INFO_RESET;
++    sdhci->regs[TO_REG(ASPEED_SDHCI_DEBOUNCE)] =3D ASPEED_SDHCI_DEBOUNCE=
+_RESET;
++}
++
++static const VMStateDescription vmstate_aspeed_sdhci =3D {
++    .name =3D TYPE_ASPEED_SDHCI,
++    .version_id =3D 1,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(regs, AspeedSDHCIState, ASPEED_SDHCI_NUM_RE=
+GS),
++        VMSTATE_END_OF_LIST(),
++    },
 +};
 +
- static void aspeed_scu_register_types(void)
- {
-     type_register_static(&aspeed_scu_info);
-     type_register_static(&aspeed_2400_scu_info);
-     type_register_static(&aspeed_2500_scu_info);
-+    type_register_static(&aspeed_2600_scu_info);
- }
-=20
- type_init(aspeed_scu_register_types);
++static void aspeed_sdhci_class_init(ObjectClass *classp, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(classp);
++
++    dc->realize =3D aspeed_sdhci_realize;
++    dc->reset =3D aspeed_sdhci_reset;
++    dc->vmsd =3D &vmstate_aspeed_sdhci;
++}
++
++static TypeInfo aspeed_sdhci_info =3D {
++    .name          =3D TYPE_ASPEED_SDHCI,
++    .parent        =3D TYPE_SYS_BUS_DEVICE,
++    .instance_size =3D sizeof(AspeedSDHCIState),
++    .class_init    =3D aspeed_sdhci_class_init,
++};
++
++static void aspeed_sdhci_register_types(void)
++{
++    type_register_static(&aspeed_sdhci_info);
++}
++
++type_init(aspeed_sdhci_register_types)
+diff --git a/hw/sd/Makefile.objs b/hw/sd/Makefile.objs
+index 06657279d183..a884c238dfb3 100644
+--- a/hw/sd/Makefile.objs
++++ b/hw/sd/Makefile.objs
+@@ -8,3 +8,4 @@ obj-$(CONFIG_MILKYMIST) +=3D milkymist-memcard.o
+ obj-$(CONFIG_OMAP) +=3D omap_mmc.o
+ obj-$(CONFIG_PXA2XX) +=3D pxa2xx_mmci.o
+ obj-$(CONFIG_RASPI) +=3D bcm2835_sdhost.o
++obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_sdhci.o
 --=20
 2.21.0
 
