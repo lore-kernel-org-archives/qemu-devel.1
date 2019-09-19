@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=FROM_EXCESS_BASE64,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C93C49ED7
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 18:01:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72EFAC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 18:05:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4934A217D6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 18:01:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4934A217D6
+	by mail.kernel.org (Postfix) with ESMTPS id 46648206C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 18:05:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46648206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB0ke-0000Gh-8h
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 14:01:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52604)
+	id 1iB0oV-0004RC-D8
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 14:05:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52386)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iB0KA-0005U8-2K
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:34:35 -0400
+ (envelope-from <berrange@redhat.com>) id 1iB0II-00037U-HT
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:32:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iB0K8-0000nG-PG
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:34:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45242)
+ (envelope-from <berrange@redhat.com>) id 1iB0IH-0007qo-EN
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:32:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58332)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iB0K8-0000mv-Jr
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:34:32 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iB0IH-0007qa-85
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:32:37 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DE2D53086208
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 17:34:31 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 901EB3B58C
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 17:32:36 +0000 (UTC)
 Received: from redhat.com (ovpn-112-51.ams2.redhat.com [10.36.112.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BB85760C5E;
- Thu, 19 Sep 2019 17:34:27 +0000 (UTC)
-Date: Thu, 19 Sep 2019 18:34:24 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 896E3100197A;
+ Thu, 19 Sep 2019 17:32:31 +0000 (UTC)
+Date: Thu, 19 Sep 2019 18:32:28 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH v3 4/5] migration: Use automatic rcu_read unlock in rdma.c
-Message-ID: <20190919173424.GG22853@redhat.com>
+Subject: Re: [PATCH v3 2/5] migration: Fix missing rcu_read_unlock
+Message-ID: <20190919173228.GE22853@redhat.com>
 References: <20190913102538.24167-1-dgilbert@redhat.com>
- <20190913102538.24167-5-dgilbert@redhat.com>
+ <20190913102538.24167-3-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190913102538.24167-5-dgilbert@redhat.com>
+In-Reply-To: <20190913102538.24167-3-dgilbert@redhat.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Thu, 19 Sep 2019 17:34:31 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Thu, 19 Sep 2019 17:32:36 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -78,16 +78,16 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 13, 2019 at 11:25:37AM +0100, Dr. David Alan Gilbert (git) wr=
+On Fri, Sep 13, 2019 at 11:25:35AM +0100, Dr. David Alan Gilbert (git) wr=
 ote:
 > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >=20
-> Use the automatic read unlocker in migration/rdma.c.
+> Use the automatic rcu_read unlocker to fix a missing unlock.
 >=20
 > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
->  migration/rdma.c | 57 ++++++++++--------------------------------------
->  1 file changed, 11 insertions(+), 46 deletions(-)
+>  migration/ram.c | 35 +++++++++++++++++------------------
+>  1 file changed, 17 insertions(+), 18 deletions(-)
 
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
