@@ -2,63 +2,90 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05D52C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 01:24:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CD3BC4CEC4
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 01:26:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF5DF21925
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 01:24:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF5DF21925
+	by mail.kernel.org (Postfix) with ESMTPS id 65E392196F
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 01:26:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65E392196F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36801 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAlBp-0007jq-VY
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 21:24:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45104)
+	id 1iAlDM-0000WC-Ka
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 21:26:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45229)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1iAlAw-0007IL-6e
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:24:03 -0400
+ (envelope-from <eblake@redhat.com>) id 1iAlCE-0008Ft-47
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:25:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1iAlAv-0005uE-1j
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:24:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34782)
+ (envelope-from <eblake@redhat.com>) id 1iAlCC-0006J0-Uu
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:25:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51322)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iAlAu-0005ty-PL
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:24:00 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAlCC-0006If-ME
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:25:20 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B7111308FC4A;
- Thu, 19 Sep 2019 01:23:59 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-123-8.rdu2.redhat.com [10.10.123.8])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 955105C22C;
- Thu, 19 Sep 2019 01:23:52 +0000 (UTC)
-Date: Wed, 18 Sep 2019 21:23:51 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190919012351.GB23168@localhost.localdomain>
-References: <20190918122748.2144-1-philmd@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id D25CDC0495A3;
+ Thu, 19 Sep 2019 01:25:19 +0000 (UTC)
+Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 708A660F88;
+ Thu, 19 Sep 2019 01:25:19 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+References: <20190913154952.27724-1-peter.maydell@linaro.org>
+ <20190913154952.27724-13-peter.maydell@linaro.org>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <9ede7068-7f92-3e1a-c1f8-c0994eddf671@redhat.com>
+Date: Wed, 18 Sep 2019 20:25:18 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190918122748.2144-1-philmd@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20190913154952.27724-13-peter.maydell@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="h6qLYYAajYpOgJBsgFL0uWiEYxcKCWUAf"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Thu, 19 Sep 2019 01:24:00 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.31]); Thu, 19 Sep 2019 01:25:19 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] BootLinuxSshTest: Only run the tests when
- explicitly requested
+Subject: Re: [Qemu-devel] [PULL 12/12] qemu-ga: Convert invocation
+ documentation to rST
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,105 +97,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 18, 2019 at 02:27:48PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Currently the Avocado framework does not distinct the time spent
-> downloading assets vs. the time spent running a test. With big
-> assets (like a full VM image) the tests likely fail.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--h6qLYYAajYpOgJBsgFL0uWiEYxcKCWUAf
+Content-Type: multipart/mixed; boundary="QSXfKTR672vY1F1OkitnXLLoV1aq3kwVe";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Message-ID: <9ede7068-7f92-3e1a-c1f8-c0994eddf671@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 12/12] qemu-ga: Convert invocation
+ documentation to rST
+References: <20190913154952.27724-1-peter.maydell@linaro.org>
+ <20190913154952.27724-13-peter.maydell@linaro.org>
+In-Reply-To: <20190913154952.27724-13-peter.maydell@linaro.org>
+
+--QSXfKTR672vY1F1OkitnXLLoV1aq3kwVe
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 9/13/19 10:49 AM, Peter Maydell wrote:
+> The qemu-ga documentation is currently in qemu-ga.texi in
+> Texinfo format, which we present to the user as:
+>  * a qemu-ga manpage
+>  * a section of the main qemu-doc HTML documentation
 >=20
-> This is a limitation known by the Avocado team.
-> Until this issue get fixed, do not run this tests automatically.
+> Convert the documentation to rST format, and present it to
+> the user as:
+>  * a qemu-ga manpage
+>  * part of the interop/ Sphinx manual
 >=20
-> Tests can still be run setting the AVOCADO_TIMEOUT_EXPECTED
-> environment variable.
->=20
-> Reported-by: Gerd Hoffmann <kraxel@redhat.com>
-> Reported-by: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Tested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Message-id: 20190905131040.8350-1-peter.maydell@linaro.org
 > ---
->  tests/acceptance/linux_ssh_mips_malta.py | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->=20
-> diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptanc=
-e/linux_ssh_mips_malta.py
-> index 134f10cac3..7200507a3a 100644
-> --- a/tests/acceptance/linux_ssh_mips_malta.py
-> +++ b/tests/acceptance/linux_ssh_mips_malta.py
-> @@ -12,7 +12,7 @@ import logging
->  import paramiko
->  import time
-> =20
-> -from avocado import skipIf
-> +from avocado import skipUnless
->  from avocado_qemu import Test
->  from avocado.utils import process
->  from avocado.utils import archive
-> @@ -171,7 +171,7 @@ class LinuxSSH(Test):
->          self.run_common_commands()
->          self.shutdown_via_ssh()
-> =20
-> -    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI=
-')
-> +    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might tim=
-eout')
 
-This is definitely an improvement, specially because IMO a "make
-check-acceptance" command should be more similar across executions,
-wether on Travis or not.  The problem is (which is not new) is that
-users have to resort to the test to learn how to run those tests.
+In an incremental build on Fedora 30, I'm now seeing:
 
-FIY, I'm working on a RFC to have a handful of "make
-check-acceptance-$(TYPE)" targets that hopefully can represent most
-users' needs.  The avocado command line would still be available for
-more advanced users.
+	CHK version_gen.h
+  GEN     docs/interop/qemu-ga.8
+No filename or title
+make: *** [/home/eblake/qemu/rules.mak:394: docs/interop/qemu-ga.8]
+Error 255
 
->      def test_mips_malta32eb_kernel3_2_0(self):
->          """
->          :avocado: tags=3Darch:mips
-> @@ -186,7 +186,7 @@ class LinuxSSH(Test):
-> =20
->          self.check_mips_malta('be', kernel_path, 'mips')
-> =20
-> -    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI=
-')
-> +    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might tim=
-eout')
->      def test_mips_malta32el_kernel3_2_0(self):
->          """
->          :avocado: tags=3Darch:mipsel
-> @@ -201,7 +201,7 @@ class LinuxSSH(Test):
-> =20
->          self.check_mips_malta('le', kernel_path, 'mips')
-> =20
-> -    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI=
-')
-> +    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might tim=
-eout')
->      def test_mips_malta64eb_kernel3_2_0(self):
->          """
->          :avocado: tags=3Darch:mips64
-> @@ -215,7 +215,7 @@ class LinuxSSH(Test):
->          kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkern=
-el_hash)
->          self.check_mips_malta('be', kernel_path, 'mips64')
-> =20
-> -    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI=
-')
-> +    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might tim=
-eout')
->      def test_mips_malta64el_kernel3_2_0(self):
->          """
->          :avocado: tags=3Darch:mips64el
-> --=20
-> 2.20.1
->=20
+and suspect this patch introduced it.  It may be that I just need to
+nuke intermediate artifacts rather than an actual problem with the
+patch, but I'd welcome help in identifying the problem.
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--QSXfKTR672vY1F1OkitnXLLoV1aq3kwVe--
+
+--h6qLYYAajYpOgJBsgFL0uWiEYxcKCWUAf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2C2P4ACgkQp6FrSiUn
+Q2o4/AgAmlfzJZUFom4IhCXDKhQ/OAer95+sFaS8aq5wkh4oAqj903L1/nbkOfCw
+1bEMatbhKeY2TTJZohCe0GT1RuoYqS9dJJmYvKAbEsnd5gLaSB8AHXS+daaBcx0Z
+1+P84AfonQjKBW0ATgqQzi7V8+Vg0xiI4IHuv1i0H0vxkH8zsCBAzanqL9m//KT7
+DBQ7j44FIr93GS+J9sqWWhlMZF5pOelwD517d5KBZsk9FmRameFeHo2RuUxZZh0Y
+nmuFdpw4MOomUKRL1q+M/AlOZ4X/rDYmNBI+gStx4G23Ay13vwAM9oX5ww9TzCy9
+xJHGRgShf5PoA2BZtpSyqSRxTU3BBA==
+=iR9Y
+-----END PGP SIGNATURE-----
+
+--h6qLYYAajYpOgJBsgFL0uWiEYxcKCWUAf--
 
