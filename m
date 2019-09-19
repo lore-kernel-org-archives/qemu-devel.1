@@ -1,67 +1,73 @@
 Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.2 required=3.0 tests=BODY_QUOTE_MALF_MSGID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCDC1C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:29:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6400C49ED7
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:30:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4939721907
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:29:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4939721907
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id AC51421927
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:30:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC51421927
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAtgx-0003Gu-Ky
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 06:29:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52946)
+	id 1iAtho-0003sm-1V
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 06:30:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52065)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iAtfE-0001tz-2C
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:27:54 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1iAtbV-0006Jm-T7
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:24:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iAtfB-0002Z8-N3
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:27:51 -0400
-Resent-Date: Thu, 19 Sep 2019 06:27:50 -0400
-Resent-Message-Id: <E1iAtfB-0002Z8-N3@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21599)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iAtfB-0002YP-Et
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:27:49 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1568888861; cv=none; d=zoho.com; s=zohoarc; 
- b=mX5jaZb4/8I2DUG4syrPXrlJBwmwKXkl5iJ9R29JzzLm3Yk/pIRB38VT/XFXGUdPI3tPdi7ZcXkFXjjh/7MVnxnxS29koY5MG285xd3XK2qPCkvmH0gkvXFsF3GX53qcobxFhUoO0gT0r9VMeh90mDTfzFXnpwAamVrJoYwwNow=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1568888861;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=TVLuLUJO/7mxD87qK3jCoQapEGYsV/LovOoEvyU82Vo=; 
- b=jBxvLvr934ui7RYacJS0CfUC7L6sMV/sMC47JiTfFLz8ejF5Isx0zyZvmiS9frPm89pveyzSivPkl3OJHlrsZcTFr8OIQ68bgotUbauvFC/UBb0mrZUbRpJbpzXW+61fw3D+9m1EvK4xpxIdz9cxS2ZTyT+OAHfiqC9JkAzcam4=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1568888860711451.7879703649876;
- Thu, 19 Sep 2019 03:27:40 -0700 (PDT)
-In-Reply-To: <20190918180251.32003-1-richard.henderson@linaro.org>
-Message-ID: <156888885939.133.16953475900465211354@1c8ae44fe5c0>
+ (envelope-from <yan.y.zhao@intel.com>) id 1iAtbT-0000LR-JH
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:24:00 -0400
+Received: from mga04.intel.com ([192.55.52.120]:42469)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1iAtbT-0000KZ-9M
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:23:59 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 19 Sep 2019 03:23:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,523,1559545200"; d="scan'208";a="188050233"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.9])
+ by fmsmga007.fm.intel.com with ESMTP; 19 Sep 2019 03:23:54 -0700
+Date: Thu, 19 Sep 2019 06:16:11 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Jason Wang <jasowang@redhat.com>
+Message-ID: <20190919101611.GF18391@joy-OptiPlex-7040>
+References: <AADFC41AFE54684AB9EE6CBC0274A5D19D57B1D1@SHSMSX104.ccr.corp.intel.com>
+ <6d73572e-1e89-b04a-bdd6-98ac73798083@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57B90C@SHSMSX104.ccr.corp.intel.com>
+ <204219fa-ee72-ca60-52a4-fb4bbc887773@redhat.com>
+ <20190919052819.GA18391@joy-OptiPlex-7040>
+ <7b6d6343-33de-ebd7-9846-af54a45a82a2@redhat.com>
+ <20190919061756.GB18391@joy-OptiPlex-7040>
+ <e0efbdc0-aad9-0d17-ec68-36460865501f@redhat.com>
+ <20190919062954.GC18391@joy-OptiPlex-7040>
+ <297143e5-a0b5-4873-77bf-7d2a97ec3c7c@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: richard.henderson@linaro.org
-Date: Thu, 19 Sep 2019 03:27:40 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [RFC v2 0/5] Move notdirty handling to cputlb
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <297143e5-a0b5-4873-77bf-7d2a97ec3c7c@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.120
+Subject: Re: [Qemu-devel] vhost, iova, and dirty page tracking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,37 +79,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, alex.bennee@linaro.org, qemu-devel@nongnu.org,
- stefanha@redhat.com, david@redhat.com
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ 'Alex Williamson' <alex.williamson@redhat.com>, Peter Xu <peterx@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxODE4MDI1MS4zMjAw
-My0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFp
-bGVkIHRoZSBkb2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUg
-dGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2Nr
-ZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50
-b3M3IFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hP
-V19FTlY9MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKbGlicG1lbSBz
-dXBwb3J0ICAgbm8KbGlidWRldiAgICAgICAgICAgbm8KZGVmYXVsdCBkZXZpY2VzICAgeWVzCndh
-cm5pbmc6IFB5dGhvbiAyIHN1cHBvcnQgaXMgZGVwcmVjYXRlZAp3YXJuaW5nOiBQeXRob24gMyB3
-aWxsIGJlIHJlcXVpcmVkIGZvciBidWlsZGluZyBmdXR1cmUgdmVyc2lvbnMgb2YgUUVNVQoKY3Jv
-c3MgY29udGFpbmVycyAgbm8KCi0tLQogIFRFU1QgICAgaW90ZXN0LXFjb3cyOiAyNjUKUGFzc2Vk
-IGFsbCAxMDcgaW90ZXN0cwoqKgpFUlJPUjovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvYm9vdC1z
-ZWN0b3IuYzoxNjE6Ym9vdF9zZWN0b3JfdGVzdDogYXNzZXJ0aW9uIGZhaWxlZCAoc2lnbmF0dXJl
-ID09IFNJR05BVFVSRSk6ICgweDAwMDAwMDAwID09IDB4MDAwMGRlYWQpCkVSUk9SIC0gQmFpbCBv
-dXQhIEVSUk9SOi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9ib290LXNlY3Rvci5jOjE2MTpib290
-X3NlY3Rvcl90ZXN0OiBhc3NlcnRpb24gZmFpbGVkIChzaWduYXR1cmUgPT0gU0lHTkFUVVJFKTog
-KDB4MDAwMDAwMDAgPT0gMHgwMDAwZGVhZCkKbWFrZTogKioqIFtjaGVjay1xdGVzdC14ODZfNjRd
-IEVycm9yIDEKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVz
-dHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNjY0LCBpbiA8bW9kdWxlPgoKClRoZSBmdWxsIGxv
-ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA5MTgxODAyNTEu
-MzIwMDMtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnL3Rlc3RpbmcuZG9ja2VyLXF1aWNr
-QGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
-YmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Thu, Sep 19, 2019 at 06:06:52PM +0800, Jason Wang wrote:
+> 
+> On 2019/9/19 下午2:29, Yan Zhao wrote:
+> > On Thu, Sep 19, 2019 at 02:32:03PM +0800, Jason Wang wrote:
+> >> On 2019/9/19 下午2:17, Yan Zhao wrote:
+> >>> On Thu, Sep 19, 2019 at 02:09:53PM +0800, Jason Wang wrote:
+> >>>> On 2019/9/19 下午1:28, Yan Zhao wrote:
+> >>>>> On Thu, Sep 19, 2019 at 09:05:12AM +0800, Jason Wang wrote:
+> >>>>>> On 2019/9/18 下午4:37, Tian, Kevin wrote:
+> >>>>>>>> From: Jason Wang [mailto:jasowang@redhat.com]
+> >>>>>>>> Sent: Wednesday, September 18, 2019 2:10 PM
+> >>>>>>>>
+> >>>>>>>>>> Note that the HVA to GPA mapping is not an 1:1 mapping. One HVA
+> >>>>>>>> range
+> >>>>>>>>>> could be mapped to several GPA ranges.
+> >>>>>>>>> This is fine. Currently vfio_dma maintains IOVA->HVA mapping.
+> >>>>>>>>>
+> >>>>>>>>> btw under what condition HVA->GPA is not 1:1 mapping? I didn't realize it.
+> >>>>>>>> I don't remember the details e.g memory region alias? And neither kvm
+> >>>>>>>> nor kvm API does forbid this if my memory is correct.
+> >>>>>>>>
+> >>>>>>> I checkedhttps://qemu.weilnetz.de/doc/devel/memory.html, which
+> >>>>>>> provides an example of aliased layout. However, its aliasing is all
+> >>>>>>> 1:1, instead of N:1. From guest p.o.v every writable GPA implies an
+> >>>>>>> unique location. Why would we hit the situation where multiple
+> >>>>>>> write-able GPAs are mapped to the same HVA (i.e. same physical
+> >>>>>>> memory location)?
+> >>>>>> I don't know, just want to say current API does not forbid this. So we
+> >>>>>> probably need to take care it.
+> >>>>>>
+> >>>>> yes, in KVM API level, it does not forbid two slots to have the same HVA(slot->userspace_addr).
+> >>>>> But
+> >>>>> (1) there's only one kvm instance for each vm for each qemu process.
+> >>>>> (2) all ramblock->host (corresponds to HVA and slot->userspace_addr) in one qemu
+> >>>>> process is non-overlapping as it's obtained from mmmap().
+> >>>>> (3) qemu ensures two kvm slots will not point to the same section of one ramblock.
+> >>>>>
+> >>>>> So, as long as kvm instance is not shared in two processes, and
+> >>>>> there's no bug in qemu, we can assure that HVA to GPA is 1:1.
+> >>>> Well, you leave this API for userspace, so you can't assume qemu is the
+> >>>> only user or any its behavior. If you had you should limit it in the API
+> >>>> level instead of open window for them.
+> >>>>
+> >>>>
+> >>>>> But even if there are two processes operating on the same kvm instance
+> >>>>> and manipulating on memory slots, adding an extra GPA along side current
+> >>>>> IOVA & HVA to ioctl VFIO_IOMMU_MAP_DMA can still let driver knows the
+> >>>>> right IOVA->GPA mapping, right?
+> >>>> It looks fragile. Consider HVA was mapped to both GPA1 and GPA2. Guest
+> >>>> maps IOVA to GPA2, so we have IOVA GPA2 HVA in the new ioctl and then
+> >>>> log through GPA2. If userspace is trying to sync through GPA1, it will
+> >>>> miss the dirty page. So for safety we need log both GPA1 and GPA2. (See
+> >>>> what has been done in log_write_hva() in vhost.c). The only way to do
+> >>>> that is to maintain an independent HVA to GPA mapping like what KVM or
+> >>>> vhost did.
+> >>>>
+> >>> why GPA1 and GPA2 should be both dirty?
+> >>> even they have the same HVA due to overlaping virtual address space in
+> >>> two processes, they still correspond to two physical pages.
+> >>> don't get what's your meaning:)
+> >> The point is not leave any corner case that is hard to debug or fix in
+> >> the future.
+> >>
+> >> Let's just start by a single process, the API allows userspace to maps
+> >> HVA to both GPA1 and GPA2. Since it knows GPA1 and GPA2 are equivalent,
+> >> it's ok to sync just through GPA1. That means if you only log GPA2, it
+> >> won't work.
+> >>
+> > In that case, cannot log dirty according to HPA.
+> > because kvm cannot tell whether it's an valid case (the two GPAs are equivalent)
+> > or an invalid case (the two GPAs are not equivalent, but with the same
+> > HVA value).
+> >
+> > Right?
+> 
+> 
+> There no need any examination on whether it was 'valid' or not. It's as 
+> simple as logging both GPA1 and GPA2. Then you won't need to care any 
+> corner case.
+>
+But, if GPA1 and GPA2 point to the same HVA, it means they point to the
+same page. Then if you only log GPA2, and send GPA2 to target,  it
+should still works, unless in the target side GPA1 and GPA2 do not point to
+the same HVA?
 
+In what condition you met it in reality?
+Please kindly point it out :)
+
+
+
+> Thanks
+> 
+> 
+> >
+> > Thanks
+> > Yan
+> >
+> >
 
