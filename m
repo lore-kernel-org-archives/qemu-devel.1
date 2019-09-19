@@ -2,99 +2,90 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC425C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 11:29:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD1C5C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 11:33:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A839921929
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 11:29:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A667A21A49
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 11:33:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GoGtPHlO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A839921929
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="heBdtpaV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A667A21A49
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAudG-0004Bp-2D
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 07:29:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59742)
+	id 1iAugc-0007xI-Op
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 07:33:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59967)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iAuaK-0000dJ-D9
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 07:26:53 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iAucQ-0003sp-K3
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 07:29:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iAuaJ-0002Cc-15
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 07:26:52 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36483
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iAuaI-0002BW-Qy
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 07:26:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1568892409;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=V/BffB31lVpDDTHXON2h+WYJBrw+b5jOySxVB0LM4rI=;
- b=GoGtPHlO1PC/VkmCim3CYEnCCQT6oDykMvJsGIx27Ek04e+fSpHMgTmbyt4PxEW0nkXGmO
- GfT54Yv3jY1Vy+KMSy/MgLXYQWcoBTbR+8zMjaKnYnU+rgRMmDTbwDjSCEqUZaiSPa+scx
- qCuMdvET+Y1+6M/1Peg3WAiuPhZuRm4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281-TDly9ShrPPyf24T4s-rY6A-1; Thu, 19 Sep 2019 07:26:48 -0400
-Received: by mail-wm1-f72.google.com with SMTP id k9so1611427wmb.0
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 04:26:47 -0700 (PDT)
+ (envelope-from <alex.bennee@linaro.org>) id 1iAucO-0003g9-Pv
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 07:29:02 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43564)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iAucO-0003ff-GK
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 07:29:00 -0400
+Received: by mail-wr1-x443.google.com with SMTP id q17so2684981wrx.10
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 04:29:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=3VSlKKNw5EpL9Fi4aF6CtAPG6bR3KVIOfeYUVZua+a0=;
+ b=heBdtpaVW3d33q0NoKJ4/oJweg6uAk6yyL/rFj8Ru94EhrJRIW43Zrnyn1/r9NSm/h
+ 5alddaG2Jt0FmDVsYi9YfY96OlJJCLJP3wCuBMC1POOaRJXNyUwLe4lha/XNlJ73Q5Mr
+ N8Og01Tr06n/NbyLzOfJ9plzGIjeKzoqlfHVO/1wEDhCLMsJrwBuCnbBjkGjmK/M/tFU
+ saO2NgSBkstDzissIg9yuCqBABC4wEV+kvr6zRNdiBMqZ+FsR99B2B0mVU/8tWHWsmjz
+ G8qmM0MLnHrqJsEnB20/TXgD828xbWav2PmQrRimZxvvTJ129MT1XGCI/7UH6tLh2c7r
+ qopw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=tLNKBcGvOcugw6Jnek+jrrm29xCgPjORNAP/3HW0eOI=;
- b=i6rBDcSE7GlMKCE9cmJzbGpiP4MHR0jVgtg0FRgQbzn8AJaCrzBJU9FLutsjLY5nDF
- QoDJnCbrAwlz3EDzoWGaKMpKRfWEhtLMyJot60uKXYA4+vLTGNdq+mi/Imuxb/WCjCGC
- mBkLaTULLTwrRJZXEV/gFecVXW1sZ8/83SxuEIFhBfEeoUHXiMU35wAIeDIXHJoRAoHy
- v7KOKNayAfw1sYePrkM2CdMRTD3ccgNJAln5kkbSBnDLpXJyAWFawvBG7YuPMbzCUxdq
- GThfle+DK+JPTLd3HLEp8xn8XIcnZLjWwDbZty2wpzp4I0gI4OLfGRurnVRb/ZWkqhrp
- gcxw==
-X-Gm-Message-State: APjAAAWXJ7YNrIltLKquC7ISmDY91sA0QUuWp0EUfkFW78B2YpjauNwx
- lnrpn4gpS8zW6p9/kRldEFzXXWqbHcFiKmwvj0tQYzaVGZrBHREHDBdtNbfVdiVzCbbODqVJvYz
- eyGjP9C5TuuqrZdw=
-X-Received: by 2002:a1c:cbc3:: with SMTP id b186mr2491040wmg.130.1568892406862; 
- Thu, 19 Sep 2019 04:26:46 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzGdvC+l9q8hHTx1i0eodS8UjJcLHBygqtxpLlzZtncMvCYs/9CgeYP2wF1xTJM496lWOfp8g==
-X-Received: by 2002:a1c:cbc3:: with SMTP id b186mr2491028wmg.130.1568892406693; 
- Thu, 19 Sep 2019 04:26:46 -0700 (PDT)
-Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id e17sm5695830wma.15.2019.09.19.04.26.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 19 Sep 2019 04:26:46 -0700 (PDT)
-To: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=3VSlKKNw5EpL9Fi4aF6CtAPG6bR3KVIOfeYUVZua+a0=;
+ b=ZAGxcJt/8aNe0S9GnTvT4JfU2a14wWa88e9oLfL67BTHYMI/C/zeNKu9xhM3jO/MRp
+ GvxbvLWm1HOY8JXsOrj8BvxIUtZ3dm4DRA65rvHKz1Ja1LdWL1xePRS6xGy9zztLvpUc
+ w7ovH0SC2HiybBm0E00pZQkpI4QIaPfNhCE6dRPUDFMqUs8U62MD4lYHLCHJVIaOjOs6
+ Cbt39e4VbmsWdD2xH6IUeu19IrphG9sZ0awTFUOzoJp57v3EFUkGSUc4Qw6c0xUmNocS
+ 0hgWwh2kanP9D69IiSKeEiCKLeNg1S9YOroYtR9o/Wzml8zspbvlfMZ/FxDvQvWXvyq5
+ ZsXQ==
+X-Gm-Message-State: APjAAAUWc89sgZq0Qb5iGCmPUHAmQ1r8WkBeHntE3lwp2m9DsHnmW5d3
+ 5aL+J1TJVamDPQB5kLviiJmMHg==
+X-Google-Smtp-Source: APXvYqyGqvGuTmq1DXnyIEhojHqpmNblLoG+lbwdaHdm7n7bPXRoAXvFINzLTq0keRkW2ZplS8Rn4A==
+X-Received: by 2002:a5d:4985:: with SMTP id r5mr6677105wrq.139.1568892539181; 
+ Thu, 19 Sep 2019 04:28:59 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id q192sm7110465wme.23.2019.09.19.04.28.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 19 Sep 2019 04:28:58 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id D8FD91FF87;
+ Thu, 19 Sep 2019 12:28:57 +0100 (BST)
 References: <20190919105932.19412-1-philmd@redhat.com>
- <04454c37-ad8b-b69b-3f40-bb78f0c20ef2@weilnetz.de>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <0806fcfd-9468-07ec-4695-25ee35005a64@redhat.com>
-Date: Thu, 19 Sep 2019 13:26:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ <20190919105932.19412-2-philmd@redhat.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+In-reply-to: <20190919105932.19412-2-philmd@redhat.com>
+Date: Thu, 19 Sep 2019 12:28:57 +0100
+Message-ID: <87pnjwzfra.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <04454c37-ad8b-b69b-3f40-bb78f0c20ef2@weilnetz.de>
-Content-Language: en-US
-X-MC-Unique: TDly9ShrPPyf24T4s-rY6A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.81
-Subject: Re: [Qemu-devel] [PATCH 0/2] testing: Build WHPX enabled binaries
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH 1/2] tests/docker: Add
+ fedora-win10sdk-cross image
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,52 +98,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Lucian Petrut <lpetrut@cloudbasesolutions.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Ilias Maratos <i.maratos@gmail.com>, Justin Terry <juterry@microsoft.com>
+ Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org,
+ Justin Terry <juterry@microsoft.com>, Ilias Maratos <i.maratos@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/19/19 1:18 PM, Stefan Weil wrote:
-> Am 19.09.2019 um 12:59 schrieb Philippe Mathieu-Daud=C3=A9:
->> Add a job to cross-build QEMU with WHPX enabled.
->>
->> Use the Win10SDK headers from the Android Project, as commented
->> in https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg03842.html
->>
->> Based-on: <20190918121101.30690-1-philmd@redhat.com>
->> https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg03844.html
->>
->> Philippe Mathieu-Daud=C3=A9 (2):
->>   tests/docker: Add fedora-win10sdk-cross image
->>   .shippable.yml: Build WHPX enabled binaries
->>
->>  .shippable.yml                                |  2 ++
->>  tests/docker/Makefile.include                 |  1 +
->>  .../dockerfiles/fedora-win10sdk-cross.docker  | 21 +++++++++++++++++++
->>  3 files changed, 24 insertions(+)
->>  create mode 100644 tests/docker/dockerfiles/fedora-win10sdk-cross.docke=
-r
->>
->=20
-> Please note that the required header files are part of the Win10SDK
-> which is not published under a free license, so I am afraid that they
-> cannot be used with QEMU code to produce free binaries.
 
-Yes :S
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> I have addressed that some time ago, and Justin Terry is still looking
-> for a solution on the Microsoft side.
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  tests/docker/Makefile.include                 |  1 +
+>  .../dockerfiles/fedora-win10sdk-cross.docker  | 21 +++++++++++++++++++
+>  2 files changed, 22 insertions(+)
+>  create mode 100644 tests/docker/dockerfiles/fedora-win10sdk-cross.docker
+>
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+> index 50a400b573..0df72a810b 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -125,6 +125,7 @@ docker-image-debian-ppc64-cross: docker-image-debian10
+>  docker-image-debian-riscv64-cross: docker-image-debian10
+>  docker-image-debian-sh4-cross: docker-image-debian10
+>  docker-image-debian-sparc64-cross: docker-image-debian10
+> +docker-image-fedora-win10sdk-cross: docker-image-fedora
+>
+>  docker-image-travis: NOUSER=3D1
+>
+> diff --git a/tests/docker/dockerfiles/fedora-win10sdk-cross.docker b/test=
+s/docker/dockerfiles/fedora-win10sdk-cross.docker
+> new file mode 100644
+> index 0000000000..1aafdad483
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/fedora-win10sdk-cross.docker
+> @@ -0,0 +1,21 @@
+> +#
+> +# Docker MinGW64 cross-compiler target with WHPX header installed
+> +#
+> +# This docker target builds on the Fedora 30 base image.
+> +#
+> +# SPDX-License-Identifier: GPL-2.0-or-later
+> +#
+> +FROM qemu:fedora
+> +
+> +# Install headers extracted by the Android folks from the win10sdk.iso:
+> +# https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk
+> +ENV WIN10SDK_INCDIR /usr/local/include/win10sdk
+> +RUN mkdir ${WIN10SDK_INCDIR} && \
+> +    for hdr in WinHvEmulation.h WinHvPlatformDefs.h WinHvPlatform.h; do \
+> +        curl -s "https://android.googlesource.com/platform/prebuilts/gcc=
+/linux-x86/host/x86_64-w64-mingw32-4.8/+/1bde9c3b14f3a3b081ada6e32da9f28706=
+71b46f/x86_64-w64-mingw32/include/${hdr}?format=3DTEXT" | base64 --decode >=
+ ${WIN10SDK_INCDIR}/${hdr}; \
+> +    done
 
-Oh this is a good news, thanks for caring about this issue,
-and thanks Justin for looking for a solution!
+Hmm I guess this is a stable URL as Google never deletes anything?
 
-Trying to understand how WHPX is used, I noticed there are much many
-Windows QEMU users than I thought, and it would be nice if we can have
-some upstream CI testing to not break the various projects using it.
+> +
+> +ENV QEMU_CONFIGURE_OPTS ${QEMU_CONFIGURE_OPTS} \
+> +    --cross-prefix=3Dx86_64-w64-mingw32- \
+> +    --extra-cflags=3D"-I ${WIN10SDK_INCDIR}" --disable-werror \
+> +    --enable-hax --enable-whpx
 
-Regards,
 
-Phil.
-
+--
+Alex Benn=C3=A9e
 
