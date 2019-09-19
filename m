@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B1E3C49ED7
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 06:07:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C3ECC49ED7
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 06:07:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68D3C21848
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 06:07:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68D3C21848
+	by mail.kernel.org (Postfix) with ESMTPS id 2A85621848
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 06:07:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A85621848
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iApb8-0001BX-85
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 02:07:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42761)
+	id 1iApbc-0001r3-17
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 02:07:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42649)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iApM0-000237-Gr
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:51:46 -0400
+ (envelope-from <clg@kaod.org>) id 1iApLg-0001b6-3B
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:51:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iApLy-0008RE-Ky
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:51:44 -0400
-Received: from 5.mo68.mail-out.ovh.net ([46.105.62.179]:41845)
+ (envelope-from <clg@kaod.org>) id 1iApLe-0008D7-9g
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:51:23 -0400
+Received: from 4.mo69.mail-out.ovh.net ([46.105.42.102]:46187)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iApLy-0008QT-BM
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:51:42 -0400
-Received: from player788.ha.ovh.net (unknown [10.108.54.156])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id EA9F3143E53
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 07:51:40 +0200 (CEST)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iApLe-0008By-2H
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:51:22 -0400
+Received: from player788.ha.ovh.net (unknown [10.109.143.136])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 38E4B6979D
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 07:51:20 +0200 (CEST)
 Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
  (Authenticated sender: clg@kaod.org)
- by player788.ha.ovh.net (Postfix) with ESMTPSA id 25DFA9F17587;
- Thu, 19 Sep 2019 05:51:33 +0000 (UTC)
+ by player788.ha.ovh.net (Postfix) with ESMTPSA id 8E9269F174A3;
+ Thu, 19 Sep 2019 05:51:13 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Sep 2019 07:49:54 +0200
-Message-Id: <20190919055002.6729-14-clg@kaod.org>
+Date: Thu, 19 Sep 2019 07:49:51 +0200
+Message-Id: <20190919055002.6729-11-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190919055002.6729-1-clg@kaod.org>
 References: <20190919055002.6729-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 1687723960517430033
+X-Ovh-Tracer-Id: 1682094464071207697
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudelgdelhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.62.179
-Subject: [Qemu-devel] [PATCH 13/21] hw/gpio: Add in AST2600 specific
- implementation
+X-Received-From: 46.105.42.102
+Subject: [Qemu-devel] [PATCH 10/21] watchdog/aspeed: Introduce an object
+ class per SoC
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,277 +68,301 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Rashmica Gupta <rashmica.g@gmail.com>, Joel Stanley <joel@jms.id.au>
+Cc: Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Rashmica Gupta <rashmica.g@gmail.com>
+It cleanups the current models for the Aspeed AST2400 and AST2500 SoCs
+and prepares ground for future SoCs. It removes the need of the
+'silicon_rev' property.
 
-The AST2600 has the same sets of 3.6v gpios as the AST2400 plus an
-addtional two sets of 1.8V gpios.
-
-Signed-off-by: Rashmica Gupta <rashmica.g@gmail.com>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/gpio/aspeed_gpio.c | 142 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 137 insertions(+), 5 deletions(-)
+ include/hw/watchdog/wdt_aspeed.h |  18 ++++-
+ hw/arm/aspeed_soc.c              |   9 ++-
+ hw/watchdog/wdt_aspeed.c         | 122 ++++++++++++++++---------------
+ 3 files changed, 86 insertions(+), 63 deletions(-)
 
-diff --git a/hw/gpio/aspeed_gpio.c b/hw/gpio/aspeed_gpio.c
-index 25fbfec3b84e..196e47c26284 100644
---- a/hw/gpio/aspeed_gpio.c
-+++ b/hw/gpio/aspeed_gpio.c
-@@ -169,6 +169,48 @@
- #define GPIO_3_6V_MEM_SIZE         0x1F0
- #define GPIO_3_6V_REG_ARRAY_SIZE   (GPIO_3_6V_MEM_SIZE >> 2)
+diff --git a/include/hw/watchdog/wdt_aspeed.h b/include/hw/watchdog/wdt_a=
+speed.h
+index 8c5691ce2047..796342764e2e 100644
+--- a/include/hw/watchdog/wdt_aspeed.h
++++ b/include/hw/watchdog/wdt_aspeed.h
+@@ -16,6 +16,8 @@
+ #define TYPE_ASPEED_WDT "aspeed.wdt"
+ #define ASPEED_WDT(obj) \
+     OBJECT_CHECK(AspeedWDTState, (obj), TYPE_ASPEED_WDT)
++#define TYPE_ASPEED_2400_WDT TYPE_ASPEED_WDT "-ast2400"
++#define TYPE_ASPEED_2500_WDT TYPE_ASPEED_WDT "-ast2500"
 =20
-+/* AST2600 only - 1.8V gpios */
-+/*
-+ * The AST2600 has same 3.6V gpios as the AST2400 (memory offsets 0x0-0x=
-198)
-+ * and addtional 1.8V gpios (memory offsets 0x800-0x9D4).
-+ */
-+#define GPIO_1_8V_REG_OFFSET          0x800
-+#define GPIO_1_8V_ABCD_DATA_VALUE     ((0x800 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_ABCD_DIRECTION      ((0x804 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_ABCD_INT_ENABLE     ((0x808 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_ABCD_INT_SENS_0     ((0x80C - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_ABCD_INT_SENS_1     ((0x810 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_ABCD_INT_SENS_2     ((0x814 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_ABCD_INT_STATUS     ((0x818 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_ABCD_RESET_TOLERANT ((0x81C - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_E_DATA_VALUE        ((0x820 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_E_DIRECTION         ((0x824 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_E_INT_ENABLE        ((0x828 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_E_INT_SENS_0        ((0x82C - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_E_INT_SENS_1        ((0x830 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_E_INT_SENS_2        ((0x834 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_E_INT_STATUS        ((0x838 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_E_RESET_TOLERANT    ((0x83C - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_ABCD_DEBOUNCE_1     ((0x840 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_ABCD_DEBOUNCE_2     ((0x844 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_E_DEBOUNCE_1        ((0x848 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_E_DEBOUNCE_2        ((0x84C - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_DEBOUNCE_TIME_1     ((0x850 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_DEBOUNCE_TIME_2     ((0x854 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_DEBOUNCE_TIME_3     ((0x858 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_ABCD_COMMAND_SRC_0  ((0x860 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_ABCD_COMMAND_SRC_1  ((0x864 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_E_COMMAND_SRC_0     ((0x868 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_E_COMMAND_SRC_1     ((0x86C - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_ABCD_DATA_READ      ((0x8C0 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_E_DATA_READ         ((0x8C4 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_ABCD_INPUT_MASK     ((0x9D0 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_E_INPUT_MASK        ((0x9D4 - GPIO_1_8V_REG_OFFSET) >>=
- 2)
-+#define GPIO_1_8V_MEM_SIZE            0x9D8
-+#define GPIO_1_8V_REG_ARRAY_SIZE      ((GPIO_1_8V_MEM_SIZE - \
-+                                      GPIO_1_8V_REG_OFFSET) >> 2)
-+#define GPIO_MAX_MEM_SIZE           MAX(GPIO_3_6V_MEM_SIZE, GPIO_1_8V_ME=
-M_SIZE)
+ #define ASPEED_WDT_REGS_MAX        (0x20 / 4)
+=20
+@@ -30,8 +32,20 @@ typedef struct AspeedWDTState {
+=20
+     AspeedSCUState *scu;
+     uint32_t pclk_freq;
+-    uint32_t silicon_rev;
+-    uint32_t ext_pulse_width_mask;
+ } AspeedWDTState;
+=20
++#define ASPEED_WDT_CLASS(klass) \
++     OBJECT_CLASS_CHECK(AspeedWDTClass, (klass), TYPE_ASPEED_WDT)
++#define ASPEED_WDT_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(AspeedWDTClass, (obj), TYPE_ASPEED_WDT)
 +
- static int aspeed_evaluate_irq(GPIOSets *regs, int gpio_prev_high, int g=
-pio)
- {
-     uint32_t falling_edge =3D 0, rising_edge =3D 0;
-@@ -465,6 +507,39 @@ static const AspeedGPIOReg aspeed_3_6v_gpios[GPIO_3_=
-6V_REG_ARRAY_SIZE] =3D {
-     [GPIO_AC_INPUT_MASK] =3D         { 7, gpio_reg_input_mask },
- };
-=20
-+static const AspeedGPIOReg aspeed_1_8v_gpios[GPIO_1_8V_REG_ARRAY_SIZE] =3D=
- {
-+    /* 1.8V Set ABCD */
-+    [GPIO_1_8V_ABCD_DATA_VALUE] =3D     {0, gpio_reg_data_value},
-+    [GPIO_1_8V_ABCD_DIRECTION] =3D      {0, gpio_reg_direction},
-+    [GPIO_1_8V_ABCD_INT_ENABLE] =3D     {0, gpio_reg_int_enable},
-+    [GPIO_1_8V_ABCD_INT_SENS_0] =3D     {0, gpio_reg_int_sens_0},
-+    [GPIO_1_8V_ABCD_INT_SENS_1] =3D     {0, gpio_reg_int_sens_1},
-+    [GPIO_1_8V_ABCD_INT_SENS_2] =3D     {0, gpio_reg_int_sens_2},
-+    [GPIO_1_8V_ABCD_INT_STATUS] =3D     {0, gpio_reg_int_status},
-+    [GPIO_1_8V_ABCD_RESET_TOLERANT] =3D {0, gpio_reg_reset_tolerant},
-+    [GPIO_1_8V_ABCD_DEBOUNCE_1] =3D     {0, gpio_reg_debounce_1},
-+    [GPIO_1_8V_ABCD_DEBOUNCE_2] =3D     {0, gpio_reg_debounce_2},
-+    [GPIO_1_8V_ABCD_COMMAND_SRC_0] =3D  {0, gpio_reg_cmd_source_0},
-+    [GPIO_1_8V_ABCD_COMMAND_SRC_1] =3D  {0, gpio_reg_cmd_source_1},
-+    [GPIO_1_8V_ABCD_DATA_READ] =3D      {0, gpio_reg_data_read},
-+    [GPIO_1_8V_ABCD_INPUT_MASK] =3D     {0, gpio_reg_input_mask},
-+    /* 1.8V Set E */
-+    [GPIO_1_8V_E_DATA_VALUE] =3D     {1, gpio_reg_data_value},
-+    [GPIO_1_8V_E_DIRECTION] =3D      {1, gpio_reg_direction},
-+    [GPIO_1_8V_E_INT_ENABLE] =3D     {1, gpio_reg_int_enable},
-+    [GPIO_1_8V_E_INT_SENS_0] =3D     {1, gpio_reg_int_sens_0},
-+    [GPIO_1_8V_E_INT_SENS_1] =3D     {1, gpio_reg_int_sens_1},
-+    [GPIO_1_8V_E_INT_SENS_2] =3D     {1, gpio_reg_int_sens_2},
-+    [GPIO_1_8V_E_INT_STATUS] =3D     {1, gpio_reg_int_status},
-+    [GPIO_1_8V_E_RESET_TOLERANT] =3D {1, gpio_reg_reset_tolerant},
-+    [GPIO_1_8V_E_DEBOUNCE_1] =3D     {1, gpio_reg_debounce_1},
-+    [GPIO_1_8V_E_DEBOUNCE_2] =3D     {1, gpio_reg_debounce_2},
-+    [GPIO_1_8V_E_COMMAND_SRC_0] =3D  {1, gpio_reg_cmd_source_0},
-+    [GPIO_1_8V_E_COMMAND_SRC_1] =3D  {1, gpio_reg_cmd_source_1},
-+    [GPIO_1_8V_E_DATA_READ] =3D      {1, gpio_reg_data_read},
-+    [GPIO_1_8V_E_INPUT_MASK] =3D     {1, gpio_reg_input_mask},
-+};
++typedef struct AspeedWDTClass {
++    SysBusDeviceClass parent_class;
 +
- static uint64_t aspeed_gpio_read(void *opaque, hwaddr offset, uint32_t s=
-ize)
- {
-     AspeedGPIOState *s =3D ASPEED_GPIO(opaque);
-@@ -663,8 +738,11 @@ static void aspeed_gpio_get_pin(Object *obj, Visitor=
- *v, const char *name,
-     int set_idx, group_idx =3D 0;
++    uint32_t offset;
++    uint32_t ext_pulse_width_mask;
++    uint32_t reset_ctrl_reg;
++    void (*reset_pulse)(AspeedWDTState *s, uint32_t property);
++}  AspeedWDTClass;
++
+ #endif /* WDT_ASPEED_H */
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index aaf18d3e42f1..5c5fcb810944 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -214,10 +214,9 @@ static void aspeed_soc_init(Object *obj)
+                               "max-ram-size", &error_abort);
 =20
-     if (sscanf(name, "gpio%2[A-Z]%1d", group, &pin) !=3D 2) {
--        error_setg(errp, "%s: error reading %s", __func__, name);
--        return;
-+        /* 1.8V gpio */
-+        if (sscanf(name, "gpio%3s%1d", group, &pin) !=3D 2) {
-+            error_setg(errp, "%s: error reading %s", __func__, name);
-+            return;
-+        }
+     for (i =3D 0; i < sc->info->wdts_num; i++) {
++        snprintf(typename, sizeof(typename), "aspeed.wdt-%s", socname);
+         sysbus_init_child_obj(obj, "wdt[*]", OBJECT(&s->wdt[i]),
+-                              sizeof(s->wdt[i]), TYPE_ASPEED_WDT);
+-        qdev_prop_set_uint32(DEVICE(&s->wdt[i]), "silicon-rev",
+-                                    sc->info->silicon_rev);
++                              sizeof(s->wdt[i]), typename);
+         object_property_add_const_link(OBJECT(&s->wdt[i]), "scu",
+                                        OBJECT(&s->scu), &error_abort);
      }
-     set_idx =3D get_set_idx(s, group, &group_idx);
-     if (set_idx =3D=3D -1) {
-@@ -692,8 +770,11 @@ static void aspeed_gpio_set_pin(Object *obj, Visitor=
- *v, const char *name,
+@@ -384,13 +383,15 @@ static void aspeed_soc_realize(DeviceState *dev, Er=
+ror **errp)
+=20
+     /* Watch dog */
+     for (i =3D 0; i < sc->info->wdts_num; i++) {
++        AspeedWDTClass *awc =3D ASPEED_WDT_GET_CLASS(&s->wdt[i]);
++
+         object_property_set_bool(OBJECT(&s->wdt[i]), true, "realized", &=
+err);
+         if (err) {
+             error_propagate(errp, err);
+             return;
+         }
+         sysbus_mmio_map(SYS_BUS_DEVICE(&s->wdt[i]), 0,
+-                        sc->info->memmap[ASPEED_WDT] + i * 0x20);
++                        sc->info->memmap[ASPEED_WDT] + i * awc->offset);
+     }
+=20
+     /* Net */
+diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
+index f710036535da..fc0e6c486a70 100644
+--- a/hw/watchdog/wdt_aspeed.c
++++ b/hw/watchdog/wdt_aspeed.c
+@@ -54,21 +54,6 @@ static bool aspeed_wdt_is_enabled(const AspeedWDTState=
+ *s)
+     return s->regs[WDT_CTRL] & WDT_CTRL_ENABLE;
+ }
+=20
+-static bool is_ast2500(const AspeedWDTState *s)
+-{
+-    switch (s->silicon_rev) {
+-    case AST2500_A0_SILICON_REV:
+-    case AST2500_A1_SILICON_REV:
+-        return true;
+-    case AST2400_A0_SILICON_REV:
+-    case AST2400_A1_SILICON_REV:
+-    default:
+-        break;
+-    }
+-
+-    return false;
+-}
+-
+ static uint64_t aspeed_wdt_read(void *opaque, hwaddr offset, unsigned si=
+ze)
+ {
+     AspeedWDTState *s =3D ASPEED_WDT(opaque);
+@@ -124,6 +109,7 @@ static void aspeed_wdt_write(void *opaque, hwaddr off=
+set, uint64_t data,
+                              unsigned size)
+ {
+     AspeedWDTState *s =3D ASPEED_WDT(opaque);
++    AspeedWDTClass *awc =3D ASPEED_WDT_GET_CLASS(s);
+     bool enable =3D data & WDT_CTRL_ENABLE;
+=20
+     offset >>=3D 2;
+@@ -153,24 +139,13 @@ static void aspeed_wdt_write(void *opaque, hwaddr o=
+ffset, uint64_t data,
+         }
+         break;
+     case WDT_RESET_WIDTH:
+-    {
+-        uint32_t property =3D data & WDT_POLARITY_MASK;
+-
+-        if (property && is_ast2500(s)) {
+-            if (property =3D=3D WDT_ACTIVE_HIGH_MAGIC) {
+-                s->regs[WDT_RESET_WIDTH] |=3D WDT_RESET_WIDTH_ACTIVE_HIG=
+H;
+-            } else if (property =3D=3D WDT_ACTIVE_LOW_MAGIC) {
+-                s->regs[WDT_RESET_WIDTH] &=3D ~WDT_RESET_WIDTH_ACTIVE_HI=
+GH;
+-            } else if (property =3D=3D WDT_PUSH_PULL_MAGIC) {
+-                s->regs[WDT_RESET_WIDTH] |=3D WDT_RESET_WIDTH_PUSH_PULL;
+-            } else if (property =3D=3D WDT_OPEN_DRAIN_MAGIC) {
+-                s->regs[WDT_RESET_WIDTH] &=3D ~WDT_RESET_WIDTH_PUSH_PULL=
+;
+-            }
++        if (awc->reset_pulse) {
++            awc->reset_pulse(s, data & WDT_POLARITY_MASK);
+         }
+-        s->regs[WDT_RESET_WIDTH] &=3D ~s->ext_pulse_width_mask;
+-        s->regs[WDT_RESET_WIDTH] |=3D data & s->ext_pulse_width_mask;
++        s->regs[WDT_RESET_WIDTH] &=3D ~awc->ext_pulse_width_mask;
++        s->regs[WDT_RESET_WIDTH] |=3D data & awc->ext_pulse_width_mask;
+         break;
+-    }
++
+     case WDT_TIMEOUT_STATUS:
+     case WDT_TIMEOUT_CLEAR:
+         qemu_log_mask(LOG_UNIMP,
+@@ -226,9 +201,10 @@ static void aspeed_wdt_reset(DeviceState *dev)
+ static void aspeed_wdt_timer_expired(void *dev)
+ {
+     AspeedWDTState *s =3D ASPEED_WDT(dev);
++    uint32_t reset_ctrl_reg =3D ASPEED_WDT_GET_CLASS(s)->reset_ctrl_reg;
+=20
+     /* Do not reset on SDRAM controller reset */
+-    if (s->scu->regs[SCU_RESET_CONTROL1] & SCU_RESET_SDRAM) {
++    if (s->scu->regs[reset_ctrl_reg] & SCU_RESET_SDRAM) {
+         timer_del(s->timer);
+         s->regs[WDT_CTRL] =3D 0;
          return;
-     }
-     if (sscanf(name, "gpio%2[A-Z]%1d", group, &pin) !=3D 2) {
--        error_setg(errp, "%s: error reading %s", __func__, name);
--        return;
-+        /* 1.8V gpio */
-+        if (sscanf(name, "gpio%3s%1d", group, &pin) !=3D 2) {
-+            error_setg(errp, "%s: error reading %s", __func__, name);
-+            return;
-+        }
-     }
-     set_idx =3D get_set_idx(s, group, &group_idx);
-     if (set_idx =3D=3D -1) {
-@@ -726,6 +807,21 @@ static const GPIOSetProperties ast2500_set_props[] =3D=
- {
-     [7] =3D {0x000000ff,  0x000000ff,  {"AC"} },
- };
-=20
-+static GPIOSetProperties ast2600_3_6v_set_props[] =3D {
-+    [0] =3D {0xffffffff,  0xffffffff,  {"A", "B", "C", "D"} },
-+    [1] =3D {0xffffffff,  0xffffffff,  {"E", "F", "G", "H"} },
-+    [2] =3D {0xffffffff,  0xffffffff,  {"I", "J", "K", "L"} },
-+    [3] =3D {0xffffffff,  0xffffffff,  {"M", "N", "O", "P"} },
-+    [4] =3D {0xffffffff,  0xffffffff,  {"Q", "R", "S", "T"} },
-+    [5] =3D {0xffffffff,  0x0000ffff,  {"U", "V", "W", "X"} },
-+    [6] =3D {0xffff0000,  0x0fff0000,  {"Y", "Z", "", ""} },
-+};
-+
-+static GPIOSetProperties ast2600_1_8v_set_props[] =3D {
-+    [0] =3D {0xffffffff,  0xffffffff,  {"18A", "18B", "18C", "18D"} },
-+    [1] =3D {0x0000000f,  0x0000000f,  {"18E"} },
-+};
-+
- static const MemoryRegionOps aspeed_gpio_ops =3D {
-     .read       =3D aspeed_gpio_read,
-     .write      =3D aspeed_gpio_write,
-@@ -758,7 +854,7 @@ static void aspeed_gpio_realize(DeviceState *dev, Err=
+@@ -256,25 +232,6 @@ static void aspeed_wdt_realize(DeviceState *dev, Err=
 or **errp)
      }
+     s->scu =3D ASPEED_SCU(obj);
 =20
-     memory_region_init_io(&s->iomem, OBJECT(s), &aspeed_gpio_ops, s,
--            TYPE_ASPEED_GPIO, GPIO_3_6V_MEM_SIZE);
-+            TYPE_ASPEED_GPIO, GPIO_MAX_MEM_SIZE);
+-    if (!is_supported_silicon_rev(s->silicon_rev)) {
+-        error_setg(errp, "Unknown silicon revision: 0x%" PRIx32,
+-                s->silicon_rev);
+-        return;
+-    }
+-
+-    switch (s->silicon_rev) {
+-    case AST2400_A0_SILICON_REV:
+-    case AST2400_A1_SILICON_REV:
+-        s->ext_pulse_width_mask =3D 0xff;
+-        break;
+-    case AST2500_A0_SILICON_REV:
+-    case AST2500_A1_SILICON_REV:
+-        s->ext_pulse_width_mask =3D 0xfffff;
+-        break;
+-    default:
+-        g_assert_not_reached();
+-    }
+-
+     s->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, aspeed_wdt_timer_expir=
+ed, dev);
 =20
+     /* FIXME: This setting should be derived from the SCU hw strapping
+@@ -287,20 +244,15 @@ static void aspeed_wdt_realize(DeviceState *dev, Er=
+ror **errp)
      sysbus_init_mmio(sbd, &s->iomem);
  }
-@@ -851,6 +947,26 @@ static void aspeed_gpio_2500_class_init(ObjectClass =
-*klass, void *data)
-     agc->reg_table =3D aspeed_3_6v_gpios;
+=20
+-static Property aspeed_wdt_properties[] =3D {
+-    DEFINE_PROP_UINT32("silicon-rev", AspeedWDTState, silicon_rev, 0),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+ static void aspeed_wdt_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+=20
++    dc->desc =3D "ASPEED Watchdog Controller";
+     dc->realize =3D aspeed_wdt_realize;
+     dc->reset =3D aspeed_wdt_reset;
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+     dc->vmsd =3D &vmstate_aspeed_wdt;
+-    dc->props =3D aspeed_wdt_properties;
  }
 =20
-+static void aspeed_gpio_ast2600_3_6v_class_init(ObjectClass *klass, void=
- *data)
-+{
-+    AspeedGPIOClass *agc =3D ASPEED_GPIO_CLASS(klass);
+ static const TypeInfo aspeed_wdt_info =3D {
+@@ -308,12 +260,68 @@ static const TypeInfo aspeed_wdt_info =3D {
+     .name  =3D TYPE_ASPEED_WDT,
+     .instance_size  =3D sizeof(AspeedWDTState),
+     .class_init =3D aspeed_wdt_class_init,
++    .class_size    =3D sizeof(AspeedWDTClass),
++    .abstract      =3D true,
++};
 +
-+    agc->props =3D ast2600_3_6v_set_props;
-+    agc->nr_gpio_pins =3D 208;
-+    agc->nr_gpio_sets =3D 7;
-+    agc->reg_table =3D aspeed_3_6v_gpios;
++static void aspeed_2400_wdt_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++    AspeedWDTClass *awc =3D ASPEED_WDT_CLASS(klass);
++
++    dc->desc =3D "ASPEED 2400 Watchdog Controller";
++    awc->offset =3D 0x20;
++    awc->ext_pulse_width_mask =3D 0xff;
++    awc->reset_ctrl_reg =3D SCU_RESET_CONTROL1;
 +}
 +
-+static void aspeed_gpio_ast2600_1_8v_class_init(ObjectClass *klass, void=
- *data)
-+{
-+    AspeedGPIOClass *agc =3D ASPEED_GPIO_CLASS(klass);
++static const TypeInfo aspeed_2400_wdt_info =3D {
++    .name =3D TYPE_ASPEED_2400_WDT,
++    .parent =3D TYPE_ASPEED_WDT,
++    .instance_size =3D sizeof(AspeedWDTState),
++    .class_init =3D aspeed_2400_wdt_class_init,
++};
 +
-+    agc->props =3D ast2600_1_8v_set_props;
-+    agc->nr_gpio_pins =3D 36;
-+    agc->nr_gpio_sets =3D 2;
-+    agc->reg_table =3D aspeed_1_8v_gpios;
++static void aspeed_2500_wdt_reset_pulse(AspeedWDTState *s, uint32_t prop=
+erty)
++{
++    if (property) {
++        if (property =3D=3D WDT_ACTIVE_HIGH_MAGIC) {
++            s->regs[WDT_RESET_WIDTH] |=3D WDT_RESET_WIDTH_ACTIVE_HIGH;
++        } else if (property =3D=3D WDT_ACTIVE_LOW_MAGIC) {
++            s->regs[WDT_RESET_WIDTH] &=3D ~WDT_RESET_WIDTH_ACTIVE_HIGH;
++        } else if (property =3D=3D WDT_PUSH_PULL_MAGIC) {
++            s->regs[WDT_RESET_WIDTH] |=3D WDT_RESET_WIDTH_PUSH_PULL;
++        } else if (property =3D=3D WDT_OPEN_DRAIN_MAGIC) {
++            s->regs[WDT_RESET_WIDTH] &=3D ~WDT_RESET_WIDTH_PUSH_PULL;
++        }
++    }
 +}
 +
- static const TypeInfo aspeed_gpio_info =3D {
-     .name           =3D TYPE_ASPEED_GPIO,
-     .parent         =3D TYPE_SYS_BUS_DEVICE,
-@@ -874,11 +990,27 @@ static const TypeInfo aspeed_gpio_ast2500_info =3D =
-{
-     .instance_init  =3D aspeed_gpio_init,
++static void aspeed_2500_wdt_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++    AspeedWDTClass *awc =3D ASPEED_WDT_CLASS(klass);
++
++    dc->desc =3D "ASPEED 2500 Watchdog Controller";
++    awc->offset =3D 0x20;
++    awc->ext_pulse_width_mask =3D 0xfffff;
++    awc->reset_ctrl_reg =3D SCU_RESET_CONTROL1;
++    awc->reset_pulse =3D aspeed_2500_wdt_reset_pulse;
++}
++
++static const TypeInfo aspeed_2500_wdt_info =3D {
++    .name =3D TYPE_ASPEED_2500_WDT,
++    .parent =3D TYPE_ASPEED_WDT,
++    .instance_size =3D sizeof(AspeedWDTState),
++    .class_init =3D aspeed_2500_wdt_class_init,
  };
 =20
-+static const TypeInfo aspeed_gpio_ast2600_3_6v_info =3D {
-+    .name           =3D TYPE_ASPEED_GPIO "-ast2600",
-+    .parent         =3D TYPE_ASPEED_GPIO,
-+    .class_init     =3D aspeed_gpio_ast2600_3_6v_class_init,
-+    .instance_init  =3D aspeed_gpio_init,
-+};
-+
-+static const TypeInfo aspeed_gpio_ast2600_1_8v_info =3D {
-+    .name           =3D TYPE_ASPEED_GPIO "-ast2600-1_8v",
-+    .parent         =3D TYPE_ASPEED_GPIO,
-+    .class_init     =3D aspeed_gpio_ast2600_1_8v_class_init,
-+    .instance_init  =3D aspeed_gpio_init,
-+};
-+
- static void aspeed_gpio_register_types(void)
+ static void wdt_aspeed_register_types(void)
  {
-     type_register_static(&aspeed_gpio_info);
-     type_register_static(&aspeed_gpio_ast2400_info);
-     type_register_static(&aspeed_gpio_ast2500_info);
-+    type_register_static(&aspeed_gpio_ast2600_3_6v_info);
-+    type_register_static(&aspeed_gpio_ast2600_1_8v_info);
+     watchdog_add_model(&model);
+     type_register_static(&aspeed_wdt_info);
++    type_register_static(&aspeed_2400_wdt_info);
++    type_register_static(&aspeed_2500_wdt_info);
  }
 =20
- type_init(aspeed_gpio_register_types);
+ type_init(wdt_aspeed_register_types)
 --=20
 2.21.0
 
