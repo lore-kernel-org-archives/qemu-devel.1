@@ -2,80 +2,65 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 377B2C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 13:44:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46372C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 13:47:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00D9F21D56
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 13:44:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yCcvo0DJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00D9F21D56
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id CCB2B21D6C
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 13:47:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCB2B21D6C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAwjq-00085q-E7
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 09:44:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46334)
+	id 1iAwmJ-0001WC-VT
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 09:47:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46231)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iAwRk-00034p-6e
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:26:09 -0400
+ (envelope-from <berrange@redhat.com>) id 1iAwR1-0002DF-8l
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:25:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iAwRh-0007rT-Rl
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:26:07 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36455)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iAwRf-0007oJ-R0
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:26:04 -0400
-Received: by mail-oi1-x242.google.com with SMTP id k20so2721235oih.3
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 06:26:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=hmtA+x4AdVtvOO2BSWhLjM0XYkfRJORb4qO8gBWVHtY=;
- b=yCcvo0DJzBAoVAhGUhOJUtiN9+Z259EVxR0whCETfBFEEmi9RDdB4VopwOVrNm0s3z
- s9DtdfuS2458Dr60kBBOYtMtvOyk+j/V3NOD3JLCkDfd5xf++qRIUnWaCFidV6afCTP5
- 7jRGptjHnzZYtY+e/r5qVOm5E/b8Jej1YWo9AKi5qxT4i6C7mkC0U24iLE04N2KOrEkP
- XOg5AWRnw8yLYyuX5MhepxSWvJ9VT4ROeZozks0UN51rFzGfvonRpi46KQa3EgRX4wjC
- Xj/lnRQuQbA/GPh0EgrJKpjF6AnnUhFf0XqaBuAxLkQdMm0GV8fw/ZXqN6EMPhyE4y0O
- tr8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=hmtA+x4AdVtvOO2BSWhLjM0XYkfRJORb4qO8gBWVHtY=;
- b=jps7JgwPYk8iX2RV5xxQSZ21/a1fvsEZQvBiaIL8WHAP70gSnjrEC3/Nc7RNAwr4If
- 0l4i+Shg2OOdEu6DxL+8wsy2UNezE0SaCMUFcfxX3s/oi842Crlqz3mK0JVZKXjJ6lKI
- Sddc7FwFdKOpAxkvxDNkrXgSXXTSpBZrcs0J9A2DpT84uFD6yWApVyLH0Est7QeCV24K
- geIPGX/QvIZGKmEQUzdN5u6uqhKLe4nPA7xajJNA2NUdejV7d/0FYM1ccZRKe20O3TI8
- wRcBQ7BxiL2vhB/XcS57WzgluLdDfsA/Y8g7AnAAgvfYvfKC+OHknnbq25m47lxPURIw
- ZxCQ==
-X-Gm-Message-State: APjAAAVzkk07VVfyXe+1U3HJjT5Pk7v5ZnEIPM5CHJSzCYn4nGZXG6Hu
- xljWjJZMFY5iY+qNjm0mGqh8eCIvYLpjuvLfxsLBOg==
-X-Google-Smtp-Source: APXvYqx6ds8Gqm4QHdytrchiFfVqhwMnVbIIhqfYJVJmtolzn2WvhWgL9hnLN7pIVtUz4m66OjKl9p4RQRosq6MV0vQ=
-X-Received: by 2002:aca:53d4:: with SMTP id h203mr1990335oib.146.1568899560540; 
- Thu, 19 Sep 2019 06:26:00 -0700 (PDT)
+ (envelope-from <berrange@redhat.com>) id 1iAwQy-00079O-G0
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:25:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51292)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iAwQy-00078Y-55
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:25:20 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6FF187BDA6;
+ Thu, 19 Sep 2019 13:25:18 +0000 (UTC)
+Received: from redhat.com (ovpn-112-51.ams2.redhat.com [10.36.112.51])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D57460C18;
+ Thu, 19 Sep 2019 13:25:11 +0000 (UTC)
+Date: Thu, 19 Sep 2019 14:25:08 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Message-ID: <20190919132508.GQ20217@redhat.com>
+References: <20190919105932.19412-1-philmd@redhat.com>
+ <04454c37-ad8b-b69b-3f40-bb78f0c20ef2@weilnetz.de>
+ <20190919114152.GK20217@redhat.com>
+ <982785f8-6864-46cb-dca2-0a9877c2d92e@redhat.com>
 MIME-Version: 1.0
-References: <20190906083152.25716-1-zhengxiang9@huawei.com>
- <20190906083152.25716-3-zhengxiang9@huawei.com>
-In-Reply-To: <20190906083152.25716-3-zhengxiang9@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Sep 2019 14:25:49 +0100
-Message-ID: <CAFEAcA_MGiatTVCEbnoy5D7S_j9H1DyPkqWMb8uBKL_oycyVDg@mail.gmail.com>
-To: Xiang Zheng <zhengxiang9@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Subject: Re: [Qemu-devel] [PATCH v18 2/6] docs: APEI GHES generation and
- CPER record description
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <982785f8-6864-46cb-dca2-0a9877c2d92e@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Thu, 19 Sep 2019 13:25:18 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/2] testing: Build WHPX enabled binaries
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,199 +72,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, wanghaibin.wang@huawei.com,
- Marcelo Tosatti <mtosatti@redhat.com>, Linuxarm <linuxarm@huawei.com>,
- QEMU Developers <qemu-devel@nongnu.org>, gengdongjiu <gengdongjiu@huawei.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- James Morse <james.morse@arm.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "xuwei \(O\)" <xuwei5@huawei.com>, Laszlo Ersek <lersek@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Lucian Petrut <lpetrut@cloudbasesolutions.com>,
+ Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org,
+ Justin Terry <juterry@microsoft.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Ilias Maratos <i.maratos@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 6 Sep 2019 at 09:33, Xiang Zheng <zhengxiang9@huawei.com> wrote:
->
-> From: Dongjiu Geng <gengdongjiu@huawei.com>
->
-> Add APEI/GHES detailed design document
->
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-> ---
->  docs/specs/acpi_hest_ghes.txt | 88 +++++++++++++++++++++++++++++++++++
->  1 file changed, 88 insertions(+)
->  create mode 100644 docs/specs/acpi_hest_ghes.txt
+On Thu, Sep 19, 2019 at 01:54:40PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> On 9/19/19 1:41 PM, Daniel P. Berrang=C3=A9 wrote:
+> > On Thu, Sep 19, 2019 at 01:18:57PM +0200, Stefan Weil wrote:
+> >> Am 19.09.2019 um 12:59 schrieb Philippe Mathieu-Daud=C3=A9:
+> >>> Add a job to cross-build QEMU with WHPX enabled.
+> >>>
+> >>> Use the Win10SDK headers from the Android Project, as commented
+> >>> in https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg03842.h=
+tml
+> >>>
+> >>> Based-on: <20190918121101.30690-1-philmd@redhat.com>
+> >>> https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg03844.html
+> >>>
+> >>> Philippe Mathieu-Daud=C3=A9 (2):
+> >>>   tests/docker: Add fedora-win10sdk-cross image
+> >>>   .shippable.yml: Build WHPX enabled binaries
+> >>>
+> >>>  .shippable.yml                                |  2 ++
+> >>>  tests/docker/Makefile.include                 |  1 +
+> >>>  .../dockerfiles/fedora-win10sdk-cross.docker  | 21 +++++++++++++++=
+++++
+> >>>  3 files changed, 24 insertions(+)
+> >>>  create mode 100644 tests/docker/dockerfiles/fedora-win10sdk-cross.=
+docker
+> >>>
+> >>
+> >> Please note that the required header files are part of the Win10SDK
+> >> which is not published under a free license, so I am afraid that the=
+y
+> >> cannot be used with QEMU code to produce free binaries.
+> >=20
+> > Can you elaborate on why you think that is the case ?
+> >=20
+> > Looking at the 3 header files used, all they contain are struct
+> > definitions and integer constants, fortunately no functional
+> > code in macros or inline functions. As such, it is questionable
+> > whether the headers alone can be considered copyrightable material.
+> > Any compatible implementation that follows the WHPX API/ABI will by
+> > neccessity be the same, modulo code style.
+> >=20
+> > Further, from a GPL POV, these headers should fall under the system
+> > libraries exception, as WHPX is core low level operating system
+> > functionality.
+> >=20
+> > There's a valid legal question as to how to we got access to the
+> > files in the first place. Assuming they are freely distributable
+> > though, given their hosting on Google Android downloads.
+> >=20
+> > So the fact that the headers are not under an open source / free
+> > license doesn't look like it should impact the ability to distribute
+> > the resulting QEMU binaries.
+>=20
+> Are we distributing the resulting binaries?
+> I don't think so, we only build until linking in a scratch container an=
+d
+> discard its content, we don't have access to the container storage via
+> Shippable (also Travis). We only use the exit code and the console
+> output from the build.
+>=20
+> We are not distributing those headers neither, as we currently do not
+> distribute the docker images.
 
-Hi; new documentation in docs/specs should be in rst format and
-listed in the contents page for the manual at docs/specs/index.rst,
-please. Conversion from plain text should hopefully be fairly
-straightforward.
+No, but I think its none the less useful to consider what impact is
+on distribution of binaries. Currently Stefan builds & distributes
+the QEMU Windows binaries for each release. I think the ideal would
+be for Windows builds to be a core deliverable of the upstram release
+process. So this docker CI job can be viewed as a stepping stone to
+that point, especially if it is made to run the full NSIS installer
+build, not just standalone binary build.
 
-
-I've also provided some minor typo/grammar fixes below.
-
-
-> diff --git a/docs/specs/acpi_hest_ghes.txt b/docs/specs/acpi_hest_ghes.txt
-> new file mode 100644
-> index 0000000000..690d4b2bd0
-> --- /dev/null
-> +++ b/docs/specs/acpi_hest_ghes.txt
-> @@ -0,0 +1,88 @@
-> +APEI tables generating and CPER record
-> +=============================
-> +
-> +Copyright (C) 2019 Huawei Corporation.
-> +
-> +Design Details:
-> +-------------------
-> +
-> +       etc/acpi/tables                                 etc/hardware_errors
-> +    ====================                      ==========================================
-> ++ +--------------------------+            +-----------------------+
-> +| | HEST                     |            |    address            |            +--------------+
-> +| +--------------------------+            |    registers          |            | Error Status |
-> +| | GHES1                    |            | +---------------------+            | Data Block 1 |
-> +| +--------------------------+ +--------->| |error_block_address1 |----------->| +------------+
-> +| | .................        | |          | +---------------------+            | |  CPER      |
-> +| | error_status_address-----+-+ +------->| |error_block_address2 |--------+   | |  CPER      |
-> +| | .................        |   |        | +---------------------+        |   | |  ....      |
-> +| | read_ack_register--------+-+ |        | |    ..............   |        |   | |  CPER      |
-> +| | read_ack_preserve        | | |        +-----------------------+        |   | +------------+
-> +| | read_ack_write           | | | +----->| |error_block_addressN |------+ |   | Error Status |
-> ++ +--------------------------+ | | |      | +---------------------+      | |   | Data Block 2 |
-> +| | GHES2                    | +-+-+----->| |read_ack_register1   |      | +-->| +------------+
-> ++ +--------------------------+   | |      | +---------------------+      |     | |  CPER      |
-> +| | .................        |   | | +--->| |read_ack_register2   |      |     | |  CPER      |
-> +| | error_status_address-----+---+ | |    | +---------------------+      |     | |  ....      |
-> +| | .................        |     | |    | |  .............      |      |     | |  CPER      |
-> +| | read_ack_register--------+-----+-+    | +---------------------+      |     +-+------------+
-> +| | read_ack_preserve        |     |   +->| |read_ack_registerN   |      |     | |..........  |
-> +| | read_ack_write           |     |   |  | +---------------------+      |     | +------------+
-> ++ +--------------------------|     |   |                                 |     | Error Status |
-> +| | ...............          |     |   |                                 |     | Data Block N |
-> ++ +--------------------------+     |   |                                 +---->| +------------+
-> +| | GHESN                    |     |   |                                       | |  CPER      |
-> ++ +--------------------------+     |   |                                       | |  CPER      |
-> +| | .................        |     |   |                                       | |  ....      |
-> +| | error_status_address-----+-----+   |                                       | |  CPER      |
-> +| | .................        |         |                                       +-+------------+
-> +| | read_ack_register--------+---------+
-> +| | read_ack_preserve        |
-> +| | read_ack_write           |
-> ++ +--------------------------+
-> +
-> +(1) QEMU generates the ACPI HEST table. This table goes in the current
-> +    "etc/acpi/tables" fw_cfg blob. Each error source has different
-> +    notification types.
-> +
-> +(2) A new fw_cfg blob called "etc/hardware_errors" is introduced. QEMU
-> +    also need to populate this blob. The "etc/hardwre_errors" fw_cfg blob
-
-"needs". "hardware_errors".
-
-> +    contains an address registers table and an Error Status Data Block table.
-> +
-> +(3) The address registers table contains N Error Block Address entries
-> +    and N Read Ack Register entries, the size for each entry is 8-byte.
-
-". The size".
-
-> +    The Error Status Data Block table contains N Error Status Data Block
-> +    entries, the size for each entry is 4096(0x1000) bytes. The total size
-
-
-". The size"
-
-> +    for "etc/hardware_errors" fw_cfg blob is (N * 8 * 2 + N * 4096) bytes.
-
-"for the"
-
-> +    N is the kinds of hardware error sources.
-
-Not sure what you had in mind here. Possibly either "N is the number of kinds of
-hardware error sources" or "N is the number of hardware error sources" ?
-
-> +
-> +(4) QEMU generates the ACPI linker/loader script for the firmware, the
-
-". The"
-
-> +    firmware pre-allocates memory for "etc/acpi/tables", "etc/hardware_errors"
-> +    and copies blobs content there.
-
-"blob contents"
-
-> +
-> +(5) QEMU generates N ADD_POINTER commands, which patch address in the
-
-"addresses"
-
-> +    "error_status_address" fields of the HEST table with a pointer to the
-> +    corresponding "address registers" in "etc/hardware_errors" blob.
-
-"in the"
-
-> +
-> +(6) QEMU generates N ADD_POINTER commands, which patch address in the
-
-"addresses"
-
-> +    "read_ack_register" fields of the HEST table with a pointer to the
-> +    corresponding "address registers" in "etc/hardware_errors" blob.
-
-"in the"
-
-> +
-> +(7) QEMU generates N ADD_POINTER commands for the firmware, which patch
-> +    address in the " error_block_address" fields with a pointer to the
-
-"addresses". Stray extra space after open-quote.
-
-> +    respective "Error Status Data Block" in "etc/hardware_errors" blob.
-
-"in the"
-
-> +
-> +(8) QEMU defines a third and write-only fw_cfg blob which is called
-> +    "etc/hardware_errors_addr". Through that blob, the firmware can send back
-> +    the guest-side allocation addresses to QEMU. The "etc/hardware_errors_addr"
-> +    blob contains a 8-byte entry. QEMU generates a single WRITE_POINTER commands
-
-"command"
-
-> +    for the firmware, the firmware will write back the start address of
-
-". The"
-
-> +    "etc/hardware_errors" blob to fw_cfg file "etc/hardware_errors_addr".
-
-"to the fw_cfg file"
-
-> +
-> +(9) When QEMU gets SIGBUS from the kernel, QEMU formats the CPER right into
-
-"a SIGBUS"
-
-> +    guest memory, and then injects whatever interrupt (or assert whatever GPIO
-
-"or asserts"
-
-> +    line) as a notification which is necessary for notifying the guest.
-> +
-> +(10) This notification (in virtual hardware) will be handled by guest kernel,
-
-"the guest kernel"
-
-> +    guest APEI driver will read the CPER which is recorded by QEMU and do the
-
-"and the guest APEI driver"
-
-> +    recovery.
-
-thanks
--- PMM
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
