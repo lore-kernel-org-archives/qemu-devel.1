@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F269C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 21:49:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58B43C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 21:49:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 362E4217D6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 21:49:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 231DF217D6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 21:49:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hru8wI97"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 362E4217D6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f6eO/JHk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 231DF217D6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB4Ig-0002Ac-2I
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 17:49:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56228)
+	id 1iB4Iv-0002bk-50
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 17:49:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56263)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tcminyard@gmail.com>) id 1iB49R-0001Tu-79
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:39:51 -0400
+ (envelope-from <tcminyard@gmail.com>) id 1iB49Z-0001W5-UF
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:40:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tcminyard@gmail.com>) id 1iB49M-00069e-WA
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:39:44 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:42040)
+ (envelope-from <tcminyard@gmail.com>) id 1iB49L-00067e-9A
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:39:51 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:41334)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1iB49M-00069Y-R2
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:39:40 -0400
-Received: by mail-oi1-x241.google.com with SMTP id i185so9735oif.9
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 14:39:40 -0700 (PDT)
+ (Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1iB49L-00067P-4A
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:39:39 -0400
+Received: by mail-ot1-x341.google.com with SMTP id g13so4435599otp.8
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 14:39:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=cVK217iyCckYWeLWjL20H8sYo3oU/9iWz2Z9ZL5bhw8=;
- b=hru8wI973heFuYi/HxwK1UZ45mIPRZqK5XJdwzGl6uUQeG96OsTQUIhGYKy9gBb/DQ
- W+dYf3fYBUeqCUlIaEg9gX7rBH93OZFPbt+aJSIg7ntTGMJoEnlULq6CN2BtkkJqAkd/
- oZSo3oFTcHtaWjw2ROGFosYqOXK+cQUDBDK+TcJl1PlWLR1ISdHL7E/REOdWPD7LOZl4
- 6OiYthZoyjz8qGUVtwnD9HN0kxqaBxxEEuhbx2v+6pam6D+D80UQ3sg3GZyIndqh7Paq
- S4e+jTZKTWXABFIv3IoFhw6SmpuMk/tSMDIDgPSuzw18fIUSp3vn37gke2AiyF7nl2xP
- zBHw==
+ bh=5IGB425rPWZv6PIAxxgYjNsziWO2Aym53s828C6B59k=;
+ b=f6eO/JHkxF8rpFPmPfyZBdK5XnzYZ08xkGF6yBaNn+tGSlFPUDHgJhLxBgxgWDyKeG
+ T8VjjlVVd+lerZ7Qcpf1ZMdQ5r6Sndlle8hYEx53foA2NxWV+egPmaYggxHQ/PoDZ+Mp
+ uNg7meWFpF34+w73my3BhJLL5PXaS8xJRNUd5LmJ67NccZtrxQbvTesFBV4j6ISbacGI
+ h2cZv7mi6q3oR7xCsD/bE3O1ArNtC+zfJiIdppSeZiA9ECv6cZIXhMSAW3RnYzr4dQVh
+ EeVo0nBQv9O4qkdDeC9+v+Suwswr4qbMiIUNgpt7nw3aCg8S85X8J9BRi9Q9rJs21cqZ
+ 0QCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=cVK217iyCckYWeLWjL20H8sYo3oU/9iWz2Z9ZL5bhw8=;
- b=e0cAbKuHLul+yT91i5TL/CRXHQDNFAr6z4k55FuhN2NRsGE3l574bazr3y4so+lYJM
- h0hv3sA/HdzOTVoYMc65GvbrExX5s/9jSN9G740mrD473pv3uskKo8ZF9kXAu3+m4dpy
- tnX44GDEMGQD2ClnSt8MkqKoGJoAauNmhjzB6mNkTyjpG2yXBoIkVASXVNQuab9lK5AT
- agL6ZcMgO3IY+0KPSOz+WX1Ee3BGZlSULjs/yDKbycJ+uwdePK6vr2fne65IOgJ0zZkR
- sEZhcZ1iP3HavYxHF4RbV3xLqhGGK2Oe20BfvTp4xnL/2KZxDoXFEv//kg4Bu/2VCsIj
- Otdg==
-X-Gm-Message-State: APjAAAXg6Yj5/cqA9E9LSYE/0V+AujuUK7s9yjJrzDcjrDuFLcxbhZfu
- WqrVzlU2nFv9AMbZK8KXvg==
-X-Google-Smtp-Source: APXvYqzDNP0IC6aL+Nq1/7VRCiTRB1CQRvuZ02UGd3SaqgAxo/UoHfg3rjUltDldqKoXFU7MMms9pw==
-X-Received: by 2002:a54:4382:: with SMTP id u2mr63112oiv.96.1568929179958;
- Thu, 19 Sep 2019 14:39:39 -0700 (PDT)
+ bh=5IGB425rPWZv6PIAxxgYjNsziWO2Aym53s828C6B59k=;
+ b=byeK+xSI55BH/75NR3QuGb+tcZmm/Lbe54abJ0JZgPftP7zd1c1s2NCFnRk4yl3v2x
+ mNneLxwjcoAs0R3SHLSUSRX2+WWVxn7l4vpWvju0P9woySiXcpszLqCAoj/j3ONJCsgv
+ ociRi6VLK3YbIidL/Rp4scZ7R3ovnEZtUdwsGncE5WqBKu/vI8ORQrg64lglv51f3ICg
+ 61LPFTJBsCr2zQUJL2XR7zGyF4EVC3cSfnvOAyMyfOKpxfwwIzPyGOi7a+j5aWVnwnP8
+ BTsnyD6uOmg/Mq32dtm5T4mki/xMOPE7J2zJWLgbAP5uKhuaab9VEerACUIjNrhmUoAw
+ VIvA==
+X-Gm-Message-State: APjAAAUATTlgIXbdM3pPKnTQxNwk6csUl9KwLJUn36GxdmKmLOVb2BO3
+ pDsDWUqwRFblo5xhNWgfkA==
+X-Google-Smtp-Source: APXvYqxxbatzF0qNdrR6VcJgnE+Q1xRiwpH4RgsqIdkBs7PWk5tp6e5fKc/KI6+RuLNGmZr/g1a0TQ==
+X-Received: by 2002:a9d:128c:: with SMTP id g12mr9010106otg.239.1568929178116; 
+ Thu, 19 Sep 2019 14:39:38 -0700 (PDT)
 Received: from serve.minyard.net ([47.184.136.59])
- by smtp.gmail.com with ESMTPSA id v6sm38601oie.4.2019.09.19.14.39.36
+ by smtp.gmail.com with ESMTPSA id t12sm34378otl.35.2019.09.19.14.39.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Thu, 19 Sep 2019 14:39:36 -0700 (PDT)
 Received: from t560.minyard.net (unknown [192.168.27.180])
- by serve.minyard.net (Postfix) with ESMTPA id 1D93918059D;
- Thu, 19 Sep 2019 21:39:36 +0000 (UTC)
+ by serve.minyard.net (Postfix) with ESMTPA id BF44B18059B;
+ Thu, 19 Sep 2019 21:39:35 +0000 (UTC)
 From: minyard@acm.org
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH 04/15] tests:ipmi: Fix IPMI BT tests
-Date: Thu, 19 Sep 2019 16:39:13 -0500
-Message-Id: <20190919213924.31852-5-minyard@acm.org>
+Subject: [PATCH 02/15] ipmi: Fix the get watchdog command
+Date: Thu, 19 Sep 2019 16:39:11 -0500
+Message-Id: <20190919213924.31852-3-minyard@acm.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190919213924.31852-1-minyard@acm.org>
 References: <20190919213924.31852-1-minyard@acm.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,87 +104,26 @@ Sender: "Qemu-devel"
 
 From: Corey Minyard <cminyard@mvista.com>
 
-The IPMI BT tests had a race condition, if it receive an IPMI command
-to enable interrupt, it would write the message to enable interrupts
-after it wrote the command response.  So the test code could
-receive the command response and issue the next command before the
-device handled the interrupt enable command, and thus no interrupt.
+It wasn't returning the set timeout like it should have been.
 
-So send the message to enable interrupt before the command response.
-
-Also add some sleeps to give qemu time to handle responses, there was
-no delay before, and it could result in an invalid timeout.
-
-And re-enable the tests, as hopefully they are fixed now.
-
-Note that I was unable to reproduce this even with the instructions
-Peter gave me, but hopefully this fixes the issue.
-
-Cc: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
 ---
- tests/Makefile.include | 3 +--
- tests/ipmi-bt-test.c   | 6 ++++--
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ hw/ipmi/ipmi_bmc_sim.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 793632ca72..479664f899 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -170,8 +170,7 @@ check-qtest-i386-$(CONFIG_SGA) += tests/boot-serial-test$(EXESUF)
- check-qtest-i386-$(CONFIG_SLIRP) += tests/pxe-test$(EXESUF)
- check-qtest-i386-y += tests/rtc-test$(EXESUF)
- check-qtest-i386-$(CONFIG_ISA_IPMI_KCS) += tests/ipmi-kcs-test$(EXESUF)
--# Disabled temporarily as it fails intermittently especially under NetBSD VM
--# check-qtest-i386-$(CONFIG_ISA_IPMI_BT) += tests/ipmi-bt-test$(EXESUF)
-+check-qtest-i386-$(CONFIG_ISA_IPMI_BT) += tests/ipmi-bt-test$(EXESUF)
- check-qtest-i386-y += tests/i440fx-test$(EXESUF)
- check-qtest-i386-y += tests/fw_cfg-test$(EXESUF)
- check-qtest-i386-y += tests/device-plug-test$(EXESUF)
-diff --git a/tests/ipmi-bt-test.c b/tests/ipmi-bt-test.c
-index fc4c83b5db..a42207d416 100644
---- a/tests/ipmi-bt-test.c
-+++ b/tests/ipmi-bt-test.c
-@@ -30,7 +30,7 @@
- #include <netinet/tcp.h>
- 
- 
--#include "libqtest.h"
-+#include "libqtest-single.h"
- #include "qemu-common.h"
- 
- #define IPMI_IRQ        5
-@@ -99,6 +99,7 @@ static void bt_wait_b_busy(void)
-     unsigned int count = 1000;
-     while (IPMI_BT_CTLREG_GET_B_BUSY() != 0) {
-         g_assert(--count != 0);
-+        usleep(100);
-     }
- }
- 
-@@ -107,6 +108,7 @@ static void bt_wait_b2h_atn(void)
-     unsigned int count = 1000;
-     while (IPMI_BT_CTLREG_GET_B2H_ATN() == 0) {
-         g_assert(--count != 0);
-+        usleep(100);
-     }
- }
- 
-@@ -240,13 +242,13 @@ static void emu_msg_handler(void)
-         write_emu_msg(msg, msg_len);
-     } else if ((msg[1] == set_bmc_globals_cmd[0]) &&
-                (msg[2] == set_bmc_globals_cmd[1])) {
-+        write_emu_msg(enable_irq_cmd, sizeof(enable_irq_cmd));
-         memcpy(msg + 1, set_bmc_globals_rsp, sizeof(set_bmc_globals_rsp));
-         msg_len = sizeof(set_bmc_globals_rsp) + 1;
-         msg[msg_len] = -ipmb_checksum(msg, msg_len, 0);
-         msg_len++;
-         msg[msg_len++] = 0xa0;
-         write_emu_msg(msg, msg_len);
--        write_emu_msg(enable_irq_cmd, sizeof(enable_irq_cmd));
-     } else {
-         g_assert(0);
-     }
+diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
+index 8f63bb7181..afb99e33d7 100644
+--- a/hw/ipmi/ipmi_bmc_sim.c
++++ b/hw/ipmi/ipmi_bmc_sim.c
+@@ -1228,6 +1228,8 @@ static void get_watchdog_timer(IPMIBmcSim *ibs,
+     rsp_buffer_push(rsp, ibs->watchdog_action);
+     rsp_buffer_push(rsp, ibs->watchdog_pretimeout);
+     rsp_buffer_push(rsp, ibs->watchdog_expired);
++    rsp_buffer_push(rsp, ibs->watchdog_timeout & 0xff);
++    rsp_buffer_push(rsp, (ibs->watchdog_timeout >> 8) & 0xff);
+     if (ibs->watchdog_running) {
+         long timeout;
+         timeout = ((ibs->watchdog_expiry - ipmi_getmonotime() + 50000000)
 -- 
 2.17.1
 
