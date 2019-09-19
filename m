@@ -6,60 +6,59 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E30BBC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 08:38:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D0DBC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 08:39:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8E77217D6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 08:38:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8E77217D6
+	by mail.kernel.org (Postfix) with ESMTPS id 00CC9217D6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 08:39:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00CC9217D6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iArxo-0007FY-OS
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 04:38:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35717)
+	id 1iArxx-0007Jd-Ki
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 04:39:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35839)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1iArve-00052F-4x
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:36:47 -0400
+ (envelope-from <kraxel@redhat.com>) id 1iArvk-00059K-Ar
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:36:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1iArvb-0000BU-D4
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:36:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34766)
+ (envelope-from <kraxel@redhat.com>) id 1iArve-0000G9-RH
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:36:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42288)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iArvb-0000AP-2C
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:36:39 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iArve-0000Dx-8K
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:36:42 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 613B0308FBFC;
- Thu, 19 Sep 2019 08:36:38 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id DB70618C8935;
+ Thu, 19 Sep 2019 08:36:40 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-47.ams2.redhat.com
  [10.36.116.47])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 31D735C21E;
- Thu, 19 Sep 2019 08:36:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E6104100197A;
+ Thu, 19 Sep 2019 08:36:39 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 812A49D75; Thu, 19 Sep 2019 10:36:29 +0200 (CEST)
+ id 36B5B9CBB; Thu, 19 Sep 2019 10:36:30 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 19 Sep 2019 10:36:06 +0200
-Message-Id: <20190919083629.29998-4-kraxel@redhat.com>
+Date: Thu, 19 Sep 2019 10:36:20 +0200
+Message-Id: <20190919083629.29998-18-kraxel@redhat.com>
 In-Reply-To: <20190919083629.29998-1-kraxel@redhat.com>
 References: <20190919083629.29998-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Thu, 19 Sep 2019 08:36:38 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Thu, 19 Sep 2019 08:36:40 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 03/26] coreaudio: port to the new audio backend
- api
+Subject: [Qemu-devel] [PULL 17/26] paaudio: get/put_buffer functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,215 +77,131 @@ Sender: "Qemu-devel"
 
 From: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.ice.hu@gmail.com>
 
+This lets us avoid some buffer copying when using mixeng.
+
 Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.com=
 >
-Message-id: 60d68c051ed180c7315f7cdd6084b58b6fc9bb6d.1568574965.git.DirtY=
+Message-id: 4554ff54ad04f706ad0e9af87fe07650fd6d9ac1.1568574965.git.DirtY=
 .iCE.hu@gmail.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- audio/coreaudio.c | 130 ++++++++++++++++++++++++----------------------
- 1 file changed, 69 insertions(+), 61 deletions(-)
+ audio/paaudio.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 83 insertions(+)
 
-diff --git a/audio/coreaudio.c b/audio/coreaudio.c
-index d1be58b40aa8..5cde42f9826c 100644
---- a/audio/coreaudio.c
-+++ b/audio/coreaudio.c
-@@ -43,9 +43,6 @@ typedef struct coreaudioVoiceOut {
-     UInt32 audioDevicePropertyBufferFrameSize;
-     AudioStreamBasicDescription outputStreamBasicDescription;
-     AudioDeviceIOProcID ioprocid;
--    size_t live;
--    size_t decr;
--    size_t rpos;
- } coreaudioVoiceOut;
+diff --git a/audio/paaudio.c b/audio/paaudio.c
+index ed31f863f7fe..6ccdf3141598 100644
+--- a/audio/paaudio.c
++++ b/audio/paaudio.c
+@@ -98,6 +98,59 @@ static inline int PA_STREAM_IS_GOOD(pa_stream_state_t =
+x)
+         }                                                               =
+\
+     } while (0)
 =20
- #if MAC_OS_X_VERSION_MAX_ALLOWED >=3D MAC_OS_X_VERSION_10_6
-@@ -397,31 +394,29 @@ static int coreaudio_unlock (coreaudioVoiceOut *cor=
-e, const char *fn_name)
-     return 0;
- }
-=20
--static size_t coreaudio_run_out(HWVoiceOut *hw, size_t live)
--{
--    size_t decr;
--    coreaudioVoiceOut *core =3D (coreaudioVoiceOut *) hw;
--
--    if (coreaudio_lock (core, "coreaudio_run_out")) {
--        return 0;
-+#define COREAUDIO_WRAPPER_FUNC(name, ret_type, args_decl, args) \
-+    static ret_type glue(coreaudio_, name)args_decl             \
-+    {                                                           \
-+        coreaudioVoiceOut *core =3D (coreaudioVoiceOut *) hw;     \
-+        ret_type ret;                                           \
-+                                                                \
-+        if (coreaudio_lock(core, "coreaudio_" #name)) {         \
-+            return 0;                                           \
-+        }                                                       \
-+                                                                \
-+        ret =3D glue(audio_generic_, name)args;                   \
-+                                                                \
-+        coreaudio_unlock(core, "coreaudio_" #name);             \
-+        return ret;                                             \
-     }
--
--    if (core->decr > live) {
--        ldebug ("core->decr %d live %d core->live %d\n",
--                core->decr,
--                live,
--                core->live);
--    }
--
--    decr =3D MIN (core->decr, live);
--    core->decr -=3D decr;
--
--    core->live =3D live - decr;
--    hw->rpos =3D core->rpos;
--
--    coreaudio_unlock (core, "coreaudio_run_out");
--    return decr;
--}
-+COREAUDIO_WRAPPER_FUNC(get_buffer_out, void *, (HWVoiceOut *hw, size_t *=
-size),
-+                       (hw, size))
-+COREAUDIO_WRAPPER_FUNC(put_buffer_out_nowrite, size_t,
-+                       (HWVoiceOut *hw, void *buf, size_t size),
-+                       (hw, buf, size))
-+COREAUDIO_WRAPPER_FUNC(write, size_t, (HWVoiceOut *hw, void *buf, size_t=
- size),
-+                       (hw, buf, size))
-+#undef COREAUDIO_WRAPPER_FUNC
-=20
- /* callback to feed audiooutput buffer */
- static OSStatus audioDeviceIOProc(
-@@ -433,19 +428,11 @@ static OSStatus audioDeviceIOProc(
-     const AudioTimeStamp* inOutputTime,
-     void* hwptr)
- {
--    UInt32 frame, frameCount;
--    float *out =3D outOutputData->mBuffers[0].mData;
-+    UInt32 frameCount, pending_frames;
-+    void *out =3D outOutputData->mBuffers[0].mData;
-     HWVoiceOut *hw =3D hwptr;
-     coreaudioVoiceOut *core =3D (coreaudioVoiceOut *) hwptr;
--    int rpos, live;
--    struct st_sample *src;
--#ifndef FLOAT_MIXENG
--#ifdef RECIPROCAL
--    const float scale =3D 1.f / UINT_MAX;
--#else
--    const float scale =3D UINT_MAX;
--#endif
--#endif
-+    size_t len;
-=20
-     if (coreaudio_lock (core, "audioDeviceIOProc")) {
-         inInputTime =3D 0;
-@@ -453,42 +440,51 @@ static OSStatus audioDeviceIOProc(
-     }
-=20
-     frameCount =3D core->audioDevicePropertyBufferFrameSize;
--    live =3D core->live;
-+    pending_frames =3D hw->pending_emul >> hw->info.shift;
-=20
-     /* if there are not enough samples, set signal and return */
--    if (live < frameCount) {
-+    if (pending_frames < frameCount) {
-         inInputTime =3D 0;
-         coreaudio_unlock (core, "audioDeviceIOProc(empty)");
-         return 0;
-     }
-=20
--    rpos =3D core->rpos;
--    src =3D hw->mix_buf + rpos;
-+    len =3D frameCount << hw->info.shift;
-+    while (len) {
-+        size_t write_len;
-+        ssize_t start =3D ((ssize_t) hw->pos_emul) - hw->pending_emul;
-+        if (start < 0) {
-+            start +=3D hw->size_emul;
-+        }
-+        assert(start >=3D 0 && start < hw->size_emul);
-=20
--    /* fill buffer */
--    for (frame =3D 0; frame < frameCount; frame++) {
--#ifdef FLOAT_MIXENG
--        *out++ =3D src[frame].l; /* left channel */
--        *out++ =3D src[frame].r; /* right channel */
--#else
--#ifdef RECIPROCAL
--        *out++ =3D src[frame].l * scale; /* left channel */
--        *out++ =3D src[frame].r * scale; /* right channel */
--#else
--        *out++ =3D src[frame].l / scale; /* left channel */
--        *out++ =3D src[frame].r / scale; /* right channel */
--#endif
--#endif
-+        write_len =3D MIN(MIN(hw->pending_emul, len),
-+                        hw->size_emul - start);
-+
-+        memcpy(out, hw->buf_emul + start, write_len);
-+        hw->pending_emul -=3D write_len;
-+        len -=3D write_len;
-+        out +=3D write_len;
-     }
-=20
--    rpos =3D (rpos + frameCount) % hw->samples;
--    core->decr +=3D frameCount;
--    core->rpos =3D rpos;
--
-     coreaudio_unlock (core, "audioDeviceIOProc");
-     return 0;
- }
-=20
-+static UInt32 coreaudio_get_flags(struct audio_pcm_info *info,
-+                                  struct audsettings *as)
++static void *qpa_get_buffer_in(HWVoiceIn *hw, size_t *size)
 +{
-+    UInt32 flags =3D info->sign ? kAudioFormatFlagIsSignedInteger : 0;
-+    if (as->endianness) { /* 0 =3D little, 1 =3D big */
-+        flags |=3D kAudioFormatFlagIsBigEndian;
++    PAVoiceIn *p =3D (PAVoiceIn *) hw;
++    PAConnection *c =3D p->g->conn;
++    int r;
++
++    pa_threaded_mainloop_lock(c->mainloop);
++
++    CHECK_DEAD_GOTO(c, p->stream, unlock_and_fail,
++                    "pa_threaded_mainloop_lock failed\n");
++
++    if (!p->read_length) {
++        r =3D pa_stream_peek(p->stream, &p->read_data, &p->read_length);
++        CHECK_SUCCESS_GOTO(c, r =3D=3D 0, unlock_and_fail,
++                           "pa_stream_peek failed\n");
 +    }
 +
-+    if (flags =3D=3D 0) { /* must not be 0 */
-+        flags =3D kAudioFormatFlagsAreAllClear;
-+    }
-+    return flags;
++    *size =3D MIN(p->read_length, *size);
++
++    pa_threaded_mainloop_unlock(c->mainloop);
++    return (void *) p->read_data;
++
++unlock_and_fail:
++    pa_threaded_mainloop_unlock(c->mainloop);
++    *size =3D 0;
++    return NULL;
 +}
 +
- static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
-                               void *drv_opaque)
- {
-@@ -576,6 +572,16 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct=
- audsettings *as,
-=20
-     /* set Samplerate */
-     core->outputStreamBasicDescription.mSampleRate =3D (Float64) as->fre=
-q;
-+    core->outputStreamBasicDescription.mFormatID =3D kAudioFormatLinearP=
-CM;
-+    core->outputStreamBasicDescription.mFormatFlags =3D
-+        coreaudio_get_flags(&hw->info, as);
-+    core->outputStreamBasicDescription.mBytesPerPacket =3D
-+        core->outputStreamBasicDescription.mBytesPerFrame =3D
-+        hw->info.nchannels * hw->info.bits / 8;
-+    core->outputStreamBasicDescription.mFramesPerPacket =3D 1;
-+    core->outputStreamBasicDescription.mChannelsPerFrame =3D hw->info.nc=
-hannels;
-+    core->outputStreamBasicDescription.mBitsPerChannel =3D hw->info.bits=
-;
++static void qpa_put_buffer_in(HWVoiceIn *hw, void *buf, size_t size)
++{
++    PAVoiceIn *p =3D (PAVoiceIn *) hw;
++    PAConnection *c =3D p->g->conn;
++    int r;
 +
-     status =3D coreaudio_set_streamformat(core->outputDeviceID,
-                                         &core->outputStreamBasicDescript=
-ion);
-     if (status !=3D kAudioHardwareNoError) {
-@@ -686,7 +692,9 @@ static void coreaudio_audio_fini (void *opaque)
- static struct audio_pcm_ops coreaudio_pcm_ops =3D {
-     .init_out =3D coreaudio_init_out,
-     .fini_out =3D coreaudio_fini_out,
--    .run_out  =3D coreaudio_run_out,
-+    .write    =3D coreaudio_write,
-+    .get_buffer_out =3D coreaudio_get_buffer_out,
-+    .put_buffer_out =3D coreaudio_put_buffer_out_nowrite,
-     .ctl_out  =3D coreaudio_ctl_out
++    pa_threaded_mainloop_lock(c->mainloop);
++
++    CHECK_DEAD_GOTO(c, p->stream, unlock,
++                    "pa_threaded_mainloop_lock failed\n");
++
++    assert(buf =3D=3D p->read_data && size <=3D p->read_length);
++
++    p->read_data +=3D size;
++    p->read_length -=3D size;
++
++    if (size && !p->read_length) {
++        r =3D pa_stream_drop(p->stream);
++        CHECK_SUCCESS_GOTO(c, r =3D=3D 0, unlock, "pa_stream_drop failed=
+\n");
++    }
++
++unlock:
++    pa_threaded_mainloop_unlock(c->mainloop);
++}
++
+ static size_t qpa_read(HWVoiceIn *hw, void *data, size_t length)
+ {
+     PAVoiceIn *p =3D (PAVoiceIn *) hw;
+@@ -136,6 +189,32 @@ unlock_and_fail:
+     return 0;
+ }
+=20
++static void *qpa_get_buffer_out(HWVoiceOut *hw, size_t *size)
++{
++    PAVoiceOut *p =3D (PAVoiceOut *) hw;
++    PAConnection *c =3D p->g->conn;
++    void *ret;
++    int r;
++
++    pa_threaded_mainloop_lock(c->mainloop);
++
++    CHECK_DEAD_GOTO(c, p->stream, unlock_and_fail,
++                    "pa_threaded_mainloop_lock failed\n");
++
++    *size =3D -1;
++    r =3D pa_stream_begin_write(p->stream, &ret, size);
++    CHECK_SUCCESS_GOTO(c, r >=3D 0, unlock_and_fail,
++                       "pa_stream_begin_write failed\n");
++
++    pa_threaded_mainloop_unlock(c->mainloop);
++    return ret;
++
++unlock_and_fail:
++    pa_threaded_mainloop_unlock(c->mainloop);
++    *size =3D 0;
++    return NULL;
++}
++
+ static size_t qpa_write(HWVoiceOut *hw, void *data, size_t length)
+ {
+     PAVoiceOut *p =3D (PAVoiceOut *) hw;
+@@ -698,11 +777,15 @@ static struct audio_pcm_ops qpa_pcm_ops =3D {
+     .init_out =3D qpa_init_out,
+     .fini_out =3D qpa_fini_out,
+     .write    =3D qpa_write,
++    .get_buffer_out =3D qpa_get_buffer_out,
++    .put_buffer_out =3D qpa_write, /* pa handles it */
+     .volume_out =3D qpa_volume_out,
+=20
+     .init_in  =3D qpa_init_in,
+     .fini_in  =3D qpa_fini_in,
+     .read     =3D qpa_read,
++    .get_buffer_in =3D qpa_get_buffer_in,
++    .put_buffer_in =3D qpa_put_buffer_in,
+     .volume_in =3D qpa_volume_in
  };
 =20
 --=20
