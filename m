@@ -2,90 +2,94 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD637C4CECE
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:13:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 127EBC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:17:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A41362067B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:13:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A41362067B
+	by mail.kernel.org (Postfix) with ESMTPS id DEE2C20882
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:17:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEE2C20882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44741 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAxBh-0000EA-SS
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 10:13:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53410)
+	id 1iAxFJ-0004FF-BM
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 10:17:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51626)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iAx4y-0008JI-Qe
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:06:42 -0400
+ (envelope-from <eblake@redhat.com>) id 1iAwx4-0007Dl-6o
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:58:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iAx4w-0002Je-Ii
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:06:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38876)
+ (envelope-from <eblake@redhat.com>) id 1iAwsx-0003PG-Kb
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:54:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35988)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iAx4w-0002Ic-AN
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 10:06:38 -0400
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAwsx-0003Ok-By
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:54:15 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 50ACBC057F20
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 14:06:36 +0000 (UTC)
-Received: by mail-qt1-f199.google.com with SMTP id e13so4009499qto.18
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 07:06:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=KfRtE4DtvcLjZqJHQLhl42mBYywH0dJPoWBRYCjw13Y=;
- b=i5yO+M6bpvx1QyYh97ffjNT1QfXYofzHj1iQrZftEqL9AuU2gSieZVUSKUovAhiNjI
- C9pZb0XqMt0Jz/An/vui2zV0yRsBnugZGMiRuatZwNBJoo58+46k8c9vuTT5mIECg4h4
- rWq2n61m9lSohLQ4ITn7AGjnOOkYFOMe9ES6/wBrk75iae2RyFKNvuAf/3K/U4zVh1t7
- CMXEeIS4k/TfwE7OVcbHPHTp8AcU8MfUcUT3H0dQoC5bEzZP4HbPE3F57Iu4jShJ0FVH
- tBz8oQvWAZa4XSBlwaTXAsCA6Jo3u+2APYm/neTkRk5xzXkRdvEPkWBp+IXjlQwJsp1i
- kBlQ==
-X-Gm-Message-State: APjAAAXdPk5s6XO1BugcwrlAKW9LGTnwJ1r7Zy9OCnm5G4KzNqQ4kQJi
- kpvmt0Id5TYzbl6//cEGdnn78uZTJDG9wafdAF4cN+9xgUJ1+XykDrpyAd7p++lITdbdpgJ1SXa
- vtlMbD5utCJ17ICw=
-X-Received: by 2002:a37:4286:: with SMTP id p128mr3142957qka.40.1568901995618; 
- Thu, 19 Sep 2019 07:06:35 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqz3CQTlapBH0+G6VI3PMEL77ZIlxofWLKCKf/PWfhZsj49frLLzAyPDlnKLcz9sU0RvaOd3eQ==
-X-Received: by 2002:a37:4286:: with SMTP id p128mr3142924qka.40.1568901995307; 
- Thu, 19 Sep 2019 07:06:35 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
- by smtp.gmail.com with ESMTPSA id h68sm4466965qkf.2.2019.09.19.07.06.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Sep 2019 07:06:34 -0700 (PDT)
-Date: Thu, 19 Sep 2019 10:06:30 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Message-ID: <20190919100545-mutt-send-email-mst@kernel.org>
-References: <AADFC41AFE54684AB9EE6CBC0274A5D19D57B1D1@SHSMSX104.ccr.corp.intel.com>
- <6d73572e-1e89-b04a-bdd6-98ac73798083@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D57B90C@SHSMSX104.ccr.corp.intel.com>
- <204219fa-ee72-ca60-52a4-fb4bbc887773@redhat.com>
- <20190919052819.GA18391@joy-OptiPlex-7040>
- <7b6d6343-33de-ebd7-9846-af54a45a82a2@redhat.com>
- <20190919061756.GB18391@joy-OptiPlex-7040>
- <e0efbdc0-aad9-0d17-ec68-36460865501f@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D57DD2A@SHSMSX104.ccr.corp.intel.com>
- <7906030a-00e3-012d-da4f-bb0c1b2901b2@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id A86597BDAE;
+ Thu, 19 Sep 2019 13:54:14 +0000 (UTC)
+Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 06B7BBA65;
+ Thu, 19 Sep 2019 13:54:13 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190913154952.27724-1-peter.maydell@linaro.org>
+ <20190913154952.27724-13-peter.maydell@linaro.org>
+ <9ede7068-7f92-3e1a-c1f8-c0994eddf671@redhat.com>
+ <CAFEAcA8nj27YwR3F0NA8JiV2yqqLcBzZ6T42Ue5FV2cUcmRoaQ@mail.gmail.com>
+ <4324a9d9-6070-d014-27c9-77187cea1dfa@redhat.com>
+ <CAFEAcA_P8H4=-tnKLrm+YTqH_p7x2oVjHq1Sg03m6ssrWnKsjw@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <07b8a4b8-79d2-a2f6-721d-e4a14917c808@redhat.com>
+Date: Thu, 19 Sep 2019 08:54:13 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <7906030a-00e3-012d-da4f-bb0c1b2901b2@redhat.com>
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAFEAcA_P8H4=-tnKLrm+YTqH_p7x2oVjHq1Sg03m6ssrWnKsjw@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="vGjWQyf8ylyddnEPSgJO2EZC8mVsdyD0H"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Thu, 19 Sep 2019 13:54:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] vhost, iova, and dirty page tracking
+Subject: Re: [Qemu-devel] [PULL 12/12] qemu-ga: Convert invocation
+ documentation to rST
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,155 +101,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>,
- "Zhao, Yan Y" <yan.y.zhao@intel.com>,
- 'Alex Williamson' <alex.williamson@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 19, 2019 at 05:37:48PM +0800, Jason Wang wrote:
->=20
-> On 2019/9/19 =E4=B8=8B=E5=8D=883:16, Tian, Kevin wrote:
-> > +Paolo to help clarify here.
-> >=20
-> > > From: Jason Wang [mailto:jasowang@redhat.com]
-> > > Sent: Thursday, September 19, 2019 2:32 PM
-> > >=20
-> > >=20
-> > > On 2019/9/19 =E4=B8=8B=E5=8D=882:17, Yan Zhao wrote:
-> > > > On Thu, Sep 19, 2019 at 02:09:53PM +0800, Jason Wang wrote:
-> > > > > On 2019/9/19 =E4=B8=8B=E5=8D=881:28, Yan Zhao wrote:
-> > > > > > On Thu, Sep 19, 2019 at 09:05:12AM +0800, Jason Wang wrote:
-> > > > > > > On 2019/9/18 =E4=B8=8B=E5=8D=884:37, Tian, Kevin wrote:
-> > > > > > > > > From: Jason Wang [mailto:jasowang@redhat.com]
-> > > > > > > > > Sent: Wednesday, September 18, 2019 2:10 PM
-> > > > > > > > >=20
-> > > > > > > > > > > Note that the HVA to GPA mapping is not an 1:1 mapp=
-ing. One
-> > > HVA
-> > > > > > > > > range
-> > > > > > > > > > > could be mapped to several GPA ranges.
-> > > > > > > > > > This is fine. Currently vfio_dma maintains IOVA->HVA =
-mapping.
-> > > > > > > > > >=20
-> > > > > > > > > > btw under what condition HVA->GPA is not 1:1 mapping?=
- I didn't
-> > > realize it.
-> > > > > > > > > I don't remember the details e.g memory region alias? A=
-nd neither
-> > > kvm
-> > > > > > > > > nor kvm API does forbid this if my memory is correct.
-> > > > > > > > >=20
-> > > > > > > > I checked https://qemu.weilnetz.de/doc/devel/memory.html,=
- which
-> > > > > > > > provides an example of aliased layout. However, its alias=
-ing is all
-> > > > > > > > 1:1, instead of N:1. From guest p.o.v every writable GPA =
-implies an
-> > > > > > > > unique location. Why would we hit the situation where mul=
-tiple
-> > > > > > > > write-able GPAs are mapped to the same HVA (i.e. same phy=
-sical
-> > > > > > > > memory location)?
-> > > > > > > I don't know, just want to say current API does not forbid =
-this. So we
-> > > > > > > probably need to take care it.
-> > > > > > >=20
-> > > > > > yes, in KVM API level, it does not forbid two slots to have t=
-he same
-> > > HVA(slot->userspace_addr).
-> > > > > > But
-> > > > > > (1) there's only one kvm instance for each vm for each qemu p=
-rocess.
-> > > > > > (2) all ramblock->host (corresponds to HVA and slot->userspac=
-e_addr)
-> > > in one qemu
-> > > > > > process is non-overlapping as it's obtained from mmmap().
-> > > > > > (3) qemu ensures two kvm slots will not point to the same sec=
-tion of
-> > > one ramblock.
-> > > > > > So, as long as kvm instance is not shared in two processes, a=
-nd
-> > > > > > there's no bug in qemu, we can assure that HVA to GPA is 1:1.
-> > > > > Well, you leave this API for userspace, so you can't assume qem=
-u is the
-> > > > > only user or any its behavior. If you had you should limit it i=
-n the API
-> > > > > level instead of open window for them.
-> > > > >=20
-> > > > >=20
-> > > > > > But even if there are two processes operating on the same kvm
-> > > instance
-> > > > > > and manipulating on memory slots, adding an extra GPA along s=
-ide
-> > > current
-> > > > > > IOVA & HVA to ioctl VFIO_IOMMU_MAP_DMA can still let driver k=
-nows
-> > > the
-> > > > > > right IOVA->GPA mapping, right?
-> > > > > It looks fragile. Consider HVA was mapped to both GPA1 and GPA2=
-.
-> > > Guest
-> > > > > maps IOVA to GPA2, so we have IOVA GPA2 HVA in the new ioctl an=
-d
-> > > then
-> > > > > log through GPA2. If userspace is trying to sync through GPA1, =
-it will
-> > > > > miss the dirty page. So for safety we need log both GPA1 and GP=
-A2. (See
-> > > > > what has been done in log_write_hva() in vhost.c). The only way=
- to do
-> > > > > that is to maintain an independent HVA to GPA mapping like what=
- KVM
-> > > or
-> > > > > vhost did.
-> > > > >=20
-> > > > why GPA1 and GPA2 should be both dirty?
-> > > > even they have the same HVA due to overlaping virtual address spa=
-ce in
-> > > > two processes, they still correspond to two physical pages.
-> > > > don't get what's your meaning :)
-> > >=20
-> > > The point is not leave any corner case that is hard to debug or fix=
- in
-> > > the future.
-> > >=20
-> > > Let's just start by a single process, the API allows userspace to m=
-aps
-> > > HVA to both GPA1 and GPA2. Since it knows GPA1 and GPA2 are equival=
-ent,
-> > > it's ok to sync just through GPA1. That means if you only log GPA2,=
- it
-> > > won't work.
-> > >=20
-> > I noted KVM itself doesn't consider such situation (one HVA is mapped
-> > to multiple GPAs), when doing its dirty page tracking. If you look at
-> > kvm_vcpu_mark_page_dirty, it simply finds the unique memslot which
-> > contains the dirty gfn and then set the dirty bit within that slot. I=
-t
-> > doesn't attempt to walk all memslots to find out any other GPA which
-> > may be mapped to the same HVA.
-> >=20
-> > So there must be some disconnect here. let's hear from Paolo first an=
-d
-> > understand the rationale behind such situation.
->=20
->=20
-> Neither did vhost when IOTLB is disabled. And cc Michael who points out=
- this
-> issue at the beginning.
->=20
-> Thanks
->=20
->=20
-> >=20
-> > Thanks
-> > Kevin
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vGjWQyf8ylyddnEPSgJO2EZC8mVsdyD0H
+Content-Type: multipart/mixed; boundary="ZC1X6xnYXn2FWOiWZUMH6E1XGMjflVDOa";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <07b8a4b8-79d2-a2f6-721d-e4a14917c808@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 12/12] qemu-ga: Convert invocation
+ documentation to rST
+References: <20190913154952.27724-1-peter.maydell@linaro.org>
+ <20190913154952.27724-13-peter.maydell@linaro.org>
+ <9ede7068-7f92-3e1a-c1f8-c0994eddf671@redhat.com>
+ <CAFEAcA8nj27YwR3F0NA8JiV2yqqLcBzZ6T42Ue5FV2cUcmRoaQ@mail.gmail.com>
+ <4324a9d9-6070-d014-27c9-77187cea1dfa@redhat.com>
+ <CAFEAcA_P8H4=-tnKLrm+YTqH_p7x2oVjHq1Sg03m6ssrWnKsjw@mail.gmail.com>
+In-Reply-To: <CAFEAcA_P8H4=-tnKLrm+YTqH_p7x2oVjHq1Sg03m6ssrWnKsjw@mail.gmail.com>
 
-Yes, we fixed with a kind of a work around, at the time I proposed
-a new interace to fix it fully. I don't think we ever got around
-to implementing it - right?
+--ZC1X6xnYXn2FWOiWZUMH6E1XGMjflVDOa
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
+On 9/19/19 8:35 AM, Peter Maydell wrote:
+> On Thu, 19 Sep 2019 at 14:27, Eric Blake <eblake@redhat.com> wrote:
+>>
+>> On 9/19/19 7:00 AM, Peter Maydell wrote:
+>>
+>>>> In an incremental build on Fedora 30, I'm now seeing:
+>>>>
+>>>>         CHK version_gen.h
+>>>>   GEN     docs/interop/qemu-ga.8
+>>>> No filename or title
+>>>> make: *** [/home/eblake/qemu/rules.mak:394: docs/interop/qemu-ga.8]
+>>>> Error 255
+>>>>
+>>>> and suspect this patch introduced it.  It may be that I just need to=
+
+>>>> nuke intermediate artifacts rather than an actual problem with the
+>>>> patch, but I'd welcome help in identifying the problem.
+>>>
+>>> If you build with V=3D1 what does it say it's doing?
+>>
+>> make[1]: Leaving directory '/home/eblake/qemu/dtc'
+>> perl -Ww -- /home/eblake/qemu/scripts/texi2pod.pl -I docs -I scripts -=
+I
+>> docs/interop -DVERSION=3D"4.1.50" -DCONFDIR=3D"/usr/local/etc/qemu"
+>> scripts/texi2pod.pl docs/interop/qemu-ga.8.pod && pod2man --utf8
+>> --section=3D8 --center=3D" " --release=3D" " docs/interop/qemu-ga.8.po=
+d >
+>> docs/interop/qemu-ga.8
+>> No filename or title
+>> make: *** [/home/eblake/qemu/rules.mak:394: docs/interop/qemu-ga.8]
+>> Error 255
+>=20
+> Do you have sphinx installed on this machine?
+
+Not yet.
+
+/me goes and installs sphinx-2.2.11-12.fc30.x86_64
+
+Nope, problem is still happening even after rerunning ./configure
+
+
+> I'm wondering
+> if the problem here is that we have disabled the sphinx build
+> runes but are then falling back to the "try to make any %.8
+> via the TEXI2MAN rule in rules.mak" [*]. On the other hand
+> docs/interop/qemu-ga.8 is only put into DOCS if BUILD_DOCS is
+> set, which should only happen if sphinx is available.
+>=20
+> [*] these rules are a bit bogus, because I think they will apply even
+> if there's no other rule saying 'foo.8 depends on something.texi',
+> and then as you can see in your command line we end up running
+> texi2pod with an empty "$<" rather than passing it a texi file.
+
+Okay, that's something to play with.
+
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--ZC1X6xnYXn2FWOiWZUMH6E1XGMjflVDOa--
+
+--vGjWQyf8ylyddnEPSgJO2EZC8mVsdyD0H
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2DiIUACgkQp6FrSiUn
+Q2o1VAgAlV1Cp9keGdwmjkjJx+WQArzAeza7So9DR4HERboxsYuBRN2Q7uTkosnG
+TVeJRhK5Gz/qRXMX0jms9Sm9iXfHhwXuvy43Pv+8apGYbLEfVnaCbwUD2KHUsPnS
+/H2X/HUswUGHeo9exhN8HCT9IkJp3Qnv9Qi0HBKfJQ+D+z6N3ATCUeT6Yb7GmsMO
+TNDESk5yDCAJPaJbXYi45t0Dzt1D2IEt7JRvuUFfLw9Yxj9hjSXMiX66FwQTlpuL
+u9ykh0q8V2A6s7ik5NN3bnQAkIHVsLtkS2jQUa4OB3jDskGu0sqGjVBJyM29XckT
+CreTJxRCMIyceGiC7sbEmK7cppJEhA==
+=3DO/
+-----END PGP SIGNATURE-----
+
+--vGjWQyf8ylyddnEPSgJO2EZC8mVsdyD0H--
 
