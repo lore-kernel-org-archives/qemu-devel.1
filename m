@@ -2,69 +2,57 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0DADC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:10:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EB1BC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:10:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85702218AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:10:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85702218AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 359F6218AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:10:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 359F6218AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAsRv-0001vw-H3
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:10:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37668)
+	id 1iAsRy-00022Y-OJ
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:10:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37838)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iAsC3-0000Aj-9w
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:53:48 -0400
+ (envelope-from <dovgaluk@ispras.ru>) id 1iAsCt-0001Cf-95
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:54:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iAsBz-0005Xp-53
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:53:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46484)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iAsBe-0005U9-CB
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:53:34 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 739B14E4E6;
- Thu, 19 Sep 2019 08:53:13 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.36.116.255])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D98D45D9CD;
- Thu, 19 Sep 2019 08:53:03 +0000 (UTC)
-Date: Thu, 19 Sep 2019 10:53:02 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Message-ID: <20190919085302.GA10163@localhost.localdomain>
-References: <156872146565.1757.3033215873677512474.stgit@pasha-Precision-3630-Tower>
- <156872148244.1757.2888672921697745021.stgit@pasha-Precision-3630-Tower>
- <20190918091831.GD5207@localhost.localdomain>
- <001201d56e02$9d88b5f0$d89a21d0$@ru>
- <20190918093305.GF5207@localhost.localdomain>
- <001401d56e04$b93c02a0$2bb407e0$@ru>
- <20190918094436.GG5207@localhost.localdomain>
- <001501d56e06$bbd7aa30$3386fe90$@ru>
+ (envelope-from <dovgaluk@ispras.ru>) id 1iAsCs-0005jE-2B
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:54:31 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:55166)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <dovgaluk@ispras.ru>)
+ id 1iAsCp-0005iB-3j; Thu, 19 Sep 2019 04:54:27 -0400
+Received: from PASHAISP (unknown [85.142.117.226])
+ by mail.ispras.ru (Postfix) with ESMTPSA id 73F71540081;
+ Thu, 19 Sep 2019 11:54:23 +0300 (MSK)
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+To: =?UTF-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>,
+ <qemu-devel@nongnu.org>
+References: <20190918153335.20797-1-alex.bennee@linaro.org>
+In-Reply-To: <20190918153335.20797-1-alex.bennee@linaro.org>
+Date: Thu, 19 Sep 2019 11:54:27 +0300
+Message-ID: <001801d56ec7$d80940d0$881bc270$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <001501d56e06$bbd7aa30$3386fe90$@ru>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Thu, 19 Sep 2019 08:53:13 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [for-4.2 PATCH 3/6] replay: update docs for
- record/replay with block devices
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Office Outlook 12.0
+Thread-Index: AdVuNoszH7q5RfvASfiDKqZTDLZgqwAkGOsg
+Content-Language: ru
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 83.149.199.45
+Subject: Re: [Qemu-devel] [PATCH] tests/tcg: add simple record/replay smoke
+ test for aarch64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,117 +64,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru,
- crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com,
- quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- alex.bennee@linaro.org, 'Pavel Dovgalyuk' <pavel.dovgaluk@gmail.com>,
- maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com,
- boost.lists@gmail.com, thomas.dullien@googlemail.com, pbonzini@redhat.com,
- mreitz@redhat.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com,
- rth@twiddle.net
+Cc: 'Peter Maydell' <peter.maydell@linaro.org>,
+ "'open list:ARM TCG CPUs'" <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 18.09.2019 um 11:52 hat Pavel Dovgalyuk geschrieben:
-> > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > Am 18.09.2019 um 11:37 hat Pavel Dovgalyuk geschrieben:
-> > > > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > > > Am 18.09.2019 um 11:22 hat Pavel Dovgalyuk geschrieben:
-> > > > > > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > > > > > Am 17.09.2019 um 13:58 hat Pavel Dovgalyuk geschrieben:
-> > > > > > > From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> > > > > > >
-> > > > > > > This patch updates the description of the command lines for using
-> > > > > > > record/replay with attached block devices.
-> > > > > > >
-> > > > > > > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> > > > > > > ---
-> > > > > > >  docs/replay.txt |   12 +++++++++---
-> > > > > > >  1 file changed, 9 insertions(+), 3 deletions(-)
-> > > > > > >
-> > > > > > > diff --git a/docs/replay.txt b/docs/replay.txt
-> > > > > > > index ee6aee9861..ce97c3f72f 100644
-> > > > > > > --- a/docs/replay.txt
-> > > > > > > +++ b/docs/replay.txt
-> > > > > > > @@ -27,7 +27,7 @@ Usage of the record/replay:
-> > > > > > >   * First, record the execution with the following command line:
-> > > > > > >      qemu-system-i386 \
-> > > > > > >       -icount shift=7,rr=record,rrfile=replay.bin \
-> > > > > > > -     -drive file=disk.qcow2,if=none,id=img-direct \
-> > > > > > > +     -drive file=disk.qcow2,if=none,snapshot,id=img-direct \
-> > > > > > >       -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
-> > > > > > >       -device ide-hd,drive=img-blkreplay \
-> > > > > > >       -netdev user,id=net1 -device rtl8139,netdev=net1 \
-> > > > > > > @@ -35,7 +35,7 @@ Usage of the record/replay:
-> > > > > > >   * After recording, you can replay it by using another command line:
-> > > > > > >      qemu-system-i386 \
-> > > > > > >       -icount shift=7,rr=replay,rrfile=replay.bin \
-> > > > > > > -     -drive file=disk.qcow2,if=none,id=img-direct \
-> > > > > > > +     -drive file=disk.qcow2,if=none,snapshot,id=img-direct \
-> > > > > > >       -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
-> > > > > > >       -device ide-hd,drive=img-blkreplay \
-> > > > > > >       -netdev user,id=net1 -device rtl8139,netdev=net1 \
-> > > > > > > @@ -223,7 +223,7 @@ Block devices record/replay module intercepts calls of
-> > > > > > >  bdrv coroutine functions at the top of block drivers stack.
-> > > > > > >  To record and replay block operations the drive must be configured
-> > > > > > >  as following:
-> > > > > > > - -drive file=disk.qcow2,if=none,id=img-direct
-> > > > > > > + -drive file=disk.qcow2,if=none,snapshot,id=img-direct
-> > > > > > >   -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay
-> > > > > > >   -device ide-hd,drive=img-blkreplay
-> > > > > > >
-> > > > > > > @@ -252,6 +252,12 @@ This snapshot is created at start of recording and restored at
-> > > > start
-> > > > > > >  of replaying. It also can be loaded while replaying to roll back
-> > > > > > >  the execution.
-> > > > > > >
-> > > > > > > +'snapshot' flag of the disk image must be removed to save the snapshots
-> > > > > > > +in the overlay (or original image) instead of using the temporary overlay.
-> > > > > > > + -drive file=disk.ovl,if=none,id=img-direct
-> > > > > > > + -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay
-> > > > > > > + -device ide-hd,drive=img-blkreplay
-> > > > > >
-> > > > > > Wait, didn't patch 2 just make -snapshot unconditionally incompatible
-> > > > > > with replay? So isn't saving the snapshot in the original image the only
-> > > > > > supported mode now?
-> > > > >
-> > > > > There are two ways to run record/replay:
-> > > > > 1. Disk with snapshot option and any image to make it unchanged
-> > > > > 2. Disk with overlay without snapshot option to save VM snapshots on it
-> > > >
-> > > > Yes, I think I understand the two options that you intend to make
-> > > > available, but when -snapshot sets a replay blocker, how can 1. still
-> > > > work? Is there some code that ignores replay blockers?
-> > >
-> > > I checked the text and don't see anything about global "-snapshot" option.
-> > > All references are about drive snapshot flag.
-> > > Can you point me where did I missed that?
-> > 
-> > Oh, sorry, you're right and I misread.
-> > 
-> > However, global -snapshot is just a convenient shortcut for specifying
-> > snapshot=on for all -drive arguments. So if -snapshot is incompatible
-> > with replay, shouldn't manually marking all drives as snapshot=on be
-> > incompatible as well?
-> > 
-> > Maybe you're really interested in some specific drive not having
-> > snapshot=on? But then it might be better to check that specific drive
-> > instad of forbidding just the shortcut for setting it.
-> 
-> -snapshot adds the flag for top-level drive, making driver operations
-> dependent on temporary file structure.
-> 
-> Moving this overlay beneath blkreplay driver makes drive operations
-> deterministic for the top-level device.
+Thanks!
 
-So the real requirement is that blkreplay is the top-level node of any
-guest device, right? And only because of this, you can't use -snapshot
-(or snapshot=on on the blkreplay driver).
+This seem to correctly run record and replay command lines.
+When I break the replay correctness, then the test reports a timeout =
+error.
 
-If we instead check e.g. in blk_insert_bs() or blk_attach_dev() that in
-record/replay mode, the root node of the BlockBackend is blkreplay,
-wouldn't we catch many more incorrect setups?
+However, we need some kind of a manual for tcg testing. I had to dig =
+through makefile and configure
+scripts to undestand that testing needs the cross compilers to be =
+installed.
+Then I installed a random cross compiler and everything worked normally.
 
-Kevin
+Pavel Dovgalyuk
+
+> -----Original Message-----
+> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+> Sent: Wednesday, September 18, 2019 6:34 PM
+> To: qemu-devel@nongnu.org
+> Cc: Alex Benn=C3=A9e; Pavel Dovgalyuk; Peter Maydell; open list:ARM =
+TCG CPUs
+> Subject: [PATCH] tests/tcg: add simple record/replay smoke test for =
+aarch64
+>=20
+> This adds two new tests that re-use the memory test to check basic
+> record replay functionality is still working. We have to define our
+> own runners rather than using the default pattern as we want to change
+> the test name but re-use the memory binary.
+>=20
+> We declare the test binaries as PHONY as they don't rely exist.
+>=20
+> [AJB: A better test would output some sort of timer value or other
+> otherwise variable value so we could compare the record and replay
+> outputs and ensure they match]
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+> ---
+>  tests/tcg/aarch64/Makefile.softmmu-target | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+>=20
+> diff --git a/tests/tcg/aarch64/Makefile.softmmu-target =
+b/tests/tcg/aarch64/Makefile.softmmu-
+> target
+> index 4c4aaf61dd3..b4b39579634 100644
+> --- a/tests/tcg/aarch64/Makefile.softmmu-target
+> +++ b/tests/tcg/aarch64/Makefile.softmmu-target
+> @@ -32,3 +32,24 @@ memory: CFLAGS+=3D-DCHECK_UNALIGNED=3D1
+>=20
+>  # Running
+>  QEMU_OPTS+=3D-M virt -cpu max -display none -semihosting-config
+> enable=3Don,target=3Dnative,chardev=3Doutput -kernel
+> +
+> +# Simple Record/Replay Test
+> +.PHONY: memory-record
+> +run-memory-record: memory-record memory
+> +	$(call run-test, $<, \
+> +	  $(QEMU) -monitor none -display none \
+> +		  -chardev file$(COMMA)path=3D$<.out$(COMMA)id=3Doutput \
+> +		  -icount shift=3D5$(COMMA)rr=3Drecord$(COMMA)rrfile=3Drecord.bin \
+> +	   	  $(QEMU_OPTS) memory, \
+> +	  "$< on $(TARGET_NAME)")
+> +
+> +.PHONY: memory-replay
+> +run-memory-replay: memory-replay run-memory-record
+> +	$(call run-test, $<, \
+> +	  $(QEMU) -monitor none -display none \
+> +		  -chardev file$(COMMA)path=3D$<.out$(COMMA)id=3Doutput \
+> +		  -icount shift=3D5$(COMMA)rr=3Dreplay$(COMMA)rrfile=3Drecord.bin \
+> +	   	  $(QEMU_OPTS) memory, \
+> +	  "$< on $(TARGET_NAME)")
+> +
+> +TESTS+=3Dmemory-record memory-replay
+> --
+> 2.20.1
+
+
 
