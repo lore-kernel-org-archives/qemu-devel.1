@@ -2,81 +2,76 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63EF9C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:37:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7370DC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:38:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3287B2053B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:37:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eiWyH2rf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3287B2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 49B7A2053B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:38:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49B7A2053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB0Mr-00084a-C6
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 13:37:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50174)
+	id 1iB0Nc-0000Pp-8k
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 13:38:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50270)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iB07S-0008UJ-18
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:21:27 -0400
+ (envelope-from <bounces@canonical.com>) id 1iB073-0000Cl-Vw
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:21:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iAzvN-0003pJ-Nx
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:08:58 -0400
-Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:42659)
+ (envelope-from <bounces@canonical.com>) id 1iB072-0000us-BX
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:21:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41850)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iAzvN-0003ow-GF
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:08:57 -0400
-Received: by mail-oi1-x22d.google.com with SMTP id i185so3338005oif.9
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 10:08:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=aTRi6tT55RAkYx7Li11LL7xBS9tOOOaLa888zMSma7E=;
- b=eiWyH2rfvPL1hfDMJTJftugwJ6VKg4MAuOiAd7uncY3Ch9mHI6nO3OuywZPCwGhppX
- Vf/m/D7L/3vDy3PyCeZBTO2x0sqGlrTwrFqFpTP2KG3LuIspx3v4AnicVlYfpkIWx+Zi
- luxA6ExRi1pzu/419JGpzH1p0EybTEm4BeYf35Q0o3kMsz7mL2R8re0Z5/mJKeo/3rC5
- tFp81SHm+sVCi61kWmmX+xTx4fKPWN1lE8wFsc5jLEuH8TEqHHvJITzftFaFROvTnduS
- ZgOv4NL3YLNf8THQQ7tkgqanfoCjiEWeCu/5+3TJmHMHO7o61qx48Nzi41mrLDTRM35E
- jTkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=aTRi6tT55RAkYx7Li11LL7xBS9tOOOaLa888zMSma7E=;
- b=CtNoxwfnuLh1do8ni/mRz6cCj5vTZVH+Np5Y1upwZRxZJDmpLE9IgwhC3YKEpw7DT5
- uVIJJ5lg8XgJfjX3mgWon4cHCNtbtb/1j+oxfeQzDDfrMupOtoq6GPr9i1n2N/+yZHN0
- 1ExxYnoZSMp7rD+et2e5cXDXzFU1MT+rbZDmvAxircNEfvb7pIfRRyMELbkAnMrZl7Oc
- DXFznSA9aJSpUpkK+n1ZAqaXTekXQwj6hpzCh4ldlWqQg+w9UNdIhjxMW+SGQKmE/qhO
- 54ZVS95luenUeXohgqsXu7r2GdtIuO67Up+5QzIpac8CAWX6K+Q/H7k1K2XGz5+z/V/+
- tQsQ==
-X-Gm-Message-State: APjAAAUWYGy5DZSd8Ifm/OJhxLMYgMUku5ktArXL+tZoDtmteAE+Mfev
- r/y7WJ4Zl6a3CNI2MbNuKPcOZw6ujFCa22tZ69Kii2wNhXU=
-X-Google-Smtp-Source: APXvYqx2kaJxDOXY/rkLtND6vROE3hSq9/ZGuX3y7hKZ+t3+Ujsv63AJk0DrG+zwkkX5ke7r0704oiFRpm/vNk1vf1g=
-X-Received: by 2002:aca:50d8:: with SMTP id e207mr3023103oib.48.1568912936471; 
- Thu, 19 Sep 2019 10:08:56 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iB072-0000uF-5Z
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:21:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iB06z-0002Qu-52
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 17:20:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id AF10B2E80D2
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 17:20:55 +0000 (UTC)
 MIME-Version: 1.0
-References: <9c6bf92a-0869-cf5d-222b-305e55393ebb@schrodt.org>
-In-Reply-To: <9c6bf92a-0869-cf5d-222b-305e55393ebb@schrodt.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Sep 2019 18:08:45 +0100
-Message-ID: <CAFEAcA-GdcL+4yOnn1-SbD-8F8THA1TN5japT6Sk27GwtwBNnA@mail.gmail.com>
-Subject: Re: Will the qemu-devel prefix in the mails come back?
-To: Martin Schrodt <martin@schrodt.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22d
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 19 Sep 2019 17:14:04 -0000
+From: Cleber Rosa <cleber.gnu@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=philmd@redhat.com; 
+X-Launchpad-Bug-Tags: mips pflash
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: cleber-gnu philmd
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: Cleber Rosa (cleber-gnu)
+References: <156110193683.18432.8339006487274258755.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156891324474.32435.6642214766509415320.malone@wampee.canonical.com>
+Subject: [Bug 1833661] Re: Linux kernel oops on Malta board while accessing
+ pflash
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19048";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: a16eb0b7a4ebf9296cc0170be6ec47a767a651ed
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,22 +80,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1833661 <1833661@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 19 Sep 2019 at 18:06, Martin Schrodt <martin@schrodt.org> wrote:
->
-> Does anybody know?
->
-> My mail filter would appreciate :)
+When running
+tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mips_malta64el_kerne=
+l3_2_0,
+I'm getting in roughly 8% of executions:
 
-Sorry, no. See the announcement sent out last week:
-https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg01645.html
+2019-09-18 22:37:43,665 linux_ssh_mips_m L0065 DEBUG| Intel/Sharp Extended =
+Query Table at 0x0031
+2019-09-18 22:37:43,668 linux_ssh_mips_m L0065 DEBUG| Using buffer write me=
+thod
+2019-09-18 22:37:45,722 linux_ssh_mips_m L0065 DEBUG| Searching for RedBoot=
+ partition table in physmap-flash.0 at offset 0x1003f0000
+2019-09-18 22:37:46,287 linux_ssh_mips_m L0065 DEBUG| ESC[?25lESC[?1cESC7Cr=
+eating 3 MTD partitions on "physmap-flash.0":
+2019-09-18 22:37:46,287 linux_ssh_mips_m L0065 DEBUG| 0x000000000000-0x0000=
+00100000 : "YAMON"
+2019-09-18 22:37:46,314 linux_ssh_mips_m L0065 DEBUG| 0x000000100000-0x0000=
+003e0000 : "User FS"
+2019-09-18 22:37:46,319 linux_ssh_mips_m L0065 DEBUG| 0x0000003e0000-0x0000=
+00400000 : "Board Config"
+2019-09-18 22:37:47,260 linux_ssh_mips_m L0065 DEBUG| ESC[1G[ESC[32m ok ESC=
+[39;49mCPU 0 Unable to handle kernel paging request at virtual address =
 
-We recommend you filter using the List-Id: header instead.
+0000000000000028, epc =3D=3D ffffffffc00ed234, ra =3D=3D ffffffffc00ed210
+2019-09-18 22:37:47,262 linux_ssh_mips_m L0065 DEBUG| Oops[#1]:
 
-thanks
--- PMM
+
+And when running tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mip=
+s_malta32eb_kernel3_2_0:
+
+2019-09-19 00:02:47,151 linux_ssh_mips_m L0065 DEBUG| Searching for RedBoot=
+ partition table in physmap-flash.0 at offset 0x3f0000
+2019-09-19 00:02:47,154 linux_ssh_mips_m L0065 DEBUG| No RedBoot partition =
+table detected in physmap-flash.0
+2019-09-19 00:02:47,847 linux_ssh_mips_m L0065 DEBUG| Creating 3 MTD partit=
+ions on "physmap-flash.0":
+2019-09-19 00:02:47,850 linux_ssh_mips_m L0065 DEBUG| 0x000000000000-0x0000=
+00100000 : "YAMON"
+2019-09-19 00:02:47,875 linux_ssh_mips_m L0065 DEBUG| 0x000000100000-0x0000=
+003e0000 : "User FS"
+2019-09-19 00:02:47,875 linux_ssh_mips_m L0065 DEBUG| 0x0000003e0000-0x0000=
+00400000 : "Board Config"
+2019-09-19 00:02:48,792 linux_ssh_mips_m L0065 DEBUG| ESC[?25lESC[?1cESC7CP=
+U 0 Unable to handle kernel paging request at virtual address 00000014,
+ epc =3D=3D c0205278, ra =3D=3D c0205254
+2019-09-19 00:02:48,794 linux_ssh_mips_m L0065 DEBUG| Oops[#1]:
+
+** Changed in: qemu
+       Status: New =3D> Confirmed
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1833661
+
+Title:
+  Linux kernel oops on Malta board while accessing pflash
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  commit 33d609990621dea6c7d056c86f707b8811320ac1
+
+  While running tests/acceptance/linux_ssh_mips_malta.py, the big-endian
+  tests fail:
+
+    physmap-flash.0: Found 1 x32 devices at 0x0 in 32-bit bank. Manufacture=
+r ID 0x000000 Chip ID 0x000000
+    Intel/Sharp Extended Query Table at 0x0031
+    Using buffer write method
+    Searching for RedBoot partition table in physmap-flash.0 at offset 0x10=
+03f0000
+    Creating 3 MTD partitions on "physmap-flash.0":
+    0x000000000000-0x000000100000 : "YAMON"
+    0x000000100000-0x0000003e0000 : "User FS"
+    0x0000003e0000-0x000000400000 : "Board Config"
+    CPU 0 Unable to handle kernel paging request at virtual address 00000014
+
+  The 64-bit test fails with:
+
+    CPU 0 Unable to handle kernel paging request at virtual address
+  0000000000000028
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1833661/+subscriptions
 
