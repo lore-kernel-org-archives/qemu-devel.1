@@ -2,92 +2,64 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C1EC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:39:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61CE6C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:41:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C74A207FC
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:39:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BD17TmyJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C74A207FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 37BBF207FC
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:41:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37BBF207FC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAtqb-0006M0-79
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 06:39:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52347)
+	id 1iAtsW-0000Qg-Ac
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 06:41:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54448)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iAtd3-00084k-Lk
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:25:38 -0400
+ (envelope-from <stefanha@redhat.com>) id 1iAtos-0004nl-DL
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:37:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iAtd1-0001IX-TK
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:25:37 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35316)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iAtd1-0001H3-IT
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:25:35 -0400
-Received: by mail-wr1-x443.google.com with SMTP id v8so2526625wrt.2
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 03:25:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=ksqPaSvT/Z7IK9AS5pVSJVleJ8F5p8sjOHedTb/ht0M=;
- b=BD17TmyJwLxLESPq+w9cm/GYKEJobv9CmAVIcoUS2pFSmBZEascb7Mf4bFlu34j9gC
- +IPNg6EgVy4tt/WNPOTBHEyiBiZqczrCswRTZP238J403w7KvQypgBXw8T3tXryzSVR0
- txiV6XzZYXfQ3rugY+1CeLQrAHxL0aLbTa+u3wO5A+xRJ5akmPEUNRDo6gfxpm3JPs+k
- gFGnnbxE5SfH68+u7jUd8rlKAZL6he53PA/M6P/IrOUB+vARYTogHOsD+8fop1oh6+5s
- az22wngeW+ctNhIAu6ff0Arm2GvTElKDQZHscOHTsuR670ArWcRNzIJA6Ik6lZI89ydB
- zuQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=ksqPaSvT/Z7IK9AS5pVSJVleJ8F5p8sjOHedTb/ht0M=;
- b=OrDGoYMC2HxBzVqrWQmwZrRV4Xi4e8DDN2kSX6cce+4pTD0/3wFn7RzZKbmDxds6c4
- BO8rOJTfuHoccqFH2CNoApkz877S/OaZczhmzH3IgNAYb8V/qY3wj9EilfoDBEKHHJos
- 5+0raZ3WVs+rproKSE5l6meL700Z4kOjrlWPNT1KL8w95U1+erMewX/mED642nu8EpEg
- qCXCaQKkq1fqB8jt63rRpeI4/1fxURbR7AZuHVhhiMqkwoJiNRKv+gG/G3c/S6oq7WV2
- iMpPhlcTMxOPdXSXQJuUZjJK8qEICM6H5vvG2mzfUn2cS8bf2JCQRaBhKgnDJWsb2pGZ
- WPKw==
-X-Gm-Message-State: APjAAAXGVLaCuUet03Z4Px/zbUPSQ/mPGrfjrEnBjK1xSbGJpS4dKxiJ
- PjNHklC3Zv3kdPr+D6h6hs8x0w==
-X-Google-Smtp-Source: APXvYqw/gGIuI9mE9UiuoGZhVqE4nwVN1zHeV41zr02HYU9o4UBp4x6L2TEcdmAf0m7FhcUEhhjhxg==
-X-Received: by 2002:adf:f790:: with SMTP id q16mr6813753wrp.164.1568888733857; 
- Thu, 19 Sep 2019 03:25:33 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z189sm7924729wmc.25.2019.09.19.03.25.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Sep 2019 03:25:33 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 820661FF87;
- Thu, 19 Sep 2019 11:25:32 +0100 (BST)
-References: <20190913154952.27724-1-peter.maydell@linaro.org>
- <20190913154952.27724-13-peter.maydell@linaro.org>
- <9ede7068-7f92-3e1a-c1f8-c0994eddf671@redhat.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <9ede7068-7f92-3e1a-c1f8-c0994eddf671@redhat.com>
-Date: Thu, 19 Sep 2019 11:25:32 +0100
-Message-ID: <87r24czioz.fsf@linaro.org>
+ (envelope-from <stefanha@redhat.com>) id 1iAtor-0007F6-CK
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:37:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38788)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iAtor-0007Ev-6V
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:37:49 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 73F8B100EFBA;
+ Thu, 19 Sep 2019 10:37:48 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BBF525D6B0;
+ Thu, 19 Sep 2019 10:37:42 +0000 (UTC)
+Date: Thu, 19 Sep 2019 11:37:41 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Oleinik, Alexander" <alxndr@bu.edu>
+Message-ID: <20190919103741.GO3606@stefanha-x1.localdomain>
+References: <20190918231846.22538-1-alxndr@bu.edu>
+ <20190918231846.22538-14-alxndr@bu.edu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PULL 12/12] qemu-ga: Convert invocation
- documentation to rST
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="f0PSjARDFl/vfYT5"
+Content-Disposition: inline
+In-Reply-To: <20190918231846.22538-14-alxndr@bu.edu>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Thu, 19 Sep 2019 10:37:48 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 13/22] libqtest: make qtest_bufwrite
+ send "atomic"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,48 +71,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "bsd@redhat.com" <bsd@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Eric Blake <eblake@redhat.com> writes:
+--f0PSjARDFl/vfYT5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On 9/13/19 10:49 AM, Peter Maydell wrote:
->> The qemu-ga documentation is currently in qemu-ga.texi in
->> Texinfo format, which we present to the user as:
->>  * a qemu-ga manpage
->>  * a section of the main qemu-doc HTML documentation
->>
->> Convert the documentation to rST format, and present it to
->> the user as:
->>  * a qemu-ga manpage
->>  * part of the interop/ Sphinx manual
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
->> Tested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
->> Message-id: 20190905131040.8350-1-peter.maydell@linaro.org
->> ---
->
-> In an incremental build on Fedora 30, I'm now seeing:
->
-> 	CHK version_gen.h
->   GEN     docs/interop/qemu-ga.8
-> No filename or title
-> make: *** [/home/eblake/qemu/rules.mak:394: docs/interop/qemu-ga.8]
-> Error 255
->
-> and suspect this patch introduced it.  It may be that I just need to
-> nuke intermediate artifacts rather than an actual problem with the
-> patch, but I'd welcome help in identifying the problem.
+On Wed, Sep 18, 2019 at 11:19:40PM +0000, Oleinik, Alexander wrote:
+> When using qtest "in-process" communication, qtest_sendf directly calls
+> a function in the server (qtest.c). Combining the contents of the
+> subsequent socket_sends into the qtest_sendf, makes it so the server can
+> immediately handle the command, without building a local buffer and
+> waiting for a newline.
+>=20
+> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
+> ---
+>  tests/libqtest.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+>=20
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 19feea9e17..d770462869 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -1086,9 +1086,7 @@ void qtest_bufwrite(QTestState *s, uint64_t addr, c=
+onst void *data, size_t size)
+>      gchar *bdata;
+> =20
+>      bdata =3D g_base64_encode(data, size);
+> -    qtest_sendf(s, "b64write 0x%" PRIx64 " 0x%zx ", addr, size);
+> -    socket_send(s->fd, bdata, strlen(bdata));
+> -    socket_send(s->fd, "\n", 1);
+> +    qtest_sendf(s, "b64write 0x%" PRIx64 " 0x%zx %s\n", addr, size, bdat=
+a);
+>      qtest_rsp(s, 0);
+>      g_free(bdata);
+>  }
+> --=20
+> 2.23.0
 
-It did - it's also the commit that has broken shippable builds. Once I
-reverted they started working again. However I'm finding it hard to
-trigger in the same containers on my setup so I'm confused as to how it
-breaks.
+Cc John Snow, who added the b64write command.
 
---
-Alex Benn=C3=A9e
+The downside to doing this is that sprintf-formatting needs to be
+performed on the entire base64 buffer.  This slows things down slightly
+and a larger temporary buffer needs to be allocated, but I'm not sure it
+matters.
+
+--f0PSjARDFl/vfYT5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2DWnUACgkQnKSrs4Gr
+c8i9qwf/WLzFN5PYw3GjtAEzHsqFxYXzdc4ZHb4phouJmFsEkdpO8Rk+i3WV4Waz
+5z1FA4Dc2c4iPpxgMlx1b9JaX7DfejNdmjUR8gYLyHNXdxtUkgUl+aQFSK5ncC2z
+jZXhgsdhDA88y0HQJr/Bu1o41UocjDpARVe7dEHt6WZQt5NmUR24YDG/747ERfQs
+wChib+CQIO4gLD576Ts/Y7D3sbCpkC1ji85txnvMD5JpNQEb8tNo05dV32rZwhs1
+48YtXAPOFFhvfGbATSDUEgst6S0h8gj300fcNb6pIM3m+HOajWHm+wFiREWnTstv
+IVn/0FrMEs21DjTcgD6kcjQtyuKaxg==
+=Nlpt
+-----END PGP SIGNATURE-----
+
+--f0PSjARDFl/vfYT5--
 
