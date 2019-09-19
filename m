@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B66C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 12:24:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36924C49ED7
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 12:24:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B266207FC
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 12:24:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B266207FC
+	by mail.kernel.org (Postfix) with ESMTPS id 0CDB0207FC
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 12:24:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CDB0207FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAvTj-0001hQ-0l
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 08:24:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37674)
+	id 1iAvU3-0002I1-S1
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 08:24:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37705)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1iAvOw-0005Af-5c
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 08:19:11 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1iAvP1-0005IN-3X
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 08:19:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1iAvOv-0003vQ-2r
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 08:19:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49484)
+ (envelope-from <eric.auger@redhat.com>) id 1iAvOz-00040d-Vi
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 08:19:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:64579)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1iAvOs-0003s8-JU; Thu, 19 Sep 2019 08:19:06 -0400
+ id 1iAvOx-0003xf-LX; Thu, 19 Sep 2019 08:19:11 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BF48581DF7;
- Thu, 19 Sep 2019 12:19:05 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E52AE3D962;
+ Thu, 19 Sep 2019 12:19:10 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-117-220.ams2.redhat.com [10.36.117.220])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 953C560BF1;
- Thu, 19 Sep 2019 12:19:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 239A660BF1;
+ Thu, 19 Sep 2019 12:19:05 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com,
  alex.williamson@redhat.com, peterx@redhat.com
-Date: Thu, 19 Sep 2019 14:18:42 +0200
-Message-Id: <20190919121845.29520-3-eric.auger@redhat.com>
+Date: Thu, 19 Sep 2019 14:18:43 +0200
+Message-Id: <20190919121845.29520-4-eric.auger@redhat.com>
 In-Reply-To: <20190919121845.29520-1-eric.auger@redhat.com>
 References: <20190919121845.29520-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Thu, 19 Sep 2019 12:19:05 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Thu, 19 Sep 2019 12:19:10 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 2/5] vfio/common: Handle
+Subject: [Qemu-devel] [PATCH v2 3/5] exec: assert on
  memory_region_register_iommu_notifier() failure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,40 +74,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now memory_region_register_iommu_notifier() is allowed to fail,
-let's handle the returned value in vfio_listener_region_add().
-
-This will allow to remove the error handling (exit) in the
-IOMMUs that implement a notify_flag_changed() that sometimes
-cannot accept the MAP flag.
+memory_region_register_iommu_notifier now returns an error
+in case of failure. Assert in such a case.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/vfio/common.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 3e03c495d8..d57d72cfb9 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -630,9 +630,13 @@ static void vfio_listener_region_add(MemoryListener =
-*listener,
-                             section->offset_within_region,
-                             int128_get64(llend),
+---
+
+v1 -> v2:
+- add assert(!ret)
+---
+ exec.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/exec.c b/exec.c
+index 8b998974f8..5be8db6253 100644
+--- a/exec.c
++++ b/exec.c
+@@ -663,7 +663,7 @@ static void tcg_register_iommu_notifier(CPUState *cpu=
+,
+      */
+     MemoryRegion *mr =3D MEMORY_REGION(iommu_mr);
+     TCGIOMMUNotifier *notifier;
+-    int i;
++    int i, ret;
+=20
+     for (i =3D 0; i < cpu->iommu_notifiers->len; i++) {
+         notifier =3D g_array_index(cpu->iommu_notifiers, TCGIOMMUNotifie=
+r *, i);
+@@ -692,7 +692,9 @@ static void tcg_register_iommu_notifier(CPUState *cpu=
+,
+                             0,
+                             HWADDR_MAX,
                              iommu_idx);
--        QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
+-        memory_region_register_iommu_notifier(notifier->mr, &notifier->n=
+);
++        ret =3D memory_region_register_iommu_notifier(notifier->mr,
++                                                    &notifier->n);
++        assert(!ret);
+     }
 =20
--        memory_region_register_iommu_notifier(section->mr, &giommu->n);
-+        ret =3D memory_region_register_iommu_notifier(section->mr, &giom=
-mu->n);
-+        if (ret) {
-+            g_free(giommu);
-+            goto fail;
-+        }
-+        QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
-         memory_region_iommu_replay(giommu->iommu, &giommu->n);
-=20
-         return;
+     if (!notifier->active) {
 --=20
 2.20.1
 
