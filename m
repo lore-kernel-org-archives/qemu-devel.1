@@ -2,84 +2,83 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E526C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 21:38:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6D87C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 21:42:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8F37208C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 21:38:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A0B2208C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 21:42:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qYG/PH9T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8F37208C0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T729J/bi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A0B2208C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB488-0006mv-B9
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 17:38:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53656)
+	id 1iB4CM-0003c1-Ik
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 17:42:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53604)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iB3uv-0002tD-91
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:24:47 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iB3us-0000jH-Lg
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1iB3us-0002q5-MD
  for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:24:44 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44247)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1iB3uq-0000hi-Ga
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:24:42 -0400
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:40967)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1iB3uq-0000h9-IW
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:24:42 -0400
-Received: by mail-wr1-x442.google.com with SMTP id i18so4581957wru.11
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 14:24:40 -0700 (PDT)
+ id 1iB3uo-0000eX-8H
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 17:24:38 -0400
+Received: by mail-wr1-x434.google.com with SMTP id h7so4600766wrw.8
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 14:24:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=hBNbSNYdRxpi4YPwJzeBrQcOF4eLYJl4drOoaIZgmh0=;
- b=qYG/PH9TAJA2E3I9z14eo1AM0NVKw0EoWcxBq/VOw4CBOyly+wSPNYG6VmNBkavyre
- +fzp+avRUTYVP2/eDn4+xCF7GpB2XI2bn+f9FYXiNrhLl07/7aPKnTrJjJucyqxLIthZ
- B5/ymK4ywvnqoQgoeCCMvO2UTbQ/x7lYWaADUeSh05kKfCHWZzLwQgU2tmSpnO+LVx50
- uavtMFGpft8W4UKGcB/z1BfcIIth+vmpIsL1vRPR08xoerarXUWvAxae8/Rq1Jxjamx2
- MWJ34N0z7hQpY185bgG9wsVozmwxtMJ7bSAUyGgf+oPt8i0UXMgg2f8TInPiG+j2vB1I
- bFjg==
+ bh=SAJE24jrD+6zgfdi/kjreA5oPQEW/oM4tr6aWGLatS8=;
+ b=T729J/bi5mNiTOXtjBdx/MmujoNm0zzx/BBO1/CPFFXJZcgThXQrbOq8uzpKF5HDOb
+ pw3vud2Ca+C+USedsJrxM+EcuKxB/JgsLJjjbSn4r7x6VO+g1ZSu0RgBiBz4hW3TwYGI
+ qPAuKIjdDuk+aJkdfGhM9friSpf8cXs3C5X4BiwPzz+JR8uGLcGF8ibXDunq0JTcrZqs
+ xSGikditgUy1xH186Is6u4ZPTDt46a8izcEFnwjAnR0MV4W4xI+sr2RyKSBtiY+Ap7QX
+ zRTCkdsaVM9voPf2bjfFslaq7A65Ofe4OPCwOUvr8eMZhnVvwGOjWTv1rxd0VgR/TCpj
+ eXCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=hBNbSNYdRxpi4YPwJzeBrQcOF4eLYJl4drOoaIZgmh0=;
- b=fs6hQuDZLOfmBmrt1lZv6g9YTmyluBzqUbfMZ7UJPQUrNAXJzurpMZfhmzUcGKPBs/
- BA9GCc4NgdAl0zwWT0VgRM3u7skCbj46nHLvJTuA1674JF9OubJkgrIlMprgPUVKQcIX
- HJaLop0CfH8G2gAXJnPHv5KCFyAXC4vvnON9umi0mI2ZdsPIjbfHP1Pl4wA7m5cpCyep
- 5WIfPLJKAbzM3E979YsSnOlVPN1euIWvQgP7WI2yLyUDfCogPRQmc/S/5nUcUfErYyEq
- S9yARN28+cTCXWu27kUwigVfKT9tF4hj+4rggk+EhLWZyDn07GHlARr3GqUM6pFp7z4R
- eIXA==
-X-Gm-Message-State: APjAAAXYWKJLipGt0ZsYGe/rct0PaKbJV89tL7/hK8azcZuY9mH8u4JL
- +nQ9wzbVgxN7HdgHN83T/coHLl5a
-X-Google-Smtp-Source: APXvYqw5xuUIwvXtnTghIehZQONtnXxXl2zaK3tNNehqdEzVbXDfrCg626EwAhctGH/QPgYGr/ki4w==
-X-Received: by 2002:a5d:4745:: with SMTP id o5mr8418666wrs.125.1568928279259; 
- Thu, 19 Sep 2019 14:24:39 -0700 (PDT)
+ bh=SAJE24jrD+6zgfdi/kjreA5oPQEW/oM4tr6aWGLatS8=;
+ b=FqqJHJWIrifmzo5sw7fsOYieZLyCEXg4TQus4vvHNv7QNmneNkksqtBHfP1CQafLBI
+ DlrrjcVQm1EEXtnBLq/uC1/XigUkmcNDmAv8O/nlwq7hxkya7Z9319X1SGr9RrFv/Lut
+ VLFxJOAiczxA3CYQZEjNbikaC4KT3umNxjMCIJbnunBlO3ZVni6jbuv7MSbo5GnsxBu1
+ Ny31+6tRv/3o4cVOZyd3sPnGpPpd5UiBrBinrY59gCWFBuT1GFxda4910NLeX+hA9Q9p
+ yCk0HTpU6SGW+cimo89X5XzCweyJwFd1wZJcEeL9+SdLTU6IgwnneWOCnLG5K9hJh/1A
+ QRMg==
+X-Gm-Message-State: APjAAAVyoPKjIuqJokXehtjvyubIUy1CwYC910TzQiLlASWdGjRTs0bm
+ UY6Q38Y2+0lnJSxijSs1x2aLKDIz
+X-Google-Smtp-Source: APXvYqylUWYkxcp/rt9vR5158j6CZuG4ZQeJ2Hz0o9VBP16zRV56KaFwHtMVRGksgkQ1y/SQn1zLqA==
+X-Received: by 2002:a5d:5384:: with SMTP id d4mr8582649wrv.255.1568928276927; 
+ Thu, 19 Sep 2019 14:24:36 -0700 (PDT)
 Received: from nullptr.home.dirty-ice.org
  (2a01-036c-0113-74ef-0000-0000-0000-0005.pool6.digikabel.hu.
  [2a01:36c:113:74ef::5])
- by smtp.gmail.com with ESMTPSA id w125sm13191292wmg.32.2019.09.19.14.24.38
+ by smtp.gmail.com with ESMTPSA id w125sm13191292wmg.32.2019.09.19.14.24.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Sep 2019 14:24:38 -0700 (PDT)
+ Thu, 19 Sep 2019 14:24:36 -0700 (PDT)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
  <dirty.ice.hu@gmail.com>
 X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
  <DirtY.iCE.hu@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 18/24] audio: support more than two channels in volume
- setting
-Date: Thu, 19 Sep 2019 23:24:26 +0200
-Message-Id: <554e7d54424036e01ac0be8d5baccd2ccc8393cc.1568927990.git.DirtY.iCE.hu@gmail.com>
+Subject: [PATCH v4 15/24] audio: add mixing-engine option (documentation)
+Date: Thu, 19 Sep 2019 23:24:23 +0200
+Message-Id: <68c4b4bd438e9cb5c97aed32ee31e3dabd96cbf6.1568927990.git.DirtY.iCE.hu@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <cover.1568927990.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1568927990.git.DirtY.iCE.hu@gmail.com>
@@ -88,7 +87,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::434
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,219 +99,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This will allow us to disable mixeng when we use a decent backend.
+
+Disabling mixeng have a few advantages:
+* we no longer convert the audio output from one format to another, when
+  the underlying audio system would just convert it to a third format.
+  We no longer convert, only the underlying system, when needed.
+* the underlying system probably has better resampling and sample format
+  converting methods anyway...
+* we may support formats that the mixeng currently does not support (S24
+  or float samples, more than two channels)
+* when using an audio server (like pulseaudio) different sound card
+  outputs will show up as separate streams, even if we use only one
+  backend
+
+Disadvantages:
+* audio capturing no longer works (wavcapture, and vnc audio extension)
+* some backends only support a single playback stream or very picky
+  about the audio format.  In this case we can't disable mixeng.
+
+However mixeng is not removed, only made optional, so this shouldn't be
+a big concern.
+
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/audio.c      | 30 ++++++++++++++++++++++--------
- audio/audio.h      | 10 ++++++++++
- audio/audio_int.h  |  4 ++--
- audio/paaudio.c    | 20 ++++++++++++--------
- audio/spiceaudio.c | 14 ++++++++------
- 5 files changed, 54 insertions(+), 24 deletions(-)
 
-diff --git a/audio/audio.c b/audio/audio.c
-index d616a4af98..f1c145dfcd 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -1891,31 +1891,45 @@ void AUD_del_capture (CaptureVoiceOut *cap, void *cb_opaque)
- }
+Notes:
+    Changes from v1:
+    
+    * renamed mixeng to mixing-engine
+
+ qapi/audio.json | 5 +++++
+ qemu-options.hx | 6 ++++++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/qapi/audio.json b/qapi/audio.json
+index 9fefdf5186..0535eff794 100644
+--- a/qapi/audio.json
++++ b/qapi/audio.json
+@@ -11,6 +11,10 @@
+ # General audio backend options that are used for both playback and
+ # recording.
+ #
++# @mixing-engine: use QEMU's mixing engine to mix all streams inside QEMU. When
++#                 set to off, fixed-settings must be also off. Not every backend
++#                 compatible with the off setting (default on, since 4.2)
++#
+ # @fixed-settings: use fixed settings for host input/output. When off,
+ #                  frequency, channels and format must not be
+ #                  specified (default true)
+@@ -31,6 +35,7 @@
+ ##
+ { 'struct': 'AudiodevPerDirectionOptions',
+   'data': {
++    '*mixing-engine':  'bool',
+     '*fixed-settings': 'bool',
+     '*frequency':      'uint32',
+     '*channels':       'uint32',
+diff --git a/qemu-options.hx b/qemu-options.hx
+index bbfd936d29..395427422a 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -433,6 +433,7 @@ DEF("audiodev", HAS_ARG, QEMU_OPTION_audiodev,
+     "                specifies the audio backend to use\n"
+     "                id= identifier of the backend\n"
+     "                timer-period= timer period in microseconds\n"
++    "                in|out.mixing-engine= use mixing engine to mix streams inside QEMU\n"
+     "                in|out.fixed-settings= use fixed settings for host audio\n"
+     "                in|out.frequency= frequency to use with fixed settings\n"
+     "                in|out.channels= number of channels to use with fixed settings\n"
+@@ -503,6 +504,11 @@ Identifies the audio backend.
+ Sets the timer @var{period} used by the audio subsystem in microseconds.
+ Default is 10000 (10 ms).
  
- void AUD_set_volume_out (SWVoiceOut *sw, int mute, uint8_t lvol, uint8_t rvol)
-+{
-+    Volume vol = { .mute = mute, .channels = 2, .vol = { lvol, rvol } };
-+    audio_set_volume_out(sw, &vol);
-+}
++@item in|out.mixing-engine=on|off
++Use QEMU's mixing engine to mix all streams inside QEMU.  When off,
++@var{fixed-settings} must be off too.  Not every backend is fully
++compatible with the off setting.  Default is on.
 +
-+void audio_set_volume_out(SWVoiceOut *sw, Volume *vol)
- {
-     if (sw) {
-         HWVoiceOut *hw = sw->hw;
- 
--        sw->vol.mute = mute;
--        sw->vol.l = nominal_volume.l * lvol / 255;
--        sw->vol.r = nominal_volume.r * rvol / 255;
-+        sw->vol.mute = vol->mute;
-+        sw->vol.l = nominal_volume.l * vol->vol[0] / 255;
-+        sw->vol.r = nominal_volume.l * vol->vol[vol->channels > 1 ? 1 : 0] /
-+            255;
- 
-         if (hw->pcm_ops->volume_out) {
--            hw->pcm_ops->volume_out(hw, &sw->vol);
-+            hw->pcm_ops->volume_out(hw, vol);
-         }
-     }
- }
- 
- void AUD_set_volume_in (SWVoiceIn *sw, int mute, uint8_t lvol, uint8_t rvol)
-+{
-+    Volume vol = { .mute = mute, .channels = 2, .vol = { lvol, rvol } };
-+    audio_set_volume_in(sw, &vol);
-+}
-+
-+void audio_set_volume_in(SWVoiceIn *sw, Volume *vol)
- {
-     if (sw) {
-         HWVoiceIn *hw = sw->hw;
- 
--        sw->vol.mute = mute;
--        sw->vol.l = nominal_volume.l * lvol / 255;
--        sw->vol.r = nominal_volume.r * rvol / 255;
-+        sw->vol.mute = vol->mute;
-+        sw->vol.l = nominal_volume.l * vol->vol[0] / 255;
-+        sw->vol.r = nominal_volume.r * vol->vol[vol->channels > 1 ? 1 : 0] /
-+            255;
- 
-         if (hw->pcm_ops->volume_in) {
--            hw->pcm_ops->volume_in(hw, &sw->vol);
-+            hw->pcm_ops->volume_in(hw, vol);
-         }
-     }
- }
-diff --git a/audio/audio.h b/audio/audio.h
-index c74abb8c47..0db3c7dd5e 100644
---- a/audio/audio.h
-+++ b/audio/audio.h
-@@ -124,6 +124,16 @@ uint64_t AUD_get_elapsed_usec_out (SWVoiceOut *sw, QEMUAudioTimeStamp *ts);
- void AUD_set_volume_out (SWVoiceOut *sw, int mute, uint8_t lvol, uint8_t rvol);
- void AUD_set_volume_in (SWVoiceIn *sw, int mute, uint8_t lvol, uint8_t rvol);
- 
-+#define AUDIO_MAX_CHANNELS 16
-+typedef struct Volume {
-+    bool mute;
-+    int channels;
-+    uint8_t vol[AUDIO_MAX_CHANNELS];
-+} Volume;
-+
-+void audio_set_volume_out(SWVoiceOut *sw, Volume *vol);
-+void audio_set_volume_in(SWVoiceIn *sw, Volume *vol);
-+
- SWVoiceIn *AUD_open_in (
-     QEMUSoundCard *card,
-     SWVoiceIn *sw,
-diff --git a/audio/audio_int.h b/audio/audio_int.h
-index 22a703c13e..9176db249b 100644
---- a/audio/audio_int.h
-+++ b/audio/audio_int.h
-@@ -166,7 +166,7 @@ struct audio_pcm_ops {
-      */
-     size_t (*put_buffer_out)(HWVoiceOut *hw, void *buf, size_t size);
-     void   (*enable_out)(HWVoiceOut *hw, bool enable);
--    void   (*volume_out)(HWVoiceOut *hw, struct mixeng_volume *vol);
-+    void   (*volume_out)(HWVoiceOut *hw, Volume *vol);
- 
-     int    (*init_in) (HWVoiceIn *hw, audsettings *as, void *drv_opaque);
-     void   (*fini_in) (HWVoiceIn *hw);
-@@ -174,7 +174,7 @@ struct audio_pcm_ops {
-     void  *(*get_buffer_in)(HWVoiceIn *hw, size_t *size);
-     void   (*put_buffer_in)(HWVoiceIn *hw, void *buf, size_t size);
-     void   (*enable_in)(HWVoiceIn *hw, bool enable);
--    void   (*volume_in)(HWVoiceIn *hw, struct mixeng_volume *vol);
-+    void   (*volume_in)(HWVoiceIn *hw, Volume *vol);
- };
- 
- void *audio_generic_get_buffer_in(HWVoiceIn *hw, size_t *size);
-diff --git a/audio/paaudio.c b/audio/paaudio.c
-index 6ccdf31415..d195b1caa8 100644
---- a/audio/paaudio.c
-+++ b/audio/paaudio.c
-@@ -531,20 +531,22 @@ static void qpa_fini_in (HWVoiceIn *hw)
-     }
- }
- 
--static void qpa_volume_out(HWVoiceOut *hw, struct mixeng_volume *vol)
-+static void qpa_volume_out(HWVoiceOut *hw, Volume *vol)
- {
-     PAVoiceOut *pa = (PAVoiceOut *) hw;
-     pa_operation *op;
-     pa_cvolume v;
-     PAConnection *c = pa->g->conn;
-+    int i;
- 
- #ifdef PA_CHECK_VERSION    /* macro is present in 0.9.16+ */
-     pa_cvolume_init (&v);  /* function is present in 0.9.13+ */
- #endif
- 
--    v.channels = 2;
--    v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->l) / UINT32_MAX;
--    v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->r) / UINT32_MAX;
-+    v.channels = vol->channels;
-+    for (i = 0; i < vol->channels; ++i) {
-+        v.values[i] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->vol[i]) / 255;
-+    }
- 
-     pa_threaded_mainloop_lock(c->mainloop);
- 
-@@ -571,20 +573,22 @@ static void qpa_volume_out(HWVoiceOut *hw, struct mixeng_volume *vol)
-     pa_threaded_mainloop_unlock(c->mainloop);
- }
- 
--static void qpa_volume_in(HWVoiceIn *hw, struct mixeng_volume *vol)
-+static void qpa_volume_in(HWVoiceIn *hw, Volume *vol)
- {
-     PAVoiceIn *pa = (PAVoiceIn *) hw;
-     pa_operation *op;
-     pa_cvolume v;
-     PAConnection *c = pa->g->conn;
-+    int i;
- 
- #ifdef PA_CHECK_VERSION
-     pa_cvolume_init (&v);
- #endif
- 
--    v.channels = 2;
--    v.values[0] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->l) / UINT32_MAX;
--    v.values[1] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->r) / UINT32_MAX;
-+    v.channels = vol->channels;
-+    for (i = 0; i < vol->channels; ++i) {
-+        v.values[i] = ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * vol->vol[i]) / 255;
-+    }
- 
-     pa_threaded_mainloop_lock(c->mainloop);
- 
-diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
-index 9860f9c5e1..6ed7f7a79e 100644
---- a/audio/spiceaudio.c
-+++ b/audio/spiceaudio.c
-@@ -179,13 +179,14 @@ static void line_out_enable(HWVoiceOut *hw, bool enable)
- }
- 
- #if ((SPICE_INTERFACE_PLAYBACK_MAJOR >= 1) && (SPICE_INTERFACE_PLAYBACK_MINOR >= 2))
--static void line_out_volume(HWVoiceOut *hw, struct mixeng_volume *vol)
-+static void line_out_volume(HWVoiceOut *hw, Volume *vol)
- {
-     SpiceVoiceOut *out = container_of(hw, SpiceVoiceOut, hw);
-     uint16_t svol[2];
- 
--    svol[0] = vol->l / ((1ULL << 16) + 1);
--    svol[1] = vol->r / ((1ULL << 16) + 1);
-+    assert(vol->channels == 2);
-+    svol[0] = vol->vol[0] * 257;
-+    svol[1] = vol->vol[1] * 257;
-     spice_server_playback_set_volume(&out->sin, 2, svol);
-     spice_server_playback_set_mute(&out->sin, vol->mute);
- }
-@@ -262,13 +263,14 @@ static void line_in_enable(HWVoiceIn *hw, bool enable)
- }
- 
- #if ((SPICE_INTERFACE_RECORD_MAJOR >= 2) && (SPICE_INTERFACE_RECORD_MINOR >= 2))
--static void line_in_volume(HWVoiceIn *hw, struct mixeng_volume *vol)
-+static void line_in_volume(HWVoiceIn *hw, Volume *vol)
- {
-     SpiceVoiceIn *in = container_of(hw, SpiceVoiceIn, hw);
-     uint16_t svol[2];
- 
--    svol[0] = vol->l / ((1ULL << 16) + 1);
--    svol[1] = vol->r / ((1ULL << 16) + 1);
-+    assert(vol->channels == 2);
-+    svol[0] = vol->vol[0] * 257;
-+    svol[1] = vol->vol[1] * 257;
-     spice_server_record_set_volume(&in->sin, 2, svol);
-     spice_server_record_set_mute(&in->sin, vol->mute);
- }
+ @item in|out.fixed-settings=on|off
+ Use fixed settings for host audio.  When off, it will change based on
+ how the guest opens the sound card.  In this case you must not specify
 -- 
 2.23.0
 
