@@ -3,58 +3,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA46C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 12:57:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC103C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 13:00:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12291218AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 12:57:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12291218AF
+	by mail.kernel.org (Postfix) with ESMTPS id B0B6C205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 13:00:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0B6C205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAw0E-0005vH-N8
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 08:57:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41468)
+	id 1iAw3I-0008Oz-CE
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 09:00:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41479)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1iAvsR-0006KH-Hd
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 08:49:40 -0400
+ (envelope-from <cohuck@redhat.com>) id 1iAvsL-0006Le-L9
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 08:49:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1iAvmH-00021f-Vf
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 08:43:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48360)
+ (envelope-from <cohuck@redhat.com>) id 1iAvmU-0002GF-F2
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 08:43:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49140)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1iAvmH-00020p-QO; Thu, 19 Sep 2019 08:43:17 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1iAvmU-0002FT-7L; Thu, 19 Sep 2019 08:43:30 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1F6D2C057F20;
- Thu, 19 Sep 2019 12:43:17 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 859CC20EB;
+ Thu, 19 Sep 2019 12:43:29 +0000 (UTC)
 Received: from localhost (dhcp-192-230.str.redhat.com [10.33.192.230])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1908260BF1;
- Thu, 19 Sep 2019 12:43:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3234B5D6B0;
+ Thu, 19 Sep 2019 12:43:29 +0000 (UTC)
 From: Cornelia Huck <cohuck@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Sep 2019 14:41:09 +0200
-Message-Id: <20190919124115.11510-29-cohuck@redhat.com>
+Date: Thu, 19 Sep 2019 14:41:14 +0200
+Message-Id: <20190919124115.11510-34-cohuck@redhat.com>
 In-Reply-To: <20190919124115.11510-1-cohuck@redhat.com>
 References: <20190919124115.11510-1-cohuck@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Thu, 19 Sep 2019 12:43:17 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Thu, 19 Sep 2019 12:43:29 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 28/34] s390x/tcg: MVO: Fault-safe handling
+Subject: [Qemu-devel] [PULL 33/34] s390x/kvm: Officially require at least
+ kernel 3.15
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,79 +67,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
 
-Each operand can have a maximum length of 16. Make sure to prepare all
-reads/writes before writing.
+Since QEMU v2.10, the KVM acceleration does not work on older kernels
+anymore since the code accidentally requires the KVM_CAP_DEVICE_CTRL
+capability now - it should have been optional instead.
+Instead of fixing the bug, we asked in the ChangeLog of QEMU 2.11 - 3.0
+that people should speak up if they still need support of QEMU running
+with KVM on older kernels, but seems like nobody really complained.
+Thus let's make this official now and turn it into a proper error
+message, telling the users to use at least kernel 3.15 now.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20190913091443.27565-1-thuth@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/mem_helper.c | 27 +++++++++++++++------------
- 1 file changed, 15 insertions(+), 12 deletions(-)
+ hw/intc/s390_flic_kvm.c | 6 ------
+ hw/intc/trace-events    | 1 -
+ target/s390x/kvm.c      | 7 +++++++
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 671e917dc1f8..504542002033 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -516,31 +516,34 @@ void HELPER(mvn)(CPUS390XState *env, uint32_t l, ui=
-nt64_t dest, uint64_t src)
- /* move with offset  */
- void HELPER(mvo)(CPUS390XState *env, uint32_t l, uint64_t dest, uint64_t=
- src)
- {
-+    const int mmu_idx =3D cpu_mmu_index(env, false);
-+    /* MVO always processes one more byte than specified - maximum is 16=
- */
-+    const int len_dest =3D (l >> 4) + 1;
-+    const int len_src =3D (l & 0xf) + 1;
-     uintptr_t ra =3D GETPC();
--    int len_dest =3D l >> 4;
--    int len_src =3D l & 0xf;
-     uint8_t byte_dest, byte_src;
--    int i;
-+    S390Access srca, desta;
-+    int i, j;
-=20
--    src +=3D len_src;
--    dest +=3D len_dest;
-+    srca =3D access_prepare(env, src, len_src, MMU_DATA_LOAD, mmu_idx, r=
-a);
-+    desta =3D access_prepare(env, dest, len_dest, MMU_DATA_STORE, mmu_id=
-x, ra);
-=20
-     /* Handle rightmost byte */
--    byte_src =3D cpu_ldub_data_ra(env, src, ra);
--    byte_dest =3D cpu_ldub_data_ra(env, dest, ra);
-+    byte_dest =3D cpu_ldub_data_ra(env, dest + len_dest - 1, ra);
-+    byte_src =3D access_get_byte(env, &srca, len_src - 1, ra);
-     byte_dest =3D (byte_dest & 0x0f) | (byte_src << 4);
--    cpu_stb_data_ra(env, dest, byte_dest, ra);
-+    access_set_byte(env, &desta, len_dest - 1, byte_dest, ra);
-=20
-     /* Process remaining bytes from right to left */
--    for (i =3D 1; i <=3D len_dest; i++) {
-+    for (i =3D len_dest - 2, j =3D len_src - 2; i >=3D 0; i--, j--) {
-         byte_dest =3D byte_src >> 4;
--        if (len_src - i >=3D 0) {
--            byte_src =3D cpu_ldub_data_ra(env, src - i, ra);
-+        if (j >=3D 0) {
-+            byte_src =3D access_get_byte(env, &srca, j, ra);
-         } else {
-             byte_src =3D 0;
-         }
-         byte_dest |=3D byte_src << 4;
--        cpu_stb_data_ra(env, dest - i, byte_dest, ra);
-+        access_set_byte(env, &desta, i, byte_dest, ra);
+diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
+index 819aa5e198b7..cedccba8a9c7 100644
+--- a/hw/intc/s390_flic_kvm.c
++++ b/hw/intc/s390_flic_kvm.c
+@@ -589,12 +589,6 @@ static void kvm_s390_flic_realize(DeviceState *dev, =
+Error **errp)
+         goto fail;
      }
- }
+     flic_state->fd =3D -1;
+-    if (!kvm_check_extension(kvm_state, KVM_CAP_DEVICE_CTRL)) {
+-        error_setg_errno(&errp_local, errno, "KVM is missing capability"
+-                         " KVM_CAP_DEVICE_CTRL");
+-        trace_flic_no_device_api(errno);
+-        goto fail;
+-    }
 =20
+     cd.type =3D KVM_DEV_TYPE_FLIC;
+     ret =3D kvm_vm_ioctl(kvm_state, KVM_CREATE_DEVICE, &cd);
+diff --git a/hw/intc/trace-events b/hw/intc/trace-events
+index 90c9d07c1a66..719f46b51628 100644
+--- a/hw/intc/trace-events
++++ b/hw/intc/trace-events
+@@ -75,7 +75,6 @@ xics_ics_simple_eoi(int nr) "ics_eoi: irq 0x%x"
+=20
+ # s390_flic_kvm.c
+ flic_create_device(int err) "flic: create device failed %d"
+-flic_no_device_api(int err) "flic: no Device Contral API support %d"
+ flic_reset_failed(int err) "flic: reset failed %d"
+=20
+ # s390_flic.c
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index cea71ac7c3dd..97a662ad0ebf 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -316,6 +316,13 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     MachineClass *mc =3D MACHINE_GET_CLASS(ms);
+=20
+     mc->default_cpu_type =3D S390_CPU_TYPE_NAME("host");
++
++    if (!kvm_check_extension(kvm_state, KVM_CAP_DEVICE_CTRL)) {
++        error_report("KVM is missing capability KVM_CAP_DEVICE_CTRL - "
++                     "please use kernel 3.15 or newer");
++        return -1;
++    }
++
+     cap_sync_regs =3D kvm_check_extension(s, KVM_CAP_SYNC_REGS);
+     cap_async_pf =3D kvm_check_extension(s, KVM_CAP_ASYNC_PF);
+     cap_mem_op =3D kvm_check_extension(s, KVM_CAP_S390_MEM_OP);
 --=20
 2.20.1
 
