@@ -2,80 +2,81 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83013C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E5C9C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:26:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51C1721928
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:25:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CDDE921928
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:26:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WbJY7zRH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51C1721928
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K+oneVqM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDDE921928
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB0BQ-0004AL-Rp
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 13:25:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50104)
+	id 1iB0CW-0005Gt-Ls
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 13:26:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50174)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iB06q-0008Ns-Le
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:20:49 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iB07P-0008UJ-7k
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:21:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iB05n-0000PG-Be
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:19:44 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51650)
+ (envelope-from <alex.bennee@linaro.org>) id 1iAzwi-0004La-FZ
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:10:21 -0400
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:52489)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iB05n-0000Oh-44
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:19:43 -0400
-Received: by mail-wm1-x344.google.com with SMTP id 7so5580613wme.1
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 10:19:43 -0700 (PDT)
+ id 1iAzwi-0004Kv-8A
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:10:20 -0400
+Received: by mail-wm1-x335.google.com with SMTP id x2so5535941wmj.2
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 10:10:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=FEApLzz8EuHV+XBsNFul7xa5XssJJY+Lsb1MZ6+FuAA=;
- b=WbJY7zRH3FBZJID4Msl3iQLfATLOJAVeGd2ybGuFZIMZMUlMCOLQujs0NmUQHGfOme
- 1H0AvesJ+qAaFDqO2OTNbp1K08pEU/3RwJGMgmWpaDfIlBSuCx+FQVgGBv/Li5hwYZXc
- voerk9OkoIUf8bKpBchw5Q2lU9gMbpJMDS982ccohsZppkxySp5OPFphuqlTj0nYXxpd
- Cj1ApVaReI6hzQyYaoA2RzKFA8LOXhMxhSKwOSJMDNIgcQ+Z8N9cqPBG9a33Lqvnx4gv
- +5ozAw+mjiW2+0LD88cFXyJ4VOK4hAAEy+VOWqOW4OQEQLm0cujwlq4Fo5RpGt8Cv0Rb
- /aTg==
+ bh=ROcEXk4VlPnAKdNfwfPvcGYJ80CFnYnY+S2Rny52Nig=;
+ b=K+oneVqMntgvacF/QwvgdIWnZ+iqP61QhjnSWz3HUiIMnTVPQW8+k4Y1URy08n7YfR
+ k/kivN3Cl4xh/gxb3T+YEXdxkxx+aIarEG5U/JqLNYIBQwxR7rF+Jag4fYyf3I2tPMpD
+ I7gXfXP1UBNIoFIMYtVwzNzvtKFzG9HnOMxTCOQFyj4+lzWKr3lbAyT42FIbYePC8Hlv
+ XQMAjMsdauN8We8+3v1UfmpjQpXxX8bmqnoGgd085W2CYYyqsBG/H/2L4AbCEmHs/k3w
+ V1b+IrQj/cxJvaDwidc+xvLDFmHAVUcxajEzLxmeHUnDb5Xg5Kh1R5J8D+ECZS0JlLGs
+ YruA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=FEApLzz8EuHV+XBsNFul7xa5XssJJY+Lsb1MZ6+FuAA=;
- b=IufINyblZQV+4eRygmpHcdKX5w0Y7EHncOLBPLzZAlronat+JOAy8P4a2g+mUeTaJ6
- ZiESlbyc0zxgglOu3gBLKZnc7bWhbE4CU6Bbw0Y7Xi2p9XoByrPWQIYW7QF8ooBfxrxB
- BM6saGmK88vfxlUtzcQGBj+C5jZjfDxnCzj9cS+F6ZHxf6rwi36frM7GKTelm/9l35da
- 57pQS92EY62uFTBMsJrAXuzGcJOcxFElqGePtJC6wARFE9yjC52rCIiwKTu6AX+ReY/f
- YsEJaFYcflrFJq6dGEWElt+AeyRZUhP8BX29DRaTYzN++aSbQLoJvdZ7oBGbbqeIc1xU
- ftnQ==
-X-Gm-Message-State: APjAAAU2Ekp3IgISqhDCTxdhR8mfZr03vzMlWygkZPEL51J6+HAc22Jz
- 7NNCoL7VEHHZDtsTRg8z/TDQ7Q==
-X-Google-Smtp-Source: APXvYqy3zWqraInHq/1yrCNNyAj0A9JsjYziQEXKuPMMBnC6Hs6DZdjj9iWXwqDknHXcmxaetGrhRQ==
-X-Received: by 2002:a1c:2bc7:: with SMTP id r190mr4099465wmr.143.1568913582083; 
- Thu, 19 Sep 2019 10:19:42 -0700 (PDT)
+ bh=ROcEXk4VlPnAKdNfwfPvcGYJ80CFnYnY+S2Rny52Nig=;
+ b=udQ2hunpK1zR0tC5uraPchW0ACSq0INN9os3RWMxDCg/+lW4uY5I5/cquIgzP4585T
+ b2fHdSSdnu9kpoTORuCTCo9cDolwCbz21pwzDNsnWRKkRqb3wq+UQ4iIn6UP/iIt/yY0
+ A9UuscAKxNh4/aitUinlFQ+1UZ6C92sEfx2j7+OhaF8jWTl79my9GW51I3DFrYM6pKVv
+ zQPVJum8Nkk3v65UXHcrCjTz5LAhAafUcvKbOEAE5nf5kiSudisyrAnNa2C0x6d3BWQ0
+ CVymPMzaQCfh4DooyKvKVNMvy4ocYR/ZPqiEckeOIeX0d861rgQRHC2nKZYnPDQjpTWJ
+ Nvog==
+X-Gm-Message-State: APjAAAUREnMGFFLlRsLySzOkRSSYC+O0il4iQy+cpwmXnDHtTKiMWQt5
+ lIeGuLEy7LzpyU2tQK5hZH3crA==
+X-Google-Smtp-Source: APXvYqzK7PmrHbs3U0flW+np4Ek+hyDa6VpRfJ3lQPBOL8IKz0xeyQ3q0rMfh4z4T+Lerql5q6qijA==
+X-Received: by 2002:a05:600c:2059:: with SMTP id
+ p25mr3974611wmg.50.1568913019152; 
+ Thu, 19 Sep 2019 10:10:19 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id s1sm14108473wrg.80.2019.09.19.10.19.40
+ by smtp.gmail.com with ESMTPSA id f143sm11670669wme.40.2019.09.19.10.10.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Sep 2019 10:19:40 -0700 (PDT)
+ Thu, 19 Sep 2019 10:10:16 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 1543E1FF9E;
- Thu, 19 Sep 2019 18:10:17 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id E9B641FF90;
+ Thu, 19 Sep 2019 18:10:15 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v2 14/16] configure: preserve PKG_CONFIG for subdir builds
-Date: Thu, 19 Sep 2019 18:10:13 +0100
-Message-Id: <20190919171015.12681-15-alex.bennee@linaro.org>
+Subject: [PATCH  v2 03/16] tests/docker: remove python2.7 from docker9-mxe
+Date: Thu, 19 Sep 2019 18:10:02 +0100
+Message-Id: <20190919171015.12681-4-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190919171015.12681-1-alex.bennee@linaro.org>
 References: <20190919171015.12681-1-alex.bennee@linaro.org>
@@ -84,7 +85,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::335
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,52 +97,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Fam Zheng <fam@euphon.net>, peter.maydell@linaro.org,
+ John Snow <jsnow@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The slirp sub-module complains about not being able to find the glib
-library on cross-compiles because it is using the default pkg-config
-tool (which isn't installed in our cross-build docker images).
-Preserve PKG_CONFIG in our host config and pass it down to slirp.
+From: John Snow <jsnow@redhat.com>
 
+When it was based on docker8 which uses python-minimal, it needed this.
+It no longer does.
+
+Goodbye, python2.7.
+
+Signed-off-by: John Snow <jsnow@redhat.com>
+Message-Id: <20190918222546.11696-1-jsnow@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- Makefile  | 6 +++++-
- configure | 1 +
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ tests/docker/dockerfiles/debian9-mxe.docker | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 111082ce545..3cf5b1e7539 100644
---- a/Makefile
-+++ b/Makefile
-@@ -499,7 +499,11 @@ capstone/all: .git-submodule-status
+diff --git a/tests/docker/dockerfiles/debian9-mxe.docker b/tests/docker/dockerfiles/debian9-mxe.docker
+index 7431168dad9..62ff1cecf2d 100644
+--- a/tests/docker/dockerfiles/debian9-mxe.docker
++++ b/tests/docker/dockerfiles/debian9-mxe.docker
+@@ -16,7 +16,6 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C6BF758A33A3A276 &&
+ RUN apt-get update && \
+     DEBIAN_FRONTEND=noninteractive eatmydata \
+     apt-get install -y --no-install-recommends \
+-        libpython2.7-stdlib \
+         $(apt-get -s install -y --no-install-recommends gw32.shared-mingw-w64 | egrep "^Inst mxe-x86-64-unknown-" | cut -d\  -f2)
  
- .PHONY: slirp/all
- slirp/all: .git-submodule-status
--	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/slirp BUILD_DIR="$(BUILD_DIR)/slirp" CC="$(CC)" AR="$(AR)" LD="$(LD)" RANLIB="$(RANLIB)" CFLAGS="$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)")
-+	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/slirp		\
-+		BUILD_DIR="$(BUILD_DIR)/slirp" 			\
-+		PKG_CONFIG="$(PKG_CONFIG)" 				\
-+		CC="$(CC)" AR="$(AR)" 	LD="$(LD)" RANLIB="$(RANLIB)"	\
-+		CFLAGS="$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)")
- 
- # Compatibility gunk to keep make working across the rename of targets
- # for recursion, to be removed some time after 4.1.
-diff --git a/configure b/configure
-index 30aad233d17..377fbdc9f1b 100755
---- a/configure
-+++ b/configure
-@@ -7302,6 +7302,7 @@ echo "OBJCOPY=$objcopy" >> $config_host_mak
- echo "LD=$ld" >> $config_host_mak
- echo "RANLIB=$ranlib" >> $config_host_mak
- echo "NM=$nm" >> $config_host_mak
-+echo "PKG_CONFIG=$pkg_config_exe" >> $config_host_mak
- echo "WINDRES=$windres" >> $config_host_mak
- echo "CFLAGS=$CFLAGS" >> $config_host_mak
- echo "CFLAGS_NOPIE=$CFLAGS_NOPIE" >> $config_host_mak
+-ENV PATH $PATH:/usr/lib/mxe/usr/bin/ 
++ENV PATH $PATH:/usr/lib/mxe/usr/bin/
 -- 
 2.20.1
 
