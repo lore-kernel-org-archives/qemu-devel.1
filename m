@@ -2,62 +2,62 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49FADC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 08:36:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12D80C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 08:38:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2058A217D6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 08:36:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2058A217D6
+	by mail.kernel.org (Postfix) with ESMTPS id DD480217D6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 08:38:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD480217D6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iArvd-0004gh-2l
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 04:36:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35617)
+	id 1iArxS-0006cq-3E
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 04:38:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35669)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iArug-00045A-EG
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:35:44 -0400
+ (envelope-from <kraxel@redhat.com>) id 1iArvW-0004qk-Kv
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:36:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iArue-0008V5-K7
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:35:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51496)
+ (envelope-from <kraxel@redhat.com>) id 1iArvV-00009g-JP
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:36:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35456)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iArua-0008T2-U1; Thu, 19 Sep 2019 04:35:37 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iArvV-00009M-C4
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 04:36:33 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C5D0A20F2;
- Thu, 19 Sep 2019 08:35:35 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.36.116.255])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E087196AE;
- Thu, 19 Sep 2019 08:35:31 +0000 (UTC)
-Date: Thu, 19 Sep 2019 10:35:30 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Message-ID: <20190919083530.GC6645@localhost.localdomain>
-References: <20190918085519.17290-1-kwolf@redhat.com>
- <b0f72b9f-69b1-4e1d-4321-d30c7d85355f@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 9EB31308218D
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 08:36:32 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-47.ams2.redhat.com
+ [10.36.116.47])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1356B5D6B2;
+ Thu, 19 Sep 2019 08:36:30 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 6109017535; Thu, 19 Sep 2019 10:36:29 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 19 Sep 2019 10:36:03 +0200
+Message-Id: <20190919083629.29998-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b0f72b9f-69b1-4e1d-4321-d30c7d85355f@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Thu, 19 Sep 2019 08:35:35 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Thu, 19 Sep 2019 08:36:32 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] iotests: Require Python 3.5 or later
+Subject: [Qemu-devel] [PULL 00/26] Audio 20190919 patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,53 +69,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- ehabkost@redhat.com
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 18.09.2019 um 20:49 hat John Snow geschrieben:
-> 
-> 
-> On 9/18/19 4:55 AM, Kevin Wolf wrote:
-> > Running iotests is not required to build QEMU, so we can have stricter
-> > version requirements for Python here and can make use of new features
-> > and drop compatibility code earlier.
-> > 
-> > This makes qemu-iotests skip all Python tests if a Python version before
-> > 3.5 is used for the build.
-> > 
-> > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >   tests/qemu-iotests/check | 14 +++++++++++++-
-> >   1 file changed, 13 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-> > index 875399d79f..a68f414d6c 100755
-> > --- a/tests/qemu-iotests/check
-> > +++ b/tests/qemu-iotests/check
-> > @@ -633,6 +633,13 @@ then
-> >       export SOCKET_SCM_HELPER="$build_iotests/socket_scm_helper"
-> >   fi
-> > +# Note that if the Python conditional here evaluates True we will exit
-> > +# with status 1 which is a shell 'false' value.
-> > +python_usable=false
-> > +if ! $PYTHON -c 'import sys; sys.exit(sys.version_info >= (3,5))'; then
-> > +    python_usable=true
-> > +fi
-> > +
-> 
-> Do we want this as a temporary fix only until we can stipulate the same
-> version in the configure file?
+The following changes since commit f8c3db33a5e863291182f8862ddf81618a7c61=
+94:
 
-I thought that maybe we should leave the code around so that at some
-later point, we could upgrade it to 3.6 (or something else) before QEMU
-as a whole does so.
+  target/sparc: Switch to do_transaction_failed() hook (2019-09-17 12:01:=
+00 +0100)
 
-In fact... Could we already require 3.6 now instead of using 3.5, which
-I think we only chose because of Debian Stretch (oldstable)?
+are available in the Git repository at:
 
-Kevin
+  git://git.kraxel.org/qemu tags/audio-20190919-pull-request
+
+for you to fetch changes up to cf0c1c2aa32db5d658c3c797ad995a6d571bad96:
+
+  audio: fix ALSA period-length typo in documentation (2019-09-19 10:32:4=
+8 +0200)
+
+----------------------------------------------------------------
+audio: make mixeng optional.
+audio: add surround sound support.
+audio: documentation fixes.
+
+----------------------------------------------------------------
+
+K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n (24):
+  audio: api for mixeng code free backends
+  alsaaudio: port to the new audio backend api
+  coreaudio: port to the new audio backend api
+  dsoundaudio: port to the new audio backend api
+  noaudio: port to the new audio backend api
+  ossaudio: port to the new audio backend api
+  paaudio: port to the new audio backend api
+  sdlaudio: port to the new audio backend api
+  spiceaudio: port to the new audio backend api
+  wavaudio: port to the new audio backend api
+  audio: remove remains of the old backend api
+  audio: unify input and output mixeng buffer management
+  audio: common rate control code for timer based outputs
+  audio: split ctl_* functions into enable_* and volume_*
+  audio: add mixeng option (documentation)
+  audio: make mixeng optional
+  paaudio: get/put_buffer functions
+  audio: support more than two channels in volume setting
+  audio: replace shift in audio_pcm_info with bytes_per_frame
+  audio: basic support for multichannel audio
+  paaudio: channel-map option
+  usb-audio: do not count on avail bytes actually available
+  usb-audio: support more than two channels of audio
+  usbaudio: change playback counters to 64 bit
+
+Stefan Hajnoczi (2):
+  audio: fix buffer-length typo in documentation
+  audio: fix ALSA period-length typo in documentation
+
+ configure               |   5 -
+ audio/audio.h           |  10 +
+ audio/audio_int.h       |  79 ++++--
+ audio/audio_pt_int.h    |  22 --
+ audio/audio_template.h  |  31 ++-
+ audio/dsound_template.h |  53 ++--
+ audio/alsaaudio.c       | 378 ++++++++-------------------
+ audio/audio.c           | 527 +++++++++++++++++++++++++++++---------
+ audio/audio_pt_int.c    | 173 -------------
+ audio/coreaudio.c       | 143 ++++++-----
+ audio/dsoundaudio.c     | 383 ++++++++-------------------
+ audio/noaudio.c         |  76 +++---
+ audio/ossaudio.c        | 376 ++++++++++-----------------
+ audio/paaudio.c         | 554 +++++++++++++---------------------------
+ audio/sdlaudio.c        | 104 ++++----
+ audio/spiceaudio.c      | 260 +++++++------------
+ audio/wavaudio.c        |  78 ++----
+ hw/usb/dev-audio.c      | 461 ++++++++++++++++++++++++++++-----
+ audio/Makefile.objs     |   1 -
+ qapi/audio.json         |  12 +-
+ qemu-options.hx         |  23 +-
+ 21 files changed, 1719 insertions(+), 2030 deletions(-)
+ delete mode 100644 audio/audio_pt_int.h
+ delete mode 100644 audio/audio_pt_int.c
+
+--=20
+2.18.1
+
 
