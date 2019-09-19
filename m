@@ -2,63 +2,91 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 798BCC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:12:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDDE0C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:16:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F20421924
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:12:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F20421924
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 970BE21907
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:16:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U9YQeCKw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 970BE21907
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAtQ4-00027U-Ra
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 06:12:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50142)
+	id 1iAtUc-0006B3-Va
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 06:16:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49926)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iAtNi-0008K2-Rb
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:09:48 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iAtM0-0006Ob-9t
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:08:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iAtNh-0000qo-FM
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:09:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41690)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>)
- id 1iAtNc-0000mV-1n; Thu, 19 Sep 2019 06:09:40 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 50DFD3168BEB;
- Thu, 19 Sep 2019 10:09:38 +0000 (UTC)
-Received: from redhat.com (ovpn-112-51.ams2.redhat.com [10.36.112.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A149A5C21E;
- Thu, 19 Sep 2019 10:09:05 +0000 (UTC)
-Date: Thu, 19 Sep 2019 11:09:03 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190919100903.GF20217@redhat.com>
-References: <20190918130244.24257-1-vsementsov@virtuozzo.com>
- <abb14088-6af2-5db2-da0d-0948fd4ac81c@redhat.com>
- <20190919091720.GB10163@localhost.localdomain>
+ (envelope-from <alex.bennee@linaro.org>) id 1iAtLy-00004z-Lg
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:07:59 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55772)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iAtLy-0008Vq-B7
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:07:58 -0400
+Received: by mail-wm1-x342.google.com with SMTP id a6so3695972wma.5
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 03:07:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=T3X7iW8zonxKhxux5mIWJQXmtTE452vWJrhhuOcOjwk=;
+ b=U9YQeCKw7PdAdwiOd3aeqj0HJW+9wkNKJ93JbqumT4sjqZfdBR4X/zbyWSGS8YYEyl
+ B4/H9gkMcRy/lRNJiQzIsFS1rBAPIjxSz/0N/JQ27gdtxsfOESFTDYqRsqjCze0syLL8
+ svZeSsJO84jsdg5StKF6l/8zpVauPdef2aiie1NYnBBplO2xfWg0EVz1vkfHhb5t6WVX
+ m/zLsAc3s8YfNgnD05niV6jo6TWOOsfotehQ4n1dQ0bA/NwVzWId2IPje9MdzY7ScWAc
+ Hnu7IpsdTy7VmcwmIhRIDOwhg2RuImjGITkpp7HSpQcbU55Cee9CW8OGfCi8x2wmeQrW
+ UtWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=T3X7iW8zonxKhxux5mIWJQXmtTE452vWJrhhuOcOjwk=;
+ b=C69EsK9h6YSulQ4pDfLSFpm8WZ1oJ+TCTDZ7d5gWZnr6w8V99G+1ZSmVYLav8iOEY+
+ ebYPTP+J7YIum7rTZeBu+kwWepALixeGd6Oio9GubdVNpz0+KS0mhKmIJg+nfY0NLm1r
+ vG0xDXnI9ReytAGHrqLGRoAKN7TP4aGK8TeWbWXCRpyiylWjTSIlTM8NYiLmfnsL0k1Y
+ XBluod3J3XgiHODeMVe1kwXezzar9xA+vlvNJN0I/SUsU5NL6cHWImr03FXssG5QsPoD
+ moObIMYG7ydznVSjIPudQuLwZ04qKqsrop5vyT1USVUXkaaRJx9shKuiAVfBKj7YuMZo
+ YqXw==
+X-Gm-Message-State: APjAAAXui+iDsSrREMzgUCXmGGuenlensWA511jx5P+ozJMbThPplUZh
+ pck2iFFn4t+Q+kyHpnF7QfzvJA==
+X-Google-Smtp-Source: APXvYqyXxcLYuX69g6uD9+yWOWrfuFvJ5Vepl35Opal7YyrDJFF4IGKKTtZeNyf0RTKOoLzcsKMsXA==
+X-Received: by 2002:a1c:a74f:: with SMTP id q76mr2244915wme.16.1568887676602; 
+ Thu, 19 Sep 2019 03:07:56 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id e20sm14319040wrc.34.2019.09.19.03.07.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 19 Sep 2019 03:07:55 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 48A301FF87;
+ Thu, 19 Sep 2019 11:07:55 +0100 (BST)
+References: <20190918153335.20797-1-alex.bennee@linaro.org>
+ <001801d56ec7$d80940d0$881bc270$@ru>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+In-reply-to: <001801d56ec7$d80940d0$881bc270$@ru>
+Date: Thu, 19 Sep 2019 11:07:55 +0100
+Message-ID: <87sgoszjic.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190919091720.GB10163@localhost.localdomain>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Thu, 19 Sep 2019 10:09:38 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC] error: auto propagated local_err
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH] tests/tcg: add simple record/replay smoke
+ test for aarch64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,100 +98,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: fam@euphon.net, peter.maydell@linaro.org, mst@redhat.com,
- codyprime@gmail.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
- armbru@redhat.com, kraxel@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org,
- quintela@redhat.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, marcandre.lureau@redhat.com,
- rth@twiddle.net, farman@linux.ibm.com, groug@kaod.org, dgilbert@redhat.com,
- alex.williamson@redhat.com, qemu-arm@nongnu.org, stefanha@redhat.com,
- jsnow@redhat.com, david@gibson.dropbear.id.au,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, cohuck@redhat.com,
- qemu-s390x@nongnu.org, sundeep.lkml@gmail.com, qemu-ppc@nongnu.org,
- pbonzini@redhat.com
+Cc: 'Peter Maydell' <peter.maydell@linaro.org>,
+ "'open list:ARM TCG CPUs'" <qemu-arm@nongnu.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 19, 2019 at 11:17:20AM +0200, Kevin Wolf wrote:
-> Am 18.09.2019 um 19:10 hat Eric Blake geschrieben:
-> > On 9/18/19 8:02 AM, Vladimir Sementsov-Ogievskiy wrote:
-> > > + */
-> > > +#define MAKE_ERRP_SAFE(errp) \
-> > > +g_auto(ErrorPropagationStruct) (__auto_errp_prop) = {.errp = (errp)}; \
-> > > +if ((errp) == NULL || *(errp) == error_abort || *(errp) == error_fatal) { \
-> > > +    (errp) = &__auto_errp_prop.local_err; \
-> > > +}
-> > 
-> > Not written to take a trailing semicolon in the caller.
-> > 
-> > You could even set __auto_errp_prop unconditionally rather than trying
-> > to reuse incoming errp (the difference being that error_propagate() gets
-> > called more frequently).
-> 
-> I think this difference is actually a problem.
-> 
-> When debugging things, I hate error_propagate(). It means that the Error
-> (specifically its fields src/func/line) points to the outermost
-> error_propagate() rather than the place where the error really happened.
-> It also makes error_abort completely useless because at the point where
-> the process gets aborted, the interesting information is already lost.
 
-Yeah, that is very frustrating. For personal development you can eventually
-figure it out, but with customer support requests, all you get is the
-stack trace and you've no core file to investigate, so you're stuck.
-IOW, as a general principle, we should strive to minimize the usage
-of error propagate.
+Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
 
-The key reason why we typically need the propagate calls, is because
-we allow the passed in Error **errp parameter to be NULL, while at the
-same time we want to inspect it to see if its contents are non-NULL
-to detect failure. I venture to suggest that this is flawed API
-design on our part. We should not need to inspect the error object
-to see if a method call fails - the return value can be used for
-this purpose.
+> Thanks!
+>
+> This seem to correctly run record and replay command lines.
+> When I break the replay correctness, then the test reports a timeout erro=
+r.
+>
+> However, we need some kind of a manual for tcg testing. I had to dig thro=
+ugh makefile and configure
+> scripts to undestand that testing needs the cross compilers to be install=
+ed.
+> Then I installed a random cross compiler and everything worked
+> normally.
 
-IOW, instead of this pattern with typically 'void' methods
+I shall add a section to the testing.rst documentation.
 
-     extern void somemethod(Error **errp);
+>
+> Pavel Dovgalyuk
+>
+>> -----Original Message-----
+>> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+>> Sent: Wednesday, September 18, 2019 6:34 PM
+>> To: qemu-devel@nongnu.org
+>> Cc: Alex Benn=C3=A9e; Pavel Dovgalyuk; Peter Maydell; open list:ARM TCG =
+CPUs
+>> Subject: [PATCH] tests/tcg: add simple record/replay smoke test for aarc=
+h64
+>>
+>> This adds two new tests that re-use the memory test to check basic
+>> record replay functionality is still working. We have to define our
+>> own runners rather than using the default pattern as we want to change
+>> the test name but re-use the memory binary.
+>>
+>> We declare the test binaries as PHONY as they don't rely exist.
+>>
+>> [AJB: A better test would output some sort of timer value or other
+>> otherwise variable value so we could compare the record and replay
+>> outputs and ensure they match]
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+>> ---
+>>  tests/tcg/aarch64/Makefile.softmmu-target | 21 +++++++++++++++++++++
+>>  1 file changed, 21 insertions(+)
+>>
+>> diff --git a/tests/tcg/aarch64/Makefile.softmmu-target b/tests/tcg/aarch=
+64/Makefile.softmmu-
+>> target
+>> index 4c4aaf61dd3..b4b39579634 100644
+>> --- a/tests/tcg/aarch64/Makefile.softmmu-target
+>> +++ b/tests/tcg/aarch64/Makefile.softmmu-target
+>> @@ -32,3 +32,24 @@ memory: CFLAGS+=3D-DCHECK_UNALIGNED=3D1
+>>
+>>  # Running
+>>  QEMU_OPTS+=3D-M virt -cpu max -display none -semihosting-config
+>> enable=3Don,target=3Dnative,chardev=3Doutput -kernel
+>> +
+>> +# Simple Record/Replay Test
+>> +.PHONY: memory-record
+>> +run-memory-record: memory-record memory
+>> +	$(call run-test, $<, \
+>> +	  $(QEMU) -monitor none -display none \
+>> +		  -chardev file$(COMMA)path=3D$<.out$(COMMA)id=3Doutput \
+>> +		  -icount shift=3D5$(COMMA)rr=3Drecord$(COMMA)rrfile=3Drecord.bin \
+>> +	   	  $(QEMU_OPTS) memory, \
+>> +	  "$< on $(TARGET_NAME)")
+>> +
+>> +.PHONY: memory-replay
+>> +run-memory-replay: memory-replay run-memory-record
+>> +	$(call run-test, $<, \
+>> +	  $(QEMU) -monitor none -display none \
+>> +		  -chardev file$(COMMA)path=3D$<.out$(COMMA)id=3Doutput \
+>> +		  -icount shift=3D5$(COMMA)rr=3Dreplay$(COMMA)rrfile=3Drecord.bin \
+>> +	   	  $(QEMU_OPTS) memory, \
+>> +	  "$< on $(TARGET_NAME)")
+>> +
+>> +TESTS+=3Dmemory-record memory-replay
+>> --
+>> 2.20.1
 
-     void thismethod(Error **errp) {
-        Error *local_err = NULL;
-	...
-        somemethod(&local_err);
-        if (local_err) {
-	    error_propagate(errp, local_err);
-	    return;
-	}
-        ...
-     }
 
-We should be preferring
-
-     extern int somemethod(Error **errp);
-
-     int thismethod(Error **errp) {
-	...
-        if (somemethod(errp) < 0) {
-	    return -1;
-	}
-        ...
-     }
-
-ie only using the Error object to bubble up the *details* of
-the error, not as the mechanism for finding if an error occurred.
-
-There is of course a downside with this approach, in that a
-method might set 'errp' but return 0, or not set 'errp' but
-return -1. I think this is outweighed by the simpler code
-pattern overall though.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--
+Alex Benn=C3=A9e
 
