@@ -2,81 +2,91 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC8E9C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:34:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41750C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:35:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D2A521D7A
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:34:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 101F221929
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:35:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jDzE03Qz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D2A521D7A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JjNW3GJj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 101F221929
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB0KQ-0004sM-8R
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 13:34:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50104)
+	id 1iB0L6-0005nx-Hz
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 13:35:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50079)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iB074-0008Ns-Mw
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:21:03 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iB06t-0008Kv-5M
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:20:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iB00j-00075u-3s
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:14:31 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:45120)
+ (envelope-from <alex.bennee@linaro.org>) id 1iB05m-0000Oy-Uv
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:19:44 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51649)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iB00i-00075a-TN
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:14:29 -0400
-Received: by mail-ot1-x343.google.com with SMTP id 41so3726932oti.12
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 10:14:28 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iB05m-0000OX-NN
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:19:42 -0400
+Received: by mail-wm1-x343.google.com with SMTP id 7so5580577wme.1
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 10:19:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=C7U+Ar7WX+/s1+tZT3Oqehz+ER6Xaapmj57+Z6B/wNk=;
- b=jDzE03QzZ4KSHCVv0gBDW+kTvi66gOOsHbqSqShDZUt2z5tRUX1a5PGBgSUGo7azCF
- T5GSfv1swuRj4uFraCHfXedNCVzbLkI63nh5ZJWhndOv2K1wSdU+MXSPovgbd+E5/rob
- HxisIquUbx+QNv21pLrwGuUvaNZPTQrkSvBkucupH19DNuXLiuGK7p/IYkCYLvExuUm1
- aobQfE6RXI8Iuudz73V8ZMHdxTGO+C1F5o+JxdIH2hiJiKrtplI7FgBQy9WkDCbKjUbE
- CjA++r5KODX/7BuMS0ez6uj6clyu0HYVXDZi7DpZ4/gUttJhfmKLglR76P+mIevxx0Fc
- riqA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=9KzFKDieUQ0ZocRaEPSFD2NAIupLGWoORjl8U1JZy58=;
+ b=JjNW3GJjd7o4+WlIbaiGLZfdMPRuwsOPRbOE/dILPFjnjCA+xUhajV/gk0RnJjKRu4
+ BeorQ5tYCCB7ozP9g+JHrgQzUXfXlGm5LLTM7ygD9ymIHglJARq2qNt84Oo+p0Zn5gvw
+ yhKl4jPhhjD/ITzHRVWpuG1s5BEyfQUWc0hImXFrlPVjFcHHLRuwmn1pr6s/CORob0nW
+ h0L3keq2bYf1uS+HxYoGR8PRPnsFiNYYfLczl2blHT5gHNMmZpEAPlzSBjXlfb1XwzAx
+ 6ZcCXLgyAGSk6gsM01V5vwK04OIR47Q1a+XWMQS8BwPjlq1mkkpHOkYU9KdSvhR6Yfe/
+ zu7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=C7U+Ar7WX+/s1+tZT3Oqehz+ER6Xaapmj57+Z6B/wNk=;
- b=OQ09BlOcYmrWiLhxHual68dtfbpFVM7C46qk6lRnTgBVku4kJ0b7rrjYZZTkwhZeH5
- mauAN80mJdEAGI+PcBiRpnaXw9X/qH5fALYp65nGqM2vzb46aeZIdf8L+wI7SXj25GqZ
- VjydiUR1PFCpyH/fGXU1LxnTd8YDFYfI407gsX86rzSLgo4E4NPM3jGqcLsOR2Ozgz9g
- /Fwp7jUChTp057BJFsgTS+fmwZoY3/0ZR6AWLtPFrjcBw/hQMFGRYg9zJPECBu0seE05
- 48wD6nEmUZUVqJDzGo0gQs3wq9wdz7ZHq/bpuDIHIH6G1uCaFySUmLRUSr6fxT5Y34+F
- FMAw==
-X-Gm-Message-State: APjAAAWf3H1YWKksoDe5PouCbI62JHs9ytcVspoN3zEuUJ3w1Ch3DpZ/
- UrkyRjRnBnp3fuKCJS2siNo2J7BtQzX3KtKhRvoJtw==
-X-Google-Smtp-Source: APXvYqyqcqMz0pXY33Lq2ajVUibUhDshvafW388h+CaFAplrrSUqWA+Z+Yjtx55pV1/O30KlojHYZd38hPShNf8T2o8=
-X-Received: by 2002:a9d:4615:: with SMTP id y21mr602247ote.97.1568913267802;
- Thu, 19 Sep 2019 10:14:27 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=9KzFKDieUQ0ZocRaEPSFD2NAIupLGWoORjl8U1JZy58=;
+ b=MtUI88rI4r2cZx0QyA5DmnjQbsXevEFsrIAA9uAXo9VUdfU9HT+LQosPVuOZDYUWrk
+ tR9fUcfuKMaungVOcOFTCSs2XmfqwFZIOVHIL0rfMAerWQrUW7DJm4yrwgUAYYYeGwOk
+ G1R/XwQrSQw64FDK087kwX1sTJcnd+mzpmseXIniRxp32x6qT3l6zHBIpCsvIumr/yXg
+ a92JgDWAszUE6FY44Ca9c4hTL5pyb4IrBTYoNY/u61GXB16CdPXUi/AG+WziRb7vZzFo
+ jqDQjSMXyaPQtLx+kK501BCVn9jLRT4NdyIjgbHF6KRiBsbcYeyVW+dc+bXPTEcrsD/b
+ Ivjw==
+X-Gm-Message-State: APjAAAXrnD0RdF67j+G/5/H8rhiWfCJZgIrHhqSTJ3bzj1IFDlPXZh+r
+ RgoQ9P365AS8XrSepJwjYUGuwfFyzFM=
+X-Google-Smtp-Source: APXvYqyvashH4wJKjB8lrKIEttfiI5bDbWGrp085lEOxhE/co9aOnMaeYvuYqVZzd+zH2c9I95Lc9g==
+X-Received: by 2002:a05:600c:204a:: with SMTP id
+ p10mr3977039wmg.175.1568913581547; 
+ Thu, 19 Sep 2019 10:19:41 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id j26sm16970160wrd.2.2019.09.19.10.19.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 19 Sep 2019 10:19:40 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 3D8211FF9F;
+ Thu, 19 Sep 2019 18:10:17 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 16/16] Makefile: fix-up qemu-ga.8 paths to take in-src
+ builds into account
+Date: Thu, 19 Sep 2019 18:10:15 +0100
+Message-Id: <20190919171015.12681-17-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190919171015.12681-1-alex.bennee@linaro.org>
+References: <20190919171015.12681-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-References: <20190919155957.12618-1-peter.maydell@linaro.org>
- <87muf0yzvf.fsf@linaro.org>
-In-Reply-To: <87muf0yzvf.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Sep 2019 18:14:16 +0100
-Message-ID: <CAFEAcA-eLvH2PfZjK_kxykQJT75y6CNzmZzxZg4SNZrekbvNHQ@mail.gmail.com>
-Subject: Re: [PATCH] Makefile: Fix in-tree builds when Sphinx is available
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,55 +98,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 19 Sep 2019 at 18:12, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
->
->
-> Peter Maydell <peter.maydell@linaro.org> writes:
->
-> > In commit 27a296fce9821e we switched the qemu-ga manpage over to
-> > being built from Sphinx.  The makefile rules for this were correct
-> > for an out-of-tree build, but break for in-tree builds if Sphinx is
-> > present and we're trying to build the documentation.
-> >
-> > Specifically, because Sphinx refuses to build output files into
-> > the same directory as its sources, for an in-tree build we tell
-> > it to build into a subdirectory docs/built, and set up a makefile
-> > variable MANUAL_BUILDDIR indicating where the docs are going.
-> > The makefile rule telling Make how to build qemu-ga.8 correctly
-> > used this variable, but the lines adding qemu-ga.8 to the list
-> > of DOCS to be built and the 'make install' rune did not. The
-> > effect was that for an in-tree build we told Make to build
-> > 'docs/interop/qemu-ga.8' but did not provide a specific rule for
-> > doing so, which caused Make to fall back to the old rules.make
-> > rule for building any "%.8" file. Make tried to invoke texi2pod
-> > with a bogus command line, resulting in the error:
-> >
-> >   GEN     docs/interop/qemu-ga.8
-> > No filename or title
-> > make: *** [rules.mak:394: docs/interop/qemu-ga.8]
-> >
-> > Fix this by using $(MANUAL_BUILDDIR) when constructing the
-> > list of DOCS files we want to build and also in the source
-> > file name we install for 'make install'.
-> >
-> > (Among other things, this broke the Shippable CI builds.)
-> >
-> > Reported-by: Eric Blake <eblake@redhat.com>
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->
-> heh I'd manually rebuilt the patch from your last email. I guess you can
-> apply this one directly though and I'll clean-up when I rebase for the PR=
-.
+We tweak MANUAL_BUILDIR for in-src builds because sphinx won't build
+documents inside a source tree. This was causing the document build to
+fail on things like shippable which were using in-tree builds.
 
-Yeah; I plan to apply it directly once it's accumulated some
-tested-by/reviewed-by tags.
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ Makefile | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-thanks
--- PMM
+diff --git a/Makefile b/Makefile
+index 3cf5b1e7539..8da33595edd 100644
+--- a/Makefile
++++ b/Makefile
+@@ -324,8 +324,19 @@ endif
+ endif
+ endif
+ 
++# Sphinx does not allow building manuals into the same directory as
++# the source files, so if we're doing an in-tree QEMU build we must
++# build the manuals into a subdirectory (and then install them from
++# there for 'make install'). For an out-of-tree build we can just
++# use the docs/ subdirectory in the build tree as normal.
++ifeq ($(realpath $(SRC_PATH)),$(realpath .))
++MANUAL_BUILDDIR := docs/built
++else
++MANUAL_BUILDDIR := docs
++endif
++
+ ifdef BUILD_DOCS
+-DOCS=qemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 qemu-nbd.8 docs/interop/qemu-ga.8
++DOCS=qemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 qemu-nbd.8 $(MANUAL_BUILDDIR)/interop/qemu-ga.8
+ DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7
+ DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7
+ DOCS+=docs/qemu-block-drivers.7
+@@ -703,17 +714,6 @@ dist: qemu-$(VERSION).tar.bz2
+ qemu-%.tar.bz2:
+ 	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar.bz2,%,$@)"
+ 
+-# Sphinx does not allow building manuals into the same directory as
+-# the source files, so if we're doing an in-tree QEMU build we must
+-# build the manuals into a subdirectory (and then install them from
+-# there for 'make install'). For an out-of-tree build we can just
+-# use the docs/ subdirectory in the build tree as normal.
+-ifeq ($(realpath $(SRC_PATH)),$(realpath .))
+-MANUAL_BUILDDIR := docs/built
+-else
+-MANUAL_BUILDDIR := docs
+-endif
+-
+ define clean-manual =
+ rm -rf $(MANUAL_BUILDDIR)/$1/_static
+ rm -f $(MANUAL_BUILDDIR)/$1/objects.inv $(MANUAL_BUILDDIR)/$1/searchindex.js $(MANUAL_BUILDDIR)/$1/*.html
+@@ -823,7 +823,7 @@ ifdef CONFIG_TRACE_SYSTEMTAP
+ 	$(INSTALL_DATA) scripts/qemu-trace-stap.1 "$(DESTDIR)$(mandir)/man1"
+ endif
+ ifneq (,$(findstring qemu-ga,$(TOOLS)))
+-	$(INSTALL_DATA) docs/interop/qemu-ga.8 "$(DESTDIR)$(mandir)/man8"
++	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/interop/qemu-ga.8 "$(DESTDIR)$(mandir)/man8"
+ 	$(INSTALL_DATA) docs/interop/qemu-ga-ref.html "$(DESTDIR)$(qemu_docdir)"
+ 	$(INSTALL_DATA) docs/interop/qemu-ga-ref.txt "$(DESTDIR)$(qemu_docdir)"
+ 	$(INSTALL_DATA) docs/interop/qemu-ga-ref.7 "$(DESTDIR)$(mandir)/man7"
+-- 
+2.20.1
+
 
