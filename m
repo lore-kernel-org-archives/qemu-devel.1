@@ -2,108 +2,72 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8CF0C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:42:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0817AC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:44:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D61921907
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:42:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D61921907
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D17B421907
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:44:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D17B421907
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAsxi-000519-Qv
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:42:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46217)
+	id 1iAszc-0006RY-3T
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:44:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46437)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iAswm-0003ve-4A
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:41:57 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1iAsyj-0005jE-3U
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:43:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iAswl-0002Ra-0q
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:41:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41698)
+ (envelope-from <yan.y.zhao@intel.com>) id 1iAsyg-0003nz-TW
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:43:56 -0400
+Received: from mga01.intel.com ([192.55.52.88]:32033)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iAswk-0002RO-P6; Thu, 19 Sep 2019 05:41:54 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 190907FDE5;
- Thu, 19 Sep 2019 09:41:54 +0000 (UTC)
-Received: from [10.36.117.104] (ovpn-117-104.ams2.redhat.com [10.36.117.104])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6821260872;
- Thu, 19 Sep 2019 09:41:52 +0000 (UTC)
-To: qemu-devel@nongnu.org
-References: <20190919092829.15393-1-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <7995a66a-b1c6-2332-dd12-28ff69efa612@redhat.com>
-Date: Thu, 19 Sep 2019 11:41:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1iAsyg-0003nW-JV
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:43:54 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 19 Sep 2019 02:43:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,523,1559545200"; d="scan'208";a="189553607"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.9])
+ by orsmga003.jf.intel.com with ESMTP; 19 Sep 2019 02:43:49 -0700
+Date: Thu, 19 Sep 2019 05:36:06 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Jason Wang <jasowang@redhat.com>
+Message-ID: <20190919093606.GE18391@joy-OptiPlex-7040>
+References: <6d73572e-1e89-b04a-bdd6-98ac73798083@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57B90C@SHSMSX104.ccr.corp.intel.com>
+ <204219fa-ee72-ca60-52a4-fb4bbc887773@redhat.com>
+ <20190919052819.GA18391@joy-OptiPlex-7040>
+ <7b6d6343-33de-ebd7-9846-af54a45a82a2@redhat.com>
+ <20190919061756.GB18391@joy-OptiPlex-7040>
+ <e0efbdc0-aad9-0d17-ec68-36460865501f@redhat.com>
+ <20190919062954.GC18391@joy-OptiPlex-7040>
+ <20190919063249.GD18391@joy-OptiPlex-7040>
+ <98e04514-f807-ba7d-6bd4-8872fcc96c76@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190919092829.15393-1-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Thu, 19 Sep 2019 09:41:54 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1] tests/tcg: target/s390x: Test MVC
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <98e04514-f807-ba7d-6bd4-8872fcc96c76@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.88
+Subject: Re: [Qemu-devel] vhost, iova, and dirty page tracking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,99 +79,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ 'Alex Williamson' <alex.williamson@redhat.com>, Peter Xu <peterx@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19.09.19 11:28, David Hildenbrand wrote:
-> Let's add a test that especially verifies that no data will be touched
-> in case we cross page boundaries and one page access triggers a fault.
->=20
-> Before the fault-safe handling fixes, the test failes with:
->       TEST    mvc on s390x
->     data modified during a fault
->     make[2]: *** [../Makefile.target:116: run-mvc] Error 1
->=20
-> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  tests/tcg/s390x/Makefile.target |   1 +
->  tests/tcg/s390x/mvc.c           | 109 ++++++++++++++++++++++++++++++++
->  2 files changed, 110 insertions(+)
->  create mode 100644 tests/tcg/s390x/mvc.c
->=20
-> diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefile=
-.target
-> index 6a3bfa8b29..241ef28f61 100644
-> --- a/tests/tcg/s390x/Makefile.target
-> +++ b/tests/tcg/s390x/Makefile.target
-> @@ -7,3 +7,4 @@ TESTS+=3Dexrl-trt
->  TESTS+=3Dexrl-trtr
->  TESTS+=3Dpack
->  TESTS+=3Dmvo
-> +TESTS+=3Dmvc
-> diff --git a/tests/tcg/s390x/mvc.c b/tests/tcg/s390x/mvc.c
-> new file mode 100644
-> index 0000000000..aa552d52e5
-> --- /dev/null
-> +++ b/tests/tcg/s390x/mvc.c
-> @@ -0,0 +1,109 @@
-> +#include <stdint.h>
-> +#include <stdlib.h>
-> +#include <stdio.h>
-> +#include <string.h>
-> +#include <sys/mman.h>
-> +#include <signal.h>
-> +#include <setjmp.h>
-> +
-> +jmp_buf jmp_env;
-> +
-> +static void handle_sigsegv(int sig)
-> +{
-> +    siglongjmp(jmp_env, 1);
-> +}
-> +
-> +#define ALLOC_SIZE (2 * 4096)
-> +
-> +static inline void mvc_256(const char *dst, const char *src)
-> +{
-> +    asm volatile (
-> +        "    mvc 0(256,%[dst]),0(%[src])\n"
-> +        :
-> +        : [dst] "d" (dst),
-> +          [src] "d" (src)
-> +        : "memory");
-> +}
-> +
-> +int main(void)
-> +{
-> +    char *src, *dst;
-> +    int i;
-> +
-> +    /* register the SIGSEGV handler */
-> +    if (signal(SIGSEGV, handle_sigsegv) =3D=3D SIG_ERR) {
-> +        fprintf(stderr, "SIGSEGV not registered\n");
-> +        return 1;
-> +    }
-> +
-> +    /* prepare the buffers - two consecutive pages */
-> +    src =3D valloc(ALLOC_SIZE);
-> +    dst =3D valloc(ALLOC_SIZE);
+On Thu, Sep 19, 2019 at 05:35:05PM +0800, Jason Wang wrote:
+> 
+> On 2019/9/19 下午2:32, Yan Zhao wrote:
+> > On Thu, Sep 19, 2019 at 02:29:54PM +0800, Yan Zhao wrote:
+> >> On Thu, Sep 19, 2019 at 02:32:03PM +0800, Jason Wang wrote:
+> >>> On 2019/9/19 下午2:17, Yan Zhao wrote:
+> >>>> On Thu, Sep 19, 2019 at 02:09:53PM +0800, Jason Wang wrote:
+> >>>>> On 2019/9/19 下午1:28, Yan Zhao wrote:
+> >>>>>> On Thu, Sep 19, 2019 at 09:05:12AM +0800, Jason Wang wrote:
+> >>>>>>> On 2019/9/18 下午4:37, Tian, Kevin wrote:
+> >>>>>>>>> From: Jason Wang [mailto:jasowang@redhat.com]
+> >>>>>>>>> Sent: Wednesday, September 18, 2019 2:10 PM
+> >>>>>>>>>
+> >>>>>>>>>>> Note that the HVA to GPA mapping is not an 1:1 mapping. One HVA
+> >>>>>>>>> range
+> >>>>>>>>>>> could be mapped to several GPA ranges.
+> >>>>>>>>>> This is fine. Currently vfio_dma maintains IOVA->HVA mapping.
+> >>>>>>>>>>
+> >>>>>>>>>> btw under what condition HVA->GPA is not 1:1 mapping? I didn't realize it.
+> >>>>>>>>> I don't remember the details e.g memory region alias? And neither kvm
+> >>>>>>>>> nor kvm API does forbid this if my memory is correct.
+> >>>>>>>>>
+> >>>>>>>> I checked https://qemu.weilnetz.de/doc/devel/memory.html, which
+> >>>>>>>> provides an example of aliased layout. However, its aliasing is all
+> >>>>>>>> 1:1, instead of N:1. From guest p.o.v every writable GPA implies an
+> >>>>>>>> unique location. Why would we hit the situation where multiple
+> >>>>>>>> write-able GPAs are mapped to the same HVA (i.e. same physical
+> >>>>>>>> memory location)?
+> >>>>>>> I don't know, just want to say current API does not forbid this. So we
+> >>>>>>> probably need to take care it.
+> >>>>>>>
+> >>>>>> yes, in KVM API level, it does not forbid two slots to have the same HVA(slot->userspace_addr).
+> >>>>>> But
+> >>>>>> (1) there's only one kvm instance for each vm for each qemu process.
+> >>>>>> (2) all ramblock->host (corresponds to HVA and slot->userspace_addr) in one qemu
+> >>>>>> process is non-overlapping as it's obtained from mmmap().
+> >>>>>> (3) qemu ensures two kvm slots will not point to the same section of one ramblock.
+> >>>>>>
+> >>>>>> So, as long as kvm instance is not shared in two processes, and
+> >>>>>> there's no bug in qemu, we can assure that HVA to GPA is 1:1.
+> >>>>> Well, you leave this API for userspace, so you can't assume qemu is the
+> >>>>> only user or any its behavior. If you had you should limit it in the API
+> >>>>> level instead of open window for them.
+> >>>>>
+> >>>>>
+> >>>>>> But even if there are two processes operating on the same kvm instance
+> >>>>>> and manipulating on memory slots, adding an extra GPA along side current
+> >>>>>> IOVA & HVA to ioctl VFIO_IOMMU_MAP_DMA can still let driver knows the
+> >>>>>> right IOVA->GPA mapping, right?
+> >>>>> It looks fragile. Consider HVA was mapped to both GPA1 and GPA2. Guest
+> >>>>> maps IOVA to GPA2, so we have IOVA GPA2 HVA in the new ioctl and then
+> >>>>> log through GPA2. If userspace is trying to sync through GPA1, it will
+> >>>>> miss the dirty page. So for safety we need log both GPA1 and GPA2. (See
+> >>>>> what has been done in log_write_hva() in vhost.c). The only way to do
+> >>>>> that is to maintain an independent HVA to GPA mapping like what KVM or
+> >>>>> vhost did.
+> >>>>>
+> >>>> why GPA1 and GPA2 should be both dirty?
+> >>>> even they have the same HVA due to overlaping virtual address space in
+> >>>> two processes, they still correspond to two physical pages.
+> >>>> don't get what's your meaning :)
+> >>>
+> >>> The point is not leave any corner case that is hard to debug or fix in
+> >>> the future.
+> >>>
+> >>> Let's just start by a single process, the API allows userspace to maps
+> >>> HVA to both GPA1 and GPA2. Since it knows GPA1 and GPA2 are equivalent,
+> >>> it's ok to sync just through GPA1. That means if you only log GPA2, it
+> >>> won't work.
+> >>>
+> >> In that case, cannot log dirty according to HPA.
+> > sorry, it should be "cannot log dirty according to HVA".
+> 
+> 
+> I think we are discussing the choice between GPA and IOVA, not HVA?
+>
+Right. so why do we need to care about HVA to GPA mapping?
+as long as IOVA to GPA is 1:1, then it's fine.
 
-If anybody cares, I can convert the obsolete valloc into a
-posix_memalign(&src, 4096, ALLOC_SIZE) etc.
+Thanks
+Yan
 
-> +    memset(src, 0xff, ALLOC_SIZE);
-> +    memset(dst, 0x0, ALLOC_SIZE);
-> +
-
-
---=20
-
-Thanks,
-
-David / dhildenb
+> Thanks
+> 
+> 
+> >
+> >> because kvm cannot tell whether it's an valid case (the two GPAs are equivalent)
+> >> or an invalid case (the two GPAs are not equivalent, but with the same
+> >> HVA value).
+> >>
+> >> Right?
+> >>
+> >> Thanks
+> >> Yan
+> >>
+> >>
+> >>> Thanks
+> >>>
+> >>>
+> >>>> Thanks
+> >>>> Yan
+> >>>>
+> >>>>
+> >>>>> Thanks
+> >>>>>
+> >>>>>
+> >>>>>> Thanks
+> >>>>>> Yan
+> >>>>>>
+> >>>>>>>> Is Qemu doing its own same-content memory
+> >>>>>>>> merging in GPA level, similar to KSM?
+> >>>>>>> AFAIK, it doesn't.
+> >>>>>>>
+> >>>>>>> Thanks
+> >>>>>>>
+> >>>>>>>
+> >>>>>>>> Thanks
+> >>>>>>>> Kevin
 
