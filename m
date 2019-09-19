@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17641C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:46:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E86D5C49ED7
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:47:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7C6E21924
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:46:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BCE4A21A4C
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:47:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Gn6s6O/U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7C6E21924
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BaG9Db08"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCE4A21A4C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB0Vr-0001P0-IG
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 13:46:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50174)
+	id 1iB0Wy-0002mV-DA
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 13:47:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50363)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iB07M-0008UJ-I8
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:21:21 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iB07O-0000JK-OV
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:21:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iAzwm-0004O4-6i
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:10:25 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42016)
+ (envelope-from <alex.bennee@linaro.org>) id 1iAzwj-0004Lz-6F
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:10:22 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:34213)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iAzwm-0004NQ-0G
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:10:24 -0400
-Received: by mail-wr1-x442.google.com with SMTP id n14so3894124wrw.9
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 10:10:23 -0700 (PDT)
+ id 1iAzwi-0004LT-Ve
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 13:10:21 -0400
+Received: by mail-wm1-x344.google.com with SMTP id y135so7642637wmc.1
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 10:10:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=rlSvkcXczqc1cNe9s/EmLRGBxbkZT67vdQCCwyIuOR0=;
- b=Gn6s6O/Uaw8zCiEq1a4MYOCWlQzr4i/kjdjcv5EulhSPMJlIIAx6W/TDJF3v7hadn7
- 4hSdkgSv/CTLvyU9kdZYSmkmHShbtYyVzsmS68zM4F2RSyTgBlqwCchl+4Gj5NrAj0QY
- IE60JJNRnkD9bmJaUKNsjb7q3yCutTn3xDMM4ttsi0Og+z3R/Gkvpmz73CuOUh1grRyY
- N/UTETTJ2R8LFFFACW8nJjtMGGodRdpg6cMHXtMTdMSuTPtHUSmE+iJyJfJnhx4Q4HOZ
- jITBqe9jdTH3tcq5NMiqYjV2teVEPLQjRhDEIs5p2ZAhisO0lp2L/soY8A9SfdKiqYYb
- gF8g==
+ bh=CCrWZlrAxxrJZBUu+oP477w2n13YI50PJV59anpksr4=;
+ b=BaG9Db08x1Qa/PxygQOVTvtkIyBibdb4t7y+ICQkop/gZxUNWgXowJ6BPvEHIql7qW
+ ybvH4Rh1sqDpEKWa2kl7qS1RyldNiI3d+yro9farCA2x/qGJEJ33BV/F7OqFa1ja8xFh
+ BMKvMP7wKV0YVtTp7Tu0bwudYc2f1GoAG1M2bV0pJHYS3ZtPqNQTneLao72V2z4KyrVC
+ VlKtmjtcxvIuFCdKw2MFLc6we8tnCuYEO9Iu2bJT0NtAEIqlbtifq0plMYB7VfroSTg7
+ +eKmHjDO7CnVtHp2SXAecjXr1Wk+ieJ1Rn5HPfreacQ34Xne/8XzAX8l57H8pRuDI6y0
+ s7mQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=rlSvkcXczqc1cNe9s/EmLRGBxbkZT67vdQCCwyIuOR0=;
- b=XfXAqcTng91MwG262CBaTpmVeb9jKajwnsR7ptLnuNcqq5Omur2dtUYgF6WbCCvkZN
- q4PwRY05dz0twIM0BBiv1L62UfU1I+Feuqz6ue/qv6U7wbFCR8U510pSPIAbQ2fC7C/E
- o+LKxkuPJQPZYh1wuOaey0dLkEOtIiz6wRNHMwaco5nykkuxGe/OiNHFT/ey8EHPXQVB
- fp8GMUzl1PY822CMnfwEB1RkAnVHITtNdsWM66klOq9JEEqMyplyHKgxctEr0iKYxZuH
- Ssl6Ll3BQF/LT1/xTexnuoEfa+7XjRgfD3sMxCo5xqr0UYhQ6Vb9hJPVfgOltJgLEwWB
- QmPQ==
-X-Gm-Message-State: APjAAAWN+XC8ss8Fj531eHa3l50HAgxqTRTsEaoQZVzeg8qx0qkT3Gja
- Mfv2iViVzY98S8pNikJvmi5VBA==
-X-Google-Smtp-Source: APXvYqxL3Xr8sX4HQAfgu7Rm9V9PlIAu51t8jikbQiZfaeItxvo9SE4r+fW7m7scgVN0ZmKQAjqjjA==
-X-Received: by 2002:adf:a415:: with SMTP id d21mr8909155wra.94.1568913022770; 
- Thu, 19 Sep 2019 10:10:22 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id r12sm7991654wrq.88.2019.09.19.10.10.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ bh=CCrWZlrAxxrJZBUu+oP477w2n13YI50PJV59anpksr4=;
+ b=eanuwZwasSziQvXQEJttpeIaUIytuc6Z6daGNr+MxvryOpxBNgc1Qz4hroGwZ8KhL5
+ LoTuwXEmbw2tn2x+uPc3eEOFQ1wl5NTI6pkn8I/pe0ExCPGEqFF5RIubZqLNbBy5xFCd
+ dGswOmjrq9KK88tACXji4Owdc9DbfmslFfLsrBavHlVj9yCqReRrAes3CoKCJJA527Q2
+ NhNs1z5V2kL0cF1RDVJulf6eLAJSXoIUMy9zy93Nb3tTFcjPdH3n7yNRJU1vhNVaSrIH
+ +gdIDzWDdFsg6BsVS3Jd15+OH2IDmk2upZe+w13j4B4hlSzIGadvJAP+A3b+1RTHtYRd
+ +Tpw==
+X-Gm-Message-State: APjAAAW2wTKJNL984nsg2/o7+30Z8+UQGFbPR2dfSzEUUH+wyu3uCUVw
+ TALXolxnHbFEjGGE3ZUXSSifTA==
+X-Google-Smtp-Source: APXvYqymbbxErAqOoXBy13R/t8n0/Fc5S4uFkTbAh1XJ9EV/qAO3aSrRpJ1rny0SrvL9xKIvfXYCCg==
+X-Received: by 2002:a1c:1f08:: with SMTP id f8mr3874144wmf.46.1568913019810;
  Thu, 19 Sep 2019 10:10:19 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a13sm19762180wrf.73.2019.09.19.10.10.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 19 Sep 2019 10:10:17 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 624FE1FF98;
+ by zen.linaroharston (Postfix) with ESMTP id 090F31FF91;
  Thu, 19 Sep 2019 18:10:16 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v2 08/16] tests/tcg: re-enable linux-test for ppc64abi32
-Date: Thu, 19 Sep 2019 18:10:07 +0100
-Message-Id: <20190919171015.12681-9-alex.bennee@linaro.org>
+Subject: [PATCH v2 04/16] tests/docker: reduce scary warnings from failed
+ inspect
+Date: Thu, 19 Sep 2019 18:10:03 +0100
+Message-Id: <20190919171015.12681-5-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190919171015.12681-1-alex.bennee@linaro.org>
 References: <20190919171015.12681-1-alex.bennee@linaro.org>
@@ -84,7 +85,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,60 +97,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Richard Henderson <richard.henderson@linaro.org>,
- qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Fam Zheng <fam@euphon.net>, peter.maydell@linaro.org, qemu-arm@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now we have fixed the signal delivary bug we can remove this horrible
-hack from the system.
+There is a race here in the clean-up code so lets just accept that
+sometimes the active task we just looked up might have finished before
+we got to inspect it.
 
-Cc: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/tcg/configure.sh              |  1 +
- tests/tcg/multiarch/Makefile.target | 11 +++--------
- 2 files changed, 4 insertions(+), 8 deletions(-)
+ tests/docker/docker.py | 32 ++++++++++++++++++--------------
+ 1 file changed, 18 insertions(+), 14 deletions(-)
 
-diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
-index 6c4a471aeae..e8a1a1495fc 100755
---- a/tests/tcg/configure.sh
-+++ b/tests/tcg/configure.sh
-@@ -54,6 +54,7 @@ fi
- : ${cross_cc_cflags_ppc="-m32"}
- : ${cross_cc_ppc64="powerpc-linux-gnu-gcc"}
- : ${cross_cc_cflags_ppc64="-m64"}
-+: ${cross_cc_cflags_ppc64abi32="-mcpu=power8"}
- : ${cross_cc_ppc64le="powerpc64le-linux-gnu-gcc"}
- : ${cross_cc_cflags_s390x="-m64"}
- : ${cross_cc_cflags_sparc="-m32 -mv8plus -mcpu=ultrasparc"}
-diff --git a/tests/tcg/multiarch/Makefile.target b/tests/tcg/multiarch/Makefile.target
-index 6b1e30e2fec..657a04f802d 100644
---- a/tests/tcg/multiarch/Makefile.target
-+++ b/tests/tcg/multiarch/Makefile.target
-@@ -12,14 +12,6 @@ VPATH 		+= $(MULTIARCH_SRC)
- MULTIARCH_SRCS   =$(notdir $(wildcard $(MULTIARCH_SRC)/*.c))
- MULTIARCH_TESTS  =$(MULTIARCH_SRCS:.c=)
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index 29613afd489..4dca6006d2f 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -235,20 +235,24 @@ class Docker(object):
+         if not only_active:
+             cmd.append("-a")
+         for i in self._output(cmd).split():
+-            resp = self._output(["inspect", i])
+-            labels = json.loads(resp)[0]["Config"]["Labels"]
+-            active = json.loads(resp)[0]["State"]["Running"]
+-            if not labels:
+-                continue
+-            instance_uuid = labels.get("com.qemu.instance.uuid", None)
+-            if not instance_uuid:
+-                continue
+-            if only_known and instance_uuid not in self._instances:
+-                continue
+-            print("Terminating", i)
+-            if active:
+-                self._do(["kill", i])
+-            self._do(["rm", i])
++            try:
++                resp = self._output(["inspect", i])
++                labels = json.loads(resp)[0]["Config"]["Labels"]
++                active = json.loads(resp)[0]["State"]["Running"]
++                if not labels:
++                    continue
++                instance_uuid = labels.get("com.qemu.instance.uuid", None)
++                if not instance_uuid:
++                    continue
++                if only_known and instance_uuid not in self._instances:
++                    continue
++                print("Terminating", i)
++                if active:
++                    self._do(["kill", i])
++                    self._do(["rm", i])
++            except subprocess.CalledProcessError:
++                # i likely finished running before we got here
++                pass
  
--# FIXME: ppc64abi32 linux-test seems to have issues but the other basic tests work
--ifeq ($(TARGET_NAME),ppc64abi32)
--BROKEN_TESTS = linux-test
--endif
--
--# Update TESTS
--TESTS		+= $(filter-out $(BROKEN_TESTS), $(MULTIARCH_TESTS))
--
- #
- # The following are any additional rules needed to build things
- #
-@@ -39,3 +31,6 @@ run-test-mmap: test-mmap
- run-test-mmap-%: test-mmap
- 	$(call run-test, test-mmap-$*, $(QEMU) -p $* $<,\
- 		"$< ($* byte pages) on $(TARGET_NAME)")
-+
-+# Update TESTS
-+TESTS += $(MULTIARCH_TESTS)
+     def clean(self):
+         self._do_kill_instances(False, False)
 -- 
 2.20.1
 
