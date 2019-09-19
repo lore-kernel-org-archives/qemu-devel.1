@@ -2,41 +2,42 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DCEDC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:24:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26137C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:25:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D544F21907
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:24:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D544F21907
+	by mail.kernel.org (Postfix) with ESMTPS id EF79321907
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 10:25:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF79321907
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAtcC-0006oD-Me
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 06:24:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50425)
+	id 1iAtcR-00076p-Lw
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 06:24:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51503)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iAtP9-00020z-Il
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:11:16 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iAtXi-0001AX-44
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:20:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iAtP8-0001qR-G0
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:11:15 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:46587)
+ (envelope-from <laurent@vivier.eu>) id 1iAtXf-0006UY-W3
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 06:20:05 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:33789)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iAtP6-0001mP-19; Thu, 19 Sep 2019 06:11:12 -0400
+ id 1iAtXd-0006Sv-Ap; Thu, 19 Sep 2019 06:20:01 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
  (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Mqro7-1hom7H2MID-00moRK; Thu, 19 Sep 2019 12:10:58 +0200
-To: Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>
-References: <156829664683.2070256.13400788010568373502.stgit@bahia.tls.ibm.com>
+ 1M8hIl-1iF0HP3i1x-004k4L; Thu, 19 Sep 2019 12:19:59 +0200
+To: qemu-devel@nongnu.org
+References: <20190821082546.5252-1-laurent@vivier.eu>
+ <20190821082546.5252-2-laurent@vivier.eu>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -81,37 +82,37 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <34c6e639-d3b4-734e-bd89-bb1d8eb098f4@vivier.eu>
-Date: Thu, 19 Sep 2019 12:10:52 +0200
+Message-ID: <89256120-20ac-54e1-0b30-9d70cad99520@vivier.eu>
+Date: Thu, 19 Sep 2019 12:19:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <156829664683.2070256.13400788010568373502.stgit@bahia.tls.ibm.com>
+In-Reply-To: <20190821082546.5252-2-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:eyJ1Rawxssvql5AajtQFRRvPa5E9FPciCoo0LRuuPeTEZsuu7k5
- eTzujRnIuhFEYydgKyIXxKxrabUzf/1w3R17X/eMkFpZA7r//fncgGKmM8kmC2KyqHCmL2/
- NqrMovxd9Jz31Y9jc11QMLdrvovrAESE3B/DKNL8gRICY2JZ+/72LPcB/l2qP+xg+prt21t
- 4xryzuo0WfIFW68nExWbg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7CLH2JpjIo4=:0Xk8U9QU0ek33eAQaE/8Q4
- s27Xhhxv9pFPw4Fvxi3gtTscXY294m8tfuU8e4p9ym3NLP+mM6QxNGn1s/fGFSjZ6gP1vuQCd
- y0IDH0AbgY+ISXd/Ytl4J/tIdUBbPm7iF7Xzze1dUKImuQzblAidhqB4vKZsW/FznvOMyNQgS
- ULJREY1HQ1B9z3u+uk85tMGZAFarDILdqmAk3h5NNXK7Y1lPurMat5HftnUf/Ec+gfn1glMfG
- FfTN4gnlEkYh5TmiIlwv3Q2uOtExzx7oN2NOfKBymiGENQTS4DnUhog0Q+kJzctb0XiVVfLlX
- nHNapUdUlTNh+XSqro22m/irM3dgJteAhO4qTUtC0279UHv/3GCGiIcoi49KLupPBmtSfVVoJ
- YwO6reaDrMqwrDUstjEk3XllX5kI6x+M0S1h1hA6RGz1ZHMJmLDX/1WLGJIxGgjWtOI+mChMU
- lYyQ1B+YO/m6mFkoWAeAEe6wyHI65t6scXbWpeGucHMAtTI2ejqzFk30WaO4hTyVeruupmiBu
- ShgZ5RV7FufCbgWu3dKmbBMAQzEn/8crU+VUTORPoJSQKg0otOeAeWcc5cDOfa/hB+IQZmLPQ
- OIVpLKMkhP/aOEJZ176KQIIWPw3U2fDLvpRXwnFQH7UNxTAU+W5hlXTucbK52kpIOiXgSMFK0
- omk07Qr3JU20wWnIFmp9hIMhM3Z25pyvdMRncCCYLS6QaY751JR1Go3O7/99xu7vkchtYlku7
- IRoD9kjFc0yi68x4s1Ov0nHfOnjbIoi83KyMe+PCyUID6TPfrgdJxRsYWSgiJ2/aqhfIfVqfV
- jPUQSvTt6CMHBjFeZxyq8pupglek1hn7FA1KG2B61SIXzqJgVU1xW4VDGXwBLC/88va1eyCsx
- 8DHUEIkKO54FY7jPTsJ/1ei7vgdieqRNvbjU7IJAI=
+X-Provags-ID: V03:K1:JF0BaepEvKoMWlzSkOBkwNu0iJBT878LHP9pWdXHkj2mF0I2x0N
+ jIL+iAn37ErlqpqrATyMLzunyfeZO0zIWwMIEyo+o3X/Nr2QqROfYX5TNuYOD0mceXyl+H/
+ 2b1lbdqy+9tSQZLu1Q3XJ843Ua7QCYUFmAk80pF+LdFCDtDRb5XR7XoY8tXcAOLnauXTDO2
+ EhpEuoqbARKV7zxbiDtPw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:KXd+xGahwIQ=:lB/df4YjeRQQEr7TS8T3Ef
+ LiqG0RAI1SXCBD5U77skcFdbkwydk1SMyM0g9Q/iTeSmDYg5q4rgrzISYFVbPXeE3pE2+LG79
+ oQvwfvZ/Oq7llqHlFL/fgSqZxsfNpl0HjTkPHso3Xy2Ph8Lvos0cfuXKkpMhEkwLP8Bh0uk8e
+ qTklgHmel9+hgL9byK25F2YHFCDPxSaheFvsRlPzfJ5ldG/kiWq4Rret/AmDBsok2OwrZVZpf
+ +mZxM+GR+15IK3h6AbNs5fEFLW61UndEGzpR6+40RKe22eWXFZMYd3O6JO+NlJcvXj3IYGLdF
+ 4X/jY4BTC5oO8LlPO2ipxOpjEi4suG6N21+Lvr0Xp3SJqEx0isRKuZdQw0us0+exS0WE2l8AK
+ ZXhZi2h8pjhjIhBMA3cubPYsjIQ68jAHnxhFP5G0EyQ8bsIacVQwFgaLHxtNNP8kD4j/znKSr
+ SjblrIqtAtTU/x/APwxwY+2rDJ/wYJaLbzDcBKSpKvM5mWl26wwqk/nhxvvyqoplpv+7XYAer
+ FT5ti7pJ78mkegkZP+CGs6svSqG79d+e9vOgu+Y2ENbmc4xr4ggkJ69U9CQtuwIVLc86Lss1k
+ GDID0MMW9xAJyOe05FmltTT9dEubahI0lXVINYiL4KkNMqrot9oQXLFXXnGER4MXx5J0qbtLp
+ OpX4MgQrixiWwLNnZyUl1Wk9tqA/0yio3VTx6FPi+QxGdnEaISQ9vG6Nc8nqQwbTOuV2JqioI
+ MjY+76uykj/pUgAm4LfFmreO1zyYWruFBA0es1WPDma20pKsSkn4Ab9eMcfZNBY2s22TxDmDa
+ awfcNz1pgTjtsG/wGzIHtQ79Rj6i5LoCJ0/JICbE5Ra8nz/T4/DTGOFBy5wD5cKfvi7EIhuMK
+ 4KyWnbLBaK6uqMmjDkXvC687j33msmLkgHeDdCoas=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 217.72.192.73
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] kvm: Fix typo in header of
- kvm_device_access()
+Subject: Re: [Qemu-devel] [PATCH 1/1] Fix cacheline detection on
+ FreeBSD/powerpc.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,33 +124,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
- qemu-devel@nongnu.org
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Justin Hibbits <chmeeedalf@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 12/09/2019 à 15:57, Greg Kurz a écrit :
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+Le 21/08/2019 à 10:25, Laurent Vivier a écrit :
+> From: Justin Hibbits <chmeeedalf@gmail.com>
+> 
+> machdep.cacheline_size is an integer, not a long.  Since PowerPC is
+> big-endian this causes sysctlbyname() to fill in the upper bits of the
+> argument, rather than the correct 'lower bits' of the word.  Specify the
+> correct type to fix this.
+> 
+> Fixes: b255b2c8a548 ("util: add cacheinfo")
+> Signed-off-by: Justin Hibbits <chmeeedalf@gmail.com>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  include/sysemu/kvm.h |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  util/cacheinfo.c | 23 +++++++++++++----------
+>  1 file changed, 13 insertions(+), 10 deletions(-)
 > 
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index 909bcd77cf82..fd674772ab31 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -308,7 +308,7 @@ int kvm_vm_check_attr(KVMState *s, uint32_t group, uint64_t attr);
->  int kvm_device_check_attr(int fd, uint32_t group, uint64_t attr);
+> diff --git a/util/cacheinfo.c b/util/cacheinfo.c
+> index eebe1ce9c5d2..ea6f3e99bf4a 100644
+> --- a/util/cacheinfo.c
+> +++ b/util/cacheinfo.c
+> @@ -65,25 +65,28 @@ static void sys_cache_info(int *isize, int *dsize)
+>      g_free(buf);
+>  }
 >  
->  /**
-> - * kvm_device_access - set or get value of a specific vm attribute
-> + * kvm_device_access - set or get value of a specific device attribute
->   * @fd: The device file descriptor
->   * @group: the group
->   * @attr: the attribute of that group to set or get
-> 
+> -#elif defined(__APPLE__) \
+> -      || defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+> +#elif defined(__APPLE__)
+>  # include <sys/sysctl.h>
+> -# if defined(__APPLE__)
+> -#  define SYSCTL_CACHELINE_NAME "hw.cachelinesize"
+> -# else
+> -#  define SYSCTL_CACHELINE_NAME "machdep.cacheline_size"
+> -# endif
+> -
+>  static void sys_cache_info(int *isize, int *dsize)
+>  {
+>      /* There's only a single sysctl for both I/D cache line sizes.  */
+>      long size;
+>      size_t len = sizeof(size);
+> -    if (!sysctlbyname(SYSCTL_CACHELINE_NAME, &size, &len, NULL, 0)) {
+> +    if (!sysctlbyname("hw.cachelinesize", &size, &len, NULL, 0)) {
+> +        *isize = *dsize = size;
+> +    }
+> +}
+> +#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+> +# include <sys/sysctl.h>
+> +static void sys_cache_info(int *isize, int *dsize)
+> +{
+> +    /* There's only a single sysctl for both I/D cache line sizes.  */
+> +    int size;
+> +    size_t len = sizeof(size);
+> +    if (!sysctlbyname("machdep.cacheline_size", &size, &len, NULL, 0)) {
+>          *isize = *dsize = size;
+>      }
+>  }
+> -
+>  #else
+>  /* POSIX */
+>  
 > 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Applied to my trivial-patches branch.
+
+Thanks,
+Laurent
+
 
