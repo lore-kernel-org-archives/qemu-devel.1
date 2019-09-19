@@ -2,91 +2,85 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A70C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:01:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B45F6C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:03:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4902520644
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:01:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4902520644
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7E6B920644
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 17:03:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P7t5bgJA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E6B920644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAzoP-0005se-NO
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 13:01:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47640)
+	id 1iAzpo-00071o-KZ
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 13:03:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47746)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iAzli-0004EN-Dn
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:59:00 -0400
+ (envelope-from <fintelia@gmail.com>) id 1iAzmT-00058U-VC
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:59:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iAzlh-0005sk-26
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:58:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40504)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iAzlc-0005pu-C8; Thu, 19 Sep 2019 12:58:53 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 119A530860C5;
- Thu, 19 Sep 2019 16:58:51 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.61])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 174D560BF1;
- Thu, 19 Sep 2019 16:58:46 +0000 (UTC)
-Subject: Re: [Qemu-devel] [PATCH 4/4] iotests: Add test for failing mirror
- complete
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-References: <20190912135632.13925-1-mreitz@redhat.com>
- <20190912135632.13925-5-mreitz@redhat.com>
- <377314de-2a77-0fe7-e5ea-07f368c504ec@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <37b2e17e-6a66-f044-98cf-7603cac5f66f@redhat.com>
-Date: Thu, 19 Sep 2019 18:58:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <fintelia@gmail.com>) id 1iAzmS-0006OO-Tt
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:59:45 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:46944)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <fintelia@gmail.com>)
+ id 1iAzmQ-0006LK-85; Thu, 19 Sep 2019 12:59:42 -0400
+Received: by mail-lj1-x244.google.com with SMTP id e17so4281258ljf.13;
+ Thu, 19 Sep 2019 09:59:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=fXq/CJAkjIlUrA7ulzeCY/7Lh2+aL00qHpfQzFW/RSA=;
+ b=P7t5bgJAAhwzyF4RhvG411jOvFZ7EMd6XMk2PHwFl/EWyS0d2rqHUUN3wGNVHoznHE
+ vChbPsnXfTynKg6gUgutf5icXKS3/6PFAEv941YQHAmkaaN/obQeD9uKStQw+R0e45nx
+ q1sn+6AYEGdpfqhCMu9H4Lybq065uIDtZLwhZxUwAXZsYbxa/JhpGpYK0I8X+5t+tQCx
+ R3WVY5HzQRjSHOF81M/8LoLBthlN8zeB2KDbXluR8bwkuIS3b+x6Dhh72gXrGnqZPiGM
+ InA8s8ZWsDD2L816NCUTjxoSTHTKuDrbH8XHS4c+dWO5Fx5yHp8CC+iSRuWtB2UmFKUC
+ CHDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=fXq/CJAkjIlUrA7ulzeCY/7Lh2+aL00qHpfQzFW/RSA=;
+ b=E/pWbKeflmQPrboi5o+Uk5XH2Q2BEGIkr17T3ubUeaE1/IJoW2KJ6a0d0BukMfYWyx
+ Bfo44XEUSQNgrW0TLSRTRaIf6kXD6NWl0r867Uu033hfX8SdqDveGW2L+0VrikpjcXfO
+ ph6pQaRQr/LUyTcuh8qKrjq/YFhYVl/iyANqFP2+iKdNOHItQAyvAZS7a+Pice+Ex9qr
+ Cjd5YLWOavnv7A0jgcHay2yedV4zDdwnK/Psm1AukKr7rkNmhNVxeKmpO7xIj2QbSesj
+ EU80QYfX3GT6zLR4NeoMzA7iBBeJHr7yEmJY0BBN/UQX9ypHOC5TaJBC7gcB3QmQscIa
+ 5Nrg==
+X-Gm-Message-State: APjAAAXQYGpbDp1ifNEZdkKePAWrwHfU7LxC8NzerqQZ34NVuSswWD6U
+ Kb2yYEGeyZPErvr80n7kK4pYoe6r1+yJ349IAjY=
+X-Google-Smtp-Source: APXvYqygCVfYIMMKo6iG2cltIZIYVjrycZSGE0Izyk3ZJSI3Wv6T2QiuaALARmw4u9YcLIXkSYoITxW9Up/Xp3icivg=
+X-Received: by 2002:a2e:3a0e:: with SMTP id h14mr5947753lja.161.1568912379933; 
+ Thu, 19 Sep 2019 09:59:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <377314de-2a77-0fe7-e5ea-07f368c504ec@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="cczgyragS5RHr7HV712zMYsZhw9BR5Yps"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Thu, 19 Sep 2019 16:58:51 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+References: <850360df8fc15a3671bf2237f972ebaf09110015.1566603412.git.alistair.francis@wdc.com>
+ <mhng-b813f03d-c23e-405a-8213-c4c9b22a6831@palmer-si-x1e>
+ <CANnJOVFNqXEg9KkJC4CHkt0KTt2_6HjyhU2CvMROW+e79mDncA@mail.gmail.com>
+ <CAKmqyKMfODSjbBm5ZgmHYYzzrf3B_4WEbANeKXo6rSO6V5Pzeg@mail.gmail.com>
+ <CANnJOVGPW1ppNdx+=KAvgNhgGQPvJxjyGY=rxunicu=f++xhiQ@mail.gmail.com>
+ <CAKmqyKPQPrPKdkaRjZ7P75jamuqEq6BABir56VrYGm=ZSFpAww@mail.gmail.com>
+ <18b87754-d5b2-e4f1-bdc5-92ad26b97379@linaro.org>
+In-Reply-To: <18b87754-d5b2-e4f1-bdc5-92ad26b97379@linaro.org>
+From: Jonathan Behrens <fintelia@gmail.com>
+Date: Thu, 19 Sep 2019 12:58:40 -0400
+Message-ID: <CANnJOVEsF57FBbNxJ_WvL3O7iJ_mZijYikC_aNhxKcP856qTzw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH v1 10/28] target/riscv: Convert
+ mie and mstatus to pointers
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,223 +92,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
+Cc: Palmer Dabbelt <palmer@sifive.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>, Anup Patel <Anup.Patel@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Atish Patra <Atish.Patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ Alistair Francis <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cczgyragS5RHr7HV712zMYsZhw9BR5Yps
-Content-Type: multipart/mixed; boundary="ik4BnpcrHOhypxP61fFolaHOKkp8JTO3U";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <37b2e17e-6a66-f044-98cf-7603cac5f66f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] iotests: Add test for failing mirror
- complete
-References: <20190912135632.13925-1-mreitz@redhat.com>
- <20190912135632.13925-5-mreitz@redhat.com>
- <377314de-2a77-0fe7-e5ea-07f368c504ec@redhat.com>
-In-Reply-To: <377314de-2a77-0fe7-e5ea-07f368c504ec@redhat.com>
+On Thu, Sep 19, 2019 at 10:50 AM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 9/18/19 4:47 PM, Alistair Francis wrote:
+> > I'm not a fan of the pointer method that I'm using, but to me it seems
+> > the least worst in terms of handling future code, keeping everythign
+> > consistnent and avoiding complex access rules.
+>
+> FWIW, I prefer the "banked" register method used by ARM.
+>
+> enum {
+>     M_REG_NS = 0,    /* non-secure mode */
+>     M_REG_S = 1,     /* secure mode */
+>     M_REG_NUM_BANKS = 2,
+> };
+>
+> ...
+>
+>         uint32_t vecbase[M_REG_NUM_BANKS];
+>         uint32_t basepri[M_REG_NUM_BANKS];
+>         uint32_t control[M_REG_NUM_BANKS];
+>
+> The major difference that I see is that a pointer can only represent a single
+> state at a single time.  With an index, different parts of the code can ask
+> different questions that may have different states.  E.g. "are we currently in
+> secure mode" vs "will the exception return to secure mode".
 
---ik4BnpcrHOhypxP61fFolaHOKkp8JTO3U
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+This makes a lot of sense to me. It means that any individual control register
+has an unambiguous name that doesn't change based on context. They aren't quite
+the same names as used in the architecture specification (mie & vsie
+vs. mie[NOVIRT] & mie[VIRT]), but they are reasonably close. It also means other
+parts of the code can't ignore that there are two different versions of the
+registers in play. Perhaps the biggest benefit though is that you can sidestep
+swapping on mode changes *and* avoid needing any super fancy logic in the access
+functions:
 
-On 18.09.19 20:46, John Snow wrote:
->=20
->=20
-> On 9/12/19 9:56 AM, Max Reitz wrote:
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->> =C2=A0 tests/qemu-iotests/041=C2=A0=C2=A0=C2=A0=C2=A0 | 44 +++++++++++=
-+++++++++++++++++++++++++++
->> =C2=A0 tests/qemu-iotests/041.out |=C2=A0 4 ++--
->> =C2=A0 2 files changed, 46 insertions(+), 2 deletions(-)
->>
->> diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
->> index 8568426311..84bc6d6581 100755
->> --- a/tests/qemu-iotests/041
->> +++ b/tests/qemu-iotests/041
->> @@ -1121,6 +1121,50 @@ class TestOrphanedSource(iotests.QMPTestCase):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 target=3D'dest-ro')
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assert_qmp=
-(result, 'error/class', 'GenericError')
->> =C2=A0 +=C2=A0=C2=A0=C2=A0 def test_failing_permission_in_complete(sel=
-f):
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assert_no_active_bloc=
-k_jobs()
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Unshare consistent-read =
-on the target
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # (The mirror job does not=
- care)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 result =3D self.vm.qmp('bl=
-ockdev-add',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 driver=3D'blkdebug',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 node_name=3D'dest-perm',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 image=3D'dest',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 unshare_child_perms=3D['consistent-read'])
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assert_qmp(result, 'r=
-eturn', {})
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 result =3D self.vm.qmp('bl=
-ockdev-mirror', job_id=3D'job',
->> device=3D'src',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 sync=3D'full', target=3D'dest',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 filter_node_name=3D'mirror-filter')
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assert_qmp(result, 'r=
-eturn', {})
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Require consistent-read =
-on the source
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # (We can only add this no=
-de once the job has started, or it
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # will complain that it do=
-es not want to run on non-root nodes)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 result =3D self.vm.qmp('bl=
-ockdev-add',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 driver=3D'blkdebug',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 node_name=3D'src-perm',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 image=3D'src',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 take_child_perms=3D['consistent-read'])
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assert_qmp(result, 'r=
-eturn', {})
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # While completing, mirror=
- will attempt to replace src by
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # dest, which must fail be=
-cause src-perm requires
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # consistent-read but dest=
--perm does not share it; thus
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # aborting the job when it=
- is supposed to complete
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.complete_and_wait('jo=
-b',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 completion_error=3D'Operation not
->> permitted')
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Assert that all of our n=
-odes are still there (except for the
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # mirror filter, which sho=
-uld be gone despite the failure)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nodes =3D self.vm.qmp('que=
-ry-named-block-nodes')['return']
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nodes =3D list(map(lambda =
-image: image['node-name'], nodes))
->=20
-> Sadly, the list comprehension is a good suggestion. Squash it in if
-> you'd like.
+int read_mstatus(...) {
+    target_ulong novirt_mask = ...;
+    *val = env->mstatus[NOVIRT] & novirt_mask | env->mstatus[virt_mode()];
+}
 
-You know I don=E2=80=99t, but I=E2=80=99ll do it anyway.
+int read_vsstatus(...) {
+    *val = env->mstatus[VIRT];
+}
 
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for expect in ['src', 'src=
--perm', 'dest', 'dest-perm']:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 se=
-lf.assertTrue(expect in nodes, '%s disappeared' % expect)
->=20
-> I could be a real weenie and say "why not use a tuple here?"
-
-OK.
-
-> but, I'll only pretend I didn't say that instead of couching it in a
-> self-deprecating wrapper to the same end effect.
->=20
-> (I'm a weenie.)
->=20
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assertFalse('mirror-f=
-ilter' in nodes,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- 'Mirror filter node did not disappear')
->> +
->> =C2=A0 if __name__ =3D=3D '__main__':
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iotests.main(supported_fmts=3D['qcow2',=
- 'qed'],
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 supported_protocols=3D['file'])
->> diff --git a/tests/qemu-iotests/041.out b/tests/qemu-iotests/041.out
->> index 2c448b4239..f496be9197 100644
->> --- a/tests/qemu-iotests/041.out
->> +++ b/tests/qemu-iotests/041.out
->> @@ -1,5 +1,5 @@
->> -.....................................................................=
-=2E....................
->>
->> +.....................................................................=
-=2E.....................
->>
->> =C2=A0 ---------------------------------------------------------------=
--------
->> -Ran 90 tests
->> +Ran 91 tests
->> =C2=A0 =C2=A0 OK
->>
->=20
-> Or don't do anything, because I'm just being obnoxious, and I owe you
-> one for giving you bad advice last round.
-
-Come on, I have better (more selfish) reasons.
-
-For the list comprehension: I want to introduce as many instances of
-map/filter as I can so using those functions becomes normal.
-
-For the tuple: This is a test, nobody cares whether it uses 60 bytes
-more memory or is 10 =C2=B5s slower or lets something be mutable when it =
-is
-actually never changed.  As such, I like to use the most general
-solution which is simply a list.
-
-Max
-
-
---ik4BnpcrHOhypxP61fFolaHOKkp8JTO3U--
-
---cczgyragS5RHr7HV712zMYsZhw9BR5Yps
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2Ds8UACgkQ9AfbAGHV
-z0DUZggAmHz1zwqsK2TTb5Qczh33oUVyY9CYkK82mbjRnwH5J4lsiEJ2vZ2T13yA
-ODOQrdMbJyqDuekZHLReJOqV1AqAW3ELyvo5PikX0vIqOJNWLln+lVNulPUaaFOu
-FMLdTS1C161EkMXag6WvJQb4O1ttM0qifmS3bavOymiAGRzLEqOg5tLtmhIamnEF
-K7zWau19TvGexVvHGV/MfaYHp6RhT72S2ooRS2nmPvcWGoz8h8ap5DrmWCLboXCE
-8NAtW0o0qfoAXdtzIQioHW9R1FV/TlTk7XNmDpr8g+2veeWC0R8AG+jhGAlBRJKX
-UGz9n0pNiOwuG/grRBRc4L80vuctOQ==
-=uHPr
------END PGP SIGNATURE-----
-
---cczgyragS5RHr7HV712zMYsZhw9BR5Yps--
+int write_mstatus(...) {
+    ...
+    target_ulong novirt_mask = ...;
+    env->mstatus[NOVIRT] = (env->mstatus[NOVIRT] & ~novirt_mask) |
+                           (newval & novirt_mask);
+    env->mstatus[virt_mode()] = (env->mstatus[virt_mode()] & novirt_mask) |
+                                (newval & ~novirt_mask);
+}
 
