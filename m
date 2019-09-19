@@ -2,90 +2,60 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33586C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 16:55:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A2D0C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 16:57:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 088B2206C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 16:55:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 088B2206C2
+	by mail.kernel.org (Postfix) with ESMTPS id 6D41F214AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 16:57:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D41F214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAzi1-0008Sj-2G
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 12:55:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46456)
+	id 1iAzkS-0002Ci-I4
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 12:57:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47199)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iAzgZ-0006ze-07
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:53:40 -0400
+ (envelope-from <crosa@redhat.com>) id 1iAzjW-0001a4-3X
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:56:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iAzgX-0002pX-QK
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:53:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37222)
+ (envelope-from <crosa@redhat.com>) id 1iAzjU-0004HB-BL
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:56:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38454)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iAzeZ-0001uV-15; Thu, 19 Sep 2019 12:53:35 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iAzjU-0004GY-2A
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 12:56:40 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 56246315C030;
- Thu, 19 Sep 2019 16:51:34 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.61])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 184B41001947;
- Thu, 19 Sep 2019 16:51:29 +0000 (UTC)
-Subject: Re: [Qemu-devel] [PATCH 4/4] iotests: Add test for failing mirror
- complete
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190912135632.13925-1-mreitz@redhat.com>
- <20190912135632.13925-5-mreitz@redhat.com>
- <19f8eac0-7722-4894-72bb-df7501ca20ef@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <737afcda-cbfd-2699-72f1-6775ff0f3169@redhat.com>
-Date: Thu, 19 Sep 2019 18:51:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 612AE8A1C92;
+ Thu, 19 Sep 2019 16:56:39 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-123-8.rdu2.redhat.com [10.10.123.8])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E1085D9CD;
+ Thu, 19 Sep 2019 16:56:34 +0000 (UTC)
+Date: Thu, 19 Sep 2019 12:56:32 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: Problems with MIPS Malta SSH tests in make check-acceptance
+Message-ID: <20190919165632.GA5821@localhost.localdomain>
+References: <20190918071654.GK2440@umbus.fritz.box>
+ <20190919011452.GA23168@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <19f8eac0-7722-4894-72bb-df7501ca20ef@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="2lNDZeKlvC08ZJHdTAWm2NLzYvinuIfco"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Thu, 19 Sep 2019 16:51:34 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190919011452.GA23168@localhost.localdomain>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Thu, 19 Sep 2019 16:56:39 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,128 +69,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>
+Cc: philmd@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2lNDZeKlvC08ZJHdTAWm2NLzYvinuIfco
-Content-Type: multipart/mixed; boundary="W87L3RQSMP4SxpT88nYEJcjCXBJL1olZC";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <737afcda-cbfd-2699-72f1-6775ff0f3169@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] iotests: Add test for failing mirror
- complete
-References: <20190912135632.13925-1-mreitz@redhat.com>
- <20190912135632.13925-5-mreitz@redhat.com>
- <19f8eac0-7722-4894-72bb-df7501ca20ef@virtuozzo.com>
-In-Reply-To: <19f8eac0-7722-4894-72bb-df7501ca20ef@virtuozzo.com>
+On Wed, Sep 18, 2019 at 09:14:58PM -0400, Cleber Rosa wrote:
+> On Wed, Sep 18, 2019 at 05:16:54PM +1000, David Gibson wrote:
+> > Hi,
+> > 
+> > I'm finding make check-acceptance is currently useless for me as a
+> > pre-pull test, because a bunch of the tests are not at all reliable.
+> > There are a bunch which I'm still investigating, but for now I'm
+> > looking at the MIPS Malta SSH tests.
+> > 
+> > There seem to be at least two problems here.  First, the test includes
+> > a download of a pretty big guest disk image.  This can easily exhaust
+> > the 2m30 timeout on its own.
+> >
+> 
+> You're correct that successes and failures on those tests depend
+> largely on bandwith.  On a shared environment I used for tests
+> the download of those images take roughly 400 seconds, resulting
+> in failures.  On my own machine, around 60, and the tests pass.
+> 
+> There's a conceptual and conflicting problem in that the environment
+> for tests to run should be prepared beforehand.  The conflicting
+> solutions can be:
+> 
+>  * extensive bootstrapping of the test execution environment, such
+>    as the installation of guests from ISOs or installation trees, or
+>    the download of "default" images wether the tests will use it or
+>    not (this is what Avocado-VT does/requires)
+> 
+>  * keeping test assets in the tree (Avocado allows this if you have
+>    a your_test.py.data/ directory), but it's not practical for large
+>    files or files that can't or shouldn't be redistributed
+> 
+> > Even without the timeout, it makes the test really slow, even on
+> > repeated runs.  Is there some way we can make the image download part
+> > of "building" the tests rather than actually running the testsuite, so
+> > that a) the test themselves go faster and b) we don't include the
+> > download in the test timeout - obviously the download speed is hugely
+> > dependent on factors that aren't really related to what we're testing
+> > here.
+> >
+> 
+> On Avocado version 72.0 we attempted to minimize the isse by
+> implementing a "vmimage" command.  So, if you expect to use Fedora 30
+> aarch64 images, you could run before your tests:
+> 
+>  $ avocado vmimage get --distro fedora --distro-version 30 --arch aarch64
+> 
+> And to list the images on your cache:
+> 
+>  $ avocado vmimage list
+> 
+> Unfortunately, this test doesn't use the vmimage API.  Actually that
+> is fine because not all test assets map nicely to the vmimage goal,
+> and should keep using the more generic (and lower level) fetch_asset().
+> 
+> We're now working on various "asset fetcher" improvements that should
+> allow us to check/cache all assets before a test is executed.  Also,
+> we're adding a mode in which the "fetch_asset()" API will default to
+> cancel (aka SKIP) a test if the asset could not be downloaded.
+> 
+> If you're interested in the card we're using to track that new feature:
+> 
+>   https://trello.com/c/T3SC1sZs/1521-implement-fetch-assets-command-line-parameter
+> 
+> Another possibility that we've prototyped, and we'll be working on
+> further, is to make a specific part of the "test" code execution
+> (really a pre-test phase) to be executed without a timeout and even be
+> tried a number of times before bailing out and skipping the test.
+> 
+> > In the meantime, I tried hacking it by just increasing the timeout to
+> > 10m.  That got several of the tests working for me, but one still
+> > failed.  Specifically 'LinuxSSH.test_mips_malta32eb_kernel3_2_0' still
+> > timed out for me, but now after booting the guest, rather than during
+> > the image download.  Looking at the avocado log file I'm seeing a
+> > bunch of soft lockup messages from the guest console, AFAICT.  So it
+> > looks like we have a real bug here, which I suspect has been
+> > overlooked precisely because the download problems mean this test
+> > isn't reliable.
+> >
+> 
+> I've schedulled a 100 executions of `make check-acceptance` builds, with
+> the linux_ssh_mips_malta.py tests having a 1500 seconds timeout.  The
+> very first execution already brought interesting results:
+> 
+>  ...
+>  (15/39) /home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mips_malta32eb_kernel3_2_0: PASS (198.38 s)
+>  (16/39) /home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mips_malta64el_kernel3_2_0: FAIL: Failure message found in console: Oops (22.83 s)
+> 
+> I'll let you know about my full results.  This should also serve as a
+> starting point to a discussion about the reliability of other tests,
+> as you mentioned before.
 
---W87L3RQSMP4SxpT88nYEJcjCXBJL1olZC
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Out of the 100 executions on a ppc64le host, the results that contain
+failures and errors:
 
-On 18.09.19 18:30, Vladimir Sementsov-Ogievskiy wrote:
-> 12.09.2019 16:56, Max Reitz wrote:
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>   tests/qemu-iotests/041     | 44 ++++++++++++++++++++++++++++++++++++=
-++
->>   tests/qemu-iotests/041.out |  4 ++--
->>   2 files changed, 46 insertions(+), 2 deletions(-)
->>
->> diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
->> index 8568426311..84bc6d6581 100755
->> --- a/tests/qemu-iotests/041
->> +++ b/tests/qemu-iotests/041
->> @@ -1121,6 +1121,50 @@ class TestOrphanedSource(iotests.QMPTestCase):
->>                                target=3D'dest-ro')
->>           self.assert_qmp(result, 'error/class', 'GenericError')
->>  =20
->> +    def test_failing_permission_in_complete(self):
->> +        self.assert_no_active_block_jobs()
->> +
->> +        # Unshare consistent-read on the target
->> +        # (The mirror job does not care)
->> +        result =3D self.vm.qmp('blockdev-add',
->> +                             driver=3D'blkdebug',
->> +                             node_name=3D'dest-perm',
->> +                             image=3D'dest',
->> +                             unshare_child_perms=3D['consistent-read'=
-])
->> +        self.assert_qmp(result, 'return', {})
->> +
->> +        result =3D self.vm.qmp('blockdev-mirror', job_id=3D'job', dev=
-ice=3D'src',
->> +                             sync=3D'full', target=3D'dest',
->> +                             filter_node_name=3D'mirror-filter')
->> +        self.assert_qmp(result, 'return', {})
->> +
->> +        # Require consistent-read on the source
->> +        # (We can only add this node once the job has started, or it
->> +        # will complain that it does not want to run on non-root node=
-s)
->> +        result =3D self.vm.qmp('blockdev-add',
->> +                             driver=3D'blkdebug',
->> +                             node_name=3D'src-perm',
->> +                             image=3D'src',
->> +                             take_child_perms=3D['consistent-read'])
->> +        self.assert_qmp(result, 'return', {})
->> +
->> +        # While completing, mirror will attempt to replace src by
->> +        # dest, which must fail because src-perm requires
->> +        # consistent-read but dest-perm does not share it; thus
->> +        # aborting the job when it is supposed to complete
->> +        self.complete_and_wait('job',
->> +                               completion_error=3D'Operation not perm=
-itted')
->> +
->> +        # Assert that all of our nodes are still there (except for th=
-e
->> +        # mirror filter, which should be gone despite the failure)
->> +        nodes =3D self.vm.qmp('query-named-block-nodes')['return']
->> +        nodes =3D list(map(lambda image: image['node-name'], nodes))
->=20
-> using list comprehension is a bit more pythonic:
-> nodes =3D [node['node-name'] for node in nodes]
+15-/home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mips_malta32eb_kernel3_2_0
+  - PASS: 92
+  - INTERRUPTED: 4
+  - FAIL: 4
+16-/home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mips_malta64el_kernel3_2_0
+  - PASS: 95
+  - FAIL: 5
 
-OK.  I can never remember, so I rarely bother using list/dict
-comprehensions and instead use what I would do in any other language.
-(Hence the =E2=80=9CSadly=E2=80=9D from John.)
+FAIL means that self.fail() was called, which means 'Oops' was found
+in the console.  INTERRUPTED here means that the test timeout kicked
+in, and I can back David's statements about soft lockups.
 
-(And then wait for some kind reviewer to tell me how to do it right. :-))=
+Let me know if anyone wants access to the full logs/results.
 
+- Cleber.
 
-Max
-
-
---W87L3RQSMP4SxpT88nYEJcjCXBJL1olZC--
-
---2lNDZeKlvC08ZJHdTAWm2NLzYvinuIfco
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2DshAACgkQ9AfbAGHV
-z0ADogf8CZX9vVSKJvh99pDyP28dNTi67M1FQ88+YEm1EoMI3ekxaM1bnvuo8XY5
-BK/ZhhsCeuTuw3cA80jWgWW8t37qut44o9yWgN41116XsPEI02DdgN+pIBdj5zLD
-4xAIVAVpuy0GDA39kR9qt5F+t6TWUZg6msp6LoTae8xzYkVaO/7Gs9WzWbt3HfBL
-zlOf2zDSNyhdRtOQz2FGAOgIArGKoEwMh5dEJHRT5he31EVbkQHQg3BVgberu2En
-j6Ui7UO1CJTnQ1NeI04iV06/haMWBbhSgBxC/lSdXxJ3xuKnpUWpv0NMM/UEvku9
-j55MTwQ1TwcnlG21moYgvlxoa/MVHw==
-=31il
------END PGP SIGNATURE-----
-
---2lNDZeKlvC08ZJHdTAWm2NLzYvinuIfco--
+> 
+> In my experience, and backed by the executions on Travis, most tests
+> have been really stable on x86_64 hosts.  Last week I've worked in
+> ppc64 and aarch64 hosts, and posted a number of patches addressing
+> the failures I found.  I'll compile a list of the posted patches and
+> their status.
+> 
+> Thanks for reporting those issues.
+> - Cleber.
+> 
+> > Any thoughts on how to improve the situation?
+> > 
+> > -- 
+> > David Gibson			| I'll have my music baroque, and my code
+> > david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> > 				| _way_ _around_!
+> > http://www.ozlabs.org/~dgibson
+> 
+> 
 
