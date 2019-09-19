@@ -2,71 +2,87 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ABC5C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:09:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B758FC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:12:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2D082067B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:09:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2D082067B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 90B09205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:12:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90B09205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAx7w-0003DB-Ek
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 10:09:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51610)
+	id 1iAxAc-0007BH-Ug
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 10:12:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51866)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iAwx3-0007Cl-IG
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:58:30 -0400
+ (envelope-from <philmd@redhat.com>) id 1iAwxA-0007b5-5E
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:58:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iAwtY-0003hV-5e
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:54:53 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:36933)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iAwtX-0003gq-T1; Thu, 19 Sep 2019 09:54:52 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1N0nSN-1hyWoc3a1V-00wq5c; Thu, 19 Sep 2019 15:54:48 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Date: Thu, 19 Sep 2019 15:54:37 +0200
-Message-Id: <20190919135443.15164-3-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190919135443.15164-1-laurent@vivier.eu>
-References: <20190919135443.15164-1-laurent@vivier.eu>
+ (envelope-from <philmd@redhat.com>) id 1iAwqn-0002Aw-M0
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:52:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44106)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iAwqn-00029Z-Gi
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:52:01 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 47FB164132
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 13:52:00 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id t11so1104389wro.10
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 06:52:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=2I/QFFNOpwYufZDIchbsJ8ibuXr+OBeCA/S1C9KAdqU=;
+ b=LKMUXd46mXN2+DYh7XE8HAivUeqqBIhP7g18mlmq4ZkVTaZW3W3SbEFLXIVhmQOIS1
+ RF/nB1LWP8C+g2d99+uFHY3jPaDVV34QXdqB9scoddIJfY+7NCCFo0/pFiQeaxWFGQbf
+ U9OF1yLc2iNwV2+/ps9516LZFBMUNMCQFpVVznOIpvarTVlGZsJAh+kfV3+49CvhBFwb
+ HJk7RLXe7tRzVYrJ9uYX1yLurgBtg9tx2KM3ucmmxyBDPxMZY0CnFpBv7CEsFoXHnN2i
+ aTjZkN9rT0pupGP+8WMox9p5hWo3SLQcx56HqNMyhqmz7dhMf0RFR+49R8S3tCcFG8Qi
+ 63ag==
+X-Gm-Message-State: APjAAAUakaUOikRM+G9y4/Ec4RRMJTx3UGDOvtVSSCKS33T1EVvBBjwi
+ 0krlDnKmlaRIiFIO4UE6FMCYGB0Ya63s5A9KTP3fkpcdf8oqNeovHSVGrF0wJG3uONo7plVG4Rj
+ /JBuPWEMGITm6qkQ=
+X-Received: by 2002:a7b:c956:: with SMTP id i22mr3202481wml.90.1568901119108; 
+ Thu, 19 Sep 2019 06:51:59 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxZNvXKZBCSX5MgThTZyfCI0xyHD32HgbrFUGXW/2OJfmoNfUWDwZyA0aYZQB9YFOozC39HuQ==
+X-Received: by 2002:a7b:c956:: with SMTP id i22mr3202459wml.90.1568901118924; 
+ Thu, 19 Sep 2019 06:51:58 -0700 (PDT)
+Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id i73sm3844687wmg.33.2019.09.19.06.51.58
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 19 Sep 2019 06:51:58 -0700 (PDT)
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+References: <20190912231202.12327-1-mdroth@linux.vnet.ibm.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <4d90ff88-07ad-b456-bae4-bd635e192d02@redhat.com>
+Date: Thu, 19 Sep 2019 15:51:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:xPGho2GRX7EUlkypACv+yhmVOn2fdClQAwJzIDjJjLjjATUqouJ
- vLla1oVdC0qkTVDvRJKgpSM4TAuSy6/vtIhfQ7WZUppZ8ADYpwkNHRopgbUMxXst7uzAOJL
- 7Ue4TtvmfBhpON9eJqq4nH4n3NeKnS7aab6qJbUty+MffpIa0mkbTDsCbZIseYTOvHZaiH/
- peTBvkTJb0rR3vgjk3wow==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:6UpysBwUi7s=:qFJvhP7ChDJuzkdplyJBXt
- btnBqZHlyscHGi8D9l4QdbD/3LDRBz0npl9n4NzA4FtfkchkGAc9FQsp3hNJtyHBC/73Omu0K
- 67tlSh4S+SJu+ch3AjIUhUZFGNIZNcG9ctdkZurCxbl+cNPfrXCcX2pv0caWvfs/T2AimaJyz
- +4Scy5YSMVgl2GHB/PsHN2F3uQ0nlZVWTP4uvVogJSrMPviOR+BdBrBb8aUPaue410E5mfCEy
- O7Ywys9mxvJqMARgFqJ4R0V/ptrh14vIqVIUS7A2vp3UT2hwRMNDk5MqjUG1PfeXyClnKMXtj
- XPcuM7d2OthofGjhHCqTjrMt8tfgxTzMrOzw3rFtMwdwx1l0lluJeSCcWVImuH0g9OXiJ4Gfo
- AN7Qr+MEM7B+ip7ZdiT5IctNLOpY3gQTTCc7gc8zjSZOfX6Vj5KnU85SXGnxBUuKFjET4GmjS
- 8PU6Cw+e4dXVI0bTGT6nr5FwU/YNNvQDvf8x2HqT5i0PT0lb2v+B7GkAzLM0bwVrjMJXgFMGp
- KEjqB0EMKpnrTxY5VVHLXpsZyNw0sOhhJIM/XVQM0ufm7/nBikQP39QX8BaUE80Dt4K2g/AKd
- /EUtA52rYtPSFuspvi6mFXdq6BBzqmEzOQTwfK4mXmcT1nM7UHAjYcRFc6ScRLc3VyI+azWfQ
- wNYZUQ8DtcEC1wSsASTSxm9uE3nG1hrVp9timL2I+Mt2oprln3/zY2JGwdXbIdPEf46GL0UlG
- /JLUTlclH4q+FT6Dv07jemn4EepyMIRsC4jRfJTRhCVQ7jvL4apBGielLyV3hOcQo8fkJdC8v
- 6W1bDNwT+GZR5PpTwCgqec+QU+gkBuVrMEGLMG6g45b0aPruOm+3fcSxuveiFw4a1D4b/yy3R
- QeLfCGE3ovsnYYz0CTgdMbs3PfCAAVXxIonYpmKy8=
+In-Reply-To: <20190912231202.12327-1-mdroth@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.24
-Subject: [Qemu-devel] [PULL 2/8] cutils: Move size_to_str() from
- "qemu-common.h" to "qemu/cutils.h"
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/2] Fix tarball builds of UEFI/EDK2
+ firmware
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,86 +94,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, John Snow <jsnow@redhat.com>,
- Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- Peter Xu <peterx@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: lersek@redhat.com, brogers@suse.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+On 9/13/19 1:12 AM, Michael Roth wrote:
+> Bruce noticed that we cannot build `make efi` target from the v4.1.0
+> tarball. This is due to a failure on the part of the make-release scrip=
+t
+> to pull in submodules nested under other submodules, as well as
+> Makefile.edk2's assumptions about being in a git tree.
 
-"qemu/cutils.h" contains various qemu_strtosz_*() functions
-useful to convert strings to size. It seems natural to have
-the opposite usage (from size to string) there too.
+Hmm I'd expect distributions interested in building EDK2, build it
+properly tuned, outside of QEMU. I consider what is here as default
+config useful for testing, not for production use. I might be wrong.
 
-The function definition is already in util/cutils.c.
+Meanwhile, it is true 'make efi' should not fail.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20190903120555.7551-1-philmd@redhat.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- block/qapi.c                 | 2 +-
- include/qemu-common.h        | 1 -
- include/qemu/cutils.h        | 2 ++
- qapi/string-output-visitor.c | 2 +-
- 4 files changed, 4 insertions(+), 3 deletions(-)
+> Suggestions for more robust solutions are definitely welcome, but for
+> now this series takes what seems to be the most direct approach.
 
-diff --git a/block/qapi.c b/block/qapi.c
-index 15f103026473..7ee2ee065d24 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -23,7 +23,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "qemu-common.h"
-+#include "qemu/cutils.h"
- #include "block/qapi.h"
- #include "block/block_int.h"
- #include "block/throttle-groups.h"
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index 0235cd3b912e..8d84db90b083 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -123,7 +123,6 @@ void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size);
- int parse_debug_env(const char *name, int max, int initial);
- 
- const char *qemu_ether_ntoa(const MACAddr *mac);
--char *size_to_str(uint64_t val);
- void page_size_init(void);
- 
- /* returns non-zero if dump is in progress, otherwise zero is
-diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-index 12301340a474..b54c847e0fef 100644
---- a/include/qemu/cutils.h
-+++ b/include/qemu/cutils.h
-@@ -155,6 +155,8 @@ int qemu_strtosz(const char *nptr, const char **end, uint64_t *result);
- int qemu_strtosz_MiB(const char *nptr, const char **end, uint64_t *result);
- int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *result);
- 
-+char *size_to_str(uint64_t val);
-+
- /* used to print char* safely */
- #define STR_OR_NULL(str) ((str) ? (str) : "null")
- 
-diff --git a/qapi/string-output-visitor.c b/qapi/string-output-visitor.c
-index 7ab64468d9a5..0d93605d77a7 100644
---- a/qapi/string-output-visitor.c
-+++ b/qapi/string-output-visitor.c
-@@ -11,7 +11,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "qemu-common.h"
-+#include "qemu/cutils.h"
- #include "qapi/string-output-visitor.h"
- #include "qapi/visitor-impl.h"
- #include "qemu/host-utils.h"
--- 
-2.21.0
+This is fine:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
+I'll queue these patches in my edk2-next branch since I'm preparing a
+pull request.
+
+Thanks,
+
+Phil.
 
