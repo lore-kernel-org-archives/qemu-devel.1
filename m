@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B1E2C49ED7
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 06:04:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1383AC49ED7
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 06:04:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4095B21848
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 06:04:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4095B21848
+	by mail.kernel.org (Postfix) with ESMTPS id DD4DA21848
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 06:04:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD4DA21848
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iApY2-0006yR-NB
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 02:04:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42592)
+	id 1iApYf-0007Sr-PW
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 02:04:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42795)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iApLT-0001KO-30
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:51:12 -0400
+ (envelope-from <clg@kaod.org>) id 1iApM6-0002BV-Rp
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:51:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iApLQ-00084k-Oh
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:51:10 -0400
-Received: from 6.mo173.mail-out.ovh.net ([46.105.43.93]:36207)
+ (envelope-from <clg@kaod.org>) id 1iApM5-0008Vk-BF
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:51:50 -0400
+Received: from 19.mo3.mail-out.ovh.net ([178.32.98.231]:54574)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iApLQ-00083w-Ge
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:51:08 -0400
-Received: from player788.ha.ovh.net (unknown [10.108.35.59])
- by mo173.mail-out.ovh.net (Postfix) with ESMTP id 2788C11A066
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 07:51:07 +0200 (CEST)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iApM5-0008US-5L
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 01:51:49 -0400
+Received: from player788.ha.ovh.net (unknown [10.109.160.143])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id 8003F225BAA
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 07:51:47 +0200 (CEST)
 Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
  (Authenticated sender: clg@kaod.org)
- by player788.ha.ovh.net (Postfix) with ESMTPSA id 960089F17426;
- Thu, 19 Sep 2019 05:51:00 +0000 (UTC)
+ by player788.ha.ovh.net (Postfix) with ESMTPSA id DF88C9F175BC;
+ Thu, 19 Sep 2019 05:51:40 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 19 Sep 2019 07:49:49 +0200
-Message-Id: <20190919055002.6729-9-clg@kaod.org>
+Date: Thu, 19 Sep 2019 07:49:55 +0200
+Message-Id: <20190919055002.6729-15-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190919055002.6729-1-clg@kaod.org>
 References: <20190919055002.6729-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 1678435286725462801
+X-Ovh-Tracer-Id: 1689694286966786833
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudelgdelhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.43.93
-Subject: [Qemu-devel] [PATCH 08/21] aspeed/sdmc: Introduce an object class
+X-Received-From: 178.32.98.231
+Subject: [Qemu-devel] [PATCH 14/21] aspeed/i2c: Introduce an object class
  per SoC
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,305 +75,186 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use class handlers and class constants to differentiate the
-characteristics of the memory controller and remove the 'silicon_rev'
-property.
+It prepares ground for register differences between SoCs.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/misc/aspeed_sdmc.h |  19 +++-
- hw/arm/aspeed_soc.c           |   5 +-
- hw/misc/aspeed_sdmc.c         | 168 +++++++++++++++++++++-------------
- 3 files changed, 122 insertions(+), 70 deletions(-)
+ include/hw/i2c/aspeed_i2c.h | 15 ++++++++++
+ hw/arm/aspeed_soc.c         |  3 +-
+ hw/i2c/aspeed_i2c.c         | 60 ++++++++++++++++++++++++++++++++-----
+ 3 files changed, 69 insertions(+), 9 deletions(-)
 
-diff --git a/include/hw/misc/aspeed_sdmc.h b/include/hw/misc/aspeed_sdmc.=
-h
-index b3c926acae90..81156320c497 100644
---- a/include/hw/misc/aspeed_sdmc.h
-+++ b/include/hw/misc/aspeed_sdmc.h
-@@ -13,6 +13,8 @@
+diff --git a/include/hw/i2c/aspeed_i2c.h b/include/hw/i2c/aspeed_i2c.h
+index a2753f0bbbaa..6e2dae7db818 100644
+--- a/include/hw/i2c/aspeed_i2c.h
++++ b/include/hw/i2c/aspeed_i2c.h
+@@ -25,6 +25,8 @@
+ #include "hw/sysbus.h"
 =20
- #define TYPE_ASPEED_SDMC "aspeed.sdmc"
- #define ASPEED_SDMC(obj) OBJECT_CHECK(AspeedSDMCState, (obj), TYPE_ASPEE=
-D_SDMC)
-+#define TYPE_ASPEED_2400_SDMC TYPE_ASPEED_SDMC "-ast2400"
-+#define TYPE_ASPEED_2500_SDMC TYPE_ASPEED_SDMC "-ast2500"
+ #define TYPE_ASPEED_I2C "aspeed.i2c"
++#define TYPE_ASPEED_2400_I2C TYPE_ASPEED_I2C "-ast2400"
++#define TYPE_ASPEED_2500_I2C TYPE_ASPEED_I2C "-ast2500"
+ #define ASPEED_I2C(obj) \
+     OBJECT_CHECK(AspeedI2CState, (obj), TYPE_ASPEED_I2C)
 =20
- #define ASPEED_SDMC_NR_REGS (0x174 >> 2)
+@@ -59,6 +61,19 @@ typedef struct AspeedI2CState {
+     AspeedI2CBus busses[ASPEED_I2C_NR_BUSSES];
+ } AspeedI2CState;
 =20
-@@ -24,12 +26,21 @@ typedef struct AspeedSDMCState {
-     MemoryRegion iomem;
-=20
-     uint32_t regs[ASPEED_SDMC_NR_REGS];
--    uint32_t silicon_rev;
--    uint32_t ram_bits;
-     uint64_t ram_size;
-     uint64_t max_ram_size;
--    uint32_t fixed_conf;
--
- } AspeedSDMCState;
-=20
-+#define ASPEED_SDMC_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(AspeedSDMCClass, (klass), TYPE_ASPEED_SDMC)
-+#define ASPEED_SDMC_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(AspeedSDMCClass, (obj), TYPE_ASPEED_SDMC)
++#define ASPEED_I2C_CLASS(klass) \
++     OBJECT_CLASS_CHECK(AspeedI2CClass, (klass), TYPE_ASPEED_I2C)
++#define ASPEED_I2C_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(AspeedI2CClass, (obj), TYPE_ASPEED_I2C)
 +
-+typedef struct AspeedSDMCClass {
++typedef struct AspeedI2CClass {
 +    SysBusDeviceClass parent_class;
 +
-+    uint64_t max_ram_size;
-+    uint32_t (*compute_conf)(AspeedSDMCState *s, uint32_t data);
-+    void (*write)(AspeedSDMCState *s, uint32_t reg, uint32_t data);
-+} AspeedSDMCClass;
++    uint8_t num_busses;
++    uint8_t reg_size;
++    uint8_t gap;
++} AspeedI2CClass;
 +
- #endif /* ASPEED_SDMC_H */
+ I2CBus *aspeed_i2c_get_bus(DeviceState *dev, int busnr);
+=20
+ #endif /* ASPEED_I2C_H */
 diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index 26e03486f9b7..aaf18d3e42f1 100644
+index 5c5fcb810944..e60f198d92c1 100644
 --- a/hw/arm/aspeed_soc.c
 +++ b/hw/arm/aspeed_soc.c
-@@ -205,10 +205,9 @@ static void aspeed_soc_init(Object *obj)
-                               sizeof(s->spi[i]), typename);
-     }
+@@ -188,8 +188,9 @@ static void aspeed_soc_init(Object *obj)
+     object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
+                                    OBJECT(&s->scu), &error_abort);
 =20
-+    snprintf(typename, sizeof(typename), "aspeed.sdmc-%s", socname);
-     sysbus_init_child_obj(obj, "sdmc", OBJECT(&s->sdmc), sizeof(s->sdmc)=
-,
--                          TYPE_ASPEED_SDMC);
--    qdev_prop_set_uint32(DEVICE(&s->sdmc), "silicon-rev",
--                         sc->info->silicon_rev);
++    snprintf(typename, sizeof(typename), "aspeed.i2c-%s", socname);
+     sysbus_init_child_obj(obj, "i2c", OBJECT(&s->i2c), sizeof(s->i2c),
+-                          TYPE_ASPEED_I2C);
 +                          typename);
-     object_property_add_alias(obj, "ram-size", OBJECT(&s->sdmc),
-                               "ram-size", &error_abort);
-     object_property_add_alias(obj, "max-ram-size", OBJECT(&s->sdmc),
-diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
-index cb13c63ec848..60c99e773488 100644
---- a/hw/misc/aspeed_sdmc.c
-+++ b/hw/misc/aspeed_sdmc.c
-@@ -110,6 +110,7 @@ static void aspeed_sdmc_write(void *opaque, hwaddr ad=
-dr, uint64_t data,
-                              unsigned int size)
+=20
+     snprintf(typename, sizeof(typename), "aspeed.fmc-%s", socname);
+     sysbus_init_child_obj(obj, "fmc", OBJECT(&s->fmc), sizeof(s->fmc),
+diff --git a/hw/i2c/aspeed_i2c.c b/hw/i2c/aspeed_i2c.c
+index a956eb384922..fabdb01e9747 100644
+--- a/hw/i2c/aspeed_i2c.c
++++ b/hw/i2c/aspeed_i2c.c
+@@ -408,10 +408,11 @@ static void aspeed_i2c_reset(DeviceState *dev)
  {
-     AspeedSDMCState *s =3D ASPEED_SDMC(opaque);
-+    AspeedSDMCClass *asc =3D ASPEED_SDMC_GET_CLASS(s);
+     int i;
+     AspeedI2CState *s =3D ASPEED_I2C(dev);
++    AspeedI2CClass *aic =3D ASPEED_I2C_GET_CLASS(s);
 =20
-     addr >>=3D 2;
+     s->intr_status =3D 0;
 =20
-@@ -130,41 +131,7 @@ static void aspeed_sdmc_write(void *opaque, hwaddr a=
-ddr, uint64_t data,
-         return;
-     }
-=20
--    if (addr =3D=3D R_CONF) {
--        /* Make sure readonly bits are kept */
--        switch (s->silicon_rev) {
--        case AST2400_A0_SILICON_REV:
--        case AST2400_A1_SILICON_REV:
--            data &=3D ~ASPEED_SDMC_READONLY_MASK;
--            data |=3D s->fixed_conf;
--            break;
--        case AST2500_A0_SILICON_REV:
--        case AST2500_A1_SILICON_REV:
--            data &=3D ~ASPEED_SDMC_AST2500_READONLY_MASK;
--            data |=3D s->fixed_conf;
--            break;
--        default:
--            g_assert_not_reached();
--        }
--    }
--    if (s->silicon_rev =3D=3D AST2500_A0_SILICON_REV ||
--            s->silicon_rev =3D=3D AST2500_A1_SILICON_REV) {
--        switch (addr) {
--        case R_STATUS1:
--            /* Will never return 'busy' */
--            data &=3D ~PHY_BUSY_STATE;
--            break;
--        case R_ECC_TEST_CTRL:
--            /* Always done, always happy */
--            data |=3D ECC_TEST_FINISHED;
--            data &=3D ~ECC_TEST_FAIL;
--            break;
--        default:
--            break;
--        }
--    }
--
--    s->regs[addr] =3D data;
-+    asc->write(s, addr, data);
+-    for (i =3D 0; i < ASPEED_I2C_NR_BUSSES; i++) {
++    for (i =3D 0; i < aic->num_busses; i++) {
+         s->busses[i].intr_ctrl =3D 0;
+         s->busses[i].intr_status =3D 0;
+         s->busses[i].cmd =3D 0;
+@@ -421,7 +422,7 @@ static void aspeed_i2c_reset(DeviceState *dev)
  }
 =20
- static const MemoryRegionOps aspeed_sdmc_ops =3D {
-@@ -222,44 +189,21 @@ static int ast2500_rambits(AspeedSDMCState *s)
- static void aspeed_sdmc_reset(DeviceState *dev)
- {
-     AspeedSDMCState *s =3D ASPEED_SDMC(dev);
-+    AspeedSDMCClass *asc =3D ASPEED_SDMC_GET_CLASS(s);
-=20
-     memset(s->regs, 0, sizeof(s->regs));
-=20
-     /* Set ram size bit and defaults values */
--    s->regs[R_CONF] =3D s->fixed_conf;
-+    s->regs[R_CONF] =3D asc->compute_conf(s, 0);
- }
-=20
- static void aspeed_sdmc_realize(DeviceState *dev, Error **errp)
- {
+ /*
+- * Address Definitions
++ * Address Definitions (AST2400 and AST2500)
+  *
+  *   0x000 ... 0x03F: Global Register
+  *   0x040 ... 0x07F: Device 1
+@@ -446,22 +447,24 @@ static void aspeed_i2c_realize(DeviceState *dev, Er=
+ror **errp)
+     int i;
      SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-     AspeedSDMCState *s =3D ASPEED_SDMC(dev);
-+    AspeedSDMCClass *asc =3D ASPEED_SDMC_GET_CLASS(s);
+     AspeedI2CState *s =3D ASPEED_I2C(dev);
++    AspeedI2CClass *aic =3D ASPEED_I2C_GET_CLASS(s);
 =20
--    if (!is_supported_silicon_rev(s->silicon_rev)) {
--        error_setg(errp, "Unknown silicon revision: 0x%" PRIx32,
--                s->silicon_rev);
--        return;
--    }
--
--    switch (s->silicon_rev) {
--    case AST2400_A0_SILICON_REV:
--    case AST2400_A1_SILICON_REV:
--        s->ram_bits =3D ast2400_rambits(s);
--        s->max_ram_size =3D 512 << 20;
--        s->fixed_conf =3D ASPEED_SDMC_VGA_COMPAT |
--            ASPEED_SDMC_DRAM_SIZE(s->ram_bits);
--        break;
--    case AST2500_A0_SILICON_REV:
--    case AST2500_A1_SILICON_REV:
--        s->ram_bits =3D ast2500_rambits(s);
--        s->max_ram_size =3D 1024 << 20;
--        s->fixed_conf =3D ASPEED_SDMC_HW_VERSION(1) |
--            ASPEED_SDMC_VGA_APERTURE(ASPEED_SDMC_VGA_64MB) |
--            ASPEED_SDMC_CACHE_INITIAL_DONE |
--            ASPEED_SDMC_DRAM_SIZE(s->ram_bits);
--        break;
--    default:
--        g_assert_not_reached();
--    }
-+    s->max_ram_size =3D asc->max_ram_size;
+     sysbus_init_irq(sbd, &s->irq);
+     memory_region_init_io(&s->iomem, OBJECT(s), &aspeed_i2c_ctrl_ops, s,
+                           "aspeed.i2c", 0x1000);
+     sysbus_init_mmio(sbd, &s->iomem);
 =20
-     memory_region_init_io(&s->iomem, OBJECT(s), &aspeed_sdmc_ops, s,
-                           TYPE_ASPEED_SDMC, 0x1000);
-@@ -277,7 +221,6 @@ static const VMStateDescription vmstate_aspeed_sdmc =3D=
- {
- };
-=20
- static Property aspeed_sdmc_properties[] =3D {
--    DEFINE_PROP_UINT32("silicon-rev", AspeedSDMCState, silicon_rev, 0),
-     DEFINE_PROP_UINT64("ram-size", AspeedSDMCState, ram_size, 0),
-     DEFINE_PROP_UINT64("max-ram-size", AspeedSDMCState, max_ram_size, 0)=
-,
-     DEFINE_PROP_END_OF_LIST(),
-@@ -298,11 +241,110 @@ static const TypeInfo aspeed_sdmc_info =3D {
-     .parent =3D TYPE_SYS_BUS_DEVICE,
-     .instance_size =3D sizeof(AspeedSDMCState),
-     .class_init =3D aspeed_sdmc_class_init,
-+    .class_size =3D sizeof(AspeedSDMCClass),
+-    for (i =3D 0; i < ASPEED_I2C_NR_BUSSES; i++) {
+-        char name[16];
+-        int offset =3D i < 7 ? 1 : 5;
++    for (i =3D 0; i < aic->num_busses; i++) {
++        char name[32];
++        int offset =3D i < aic->gap ? 1 : 5;
+         snprintf(name, sizeof(name), "aspeed.i2c.%d", i);
+         s->busses[i].controller =3D s;
+         s->busses[i].id =3D i;
+         s->busses[i].bus =3D i2c_init_bus(dev, name);
+         memory_region_init_io(&s->busses[i].mr, OBJECT(dev),
+-                              &aspeed_i2c_bus_ops, &s->busses[i], name, =
+0x40);
+-        memory_region_add_subregion(&s->iomem, 0x40 * (i + offset),
++                              &aspeed_i2c_bus_ops, &s->busses[i], name,
++                              aic->reg_size);
++        memory_region_add_subregion(&s->iomem, aic->reg_size * (i + offs=
+et),
+                                     &s->busses[i].mr);
+     }
+ }
+@@ -481,11 +484,51 @@ static const TypeInfo aspeed_i2c_info =3D {
+     .parent        =3D TYPE_SYS_BUS_DEVICE,
+     .instance_size =3D sizeof(AspeedI2CState),
+     .class_init    =3D aspeed_i2c_class_init,
++    .class_size =3D sizeof(AspeedI2CClass),
 +    .abstract   =3D true,
 +};
 +
-+static uint32_t aspeed_2400_sdmc_compute_conf(AspeedSDMCState *s, uint32=
-_t data)
-+{
-+    uint32_t fixed_conf =3D ASPEED_SDMC_VGA_COMPAT |
-+        ASPEED_SDMC_DRAM_SIZE(ast2400_rambits(s));
-+
-+    /* Make sure readonly bits are kept */
-+    data &=3D ~ASPEED_SDMC_READONLY_MASK;
-+
-+    return data | fixed_conf;
-+}
-+
-+static void aspeed_2400_sdmc_write(AspeedSDMCState *s, uint32_t reg,
-+                                   uint32_t data)
-+{
-+    switch (reg) {
-+    case R_CONF:
-+        data =3D aspeed_2400_sdmc_compute_conf(s, data);
-+        break;
-+    default:
-+        break;
-+    }
-+
-+    s->regs[reg] =3D data;
-+}
-+
-+static void aspeed_2400_sdmc_class_init(ObjectClass *klass, void *data)
++static void aspeed_2400_i2c_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    AspeedSDMCClass *asc =3D ASPEED_SDMC_CLASS(klass);
++    AspeedI2CClass *aic =3D ASPEED_I2C_CLASS(klass);
 +
-+    dc->desc =3D "ASPEED 2400 SDRAM Memory Controller";
-+    asc->max_ram_size =3D 512 << 20;
-+    asc->compute_conf =3D aspeed_2400_sdmc_compute_conf;
-+    asc->write =3D aspeed_2400_sdmc_write;
++    dc->desc =3D "ASPEED 2400 I2C Controller";
++
++    aic->num_busses =3D 14;
++    aic->reg_size =3D 0x40;
++    aic->gap =3D 7;
 +}
 +
-+static const TypeInfo aspeed_2400_sdmc_info =3D {
-+    .name =3D TYPE_ASPEED_2400_SDMC,
-+    .parent =3D TYPE_ASPEED_SDMC,
-+    .class_init =3D aspeed_2400_sdmc_class_init,
++static const TypeInfo aspeed_2400_i2c_info =3D {
++    .name =3D TYPE_ASPEED_2400_I2C,
++    .parent =3D TYPE_ASPEED_I2C,
++    .class_init =3D aspeed_2400_i2c_class_init,
 +};
 +
-+static uint32_t aspeed_2500_sdmc_compute_conf(AspeedSDMCState *s, uint32=
-_t data)
-+{
-+    uint32_t fixed_conf =3D ASPEED_SDMC_HW_VERSION(1) |
-+        ASPEED_SDMC_VGA_APERTURE(ASPEED_SDMC_VGA_64MB) |
-+        ASPEED_SDMC_CACHE_INITIAL_DONE |
-+        ASPEED_SDMC_DRAM_SIZE(ast2500_rambits(s));
-+
-+    /* Make sure readonly bits are kept */
-+    data &=3D ~ASPEED_SDMC_AST2500_READONLY_MASK;
-+
-+    return data | fixed_conf;
-+}
-+
-+static void aspeed_2500_sdmc_write(AspeedSDMCState *s, uint32_t reg,
-+                                   uint32_t data)
-+{
-+    switch (reg) {
-+    case R_CONF:
-+        data =3D aspeed_2500_sdmc_compute_conf(s, data);
-+        break;
-+    case R_STATUS1:
-+        /* Will never return 'busy' */
-+        data &=3D ~PHY_BUSY_STATE;
-+        break;
-+    case R_ECC_TEST_CTRL:
-+        /* Always done, always happy */
-+        data |=3D ECC_TEST_FINISHED;
-+        data &=3D ~ECC_TEST_FAIL;
-+        break;
-+    default:
-+        break;
-+    }
-+
-+    s->regs[reg] =3D data;
-+}
-+
-+static void aspeed_2500_sdmc_class_init(ObjectClass *klass, void *data)
++static void aspeed_2500_i2c_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    AspeedSDMCClass *asc =3D ASPEED_SDMC_CLASS(klass);
++    AspeedI2CClass *aic =3D ASPEED_I2C_CLASS(klass);
 +
-+    dc->desc =3D "ASPEED 2500 SDRAM Memory Controller";
-+    asc->max_ram_size =3D 1024 << 20;
-+    asc->compute_conf =3D aspeed_2500_sdmc_compute_conf;
-+    asc->write =3D aspeed_2500_sdmc_write;
++    dc->desc =3D "ASPEED 2500 I2C Controller";
++
++    aic->num_busses =3D 14;
++    aic->reg_size =3D 0x40;
++    aic->gap =3D 7;
 +}
 +
-+static const TypeInfo aspeed_2500_sdmc_info =3D {
-+    .name =3D TYPE_ASPEED_2500_SDMC,
-+    .parent =3D TYPE_ASPEED_SDMC,
-+    .class_init =3D aspeed_2500_sdmc_class_init,
++static const TypeInfo aspeed_2500_i2c_info =3D {
++    .name =3D TYPE_ASPEED_2500_I2C,
++    .parent =3D TYPE_ASPEED_I2C,
++    .class_init =3D aspeed_2500_i2c_class_init,
  };
 =20
- static void aspeed_sdmc_register_types(void)
+ static void aspeed_i2c_register_types(void)
  {
-     type_register_static(&aspeed_sdmc_info);
-+    type_register_static(&aspeed_2400_sdmc_info);
-+    type_register_static(&aspeed_2500_sdmc_info);
+     type_register_static(&aspeed_i2c_info);
++    type_register_static(&aspeed_2400_i2c_info);
++    type_register_static(&aspeed_2500_i2c_info);
  }
 =20
- type_init(aspeed_sdmc_register_types);
+ type_init(aspeed_i2c_register_types)
+@@ -494,9 +537,10 @@ type_init(aspeed_i2c_register_types)
+ I2CBus *aspeed_i2c_get_bus(DeviceState *dev, int busnr)
+ {
+     AspeedI2CState *s =3D ASPEED_I2C(dev);
++    AspeedI2CClass *aic =3D ASPEED_I2C_GET_CLASS(s);
+     I2CBus *bus =3D NULL;
+=20
+-    if (busnr >=3D 0 && busnr < ASPEED_I2C_NR_BUSSES) {
++    if (busnr >=3D 0 && busnr < aic->num_busses) {
+         bus =3D s->busses[busnr].bus;
+     }
+=20
 --=20
 2.21.0
 
