@@ -2,63 +2,60 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6070C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 13:35:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBED6C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 13:36:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C24D218AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 13:35:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C24D218AF
+	by mail.kernel.org (Postfix) with ESMTPS id 5009921D56
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 13:36:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5009921D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAwb2-0004pn-4y
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 09:35:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44206)
+	id 1iAwc9-0006Vh-Bu
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 09:36:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41479)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iAwAX-0007hG-OA
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:08:22 -0400
+ (envelope-from <cohuck@redhat.com>) id 1iAvsh-0006Le-64
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 08:50:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iAwAW-00060o-Fo
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:08:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40592)
+ (envelope-from <cohuck@redhat.com>) id 1iAvke-0007zX-3X
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 08:41:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33286)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iAwAW-00060K-AG
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:08:20 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1iAvkd-0007wJ-SJ; Thu, 19 Sep 2019 08:41:36 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5ACC6898106;
- Thu, 19 Sep 2019 13:08:19 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 289F25C1D4;
- Thu, 19 Sep 2019 13:08:11 +0000 (UTC)
-Date: Thu, 19 Sep 2019 14:08:10 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "Oleinik, Alexander" <alxndr@bu.edu>
-Message-ID: <20190919130810.GS3606@stefanha-x1.localdomain>
-References: <20190918231846.22538-1-alxndr@bu.edu>
- <20190918231846.22538-21-alxndr@bu.edu>
+ by mx1.redhat.com (Postfix) with ESMTPS id 328CE30B2502;
+ Thu, 19 Sep 2019 12:41:35 +0000 (UTC)
+Received: from localhost (dhcp-192-230.str.redhat.com [10.33.192.230])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8321460BF1;
+ Thu, 19 Sep 2019 12:41:31 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 19 Sep 2019 14:40:45 +0200
+Message-Id: <20190919124115.11510-5-cohuck@redhat.com>
+In-Reply-To: <20190919124115.11510-1-cohuck@redhat.com>
+References: <20190919124115.11510-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="/KohU7xR/z4Rz7fl"
-Content-Disposition: inline
-In-Reply-To: <20190918231846.22538-21-alxndr@bu.edu>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Thu, 19 Sep 2019 13:08:19 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Thu, 19 Sep 2019 12:41:35 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 20/22] fuzz: add i440fx fuzz targets
+Subject: [Qemu-devel] [PULL 04/34] s390x/tcg: MVCL: Process max 4k bytes at
+ a time
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,84 +67,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "bsd@redhat.com" <bsd@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: qemu-s390x@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: David Hildenbrand <david@redhat.com>
 
---/KohU7xR/z4Rz7fl
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Process max 4k bytes at a time, writing back registers between the
+accesses. The instruction is interruptible.
+    "For operands longer than 2K bytes, access exceptions are not
+    recognized for locations more than 2K bytes beyond the current locati=
+on
+    being processed."
+Note that on z/Architecture, 2k vs. 4k access cannot get differentiated a=
+s
+long as pages are not crossed. This seems to be a leftover from ESA/390.
+Simply stay within single pages.
 
-On Wed, Sep 18, 2019 at 11:19:47PM +0000, Oleinik, Alexander wrote:
-> +static void i440fx_fuzz_qtest(QTestState *s,
-> +        const unsigned char *Data, size_t Size) {
-> +
-> +    typedef struct QTestFuzzAction {
-> +        uint8_t id;
-> +        uint8_t addr;
-> +        uint32_t value;
-> +    } QTestFuzzAction;
+MVCL handling is quite different than MVCLE/MVCLU handling, so split up
+the handlers.
 
-I'm concerned about padding within the struct and struct alignment
-causing us to skip some bytes in Data[].  Also, on some architectures
-unaligned memory accesses are unsupported so memcpy() is safer than
-casting a pointer directly into Data[].
+Defer interrupt handling, as that will require more thought, add a TODO
+for that.
 
-The question is whether skipping bytes in Data[] matters.
-Feedback-directed fuzzing should realize that certain offsets in Data[]
-are unused and do not affect the input space.  Still, I think we should
-arrange things so that every bit in Data[] matters as much as possible.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/mem_helper.c | 44 +++++++++++++++++++++++++++++++++------
+ 1 file changed, 38 insertions(+), 6 deletions(-)
 
-The struct can be arranged to avoid struct field padding:
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 223312a4b194..58ab2e48e341 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -798,19 +798,51 @@ uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t =
+r1, uint32_t r2)
+     uint64_t srclen =3D env->regs[r2 + 1] & 0xffffff;
+     uint64_t src =3D get_address(env, r2);
+     uint8_t pad =3D env->regs[r2 + 1] >> 24;
+-    uint32_t cc;
++    uint32_t cc, cur_len;
+=20
+     if (is_destructive_overlap(env, dest, src, MIN(srclen, destlen))) {
+         cc =3D 3;
++    } else if (srclen =3D=3D destlen) {
++        cc =3D 0;
++    } else if (destlen < srclen) {
++        cc =3D 1;
+     } else {
+-        cc =3D do_mvcl(env, &dest, &destlen, &src, &srclen, pad, 1, ra);
++        cc =3D 2;
+     }
+=20
+-    env->regs[r1 + 1] =3D deposit64(env->regs[r1 + 1], 0, 24, destlen);
+-    env->regs[r2 + 1] =3D deposit64(env->regs[r2 + 1], 0, 24, srclen);
+-    set_address_zero(env, r1, dest);
+-    set_address_zero(env, r2, src);
++    /* We might have to zero-out some bits even if there was no action. =
+*/
++    if (unlikely(!destlen || cc =3D=3D 3)) {
++        set_address_zero(env, r2, src);
++        set_address_zero(env, r1, dest);
++        return cc;
++    } else if (!srclen) {
++        set_address_zero(env, r2, src);
++    }
+=20
++    /*
++     * Only perform one type of type of operation (move/pad) in one step=
+.
++     * Stay within single pages.
++     */
++    while (destlen) {
++        cur_len =3D MIN(destlen, -(dest | TARGET_PAGE_MASK));
++        if (!srclen) {
++            fast_memset(env, dest, pad, cur_len, ra);
++        } else {
++            cur_len =3D MIN(MIN(srclen, -(src | TARGET_PAGE_MASK)), cur_=
+len);
++
++            fast_memmove(env, dest, src, cur_len, ra);
++            src =3D wrap_address(env, src + cur_len);
++            srclen -=3D cur_len;
++            env->regs[r2 + 1] =3D deposit64(env->regs[r2 + 1], 0, 24, sr=
+clen);
++            set_address_zero(env, r2, src);
++        }
++        dest =3D wrap_address(env, dest + cur_len);
++        destlen -=3D cur_len;
++        env->regs[r1 + 1] =3D deposit64(env->regs[r1 + 1], 0, 24, destle=
+n);
++        set_address_zero(env, r1, dest);
++
++        /* TODO: Deliver interrupts. */
++    }
+     return cc;
+ }
+=20
+--=20
+2.20.1
 
-  uint32_t value;
-  uint8_t id;
-  uint8_t addr;
-
-> +    QTestFuzzAction *a = (QTestFuzzAction *)Data;
-> +    while (Size >= sizeof(QTestFuzzAction)) {
-
-To avoid struct alignment issues:
-
-  QTestFuzzAction a;
-  while (Size >= sizeof(a)) {
-      memcpy(&a, Data, sizeof(a));
-      ...
-      Data += sizeof(a);
-  }
-
-> +        uint16_t addr = a->addr % 2 ? 0xcf8 : 0xcfc;
-
-Please define constants for these magic numbers (e.g.
-I440FX_PCI_HOST_BRIDGE_CFG, I440FX_PCI_HOST_BRIDGE_DATA).
-
-> +        switch (a->id) {
-
-How about:
-
-  switch (a->id % ACTION_MAX) {
-
-This way we always exercise a useful code path instead of just skipping
-the input.
-
---/KohU7xR/z4Rz7fl
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2DfboACgkQnKSrs4Gr
-c8ihMgf+JXb7cKluUZGmNjU9Vm2A/2xVAQGI+X52hcOsR7Jt4fhIF5Ann9o8yZYJ
-+tqd/xEGjDSaBUSyXd4XT3LgolGX10L8lOrL+6tpVu3sC8adlqveYpe7DsZ1ucZH
-F9utiQtAHLpFHOzTDXZOXH7yBEs90oVVUhdCneOd/m9jUWvNMJ+4I5rTeQVhGEzZ
-RLgbZPxg9f/12B6HpBfTPUYrx8Hz7O3wJbr1qhBBDk6hCImpHWDkJbz2sWDSZ+sI
-sKj8jOw5gTcTl2n8OuLJu7ESG2KJ7WGIbDD3IsiV7kcYI/Mlr0/YtOn+d54BpYA/
-xzRkd6PJxyJ/w64RgzYyL/8XbmxyJw==
-=CK/n
------END PGP SIGNATURE-----
-
---/KohU7xR/z4Rz7fl--
 
