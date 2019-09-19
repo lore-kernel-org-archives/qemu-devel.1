@@ -6,65 +6,58 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BACE5C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 01:06:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A9DC4CEC4
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 01:15:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A096218AE
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 01:06:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A096218AE
+	by mail.kernel.org (Postfix) with ESMTPS id D1F8921907
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 01:15:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1F8921907
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAktq-0008O0-Bc
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 21:06:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43346)
+	id 1iAl31-00049F-UT
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 21:15:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44263)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1iAksx-0007mN-MF
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:05:28 -0400
+ (envelope-from <crosa@redhat.com>) id 1iAl2E-0003cW-LG
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:15:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1iAksr-0004cL-Bv
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:05:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34388)
+ (envelope-from <crosa@redhat.com>) id 1iAl2C-0001WC-L6
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:15:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57780)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1iAksr-0004aI-5r
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:05:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iAl2C-0001Vr-Cw
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:15:00 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3C41C18C891B;
- Thu, 19 Sep 2019 01:05:19 +0000 (UTC)
-Received: from [10.72.12.81] (ovpn-12-81.pek2.redhat.com [10.72.12.81])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B071E60920;
- Thu, 19 Sep 2019 01:05:14 +0000 (UTC)
-To: "Tian, Kevin" <kevin.tian@intel.com>
-References: <AADFC41AFE54684AB9EE6CBC0274A5D19D577BEA@SHSMSX104.ccr.corp.intel.com>
- <60110ea3-9228-7e5d-ea32-05c72a95af0b@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D57A080@SHSMSX104.ccr.corp.intel.com>
- <8302a4ae-1914-3046-b3b5-b3234d7dda02@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D57B1D1@SHSMSX104.ccr.corp.intel.com>
- <6d73572e-1e89-b04a-bdd6-98ac73798083@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D57B90C@SHSMSX104.ccr.corp.intel.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <204219fa-ee72-ca60-52a4-fb4bbc887773@redhat.com>
-Date: Thu, 19 Sep 2019 09:05:12 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 9A18A3082132;
+ Thu, 19 Sep 2019 01:14:58 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-123-8.rdu2.redhat.com [10.10.123.8])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 488EA1001281;
+ Thu, 19 Sep 2019 01:14:54 +0000 (UTC)
+Date: Wed, 18 Sep 2019 21:14:52 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190919011452.GA23168@localhost.localdomain>
+References: <20190918071654.GK2440@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D57B90C@SHSMSX104.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Thu, 19 Sep 2019 01:05:19 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190918071654.GK2440@umbus.fritz.box>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Thu, 19 Sep 2019 01:14:58 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] vhost, iova, and dirty page tracking
+Subject: Re: [Qemu-devel] Problems with MIPS Malta SSH tests in make
+ check-acceptance
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,52 +69,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: 'Alex Williamson' <alex.williamson@redhat.com>, "Zhao,
- Yan Y" <yan.y.zhao@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: philmd@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, Sep 18, 2019 at 05:16:54PM +1000, David Gibson wrote:
+> Hi,
+> 
+> I'm finding make check-acceptance is currently useless for me as a
+> pre-pull test, because a bunch of the tests are not at all reliable.
+> There are a bunch which I'm still investigating, but for now I'm
+> looking at the MIPS Malta SSH tests.
+> 
+> There seem to be at least two problems here.  First, the test includes
+> a download of a pretty big guest disk image.  This can easily exhaust
+> the 2m30 timeout on its own.
+>
 
-On 2019/9/18 =E4=B8=8B=E5=8D=884:37, Tian, Kevin wrote:
->> From: Jason Wang [mailto:jasowang@redhat.com]
->> Sent: Wednesday, September 18, 2019 2:10 PM
->>
->>>> Note that the HVA to GPA mapping is not an 1:1 mapping. One HVA
->> range
->>>> could be mapped to several GPA ranges.
->>> This is fine. Currently vfio_dma maintains IOVA->HVA mapping.
->>>
->>> btw under what condition HVA->GPA is not 1:1 mapping? I didn't realiz=
-e it.
->>
->> I don't remember the details e.g memory region alias? And neither kvm
->> nor kvm API does forbid this if my memory is correct.
->>
-> I checked https://qemu.weilnetz.de/doc/devel/memory.html, which
-> provides an example of aliased layout. However, its aliasing is all
-> 1:1, instead of N:1. From guest p.o.v every writable GPA implies an
-> unique location. Why would we hit the situation where multiple
-> write-able GPAs are mapped to the same HVA (i.e. same physical
-> memory location)?
+You're correct that successes and failures on those tests depend
+largely on bandwith.  On a shared environment I used for tests
+the download of those images take roughly 400 seconds, resulting
+in failures.  On my own machine, around 60, and the tests pass.
 
+There's a conceptual and conflicting problem in that the environment
+for tests to run should be prepared beforehand.  The conflicting
+solutions can be:
 
-I don't know, just want to say current API does not forbid this. So we=20
-probably need to take care it.
+ * extensive bootstrapping of the test execution environment, such
+   as the installation of guests from ISOs or installation trees, or
+   the download of "default" images wether the tests will use it or
+   not (this is what Avocado-VT does/requires)
 
+ * keeping test assets in the tree (Avocado allows this if you have
+   a your_test.py.data/ directory), but it's not practical for large
+   files or files that can't or shouldn't be redistributed
 
-> Is Qemu doing its own same-content memory
-> merging in GPA level, similar to KSM?
+> Even without the timeout, it makes the test really slow, even on
+> repeated runs.  Is there some way we can make the image download part
+> of "building" the tests rather than actually running the testsuite, so
+> that a) the test themselves go faster and b) we don't include the
+> download in the test timeout - obviously the download speed is hugely
+> dependent on factors that aren't really related to what we're testing
+> here.
+>
 
+On Avocado version 72.0 we attempted to minimize the isse by
+implementing a "vmimage" command.  So, if you expect to use Fedora 30
+aarch64 images, you could run before your tests:
 
-AFAIK, it doesn't.
+ $ avocado vmimage get --distro fedora --distro-version 30 --arch aarch64
 
-Thanks
+And to list the images on your cache:
 
+ $ avocado vmimage list
 
-> Thanks
-> Kevin
+Unfortunately, this test doesn't use the vmimage API.  Actually that
+is fine because not all test assets map nicely to the vmimage goal,
+and should keep using the more generic (and lower level) fetch_asset().
 
+We're now working on various "asset fetcher" improvements that should
+allow us to check/cache all assets before a test is executed.  Also,
+we're adding a mode in which the "fetch_asset()" API will default to
+cancel (aka SKIP) a test if the asset could not be downloaded.
+
+If you're interested in the card we're using to track that new feature:
+
+  https://trello.com/c/T3SC1sZs/1521-implement-fetch-assets-command-line-parameter
+
+Another possibility that we've prototyped, and we'll be working on
+further, is to make a specific part of the "test" code execution
+(really a pre-test phase) to be executed without a timeout and even be
+tried a number of times before bailing out and skipping the test.
+
+> In the meantime, I tried hacking it by just increasing the timeout to
+> 10m.  That got several of the tests working for me, but one still
+> failed.  Specifically 'LinuxSSH.test_mips_malta32eb_kernel3_2_0' still
+> timed out for me, but now after booting the guest, rather than during
+> the image download.  Looking at the avocado log file I'm seeing a
+> bunch of soft lockup messages from the guest console, AFAICT.  So it
+> looks like we have a real bug here, which I suspect has been
+> overlooked precisely because the download problems mean this test
+> isn't reliable.
+>
+
+I've schedulled a 100 executions of `make check-acceptance` builds, with
+the linux_ssh_mips_malta.py tests having a 1500 seconds timeout.  The
+very first execution already brought interesting results:
+
+ ...
+ (15/39) /home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mips_malta32eb_kernel3_2_0: PASS (198.38 s)
+ (16/39) /home/cleber/src/qemu/tests/acceptance/linux_ssh_mips_malta.py:LinuxSSH.test_mips_malta64el_kernel3_2_0: FAIL: Failure message found in console: Oops (22.83 s)
+
+I'll let you know about my full results.  This should also serve as a
+starting point to a discussion about the reliability of other tests,
+as you mentioned before.
+
+In my experience, and backed by the executions on Travis, most tests
+have been really stable on x86_64 hosts.  Last week I've worked in
+ppc64 and aarch64 hosts, and posted a number of patches addressing
+the failures I found.  I'll compile a list of the posted patches and
+their status.
+
+Thanks for reporting those issues.
+- Cleber.
+
+> Any thoughts on how to improve the situation?
+> 
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
 
 
 
