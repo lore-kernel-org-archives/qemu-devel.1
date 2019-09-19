@@ -2,61 +2,60 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 542ADC49ED7
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 07:13:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3527BC4CEC4
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 07:13:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2A7220678
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 07:13:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2A7220678
+	by mail.kernel.org (Postfix) with ESMTPS id E1EA920678
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 07:13:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1EA920678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAqcq-0005hZ-2z
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 03:13:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53463)
+	id 1iAqcr-0005ht-1z
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 03:13:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53436)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1iAqZI-0001JW-Eh
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 03:09:39 -0400
+ (envelope-from <kraxel@redhat.com>) id 1iAqZG-0001HO-Mt
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 03:09:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1iAqZB-00050J-Ct
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 03:09:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41514)
+ (envelope-from <kraxel@redhat.com>) id 1iAqZA-0004zC-6u
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 03:09:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55832)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iAqZA-0004z1-J5
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 03:09:25 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iAqZ9-0004xz-Ot
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 03:09:24 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B397E3083391;
+ by mx1.redhat.com (Postfix) with ESMTPS id 11BA810CBC4B;
  Thu, 19 Sep 2019 07:09:23 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-47.ams2.redhat.com
  [10.36.116.47])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 502216012E;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4EBD060872;
  Thu, 19 Sep 2019 07:09:19 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 8F304A1E0; Thu, 19 Sep 2019 09:09:18 +0200 (CEST)
+ id A193B9D75; Thu, 19 Sep 2019 09:09:18 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 19 Sep 2019 09:09:17 +0200
-Message-Id: <20190919070918.16059-4-kraxel@redhat.com>
+Date: Thu, 19 Sep 2019 09:09:18 +0200
+Message-Id: <20190919070918.16059-5-kraxel@redhat.com>
 In-Reply-To: <20190919070918.16059-1-kraxel@redhat.com>
 References: <20190919070918.16059-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Thu, 19 Sep 2019 07:09:23 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Thu, 19 Sep 2019 07:09:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 3/4] ui: add an embedded Barrier client
+Subject: [Qemu-devel] [PULL 4/4] vnc: fix memory leak when vnc disconnect
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,1335 +67,1019 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Laurent Vivier <laurent@vivier.eu>
+Cc: Li Qiang <liq3ea@163.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Laurent Vivier <laurent@vivier.eu>
+From: Li Qiang <liq3ea@163.com>
 
-This allows to receive mouse and keyboard events from
-a Barrier server.
+Currently when qemu receives a vnc connect, it creates a 'VncState' to
+represent this connection. In 'vnc_worker_thread_loop' it creates a
+local 'VncState'. The connection 'VcnState' and local 'VncState' exchange
+data in 'vnc_async_encoding_start' and 'vnc_async_encoding_end'.
+In 'zrle_compress_data' it calls 'deflateInit2' to allocate the libz library
+opaque data. The 'VncState' used in 'zrle_compress_data' is the local
+'VncState'. In 'vnc_zrle_clear' it calls 'deflateEnd' to free the libz
+library opaque data. The 'VncState' used in 'vnc_zrle_clear' is the connection
+'VncState'. In currently implementation there will be a memory leak when the
+vnc disconnect. Following is the asan output backtrack:
 
-This is enabled by adding the following parameter on the
-command line
+Direct leak of 29760 byte(s) in 5 object(s) allocated from:
+    0 0xffffa67ef3c3 in __interceptor_calloc (/lib64/libasan.so.4+0xd33c3)
+    1 0xffffa65071cb in g_malloc0 (/lib64/libglib-2.0.so.0+0x571cb)
+    2 0xffffa5e968f7 in deflateInit2_ (/lib64/libz.so.1+0x78f7)
+    3 0xaaaacec58613 in zrle_compress_data ui/vnc-enc-zrle.c:87
+    4 0xaaaacec58613 in zrle_send_framebuffer_update ui/vnc-enc-zrle.c:344
+    5 0xaaaacec34e77 in vnc_send_framebuffer_update ui/vnc.c:919
+    6 0xaaaacec5e023 in vnc_worker_thread_loop ui/vnc-jobs.c:271
+    7 0xaaaacec5e5e7 in vnc_worker_thread ui/vnc-jobs.c:340
+    8 0xaaaacee4d3c3 in qemu_thread_start util/qemu-thread-posix.c:502
+    9 0xffffa544e8bb in start_thread (/lib64/libpthread.so.0+0x78bb)
+    10 0xffffa53965cb in thread_start (/lib64/libc.so.6+0xd55cb)
 
-    ... -object input-barrier,id=$id,name=$name ...
+This is because the opaque allocated in 'deflateInit2' is not freed in
+'deflateEnd'. The reason is that the 'deflateEnd' calls 'deflateStateCheck'
+and in the latter will check whether 's->strm != strm'(libz's data structure).
+This check will be true so in 'deflateEnd' it just return 'Z_STREAM_ERROR' and
+not free the data allocated in 'deflateInit2'.
 
-Where $name is the name declared in the screens section of barrier.conf
+The reason this happens is that the 'VncState' contains the whole 'VncZrle',
+so when calling 'deflateInit2', the 's->strm' will be the local address.
+So 's->strm != strm' will be true.
 
-The barrier server (barriers) must be configured and must run on the
-local host.
+To fix this issue, we need to make 'zrle' of 'VncState' to be a pointer.
+Then the connection 'VncState' and local 'VncState' exchange mechanism will
+work as expection. The 'tight' of 'VncState' has the same issue, let's also turn
+it to a pointer.
 
-For instance:
-
-  section: screens
-      localhost:
-          ...
-      VM-1:
-          ...
-      end
-
-  section: links
-      localhost:
-          right = VM-1
-      VM-1:
-          left = localhost
-  end
-
-Then on the QEMU command line:
-
-    ... -object input-barrier,id=barrie0,name=VM-1 ...
-
-When the mouse will move out of the screen of the local host on
-the right, the mouse and the keyboard will be grabbed and all
-related events will be send to the guest OS.
-
-This is usefull when qemu is configured without emulated graphic card
-but with a VFIO attached graphic card.
-
-More information about Barrier can be found at:
-
-  https://github.com/debauchee/barrier
-
-This avoids to install the Barrier server in the guest OS,
-for instance when it is not supported or during the installation.
-
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-id: 20190906083812.29487-1-laurent@vivier.eu
+Reported-by: Ying Fang <fangying1@huawei.com>
+Signed-off-by: Li Qiang <liq3ea@163.com>
+Message-id: 20190831153922.121308-1-liq3ea@163.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- docs/barrier.txt   | 370 ++++++++++++++++++++++
- ui/input-barrier.h | 112 +++++++
- ui/input-barrier.c | 750 +++++++++++++++++++++++++++++++++++++++++++++
- ui/Makefile.objs   |   1 +
- 4 files changed, 1233 insertions(+)
- create mode 100644 docs/barrier.txt
- create mode 100644 ui/input-barrier.h
- create mode 100644 ui/input-barrier.c
+ ui/vnc.h              |   4 +-
+ ui/vnc-enc-tight.c    | 219 +++++++++++++++++++++---------------------
+ ui/vnc-enc-zlib.c     |  11 ++-
+ ui/vnc-enc-zrle.c     |  68 ++++++-------
+ ui/vnc-enc-zrle.inc.c |   2 +-
+ ui/vnc.c              |  28 +++---
+ 6 files changed, 170 insertions(+), 162 deletions(-)
 
-diff --git a/docs/barrier.txt b/docs/barrier.txt
-new file mode 100644
-index 000000000000..b21d15015d96
---- /dev/null
-+++ b/docs/barrier.txt
-@@ -0,0 +1,370 @@
-+                                QEMU Barrier Client
-+
-+
-+* About
-+
-+    Barrier is a KVM (Keyboard-Video-Mouse) software forked from Symless's
-+    synergy 1.9 codebase.
-+
-+    See https://github.com/debauchee/barrier
-+
-+* QEMU usage
-+
-+    Generally, mouse and keyboard are grabbed through the QEMU video
-+    interface emulation.
-+
-+    But when we want to use a video graphic adapter via a PCI passthrough
-+    there is no way to provide the keyboard and mouse inputs to the VM
-+    except by plugging a second set of mouse and keyboard to the host
-+    or by installing a KVM software in the guest OS.
-+
-+    The QEMU Barrier client avoids this by implementing directly the Barrier
-+    protocol into QEMU.
-+
-+    This protocol is enabled by adding an input-barrier object to QEMU.
-+
-+    Syntax: input-barrier,id=<object-id>,name=<guest display name>
-+            [,server=<barrier server address>][,port=<barrier server port>]
-+            [,x-origin=<x-origin>][,y-origin=<y-origin>]
-+            [,width=<width>][,height=<height>]
-+
-+    The object can be added on the QEMU command line, for instance with:
-+
-+        ... -object input-barrier,id=barrier0,name=VM-1 ...
-+
-+    where VM-1 is the name the display configured int the Barrier server
-+    on the host providing the mouse and the keyboard events.
-+
-+    by default <barrier server address> is "localhost", port is 24800,
-+    <x-origin> and <y-origin> are set to 0, <width> and <height> to
-+    1920 and 1080.
-+
-+    If Barrier server is stopped QEMU needs to be reconnected manually,
-+    by removing and re-adding the input-barrier object, for instance
-+    with the help of the HMP monitor:
-+
-+        (qemu) object_del barrier0
-+        (qemu) object_add input-barrier,id=barrier0,name=VM-1
-+
-+* Message format
-+
-+    Message format between the server and client is in two parts:
-+
-+        1- the payload length is a 32bit integer in network endianness,
-+        2- the payload
-+
-+    The payload starts with a 4byte string (without NUL) which is the
-+    command. The first command between the server and the client
-+    is the only command not encoded on 4 bytes ("Barrier").
-+    The remaining part of the payload is decoded according to the command.
-+
-+* Protocol Description (from barrier/src/lib/barrier/protocol_types.h)
-+
-+    - barrierCmdHello          "Barrier"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t minor, int16_t major }
-+      Description:
-+
-+          Say hello to client
-+          minor = protocol major version number supported by server
-+          major = protocol minor version number supported by server
-+
-+    - barrierCmdHelloBack      "Barrier"
-+
-+      Direction:  client ->server
-+      Parameters: { int16_t minor, int16_t major, char *name}
-+      Description:
-+
-+          Respond to hello from server
-+          minor = protocol major version number supported by client
-+          major = protocol minor version number supported by client
-+          name  = client name
-+
-+    - barrierCmdDInfo          "DINF"
-+
-+      Direction:  client ->server
-+      Parameters: { int16_t x_origin, int16_t y_origin, int16_t width, int16_t height, int16_t x, int16_t y}
-+      Description:
-+
-+          The client screen must send this message in response to the
-+          barrierCmdQInfo message.  It must also send this message when the
-+          screen's resolution changes.  In this case, the client screen should
-+          ignore any barrierCmdDMouseMove messages until it receives a
-+          barrierCmdCInfoAck in order to prevent attempts to move the mouse off
-+          the new screen area.
-+
-+    - barrierCmdCNoop          "CNOP"
-+
-+      Direction:  client -> server
-+      Parameters: None
-+      Description:
-+
-+          No operation
-+
-+    - barrierCmdCClose         "CBYE"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Close connection
-+
-+    - barrierCmdCEnter         "CINN"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t x, int16_t y, int32_t seq, int16_t modifier }
-+      Description:
-+
-+          Enter screen.
-+          x,y      = entering screen absolute coordinates
-+          seq      = sequence number, which is used to order messages between
-+                     screens.  the secondary screen must return this number
-+                     with some messages
-+          modifier = modifier key mask.  this will have bits set for each
-+                     toggle modifier key that is activated on entry to the
-+                     screen.  the secondary screen should adjust its toggle
-+                     modifiers to reflect that state.
-+
-+    - barrierCmdCLeave         "COUT"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Leaving screen.  the secondary screen should send clipboard data in
-+          response to this message for those clipboards that it has grabbed
-+          (i.e. has sent a barrierCmdCClipboard for and has not received a
-+          barrierCmdCClipboard for with a greater sequence number) and that
-+          were grabbed or have changed since the last leave.
-+
-+    - barrierCmdCClipboard     "CCLP"
-+
-+      Direction:  server -> client
-+      Parameters: { int8_t id, int32_t seq }
-+      Description:
-+
-+          Grab clipboard. Sent by screen when some other app on that screen
-+          grabs a clipboard.
-+          id  = the clipboard identifier
-+          seq = sequence number. Client must use the sequence number passed in
-+                the most recent barrierCmdCEnter.  the server always sends 0.
-+
-+    - barrierCmdCScreenSaver   "CSEC"
-+
-+      Direction:  server -> client
-+      Parameters: { int8_t started }
-+      Description:
-+
-+          Screensaver change.
-+          started = Screensaver on primary has started (1) or closed (0)
-+
-+    - barrierCmdCResetOptions  "CROP"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Reset options. Client should reset all of its options to their
-+          defaults.
-+
-+    - barrierCmdCInfoAck       "CIAK"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Resolution change acknowledgment. Sent by server in response to a
-+          client screen's barrierCmdDInfo. This is sent for every
-+          barrierCmdDInfo, whether or not the server had sent a barrierCmdQInfo.
-+
-+    - barrierCmdCKeepAlive     "CALV"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Keep connection alive. Sent by the server periodically to verify
-+          that connections are still up and running.  clients must reply in
-+          kind on receipt.  if the server gets an error sending the message or
-+          does not receive a reply within a reasonable time then the server
-+          disconnects the client.  if the client doesn't receive these (or any
-+          message) periodically then it should disconnect from the server.  the
-+          appropriate interval is defined by an option.
-+
-+    - barrierCmdDKeyDown       "DKDN"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t keyid, int16_t modifier [,int16_t button] }
-+      Description:
-+
-+          Key pressed.
-+          keyid    = X11 key id
-+          modified = modified mask
-+          button   = X11 Xkb keycode (optional)
-+
-+    - barrierCmdDKeyRepeat     "DKRP"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t keyid, int16_t modifier, int16_t repeat [,int16_t button] }
-+      Description:
-+
-+          Key auto-repeat.
-+          keyid    = X11 key id
-+          modified = modified mask
-+          repeat   = number of repeats
-+          button   = X11 Xkb keycode (optional)
-+
-+    - barrierCmdDKeyUp         "DKUP"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t keyid, int16_t modifier [,int16_t button] }
-+      Description:
-+
-+          Key released.
-+          keyid    = X11 key id
-+          modified = modified mask
-+          button   = X11 Xkb keycode (optional)
-+
-+    - barrierCmdDMouseDown     "DMDN"
-+
-+      Direction:  server -> client
-+      Parameters: { int8_t button }
-+      Description:
-+
-+          Mouse button pressed.
-+          button = button id
-+
-+    - barrierCmdDMouseUp       "DMUP"
-+
-+      Direction:  server -> client
-+      Parameters: { int8_t button }
-+      Description:
-+
-+          Mouse button release.
-+          button = button id
-+
-+    - barrierCmdDMouseMove     "DMMV"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t x, int16_t y }
-+      Description:
-+
-+          Absolute mouse moved.
-+          x,y = absolute screen coordinates
-+
-+    - barrierCmdDMouseRelMove  "DMRM"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t x, int16_t y }
-+      Description:
-+
-+          Relative mouse moved.
-+          x,y = r relative screen coordinates
-+
-+    - barrierCmdDMouseWheel    "DMWM"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t x , int16_t y } or { int16_t y }
-+      Description:
-+
-+          Mouse scroll. The delta should be +120 for one tick forward (away
-+          from the user) or right and -120 for one tick backward (toward the
-+          user) or left.
-+          x = x delta
-+          y = y delta
-+
-+    - barrierCmdDClipboard     "DCLP"
-+
-+      Direction:  server -> client
-+      Parameters: { int8_t id, int32_t seq, int8_t mark, char *data }
-+      Description:
-+
-+          Clipboard data.
-+          id  = clipboard id
-+          seq = sequence number. The sequence number is 0 when sent by the
-+                server.  Client screens should use the/ sequence number from
-+                the most recent barrierCmdCEnter.
-+
-+    - barrierCmdDSetOptions    "DSOP"
-+
-+      Direction:  server -> client
-+      Parameters: { int32 t nb, { int32_t id, int32_t val }[] }
-+      Description:
-+
-+          Set options. Client should set the given option/value pairs.
-+          nb  = numbers of { id, val } entries
-+          id  = option id
-+          val = option new value
-+
-+    - barrierCmdDFileTransfer  "DFTR"
-+
-+      Direction:  server -> client
-+      Parameters: { int8_t mark, char *content }
-+      Description:
-+
-+          Transfer file data.
-+          mark = 0 means the content followed is the file size
-+                 1 means the content followed is the chunk data
-+                 2 means the file transfer is finished
-+
-+    - barrierCmdDDragInfo      "DDRG" int16_t char *
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t nb, char *content }
-+      Description:
-+
-+          Drag information.
-+          nb      = number of dragging objects
-+          content = object's directory
-+
-+    - barrierCmdQInfo          "QINF"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Query screen info
-+          Client should reply with a barrierCmdDInfo
-+
-+    - barrierCmdEIncompatible  "EICV"
-+
-+      Direction:  server -> client
-+      Parameters: { int16_t nb, major *minor }
-+      Description:
-+
-+          Incompatible version.
-+          major = major version
-+          minor = minor version
-+
-+    - barrierCmdEBusy          "EBSY"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Name provided when connecting is already in use.
-+
-+    - barrierCmdEUnknown       "EUNK"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Unknown client. Name provided when connecting is not in primary's
-+           screen configuration map.
-+
-+    - barrierCmdEBad           "EBAD"
-+
-+      Direction:  server -> client
-+      Parameters: None
-+      Description:
-+
-+          Protocol violation. Server should disconnect after sending this
-+          message.
-+
-+* TO DO
-+
-+    - Enable SSL
-+    - Manage SetOptions/ResetOptions commands
-+
-diff --git a/ui/input-barrier.h b/ui/input-barrier.h
-new file mode 100644
-index 000000000000..e5b090590ad5
---- /dev/null
-+++ b/ui/input-barrier.h
-@@ -0,0 +1,112 @@
-+/*
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef UI_INPUT_BARRIER_H
-+#define UI_INPUT_BARRIER_H
-+
-+/* Barrier protocol */
-+#define BARRIER_VERSION_MAJOR 1
-+#define BARRIER_VERSION_MINOR 6
-+
-+enum barrierCmd {
-+    barrierCmdCNoop,
-+    barrierCmdCClose,
-+    barrierCmdCEnter,
-+    barrierCmdCLeave,
-+    barrierCmdCClipboard,
-+    barrierCmdCScreenSaver,
-+    barrierCmdCResetOptions,
-+    barrierCmdCInfoAck,
-+    barrierCmdCKeepAlive,
-+    barrierCmdDKeyDown,
-+    barrierCmdDKeyRepeat,
-+    barrierCmdDKeyUp,
-+    barrierCmdDMouseDown,
-+    barrierCmdDMouseUp,
-+    barrierCmdDMouseMove,
-+    barrierCmdDMouseRelMove,
-+    barrierCmdDMouseWheel,
-+    barrierCmdDClipboard,
-+    barrierCmdDInfo,
-+    barrierCmdDSetOptions,
-+    barrierCmdDFileTransfer,
-+    barrierCmdDDragInfo,
-+    barrierCmdQInfo,
-+    barrierCmdEIncompatible,
-+    barrierCmdEBusy,
-+    barrierCmdEUnknown,
-+    barrierCmdEBad,
-+    /* connection sequence */
-+    barrierCmdHello,
-+    barrierCmdHelloBack,
-+};
-+
-+enum {
-+   barrierButtonNone,
-+   barrierButtonLeft,
-+   barrierButtonMiddle,
-+   barrierButtonRight,
-+   barrierButtonExtra0
-+};
-+
-+struct barrierVersion {
-+    int16_t major;
-+    int16_t minor;
-+};
-+
-+struct barrierMouseButton {
-+    int8_t buttonid;
-+};
-+
-+struct barrierEnter {
-+    int16_t x;
-+    int16_t y;
-+    int32_t seqn;
-+    int16_t modifier;
-+};
-+
-+struct barrierMousePos {
-+    int16_t x;
-+    int16_t y;
-+};
-+
-+struct barrierKey {
-+    int16_t keyid;
-+    int16_t modifier;
-+    int16_t button;
-+};
-+
-+struct barrierRepeat {
-+    int16_t keyid;
-+    int16_t modifier;
-+    int16_t repeat;
-+    int16_t button;
-+};
-+
-+#define BARRIER_MAX_OPTIONS 32
-+struct barrierSet {
-+    int nb;
-+    struct {
-+        int id;
-+        char nul;
-+        int value;
-+    } option[BARRIER_MAX_OPTIONS];
-+};
-+
-+struct barrierMsg {
-+    enum barrierCmd cmd;
-+    union {
-+        struct barrierVersion version;
-+        struct barrierMouseButton mousebutton;
-+        struct barrierMousePos mousepos;
-+        struct barrierEnter enter;
-+        struct barrierKey key;
-+        struct barrierRepeat repeat;
-+        struct barrierSet set;
-+    };
-+};
-+#endif
-diff --git a/ui/input-barrier.c b/ui/input-barrier.c
-new file mode 100644
-index 000000000000..a2c961f285a4
---- /dev/null
-+++ b/ui/input-barrier.c
-@@ -0,0 +1,750 @@
-+/*
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "sysemu/sysemu.h"
-+#include "qemu/main-loop.h"
-+#include "qemu/sockets.h"
-+#include "qapi/error.h"
-+#include "qom/object_interfaces.h"
-+#include "io/channel-socket.h"
-+#include "ui/input.h"
-+#include "ui/vnc_keysym.h" /* use name2keysym from VNC as we use X11 values */
-+#include "qemu/cutils.h"
-+#include "qapi/qmp/qerror.h"
-+#include "input-barrier.h"
-+
-+#define TYPE_INPUT_BARRIER "input-barrier"
-+#define INPUT_BARRIER(obj) \
-+    OBJECT_CHECK(InputBarrier, (obj), TYPE_INPUT_BARRIER)
-+#define INPUT_BARRIER_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(InputBarrierClass, (obj), TYPE_INPUT_BARRIER)
-+#define INPUT_BARRIER_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(InputBarrierClass, (klass), TYPE_INPUT_BARRIER)
-+
-+typedef struct InputBarrier InputBarrier;
-+typedef struct InputBarrierClass InputBarrierClass;
-+
-+#define MAX_HELLO_LENGTH 1024
-+
-+struct InputBarrier {
-+    Object parent;
-+
-+    QIOChannelSocket *sioc;
-+    guint ioc_tag;
-+
-+    /* display properties */
-+    gchar *name;
-+    int16_t x_origin, y_origin;
-+    int16_t width, height;
-+
-+    /* keyboard/mouse server */
-+
-+    SocketAddress saddr;
-+
-+    char buffer[MAX_HELLO_LENGTH];
-+};
-+
-+struct InputBarrierClass {
-+    ObjectClass parent_class;
-+};
-+
-+static const char *cmd_names[] = {
-+    [barrierCmdCNoop]          = "CNOP",
-+    [barrierCmdCClose]         = "CBYE",
-+    [barrierCmdCEnter]         = "CINN",
-+    [barrierCmdCLeave]         = "COUT",
-+    [barrierCmdCClipboard]     = "CCLP",
-+    [barrierCmdCScreenSaver]   = "CSEC",
-+    [barrierCmdCResetOptions]  = "CROP",
-+    [barrierCmdCInfoAck]       = "CIAK",
-+    [barrierCmdCKeepAlive]     = "CALV",
-+    [barrierCmdDKeyDown]       = "DKDN",
-+    [barrierCmdDKeyRepeat]     = "DKRP",
-+    [barrierCmdDKeyUp]         = "DKUP",
-+    [barrierCmdDMouseDown]     = "DMDN",
-+    [barrierCmdDMouseUp]       = "DMUP",
-+    [barrierCmdDMouseMove]     = "DMMV",
-+    [barrierCmdDMouseRelMove]  = "DMRM",
-+    [barrierCmdDMouseWheel]    = "DMWM",
-+    [barrierCmdDClipboard]     = "DCLP",
-+    [barrierCmdDInfo]          = "DINF",
-+    [barrierCmdDSetOptions]    = "DSOP",
-+    [barrierCmdDFileTransfer]  = "DFTR",
-+    [barrierCmdDDragInfo]      = "DDRG",
-+    [barrierCmdQInfo]          = "QINF",
-+    [barrierCmdEIncompatible]  = "EICV",
-+    [barrierCmdEBusy]          = "EBSY",
-+    [barrierCmdEUnknown]       = "EUNK",
-+    [barrierCmdEBad]           = "EBAD",
-+    [barrierCmdHello]          = "Barrier",
-+    [barrierCmdHelloBack]      = "Barrier",
-+};
-+
-+static kbd_layout_t *kbd_layout;
-+
-+static int input_barrier_to_qcode(uint16_t keyid, uint16_t keycode)
-+{
-+    /* keycode is optional, if it is not provided use keyid */
-+    if (keycode && keycode <= qemu_input_map_xorgkbd_to_qcode_len) {
-+        return qemu_input_map_xorgkbd_to_qcode[keycode];
-+    }
-+
-+    if (keyid >= 0xE000 && keyid <= 0xEFFF) {
-+        keyid += 0x1000;
-+    }
-+
-+    /* keyid is the X11 key id */
-+    if (kbd_layout) {
-+        keycode = keysym2scancode(kbd_layout, keyid, NULL, false);
-+
-+        return qemu_input_key_number_to_qcode(keycode);
-+    }
-+
-+    return qemu_input_map_x11_to_qcode[keyid];
-+}
-+
-+static int input_barrier_to_mouse(uint8_t buttonid)
-+{
-+    switch (buttonid) {
-+    case barrierButtonLeft:
-+        return INPUT_BUTTON_LEFT;
-+    case barrierButtonMiddle:
-+        return INPUT_BUTTON_MIDDLE;
-+    case barrierButtonRight:
-+        return INPUT_BUTTON_RIGHT;
-+    case barrierButtonExtra0:
-+        return INPUT_BUTTON_SIDE;
-+    }
-+    return buttonid;
-+}
-+
-+#define read_char(x, p, l)           \
-+do {                                 \
-+    int size = sizeof(char);         \
-+    if (l < size) {                  \
-+        return G_SOURCE_REMOVE;      \
-+    }                                \
-+    x = *(char *)p;                  \
-+    p += size;                       \
-+    l -= size;                       \
-+} while (0)
-+
-+#define read_short(x, p, l)          \
-+do {                                 \
-+    int size = sizeof(short);        \
-+    if (l < size) {                  \
-+        return G_SOURCE_REMOVE;      \
-+    }                                \
-+    x = ntohs(*(short *)p);          \
-+    p += size;                       \
-+    l -= size;                       \
-+} while (0)
-+
-+#define write_short(p, x, l)         \
-+do {                                 \
-+    int size = sizeof(short);        \
-+    if (l < size) {                  \
-+        return G_SOURCE_REMOVE;      \
-+    }                                \
-+    *(short *)p = htons(x);          \
-+    p += size;                       \
-+    l -= size;                       \
-+} while (0)
-+
-+#define read_int(x, p, l)            \
-+do {                                 \
-+    int size = sizeof(int);          \
-+    if (l < size) {                  \
-+        return G_SOURCE_REMOVE;      \
-+    }                                \
-+    x = ntohl(*(int *)p);            \
-+    p += size;                       \
-+    l -= size;                       \
-+} while (0)
-+
-+#define write_int(p, x, l)           \
-+do {                                 \
-+    int size = sizeof(int);          \
-+    if (l < size) {                  \
-+        return G_SOURCE_REMOVE;      \
-+    }                                \
-+    *(int *)p = htonl(x);            \
-+    p += size;                       \
-+    l -= size;                       \
-+} while (0)
-+
-+#define write_cmd(p, c, l)           \
-+do {                                 \
-+    int size = strlen(cmd_names[c]); \
-+    if (l < size) {                  \
-+        return G_SOURCE_REMOVE;      \
-+    }                                \
-+    memcpy(p, cmd_names[c], size);   \
-+    p += size;                       \
-+    l -= size;                       \
-+} while (0)
-+
-+#define write_string(p, s, l)        \
-+do {                                 \
-+    int size = strlen(s);            \
-+    if (l < size + sizeof(int)) {    \
-+        return G_SOURCE_REMOVE;      \
-+    }                                \
-+    *(int *)p = htonl(size);         \
-+    p += sizeof(size);               \
-+    l -= sizeof(size);               \
-+    memcpy(p, s, size);              \
-+    p += size;                       \
-+    l -= size;                       \
-+} while (0)
-+
-+static gboolean readcmd(InputBarrier *ib, struct barrierMsg *msg)
-+{
-+    int ret, len, i;
-+    enum barrierCmd cmd;
-+    char *p;
-+
-+    ret = qio_channel_read(QIO_CHANNEL(ib->sioc), (char *)&len, sizeof(len),
-+                           NULL);
-+    if (ret < 0) {
-+        return G_SOURCE_REMOVE;
-+    }
-+
-+    len = ntohl(len);
-+    if (len > MAX_HELLO_LENGTH) {
-+        return G_SOURCE_REMOVE;
-+    }
-+
-+    ret = qio_channel_read(QIO_CHANNEL(ib->sioc), ib->buffer, len, NULL);
-+    if (ret < 0) {
-+        return G_SOURCE_REMOVE;
-+    }
-+
-+    p = ib->buffer;
-+    if (len >= strlen(cmd_names[barrierCmdHello]) &&
-+        memcmp(p, cmd_names[barrierCmdHello],
-+               strlen(cmd_names[barrierCmdHello])) == 0) {
-+        cmd = barrierCmdHello;
-+        p += strlen(cmd_names[barrierCmdHello]);
-+        len -= strlen(cmd_names[barrierCmdHello]);
-+    } else {
-+        for (cmd = 0; cmd < barrierCmdHello; cmd++) {
-+            if (memcmp(ib->buffer, cmd_names[cmd], 4) == 0) {
-+                break;
-+            }
-+        }
-+
-+        if (cmd == barrierCmdHello) {
-+            return G_SOURCE_REMOVE;
-+        }
-+        p += 4;
-+        len -= 4;
-+    }
-+
-+    msg->cmd = cmd;
-+    switch (cmd) {
-+    /* connection */
-+    case barrierCmdHello:
-+        read_short(msg->version.major, p, len);
-+        read_short(msg->version.minor, p, len);
-+        break;
-+    case barrierCmdDSetOptions:
-+        read_int(msg->set.nb, p, len);
-+        msg->set.nb /= 2;
-+        if (msg->set.nb > BARRIER_MAX_OPTIONS) {
-+            msg->set.nb = BARRIER_MAX_OPTIONS;
-+        }
-+        i = 0;
-+        while (len && i < msg->set.nb) {
-+            read_int(msg->set.option[i].id, p, len);
-+            /* it's a string, restore endianness */
-+            msg->set.option[i].id = htonl(msg->set.option[i].id);
-+            msg->set.option[i].nul = 0;
-+            read_int(msg->set.option[i].value, p, len);
-+            i++;
-+        }
-+        break;
-+    case barrierCmdQInfo:
-+        break;
-+
-+    /* mouse */
-+    case barrierCmdDMouseMove:
-+    case barrierCmdDMouseRelMove:
-+        read_short(msg->mousepos.x, p, len);
-+        read_short(msg->mousepos.y, p, len);
-+        break;
-+    case barrierCmdDMouseDown:
-+    case barrierCmdDMouseUp:
-+        read_char(msg->mousebutton.buttonid, p, len);
-+        break;
-+    case barrierCmdDMouseWheel:
-+        read_short(msg->mousepos.y, p, len);
-+        msg->mousepos.x = 0;
-+        if (len) {
-+            msg->mousepos.x = msg->mousepos.y;
-+            read_short(msg->mousepos.y, p, len);
-+        }
-+        break;
-+
-+    /* keyboard */
-+    case barrierCmdDKeyDown:
-+    case barrierCmdDKeyUp:
-+        read_short(msg->key.keyid, p, len);
-+        read_short(msg->key.modifier, p, len);
-+        msg->key.button = 0;
-+        if (len) {
-+            read_short(msg->key.button, p, len);
-+        }
-+        break;
-+    case barrierCmdDKeyRepeat:
-+        read_short(msg->repeat.keyid, p, len);
-+        read_short(msg->repeat.modifier, p, len);
-+        read_short(msg->repeat.repeat, p, len);
-+        msg->repeat.button = 0;
-+        if (len) {
-+            read_short(msg->repeat.button, p, len);
-+        }
-+        break;
-+    case barrierCmdCInfoAck:
-+    case barrierCmdCResetOptions:
-+    case barrierCmdCEnter:
-+    case barrierCmdDClipboard:
-+    case barrierCmdCKeepAlive:
-+    case barrierCmdCLeave:
-+    case barrierCmdCClose:
-+        break;
-+
-+    /* Invalid from the server */
-+    case barrierCmdHelloBack:
-+    case barrierCmdCNoop:
-+    case barrierCmdDInfo:
-+        break;
-+
-+    /* Error codes */
-+    case barrierCmdEIncompatible:
-+        read_short(msg->version.major, p, len);
-+        read_short(msg->version.minor, p, len);
-+        break;
-+    case barrierCmdEBusy:
-+    case barrierCmdEUnknown:
-+    case barrierCmdEBad:
-+        break;
-+    default:
-+        return G_SOURCE_REMOVE;
-+    }
-+
-+    return G_SOURCE_CONTINUE;
-+}
-+
-+static gboolean writecmd(InputBarrier *ib, struct barrierMsg *msg)
-+{
-+    char *p;
-+    int ret, i;
-+    int avail, len;
-+
-+    p = ib->buffer;
-+    avail = MAX_HELLO_LENGTH;
-+
-+    /* reserve space to store the length */
-+    p += sizeof(int);
-+    avail -= sizeof(int);
-+
-+    switch (msg->cmd) {
-+    case barrierCmdHello:
-+        if (msg->version.major < BARRIER_VERSION_MAJOR ||
-+            (msg->version.major == BARRIER_VERSION_MAJOR &&
-+             msg->version.minor < BARRIER_VERSION_MINOR)) {
-+            ib->ioc_tag = 0;
-+            return G_SOURCE_REMOVE;
-+        }
-+        write_cmd(p, barrierCmdHelloBack, avail);
-+        write_short(p, BARRIER_VERSION_MAJOR, avail);
-+        write_short(p, BARRIER_VERSION_MINOR, avail);
-+        write_string(p, ib->name, avail);
-+        break;
-+    case barrierCmdCClose:
-+        ib->ioc_tag = 0;
-+        return G_SOURCE_REMOVE;
-+    case barrierCmdQInfo:
-+        write_cmd(p, barrierCmdDInfo, avail);
-+        write_short(p, ib->x_origin, avail);
-+        write_short(p, ib->y_origin, avail);
-+        write_short(p, ib->width, avail);
-+        write_short(p, ib->height, avail);
-+        write_short(p, 0, avail);    /* warpsize (obsolete) */
-+        write_short(p, 0, avail);    /* mouse x */
-+        write_short(p, 0, avail);    /* mouse y */
-+        break;
-+    case barrierCmdCInfoAck:
-+        break;
-+    case barrierCmdCResetOptions:
-+        /* TODO: reset options */
-+        break;
-+    case barrierCmdDSetOptions:
-+        /* TODO: set options */
-+        break;
-+    case barrierCmdCEnter:
-+        break;
-+    case barrierCmdDClipboard:
-+        break;
-+    case barrierCmdCKeepAlive:
-+        write_cmd(p, barrierCmdCKeepAlive, avail);
-+        break;
-+    case barrierCmdCLeave:
-+        break;
-+
-+    /* mouse */
-+    case barrierCmdDMouseMove:
-+        qemu_input_queue_abs(NULL, INPUT_AXIS_X, msg->mousepos.x,
-+                             ib->x_origin, ib->width);
-+        qemu_input_queue_abs(NULL, INPUT_AXIS_Y, msg->mousepos.y,
-+                             ib->y_origin, ib->height);
-+        qemu_input_event_sync();
-+        break;
-+    case barrierCmdDMouseRelMove:
-+        qemu_input_queue_rel(NULL, INPUT_AXIS_X, msg->mousepos.x);
-+        qemu_input_queue_rel(NULL, INPUT_AXIS_Y, msg->mousepos.y);
-+        qemu_input_event_sync();
-+        break;
-+    case barrierCmdDMouseDown:
-+        qemu_input_queue_btn(NULL,
-+                             input_barrier_to_mouse(msg->mousebutton.buttonid),
-+                             true);
-+        qemu_input_event_sync();
-+        break;
-+    case barrierCmdDMouseUp:
-+        qemu_input_queue_btn(NULL,
-+                             input_barrier_to_mouse(msg->mousebutton.buttonid),
-+                             false);
-+        qemu_input_event_sync();
-+        break;
-+    case barrierCmdDMouseWheel:
-+        qemu_input_queue_btn(NULL, (msg->mousepos.y > 0) ? INPUT_BUTTON_WHEEL_UP
-+                             : INPUT_BUTTON_WHEEL_DOWN, true);
-+        qemu_input_event_sync();
-+        qemu_input_queue_btn(NULL, (msg->mousepos.y > 0) ? INPUT_BUTTON_WHEEL_UP
-+                             : INPUT_BUTTON_WHEEL_DOWN, false);
-+        qemu_input_event_sync();
-+        break;
-+
-+    /* keyboard */
-+    case barrierCmdDKeyDown:
-+        qemu_input_event_send_key_qcode(NULL,
-+                        input_barrier_to_qcode(msg->key.keyid, msg->key.button),
-+                                        true);
-+        break;
-+    case barrierCmdDKeyRepeat:
-+        for (i = 0; i < msg->repeat.repeat; i++) {
-+            qemu_input_event_send_key_qcode(NULL,
-+                  input_barrier_to_qcode(msg->repeat.keyid, msg->repeat.button),
-+                                            false);
-+            qemu_input_event_send_key_qcode(NULL,
-+                  input_barrier_to_qcode(msg->repeat.keyid, msg->repeat.button),
-+                                            true);
-+        }
-+        break;
-+    case barrierCmdDKeyUp:
-+        qemu_input_event_send_key_qcode(NULL,
-+                        input_barrier_to_qcode(msg->key.keyid, msg->key.button),
-+                                        false);
-+        break;
-+    default:
-+        write_cmd(p, barrierCmdEUnknown, avail);
-+        break;;
-+    }
-+
-+    len = MAX_HELLO_LENGTH - avail - sizeof(int);
-+    if (len) {
-+        p = ib->buffer;
-+        avail = sizeof(len);
-+        write_int(p, len, avail);
-+        ret = qio_channel_write(QIO_CHANNEL(ib->sioc), ib->buffer,
-+                                len + sizeof(len), NULL);
-+        if (ret < 0) {
-+            ib->ioc_tag = 0;
-+            return G_SOURCE_REMOVE;
-+        }
-+    }
-+
-+    return G_SOURCE_CONTINUE;
-+}
-+
-+static gboolean input_barrier_event(QIOChannel *ioc G_GNUC_UNUSED,
-+                                    GIOCondition condition, void *opaque)
-+{
-+    InputBarrier *ib = opaque;
-+    int ret;
-+    struct barrierMsg msg;
-+
-+    ret = readcmd(ib, &msg);
-+    if (ret == G_SOURCE_REMOVE) {
-+        ib->ioc_tag = 0;
-+        return G_SOURCE_REMOVE;
-+    }
-+
-+    return writecmd(ib, &msg);
-+}
-+
-+static void input_barrier_complete(UserCreatable *uc, Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(uc);
-+    Error *local_err = NULL;
-+
-+    if (!ib->name) {
-+        error_setg(errp, QERR_MISSING_PARAMETER, "name");
-+        return;
-+    }
-+
-+    /*
-+     * Connect to the primary
-+     * Primary is the server where the keyboard and the mouse
-+     * are connected and forwarded to the secondary (the client)
-+     */
-+
-+    ib->sioc = qio_channel_socket_new();
-+    qio_channel_set_name(QIO_CHANNEL(ib->sioc), "barrier-client");
-+
-+    qio_channel_socket_connect_sync(ib->sioc, &ib->saddr, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    qio_channel_set_delay(QIO_CHANNEL(ib->sioc), false);
-+
-+    ib->ioc_tag = qio_channel_add_watch(QIO_CHANNEL(ib->sioc), G_IO_IN,
-+                                        input_barrier_event, ib, NULL);
-+}
-+
-+static void input_barrier_instance_finalize(Object *obj)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    if (ib->ioc_tag) {
-+        g_source_remove(ib->ioc_tag);
-+        ib->ioc_tag = 0;
-+    }
-+
-+    if (ib->sioc) {
-+        qio_channel_close(QIO_CHANNEL(ib->sioc), NULL);
-+        object_unref(OBJECT(ib->sioc));
-+    }
-+    g_free(ib->name);
-+    g_free(ib->saddr.u.inet.host);
-+    g_free(ib->saddr.u.inet.port);
-+}
-+
-+static char *input_barrier_get_name(Object *obj, Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    return g_strdup(ib->name);
-+}
-+
-+static void input_barrier_set_name(Object *obj, const char *value,
-+                                  Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    if (ib->name) {
-+        error_setg(errp, "name property already set");
-+        return;
-+    }
-+    ib->name = g_strdup(value);
-+}
-+
-+static char *input_barrier_get_server(Object *obj, Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    return g_strdup(ib->saddr.u.inet.host);
-+}
-+
-+static void input_barrier_set_server(Object *obj, const char *value,
-+                                     Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    g_free(ib->saddr.u.inet.host);
-+    ib->saddr.u.inet.host = g_strdup(value);
-+}
-+
-+static char *input_barrier_get_port(Object *obj, Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    return g_strdup(ib->saddr.u.inet.port);
-+}
-+
-+static void input_barrier_set_port(Object *obj, const char *value,
-+                                     Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    g_free(ib->saddr.u.inet.port);
-+    ib->saddr.u.inet.port = g_strdup(value);
-+}
-+
-+static void input_barrier_set_x_origin(Object *obj, const char *value,
-+                                       Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+    int result, err;
-+
-+    err = qemu_strtoi(value, NULL, 0, &result);
-+    if (err < 0 || result < 0 || result > SHRT_MAX) {
-+        error_setg(errp,
-+                   "x-origin property must be in the range [0..%d]", SHRT_MAX);
-+        return;
-+    }
-+    ib->x_origin = result;
-+}
-+
-+static char *input_barrier_get_x_origin(Object *obj, Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    return g_strdup_printf("%d", ib->x_origin);
-+}
-+
-+static void input_barrier_set_y_origin(Object *obj, const char *value,
-+                                       Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+    int result, err;
-+
-+    err = qemu_strtoi(value, NULL, 0, &result);
-+    if (err < 0 || result < 0 || result > SHRT_MAX) {
-+        error_setg(errp,
-+                   "y-origin property must be in the range [0..%d]", SHRT_MAX);
-+        return;
-+    }
-+    ib->y_origin = result;
-+}
-+
-+static char *input_barrier_get_y_origin(Object *obj, Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    return g_strdup_printf("%d", ib->y_origin);
-+}
-+
-+static void input_barrier_set_width(Object *obj, const char *value,
-+                                       Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+    int result, err;
-+
-+    err = qemu_strtoi(value, NULL, 0, &result);
-+    if (err < 0 || result < 0 || result > SHRT_MAX) {
-+        error_setg(errp,
-+                   "width property must be in the range [0..%d]", SHRT_MAX);
-+        return;
-+    }
-+    ib->width = result;
-+}
-+
-+static char *input_barrier_get_width(Object *obj, Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    return g_strdup_printf("%d", ib->width);
-+}
-+
-+static void input_barrier_set_height(Object *obj, const char *value,
-+                                       Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+    int result, err;
-+
-+    err = qemu_strtoi(value, NULL, 0, &result);
-+    if (err < 0 || result < 0 || result > SHRT_MAX) {
-+        error_setg(errp,
-+                   "height property must be in the range [0..%d]", SHRT_MAX);
-+        return;
-+    }
-+    ib->height = result;
-+}
-+
-+static char *input_barrier_get_height(Object *obj, Error **errp)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    return g_strdup_printf("%d", ib->height);
-+}
-+
-+static void input_barrier_instance_init(Object *obj)
-+{
-+    InputBarrier *ib = INPUT_BARRIER(obj);
-+
-+    ib->saddr.type = SOCKET_ADDRESS_TYPE_INET;
-+    ib->saddr.u.inet.host = g_strdup("localhost");
-+    ib->saddr.u.inet.port = g_strdup("24800");
-+
-+    ib->x_origin = 0;
-+    ib->y_origin = 0;
-+    ib->width = 1920;
-+    ib->height = 1080;
-+
-+    object_property_add_str(obj, "name",
-+                            input_barrier_get_name,
-+                            input_barrier_set_name, NULL);
-+    object_property_add_str(obj, "server",
-+                            input_barrier_get_server,
-+                            input_barrier_set_server, NULL);
-+    object_property_add_str(obj, "port",
-+                            input_barrier_get_port,
-+                            input_barrier_set_port, NULL);
-+    object_property_add_str(obj, "x-origin",
-+                            input_barrier_get_x_origin,
-+                            input_barrier_set_x_origin, NULL);
-+    object_property_add_str(obj, "y-origin",
-+                            input_barrier_get_y_origin,
-+                            input_barrier_set_y_origin, NULL);
-+    object_property_add_str(obj, "width",
-+                            input_barrier_get_width,
-+                            input_barrier_set_width, NULL);
-+    object_property_add_str(obj, "height",
-+                            input_barrier_get_height,
-+                            input_barrier_set_height, NULL);
-+}
-+
-+static void input_barrier_class_init(ObjectClass *oc, void *data)
-+{
-+    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
-+
-+    ucc->complete = input_barrier_complete;
-+
-+    /* always use generic keymaps */
-+    if (keyboard_layout) {
-+        /* We use X11 key id, so use VNC name2keysym */
-+        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout,
-+                                          &error_fatal);
-+    }
-+}
-+
-+static const TypeInfo input_barrier_info = {
-+    .name = TYPE_INPUT_BARRIER,
-+    .parent = TYPE_OBJECT,
-+    .class_size = sizeof(InputBarrierClass),
-+    .class_init = input_barrier_class_init,
-+    .instance_size = sizeof(InputBarrier),
-+    .instance_init = input_barrier_instance_init,
-+    .instance_finalize = input_barrier_instance_finalize,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_USER_CREATABLE },
-+        { }
-+    }
-+};
-+
-+static void register_types(void)
-+{
-+    type_register_static(&input_barrier_info);
-+}
-+
-+type_init(register_types);
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index ba39080edb2b..e6da6ff047fd 100644
---- a/ui/Makefile.objs
-+++ b/ui/Makefile.objs
-@@ -9,6 +9,7 @@ vnc-obj-y += vnc-jobs.o
+diff --git a/ui/vnc.h b/ui/vnc.h
+index 86438609673a..fea79c2fc998 100644
+--- a/ui/vnc.h
++++ b/ui/vnc.h
+@@ -338,10 +338,10 @@ struct VncState
+     /* Encoding specific, if you add something here, don't forget to
+      *  update vnc_async_encoding_start()
+      */
+-    VncTight tight;
++    VncTight *tight;
+     VncZlib zlib;
+     VncHextile hextile;
+-    VncZrle zrle;
++    VncZrle *zrle;
+     VncZywrle zywrle;
  
- common-obj-y += keymaps.o console.o cursor.o qemu-pixman.o
- common-obj-y += input.o input-keymap.o input-legacy.o kbd-state.o
-+common-obj-y += input-barrier.o
- common-obj-$(CONFIG_LINUX) += input-linux.o
- common-obj-$(CONFIG_SPICE) += spice-core.o spice-input.o spice-display.o
- common-obj-$(CONFIG_COCOA) += cocoa.o
+     Notifier mouse_mode_notifier;
+diff --git a/ui/vnc-enc-tight.c b/ui/vnc-enc-tight.c
+index 9084c2201b31..1e0851826a84 100644
+--- a/ui/vnc-enc-tight.c
++++ b/ui/vnc-enc-tight.c
+@@ -116,7 +116,7 @@ static int send_png_rect(VncState *vs, int x, int y, int w, int h,
+ 
+ static bool tight_can_send_png_rect(VncState *vs, int w, int h)
+ {
+-    if (vs->tight.type != VNC_ENCODING_TIGHT_PNG) {
++    if (vs->tight->type != VNC_ENCODING_TIGHT_PNG) {
+         return false;
+     }
+ 
+@@ -144,7 +144,7 @@ tight_detect_smooth_image24(VncState *vs, int w, int h)
+     int pixels = 0;
+     int pix, left[3];
+     unsigned int errors;
+-    unsigned char *buf = vs->tight.tight.buffer;
++    unsigned char *buf = vs->tight->tight.buffer;
+ 
+     /*
+      * If client is big-endian, color samples begin from the second
+@@ -215,7 +215,7 @@ tight_detect_smooth_image24(VncState *vs, int w, int h)
+         int pixels = 0;                                                 \
+         int sample, sum, left[3];                                       \
+         unsigned int errors;                                            \
+-        unsigned char *buf = vs->tight.tight.buffer;                    \
++        unsigned char *buf = vs->tight->tight.buffer;                    \
+                                                                         \
+         endian = 0; /* FIXME */                                         \
+                                                                         \
+@@ -296,8 +296,8 @@ static int
+ tight_detect_smooth_image(VncState *vs, int w, int h)
+ {
+     unsigned int errors;
+-    int compression = vs->tight.compression;
+-    int quality = vs->tight.quality;
++    int compression = vs->tight->compression;
++    int quality = vs->tight->quality;
+ 
+     if (!vs->vd->lossy) {
+         return 0;
+@@ -309,7 +309,7 @@ tight_detect_smooth_image(VncState *vs, int w, int h)
+         return 0;
+     }
+ 
+-    if (vs->tight.quality != (uint8_t)-1) {
++    if (vs->tight->quality != (uint8_t)-1) {
+         if (w * h < VNC_TIGHT_JPEG_MIN_RECT_SIZE) {
+             return 0;
+         }
+@@ -320,9 +320,9 @@ tight_detect_smooth_image(VncState *vs, int w, int h)
+     }
+ 
+     if (vs->client_pf.bytes_per_pixel == 4) {
+-        if (vs->tight.pixel24) {
++        if (vs->tight->pixel24) {
+             errors = tight_detect_smooth_image24(vs, w, h);
+-            if (vs->tight.quality != (uint8_t)-1) {
++            if (vs->tight->quality != (uint8_t)-1) {
+                 return (errors < tight_conf[quality].jpeg_threshold24);
+             }
+             return (errors < tight_conf[compression].gradient_threshold24);
+@@ -352,7 +352,7 @@ tight_detect_smooth_image(VncState *vs, int w, int h)
+         uint##bpp##_t c0, c1, ci;                                       \
+         int i, n0, n1;                                                  \
+                                                                         \
+-        data = (uint##bpp##_t *)vs->tight.tight.buffer;                 \
++        data = (uint##bpp##_t *)vs->tight->tight.buffer;                \
+                                                                         \
+         c0 = data[0];                                                   \
+         i = 1;                                                          \
+@@ -423,9 +423,9 @@ static int tight_fill_palette(VncState *vs, int x, int y,
+ {
+     int max;
+ 
+-    max = count / tight_conf[vs->tight.compression].idx_max_colors_divisor;
++    max = count / tight_conf[vs->tight->compression].idx_max_colors_divisor;
+     if (max < 2 &&
+-        count >= tight_conf[vs->tight.compression].mono_min_rect_size) {
++        count >= tight_conf[vs->tight->compression].mono_min_rect_size) {
+         max = 2;
+     }
+     if (max >= 256) {
+@@ -558,7 +558,7 @@ tight_filter_gradient24(VncState *vs, uint8_t *buf, int w, int h)
+     int x, y, c;
+ 
+     buf32 = (uint32_t *)buf;
+-    memset(vs->tight.gradient.buffer, 0, w * 3 * sizeof(int));
++    memset(vs->tight->gradient.buffer, 0, w * 3 * sizeof(int));
+ 
+     if (1 /* FIXME */) {
+         shift[0] = vs->client_pf.rshift;
+@@ -575,7 +575,7 @@ tight_filter_gradient24(VncState *vs, uint8_t *buf, int w, int h)
+             upper[c] = 0;
+             here[c] = 0;
+         }
+-        prev = (int *)vs->tight.gradient.buffer;
++        prev = (int *)vs->tight->gradient.buffer;
+         for (x = 0; x < w; x++) {
+             pix32 = *buf32++;
+             for (c = 0; c < 3; c++) {
+@@ -615,7 +615,7 @@ tight_filter_gradient24(VncState *vs, uint8_t *buf, int w, int h)
+         int prediction;                                                 \
+         int x, y, c;                                                    \
+                                                                         \
+-        memset (vs->tight.gradient.buffer, 0, w * 3 * sizeof(int));     \
++        memset(vs->tight->gradient.buffer, 0, w * 3 * sizeof(int));     \
+                                                                         \
+         endian = 0; /* FIXME */                                         \
+                                                                         \
+@@ -631,7 +631,7 @@ tight_filter_gradient24(VncState *vs, uint8_t *buf, int w, int h)
+                 upper[c] = 0;                                           \
+                 here[c] = 0;                                            \
+             }                                                           \
+-            prev = (int *)vs->tight.gradient.buffer;                    \
++            prev = (int *)vs->tight->gradient.buffer;                    \
+             for (x = 0; x < w; x++) {                                   \
+                 pix = *buf;                                             \
+                 if (endian) {                                           \
+@@ -785,7 +785,7 @@ static void extend_solid_area(VncState *vs, int x, int y, int w, int h,
+ static int tight_init_stream(VncState *vs, int stream_id,
+                              int level, int strategy)
+ {
+-    z_streamp zstream = &vs->tight.stream[stream_id];
++    z_streamp zstream = &vs->tight->stream[stream_id];
+ 
+     if (zstream->opaque == NULL) {
+         int err;
+@@ -803,15 +803,15 @@ static int tight_init_stream(VncState *vs, int stream_id,
+             return -1;
+         }
+ 
+-        vs->tight.levels[stream_id] = level;
++        vs->tight->levels[stream_id] = level;
+         zstream->opaque = vs;
+     }
+ 
+-    if (vs->tight.levels[stream_id] != level) {
++    if (vs->tight->levels[stream_id] != level) {
+         if (deflateParams(zstream, level, strategy) != Z_OK) {
+             return -1;
+         }
+-        vs->tight.levels[stream_id] = level;
++        vs->tight->levels[stream_id] = level;
+     }
+     return 0;
+ }
+@@ -839,11 +839,11 @@ static void tight_send_compact_size(VncState *vs, size_t len)
+ static int tight_compress_data(VncState *vs, int stream_id, size_t bytes,
+                                int level, int strategy)
+ {
+-    z_streamp zstream = &vs->tight.stream[stream_id];
++    z_streamp zstream = &vs->tight->stream[stream_id];
+     int previous_out;
+ 
+     if (bytes < VNC_TIGHT_MIN_TO_COMPRESS) {
+-        vnc_write(vs, vs->tight.tight.buffer, vs->tight.tight.offset);
++        vnc_write(vs, vs->tight->tight.buffer, vs->tight->tight.offset);
+         return bytes;
+     }
+ 
+@@ -852,13 +852,13 @@ static int tight_compress_data(VncState *vs, int stream_id, size_t bytes,
+     }
+ 
+     /* reserve memory in output buffer */
+-    buffer_reserve(&vs->tight.zlib, bytes + 64);
++    buffer_reserve(&vs->tight->zlib, bytes + 64);
+ 
+     /* set pointers */
+-    zstream->next_in = vs->tight.tight.buffer;
+-    zstream->avail_in = vs->tight.tight.offset;
+-    zstream->next_out = vs->tight.zlib.buffer + vs->tight.zlib.offset;
+-    zstream->avail_out = vs->tight.zlib.capacity - vs->tight.zlib.offset;
++    zstream->next_in = vs->tight->tight.buffer;
++    zstream->avail_in = vs->tight->tight.offset;
++    zstream->next_out = vs->tight->zlib.buffer + vs->tight->zlib.offset;
++    zstream->avail_out = vs->tight->zlib.capacity - vs->tight->zlib.offset;
+     previous_out = zstream->avail_out;
+     zstream->data_type = Z_BINARY;
+ 
+@@ -868,14 +868,14 @@ static int tight_compress_data(VncState *vs, int stream_id, size_t bytes,
+         return -1;
+     }
+ 
+-    vs->tight.zlib.offset = vs->tight.zlib.capacity - zstream->avail_out;
++    vs->tight->zlib.offset = vs->tight->zlib.capacity - zstream->avail_out;
+     /* ...how much data has actually been produced by deflate() */
+     bytes = previous_out - zstream->avail_out;
+ 
+     tight_send_compact_size(vs, bytes);
+-    vnc_write(vs, vs->tight.zlib.buffer, bytes);
++    vnc_write(vs, vs->tight->zlib.buffer, bytes);
+ 
+-    buffer_reset(&vs->tight.zlib);
++    buffer_reset(&vs->tight->zlib);
+ 
+     return bytes;
+ }
+@@ -927,16 +927,17 @@ static int send_full_color_rect(VncState *vs, int x, int y, int w, int h)
+ 
+     vnc_write_u8(vs, stream << 4); /* no flushing, no filter */
+ 
+-    if (vs->tight.pixel24) {
+-        tight_pack24(vs, vs->tight.tight.buffer, w * h, &vs->tight.tight.offset);
++    if (vs->tight->pixel24) {
++        tight_pack24(vs, vs->tight->tight.buffer, w * h,
++                     &vs->tight->tight.offset);
+         bytes = 3;
+     } else {
+         bytes = vs->client_pf.bytes_per_pixel;
+     }
+ 
+     bytes = tight_compress_data(vs, stream, w * h * bytes,
+-                                tight_conf[vs->tight.compression].raw_zlib_level,
+-                                Z_DEFAULT_STRATEGY);
++                            tight_conf[vs->tight->compression].raw_zlib_level,
++                            Z_DEFAULT_STRATEGY);
+ 
+     return (bytes >= 0);
+ }
+@@ -947,14 +948,14 @@ static int send_solid_rect(VncState *vs)
+ 
+     vnc_write_u8(vs, VNC_TIGHT_FILL << 4); /* no flushing, no filter */
+ 
+-    if (vs->tight.pixel24) {
+-        tight_pack24(vs, vs->tight.tight.buffer, 1, &vs->tight.tight.offset);
++    if (vs->tight->pixel24) {
++        tight_pack24(vs, vs->tight->tight.buffer, 1, &vs->tight->tight.offset);
+         bytes = 3;
+     } else {
+         bytes = vs->client_pf.bytes_per_pixel;
+     }
+ 
+-    vnc_write(vs, vs->tight.tight.buffer, bytes);
++    vnc_write(vs, vs->tight->tight.buffer, bytes);
+     return 1;
+ }
+ 
+@@ -963,7 +964,7 @@ static int send_mono_rect(VncState *vs, int x, int y,
+ {
+     ssize_t bytes;
+     int stream = 1;
+-    int level = tight_conf[vs->tight.compression].mono_zlib_level;
++    int level = tight_conf[vs->tight->compression].mono_zlib_level;
+ 
+ #ifdef CONFIG_VNC_PNG
+     if (tight_can_send_png_rect(vs, w, h)) {
+@@ -991,26 +992,26 @@ static int send_mono_rect(VncState *vs, int x, int y,
+         uint32_t buf[2] = {bg, fg};
+         size_t ret = sizeof (buf);
+ 
+-        if (vs->tight.pixel24) {
++        if (vs->tight->pixel24) {
+             tight_pack24(vs, (unsigned char*)buf, 2, &ret);
+         }
+         vnc_write(vs, buf, ret);
+ 
+-        tight_encode_mono_rect32(vs->tight.tight.buffer, w, h, bg, fg);
++        tight_encode_mono_rect32(vs->tight->tight.buffer, w, h, bg, fg);
+         break;
+     }
+     case 2:
+         vnc_write(vs, &bg, 2);
+         vnc_write(vs, &fg, 2);
+-        tight_encode_mono_rect16(vs->tight.tight.buffer, w, h, bg, fg);
++        tight_encode_mono_rect16(vs->tight->tight.buffer, w, h, bg, fg);
+         break;
+     default:
+         vnc_write_u8(vs, bg);
+         vnc_write_u8(vs, fg);
+-        tight_encode_mono_rect8(vs->tight.tight.buffer, w, h, bg, fg);
++        tight_encode_mono_rect8(vs->tight->tight.buffer, w, h, bg, fg);
+         break;
+     }
+-    vs->tight.tight.offset = bytes;
++    vs->tight->tight.offset = bytes;
+ 
+     bytes = tight_compress_data(vs, stream, bytes, level, Z_DEFAULT_STRATEGY);
+     return (bytes >= 0);
+@@ -1040,7 +1041,7 @@ static void write_palette(int idx, uint32_t color, void *opaque)
+ static bool send_gradient_rect(VncState *vs, int x, int y, int w, int h)
+ {
+     int stream = 3;
+-    int level = tight_conf[vs->tight.compression].gradient_zlib_level;
++    int level = tight_conf[vs->tight->compression].gradient_zlib_level;
+     ssize_t bytes;
+ 
+     if (vs->client_pf.bytes_per_pixel == 1) {
+@@ -1050,23 +1051,23 @@ static bool send_gradient_rect(VncState *vs, int x, int y, int w, int h)
+     vnc_write_u8(vs, (stream | VNC_TIGHT_EXPLICIT_FILTER) << 4);
+     vnc_write_u8(vs, VNC_TIGHT_FILTER_GRADIENT);
+ 
+-    buffer_reserve(&vs->tight.gradient, w * 3 * sizeof (int));
++    buffer_reserve(&vs->tight->gradient, w * 3 * sizeof(int));
+ 
+-    if (vs->tight.pixel24) {
+-        tight_filter_gradient24(vs, vs->tight.tight.buffer, w, h);
++    if (vs->tight->pixel24) {
++        tight_filter_gradient24(vs, vs->tight->tight.buffer, w, h);
+         bytes = 3;
+     } else if (vs->client_pf.bytes_per_pixel == 4) {
+-        tight_filter_gradient32(vs, (uint32_t *)vs->tight.tight.buffer, w, h);
++        tight_filter_gradient32(vs, (uint32_t *)vs->tight->tight.buffer, w, h);
+         bytes = 4;
+     } else {
+-        tight_filter_gradient16(vs, (uint16_t *)vs->tight.tight.buffer, w, h);
++        tight_filter_gradient16(vs, (uint16_t *)vs->tight->tight.buffer, w, h);
+         bytes = 2;
+     }
+ 
+-    buffer_reset(&vs->tight.gradient);
++    buffer_reset(&vs->tight->gradient);
+ 
+     bytes = w * h * bytes;
+-    vs->tight.tight.offset = bytes;
++    vs->tight->tight.offset = bytes;
+ 
+     bytes = tight_compress_data(vs, stream, bytes,
+                                 level, Z_FILTERED);
+@@ -1077,7 +1078,7 @@ static int send_palette_rect(VncState *vs, int x, int y,
+                              int w, int h, VncPalette *palette)
+ {
+     int stream = 2;
+-    int level = tight_conf[vs->tight.compression].idx_zlib_level;
++    int level = tight_conf[vs->tight->compression].idx_zlib_level;
+     int colors;
+     ssize_t bytes;
+ 
+@@ -1104,12 +1105,12 @@ static int send_palette_rect(VncState *vs, int x, int y,
+         palette_iter(palette, write_palette, &priv);
+         vnc_write(vs, header, sizeof(header));
+ 
+-        if (vs->tight.pixel24) {
++        if (vs->tight->pixel24) {
+             tight_pack24(vs, vs->output.buffer + old_offset, colors, &offset);
+             vs->output.offset = old_offset + offset;
+         }
+ 
+-        tight_encode_indexed_rect32(vs->tight.tight.buffer, w * h, palette);
++        tight_encode_indexed_rect32(vs->tight->tight.buffer, w * h, palette);
+         break;
+     }
+     case 2:
+@@ -1119,7 +1120,7 @@ static int send_palette_rect(VncState *vs, int x, int y,
+ 
+         palette_iter(palette, write_palette, &priv);
+         vnc_write(vs, header, sizeof(header));
+-        tight_encode_indexed_rect16(vs->tight.tight.buffer, w * h, palette);
++        tight_encode_indexed_rect16(vs->tight->tight.buffer, w * h, palette);
+         break;
+     }
+     default:
+@@ -1127,7 +1128,7 @@ static int send_palette_rect(VncState *vs, int x, int y,
+         break;
+     }
+     bytes = w * h;
+-    vs->tight.tight.offset = bytes;
++    vs->tight->tight.offset = bytes;
+ 
+     bytes = tight_compress_data(vs, stream, bytes,
+                                 level, Z_DEFAULT_STRATEGY);
+@@ -1146,7 +1147,7 @@ static int send_palette_rect(VncState *vs, int x, int y,
+ static void jpeg_init_destination(j_compress_ptr cinfo)
+ {
+     VncState *vs = cinfo->client_data;
+-    Buffer *buffer = &vs->tight.jpeg;
++    Buffer *buffer = &vs->tight->jpeg;
+ 
+     cinfo->dest->next_output_byte = (JOCTET *)buffer->buffer + buffer->offset;
+     cinfo->dest->free_in_buffer = (size_t)(buffer->capacity - buffer->offset);
+@@ -1156,7 +1157,7 @@ static void jpeg_init_destination(j_compress_ptr cinfo)
+ static boolean jpeg_empty_output_buffer(j_compress_ptr cinfo)
+ {
+     VncState *vs = cinfo->client_data;
+-    Buffer *buffer = &vs->tight.jpeg;
++    Buffer *buffer = &vs->tight->jpeg;
+ 
+     buffer->offset = buffer->capacity;
+     buffer_reserve(buffer, 2048);
+@@ -1168,7 +1169,7 @@ static boolean jpeg_empty_output_buffer(j_compress_ptr cinfo)
+ static void jpeg_term_destination(j_compress_ptr cinfo)
+ {
+     VncState *vs = cinfo->client_data;
+-    Buffer *buffer = &vs->tight.jpeg;
++    Buffer *buffer = &vs->tight->jpeg;
+ 
+     buffer->offset = buffer->capacity - cinfo->dest->free_in_buffer;
+ }
+@@ -1187,7 +1188,7 @@ static int send_jpeg_rect(VncState *vs, int x, int y, int w, int h, int quality)
+         return send_full_color_rect(vs, x, y, w, h);
+     }
+ 
+-    buffer_reserve(&vs->tight.jpeg, 2048);
++    buffer_reserve(&vs->tight->jpeg, 2048);
+ 
+     cinfo.err = jpeg_std_error(&jerr);
+     jpeg_create_compress(&cinfo);
+@@ -1222,9 +1223,9 @@ static int send_jpeg_rect(VncState *vs, int x, int y, int w, int h, int quality)
+ 
+     vnc_write_u8(vs, VNC_TIGHT_JPEG << 4);
+ 
+-    tight_send_compact_size(vs, vs->tight.jpeg.offset);
+-    vnc_write(vs, vs->tight.jpeg.buffer, vs->tight.jpeg.offset);
+-    buffer_reset(&vs->tight.jpeg);
++    tight_send_compact_size(vs, vs->tight->jpeg.offset);
++    vnc_write(vs, vs->tight->jpeg.buffer, vs->tight->jpeg.offset);
++    buffer_reset(&vs->tight->jpeg);
+ 
+     return 1;
+ }
+@@ -1240,7 +1241,7 @@ static void write_png_palette(int idx, uint32_t pix, void *opaque)
+     VncState *vs = priv->vs;
+     png_colorp color = &priv->png_palette[idx];
+ 
+-    if (vs->tight.pixel24)
++    if (vs->tight->pixel24)
+     {
+         color->red = (pix >> vs->client_pf.rshift) & vs->client_pf.rmax;
+         color->green = (pix >> vs->client_pf.gshift) & vs->client_pf.gmax;
+@@ -1267,10 +1268,10 @@ static void png_write_data(png_structp png_ptr, png_bytep data,
+ {
+     VncState *vs = png_get_io_ptr(png_ptr);
+ 
+-    buffer_reserve(&vs->tight.png, vs->tight.png.offset + length);
+-    memcpy(vs->tight.png.buffer + vs->tight.png.offset, data, length);
++    buffer_reserve(&vs->tight->png, vs->tight->png.offset + length);
++    memcpy(vs->tight->png.buffer + vs->tight->png.offset, data, length);
+ 
+-    vs->tight.png.offset += length;
++    vs->tight->png.offset += length;
+ }
+ 
+ static void png_flush_data(png_structp png_ptr)
+@@ -1295,8 +1296,8 @@ static int send_png_rect(VncState *vs, int x, int y, int w, int h,
+     png_infop info_ptr;
+     png_colorp png_palette = NULL;
+     pixman_image_t *linebuf;
+-    int level = tight_png_conf[vs->tight.compression].png_zlib_level;
+-    int filters = tight_png_conf[vs->tight.compression].png_filters;
++    int level = tight_png_conf[vs->tight->compression].png_zlib_level;
++    int filters = tight_png_conf[vs->tight->compression].png_filters;
+     uint8_t *buf;
+     int dy;
+ 
+@@ -1340,21 +1341,23 @@ static int send_png_rect(VncState *vs, int x, int y, int w, int h,
+         png_set_PLTE(png_ptr, info_ptr, png_palette, palette_size(palette));
+ 
+         if (vs->client_pf.bytes_per_pixel == 4) {
+-            tight_encode_indexed_rect32(vs->tight.tight.buffer, w * h, palette);
++            tight_encode_indexed_rect32(vs->tight->tight.buffer, w * h,
++                                        palette);
+         } else {
+-            tight_encode_indexed_rect16(vs->tight.tight.buffer, w * h, palette);
++            tight_encode_indexed_rect16(vs->tight->tight.buffer, w * h,
++                                        palette);
+         }
+     }
+ 
+     png_write_info(png_ptr, info_ptr);
+ 
+-    buffer_reserve(&vs->tight.png, 2048);
++    buffer_reserve(&vs->tight->png, 2048);
+     linebuf = qemu_pixman_linebuf_create(PIXMAN_BE_r8g8b8, w);
+     buf = (uint8_t *)pixman_image_get_data(linebuf);
+     for (dy = 0; dy < h; dy++)
+     {
+         if (color_type == PNG_COLOR_TYPE_PALETTE) {
+-            memcpy(buf, vs->tight.tight.buffer + (dy * w), w);
++            memcpy(buf, vs->tight->tight.buffer + (dy * w), w);
+         } else {
+             qemu_pixman_linebuf_fill(linebuf, vs->vd->server, w, x, y + dy);
+         }
+@@ -1372,27 +1375,27 @@ static int send_png_rect(VncState *vs, int x, int y, int w, int h,
+ 
+     vnc_write_u8(vs, VNC_TIGHT_PNG << 4);
+ 
+-    tight_send_compact_size(vs, vs->tight.png.offset);
+-    vnc_write(vs, vs->tight.png.buffer, vs->tight.png.offset);
+-    buffer_reset(&vs->tight.png);
++    tight_send_compact_size(vs, vs->tight->png.offset);
++    vnc_write(vs, vs->tight->png.buffer, vs->tight->png.offset);
++    buffer_reset(&vs->tight->png);
+     return 1;
+ }
+ #endif /* CONFIG_VNC_PNG */
+ 
+ static void vnc_tight_start(VncState *vs)
+ {
+-    buffer_reset(&vs->tight.tight);
++    buffer_reset(&vs->tight->tight);
+ 
+     // make the output buffer be the zlib buffer, so we can compress it later
+-    vs->tight.tmp = vs->output;
+-    vs->output = vs->tight.tight;
++    vs->tight->tmp = vs->output;
++    vs->output = vs->tight->tight;
+ }
+ 
+ static void vnc_tight_stop(VncState *vs)
+ {
+     // switch back to normal output/zlib buffers
+-    vs->tight.tight = vs->output;
+-    vs->output = vs->tight.tmp;
++    vs->tight->tight = vs->output;
++    vs->output = vs->tight->tmp;
+ }
+ 
+ static int send_sub_rect_nojpeg(VncState *vs, int x, int y, int w, int h,
+@@ -1426,9 +1429,9 @@ static int send_sub_rect_jpeg(VncState *vs, int x, int y, int w, int h,
+     int ret;
+ 
+     if (colors == 0) {
+-        if (force || (tight_jpeg_conf[vs->tight.quality].jpeg_full &&
++        if (force || (tight_jpeg_conf[vs->tight->quality].jpeg_full &&
+                       tight_detect_smooth_image(vs, w, h))) {
+-            int quality = tight_conf[vs->tight.quality].jpeg_quality;
++            int quality = tight_conf[vs->tight->quality].jpeg_quality;
+ 
+             ret = send_jpeg_rect(vs, x, y, w, h, quality);
+         } else {
+@@ -1440,9 +1443,9 @@ static int send_sub_rect_jpeg(VncState *vs, int x, int y, int w, int h,
+         ret = send_mono_rect(vs, x, y, w, h, bg, fg);
+     } else if (colors <= 256) {
+         if (force || (colors > 96 &&
+-                      tight_jpeg_conf[vs->tight.quality].jpeg_idx &&
++                      tight_jpeg_conf[vs->tight->quality].jpeg_idx &&
+                       tight_detect_smooth_image(vs, w, h))) {
+-            int quality = tight_conf[vs->tight.quality].jpeg_quality;
++            int quality = tight_conf[vs->tight->quality].jpeg_quality;
+ 
+             ret = send_jpeg_rect(vs, x, y, w, h, quality);
+         } else {
+@@ -1480,20 +1483,20 @@ static int send_sub_rect(VncState *vs, int x, int y, int w, int h)
+         qemu_thread_atexit_add(&vnc_tight_cleanup_notifier);
+     }
+ 
+-    vnc_framebuffer_update(vs, x, y, w, h, vs->tight.type);
++    vnc_framebuffer_update(vs, x, y, w, h, vs->tight->type);
+ 
+     vnc_tight_start(vs);
+     vnc_raw_send_framebuffer_update(vs, x, y, w, h);
+     vnc_tight_stop(vs);
+ 
+ #ifdef CONFIG_VNC_JPEG
+-    if (!vs->vd->non_adaptive && vs->tight.quality != (uint8_t)-1) {
++    if (!vs->vd->non_adaptive && vs->tight->quality != (uint8_t)-1) {
+         double freq = vnc_update_freq(vs, x, y, w, h);
+ 
+-        if (freq < tight_jpeg_conf[vs->tight.quality].jpeg_freq_min) {
++        if (freq < tight_jpeg_conf[vs->tight->quality].jpeg_freq_min) {
+             allow_jpeg = false;
+         }
+-        if (freq >= tight_jpeg_conf[vs->tight.quality].jpeg_freq_threshold) {
++        if (freq >= tight_jpeg_conf[vs->tight->quality].jpeg_freq_threshold) {
+             force_jpeg = true;
+             vnc_sent_lossy_rect(vs, x, y, w, h);
+         }
+@@ -1503,7 +1506,7 @@ static int send_sub_rect(VncState *vs, int x, int y, int w, int h)
+     colors = tight_fill_palette(vs, x, y, w * h, &bg, &fg, color_count_palette);
+ 
+ #ifdef CONFIG_VNC_JPEG
+-    if (allow_jpeg && vs->tight.quality != (uint8_t)-1) {
++    if (allow_jpeg && vs->tight->quality != (uint8_t)-1) {
+         ret = send_sub_rect_jpeg(vs, x, y, w, h, bg, fg, colors,
+                                  color_count_palette, force_jpeg);
+     } else {
+@@ -1520,7 +1523,7 @@ static int send_sub_rect(VncState *vs, int x, int y, int w, int h)
+ 
+ static int send_sub_rect_solid(VncState *vs, int x, int y, int w, int h)
+ {
+-    vnc_framebuffer_update(vs, x, y, w, h, vs->tight.type);
++    vnc_framebuffer_update(vs, x, y, w, h, vs->tight->type);
+ 
+     vnc_tight_start(vs);
+     vnc_raw_send_framebuffer_update(vs, x, y, w, h);
+@@ -1538,8 +1541,8 @@ static int send_rect_simple(VncState *vs, int x, int y, int w, int h,
+     int rw, rh;
+     int n = 0;
+ 
+-    max_size = tight_conf[vs->tight.compression].max_rect_size;
+-    max_width = tight_conf[vs->tight.compression].max_rect_width;
++    max_size = tight_conf[vs->tight->compression].max_rect_size;
++    max_width = tight_conf[vs->tight->compression].max_rect_width;
+ 
+     if (split && (w > max_width || w * h > max_size)) {
+         max_sub_width = (w > max_width) ? max_width : w;
+@@ -1648,16 +1651,16 @@ static int tight_send_framebuffer_update(VncState *vs, int x, int y,
+ 
+     if (vs->client_pf.bytes_per_pixel == 4 && vs->client_pf.rmax == 0xFF &&
+         vs->client_pf.bmax == 0xFF && vs->client_pf.gmax == 0xFF) {
+-        vs->tight.pixel24 = true;
++        vs->tight->pixel24 = true;
+     } else {
+-        vs->tight.pixel24 = false;
++        vs->tight->pixel24 = false;
+     }
+ 
+ #ifdef CONFIG_VNC_JPEG
+-    if (vs->tight.quality != (uint8_t)-1) {
++    if (vs->tight->quality != (uint8_t)-1) {
+         double freq = vnc_update_freq(vs, x, y, w, h);
+ 
+-        if (freq > tight_jpeg_conf[vs->tight.quality].jpeg_freq_threshold) {
++        if (freq > tight_jpeg_conf[vs->tight->quality].jpeg_freq_threshold) {
+             return send_rect_simple(vs, x, y, w, h, false);
+         }
+     }
+@@ -1669,8 +1672,8 @@ static int tight_send_framebuffer_update(VncState *vs, int x, int y,
+ 
+     /* Calculate maximum number of rows in one non-solid rectangle. */
+ 
+-    max_rows = tight_conf[vs->tight.compression].max_rect_size;
+-    max_rows /= MIN(tight_conf[vs->tight.compression].max_rect_width, w);
++    max_rows = tight_conf[vs->tight->compression].max_rect_size;
++    max_rows /= MIN(tight_conf[vs->tight->compression].max_rect_width, w);
+ 
+     return find_large_solid_color_rect(vs, x, y, w, h, max_rows);
+ }
+@@ -1678,33 +1681,33 @@ static int tight_send_framebuffer_update(VncState *vs, int x, int y,
+ int vnc_tight_send_framebuffer_update(VncState *vs, int x, int y,
+                                       int w, int h)
+ {
+-    vs->tight.type = VNC_ENCODING_TIGHT;
++    vs->tight->type = VNC_ENCODING_TIGHT;
+     return tight_send_framebuffer_update(vs, x, y, w, h);
+ }
+ 
+ int vnc_tight_png_send_framebuffer_update(VncState *vs, int x, int y,
+                                           int w, int h)
+ {
+-    vs->tight.type = VNC_ENCODING_TIGHT_PNG;
++    vs->tight->type = VNC_ENCODING_TIGHT_PNG;
+     return tight_send_framebuffer_update(vs, x, y, w, h);
+ }
+ 
+ void vnc_tight_clear(VncState *vs)
+ {
+     int i;
+-    for (i=0; i<ARRAY_SIZE(vs->tight.stream); i++) {
+-        if (vs->tight.stream[i].opaque) {
+-            deflateEnd(&vs->tight.stream[i]);
++    for (i = 0; i < ARRAY_SIZE(vs->tight->stream); i++) {
++        if (vs->tight->stream[i].opaque) {
++            deflateEnd(&vs->tight->stream[i]);
+         }
+     }
+ 
+-    buffer_free(&vs->tight.tight);
+-    buffer_free(&vs->tight.zlib);
+-    buffer_free(&vs->tight.gradient);
++    buffer_free(&vs->tight->tight);
++    buffer_free(&vs->tight->zlib);
++    buffer_free(&vs->tight->gradient);
+ #ifdef CONFIG_VNC_JPEG
+-    buffer_free(&vs->tight.jpeg);
++    buffer_free(&vs->tight->jpeg);
+ #endif
+ #ifdef CONFIG_VNC_PNG
+-    buffer_free(&vs->tight.png);
++    buffer_free(&vs->tight->png);
+ #endif
+ }
+diff --git a/ui/vnc-enc-zlib.c b/ui/vnc-enc-zlib.c
+index 33e9df2f6ade..900ae5b30f6b 100644
+--- a/ui/vnc-enc-zlib.c
++++ b/ui/vnc-enc-zlib.c
+@@ -76,7 +76,8 @@ static int vnc_zlib_stop(VncState *vs)
+         zstream->zalloc = vnc_zlib_zalloc;
+         zstream->zfree = vnc_zlib_zfree;
+ 
+-        err = deflateInit2(zstream, vs->tight.compression, Z_DEFLATED, MAX_WBITS,
++        err = deflateInit2(zstream, vs->tight->compression, Z_DEFLATED,
++                           MAX_WBITS,
+                            MAX_MEM_LEVEL, Z_DEFAULT_STRATEGY);
+ 
+         if (err != Z_OK) {
+@@ -84,16 +85,16 @@ static int vnc_zlib_stop(VncState *vs)
+             return -1;
+         }
+ 
+-        vs->zlib.level = vs->tight.compression;
++        vs->zlib.level = vs->tight->compression;
+         zstream->opaque = vs;
+     }
+ 
+-    if (vs->tight.compression != vs->zlib.level) {
+-        if (deflateParams(zstream, vs->tight.compression,
++    if (vs->tight->compression != vs->zlib.level) {
++        if (deflateParams(zstream, vs->tight->compression,
+                           Z_DEFAULT_STRATEGY) != Z_OK) {
+             return -1;
+         }
+-        vs->zlib.level = vs->tight.compression;
++        vs->zlib.level = vs->tight->compression;
+     }
+ 
+     // reserve memory in output buffer
+diff --git a/ui/vnc-enc-zrle.c b/ui/vnc-enc-zrle.c
+index 7493a8472306..17fd28a2e2b0 100644
+--- a/ui/vnc-enc-zrle.c
++++ b/ui/vnc-enc-zrle.c
+@@ -37,18 +37,18 @@ static const int bits_per_packed_pixel[] = {
+ 
+ static void vnc_zrle_start(VncState *vs)
+ {
+-    buffer_reset(&vs->zrle.zrle);
++    buffer_reset(&vs->zrle->zrle);
+ 
+     /* make the output buffer be the zlib buffer, so we can compress it later */
+-    vs->zrle.tmp = vs->output;
+-    vs->output = vs->zrle.zrle;
++    vs->zrle->tmp = vs->output;
++    vs->output = vs->zrle->zrle;
+ }
+ 
+ static void vnc_zrle_stop(VncState *vs)
+ {
+     /* switch back to normal output/zlib buffers */
+-    vs->zrle.zrle = vs->output;
+-    vs->output = vs->zrle.tmp;
++    vs->zrle->zrle = vs->output;
++    vs->output = vs->zrle->tmp;
+ }
+ 
+ static void *zrle_convert_fb(VncState *vs, int x, int y, int w, int h,
+@@ -56,24 +56,24 @@ static void *zrle_convert_fb(VncState *vs, int x, int y, int w, int h,
+ {
+     Buffer tmp;
+ 
+-    buffer_reset(&vs->zrle.fb);
+-    buffer_reserve(&vs->zrle.fb, w * h * bpp + bpp);
++    buffer_reset(&vs->zrle->fb);
++    buffer_reserve(&vs->zrle->fb, w * h * bpp + bpp);
+ 
+     tmp = vs->output;
+-    vs->output = vs->zrle.fb;
++    vs->output = vs->zrle->fb;
+ 
+     vnc_raw_send_framebuffer_update(vs, x, y, w, h);
+ 
+-    vs->zrle.fb = vs->output;
++    vs->zrle->fb = vs->output;
+     vs->output = tmp;
+-    return vs->zrle.fb.buffer;
++    return vs->zrle->fb.buffer;
+ }
+ 
+ static int zrle_compress_data(VncState *vs, int level)
+ {
+-    z_streamp zstream = &vs->zrle.stream;
++    z_streamp zstream = &vs->zrle->stream;
+ 
+-    buffer_reset(&vs->zrle.zlib);
++    buffer_reset(&vs->zrle->zlib);
+ 
+     if (zstream->opaque != vs) {
+         int err;
+@@ -93,13 +93,13 @@ static int zrle_compress_data(VncState *vs, int level)
+     }
+ 
+     /* reserve memory in output buffer */
+-    buffer_reserve(&vs->zrle.zlib, vs->zrle.zrle.offset + 64);
++    buffer_reserve(&vs->zrle->zlib, vs->zrle->zrle.offset + 64);
+ 
+     /* set pointers */
+-    zstream->next_in = vs->zrle.zrle.buffer;
+-    zstream->avail_in = vs->zrle.zrle.offset;
+-    zstream->next_out = vs->zrle.zlib.buffer + vs->zrle.zlib.offset;
+-    zstream->avail_out = vs->zrle.zlib.capacity - vs->zrle.zlib.offset;
++    zstream->next_in = vs->zrle->zrle.buffer;
++    zstream->avail_in = vs->zrle->zrle.offset;
++    zstream->next_out = vs->zrle->zlib.buffer + vs->zrle->zlib.offset;
++    zstream->avail_out = vs->zrle->zlib.capacity - vs->zrle->zlib.offset;
+     zstream->data_type = Z_BINARY;
+ 
+     /* start encoding */
+@@ -108,8 +108,8 @@ static int zrle_compress_data(VncState *vs, int level)
+         return -1;
+     }
+ 
+-    vs->zrle.zlib.offset = vs->zrle.zlib.capacity - zstream->avail_out;
+-    return vs->zrle.zlib.offset;
++    vs->zrle->zlib.offset = vs->zrle->zlib.capacity - zstream->avail_out;
++    return vs->zrle->zlib.offset;
+ }
+ 
+ /* Try to work out whether to use RLE and/or a palette.  We do this by
+@@ -259,14 +259,14 @@ static int zrle_send_framebuffer_update(VncState *vs, int x, int y,
+     size_t bytes;
+     int zywrle_level;
+ 
+-    if (vs->zrle.type == VNC_ENCODING_ZYWRLE) {
+-        if (!vs->vd->lossy || vs->tight.quality == (uint8_t)-1
+-            || vs->tight.quality == 9) {
++    if (vs->zrle->type == VNC_ENCODING_ZYWRLE) {
++        if (!vs->vd->lossy || vs->tight->quality == (uint8_t)-1
++            || vs->tight->quality == 9) {
+             zywrle_level = 0;
+-            vs->zrle.type = VNC_ENCODING_ZRLE;
+-        } else if (vs->tight.quality < 3) {
++            vs->zrle->type = VNC_ENCODING_ZRLE;
++        } else if (vs->tight->quality < 3) {
+             zywrle_level = 3;
+-        } else if (vs->tight.quality < 6) {
++        } else if (vs->tight->quality < 6) {
+             zywrle_level = 2;
+         } else {
+             zywrle_level = 1;
+@@ -337,30 +337,30 @@ static int zrle_send_framebuffer_update(VncState *vs, int x, int y,
+ 
+     vnc_zrle_stop(vs);
+     bytes = zrle_compress_data(vs, Z_DEFAULT_COMPRESSION);
+-    vnc_framebuffer_update(vs, x, y, w, h, vs->zrle.type);
++    vnc_framebuffer_update(vs, x, y, w, h, vs->zrle->type);
+     vnc_write_u32(vs, bytes);
+-    vnc_write(vs, vs->zrle.zlib.buffer, vs->zrle.zlib.offset);
++    vnc_write(vs, vs->zrle->zlib.buffer, vs->zrle->zlib.offset);
+     return 1;
+ }
+ 
+ int vnc_zrle_send_framebuffer_update(VncState *vs, int x, int y, int w, int h)
+ {
+-    vs->zrle.type = VNC_ENCODING_ZRLE;
++    vs->zrle->type = VNC_ENCODING_ZRLE;
+     return zrle_send_framebuffer_update(vs, x, y, w, h);
+ }
+ 
+ int vnc_zywrle_send_framebuffer_update(VncState *vs, int x, int y, int w, int h)
+ {
+-    vs->zrle.type = VNC_ENCODING_ZYWRLE;
++    vs->zrle->type = VNC_ENCODING_ZYWRLE;
+     return zrle_send_framebuffer_update(vs, x, y, w, h);
+ }
+ 
+ void vnc_zrle_clear(VncState *vs)
+ {
+-    if (vs->zrle.stream.opaque) {
+-        deflateEnd(&vs->zrle.stream);
++    if (vs->zrle->stream.opaque) {
++        deflateEnd(&vs->zrle->stream);
+     }
+-    buffer_free(&vs->zrle.zrle);
+-    buffer_free(&vs->zrle.fb);
+-    buffer_free(&vs->zrle.zlib);
++    buffer_free(&vs->zrle->zrle);
++    buffer_free(&vs->zrle->fb);
++    buffer_free(&vs->zrle->zlib);
+ }
+diff --git a/ui/vnc-enc-zrle.inc.c b/ui/vnc-enc-zrle.inc.c
+index abf6b86e4eba..c107d8affcff 100644
+--- a/ui/vnc-enc-zrle.inc.c
++++ b/ui/vnc-enc-zrle.inc.c
+@@ -96,7 +96,7 @@ static void ZRLE_ENCODE(VncState *vs, int x, int y, int w, int h,
+ static void ZRLE_ENCODE_TILE(VncState *vs, ZRLE_PIXEL *data, int w, int h,
+                              int zywrle_level)
+ {
+-    VncPalette *palette = &vs->zrle.palette;
++    VncPalette *palette = &vs->zrle->palette;
+ 
+     int runs = 0;
+     int single_pixels = 0;
+diff --git a/ui/vnc.c b/ui/vnc.c
+index bc43c4ca16bf..87b8045afec2 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -1307,6 +1307,8 @@ void vnc_disconnect_finish(VncState *vs)
+     object_unref(OBJECT(vs->sioc));
+     vs->sioc = NULL;
+     vs->magic = 0;
++    g_free(vs->zrle);
++    g_free(vs->tight);
+     g_free(vs);
+ }
+ 
+@@ -2058,8 +2060,8 @@ static void set_encodings(VncState *vs, int32_t *encodings, size_t n_encodings)
+ 
+     vs->features = 0;
+     vs->vnc_encoding = 0;
+-    vs->tight.compression = 9;
+-    vs->tight.quality = -1; /* Lossless by default */
++    vs->tight->compression = 9;
++    vs->tight->quality = -1; /* Lossless by default */
+     vs->absolute = -1;
+ 
+     /*
+@@ -2127,11 +2129,11 @@ static void set_encodings(VncState *vs, int32_t *encodings, size_t n_encodings)
+             vs->features |= VNC_FEATURE_LED_STATE_MASK;
+             break;
+         case VNC_ENCODING_COMPRESSLEVEL0 ... VNC_ENCODING_COMPRESSLEVEL0 + 9:
+-            vs->tight.compression = (enc & 0x0F);
++            vs->tight->compression = (enc & 0x0F);
+             break;
+         case VNC_ENCODING_QUALITYLEVEL0 ... VNC_ENCODING_QUALITYLEVEL0 + 9:
+             if (vs->vd->lossy) {
+-                vs->tight.quality = (enc & 0x0F);
++                vs->tight->quality = (enc & 0x0F);
+             }
+             break;
+         default:
+@@ -3034,6 +3036,8 @@ static void vnc_connect(VncDisplay *vd, QIOChannelSocket *sioc,
+     int i;
+ 
+     trace_vnc_client_connect(vs, sioc);
++    vs->zrle = g_new0(VncZrle, 1);
++    vs->tight = g_new0(VncTight, 1);
+     vs->magic = VNC_MAGIC;
+     vs->sioc = sioc;
+     object_ref(OBJECT(vs->sioc));
+@@ -3045,19 +3049,19 @@ static void vnc_connect(VncDisplay *vd, QIOChannelSocket *sioc,
+     buffer_init(&vs->output,         "vnc-output/%p", sioc);
+     buffer_init(&vs->jobs_buffer,    "vnc-jobs_buffer/%p", sioc);
+ 
+-    buffer_init(&vs->tight.tight,    "vnc-tight/%p", sioc);
+-    buffer_init(&vs->tight.zlib,     "vnc-tight-zlib/%p", sioc);
+-    buffer_init(&vs->tight.gradient, "vnc-tight-gradient/%p", sioc);
++    buffer_init(&vs->tight->tight,    "vnc-tight/%p", sioc);
++    buffer_init(&vs->tight->zlib,     "vnc-tight-zlib/%p", sioc);
++    buffer_init(&vs->tight->gradient, "vnc-tight-gradient/%p", sioc);
+ #ifdef CONFIG_VNC_JPEG
+-    buffer_init(&vs->tight.jpeg,     "vnc-tight-jpeg/%p", sioc);
++    buffer_init(&vs->tight->jpeg,     "vnc-tight-jpeg/%p", sioc);
+ #endif
+ #ifdef CONFIG_VNC_PNG
+-    buffer_init(&vs->tight.png,      "vnc-tight-png/%p", sioc);
++    buffer_init(&vs->tight->png,      "vnc-tight-png/%p", sioc);
+ #endif
+     buffer_init(&vs->zlib.zlib,      "vnc-zlib/%p", sioc);
+-    buffer_init(&vs->zrle.zrle,      "vnc-zrle/%p", sioc);
+-    buffer_init(&vs->zrle.fb,        "vnc-zrle-fb/%p", sioc);
+-    buffer_init(&vs->zrle.zlib,      "vnc-zrle-zlib/%p", sioc);
++    buffer_init(&vs->zrle->zrle,      "vnc-zrle/%p", sioc);
++    buffer_init(&vs->zrle->fb,        "vnc-zrle-fb/%p", sioc);
++    buffer_init(&vs->zrle->zlib,      "vnc-zrle-zlib/%p", sioc);
+ 
+     if (skipauth) {
+         vs->auth = VNC_AUTH_NONE;
 -- 
 2.18.1
 
