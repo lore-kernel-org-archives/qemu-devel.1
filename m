@@ -6,103 +6,83 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3184C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 15:42:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 023A2C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 15:47:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47E4C21907
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 15:42:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47E4C21907
+	by mail.kernel.org (Postfix) with ESMTPS id 82CBF208C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 15:47:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82CBF208C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAyZl-0007wb-GJ
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 11:42:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37413)
+	id 1iAyew-0001uB-AA
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 11:47:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37994)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iAyXj-0005sp-TO
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:40:29 -0400
+ (envelope-from <philmd@redhat.com>) id 1iAyd4-0000T3-SZ
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:46:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iAyXi-0001Th-Cx
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:40:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55526)
+ (envelope-from <philmd@redhat.com>) id 1iAyd2-0004Q8-U6
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:45:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40546)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iAyXi-0001T8-5A
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:40:26 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iAyd2-0004P0-Iu
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:45:56 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 73F504705B;
- Thu, 19 Sep 2019 15:40:25 +0000 (UTC)
-Received: from [10.36.118.9] (unknown [10.36.118.9])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 002025C1D4;
- Thu, 19 Sep 2019 15:40:17 +0000 (UTC)
-Subject: Re: [RFC v2 4/5] exec: Adjust notdirty tracing
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190918180251.32003-1-richard.henderson@linaro.org>
- <20190918180251.32003-5-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <9b5b5f92-4e3b-480f-351a-8070ab17a9f2@redhat.com>
-Date: Thu, 19 Sep 2019 17:40:17 +0200
+ by mx1.redhat.com (Postfix) with ESMTPS id 82DCAA909
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 15:45:55 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id v18so1222851wro.16
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 08:45:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=n4VwMeCgOkMDgF/Tb86b2xxDOCQzflHpgwxUUtzxdgg=;
+ b=av6r6hxckaWx2UaSx+VP/lx508PyB547SprA5S/SpZVHNRY7CQEZn61OJLkNA6MrdF
+ CKu4PmZ5akRW69m91UZaD+ElcuKvkRmwmkyQY1IMHIMCiA808rQD12io6dWiaOFee650
+ z7rxoUOpMCJBXzyzrcUfIoGH59q+4dN3zgEsgczSgAeDTZCCk5KFxaSXxGjarxLi1IxF
+ VATJNd/kGF4kKax6joiaWi8XCgOlooNdi3NLw8N7v3G74KNb0PhFItDNoOR8ScjGzLzQ
+ aAdtR4VezyAYGSPmkl10731exV/zqbrg9yelxYyqg3EVkR5mU3Dww4UctOdCcAMpLkE8
+ sgog==
+X-Gm-Message-State: APjAAAVOVi7rh8783S1kzTWqQWND40Diopb/ZBErWTPLCaZ3J2db5vE0
+ KdHpSer5o7Vo80nZ//o/lBlS8tDoCdVTqCzGtAQlXYPrXF1m9T39CHOGisoTWOC6mGBnLjQITLP
+ CakyIBlNYlfgcQSo=
+X-Received: by 2002:a1c:110:: with SMTP id 16mr3616018wmb.88.1568907954267;
+ Thu, 19 Sep 2019 08:45:54 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwV/IeFPtsBqRcwcOH5mdayNWUT6KOf19N7ALXoSN1wTVFRy0qh847HSmKJHdLgrEoh/X1f/A==
+X-Received: by 2002:a1c:110:: with SMTP id 16mr3615990wmb.88.1568907954003;
+ Thu, 19 Sep 2019 08:45:54 -0700 (PDT)
+Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id s12sm15371836wra.82.2019.09.19.08.45.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 19 Sep 2019 08:45:53 -0700 (PDT)
+Subject: Re: [NOTFORMERGE PATCH v2 1/9] tests/docker: Kludge to build the
+ Fedora image
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20190715174817.18981-1-philmd@redhat.com>
+ <20190715174817.18981-2-philmd@redhat.com> <87ef2quu53.fsf@zen.linaroharston>
+ <594aeb2a-cf54-16be-fdfa-05fb7a96842b@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <0898141b-2c4e-bba7-8ec1-835636e23d03@redhat.com>
+Date: Thu, 19 Sep 2019 17:45:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190918180251.32003-5-richard.henderson@linaro.org>
+In-Reply-To: <594aeb2a-cf54-16be-fdfa-05fb7a96842b@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Thu, 19 Sep 2019 15:40:25 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -116,116 +96,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, alex.bennee@linaro.org, stefanha@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ Helge Deller <deller@gmx.de>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Richard Henderson <rth@twiddle.net>, Laszlo Ersek <lersek@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18.09.19 20:02, Richard Henderson wrote:
-> The memory_region_tb_read tracepoint is unreachable, since notdirty
-> is supposed to apply only to writes.  The memory_region_tb_write
-> tracepoint is mis-named, because notdirty is not only used for TB
-> invalidation.  It is also used for e.g. VGA RAM updates and migration.
-> 
-> Replace memory_region_tb_write with memory_notdirty_write_access,
-> and place it in memory_notdirty_write_prepare where it can catch
-> all of the instances.  Add memory_notdirty_set_dirty to log when
-> we no longer intercept writes to a page.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
-> v2: Rename new tracepoints as suggested (David)
-> ---
->  exec.c       | 3 +++
->  memory.c     | 4 ----
->  trace-events | 4 ++--
->  3 files changed, 5 insertions(+), 6 deletions(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index 8b998974f8..5f2587b621 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -2755,6 +2755,8 @@ void memory_notdirty_write_prepare(NotDirtyInfo *ndi,
->      ndi->size = size;
->      ndi->pages = NULL;
->  
-> +    trace_memory_notdirty_write_access(mem_vaddr, ram_addr, size);
-> +
->      assert(tcg_enabled());
->      if (!cpu_physical_memory_get_dirty_flag(ram_addr, DIRTY_MEMORY_CODE)) {
->          ndi->pages = page_collection_lock(ram_addr, ram_addr + size);
-> @@ -2779,6 +2781,7 @@ void memory_notdirty_write_complete(NotDirtyInfo *ndi)
->      /* we remove the notdirty callback only if the code has been
->         flushed */
->      if (!cpu_physical_memory_is_clean(ndi->ram_addr)) {
-> +        trace_memory_notdirty_set_dirty(ndi->mem_vaddr);
->          tlb_set_dirty(ndi->cpu, ndi->mem_vaddr);
->      }
->  }
-> diff --git a/memory.c b/memory.c
-> index b9dd6b94ca..57c44c97db 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -438,7 +438,6 @@ static MemTxResult  memory_region_read_accessor(MemoryRegion *mr,
->          /* Accesses to code which has previously been translated into a TB show
->           * up in the MMIO path, as accesses to the io_mem_notdirty
->           * MemoryRegion. */
-> -        trace_memory_region_tb_read(get_cpu_index(), addr, tmp, size);
->      } else if (TRACE_MEMORY_REGION_OPS_READ_ENABLED) {
->          hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
->          trace_memory_region_ops_read(get_cpu_index(), mr, abs_addr, tmp, size);
-> @@ -465,7 +464,6 @@ static MemTxResult memory_region_read_with_attrs_accessor(MemoryRegion *mr,
->          /* Accesses to code which has previously been translated into a TB show
->           * up in the MMIO path, as accesses to the io_mem_notdirty
->           * MemoryRegion. */
-> -        trace_memory_region_tb_read(get_cpu_index(), addr, tmp, size);
->      } else if (TRACE_MEMORY_REGION_OPS_READ_ENABLED) {
->          hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
->          trace_memory_region_ops_read(get_cpu_index(), mr, abs_addr, tmp, size);
-> @@ -490,7 +488,6 @@ static MemTxResult memory_region_write_accessor(MemoryRegion *mr,
->          /* Accesses to code which has previously been translated into a TB show
->           * up in the MMIO path, as accesses to the io_mem_notdirty
->           * MemoryRegion. */
-> -        trace_memory_region_tb_write(get_cpu_index(), addr, tmp, size);
->      } else if (TRACE_MEMORY_REGION_OPS_WRITE_ENABLED) {
->          hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
->          trace_memory_region_ops_write(get_cpu_index(), mr, abs_addr, tmp, size);
-> @@ -515,7 +512,6 @@ static MemTxResult memory_region_write_with_attrs_accessor(MemoryRegion *mr,
->          /* Accesses to code which has previously been translated into a TB show
->           * up in the MMIO path, as accesses to the io_mem_notdirty
->           * MemoryRegion. */
-> -        trace_memory_region_tb_write(get_cpu_index(), addr, tmp, size);
->      } else if (TRACE_MEMORY_REGION_OPS_WRITE_ENABLED) {
->          hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
->          trace_memory_region_ops_write(get_cpu_index(), mr, abs_addr, tmp, size);
-> diff --git a/trace-events b/trace-events
-> index 823a4ae64e..20821ba545 100644
-> --- a/trace-events
-> +++ b/trace-events
-> @@ -52,14 +52,14 @@ dma_map_wait(void *dbs) "dbs=%p"
->  find_ram_offset(uint64_t size, uint64_t offset) "size: 0x%" PRIx64 " @ 0x%" PRIx64
->  find_ram_offset_loop(uint64_t size, uint64_t candidate, uint64_t offset, uint64_t next, uint64_t mingap) "trying size: 0x%" PRIx64 " @ 0x%" PRIx64 ", offset: 0x%" PRIx64" next: 0x%" PRIx64 " mingap: 0x%" PRIx64
->  ram_block_discard_range(const char *rbname, void *hva, size_t length, bool need_madvise, bool need_fallocate, int ret) "%s@%p + 0x%zx: madvise: %d fallocate: %d ret: %d"
-> +memory_notdirty_write_access(uint64_t vaddr, uint64_t ram_addr, unsigned size) "0x%" PRIx64 " ram_addr 0x%" PRIx64 " size %u"
-> +memory_notdirty_set_dirty(uint64_t vaddr) "0x%" PRIx64
->  
->  # memory.c
->  memory_region_ops_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
->  memory_region_ops_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
->  memory_region_subpage_read(int cpu_index, void *mr, uint64_t offset, uint64_t value, unsigned size) "cpu %d mr %p offset 0x%"PRIx64" value 0x%"PRIx64" size %u"
->  memory_region_subpage_write(int cpu_index, void *mr, uint64_t offset, uint64_t value, unsigned size) "cpu %d mr %p offset 0x%"PRIx64" value 0x%"PRIx64" size %u"
-> -memory_region_tb_read(int cpu_index, uint64_t addr, uint64_t value, unsigned size) "cpu %d addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
-> -memory_region_tb_write(int cpu_index, uint64_t addr, uint64_t value, unsigned size) "cpu %d addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
->  memory_region_ram_device_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
->  memory_region_ram_device_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
->  flatview_new(void *view, void *root) "%p (root %p)"
-> 
+On 7/16/19 3:03 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 7/16/19 12:54 PM, Alex Benn=C3=A9e wrote:
+>>
+>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>>
+>>> Rebuilding the Fedora image is failing:
+>>>
+>>>   $ make docker-image-fedora V=3D1
+>>
+>> Broken build state? Just do:
+>>
+>>   make docker-image-fedora V=3D1 NOCACHE=3D1
+>=20
+> No, this doesn't help:
+>=20
+> $ make docker-image-fedora V=3D1 NOCACHE=3D1
+> ./tests/docker/docker.py build qemu:fedora
+> tests/docker/dockerfiles/fedora.docker  --no-cache --add-current-user
+> Sending build context to Docker daemon  4.096kB
+> Step 1/8 : FROM fedora:30
+>  ---> 9754ce14641d
+> Step 2/8 : ENV PACKAGES     bc     bison     bluez-libs-devel
+> brlapi-devel     bzip2     bzip2-devel     ccache     clang
+> cyrus-sasl-devel     device-mapper-multipath-devel     findutils
+> flex     gcc     gcc-c++     gettext     git     glib2-devel
+> glusterfs-api-devel     gnutls-devel     gtk3-devel     hostname
+> libaio-devel     libasan     libattr-devel     libblockdev-mpath-devel
+>    libcap-devel     libcap-ng-devel     libcurl-devel     libfdt-devel
+>    libiscsi-devel     libjpeg-devel     libpmem-devel     libpng-devel
+>    librbd-devel     libseccomp-devel     libssh-devel     libubsan
+> libusbx-devel     libxml2-devel     llvm     lzo-devel     make
+> mingw32-bzip2     mingw32-curl     mingw32-glib2     mingw32-gmp
+> mingw32-gnutls     mingw32-gtk3     mingw32-libjpeg-turbo
+> mingw32-libpng     mingw32-libtasn1     mingw32-nettle
+> mingw32-pixman     mingw32-pkg-config     mingw32-SDL2     mingw64-bzip=
+2
+>     mingw64-curl     mingw64-glib2     mingw64-gmp     mingw64-gnutls
+>   mingw64-gtk3     mingw64-libjpeg-turbo     mingw64-libpng
+> mingw64-libtasn1     mingw64-nettle     mingw64-pixman
+> mingw64-pkg-config     mingw64-SDL2     ncurses-devel     nettle-devel
+>    nss-devel     numactl-devel     perl     perl-Test-Harness
+> pixman-devel     python3     python3-sphinx     PyYAML
+> rdma-core-devel     SDL2-devel     snappy-devel     sparse
+> spice-server-devel     systemd-devel     systemtap-sdt-devel     tar
+>  usbredir-devel     virglrenderer-devel     vte291-devel     which
+> xen-devel     zlib-devel
+>  ---> Running in dfeaaaa6bd31
+> Removing intermediate container dfeaaaa6bd31
+>  ---> 853735cf32a1
+> Step 3/8 : ENV QEMU_CONFIGURE_OPTS --python=3D/usr/bin/python3
+>  ---> Running in 64af2877181d
+> Removing intermediate container 64af2877181d
+>  ---> 2cb74a994b35
+> Step 4/8 : RUN dnf install -y $PACKAGES
+>  ---> Running in 106e7fcb2900
+> Fedora Modular 30 - x86_64                      2.1 MB/s | 2.7 MB
+> 00:01
+> Fedora Modular 30 - x86_64 - Updates            1.6 MB/s | 2.3 MB
+> 00:01
+> Fedora 30 - x86_64 - Updates                    6.3 MB/s |  17 MB
+> 00:02
+> Failed to synchronize cache for repo 'updates'
+> Error: Failed to synchronize cache for repo 'updates'
+> The command '/bin/sh -c dnf install -y $PACKAGES' returned a non-zero
+> code: 1
+>=20
+>>>   [...]
+>>>   Step 4/8 : RUN dnf install -y $PACKAGES
+>>>    ---> Running in cef9615efafb
+>>>   Fedora Modular 30 - x86_64                      2.0 MB/s | 2.7 MB  =
+   00:01
+>>>   Fedora Modular 30 - x86_64 - Updates            1.6 MB/s | 2.3 MB  =
+   00:01
+>>>   Fedora 30 - x86_64 - Updates                    6.1 MB/s |  17 MB  =
+   00:02
+>>>   Failed to synchronize cache for repo 'updates'
+>>>   Error: Failed to synchronize cache for repo 'updates'
+>>>   The command '/bin/sh -c dnf install -y $PACKAGES' returned a non-ze=
+ro code: 1
+>>>   Traceback (most recent call last):
+>>>     File "./tests/docker/docker.py", line 615, in <module>
+>>>       sys.exit(main())
+>>>     File "./tests/docker/docker.py", line 611, in main
+>>>       return args.cmdobj.run(args, argv)
+>>>     File "./tests/docker/docker.py", line 413, in run
+>>>       extra_files_cksum=3Dcksum)
+>>>     File "./tests/docker/docker.py", line 280, in build_image
+>>>       quiet=3Dquiet)
+>>>     File "./tests/docker/docker.py", line 207, in _do_check
+>>>       return subprocess.check_call(self._command + cmd, **kwargs)
+>>>     File "/usr/lib64/python2.7/subprocess.py", line 190, in check_cal=
+l
+>>>       raise CalledProcessError(retcode, cmd)
+>>>   subprocess.CalledProcessError: Command '['docker', 'build', '-t', '=
+qemu:fedora', '-f', '/tmp/docker_buildbKtWAa/tmpIctHw2.docker', '/tmp/doc=
+ker_buildbKtWAa']' returned non-zero exit status 1
+>>>   make: *** [tests/docker/Makefile.include:53: docker-image-fedora] E=
+rror 1
+>>>
+>>> The fix found in one of the comment from this thread helped to have
+>>> it working again: https://bugzilla.redhat.com/show_bug.cgi?id=3D17066=
+27
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> ---
+>>> I have no idea what it does, it just works (TM).
+>>> ---
+>>>  tests/docker/dockerfiles/fedora.docker | 3 ++-
+>>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/do=
+ckerfiles/fedora.docker
+>>> index e6d39e14cb..f6be5e2dd7 100644
+>>> --- a/tests/docker/dockerfiles/fedora.docker
+>>> +++ b/tests/docker/dockerfiles/fedora.docker
+>>> @@ -94,6 +94,7 @@ ENV PACKAGES \
+>>>      zlib-devel
+>>>  ENV QEMU_CONFIGURE_OPTS --python=3D/usr/bin/python3
+>>>
+>>> -RUN dnf install -y $PACKAGES
+>>> +RUN echo zchunk=3DFalse >> /etc/dnf/dnf.conf
+>>> +RUN dnf clean metadata && dnf install -y $PACKAGES
+>>>  RUN rpm -q $PACKAGES | sort > /packages.txt
+>>>  ENV FEATURES mingw clang pyyaml asan
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
-
-Thanks,
-
-David / dhildenb
+Bouh this issue is back, and using the same kludge I can build the
+Fedora image. Might be related to my ISP, no idea.
 
