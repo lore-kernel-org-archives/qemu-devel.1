@@ -2,80 +2,84 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D924EC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 23:33:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5338AC49ED7
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 23:33:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FFF7206C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 23:33:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FB97206C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 23:33:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Wp1vSx0p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FFF7206C2
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Bbc92H/H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FB97206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB5vF-0000Tu-Ts
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 19:33:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39217)
+	id 1iB5vG-0000UB-W4
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 19:33:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39225)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iB5s5-0006Cp-MD
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 19:29:58 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iB5s6-0006EQ-Ak
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 19:29:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iB5s4-0000iP-A6
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 19:29:57 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:40970)
+ (envelope-from <richard.henderson@linaro.org>) id 1iB5s5-0000ir-8Z
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 19:29:58 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:40601)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iB5s4-0000i5-2N
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 19:29:56 -0400
-Received: by mail-pl1-x642.google.com with SMTP id t10so2301376plr.8
+ id 1iB5s5-0000iV-1n
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 19:29:57 -0400
+Received: by mail-pl1-x643.google.com with SMTP id d22so2303275pll.7
  for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 16:29:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id;
- bh=+1oeXQseKrei+GHbOaidjKnLfGpU8gMtcIAwTzhYn3w=;
- b=Wp1vSx0pcWXq2B/YX7BhgapehSwCo3wVfqzPoRnatNFECxxdPeg8hl0IMcyX7J9ehF
- TxoAlY8bSNIk8qXy6ClBqGlNGngI72+Z5tJ0ShqVuUNOQAumA0T4ROHH8tE3oSsY+81Q
- GUGKCrzFubNIRGwABTtThkIwbGrGz86A8JLcLw4YXLYskCi6GaxuAM618WdeZYfafPT4
- 5ABx4E3nheFFggL6lch4JbZsXA9quzjUUjBrislYqCcgxByq+fSCWYXrSlqVp0DMFATX
- cq7vMzXtsDLLI1gXDx7R28KJ4NSdZAVKcZ3wz4uGNJANjypTmaStPDSljWUIspX7v1SP
- Clnw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=QPmhTNNeHsMpQB5FpTHLnap4hQHr8B38z692x1bPeOE=;
+ b=Bbc92H/HCxfeTY5layjFht+Avl8YAvGQ7oS3mzcEiF60ozopazSrVflFe8u6KoOvNi
+ saTo3BDtVhs1ubLHUgsnh2teyu7ZcylkZSTtmG+En9FwNxtaarczEGeEcWb/vJiR46eA
+ QWQsOo2ies0BKNQ2cjxWfLBGaVNz1862ryTY1eHfAO6N72gyP4/fGQapyJ17yitRNI6o
+ 40cc6BJSo6Ltfa0QOMhELyUicTeDNLH6joqyiEBc7Iu3IA3dnMdL2BK9RiC2+eqLUYRQ
+ 1Bvu/cR6P1i5+OxeeriyJIzIJgJJX0Sp+njn3DwhEgNa3bMMMyjOf7gHkpES2EnWUE7V
+ qSvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=+1oeXQseKrei+GHbOaidjKnLfGpU8gMtcIAwTzhYn3w=;
- b=g9VblAXn9vUcJHdkei/L6cg386YSnU3WzKF1Cir7UxwyQ1Clwt7ByayU7eTIiiOPNF
- 51ZmLS0t9QiEYNN/cNnOW5KWHWvgAPMO3/ulmeL49ICSsHTZDrCrp9I402nnxNA+q+1d
- UrkUESiMVOLOjt0A8HvzkHpR1JJi3WBJkY0oDvAgusu8aW167C6aH6t8dDdg6goE9WGw
- azpJrREGVMUAC/J2VcybYcQIit4YeakGqCMVkaAXbLclbSFmLaMSMtbRWuvR3uM2QLL4
- pFBdCCCBvz9oceqfLVtqsB33dlwuHg5AU3n9bbf9Cuw47FzdIbIkYmFUSfMnD5d1qtmF
- 7gXQ==
-X-Gm-Message-State: APjAAAUyqbGOqk7zI1KWLbl0xB7fKSRz8U+m7TFuhRURwCLF4qp8ooJJ
- uMywnnTxgIcBQgs5Lv5ifvizy/kJJYY=
-X-Google-Smtp-Source: APXvYqxU/jMrGpkgzYANQIqjBCfFXSrE9rM0TplCW+xSuv147LXpStpGWfz/NentqXPnFRvcP5bYMQ==
-X-Received: by 2002:a17:902:9a88:: with SMTP id
- w8mr854023plp.129.1568935794336; 
- Thu, 19 Sep 2019 16:29:54 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=QPmhTNNeHsMpQB5FpTHLnap4hQHr8B38z692x1bPeOE=;
+ b=F1TIWB/UHZoBykvwbCCMixseIEiydZ+91zOv66QAvqKUQ0gjxpRXWCtKJbQ3hNNevq
+ y3S5ecYu9qZHAdIm7sl7iwaIxMNh2LweUsgyB6dhhbDKzQ+tJH/OvgbvdTbGHzQnN4uz
+ K8x0FB3l0wErdqHebl6SygV5sch5+d4TnAHKw5hLkGbkZkRTAZO5peC+iIRrdnHdiWph
+ xEYmnX+tv5XVnHdbxeCJmMuG8l4WYJpA/8vz7+qvhSQGvsutCugPq7pGA4LuShnTJq3o
+ 3WGCODgE+x8j3wHsm3DMGBepjHOIMGR9P/9iszRP2gia/YxcGDahw02k/C9jynKWWViW
+ fWiQ==
+X-Gm-Message-State: APjAAAUgSAKG0ho6eGuxU99nn49W4Cbn85jbdLWn2fdhiKY8J/uldDDd
+ kil1tzwEDiqG6Haur/y63qdbUi4BA10=
+X-Google-Smtp-Source: APXvYqzxE8WJNjcUoAGwNLJJz8qHd1QNndol6PEcapeQm0XaGrx6uaxsHtAARj4CQ+1fuTqu6A/xVQ==
+X-Received: by 2002:a17:902:59da:: with SMTP id
+ d26mr12809340plj.193.1568935795675; 
+ Thu, 19 Sep 2019 16:29:55 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id h8sm103340pfo.64.2019.09.19.16.29.52
+ by smtp.gmail.com with ESMTPSA id h8sm103340pfo.64.2019.09.19.16.29.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Sep 2019 16:29:53 -0700 (PDT)
+ Thu, 19 Sep 2019 16:29:54 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/7] exec: Improve code for TARGET_PAGE_BITS_VARY
-Date: Thu, 19 Sep 2019 16:29:45 -0700
-Message-Id: <20190919232952.6382-1-richard.henderson@linaro.org>
+Subject: [PATCH 1/7] exec: Use TARGET_PAGE_BITS_MIN for TLB flags
+Date: Thu, 19 Sep 2019 16:29:46 -0700
+Message-Id: <20190919232952.6382-2-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190919232952.6382-1-richard.henderson@linaro.org>
+References: <20190919232952.6382-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::642
+X-Received-From: 2607:f8b0:4864:20::643
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,57 +96,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There's currently a fair amount of overhead in the way we currently
-treat TARGET_PAGE_{BITS,SIZE,MASK} with TARGET_PAGE_BITS_VARY.
+These bits do not need to vary with the actual page size
+used by the guest.
 
-We have assertions that TARGET_PAGE_BITS has been finalized.  Which
-is fine, but the variable that controls the assertion may be assumed
-to be modified by any function call, which means that we have lots
-of duplicate assertions.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ include/exec/cpu-all.h | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-This re-arranges things using a const symbol, which allows the compiler
-to assume that the variable is not modified across calls.  In order to
-allow initialization of the variable during startup, use an alias that
-is non-const and controls the allocation into a read-write section.
-
-Remove the assertion for release builds.
-
-Precompute TARGET_PAGE_MASK.  This removes a runtime shift and allows
-the variable to be used as a direct memory operand on x86.
-
-Size reductions vs master for qemu-system-aarch64 for various hosts:
-
-PPC64LE:
-  debug-tcg:  -32264
-  release:    -44360
-AARCH64:
-  debug-tcg:  -33304
-  relase:     -77080
-X86_64:
-  debug-tcg:   -6685
-  relase:     -15597
-
-
-r~
-
-
-Richard Henderson (7):
-  exec: Use TARGET_PAGE_BITS_MIN for TLB flags
-  exec: Split out variable page size support to exec-vary.c
-  exec: Use const alias for TARGET_PAGE_BITS_VARY
-  exec: Restrict TARGET_PAGE_BITS_VARY assert to CONFIG_DEBUG_TCG
-  exec: Promote TARGET_PAGE_MASK to target_long
-  exec: Tidy TARGET_PAGE_ALIGN
-  exec: Cache TARGET_PAGE_MASK for TARGET_PAGE_BITS_VARY
-
- Makefile.target        |  2 +-
- include/exec/cpu-all.h | 41 +++++++++++++-------
- include/qemu-common.h  |  6 +++
- exec-vary.c            | 88 ++++++++++++++++++++++++++++++++++++++++++
- exec.c                 | 34 ----------------
- 5 files changed, 123 insertions(+), 48 deletions(-)
- create mode 100644 exec-vary.c
-
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index d2d443c4f9..e0c8dc540c 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -317,20 +317,24 @@ CPUArchState *cpu_copy(CPUArchState *env);
+ 
+ #if !defined(CONFIG_USER_ONLY)
+ 
+-/* Flags stored in the low bits of the TLB virtual address.  These are
+- * defined so that fast path ram access is all zeros.
++/*
++ * Flags stored in the low bits of the TLB virtual address.
++ * These are defined so that fast path ram access is all zeros.
+  * The flags all must be between TARGET_PAGE_BITS and
+  * maximum address alignment bit.
++ *
++ * Use TARGET_PAGE_BITS_MIN so that these bits are constant
++ * when TARGET_PAGE_BITS_VARY is in effect.
+  */
+ /* Zero if TLB entry is valid.  */
+-#define TLB_INVALID_MASK    (1 << (TARGET_PAGE_BITS - 1))
++#define TLB_INVALID_MASK    (1 << (TARGET_PAGE_BITS_MIN - 1))
+ /* Set if TLB entry references a clean RAM page.  The iotlb entry will
+    contain the page physical address.  */
+-#define TLB_NOTDIRTY        (1 << (TARGET_PAGE_BITS - 2))
++#define TLB_NOTDIRTY        (1 << (TARGET_PAGE_BITS_MIN - 2))
+ /* Set if TLB entry is an IO callback.  */
+-#define TLB_MMIO            (1 << (TARGET_PAGE_BITS - 3))
++#define TLB_MMIO            (1 << (TARGET_PAGE_BITS_MIN - 3))
+ /* Set if TLB entry contains a watchpoint.  */
+-#define TLB_WATCHPOINT      (1 << (TARGET_PAGE_BITS - 4))
++#define TLB_WATCHPOINT      (1 << (TARGET_PAGE_BITS_MIN - 4))
+ 
+ /* Use this mask to check interception with an alignment mask
+  * in a TCG backend.
 -- 
 2.17.1
 
