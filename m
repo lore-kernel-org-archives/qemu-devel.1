@@ -6,51 +6,45 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84798C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 15:25:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A983FC49ED7
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 15:28:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B3BC20578
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 15:25:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B3BC20578
+	by mail.kernel.org (Postfix) with ESMTPS id 80F2020665
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 15:28:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80F2020665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAyJd-0002wi-FQ
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 11:25:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35275)
+	id 1iAyLn-0005Ps-ID
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 11:28:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35509)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iAyIg-00022Z-PJ
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:24:56 -0400
+ (envelope-from <eblake@redhat.com>) id 1iAyL5-0004xr-QR
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:27:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iAyIf-0001km-DY
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:24:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40164)
+ (envelope-from <eblake@redhat.com>) id 1iAyL4-0002wC-Jt
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:27:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:5670)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iAyIY-0001iE-O4; Thu, 19 Sep 2019 11:24:46 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iAyL4-0002vv-Bw
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 11:27:22 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BD1BB7F746;
- Thu, 19 Sep 2019 15:24:45 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4CFB387630;
+ Thu, 19 Sep 2019 15:27:21 +0000 (UTC)
 Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A08BE5C1B5;
- Thu, 19 Sep 2019 15:24:21 +0000 (UTC)
-Subject: Re: [RFC] error: auto propagated local_err
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20190918130244.24257-1-vsementsov@virtuozzo.com>
- <abb14088-6af2-5db2-da0d-0948fd4ac81c@redhat.com>
- <20190919091720.GB10163@localhost.localdomain>
- <57483252-273c-4606-47a8-eddeb840109a@redhat.com>
- <35c972e1-bdb5-cbcb-ed45-6a51f19af98c@virtuozzo.com>
- <696673be-95c8-3f75-551c-26fccd230eb1@virtuozzo.com>
- <152afb5b-8efb-d968-d595-94f58ad02a04@redhat.com>
- <20190919144948.GR20217@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 42BCD1001938;
+ Thu, 19 Sep 2019 15:27:18 +0000 (UTC)
+Subject: Re: [PULL 15/26] audio: add mixeng option (documentation)
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20190919083629.29998-1-kraxel@redhat.com>
+ <20190919083629.29998-16-kraxel@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -77,18 +71,18 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <b5128e58-8b90-233d-6bb1-cc9009852d8d@redhat.com>
-Date: Thu, 19 Sep 2019 10:24:20 -0500
+Message-ID: <051bc473-f0b3-1ef5-1fef-6fe945dd9db3@redhat.com>
+Date: Thu, 19 Sep 2019 10:27:17 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190919144948.GR20217@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20190919083629.29998-16-kraxel@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="RIdYIAvZZf2vRxvGGi6U3VGfI0qea9GDy"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Thu, 19 Sep 2019 15:24:46 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.26]); Thu, 19 Sep 2019 15:27:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,111 +96,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "mst@redhat.com" <mst@redhat.com>, "codyprime@gmail.com" <codyprime@gmail.com>,
- "mark.cave-ayland@ilande.co.uk" <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "kraxel@redhat.com" <kraxel@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "david@redhat.com" <david@redhat.com>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
- "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
- "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>,
- "farman@linux.ibm.com" <farman@linux.ibm.com>,
- "groug@kaod.org" <groug@kaod.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
- Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
- "sundeep.lkml@gmail.com" <sundeep.lkml@gmail.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/19/19 9:49 AM, Daniel P. Berrang=C3=A9 wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RIdYIAvZZf2vRxvGGi6U3VGfI0qea9GDy
+Content-Type: multipart/mixed; boundary="2PHc1oizA3W57TgVM9HegQHaOKhyqJmCi";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
+Message-ID: <051bc473-f0b3-1ef5-1fef-6fe945dd9db3@redhat.com>
+Subject: Re: [PULL 15/26] audio: add mixeng option (documentation)
+References: <20190919083629.29998-1-kraxel@redhat.com>
+ <20190919083629.29998-16-kraxel@redhat.com>
+In-Reply-To: <20190919083629.29998-16-kraxel@redhat.com>
 
->> ALWAYS using MAKE_ERRP_SAFE() on entry to any function that has an Err=
-or
->> **errp parameter is dirt-simple to explain.  It has no performance
->> penalty if the user passed in a normal error or error_abort (the cost =
-of
->> an 'if' hidden in the macro is probably negligible compared to
->> everything else we do), and has no semantic penalty if the user passed
->> in NULL or error_fatal (we now get the behavior we want with less
->> boilerplate).
->>
->> Having to think 'does this method require me to use MAKE_ERRP_SAFE, or
->> can I omit it?' does not provide the same simplicity.
+--2PHc1oizA3W57TgVM9HegQHaOKhyqJmCi
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 9/19/19 3:36 AM, Gerd Hoffmann wrote:
+> From: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.ice.hu@gmail.com>
 >=20
-> The flipside is that MAKE_ERRP_SAFE hides a bunch of logic, so you don'=
+> This will allow us to disable mixeng when we use a decent backend.
+>=20
+> Disabling mixeng have a few advantages:
+> * we no longer convert the audio output from one format to another, whe=
+n
+>   the underlying audio system would just convert it to a third format.
+>   We no longer convert, only the underlying system, when needed.
+> * the underlying system probably has better resampling and sample forma=
 t
-> really know what its doing without looking at it, and this is QEMU
-> custom concept so one more thing to learn for new contributors.
+>   converting methods anyway...
+> * we may support formats that the mixeng currently does not support (S2=
+4
+>   or float samples, more than two channels)
+> * when using an audio server (like pulseaudio) different sound card
+>   outputs will show up as separate streams, even if we use only one
+>   backend
 >=20
-> While I think it is a nice trick, personally I think we would be better
-> off if we simply used a code pattern which does not require de-referenc=
-ing
-> 'errp' at all, aside from exceptional cases. IOW, no added macro in 95%
-> of all our methods using Error **errp.
+> Disadvantages:
+> * audio capturing no longer works (wavcapture, and vnc audio extension)=
 
-If 100% of our callsites use the macro, then new contributors will
-quickly learn by observation alone that the macro usage must be
-important on any new function taking Error **errp, whether or not they
-actually read the macro to see what it does.  If only 5% of our
-callsites use the macro, it's harder to argue that a new user will pick
-up on the nuances by observation alone (presumably, our docs would also
-spell it out, but we know that not everyone reads those...).
+> * some backends only support a single playback stream or very picky
+>   about the audio format.  In this case we can't disable mixeng.
+>=20
+> However mixeng is not removed, only made optional, so this shouldn't be=
 
-However, if we can automate syntax checks to reach a near-100% accuracy,
-we don't HAVE to worry about whether a new programmer picks up on the
-nuances by observation, because they will instead pick up the nuances by
-CI rejection messages.  This is true for _either_ style:
+> a big concern.
+>=20
 
-100% use of the macro: CI message would be "you added a method with a
-parameter 'Error **errp' but forgot to use MAKE_ERRP_SAFE"
+> +++ b/qemu-options.hx
+> @@ -433,6 +433,7 @@ DEF("audiodev", HAS_ARG, QEMU_OPTION_audiodev,
+>      "                specifies the audio backend to use\n"
+>      "                id=3D identifier of the backend\n"
+>      "                timer-period=3D timer period in microseconds\n"
+> +    "                in|out.mixing-engineeng=3D use mixing engine to m=
+ix streams inside QEMU\n"
 
-use of the macro only where necessary (namely, functions that contain
-'*errp' and/or 'error_append_hint'): CI message would either be "your
-function body requires MAKE_ERRP_SAFE but you forgot it" or "your
-function body does not require MAKE_ERRP_SAFE but you forgot to remove
-it".  And this would work even for experienced committers editing
-existing functions (such as ongoing work to convert away from 'void
-child(errp); if (*errp)' and towards 'if (int child(errp) < 0)').
-
-Writing the CI engine for the first case is easy, writing it for the
-second is a bit harder, but still seems tractable (since, for any
-function with an 'Error **errp' parameter, it should be easy to scan the
-function body for instances of '*errp' or 'error_append_hint', as well
-as to scan whether MAKE_ERRP_SAFE was present or absent accordingly).
-
-> There are lots of neat things we could do with auto-cleanup functions w=
-e
-> I think we need to be wary of hiding too much cleverness behind macros
-> when doing so overall.
-
-The benefit of getting rid of the 'Error *local_err =3D NULL; ...
-error_propagate()' boilerplate is worth the cleverness, in my opinion,
-but especially if also accompanied by CI coverage that we abide by our
-new rules.
-
-I'd really like to hear Markus' opinion on the matter, as Error maintaine=
-r.
+s/engineeng/engine/
 
 --=20
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
+
+
+--2PHc1oizA3W57TgVM9HegQHaOKhyqJmCi--
+
+--RIdYIAvZZf2vRxvGGi6U3VGfI0qea9GDy
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2DnlUACgkQp6FrSiUn
+Q2pYkwgAlnXvg8uFP9f+Ms5NnpKplxofLGzZmycbrsAEy2pt9nmeJgGHDa1m9exu
+XcdRPO9q/M+GPfyZsbezVsPdNchqKhwTDXtMueGB05FtNv5mirkn/RoFfRXlPLl4
+/dGfSn7lBsmsrailQJQyVLWaZRoATNL4b4pjj6bETPicfFYhNC1FA282AsXBY+Oa
+RiHLqU6+GQTqfF9sbSaetc96DE6VG0yP8GZKNQYzYuT2DFbGPkXCtfVX3A3gpdC+
+vMuhv45j5MaX+kP+qB7Lj9x6jC0DvPsWDIEjlsqQZw5a8v6jLc7gFIgMtuWLBy92
+m9MxfV9hzdU5HmEjFjexzMQ99vaCgQ==
+=u9gO
+-----END PGP SIGNATURE-----
+
+--RIdYIAvZZf2vRxvGGi6U3VGfI0qea9GDy--
 
