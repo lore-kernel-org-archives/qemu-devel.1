@@ -2,70 +2,64 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81B0EC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:12:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52493C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:13:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5897F205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:12:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5897F205F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 29485205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 14:13:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29485205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAxAh-0007HJ-Ft
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 10:12:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51626)
+	id 1iAxB7-0007pc-Nw
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 10:13:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51677)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iAwx2-0007Dl-Mo
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:58:30 -0400
+ (envelope-from <crosa@redhat.com>) id 1iAwx8-0007Ju-Sl
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:58:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iAwtZ-0003iK-DR
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:54:54 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:39945)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iAwtZ-0003hb-4N; Thu, 19 Sep 2019 09:54:53 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1Md6AP-1han871umB-00aCra; Thu, 19 Sep 2019 15:54:48 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Date: Thu, 19 Sep 2019 15:54:38 +0200
-Message-Id: <20190919135443.15164-4-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190919135443.15164-1-laurent@vivier.eu>
-References: <20190919135443.15164-1-laurent@vivier.eu>
+ (envelope-from <crosa@redhat.com>) id 1iAwrK-0002WR-By
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:52:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60046)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iAwrI-0002VG-Rx
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 09:52:33 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DCEC03DE04;
+ Thu, 19 Sep 2019 13:52:31 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-123-8.rdu2.redhat.com [10.10.123.8])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 191315C541;
+ Thu, 19 Sep 2019 13:52:25 +0000 (UTC)
+Date: Thu, 19 Sep 2019 09:52:23 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Message-ID: <20190919135223.GA5436@localhost.localdomain>
+References: <20190918122748.2144-1-philmd@redhat.com>
+ <20190919012351.GB23168@localhost.localdomain>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:SMeMu5RPOQoX5EG7ToWuGiXxNEBcKDlPdbYxiLnwkVN3lFN1LSn
- uXF7kLKM+XF86gBvQf3vs4DFsXwtg8XAJcOljG4E/bustw2tMSccVi5naAowVYf4GxCCFVb
- bGMkV3qlsXsEFs3S8XfL/qepbcGQCXXHhb8/9m15M+WzRm82fTqz5G7yC5hUGoJ+zjvJTHj
- y/8yShNLHqIVN8Wx3DlVQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7LdlLPoGuBE=:Nz1hGprNHVO7pM05+Q61uZ
- T96JpsjGypEUo58Sjj17YSY8Vg5GXZqAZRjyovN2LH9DHFsu1dnIRGSjUggJ6YHGCRwTMb4JB
- hmQrEpFf9LqH9T2Hp/tvn+yeJwUM+1uBQuJX45QsIqBpA608z4JZJqDnzQ6yUI73aZnzKD2F1
- eXfXJUmewIAqylRq9COD8m+NJepXW0y3vRn4fHDMGK/tgXzRjtvbqI10bKwq28/5TvQXs7DHX
- ywiVe7qaynAeOo4eNcGizpt5w5RyvM2kF18w8kTGIw3qIxCH9U6XQb8IAouKJV/k2GK0H2jtj
- T7eGkeE2fNyWEGYYBL7d7dlm7HZqjIoJFdt71fXUEMG+ovFS3Iu+Ctuw3wvw0Ewxt11pkfM4o
- /zlbiK0gr+rHooSpXVyJdFAuDaVm2EF+KFKkBdXxlr//WOxFmsmWLYOMH4rGXiXTWN8bPysQa
- PtL9nqiCIZCBeVP9UOHeBjMFiP5Ojq8BDVcWd2nyNt6Hm5deWgFs+4GDnky7O8U3XQKddNwqT
- mq2ky745Zhc9MtBxtR6JH2hDt5NH7HZqf2Hf+bVMel9kXXrFeq3ZtiJj71f2zibXELhuVPHDU
- HwBCtZApeGhPuEz9h8qIUIe8OQtDJMmCpow/YbwzuOqjxj5HxBoHFENtHHqkmPFBHarmr/1DY
- 6QTHuIjdQT69VXzLikW01etmH7EasoDJ8hrMwzOtUhVSmFsCHUe3y1sRYuoDnTD8FA/7cAQOG
- qrBFQoCK+FgCm7sBmtDjGoI631yYRuTwPtcK+VxqW1Ec0J3yge3WDQ591q8bzR1moeDIHuFVa
- Vll6hFlzb1ykya4fRkqgZAylZ8DQfrwtHVF/jsIU9KbzkaBioWw31yK6SuzF5RL4whHMnwoT/
- hVW/8gDxikELBN/XJGjw==
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190919012351.GB23168@localhost.localdomain>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Thu, 19 Sep 2019 13:52:32 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
-Subject: [Qemu-devel] [PULL 3/8] Replace '-machine accel=xyz' with '-accel
- xyz'
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] BootLinuxSshTest: Only run the tests when
+ explicitly requested
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,115 +71,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+On Wed, Sep 18, 2019 at 09:23:59PM -0400, Cleber Rosa wrote:
+> On Wed, Sep 18, 2019 at 02:27:48PM +0200, Philippe Mathieu-Daud=E9 wrot=
+e:
+> > Currently the Avocado framework does not distinct the time spent
+> > downloading assets vs. the time spent running a test. With big
+> > assets (like a full VM image) the tests likely fail.
+> >=20
+> > This is a limitation known by the Avocado team.
+> > Until this issue get fixed, do not run this tests automatically.
+> >=20
+> > Tests can still be run setting the AVOCADO_TIMEOUT_EXPECTED
+> > environment variable.
+> >=20
+> > Reported-by: Gerd Hoffmann <kraxel@redhat.com>
+> > Reported-by: David Gibson <david@gibson.dropbear.id.au>
+> > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> > ---
+> >  tests/acceptance/linux_ssh_mips_malta.py | 10 +++++-----
+> >  1 file changed, 5 insertions(+), 5 deletions(-)
+> >=20
+> > diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/accepta=
+nce/linux_ssh_mips_malta.py
+> > index 134f10cac3..7200507a3a 100644
+> > --- a/tests/acceptance/linux_ssh_mips_malta.py
+> > +++ b/tests/acceptance/linux_ssh_mips_malta.py
+> > @@ -12,7 +12,7 @@ import logging
+> >  import paramiko
+> >  import time
+> > =20
+> > -from avocado import skipIf
+> > +from avocado import skipUnless
+> >  from avocado_qemu import Test
+> >  from avocado.utils import process
+> >  from avocado.utils import archive
+> > @@ -171,7 +171,7 @@ class LinuxSSH(Test):
+> >          self.run_common_commands()
+> >          self.shutdown_via_ssh()
+> > =20
+> > -    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-=
+CI')
+> > +    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might t=
+imeout')
+>=20
+> This is definitely an improvement, specially because IMO a "make
+> check-acceptance" command should be more similar across executions,
+> wether on Travis or not.  The problem is (which is not new) is that
+> users have to resort to the test to learn how to run those tests.
+>=20
+> FIY, I'm working on a RFC to have a handful of "make
+> check-acceptance-$(TYPE)" targets that hopefully can represent most
+> users' needs.  The avocado command line would still be available for
+> more advanced users.
+>=20
+> >      def test_mips_malta32eb_kernel3_2_0(self):
+> >          """
+> >          :avocado: tags=3Darch:mips
+> > @@ -186,7 +186,7 @@ class LinuxSSH(Test):
+> > =20
+> >          self.check_mips_malta('be', kernel_path, 'mips')
+> > =20
+> > -    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-=
+CI')
+> > +    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might t=
+imeout')
+> >      def test_mips_malta32el_kernel3_2_0(self):
+> >          """
+> >          :avocado: tags=3Darch:mipsel
+> > @@ -201,7 +201,7 @@ class LinuxSSH(Test):
+> > =20
+> >          self.check_mips_malta('le', kernel_path, 'mips')
+> > =20
+> > -    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-=
+CI')
+> > +    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might t=
+imeout')
+> >      def test_mips_malta64eb_kernel3_2_0(self):
+> >          """
+> >          :avocado: tags=3Darch:mips64
+> > @@ -215,7 +215,7 @@ class LinuxSSH(Test):
+> >          kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dke=
+rnel_hash)
+> >          self.check_mips_malta('be', kernel_path, 'mips64')
+> > =20
+> > -    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-=
+CI')
+> > +    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might t=
+imeout')
+> >      def test_mips_malta64el_kernel3_2_0(self):
+> >          """
+> >          :avocado: tags=3Darch:mips64el
+> > --=20
+> > 2.20.1
+> >=20
+>=20
+> Reviewed-by: Cleber Rosa <crosa@redhat.com>
 
-We've got a separate option to configure the accelerator nowadays, which
-is shorter to type and the preferred way of specifying an accelerator.
-Use it in the source and examples to show that it is the favored option.
-(However, do not touch the places yet which also specify other machine
-options or multiple accelerators - these are currently still better
-handled with one single "-machine" statement instead)
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20190904052739.22123-1-thuth@redhat.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- python/qemu/qtest.py                | 2 +-
- qemu-deprecated.texi                | 3 +--
- qemu-options.hx                     | 2 +-
- tests/libqtest.c                    | 2 +-
- tests/migration/guestperf/engine.py | 2 +-
- tests/qemu-iotests/172              | 2 +-
- 6 files changed, 6 insertions(+), 7 deletions(-)
-
-diff --git a/python/qemu/qtest.py b/python/qemu/qtest.py
-index eebcc233ed5c..3f1d2cb32543 100644
---- a/python/qemu/qtest.py
-+++ b/python/qemu/qtest.py
-@@ -96,7 +96,7 @@ class QEMUQtestMachine(QEMUMachine):
-     def _base_args(self):
-         args = super(QEMUQtestMachine, self)._base_args()
-         args.extend(['-qtest', 'unix:path=' + self._qtest_path,
--                     '-machine', 'accel=qtest'])
-+                     '-accel', 'qtest'])
-         return args
- 
-     def _pre_launch(self):
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 9d74a1cfc017..01245e0b1c4b 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -26,8 +26,7 @@ The @option{enforce-config-section} parameter is replaced by the
- 
- @subsection -no-kvm (since 1.3.0)
- 
--The ``-no-kvm'' argument is now a synonym for setting
--``-machine accel=tcg''.
-+The ``-no-kvm'' argument is now a synonym for setting ``-accel tcg''.
- 
- @subsection -usbdevice (since 2.10.0)
- 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index bbfd936d29ec..80c16fa317e5 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4156,7 +4156,7 @@ STEXI
- Enable FIPS 140-2 compliance mode.
- ETEXI
- 
--HXCOMM Deprecated by -machine accel=tcg property
-+HXCOMM Deprecated by -accel tcg
- DEF("no-kvm", 0, QEMU_OPTION_no_kvm, "", QEMU_ARCH_I386)
- 
- DEF("msg", HAS_ARG, QEMU_OPTION_msg,
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 4a7556462d65..38e4f5b5871e 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -241,7 +241,7 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
-                               "-qtest-log %s "
-                               "-chardev socket,path=%s,id=char0 "
-                               "-mon chardev=char0,mode=control "
--                              "-machine accel=qtest "
-+                              "-accel qtest "
-                               "-display none "
-                               "%s", qemu_binary, socket_path,
-                               getenv("QTEST_LOG") ? "/dev/fd/2" : "/dev/null",
-diff --git a/tests/migration/guestperf/engine.py b/tests/migration/guestperf/engine.py
-index f13dbea8000d..1dd04ce33b72 100644
---- a/tests/migration/guestperf/engine.py
-+++ b/tests/migration/guestperf/engine.py
-@@ -287,7 +287,7 @@ class Engine(object):
-             cmdline = "'" + cmdline + "'"
- 
-         argv = [
--            "-machine", "accel=kvm",
-+            "-accel", "kvm",
-             "-cpu", "host",
-             "-kernel", self._kernel,
-             "-initrd", self._initrd,
-diff --git a/tests/qemu-iotests/172 b/tests/qemu-iotests/172
-index ba7dad905751..d67997e5f62b 100755
---- a/tests/qemu-iotests/172
-+++ b/tests/qemu-iotests/172
-@@ -55,7 +55,7 @@ do_run_qemu()
-             done
-         fi
-         echo quit
--    ) | $QEMU -machine accel=qtest -nographic -monitor stdio -serial none "$@"
-+    ) | $QEMU -accel qtest -nographic -monitor stdio -serial none "$@"
-     echo
- }
- 
--- 
-2.21.0
-
+BTW, also queueing this one on my python-next branch.
 
