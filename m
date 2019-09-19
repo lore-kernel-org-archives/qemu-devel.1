@@ -2,86 +2,72 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16BD0C4CEC4
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 01:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7AB3C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 01:51:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C697121907
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 01:41:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C697121907
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8DD18218AE
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 01:51:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DD18218AE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAlRW-0006YM-RP
-	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 21:41:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46445)
+	id 1iAlbX-00024A-GN
+	for qemu-devel@archiver.kernel.org; Wed, 18 Sep 2019 21:51:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47203)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jingqi.liu@intel.com>) id 1iAlQi-00064f-9A
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:40:22 -0400
+ (envelope-from <bounces@canonical.com>) id 1iAlah-0001Vq-0i
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:50:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jingqi.liu@intel.com>) id 1iAlQf-0004us-JT
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:40:19 -0400
-Received: from mga09.intel.com ([134.134.136.24]:5733)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
- id 1iAlQf-0004r2-7P
- for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:40:17 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 18 Sep 2019 18:40:06 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,522,1559545200"; d="scan'208";a="362363381"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
- by orsmga005.jf.intel.com with ESMTP; 18 Sep 2019 18:40:05 -0700
-Received: from fmsmsx154.amr.corp.intel.com (10.18.116.70) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 18 Sep 2019 18:40:05 -0700
-Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
- FMSMSX154.amr.corp.intel.com (10.18.116.70) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 18 Sep 2019 18:40:05 -0700
-Received: from shsmsx103.ccr.corp.intel.com ([169.254.4.140]) by
- SHSMSX106.ccr.corp.intel.com ([169.254.10.86]) with mapi id 14.03.0439.000;
- Thu, 19 Sep 2019 09:40:03 +0800
-From: "Liu, Jingqi" <jingqi.liu@intel.com>
-To: "Xu, Tao3" <tao3.xu@intel.com>, "imammedo@redhat.com"
- <imammedo@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>
-Thread-Topic: [PATCH v11 05/11] numa: Extend CLI to provide initiator
- information for numa nodes
-Thread-Index: AQHVaSwg5/YFUUDoLE+BgI9g4fePEacyQ6wA
-Date: Thu, 19 Sep 2019 01:40:03 +0000
-Message-ID: <09D68D4CF52CAF489B702DEBDD12D3D3529F9D90@SHSMSX103.ccr.corp.intel.com>
-References: <20190912053638.4858-1-tao3.xu@intel.com>
- <20190912053638.4858-6-tao3.xu@intel.com>
-In-Reply-To: <20190912053638.4858-6-tao3.xu@intel.com>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <bounces@canonical.com>) id 1iAlad-0001DI-6e
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:50:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59402)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iAlad-0001Cn-03
+ for qemu-devel@nongnu.org; Wed, 18 Sep 2019 21:50:35 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iAlab-0002Ad-Pl
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 01:50:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id BBAE62E80CB
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 01:50:33 +0000 (UTC)
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.24
-Subject: Re: [Qemu-devel] [PATCH v11 05/11] numa: Extend CLI to provide
- initiator information for numa nodes
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 19 Sep 2019 01:42:38 -0000
+From: Nathan Chancellor <1844597@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: nathanchance
+X-Launchpad-Bug-Reporter: Nathan Chancellor (nathanchance)
+X-Launchpad-Bug-Modifier: Nathan Chancellor (nathanchance)
+Message-Id: <156885735889.27264.8945287928013294736.malonedeb@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19048";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 503ef71683ca722d232ea4b9e32919c233a02863
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1844597] [NEW]
+ fc1120a7f5f2d4b601003205c598077d3eb11ad2 causes a kernel panic in vfp_init
+ on a clang built kernel
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,352 +76,278 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Williams, Dan J" <dan.j.williams@intel.com>, "Du, Fan" <fan.du@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>
+Reply-To: Bug 1844597 <1844597@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Xu, Tao3
-> Sent: Thursday, September 12, 2019 1:37 PM
-> To: imammedo@redhat.com; eblake@redhat.com; ehabkost@redhat.com
-> Cc: Xu, Tao3 <tao3.xu@intel.com>; Liu, Jingqi <jingqi.liu@intel.com>; Wil=
-liams, Dan J <dan.j.williams@intel.com>;
-> jonathan.cameron@huawei.com; Du, Fan <fan.du@intel.com>; qemu-devel@nongn=
-u.org
-> Subject: [PATCH v11 05/11] numa: Extend CLI to provide initiator informat=
-ion for numa nodes
->=20
-> In ACPI 6.3 chapter 5.2.27 Heterogeneous Memory Attribute Table (HMAT), T=
-he initiator represents processor which access to memory. And
-> in 5.2.27.3 Memory Proximity Domain Attributes Structure, the attached in=
-itiator is defined as where the memory controller responsible for
-> a memory proximity domain. With attached initiator information, the topol=
-ogy of heterogeneous memory can be described.
->=20
-> Extend CLI of "-numa node" option to indicate the initiator numa node-id.
-> In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and repo=
-rt the platform's HMAT tables.
->=20
-Thanks.
-Reviewed-by: Jingqi Liu <jingqi.liu@intel.com>
+Public bug reported:
 
-Jingqi
+Commit 4cdabee7d6d2 ("ARM: configs: aspeed_g5: Enable AST2600") [1] in
+the Linux kernel enabled CONFIG_VFP. When building this config with
+Clang, the resulting kernel does not boot after commit fc1120a7f5
+("target/arm: Implement NSACR gating of floating point") [2] (present
+since the 4.1.0 release).
 
-> Suggested-by: Dan Williams <dan.j.williams@intel.com>
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> ---
->=20
-> No changes in v11.
->=20
-> Changes in v10:
-> 	- Add machine oprion properties "-machine hmat=3Don|off" for
-> 	enabling or disabling HMAT in QEMU.
-> 	- Add more description for initiator option.
-> 	- Report error then HMAT is enalbe and initiator option is
-> 	missing. Not allow invaild initiator now. (Igor)
-> ---
->  hw/core/machine.c     | 72 +++++++++++++++++++++++++++++++++++++++++++
->  hw/core/numa.c        | 11 +++++++
->  include/sysemu/numa.h |  6 ++++
->  qapi/machine.json     | 10 +++++-
->  qemu-options.hx       | 35 ++++++++++++++++++---
->  5 files changed, 128 insertions(+), 6 deletions(-)
->=20
-> diff --git a/hw/core/machine.c b/hw/core/machine.c index 1689ad3bf8..b42f=
-574282 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -518,6 +518,20 @@ static void machine_set_nvdimm(Object *obj, bool val=
-ue, Error **errp)
->      ms->nvdimms_state->is_enabled =3D value;  }
->=20
-> +static bool machine_get_hmat(Object *obj, Error **errp) {
-> +    MachineState *ms =3D MACHINE(obj);
-> +
-> +    return ms->numa_state->hmat_enabled; }
-> +
-> +static void machine_set_hmat(Object *obj, bool value, Error **errp) {
-> +    MachineState *ms =3D MACHINE(obj);
-> +
-> +    ms->numa_state->hmat_enabled =3D value; }
-> +
->  static char *machine_get_nvdimm_persistence(Object *obj, Error **errp)  =
-{
->      MachineState *ms =3D MACHINE(obj);
-> @@ -645,6 +659,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
->                                 const CpuInstanceProperties *props, Error=
- **errp)  {
->      MachineClass *mc =3D MACHINE_GET_CLASS(machine);
-> +    NodeInfo *numa_info =3D machine->numa_state->nodes;
->      bool match =3D false;
->      int i;
->=20
-> @@ -714,6 +729,16 @@ void machine_set_cpu_numa_node(MachineState *machine=
-,
->          match =3D true;
->          slot->props.node_id =3D props->node_id;
->          slot->props.has_node_id =3D props->has_node_id;
-> +
-> +        if (numa_info[props->node_id].initiator_valid &&
-> +            (props->node_id !=3D numa_info[props->node_id].initiator)) {
-> +            error_setg(errp, "The initiator of CPU NUMA node %" PRId64
-> +                       " should be itself.", props->node_id);
-> +            return;
-> +        }
-> +        numa_info[props->node_id].initiator_valid =3D true;
-> +        numa_info[props->node_id].has_cpu =3D true;
-> +        numa_info[props->node_id].initiator =3D props->node_id;
->      }
->=20
->      if (!match) {
-> @@ -960,6 +985,13 @@ static void machine_initfn(Object *obj)
->=20
->      if (mc->numa_mem_supported) {
->          ms->numa_state =3D g_new0(NumaState, 1);
-> +        object_property_add_bool(obj, "hmat",
-> +                                 machine_get_hmat, machine_set_hmat,
-> +                                 &error_abort);
-> +        object_property_set_description(obj, "hmat",
-> +                                        "Set on/off to enable/disable "
-> +                                        "ACPI Heterogeneous Memory Attri=
-bute "
-> +                                        "Table (HMAT)", NULL);
->      }
->=20
->      /* Register notifier when init is done for sysbus sanity checks */ @=
-@ -1048,6 +1080,41 @@ static char *cpu_slot_to_string(const
-> CPUArchId *cpu)
->      return g_string_free(s, false);
->  }
->=20
-> +static void numa_validate_initiator(NumaState *nstat) {
-> +    int i;
-> +    NodeInfo *numa_info =3D nstat->nodes;
-> +
-> +    for (i =3D 0; i < nstat->num_nodes; i++) {
-> +        if (numa_info[i].initiator >=3D MAX_NODES) {
-> +            error_report("The initiator id %" PRIu16 " expects an intege=
-r "
-> +                         "between 0 and %d", numa_info[i].initiator,
-> +                         MAX_NODES - 1);
-> +            goto err;
-> +        }
-> +
-> +        if (!numa_info[numa_info[i].initiator].present) {
-> +            error_report("NUMA node %" PRIu16 " is missing, use "
-> +                         "'-numa node' option to declare it first.",
-> +                         numa_info[i].initiator);
-> +            goto err;
-> +        }
-> +
-> +        if (numa_info[numa_info[i].initiator].has_cpu) {
-> +            numa_info[i].initiator_valid =3D true;
-> +        } else {
-> +            error_report("The initiator of NUMA node %d is invalid.", i)=
-;
-> +            goto err;
-> +        }
-> +    }
-> +
-> +    return;
-> +
-> +err:
-> +    error_printf("\n");
-> +    exit(1);
-> +}
-> +
->  static void machine_numa_finish_cpu_init(MachineState *machine)  {
->      int i;
-> @@ -1088,6 +1155,11 @@ static void machine_numa_finish_cpu_init(MachineSt=
-ate *machine)
->              machine_set_cpu_numa_node(machine, &props, &error_fatal);
->          }
->      }
-> +
-> +    if (machine->numa_state->hmat_enabled) {
-> +        numa_validate_initiator(machine->numa_state);
-> +    }
-> +
->      if (s->len && !qtest_enabled()) {
->          warn_report("CPU(s) not present in any NUMA nodes: %s",
->                      s->str);
-> diff --git a/hw/core/numa.c b/hw/core/numa.c index 4dfec5c95b..bdce7d4217=
- 100644
-> --- a/hw/core/numa.c
-> +++ b/hw/core/numa.c
-> @@ -133,6 +133,17 @@ static void parse_numa_node(MachineState *ms, NumaNo=
-deOptions *node,
->          numa_info[nodenr].node_mem =3D object_property_get_uint(o, "size=
-", NULL);
->          numa_info[nodenr].node_memdev =3D MEMORY_BACKEND(o);
->      }
-> +
-> +    if (node->has_initiator) {
-> +        if (!ms->numa_state->hmat_enabled) {
-> +            error_setg(errp, "ACPI Heterogeneous Memory Attribute Table =
-"
-> +                       "(HMAT) is disabled, use -machine hmat=3Don befor=
-e "
-> +                       "set initiator of NUMA");
-> +            return;
-> +        }
-> +
-> +        numa_info[nodenr].initiator =3D node->initiator;
-> +    }
->      numa_info[nodenr].present =3D true;
->      max_numa_nodeid =3D MAX(max_numa_nodeid, nodenr + 1);
->      ms->numa_state->num_nodes++;
-> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h index ae9c41d0=
-2b..a788c3b126 100644
-> --- a/include/sysemu/numa.h
-> +++ b/include/sysemu/numa.h
-> @@ -18,6 +18,9 @@ struct NodeInfo {
->      uint64_t node_mem;
->      struct HostMemoryBackend *node_memdev;
->      bool present;
-> +    bool has_cpu;
-> +    bool initiator_valid;
-> +    uint16_t initiator;
->      uint8_t distance[MAX_NODES];
->  };
->=20
-> @@ -33,6 +36,9 @@ struct NumaState {
->      /* Allow setting NUMA distance for different NUMA nodes */
->      bool have_numa_distance;
->=20
-> +    /* Detect if HMAT support is enabled. */
-> +    bool hmat_enabled;
-> +
->      /* NUMA nodes information */
->      NodeInfo nodes[MAX_NODES];
->  };
-> diff --git a/qapi/machine.json b/qapi/machine.json index ca26779f1a..3c29=
-14cd1c 100644
-> --- a/qapi/machine.json
-> +++ b/qapi/machine.json
-> @@ -463,6 +463,13 @@
->  # @memdev: memory backend object.  If specified for one node,
->  #          it must be specified for all nodes.
->  #
-> +# @initiator: defined in ACPI 6.3 Chapter 5.2.27.3 Table 5-145,
-> +#             indicate the nodeid which has the memory controller
-> +#             responsible for this NUMA node. This field provides
-> +#             additional information as to the initiator node that
-> +#             is closest (as in directly attached) to this node, and
-> +#             therefore has the best performance (since 4.2)
-> +#
->  # Since: 2.1
->  ##
->  { 'struct': 'NumaNodeOptions',
-> @@ -470,7 +477,8 @@
->     '*nodeid': 'uint16',
->     '*cpus':   ['uint16'],
->     '*mem':    'size',
-> -   '*memdev': 'str' }}
-> +   '*memdev': 'str',
-> +   '*initiator': 'uint16' }}
->=20
->  ##
->  # @NumaDistOptions:
-> diff --git a/qemu-options.hx b/qemu-options.hx index bbfd936d29..74ccc4d7=
-82 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -43,7 +43,8 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
->      "                suppress-vmdesc=3Don|off disables self-describing m=
-igration (default=3Doff)\n"
->      "                nvdimm=3Don|off controls NVDIMM support (default=3D=
-off)\n"
->      "                enforce-config-section=3Don|off enforce configurati=
-on section migration (default=3Doff)\n"
-> -    "                memory-encryption=3D@var{} memory encryption object=
- to use (default=3Dnone)\n",
-> +    "                memory-encryption=3D@var{} memory encryption object=
- to use (default=3Dnone)\n"
-> +    "                hmat=3Don|off controls ACPI HMAT support (default=
-=3Doff)\n",
->      QEMU_ARCH_ALL)
->  STEXI
->  @item -machine [type=3D]@var{name}[,prop=3D@var{value}[,...]]
-> @@ -103,6 +104,9 @@ NOTE: this parameter is deprecated. Please use @optio=
-n{-global}  @option{migration.send-
-> configuration}=3D@var{on|off} instead.
->  @item memory-encryption=3D@var{}
->  Memory encryption object to use. The default is none.
-> +@item hmat=3Don|off
-> +Enables or disables ACPI Heterogeneous Memory Attribute Table (HMAT) sup=
-port.
-> +The default is off.
->  @end table
->  ETEXI
->=20
-> @@ -161,14 +165,14 @@ If any on the three values is given, the total numb=
-er of CPUs @var{n} can be omi  ETEXI
->=20
->  DEF("numa", HAS_ARG, QEMU_OPTION_numa,
-> -    "-numa node[,mem=3Dsize][,cpus=3Dfirstcpu[-lastcpu]][,nodeid=3Dnode]=
-\n"
-> -    "-numa node[,memdev=3Did][,cpus=3Dfirstcpu[-lastcpu]][,nodeid=3Dnode=
-]\n"
-> +    "-numa node[,mem=3Dsize][,cpus=3Dfirstcpu[-lastcpu]][,nodeid=3Dnode]=
-[,initiator=3Dnode]\n"
-> +    "-numa node[,memdev=3Did][,cpus=3Dfirstcpu[-lastcpu]][,nodeid=3Dnode=
-][,initiator=3Dnode]\n"
->      "-numa dist,src=3Dsource,dst=3Ddestination,val=3Ddistance\n"
->      "-numa cpu,node-id=3Dnode[,socket-id=3Dx][,core-id=3Dy][,thread-id=
-=3Dz]\n",
->      QEMU_ARCH_ALL)
->  STEXI
-> -@item -numa node[,mem=3D@var{size}][,cpus=3D@var{firstcpu}[-@var{lastcpu=
-}]][,nodeid=3D@var{node}]
-> -@itemx -numa node[,memdev=3D@var{id}][,cpus=3D@var{firstcpu}[-@var{lastc=
-pu}]][,nodeid=3D@var{node}]
-> +@item -numa
-> +node[,mem=3D@var{size}][,cpus=3D@var{firstcpu}[-@var{lastcpu}]][,nodeid=
-=3D@va
-> +r{node}][,initiator=3D@var{initiator}]
-> +@itemx -numa
-> +node[,memdev=3D@var{id}][,cpus=3D@var{firstcpu}[-@var{lastcpu}]][,nodeid=
-=3D@v
-> +ar{node}][,initiator=3D@var{initiator}]
->  @itemx -numa dist,src=3D@var{source},dst=3D@var{destination},val=3D@var{=
-distance}
->  @itemx -numa cpu,node-id=3D@var{node}[,socket-id=3D@var{x}][,core-id=3D@=
-var{y}][,thread-id=3D@var{z}]
->  @findex -numa
-> @@ -215,6 +219,27 @@ split equally between them.
->  @samp{mem} and @samp{memdev} are mutually exclusive. Furthermore,  if on=
-e node uses @samp{memdev}, all of them have to use it.
->=20
-> +@samp{initiator} is an additional option indicate the @var{initiator}
-> +NUMA that has best performance (the lowest latency or largest
-> +bandwidth) to this NUMA @var{node}. Note that this option can be set
-> +only when the machine oprion properties "-machine hmat=3Don".
-> +
-> +Following example creates a machine with 2 NUMA nodes, node 0 has CPU.
-> +node 1 has only memory, and its' initiator is node 0. Note that because
-> +node 0 has CPU, by default the initiator of node 0 is itself and must
-> +be itself.
-> +@example
-> +-machine hmat=3Don \
-> +-m 2G,slots=3D2,maxmem=3D4G \
-> +-object memory-backend-ram,size=3D1G,id=3Dm0 \ -object
-> +memory-backend-ram,size=3D1G,id=3Dm1 \ -numa node,nodeid=3D0,memdev=3Dm0=
- \
-> +-numa node,nodeid=3D1,memdev=3Dm1,initiator=3D0 \ -smp 2,sockets=3D2,max=
-cpus=3D2
-> +\ -numa cpu,node-id=3D0,socket-id=3D0 \ -numa cpu,node-id=3D0,socket-id=
-=3D1
-> +@end example
-> +
->  @var{source} and @var{destination} are NUMA node IDs.
->  @var{distance} is the NUMA distance from @var{source} to @var{destinatio=
-n}.
->  The distance from a node to itself is always 10. If any pair of nodes is
-> --
-> 2.20.1
+The QEMU command:
 
+qemu-system-arm -m 512m \
+                -machine romulus-bmc \
+                -no-reboot \
+                -dtb out/arch/arm/boot/dts/aspeed-bmc-opp-romulus.dtb \
+                -initrd rootfs.cpio \
+                -display none \
+                -serial mon:stdio \
+                -kernel ${KBF}/arch/arm/boot/zImage
+
+If it is needed, the rootfs we are using is provided at a link below
+[3].
+
+Debugging with QEMU reveals that the kernel panics in vfp_init,
+specifically at the line:
+
+vfpsid =3D fmrx(FPSID);
+
+in arch/arm/vfp/vfpmodule.c because of an illegal instruction:
+
+[    0.058685] VFP support v0.3: =
+
+[    0.059159] Internal error: Oops - undefined instruction: 0 [#1] SMP ARM
+[    0.059525] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.3.0-next-2019091=
+8-dirty #1
+[    0.059547] Hardware name: Generic DT based system
+[    0.059702] PC is at vfp_init+0x50/0x1f4
+[    0.059721] LR is at vfp_init+0x4c/0x1f4
+[    0.059738] pc : [<80b0383c>]    lr : [<80b03838>]    psr: 60000153
+[    0.059756] sp : 9e497ec0  ip : 00000020  fp : 9e497ed8
+[    0.059773] r10: 00000000  r9 : ffffe000  r8 : 80c06048
+[    0.059792] r7 : 00000000  r6 : 80c0caac  r5 : 80c6c418  r4 : 80b037ec
+[    0.059811] r3 : 00000000  r2 : 339aa372  r1 : 00000000  r0 : 00000012
+[    0.059859] Flags: nZCv  IRQs on  FIQs off  Mode SVC_32  ISA ARM  Segmen=
+t none
+[    0.059883] Control: 00c5387d  Table: 80004008  DAC: 00000051
+[    0.059997] Process swapper/0 (pid: 1, stack limit =3D 0x(ptrval))
+[    0.060048] Stack: (0x9e497ec0 to 0x9e498000)
+[    0.060205] 7ec0: 80b037ec 80b6bf0c 80b037ec ffffffff 00000000 00000000 =
+9e497f48 80b01100
+[    0.060310] 7ee0: 00000000 9eeff9e0 80a85734 809eb9be 00000000 8014b7f4 =
+9eeff9e0 80a85734
+[    0.060408] 7f00: 9e497f48 8014b7f4 000000a4 00000001 00000001 00000000 =
+80b0133c 9e497f38
+[    0.060509] 7f20: 00000000 9eeff9d5 339aa372 80b6be80 80b6bf0c 00000000 =
+00000000 00000000
+[    0.060606] 7f40: 00000000 00000000 9e497f70 80b01864 00000001 00000001 =
+00000000 80b0133c
+[    0.060703] 7f60: 00000001 8085d268 00000000 00000000 9e497f80 80b01758 =
+00000000 00000000
+[    0.060800] 7f80: 9e497f90 80b015e4 00000000 8085d268 9e497fa8 8085d27c =
+00000000 8085d268
+[    0.060897] 7fa0: 00000000 00000000 00000000 801010e8 00000000 00000000 =
+00000000 00000000
+[    0.060993] 7fc0: 00000000 00000000 00000000 00000000 00000000 00000000 =
+00000000 00000000
+[    0.061090] 7fe0: 00000000 00000000 00000000 00000000 00000013 00000000 =
+00000000 00000000
+[    0.061625] [<80b0383c>] (vfp_init) from [<80b01100>] (do_one_initcall+0=
+xa8/0x1e0)
+[    0.061722] [<80b01100>] (do_one_initcall) from [<80b01864>] (do_initcal=
+l_level+0xfc/0x12c)
+[    0.061742] [<80b01864>] (do_initcall_level) from [<80b01758>] (do_basic=
+_setup+0x2c/0x3c)
+[    0.061759] [<80b01758>] (do_basic_setup) from [<80b015e4>] (kernel_init=
+_freeable+0x68/0x104)
+[    0.061777] [<80b015e4>] (kernel_init_freeable) from [<8085d27c>] (kerne=
+l_init+0x14/0x26c)
+[    0.061798] [<8085d27c>] (kernel_init) from [<801010e8>] (ret_from_fork+=
+0x14/0x2c)
+[    0.061835] Exception stack(0x9e497fb0 to 0x9e497ff8)
+[    0.061896] 7fa0:                                     00000000 00000000 =
+00000000 00000000
+[    0.061998] 7fc0: 00000000 00000000 00000000 00000000 00000000 00000000 =
+00000000 00000000
+[    0.062080] 7fe0: 00000000 00000000 00000000 00000000 00000013 00000000
+[    0.062263] Code: e5860000 e59f0174 ebd9d8fc e59f5170 (eef04a10) =
+
+[    0.062679] ---[ end trace 2d338c91e4e74562 ]---
+
+Before fc1120a7f5:
+
+[    0.069418] VFP support v0.3: implementor 41 architecture 1 part 20
+variant b rev 5
+
+Should you need to reproduce this locally:
+
+* clang 9.0.0 or later is needed to build this config. If you do not
+have easy access to such a build, we have a clang build script available
+[4] that can help with this:
+
+% ./build-llvm.py --branch llvmorg-9.0.0-rc6 \
+                  --build-stage1-only \
+                  --projects clang \
+                  --targets ARM
+
+* Because of an unrelated build issue, linux-next needs to be used (or
+the singular patch that resolves it needs to be cherry-picked on top of
+4cdabee7d6d2 [5]). The kernel make command used:
+
+% make -j$(nproc) -s \
+       ARCH=3Darm \
+       CC=3Dclang \
+       CROSS_COMPILE=3Darm-linux-gnueabi- \
+       O=3Dout \
+       distclean aspeed_g5_defconfig all
+
+[1]: https://git.kernel.org/linus/4cdabee7d6d2e439fea726a101e448c4ca6837f4
+[2]: https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Dfc1120a7f5f2d4b60100=
+3205c598077d3eb11ad2
+[3]: https://github.com/ClangBuiltLinux/continuous-integration/blob/800d84b=
+f8c55ee04c50ed4c78144a96d889a91c5/images/arm/rootfs.cpio
+[4]: https://github.com/ClangBuiltLinux/tc-build
+[5]: http://git.armlinux.org.uk/cgit/linux-arm.git/commit/?id=3D7b394859737=
+2e5a6b314208ac320362c204b7f0f
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1844597
+
+Title:
+  fc1120a7f5f2d4b601003205c598077d3eb11ad2 causes a kernel panic in
+  vfp_init on a clang built kernel
+
+Status in QEMU:
+  New
+
+Bug description:
+  Commit 4cdabee7d6d2 ("ARM: configs: aspeed_g5: Enable AST2600") [1] in
+  the Linux kernel enabled CONFIG_VFP. When building this config with
+  Clang, the resulting kernel does not boot after commit fc1120a7f5
+  ("target/arm: Implement NSACR gating of floating point") [2] (present
+  since the 4.1.0 release).
+
+  The QEMU command:
+
+  qemu-system-arm -m 512m \
+                  -machine romulus-bmc \
+                  -no-reboot \
+                  -dtb out/arch/arm/boot/dts/aspeed-bmc-opp-romulus.dtb \
+                  -initrd rootfs.cpio \
+                  -display none \
+                  -serial mon:stdio \
+                  -kernel ${KBF}/arch/arm/boot/zImage
+
+  If it is needed, the rootfs we are using is provided at a link below
+  [3].
+
+  Debugging with QEMU reveals that the kernel panics in vfp_init,
+  specifically at the line:
+
+  vfpsid =3D fmrx(FPSID);
+
+  in arch/arm/vfp/vfpmodule.c because of an illegal instruction:
+
+  [    0.058685] VFP support v0.3: =
+
+  [    0.059159] Internal error: Oops - undefined instruction: 0 [#1] SMP A=
+RM
+  [    0.059525] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.3.0-next-20190=
+918-dirty #1
+  [    0.059547] Hardware name: Generic DT based system
+  [    0.059702] PC is at vfp_init+0x50/0x1f4
+  [    0.059721] LR is at vfp_init+0x4c/0x1f4
+  [    0.059738] pc : [<80b0383c>]    lr : [<80b03838>]    psr: 60000153
+  [    0.059756] sp : 9e497ec0  ip : 00000020  fp : 9e497ed8
+  [    0.059773] r10: 00000000  r9 : ffffe000  r8 : 80c06048
+  [    0.059792] r7 : 00000000  r6 : 80c0caac  r5 : 80c6c418  r4 : 80b037ec
+  [    0.059811] r3 : 00000000  r2 : 339aa372  r1 : 00000000  r0 : 00000012
+  [    0.059859] Flags: nZCv  IRQs on  FIQs off  Mode SVC_32  ISA ARM  Segm=
+ent none
+  [    0.059883] Control: 00c5387d  Table: 80004008  DAC: 00000051
+  [    0.059997] Process swapper/0 (pid: 1, stack limit =3D 0x(ptrval))
+  [    0.060048] Stack: (0x9e497ec0 to 0x9e498000)
+  [    0.060205] 7ec0: 80b037ec 80b6bf0c 80b037ec ffffffff 00000000 0000000=
+0 9e497f48 80b01100
+  [    0.060310] 7ee0: 00000000 9eeff9e0 80a85734 809eb9be 00000000 8014b7f=
+4 9eeff9e0 80a85734
+  [    0.060408] 7f00: 9e497f48 8014b7f4 000000a4 00000001 00000001 0000000=
+0 80b0133c 9e497f38
+  [    0.060509] 7f20: 00000000 9eeff9d5 339aa372 80b6be80 80b6bf0c 0000000=
+0 00000000 00000000
+  [    0.060606] 7f40: 00000000 00000000 9e497f70 80b01864 00000001 0000000=
+1 00000000 80b0133c
+  [    0.060703] 7f60: 00000001 8085d268 00000000 00000000 9e497f80 80b0175=
+8 00000000 00000000
+  [    0.060800] 7f80: 9e497f90 80b015e4 00000000 8085d268 9e497fa8 8085d27=
+c 00000000 8085d268
+  [    0.060897] 7fa0: 00000000 00000000 00000000 801010e8 00000000 0000000=
+0 00000000 00000000
+  [    0.060993] 7fc0: 00000000 00000000 00000000 00000000 00000000 0000000=
+0 00000000 00000000
+  [    0.061090] 7fe0: 00000000 00000000 00000000 00000000 00000013 0000000=
+0 00000000 00000000
+  [    0.061625] [<80b0383c>] (vfp_init) from [<80b01100>] (do_one_initcall=
++0xa8/0x1e0)
+  [    0.061722] [<80b01100>] (do_one_initcall) from [<80b01864>] (do_initc=
+all_level+0xfc/0x12c)
+  [    0.061742] [<80b01864>] (do_initcall_level) from [<80b01758>] (do_bas=
+ic_setup+0x2c/0x3c)
+  [    0.061759] [<80b01758>] (do_basic_setup) from [<80b015e4>] (kernel_in=
+it_freeable+0x68/0x104)
+  [    0.061777] [<80b015e4>] (kernel_init_freeable) from [<8085d27c>] (ker=
+nel_init+0x14/0x26c)
+  [    0.061798] [<8085d27c>] (kernel_init) from [<801010e8>] (ret_from_for=
+k+0x14/0x2c)
+  [    0.061835] Exception stack(0x9e497fb0 to 0x9e497ff8)
+  [    0.061896] 7fa0:                                     00000000 0000000=
+0 00000000 00000000
+  [    0.061998] 7fc0: 00000000 00000000 00000000 00000000 00000000 0000000=
+0 00000000 00000000
+  [    0.062080] 7fe0: 00000000 00000000 00000000 00000000 00000013 00000000
+  [    0.062263] Code: e5860000 e59f0174 ebd9d8fc e59f5170 (eef04a10) =
+
+  [    0.062679] ---[ end trace 2d338c91e4e74562 ]---
+
+  Before fc1120a7f5:
+
+  [    0.069418] VFP support v0.3: implementor 41 architecture 1 part 20
+  variant b rev 5
+
+  Should you need to reproduce this locally:
+
+  * clang 9.0.0 or later is needed to build this config. If you do not
+  have easy access to such a build, we have a clang build script
+  available [4] that can help with this:
+
+  % ./build-llvm.py --branch llvmorg-9.0.0-rc6 \
+                    --build-stage1-only \
+                    --projects clang \
+                    --targets ARM
+
+  * Because of an unrelated build issue, linux-next needs to be used (or
+  the singular patch that resolves it needs to be cherry-picked on top
+  of 4cdabee7d6d2 [5]). The kernel make command used:
+
+  % make -j$(nproc) -s \
+         ARCH=3Darm \
+         CC=3Dclang \
+         CROSS_COMPILE=3Darm-linux-gnueabi- \
+         O=3Dout \
+         distclean aspeed_g5_defconfig all
+
+  [1]: https://git.kernel.org/linus/4cdabee7d6d2e439fea726a101e448c4ca6837f4
+  [2]: https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Dfc1120a7f5f2d4b601=
+003205c598077d3eb11ad2
+  [3]: https://github.com/ClangBuiltLinux/continuous-integration/blob/800d8=
+4bf8c55ee04c50ed4c78144a96d889a91c5/images/arm/rootfs.cpio
+  [4]: https://github.com/ClangBuiltLinux/tc-build
+  [5]: http://git.armlinux.org.uk/cgit/linux-arm.git/commit/?id=3D7b3948597=
+372e5a6b314208ac320362c204b7f0f
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1844597/+subscriptions
 
