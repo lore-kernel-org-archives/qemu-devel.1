@@ -2,62 +2,65 @@ Return-Path: <SRS0=AuXU=XO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51326C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:21:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CE0AC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:25:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 263EE217D6
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:21:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 263EE217D6
+	by mail.kernel.org (Postfix) with ESMTPS id E89A821924
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Sep 2019 09:25:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E89A821924
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iAscZ-00074l-8i
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:21:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40891)
+	id 1iAsgd-0000ut-46
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 05:25:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42394)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iAsZR-0003ZF-SR
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:17:50 -0400
+ (envelope-from <stefanha@redhat.com>) id 1iAsfc-0000Aa-Hz
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:24:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iAsZQ-0007Mm-ST
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:17:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56844)
+ (envelope-from <stefanha@redhat.com>) id 1iAsfX-0001XL-F9
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:24:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36140)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iAsZM-0007Ix-5u; Thu, 19 Sep 2019 05:17:44 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iAsfV-0001Vm-I0
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 05:24:06 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8392310C030B;
- Thu, 19 Sep 2019 09:17:42 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.36.116.255])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 89A7F5C207;
- Thu, 19 Sep 2019 09:17:21 +0000 (UTC)
-Date: Thu, 19 Sep 2019 11:17:20 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Message-ID: <20190919091720.GB10163@localhost.localdomain>
-References: <20190918130244.24257-1-vsementsov@virtuozzo.com>
- <abb14088-6af2-5db2-da0d-0948fd4ac81c@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 5D0A789C31
+ for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 09:24:03 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 09E4919C5B;
+ Thu, 19 Sep 2019 09:23:59 +0000 (UTC)
+Date: Thu, 19 Sep 2019 10:23:58 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190919092358.GA3606@stefanha-x1.localdomain>
+References: <20190912122514.22504-1-marcandre.lureau@redhat.com>
+ <20190912122514.22504-6-marcandre.lureau@redhat.com>
+ <20190916100035.GC2887@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="OgqxwSJOaUobr8KG"
 Content-Disposition: inline
-In-Reply-To: <abb14088-6af2-5db2-da0d-0948fd4ac81c@redhat.com>
+In-Reply-To: <20190916100035.GC2887@work-vm>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Thu, 19 Sep 2019 09:17:42 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Thu, 19 Sep 2019 09:24:03 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC] error: auto propagated local_err
+Subject: Re: [Qemu-devel] [PATCH v3 5/6] docs: start a document to describe
+ D-Bus usage
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,53 +72,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.maydell@linaro.org, mst@redhat.com,
- codyprime@gmail.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
- armbru@redhat.com, kraxel@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org,
- quintela@redhat.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, marcandre.lureau@redhat.com,
- rth@twiddle.net, farman@linux.ibm.com, groug@kaod.org, dgilbert@redhat.com,
- alex.williamson@redhat.com, qemu-arm@nongnu.org, stefanha@redhat.com,
- jsnow@redhat.com, david@gibson.dropbear.id.au,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, berrange@redhat.com,
- cohuck@redhat.com, qemu-s390x@nongnu.org, sundeep.lkml@gmail.com,
- qemu-ppc@nongnu.org, pbonzini@redhat.com
+Cc: berrange@redhat.com, quintela@redhat.com, mprivozn@redhat.com,
+ qemu-devel@nongnu.org, pbonzini@redhat.com,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 18.09.2019 um 19:10 hat Eric Blake geschrieben:
-> On 9/18/19 8:02 AM, Vladimir Sementsov-Ogievskiy wrote:
-> > + */
-> > +#define MAKE_ERRP_SAFE(errp) \
-> > +g_auto(ErrorPropagationStruct) (__auto_errp_prop) = {.errp = (errp)}; \
-> > +if ((errp) == NULL || *(errp) == error_abort || *(errp) == error_fatal) { \
-> > +    (errp) = &__auto_errp_prop.local_err; \
-> > +}
-> 
-> Not written to take a trailing semicolon in the caller.
-> 
-> You could even set __auto_errp_prop unconditionally rather than trying
-> to reuse incoming errp (the difference being that error_propagate() gets
-> called more frequently).
 
-I think this difference is actually a problem.
+--OgqxwSJOaUobr8KG
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-When debugging things, I hate error_propagate(). It means that the Error
-(specifically its fields src/func/line) points to the outermost
-error_propagate() rather than the place where the error really happened.
-It also makes error_abort completely useless because at the point where
-the process gets aborted, the interesting information is already lost.
+On Mon, Sep 16, 2019 at 11:00:35AM +0100, Dr. David Alan Gilbert wrote:
+> (Copying in Stefan since he was looking at DBus for virtiofs)
+>=20
+> * Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
+> > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  docs/interop/dbus.rst  | 73 ++++++++++++++++++++++++++++++++++++++++++
+> >  docs/interop/index.rst |  1 +
+> >  2 files changed, 74 insertions(+)
+> >  create mode 100644 docs/interop/dbus.rst
+> >=20
+> > diff --git a/docs/interop/dbus.rst b/docs/interop/dbus.rst
+> > new file mode 100644
+> > index 0000000000..c08f026edc
+> > --- /dev/null
+> > +++ b/docs/interop/dbus.rst
+> > @@ -0,0 +1,73 @@
+> > +=3D=3D=3D=3D=3D
+> > +D-Bus
+> > +=3D=3D=3D=3D=3D
+> > +
+> > +Introduction
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +
+> > +QEMU may be running with various helper processes involved:
+> > + - vhost-user* processes (gpu, virtfs, input, etc...)
+> > + - TPM emulation (or other devices)
+> > + - user networking (slirp)
+> > + - network services (DHCP/DNS, samba/ftp etc)
+> > + - background tasks (compression, streaming etc)
+> > + - client UI
+> > + - admin & cli
+> > +
+> > +Having several processes allows stricter security rules, as well as
+> > +greater modularity.
+> > +
+> > +While QEMU itself uses QMP as primary IPC (and Spice/VNC for remote
+> > +display), D-Bus is the de facto IPC of choice on Unix systems. The
+> > +wire format is machine friendly, good bindings exist for various
+> > +languages, and there are various tools available.
+> > +
+> > +Using a bus, helper processes can discover and communicate with each
+> > +other easily, without going through QEMU. The bus topology is also
+> > +easier to apprehend and debug than a mesh. However, it is wise to
+> > +consider the security aspects of it.
+> > +
+> > +Security
+> > +=3D=3D=3D=3D=3D=3D=3D=3D
+> > +
+> > +A QEMU D-Bus bus should be private to a single VM. Thus, only
+> > +cooperative tasks are running on the same bus to serve the VM.
+> > +
+> > +D-Bus, the protocol and standard, doesn't have mechanisms to enforce
+> > +security between peers once the connection is established. Peers may
+> > +have additional mechanisms to enforce security rules, based for
+> > +example on UNIX credentials.
+> > +
+> > +dbus-daemon can enforce various policies based on the UID/GID of the
+> > +processes that are connected to it. It is thus a good idea to run
+> > +helpers as different UID from QEMU and set appropriate policies (so
+> > +helper processes are only allowed to talk to qemu for example).
+> > +
+> > +For example, this allows only ``qemu`` user to talk to ``qemu-helper``
+> > +``org.qemu.Helper1`` service:
+> > +
+> > +.. code:: xml
+> > +
+> > +  <policy user=3D"qemu">
+> > +     <allow send_destination=3D"org.qemu.Helper1"/>
+> > +     <allow receive_sender=3D"org.qemu.Helper1"/>
+> > +  </policy>
+> > +
+> > +  <policy user=3D"qemu-helper">
+> > +     <allow own=3D"org.qemu.Helper1"/>
+> > +  </policy>
+> > +
+> > +
+> > +dbus-daemon can also perfom SELinux checks based on the security
+> > +context of the source and the target. For example, ``virtiofs_t``
+> > +could be allowed to send a message to ``svirt_t``, but ``virtiofs_t``
+> > +wouldn't be allowed to send a message to ``virtiofs_t``.
+>=20
+> I think we need to start thinking about this more now rather than
+> 'can'. .
 
-So I'd really like to restrict the use of error_propagate() to places
-where it's absolutely necessary. Unless, of course, you can fix these
-practical problems that error_propagate() causes for debugging.
+virtiofsd has two DBus interfaces:
 
-In fact, in the context of Greg's series, I think we really only need to
-support hints for error_fatal, which are cases that users are supposed
-to see. We should exclude error_abort in MAKE_ERRP_SAFE() because these
-are things that are never supposed to happen. A good stack trace is more
-important there than adding a hint to the message.
+1. org.qemu.Virtiofsd - the management interface
 
-Kevin
+   We don't expect QEMU to communicate with this.  Administrators or
+   management tools will connect to this.
+
+2. dbus-vmstate - we'll probably need this for live migration
+
+   This is for QEMU<->vhost-user device backend communication.
+
+Stefan
+
+--OgqxwSJOaUobr8KG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2DSS4ACgkQnKSrs4Gr
+c8iCOQf7BdVqZ08twPcRP9wCP/6zceyy4Q7V1DRPMNQF1VSUVOfRclv7TfTszia0
+rIRKWg3Urs9kpEwU6gb5gETxKFeSnf8mmSOSbqn2M2gkMhrBYyzfuIkIsT61lNCl
+U8yuxPRebVvaW3Z1x4cN2O2gONWHGe4DSKIwC1GNFtZsalppHUVXJZlwuXGllmV+
+R1kpFTYr5w9pX+/5KGCg3upNeuUvlny0ajQD3epijqkweI6VLLrGETFBQuaDM5zo
+mwRopXB3nXJjgEcqwlwW9yfD0xdMJsT+RwlGwbX+U5aCgcRIn89DByL+ttBCgCFP
+fgdfDfLSk/yU5kR7OAcDbGidZuTZiA==
+=YBu4
+-----END PGP SIGNATURE-----
+
+--OgqxwSJOaUobr8KG--
 
