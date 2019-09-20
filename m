@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2A0FC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 22:24:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D36C1C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 22:25:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34DE62086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 22:24:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34DE62086A
+	by mail.kernel.org (Postfix) with ESMTPS id A08CC2086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 22:25:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A08CC2086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBRCb-0005qr-8L
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 18:16:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57726)
+	id 1iBRLb-00087H-Mf
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 18:25:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57752)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iBR9J-00007h-A0
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 18:13:10 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iBR9K-0000JY-Lu
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 18:13:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iBR9I-0006zv-9U
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 18:13:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53584)
+ (envelope-from <jsnow@redhat.com>) id 1iBR9J-00070h-8b
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 18:13:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48006)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iBR9I-0006xr-3q
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 18:13:08 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iBR9I-0006x9-Vq
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 18:13:09 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 55D6F36955;
- Fri, 20 Sep 2019 22:13:07 +0000 (UTC)
-Received: from probe.bos.redhat.com (dhcp-17-38.bos.redhat.com [10.18.17.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B448D5D9CD;
+ by mx1.redhat.com (Postfix) with ESMTPS id 9233C308123B;
  Fri, 20 Sep 2019 22:13:06 +0000 (UTC)
+Received: from probe.bos.redhat.com (dhcp-17-38.bos.redhat.com [10.18.17.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F25C15D9C3;
+ Fri, 20 Sep 2019 22:13:05 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/5] docker: remove 'deprecated' image definitions
-Date: Fri, 20 Sep 2019 18:12:52 -0400
-Message-Id: <20190920221255.30412-3-jsnow@redhat.com>
+Subject: [PATCH v2 1/5] docker: move tests from python2 to python3
+Date: Fri, 20 Sep 2019 18:12:51 -0400
+Message-Id: <20190920221255.30412-2-jsnow@redhat.com>
 In-Reply-To: <20190920221255.30412-1-jsnow@redhat.com>
 References: <20190920221255.30412-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Fri, 20 Sep 2019 22:13:07 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Fri, 20 Sep 2019 22:13:06 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -74,50 +74,182 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There isn't a debian.dockerfile anymore,
-so perform some ghost-busting.
+As part of the push to drop python2 support, replace any explicit python2
+dependencies with python3 versions.
+
+For centos, python2 still exists as an implicit dependency, but by adding
+python3 we will be able to build even if the configure script begins to
+require python 3.5+.
+
+Tested with centos7, fedora, ubuntu, ubuntu1804, and debian 9 (amd64).
+Tested under a custom configure script that requires Python 3.5+.
+
+the travis dockerfile is also moved to using python3, which was tested
+by running `make docker-test-build@travis`, which I hope is sufficient.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
-Message-id: 20190920001413.22567-2-jsnow@redhat.com
+Message-id: 20190920200049.27216-1-jsnow@redhat.com
 ---
- tests/docker/Makefile.include | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ tests/docker/dockerfiles/centos7.docker             | 2 +-
+ tests/docker/dockerfiles/debian-ports.docker        | 2 +-
+ tests/docker/dockerfiles/debian-sid.docker          | 2 +-
+ tests/docker/dockerfiles/debian-xtensa-cross.docker | 2 +-
+ tests/docker/dockerfiles/debian10.docker            | 2 +-
+ tests/docker/dockerfiles/debian8.docker             | 3 +--
+ tests/docker/dockerfiles/debian9.docker             | 2 +-
+ tests/docker/dockerfiles/travis.docker              | 2 +-
+ tests/docker/dockerfiles/ubuntu.docker              | 2 +-
+ tests/docker/dockerfiles/ubuntu1804.docker          | 2 +-
+ 10 files changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.includ=
-e
-index d796f71b63..0d75260e46 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -4,11 +4,10 @@
+diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/docke=
+rfiles/centos7.docker
+index e0b9d7dbe9..953637065c 100644
+--- a/tests/docker/dockerfiles/centos7.docker
++++ b/tests/docker/dockerfiles/centos7.docker
+@@ -25,6 +25,7 @@ ENV PACKAGES \
+     nettle-devel \
+     perl-Test-Harness \
+     pixman-devel \
++    python3 \
+     SDL-devel \
+     spice-glib-devel \
+     spice-server-devel \
+@@ -34,4 +35,3 @@ ENV PACKAGES \
+     zlib-devel
+ RUN yum install -y $PACKAGES
+ RUN rpm -q $PACKAGES | sort > /packages.txt
+-
+diff --git a/tests/docker/dockerfiles/debian-ports.docker b/tests/docker/=
+dockerfiles/debian-ports.docker
+index 61bc3f2993..f1ea8d3bd1 100644
+--- a/tests/docker/dockerfiles/debian-ports.docker
++++ b/tests/docker/dockerfiles/debian-ports.docker
+@@ -31,6 +31,6 @@ RUN apt-get update && \
+         git \
+         pkg-config \
+         psmisc \
+-        python \
++        python3 \
+         texinfo \
+         $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut =
+-d\  -f2)
+diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/do=
+ckerfiles/debian-sid.docker
+index 2a1bcc33b2..dcb8e83715 100644
+--- a/tests/docker/dockerfiles/debian-sid.docker
++++ b/tests/docker/dockerfiles/debian-sid.docker
+@@ -31,5 +31,5 @@ RUN apt update && \
+         git \
+         pkg-config \
+         psmisc \
+-        python \
++        python3 \
+         texinfo || { echo "Failed to build - see debian-sid.docker notes=
+"; exit 1; }
+diff --git a/tests/docker/dockerfiles/debian-xtensa-cross.docker b/tests/=
+docker/dockerfiles/debian-xtensa-cross.docker
+index b9c2e2e531..e6f93f65ee 100644
+--- a/tests/docker/dockerfiles/debian-xtensa-cross.docker
++++ b/tests/docker/dockerfiles/debian-xtensa-cross.docker
+@@ -18,7 +18,7 @@ RUN apt-get update && \
+         flex \
+         gettext \
+         git \
+-        python-minimal
++        python3-minimal
 =20
- DOCKER_SUFFIX :=3D .docker
- DOCKER_FILES_DIR :=3D $(SRC_PATH)/tests/docker/dockerfiles
--DOCKER_DEPRECATED_IMAGES :=3D debian
- # we don't run tests on intermediate images (used as base by another ima=
-ge)
--DOCKER_PARTIAL_IMAGES :=3D debian debian8 debian9 debian10 debian-sid
-+DOCKER_PARTIAL_IMAGES :=3D debian8 debian9 debian10 debian-sid
- DOCKER_PARTIAL_IMAGES +=3D debian8-mxe debian9-mxe debian-ports debian-b=
-ootstrap
--DOCKER_IMAGES :=3D $(filter-out $(DOCKER_DEPRECATED_IMAGES),$(sort $(not=
-dir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker)))))
-+DOCKER_IMAGES :=3D $(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_=
-DIR)/*.docker))))
- DOCKER_TARGETS :=3D $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
- # Use a global constant ccache directory to speed up repetitive builds
- DOCKER_CCACHE_DIR :=3D $$HOME/.cache/qemu-docker-ccache
-@@ -159,7 +158,7 @@ docker-image-debian-powerpc-user-cross: docker-binfmt=
--image-debian-powerpc-user
- DOCKER_USER_IMAGES +=3D debian-powerpc-user
-=20
- # Expand all the pre-requistes for each docker image and test combinatio=
-n
--$(foreach i,$(filter-out $(DOCKER_PARTIAL_IMAGES),$(DOCKER_IMAGES) $(DOC=
-KER_DEPRECATED_IMAGES)), \
-+$(foreach i,$(filter-out $(DOCKER_PARTIAL_IMAGES),$(DOCKER_IMAGES)), \
- 	$(foreach t,$(DOCKER_TESTS) $(DOCKER_TOOLS), \
- 		$(eval .PHONY: docker-$t@$i) \
- 		$(eval docker-$t@$i: docker-image-$i docker-run-$t@$i) \
+ ENV CPU_LIST csp dc232b dc233c
+ ENV TOOLCHAIN_RELEASE 2018.02
+diff --git a/tests/docker/dockerfiles/debian10.docker b/tests/docker/dock=
+erfiles/debian10.docker
+index 30a78813f2..dad498b52e 100644
+--- a/tests/docker/dockerfiles/debian10.docker
++++ b/tests/docker/dockerfiles/debian10.docker
+@@ -26,7 +26,7 @@ RUN apt update && \
+         git \
+         pkg-config \
+         psmisc \
+-        python \
++        python3 \
+         python3-sphinx \
+         texinfo \
+         $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut =
+-d\  -f2)
+diff --git a/tests/docker/dockerfiles/debian8.docker b/tests/docker/docke=
+rfiles/debian8.docker
+index 1212a85c35..be67023826 100644
+--- a/tests/docker/dockerfiles/debian8.docker
++++ b/tests/docker/dockerfiles/debian8.docker
+@@ -30,5 +30,4 @@ RUN apt update && \
+         git \
+         gnupg \
+         pkg-config \
+-        python-minimal
+-
++        python3-minimal
+diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/docke=
+rfiles/debian9.docker
+index b36f1d4ed8..8cbd742bb5 100644
+--- a/tests/docker/dockerfiles/debian9.docker
++++ b/tests/docker/dockerfiles/debian9.docker
+@@ -26,7 +26,7 @@ RUN apt update && \
+         git \
+         pkg-config \
+         psmisc \
+-        python \
++        python3 \
+         python3-sphinx \
+         texinfo \
+         $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut =
+-d\  -f2)
+diff --git a/tests/docker/dockerfiles/travis.docker b/tests/docker/docker=
+files/travis.docker
+index e72dc85ca7..ea14da29d9 100644
+--- a/tests/docker/dockerfiles/travis.docker
++++ b/tests/docker/dockerfiles/travis.docker
+@@ -5,7 +5,7 @@ ENV LC_ALL en_US.UTF-8
+ RUN sed -i "s/# deb-src/deb-src/" /etc/apt/sources.list
+ RUN apt-get update
+ RUN apt-get -y build-dep qemu
+-RUN apt-get -y install device-tree-compiler python2.7 python-yaml dh-aut=
+oreconf gdb strace lsof net-tools gcovr
++RUN apt-get -y install device-tree-compiler python3 python3-yaml dh-auto=
+reconf gdb strace lsof net-tools gcovr
+ # Travis tools require PhantomJS / Neo4j / Maven accessible
+ # in their PATH (QEMU build won't access them).
+ ENV PATH /usr/local/phantomjs/bin:/usr/local/phantomjs:/usr/local/neo4j-=
+3.2.7/bin:/usr/local/maven-3.5.2/bin:/usr/local/cmake-3.9.2/bin:/usr/loca=
+l/clang-5.0.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin=
+:/bin
+diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/docker=
+files/ubuntu.docker
+index a4f601395c..f486492224 100644
+--- a/tests/docker/dockerfiles/ubuntu.docker
++++ b/tests/docker/dockerfiles/ubuntu.docker
+@@ -60,7 +60,7 @@ ENV PACKAGES flex bison \
+     libvte-2.91-dev \
+     libxen-dev \
+     make \
+-    python-yaml \
++    python3-yaml \
+     python3-sphinx \
+     sparse \
+     texinfo \
+diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/do=
+ckerfiles/ubuntu1804.docker
+index 883f9bcf31..3cc4f492c4 100644
+--- a/tests/docker/dockerfiles/ubuntu1804.docker
++++ b/tests/docker/dockerfiles/ubuntu1804.docker
+@@ -47,7 +47,7 @@ ENV PACKAGES flex bison \
+     libvte-2.91-dev \
+     libxen-dev \
+     make \
+-    python-yaml \
++    python3-yaml \
+     python3-sphinx \
+     sparse \
+     texinfo \
 --=20
 2.21.0
 
