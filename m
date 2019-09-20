@@ -3,55 +3,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BE2CC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 15:46:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 498A5C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 15:46:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E8B62086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 15:46:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E8B62086A
+	by mail.kernel.org (Postfix) with ESMTPS id 22F992086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 15:46:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22F992086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBL73-0007Oj-DG
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 11:46:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43945)
+	id 1iBL74-0007Os-9t
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 11:46:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44159)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iBKpj-0000pL-TE
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 11:28:32 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iBKq8-00016i-04
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 11:28:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iBKpi-0004Uu-N1
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 11:28:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:11115)
+ (envelope-from <mreitz@redhat.com>) id 1iBKq5-0004hX-LZ
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 11:28:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45400)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iBKpg-0004SF-Fa; Fri, 20 Sep 2019 11:28:28 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1iBKpz-0004dk-SV; Fri, 20 Sep 2019 11:28:49 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B8ED03082E10;
- Fri, 20 Sep 2019 15:28:27 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 924F410CC1E6;
+ Fri, 20 Sep 2019 15:28:46 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.102])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5244D60606;
- Fri, 20 Sep 2019 15:28:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A2C319C5B;
+ Fri, 20 Sep 2019 15:28:45 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 09/22] quorum: Add QuorumChild.to_be_replaced
-Date: Fri, 20 Sep 2019 17:27:51 +0200
-Message-Id: <20190920152804.12875-10-mreitz@redhat.com>
+Subject: [PATCH 17/22] iotests: Add VM.assert_block_path()
+Date: Fri, 20 Sep 2019 17:27:59 +0200
+Message-Id: <20190920152804.12875-18-mreitz@redhat.com>
 In-Reply-To: <20190920152804.12875-1-mreitz@redhat.com>
 References: <20190920152804.12875-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 20 Sep 2019 15:28:27 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Fri, 20 Sep 2019 15:28:46 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -72,64 +72,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We will need this to verify that Quorum can let one of its children be
-replaced without breaking anything else.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/quorum.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ tests/qemu-iotests/iotests.py | 48 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/block/quorum.c b/block/quorum.c
-index cf2171cc74..207054a64e 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -67,6 +67,13 @@ typedef struct QuorumVotes {
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+index daed4ee013..e6fb46287d 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -670,6 +670,54 @@ class VM(qtest.QEMUQtestMachine):
 =20
- typedef struct QuorumChild {
-     BdrvChild *child;
-+
-+    /*
-+     * If set, check whether this node can be replaced without any
-+     * other parent noticing: Unshare CONSISTENT_READ, and take the
-+     * WRITE permission.
-+     */
-+    bool to_be_replaced;
- } QuorumChild;
+         return fields.items() <=3D ret.items()
 =20
- /* the following structure holds the state of one quorum instance */
-@@ -1128,6 +1135,16 @@ static void quorum_child_perm(BlockDriverState *bs=
-, BdrvChild *c,
-                               uint64_t perm, uint64_t shared,
-                               uint64_t *nperm, uint64_t *nshared)
- {
-+    BDRVQuorumState *s =3D bs->opaque;
-+    int i;
++    '''
++    @path is a string whose components are separated by slashes.
++    The first component is a node name, the rest are child names.
++    Examples:
++      - "qcow2-node/backing/file"
++      - "quorum-node/children.2/file"
 +
-+    for (i =3D 0; i < s->num_children; i++) {
-+        if (s->children[i].child =3D=3D c) {
-+            break;
-+        }
-+    }
-+    assert(!c || i < s->num_children);
++    @expected_node may be None.
 +
-     *nperm =3D perm & DEFAULT_PERM_PASSTHROUGH;
++    @graph may be None or the result of an x-debug-query-block-graph
++    call that has already been performed.
++    '''
++    def assert_block_path(self, path, expected_node, graph=3DNone):
++        if graph is None:
++            graph =3D self.qmp('x-debug-query-block-graph')['return']
++
++        iter_path =3D iter(path.split('/'))
++        root =3D next(iter_path)
++        try:
++            node =3D next(node for node in graph['nodes'] if node['name'=
+] =3D=3D root)
++        except StopIteration:
++            node =3D None
++
++        for path_node in iter_path:
++            assert node is not None, 'Cannot follow path %s' % path
++
++            try:
++                node_id =3D next(edge['child'] for edge in graph['edges'=
+] \
++                                             if edge['parent'] =3D=3D no=
+de['id'] and
++                                                edge['name'] =3D=3D path=
+_node)
++
++                node =3D next(node for node in graph['nodes'] \
++                                 if node['id'] =3D=3D node_id)
++            except StopIteration:
++                node =3D None
++
++        assert node is not None or expected_node is None, \
++               'No node found under %s (but expected %s)' % \
++               (path, expected_node)
++
++        assert expected_node is not None or node is None, \
++               'Found node %s under %s (but expected none)' % \
++               (node['name'], path)
++
++        if node is not None and expected_node is not None:
++            assert node['name'] =3D=3D expected_node, \
++                   'Found node %s under %s (but expected %s)' % \
++                   (node['name'], path, expected_node)
 =20
-     /*
-@@ -1137,6 +1154,12 @@ static void quorum_child_perm(BlockDriverState *bs=
-, BdrvChild *c,
-     *nshared =3D (shared & (BLK_PERM_CONSISTENT_READ |
-                           BLK_PERM_WRITE_UNCHANGED))
-              | DEFAULT_PERM_UNCHANGED;
-+
-+    if (c && s->children[i].to_be_replaced) {
-+        /* Prepare for sudden data changes */
-+        *nperm |=3D BLK_PERM_WRITE;
-+        *nshared &=3D ~BLK_PERM_CONSISTENT_READ;
-+    }
- }
+ index_re =3D re.compile(r'([^\[]+)\[([^\]]+)\]')
 =20
- static const char *const quorum_strong_runtime_opts[] =3D {
 --=20
 2.21.0
 
