@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8672C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 15:52:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 151DEC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 15:52:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5194D20C01
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 15:52:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5194D20C01
+	by mail.kernel.org (Postfix) with ESMTPS id DA6ED2086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 15:52:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA6ED2086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBLCm-0003PL-JU
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 11:52:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44198)
+	id 1iBLCz-0003dO-8B
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 11:52:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44027)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iBKq9-00018U-CE
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 11:28:58 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iBKpy-00011E-3Y
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 11:28:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iBKq7-0004ib-RQ
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 11:28:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48966)
+ (envelope-from <mreitz@redhat.com>) id 1iBKpu-0004aE-91
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 11:28:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39996)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iBKq1-0004f1-Qu; Fri, 20 Sep 2019 11:28:50 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1iBKpo-0004WZ-40; Fri, 20 Sep 2019 11:28:36 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DA1B218C8919;
- Fri, 20 Sep 2019 15:28:48 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id DA21218C4277;
+ Fri, 20 Sep 2019 15:28:34 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.102])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 732DF5D6A7;
- Fri, 20 Sep 2019 15:28:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F47C60C57;
+ Fri, 20 Sep 2019 15:28:34 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 18/22] iotests: Resolve TODOs in 041
-Date: Fri, 20 Sep 2019 17:28:00 +0200
-Message-Id: <20190920152804.12875-19-mreitz@redhat.com>
+Subject: [PATCH 12/22] block: Remove bdrv_recurse_is_first_non_filter()
+Date: Fri, 20 Sep 2019 17:27:54 +0200
+Message-Id: <20190920152804.12875-13-mreitz@redhat.com>
 In-Reply-To: <20190920152804.12875-1-mreitz@redhat.com>
 References: <20190920152804.12875-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Fri, 20 Sep 2019 15:28:48 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.62]); Fri, 20 Sep 2019 15:28:34 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -72,41 +72,277 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+It no longer has any users.
+
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/041 | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ include/block/block.h     |  4 ----
+ include/block/block_int.h |  8 --------
+ block.c                   | 33 ---------------------------------
+ block/blkverify.c         | 15 ---------------
+ block/copy-on-read.c      |  9 ---------
+ block/quorum.c            | 18 ------------------
+ block/replication.c       |  7 -------
+ block/throttle.c          |  8 --------
+ 8 files changed, 102 deletions(-)
 
-diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-index d91f538276..ca126de3ff 100755
---- a/tests/qemu-iotests/041
-+++ b/tests/qemu-iotests/041
-@@ -921,8 +921,7 @@ class TestRepairQuorum(iotests.QMPTestCase):
+diff --git a/include/block/block.h b/include/block/block.h
+index d3ccab4722..2944980c03 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -400,10 +400,6 @@ int bdrv_amend_options(BlockDriverState *bs_new, Qem=
+uOpts *opts,
+                        BlockDriverAmendStatusCB *status_cb, void *cb_opa=
+que,
+                        Error **errp);
 =20
-         self.complete_and_wait(drive=3D"job0")
-         self.assert_has_block_node("repair0", quorum_repair_img)
--        # TODO: a better test requiring some QEMU infrastructure will be=
- added
--        #       to check that this file is really driven by quorum
-+        self.vm.assert_block_path('quorum0/children.1', 'repair0')
-         self.vm.shutdown()
-         self.assertTrue(iotests.compare_images(quorum_img2, quorum_repai=
-r_img),
-                         'target image does not match source after mirror=
-ing')
-@@ -1074,9 +1073,7 @@ class TestRepairQuorum(iotests.QMPTestCase):
+-/* external snapshots */
+-bool bdrv_recurse_is_first_non_filter(BlockDriverState *bs,
+-                                      BlockDriverState *candidate);
+-
+ /* check if a named node can be replaced when doing drive-mirror */
+ BlockDriverState *check_to_replace_node(BlockDriverState *parent_bs,
+                                         const char *node_name, Error **e=
+rrp);
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 0be7d12f04..70f26530c9 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -95,14 +95,6 @@ struct BlockDriver {
+      * must implement them and return -ENOTSUP.
+      */
+     bool is_filter;
+-    /* for snapshots block filter like Quorum can implement the
+-     * following recursive callback.
+-     * It's purpose is to recurse on the filter children while calling
+-     * bdrv_recurse_is_first_non_filter on them.
+-     * For a sample implementation look in the future Quorum block filte=
+r.
+-     */
+-    bool (*bdrv_recurse_is_first_non_filter)(BlockDriverState *bs,
+-                                             BlockDriverState *candidate=
+);
+     /*
+      * Return true if @to_replace can be replaced by a BDS with the
+      * same data as @bs without it affecting @bs's behavior (that is,
+diff --git a/block.c b/block.c
+index 02177bde9a..0d9b3de98f 100644
+--- a/block.c
++++ b/block.c
+@@ -6173,39 +6173,6 @@ int bdrv_amend_options(BlockDriverState *bs, QemuO=
+pts *opts,
+     return bs->drv->bdrv_amend_options(bs, opts, status_cb, cb_opaque, e=
+rrp);
+ }
 =20
-         self.complete_and_wait('job0')
-         self.assert_has_block_node("repair0", quorum_repair_img)
--        # TODO: a better test requiring some QEMU infrastructure will be=
- added
--        #       to check that this file is really driven by quorum
--        self.vm.shutdown()
-+        self.vm.assert_block_path('quorum0/children.1', 'repair0')
+-/* This function will be called by the bdrv_recurse_is_first_non_filter =
+method
+- * of block filter and by bdrv_is_first_non_filter.
+- * It is used to test if the given bs is the candidate or recurse more i=
+n the
+- * node graph.
+- */
+-bool bdrv_recurse_is_first_non_filter(BlockDriverState *bs,
+-                                      BlockDriverState *candidate)
+-{
+-    /* return false if basic checks fails */
+-    if (!bs || !bs->drv) {
+-        return false;
+-    }
+-
+-    /* the code reached a non block filter driver -> check if the bs is
+-     * the same as the candidate. It's the recursion termination conditi=
+on.
+-     */
+-    if (!bs->drv->is_filter) {
+-        return bs =3D=3D candidate;
+-    }
+-    /* Down this path the driver is a block filter driver */
+-
+-    /* If the block filter recursion method is defined use it to recurse=
+ down
+-     * the node graph.
+-     */
+-    if (bs->drv->bdrv_recurse_is_first_non_filter) {
+-        return bs->drv->bdrv_recurse_is_first_non_filter(bs, candidate);
+-    }
+-
+-    /* the driver is a block filter but don't allow to recurse -> return=
+ false
+-     */
+-    return false;
+-}
+-
+ /*
+  * This function checks whether the given @to_replace is allowed to be
+  * replaced by a node that always shows the same data as @bs.  This is
+diff --git a/block/blkverify.c b/block/blkverify.c
+index 0add3ab483..ba6b1853ae 100644
+--- a/block/blkverify.c
++++ b/block/blkverify.c
+@@ -268,20 +268,6 @@ static int blkverify_co_flush(BlockDriverState *bs)
+     return bdrv_co_flush(s->test_file->bs);
+ }
 =20
- # Test mirroring with a source that does not have any parents (not even =
-a
- # BlockBackend)
+-static bool blkverify_recurse_is_first_non_filter(BlockDriverState *bs,
+-                                                  BlockDriverState *cand=
+idate)
+-{
+-    BDRVBlkverifyState *s =3D bs->opaque;
+-
+-    bool perm =3D bdrv_recurse_is_first_non_filter(bs->file->bs, candida=
+te);
+-
+-    if (perm) {
+-        return true;
+-    }
+-
+-    return bdrv_recurse_is_first_non_filter(s->test_file->bs, candidate)=
+;
+-}
+-
+ static bool blkverify_recurse_can_replace(BlockDriverState *bs,
+                                           BlockDriverState *to_replace)
+ {
+@@ -341,7 +327,6 @@ static BlockDriver bdrv_blkverify =3D {
+     .bdrv_co_flush                    =3D blkverify_co_flush,
+=20
+     .is_filter                        =3D true,
+-    .bdrv_recurse_is_first_non_filter =3D blkverify_recurse_is_first_non=
+_filter,
+     .bdrv_recurse_can_replace         =3D blkverify_recurse_can_replace,
+ };
+=20
+diff --git a/block/copy-on-read.c b/block/copy-on-read.c
+index 6631f30205..3204259513 100644
+--- a/block/copy-on-read.c
++++ b/block/copy-on-read.c
+@@ -125,13 +125,6 @@ static void cor_lock_medium(BlockDriverState *bs, bo=
+ol locked)
+ }
+=20
+=20
+-static bool cor_recurse_is_first_non_filter(BlockDriverState *bs,
+-                                            BlockDriverState *candidate)
+-{
+-    return bdrv_recurse_is_first_non_filter(bs->file->bs, candidate);
+-}
+-
+-
+ static BlockDriver bdrv_copy_on_read =3D {
+     .format_name                        =3D "copy-on-read",
+=20
+@@ -151,8 +144,6 @@ static BlockDriver bdrv_copy_on_read =3D {
+=20
+     .bdrv_co_block_status               =3D bdrv_co_block_status_from_fi=
+le,
+=20
+-    .bdrv_recurse_is_first_non_filter   =3D cor_recurse_is_first_non_fil=
+ter,
+-
+     .has_variable_length                =3D true,
+     .is_filter                          =3D true,
+ };
+diff --git a/block/quorum.c b/block/quorum.c
+index 81b57dbae2..7a8f8b5475 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -808,23 +808,6 @@ static coroutine_fn int quorum_co_flush(BlockDriverS=
+tate *bs)
+     return result;
+ }
+=20
+-static bool quorum_recurse_is_first_non_filter(BlockDriverState *bs,
+-                                               BlockDriverState *candida=
+te)
+-{
+-    BDRVQuorumState *s =3D bs->opaque;
+-    int i;
+-
+-    for (i =3D 0; i < s->num_children; i++) {
+-        bool perm =3D bdrv_recurse_is_first_non_filter(s->children[i].ch=
+ild->bs,
+-                                                     candidate);
+-        if (perm) {
+-            return true;
+-        }
+-    }
+-
+-    return false;
+-}
+-
+ static bool quorum_recurse_can_replace(BlockDriverState *bs,
+                                        BlockDriverState *to_replace)
+ {
+@@ -1255,7 +1238,6 @@ static BlockDriver bdrv_quorum =3D {
+     .bdrv_child_perm                    =3D quorum_child_perm,
+=20
+     .is_filter                          =3D true,
+-    .bdrv_recurse_is_first_non_filter   =3D quorum_recurse_is_first_non_=
+filter,
+     .bdrv_recurse_can_replace           =3D quorum_recurse_can_replace,
+=20
+     .strong_runtime_opts                =3D quorum_strong_runtime_opts,
+diff --git a/block/replication.c b/block/replication.c
+index 99532ce521..d6681b6c84 100644
+--- a/block/replication.c
++++ b/block/replication.c
+@@ -306,12 +306,6 @@ out:
+     return ret;
+ }
+=20
+-static bool replication_recurse_is_first_non_filter(BlockDriverState *bs=
+,
+-                                                    BlockDriverState *ca=
+ndidate)
+-{
+-    return bdrv_recurse_is_first_non_filter(bs->file->bs, candidate);
+-}
+-
+ static void secondary_do_checkpoint(BDRVReplicationState *s, Error **err=
+p)
+ {
+     Error *local_err =3D NULL;
+@@ -699,7 +693,6 @@ static BlockDriver bdrv_replication =3D {
+     .bdrv_co_writev             =3D replication_co_writev,
+=20
+     .is_filter                  =3D true,
+-    .bdrv_recurse_is_first_non_filter =3D replication_recurse_is_first_n=
+on_filter,
+=20
+     .has_variable_length        =3D true,
+     .strong_runtime_opts        =3D replication_strong_runtime_opts,
+diff --git a/block/throttle.c b/block/throttle.c
+index 0349f42257..71f4bb0ad1 100644
+--- a/block/throttle.c
++++ b/block/throttle.c
+@@ -207,12 +207,6 @@ static void throttle_reopen_abort(BDRVReopenState *r=
+eopen_state)
+     reopen_state->opaque =3D NULL;
+ }
+=20
+-static bool throttle_recurse_is_first_non_filter(BlockDriverState *bs,
+-                                                 BlockDriverState *candi=
+date)
+-{
+-    return bdrv_recurse_is_first_non_filter(bs->file->bs, candidate);
+-}
+-
+ static void coroutine_fn throttle_co_drain_begin(BlockDriverState *bs)
+ {
+     ThrottleGroupMember *tgm =3D bs->opaque;
+@@ -252,8 +246,6 @@ static BlockDriver bdrv_throttle =3D {
+     .bdrv_co_pwrite_zeroes              =3D   throttle_co_pwrite_zeroes,
+     .bdrv_co_pdiscard                   =3D   throttle_co_pdiscard,
+=20
+-    .bdrv_recurse_is_first_non_filter   =3D   throttle_recurse_is_first_=
+non_filter,
+-
+     .bdrv_attach_aio_context            =3D   throttle_attach_aio_contex=
+t,
+     .bdrv_detach_aio_context            =3D   throttle_detach_aio_contex=
+t,
+=20
 --=20
 2.21.0
 
