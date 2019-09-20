@@ -6,49 +6,48 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7ECFC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 07:51:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A6D6C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 07:51:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EC1C2054F
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 07:51:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EC1C2054F
+	by mail.kernel.org (Postfix) with ESMTPS id 7323A2054F
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 07:51:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7323A2054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBDh9-00007c-7d
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 03:51:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60846)
+	id 1iBDhA-0000AE-Al
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 03:51:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60799)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iBDaJ-0001dn-68
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:44:09 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1iBDaF-0001dB-0h
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:44:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iBDaH-0005ZE-8W
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:44:07 -0400
-Received: from mga17.intel.com ([192.55.52.151]:9881)
+ (envelope-from <tao3.xu@intel.com>) id 1iBDaD-0005XC-K5
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:44:02 -0400
+Received: from mga17.intel.com ([192.55.52.151]:9877)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iBDaH-0005Yc-1c
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:44:05 -0400
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iBDaD-0005Wd-BH
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:44:01 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 20 Sep 2019 00:44:03 -0700
+ 20 Sep 2019 00:43:58 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,527,1559545200"; d="scan'208";a="212495070"
+X-IronPort-AV: E=Sophos;i="5.64,527,1559545200"; d="scan'208";a="212495037"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga004.fm.intel.com with ESMTP; 20 Sep 2019 00:44:01 -0700
+ by fmsmga004.fm.intel.com with ESMTP; 20 Sep 2019 00:43:56 -0700
 From: Tao Xu <tao3.xu@intel.com>
 To: imammedo@redhat.com,
 	eblake@redhat.com,
 	ehabkost@redhat.com
-Subject: [PATCH v12 05/11] numa: Extend CLI to provide initiator information
- for numa nodes
-Date: Fri, 20 Sep 2019 15:43:43 +0800
-Message-Id: <20190920074349.2616-6-tao3.xu@intel.com>
+Subject: [PATCH v12 02/11] tests/cutils: Add test for qemu_strtotime_ps()
+Date: Fri, 20 Sep 2019 15:43:40 +0800
+Message-Id: <20190920074349.2616-3-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190920074349.2616-1-tao3.xu@intel.com>
 References: <20190920074349.2616-1-tao3.xu@intel.com>
@@ -74,317 +73,235 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In ACPI 6.3 chapter 5.2.27 Heterogeneous Memory Attribute Table (HMAT),
-The initiator represents processor which access to memory. And in 5.2.27.3
-Memory Proximity Domain Attributes Structure, the attached initiator is
-defined as where the memory controller responsible for a memory proximity
-domain. With attached initiator information, the topology of heterogeneous
-memory can be described.
+Test the input of basic, time suffixes, float, invaild, trailing and
+overflow.
 
-Extend CLI of "-numa node" option to indicate the initiator numa node-id.
-In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and report
-the platform's HMAT tables.
-
-Reviewed-by: Jingqi Liu <jingqi.liu@intel.com>
-Suggested-by: Dan Williams <dan.j.williams@intel.com>
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
 
-Changes in v12:
-    - Fix the bug that a memory-only node without initiator setting
-      doesn't report error. (reported by Danmei Wei)
+No changes in v11 and v12.
 
-No changes in v11.
-
-Changes in v10:
-    - Add machine oprion properties "-machine hmat=on|off" for enabling
-      or disabling HMAT in QEMU.
-    - Add more description for initiator option.
-    - Report error then HMAT is enable and initiator option is missing.
-      Not allow invaild initiator now. (Igor)
+New patch in v10.
 ---
- hw/core/machine.c     | 71 +++++++++++++++++++++++++++++++++++++++++++
- hw/core/numa.c        | 24 +++++++++++++++
- include/sysemu/numa.h |  6 ++++
- qapi/machine.json     | 10 +++++-
- qemu-options.hx       | 35 ++++++++++++++++++---
- 5 files changed, 140 insertions(+), 6 deletions(-)
+ tests/test-cutils.c | 199 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 199 insertions(+)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 1689ad3bf8..087baaf571 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -518,6 +518,20 @@ static void machine_set_nvdimm(Object *obj, bool value, Error **errp)
-     ms->nvdimms_state->is_enabled = value;
+diff --git a/tests/test-cutils.c b/tests/test-cutils.c
+index 1aa8351520..19c967d3d5 100644
+--- a/tests/test-cutils.c
++++ b/tests/test-cutils.c
+@@ -2179,6 +2179,193 @@ static void test_qemu_strtosz_metric(void)
+     g_assert(endptr == str + 6);
  }
  
-+static bool machine_get_hmat(Object *obj, Error **errp)
++static void test_qemu_strtotime_ps_simple(void)
 +{
-+    MachineState *ms = MACHINE(obj);
++    const char *str;
++    const char *endptr;
++    int err;
++    uint64_t res = 0xbaadf00d;
 +
-+    return ms->numa_state->hmat_enabled;
++    str = "0";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 0);
++    g_assert(endptr == str + 1);
++
++    str = "56789";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 56789);
++    g_assert(endptr == str + 5);
++
++    err = qemu_strtotime_ps(str, NULL, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 56789);
++
++    /* Note: precision is 53 bits since we're parsing with strtod() */
++
++    str = "9007199254740991"; /* 2^53-1 */
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 0x1fffffffffffff);
++    g_assert(endptr == str + 16);
++
++    str = "9007199254740992"; /* 2^53 */
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 0x20000000000000);
++    g_assert(endptr == str + 16);
++
++    str = "9007199254740993"; /* 2^53+1 */
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 0x20000000000000); /* rounded to 53 bits */
++    g_assert(endptr == str + 16);
++
++    str = "18446744073709549568"; /* 0xfffffffffffff800 (53 msbs set) */
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 0xfffffffffffff800);
++    g_assert(endptr == str + 20);
++
++    str = "18446744073709550591"; /* 0xfffffffffffffbff */
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 0xfffffffffffff800); /* rounded to 53 bits */
++    g_assert(endptr == str + 20);
++
++    /* 0x7ffffffffffffe00..0x7fffffffffffffff get rounded to
++     * 0x8000000000000000, thus -ERANGE; see test_qemu_strtosz_erange() */
 +}
 +
-+static void machine_set_hmat(Object *obj, bool value, Error **errp)
++static void test_qemu_strtotime_ps_units(void)
 +{
-+    MachineState *ms = MACHINE(obj);
++    const char *ps = "1ps";
++    const char *ns = "1ns";
++    const char *us = "1us";
++    const char *ms = "1ms";
++    const char *s = "1s";
++    int err;
++    const char *endptr;
++    uint64_t res = 0xbaadf00d;
 +
-+    ms->numa_state->hmat_enabled = value;
++    err = qemu_strtotime_ps(ps, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 1);
++    g_assert(endptr == ps + 3);
++
++    err = qemu_strtotime_ps(ns, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 1000);
++    g_assert(endptr == ns + 3);
++
++    err = qemu_strtotime_ps(us, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 1000000);
++    g_assert(endptr == us + 3);
++
++    err = qemu_strtotime_ps(ms, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 1000000000LL);
++    g_assert(endptr == ms + 3);
++
++    err = qemu_strtotime_ps(s, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 1000000000000ULL);
++    g_assert(endptr == s + 2);
 +}
 +
- static char *machine_get_nvdimm_persistence(Object *obj, Error **errp)
- {
-     MachineState *ms = MACHINE(obj);
-@@ -645,6 +659,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
-                                const CpuInstanceProperties *props, Error **errp)
- {
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-+    NodeInfo *numa_info = machine->numa_state->nodes;
-     bool match = false;
-     int i;
- 
-@@ -714,6 +729,16 @@ void machine_set_cpu_numa_node(MachineState *machine,
-         match = true;
-         slot->props.node_id = props->node_id;
-         slot->props.has_node_id = props->has_node_id;
++static void test_qemu_strtotime_ps_float(void)
++{
++    const char *str = "56.789ns";
++    int err;
++    const char *endptr;
++    uint64_t res = 0xbaadf00d;
 +
-+        if (numa_info[props->node_id].initiator_valid &&
-+            (props->node_id != numa_info[props->node_id].initiator)) {
-+            error_setg(errp, "The initiator of CPU NUMA node %" PRId64
-+                       " should be itself.", props->node_id);
-+            return;
-+        }
-+        numa_info[props->node_id].initiator_valid = true;
-+        numa_info[props->node_id].has_cpu = true;
-+        numa_info[props->node_id].initiator = props->node_id;
-     }
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, 0);
++    g_assert_cmpint(res, ==, 56.789 * 1000);
++    g_assert(endptr == str + 8);
++}
++
++static void test_qemu_strtotime_ps_invalid(void)
++{
++    const char *str;
++    const char *endptr;
++    int err;
++    uint64_t res = 0xbaadf00d;
++
++    str = "";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
++
++    str = " \t ";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
++
++    str = "crap";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
++
++    str = "inf";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
++
++    str = "NaN";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -EINVAL);
++    g_assert(endptr == str);
++}
++
++static void test_qemu_strtotime_ps_trailing(void)
++{
++    const char *str;
++    int err;
++    uint64_t res = 0xbaadf00d;
++
++    str = "123xxx";
++
++    err = qemu_strtotime_ps(str, NULL, &res);
++    g_assert_cmpint(err, ==, -EINVAL);
++}
++
++static void test_qemu_strtotime_ps_erange(void)
++{
++    const char *str;
++    const char *endptr;
++    int err;
++    uint64_t res = 0xbaadf00d;
++
++    str = "-1";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -ERANGE);
++    g_assert(endptr == str + 2);
++
++    str = "18446744073709550592"; /* 0xfffffffffffffc00 */
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -ERANGE);
++    g_assert(endptr == str + 20);
++
++    str = "18446744073709551615"; /* 2^64-1 */
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -ERANGE);
++    g_assert(endptr == str + 20);
++
++    str = "18446744073709551616"; /* 2^64 */
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -ERANGE);
++    g_assert(endptr == str + 20);
++
++    str = "200000000000000s";
++    err = qemu_strtotime_ps(str, &endptr, &res);
++    g_assert_cmpint(err, ==, -ERANGE);
++    g_assert(endptr == str + 16);
++}
++
+ int main(int argc, char **argv)
+ {
+     g_test_init(&argc, &argv, NULL);
+@@ -2456,5 +2643,17 @@ int main(int argc, char **argv)
+     g_test_add_func("/cutils/strtosz/metric",
+                     test_qemu_strtosz_metric);
  
-     if (!match) {
-@@ -960,6 +985,13 @@ static void machine_initfn(Object *obj)
- 
-     if (mc->numa_mem_supported) {
-         ms->numa_state = g_new0(NumaState, 1);
-+        object_property_add_bool(obj, "hmat",
-+                                 machine_get_hmat, machine_set_hmat,
-+                                 &error_abort);
-+        object_property_set_description(obj, "hmat",
-+                                        "Set on/off to enable/disable "
-+                                        "ACPI Heterogeneous Memory Attribute "
-+                                        "Table (HMAT)", NULL);
-     }
- 
-     /* Register notifier when init is done for sysbus sanity checks */
-@@ -1048,6 +1080,40 @@ static char *cpu_slot_to_string(const CPUArchId *cpu)
-     return g_string_free(s, false);
++    g_test_add_func("/cutils/strtotime/simple",
++                    test_qemu_strtotime_ps_simple);
++    g_test_add_func("/cutils/strtotime/units",
++                    test_qemu_strtotime_ps_units);
++    g_test_add_func("/cutils/strtotime/float",
++                    test_qemu_strtotime_ps_float);
++    g_test_add_func("/cutils/strtotime/invalid",
++                    test_qemu_strtotime_ps_invalid);
++    g_test_add_func("/cutils/strtotime/trailing",
++                    test_qemu_strtotime_ps_trailing);
++    g_test_add_func("/cutils/strtotime/erange",
++                    test_qemu_strtotime_ps_erange);
+     return g_test_run();
  }
- 
-+static void numa_validate_initiator(NumaState *nstat)
-+{
-+    int i;
-+    NodeInfo *numa_info = nstat->nodes;
-+
-+    for (i = 0; i < nstat->num_nodes; i++) {
-+        if (numa_info[i].initiator == MAX_NODES) {
-+            error_report("The initiator of NUMA node %d is missing, use "
-+                         "'-numa node,initiator' option to declare it.", i);
-+            goto err;
-+        }
-+
-+        if (!numa_info[numa_info[i].initiator].present) {
-+            error_report("NUMA node %" PRIu16 " is missing, use "
-+                         "'-numa node' option to declare it first.",
-+                         numa_info[i].initiator);
-+            goto err;
-+        }
-+
-+        if (numa_info[numa_info[i].initiator].has_cpu) {
-+            numa_info[i].initiator_valid = true;
-+        } else {
-+            error_report("The initiator of NUMA node %d is invalid.", i);
-+            goto err;
-+        }
-+    }
-+
-+    return;
-+
-+err:
-+    error_printf("\n");
-+    exit(1);
-+}
-+
- static void machine_numa_finish_cpu_init(MachineState *machine)
- {
-     int i;
-@@ -1088,6 +1154,11 @@ static void machine_numa_finish_cpu_init(MachineState *machine)
-             machine_set_cpu_numa_node(machine, &props, &error_fatal);
-         }
-     }
-+
-+    if (machine->numa_state->hmat_enabled) {
-+        numa_validate_initiator(machine->numa_state);
-+    }
-+
-     if (s->len && !qtest_enabled()) {
-         warn_report("CPU(s) not present in any NUMA nodes: %s",
-                     s->str);
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index 4dfec5c95b..eff5491f6f 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -133,6 +133,30 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-         numa_info[nodenr].node_mem = object_property_get_uint(o, "size", NULL);
-         numa_info[nodenr].node_memdev = MEMORY_BACKEND(o);
-     }
-+
-+    if (node->has_initiator) {
-+        if (!ms->numa_state->hmat_enabled) {
-+            error_setg(errp, "ACPI Heterogeneous Memory Attribute Table "
-+                       "(HMAT) is disabled, use -machine hmat=on before "
-+                       "set initiator of NUMA");
-+            return;
-+        }
-+
-+        if (node->initiator >= MAX_NODES) {
-+            error_report("The initiator id %" PRIu16 " expects an integer "
-+                         "between 0 and %d", node->initiator,
-+                         MAX_NODES - 1);
-+            return;
-+        }
-+
-+        numa_info[nodenr].initiator = node->initiator;
-+    } else if (ms->numa_state->hmat_enabled) {
-+        /*
-+         * If not set the initiator, set it to MAX_NODES. And if
-+         * HMAT is enabled and this node has no cpus, QEMU will raise error.
-+         */
-+        numa_info[nodenr].initiator = MAX_NODES;
-+    }
-     numa_info[nodenr].present = true;
-     max_numa_nodeid = MAX(max_numa_nodeid, nodenr + 1);
-     ms->numa_state->num_nodes++;
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index ae9c41d02b..a788c3b126 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -18,6 +18,9 @@ struct NodeInfo {
-     uint64_t node_mem;
-     struct HostMemoryBackend *node_memdev;
-     bool present;
-+    bool has_cpu;
-+    bool initiator_valid;
-+    uint16_t initiator;
-     uint8_t distance[MAX_NODES];
- };
- 
-@@ -33,6 +36,9 @@ struct NumaState {
-     /* Allow setting NUMA distance for different NUMA nodes */
-     bool have_numa_distance;
- 
-+    /* Detect if HMAT support is enabled. */
-+    bool hmat_enabled;
-+
-     /* NUMA nodes information */
-     NodeInfo nodes[MAX_NODES];
- };
-diff --git a/qapi/machine.json b/qapi/machine.json
-index ca26779f1a..3c2914cd1c 100644
---- a/qapi/machine.json
-+++ b/qapi/machine.json
-@@ -463,6 +463,13 @@
- # @memdev: memory backend object.  If specified for one node,
- #          it must be specified for all nodes.
- #
-+# @initiator: defined in ACPI 6.3 Chapter 5.2.27.3 Table 5-145,
-+#             indicate the nodeid which has the memory controller
-+#             responsible for this NUMA node. This field provides
-+#             additional information as to the initiator node that
-+#             is closest (as in directly attached) to this node, and
-+#             therefore has the best performance (since 4.2)
-+#
- # Since: 2.1
- ##
- { 'struct': 'NumaNodeOptions',
-@@ -470,7 +477,8 @@
-    '*nodeid': 'uint16',
-    '*cpus':   ['uint16'],
-    '*mem':    'size',
--   '*memdev': 'str' }}
-+   '*memdev': 'str',
-+   '*initiator': 'uint16' }}
- 
- ##
- # @NumaDistOptions:
-diff --git a/qemu-options.hx b/qemu-options.hx
-index bbfd936d29..74ccc4d782 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -43,7 +43,8 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
-     "                suppress-vmdesc=on|off disables self-describing migration (default=off)\n"
-     "                nvdimm=on|off controls NVDIMM support (default=off)\n"
-     "                enforce-config-section=on|off enforce configuration section migration (default=off)\n"
--    "                memory-encryption=@var{} memory encryption object to use (default=none)\n",
-+    "                memory-encryption=@var{} memory encryption object to use (default=none)\n"
-+    "                hmat=on|off controls ACPI HMAT support (default=off)\n",
-     QEMU_ARCH_ALL)
- STEXI
- @item -machine [type=]@var{name}[,prop=@var{value}[,...]]
-@@ -103,6 +104,9 @@ NOTE: this parameter is deprecated. Please use @option{-global}
- @option{migration.send-configuration}=@var{on|off} instead.
- @item memory-encryption=@var{}
- Memory encryption object to use. The default is none.
-+@item hmat=on|off
-+Enables or disables ACPI Heterogeneous Memory Attribute Table (HMAT) support.
-+The default is off.
- @end table
- ETEXI
- 
-@@ -161,14 +165,14 @@ If any on the three values is given, the total number of CPUs @var{n} can be omi
- ETEXI
- 
- DEF("numa", HAS_ARG, QEMU_OPTION_numa,
--    "-numa node[,mem=size][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
--    "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
-+    "-numa node[,mem=size][,cpus=firstcpu[-lastcpu]][,nodeid=node][,initiator=node]\n"
-+    "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node][,initiator=node]\n"
-     "-numa dist,src=source,dst=destination,val=distance\n"
-     "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n",
-     QEMU_ARCH_ALL)
- STEXI
--@item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
--@itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
-+@item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
-+@itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
- @itemx -numa dist,src=@var{source},dst=@var{destination},val=@var{distance}
- @itemx -numa cpu,node-id=@var{node}[,socket-id=@var{x}][,core-id=@var{y}][,thread-id=@var{z}]
- @findex -numa
-@@ -215,6 +219,27 @@ split equally between them.
- @samp{mem} and @samp{memdev} are mutually exclusive. Furthermore,
- if one node uses @samp{memdev}, all of them have to use it.
- 
-+@samp{initiator} is an additional option indicate the @var{initiator}
-+NUMA that has best performance (the lowest latency or largest bandwidth)
-+to this NUMA @var{node}. Note that this option can be set only when
-+the machine oprion properties "-machine hmat=on".
-+
-+Following example creates a machine with 2 NUMA nodes, node 0 has CPU.
-+node 1 has only memory, and its' initiator is node 0. Note that because
-+node 0 has CPU, by default the initiator of node 0 is itself and must be
-+itself.
-+@example
-+-machine hmat=on \
-+-m 2G,slots=2,maxmem=4G \
-+-object memory-backend-ram,size=1G,id=m0 \
-+-object memory-backend-ram,size=1G,id=m1 \
-+-numa node,nodeid=0,memdev=m0 \
-+-numa node,nodeid=1,memdev=m1,initiator=0 \
-+-smp 2,sockets=2,maxcpus=2  \
-+-numa cpu,node-id=0,socket-id=0 \
-+-numa cpu,node-id=0,socket-id=1
-+@end example
-+
- @var{source} and @var{destination} are NUMA node IDs.
- @var{distance} is the NUMA distance from @var{source} to @var{destination}.
- The distance from a node to itself is always 10. If any pair of nodes is
 -- 
 2.20.1
 
