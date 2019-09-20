@@ -2,59 +2,61 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFF61C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 20:34:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 886A0C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 20:50:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE130208C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 20:34:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE130208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 5DDD32086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 20:50:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DDD32086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBPc5-0002nv-T5
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 16:34:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44420)
+	id 1iBPrX-0006Nd-Dw
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 16:50:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46303)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iBPb6-00025q-Jl
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 16:33:45 -0400
+ (envelope-from <crosa@redhat.com>) id 1iBPqC-0005t3-W6
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 16:49:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iBPb4-0003wP-Pz
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 16:33:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49354)
+ (envelope-from <crosa@redhat.com>) id 1iBPqB-0008Nu-GH
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 16:49:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47716)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iBPb4-0003wF-Ki
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 16:33:42 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iBPqB-0008Ne-B0
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 16:49:19 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 93BB110DCC87;
- Fri, 20 Sep 2019 20:33:41 +0000 (UTC)
-Received: from localhost (ovpn-116-45.gru2.redhat.com [10.97.116.45])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 77C0F5D9CD;
- Fri, 20 Sep 2019 20:33:36 +0000 (UTC)
-Date: Fri, 20 Sep 2019 17:33:35 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Cleber Rosa <crosa@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 6BBF35AFE9;
+ Fri, 20 Sep 2019 20:49:18 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-123-8.rdu2.redhat.com [10.10.123.8])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A35E71001947;
+ Fri, 20 Sep 2019 20:49:12 +0000 (UTC)
+Date: Fri, 20 Sep 2019 16:49:10 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
 Subject: Re: [PATCH] Acceptance tests: use avocado.utils.ssh for SSH
  interaction
-Message-ID: <20190920203335.GP5035@habkost.net>
+Message-ID: <20190920204910.GA9182@localhost.localdomain>
 References: <20190919225905.10829-1-crosa@redhat.com>
+ <20190920203335.GP5035@habkost.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190919225905.10829-1-crosa@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Fri, 20 Sep 2019 20:33:41 +0000 (UTC)
+In-Reply-To: <20190920203335.GP5035@habkost.net>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Fri, 20 Sep 2019 20:49:18 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -77,14 +79,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 19, 2019 at 06:59:05PM -0400, Cleber Rosa wrote:
-> This replaces paramiko with avocado.utils.ssh module, which is based
-> on a (open)ssh binary, supposedly more ubiquitous.
+On Fri, Sep 20, 2019 at 05:33:35PM -0300, Eduardo Habkost wrote:
+> On Thu, Sep 19, 2019 at 06:59:05PM -0400, Cleber Rosa wrote:
+> > This replaces paramiko with avocado.utils.ssh module, which is based
+> > on a (open)ssh binary, supposedly more ubiquitous.
+> > 
+> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
 > 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> 
+> -- 
+> Eduardo
+> 
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+With this being reviewed, we can carry out the substitution of
+https://lore.kernel.org/qemu-devel/20190830184033.7630-1-philmd@redhat.com/
+for this one IMO.
 
--- 
-Eduardo
+And, as you've suggested, I'll be picking up your pending patches
+(but that one) and queueing them on my python-next branch.
+
+Thanks a lot!
+
+- Cleber.
 
