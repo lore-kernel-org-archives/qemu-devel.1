@@ -2,68 +2,73 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BA55C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 02:09:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A844BC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 02:35:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3806214AF
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 02:09:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3806214AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7D393217D6
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 02:35:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D393217D6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB8Mi-0007lv-5f
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 22:09:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52474)
+	id 1iB8lg-0000FP-MH
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 22:35:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54086)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1iB8LG-0006eZ-OB
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 22:08:16 -0400
+ (envelope-from <bounces@canonical.com>) id 1iB8k9-0006uq-8F
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 22:33:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1iB8LF-00079k-3J
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 22:08:14 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2239 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1iB8LB-00071W-74; Thu, 19 Sep 2019 22:08:09 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id E64648F65FBBB5223B92;
- Fri, 20 Sep 2019 10:07:55 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Fri, 20 Sep 2019
- 10:07:49 +0800
-Subject: Re: [PATCH v18 0/6] Add ARMv8 RAS virtualization support in QEMU
-To: Xiang Zheng <zhengxiang9@huawei.com>, <pbonzini@redhat.com>,
- <mst@redhat.com>, <imammedo@redhat.com>, <shannon.zhaosl@gmail.com>,
- <peter.maydell@linaro.org>, <lersek@redhat.com>, <james.morse@arm.com>,
- <mtosatti@redhat.com>, <rth@twiddle.net>, <ehabkost@redhat.com>,
- <jonathan.cameron@huawei.com>, <xuwei5@huawei.com>, <kvm@vger.kernel.org>,
- <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
-References: <20190906083152.25716-1-zhengxiang9@huawei.com>
- <997a7f78-9ade-a107-8f83-de5dde85e483@huawei.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <d6827588-32a5-6bef-64b7-edeaddbd74d8@huawei.com>
-Date: Fri, 20 Sep 2019 10:07:40 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+ (envelope-from <bounces@canonical.com>) id 1iB8XG-0008Lx-Ri
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 22:20:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41298)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iB8XG-0008LW-Mj
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 22:20:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iB8XE-00089k-UD
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 02:20:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id E2E462E80C7
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 02:20:36 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <997a7f78-9ade-a107-8f83-de5dde85e483@huawei.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 20 Sep 2019 02:14:41 -0000
+From: James Harvey <jamespharvey20@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h jamespharvey20
+X-Launchpad-Bug-Reporter: James Harvey (jamespharvey20)
+X-Launchpad-Bug-Modifier: James Harvey (jamespharvey20)
+References: <156790812963.29382.11232177290822294099.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156894568135.5105.8706702617896971035.malone@chaenomeles.canonical.com>
+Subject: [Bug 1843151] Re: Regression: QEMU 4.1.0 qxl and KMS resoluiton only
+ 4x10
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19048";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 9e0549303d8ecf7c0b943f0b52d0302a571584f8
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.191
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -72,163 +77,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wanghaibin.wang@huawei.com
+Reply-To: Bug 1843151 <1843151@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks xiang's continue upstream and test.
-Hope maintainer can review it.
+Yes, I first replicated the issue by removing "max_outputs=3D1", then
+patched spice server, and the issue no longer happens.
 
+QEMU 4.1.0 still changed something.  If I understand correctly, it's now
+in some circumstances saying there are 0 monitors, even though there's a
+graphic card?
 
-On 2019/9/17 20:39, Xiang Zheng wrote:
-> Hi all,
-> 
-> This patch series has been tested for both TCG and KVM scenes.
-> 
-> 1) Test for TCG:
->    - Re-compile qemu after applying the patch refered to https://patchwork.kernel.org/cover/10942757/#22640271).
->    - Use command line shown below to start qemu:
->         ./qemu-system-aarch64 \
->                 -name guest=ras \
->                 -machine virt,gic-version=3,ras=on \
->                 -cpu cortex-a57 \
->                 -bios /usr/share/edk2/aarch64/QEMU_EFI.fd \
->                 -nodefaults \
->                 -kernel ${GUEST_KERNEL} \
->                 -initrd ${GUEST_FS} \
->                 -append "rdinit=init console=ttyAMA0 earlycon=pl011,0x9000000" \
->                 -m 8192 \
->                 -smp 4 \
->                 -serial stdio \
-> 
->    - Send a signal to one of the VCPU threads:
->         kill -s SIGBUS 71571
-> 
->    - The result of test is shown below:
-> 
->     [   41.194753] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 0
->     [   41.197329] {1}[Hardware Error]: event severity: recoverable
->     [   41.199078] {1}[Hardware Error]:  Error 0, type: recoverable
->     [   41.200829] {1}[Hardware Error]:   section_type: memory error
->     [   41.202603] {1}[Hardware Error]:   physical_address: 0x00000000400a1000
->     [   41.204649] {1}[Hardware Error]:   error_type: 0, unknown
->     [   41.206328] EDAC MC0: 1 UE Unknown on unknown label ( page:0x400a1 offset:0x0 grain:0)
->     [   41.208788] Internal error: synchronous external abort: 96000410 [#1] SMP
->     [   41.210879] Modules linked in:
->     [   41.211823] CPU: 2 PID: 0 Comm: swapper/2 Not tainted 4.19.0+ #8
->     [   41.213698] Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/2015
->     [   41.215812] pstate: 60c00085 (nZCv daIf +PAN +UAO)
->     [   41.217296] pc : cpu_do_idle+0x8/0xc
->     [   41.218400] lr : arch_cpu_idle+0x2c/0x1b8
->     [   41.219629] sp : ffff000009f9bf00
->     [   41.220649] x29: ffff000009f9bf00 x28: 0000000000000000
->     [   41.222310] x27: 0000000000000000 x26: ffff8001fe471d80
->     [   41.223945] x25: 0000000000000000 x24: ffff00000937ba38
->     [   41.225581] x23: ffff0000090b3338 x22: ffff000009379000
->     [   41.227220] x21: ffff00000937b000 x20: 0000000000000004
->     [   41.228871] x19: ffff0000090a6000 x18: 0000000000000000
->     [   41.230517] x17: 0000000000000000 x16: 0000000000000000
->     [   41.232165] x15: 0000000000000000 x14: 0000000000000000
->     [   41.233810] x13: ffff0000089f4da8 x12: 000000000000000e
->     [   41.235448] x11: ffff0000089f4d80 x10: 0000000000000af0
->     [   41.237101] x9 : ffff000009f9be80 x8 : ffff8001fe4728d0
->     [   41.238738] x7 : 0000000000000004 x6 : ffff8001fffbaf30
->     [   41.240380] x5 : ffff00000c43b940 x4 : 00008001f6f0c000
->     [   41.242030] x3 : 0000000000000001 x2 : ffff000009f9bf00
->     [   41.243666] x1 : ffff8001fffb82c8 x0 : ffff0000090a6018
->     [   41.245306] Process swapper/2 (pid: 0, stack limit = 0x(____ptrval____))
->     [   41.247378] Call trace:
->     [   41.248117]  cpu_do_idle+0x8/0xc
->     [   41.249111]  do_idle+0x1dc/0x2a8
->     [   41.250111]  cpu_startup_entry+0x28/0x30
->     [   41.251319]  secondary_start_kernel+0x180/0x1c8
->     [   41.252725] Code: a8c17bfd d65f03c0 d5033f9f d503207f (d65f03c0)
->     [   41.254606] ---[ end trace 221bc8a614fb5a1d ]---
->     [   41.256030] Kernel panic - not syncing: Fatal exception
->     [   41.257644] SMP: stopping secondary CPUs
->     [   41.258912] Kernel Offset: disabled
->     [   41.260011] CPU features: 0x0,22a00238
->     [   41.261178] Memory Limit: none
->     [   41.262122] ---[ end Kernel panic - not syncing: Fatal exception ]---
-> 
-> 2) Test for KVM:
->    - Use command line shown below to start qemu:
->         ./qemu-system-aarch64 \
->             -name guest=ras \
->             -machine virt,accel=kvm,gic-version=3,ras=on \
->             -cpu host \
->             -bios /usr/share/edk2/aarch64/QEMU_EFI.fd \
->             -nodefaults \
->             -kernel ${GUEST_KERNEL} \
->             -initrd ${GUEST_FS} \
->             -append "rdinit=init console=ttyAMA0 earlycon=pl011,0x9000000" \
->             -m 8192 \
->             -smp 4 \
->             -serial stdio \
-> 
->    - Run mca-recover and get the GPA(IPA) of allocated page which would be corrupted on the later.
->    - Convert the GPA to HPA and corrupt this HPA via APEI/EINJ.
->    - Go back to guest and continue to read this page.
-> 
->    - The result of test is shown below:
-> 
->     root@genericarmv8:~/tools# ./mca-recover
->     pagesize: 0x1000
->     before clear cache
->     flags for page 0x2317b2: uptodate active mmap anon swapbacked
->     vtop(0xffff9c9e8000) = 0x2317b2000
->     Hit any key to access: before read
-> 
->     after read
->     Access at Tue Sep 17 01:41:14 2019
-> 
->     flags for page 0x2317b2: uptodate active mmap anon swapbacked
->     [  403.298539] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 0
->     [  403.301421] {1}[Hardware Error]: event severity: recoverable
->     [  403.303217] {1}[Hardware Error]:  Error 0, type: recoverable
->     [  403.304920] {1}[Hardware Error]:   section_type: memory error
->     [  403.306645] {1}[Hardware Error]:   physical_address: 0x00000002317b2000
->     [  403.308947] {1}[Hardware Error]:   error_type: 0, unknown
->     [  403.310630] WARNING: CPU: 0 PID: 510 at drivers/edac/ghes_edac.c:202 ghes_edac_report_mem_error+0x648/0xb20
->     [  403.310630] Modules linked in:
->     [  403.310631] CPU: 0 PID: 510 Comm: mca-recover Not tainted 4.19.0+ #8
->     [  403.310632] Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/2015
->     [  403.310632] pstate: 60000005 (nZCv daif -PAN -UAO)
->     [  403.310632] pc : ghes_edac_report_mem_error+0x648/0xb20
->     [  403.310633] lr : ghes_proc+0x3d8/0x950
->     [  403.310633] sp : ffff00000c543b20
->     [  403.310633] x29: ffff00000c543b50 x28: ffff8001f5918014
->     [  403.310634] x27: 0000000000000000 x26: b1837ced833e63b8
->     [  403.310635] x25: 430fbbc1d995e954 x24: 0000000000000002
->     [  403.310636] x23: 0000000000000002 x22: ffff0000096ec000
->     [  403.310637] x21: ffff000009379000 x20: ffff8001f591805c
->     [  403.310638] x19: ffff8001f591e71c x18: ffffffffffffffff
->     [  403.310638] x17: 0000000000000000 x16: 0000000000000000
->     [  403.310639] x15: ffff000009379708 x14: 0000000000000000
->     [  403.310640] x13: 0000000000000002 x12: 317b200000000000
->     [  403.310641] x11: 0000000000000000 x10: 0000400200000000
->     [  403.310642] x9 : 0000000000000000 x8 : 00000002540be3ff
->     [  403.310642] x7 : 0000000000000000 x6 : ffff0000096dce30
->     [  403.310643] x5 : 4ede6f64a5bc1114 x4 : 0000000000000000
->     [  403.310644] x3 : ffff0000096ec4f0 x2 : ffff8001f591805c
->     [  403.310645] x1 : 0000000000000000 x0 : 0000000000110000
->     [  403.310646] Call trace:
->     [  403.310646]  ghes_edac_report_mem_error+0x648/0xb20
->     [  403.310646]  ghes_proc+0x3d8/0x950
->     [  403.310647]  ghes_notify_sea+0x3c/0x68
->     [  403.310647]  do_sea+0x9c/0x188
->     [  403.310647]  do_mem_abort+0x74/0x140
->     [  403.310648]  el0_da+0x24/0x28
->     [  403.310648] ---[ end trace 651f1abaa6b1de2d ]---
->     Recover: sig=7 si=0xffffc9bc5640 v=0xffffc9bc56c0[  403.364295] Memory failure: 0x2317b2: recovery action for dirty LRU page: Recovered
->     [  403.364295] Memory failure: 0x2317b2: recovery action for dirty LRU page: Recovered
-> 
->     Platform memory error at 0x(nil)
->     Addr = (nil) lsb=0
->     Recovery allocated new page at physical 0x232563000
->     Got 2a2a2a2a
-> 
-> 
+Fixing this in spice to effectively ignore being told 0, and go with 1
+instead, gets around the bug, but still makes me think there's something
+wrong in QEMU 4.1.0.  Granted, perhaps with this spice fix, it might not
+cause any negative effects anymore.
 
+But, I don't know if there are any third party applications especially
+on Windows that don't use upstream spice-server and might be thrown off
+by this in a similar way.  So, I wonder if QEMU 4.1.0 should still have
+something fixed.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1843151
+
+Title:
+  Regression: QEMU 4.1.0 qxl and KMS resoluiton only 4x10
+
+Status in QEMU:
+  New
+
+Bug description:
+  Host is Arch Linux.  linux 5.2.13, qemu 4.1.0.  virt-viewer 8.0.
+
+  Guest is Arch Linux Sept 2019 ISO.  linux 5.2.11.
+
+  Have replicated this both on a system using amdgpu and one using
+  integrated ASPEED graphics.
+
+  Downgrading from 4.1.0 to 4.0.0 works as usual, see:
+  https://www.youtube.com/watch?v=3DNyMdcYwOCvY
+
+  Going back to 4.1.0 reproduces, see:
+  https://www.youtube.com/watch?v=3DH3nGG2Mk6i0
+
+  4.1.0 displays fine until KMS kicks in.
+
+  Using 4.1.0 with virtio-vga doesn't cause this.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1843151/+subscriptions
 
