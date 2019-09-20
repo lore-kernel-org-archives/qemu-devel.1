@@ -2,65 +2,78 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08C7EC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 00:57:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 272BCC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 01:20:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3B1C206C2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 00:57:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3B1C206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id F16F1214AF
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 01:20:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F16F1214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB7Ef-0006gY-QF
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 20:57:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48046)
+	id 1iB7au-0006Ho-OL
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 21:20:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49621)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iB7DK-0005he-J9
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 20:55:59 -0400
+ (envelope-from <jasowang@redhat.com>) id 1iB7Zl-000594-DO
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 21:19:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iB7DI-00046h-Cm
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 20:55:57 -0400
-Received: from mga17.intel.com ([192.55.52.151]:22655)
+ (envelope-from <jasowang@redhat.com>) id 1iB7Zj-0005G4-SF
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 21:19:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46654)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iB7DI-00045S-56
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 20:55:56 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 19 Sep 2019 17:55:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,526,1559545200"; d="scan'208";a="199580480"
-Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.107])
- ([10.239.196.107])
- by orsmga002.jf.intel.com with ESMTP; 19 Sep 2019 17:55:49 -0700
-Subject: Re: [Qemu-devel] [PATCH] target/i386: Correct extra enter and spaces
- in comment
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20190919020629.26530-1-tao3.xu@intel.com>
- <03994df5-69b7-8663-fc19-0f551a9b29d6@redhat.com>
-From: Tao Xu <tao3.xu@intel.com>
-Message-ID: <327cd301-f98c-c097-47aa-b85a70c4490d@intel.com>
-Date: Fri, 20 Sep 2019 08:55:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1iB7Zj-0005Fs-KT
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 21:19:07 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C0BC0C024AEC;
+ Fri, 20 Sep 2019 01:19:06 +0000 (UTC)
+Received: from [10.72.12.88] (ovpn-12-88.pek2.redhat.com [10.72.12.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BFCB95D9CD;
+ Fri, 20 Sep 2019 01:18:59 +0000 (UTC)
+Subject: Re: [Qemu-devel] vhost, iova, and dirty page tracking
+To: "Tian, Kevin" <kevin.tian@intel.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>
+References: <AADFC41AFE54684AB9EE6CBC0274A5D19D577BEA@SHSMSX104.ccr.corp.intel.com>
+ <60110ea3-9228-7e5d-ea32-05c72a95af0b@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57A080@SHSMSX104.ccr.corp.intel.com>
+ <8302a4ae-1914-3046-b3b5-b3234d7dda02@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57B1D1@SHSMSX104.ccr.corp.intel.com>
+ <6d73572e-1e89-b04a-bdd6-98ac73798083@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57B90C@SHSMSX104.ccr.corp.intel.com>
+ <204219fa-ee72-ca60-52a4-fb4bbc887773@redhat.com>
+ <20190919052819.GA18391@joy-OptiPlex-7040>
+ <7b6d6343-33de-ebd7-9846-af54a45a82a2@redhat.com>
+ <20190919061756.GB18391@joy-OptiPlex-7040>
+ <e0efbdc0-aad9-0d17-ec68-36460865501f@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57DD2A@SHSMSX104.ccr.corp.intel.com>
+ <1ec55b2e-6a59-f1df-0604-5b524da0f001@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D587E3C@SHSMSX104.ccr.corp.intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <51578ae6-cc36-3b1a-9184-70a847e58712@redhat.com>
+Date: Fri, 20 Sep 2019 09:18:57 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <03994df5-69b7-8663-fc19-0f551a9b29d6@redhat.com>
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D587E3C@SHSMSX104.ccr.corp.intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.151
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Fri, 20 Sep 2019 01:19:06 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,78 +85,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: 'Alex Williamson' <alex.williamson@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mst@redhat.com" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/19/2019 5:41 PM, Philippe Mathieu-Daudé wrote:
-> Hi Tao,
-> 
-> On 9/19/19 4:06 AM, Tao Xu wrote:
->> There is an extra line in comment of CPUID_8000_0008_EBX_WBNOINVD,
->> remove the extra enter and spaces.
+
+On 2019/9/20 =E4=B8=8A=E5=8D=886:54, Tian, Kevin wrote:
+>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+>> Sent: Thursday, September 19, 2019 7:14 PM
 >>
->> Signed-off-by: Tao Xu <tao3.xu@intel.com>
->> ---
->>   target/i386/cpu.h | 3 +--
->>   1 file changed, 1 insertion(+), 2 deletions(-)
+>> On 19/09/19 09:16, Tian, Kevin wrote:
+>>>>> why GPA1 and GPA2 should be both dirty?
+>>>>> even they have the same HVA due to overlaping virtual address space
+>> in
+>>>>> two processes, they still correspond to two physical pages.
+>>>>> don't get what's your meaning :)
+>>>> The point is not leave any corner case that is hard to debug or fix =
+in
+>>>> the future.
+>>>>
+>>>> Let's just start by a single process, the API allows userspace to ma=
+ps
+>>>> HVA to both GPA1 and GPA2. Since it knows GPA1 and GPA2 are
+>> equivalent,
+>>>> it's ok to sync just through GPA1. That means if you only log GPA2, =
+it
+>>>> won't work.
+>>> I noted KVM itself doesn't consider such situation (one HVA is mapped
+>>> to multiple GPAs), when doing its dirty page tracking. If you look at
+>>> kvm_vcpu_mark_page_dirty, it simply finds the unique memslot which
+>>> contains the dirty gfn and then set the dirty bit within that slot. I=
+t
+>>> doesn't attempt to walk all memslots to find out any other GPA which
+>>> may be mapped to the same HVA.
+>>>
+>>> So there must be some disconnect here. let's hear from Paolo first an=
+d
+>>> understand the rationale behind such situation.
+>> In general, userspace cannot assume that it's okay to sync just throug=
+h
+>> GPA1.  It must sync the host page if *either* GPA1 or GPA2 are marked
+>> dirty.
+> Agree. In this case the kernel only needs to track whether GPA1 or
+> GPA2 is dirtied by guest operations.
+
+
+Not necessarily guest operations.
+
+
+>   The reason why vhost has to
+> set both GPA1 and GPA2 is due to its own design - it maintains
+> IOVA->HVA and GPA->HVA mappings thus given a IOVA you have
+> to reverse lookup GPA->HVA memTable which gives multiple possible
+> GPAs.
+
+
+So if userspace need to track both GPA1 and GPA2, vhost can just stop=20
+when it found a one HVA->GPA mapping there.
+
+
+>   But in concept if vhost can maintain a IOVA->GPA mapping,
+> then it is straightforward to set the right GPA every time when a IOVA
+> is tracked.
+
+
+That means, the translation is done twice by software, IOVA->GPA and=20
+GPA->HVA for each packet.
+
+Thanks
+
+
+>
+>> The situation really only arises in special cases.  For example,
+>> 0xfffe0000..0xffffffff and 0xe0000..0xfffff might be the same memory.
+>>  From "info mtree" before the guest boots:
 >>
->> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
->> index 5f6e3a029a..71b6193390 100644
->> --- a/target/i386/cpu.h
->> +++ b/target/i386/cpu.h
->> @@ -695,8 +695,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->>   
->>   #define CPUID_7_1_EAX_AVX512_BF16 (1U << 5) /* AVX512 BFloat16 Instruction */
->>   
->> -#define CPUID_8000_0008_EBX_WBNOINVD  (1U << 9)  /* Write back and
->> -                                                                             do not invalidate cache */
->> +#define CPUID_8000_0008_EBX_WBNOINVD (1U << 9) /* Write back and do not invalidate cache */
-> 
-> The QEMU CODING_STYLE [*] recommend a 80 chars per line limit:
-> 
-> Line width
-> ==========
-> 
-> Lines should be 80 characters; try not to make them longer.
-> 
-> Sometimes it is hard to do, especially when dealing with QEMU subsystems
-> that use long function or symbol names.  Even in that case, do not make
-> lines much longer than 80 characters.
-> 
-> Rationale:
-> 
-> * Some people like to tile their 24" screens with a 6x4 matrix of 80x24
->    xterms and use vi in all of them.  The best way to punish them is to
->    let them keep doing it.
-> * Code and especially patches is much more readable if limited to a sane
->    line length.  Eighty is traditional.
-> * The four-space indentation makes the most common excuse ("But look
->    at all that white space on the left!") moot.
-> * It is the QEMU coding style.
-> 
-> [*]
-> https://git.qemu.org/?p=qemu.git;a=blob;f=CODING_STYLE.rst;h=427699e0e425431ea99d4046e40543bdcc22e9c5;hb=HEAD#l82
-> 
-> Can you repost using correct lenght comments?
-
-Yes, But it is hard to do and in this header file there are lots of 
-lines over 80 chars even 90 chars. So how about I correct all the lines 
-over 80 like this:
-
-/* Write back and do not invalidate cache */
-#define CPUID_8000_0008_EBX_WBNOINVD  (1U << 9)
-/* Indirect Branch Prediction Barrier */
-#define CPUID_8000_0008_EBX_IBPB    (1U << 12)
-
-> 
->>   #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
->>   
->>   #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
+>>      0000000000000000-ffffffffffffffff (prio -1, i/o): pci
+>>        00000000000e0000-00000000000fffff (prio 1, i/o): alias isa-bios
+>> @pc.bios 0000000000020000-000000000003ffff
+>>        00000000fffc0000-00000000ffffffff (prio 0, rom): pc.bios
 >>
-
+>> However, non-x86 machines may have other cases of aliased memory so
+>> it's
+>> a case that you should cover.
+>>
+> Above example is read-only, thus won't be touched in logdirty path.
+> But now I agree that a specific architecture may define two
+> writable GPA ranges with one as the alias to the other, as long as
+> such case is explicitly documented so guest OS won't treat them as
+> separate memory pages.
+>
+> Thanks
+> Kevin
 
