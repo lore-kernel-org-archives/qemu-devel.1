@@ -2,57 +2,66 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADDF4C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 00:19:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7549FC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 00:20:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 824DE217D6
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 00:19:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 824DE217D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 46F4020665
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 00:20:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46F4020665
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB6e8-0000RC-GT
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 20:19:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44426)
+	id 1iB6fN-0001fl-4D
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 20:20:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44583)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iB6d5-00083X-US
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 20:18:33 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iB6dz-0000U4-2f
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 20:19:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iB6d4-0006T4-J7
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 20:18:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44114)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iB6d4-0006Sk-BY
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 20:18:30 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A72C23D962;
- Fri, 20 Sep 2019 00:18:29 +0000 (UTC)
-Received: from probe.bos.redhat.com (dhcp-17-38.bos.redhat.com [10.18.17.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C4E515D9CD;
- Fri, 20 Sep 2019 00:18:23 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH RFC] docker: automatic dependencies for dockerfiles
-Date: Thu, 19 Sep 2019 20:18:23 -0400
-Message-Id: <20190920001823.23279-1-jsnow@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1iB6dx-0006jg-7P
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 20:19:26 -0400
+Resent-Date: Thu, 19 Sep 2019 20:19:26 -0400
+Resent-Message-Id: <E1iB6dx-0006jg-7P@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21479)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iB6dx-0006jL-24
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 20:19:25 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1568938758; cv=none; d=zoho.com; s=zohoarc; 
+ b=BybfmyPv5nHOYYPoqiFrVWdXkztYPocGiBOrtEyjNG0pXgS+bVbFMoAvKxyRM2xslTw3SidFaFnMCy27dse521SMuJdrct5P1do1PSEOPSUCUxpwdfYAxZaPTDqUTAKy6h1U24Gr0sT7nX+sR/DvBYZMxW2BFu3cAw2rhUvcOSA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1568938758;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=CfgxVEAA3NeFJaCi3TSPNkoegftP0SsmnfWrMaG6ndw=; 
+ b=RRK8whFWV89RuGA/3sepUX/uc9MpE/fRgbc1JZa6rL2gDaomwKhkIjOGy74pW+BdmiRCcK4H7iWK37b0iKo6T1kBT6s0UGGW8N+Zm/aYkF6Nic2klIIu3hZcOiNx2x9pVFCBAPmVDrLy6/75g/bA7YnPHqjJUzXfsO02rO6j6D8=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1568938757919709.3972385461869;
+ Thu, 19 Sep 2019 17:19:17 -0700 (PDT)
+In-Reply-To: <20190918231846.22538-1-alxndr@bu.edu>
+Subject: Re: [Qemu-devel] [PATCH v3 00/22] Add virtual device fuzzing support
+Message-ID: <156893875672.2125.6151659952145103463@1c8ae44fe5c0>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Fri, 20 Sep 2019 00:18:29 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: alxndr@bu.edu
+Date: Thu, 19 Sep 2019 17:19:17 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,167 +73,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- John Snow <jsnow@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, bsd@redhat.com, qemu-devel@nongnu.org,
+ stefanha@redhat.com, alxndr@bu.edu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a demo for using makefile dependencies for image requisites.
-Honestly, I don't like it -- Makefile sorcery is a bit beyond my
-comprehension.
-
-This is as near as I could stab, and it has the unfortunate requisite
-that it will generate all of the *.d files at first run and not in an
-on-demand way. Boo.
-
-But, I wanted to raise the point that manually managing the variables
-is not long-term viable -- we should manage them automatically if we
-can.
-
-As far as "partial" images vs "full" images, we should manage this
-too; perhaps by subdirectory on the dockerfiles -- that way these
-won't get out of date, either.
-
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- tests/docker/Makefile.include | 37 ++++++++-------------------------
- tests/docker/deputil.py       | 39 +++++++++++++++++++++++++++++++++++
- 2 files changed, 48 insertions(+), 28 deletions(-)
- create mode 100755 tests/docker/deputil.py
-
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.includ=
-e
-index 50a400b573..266395d927 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -21,6 +21,7 @@ DOCKER_TOOLS :=3D travis
- ENGINE :=3D auto
-=20
- DOCKER_SCRIPT=3D$(SRC_PATH)/tests/docker/docker.py --engine $(ENGINE)
-+DEPTOOL=3D$(SRC_PATH)/tests/docker/deputil.py
-=20
- TESTS ?=3D %
- IMAGES ?=3D %
-@@ -47,12 +48,12 @@ docker-image: ${DOCKER_TARGETS}
- # invoked with SKIP_DOCKER_BUILD we still check the image is up to date
- # though
- ifdef SKIP_DOCKER_BUILD
--docker-image-%: $(DOCKER_FILES_DIR)/%.docker
-+docker-image-%: $(DOCKER_FILES_DIR)/%.docker %.d
- 	$(call quiet-command, \
- 		$(DOCKER_SCRIPT) check --quiet qemu:$* $<, \
- 		"CHECK", "$*")
- else
--docker-image-%: $(DOCKER_FILES_DIR)/%.docker
-+docker-image-%: $(DOCKER_FILES_DIR)/%.docker %.d
- 	$(call quiet-command,\
- 		$(DOCKER_SCRIPT) build qemu:$* $< \
- 		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
-@@ -88,23 +89,17 @@ docker-binfmt-image-debian-%: $(DOCKER_FILES_DIR)/deb=
-ian-bootstrap.docker
- endif
-=20
- # Enforce dependencies for composite images
--docker-image-debian9-mxe: docker-image-debian9
-+%.d: $(DOCKER_FILES_DIR)/%.docker
-+	$(call quiet-command, $(DEPTOOL) $(DOCKER_FILES_DIR)/$*.docker > $@)
-+
-+DEPFILES :=3D $(DOCKER_IMAGES:%=3D%.d)
-+include $(DEPFILES)
-+
- ifeq ($(ARCH),x86_64)
--docker-image-debian-amd64: docker-image-debian9
- DOCKER_PARTIAL_IMAGES +=3D debian-amd64-cross
- else
--docker-image-debian-amd64-cross: docker-image-debian10
- DOCKER_PARTIAL_IMAGES +=3D debian-amd64
- endif
--docker-image-debian-armel-cross: docker-image-debian9
--docker-image-debian-armhf-cross: docker-image-debian9
--docker-image-debian-mips-cross: docker-image-debian9
--docker-image-debian-mipsel-cross: docker-image-debian9
--docker-image-debian-mips64el-cross: docker-image-debian9
--docker-image-debian-ppc64el-cross: docker-image-debian9
--docker-image-debian-s390x-cross: docker-image-debian9
--docker-image-debian-win32-cross: docker-image-debian9-mxe
--docker-image-debian-win64-cross: docker-image-debian9-mxe
-=20
- # For non-x86 hosts not all cross-compilers have been packaged
- ifneq ($(ARCH),x86_64)
-@@ -115,22 +110,8 @@ DOCKER_PARTIAL_IMAGES +=3D debian-win32-cross debian=
--win64-cross
- DOCKER_PARTIAL_IMAGES +=3D fedora travis
- endif
-=20
--docker-image-debian-alpha-cross: docker-image-debian10
--docker-image-debian-arm64-cross: docker-image-debian10
--docker-image-debian-hppa-cross: docker-image-debian10
--docker-image-debian-m68k-cross: docker-image-debian10
--docker-image-debian-mips64-cross: docker-image-debian10
--docker-image-debian-powerpc-cross: docker-image-debian10
--docker-image-debian-ppc64-cross: docker-image-debian10
--docker-image-debian-riscv64-cross: docker-image-debian10
--docker-image-debian-sh4-cross: docker-image-debian10
--docker-image-debian-sparc64-cross: docker-image-debian10
--
- docker-image-travis: NOUSER=3D1
-=20
--# Specialist build images, sometimes very limited tools
--docker-image-tricore-cross: docker-image-debian9
--
- # These images may be good enough for building tests but not for test bu=
-ilds
- DOCKER_PARTIAL_IMAGES +=3D debian-alpha-cross
- DOCKER_PARTIAL_IMAGES +=3D debian-hppa-cross
-diff --git a/tests/docker/deputil.py b/tests/docker/deputil.py
-new file mode 100755
-index 0000000000..69711cf85e
---- /dev/null
-+++ b/tests/docker/deputil.py
-@@ -0,0 +1,39 @@
-+#!/usr/bin/env python3
-+import os
-+import re
-+import sys
-+from typing import IO, Optional
-+
-+def get_dep(infile: IO[str]) -> Optional[str]:
-+    """Get a dependency as a string from a dockerfile."""
-+    for line in infile:
-+        match =3D re.match(r'FROM (.+)', line)
-+        if match:
-+            return match[1]
-+    return None
-+
-+def get_qemu_dep(infile: IO[str]) -> Optional[str]:
-+    """Get a dependency on the qemu: namespace from a dockerfile."""
-+    dep =3D get_dep(infile) or ''
-+    match =3D re.match(r'qemu:(.+)', dep)
-+    return match[1] if match else None
-+
-+def main() -> None:
-+    filename =3D sys.argv[1]
-+    basefile =3D os.path.basename(filename)
-+    base =3D os.path.splitext(basefile)[0]
-+    depfile =3D f"{base}.d"
-+    deps =3D [filename]
-+
-+    print(f"{depfile}: {filename}")
-+    with open(filename, "r") as infile:
-+        match =3D get_qemu_dep(infile) or ''
-+        if match:
-+            deps.append(f"docker-image-{match}")
-+    print("{}: {}".format(
-+        f"docker-image-{base}",
-+        " ".join(deps)
-+    ))
-+
-+if __name__ =3D=3D '__main__':
-+    main()
---=20
-2.21.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkxODIzMTg0Ni4yMjUz
+OC0xLWFseG5kckBidS5lZHUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBhc2FuIGJ1
+aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRw
+dXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkg
+cmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
+YXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtlIGRvY2tlci1pbWFnZS1mZWRvcmEgVj0xIE5FVFdP
+Uks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtZGVidWdAZmVkb3JhIFRBUkdFVF9MSVNUPXg4Nl82
+NC1zb2Z0bW11IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpjbGFuZyAt
+aXF1b3RlIC90bXAvcWVtdS10ZXN0L2J1aWxkL3Rlc3RzIC1pcXVvdGUgdGVzdHMgLWlxdW90ZSAv
+dG1wL3FlbXUtdGVzdC9zcmMvdGNnIC1pcXVvdGUgL3RtcC9xZW11LXRlc3Qvc3JjL3RjZy9pMzg2
+IC1JL3RtcC9xZW11LXRlc3Qvc3JjL2xpbnV4LWhlYWRlcnMgLUkvdG1wL3FlbXUtdGVzdC9idWls
+ZC9saW51eC1oZWFkZXJzIC1pcXVvdGUgLiAtaXF1b3RlIC90bXAvcWVtdS10ZXN0L3NyYyAtaXF1
+b3RlIC90bXAvcWVtdS10ZXN0L3NyYy9hY2NlbC90Y2cgLWlxdW90ZSAvdG1wL3FlbXUtdGVzdC9z
+cmMvaW5jbHVkZSAtSS91c3IvaW5jbHVkZS9waXhtYW4tMSAgLUkvdG1wL3FlbXUtdGVzdC9zcmMv
+ZHRjL2xpYmZkdCAtV2Vycm9yICAtcHRocmVhZCAtSS91c3IvaW5jbHVkZS9nbGliLTIuMCAtSS91
+c3IvbGliNjQvZ2xpYi0yLjAvaW5jbHVkZSAgLWZQSUUgLURQSUUgLW02NCAtbWN4MTYgLURfR05V
+X1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJp
+Y3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3Ry
+aW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1v
+biAtZndyYXB2IC1zdGQ9Z251OTkgIC1Xbm8tc3RyaW5nLXBsdXMtaW50IC1Xbm8tdHlwZWRlZi1y
+ZWRlZmluaXRpb24gLVduby1pbml0aWFsaXplci1vdmVycmlkZXMgLVdleHBhbnNpb24tdG8tZGVm
+aW5lZCAtV2VuZGlmLWxhYmVscyAtV25vLXNoaWZ0LW5lZ2F0aXZlLXZhbHVlIC1Xbm8tbWlzc2lu
+Zy1pbmNsdWRlLWRpcnMgLVdlbXB0eS1ib2R5IC1XbmVzdGVkLWV4dGVybnMgLVdmb3JtYXQtc2Vj
+dXJpdHkgLVdmb3JtYXQteTJrIC1XaW5pdC1zZWxmIC1XaWdub3JlZC1xdWFsaWZpZXJzIC1Xb2xk
+LXN0eWxlLWRlZmluaXRpb24gLVd0eXBlLWxpbWl0cyAtZnN0YWNrLXByb3RlY3Rvci1zdHJvbmcg
+IC1JL3Vzci9pbmNsdWRlL3AxMS1raXQtMSAgICAgLUkvdXNyL2luY2x1ZGUvbGlicG5nMTYgIC1J
+L3Vzci9pbmNsdWRlL3NwaWNlLTEgLUkvdXNyL2luY2x1ZGUvc3BpY2Utc2VydmVyIC1JL3Vzci9p
+bmNsdWRlL2NhY2FyZCAtSS91c3IvaW5jbHVkZS9nbGliLTIuMCAtSS91c3IvbGliNjQvZ2xpYi0y
+LjAvaW5jbHVkZSAtSS91c3IvaW5jbHVkZS9uc3MzIC1JL3Vzci9pbmNsdWRlL25zcHI0IC1wdGhy
+ZWFkIC1JL3Vzci9pbmNsdWRlL2xpYm1vdW50IC1JL3Vzci9pbmNsdWRlL2Jsa2lkIC1JL3Vzci9p
+bmNsdWRlL3V1aWQgLUkvdXNyL2luY2x1ZGUvcGl4bWFuLTEgICAtSS90bXAvcWVtdS10ZXN0L3Ny
+Yy90ZXN0cyAtTU1EIC1NUCAtTVQgdGVzdHMvdGVzdC1hdXRoei1zaW1wbGUubyAtTUYgdGVzdHMv
+dGVzdC1hdXRoei1zaW1wbGUuZCAtZnNhbml0aXplPXVuZGVmaW5lZCAtZnNhbml0aXplPWFkZHJl
+c3MgLWcgICAtYyAtbyB0ZXN0cy90ZXN0LWF1dGh6LXNpbXBsZS5vIC90bXAvcWVtdS10ZXN0L3Ny
+Yy90ZXN0cy90ZXN0LWF1dGh6LXNpbXBsZS5jCmNsYW5nIC1pcXVvdGUgL3RtcC9xZW11LXRlc3Qv
+YnVpbGQvdGVzdHMgLWlxdW90ZSB0ZXN0cyAtaXF1b3RlIC90bXAvcWVtdS10ZXN0L3NyYy90Y2cg
+LWlxdW90ZSAvdG1wL3FlbXUtdGVzdC9zcmMvdGNnL2kzODYgLUkvdG1wL3FlbXUtdGVzdC9zcmMv
+bGludXgtaGVhZGVycyAtSS90bXAvcWVtdS10ZXN0L2J1aWxkL2xpbnV4LWhlYWRlcnMgLWlxdW90
+ZSAuIC1pcXVvdGUgL3RtcC9xZW11LXRlc3Qvc3JjIC1pcXVvdGUgL3RtcC9xZW11LXRlc3Qvc3Jj
+L2FjY2VsL3RjZyAtaXF1b3RlIC90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlIC1JL3Vzci9pbmNs
+dWRlL3BpeG1hbi0xICAtSS90bXAvcWVtdS10ZXN0L3NyYy9kdGMvbGliZmR0IC1XZXJyb3IgIC1w
+dGhyZWFkIC1JL3Vzci9pbmNsdWRlL2dsaWItMi4wIC1JL3Vzci9saWI2NC9nbGliLTIuMC9pbmNs
+dWRlICAtZlBJRSAtRFBJRSAtbTY0IC1tY3gxNiAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VU
+X0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5k
+YW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5
+cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAg
+LVduby1zdHJpbmctcGx1cy1pbnQgLVduby10eXBlZGVmLXJlZGVmaW5pdGlvbiAtV25vLWluaXRp
+YWxpemVyLW92ZXJyaWRlcyAtV2V4cGFuc2lvbi10by1kZWZpbmVkIC1XZW5kaWYtbGFiZWxzIC1X
+bm8tc2hpZnQtbmVnYXRpdmUtdmFsdWUgLVduby1taXNzaW5nLWluY2x1ZGUtZGlycyAtV2VtcHR5
+LWJvZHkgLVduZXN0ZWQtZXh0ZXJucyAtV2Zvcm1hdC1zZWN1cml0eSAtV2Zvcm1hdC15MmsgLVdp
+bml0LXNlbGYgLVdpZ25vcmVkLXF1YWxpZmllcnMgLVdvbGQtc3R5bGUtZGVmaW5pdGlvbiAtV3R5
+cGUtbGltaXRzIC1mc3RhY2stcHJvdGVjdG9yLXN0cm9uZyAgLUkvdXNyL2luY2x1ZGUvcDExLWtp
+dC0xICAgICAtSS91c3IvaW5jbHVkZS9saWJwbmcxNiAgLUkvdXNyL2luY2x1ZGUvc3BpY2UtMSAt
+SS91c3IvaW5jbHVkZS9zcGljZS1zZXJ2ZXIgLUkvdXNyL2luY2x1ZGUvY2FjYXJkIC1JL3Vzci9p
+bmNsdWRlL2dsaWItMi4wIC1JL3Vzci9saWI2NC9nbGliLTIuMC9pbmNsdWRlIC1JL3Vzci9pbmNs
+dWRlL25zczMgLUkvdXNyL2luY2x1ZGUvbnNwcjQgLXB0aHJlYWQgLUkvdXNyL2luY2x1ZGUvbGli
+bW91bnQgLUkvdXNyL2luY2x1ZGUvYmxraWQgLUkvdXNyL2luY2x1ZGUvdXVpZCAtSS91c3IvaW5j
+bHVkZS9waXhtYW4tMSAgIC1JL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzIC1NTUQgLU1QIC1NVCB0
+ZXN0cy90ZXN0LWF1dGh6LWxpc3QubyAtTUYgdGVzdHMvdGVzdC1hdXRoei1saXN0LmQgLWZzYW5p
+dGl6ZT11bmRlZmluZWQgLWZzYW5pdGl6ZT1hZGRyZXNzIC1nICAgLWMgLW8gdGVzdHMvdGVzdC1h
+dXRoei1saXN0Lm8gL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtYXV0aHotbGlzdC5jCmNs
+YW5nIC1pcXVvdGUgL3RtcC9xZW11LXRlc3QvYnVpbGQvdGVzdHMgLWlxdW90ZSB0ZXN0cyAtaXF1
+b3RlIC90bXAvcWVtdS10ZXN0L3NyYy90Y2cgLWlxdW90ZSAvdG1wL3FlbXUtdGVzdC9zcmMvdGNn
+L2kzODYgLUkvdG1wL3FlbXUtdGVzdC9zcmMvbGludXgtaGVhZGVycyAtSS90bXAvcWVtdS10ZXN0
+L2J1aWxkL2xpbnV4LWhlYWRlcnMgLWlxdW90ZSAuIC1pcXVvdGUgL3RtcC9xZW11LXRlc3Qvc3Jj
+IC1pcXVvdGUgL3RtcC9xZW11LXRlc3Qvc3JjL2FjY2VsL3RjZyAtaXF1b3RlIC90bXAvcWVtdS10
+ZXN0L3NyYy9pbmNsdWRlIC1JL3Vzci9pbmNsdWRlL3BpeG1hbi0xICAtSS90bXAvcWVtdS10ZXN0
+L3NyYy9kdGMvbGliZmR0IC1XZXJyb3IgIC1wdGhyZWFkIC1JL3Vzci9pbmNsdWRlL2dsaWItMi4w
+IC1JL3Vzci9saWI2NC9nbGliLTIuMC9pbmNsdWRlICAtZlBJRSAtRFBJRSAtbTY0IC1tY3gxNiAt
+RF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAt
+V3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0
+ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8t
+Y29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAgLVduby1zdHJpbmctcGx1cy1pbnQgLVduby10eXBl
+ZGVmLXJlZGVmaW5pdGlvbiAtV25vLWluaXRpYWxpemVyLW92ZXJyaWRlcyAtV2V4cGFuc2lvbi10
+by1kZWZpbmVkIC1XZW5kaWYtbGFiZWxzIC1Xbm8tc2hpZnQtbmVnYXRpdmUtdmFsdWUgLVduby1t
+aXNzaW5nLWluY2x1ZGUtZGlycyAtV2VtcHR5LWJvZHkgLVduZXN0ZWQtZXh0ZXJucyAtV2Zvcm1h
+dC1zZWN1cml0eSAtV2Zvcm1hdC15MmsgLVdpbml0LXNlbGYgLVdpZ25vcmVkLXF1YWxpZmllcnMg
+LVdvbGQtc3R5bGUtZGVmaW5pdGlvbiAtV3R5cGUtbGltaXRzIC1mc3RhY2stcHJvdGVjdG9yLXN0
+cm9uZyAgLUkvdXNyL2luY2x1ZGUvcDExLWtpdC0xICAgICAtSS91c3IvaW5jbHVkZS9saWJwbmcx
+NiAgLUkvdXNyL2luY2x1ZGUvc3BpY2UtMSAtSS91c3IvaW5jbHVkZS9zcGljZS1zZXJ2ZXIgLUkv
+dXNyL2luY2x1ZGUvY2FjYXJkIC1JL3Vzci9pbmNsdWRlL2dsaWItMi4wIC1JL3Vzci9saWI2NC9n
+bGliLTIuMC9pbmNsdWRlIC1JL3Vzci9pbmNsdWRlL25zczMgLUkvdXNyL2luY2x1ZGUvbnNwcjQg
+LXB0aHJlYWQgLUkvdXNyL2luY2x1ZGUvbGlibW91bnQgLUkvdXNyL2luY2x1ZGUvYmxraWQgLUkv
+dXNyL2luY2x1ZGUvdXVpZCAtSS91c3IvaW5jbHVkZS9waXhtYW4tMSAgIC1JL3RtcC9xZW11LXRl
+c3Qvc3JjL3Rlc3RzIC1NTUQgLU1QIC1NVCB0ZXN0cy90ZXN0LWF1dGh6LWxpc3RmaWxlLm8gLU1G
+IHRlc3RzL3Rlc3QtYXV0aHotbGlzdGZpbGUuZCAtZnNhbml0aXplPXVuZGVmaW5lZCAtZnNhbml0
+aXplPWFkZHJlc3MgLWcgICAtYyAtbyB0ZXN0cy90ZXN0LWF1dGh6LWxpc3RmaWxlLm8gL3RtcC9x
+ZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtYXV0aHotbGlzdGZpbGUuYwovdG1wL3FlbXUtdGVzdC9z
+cmMvdGVzdHMvdGVzdC1jaGFyLmM6MzE6MTM6IGVycm9yOiBzdGF0aWMgZGVjbGFyYXRpb24gb2Yg
+J21haW5fbG9vcCcgZm9sbG93cyBub24tc3RhdGljIGRlY2xhcmF0aW9uCnN0YXRpYyB2b2lkIG1h
+aW5fbG9vcCh2b2lkKQogICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL3N5
+c2VtdS9zeXNlbXUuaDoxMTc6Njogbm90ZTogcHJldmlvdXMgZGVjbGFyYXRpb24gaXMgaGVyZQoK
+ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAx
+OTA5MTgyMzE4NDYuMjI1MzgtMS1hbHhuZHJAYnUuZWR1L3Rlc3RpbmcuYXNhbi8/dHlwZT1tZXNz
+YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6
+Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
+ZWxAcmVkaGF0LmNvbQ==
 
 
