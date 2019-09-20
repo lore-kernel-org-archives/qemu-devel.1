@@ -2,72 +2,53 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62183C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 08:21:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A55BC49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 08:27:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37DD2207FC
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 08:21:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37DD2207FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F35DF2080F
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 08:27:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F35DF2080F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBEAr-0006RD-55
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 04:21:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42061)
+	id 1iBEGd-0001jV-Mz
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 04:27:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42630)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iBE9s-0005ex-V7
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 04:20:54 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iBEEh-0008DZ-1T
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 04:25:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iBE9r-0003Vx-JR
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 04:20:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54060)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iBE9r-0003VB-Dj
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 04:20:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iBE9p-0006FV-Es
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 08:20:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6F9782E80CD
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 08:20:49 +0000 (UTC)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iBEEf-0005PQ-SS
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 04:25:50 -0400
+Received: from relay.sw.ru ([185.231.240.75]:60548)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iBEEc-0005Nh-PN; Fri, 20 Sep 2019 04:25:46 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iBEEZ-0004DS-Be; Fri, 20 Sep 2019 11:25:43 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v3 0/3] proper locking on bitmap add/remove paths
+Date: Fri, 20 Sep 2019 11:25:40 +0300
+Message-Id: <20190920082543.23444-1-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 20 Sep 2019 08:08:13 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h jamespharvey20
-X-Launchpad-Bug-Reporter: James Harvey (jamespharvey20)
-X-Launchpad-Bug-Modifier: Dr. David Alan Gilbert (dgilbert-h)
-References: <156790812963.29382.11232177290822294099.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156896689342.5029.8017679812124695504.malone@chaenomeles.canonical.com>
-Subject: [Bug 1843151] Re: Regression: QEMU 4.1.0 qxl and KMS resoluiton only
- 4x10
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19048";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 31f46d9c1dcc0326a8bcc2ee445f8f0f96dca681
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,47 +57,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1843151 <1843151@bugs.launchpad.net>
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi James,
-  The change in QEMU in 4.1 is that it's using a newer spice interface;  Fr=
-eddy is on our spice team and we chatted about whether to change QEMU but t=
-hey thought it best to fix Spice to be more tolerant; so I'm happy to go wi=
-th that recommendation.
+Hi all!
 
--- =
+We need to lock qcow2 mutex on accessing in-image metadata, especially
+on updating this metadata. Let's implement it.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1843151
+v3:
+01: add John's r-b
+02: - fix bdrv_remove_persistent_dirty_bitmap return value
+    - drop extra zeroing of ret in qcow2_remove_persistent_dirty_bitmap
+03: add John's r-b
 
-Title:
-  Regression: QEMU 4.1.0 qxl and KMS resoluiton only 4x10
+Vladimir Sementsov-Ogievskiy (3):
+  block: move bdrv_can_store_new_dirty_bitmap to block/dirty-bitmap.c
+  block/dirty-bitmap: return int from
+    bdrv_remove_persistent_dirty_bitmap
+  block/qcow2: proper locking on bitmap add/remove paths
 
-Status in QEMU:
-  New
+ block/qcow2.h                |  14 ++---
+ include/block/block_int.h    |  14 ++---
+ include/block/dirty-bitmap.h |   5 +-
+ block.c                      |  22 -------
+ block/dirty-bitmap.c         | 119 +++++++++++++++++++++++++++++++++--
+ block/qcow2-bitmap.c         |  36 +++++++----
+ block/qcow2.c                |   5 +-
+ blockdev.c                   |  28 +++------
+ 8 files changed, 163 insertions(+), 80 deletions(-)
 
-Bug description:
-  Host is Arch Linux.  linux 5.2.13, qemu 4.1.0.  virt-viewer 8.0.
+-- 
+2.21.0
 
-  Guest is Arch Linux Sept 2019 ISO.  linux 5.2.11.
-
-  Have replicated this both on a system using amdgpu and one using
-  integrated ASPEED graphics.
-
-  Downgrading from 4.1.0 to 4.0.0 works as usual, see:
-  https://www.youtube.com/watch?v=3DNyMdcYwOCvY
-
-  Going back to 4.1.0 reproduces, see:
-  https://www.youtube.com/watch?v=3DH3nGG2Mk6i0
-
-  4.1.0 displays fine until KMS kicks in.
-
-  Using 4.1.0 with virtio-vga doesn't cause this.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1843151/+subscriptions
 
