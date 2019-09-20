@@ -2,59 +2,56 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82355C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 08:40:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F3F2C4CEC9
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 08:40:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51A232070C
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 08:40:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51A232070C
+	by mail.kernel.org (Postfix) with ESMTPS id 38C192070C
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 08:40:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38C192070C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBET5-0003yq-3w
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 04:40:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45649)
+	id 1iBET6-0003zX-6D
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 04:40:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45630)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iBEQo-0001ZM-3l
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 04:38:23 -0400
+ (envelope-from <lersek@redhat.com>) id 1iBEQl-0001Z0-H3
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 04:38:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iBEQm-0002jd-AS
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 04:38:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41114)
+ (envelope-from <lersek@redhat.com>) id 1iBEQk-0002iT-8H
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 04:38:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55574)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iBEQm-0002j1-3O
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 04:38:20 -0400
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iBEQj-0002iI-Kv
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 04:38:17 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 61BAA3B558
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 08:38:19 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E917910C0929
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 08:38:16 +0000 (UTC)
 Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-165.rdu2.redhat.com
  [10.10.120.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4F5D860BF1;
- Fri, 20 Sep 2019 08:38:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EA72060BF1;
+ Fri, 20 Sep 2019 08:38:10 +0000 (UTC)
 From: Laszlo Ersek <lersek@redhat.com>
 To: qemu devel list <qemu-devel@nongnu.org>
-Subject: [PATCH v2 2/2] edk2 build scripts: work around TianoCore#1607 without
- forcing Python 2
-Date: Fri, 20 Sep 2019 10:38:08 +0200
-Message-Id: <20190920083808.21399-3-lersek@redhat.com>
-In-Reply-To: <20190920083808.21399-1-lersek@redhat.com>
-References: <20190920083808.21399-1-lersek@redhat.com>
+Subject: [PATCH v2 0/2] edk2 build scripts: eliminate python 2 dependency
+Date: Fri, 20 Sep 2019 10:38:06 +0200
+Message-Id: <20190920083808.21399-1-lersek@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Fri, 20 Sep 2019 08:38:19 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Fri, 20 Sep 2019 08:38:16 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -75,180 +72,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It turns out that forcing python2 for running the edk2 "build" utility is
-neither necessary nor sufficient.
+v1 URL:
+http://mid.mail-archive.com/20190918171141.15957-1-lersek@redhat.com
 
-Forcing python2 is not sufficient for two reasons:
-
-- QEMU is moving away from python2, with python2 nearing EOL,
-
-- according to my most recent testing, the lacking dependency information
-  in the makefiles that are generated by edk2's "build" utility can cause
-  parallel build failures even when "build" is executed by python2.
-
-And forcing python2 is not necessary because we can still return to the
-original idea of filtering out jobserver-related options from MAKEFLAGS.
-So do that.
-
-While at it, cut short edk2's auto-detection of the python3.* minor
-version, by setting PYTHON_COMMAND to "python3" (which we expect to be
-available wherever we intend to build edk2).
-
-With this patch, the guest UEFI binaries that are used as part of the BIO=
-S
-tables test, and the OVMF and ArmVirtQemu platform firmwares, will be
-built strictly in a single job, regardless of an outermost "-jN" make
-option. Alas, there appears to be no reliable way to build edk2 in an
-(outer make, inner make) environment, with a jobserver enabled.
+Updates are noted on each patch.
 
 Cc: Eduardo Habkost <ehabkost@redhat.com>
 Cc: John Snow <jsnow@redhat.com>
 Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reported-by: John Snow <jsnow@redhat.com>
-Signed-off-by: Laszlo Ersek <lersek@redhat.com>
----
 
-Notes:
-    v2:
-   =20
-    - set PYTHON_COMMAND to python3; update commit message [Phil]
-   =20
-    - do not pick up any feedback tags from v1 (v2 is not a trivial updat=
-e)
-   =20
-    v1:
-   =20
-    - Tested on RHEL7 (where the outer "make" sets the old-style
-      "--jobserver-fds" flag) and on Fedora 29 (where the outer "make" se=
-ts
-      the new-style "--jobserver-auth" flag).
-   =20
-    - I've rebuilt all the edk2 binaries with this patch applied. Everyth=
-ing
-      works fine. However, if you test this patch, you might notice that =
-git
-      reports all the build products as modified. That's because when usi=
-ng
-      the python3 code in edk2 BaseTools, the generated makefiles differ
-      greatly from the ones generated when running in python2 mode (e.g. =
-due
-      to different random seeds in python hashes / dictionaries). As a
-      result, parts of the firmware volumes / firmware filesystems could
-      appear in a different order than before. This is harmless, and does=
-n't
-      necessitate checking in the rebuilt binaries.
+Thanks
+Laszlo
+
+Laszlo Ersek (2):
+  edk2 build scripts: honor external BaseTools flags with
+    uefi-test-tools
+  edk2 build scripts: work around TianoCore#1607 without forcing Python
+    2
 
  roms/Makefile                  |  1 +
- tests/uefi-test-tools/Makefile |  1 +
  roms/edk2-build.sh             |  4 ++--
  roms/edk2-funcs.sh             | 17 +++++++++++++++++
+ tests/uefi-test-tools/Makefile |  5 ++++-
  tests/uefi-test-tools/build.sh |  6 ++++--
- 5 files changed, 25 insertions(+), 4 deletions(-)
+ 5 files changed, 28 insertions(+), 5 deletions(-)
 
-diff --git a/roms/Makefile b/roms/Makefile
-index 6cf07d3b44ee..06339efa6fc4 100644
---- a/roms/Makefile
-+++ b/roms/Makefile
-@@ -141,6 +141,7 @@ build-efi-roms: build-pxe-roms
- #
- edk2-basetools:
- 	$(MAKE) -C edk2/BaseTools \
-+		PYTHON_COMMAND=3D$${EDK2_PYTHON_COMMAND:-python3} \
- 		EXTRA_OPTFLAGS=3D'$(EDK2_BASETOOLS_OPTFLAGS)' \
- 		EXTRA_LDFLAGS=3D'$(EDK2_BASETOOLS_LDFLAGS)'
-=20
-diff --git a/tests/uefi-test-tools/Makefile b/tests/uefi-test-tools/Makef=
-ile
-index 7e0177d7337e..1dcddcdbbabf 100644
---- a/tests/uefi-test-tools/Makefile
-+++ b/tests/uefi-test-tools/Makefile
-@@ -100,6 +100,7 @@ Build/bios-tables-test.%.efi: build-edk2-tools
-=20
- build-edk2-tools:
- 	$(MAKE) -C $(edk2_dir)/BaseTools \
-+		PYTHON_COMMAND=3D$${EDK2_PYTHON_COMMAND:-python3} \
- 		EXTRA_OPTFLAGS=3D'$(EDK2_BASETOOLS_OPTFLAGS)' \
- 		EXTRA_LDFLAGS=3D'$(EDK2_BASETOOLS_LDFLAGS)'
-=20
-diff --git a/roms/edk2-build.sh b/roms/edk2-build.sh
-index 4f46f8a6a217..d5391c763728 100755
---- a/roms/edk2-build.sh
-+++ b/roms/edk2-build.sh
-@@ -27,8 +27,7 @@ shift $num_args
-=20
- cd edk2
-=20
--# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>.
--export PYTHON_COMMAND=3Dpython2
-+export PYTHON_COMMAND=3D${EDK2_PYTHON_COMMAND:-python3}
-=20
- # Source "edksetup.sh" carefully.
- set +e +u +C
-@@ -43,6 +42,7 @@ fi
- # any), for the edk2 "build" utility.
- source ../edk2-funcs.sh
- edk2_toolchain=3D$(qemu_edk2_get_toolchain "$emulation_target")
-+MAKEFLAGS=3D$(qemu_edk2_quirk_tianocore_1607 "$MAKEFLAGS")
- edk2_thread_count=3D$(qemu_edk2_get_thread_count "$MAKEFLAGS")
- qemu_edk2_set_cross_env "$emulation_target"
-=20
-diff --git a/roms/edk2-funcs.sh b/roms/edk2-funcs.sh
-index a9fae7ee891b..3f4485b201f1 100644
---- a/roms/edk2-funcs.sh
-+++ b/roms/edk2-funcs.sh
-@@ -251,3 +251,20 @@ qemu_edk2_get_thread_count()
-     printf '1\n'
-   fi
- }
-+
-+
-+# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607> by
-+# filtering jobserver-related flags out of MAKEFLAGS. Print the result t=
-o the
-+# standard output.
-+#
-+# Parameters:
-+#   $1: the value of the MAKEFLAGS variable
-+qemu_edk2_quirk_tianocore_1607()
-+{
-+  local makeflags=3D"$1"
-+
-+  printf %s "$makeflags" \
-+  | LC_ALL=3DC sed --regexp-extended \
-+      --expression=3D's/--jobserver-(auth|fds)=3D[0-9]+,[0-9]+//' \
-+      --expression=3D's/-j([0-9]+)?//'
-+}
-diff --git a/tests/uefi-test-tools/build.sh b/tests/uefi-test-tools/build=
-.sh
-index 8aa7935c43bb..3b78f3084069 100755
---- a/tests/uefi-test-tools/build.sh
-+++ b/tests/uefi-test-tools/build.sh
-@@ -29,8 +29,7 @@ export PACKAGES_PATH=3D$(realpath -- "$edk2_dir")
- export WORKSPACE=3D$PWD
- mkdir -p Conf
-=20
--# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>.
--export PYTHON_COMMAND=3Dpython2
-+export PYTHON_COMMAND=3D${EDK2_PYTHON_COMMAND:-python3}
-=20
- # Source "edksetup.sh" carefully.
- set +e +u +C
-@@ -46,12 +45,15 @@ fi
- source "$edk2_dir/../edk2-funcs.sh"
- edk2_arch=3D$(qemu_edk2_get_arch "$emulation_target")
- edk2_toolchain=3D$(qemu_edk2_get_toolchain "$emulation_target")
-+MAKEFLAGS=3D$(qemu_edk2_quirk_tianocore_1607 "$MAKEFLAGS")
-+edk2_thread_count=3D$(qemu_edk2_get_thread_count "$MAKEFLAGS")
- qemu_edk2_set_cross_env "$emulation_target"
-=20
- # Build the UEFI binary
- mkdir -p log
- build \
-   --arch=3D"$edk2_arch" \
-+  -n "$edk2_thread_count" \
-   --buildtarget=3DDEBUG \
-   --platform=3DUefiTestToolsPkg/UefiTestToolsPkg.dsc \
-   --tagname=3D"$edk2_toolchain" \
 --=20
 2.19.1.3.g30247aa5d201
 
