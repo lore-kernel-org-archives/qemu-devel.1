@@ -2,89 +2,63 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44589C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 16:53:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9839C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 16:55:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A929207FC
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 16:53:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A929207FC
+	by mail.kernel.org (Postfix) with ESMTPS id 80A73207FC
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 16:55:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80A73207FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBM9j-0004hJ-5d
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 12:53:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54265)
+	id 1iBMC7-0006ci-Ls
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 12:55:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57675)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iBLlV-0002wU-B0
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 12:28:15 -0400
+ (envelope-from <tasleson@redhat.com>) id 1iBLyr-000214-IW
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 12:42:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iBLlQ-00031i-De
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 12:28:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50986)
+ (envelope-from <tasleson@redhat.com>) id 1iBLyo-0008Em-Qz
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 12:42:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46760)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iBLlQ-00031U-5X
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 12:28:08 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <tasleson@redhat.com>) id 1iBLyo-0008ER-I3
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 12:41:58 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 972B983F45
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 16:28:06 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id c1so2477762wrb.12
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 09:28:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Zu3bPOo/xJ8Hl4J7P6fPHUSXQfc6ARL6LzwY0LA4f6o=;
- b=BaXQR49o8T1c+O5Fxb2bfpKv2rk6Z0+3EbnQ4ddBNIxlctk1+/yxSA3MNG4W1VyLX/
- JEUmZwsHjc/kgQBFkCdBbSFul27lMbmi9hjKpx9T415lyidmHdxD0GVN2i+nVJ//wg57
- LYgChz9czPAbzsZzlEpA29CFvWrBEY8xfLRMyHnl+C0vKxm+tHFLp8D3vvQixCo08ocE
- fbHkQKgbWoczqB45bg+bde0zZFIaEJwMcIQA1Ql41aGt4w45PCAmW1RaQ6I6CODW2CWr
- LKHE/Xmtj7XSAVMTDzjTHz7iLSjW5i9gLBA07dHEE2oimQ+P/kyM+k7UPtqmlDbAc6O0
- t4Gg==
-X-Gm-Message-State: APjAAAXYL4iRw7IhpKR+Pe8anf9qaSVeHVM52Umx46FB123cyNmZ3k+w
- Q3pQvPlcJqjz4X0AwLP4/iyiidGaq6hpyMYga9Af9cHAx9oVp8kCrxhKAsNfdko6aswdbHzzH03
- qk57UshXkoOe7RgI=
-X-Received: by 2002:a5d:5643:: with SMTP id j3mr251902wrw.357.1568996885331;
- Fri, 20 Sep 2019 09:28:05 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxw+XxzC7kOijzMv2jm4PEnDUYnOHWHaDsI6bhkBN1NF7oT2beDlqbeD6YpAc1q6bGFvBlEUw==
-X-Received: by 2002:a5d:5643:: with SMTP id j3mr251890wrw.357.1568996885098;
- Fri, 20 Sep 2019 09:28:05 -0700 (PDT)
-Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id m62sm3145712wmm.35.2019.09.20.09.28.04
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 20 Sep 2019 09:28:04 -0700 (PDT)
-Subject: Re: [PATCH 3/3] docker: remove unused debian-sid and debian-ports
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- John Snow <jsnow@redhat.com>
-References: <20190920001413.22567-1-jsnow@redhat.com>
- <20190920001413.22567-4-jsnow@redhat.com>
- <731ae95b-7c70-43ca-bea9-28b00de232d5@redhat.com>
- <c7b12028-0294-0d9c-3e94-60b2ba7d3528@redhat.com> <87d0fvym64.fsf@linaro.org>
- <77355885-6422-5a6a-bd32-e3871e35213e@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <4bf8c4ed-806e-6ee8-0031-5ce43dc52803@redhat.com>
-Date: Fri, 20 Sep 2019 18:28:03 +0200
+ by mx1.redhat.com (Postfix) with ESMTPS id 7565A116BB20
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 16:41:57 +0000 (UTC)
+Received: from [10.3.112.12] (ovpn-112-12.phx2.redhat.com [10.3.112.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BA50960606;
+ Fri, 20 Sep 2019 16:41:56 +0000 (UTC)
+Subject: Re: [RFC 0/4] POC: Generating realistic block errors
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20190919194847.18518-1-tasleson@redhat.com>
+ <20190920083630.GA5458@localhost.localdomain>
+From: Tony Asleson <tasleson@redhat.com>
+Organization: Red Hat
+Message-ID: <566d0d07-35fc-2d66-a47c-00526546b31e@redhat.com>
+Date: Fri, 20 Sep 2019 11:41:55 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <77355885-6422-5a6a-bd32-e3871e35213e@redhat.com>
+In-Reply-To: <20190920083630.GA5458@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Fri, 20 Sep 2019 16:41:57 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,107 +72,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org
+Reply-To: tasleson@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/20/19 6:23 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 9/20/19 6:20 PM, Alex Benn=C3=A9e wrote:
->> John Snow <jsnow@redhat.com> writes:
->>> On 9/20/19 4:49 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->>>> On 9/20/19 2:14 AM, John Snow wrote:
->>>>> These are listed as "partial" images, but have no user.
->>>>> Remove them.
->>>>
->>>> Well, I have WiP users from them. I could restore this content when =
-they
->>>> are ready... Ports is the base of deprecated Debian archs. On the ot=
-her
->>>> side Sid is the base for edge development I use from time to time to
->>>> test latest gcc/binutils.
->>>> I'll try to find time to raise WiP branches to PoC.
->>>>
->>>
->>> I think that's the right thing to do. Right now, the docker tests
->>> directory has a lot of stale entries and unusable tests. That might b=
-e
->>> fine for the people working on it, but it makes it hard to understand
->>> and use for those of us who only occasionally traipse into the direct=
-ory.
->>>
->>> I'm removing all references to python2 -- but if there's no way for m=
-e
->>> to test debian-sid and debian-ports, I can't test changes I need to m=
-ake
->>> to these "partial images", so they should be removed until they are
->>> consumable.
->>>
->>> While I am sympathetic to the idea of having a library of partial ima=
-ges
->>> to use for future tests, they're prone to rot if there's no way to
->>> exercise them in-tree.
->>
->> Don't forget some "partial" images are only used for building TCG test=
-s
->> - we want to keep them. But as git is forever I can drop the sid/ports
->> stuff for now until Phillipe has something to use them again.
->=20
-> For Sid I have this case:
->=20
-> -- >8 --
-> #
-> # Docker Renesas RX cross-compiler target
-> #
-> # This docker target builds on the debian Sid base image.
-> #
-> # Copyright (c) 2019 Philippe Mathieu-Daud=C3=A9
-> #
-> # SPDX-License-Identifier: GPL-2.0-or-later
-> #
-> FROM qemu:debian-sid
+On 9/20/19 3:36 AM, Kevin Wolf wrote:
+> I/O error inserted by blkdebug can be one-off or permanent, but since it
+> also supports using a small state machine, I think you should already be
+> able to configure your errors that are corrected by a rewrite, too, even
+> if there is no explicit support for this yet (I guess we could add it if
+> it turned out to be much easier to use).
 
-Oh well nevermind it is old, so it probably now works with debian-10.
+One thing I thought about is the feasibility of having a callback for
+these errors across qapi.  For example you could register a sector for a
+read/write/both and when that operation occurs you would block IO, send
+the sector number and associated data across qapi for test code to do
+something with it and respond allowing the operation to continue
+successfully or by returning an error determined by the external test
+code to be propagated to guest.
 
-I used the Ports base for sparc32 and x32, I don't have them on my
-workstation I'll check during the WE.
+This would allow the logic to be outside of QEMU.  So for example in the
+re-write case the test code could remove the error when it gets the
+write, instead of having that logic embedded in QEMU itself.
 
-> MAINTAINER Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->=20
-> RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
->     apt install -y --no-install-recommends \
->         wget
-> RUN wget -qO - https://ftpmirror.gnu.org/binutils/binutils-2.32.tar.xz =
-\
->     | tar -C /usr/src -xJf - && \
->     cd /usr/src/binutils-2.32 && \
->         CFLAGS=3D-w \
->         ./configure --prefix=3D/usr --disable-nls
-> --target=3Drx-unknown-linux && \
->         make && make install && \
->         rm -rf /usr/src/binutils-2.32
->=20
-> RUN git clone -b rx-trunk http://pf.osdn.net/gitroot/y/ys/ysato/gcc.git=
- \
->     /usr/src/gcc
->=20
-> RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
->     apt install -y --no-install-recommends \
->         libgmp-dev libmpfr-dev libmpc-dev
->=20
-> RUN cd /usr/src/gcc && \
->     CPPFLAGS=3D-w \
->     ./configure --target=3Drx-unknown-linux \
->         --prefix=3D/usr --disable-nls \
->         --enable-languages=3Dc --disable-shared \
->         --disable-threads --with-uclibc \
->         --disable-libssp --disable-libquadmath \
->         --disable-libgomp --disable-libatomic && \
->     make && make install && \
->     rm -rf /usr/src/gcc
->=20
-> # This image isn't designed for building QEMU but building tests
-> ENV QEMU_CONFIGURE_OPTS --disable-system --disable-user
-> ---
->=20
+Thoughts?
+
+> The one thing I see in your series that we can't currently provide this
+> way is the exact sector number where the error happened. If you read
+> from sector 32 to 64 and there is an error configured for sector 50, you
+> just see that the whole request is failing.
+
+Also depending on the device type the data behavior can be different
+too.  For SCSI devices I believe the specification states that the data
+leading up to the sector in error is transferred to the initiator.  For
+ATA I believe this is not true.  My code doesn't model this correctly.
+I generated the error before any data was transferred.
+
+I'm thinking changes in blkdebug will need to be done to handle this too?
+
+> I also wonder why you had to write low-level error handling code instead
+> of calling the existing error functions. If the existing functions don't
+> give the right result in error cases, shouldn't they be fixed anyway?
+
+I would think so too.  I'm using error constants that already exist, but
+apparently are not being used anywhere else.
+
+
+> And then, as John already hinted, adding code for debugging scenarios to
+> hot paths that are important for high-performance VMs that don't use any
+> debugging is less than optimal.
+
+I agree, the POC code was experimental, but I should have done more
+effort in minimizing the run-time costs.
+
+Additionally I think it would be good if QEMU could standardize the
+device wwn format to be consistent throughout all block device types,
+eg. uint64_t, but maybe not possible.  I also think it would be good to
+allow the wwn passed on the command line correlate with what the guest
+sees for /sys/block/<device>/device/wwid.
+
+However, I'm assuming that QEMU has the same stance as the linux kernel
+with no visible user space breakage?
+
+> 
+> So bringing everything together, what would you think of this plan:
+> 
+> 1. Extend blkdebug with whatever ways you need to trigger I/O errors
+>    (only if the existing modes aren't sufficient at least for the start;
+>    we can still always extend it later)
+> 
+> 2. Add a new BlockDriver callback that can return detailed information
+>    about an error (such as the exact sector number), and wire it up
+>    through BlockBackend (some blk_* function). Implement it in blkdebug.
+> 
+> 3. In the guest devices, only call the function to get detailed error
+>    information in the existing error path. You can then update some
+>    device state according to the details if the block driver returned
+>    anything (probably only blkdebug will return something).
+> 
+> This way, we have no changes at all in the hot I/O path if you didn't
+> configure your VM with a blkdebug filter. And we avoid duplication of
+> code both in the error handler in devices and in the error injection
+> mechanisms.
+
+This all sounds good to me.  Although I'm not 100% sure of all the
+specific details you are describing at the moment as I'm not that
+familiar with the code base.
+
+Thanks!
+
+-Tony
+
+
+
 
