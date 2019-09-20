@@ -2,46 +2,49 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CC22C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 14:28:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A1BBC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 14:28:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6D572086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 14:28:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6D572086A
+	by mail.kernel.org (Postfix) with ESMTPS id 21B59207E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 14:28:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21B59207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBJtG-0002sq-Gu
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 10:28:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32822)
+	id 1iBJtz-0003ZN-Ny
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 10:28:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32832)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iBJmW-0004ZJ-Fz
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 10:21:09 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iBJmW-0004Zf-PX
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 10:21:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iBJmU-0000tN-Ob
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iBJmU-0000tU-RH
  for qemu-devel@nongnu.org; Fri, 20 Sep 2019 10:21:08 -0400
-Received: from relay.sw.ru ([185.231.240.75]:43784)
+Received: from relay.sw.ru ([185.231.240.75]:43796)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iBJmQ-0000gB-FL; Fri, 20 Sep 2019 10:21:02 -0400
+ id 1iBJmQ-0000g8-DM; Fri, 20 Sep 2019 10:21:02 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iBJmL-0006b5-VF; Fri, 20 Sep 2019 17:20:58 +0300
+ id 1iBJmM-0006b5-KE; Fri, 20 Sep 2019 17:20:58 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v13 00/15] backup-top filter driver for backup
-Date: Fri, 20 Sep 2019 17:20:41 +0300
-Message-Id: <20190920142056.12778-1-vsementsov@virtuozzo.com>
+Subject: [PATCH v13 03/15] block/backup: split shareable copying part from
+ backup_do_cow
+Date: Fri, 20 Sep 2019 17:20:44 +0300
+Message-Id: <20190920142056.12778-4-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190920142056.12778-1-vsementsov@virtuozzo.com>
+References: <20190920142056.12778-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
@@ -65,63 +68,84 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi all!
+Split copying logic which will be shared with backup-top filter.
 
-These series introduce backup-top driver. It's a filter-node, which
-do copy-before-write operation. Mirror uses filter-node for handling
-guest writes, let's move to filter-node (from write-notifiers) for
-backup too.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ block/backup.c | 47 ++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 32 insertions(+), 15 deletions(-)
 
-v11,v12 -> v13 changes:
-
-[v12 was two fixes in separate: [PATCH v12 0/2] backup: copy_range fixes]
-
-01: new in v12, in v13 change comment
-02: in v12: add "Fixes: " to commit msg, in v13 add John's r-b
-05: rebase on 01
-07: rebase on 01. It still a clean movement, keep r-b
-
-Vladimir Sementsov-Ogievskiy (15):
-  block/backup: fix max_transfer handling for copy_range
-  block/backup: fix backup_cow_with_offload for last cluster
-  block/backup: split shareable copying part from backup_do_cow
-  block/backup: improve comment about image fleecing
-  block/backup: introduce BlockCopyState
-  block/backup: fix block-comment style
-  block: move block_copy from block/backup.c to separate file
-  block: teach bdrv_debug_breakpoint skip filters with backing
-  iotests: prepare 124 and 257 bitmap querying for backup-top filter
-  iotests: 257: drop unused Drive.device field
-  iotests: 257: drop device_add
-  block/io: refactor wait_serialising_requests
-  block: add lock/unlock range functions
-  block: introduce backup-top filter driver
-  block/backup: use backup-top instead of write notifiers
-
- qapi/block-core.json          |   8 +-
- block/backup-top.h            |  37 ++
- include/block/block-copy.h    |  84 ++++
- include/block/block_int.h     |   5 +
- block.c                       |  34 +-
- block/backup-top.c            | 240 ++++++++++++
- block/backup.c                | 440 ++++-----------------
- block/block-copy.c            | 346 ++++++++++++++++
- block/io.c                    |  68 +++-
- block/replication.c           |   2 +-
- blockdev.c                    |   1 +
- block/Makefile.objs           |   3 +
- block/trace-events            |  14 +-
- tests/qemu-iotests/056        |   8 +-
- tests/qemu-iotests/124        |  83 ++--
- tests/qemu-iotests/257        |  91 ++---
- tests/qemu-iotests/257.out    | 714 ++++++++++++++--------------------
- tests/qemu-iotests/iotests.py |  27 ++
- 18 files changed, 1287 insertions(+), 918 deletions(-)
- create mode 100644 block/backup-top.h
- create mode 100644 include/block/block-copy.h
- create mode 100644 block/backup-top.c
- create mode 100644 block/block-copy.c
-
+diff --git a/block/backup.c b/block/backup.c
+index 99177f03f8..98d7f7a905 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -248,26 +248,18 @@ static int64_t backup_bitmap_reset_unallocated(BackupBlockJob *s,
+     return ret;
+ }
+ 
+-static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+-                                      int64_t offset, uint64_t bytes,
+-                                      bool *error_is_read,
+-                                      bool is_write_notifier)
++static int coroutine_fn backup_do_copy(BackupBlockJob *job,
++                                       int64_t start, uint64_t bytes,
++                                       bool *error_is_read,
++                                       bool is_write_notifier)
+ {
+-    CowRequest cow_request;
+     int ret = 0;
+-    int64_t start, end; /* bytes */
++    int64_t end = bytes + start; /* bytes */
+     void *bounce_buffer = NULL;
+     int64_t status_bytes;
+ 
+-    qemu_co_rwlock_rdlock(&job->flush_rwlock);
+-
+-    start = QEMU_ALIGN_DOWN(offset, job->cluster_size);
+-    end = QEMU_ALIGN_UP(bytes + offset, job->cluster_size);
+-
+-    trace_backup_do_cow_enter(job, start, offset, bytes);
+-
+-    wait_for_overlapping_requests(job, start, end);
+-    cow_request_begin(&cow_request, job, start, end);
++    assert(QEMU_IS_ALIGNED(start, job->cluster_size));
++    assert(QEMU_IS_ALIGNED(end, job->cluster_size));
+ 
+     while (start < end) {
+         int64_t dirty_end;
+@@ -326,6 +318,31 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+         qemu_vfree(bounce_buffer);
+     }
+ 
++    return ret;
++}
++
++static int coroutine_fn backup_do_cow(BackupBlockJob *job,
++                                      int64_t offset, uint64_t bytes,
++                                      bool *error_is_read,
++                                      bool is_write_notifier)
++{
++    CowRequest cow_request;
++    int ret = 0;
++    int64_t start, end; /* bytes */
++
++    qemu_co_rwlock_rdlock(&job->flush_rwlock);
++
++    start = QEMU_ALIGN_DOWN(offset, job->cluster_size);
++    end = QEMU_ALIGN_UP(bytes + offset, job->cluster_size);
++
++    trace_backup_do_cow_enter(job, start, offset, bytes);
++
++    wait_for_overlapping_requests(job, start, end);
++    cow_request_begin(&cow_request, job, start, end);
++
++    ret = backup_do_copy(job, start, end - start, error_is_read,
++                         is_write_notifier);
++
+     cow_request_end(&cow_request);
+ 
+     trace_backup_do_cow_return(job, offset, bytes, ret);
 -- 
 2.21.0
 
