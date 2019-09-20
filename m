@@ -2,84 +2,64 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 393B7C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:28:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00451C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:29:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 059F02086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:28:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LyOoewGN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 059F02086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C52072086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:29:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C52072086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBFCs-0003jo-Uh
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 05:28:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51853)
+	id 1iBFEZ-0006KT-BA
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 05:29:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52842)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bmeng.cn@gmail.com>) id 1iBF8K-0005nI-Ti
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:23:21 -0400
+ (envelope-from <kwolf@redhat.com>) id 1iBFCb-0004D6-Nb
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:27:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1iBF4G-0002nx-OS
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:19:09 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:44927)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1iBF4G-0002nb-HY; Fri, 20 Sep 2019 05:19:08 -0400
-Received: by mail-pl1-x641.google.com with SMTP id q15so2888072pll.11;
- Fri, 20 Sep 2019 02:19:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:subject:date:message-id;
- bh=m9UduNtnihfL2Oqo445LRoF5PGEV/LiXCQ4Ew/lAK+U=;
- b=LyOoewGNLDkcKhlgHT2gTSOZ9v7FMPyPHHnyk3yJkiBLy4wFcciZYH6hfqH56iJxby
- zYiar3xBTY/b7vdzdSiRLlhYfn7ZHBMdkgpZI2AMDEja+BSTzSHIoaqhKW13KD8Mk9/n
- AqrQzZx1sY4UYtK85U/6DpY6vOEfWQOUopFiWdCIeveA/2dWz7FV+7vjjmyNGzWixPfS
- G3ujGOkI3/ZHt1k+rjUoGBzI5m1ZndLm0cLzor0W5YD4+1uDlLqXi/bUTcXpFekcGcHp
- 21y3JlPkNV8izYWbxYFJclwBIRC09QSyDhlV3EeHjHLCBHYeR9rFy48NBcKeCBLvXnsY
- KmlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id;
- bh=m9UduNtnihfL2Oqo445LRoF5PGEV/LiXCQ4Ew/lAK+U=;
- b=sMpRIkNSl8G9BMK2GtDiZJnBDABUjQ3mcRimoyb3g5BqpXXWFZAcBtg7w1NLgjEOrr
- vBiVhbucIX3yu2HhRZhbQbPH8au9ONB82sj9yrIE2hL3qGJr1RJz/217TyT0j2OeToy3
- htIgx/jBQ+y6uEbCY9nLfMPL5QaQmw+vfhJSn2V0hcIHK23j0RCMgmgo2IF/h26myTBG
- QiUZImdOHQlTUWHSc2aAJw3H6lQ8333FCnIDdoPQmqyCD/SOK0glSCoSGRxV329OFF/Z
- PMOnzQ1zghVwWiMEGguL5io8ssSKEkdVatAWs2fvd3zjTfs1sSrzTr4bUonWXjSc2pBB
- oyAg==
-X-Gm-Message-State: APjAAAXYdVgb0iG0707cNhM0/hqkWQ0L77ZjznwpylPb1UBB3L2FMuvM
- 706cMPx5D566ncr3aanpyZo=
-X-Google-Smtp-Source: APXvYqwhctsHGWX1V0uUa4KzrkxilqzyC6XfZzayC+EJiePEktopX5vqX/6qUcMargGcqixguHEE2w==
-X-Received: by 2002:a17:902:7c94:: with SMTP id
- y20mr3759593pll.229.1568971147620; 
- Fri, 20 Sep 2019 02:19:07 -0700 (PDT)
-Received: from localhost.localdomain (unknown-224-80.windriver.com.
- [147.11.224.80])
- by smtp.gmail.com with ESMTPSA id m9sm1500731pjf.11.2019.09.20.02.19.06
- (version=TLS1 cipher=AES128-SHA bits=128/128);
- Fri, 20 Sep 2019 02:19:07 -0700 (PDT)
-From: Bin Meng <bmeng.cn@gmail.com>
-To: Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-Subject: [PATCH 1/2] riscv: sifive_u: Drop "clock-frequency" property of cpu
- nodes
-Date: Fri, 20 Sep 2019 02:19:01 -0700
-Message-Id: <1568971142-27979-1-git-send-email-bmeng.cn@gmail.com>
-X-Mailer: git-send-email 1.7.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+ (envelope-from <kwolf@redhat.com>) id 1iBFCa-0007uQ-JG
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:27:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47272)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1iBFCX-0007sg-66; Fri, 20 Sep 2019 05:27:41 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9FDB118C427A;
+ Fri, 20 Sep 2019 09:27:39 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-117-81.ams2.redhat.com
+ [10.36.117.81])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B46A75C1B5;
+ Fri, 20 Sep 2019 09:27:30 +0000 (UTC)
+Date: Fri, 20 Sep 2019 11:27:29 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v2 1/2] iotests: Require Python 3.6 or later
+Message-ID: <20190920092729.GC5458@localhost.localdomain>
+References: <20190919162905.21830-1-kwolf@redhat.com>
+ <20190919162905.21830-2-kwolf@redhat.com>
+ <5f0e3c27-1c33-0f9b-485b-c3e4a6700138@virtuozzo.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5f0e3c27-1c33-0f9b-485b-c3e4a6700138@virtuozzo.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Fri, 20 Sep 2019 09:27:39 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,48 +71,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "thuth@redhat.com" <thuth@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "philmd@redhat.com" <philmd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The "clock-frequency" property of cpu nodes isn't required. Drop it.
+Am 20.09.2019 um 10:40 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 19.09.2019 19:29, Kevin Wolf wrote:
+> > Running iotests is not required to build QEMU, so we can have stricter
+> > version requirements for Python here and can make use of new features
+> > and drop compatibility code earlier.
+> > 
+> > This makes qemu-iotests skip all Python tests if a Python version before
+> > 3.6 is used for the build.
+> > 
+> > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >   tests/qemu-iotests/check | 13 ++++++++++++-
+> >   1 file changed, 12 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+> > index 875399d79f..588c453a94 100755
+> > --- a/tests/qemu-iotests/check
+> > +++ b/tests/qemu-iotests/check
+> > @@ -633,6 +633,12 @@ then
+> >       export SOCKET_SCM_HELPER="$build_iotests/socket_scm_helper"
+> >   fi
+> >   
+> > +python_usable=false
+> > +if $PYTHON -c 'import sys; sys.exit(0 if sys.version_info >= (3,6) else 1)'
+> > +then
+> > +    python_usable=true
+> > +fi
+> > +
+> >   default_machine=$($QEMU_PROG -machine help | sed -n '/(default)/ s/ .*//p')
+> >   default_alias_machine=$($QEMU_PROG -machine help | \
+> >      sed -n "/(alias of $default_machine)/ { s/ .*//p; q; }")
+> > @@ -809,7 +815,12 @@ do
+> >           start=$(_wallclock)
+> >   
+> >           if [ "$(head -n 1 "$source_iotests/$seq")" == "#!/usr/bin/env python" ]; then
+> > -            run_command="$PYTHON $seq"
+> > +            if $python_usable; then
+> 
+> hmm I wanted to say that this should not work, as python_usable is a
+> string. But I checked and see - it's work. Wow. Googled. And now I
+> understand that here "false" or "true" command is called, to obtain
+> it's return value.. I don't like bash and don't know its best
+> practice, but I'd prefer python_usable to be just return value of your
+> python command, like
+> 
+> above:
+> 
+>    $PYTHON -c 'import sys; sys.exit(0 if sys.version_info >= (3,6) else 1)'
+>    python_usable=$?
+> 
+> and here:
+> 
+>    if [ $python_usable -eq 0 ]; then
 
-This is to keep in sync with Linux kernel commit below:
-https://patchwork.kernel.org/patch/11133031/
+I'm just trying to be consistent with other variables used in the
+'check' script. It has many boolean variables and they all end up
+calling the true/false commands.
 
-Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
----
+And actually I think the version used is easier to read, even if maybe
+not as easy to understand why exactly it works.
 
- hw/riscv/sifive_u.c         | 2 --
- include/hw/riscv/sifive_u.h | 1 -
- 2 files changed, 3 deletions(-)
-
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 9f8e84b..02dd761 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -151,8 +151,6 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
-         char *isa;
-         qemu_fdt_add_subnode(fdt, nodename);
--        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
--                              SIFIVE_U_CLOCK_FREQ);
-         /* cpu 0 is the management hart that does not have mmu */
-         if (cpu != 0) {
-             qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
-diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-index e4df298..4850805 100644
---- a/include/hw/riscv/sifive_u.h
-+++ b/include/hw/riscv/sifive_u.h
-@@ -75,7 +75,6 @@ enum {
- };
- 
- enum {
--    SIFIVE_U_CLOCK_FREQ = 1000000000,
-     SIFIVE_U_HFCLK_FREQ = 33333333,
-     SIFIVE_U_RTCCLK_FREQ = 1000000
- };
--- 
-2.7.4
-
+Kevin
 
