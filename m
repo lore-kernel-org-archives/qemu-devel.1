@@ -2,57 +2,88 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B8C6C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 16:51:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44589C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 16:53:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1ACB3207FC
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 16:51:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ACB3207FC
+	by mail.kernel.org (Postfix) with ESMTPS id 1A929207FC
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 16:53:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A929207FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBM7e-0002eN-5Z
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 12:51:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52956)
+	id 1iBM9j-0004hJ-5d
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 12:53:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54265)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iBLeq-0007jc-Hb
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 12:21:22 -0400
+ (envelope-from <philmd@redhat.com>) id 1iBLlV-0002wU-B0
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 12:28:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iBLen-0008Eh-N9
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 12:21:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40628)
+ (envelope-from <philmd@redhat.com>) id 1iBLlQ-00031i-De
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 12:28:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50986)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iBLef-00089h-LX; Fri, 20 Sep 2019 12:21:11 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iBLlQ-00031U-5X
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 12:28:08 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5551E308624A;
- Fri, 20 Sep 2019 16:21:07 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-117-81.ams2.redhat.com
- [10.36.117.81])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2486F646A1;
- Fri, 20 Sep 2019 16:21:05 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 2/4] iotests: Test internal snapshots with -blockdev
-Date: Fri, 20 Sep 2019 18:20:56 +0200
-Message-Id: <20190920162058.29743-3-kwolf@redhat.com>
-In-Reply-To: <20190920162058.29743-1-kwolf@redhat.com>
-References: <20190920162058.29743-1-kwolf@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 972B983F45
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 16:28:06 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id c1so2477762wrb.12
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 09:28:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Zu3bPOo/xJ8Hl4J7P6fPHUSXQfc6ARL6LzwY0LA4f6o=;
+ b=BaXQR49o8T1c+O5Fxb2bfpKv2rk6Z0+3EbnQ4ddBNIxlctk1+/yxSA3MNG4W1VyLX/
+ JEUmZwsHjc/kgQBFkCdBbSFul27lMbmi9hjKpx9T415lyidmHdxD0GVN2i+nVJ//wg57
+ LYgChz9czPAbzsZzlEpA29CFvWrBEY8xfLRMyHnl+C0vKxm+tHFLp8D3vvQixCo08ocE
+ fbHkQKgbWoczqB45bg+bde0zZFIaEJwMcIQA1Ql41aGt4w45PCAmW1RaQ6I6CODW2CWr
+ LKHE/Xmtj7XSAVMTDzjTHz7iLSjW5i9gLBA07dHEE2oimQ+P/kyM+k7UPtqmlDbAc6O0
+ t4Gg==
+X-Gm-Message-State: APjAAAXYL4iRw7IhpKR+Pe8anf9qaSVeHVM52Umx46FB123cyNmZ3k+w
+ Q3pQvPlcJqjz4X0AwLP4/iyiidGaq6hpyMYga9Af9cHAx9oVp8kCrxhKAsNfdko6aswdbHzzH03
+ qk57UshXkoOe7RgI=
+X-Received: by 2002:a5d:5643:: with SMTP id j3mr251902wrw.357.1568996885331;
+ Fri, 20 Sep 2019 09:28:05 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxw+XxzC7kOijzMv2jm4PEnDUYnOHWHaDsI6bhkBN1NF7oT2beDlqbeD6YpAc1q6bGFvBlEUw==
+X-Received: by 2002:a5d:5643:: with SMTP id j3mr251890wrw.357.1568996885098;
+ Fri, 20 Sep 2019 09:28:05 -0700 (PDT)
+Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id m62sm3145712wmm.35.2019.09.20.09.28.04
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 20 Sep 2019 09:28:04 -0700 (PDT)
+Subject: Re: [PATCH 3/3] docker: remove unused debian-sid and debian-ports
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ John Snow <jsnow@redhat.com>
+References: <20190920001413.22567-1-jsnow@redhat.com>
+ <20190920001413.22567-4-jsnow@redhat.com>
+ <731ae95b-7c70-43ca-bea9-28b00de232d5@redhat.com>
+ <c7b12028-0294-0d9c-3e94-60b2ba7d3528@redhat.com> <87d0fvym64.fsf@linaro.org>
+ <77355885-6422-5a6a-bd32-e3871e35213e@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <4bf8c4ed-806e-6ee8-0031-5ce43dc52803@redhat.com>
+Date: Fri, 20 Sep 2019 18:28:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 20 Sep 2019 16:21:07 +0000 (UTC)
+In-Reply-To: <77355885-6422-5a6a-bd32-e3871e35213e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -67,454 +98,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Peter Krempa <pkrempa@redhat.com>
-Tested-by: Peter Krempa <pkrempa@redhat.com>
----
- tests/qemu-iotests/267           | 168 ++++++++++++++++++++++++++++
- tests/qemu-iotests/267.out       | 182 +++++++++++++++++++++++++++++++
- tests/qemu-iotests/common.filter |   5 +-
- tests/qemu-iotests/group         |   1 +
- 4 files changed, 352 insertions(+), 4 deletions(-)
- create mode 100755 tests/qemu-iotests/267
- create mode 100644 tests/qemu-iotests/267.out
+On 9/20/19 6:23 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 9/20/19 6:20 PM, Alex Benn=C3=A9e wrote:
+>> John Snow <jsnow@redhat.com> writes:
+>>> On 9/20/19 4:49 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>> On 9/20/19 2:14 AM, John Snow wrote:
+>>>>> These are listed as "partial" images, but have no user.
+>>>>> Remove them.
+>>>>
+>>>> Well, I have WiP users from them. I could restore this content when =
+they
+>>>> are ready... Ports is the base of deprecated Debian archs. On the ot=
+her
+>>>> side Sid is the base for edge development I use from time to time to
+>>>> test latest gcc/binutils.
+>>>> I'll try to find time to raise WiP branches to PoC.
+>>>>
+>>>
+>>> I think that's the right thing to do. Right now, the docker tests
+>>> directory has a lot of stale entries and unusable tests. That might b=
+e
+>>> fine for the people working on it, but it makes it hard to understand
+>>> and use for those of us who only occasionally traipse into the direct=
+ory.
+>>>
+>>> I'm removing all references to python2 -- but if there's no way for m=
+e
+>>> to test debian-sid and debian-ports, I can't test changes I need to m=
+ake
+>>> to these "partial images", so they should be removed until they are
+>>> consumable.
+>>>
+>>> While I am sympathetic to the idea of having a library of partial ima=
+ges
+>>> to use for future tests, they're prone to rot if there's no way to
+>>> exercise them in-tree.
+>>
+>> Don't forget some "partial" images are only used for building TCG test=
+s
+>> - we want to keep them. But as git is forever I can drop the sid/ports
+>> stuff for now until Phillipe has something to use them again.
+>=20
+> For Sid I have this case:
+>=20
+> -- >8 --
+> #
+> # Docker Renesas RX cross-compiler target
+> #
+> # This docker target builds on the debian Sid base image.
+> #
+> # Copyright (c) 2019 Philippe Mathieu-Daud=C3=A9
+> #
+> # SPDX-License-Identifier: GPL-2.0-or-later
+> #
+> FROM qemu:debian-sid
 
-diff --git a/tests/qemu-iotests/267 b/tests/qemu-iotests/267
-new file mode 100755
-index 0000000000..95f885442f
---- /dev/null
-+++ b/tests/qemu-iotests/267
-@@ -0,0 +1,168 @@
-+#!/usr/bin/env bash
-+#
-+# Test which nodes are involved in internal snapshots
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=3Dkwolf@redhat.com
-+
-+seq=3D`basename $0`
-+echo "QA output created by $seq"
-+
-+status=3D1	# failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+    rm -f "$TEST_DIR/nbd"
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+# Internal snapshots are (currently) impossible with refcount_bits=3D1
-+_unsupported_imgopts 'refcount_bits=3D1[^0-9]'
-+
-+do_run_qemu()
-+{
-+    echo Testing: "$@"
-+    (
-+        if ! test -t 0; then
-+            while read cmd; do
-+                echo $cmd
-+            done
-+        fi
-+        echo quit
-+    ) | $QEMU -nographic -monitor stdio -nodefaults "$@"
-+    echo
-+}
-+
-+run_qemu()
-+{
-+    do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qemu | _filter_hmp=
- |
-+        _filter_generated_node_ids | _filter_imgfmt
-+}
-+
-+size=3D128M
-+
-+run_test()
-+{
-+    _make_test_img $size
-+    printf "savevm snap0\ninfo snapshots\nloadvm snap0\n" | run_qemu "$@=
-" | _filter_date
-+}
-+
-+
-+echo
-+echo "=3D=3D=3D No block devices at all =3D=3D=3D"
-+echo
-+
-+run_test
-+
-+echo
-+echo "=3D=3D=3D -drive if=3Dnone =3D=3D=3D"
-+echo
-+
-+run_test -drive driver=3Dfile,file=3D"$TEST_IMG",if=3Dnone
-+run_test -drive driver=3D$IMGFMT,file=3D"$TEST_IMG",if=3Dnone
-+run_test -drive driver=3D$IMGFMT,file=3D"$TEST_IMG",if=3Dnone -device vi=
-rtio-blk,drive=3Dnone0
-+
-+echo
-+echo "=3D=3D=3D -drive if=3Dvirtio =3D=3D=3D"
-+echo
-+
-+run_test -drive driver=3Dfile,file=3D"$TEST_IMG",if=3Dvirtio
-+run_test -drive driver=3D$IMGFMT,file=3D"$TEST_IMG",if=3Dvirtio
-+
-+echo
-+echo "=3D=3D=3D Simple -blockdev =3D=3D=3D"
-+echo
-+
-+run_test -blockdev driver=3Dfile,filename=3D"$TEST_IMG",node-name=3Dfile
-+run_test -blockdev driver=3Dfile,filename=3D"$TEST_IMG",node-name=3Dfile=
- \
-+         -blockdev driver=3D$IMGFMT,file=3Dfile,node-name=3Dfmt
-+run_test -blockdev driver=3Dfile,filename=3D"$TEST_IMG",node-name=3Dfile=
- \
-+         -blockdev driver=3Draw,file=3Dfile,node-name=3Draw \
-+         -blockdev driver=3D$IMGFMT,file=3Draw,node-name=3Dfmt
-+
-+echo
-+echo "=3D=3D=3D -blockdev with a filter on top =3D=3D=3D"
-+echo
-+
-+run_test -blockdev driver=3Dfile,filename=3D"$TEST_IMG",node-name=3Dfile=
- \
-+         -blockdev driver=3D$IMGFMT,file=3Dfile,node-name=3Dfmt \
-+         -blockdev driver=3Dcopy-on-read,file=3Dfmt,node-name=3Dfilter
-+
-+echo
-+echo "=3D=3D=3D -blockdev with a backing file =3D=3D=3D"
-+echo
-+
-+TEST_IMG=3D"$TEST_IMG.base" _make_test_img $size
-+
-+IMGOPTS=3D"backing_file=3D$TEST_IMG.base" \
-+run_test -blockdev driver=3Dfile,filename=3D"$TEST_IMG.base",node-name=3D=
-backing-file \
-+         -blockdev driver=3Dfile,filename=3D"$TEST_IMG",node-name=3Dfile=
- \
-+         -blockdev driver=3D$IMGFMT,file=3Dfile,backing=3Dbacking-file,n=
-ode-name=3Dfmt
-+
-+IMGOPTS=3D"backing_file=3D$TEST_IMG.base" \
-+run_test -blockdev driver=3Dfile,filename=3D"$TEST_IMG.base",node-name=3D=
-backing-file \
-+         -blockdev driver=3D$IMGFMT,file=3Dbacking-file,node-name=3Dback=
-ing-fmt \
-+         -blockdev driver=3Dfile,filename=3D"$TEST_IMG",node-name=3Dfile=
- \
-+         -blockdev driver=3D$IMGFMT,file=3Dfile,backing=3Dbacking-fmt,no=
-de-name=3Dfmt
-+
-+# A snapshot should be present on the overlay, but not the backing file
-+echo Internal snapshots on overlay:
-+$QEMU_IMG snapshot -l "$TEST_IMG" | _filter_date
-+
-+echo Internal snapshots on backing file:
-+$QEMU_IMG snapshot -l "$TEST_IMG.base" | _filter_date
-+
-+echo
-+echo "=3D=3D=3D -blockdev with NBD server on the backing file =3D=3D=3D"
-+echo
-+
-+IMGOPTS=3D"backing_file=3D$TEST_IMG.base" _make_test_img $size
-+cat <<EOF |
-+nbd_server_start unix:$TEST_DIR/nbd
-+nbd_server_add -w backing-fmt
-+savevm snap0
-+info snapshots
-+loadvm snap0
-+EOF
-+run_qemu -blockdev driver=3Dfile,filename=3D"$TEST_IMG.base",node-name=3D=
-backing-file \
-+         -blockdev driver=3D$IMGFMT,file=3Dbacking-file,node-name=3Dback=
-ing-fmt \
-+         -blockdev driver=3Dfile,filename=3D"$TEST_IMG",node-name=3Dfile=
- \
-+         -blockdev driver=3D$IMGFMT,file=3Dfile,backing=3Dbacking-fmt,no=
-de-name=3Dfmt |
-+         _filter_date
-+
-+# This time, a snapshot should be created on both files
-+echo Internal snapshots on overlay:
-+$QEMU_IMG snapshot -l "$TEST_IMG" | _filter_date
-+
-+echo Internal snapshots on backing file:
-+$QEMU_IMG snapshot -l "$TEST_IMG.base" | _filter_date
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=3D0
-diff --git a/tests/qemu-iotests/267.out b/tests/qemu-iotests/267.out
-new file mode 100644
-index 0000000000..bb13f0ae3c
---- /dev/null
-+++ b/tests/qemu-iotests/267.out
-@@ -0,0 +1,182 @@
-+QA output created by 267
-+
-+=3D=3D=3D No block devices at all =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728
-+Testing:
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) savevm snap0
-+Error: No block device can accept snapshots
-+(qemu) info snapshots
-+No available block device supports snapshots
-+(qemu) loadvm snap0
-+Error: No block device supports snapshots
-+(qemu) quit
-+
-+
-+=3D=3D=3D -drive if=3Dnone =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728
-+Testing: -drive driver=3Dfile,file=3DTEST_DIR/t.IMGFMT,if=3Dnone
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) savevm snap0
-+Error: Device 'none0' is writable but does not support snapshots
-+(qemu) info snapshots
-+No available block device supports snapshots
-+(qemu) loadvm snap0
-+Error: Device 'none0' is writable but does not support snapshots
-+(qemu) quit
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728
-+Testing: -drive driver=3DIMGFMT,file=3DTEST_DIR/t.IMGFMT,if=3Dnone
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) savevm snap0
-+(qemu) info snapshots
-+List of snapshots present on all disks:
-+ID        TAG                 VM SIZE                DATE       VM CLOCK
-+--        snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+(qemu) loadvm snap0
-+(qemu) quit
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728
-+Testing: -drive driver=3DIMGFMT,file=3DTEST_DIR/t.IMGFMT,if=3Dnone -devi=
-ce virtio-blk,drive=3Dnone0
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) savevm snap0
-+(qemu) info snapshots
-+List of snapshots present on all disks:
-+ID        TAG                 VM SIZE                DATE       VM CLOCK
-+--        snap0               636 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+(qemu) loadvm snap0
-+(qemu) quit
-+
-+
-+=3D=3D=3D -drive if=3Dvirtio =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728
-+Testing: -drive driver=3Dfile,file=3DTEST_DIR/t.IMGFMT,if=3Dvirtio
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) savevm snap0
-+Error: Device 'virtio0' is writable but does not support snapshots
-+(qemu) info snapshots
-+No available block device supports snapshots
-+(qemu) loadvm snap0
-+Error: Device 'virtio0' is writable but does not support snapshots
-+(qemu) quit
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728
-+Testing: -drive driver=3DIMGFMT,file=3DTEST_DIR/t.IMGFMT,if=3Dvirtio
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) savevm snap0
-+(qemu) info snapshots
-+List of snapshots present on all disks:
-+ID        TAG                 VM SIZE                DATE       VM CLOCK
-+--        snap0               636 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+(qemu) loadvm snap0
-+(qemu) quit
-+
-+
-+=3D=3D=3D Simple -blockdev =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728
-+Testing: -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT,node-name=3D=
-file
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) savevm snap0
-+Error: Device '' is writable but does not support snapshots
-+(qemu) info snapshots
-+No available block device supports snapshots
-+(qemu) loadvm snap0
-+Error: Device '' is writable but does not support snapshots
-+(qemu) quit
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728
-+Testing: -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT,node-name=3D=
-file -blockdev driver=3DIMGFMT,file=3Dfile,node-name=3Dfmt
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) savevm snap0
-+(qemu) info snapshots
-+List of snapshots present on all disks:
-+ID        TAG                 VM SIZE                DATE       VM CLOCK
-+--        snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+(qemu) loadvm snap0
-+(qemu) quit
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728
-+Testing: -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT,node-name=3D=
-file -blockdev driver=3Draw,file=3Dfile,node-name=3Draw -blockdev driver=3D=
-IMGFMT,file=3Draw,node-name=3Dfmt
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) savevm snap0
-+(qemu) info snapshots
-+List of snapshots present on all disks:
-+ID        TAG                 VM SIZE                DATE       VM CLOCK
-+--        snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+(qemu) loadvm snap0
-+(qemu) quit
-+
-+
-+=3D=3D=3D -blockdev with a filter on top =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728
-+Testing: -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT,node-name=3D=
-file -blockdev driver=3DIMGFMT,file=3Dfile,node-name=3Dfmt -blockdev driv=
-er=3Dcopy-on-read,file=3Dfmt,node-name=3Dfilter
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) savevm snap0
-+(qemu) info snapshots
-+List of snapshots present on all disks:
-+ID        TAG                 VM SIZE                DATE       VM CLOCK
-+--        snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+(qemu) loadvm snap0
-+(qemu) quit
-+
-+
-+=3D=3D=3D -blockdev with a backing file =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT size=3D134217728
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 backing_fi=
-le=3DTEST_DIR/t.IMGFMT.base
-+Testing: -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT.base,node-=
-name=3Dbacking-file -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT,=
-node-name=3Dfile -blockdev driver=3DIMGFMT,file=3Dfile,backing=3Dbacking-=
-file,node-name=3Dfmt
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) savevm snap0
-+(qemu) info snapshots
-+List of snapshots present on all disks:
-+ID        TAG                 VM SIZE                DATE       VM CLOCK
-+--        snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+(qemu) loadvm snap0
-+(qemu) quit
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 backing_fi=
-le=3DTEST_DIR/t.IMGFMT.base
-+Testing: -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT.base,node-=
-name=3Dbacking-file -blockdev driver=3DIMGFMT,file=3Dbacking-file,node-na=
-me=3Dbacking-fmt -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT,nod=
-e-name=3Dfile -blockdev driver=3DIMGFMT,file=3Dfile,backing=3Dbacking-fmt=
-,node-name=3Dfmt
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) savevm snap0
-+(qemu) info snapshots
-+List of snapshots present on all disks:
-+ID        TAG                 VM SIZE                DATE       VM CLOCK
-+--        snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+(qemu) loadvm snap0
-+(qemu) quit
-+
-+Internal snapshots on overlay:
-+Snapshot list:
-+ID        TAG                 VM SIZE                DATE       VM CLOCK
-+1         snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+Internal snapshots on backing file:
-+
-+=3D=3D=3D -blockdev with NBD server on the backing file =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 backing_fi=
-le=3DTEST_DIR/t.IMGFMT.base
-+Testing: -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT.base,node-=
-name=3Dbacking-file -blockdev driver=3DIMGFMT,file=3Dbacking-file,node-na=
-me=3Dbacking-fmt -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT,nod=
-e-name=3Dfile -blockdev driver=3DIMGFMT,file=3Dfile,backing=3Dbacking-fmt=
-,node-name=3Dfmt
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) nbd_server_start unix:TEST_DIR/nbd
-+(qemu) nbd_server_add -w backing-fmt
-+(qemu) savevm snap0
-+(qemu) info snapshots
-+List of snapshots present on all disks:
-+ID        TAG                 VM SIZE                DATE       VM CLOCK
-+--        snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+(qemu) loadvm snap0
-+(qemu) quit
-+
-+Internal snapshots on overlay:
-+Snapshot list:
-+ID        TAG                 VM SIZE                DATE       VM CLOCK
-+1         snap0                   0 B yyyy-mm-dd hh:mm:ss   00:00:00.000
-+Internal snapshots on backing file:
-+Snapshot list:
-+ID        TAG                 VM SIZE                DATE       VM CLOCK
-+1         snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+*** done
-diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common=
-.filter
-index 445a1c23e0..841f7642af 100644
---- a/tests/qemu-iotests/common.filter
-+++ b/tests/qemu-iotests/common.filter
-@@ -19,12 +19,9 @@
- # standard filters
- #
-=20
--# ctime(3) dates
--#
- _filter_date()
- {
--    $SED \
--        -e 's/[A-Z][a-z][a-z] [A-z][a-z][a-z]  *[0-9][0-9]* [0-9][0-9]:[=
-0-9][0-9]:[0-9][0-9] [0-9][0-9][0-9][0-9]$/DATE/'
-+    $SED -re 's/[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}/yy=
-yy-mm-dd hh:mm:ss/'
- }
-=20
- _filter_generated_node_ids()
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 5d3da937e4..5805a79d9e 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -277,3 +277,4 @@
- 263 rw quick
- 265 rw auto quick
- 266 rw quick
-+267 rw auto quick snapshot
---=20
-2.20.1
+Oh well nevermind it is old, so it probably now works with debian-10.
 
+I used the Ports base for sparc32 and x32, I don't have them on my
+workstation I'll check during the WE.
+
+> MAINTAINER Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>=20
+> RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
+>     apt install -y --no-install-recommends \
+>         wget
+> RUN wget -qO - https://ftpmirror.gnu.org/binutils/binutils-2.32.tar.xz =
+\
+>     | tar -C /usr/src -xJf - && \
+>     cd /usr/src/binutils-2.32 && \
+>         CFLAGS=3D-w \
+>         ./configure --prefix=3D/usr --disable-nls
+> --target=3Drx-unknown-linux && \
+>         make && make install && \
+>         rm -rf /usr/src/binutils-2.32
+>=20
+> RUN git clone -b rx-trunk http://pf.osdn.net/gitroot/y/ys/ysato/gcc.git=
+ \
+>     /usr/src/gcc
+>=20
+> RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
+>     apt install -y --no-install-recommends \
+>         libgmp-dev libmpfr-dev libmpc-dev
+>=20
+> RUN cd /usr/src/gcc && \
+>     CPPFLAGS=3D-w \
+>     ./configure --target=3Drx-unknown-linux \
+>         --prefix=3D/usr --disable-nls \
+>         --enable-languages=3Dc --disable-shared \
+>         --disable-threads --with-uclibc \
+>         --disable-libssp --disable-libquadmath \
+>         --disable-libgomp --disable-libatomic && \
+>     make && make install && \
+>     rm -rf /usr/src/gcc
+>=20
+> # This image isn't designed for building QEMU but building tests
+> ENV QEMU_CONFIGURE_OPTS --disable-system --disable-user
+> ---
+>=20
 
