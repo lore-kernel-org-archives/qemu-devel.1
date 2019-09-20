@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 127D1C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:57:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B822C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 18:07:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4D312086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:57:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4D312086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1AB3520B7C
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 18:07:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AB3520B7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBN9j-0002l5-0J
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 13:57:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42998)
+	id 1iBNJ5-0007Yn-11
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 14:06:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45204)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iBN87-0001RG-Fh
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:55:41 -0400
+ (envelope-from <bounces@canonical.com>) id 1iBNHn-0006G9-KN
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 14:05:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iBN85-0006HX-S2
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:55:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42864)
+ (envelope-from <bounces@canonical.com>) id 1iBNHm-0002X4-2A
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 14:05:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50384)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iBN85-0006Gp-MI
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:55:37 -0400
+ id 1iBNHl-0002We-TA
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 14:05:38 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iBN84-0008UR-0H
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 17:55:36 +0000
+ id 1iBNHk-00016T-2b
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 18:05:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D40A32E80CB
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 17:55:35 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 0B9952E80CB
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 18:05:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 20 Sep 2019 17:49:38 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 20 Sep 2019 18:00:02 -0000
+From: Nathan Chancellor <1844597@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
@@ -54,9 +54,9 @@ X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: nathanchance pmaydell
 X-Launchpad-Bug-Reporter: Nathan Chancellor (nathanchance)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+X-Launchpad-Bug-Modifier: Nathan Chancellor (nathanchance)
 References: <156885735889.27264.8945287928013294736.malonedeb@soybean.canonical.com>
-Message-Id: <156900177897.13774.4058321407605820671.malone@gac.canonical.com>
+Message-Id: <156900240251.27220.3043591043549956422.malone@soybean.canonical.com>
 Subject: [Bug 1844597] Re: fc1120a7f5f2d4b601003205c598077d3eb11ad2 causes a
  kernel panic in vfp_init on a clang built kernel
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -64,7 +64,7 @@ X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19048";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 8adb982a8b78c32abd43da86334a631197562795
+X-Launchpad-Hash: a636920eca24d2f842530fb0ef83393ca0a681fa
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,14 +82,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Should be fixed by:
-https://patchew.org/QEMU/20190920174039.3916-1-peter.maydell@linaro.org/
-(which allows me to boot the kernel you attached at least as far as "didn't=
- find a root filesystem").
-
-
-** Changed in: qemu
-       Status: New =3D> In Progress
+I pulled down the fix, built locally, and can confirm that this resolves
+the issue. Thank you for the quick patch!
 
 -- =
 
