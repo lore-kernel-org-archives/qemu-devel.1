@@ -2,111 +2,119 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5CC7C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 11:52:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC4FC49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 11:55:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FBD4207E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 11:52:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FBD4207E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0414D207E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 11:55:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="LUx+9TUw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0414D207E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBHSr-0003tP-P5
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 07:52:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40481)
+	id 1iBHV6-0005LO-4J
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 07:55:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40702)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iBHS9-0003QM-3z
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 07:51:58 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iBHUB-0004fB-59
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 07:54:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iBHS6-0003tg-MQ
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 07:51:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39754)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iBHS6-0003sc-DM; Fri, 20 Sep 2019 07:51:54 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 97B9A18C4270;
- Fri, 20 Sep 2019 11:51:52 +0000 (UTC)
-Received: from [10.36.117.96] (ovpn-117-96.ams2.redhat.com [10.36.117.96])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 961931017E3B;
- Fri, 20 Sep 2019 11:51:51 +0000 (UTC)
-Subject: Re: [PULL 00/34] s390x update
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20190919124115.11510-1-cohuck@redhat.com>
- <CAFEAcA-WLayY+jL9mKV6zrstSZOynja7=k6Cjx4wR9g33jFPQA@mail.gmail.com>
- <20190920130038.4eaad8f0.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <2b470747-b881-d7e6-1c8c-0a446b044fb9@redhat.com>
-Date: Fri, 20 Sep 2019 13:51:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190920130038.4eaad8f0.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iBHU9-0005Lj-0x
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 07:54:02 -0400
+Received: from mail-eopbgr30109.outbound.protection.outlook.com
+ ([40.107.3.109]:23520 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iBHU8-0005KW-Fa; Fri, 20 Sep 2019 07:54:00 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=I7l87P4UwOVKLWlFy1+iqo4sG8XnzjLFhbDnXTJ4P8S1nLKDG1cbeoz9hoZwHzVbXm6EBYpyexh3R/qVic2cYLzO/70H32S8Is80SYYL6eWXOxd9ROQZd7gBfftqqtLXeAn6ueZHwNsFalViz1Tqw0G5UZ8zEae3zND/lVPBmBXcb9h+poXePVS/RYVJQkEWweIcKumDfeM2jZVGaG4mpTV2HfC3/ACBlZHMJzVsOHwRaDXvons8xk2xDK96H+k+1mr0sNmZA5lAmFfGVbIQ07RwydzAafmBAX/BZ91NR9L6kfP5vOZZhZingjk5m2lWj0TzBa2AhaqJgvth+1kDXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MGt5Jga22DEcH0Hlsjl+wtsNZXtmF9dICYRXYuORKcs=;
+ b=fCcvthpe1CqOhNsB8Pj2SnmhV3vbHRauRQgbXboGCPl+gI9HthweV+cU5TupyTbPtTXumlzjrXSOWKDTTBur5+GV3FXqxQa5Q74fJlKlZ6Og2HMtWQandP7W6N8kSbxUSzYahc5CASKkNTObzNxjNEY4AzY4fdq1QfeLMgIPasH2SvRfsLIsNtIBMLueImcPKzvL+uGL2mvnqd+TLGf4XMGFCIqXWDXznipEV1eMpD5mTqifi2VGJdd3MESLzbN0GNRqH0t3GOnRNkA2gaxQ2i4dgPdegoAMHSQJy7hrJ2T9Qc31sCi9N2DvqGIzjX8dsTlpsQYJWZDb4MkFhTW+nw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MGt5Jga22DEcH0Hlsjl+wtsNZXtmF9dICYRXYuORKcs=;
+ b=LUx+9TUwEsTbB7D1Ih4oQeuxH82I77BZWRR1wSORqMyDvH8zC1Jm5EL1AW1SBLLMwnlJozW6Tjabv3nss6q6BBP6ekc0rXf+BRv6ljSykJTJlZv+fCyPDSxVMXlokDeQPQfTsgi/ZoSGR45uhQmJy/kSot0m0f9J9Tqch+XS5vk=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB4938.eurprd08.prod.outlook.com (10.255.16.24) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2263.15; Fri, 20 Sep 2019 11:53:58 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2284.023; Fri, 20 Sep 2019
+ 11:53:58 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH v5 0/5] qcow2: async handling of fragmented io
+Thread-Topic: [PATCH v5 0/5] qcow2: async handling of fragmented io
+Thread-Index: AQHVbLeo76n3Ba9lJkqJlS+3Y8+k26c0bngAgAAMPwA=
+Date: Fri, 20 Sep 2019 11:53:57 +0000
+Message-ID: <93e72727-c46c-d30a-1f38-634237186126@virtuozzo.com>
+References: <20190916175324.18478-1-vsementsov@virtuozzo.com>
+ <d4d62196-84c2-0a90-312d-391493eae158@redhat.com>
+In-Reply-To: <d4d62196-84c2-0a90-312d-391493eae158@redhat.com>
+Accept-Language: ru-RU, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Fri, 20 Sep 2019 11:51:52 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0140.eurprd05.prod.outlook.com
+ (2603:10a6:7:28::27) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190920145354906
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 1f012a5d-009d-454a-3df8-08d73dc13848
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DB8PR08MB4938; 
+x-ms-traffictypediagnostic: DB8PR08MB4938:
+x-ms-exchange-purlcount: 1
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DB8PR08MB4938968DBF4BC7DA935B7CE5C1880@DB8PR08MB4938.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0166B75B74
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(366004)(396003)(39850400004)(376002)(136003)(346002)(189003)(199004)(53754006)(2616005)(305945005)(6506007)(36756003)(66946007)(386003)(25786009)(256004)(107886003)(14454004)(6512007)(6486002)(5660300002)(4326008)(66476007)(31686004)(6306002)(66446008)(6436002)(66556008)(86362001)(64756008)(229853002)(8936002)(446003)(31696002)(76176011)(486006)(110136005)(26005)(54906003)(476003)(66066001)(7736002)(6246003)(316002)(186003)(71190400001)(53546011)(11346002)(102836004)(2501003)(52116002)(3846002)(2906002)(6116002)(81156014)(99286004)(478600001)(81166006)(8676002)(966005)(71200400001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4938;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: nfWhksow+xOYa9i50ahnyuD/xXkwnT3vIMHp1DGHzKhrzSPEoRQyTxfhLmxNDKCRewYZMwg9KB7bfGn34zvfW5+8ADvQeuUL4qvsulCycWoUhwH0HiwqihRvcvFd+WFGqvz3nmRS9nylwwsibTTc2U+6B1Zp6xcCPWZ+JSPH7sJPu9xRYXr+6gLDX/ZKnn8CzwqrUu7xC6YtxunAPZhPyXHilGX6zvrB5sXmRNVNt5AbWi2qteR4UlyfECuB+k2nqZhEMRuKL95ZZ165ldcsfQHZpgMI9OzRzOMclL2dnwhwazsoLor+LE+Pc8itCBUd3bK2JuMrFlcpMN9ABK7HYQ9SF8gIbYWQHSaNXpiSwJ/0kp6E9FuArCkMG2yr6u+V4Wfw9cHCB259uychFcqIjhCeYRNYy78176k/PVG4j/4=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F822BC8EA1FDFF40B748693D8F9941EF@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1f012a5d-009d-454a-3df8-08d73dc13848
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Sep 2019 11:53:57.9416 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: +ycA3VN8RVcPfkpN9fPdJnA3ccl5qjU5ZGMK9S7gMbboh3lJgquJyCimHxKJtD1w+4L52Z6zkIAXeUuNK+JoDx2gSW0XL/ArFA0Wnp/JfF0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4938
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.3.109
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,70 +126,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20.09.19 13:00, Cornelia Huck wrote:
-> On Fri, 20 Sep 2019 11:45:18 +0100
-> Peter Maydell <peter.maydell@linaro.org> wrote:
-> 
->> On Thu, 19 Sep 2019 at 13:41, Cornelia Huck <cohuck@redhat.com> wrote:
->>>
->>> The following changes since commit f8c3db33a5e863291182f8862ddf81618a7c6194:
->>>
->>>   target/sparc: Switch to do_transaction_failed() hook (2019-09-17 12:01:00 +0100)
->>>
->>> are available in the Git repository at:
->>>
->>>   https://github.com/cohuck/qemu tags/s390x-20190919
->>>
->>> for you to fetch changes up to 37105adebeb28e60da3cb1ef82231d7ed8d23589:
->>>
->>>   Merge tag 'tags/s390-ccw-bios-2019-09-18' into s390-next-staging (2019-09-19 12:04:01 +0200)
->>>
->>> ----------------------------------------------------------------
->>> - bugfixes in tcg and the ccw bios
->>> - gen15a is called z15
->>> - officially require a 3.15 kernel or later for kvm
->>>
->>> ----------------------------------------------------------------  
->>
->> Hi -- I'm afraid this pullreq results in new warnings from
->> the runtime-sanitizer build when 'make check' is run:
->> MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
->> QTEST_QEMU_BINARY=s390x-softmmu/qemu-system-s390x
->> QTEST_QEMU_IMG=qemu-img tests
->> /boot-serial-test -m=quick -k --tap < /dev/null |
->> ./scripts/tap-driver.pl --test-name="boot-serial-test"
->> /home/petmay01/linaro/qemu-for-merges/target/s390x/mem_helper.c:293:17:
->> runtime error: null pointer passed as argument 1, which is declared to
->> never be null
->> /usr/include/string.h:47:14: note: nonnull attribute specified here
->> /home/petmay01/linaro/qemu-for-merges/target/s390x/mem_helper.c:293:32:
->> runtime error: null pointer passed as argument 2, which is declared to
->> never be null
->>
->> (and the same warnings for a few other tests).
->>
->> Looks like you sometimes can pass NULL pointers to the source
->> and destination of memmove(). This isn't permitted by the
->> standard even in the case where the size argument is zero.
->>
->> thanks
->> -- PMM
-> 
-> David, can you take a look?
-> 
-
-I would have assumed these pointers are ignored in case the length is
-zero, too (the only way this can happen). Easy to fix.
-
--- 
-
-Thanks,
-
-David / dhildenb
+MjAuMDkuMjAxOSAxNDoxMCwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAxNi4wOS4xOSAxOTo1Mywg
+VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IEhpIGFsbCENCj4+DQo+PiBI
+ZXJlIGlzIGFuIGFzeW5jaHJvbm91cyBzY2hlbWUgZm9yIGhhbmRsaW5nIGZyYWdtZW50ZWQgcWNv
+dzINCj4+IHJlYWRzIGFuZCB3cml0ZXMuIEJvdGggcWNvdzIgcmVhZCBhbmQgd3JpdGUgZnVuY3Rp
+b25zIGxvb3BzIHRocm91Z2gNCj4+IHNlcXVlbnRpYWwgcG9ydGlvbnMgb2YgZGF0YS4gVGhlIHNl
+cmllcyBhaW0gaXQgdG8gcGFyYWxsZWxpemUgdGhlc2UNCj4+IGxvb3BzIGl0ZXJhdGlvbnMuDQo+
+PiBJdCBpbXByb3ZlcyBwZXJmb3JtYW5jZSBmb3IgZnJhZ21lbnRlZCBxY293MiBpbWFnZXMsIEkn
+dmUgdGVzdGVkIGl0DQo+PiBhcyBkZXNjcmliZWQgYmVsb3cuDQo+IA0KPiBUaGFua3MgYWdhaW4s
+IGFwcGxpZWQgdG8gbXkgYmxvY2sgYnJhbmNoOg0KPiANCj4gaHR0cHM6Ly9naXQueGFuY2xpYy5t
+b2UvWGFuQ2xpYy9xZW11L2NvbW1pdHMvYnJhbmNoL2Jsb2NrDQoNClRoYW5rcyBhIGxvdCENCg0K
+PiANCj4+IHY1OiBmaXggMDI2IGFuZCByZWJhc2Ugb24gTWF4J3MgYmxvY2sgYnJhbmNoIFtwZXJm
+IHJlc3VsdHMgbm90IHVwZGF0ZWRdOg0KPj4NCj4+IDAxOiBuZXcsIHByZXBhcmUgMDI2IHRvIG5v
+dCBmYWlsDQo+PiAwMzogLSBkcm9wIHJlYWRfZW5jcnlwdGVkIGJsa2RiZyBldmVudCBbS2V2aW5d
+DQo+PiAgICAgIC0gYXNzZXJ0KCh4ICYgKEJEUlZfU0VDVE9SX1NJWkUgLSAxKSkgPT0gMCkgLT4g
+YXNzZXJ0KFFFTVVfSVNfQUxJR05FRCh4LCBCRFJWX1NFQ1RPUl9TSVpFKSkgW3JlYmFzZV0NCj4+
+ICAgICAgLSBmdWxsIGhvc3Qgb2Zmc2V0IGluIGFyZ3VtZW50IG9mIHFjb3cyX2NvX2RlY3J5cHQg
+W3JlYmFzZV0NCj4+IDA0OiAtIHN1YnN0aXR1dGUgcmVtYWluaW5nIHFjb3cyX2NvX2RvX3B3cml0
+ZXYgYnkgcWNvdzJfY29fcHdyaXRldl90YXNrIGluIGNvbW1lbnQgW01heF0NCj4+ICAgICAgLSBm
+dWxsIGhvc3Qgb2Zmc2V0IGluIGFyZ3VtZW50IG9mIHFjb3cyX2NvX2VuY3J5cHQgW3JlYmFzZV0N
+Cj4+IDA1OiAtIE5vdyBwYXRjaCBkb24ndCBhZmZlY3QgMDI2IGlvdGVzdCwgc28gaXRzIG91dHB1
+dCBpcyBub3QgY2hhbmdlZA0KPj4NCj4+IFJlYmFzZSBjaGFuZ2VzIHNlZW1zIHRyaXZpYWwsIHNv
+LCBJJ3ZlIGtlcHQgci1iIG1hcmtzLg0KPiANCj4gKEZvciB0aGUgcmVjb3JkLCBJIGRpZG7igJl0
+IGNvbnNpZGVyIHRoZW0gdHJpdmlhbCwgb3IgSeKAmWTigJl2ZSBhcHBsaWVkDQo+IE1heGlt4oCZ
+cyBzZXJpZXMgb24gdG9wIG9mIHlvdXJzLiAgSSBjb25zaWRlciBhIGNvbmZsaWN0IHRvIGJlIHRy
+aXZpYWxseQ0KPiByZXNvbHZhYmxlIG9ubHkgaWYgdGhlcmUgaXMgb25seSBvbmUgd2F5IG9mIGRv
+aW5nIGl0OyBidXQgd2hlbiBJDQo+IHJlc29sdmVkIHRoZSBjb25mbGljdHMgbXlzZWxmLCBJIHJl
+c29sdmVkIHRoZSBvbmUgaW4gcGF0Y2ggMyBkaWZmZXJlbnRseQ0KPiBmcm9tIHlvdSDigJMgSSBh
+ZGRlZCBhbiBvZmZzZXRfaW5fY2x1c3RlciB2YXJpYWJsZSB0bw0KPiBxY293Ml9jb19wcmVhZHZf
+ZW5jcnlwdGVkKCkuICBTdXJlLCBpdOKAmXMgc3RpbGwgc2ltcGxlIGFuZCB0aGUgZGlmZmVyZW5j
+ZQ0KPiBpcyBtaW5vciwgYnV0IHRoYXQgd2FzIGV4YWN0bHkgd2hlcmUgSSB0aG91Z2h0IHRoYXQg
+SSBjYW7igJl0IGNvbnNpZGVyDQo+IHRoaXMgdHJpdmlhbC4pDQo+IA0KDQpIbW0uIE1heSBiZSBp
+dCdzIHRyaXZpYWwgZW5vdWdoIHRvIGtlZXAgci1iIChhcyBteSBjaGFuZ2UgaXMgdHJpdmlhbCBp
+dHNlbGYpLCBidXQgbm90DQp0cml2aWFsIGVub3VnaCB0byBjaGFuZ2UgYWxpZW4gcGF0Y2ggb24g
+cXVldWluZz8gSWYgeW91IGRpc2FncmVlLCBJJ2xsIGJlIG1vcmUNCmNhcmVmdWwgb24ga2VlcGlu
+ZyByLWIgaW4gY2hhbmdlZCBwYXRjaGVzLCBzb3JyeS4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywN
+ClZsYWRpbWlyDQo=
 
