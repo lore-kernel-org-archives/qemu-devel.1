@@ -2,110 +2,84 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 977F1C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:27:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 393B7C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:28:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E180208C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:27:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E180208C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 059F02086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:28:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LyOoewGN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 059F02086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBFCe-0003aI-PL
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 05:27:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51823)
+	id 1iBFCs-0003jo-Uh
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 05:28:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51853)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iBF8a-0005j1-2C
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:23:37 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1iBF8K-0005nI-Ti
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:23:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iBEzt-0000Pz-AB
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:14:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49814)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iBEzt-0000PX-3J; Fri, 20 Sep 2019 05:14:37 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1156E309BF1A;
- Fri, 20 Sep 2019 09:14:36 +0000 (UTC)
-Received: from [10.36.116.238] (ovpn-116-238.ams2.redhat.com [10.36.116.238])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5B22460BF1;
- Fri, 20 Sep 2019 09:14:34 +0000 (UTC)
-Subject: Re: [Qemu-devel] [PATCH v1] tests/tcg: target/s390x: Test MVC
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190919092829.15393-1-david@redhat.com>
- <7995a66a-b1c6-2332-dd12-28ff69efa612@redhat.com>
- <e22f6316-aa1f-b037-2501-ed71dee09282@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <58fd53a3-dfe5-df70-5922-16a329d1c800@redhat.com>
-Date: Fri, 20 Sep 2019 11:14:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <e22f6316-aa1f-b037-2501-ed71dee09282@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 20 Sep 2019 09:14:36 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+ (envelope-from <bmeng.cn@gmail.com>) id 1iBF4G-0002nx-OS
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:19:09 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:44927)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1iBF4G-0002nb-HY; Fri, 20 Sep 2019 05:19:08 -0400
+Received: by mail-pl1-x641.google.com with SMTP id q15so2888072pll.11;
+ Fri, 20 Sep 2019 02:19:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:subject:date:message-id;
+ bh=m9UduNtnihfL2Oqo445LRoF5PGEV/LiXCQ4Ew/lAK+U=;
+ b=LyOoewGNLDkcKhlgHT2gTSOZ9v7FMPyPHHnyk3yJkiBLy4wFcciZYH6hfqH56iJxby
+ zYiar3xBTY/b7vdzdSiRLlhYfn7ZHBMdkgpZI2AMDEja+BSTzSHIoaqhKW13KD8Mk9/n
+ AqrQzZx1sY4UYtK85U/6DpY6vOEfWQOUopFiWdCIeveA/2dWz7FV+7vjjmyNGzWixPfS
+ G3ujGOkI3/ZHt1k+rjUoGBzI5m1ZndLm0cLzor0W5YD4+1uDlLqXi/bUTcXpFekcGcHp
+ 21y3JlPkNV8izYWbxYFJclwBIRC09QSyDhlV3EeHjHLCBHYeR9rFy48NBcKeCBLvXnsY
+ KmlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id;
+ bh=m9UduNtnihfL2Oqo445LRoF5PGEV/LiXCQ4Ew/lAK+U=;
+ b=sMpRIkNSl8G9BMK2GtDiZJnBDABUjQ3mcRimoyb3g5BqpXXWFZAcBtg7w1NLgjEOrr
+ vBiVhbucIX3yu2HhRZhbQbPH8au9ONB82sj9yrIE2hL3qGJr1RJz/217TyT0j2OeToy3
+ htIgx/jBQ+y6uEbCY9nLfMPL5QaQmw+vfhJSn2V0hcIHK23j0RCMgmgo2IF/h26myTBG
+ QiUZImdOHQlTUWHSc2aAJw3H6lQ8333FCnIDdoPQmqyCD/SOK0glSCoSGRxV329OFF/Z
+ PMOnzQ1zghVwWiMEGguL5io8ssSKEkdVatAWs2fvd3zjTfs1sSrzTr4bUonWXjSc2pBB
+ oyAg==
+X-Gm-Message-State: APjAAAXYdVgb0iG0707cNhM0/hqkWQ0L77ZjznwpylPb1UBB3L2FMuvM
+ 706cMPx5D566ncr3aanpyZo=
+X-Google-Smtp-Source: APXvYqwhctsHGWX1V0uUa4KzrkxilqzyC6XfZzayC+EJiePEktopX5vqX/6qUcMargGcqixguHEE2w==
+X-Received: by 2002:a17:902:7c94:: with SMTP id
+ y20mr3759593pll.229.1568971147620; 
+ Fri, 20 Sep 2019 02:19:07 -0700 (PDT)
+Received: from localhost.localdomain (unknown-224-80.windriver.com.
+ [147.11.224.80])
+ by smtp.gmail.com with ESMTPSA id m9sm1500731pjf.11.2019.09.20.02.19.06
+ (version=TLS1 cipher=AES128-SHA bits=128/128);
+ Fri, 20 Sep 2019 02:19:07 -0700 (PDT)
+From: Bin Meng <bmeng.cn@gmail.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
+Subject: [PATCH 1/2] riscv: sifive_u: Drop "clock-frequency" property of cpu
+ nodes
+Date: Fri, 20 Sep 2019 02:19:01 -0700
+Message-Id: <1568971142-27979-1-git-send-email-bmeng.cn@gmail.com>
+X-Mailer: git-send-email 1.7.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,45 +91,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19.09.19 18:01, Richard Henderson wrote:
-> On 9/19/19 2:41 AM, David Hildenbrand wrote:
->>> +    /* prepare the buffers - two consecutive pages */
->>> +    src = valloc(ALLOC_SIZE);
->>> +    dst = valloc(ALLOC_SIZE);
->>
->> If anybody cares, I can convert the obsolete valloc into a
->> posix_memalign(&src, 4096, ALLOC_SIZE) etc.
-> 
-> I don't care.  It may be obsolete, but it still works.
-> 
-> If you were to change it to anything I would think mmap
-> instead of using mprotect on the heap at all...
+The "clock-frequency" property of cpu nodes isn't required. Drop it.
 
-Yeah, that was my other thought, but after all I own "full" pages.
+This is to keep in sync with Linux kernel commit below:
+https://patchwork.kernel.org/patch/11133031/
 
-I'll leave it like this than unless somebody objects :)
+Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+---
 
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+ hw/riscv/sifive_u.c         | 2 --
+ include/hw/riscv/sifive_u.h | 1 -
+ 2 files changed, 3 deletions(-)
 
-Thanks!
-
-> 
-> 
-> r~
-> 
-
-
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 9f8e84b..02dd761 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -151,8 +151,6 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         char *isa;
+         qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+-                              SIFIVE_U_CLOCK_FREQ);
+         /* cpu 0 is the management hart that does not have mmu */
+         if (cpu != 0) {
+             qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index e4df298..4850805 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -75,7 +75,6 @@ enum {
+ };
+ 
+ enum {
+-    SIFIVE_U_CLOCK_FREQ = 1000000000,
+     SIFIVE_U_HFCLK_FREQ = 33333333,
+     SIFIVE_U_RTCCLK_FREQ = 1000000
+ };
 -- 
+2.7.4
 
-Thanks,
-
-David / dhildenb
 
