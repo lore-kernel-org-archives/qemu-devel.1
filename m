@@ -2,62 +2,136 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA5C1C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 18:12:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD6DBC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 18:13:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9306D20717
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 18:12:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9306D20717
+	by mail.kernel.org (Postfix) with ESMTPS id 8C17C20717
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 18:13:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C17C20717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBNOL-00019Y-Px
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 14:12:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46467)
+	id 1iBNPc-0002Of-NU
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 14:13:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46747)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iBNNN-0000gC-OD
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 14:11:27 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iBNOQ-0001PK-HL
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 14:12:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iBNNK-000555-Jz
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 14:11:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59232)
+ (envelope-from <jsnow@redhat.com>) id 1iBNOP-00068M-7p
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 14:12:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49630)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iBNNK-00054v-Bw
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 14:11:22 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iBNOM-00063C-PZ; Fri, 20 Sep 2019 14:12:26 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5071A3D3C
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 18:11:21 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-81.ams2.redhat.com
- [10.36.117.81])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 81C58600C6;
- Fri, 20 Sep 2019 18:11:20 +0000 (UTC)
-Date: Fri, 20 Sep 2019 20:11:19 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Tony Asleson <tasleson@redhat.com>
-Subject: Re: [RFC 0/4] POC: Generating realistic block errors
-Message-ID: <20190920181119.GF5458@localhost.localdomain>
-References: <20190919194847.18518-1-tasleson@redhat.com>
- <20190920083630.GA5458@localhost.localdomain>
- <566d0d07-35fc-2d66-a47c-00526546b31e@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 1295EC057EC6;
+ Fri, 20 Sep 2019 18:12:26 +0000 (UTC)
+Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 066665C1B5;
+ Fri, 20 Sep 2019 18:12:22 +0000 (UTC)
+Subject: Re: [Qemu-block] [PATCH v2] nbd/server: attach client channel to the
+ export's AioContext
+To: Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org
+References: <20190912110032.26395-1-slp@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <4e84115f-5317-7e84-a30f-3ed94b170f06@redhat.com>
+Date: Fri, 20 Sep 2019 14:12:22 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <566d0d07-35fc-2d66-a47c-00526546b31e@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20190912110032.26395-1-slp@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Fri, 20 Sep 2019 18:11:21 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Fri, 20 Sep 2019 18:12:26 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -71,119 +145,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 20.09.2019 um 18:41 hat Tony Asleson geschrieben:
-> On 9/20/19 3:36 AM, Kevin Wolf wrote:
-> > I/O error inserted by blkdebug can be one-off or permanent, but since it
-> > also supports using a small state machine, I think you should already be
-> > able to configure your errors that are corrected by a rewrite, too, even
-> > if there is no explicit support for this yet (I guess we could add it if
-> > it turned out to be much easier to use).
-> 
-> One thing I thought about is the feasibility of having a callback for
-> these errors across qapi.  For example you could register a sector for a
-> read/write/both and when that operation occurs you would block IO, send
-> the sector number and associated data across qapi for test code to do
-> something with it and respond allowing the operation to continue
-> successfully or by returning an error determined by the external test
-> code to be propagated to guest.
-> 
-> This would allow the logic to be outside of QEMU.  So for example in the
-> re-write case the test code could remove the error when it gets the
-> write, instead of having that logic embedded in QEMU itself.
-> 
-> Thoughts?
 
-Emitting a QMP event when blkdebug injects an error makes sense to me.
 
-I wouldn't use it for this case, though, because this would become racy.
-It could happen that the guest writes to the image, which sends a QMP
-event, and then reads before the external program has removed the error.
-
-> > The one thing I see in your series that we can't currently provide this
-> > way is the exact sector number where the error happened. If you read
-> > from sector 32 to 64 and there is an error configured for sector 50, you
-> > just see that the whole request is failing.
+On 9/12/19 7:00 AM, Sergio Lopez wrote:
+> On creation, the export's AioContext is set to the same one as the
+> BlockBackend, while the AioContext in the client QIOChannel is left
+> untouched.
 > 
-> Also depending on the device type the data behavior can be different
-> too.  For SCSI devices I believe the specification states that the data
-> leading up to the sector in error is transferred to the initiator.  For
-> ATA I believe this is not true.  My code doesn't model this correctly.
-> I generated the error before any data was transferred.
+> As a result, when using data-plane, nbd_client_receive_next_request()
+> schedules coroutines in the IOThread AioContext, while the client's
+> QIOChannel is serviced from the main_loop, potentially triggering the
+> assertion at qio_channel_restart_[read|write].
 > 
-> I'm thinking changes in blkdebug will need to be done to handle this too?
-
-Hm... The SCSI case might get a bit tricky (if the spec does indeed say
-that this is what must happen).
-
-blkdebug can only return an I/O error for the whole request. Then the
-device would ask for more information about the error and get the sector
-number of the error. And then it would have to retry up to immediately
-before the problematic sector.
-
-By the way, this is an example where fixing this in the context of
-blkdebug will also fix the behaviour for real I/O errors.
-
-> > I also wonder why you had to write low-level error handling code instead
-> > of calling the existing error functions. If the existing functions don't
-> > give the right result in error cases, shouldn't they be fixed anyway?
+> To fix this, as soon we have the export corresponding to the client,
+> we call qio_channel_attach_aio_context() to attach the QIOChannel
+> context to the export's AioContext. This matches with the logic at
+> blk_aio_attached().
 > 
-> I would think so too.  I'm using error constants that already exist, but
-> apparently are not being used anywhere else.
+> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=1748253
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> ---
+> Changelog
 > 
+> v2:
+>  - Attach the channel once after negotiation completes, avoiding
+>    duplication. (thanks Kevin Wolf).
+> ---
+>  nbd/server.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
-> > And then, as John already hinted, adding code for debugging scenarios to
-> > hot paths that are important for high-performance VMs that don't use any
-> > debugging is less than optimal.
+> diff --git a/nbd/server.c b/nbd/server.c
+> index 28c3c8be85..31d624e146 100644
+> --- a/nbd/server.c
+> +++ b/nbd/server.c
+> @@ -1297,6 +1297,11 @@ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
+>          return ret;
+>      }
+>  
+> +    /* Attach the channel to the same AioContext as the export */
+> +    if (client->exp && client->exp->ctx) {
+> +        qio_channel_attach_aio_context(client->ioc, client->exp->ctx);
+> +    }
+> +
+>      assert(!client->optlen);
+>      trace_nbd_negotiate_success();
+>  
 > 
-> I agree, the POC code was experimental, but I should have done more
-> effort in minimizing the run-time costs.
-> 
-> Additionally I think it would be good if QEMU could standardize the
-> device wwn format to be consistent throughout all block device types,
-> eg. uint64_t, but maybe not possible.  I also think it would be good to
-> allow the wwn passed on the command line correlate with what the guest
-> sees for /sys/block/<device>/device/wwid.
-> 
-> However, I'm assuming that QEMU has the same stance as the linux kernel
-> with no visible user space breakage?
 
-Changes that are visible to the guest break live migration, so they are
-only allowed with a new option that defaults to off for existing machine
-type. The default can change to on for new machine types.
+I assume this patch has been superseded by Eric's later patches?
 
-> > So bringing everything together, what would you think of this plan:
-> > 
-> > 1. Extend blkdebug with whatever ways you need to trigger I/O errors
-> >    (only if the existing modes aren't sufficient at least for the start;
-> >    we can still always extend it later)
-> > 
-> > 2. Add a new BlockDriver callback that can return detailed information
-> >    about an error (such as the exact sector number), and wire it up
-> >    through BlockBackend (some blk_* function). Implement it in blkdebug.
-> > 
-> > 3. In the guest devices, only call the function to get detailed error
-> >    information in the existing error path. You can then update some
-> >    device state according to the details if the block driver returned
-> >    anything (probably only blkdebug will return something).
-> > 
-> > This way, we have no changes at all in the hot I/O path if you didn't
-> > configure your VM with a blkdebug filter. And we avoid duplication of
-> > code both in the error handler in devices and in the error injection
-> > mechanisms.
-> 
-> This all sounds good to me.  Although I'm not 100% sure of all the
-> specific details you are describing at the moment as I'm not that
-> familiar with the code base.
-
-Yes, but I hope it does give you some pointers what to look at. Feel
-free to ask more questions once you're ready. (Though I won't be
-available next week, but there are other people, too, and I'll read it
-later anyway.)
-
-Kevin
+--js
 
