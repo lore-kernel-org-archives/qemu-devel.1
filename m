@@ -2,61 +2,92 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EF3FC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 07:56:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27C8DC49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 08:01:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7261C222D0
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 07:56:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7261C222D0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id F25D321A4A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 08:01:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F25D321A4A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBDmk-0007Yz-Az
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 03:56:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60882)
+	id 1iBDr4-0003c9-U8
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 04:01:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34812)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iBDaO-0001kF-K1
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:44:14 -0400
+ (envelope-from <philmd@redhat.com>) id 1iBDoH-0001Mj-Vt
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:58:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iBDaM-0005bS-QO
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:44:12 -0400
-Received: from mga17.intel.com ([192.55.52.151]:9881)
+ (envelope-from <philmd@redhat.com>) id 1iBDoF-00035P-Cp
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:58:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37408)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iBDaM-0005Yc-H0
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:44:10 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 20 Sep 2019 00:44:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,527,1559545200"; d="scan'208";a="212495100"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga004.fm.intel.com with ESMTP; 20 Sep 2019 00:44:07 -0700
-From: Tao Xu <tao3.xu@intel.com>
-To: imammedo@redhat.com,
-	eblake@redhat.com,
-	ehabkost@redhat.com
-Subject: [PATCH v12 08/11] hmat acpi: Build Memory Proximity Domain Attributes
- Structure(s)
-Date: Fri, 20 Sep 2019 15:43:46 +0800
-Message-Id: <20190920074349.2616-9-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190920074349.2616-1-tao3.xu@intel.com>
-References: <20190920074349.2616-1-tao3.xu@intel.com>
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iBDoF-00035A-6M
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:58:31 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2FB8F81F07
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 07:58:30 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id n3so837859wmf.3
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 00:58:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=KGn5/4uqP4WoBV74qQ5FgM9uECyyUIlv8ObsZhJdKFo=;
+ b=A6FTx9h3k8P5FccopAALTXFFBDJUrDVH9rqMTVdd0Ms68g1AaRt9W6cDweWvPzoiWB
+ a+MIEgBOMu0rdnMWhfnzj7jECP4dhZ+WYkDYK283PRStfRqL52hzoNTsip8C5wf+bgdw
+ Abm1jK5MFabKooj6+Gy47TirhXB9h6xIDXN4ZSPJB44NY+3frztOzYs3I3b2vIV/zezg
+ QBVDUfsFBDHCrCzs3vDUGwDtbX91rbAxO/cfObZzKgzA5iae/RzK4VTckMyuFAF2z3TM
+ VItDuDtN9oA3+F1WGnEJ0WoTa5284jxlIDxIVSewZXNGyqH5u6w61Iw30Vhhss9edbw0
+ SgiA==
+X-Gm-Message-State: APjAAAVBjxET0+ibXKC+Ui2SZqD3FGRzexbJcKPbko8CWZ0S/X0Bm/WD
+ AqaJMXIFy4IAJGuE6tCKLHYKGupbgo8tY/KKsOQpqnENZpLyjQeLEdNQEgLaWgWmLZ+GRpGEjMQ
+ O6OMIfsJyWOtZvio=
+X-Received: by 2002:a5d:5381:: with SMTP id d1mr45198wrv.315.1568966308841;
+ Fri, 20 Sep 2019 00:58:28 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxAG49GqeWGx7wKx0jwxOjLXDdvI3Cmgu++pgiNpg0FqLsnzm0L6cDL0mdF8q3M3YVl5uFf3g==
+X-Received: by 2002:a5d:5381:: with SMTP id d1mr45182wrv.315.1568966308553;
+ Fri, 20 Sep 2019 00:58:28 -0700 (PDT)
+Received: from [192.168.1.40] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id t1sm1156637wrn.57.2019.09.20.00.58.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 20 Sep 2019 00:58:27 -0700 (PDT)
+Subject: Re: [PATCH] edk2 build scripts: work around TianoCore#1607 without
+ forcing Python 2
+To: Laszlo Ersek <lersek@redhat.com>, qemu devel list
+ <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+References: <20190918171141.15957-1-lersek@redhat.com>
+ <2d02cb02-27ce-081b-c9ec-4c4430503749@redhat.com>
+ <6a5b3a61-0d52-6866-9fb9-4d71e5f01483@redhat.com>
+ <f6266a5b-6f9b-fa2c-2e4f-9d12cdb8b375@redhat.com>
+ <e23ac2ec-a15f-bb17-a82a-46730707d208@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <60e1c8b1-1694-7c5e-47b3-07570898a167@redhat.com>
+Date: Fri, 20 Sep 2019 09:58:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.151
+In-Reply-To: <e23ac2ec-a15f-bb17-a82a-46730707d208@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,265 +99,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, Daniel Black <daniel@linux.ibm.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>, dan.j.williams@intel.com
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Jingqi <jingqi.liu@intel.com>
+On 9/19/19 11:40 PM, Laszlo Ersek wrote:
+> On 09/19/19 21:56, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 9/19/19 9:08 PM, Laszlo Ersek wrote:
+>>> On 09/19/19 18:39, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>> On 9/18/19 7:11 PM, Laszlo Ersek wrote:
+>>>>> It turns out that forcing python2 for running the edk2 "build" util=
+ity is
+>>>>> neither necessary nor sufficient.
+>>>>>
+>>>>> Forcing python2 is not sufficient for two reasons:
+>>>>>
+>>>>> - QEMU is moving away from python2, with python2 nearing EOL,
+>>>>>
+>>>>> - according to my most recent testing, the lacking dependency infor=
+mation
+>>>>>   in the makefiles that are generated by edk2's "build" utility can=
+ cause
+>>>>>   parallel build failures even when "build" is executed by python2.
+>>>>>
+>>>>> And forcing python2 is not necessary because we can still return to=
+ the
+>>>>> original idea of filtering out jobserver-related options from MAKEF=
+LAGS.
+>>>>> So do that.
+>>>>
+>>>> FYI I tried uninstalling python2 on Fedora 29,
+>>>>
+>>>> $ make -C roms efi -j8
+>>>> make: Entering directory '/home/phil/source/qemu/roms'
+>>>> make -C edk2/BaseTools \
+>>>>         EXTRA_OPTFLAGS=3D'' \
+>>>>         EXTRA_LDFLAGS=3D''
+>>
+>> ^ this is the 'edk2-basetools' target from roms/Makefile.
+>>
+>>>> make[1]: Entering directory '/home/phil/source/qemu/roms/edk2/BaseTo=
+ols'
+>>>> [...]
+>>>> make -C Tests
+>>>> make[2]: Entering directory
+>>>> '/home/phil/source/qemu/roms/edk2/BaseTools/Tests'
+>>>> /bin/sh: python: command not found
+>>>> make[2]: *** [GNUmakefile:11: test] Error 127
+>>>>
+>>>> 'python' seems to be provided by python-unversioned-command which is
+>>>> wired to Python2:
+>>>>
+>>>> $ dnf info python-unversioned-command
+>>>> Last metadata expiration check: 0:03:08 ago on Thu 19 Sep 2019 04:21=
+:21
+>>>> PM UTC.
+>>>> Available Packages
+>>>> Name         : python-unversioned-command
+>>>> Version      : 2.7.16
+>>>> Release      : 2.fc29
+>>>> Arch         : noarch
+>>>> Size         : 13 k
+>>>> Source       : python2-2.7.16-2.fc29.src.rpm
+>>>> Repo         : updates
+>>>> Summary      : The "python" command that runs Python 2
+>>>> URL          : https://www.python.org/
+>>>> License      : Python
+>>>> Description  : This package contains /usr/bin/python - the "python"
+>>>> command that runs Python 2.
+>>>>
+>>>> I had to manually run update-alternatives to continue:
+>>>>
+>>>> $ sudo update-alternatives --install /usr/bin/python python
+>>>> /usr/bin/python3 69
+>>>>
+>>>> Not sure this is the expected behavior, it is confusing.
+>>>>
+>>>
+>>> The python detection is not fool-proof in edk2. A description is give=
+n at:
+>>>
+>>> https://github.com/tianocore/tianocore.github.io/wiki/BaseTools-Suppo=
+rt-Python2-Python3
+>>>
+>>> To summarize that, it works like this, on Linux:
+>>>
+>>> - if you set PYTHON_COMMAND, then the binary pointed to by
+>>> PYTHON_COMMAND will be used. The edk2 build infrastructure will
+>>> determine whether the pointed-to binary is python 2 or python 3, and
+>>> branch to the corresponding implementation of the build tools.
+>>>
+>>> - Otherwise, *minor* version auto-detection is attempted. With
+>>> PYTHON3_ENABLE unset, or set to "TRUE", this minor version autodetect=
+ion
+>>> will aim at minor versions of python3.
+>>>
+>>> - Otherwise (=3D PYTHON3_ENABLE set to a string different from "TRUE"=
+),
+>>> the minor version auto-detection will focus on python2.
+>>
+>> What you document regarding PYTHON3_ENABLE is valid once we sourced
+>> edksetup.sh which is done in Makefile.edk2, one step after the previou=
+s
+>> call:
+>>
+>> efi: edk2-basetools               # call 1 (python failing)
+>> 	$(MAKE) -f Makefile.edk2  # call 2 sourcing edksetup.sh
+>>
+>>> With this patch applied, the middle case is active. Apparently it fai=
+ls,
+>>> because the edk2 build tools developers could not foresee the situati=
+ons
+>>> that you've exposed the auto-detection to, on Ubuntu and Fedora. Back
+>>> when I tested the python3 enablement in edk2, I checked the patches i=
+n
+>>> the following environments:
+>>>
+>>> - on RHEL-7 with the system python 2,
+>>> - on RHEL-7 with python3.4 from EPEL-7,
+>>> - on RHEL-8 with python3.6,
+>>> - on RHEL-8 with platform-python.
+>>>
+>>> Everything worked fine for me. I have no clue what's going on in Ubun=
+tu
+>>> and in Fedora.
+>>>
+>>> Can we require all build host installations -- where we expect to run
+>>> "make efi" -- to provide a Python 3 binary on $PATH that is plainly
+>>> called "python3"?
+>>
+>> Kevin recently suggested a similar patch (in another area):
+>> https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg04377.html
+>>
+>>> Then I think this patch should work. (If necessary, I could set
+>>> "PYTHON_COMMAND=3Dpython3", too.)
+>>
+>> Yes, I confirm forcing "PYTHON_COMMAND=3Dpython3 make -C roms efi" wor=
+ks.
+>>
+>> Not sure what is the cleaner way to fix this although...
+>=20
+> Thanks for the analysis!
+>=20
+> I understand the issue now.
+>=20
+> - "edk2/BaseTools/GNUmakefile" runs $(MAKE) in three subdirs:
+>   - Source/C,
+>   - Source/Python,
+>   - Tests (which depends on the former two)
+>=20
+> - "edk2/BaseTools/Source/C/GNUmakefile" builds fine
+> - "edk2/BaseTools/Source/Python/GNUmakefile" does nothing
+> - "edk2/BaseTools/Tests/GNUmakefile" depends on PYTHON_COMMAND -- which
+>   should either come from the user, or from sourcing "edksetup.sh"
+>=20
+> Therefore the issue is:
+>=20
+> - the "edk2-basetools" target in "roms/Makefile" does not
+>   run (more precisely, does not "source") edksetup.sh
+>=20
+> - the "build-edk2-tools" target in "tests/uefi-test-tools/Makefile"
+>   does not run (more precisely, does not "source") edksetup.sh
+>=20
+> I don't think I will reorganize the dependencies in those makefiles. No=
+r
 
-HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
-(HMAT). The specification references below link:
-http://www.uefi.org/sites/default/files/resources/ACPI_6_3_final_Jan30.pdf
+Exactly, nor do I.
 
-It describes the memory attributes, such as memory side cache
-attributes and bandwidth and latency details, related to the
-Memory Proximity Domain. The software is
-expected to use this information as hint for optimization.
+> will I source edksetup.sh in the makefile recipes. Instead, I'll
+> directly set PYTHON_COMMAND=3Dpython3 in the "tools" recipes, and in th=
+e
+> build wrapper shell scripts.
 
-This structure describes Memory Proximity Domain Attributes by memory
-subsystem and its associativity with processor proximity domain as well as
-hint for memory usage.
+I notice this:
 
-In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and report
-the platform's HMAT tables.
+ $ git grep -i python configure
+ ...
+ configure:1832:python=3D"$python -B"
+ ...
+ configure:7287:echo "PYTHON=3D$python" >> $config_host_mak
+ ...
+ configure:7863:echo "export PYTHON=3D'$python'" >> "$iotests_common_env"
 
-Reviewed-by: Daniel Black <daniel@linux.ibm.com>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
----
+While config-host.mak is too QEMU specific, the iotest common.env is
+very simple:
 
-No changes in v12.
+ $ cat tests/qemu-iotests/common.env
+ # Automatically generated by configure - do not modify
+ export PYTHON=3D'python3 -B'
 
-Changes in v11:
-    - Move numa option patches forward.
----
- hw/acpi/Kconfig       |   5 +++
- hw/acpi/Makefile.objs |   1 +
- hw/acpi/hmat.c        | 101 ++++++++++++++++++++++++++++++++++++++++++
- hw/acpi/hmat.h        |  45 +++++++++++++++++++
- hw/i386/acpi-build.c  |   5 +++
- 5 files changed, 157 insertions(+)
- create mode 100644 hw/acpi/hmat.c
- create mode 100644 hw/acpi/hmat.h
+I'm not sure we need to run ./configure to run any make target in the
+roms/ directory (since we use 'make -C roms ...'), this script doesn't
+even clone the required submodules, we need to call 'make
+git-submodule-update' first.
 
-diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
-index 7c59cf900b..039bb99efa 100644
---- a/hw/acpi/Kconfig
-+++ b/hw/acpi/Kconfig
-@@ -7,6 +7,7 @@ config ACPI_X86
-     select ACPI_NVDIMM
-     select ACPI_CPU_HOTPLUG
-     select ACPI_MEMORY_HOTPLUG
-+    select ACPI_HMAT
- 
- config ACPI_X86_ICH
-     bool
-@@ -31,3 +32,7 @@ config ACPI_VMGENID
-     bool
-     default y
-     depends on PC
-+
-+config ACPI_HMAT
-+    bool
-+    depends on ACPI
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-index 9bb2101e3b..c05019b059 100644
---- a/hw/acpi/Makefile.objs
-+++ b/hw/acpi/Makefile.objs
-@@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
- common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
- common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
- common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
-+common-obj-$(CONFIG_ACPI_HMAT) += hmat.o
- common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
- 
- common-obj-y += acpi_interface.o
-diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-new file mode 100644
-index 0000000000..1368fce7ee
---- /dev/null
-+++ b/hw/acpi/hmat.c
-@@ -0,0 +1,101 @@
-+/*
-+ * HMAT ACPI Implementation
-+ *
-+ * Copyright(C) 2019 Intel Corporation.
-+ *
-+ * Author:
-+ *  Liu jingqi <jingqi.liu@linux.intel.com>
-+ *  Tao Xu <tao3.xu@intel.com>
-+ *
-+ * HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
-+ * (HMAT)
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "sysemu/numa.h"
-+#include "hw/acpi/hmat.h"
-+
-+/*
-+ * ACPI 6.3:
-+ * 5.2.27.3 Memory Proximity Domain Attributes Structure: Table 5-145
-+ */
-+static void build_hmat_mpda(GArray *table_data, uint16_t flags, int initiator,
-+                           int mem_node)
-+{
-+
-+    /* Memory Proximity Domain Attributes Structure */
-+    /* Type */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Length */
-+    build_append_int_noprefix(table_data, 40, 4);
-+    /* Flags */
-+    build_append_int_noprefix(table_data, flags, 2);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Proximity Domain for the Attached Initiator */
-+    build_append_int_noprefix(table_data, initiator, 4);
-+    /* Proximity Domain for the Memory */
-+    build_append_int_noprefix(table_data, mem_node, 4);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 4);
-+    /*
-+     * Reserved:
-+     * Previously defined as the Start Address of the System Physical
-+     * Address Range. Deprecated since ACPI Spec 6.3.
-+     */
-+    build_append_int_noprefix(table_data, 0, 8);
-+    /*
-+     * Reserved:
-+     * Previously defined as the Range Length of the region in bytes.
-+     * Deprecated since ACPI Spec 6.3.
-+     */
-+    build_append_int_noprefix(table_data, 0, 8);
-+}
-+
-+/* Build HMAT sub table structures */
-+static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
-+{
-+    uint16_t flags;
-+    int i;
-+
-+    for (i = 0; i < nstat->num_nodes; i++) {
-+        flags = 0;
-+
-+        if (nstat->nodes[i].initiator_valid) {
-+            flags |= HMAT_PROX_INIT_VALID;
-+        }
-+
-+        build_hmat_mpda(table_data, flags, nstat->nodes[i].initiator, i);
-+    }
-+}
-+
-+void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat)
-+{
-+    uint64_t hmat_start;
-+
-+    hmat_start = table_data->len;
-+
-+    /* reserve space for HMAT header  */
-+    acpi_data_push(table_data, 40);
-+
-+    hmat_build_table_structs(table_data, nstat);
-+
-+    build_header(linker, table_data,
-+                 (void *)(table_data->data + hmat_start),
-+                 "HMAT", table_data->len - hmat_start, 2, NULL, NULL);
-+}
-diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
-new file mode 100644
-index 0000000000..0c1839cf6f
---- /dev/null
-+++ b/hw/acpi/hmat.h
-@@ -0,0 +1,45 @@
-+/*
-+ * HMAT ACPI Implementation Header
-+ *
-+ * Copyright(C) 2019 Intel Corporation.
-+ *
-+ * Author:
-+ *  Liu jingqi <jingqi.liu@linux.intel.com>
-+ *  Tao Xu <tao3.xu@intel.com>
-+ *
-+ * HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
-+ * (HMAT)
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
-+ */
-+
-+#ifndef HMAT_H
-+#define HMAT_H
-+
-+#include "hw/acpi/acpi-defs.h"
-+#include "hw/acpi/acpi.h"
-+#include "hw/acpi/bios-linker-loader.h"
-+#include "hw/acpi/aml-build.h"
-+
-+/*
-+ * ACPI 6.3: 5.2.27.3 Memory Proximity Domain Attributes Structure,
-+ * Table 5-145, Field "flag", Bit [0]: set to 1 to indicate that data in
-+ * the Proximity Domain for the Attached Initiator field is valid.
-+ * Other bits reserved.
-+ */
-+#define HMAT_PROX_INIT_VALID 0x1
-+
-+void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat);
-+
-+#endif
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index e54e571a75..7f2e05f1a9 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -68,6 +68,7 @@
- #include "hw/i386/intel_iommu.h"
- 
- #include "hw/acpi/ipmi.h"
-+#include "hw/acpi/hmat.h"
- 
- /* These are used to size the ACPI tables for -M pc-i440fx-1.7 and
-  * -M pc-i440fx-2.0.  Even if the actual amount of AML generated grows
-@@ -2698,6 +2699,10 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-             acpi_add_table(table_offsets, tables_blob);
-             build_slit(tables_blob, tables->linker, machine);
-         }
-+        if (machine->numa_state->hmat_enabled) {
-+            acpi_add_table(table_offsets, tables_blob);
-+            build_hmat(tables_blob, tables->linker, machine->numa_state);
-+        }
-     }
-     if (acpi_get_mcfg(&mcfg)) {
-         acpi_add_table(table_offsets, tables_blob);
--- 
-2.20.1
+Note that when there is no 'python3' in $PATH, the ./configure script
+checks for python2, but does not use generic 'python':
 
+configure:901:for binary in "${PYTHON-python3}" python python2
+configure:905:        python=3D"$binary"
+
+> I'll try to post v2 soon.
+
+While forcing PYTHON_COMMAND in roms/Makefile would help, I think part
+of the proper way to fix this is generic to QEMU.
+
+Not sure what is the cleaner way yet :/
+
+Regards,
+
+Phil.
 
