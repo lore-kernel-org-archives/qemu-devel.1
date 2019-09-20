@@ -2,91 +2,59 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3265C3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 22:00:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 454E5C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 22:21:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D79620820
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 22:00:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vDW+y7o+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D79620820
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 186CF205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 22:21:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 186CF205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBQwz-0004Dl-Ew
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 18:00:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55691)
+	id 1iBRHB-0002R6-CO
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 18:21:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57737)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iBQwC-0003nm-GL
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 17:59:37 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iBR9K-0000EI-1P
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 18:13:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iBQwB-0000nU-3x
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 17:59:36 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:37088)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iBQwA-0000nH-SN
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 17:59:35 -0400
-Received: by mail-pl1-x641.google.com with SMTP id b10so3808872plr.4
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 14:59:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Fl/f3/ggFALzae9KsX0yoWKHmaMvS7SHiXxmHzfRV2g=;
- b=vDW+y7o+zX5Fz1FCK2oMXaFJWCbR6923xJDqoc0+TnBTiHo8q+kwtXLAGBOs6aka7X
- Ds5NdII/ESvYD0IzzZqovlRZ2qMDpTZ9AlVNNagNtkxsdiXjS9DZ4DHCy4l/fkMDFDBd
- 8CtUk76bXOHdPaK7lLyAqCZpmhemST7IUVqPA0GDK9LsO0ZTgSm9nUFr6aq6kLzR/t3P
- STkQN/ArmDNVt6B4ZR13t0HxvQL2ygw1iVHmam32wePD3XYh4aI2/5/VeClMJKqqNUQx
- UpUtsF33/fiMcj31arwUUkaYn2F8MBa9XJEt77vf7Q8XW5gveAUwQEjOtqF/eIKak3fA
- ajRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Fl/f3/ggFALzae9KsX0yoWKHmaMvS7SHiXxmHzfRV2g=;
- b=VoCI0/8z232NanLzKqRDIpiIX08Oz75VvIYXYieYXbfdVEJyxW3R2eoOiMR2wGFHMw
- hBGh2ajN5E0c9wOfdI1kdLswF4R8GE4bSWLr6vqIeG3LuYlCHGI6rOR6DNSMzhuyykBY
- 7MJT5eeZav18s++jC+ZefsJrP5Kf8SEMLAc1mWjfxNkKNiPrNfA83XIya92I7hMWy0PN
- 4uwnHlbocm/4HC5y1Wi5dMEjryggaYATS+5YweKITMi29dMeY37J8zYLCRgJ/mWfluuK
- ztoNTHYS2MPiNzUuSgTsVLJY32mZNruu7uyUEmm/zITmnEranHI46wbhDvcKCP60dJ5a
- q+RQ==
-X-Gm-Message-State: APjAAAUc05Em25S5HlWbfalAA21NVhWtFAa7USMS+pFv0qSclg0VDLx5
- RcyOB2wUMm61qGdP+qSBxVRAQ0esHWM=
-X-Google-Smtp-Source: APXvYqxmu+f4kgRO2AzR0ZsxzOi2tprfMDyfQQzrHe4ENTupxy/6MD1qs45ITaFoOzD5f9I8lyY3gQ==
-X-Received: by 2002:a17:902:202:: with SMTP id 2mr18424853plc.96.1569016772774; 
- Fri, 20 Sep 2019 14:59:32 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id c10sm3478780pfo.49.2019.09.20.14.59.31
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 20 Sep 2019 14:59:31 -0700 (PDT)
-Subject: Re: [PATCH] hw/arm/boot.c: Set NSACR.{CP11,CP10} for NS kernel boots
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20190920174039.3916-1-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <ef0f2fab-d482-cb88-4966-ca9a2eb7ab44@linaro.org>
-Date: Fri, 20 Sep 2019 14:59:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <jsnow@redhat.com>) id 1iBR9J-00070Y-2A
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 18:13:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37712)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iBR9I-0006zr-Sz
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 18:13:09 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1AC4B8980E5;
+ Fri, 20 Sep 2019 22:13:08 +0000 (UTC)
+Received: from probe.bos.redhat.com (dhcp-17-38.bos.redhat.com [10.18.17.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7977C5D9C3;
+ Fri, 20 Sep 2019 22:13:07 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 3/5] docker: remove debian8-mxe definitions
+Date: Fri, 20 Sep 2019 18:12:53 -0400
+Message-Id: <20190920221255.30412-4-jsnow@redhat.com>
+In-Reply-To: <20190920221255.30412-1-jsnow@redhat.com>
+References: <20190920221255.30412-1-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190920174039.3916-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Fri, 20 Sep 2019 22:13:08 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,34 +66,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ John Snow <jsnow@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/20/19 10:40 AM, Peter Maydell wrote:
-> If we're booting a Linux kernel directly into Non-Secure
-> state on a CPU which has Secure state, then make sure we
-> set the NSACR CP11 and CP10 bits, so that Non-Secure is allowed
-> to access the FPU. Otherwise an AArch32 kernel will UNDEF as
-> soon as it tries to use the FPU.
-> 
-> It used to not matter that we didn't do this until commit
-> fc1120a7f5f2d4b6, where we implemented actually honouring
-> these NSACR bits.
-> 
-> The problem only exists for CPUs where EL3 is AArch32; the
-> equivalent AArch64 trap bits are in CPTR_EL3 and are "0 to
-> not trap, 1 to trap", so the reset value of the register
-> permits NS access, unlike NSACR.
-> 
-> Fixes: fc1120a7f5
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1844597
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
+We don't have a debian8-mxe dockerfile anymore.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: John Snow <jsnow@redhat.com>
+Message-id: 20190920001413.22567-3-jsnow@redhat.com
+---
+ tests/docker/Makefile.include | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.includ=
+e
+index 0d75260e46..0a7fc8bc79 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -6,7 +6,7 @@ DOCKER_SUFFIX :=3D .docker
+ DOCKER_FILES_DIR :=3D $(SRC_PATH)/tests/docker/dockerfiles
+ # we don't run tests on intermediate images (used as base by another ima=
+ge)
+ DOCKER_PARTIAL_IMAGES :=3D debian8 debian9 debian10 debian-sid
+-DOCKER_PARTIAL_IMAGES +=3D debian8-mxe debian9-mxe debian-ports debian-b=
+ootstrap
++DOCKER_PARTIAL_IMAGES +=3D debian9-mxe debian-ports debian-bootstrap
+ DOCKER_IMAGES :=3D $(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_=
+DIR)/*.docker))))
+ DOCKER_TARGETS :=3D $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
+ # Use a global constant ccache directory to speed up repetitive builds
+--=20
+2.21.0
 
-r~
 
