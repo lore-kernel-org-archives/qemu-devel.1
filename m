@@ -2,66 +2,79 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 496C8C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 07:25:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D8F8C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 07:29:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F12C2086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 07:25:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F12C2086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 008902086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 07:29:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZvsCkBdq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 008902086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBDIf-0007oP-6O
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 03:25:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56222)
+	id 1iBDMX-0002ol-Rw
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 03:29:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56650)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dovgaluk@ispras.ru>) id 1iBDHo-0007Du-Cu
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:25:01 -0400
+ (envelope-from <liq3ea@gmail.com>) id 1iBDLB-0001Q4-Dh
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:28:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1iBDHm-0001MY-Uy
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:25:00 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:46030)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1iBDHm-0001LK-LD
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:24:58 -0400
-Received: from PASHAISP (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id B61F154006A;
- Fri, 20 Sep 2019 10:24:55 +0300 (MSK)
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-To: "'Kevin Wolf'" <kwolf@redhat.com>
-References: <20190918091831.GD5207@localhost.localdomain>
- <001201d56e02$9d88b5f0$d89a21d0$@ru>
- <20190918093305.GF5207@localhost.localdomain>
- <001401d56e04$b93c02a0$2bb407e0$@ru>
- <20190918094436.GG5207@localhost.localdomain>
- <001501d56e06$bbd7aa30$3386fe90$@ru>
- <20190919085302.GA10163@localhost.localdomain>
- <001901d56ec9$620ae260$2620a720$@ru>
- <20190919112702.GC10163@localhost.localdomain>
- <001a01d56ee3$4354a530$c9fdef90$@ru>
- <20190919130005.GF10163@localhost.localdomain>
-In-Reply-To: <20190919130005.GF10163@localhost.localdomain>
-Subject: RE: [for-4.2 PATCH 3/6] replay: update docs for record/replay with
- block devices
-Date: Fri, 20 Sep 2019 10:25:00 +0300
-Message-ID: <002401d56f84$83900e40$8ab02ac0$@ru>
+ (envelope-from <liq3ea@gmail.com>) id 1iBDLA-0004g5-8c
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:28:29 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40078)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1iBDLA-0004fa-4q
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:28:28 -0400
+Received: by mail-ot1-x344.google.com with SMTP id y39so5401720ota.7
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 00:28:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=m377ffvK9KHmDA9wc2++HWfB+bvf9bqknaeqmD7tmcE=;
+ b=ZvsCkBdq3PxHTxWaqc+yMKkf8QRvB8X8ZynZHSoSG3k9FBI1pygDs1DBMqdVJeZ5sC
+ 35kRU/llnQYYQEMJZ4VGsnF/wWTK1qTteq1bg5n78gCZBJ7hLIXez6HXrASeLdvB8Xhg
+ MYJZmmMF9YKMUEVbYqQgoFSP5XirPxV4bae4l8XHYtWijpp792VVgafZVRqoxoDkIb4Z
+ N6HBlHqnMzFVKHnxCUzbsKmLIfojmSX5x2IBanAFKf2vYYS3cQXTsHgBAbDSvtyKlstw
+ V3SleKjEvLi87aSOQ8WldfMmvdDUtfhHP7OeFNvYDnvkgTY+hKonh77m+GyZsgRplK+u
+ u3XQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=m377ffvK9KHmDA9wc2++HWfB+bvf9bqknaeqmD7tmcE=;
+ b=cwm8EhfuhD/3pJGR8vUs0smaaSY7K7DkWRGnkgycVNw4RbbEzPKbcVQRqiFNV+Rf8D
+ tMhOtFISKCtuVAHet3zjyTO1/9vIb7a1fZ7nl/9Kjv6xfXXFRb0fS0H5CyfPuQ9Nt4Pa
+ zDOKi9E71YtLEX7QtcTi8PNPXLXjJ3L4fVCf82zBX/vJ0d+ggBO1wRiKTr7BGM0Uqspp
+ HjqDsW8mVM9hT8c0iqnWJQgWbj2QuqxBBKJHwXioDUkl93L4Jqxd3mBx8CkDK3vfIMfb
+ tR25R17K4pYaWT3USsoP5WUfWvupRSxQGaYfbqqpsccV4f95I57WgvU3QMfPBkTnlxCI
+ hisg==
+X-Gm-Message-State: APjAAAXkAxyS/Jb/zmaR3734HFAeASAEVb/7qsy8EZ5vK46DVcsWuKHi
+ mWGIgCQ3MwACxx/ygGK8kTI2VfLLZ4UoB2orTZ8=
+X-Google-Smtp-Source: APXvYqzCf4enhEYZLqGACzJi9pD3KudqZkqI1iwx1vVAGYeKPDI7kVyrZB8OS7Uf8rYGrflrHLpaj+cXmAAuVoqwTy8=
+X-Received: by 2002:a9d:2902:: with SMTP id d2mr10087591otb.333.1568964507068; 
+ Fri, 20 Sep 2019 00:28:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Office Outlook 12.0
-Content-Language: ru
-Thread-Index: AdVu6jGMvI/1655mR8ugxifB44kziQAmiPDw
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 83.149.199.45
+References: <7f5dd2ac9f3504e2699f23e69bc3d8051b729832.1568925097.git.crobinso@redhat.com>
+In-Reply-To: <7f5dd2ac9f3504e2699f23e69bc3d8051b729832.1568925097.git.crobinso@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Fri, 20 Sep 2019 15:27:50 +0800
+Message-ID: <CAKXe6SKL9Mhqzq2FsQjkmF3N5ENyvBFv-janxsNO72B8qK8+iQ@mail.gmail.com>
+Subject: Re: [PATCH] vhost-user-gpu: Drop trailing json comma
+To: Cole Robinson <crobinso@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000001bee250592f70488"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,122 +86,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru, quintela@redhat.com,
- ciro.santilli@gmail.com, jasowang@redhat.com, crosthwaite.peter@gmail.com,
- qemu-devel@nongnu.org, armbru@redhat.com, alex.bennee@linaro.org,
- maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com,
- boost.lists@gmail.com, thomas.dullien@googlemail.com, pbonzini@redhat.com,
- mreitz@redhat.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com,
- rth@twiddle.net
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Qemu Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Kevin Wolf [mailto:kwolf@redhat.com]
-> Am 19.09.2019 um 14:10 hat Pavel Dovgalyuk geschrieben:
-> > > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > > Am 19.09.2019 um 11:05 hat Pavel Dovgalyuk geschrieben:
-> > > > > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > > > > > >
-> > > > > > > However, global -snapshot is just a convenient shortcut for specifying
-> > > > > > > snapshot=on for all -drive arguments. So if -snapshot is incompatible
-> > > > > > > with replay, shouldn't manually marking all drives as snapshot=on be
-> > > > > > > incompatible as well?
-> > > > > > >
-> > > > > > > Maybe you're really interested in some specific drive not having
-> > > > > > > snapshot=on? But then it might be better to check that specific drive
-> > > > > > > instad of forbidding just the shortcut for setting it.
-> > > > > >
-> > > > > > -snapshot adds the flag for top-level drive, making driver operations
-> > > > > > dependent on temporary file structure.
-> > > > > >
-> > > > > > Moving this overlay beneath blkreplay driver makes drive operations
-> > > > > > deterministic for the top-level device.
-> > > > >
-> > > > > So the real requirement is that blkreplay is the top-level node of any
-> > > > > guest device, right? And only because of this, you can't use -snapshot
-> > > > > (or snapshot=on on the blkreplay driver).
-> > > > >
-> > > > > If we instead check e.g. in blk_insert_bs() or blk_attach_dev() that in
-> > > > > record/replay mode, the root node of the BlockBackend is blkreplay,
-> > > > > wouldn't we catch many more incorrect setups?
-> > > >
-> > > > That sounds interesting.
-> > > > Will it help to check that every backend is connected to blkreplay?
-> > >
-> > > Yes, it would return an error when you try to attach a non-blkreplay
-> > > node to a BlockBackend (and every guest device uses a BlockBackend).
-> > >
-> > > Note that this restriction would currently make block jobs unavailable
-> > > on non-blkreplay nodes as they also use BlockBackends internally (though
-> > > this is going to change in the long run). I believe this restriction is
-> > > harmless and the typical replay use case doesn't involve any block jobs,
-> > > but if you do think it's a problem, blk_attach_dev() would be the place
-> > > that affects only devices.
-> > >
-> > > > How then this check has to be done?
-> > >
-> > > Only compile-tested, but maybe something like below?
-> > >
-> > > Kevin
-> > >
-> > > diff --git a/include/block/block_int.h b/include/block/block_int.h
-> > > index 0422acdf1c..9fa72bea51 100644
-> > > --- a/include/block/block_int.h
-> > > +++ b/include/block/block_int.h
-> > > @@ -955,6 +955,7 @@ static inline BlockDriverState *backing_bs(BlockDriverState *bs)
-> > >  extern BlockDriver bdrv_file;
-> > >  extern BlockDriver bdrv_raw;
-> > >  extern BlockDriver bdrv_qcow2;
-> > > +extern BlockDriver bdrv_blkreplay;
-> > >
-> > >  int coroutine_fn bdrv_co_preadv(BdrvChild *child,
-> > >      int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
-> > > diff --git a/block/blkreplay.c b/block/blkreplay.c
-> > > index 2b7931b940..16a4f1df6a 100644
-> > > --- a/block/blkreplay.c
-> > > +++ b/block/blkreplay.c
-> > > @@ -126,7 +126,7 @@ static int coroutine_fn blkreplay_co_flush(BlockDriverState *bs)
-> > >      return ret;
-> > >  }
-> > >
-> > > -static BlockDriver bdrv_blkreplay = {
-> > > +BlockDriver bdrv_blkreplay = {
-> > >      .format_name            = "blkreplay",
-> > >      .instance_size          = 0,
-> > >
-> > > diff --git a/block/block-backend.c b/block/block-backend.c
-> > > index 1c605d5444..c57d3d9fdf 100644
-> > > --- a/block/block-backend.c
-> > > +++ b/block/block-backend.c
-> > > @@ -17,6 +17,7 @@
-> > >  #include "block/throttle-groups.h"
-> > >  #include "hw/qdev-core.h"
-> > >  #include "sysemu/blockdev.h"
-> > > +#include "sysemu/replay.h"
-> > >  #include "sysemu/runstate.h"
-> > >  #include "qapi/error.h"
-> > >  #include "qapi/qapi-events-block.h"
-> > > @@ -808,6 +809,12 @@ void blk_remove_bs(BlockBackend *blk)
-> > >  int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp)
-> > >  {
-> > >      ThrottleGroupMember *tgm = &blk->public.throttle_group_member;
-> > > +
-> > > +    if (replay_mode != REPLAY_MODE_NONE && bs->drv != &bdrv_blkreplay) {
-> > > +        error_setg(errp, "Root node must be blkreplay");
-> > > +        return -ENOTSUP;
-> > > +    }
-> >
-> > I guess this is opposite direction - bs->drv is bdrv_file.
-> > And we should check its parent.
-> 
-> If bs->drv is bdrv_file, you want this to fail because only
-> bdrv_blkreplay should be able to be attached to devices.
+--0000000000001bee250592f70488
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-There was a regular rr invocation (as described in docs).
-And bs->drv always was a pointer to bdrv_file: for original image,
-and for temporary snapshot.
+Cole Robinson <crobinso@redhat.com> =E4=BA=8E2019=E5=B9=B49=E6=9C=8820=E6=
+=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8A=E5=8D=884:34=E5=86=99=E9=81=93=EF=BC=9A
 
-Pavel Dovgalyuk
+> Trailing comma is not valid json:
+>
+> $ cat contrib/vhost-user-gpu/50-qemu-gpu.json.in | jq
+> parse error: Expected another key-value pair at line 5, column 1
+>
+> Signed-off-by: Cole Robinson <crobinso@redhat.com>
+>
 
+
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+
+
+> ---
+>  contrib/vhost-user-gpu/50-qemu-gpu.json.in | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/contrib/vhost-user-gpu/50-qemu-gpu.json.in
+> b/contrib/vhost-user-gpu/50-qemu-gpu.json.in
+> index 658b545864..f5edd097f8 100644
+> --- a/contrib/vhost-user-gpu/50-qemu-gpu.json.in
+> +++ b/contrib/vhost-user-gpu/50-qemu-gpu.json.in
+> @@ -1,5 +1,5 @@
+>  {
+>    "description": "QEMU vhost-user-gpu",
+>    "type": "gpu",
+> -  "binary": "@libexecdir@/vhost-user-gpu",
+> +  "binary": "@libexecdir@/vhost-user-gpu"
+>  }
+> --
+> 2.23.0
+>
+>
+>
+
+--0000000000001bee250592f70488
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">Cole Robinson &lt;<a href=3D"mailto:c=
+robinso@redhat.com">crobinso@redhat.com</a>&gt; =E4=BA=8E2019=E5=B9=B49=E6=
+=9C=8820=E6=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8A=E5=8D=884:34=E5=86=99=E9=81=
+=93=EF=BC=9A<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
+ 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Tra=
+iling comma is not valid json:<br>
+<br>
+$ cat contrib/vhost-user-gpu/<a href=3D"http://50-qemu-gpu.json.in" rel=3D"=
+noreferrer" target=3D"_blank">50-qemu-gpu.json.in</a> | jq<br>
+parse error: Expected another key-value pair at line 5, column 1<br>
+<br>
+Signed-off-by: Cole Robinson &lt;<a href=3D"mailto:crobinso@redhat.com" tar=
+get=3D"_blank">crobinso@redhat.com</a>&gt;<br></blockquote><div><br></div><=
+div><br></div><div>Reviewed-by: Li Qiang &lt;<a href=3D"mailto:liq3ea@gmail=
+.com">liq3ea@gmail.com</a>&gt;</div><div>=C2=A0</div><blockquote class=3D"g=
+mail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204=
+,204,204);padding-left:1ex">
+---<br>
+=C2=A0contrib/vhost-user-gpu/<a href=3D"http://50-qemu-gpu.json.in" rel=3D"=
+noreferrer" target=3D"_blank">50-qemu-gpu.json.in</a> | 2 +-<br>
+=C2=A01 file changed, 1 insertion(+), 1 deletion(-)<br>
+<br>
+diff --git a/contrib/vhost-user-gpu/<a href=3D"http://50-qemu-gpu.json.in" =
+rel=3D"noreferrer" target=3D"_blank">50-qemu-gpu.json.in</a> b/contrib/vhos=
+t-user-gpu/<a href=3D"http://50-qemu-gpu.json.in" rel=3D"noreferrer" target=
+=3D"_blank">50-qemu-gpu.json.in</a><br>
+index 658b545864..f5edd097f8 100644<br>
+--- a/contrib/vhost-user-gpu/<a href=3D"http://50-qemu-gpu.json.in" rel=3D"=
+noreferrer" target=3D"_blank">50-qemu-gpu.json.in</a><br>
++++ b/contrib/vhost-user-gpu/<a href=3D"http://50-qemu-gpu.json.in" rel=3D"=
+noreferrer" target=3D"_blank">50-qemu-gpu.json.in</a><br>
+@@ -1,5 +1,5 @@<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0&quot;description&quot;: &quot;QEMU vhost-user-gpu&quot;,<br>
+=C2=A0 =C2=A0&quot;type&quot;: &quot;gpu&quot;,<br>
+-=C2=A0 &quot;binary&quot;: &quot;@libexecdir@/vhost-user-gpu&quot;,<br>
++=C2=A0 &quot;binary&quot;: &quot;@libexecdir@/vhost-user-gpu&quot;<br>
+=C2=A0}<br>
+-- <br>
+2.23.0<br>
+<br>
+<br>
+</blockquote></div></div>
+
+--0000000000001bee250592f70488--
 
