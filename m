@@ -2,73 +2,66 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 408ACC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 16:02:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D860BC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 16:03:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15DB8206B6
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 16:02:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15DB8206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id AA8C2206B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 16:03:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA8C2206B6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBLMI-0003tW-Az
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 12:02:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45404)
+	id 1iBLN8-0004tn-Ty
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 12:03:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47315)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iBKwo-0006QC-VI
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 11:35:52 -0400
+ (envelope-from <clg@kaod.org>) id 1iBL6a-0007zY-6l
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 11:46:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iBKwn-0006zB-HU
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 11:35:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45990)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iBKwn-0006yn-Ba
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 11:35:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iBKwk-0006Kk-Rd
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 15:35:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 113142E80DD
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 15:35:43 +0000 (UTC)
+ (envelope-from <clg@kaod.org>) id 1iBL6W-0003VL-7F
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 11:45:55 -0400
+Received: from 14.mo5.mail-out.ovh.net ([188.165.51.82]:60361)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iBL6W-0003SR-1C
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 11:45:52 -0400
+Received: from player694.ha.ovh.net (unknown [10.109.160.153])
+ by mo5.mail-out.ovh.net (Postfix) with ESMTP id 3A7E924F59E
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 17:45:49 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+ (Authenticated sender: clg@kaod.org)
+ by player694.ha.ovh.net (Postfix) with ESMTPSA id C3C669FC0D11;
+ Fri, 20 Sep 2019 15:45:35 +0000 (UTC)
+Subject: Re: [PATCH 01/15] ipmi: Fix watchdog NMI handling
+To: minyard@acm.org, Peter Maydell <peter.maydell@linaro.org>
+References: <20190919213924.31852-1-minyard@acm.org>
+ <20190919213924.31852-2-minyard@acm.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <f2d62bba-8e46-7359-2340-d07e4424f53e@kaod.org>
+Date: Fri, 20 Sep 2019 17:45:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20190919213924.31852-2-minyard@acm.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 17594437847848946616
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvddvgdelvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 20 Sep 2019 15:23:02 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: javascript js softfp
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dibalavs pmaydell
-X-Launchpad-Bug-Reporter: Vasily Dybala (dibalavs)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <154987502048.21937.8846396923018937713.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156899298280.5220.6596651952841122573.malone@chaenomeles.canonical.com>
-Subject: [Bug 1815423] Re: x86_64 TCG: Incorrect floating point cast to int.
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19048";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 21b8542e248c74573e2242d13ab55048c9f362b9
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 188.165.51.82
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,109 +70,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1815423 <1815423@bugs.launchpad.net>
+Cc: Corey Minyard <cminyard@mvista.com>, Fam Zheng <famz@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This should be fixed by commit 1e8a98b53867f61da9, which will be in the
-4.2 release.
+On 19/09/2019 23:39, minyard@acm.org wrote:
+> From: Corey Minyard <cminyard@mvista.com>
+>=20
+> The wrong logic was used for detection (so it wouldn't work at all)
+> and the wrong interface was used to inject the NMI if the detection
+> logic was correct.
+>=20
+> Signed-off-by: Corey Minyard <cminyard@mvista.com>
 
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
+C.
 
--- =
+> ---
+>  hw/ipmi/ipmi.c         | 6 +++---
+>  hw/ipmi/ipmi_bmc_sim.c | 2 +-
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/ipmi/ipmi.c b/hw/ipmi/ipmi.c
+> index 136c86b7a7..cbe158f815 100644
+> --- a/hw/ipmi/ipmi.c
+> +++ b/hw/ipmi/ipmi.c
+> @@ -28,9 +28,8 @@
+>  #include "qom/object_interfaces.h"
+>  #include "sysemu/runstate.h"
+>  #include "qapi/error.h"
+> -#include "qapi/qapi-commands-misc.h"
+> -#include "qapi/visitor.h"
+>  #include "qemu/module.h"
+> +#include "hw/nmi.h"
+> =20
+>  static uint32_t ipmi_current_uuid =3D 1;
+> =20
+> @@ -60,7 +59,8 @@ static int ipmi_do_hw_op(IPMIInterface *s, enum ipmi_=
+op op, int checkonly)
+>          if (checkonly) {
+>              return 0;
+>          }
+> -        qmp_inject_nmi(NULL);
+> +        /* We don't care what CPU we use. */
+> +        nmi_monitor_handle(0, NULL);
+>          return 0;
+> =20
+>      case IPMI_SHUTDOWN_VIA_ACPI_OVERTEMP:
+> diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
+> index 246a6d390c..8f63bb7181 100644
+> --- a/hw/ipmi/ipmi_bmc_sim.c
+> +++ b/hw/ipmi/ipmi_bmc_sim.c
+> @@ -1194,7 +1194,7 @@ static void set_watchdog_timer(IPMIBmcSim *ibs,
+>          break;
+> =20
+>      case IPMI_BMC_WATCHDOG_PRE_NMI:
+> -        if (!k->do_hw_op(s, IPMI_SEND_NMI, 1)) {
+> +        if (k->do_hw_op(s, IPMI_SEND_NMI, 1)) {
+>              /* NMI not supported. */
+>              rsp_buffer_set_error(rsp, IPMI_CC_INVALID_DATA_FIELD);
+>              return;
+>=20
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815423
-
-Title:
-  x86_64 TCG: Incorrect floating point cast to int.
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  I used exaample from:
-  https://stackoverflow.com/questions/3986795/what-is-the-result-of-casting=
--float-inf-inf-and-nan-to-integer-in-c
-
-  #include <stdio.h>
-  #include <math.h>
-
-  int main(int argc, char** argv) {
-    float a =3D INFINITY;
-    float b =3D -INFINITY;
-    float c =3D NAN;
-
-    printf("float %f %f %f\n", a, b, c); =
-
-    printf("int %d %d %d\n", (int) a, (int) b, (int) c); =
-
-    printf("uint %u %u %u\n", (unsigned int) a, (unsigned int) b, (unsigned=
- int) c); =
-
-    printf("lint %ld %ld %ld\n", (long int) a, (long int) b, (long int) b); =
-
-    printf("luint %lu %lu %lu\n", (unsigned long int) a, (unsigned long int=
-) b, (unsigned long int) c); =
-
-
-    return 0;
-  }
-
-  And got different results on real computer and on qemu.
-
-  output from real HW is the same as on stackoverflow:
-
-  $ gcc test.c && ./a.out =
-
-  float inf -inf nan
-  int -2147483648 -2147483648 -2147483648
-  uint 0 0 0
-  lint -9223372036854775808 -9223372036854775808 -9223372036854775808
-  luint 0 9223372036854775808 9223372036854775808
-
-  =
-
-  But on qemu I got another results:
-
-  float inf -inf nan
-  int 2147483647 -2147483648 2147483647
-  uint 4294967295 0 4294967295
-  lint 9223372036854775807 -9223372036854775808 -9223372036854775808
-  luint 18446744073709551615 9223372036854775808 9223372036854775807
-
-  qemu launch string:
-  /qemu-system-x86_64 -m 1024 -cpu core2duo -serial stdio -netdev user,id=
-=3Dnetwork0 -device e1000,netdev=3Dnetwork0 -kernel my_kernel
-
-  =
-
-  qemu version:
-  x86_64-softmmu/qemu-system-x86_64 --version
-  QEMU emulator version 3.1.50 (v3.1.0-1676-ge47f81b617-dirty)
-  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
-
-  =
-
-  This bug affect some javascript (surprise) calculations:
-
-  var conversion =3D "01234567890";
-  var x;
-  var result =3D conversion[x & 42];
-  console.log(result)
-
-  =
-
-  In example, var x is "undefined"
-  and when do calculation "x & 42" on js we should get 0 (it is documented =
-feature), but actually got "42"
-
-  and "result" sould be "0" but actually we got "undefined"
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1815423/+subscriptions
 
