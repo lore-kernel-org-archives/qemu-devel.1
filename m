@@ -2,48 +2,46 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 996D7C4CECD
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 14:27:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CC22C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 14:28:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 734A920882
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 14:27:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 734A920882
+	by mail.kernel.org (Postfix) with ESMTPS id E6D572086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 14:28:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6D572086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBJsR-00023d-Vx
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 10:27:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32829)
+	id 1iBJtG-0002sq-Gu
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 10:28:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32822)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iBJmW-0004ZZ-Mh
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 10:21:10 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iBJmW-0004ZJ-Fz
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 10:21:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iBJmU-0000tZ-Rv
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iBJmU-0000tN-Ob
  for qemu-devel@nongnu.org; Fri, 20 Sep 2019 10:21:08 -0400
-Received: from relay.sw.ru ([185.231.240.75]:43826)
+Received: from relay.sw.ru ([185.231.240.75]:43784)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iBJmQ-0000h0-6S; Fri, 20 Sep 2019 10:21:02 -0400
+ id 1iBJmQ-0000gB-FL; Fri, 20 Sep 2019 10:21:02 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iBJmO-0006b5-F8; Fri, 20 Sep 2019 17:21:00 +0300
+ id 1iBJmL-0006b5-VF; Fri, 20 Sep 2019 17:20:58 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v13 13/15] block: add lock/unlock range functions
-Date: Fri, 20 Sep 2019 17:20:54 +0300
-Message-Id: <20190920142056.12778-14-vsementsov@virtuozzo.com>
+Subject: [PATCH v13 00/15] backup-top filter driver for backup
+Date: Fri, 20 Sep 2019 17:20:41 +0300
+Message-Id: <20190920142056.12778-1-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190920142056.12778-1-vsementsov@virtuozzo.com>
-References: <20190920142056.12778-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
@@ -67,112 +65,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce lock/unlock range functionality, based on serialized
-requests. This is needed to refactor backup, dropping local
-tracked-request-like synchronization.
+Hi all!
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- include/block/block_int.h |  4 ++++
- block/io.c                | 44 ++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 47 insertions(+), 1 deletion(-)
+These series introduce backup-top driver. It's a filter-node, which
+do copy-before-write operation. Mirror uses filter-node for handling
+guest writes, let's move to filter-node (from write-notifiers) for
+backup too.
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 0422acdf1c..b59011ca97 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -65,6 +65,7 @@ enum BdrvTrackedRequestType {
-     BDRV_TRACKED_WRITE,
-     BDRV_TRACKED_DISCARD,
-     BDRV_TRACKED_TRUNCATE,
-+    BDRV_TRACKED_LOCK,
- };
- 
- typedef struct BdrvTrackedRequest {
-@@ -968,6 +969,9 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
- int coroutine_fn bdrv_co_pwritev_part(BdrvChild *child,
-     int64_t offset, unsigned int bytes,
-     QEMUIOVector *qiov, size_t qiov_offset, BdrvRequestFlags flags);
-+void *coroutine_fn bdrv_co_try_lock(BlockDriverState *bs,
-+                                    int64_t offset, unsigned int bytes);
-+void coroutine_fn bdrv_co_unlock(void *opaque);
- 
- static inline int coroutine_fn bdrv_co_pread(BdrvChild *child,
-     int64_t offset, unsigned int bytes, void *buf, BdrvRequestFlags flags)
-diff --git a/block/io.c b/block/io.c
-index f5f7b7357c..a749583453 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -786,6 +786,15 @@ void bdrv_dec_in_flight(BlockDriverState *bs)
-     bdrv_wakeup(bs);
- }
- 
-+static bool ignore_intersection(BdrvTrackedRequest *a, BdrvTrackedRequest *b)
-+{
-+    return a == b || (!a->serialising && !b->serialising) ||
-+        (a->type == BDRV_TRACKED_LOCK && b->type == BDRV_TRACKED_READ &&
-+         !b->serialising) ||
-+        (b->type == BDRV_TRACKED_LOCK && a->type == BDRV_TRACKED_READ &&
-+         !a->serialising);
-+}
-+
- static bool coroutine_fn do_wait_serialising_requests(BdrvTrackedRequest *self,
-                                                       bool wait)
- {
-@@ -802,7 +811,7 @@ static bool coroutine_fn do_wait_serialising_requests(BdrvTrackedRequest *self,
-         retry = false;
-         qemu_co_mutex_lock(&bs->reqs_lock);
-         QLIST_FOREACH(req, &bs->tracked_requests, list) {
--            if (req == self || (!req->serialising && !self->serialising)) {
-+            if (ignore_intersection(self, req)) {
-                 continue;
-             }
-             if (tracked_request_overlaps(req, self->overlap_offset,
-@@ -840,6 +849,12 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-     return do_wait_serialising_requests(self, true);
- }
- 
-+static bool coroutine_fn should_wait_serialising_requests(
-+        BdrvTrackedRequest *self)
-+{
-+    return do_wait_serialising_requests(self, false);
-+}
-+
- static int bdrv_check_byte_request(BlockDriverState *bs, int64_t offset,
-                                    size_t size)
- {
-@@ -3378,3 +3393,30 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
- 
-     return tco.ret;
- }
-+
-+void *coroutine_fn bdrv_co_try_lock(BlockDriverState *bs,
-+                                    int64_t offset, unsigned int bytes)
-+{
-+    BdrvTrackedRequest *req = g_new(BdrvTrackedRequest, 1);
-+
-+    tracked_request_begin(req, bs, offset, bytes, BDRV_TRACKED_LOCK);
-+    mark_request_serialising(req, bdrv_get_cluster_size(bs));
-+
-+    if (should_wait_serialising_requests(req)) {
-+        tracked_request_end(req);
-+        g_free(req);
-+        return NULL;
-+    }
-+
-+    return req;
-+}
-+
-+void coroutine_fn bdrv_co_unlock(void *opaque)
-+{
-+    BdrvTrackedRequest *req = opaque;
-+
-+    assert(req->type == BDRV_TRACKED_LOCK);
-+
-+    tracked_request_end(req);
-+    g_free(req);
-+}
+v11,v12 -> v13 changes:
+
+[v12 was two fixes in separate: [PATCH v12 0/2] backup: copy_range fixes]
+
+01: new in v12, in v13 change comment
+02: in v12: add "Fixes: " to commit msg, in v13 add John's r-b
+05: rebase on 01
+07: rebase on 01. It still a clean movement, keep r-b
+
+Vladimir Sementsov-Ogievskiy (15):
+  block/backup: fix max_transfer handling for copy_range
+  block/backup: fix backup_cow_with_offload for last cluster
+  block/backup: split shareable copying part from backup_do_cow
+  block/backup: improve comment about image fleecing
+  block/backup: introduce BlockCopyState
+  block/backup: fix block-comment style
+  block: move block_copy from block/backup.c to separate file
+  block: teach bdrv_debug_breakpoint skip filters with backing
+  iotests: prepare 124 and 257 bitmap querying for backup-top filter
+  iotests: 257: drop unused Drive.device field
+  iotests: 257: drop device_add
+  block/io: refactor wait_serialising_requests
+  block: add lock/unlock range functions
+  block: introduce backup-top filter driver
+  block/backup: use backup-top instead of write notifiers
+
+ qapi/block-core.json          |   8 +-
+ block/backup-top.h            |  37 ++
+ include/block/block-copy.h    |  84 ++++
+ include/block/block_int.h     |   5 +
+ block.c                       |  34 +-
+ block/backup-top.c            | 240 ++++++++++++
+ block/backup.c                | 440 ++++-----------------
+ block/block-copy.c            | 346 ++++++++++++++++
+ block/io.c                    |  68 +++-
+ block/replication.c           |   2 +-
+ blockdev.c                    |   1 +
+ block/Makefile.objs           |   3 +
+ block/trace-events            |  14 +-
+ tests/qemu-iotests/056        |   8 +-
+ tests/qemu-iotests/124        |  83 ++--
+ tests/qemu-iotests/257        |  91 ++---
+ tests/qemu-iotests/257.out    | 714 ++++++++++++++--------------------
+ tests/qemu-iotests/iotests.py |  27 ++
+ 18 files changed, 1287 insertions(+), 918 deletions(-)
+ create mode 100644 block/backup-top.h
+ create mode 100644 include/block/block-copy.h
+ create mode 100644 block/backup-top.c
+ create mode 100644 block/block-copy.c
+
 -- 
 2.21.0
 
