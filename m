@@ -6,75 +6,62 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6EE3C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:31:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAA0BC49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:37:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78DCB2086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:31:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78DCB2086A
+	by mail.kernel.org (Postfix) with ESMTPS id 93D992086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:37:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93D992086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBFGM-0000Kc-UO
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 05:31:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51853)
+	id 1iBFLv-0006vA-C6
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 05:37:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53006)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1iBF8X-0005nI-RH
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:23:34 -0400
+ (envelope-from <lersek@redhat.com>) id 1iBFDS-0005Ax-GY
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:28:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1iBF0I-0000fd-UT
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:15:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36032)
+ (envelope-from <lersek@redhat.com>) id 1iBFDR-0008Hx-Dz
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:28:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43006)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1iBF0I-0000el-PU
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:15:02 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iBFDR-0008Hb-9k
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:28:37 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 42FE97BDA6
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 09:15:01 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id v13so2005746wrq.23
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 02:15:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=sNfsJgsIyOv71awToOVs97vuH1M2dMkzbt40tu53VFY=;
- b=KbLz/LekjxJbOcXTW7vc2Wq6WY+QUdoC0GUvNwLTEfLfHRk/+VOQaj6BNFuH/tiIG3
- 8oR/zySDJoF24tThz3UhI0yqqXu222maP8Mhp13KIz5twv6GqD+e12YeWB06GuOa7uGy
- 4BUR2YmvrXP6fOBEhmnczDTVc9hDk7FV/OdzZR24cJDVj9RQHakokLfo+zUmaHLQIB2h
- 3PEEKDu3kslZUU1lGXBijWxa2ONIyns2xryhJo3YeDMURsVD9d9izQkYQ/5cyHQIxy4B
- 41jiU9v0jHmLNB6cFi9RWGwcjrux0u/Dp2cWSjB2WIaL+Mw/NKOd2NqoCQdhljkgYkZp
- QDKw==
-X-Gm-Message-State: APjAAAUR2RMZAb2KTno8nvrMfq7Y9zt64IctfQ8jZmeYr6hjv3XFVeh2
- b08hNsZEghVByAUcYlXrfIKxrBtzVOFZqUUi5ec/2Twm2+QAddSH4EwQeNkocbVPkdtwd9bgQ35
- QOFeJuq6cTWbXQL8=
-X-Received: by 2002:a5d:4611:: with SMTP id t17mr11111405wrq.135.1568970899980; 
- Fri, 20 Sep 2019 02:14:59 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyuK8HjpXuGcJVznGkPu9jTgW7DXy9J7CEvZtOQCRB9iFoP8LlZZrKVT5m25It48Vl8UwLG9Q==
-X-Received: by 2002:a5d:4611:: with SMTP id t17mr11111387wrq.135.1568970899776; 
- Fri, 20 Sep 2019 02:14:59 -0700 (PDT)
-Received: from steredhat (host170-61-dynamic.36-79-r.retail.telecomitalia.it.
- [79.36.61.170])
- by smtp.gmail.com with ESMTPSA id g24sm1460163wrb.35.2019.09.20.02.14.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Sep 2019 02:14:59 -0700 (PDT)
-Date: Fri, 20 Sep 2019 11:14:56 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Subject: Re: [PATCH v2] target/i386: clean up comments over 80 chars per line
-Message-ID: <20190920091456.c6r4lcnsts6jw2v7@steredhat>
-References: <20190920053136.945-1-tao3.xu@intel.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 6B05E641C7;
+ Fri, 20 Sep 2019 09:28:36 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-165.rdu2.redhat.com
+ [10.10.120.165])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 83B0F60C80;
+ Fri, 20 Sep 2019 09:28:23 +0000 (UTC)
+Subject: Re: [edk2-devel] [Qemu-devel] [PATCH 1/2] q35: implement 128K SMRAM
+ at default SMBASE address
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20190917130708.10281-1-imammedo@redhat.com>
+ <20190917130708.10281-2-imammedo@redhat.com>
+ <561f4440-7c06-10d7-80ce-bbfa810fec59@redhat.com>
+ <20190920102855.3fe2b689@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <a581abbc-ec03-c332-b225-6f7cd3cfadae@redhat.com>
+Date: Fri, 20 Sep 2019 11:28:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190920053136.945-1-tao3.xu@intel.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20190920102855.3fe2b689@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Fri, 20 Sep 2019 09:28:36 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -88,25 +75,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, philmd@redhat.com,
- ehabkost@redhat.com, rth@twiddle.net
+Cc: yingwen.chen@intel.com, Brijesh Singh <brijesh.singh@amd.com>,
+ devel@edk2.groups.io, phillip.goerl@oracle.com, qemu-devel@nongnu.org,
+ alex.williamson@redhat.com, jiewen.yao@intel.com, jun.nakajima@intel.com,
+ michael.d.kinney@intel.com, pbonzini@redhat.com, boris.ostrovsky@oracle.com,
+ rfc@edk2.groups.io, joao.m.martins@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 20, 2019 at 01:31:36PM +0800, Tao Xu wrote:
-> Drop the duplicate definition of CPUID_7_0_ECX_VBMI. And add some
-> comments, clean up comments over 80 chars per line.
+On 09/20/19 10:28, Igor Mammedov wrote:
+> On Thu, 19 Sep 2019 19:02:07 +0200
+> "Laszlo Ersek" <lersek@redhat.com> wrote:
 > 
-> There is an extra line in comment of CPUID_8000_0008_EBX_WBNOINVD,
-> remove the extra enter and spaces.
+>> Hi Igor,
+>>
+>> (+Brijesh)
+>>
+>> long-ish pondering ahead, with a question at the end.
+> [...]
+> 
+>> Finally: can you please remind me why we lock down 128KB (32 pages) at
+>> 0x3_0000, and not just half of that? What do we need the range at
+>> [0x4_0000..0x4_FFFF] for?
+> 
+> 
+> If I recall correctly, CPU consumes 64K of save/restore area.
+> The rest 64K are temporary RAM for using in SMI relocation handler,
+> if it's possible to get away without it then we can drop it and
+> lock only 64K required for CPU state. It won't help with SEV
+> conflict though as it's in the first 64K.
 
-Might it be better to split this patch into two?
+OK. Let's go with 128KB for now. Shrinking the area is always easier
+than growing it.
 
-One where you fix the comments over 80 chars rand one where you drop the
-CPUID_7_0_ECX_VBMI definition.
+> On QEMU side,  we can drop black-hole approach and allocate
+> dedicated SMRAM region, which explicitly gets mapped into
+> RAM address space and after SMI hanlder initialization, gets
+> unmapped (locked). So that SMRAM would be accessible only
+> from SMM context. That way RAM at 0x30000 could be used as
+> normal when SMRAM is unmapped.
 
-Thanks,
-Stefano
+I prefer the black-hole approach, introduced in your current patch
+series, if it can work. Way less opportunity for confusion.
 
+I've started work on the counterpart OVMF patches; I'll report back.
+
+Thanks
+Laszlo
 
