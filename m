@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D57CC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 15:33:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE87CC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 15:37:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E630120882
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 15:33:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E630120882
+	by mail.kernel.org (Postfix) with ESMTPS id 44CAB20882
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 15:37:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44CAB20882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBKu2-0003vD-Uz
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 11:33:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43815)
+	id 1iBKxw-0006WR-Bl
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 11:37:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43813)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iBKpa-0000dK-O9
+ (envelope-from <mreitz@redhat.com>) id 1iBKpa-0000dF-N5
  for qemu-devel@nongnu.org; Fri, 20 Sep 2019 11:28:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iBKpY-0004N3-GC
+ (envelope-from <mreitz@redhat.com>) id 1iBKpY-0004My-Fn
  for qemu-devel@nongnu.org; Fri, 20 Sep 2019 11:28:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33090)
+Received: from mx1.redhat.com ([209.132.183.28]:48660)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iBKpU-0004KG-0Q; Fri, 20 Sep 2019 11:28:16 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1iBKpS-0004Ft-1q; Fri, 20 Sep 2019 11:28:15 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A4D4C8665D;
- Fri, 20 Sep 2019 15:28:13 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 58CA918C890D;
+ Fri, 20 Sep 2019 15:28:11 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.102])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F66060167;
- Fri, 20 Sep 2019 15:28:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E691D60606;
+ Fri, 20 Sep 2019 15:28:10 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 03/22] block: Drop bdrv_is_first_non_filter()
-Date: Fri, 20 Sep 2019 17:27:45 +0200
-Message-Id: <20190920152804.12875-4-mreitz@redhat.com>
+Subject: [PATCH 02/22] blockdev: Allow resizing everywhere
+Date: Fri, 20 Sep 2019 17:27:44 +0200
+Message-Id: <20190920152804.12875-3-mreitz@redhat.com>
 In-Reply-To: <20190920152804.12875-1-mreitz@redhat.com>
 References: <20190920152804.12875-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Fri, 20 Sep 2019 15:28:13 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Fri, 20 Sep 2019 15:28:11 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -72,69 +72,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is unused now.  (And it was ugly because it needed to explore all BDS
-chains from the top.)
+Block nodes that do not allow resizing should not share BLK_PERM_RESIZE.
+It does not matter whether they are the first non-filter in their chain
+or not.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block.h |  1 -
- block.c               | 26 --------------------------
- 2 files changed, 27 deletions(-)
+ blockdev.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 37c9de7446..d3ccab4722 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -403,7 +403,6 @@ int bdrv_amend_options(BlockDriverState *bs_new, Qemu=
-Opts *opts,
- /* external snapshots */
- bool bdrv_recurse_is_first_non_filter(BlockDriverState *bs,
-                                       BlockDriverState *candidate);
--bool bdrv_is_first_non_filter(BlockDriverState *candidate);
+diff --git a/blockdev.c b/blockdev.c
+index b62b33dc03..0420bc29be 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3198,11 +3198,6 @@ void qmp_block_resize(bool has_device, const char =
+*device,
+     aio_context =3D bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
 =20
- /* check if a named node can be replaced when doing drive-mirror */
- BlockDriverState *check_to_replace_node(BlockDriverState *parent_bs,
-diff --git a/block.c b/block.c
-index 1c7c199849..7d99ca692c 100644
---- a/block.c
-+++ b/block.c
-@@ -6206,32 +6206,6 @@ bool bdrv_recurse_is_first_non_filter(BlockDriverS=
-tate *bs,
-     return false;
- }
-=20
--/* This function checks if the candidate is the first non filter bs down=
- it's
-- * bs chain. Since we don't have pointers to parents it explore all bs c=
-hains
-- * from the top. Some filters can choose not to pass down the recursion.
-- */
--bool bdrv_is_first_non_filter(BlockDriverState *candidate)
--{
--    BlockDriverState *bs;
--    BdrvNextIterator it;
--
--    /* walk down the bs forest recursively */
--    for (bs =3D bdrv_first(&it); bs; bs =3D bdrv_next(&it)) {
--        bool perm;
--
--        /* try to recurse in this top level bs */
--        perm =3D bdrv_recurse_is_first_non_filter(bs, candidate);
--
--        /* candidate is the first non filter */
--        if (perm) {
--            bdrv_next_cleanup(&it);
--            return true;
--        }
+-    if (!bdrv_is_first_non_filter(bs)) {
+-        error_setg(errp, QERR_FEATURE_DISABLED, "resize");
+-        goto out;
 -    }
 -
--    return false;
--}
--
- BlockDriverState *check_to_replace_node(BlockDriverState *parent_bs,
-                                         const char *node_name, Error **e=
-rrp)
- {
+     if (size < 0) {
+         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "size", "a >0 siz=
+e");
+         goto out;
 --=20
 2.21.0
 
