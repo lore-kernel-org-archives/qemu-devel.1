@@ -2,74 +2,81 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC0EAC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 10:33:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA837C4CECD
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 10:37:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C50AA2080F
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 10:33:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C50AA2080F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7374D2080F
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 10:37:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vWb8GCGg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7374D2080F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBGEK-0005lZ-IE
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 06:33:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59845)
+	id 1iBGHh-00085i-Gh
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 06:37:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60349)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iBGCB-0004lO-Ui
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 06:31:25 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iBGH0-0007Wp-Eu
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 06:36:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iBGCA-0002no-Ju
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 06:31:23 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40620)
+ (envelope-from <peter.maydell@linaro.org>) id 1iBGGz-00079w-16
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 06:36:22 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34751)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iBGCA-0002kH-9o
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 06:31:22 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iBGC8-0000O6-9B
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 10:31:20 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 266F62E8263
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 10:31:09 +0000 (UTC)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iBGGy-00079a-PS
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 06:36:20 -0400
+Received: by mail-oi1-x241.google.com with SMTP id 83so1352798oii.1
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 03:36:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=vMBGH+XzjjTKUzP8FjW/M15hcWX9k23S+YWw96WHQxM=;
+ b=vWb8GCGgLxABE7jLhlqdZjt4bQHLkPiZoqoMpocsfJXYvMK/VIeCX0jOtYexiwCPkx
+ qeOS5ZNL6TTbmpmeTNURhwINOqiVIVDWQTyJ0XeWS2XloKxurdn+I59Lx7PyQzQ9nTWa
+ 5sw/RNYxcBC92aUHiNOGbWLeH056/nGY0HqijbgpkmyPsnjsoFYxxND5H0WB0FEeLpae
+ ziS/Di0my29zYsXWfql/4UhWvRtL5zNy4J+BEZ6KIwzNFISnUwWflblPu9YtePYQO5ec
+ CZD22fyhAhh7CPU9agnWEtauo5Mu9ex7w671RbU72XRXzZXXickaF6cNzizGUDGdfanu
+ Rc/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=vMBGH+XzjjTKUzP8FjW/M15hcWX9k23S+YWw96WHQxM=;
+ b=Y+0W0t0UelkipF1s8OrtcO6kM8M25D8u5XMJQhhbbFlQnZvSa8/kcvLsKo5kNPNQ4q
+ rYERsLkaKfqZFL/BPvioDLtjYxrh/wnZTLK50EK9R+eXY9Tu0YBnj6af9YMH9lOQtIco
+ 2cIWM30uACqy2mDxn8mecThg/7rC49ukbPStMuBJBNAR1B1ThKxwiXQVLzoSoW0zBnzG
+ LNbiuyvY/yEj4I+a5gfGPBtsdFtEgkJd5A96QBQ9gmKLuFvQnzYUlV0A4FBB9cxuxALZ
+ TGmskTnsF18ttALhjjXSpdRiC4H1+AVwe7n3WVOwLJ8q2DWeKFzAo6xAdCp+MH+HrFqP
+ LyAw==
+X-Gm-Message-State: APjAAAUEnl8LL4uA5DeIn4v7i8TB/MRU2CqEyuIKOaz8ed8uTJ+n4yu3
+ i05drplTZU+Wbh8UaVi8qp+dAYVEZQM8OxzyjVn85g==
+X-Google-Smtp-Source: APXvYqyC+nkQeaS2V55VR5Wvohz4DU90VXbshtmPP5nCwSkxBK/Gn+v6TaqNZe7qFpwfyUZPSHpwAQcY8dv1tdkGphc=
+X-Received: by 2002:aca:b48a:: with SMTP id d132mr2334197oif.98.1568975779176; 
+ Fri, 20 Sep 2019 03:36:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 20 Sep 2019 10:22:09 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h djdatte zaltysz
-X-Launchpad-Bug-Reporter: =?utf-8?q?=C5=BDilvinas_=C5=BDaltiena_=28zaltysz?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: Dr. David Alan Gilbert (dgilbert-h)
-References: <154731859474.20612.3794172498936114295.malonedeb@soybean.canonical.com>
-Message-Id: <156897492934.32250.17724176885988094176.malone@wampee.canonical.com>
-Subject: [Bug 1811533] Re: Unstable Win10 guest with qemu 3.1 + huge pages +
- hv_stimer
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19048";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 56fc6c4a734c7ba0c785c3818a1d8bf5965ab528
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+References: <tencent_7BDD949D4C752E2A291A6A02@qq.com>
+In-Reply-To: <tencent_7BDD949D4C752E2A291A6A02@qq.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 20 Sep 2019 11:36:07 +0100
+Message-ID: <CAFEAcA9QDrwUAdZWX7n_gO9afnT4n9+i8ZdqOcxrNbvi6n9=sw@mail.gmail.com>
+Subject: Re: Initialize data memory in user space emulation
+To: Libo Zhou <zhlb29@foxmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,63 +85,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1811533 <1811533@bugs.launchpad.net>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Zilvinas/Damir: Can you paste in the qemu commandline you're using
-please.
+On Fri, 20 Sep 2019 at 10:25, Libo Zhou <zhlb29@foxmail.com> wrote:
+>
+> Hi all,
+>
+> I need a way to manipulate data saved in a reserved memory region in linux user space emulation. I found the -B option very promising.  Documentation says it is useful when the address region required by guest applications is reserved on the host.
+>
+> But how can I initialize that memory with data?
 
--- =
+Hi -- this isn't really what the -B option does. What -B does
+is set the 'guest base', which is the offset between what the
+guest sees as its address 0 and what the host's address is. So
+if you use -B to set the guest_base to 0x10000000, then when the
+guest tries to mmap() a file to address 0x20000000 then we will
+put the file at host address 0x30000000 (the address the guest
+asks for plus the guest_base).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1811533
+There is no way at all for the guest to access any data below the
+guest_base address. The reason this option exists is in case the
+default value QEMU chooses for guest_base would result in the guest
+trying to mmap files in places that are already used by the host
+QEMU binary or libraries. It's almost never an option users need
+to set.
 
-Title:
-  Unstable Win10 guest with qemu 3.1 + huge pages + hv_stimer
+I'm not really sure what you mean by "a reserved memory region",
+so it's a bit hard to say what might be the best way to do what
+you want to do.
 
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  Host:
-  Gentoo linux x86_64, kernel 4.20.1
-  Qemu 3.1.0 =
-
-  CPU: Intel i7 6850K
-  Chipset: X99
-
-  Guest:
-  Windows 10 Pro 64bit (1809)
-  Machine type: pc-q35_3.1
-  Hyper-V enlightenments: hv_stimer,hv_reenlightenment,hv_frequencies,hv_va=
-pic,hv_reset,hv_synic,hv_runtime,hv_vpindex,hv_time,hv_relaxed,hv_spinlocks=
-=3D0x1fff
-  Memory: 16GB backed by 2MB huge pages
-
-  Issue:
-  Once guest is started, log gets flooded with:
-
-  qemu-system-x86_64: vhost_region_add_section: Overlapping but not
-  coherent sections at 103000
-
-  or
-
-  qemu-system-x86_64: vhost_region_add_section:Section rounded to 0
-  prior to previous 1f000
-
-  (line endings change)
-
-  and as time goes guest loses network access (virtio-net-pci) and
-  general performance diminishes to extent of freezing applications.
-
-  Observations:
-  1) problem disappears when hv_stimer is removed
-  2) problem disappears when memory backing with huge pages is disabled
-  3) problem disappears when machine type is downgraded to pc-q35_3.0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1811533/+subscriptions
+thanks
+-- PMM
 
