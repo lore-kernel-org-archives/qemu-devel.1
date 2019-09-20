@@ -2,64 +2,88 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A547C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 08:46:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E293BC49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 08:51:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D6F92080F
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 08:46:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D6F92080F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AD43B2086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 08:51:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q+Ua6KTO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD43B2086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBEYM-00019M-48
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 04:46:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46862)
+	id 1iBEdA-00052X-QS
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 04:51:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47938)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iBEVu-0008BH-Ah
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 04:43:39 -0400
+ (envelope-from <stefanha@gmail.com>) id 1iBEb7-0003hC-8O
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 04:49:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iBEVt-00057G-DA
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 04:43:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44492)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iBEVr-000561-Ad; Fri, 20 Sep 2019 04:43:35 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A417A7FD6C;
- Fri, 20 Sep 2019 08:43:34 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-81.ams2.redhat.com
- [10.36.117.81])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C8A360BF1;
- Fri, 20 Sep 2019 08:43:28 +0000 (UTC)
-Date: Fri, 20 Sep 2019 10:43:27 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [RFC 4/4] ahci media error reporting
-Message-ID: <20190920084327.GB5458@localhost.localdomain>
-References: <20190919194847.18518-1-tasleson@redhat.com>
- <20190919194847.18518-5-tasleson@redhat.com>
- <df07a621-8515-2414-2f59-a7eb7eebd75b@redhat.com>
+ (envelope-from <stefanha@gmail.com>) id 1iBEb5-0001ds-CY
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 04:49:01 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51047)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iBEb3-0001c9-NY
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 04:48:58 -0400
+Received: by mail-wm1-x341.google.com with SMTP id 5so1511608wmg.0
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 01:48:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=6vF7PAOQFGbiEwK5/YHJ4+86Htoi7VUCxkBvACUAiL8=;
+ b=q+Ua6KTODc0Vr9to7OK1DkQqtBMPJrSo6JUBhcnXRuz7dufEmsAFr4Tf0FIqEc3zPX
+ eCNooZlW65qiH3d7QoMCvWiTrb+C7NsmQ+QoF/HMZh+a/m29K2TswbEDlKaGMtJxXx9r
+ Ige9vkmKEEMKodALjLdu/aw7Uthfowmgsb3a8JDCZpUkwu+msZ1YM92SwNxnGMWCeJlF
+ bMaV1cUYw860GJKHb4AeTjgr344CjygMEBkALZ4wDodvEFYY0LNMbCMXde6sPsC5BD5N
+ etj34381KDobnIoRalG7EzmesPgJwDpJWGOs2LLGtU/H+Aq3gvL+Ldp1hUY6gvSVVngF
+ iG/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=6vF7PAOQFGbiEwK5/YHJ4+86Htoi7VUCxkBvACUAiL8=;
+ b=C6RSE3Ecq1slHdqqZGz/eW5PNAW+277uswfIElnCSkIyeJ74kPXIemT6BXdL7fcQ8u
+ T6/A4ctjHON/TGKyD0wdMhciESXSY6ph+3tZwc2nJfgt6GcjK3AVGanXKoF7I6BawoPp
+ 8ZBGFbB6g144lGAsyaSswvzHf5qgUqdhORUJsV7xze3fWhHjjGVcangmqB5GlnQy2AfK
+ qJgDqvL/911Lk1kaJhTN0yUfq2946/3kOiD9bR6Qxl+ELUMktYQGbMfxFvpR4ZcdPhmG
+ rGHmyjqn+NMHGvQ64EN9e9H2QytItALtrXDbxbVe9GDuCAQKC3thStptxyVi5w1OVuFm
+ kv5w==
+X-Gm-Message-State: APjAAAUAxd/EskJF7phs1RfaRKau7Gc2Icxgk2j6+WKmarIsDul1uQEL
+ SygIL70jZv9wOeBixsuj3G8=
+X-Google-Smtp-Source: APXvYqxZoww6e1GecGqqlOR/wtAnACZH3pBgYXXAqquu7IvVRo19yYZ651FQROcr1NCbp1/15DJ/5w==
+X-Received: by 2002:a1c:4945:: with SMTP id w66mr2466522wma.40.1568969332886; 
+ Fri, 20 Sep 2019 01:48:52 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id l11sm1017833wmh.34.2019.09.20.01.48.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 20 Sep 2019 01:48:51 -0700 (PDT)
+Date: Fri, 20 Sep 2019 09:48:50 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Subject: Re: [Qemu-devel] [PATCH 1/2] docs: vhost-user: add in-band kick/call
+ messages
+Message-ID: <20190920084850.GD14365@stefanha-x1.localdomain>
+References: <20190917122625.15614-1-johannes@sipsolutions.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="OaZoDhBhXzo6bW1J"
 Content-Disposition: inline
-In-Reply-To: <df07a621-8515-2414-2f59-a7eb7eebd75b@redhat.com>
+In-Reply-To: <20190917122625.15614-1-johannes@sipsolutions.net>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Fri, 20 Sep 2019 08:43:34 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,30 +95,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tony Asleson <tasleson@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>
+Cc: qemu-devel@nongnu.org, Johannes Berg <johannes.berg@intel.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 19.09.2019 um 22:43 hat John Snow geschrieben:
-> I'd have to check -- because I can't say the AHCI emulator was designed
-> so much as congealed -- but you might need calls to ncq_finish.
-> 
-> usually, ncq_cb handles the return from any NCQ command and will call
-> ncq_err and ncq_finish as appropriate to tidy up the command.
-> 
-> It might be a mistake that execute_ncq_command issues ncq_err in the
-> `default` arm of the switch statement without a call to finish.
-> 
-> If we do call ncq_finish from this context I'm not sure if we want
-> block_acct_done here unconditionally. We may not have started a block
-> accounting operation if we never started a backend operation. Everything
-> else looks about right to me.
 
-With that much uncertainty, the one thing I'm pretty certain of is that
-someone (TM) should write some qtests - if only to figure out what
-really happens.
+--OaZoDhBhXzo6bW1J
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Kevin
+On Tue, Sep 17, 2019 at 02:26:24PM +0200, Johannes Berg wrote:
+> From: Johannes Berg <johannes.berg@intel.com>
+>=20
+> For good reason, vhost-user is currently built asynchronously, that
+> way better performance can be obtained. However, for certain use
+> cases such as simulation, this is problematic.
+>=20
+> Consider an event-based simulation in which both the device and CPU
+> have scheduled according to a simulation "calendar". Now, consider
+> the CPU sending I/O to the device, over a vring in the vhost-user
+> protocol. In this case, the CPU must wait for the vring interrupt
+> to have been processed by the device, so that the device is able to
+> put an entry onto the simulation calendar to obtain time to handle
+> the interrupt. Note that this doesn't mean the I/O is actually done
+> at this time, it just means that the handling of it is scheduled
+> before the CPU can continue running.
+>=20
+> This cannot be done with the asynchronous eventfd based vring kick
+> and call design.
+>=20
+> Extend the protocol slightly, so that a message can be used for kick
+> and call instead, if VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS is
+> negotiated. This in itself doesn't guarantee synchronisation, but both
+> sides can also negotiate VHOST_USER_PROTOCOL_F_REPLY_ACK and thus get
+> a reply to this message by setting the need_reply flag, and ensure
+> synchronisation this way.
+>=20
+> To really use it in both directions, VHOST_USER_PROTOCOL_F_SLAVE_REQ
+> is also needed.
+>=20
+> Since it is used for simulation purposes and too many messages on
+> the socket can lock up the virtual machine, document that this should
+> only be used together with the mentioned features.
+>=20
+> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+> ---
+>  docs/interop/vhost-user.rst | 120 +++++++++++++++++++++++++++++++-----
+>  1 file changed, 103 insertions(+), 17 deletions(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--OaZoDhBhXzo6bW1J
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2EknIACgkQnKSrs4Gr
+c8inJQgAtgDFKg3DktBbUQckuHSKQ1lafityxGqFKQqYpP8a/LPz0g7DCvFpAWvy
+dp+tlhlMccx5YlmOxhJNDGrUfpFZfbQPpxUxtZvibf8dO388Hxn9VXSCJAozyqX7
+qm3YPddUjSx0+wfWBqrBuBLF4cVcQbyB3/2bkdL5NHy7WsZGIX1JNwL9+AuYomCp
+cjZ6aYyeDgjABV7c/03jURRnSZy2oj/SK/6/HtWZT8ZzwGRpqv4REc16w4T2EPka
+rtf9idUMGm2ZaRx1kwjlCALOKV4k0JjSw4TPHFkSkEA4LMMJuVclNY0BN/RWStwK
+7l5KCmyO5c+o2mehuF/bqKzrXwjBRQ==
+=9hW8
+-----END PGP SIGNATURE-----
+
+--OaZoDhBhXzo6bW1J--
 
