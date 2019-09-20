@@ -2,64 +2,90 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1769CC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:05:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B89CC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:09:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E14B7207FC
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:05:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E14B7207FC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id DDB152086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:09:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDB152086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBMLd-00038I-Vu
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 13:05:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33375)
+	id 1iBMPb-00051V-Qg
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 13:09:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33830)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1iBMKl-0002Kw-64
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:04:41 -0400
+ (envelope-from <eblake@redhat.com>) id 1iBMOr-0004YF-Ci
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:08:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1iBMKj-0001xH-DR
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:04:39 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:45441 helo=huawei.com)
+ (envelope-from <eblake@redhat.com>) id 1iBMOp-0003ty-3b
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:08:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51262)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1iBMKf-0001mh-I5; Fri, 20 Sep 2019 13:04:33 -0400
-Received: from lhreml707-cah.china.huawei.com (unknown [172.18.7.106])
- by Forcepoint Email with ESMTP id 6707092E712AEA7118DC;
- Fri, 20 Sep 2019 18:04:23 +0100 (IST)
-Received: from LHREML524-MBS.china.huawei.com ([169.254.2.65]) by
- lhreml707-cah.china.huawei.com ([10.201.108.48]) with mapi id 14.03.0415.000; 
- Fri, 20 Sep 2019 18:04:15 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Subject: Invalid blob size on NVDIMM hot-add (was: RE: [RFC PATCH 0/4] ARM
- virt: ACPI memory hotplug support)
-Thread-Topic: Invalid blob size on NVDIMM hot-add (was: RE: [RFC PATCH 0/4]
- ARM virt: ACPI memory hotplug support)
-Thread-Index: AdVv0yEPLdplA0GwRKqg4qaBRPehIQ==
-Date: Fri, 20 Sep 2019 17:04:14 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA83F3FB328@lhreml524-mbs.china.huawei.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.237]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iBMOo-0003tZ-Ri
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:08:51 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id EE4ED3086218
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 17:08:49 +0000 (UTC)
+Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B9BE5D9C3;
+ Fri, 20 Sep 2019 17:08:49 +0000 (UTC)
+Subject: Re: [RFC 0/4] POC: Generating realistic block errors
+To: tasleson@redhat.com, Kevin Wolf <kwolf@redhat.com>
+References: <20190919194847.18518-1-tasleson@redhat.com>
+ <20190920083630.GA5458@localhost.localdomain>
+ <566d0d07-35fc-2d66-a47c-00526546b31e@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <c1c6ae56-ce0e-fddc-d72a-98a748b5c897@redhat.com>
+Date: Fri, 20 Sep 2019 12:08:48 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+In-Reply-To: <566d0d07-35fc-2d66-a47c-00526546b31e@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="acRLstd836nhiJ0tGLchaut2utSxivRHT"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Fri, 20 Sep 2019 17:08:49 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 185.176.76.210
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,138 +97,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "Leif Lindholm \(Linaro address\)" <leif.lindholm@linaro.org>,
- Linuxarm <linuxarm@huawei.com>, Auger Eric <eric.auger@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkgTGFzemxvL0lnb3IsDQoNCkkgc3BlbmQgc29tZSB0aW1lIHRvIGRlYnVnIHRoaXMgZnVydGhl
-ciBhcyBJIHdhcyByZWJhc2luZyB0aGUgbnZkaW1tDQpob3QtYWRkIHN1cHBvcnQgcGF0Y2hlcyBv
-biB0b3Agb2YgdGhlIG9uZ29pbmcgcGMtZGltbSBob3QgYWRkIG9uZXMuDQoNCkp1c3QgdG8gcmVm
-cmVzaCB0aGUgbWVtb3J5Og0KDQpodHRwczovL3BhdGNod29yay5rZXJuZWwub3JnL2NvdmVyLzEw
-NzgzNTg5Lw0KDQoiIEl0IGlzIG9ic2VydmVkIHRoYXQgaG90IGFkZGluZyBudmRpbW0gd2lsbCBy
-ZXN1bHRzIGluIGd1ZXN0IHJlYm9vdA0KZmFpbHVyZS4gRURLMiBmYWlscyB0byBidWlsZCB0aGUg
-QUNQSSB0YWJsZXMgb24gcmVib290LiBQbGVhc2UgZmluZA0KYmVsb3cgRURLMiBsb2cgb24gR3Vl
-c3QgcmVib290IGFmdGVyIG52ZGltbSBob3QtYWRkLA0KDQpQcm9jZXNzQ21kQWRkQ2hlY2tzdW06
-IGludmFsaWQgY2hlY2tzdW0gcmFuZ2UgaW4gImV0Yy9hY3BpL3RhYmxlcyINCk9uUm9vdEJyaWRn
-ZXNDb25uZWN0ZWQ6IEluc3RhbGxBY3BpVGFibGVzOiBQcm90b2NvbCBFcnJvcg0KIg0KDQpQbGVh
-c2UgZmluZCBiZWxvdywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBM
-YXN6bG8gRXJzZWsgW21haWx0bzpsZXJzZWtAcmVkaGF0LmNvbV0NCj4gU2VudDogMDUgTWFyY2gg
-MjAxOSAxMjoxNQ0KPiBUbzogSWdvciBNYW1tZWRvdiA8aW1hbW1lZG9AcmVkaGF0LmNvbT4NCj4g
-Q2M6IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlA
-aHVhd2VpLmNvbT47DQo+IEF1Z2VyIEVyaWMgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT47IHNoYW5u
-b24uemhhb3NsQGdtYWlsLmNvbTsNCj4gcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOyBxZW11LWRl
-dmVsQG5vbmdudS5vcmc7IHFlbXUtYXJtQG5vbmdudS5vcmc7DQo+IHh1d2VpIChPKSA8eHV3ZWk1
-QGh1YXdlaS5jb20+OyBMaW51eGFybSA8bGludXhhcm1AaHVhd2VpLmNvbT47IEFyZA0KPiBCaWVz
-aGV1dmVsIDxhcmQuYmllc2hldXZlbEBsaW5hcm8ub3JnPjsgTGVpZiBMaW5kaG9sbSAoTGluYXJv
-IGFkZHJlc3MpDQo+IDxsZWlmLmxpbmRob2xtQGxpbmFyby5vcmc+DQo+IFN1YmplY3Q6IFJlOiBb
-UkZDIFBBVENIIDAvNF0gQVJNIHZpcnQ6IEFDUEkgbWVtb3J5IGhvdHBsdWcgc3VwcG9ydA0KPiAN
-Cj4gT24gMDMvMDEvMTkgMTg6MzksIElnb3IgTWFtbWVkb3Ygd3JvdGU6DQo+ID4gT24gRnJpLCAx
-IE1hciAyMDE5IDE0OjQ5OjQ1ICswMTAwDQo+ID4gTGFzemxvIEVyc2VrIDxsZXJzZWtAcmVkaGF0
-LmNvbT4gd3JvdGU6DQo+ID4NCj4gPj4gT24gMDIvMjgvMTkgMTU6MDIsIFNoYW1lZXJhbGkgS29s
-b3RodW0gVGhvZGkgd3JvdGU6DQo+ID4+DQo+ID4+PiBBaC4uSSBtaXNzZWQgdGhlIGZhY3QgdGhh
-dCwgZmlybXdhcmUgaW5kZWVkIHNlZXMgYW4gdXBkYXRlIGluIHRoZSBibG9iIGxlbg0KPiBoZXJl
-DQo+ID4+PiAocm91bmRlZCBvciBub3QpIGFmdGVyIHJlYm9vdC4gU28gZG9u4oCZdCB0aGluayB4
-ODYgaGFzIHRoZSBzYW1lIGlzc3VlIGFuZA0KPiBwYWRkaW5nDQo+ID4+PiBpcyBub3QgdGhlIHJp
-Z2h0IHNvbHV0aW9uIGFzIElnb3IgZXhwbGFpbmVkIGluIGhpcyByZXBseS4NCj4gPj4+DQo+ID4+
-PiBJIHdpbGwgdHJ5IHRvIGRlYnVnIHRoaXMgZnVydGhlci4gQW55IHBvaW50ZXJzIHdlbGNvbWUu
-DQo+ID4+DQo+ID4+IEhvdyBhYm91dCB0aGlzLg0KPiA+Pg0KPiA+PiAoMSkgVGhlIGZpcm13YXJl
-IGxvb2tzIHVwIHRoZSBmd19jZmcgZmlsZSBjYWxsZWQgImV0Yy90YWJsZS1sb2FkZXIiIGluDQo+
-ID4+IHRoZSBmd19jZmcgZmlsZSBkaXJlY3RvcnkgKGlkZW50aWZpZWQgYnkgY29uc3RhbnQgc2Vs
-ZWN0b3Iga2V5IDB4MDAxOSwNCj4gPj4gRldfQ0ZHX0ZJTEVfRElSKS4NCj4gPj4NCj4gPj4gKDIp
-IFRoZSBkaXJlY3RvcnkgZW50cnksIG9uY2UgZm91bmQsIHRlbGxzIHRoZSBmaXJtd2FyZSB0d28g
-dGhpbmdzDQo+ID4+IHNpbXVsdGFuZW91c2x5LiBUaGUgc2VsZWN0b3Iga2V5LCBhbmQgdGhlIHNp
-emUgb2YgdGhlIGJsb2IuDQo+ID4+DQo+ID4+ICgzKSBUaGUgZmlybXdhcmUgc2VsZWN0cyB0aGUg
-c2VsZWN0b3Iga2V5IGZyb20gc3RlcCAoMikuDQo+ID4+DQo+ID4+ICg0KSBRRU1VIHJlZ2VuZXJh
-dGVzIHRoZSBBQ1BJIHBheWxvYWQgKGFzIGEgc2VsZWN0IGNhbGxiYWNrKS4NCj4gPj4NCj4gPj4g
-KDUpIFRoZSBmaXJtd2FyZSByZWFkcyB0aGUgbnVtYmVyIG9mIGJ5dGVzIGZyb20gdGhlIGZ3X2Nm
-ZyBibG9iIHRoYXQgaXQNCj4gPj4gbGVhcm5lZCBpbiBzdGVwICgyKS4NCj4gPj4NCj4gPj4gSGVy
-ZSdzIHRoZSBwcm9ibGVtLiBBcyBsb25nIGFzIFFFTVUgdXNlZCB0byBwZXJmb3JtIHN0ZXAgKDQp
-IG9ubHkgZm9yDQo+ID4+IHRoZSBwdXJwb3NlIG9mIHJlZnJlc2hpbmcgUENJIHJlc291cmNlcyBp
-biB0aGUgQUNQSSBwYXlsb2FkLCBzdGVwICg0KQ0KPiA+PiB3b3VsZG4ndCAqcmVzaXplKiB0aGUg
-YmxvYi4NCj4gPj4NCj4gPj4gSG93ZXZlciwgaWYgc3RlcCAoNCkgZW5sYXJnZXMgdGhlIGJsb2Is
-IHRoZW4gdGhlIGJ5dGUgY291bnQgdGhhdCBzdGVwDQo+ID4+ICg1KSB1c2VzIC0tIGZyb20gc3Rl
-cCAoMikgLS0gZm9yIHJlYWRpbmcsIGlzIG9ic29sZXRlLg0KPiANCj4gPiBJJ3ZlIHRob3VnaHQg
-dGhhdCB3YXMgYSBwcm9ibGVtIHdpdGggSU8gYmFzZWQgZndfY2ZnLCBhcyByZWFkaW5nDQo+IHNp
-emUvY29udGVudA0KPiA+IHdlcmUgc2VwYXJhdGVzIHN0ZXBzIGFuZCB0aGF0IGl0IHdhcyBzb2x2
-ZWQgYnkgRE1BIGJhc2VkIGZ3X2NmZyBmaWxlIHJlYWQuDQo+IA0KPiBUaGUgRE1BIGJhY2tlbmQg
-aXMgbm90IHJlbGV2YW50IGZvciB0aGlzIHF1ZXN0aW9uLCBmb3IgdHdvIHJlYXNvbnM6DQo+IA0K
-PiAoYSkgVGhlIHF1ZXN0aW9uIHdoZXRoZXIgdGhlIGZ3X2NmZyB0cmFuc2ZlciB0YWtlcyBwbGFj
-ZXMgd2l0aCBwb3J0IElPDQo+IHZzLiBETUEgaXMgaGlkZGVuIGZyb20gdGhlIGZ3X2NmZyBjbGll
-bnQgY29kZTsgdGhhdCBjb2RlIGdvZXMgdGhyb3VnaCBhbg0KPiBhYnN0cmFjdCBsaWJyYXJ5IEFQ
-SS4NCj4gDQo+IChiKSBXaGlsZSB0aGUgRE1BIG1ldGhvZCBpbmRlZWQgbGV0cyB0aGUgZmlybXdh
-cmUgc3BlY2lmeSB0aGUgZGV0YWlscyBvZg0KPiB0aGUgdHJhbnNmZXIgd2l0aCBvbmUgYWN0aW9u
-LCB0aGUgaXNzdWUgaXMgd2l0aCB0aGUgbnVtYmVyIG9mIGJ5dGVzIHRoYXQNCj4gdGhlIGZpcm13
-YXJlIHJlcXVlc3RzICh0aGF0IGlzLCBub3Qgd2l0aCAqaG93KiB0aGUgZmlybXdhcmUgcmVxdWVz
-dHMgdGhlDQo+IHRyYW5zZmVyKS4gVGhlIGZpcm13YXJlIGhhcyB0byBrbm93IHRoZSBzaXplIG9m
-IHRoZSB0cmFuc2ZlciBiZWZvcmUgaXQNCj4gY2FuIGluaXRpYXRlIHRoZSB0cmFuc2ZlciAocmVn
-YXJkbGVzcyBvZiBwb3J0IElPIHZzLiBETUEpLg0KPiANCj4gDQo+IE15IHF1ZXN0aW9uIGlzOiBh
-c3N1bWUgdGhlIGZpcm13YXJlIGl0ZW0gaW4gcXVlc3Rpb24gaXMgc2VsZWN0ZWQsIGFuZA0KPiB0
-aGUgUUVNVS1zaWRlIHNlbGVjdCBjYWxsYmFjayBydW5zIChyZWdlbmVyYXRpbmcgdGhlIEFDUEkg
-cGF5bG9hZCkuIERvZXMNCj4gdGhpcyBhY3Rpb24gdXBkYXRlIHRoZSBibG9iIHNpemUgaW4gdGhl
-IGZ3X2NmZyBmaWxlIGRpcmVjdG9yeSBhcyB3ZWxsPw0KDQpJIHRoaW5rIGl0IGRvZXNu4oCZdCB1
-cGRhdGUgdGhlIGJsb2Igc2l6ZSBvbiBzZWxlY3QgY2FsbGJhY2sgd2hpY2ggaXMgdGhlIHJvb3QN
-CmNhdXNlIG9mIHRoaXMgaXNzdWUuIEFuZCB0aGUgcmVhc29uIGxvb2tzIGxpa2UsIHFlbXVfcmFt
-X3Jlc2l6ZSgpIGZ1bmN0aW9uDQpyZXR1cm5zIHdpdGhvdXQgaW52b2tpbmcgdGhlIGNhbGxiYWNr
-IHRvIHVwZGF0ZSB0aGUgYmxvYiBzaXplLg0KIA0KT24gYm9vdCB1cCwgUWVtdSBidWlsZHMgdGhl
-IHRhYmxlIGFuZCBleHBvc2VzIGl0IHRvIGd1ZXN0LA0KICAgICAgdmlydF9hY3BpX3NldHVwKCkN
-CiAgICAgICAgYWNwaV9hZGRfcm9tX2Jsb2IoKQ0KICAgICAgICAgIHJvbV9hZGRfYmxvYigpDQog
-ICAgICAgICAgICByb21fc2V0X21yKCkgIC0tPiBtciBpcyBhbGxvY2F0ZWQgaGVyZSBhbmQgcmFt
-X2Jsb2NrIHVzZWRfbGVuZ3RoID0gSE9TVF9QQUdFX0FMSUdOKGJsb2Igc2l6ZSk7DQogICAgICAg
-ICAgICBmd19jZmdfYWRkX2ZpbGVfY2FsbGJhY2soKQ0KICAgICAgICAgICAgICBmd19jZmdfYWRk
-X2J5dGVzX2NhbGxiYWNrKCkgLS0+IFRoaXMgdXNlcyB0aGUgYmxvYiBzaXplIHBhc3NlZCBpbnRv
-IGl0Lg0KDQpPbiBzZWxlY3QgY2FsbGJhY2sgcGF0aCwNCg0KdmlydF9hY3BpX2J1aWxkX3VwZGF0
-ZSgpDQogICBhY3BpX3JhbV91cGRhdGUoKQ0KICAgIG1lbW9yeV9yZWdpb25fcmFtX3Jlc2l6ZSgp
-DQogICAgICBxZW11X3JhbV9yZXNpemUoKSAtLT4uIEhlcmUgdGhlIG5ld3NpemUgZ2V0cyBhbGln
-bmVkIHRvIEhPU1RfUEFHRSBhbmQgY2FsbGJhY2sgaXMgb25seSBjYWxsZWQgdXNlZF9sZW5ndGgg
-IT0gbmV3c2l6ZS4NCg0KaHR0cHM6Ly9naXRodWIuY29tL3FlbXUvcWVtdS9ibG9iL21hc3Rlci9l
-eGVjLmMjTDIxODANCg0KRGVidWcgbG9nczoNCkluaXRpYWwgYm9vdDoNCiMjUUVNVV9ERUJVRyMj
-IHJvbV9hZGRfYmxvYjogZmlsZSBldGMvYWNwaS90YWJsZXMgc2l6ZSAweDY0ZjcNCiMjUUVNVV9E
-RUJVRyMjIGZ3X2NmZ19hZGRfYnl0ZXNfY2FsbGJhY2s6IGtleSAweDIxIGxlbiAweDY0ZjcNCi4u
-Li4uLi4uDQouLi4uLi4uLg0KIyMjVUVGSSMjIyMgSW5zdGFsbFFlbXVGd0NmZ1RhYmxlczogImV0
-Yy90YWJsZS1sb2FkZXIiIGhhcyBGd0NmZ0l0ZW0gMHgyNyBzaXplIDB4RDAwDQojI1FFTVVfREVC
-VUcjIyB2aXJ0X2FjcGlfYnVpbGRfdXBkYXRlOg0KIyNRRU1VX0RFQlVHIyMgYWNwaV9yYW1fdXBk
-YXRlOiBzaXplIDB4NjRmNw0KIyNRRU1VX0RFQlVHIyMgcWVtdV9yYW1fcmVzaXplOiBpZHN0ciAv
-cm9tQGV0Yy9hY3BpL3RhYmxlcyB1c2VkX2xlbmd0aCAgMHg3MDAwIG5ld3NpemUgMHg3MDAwIC0t
-PiBObyBjYWxsYmFjay4NCi4uLi4uDQojIyMjIyNVRUZJIyMjIyMjIFByb2Nlc3NDbWRBbGxvY2F0
-ZTogUWVtdUZ3Q2ZnRmluZEZpbGUoImV0Yy9hY3BpL3RhYmxlcyIpOiBzaXplIDB4NjRGNyAtLT4g
-VUVGSSBnZXQgdGhlIGFjdHVhbCBzaXplLCB3aGljaCBpcyBmaW5lIGZvciBub3cuDQoNCkhvdC1h
-ZGQgbnZkaW1tcyBhbmQgcmVib290Lg0KDQpyb290QHVidW50dTovIyByZWJvb3QNCi4uLi4uLi4N
-Ci4uLi4uLi4uDQojIyNVRUZJIyMjIyBJbnN0YWxsUWVtdUZ3Q2ZnVGFibGVzOiAiZXRjL3RhYmxl
-LWxvYWRlciIgaGFzIEZ3Q2ZnSXRlbSAweDI3IHNpemUgMHhEMDANCiMjUUVNVV9ERUJVRyMjIHZp
-cnRfYWNwaV9idWlsZF91cGRhdGU6DQojI1FFTVVfREVCVUcjIyBhY3BpX3JhbV91cGRhdGU6IHNp
-emUgMHg2NjY3IC0tPiBTaXplIGNoYW5nZWQuDQojI1FFTVVfREVCVUcjIyBxZW11X3JhbV9yZXNp
-emU6IGlkc3RyIC9yb21AZXRjL2FjcGkvdGFibGVzIHVzZWRfbGVuZ3RoICAweDcwMDAgbmV3c2l6
-ZSAweDcwMDAgLS0+IG5ld3NpemUgaXMgc3RpbGwgYWxpZ25lZCB0byAweDcwMDAgYW5kIG5vIGNh
-bGxiYWNrIHRvIHVwZGF0ZS4NCi4uLi4uLg0KIyMjIyMjVUVGSSMjIyMjIyBQcm9jZXNzQ21kQWxs
-b2NhdGU6IFFlbXVGd0NmZ0ZpbmRGaWxlKCJldGMvYWNwaS90YWJsZXMiKTogc2l6ZSAweDY0Rjcg
-LS0+VUVGSSBzdGlsbCBzZWVzIHRoZSBvbGQgdmFsdWUgYW5kIGZhaWxzLg0KDQpUaGlzIGNhbiBi
-ZSBmaXhlZCBieSwNCg0KZGlmZiAtLWdpdCBhL2h3L2FybS92aXJ0LWFjcGktYnVpbGQuYyBiL2h3
-L2FybS92aXJ0LWFjcGktYnVpbGQuYyBpbmRleCBmM2JkNDU2NzViLi43OWRhM2ZkMzVkIDEwMDY0
-NA0KLS0tIGEvaHcvYXJtL3ZpcnQtYWNwaS1idWlsZC5jDQorKysgYi9ody9hcm0vdmlydC1hY3Bp
-LWJ1aWxkLmMNCkBAIC04NTQsNiArODU0LDkgQEAgdm9pZCB2aXJ0X2FjcGlfYnVpbGQoVmlydE1h
-Y2hpbmVTdGF0ZSAqdm1zLCBBY3BpQnVpbGRUYWJsZXMgKnRhYmxlcykNCiAgICAgICAgIGJ1aWxk
-X3JzZHAodGFibGVzLT5yc2RwLCB0YWJsZXMtPmxpbmtlciwgJnJzZHBfZGF0YSk7DQogICAgIH0N
-Cg0KKyAgICBnX2FycmF5X3NldF9zaXplKHRhYmxlc19ibG9iLA0KKyAgICAgICAgICAgICAgICAg
-ICAgVEFSR0VUX1BBR0VfQUxJR04oYWNwaV9kYXRhX2xlbih0YWJsZXNfYmxvYikpKTsNCisNCiAg
-ICAgLyogQ2xlYW51cCBtZW1vcnkgdGhhdCdzIG5vIGxvbmdlciB1c2VkLiAqLw0KICAgICBnX2Fy
-cmF5X2ZyZWUodGFibGVfb2Zmc2V0cywgdHJ1ZSk7DQogfQ0KDQpCdXQgSSBhbSBub3Qgc3VyZSB0
-aGlzIGlzIHRoZSBiZXN0IHRvIHdheSBmaXggdGhpcyBpc3N1ZSAoT3IgSSBhbSBtaXNzaW5nIHNv
-bWV0aGluZyBoZXJlKS4NCg0KUGxlYXNlIGxldCBtZSBrbm93Lg0KDQpUaGFua3MsDQpTaGFtZWVy
-DQoNCiANCj4gSWYgaXQgZG9lcywgdGhlbiBJIGNhbiB3b3JrIGFyb3VuZCB0aGUgcHJvYmxlbSBp
-biB0aGUgZmlybXdhcmUuIEkgY2FuDQo+IGFkZCBhIHJlLWxvb2t1cCB0byB0aGUgY29kZSBhZnRl
-ciB0aGUgaXRlbSBzZWxlY3Rpb24sIGluIG9yZGVyIHRvIGdldA0KPiB0aGUgZnJlc2ggYmxvYiBz
-aXplIGZyb20gdGhlIGZ3X2NmZyBmaWxlIGRpcmVjdG9yeS4gVGhlbiB3ZSBjYW4gdXNlIHRoYXQN
-Cj4gc2l6ZSBmb3IgdGhlIGFjdHVhbCB0cmFuc2Zlci4NCj4gDQo+IFRoaXMgd29uJ3QgaGVscCBv
-bGQgZmlybXdhcmUgb24gbmV3IFFFTVUsIGJ1dCBhdCBsZWFzdCBuZXcgZmlybXdhcmUgb24NCj4g
-b2xkIFFFTVUgd2lsbCBub3QgYmUgaHVydCAodGhlIHJlLWZldGNoaW5nIG9mIHRoZSBmd19jZmcg
-ZmlsZSBkaXJlY3RvcnkNCj4gd2lsbCBjb21lIHdpdGggYSBzbWFsbCBwZXJmb3JtYW5jZSBwZW5h
-bHR5LCBidXQgZnVuY3Rpb25hbGx5IGl0IHdpbGwgYmUNCj4gYSBuby1vcCkuDQo+IA0KPiBUaGFu
-a3MNCj4gTGFzemxvDQo=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--acRLstd836nhiJ0tGLchaut2utSxivRHT
+Content-Type: multipart/mixed; boundary="kcIO3HQzKDyB65TLsDc2NQGUWVP9OhF6B";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: tasleson@redhat.com, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org
+Message-ID: <c1c6ae56-ce0e-fddc-d72a-98a748b5c897@redhat.com>
+Subject: Re: [RFC 0/4] POC: Generating realistic block errors
+References: <20190919194847.18518-1-tasleson@redhat.com>
+ <20190920083630.GA5458@localhost.localdomain>
+ <566d0d07-35fc-2d66-a47c-00526546b31e@redhat.com>
+In-Reply-To: <566d0d07-35fc-2d66-a47c-00526546b31e@redhat.com>
+
+--kcIO3HQzKDyB65TLsDc2NQGUWVP9OhF6B
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 9/20/19 11:41 AM, Tony Asleson wrote:
+> On 9/20/19 3:36 AM, Kevin Wolf wrote:
+>> I/O error inserted by blkdebug can be one-off or permanent, but since =
+it
+>> also supports using a small state machine, I think you should already =
+be
+>> able to configure your errors that are corrected by a rewrite, too, ev=
+en
+>> if there is no explicit support for this yet (I guess we could add it =
+if
+>> it turned out to be much easier to use).
+>=20
+> One thing I thought about is the feasibility of having a callback for
+> these errors across qapi.  For example you could register a sector for =
+a
+> read/write/both and when that operation occurs you would block IO, send=
+
+> the sector number and associated data across qapi for test code to do
+> something with it and respond allowing the operation to continue
+> successfully or by returning an error determined by the external test
+> code to be propagated to guest.
+>=20
+> This would allow the logic to be outside of QEMU.  So for example in th=
+e
+> re-write case the test code could remove the error when it gets the
+> write, instead of having that logic embedded in QEMU itself.
+>=20
+> Thoughts?
+
+To some extent, this sounds similar to what you can accomplish with an
+NBD disk.  You can write an nbdkit plugin which exposes whatever error
+handling you want (such as "the first read to this sector fails with
+EIO, but a second read succeeds"), but only insofar as it fits in the
+bounds of what the NBD protocol exposes over the wire (so qemu would see
+EIO errors, and could narrow in on which portion of the disk provides or
+avoids those errors, but would not have any additional insights that
+would resemble a hardware-specific query without extensions to the NBD
+protocol).
+
+I am worried, however, that making data transactions have to go through
+QMP to get an answer on how to handle a specific guest request will slow
+things down; QMP is not built to be an efficient dataplane interface.
+If you truly want isolation (where another process receives all guest
+transactions, and makes decisions on how to handle them), it seems like
+writing up a remote server (as in 'nbdkit' for the NBD protocol, or a
+custom provider for the iscsi protocol) is the way to go.
+
+[I have no idea if there is an iscsi counterpart for nbdkit; the iscsi
+protocol is notoriously more complex than the NBD protocol, so it's not
+something I'm likely to write]
+
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--kcIO3HQzKDyB65TLsDc2NQGUWVP9OhF6B--
+
+--acRLstd836nhiJ0tGLchaut2utSxivRHT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2FB6AACgkQp6FrSiUn
+Q2pJIwf+JztofIgi+AFQC6cN8yb32J/JqAMZcC9j5i6T3iOCMifbjl739nojL4EB
+NibrjTZKSXSoaUDrRvSc/WBYOCpa1YHZ7xR5rLDY9o1Ae6cFeJw7q5K8Db3F1QEi
+rqw2dW2c+T48oVqiDDGIAzJH3FEYJdVUE9aWByQpgbWN9QezAg+OM0unHn2lbckt
+JwqlSlCpDW+dVlyNTdyFXgck2v2U3oB3lOGksU7jqBEm+yxzHFFnaMUmW4t5686F
+He2dTwRG3PMRIuIInwVakCHr2T/VW4nSulOi9yyEyY8uiK60P2certD9SBiSn/50
+jXxCzVXQrCjcdmqA7xp9WxQ/wTb6Aw==
+=2aer
+-----END PGP SIGNATURE-----
+
+--acRLstd836nhiJ0tGLchaut2utSxivRHT--
 
