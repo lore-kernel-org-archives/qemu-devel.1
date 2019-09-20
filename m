@@ -2,144 +2,73 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7103AC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 127D1C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:57:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E30B2086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:57:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E30B2086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E4D312086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:57:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4D312086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBN9b-0002YC-6v
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 13:57:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42930)
+	id 1iBN9j-0002l5-0J
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 13:57:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42998)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iBN7x-0001Cw-4x
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:55:30 -0400
+ (envelope-from <bounces@canonical.com>) id 1iBN87-0001RG-Fh
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:55:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iBN7v-00064i-TP
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:55:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47480)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iBN7q-0005xb-3D; Fri, 20 Sep 2019 13:55:23 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5EEE318CB8EF;
- Fri, 20 Sep 2019 17:55:20 +0000 (UTC)
-Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5726619C68;
- Fri, 20 Sep 2019 17:55:18 +0000 (UTC)
-Subject: Re: [Qemu-block] [Ping] [PATCH v6 0/3] qcow2: add zstd cluster
- compression
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190905093109.12261-1-dplotnikov@virtuozzo.com>
- <8c42f523-23ad-1bce-5315-c1f4511723de@virtuozzo.com>
- <4cfcdf5d-efab-1d18-3bd6-240613ee84cc@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <bcd1d34e-5be2-0150-14a8-c3d2f13bef1f@redhat.com>
-Date: Fri, 20 Sep 2019 13:55:18 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <bounces@canonical.com>) id 1iBN85-0006HX-S2
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:55:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42864)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iBN85-0006Gp-MI
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:55:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iBN84-0008UR-0H
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 17:55:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D40A32E80CB
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 17:55:35 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <4cfcdf5d-efab-1d18-3bd6-240613ee84cc@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Fri, 20 Sep 2019 17:55:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 20 Sep 2019 17:49:38 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: nathanchance pmaydell
+X-Launchpad-Bug-Reporter: Nathan Chancellor (nathanchance)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <156885735889.27264.8945287928013294736.malonedeb@soybean.canonical.com>
+Message-Id: <156900177897.13774.4058321407605820671.malone@gac.canonical.com>
+Subject: [Bug 1844597] Re: fc1120a7f5f2d4b601003205c598077d3eb11ad2 causes a
+ kernel panic in vfp_init on a clang built kernel
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19048";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 8adb982a8b78c32abd43da86334a631197562795
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -148,26 +77,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Reply-To: Bug 1844597 <1844597@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Should be fixed by:
+https://patchew.org/QEMU/20190920174039.3916-1-peter.maydell@linaro.org/
+(which allows me to boot the kernel you attached at least as far as "didn't=
+ find a root filesystem").
 
 
-On 9/18/19 12:29 PM, Denis Plotnikov wrote:
-> On 12.09.2019 11:46, Denis Plotnikov wrote:
->> ping!
->>
+** Changed in: qemu
+       Status: New =3D> In Progress
 
-https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg00943.html
+-- =
 
-I was under the impression you were addressing feedback from Vladimir.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1844597
 
---js
+Title:
+  fc1120a7f5f2d4b601003205c598077d3eb11ad2 causes a kernel panic in
+  vfp_init on a clang built kernel
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  Commit 4cdabee7d6d2 ("ARM: configs: aspeed_g5: Enable AST2600") [1] in
+  the Linux kernel enabled CONFIG_VFP. When building this config with
+  Clang, the resulting kernel does not boot after commit fc1120a7f5
+  ("target/arm: Implement NSACR gating of floating point") [2] (present
+  since the 4.1.0 release).
+
+  The QEMU command:
+
+  qemu-system-arm -m 512m \
+                  -machine romulus-bmc \
+                  -no-reboot \
+                  -dtb out/arch/arm/boot/dts/aspeed-bmc-opp-romulus.dtb \
+                  -initrd rootfs.cpio \
+                  -display none \
+                  -serial mon:stdio \
+                  -kernel ${KBF}/arch/arm/boot/zImage
+
+  If it is needed, the rootfs we are using is provided at a link below
+  [3].
+
+  Debugging with QEMU reveals that the kernel panics in vfp_init,
+  specifically at the line:
+
+  vfpsid =3D fmrx(FPSID);
+
+  in arch/arm/vfp/vfpmodule.c because of an illegal instruction:
+
+  [    0.058685] VFP support v0.3: =
+
+  [    0.059159] Internal error: Oops - undefined instruction: 0 [#1] SMP A=
+RM
+  [    0.059525] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.3.0-next-20190=
+918-dirty #1
+  [    0.059547] Hardware name: Generic DT based system
+  [    0.059702] PC is at vfp_init+0x50/0x1f4
+  [    0.059721] LR is at vfp_init+0x4c/0x1f4
+  [    0.059738] pc : [<80b0383c>]    lr : [<80b03838>]    psr: 60000153
+  [    0.059756] sp : 9e497ec0  ip : 00000020  fp : 9e497ed8
+  [    0.059773] r10: 00000000  r9 : ffffe000  r8 : 80c06048
+  [    0.059792] r7 : 00000000  r6 : 80c0caac  r5 : 80c6c418  r4 : 80b037ec
+  [    0.059811] r3 : 00000000  r2 : 339aa372  r1 : 00000000  r0 : 00000012
+  [    0.059859] Flags: nZCv  IRQs on  FIQs off  Mode SVC_32  ISA ARM  Segm=
+ent none
+  [    0.059883] Control: 00c5387d  Table: 80004008  DAC: 00000051
+  [    0.059997] Process swapper/0 (pid: 1, stack limit =3D 0x(ptrval))
+  [    0.060048] Stack: (0x9e497ec0 to 0x9e498000)
+  [    0.060205] 7ec0: 80b037ec 80b6bf0c 80b037ec ffffffff 00000000 0000000=
+0 9e497f48 80b01100
+  [    0.060310] 7ee0: 00000000 9eeff9e0 80a85734 809eb9be 00000000 8014b7f=
+4 9eeff9e0 80a85734
+  [    0.060408] 7f00: 9e497f48 8014b7f4 000000a4 00000001 00000001 0000000=
+0 80b0133c 9e497f38
+  [    0.060509] 7f20: 00000000 9eeff9d5 339aa372 80b6be80 80b6bf0c 0000000=
+0 00000000 00000000
+  [    0.060606] 7f40: 00000000 00000000 9e497f70 80b01864 00000001 0000000=
+1 00000000 80b0133c
+  [    0.060703] 7f60: 00000001 8085d268 00000000 00000000 9e497f80 80b0175=
+8 00000000 00000000
+  [    0.060800] 7f80: 9e497f90 80b015e4 00000000 8085d268 9e497fa8 8085d27=
+c 00000000 8085d268
+  [    0.060897] 7fa0: 00000000 00000000 00000000 801010e8 00000000 0000000=
+0 00000000 00000000
+  [    0.060993] 7fc0: 00000000 00000000 00000000 00000000 00000000 0000000=
+0 00000000 00000000
+  [    0.061090] 7fe0: 00000000 00000000 00000000 00000000 00000013 0000000=
+0 00000000 00000000
+  [    0.061625] [<80b0383c>] (vfp_init) from [<80b01100>] (do_one_initcall=
++0xa8/0x1e0)
+  [    0.061722] [<80b01100>] (do_one_initcall) from [<80b01864>] (do_initc=
+all_level+0xfc/0x12c)
+  [    0.061742] [<80b01864>] (do_initcall_level) from [<80b01758>] (do_bas=
+ic_setup+0x2c/0x3c)
+  [    0.061759] [<80b01758>] (do_basic_setup) from [<80b015e4>] (kernel_in=
+it_freeable+0x68/0x104)
+  [    0.061777] [<80b015e4>] (kernel_init_freeable) from [<8085d27c>] (ker=
+nel_init+0x14/0x26c)
+  [    0.061798] [<8085d27c>] (kernel_init) from [<801010e8>] (ret_from_for=
+k+0x14/0x2c)
+  [    0.061835] Exception stack(0x9e497fb0 to 0x9e497ff8)
+  [    0.061896] 7fa0:                                     00000000 0000000=
+0 00000000 00000000
+  [    0.061998] 7fc0: 00000000 00000000 00000000 00000000 00000000 0000000=
+0 00000000 00000000
+  [    0.062080] 7fe0: 00000000 00000000 00000000 00000000 00000013 00000000
+  [    0.062263] Code: e5860000 e59f0174 ebd9d8fc e59f5170 (eef04a10) =
+
+  [    0.062679] ---[ end trace 2d338c91e4e74562 ]---
+
+  Before fc1120a7f5:
+
+  [    0.069418] VFP support v0.3: implementor 41 architecture 1 part 20
+  variant b rev 5
+
+  Should you need to reproduce this locally:
+
+  * clang 9.0.0 or later is needed to build this config. If you do not
+  have easy access to such a build, we have a clang build script
+  available [4] that can help with this:
+
+  % ./build-llvm.py --branch llvmorg-9.0.0-rc6 \
+                    --build-stage1-only \
+                    --projects clang \
+                    --targets ARM
+
+  * Because of an unrelated build issue, linux-next needs to be used (or
+  the singular patch that resolves it needs to be cherry-picked on top
+  of 4cdabee7d6d2 [5]). The kernel make command used:
+
+  % make -j$(nproc) -s \
+         ARCH=3Darm \
+         CC=3Dclang \
+         CROSS_COMPILE=3Darm-linux-gnueabi- \
+         O=3Dout \
+         distclean aspeed_g5_defconfig all
+
+  [1]: https://git.kernel.org/linus/4cdabee7d6d2e439fea726a101e448c4ca6837f4
+  [2]: https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Dfc1120a7f5f2d4b601=
+003205c598077d3eb11ad2
+  [3]: https://github.com/ClangBuiltLinux/continuous-integration/blob/800d8=
+4bf8c55ee04c50ed4c78144a96d889a91c5/images/arm/rootfs.cpio
+  [4]: https://github.com/ClangBuiltLinux/tc-build
+  [5]: http://git.armlinux.org.uk/cgit/linux-arm.git/commit/?id=3D7b3948597=
+372e5a6b314208ac320362c204b7f0f
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1844597/+subscriptions
 
