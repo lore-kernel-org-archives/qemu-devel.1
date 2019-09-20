@@ -2,54 +2,49 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C69DC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:35:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F09EC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:37:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27E7220717
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:35:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27E7220717
+	by mail.kernel.org (Postfix) with ESMTPS id 2A366207FC
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:37:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A366207FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBMow-0002RD-6t
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 13:35:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38010)
+	id 1iBMqo-0003no-8U
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 13:37:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38364)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iBMo6-0001ok-P5
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:35:00 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iBMpr-0002zy-J7
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:36:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iBMo5-0006RN-HU
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:34:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45378)
+ (envelope-from <jsnow@redhat.com>) id 1iBMpq-000751-GV
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:36:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45992)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iBMo5-0006Qu-8Y
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:34:57 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iBMpq-00074i-8c; Fri, 20 Sep 2019 13:36:46 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 74DC937E80;
- Fri, 20 Sep 2019 17:34:56 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 93429307D90E;
+ Fri, 20 Sep 2019 17:36:45 +0000 (UTC)
 Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C66FD60C83;
- Fri, 20 Sep 2019 17:34:46 +0000 (UTC)
-Subject: Re: [PATCH 3/3] docker: remove unused debian-sid and debian-ports
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CAB5C60BE0;
+ Fri, 20 Sep 2019 17:36:41 +0000 (UTC)
+Subject: Re: [PATCH] roms: Add a 'make help' target alias
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20190920001413.22567-1-jsnow@redhat.com>
- <20190920001413.22567-4-jsnow@redhat.com>
- <731ae95b-7c70-43ca-bea9-28b00de232d5@redhat.com>
- <c7b12028-0294-0d9c-3e94-60b2ba7d3528@redhat.com> <87d0fvym64.fsf@linaro.org>
- <77355885-6422-5a6a-bd32-e3871e35213e@redhat.com>
- <4bf8c4ed-806e-6ee8-0031-5ce43dc52803@redhat.com>
+ qemu-devel@nongnu.org
+References: <20190920171159.18633-1-philmd@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -125,17 +120,17 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <34b9441e-824b-d6e7-903f-e04cd1cd178e@redhat.com>
-Date: Fri, 20 Sep 2019 13:34:46 -0400
+Message-ID: <65eecd81-0bd5-6345-4194-16212753cf2a@redhat.com>
+Date: Fri, 20 Sep 2019 13:36:41 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <4bf8c4ed-806e-6ee8-0031-5ce43dc52803@redhat.com>
+In-Reply-To: <20190920171159.18633-1-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Fri, 20 Sep 2019 17:34:56 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Fri, 20 Sep 2019 17:36:45 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -150,87 +145,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/20/19 12:28 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 9/20/19 6:23 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 9/20/19 6:20 PM, Alex Benn=C3=A9e wrote:
->>> John Snow <jsnow@redhat.com> writes:
->>>> On 9/20/19 4:49 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->>>>> On 9/20/19 2:14 AM, John Snow wrote:
->>>>>> These are listed as "partial" images, but have no user.
->>>>>> Remove them.
->>>>>
->>>>> Well, I have WiP users from them. I could restore this content when=
- they
->>>>> are ready... Ports is the base of deprecated Debian archs. On the o=
-ther
->>>>> side Sid is the base for edge development I use from time to time t=
-o
->>>>> test latest gcc/binutils.
->>>>> I'll try to find time to raise WiP branches to PoC.
->>>>>
->>>>
->>>> I think that's the right thing to do. Right now, the docker tests
->>>> directory has a lot of stale entries and unusable tests. That might =
-be
->>>> fine for the people working on it, but it makes it hard to understan=
-d
->>>> and use for those of us who only occasionally traipse into the direc=
-tory.
->>>>
->>>> I'm removing all references to python2 -- but if there's no way for =
-me
->>>> to test debian-sid and debian-ports, I can't test changes I need to =
-make
->>>> to these "partial images", so they should be removed until they are
->>>> consumable.
->>>>
->>>> While I am sympathetic to the idea of having a library of partial im=
-ages
->>>> to use for future tests, they're prone to rot if there's no way to
->>>> exercise them in-tree.
->>>
->>> Don't forget some "partial" images are only used for building TCG tes=
-ts
->>> - we want to keep them. But as git is forever I can drop the sid/port=
-s
->>> stuff for now until Phillipe has something to use them again.
->>
->> For Sid I have this case:
->>
->> -- >8 --
->> #
->> # Docker Renesas RX cross-compiler target
->> #
->> # This docker target builds on the debian Sid base image.
->> #
->> # Copyright (c) 2019 Philippe Mathieu-Daud=C3=A9
->> #
->> # SPDX-License-Identifier: GPL-2.0-or-later
->> #
->> FROM qemu:debian-sid
+On 9/20/19 1:11 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Various C projects provide a 'make help' target. Our root directory
+> does so. The roms/ directory lacks a such rule, but already displays
+> a help output when the default target is called.
+> Add a 'help' target aliased to the default one, to avoid:
 >=20
-> Oh well nevermind it is old, so it probably now works with debian-10.
+>   $ make -C roms help
+>   make: *** No rule to make target 'help'.  Stop.
 >=20
-> I used the Ports base for sparc32 and x32, I don't have them on my
-> workstation I'll check during the WE.
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  roms/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/roms/Makefile b/roms/Makefile
+> index 6cf07d3b44..3ffd13cc7e 100644
+> --- a/roms/Makefile
+> +++ b/roms/Makefile
+> @@ -51,7 +51,7 @@ SEABIOS_EXTRAVERSION=3D"-prebuilt.qemu.org"
+>  #
+>  EDK2_EFIROM =3D edk2/BaseTools/Source/C/bin/EfiRom
+> =20
+> -default:
+> +default help:
+>  	@echo "nothing is build by default"
+>  	@echo "available build targets:"
+>  	@echo "  bios               -- update bios.bin (seabios)"
 >=20
 
-If you want to keep docker-sid as a partial image for possible future
-uses, you might consider adding a simple amd64 user -- debian-sid-amd64
-would suffice.
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-It doesn't have to do anything interesting, but it exists to give
-debian-sid a user.
-
-I'd rather not waste your hard work, but I am making a plea that any
-images defined in the tree can be tested by running tests that use them.
+The typo can be fixed with a trivial patch or squashed into this fix,
+the purity of such things doesn't matter to me.
 
 --js
 
