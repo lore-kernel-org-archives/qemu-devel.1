@@ -6,48 +6,49 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5248C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 00:50:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A055C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 00:57:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C5CF206C2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 00:50:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C5CF206C2
+	by mail.kernel.org (Postfix) with ESMTPS id 1D417206C2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 00:57:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D417206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iB785-0002v6-DM
-	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 20:50:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47659)
+	id 1iB7EQ-0006MD-1j
+	for qemu-devel@archiver.kernel.org; Thu, 19 Sep 2019 20:57:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48000)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iB77I-0001zC-H5
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 20:49:45 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iB7D5-0005RA-JJ
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 20:55:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iB77F-0001dV-Ml
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 20:49:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43206)
+ (envelope-from <jsnow@redhat.com>) id 1iB7D4-00042u-AU
+ for qemu-devel@nongnu.org; Thu, 19 Sep 2019 20:55:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38976)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iB77F-0001dI-Eq
- for qemu-devel@nongnu.org; Thu, 19 Sep 2019 20:49:41 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iB7D1-00040e-NR; Thu, 19 Sep 2019 20:55:39 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0FC2D300DA2E;
- Fri, 20 Sep 2019 00:49:40 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D024F3082E66;
+ Fri, 20 Sep 2019 00:55:38 +0000 (UTC)
 Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C593A5D9CD;
- Fri, 20 Sep 2019 00:49:34 +0000 (UTC)
-Subject: Re: [PATCH v3 13/22] libqtest: make qtest_bufwrite send "atomic"
-To: "Oleinik, Alexander" <alxndr@bu.edu>, Stefan Hajnoczi <stefanha@redhat.com>
-References: <20190918231846.22538-1-alxndr@bu.edu>
- <20190918231846.22538-14-alxndr@bu.edu>
- <20190919103741.GO3606@stefanha-x1.localdomain>
- <da63050e-73b2-d9ac-112b-75b9a7caa54d@redhat.com>
- <b416ebcc5d9a0b09a0ad7ef78ba0cd19d13f9f2d.camel@bu.edu>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C71AC5C1B5;
+ Fri, 20 Sep 2019 00:55:37 +0000 (UTC)
+Subject: Re: [Qemu-devel] [PATCH v12 2/2] block/backup: fix
+ backup_cow_with_offload for last cluster
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190917160731.10895-1-vsementsov@virtuozzo.com>
+ <20190917160731.10895-3-vsementsov@virtuozzo.com>
+ <d5144da7-687c-f37e-4e6a-0687605aca0b@redhat.com>
+ <275828de-04f7-abed-ab58-a56e1904e415@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -123,17 +124,17 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <def68290-2e7a-0c7e-c5e0-865a5feae36a@redhat.com>
-Date: Thu, 19 Sep 2019 20:49:34 -0400
+Message-ID: <212fb4b6-6377-8e2d-0c3c-7f2e90893b3a@redhat.com>
+Date: Thu, 19 Sep 2019 20:55:37 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <b416ebcc5d9a0b09a0ad7ef78ba0cd19d13f9f2d.camel@bu.edu>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <275828de-04f7-abed-ab58-a56e1904e415@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 20 Sep 2019 00:49:40 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Fri, 20 Sep 2019 00:55:38 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -148,164 +149,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "bsd@redhat.com" <bsd@redhat.com>,
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Laurent Vivier <lvivier@redhat.com>
+ "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/19/19 3:36 PM, Oleinik, Alexander wrote:
-> On Thu, 2019-09-19 at 14:56 -0400, John Snow wrote:
->> >
->> > On 9/19/19 6:37 AM, Stefan Hajnoczi wrote:
->>> > > On Wed, Sep 18, 2019 at 11:19:40PM +0000, Oleinik, Alexander wrot=
-e:
->>>> > > > When using qtest "in-process" communication, qtest_sendf direc=
-tly
->>>> > > > calls
->>>> > > > a function in the server (qtest.c). Combining the contents of =
-the
->>>> > > > subsequent socket_sends into the qtest_sendf, makes it so the
->>>> > > > server can
->>>> > > > immediately handle the command, without building a local buffe=
-r
->>>> > > > and
->>>> > > > waiting for a newline.
->>>> > > >
->>>> > > > Signed-off-by: Alexander Oleinik <alxndr@bu.edu
->>>> <mailto:alxndr@bu.edu>>
->>>> > > > ---
->>>> > > > =A0tests/libqtest.c | 4 +---
->>>> > > > =A01 file changed, 1 insertion(+), 3 deletions(-)
->>>> > > >
->>>> > > > diff --git a/tests/libqtest.c b/tests/libqtest.c
->>>> > > > index 19feea9e17..d770462869 100644
->>>> > > > --- a/tests/libqtest.c
->>>> > > > +++ b/tests/libqtest.c
->>>> > > > @@ -1086,9 +1086,7 @@ void qtest_bufwrite(QTestState *s, uint6=
-4_t
->>>> > > > addr, const void *data, size_t size)
->>>> > > > =A0=A0=A0=A0=A0gchar *bdata;
->>>> > > > =A0
->>>> > > > =A0=A0=A0=A0=A0bdata =3D g_base64_encode(data, size);
->>>> > > > -=A0=A0=A0=A0qtest_sendf(s, "b64write 0x%" PRIx64 " 0x%zx ", a=
-ddr, size);
->>>> > > > -=A0=A0=A0=A0socket_send(s->fd, bdata, strlen(bdata));
->>>> > > > -=A0=A0=A0=A0socket_send(s->fd, "\n", 1);
->>>> > > > +=A0=A0=A0=A0qtest_sendf(s, "b64write 0x%" PRIx64 " 0x%zx %s\n=
-", addr,
->>>> > > > size, bdata);
->>>> > > > =A0=A0=A0=A0=A0qtest_rsp(s, 0);
->>>> > > > =A0=A0=A0=A0=A0g_free(bdata);
->>>> > > > =A0}
->>>> > > > --=A0
->>>> > > > 2.23.0
->>> > >
->>> > > Cc John Snow, who added the b64write command.
->>> > >
->>> > > The downside to doing this is that sprintf-formatting needs to be
->>> > > performed on the entire base64 buffer.=A0=A0This slows things dow=
-n
->>> > > slightly
->>> > > and a larger temporary buffer needs to be allocated, but I'm not
->>> > > sure it
->>> > > matters.
->>> > >
->> >
->> > *struggles to remember*
->> >
->> > I guess I wanted something that had some space savings while
->> > maintaining
->> > some semblance of debuggability. This is almost certainly meant for
->> > AHCI
->> > tests where it's writing various patterns to large blocks of memory.
->> >
->> > I doubt I really measured the performance of it, but it seemed like
->> > the
->> > way to go for transferring medium amounts of data at the time via th=
-e
->> > qtest protocol.
->> >
->> > Looks like I am the only user of it, still:
->> >
->> > tests/ahci-test.c:=A0=A0=A0=A0qtest_bufwrite(ahci->parent->qts, ptr,=
- tx,
->> > bufsize);
->> > tests/ahci-test.c:=A0=A0=A0=A0qtest_bufwrite(ahci->parent->qts, ptr,=
- tx,
->> > bufsize);
->> > tests/libqos/ahci.c:=A0=A0=A0=A0=A0=A0=A0=A0qtest_bufwrite(ahci->par=
-ent->qts, ptr,
->> > buffer, bufsize);
->> >
->> > The buffers can be quite large, so you might be re-buffering a decen=
-t
->> > amount of data from the sender now.
->> >
->> > 1, Are large transfers like this guaranteed to be atomic anyway? Wha=
-t
->> > kind of socket is it? we're probably eclipsing frame and packet size=
-s
->> > here.
->> >
->> > 2, I am not sure what being "atomic" affords us in terms of allowing
->> > the server to not wait for newlines, how does this change help?
->> >
->> > --js
+On 9/19/19 3:02 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 18.09.2019 23:14, John Snow wrote:
+>>
+>>
+>> On 9/17/19 12:07 PM, Vladimir Sementsov-Ogievskiy wrote:
+>>> We shouldn't try to copy bytes beyond EOF. Fix it.
+>>>
+>>> Fixes: 9ded4a0114968e
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+>
+>>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>> ---
+>>> =C2=A0 block/backup.c | 2 +-
+>>> =C2=A0 1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/block/backup.c b/block/backup.c
+>>> index d8fdbfadfe..89f7f89200 100644
+>>> --- a/block/backup.c
+>>> +++ b/block/backup.c
+>>> @@ -161,7 +161,7 @@ static int coroutine_fn backup_cow_with_offload(B=
+ackupBlockJob *job,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(QEMU_IS_ALIGNED(job->copy_range=
+_size, job->cluster_size));
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(QEMU_IS_ALIGNED(start, job->clu=
+ster_size));
+>>> -=C2=A0=C2=A0=C2=A0 nbytes =3D MIN(job->copy_range_size, end - start)=
+;
+>>> +=C2=A0=C2=A0=C2=A0 nbytes =3D MIN(job->copy_range_size, MIN(end, job=
+->len) - start);
+>>
+>> I'm a little confused. I think the patch as written is correct, but I =
+don't know what problem it solves.
 >=20
-> I'm modifying qtest to allow the server and client to co-exist within
-> the same process (facilitating coverage-guided fuzzing). One of the
-> modifications is making qtest_sendf directly call a function in
-> qtest.c. All the other qtest commands are sent with a single
-> qtest_sendf call, so the qtest.c function could immediately call
-> qtest_process_command. This breaks if the command is sent with
-> different qtest_send/socket_send calls, as in b64write.
+> last cluster may exceed EOF. And backup_do_cow (who calls  backup_cow_w=
+ith_offload) rounds all to clusters.
+> It's not bad, but we need to crop nbytes before calling actual io funct=
+ions. backup_cow_with_bounce_buffer does the same thing.
 >=20
-> It should be simple to change qtest_server_inproc_recv (the qtest.c
-> receiver) to wait for an "\n" prior to qtest_process_command, so I will
-> probably do that and then normal(socket) qtest will keep the
-> memory-reduction benefits of the non-"atomic" approach.
+>>
+>> If we're going to allow the caller to pass in an end that's beyond EOF=
+, does that mean we are *requiring* the caller to pass in a value that's =
+aligned?
+>=20
+> Actually yes, as we are resetting dirty bitmap.
+>=20
+>>
+>> We should probably assert what kind of a value we're accepted here, ri=
+ght? We do for start, but should we for 'end' as well?
+>=20
+> Yes assertion may be added.
+>=20
+>>
+>> Then ...
+>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nr_clusters =3D DIV_ROUND_UP(nbytes, j=
+ob->cluster_size);
+>>
+>> Don't we just round this right back up immediately anyway? Does that m=
+ean we have callers that are passing in an 'end' that's more than 1 job-c=
+luster beyond EOF? That seems like something that should be fixed in the =
+caller, surely?
+>=20
+> nr_clusters are used to set/reset dirty bitmap. It's OK. Still, for las=
+t cluster we can drop it and use nbytes directly. No there should not be =
+such callers.
+> nbytes is used to call blk_co_copy_range, and must be cropped to not ex=
+ceed EOF.
 >=20
 
-Before you spend the effort, just benchmark it if you can. I'd look at
-the before and after of the AHCI tests with and without the pre-buffering=
-.
+Ah, right, right ... I *was* confused. We don't use nr_clusters for the
+IO itself, just the bitmap. So we effectively re-calculate aligned and
+unaligned values for use in different places.
 
-> As a side note, would qtest_memwrite, also benefit from splitting up th=
-e
-> send command?
+> Also, backup_cow_with_bounce_buffer behave in similar way: it crops nby=
+tes.
 >=20
-> =A0=A0=A0=A0for (i =3D 0; i < size; i++) {
-> =A0=A0=A0=A0=A0=A0=A0=A0sprintf(&enc[i * 2], "%02x", ptr[i]);
-> =A0=A0=A0=A0}
+> Of course, there is a place for good refactoring, but I think not in th=
+is patch, it's a small bug fix.
 >=20
-> =A0=A0=A0=A0qtest_sendf(s, "write 0x%" PRIx64 " 0x%zx 0x%s\n", addr, si=
-ze, enc);
-> =A0=A0=A0=A0qtest_rsp(s, 0);
-> =A0=A0=A0=A0g_free(enc);
+>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_reset_dirty_bitmap(job->copy_bitm=
+ap, start,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job->cluster_size * nr_clusters);
+>>>
+>>
+>=20
+>=20
 
-Depends on the users. I think at the time I wrote bufwrite it was using
-obviously more data. Some of the memwrite users might be writing pretty
-small things.
+We should make the interface here a little more clear I think, but what
+you wrote is correct.
 
-Looks like users are:
-
-tests/ahci-test
-tests/ide-test
-tests/libqos/e1000e.c
-tests/libqos/pci-pc.c
-tests/libqos/pci-spapr.c
-tests/megasas-test.c
-tests/tpm-util.c
-tests/virtio-9p-test.c
-
-the libqos ones are used by other tests -- you can give it a skim and
-come up with a small list of tests to benchmark and see if it makes any
-actual difference.
-
---js
+Reviewed-by: John Snow <jsnow@redhat.com>
 
