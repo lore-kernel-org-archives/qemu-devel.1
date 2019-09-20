@@ -2,51 +2,51 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25AEEC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:23:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12219C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:25:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0EA1208C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:23:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0EA1208C3
+	by mail.kernel.org (Postfix) with ESMTPS id DB87B2054F
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:25:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB87B2054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBMdC-0002sK-4O
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 13:23:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35678)
+	id 1iBMfN-0004TX-3d
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 13:25:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35958)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iBMcT-0002Ok-D2
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:22:58 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iBMeV-0003bw-PW
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:25:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iBMcR-0000R4-Dt
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:22:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42226)
+ (envelope-from <jsnow@redhat.com>) id 1iBMeU-0001pH-Jn
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:25:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51073)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iBMcM-0000Lm-Qp; Fri, 20 Sep 2019 13:22:51 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iBMeU-0001oY-CM
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:25:02 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DB0067F74F;
- Fri, 20 Sep 2019 17:22:49 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A00E31918647;
+ Fri, 20 Sep 2019 17:25:01 +0000 (UTC)
 Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 43FA61001281;
- Fri, 20 Sep 2019 17:22:49 +0000 (UTC)
-Subject: Re: [RFC 4/4] ahci media error reporting
-To: tasleson@redhat.com
-References: <20190919194847.18518-1-tasleson@redhat.com>
- <20190919194847.18518-5-tasleson@redhat.com>
- <df07a621-8515-2414-2f59-a7eb7eebd75b@redhat.com>
- <afac6895-9a42-1eaa-3068-3e3dfdd1bd23@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 245DB60318;
+ Fri, 20 Sep 2019 17:24:57 +0000 (UTC)
+Subject: Re: [PATCH 3/3] docker: remove unused debian-sid and debian-ports
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20190920001413.22567-1-jsnow@redhat.com>
+ <20190920001413.22567-4-jsnow@redhat.com>
+ <731ae95b-7c70-43ca-bea9-28b00de232d5@redhat.com>
+ <c7b12028-0294-0d9c-3e94-60b2ba7d3528@redhat.com> <87d0fvym64.fsf@linaro.org>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -122,18 +122,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <8b8d198d-91a2-77a9-08a3-c54613789a92@redhat.com>
-Date: Fri, 20 Sep 2019 13:22:48 -0400
+Message-ID: <00e77307-d386-7ea1-3e1d-b3970bf25b8e@redhat.com>
+Date: Fri, 20 Sep 2019 13:24:56 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <afac6895-9a42-1eaa-3068-3e3dfdd1bd23@redhat.com>
+In-Reply-To: <87d0fvym64.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Fri, 20 Sep 2019 17:22:49 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.70]); Fri, 20 Sep 2019 17:25:01 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -147,219 +147,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/19/19 5:49 PM, Tony Asleson wrote:
-> On 9/19/19 3:43 PM, John Snow wrote:
->>
->>
->> On 9/19/19 3:48 PM, Tony Asleson wrote:
->>> Initial attempt at returning a media error for ahci.  This is certainly
->>> wrong and needs serious improvement.
+On 9/20/19 12:20 PM, Alex Benn=C3=A9e wrote:
+>=20
+> John Snow <jsnow@redhat.com> writes:
+>=20
+>> On 9/20/19 4:49 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> On 9/20/19 2:14 AM, John Snow wrote:
+>>>> These are listed as "partial" images, but have no user.
+>>>> Remove them.
+>>>
+>>> Well, I have WiP users from them. I could restore this content when t=
+hey
+>>> are ready... Ports is the base of deprecated Debian archs. On the oth=
+er
+>>> side Sid is the base for edge development I use from time to time to
+>>> test latest gcc/binutils.
+>>> I'll try to find time to raise WiP branches to PoC.
 >>>
 >>
->> Hi; I have the unfortunate distinction of being the AHCI maintainer.
->> Please CC me on future revisions and discussion if you are interacting
->> with my problem child.
-> 
-> Will do and thank you for taking a look at this!
-> 
->> Also remember to CC qemu-block.
+>> I think that's the right thing to do. Right now, the docker tests
+>> directory has a lot of stale entries and unusable tests. That might be
+>> fine for the people working on it, but it makes it hard to understand
+>> and use for those of us who only occasionally traipse into the directo=
+ry.
 >>
->>> Signed-off-by: Tony Asleson <tasleson@redhat.com>
->>> ---
->>>  hw/ide/ahci.c | 27 +++++++++++++++++++++++++++
->>>  1 file changed, 27 insertions(+)
->>>
->>> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
->>> index d45393c019..f487764106 100644
->>> --- a/hw/ide/ahci.c
->>> +++ b/hw/ide/ahci.c
->>> @@ -36,6 +36,7 @@
->>>  #include "hw/ide/internal.h"
->>>  #include "hw/ide/pci.h"
->>>  #include "ahci_internal.h"
->>> +#include "block/error_inject.h"
->>>  
->>>  #include "trace.h"
->>>  
->>> @@ -999,6 +1000,22 @@ static void ncq_err(NCQTransferState *ncq_tfs)
->>>      ncq_tfs->used = 0;
->>>  }
->>>  
->>> +/*
->>> + * Figure out correct way to report media error, this is at best a guess
->>> + * and based on the output of linux kernel, not even remotely close.
->>> + */
+>> I'm removing all references to python2 -- but if there's no way for me
+>> to test debian-sid and debian-ports, I can't test changes I need to ma=
+ke
+>> to these "partial images", so they should be removed until they are
+>> consumable.
 >>
->> Depends on what kind of error, exactly, you're trying to report, and at
->> what level. (AHCI, NCQ, SATA, ATA?)
-> 
-> I was trying to return a media error, like a 3/1101 for SCSI device.  I
-> think that is at the ATA level?
-> 
-> 
->> Keep in mind that you've inserted an error path for SATA drives using
->> NCQ, but seemingly haven't touched SATA drives not using NCQ, or ATAPI
->> devices using either PATA/SATA, or ATA drives on PATA.
-> 
-> Correct, but for trying out a simple read on a SATA drive for Linux I
-> end up here first :-)  Well, until the kernel retries a number of times
-> and finally gives up and returns an error while also disabling NCQ for
-> the device.
-> 
-> 
->>> +static void ncq_media_err(NCQTransferState *ncq_tfs, uint64_t err_sector)
->>> +{
->>> +    IDEState *ide_state = &ncq_tfs->drive->port.ifs[0];
->>> +
->>> +    ide_state->error = ECC_ERR;
->>> +    ide_state->status = READY_STAT | ERR_STAT;
->>> +    ncq_tfs->drive->port_regs.scr_err |= (1 << ncq_tfs->tag);
->>> +    ncq_tfs->lba = err_sector;
->>> +    qemu_sglist_destroy(&ncq_tfs->sglist);
->>> +    ncq_tfs->used = 0;
->>> +}
->>> +
->>
->> If you are definitely very sure you only want an ide_state error
->> difference, you could just as well call ncq_err and then patch
->> ide_state->error.
->>
->> (I am not sure that's what you want, but... maybe it is?)
-> 
-> As I mentioned above, return an unrecoverable media error.
-> 
-> SCSI sense data can report the first sector in error and I thought I
-> could do the same for SATA too?
-> 
->> I'd have to check -- because I can't say the AHCI emulator was designed
->> so much as congealed -- but you might need calls to ncq_finish.
->>
->> usually, ncq_cb handles the return from any NCQ command and will call
->> ncq_err and ncq_finish as appropriate to tidy up the command.
->>
->> It might be a mistake that execute_ncq_command issues ncq_err in the
->> `default` arm of the switch statement without a call to finish.
->>
->> If we do call ncq_finish from this context I'm not sure if we want
->> block_acct_done here unconditionally. We may not have started a block
->> accounting operation if we never started a backend operation. Everything
->> else looks about right to me.
->>
->>
->>>  static void ncq_finish(NCQTransferState *ncq_tfs)
->>>  {
->>>      /* If we didn't error out, set our finished bit. Errored commands
->>> @@ -1065,6 +1082,8 @@ static void execute_ncq_command(NCQTransferState *ncq_tfs)
->>>  {
->>>      AHCIDevice *ad = ncq_tfs->drive;
->>>      IDEState *ide_state = &ad->port.ifs[0];
->>> +    uint64_t error_sector = 0;
->>> +    char device_id[32];
->>>      int port = ad->port_no;
->>>  
->>>      g_assert(is_ncq(ncq_tfs->cmd));
->>> @@ -1072,6 +1091,14 @@ static void execute_ncq_command(NCQTransferState *ncq_tfs)
->>>  
->>>      switch (ncq_tfs->cmd) {
->>>      case READ_FPDMA_QUEUED:
->>> +        sprintf(device_id, "%lu", ide_state->wwn);
->>
->> This seems suspicious for your design in general, but I'd like to not
->> run sprintf to a buffer in the hotpath for NCQ.
-> 
-> I totally agree.
-> 
-> I started out using integers in the call for error_in_read, as that is
-> what SCSI uses internally for wwn.  Then I did NVMe and it's using a
-> string that doesn't apparently need to be an integer for the wwn? so I
-> changed it to being a string to accommodate.
-> 
-> I also find it interesting that when a SATA device wwid is dumped out
-> within the guest it doesn't appear to have any correlation with the wwn
-> that was passed in on the command line, eg.
-> 
-> -device ide-drive,drive=satadisk,bus=ahci.0,wwn=8675309
-> 
-> $cat /sys/block/sda/device/wwid
-> t10.ATA     QEMU HARDDISK                           QM00005
-> 
-> 
-> This does correlate for SCSI
-> 
-> -device scsi-hd,drive=hd,wwn=12345678
-> 
-> $ cat /sys/block/sdc/device/wwid
-> naa.0000000000bc614e
-> 
-> 
-> as 0xbc614e = 12345678
-> 
-> 
-> For NVMe, the wwn is in the wwid, but it's not immediately obvious.
-> 
-> Being able to correlate between the command line and what you find in
-> the guest would be good.
-> 
-> 
->> If you need this, I'd do it when wwn is set and just grab it from the
->> state structure.
->>
->>> +
->>> +        if (error_in_read(device_id, ncq_tfs->lba,
->>> +                ncq_tfs->sector_count, &error_sector)) {
->>> +            ncq_media_err(ncq_tfs, error_sector);
->>> +            return;
->>> +        }
->>> +
->>
->> One of the downsides to trying to trigger read error injections
->> per-device instead of per-node is that now you have to goof around with
->> device-specific code everywhere>
->> I suppose from your cover letter you *WANT* device-specific error
->> exercising, which would necessitate a different design from blkdebug,
->> but it means you have to add support for the framework per-device and it
->> might be very tricky to get right.
-> 
-> Yes, goal was to be able to selectively pick one or more specific block
-> devices and then create one or more block errors on each device with
-> potentially different error behavior for each block in error.
-> 
+>> While I am sympathetic to the idea of having a library of partial imag=
+es
+>> to use for future tests, they're prone to rot if there's no way to
+>> exercise them in-tree.
+>=20
+> Don't forget some "partial" images are only used for building TCG tests
+> - we want to keep them. But as git is forever I can drop the sid/ports
+> stuff for now until Phillipe has something to use them again.
+>=20
 
-Yeah -- I imagine you want to see how the kernel will respond to various
-error situations posed by certain block devices themselves.
-
-Well... In general, we support rerror=stop and werror=stop in all of our
-block emulators that we care about, and you can find the choke points
-that implement this by looking for e.g. 'BLOCK_ERROR_ACTION_STOP' --
-these error-handling points should already be kind to the various
-emulator state machines; the emulators know how to manage the error
-actions correctly from this point.
-
-I think whatever solution you end up on should look to expand these
-choke points instead of trying to add new ones.
-
-... maybe. maybe it's still too hard to weave together in that way, I'm
-not sure. I only care about IDE/ATA devices, so it's just a
-recommendation to try to use the existing error handling points as a
-basis instead of trying to add new ones.
-
-I think adding new ones will be hard to verify for correctness and hard
-to test.
+Oh, where? Is that defined within the tests/docker/Makefile.include or
+in the TCG tree where I have not gone spelunking before?
 
 --js
-
-> 
->>>          trace_execute_ncq_command_read(ad->hba, port, ncq_tfs->tag,
->>>                                         ncq_tfs->sector_count, ncq_tfs->lba);
->>>          dma_acct_start(ide_state->blk, &ncq_tfs->acct,
->>>
-> 
 
