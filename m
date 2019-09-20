@@ -2,64 +2,88 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00451C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:29:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3E70C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:30:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C52072086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:29:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C52072086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7F0292070C
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:30:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cuzezCxL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F0292070C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBFEZ-0006KT-BA
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 05:29:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52842)
+	id 1iBFFE-00078X-4x
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 05:30:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51823)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iBFCb-0004D6-Nb
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:27:47 -0400
+ (envelope-from <stefanha@gmail.com>) id 1iBF8X-0005j1-HI
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:23:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iBFCa-0007uQ-JG
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:27:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47272)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iBFCX-0007sg-66; Fri, 20 Sep 2019 05:27:41 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9FDB118C427A;
- Fri, 20 Sep 2019 09:27:39 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-81.ams2.redhat.com
- [10.36.117.81])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B46A75C1B5;
- Fri, 20 Sep 2019 09:27:30 +0000 (UTC)
-Date: Fri, 20 Sep 2019 11:27:29 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v2 1/2] iotests: Require Python 3.6 or later
-Message-ID: <20190920092729.GC5458@localhost.localdomain>
-References: <20190919162905.21830-1-kwolf@redhat.com>
- <20190919162905.21830-2-kwolf@redhat.com>
- <5f0e3c27-1c33-0f9b-485b-c3e4a6700138@virtuozzo.com>
+ (envelope-from <stefanha@gmail.com>) id 1iBF09-0000Zx-QR
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:14:54 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34582)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>)
+ id 1iBF08-0000Yp-LC; Fri, 20 Sep 2019 05:14:52 -0400
+Received: by mail-wm1-x341.google.com with SMTP id y135so9079607wmc.1;
+ Fri, 20 Sep 2019 02:14:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=/cqtzKqcWrCsVrZjWVxWwEKHDNeAGI8dMMmo4mDIy1s=;
+ b=cuzezCxLCM7OGimJK69z3aNUaXArnZbN9z2nHUTDV6RRzWxj/J3oVvBm7nlDEecgWj
+ +h1nnrCj5MZn1RyuTburoph88Fzfr01bxSfjbwYaxb77+Y7ibjJAiseFPYjPmkHNWue2
+ JXwmoOMD48koVcM3U7Eph+C9yruuvFJdjC+s9eI9Tfr0DpfQQ/L0KoMn+BO2I/XNWfuV
+ SjSfraFG4VR6rC5G+u/zPMRuFbx8kH4brRVtwX0KEvitB5ApnuKjbcAose0qMn9sdM+h
+ r2eOb12nrfe6XZLpNCQau/iMyF2ak0cijAB3FrjdBDNtvBUkGzr8ZIQTEmEBY7PW9JPz
+ vdrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=/cqtzKqcWrCsVrZjWVxWwEKHDNeAGI8dMMmo4mDIy1s=;
+ b=G7hAvXXKKrsqOrWrBcD1EQHZHpY6CYU5/dYlI0xuHxQzzgRmSGDfruFIDOHF+vzIWB
+ Iyrct8DwA12TBSwkSTK4tamF7dxsbZ+4sj9N0FF3wA7lX0DPJ4xoAi3Qznt0lswBcyYq
+ KzN/7jOIfoewSkqY7LkdMNjlBluDj/c1Wc+vmx9wFPCQnLNiAfBlQJNMpTs8ZTFjVpLh
+ 05bX17uPXoR2He12elXXLd5VlfyigG+l4yWRe6++AflX/66U9vuGZt1jb25RrhSrVfPY
+ DR+SXGoe6w8SOolsYUNkWLgNWZoaZt84FijekjNw+U+rTar0XUURpzsO50HT+rgSMf0F
+ GhzQ==
+X-Gm-Message-State: APjAAAWS2F3PAvTSpFlFJCpEgtGcJwlT8TY1una/N3N0ULfq+qyIvbVa
+ FGVp8Mz7IYz4UqiDrrIXsrs=
+X-Google-Smtp-Source: APXvYqyNT9s9NW5zDy0cdHEqCfz9rrFT67A8aiTvSIkdY5eddLkFpNIQWFEc3Be//ASopo6s12JUvg==
+X-Received: by 2002:a1c:a404:: with SMTP id n4mr2601479wme.41.1568970891010;
+ Fri, 20 Sep 2019 02:14:51 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id l18sm1630813wrc.18.2019.09.20.02.14.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 20 Sep 2019 02:14:49 -0700 (PDT)
+Date: Fri, 20 Sep 2019 10:14:48 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Sergio Lopez <slp@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v3] virtio-blk: schedule
+ virtio_notify_config to run on main context
+Message-ID: <20190920091448.GG14365@stefanha-x1.localdomain>
+References: <20190916112411.21636-1-slp@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="AGZzQgpsuUlWC1xT"
 Content-Disposition: inline
-In-Reply-To: <5f0e3c27-1c33-0f9b-485b-c3e4a6700138@virtuozzo.com>
+In-Reply-To: <20190916112411.21636-1-slp@redhat.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Fri, 20 Sep 2019 09:27:39 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,77 +95,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "thuth@redhat.com" <thuth@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "philmd@redhat.com" <philmd@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mst@redhat.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 20.09.2019 um 10:40 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 19.09.2019 19:29, Kevin Wolf wrote:
-> > Running iotests is not required to build QEMU, so we can have stricter
-> > version requirements for Python here and can make use of new features
-> > and drop compatibility code earlier.
-> > 
-> > This makes qemu-iotests skip all Python tests if a Python version before
-> > 3.6 is used for the build.
-> > 
-> > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >   tests/qemu-iotests/check | 13 ++++++++++++-
-> >   1 file changed, 12 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-> > index 875399d79f..588c453a94 100755
-> > --- a/tests/qemu-iotests/check
-> > +++ b/tests/qemu-iotests/check
-> > @@ -633,6 +633,12 @@ then
-> >       export SOCKET_SCM_HELPER="$build_iotests/socket_scm_helper"
-> >   fi
-> >   
-> > +python_usable=false
-> > +if $PYTHON -c 'import sys; sys.exit(0 if sys.version_info >= (3,6) else 1)'
-> > +then
-> > +    python_usable=true
-> > +fi
-> > +
-> >   default_machine=$($QEMU_PROG -machine help | sed -n '/(default)/ s/ .*//p')
-> >   default_alias_machine=$($QEMU_PROG -machine help | \
-> >      sed -n "/(alias of $default_machine)/ { s/ .*//p; q; }")
-> > @@ -809,7 +815,12 @@ do
-> >           start=$(_wallclock)
-> >   
-> >           if [ "$(head -n 1 "$source_iotests/$seq")" == "#!/usr/bin/env python" ]; then
-> > -            run_command="$PYTHON $seq"
-> > +            if $python_usable; then
-> 
-> hmm I wanted to say that this should not work, as python_usable is a
-> string. But I checked and see - it's work. Wow. Googled. And now I
-> understand that here "false" or "true" command is called, to obtain
-> it's return value.. I don't like bash and don't know its best
-> practice, but I'd prefer python_usable to be just return value of your
-> python command, like
-> 
-> above:
-> 
->    $PYTHON -c 'import sys; sys.exit(0 if sys.version_info >= (3,6) else 1)'
->    python_usable=$?
-> 
-> and here:
-> 
->    if [ $python_usable -eq 0 ]; then
 
-I'm just trying to be consistent with other variables used in the
-'check' script. It has many boolean variables and they all end up
-calling the true/false commands.
+--AGZzQgpsuUlWC1xT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-And actually I think the version used is easier to read, even if maybe
-not as easy to understand why exactly it works.
+On Mon, Sep 16, 2019 at 01:24:12PM +0200, Sergio Lopez wrote:
+> virtio_notify_config() needs to acquire the global mutex, which isn't
+> allowed from an iothread, and may lead to a deadlock like this:
+>=20
+>  - main thead
+>   * Has acquired: qemu_global_mutex.
+>   * Is trying the acquire: iothread AioContext lock via
+>     AIO_WAIT_WHILE (after aio_poll).
+>=20
+>  - iothread
+>   * Has acquired: AioContext lock.
+>   * Is trying to acquire: qemu_global_mutex (via
+>     virtio_notify_config->prepare_mmio_access).
+>=20
+> If virtio_blk_resize() is called from an iothread, schedule
+> virtio_notify_config() to be run in the main context BH.
+>=20
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> ---
+> Changelog
+>=20
+> v3:
+>  - Unconditionally schedule the work to be done in the main context BH
+>    (thanks John Snow and Kevin Wolf).
+>=20
+> v2:
+>  - Use aio_bh_schedule_oneshot instead of scheduling a coroutine
+>    (thanks Kevin Wolf).
+>  - Switch from RFC to v2 patch.
+> ---
+>  hw/block/virtio-blk.c | 17 ++++++++++++++++-
+>  1 file changed, 16 insertions(+), 1 deletion(-)
 
-Kevin
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
+
+Stefan
+
+--AGZzQgpsuUlWC1xT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2EmIgACgkQnKSrs4Gr
+c8gxbQgAn7WW3OCn/zEPV/rkVcKprjJFBPi/QPeRfOKToDJAtnYfbPPAdlilgxBe
+0nVUypzio2N/G4ubqlxm36ZQyseRKrtCZ6j+XbBDt7QsvloxJKskv9NJMGlZ9DuF
+Ij1n9BhrhgFyVDQQSwZy62WGdgN7cYMqt2w3XKHOfFx7zzj7Qw+2gTuaIKCgC/vX
+FM/JUqtu7bI61NaQEsNlQ7x2b4DE9rqWHCzPymLGfFsKxf2TzklX53tGdfl576Wc
+EJTU3V3fIgxJZrd6q61E38HwOjzWf57jMVNVrArQGrgRreHNJrj5R3RSWJNfo0fk
+IPHua6ADG2Gg6JGZbMAmM6f/ZrSaZA==
+=DWwK
+-----END PGP SIGNATURE-----
+
+--AGZzQgpsuUlWC1xT--
 
