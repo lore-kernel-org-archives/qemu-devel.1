@@ -2,72 +2,143 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 298E1C4CEC9
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:21:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25AEEC3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:23:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F00FD20717
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:21:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F00FD20717
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E0EA1208C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 17:23:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0EA1208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBMbW-0001Ll-33
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 13:21:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35311)
+	id 1iBMdC-0002sK-4O
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 13:23:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35678)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iBMaG-0000TR-VB
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:20:42 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iBMcT-0002Ok-D2
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:22:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iBMaE-0008Fi-I6
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:20:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47062)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iBMaE-0008FP-Cf
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:20:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iBMaD-0004vy-6b
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 17:20:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 30A752E80C9
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 17:20:37 +0000 (UTC)
+ (envelope-from <jsnow@redhat.com>) id 1iBMcR-0000R4-Dt
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 13:22:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42226)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iBMcM-0000Lm-Qp; Fri, 20 Sep 2019 13:22:51 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DB0067F74F;
+ Fri, 20 Sep 2019 17:22:49 +0000 (UTC)
+Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 43FA61001281;
+ Fri, 20 Sep 2019 17:22:49 +0000 (UTC)
+Subject: Re: [RFC 4/4] ahci media error reporting
+To: tasleson@redhat.com
+References: <20190919194847.18518-1-tasleson@redhat.com>
+ <20190919194847.18518-5-tasleson@redhat.com>
+ <df07a621-8515-2414-2f59-a7eb7eebd75b@redhat.com>
+ <afac6895-9a42-1eaa-3068-3e3dfdd1bd23@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
+ IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
+ vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
+ rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
+ 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
+ ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
+ 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
+ h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
+ T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
+ LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
+ KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
+ BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
+ qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
+ LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
+ ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
+ J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
+ vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
+ il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
+ 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
+ tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
+ 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
+ 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
+ d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
+ 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
+ MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
+ NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
+ TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
+ L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
+ JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
+ /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
+ nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
+ 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
+ Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
+ e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
+ ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
+ vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
+ C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
+ fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
+ rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
+ TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
+ PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
+ Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
+ E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
+ Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
+ rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
+ cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
+ wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
+ jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
+ vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
+ eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
+ RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
+ CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
+ AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
+ VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
+ XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
+ Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
+ y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
+ sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
+ HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
+ 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
+ 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
+ y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
+ uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
+ YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
+ 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
+ Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
+ TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
+ TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
+ GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
+ rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
+ i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
+ RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
+ glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
+Message-ID: <8b8d198d-91a2-77a9-08a3-c54613789a92@redhat.com>
+Date: Fri, 20 Sep 2019 13:22:48 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 20 Sep 2019 17:13:27 -0000
-From: Nathan Chancellor <1844597@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: nathanchance pmaydell
-X-Launchpad-Bug-Reporter: Nathan Chancellor (nathanchance)
-X-Launchpad-Bug-Modifier: Nathan Chancellor (nathanchance)
-References: <156885735889.27264.8945287928013294736.malonedeb@soybean.canonical.com>
-Message-Id: <156899960800.26694.9765262233399241142.malone@soybean.canonical.com>
-Subject: [Bug 1844597] Re: fc1120a7f5f2d4b601003205c598077d3eb11ad2 causes a
- kernel panic in vfp_init on a clang built kernel
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19048";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 9fb2d2f37f049c2cf8c6727190517e1fe76d7bc3
+In-Reply-To: <afac6895-9a42-1eaa-3068-3e3dfdd1bd23@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Fri, 20 Sep 2019 17:22:49 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,153 +147,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1844597 <1844597@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Attachment added: "aspeed-bmc-opp-romulus.dtb"
-   https://bugs.launchpad.net/qemu/+bug/1844597/+attachment/5290033/+files/=
-aspeed-bmc-opp-romulus.dtb
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1844597
+On 9/19/19 5:49 PM, Tony Asleson wrote:
+> On 9/19/19 3:43 PM, John Snow wrote:
+>>
+>>
+>> On 9/19/19 3:48 PM, Tony Asleson wrote:
+>>> Initial attempt at returning a media error for ahci.  This is certainly
+>>> wrong and needs serious improvement.
+>>>
+>>
+>> Hi; I have the unfortunate distinction of being the AHCI maintainer.
+>> Please CC me on future revisions and discussion if you are interacting
+>> with my problem child.
+> 
+> Will do and thank you for taking a look at this!
+> 
+>> Also remember to CC qemu-block.
+>>
+>>> Signed-off-by: Tony Asleson <tasleson@redhat.com>
+>>> ---
+>>>  hw/ide/ahci.c | 27 +++++++++++++++++++++++++++
+>>>  1 file changed, 27 insertions(+)
+>>>
+>>> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+>>> index d45393c019..f487764106 100644
+>>> --- a/hw/ide/ahci.c
+>>> +++ b/hw/ide/ahci.c
+>>> @@ -36,6 +36,7 @@
+>>>  #include "hw/ide/internal.h"
+>>>  #include "hw/ide/pci.h"
+>>>  #include "ahci_internal.h"
+>>> +#include "block/error_inject.h"
+>>>  
+>>>  #include "trace.h"
+>>>  
+>>> @@ -999,6 +1000,22 @@ static void ncq_err(NCQTransferState *ncq_tfs)
+>>>      ncq_tfs->used = 0;
+>>>  }
+>>>  
+>>> +/*
+>>> + * Figure out correct way to report media error, this is at best a guess
+>>> + * and based on the output of linux kernel, not even remotely close.
+>>> + */
+>>
+>> Depends on what kind of error, exactly, you're trying to report, and at
+>> what level. (AHCI, NCQ, SATA, ATA?)
+> 
+> I was trying to return a media error, like a 3/1101 for SCSI device.  I
+> think that is at the ATA level?
+> 
+> 
+>> Keep in mind that you've inserted an error path for SATA drives using
+>> NCQ, but seemingly haven't touched SATA drives not using NCQ, or ATAPI
+>> devices using either PATA/SATA, or ATA drives on PATA.
+> 
+> Correct, but for trying out a simple read on a SATA drive for Linux I
+> end up here first :-)  Well, until the kernel retries a number of times
+> and finally gives up and returns an error while also disabling NCQ for
+> the device.
+> 
+> 
+>>> +static void ncq_media_err(NCQTransferState *ncq_tfs, uint64_t err_sector)
+>>> +{
+>>> +    IDEState *ide_state = &ncq_tfs->drive->port.ifs[0];
+>>> +
+>>> +    ide_state->error = ECC_ERR;
+>>> +    ide_state->status = READY_STAT | ERR_STAT;
+>>> +    ncq_tfs->drive->port_regs.scr_err |= (1 << ncq_tfs->tag);
+>>> +    ncq_tfs->lba = err_sector;
+>>> +    qemu_sglist_destroy(&ncq_tfs->sglist);
+>>> +    ncq_tfs->used = 0;
+>>> +}
+>>> +
+>>
+>> If you are definitely very sure you only want an ide_state error
+>> difference, you could just as well call ncq_err and then patch
+>> ide_state->error.
+>>
+>> (I am not sure that's what you want, but... maybe it is?)
+> 
+> As I mentioned above, return an unrecoverable media error.
+> 
+> SCSI sense data can report the first sector in error and I thought I
+> could do the same for SATA too?
+> 
+>> I'd have to check -- because I can't say the AHCI emulator was designed
+>> so much as congealed -- but you might need calls to ncq_finish.
+>>
+>> usually, ncq_cb handles the return from any NCQ command and will call
+>> ncq_err and ncq_finish as appropriate to tidy up the command.
+>>
+>> It might be a mistake that execute_ncq_command issues ncq_err in the
+>> `default` arm of the switch statement without a call to finish.
+>>
+>> If we do call ncq_finish from this context I'm not sure if we want
+>> block_acct_done here unconditionally. We may not have started a block
+>> accounting operation if we never started a backend operation. Everything
+>> else looks about right to me.
+>>
+>>
+>>>  static void ncq_finish(NCQTransferState *ncq_tfs)
+>>>  {
+>>>      /* If we didn't error out, set our finished bit. Errored commands
+>>> @@ -1065,6 +1082,8 @@ static void execute_ncq_command(NCQTransferState *ncq_tfs)
+>>>  {
+>>>      AHCIDevice *ad = ncq_tfs->drive;
+>>>      IDEState *ide_state = &ad->port.ifs[0];
+>>> +    uint64_t error_sector = 0;
+>>> +    char device_id[32];
+>>>      int port = ad->port_no;
+>>>  
+>>>      g_assert(is_ncq(ncq_tfs->cmd));
+>>> @@ -1072,6 +1091,14 @@ static void execute_ncq_command(NCQTransferState *ncq_tfs)
+>>>  
+>>>      switch (ncq_tfs->cmd) {
+>>>      case READ_FPDMA_QUEUED:
+>>> +        sprintf(device_id, "%lu", ide_state->wwn);
+>>
+>> This seems suspicious for your design in general, but I'd like to not
+>> run sprintf to a buffer in the hotpath for NCQ.
+> 
+> I totally agree.
+> 
+> I started out using integers in the call for error_in_read, as that is
+> what SCSI uses internally for wwn.  Then I did NVMe and it's using a
+> string that doesn't apparently need to be an integer for the wwn? so I
+> changed it to being a string to accommodate.
+> 
+> I also find it interesting that when a SATA device wwid is dumped out
+> within the guest it doesn't appear to have any correlation with the wwn
+> that was passed in on the command line, eg.
+> 
+> -device ide-drive,drive=satadisk,bus=ahci.0,wwn=8675309
+> 
+> $cat /sys/block/sda/device/wwid
+> t10.ATA     QEMU HARDDISK                           QM00005
+> 
+> 
+> This does correlate for SCSI
+> 
+> -device scsi-hd,drive=hd,wwn=12345678
+> 
+> $ cat /sys/block/sdc/device/wwid
+> naa.0000000000bc614e
+> 
+> 
+> as 0xbc614e = 12345678
+> 
+> 
+> For NVMe, the wwn is in the wwid, but it's not immediately obvious.
+> 
+> Being able to correlate between the command line and what you find in
+> the guest would be good.
+> 
+> 
+>> If you need this, I'd do it when wwn is set and just grab it from the
+>> state structure.
+>>
+>>> +
+>>> +        if (error_in_read(device_id, ncq_tfs->lba,
+>>> +                ncq_tfs->sector_count, &error_sector)) {
+>>> +            ncq_media_err(ncq_tfs, error_sector);
+>>> +            return;
+>>> +        }
+>>> +
+>>
+>> One of the downsides to trying to trigger read error injections
+>> per-device instead of per-node is that now you have to goof around with
+>> device-specific code everywhere>
+>> I suppose from your cover letter you *WANT* device-specific error
+>> exercising, which would necessitate a different design from blkdebug,
+>> but it means you have to add support for the framework per-device and it
+>> might be very tricky to get right.
+> 
+> Yes, goal was to be able to selectively pick one or more specific block
+> devices and then create one or more block errors on each device with
+> potentially different error behavior for each block in error.
+> 
 
-Title:
-  fc1120a7f5f2d4b601003205c598077d3eb11ad2 causes a kernel panic in
-  vfp_init on a clang built kernel
+Yeah -- I imagine you want to see how the kernel will respond to various
+error situations posed by certain block devices themselves.
 
-Status in QEMU:
-  New
+Well... In general, we support rerror=stop and werror=stop in all of our
+block emulators that we care about, and you can find the choke points
+that implement this by looking for e.g. 'BLOCK_ERROR_ACTION_STOP' --
+these error-handling points should already be kind to the various
+emulator state machines; the emulators know how to manage the error
+actions correctly from this point.
 
-Bug description:
-  Commit 4cdabee7d6d2 ("ARM: configs: aspeed_g5: Enable AST2600") [1] in
-  the Linux kernel enabled CONFIG_VFP. When building this config with
-  Clang, the resulting kernel does not boot after commit fc1120a7f5
-  ("target/arm: Implement NSACR gating of floating point") [2] (present
-  since the 4.1.0 release).
+I think whatever solution you end up on should look to expand these
+choke points instead of trying to add new ones.
 
-  The QEMU command:
+... maybe. maybe it's still too hard to weave together in that way, I'm
+not sure. I only care about IDE/ATA devices, so it's just a
+recommendation to try to use the existing error handling points as a
+basis instead of trying to add new ones.
 
-  qemu-system-arm -m 512m \
-                  -machine romulus-bmc \
-                  -no-reboot \
-                  -dtb out/arch/arm/boot/dts/aspeed-bmc-opp-romulus.dtb \
-                  -initrd rootfs.cpio \
-                  -display none \
-                  -serial mon:stdio \
-                  -kernel ${KBF}/arch/arm/boot/zImage
+I think adding new ones will be hard to verify for correctness and hard
+to test.
 
-  If it is needed, the rootfs we are using is provided at a link below
-  [3].
+--js
 
-  Debugging with QEMU reveals that the kernel panics in vfp_init,
-  specifically at the line:
-
-  vfpsid =3D fmrx(FPSID);
-
-  in arch/arm/vfp/vfpmodule.c because of an illegal instruction:
-
-  [    0.058685] VFP support v0.3: =
-
-  [    0.059159] Internal error: Oops - undefined instruction: 0 [#1] SMP A=
-RM
-  [    0.059525] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.3.0-next-20190=
-918-dirty #1
-  [    0.059547] Hardware name: Generic DT based system
-  [    0.059702] PC is at vfp_init+0x50/0x1f4
-  [    0.059721] LR is at vfp_init+0x4c/0x1f4
-  [    0.059738] pc : [<80b0383c>]    lr : [<80b03838>]    psr: 60000153
-  [    0.059756] sp : 9e497ec0  ip : 00000020  fp : 9e497ed8
-  [    0.059773] r10: 00000000  r9 : ffffe000  r8 : 80c06048
-  [    0.059792] r7 : 00000000  r6 : 80c0caac  r5 : 80c6c418  r4 : 80b037ec
-  [    0.059811] r3 : 00000000  r2 : 339aa372  r1 : 00000000  r0 : 00000012
-  [    0.059859] Flags: nZCv  IRQs on  FIQs off  Mode SVC_32  ISA ARM  Segm=
-ent none
-  [    0.059883] Control: 00c5387d  Table: 80004008  DAC: 00000051
-  [    0.059997] Process swapper/0 (pid: 1, stack limit =3D 0x(ptrval))
-  [    0.060048] Stack: (0x9e497ec0 to 0x9e498000)
-  [    0.060205] 7ec0: 80b037ec 80b6bf0c 80b037ec ffffffff 00000000 0000000=
-0 9e497f48 80b01100
-  [    0.060310] 7ee0: 00000000 9eeff9e0 80a85734 809eb9be 00000000 8014b7f=
-4 9eeff9e0 80a85734
-  [    0.060408] 7f00: 9e497f48 8014b7f4 000000a4 00000001 00000001 0000000=
-0 80b0133c 9e497f38
-  [    0.060509] 7f20: 00000000 9eeff9d5 339aa372 80b6be80 80b6bf0c 0000000=
-0 00000000 00000000
-  [    0.060606] 7f40: 00000000 00000000 9e497f70 80b01864 00000001 0000000=
-1 00000000 80b0133c
-  [    0.060703] 7f60: 00000001 8085d268 00000000 00000000 9e497f80 80b0175=
-8 00000000 00000000
-  [    0.060800] 7f80: 9e497f90 80b015e4 00000000 8085d268 9e497fa8 8085d27=
-c 00000000 8085d268
-  [    0.060897] 7fa0: 00000000 00000000 00000000 801010e8 00000000 0000000=
-0 00000000 00000000
-  [    0.060993] 7fc0: 00000000 00000000 00000000 00000000 00000000 0000000=
-0 00000000 00000000
-  [    0.061090] 7fe0: 00000000 00000000 00000000 00000000 00000013 0000000=
-0 00000000 00000000
-  [    0.061625] [<80b0383c>] (vfp_init) from [<80b01100>] (do_one_initcall=
-+0xa8/0x1e0)
-  [    0.061722] [<80b01100>] (do_one_initcall) from [<80b01864>] (do_initc=
-all_level+0xfc/0x12c)
-  [    0.061742] [<80b01864>] (do_initcall_level) from [<80b01758>] (do_bas=
-ic_setup+0x2c/0x3c)
-  [    0.061759] [<80b01758>] (do_basic_setup) from [<80b015e4>] (kernel_in=
-it_freeable+0x68/0x104)
-  [    0.061777] [<80b015e4>] (kernel_init_freeable) from [<8085d27c>] (ker=
-nel_init+0x14/0x26c)
-  [    0.061798] [<8085d27c>] (kernel_init) from [<801010e8>] (ret_from_for=
-k+0x14/0x2c)
-  [    0.061835] Exception stack(0x9e497fb0 to 0x9e497ff8)
-  [    0.061896] 7fa0:                                     00000000 0000000=
-0 00000000 00000000
-  [    0.061998] 7fc0: 00000000 00000000 00000000 00000000 00000000 0000000=
-0 00000000 00000000
-  [    0.062080] 7fe0: 00000000 00000000 00000000 00000000 00000013 00000000
-  [    0.062263] Code: e5860000 e59f0174 ebd9d8fc e59f5170 (eef04a10) =
-
-  [    0.062679] ---[ end trace 2d338c91e4e74562 ]---
-
-  Before fc1120a7f5:
-
-  [    0.069418] VFP support v0.3: implementor 41 architecture 1 part 20
-  variant b rev 5
-
-  Should you need to reproduce this locally:
-
-  * clang 9.0.0 or later is needed to build this config. If you do not
-  have easy access to such a build, we have a clang build script
-  available [4] that can help with this:
-
-  % ./build-llvm.py --branch llvmorg-9.0.0-rc6 \
-                    --build-stage1-only \
-                    --projects clang \
-                    --targets ARM
-
-  * Because of an unrelated build issue, linux-next needs to be used (or
-  the singular patch that resolves it needs to be cherry-picked on top
-  of 4cdabee7d6d2 [5]). The kernel make command used:
-
-  % make -j$(nproc) -s \
-         ARCH=3Darm \
-         CC=3Dclang \
-         CROSS_COMPILE=3Darm-linux-gnueabi- \
-         O=3Dout \
-         distclean aspeed_g5_defconfig all
-
-  [1]: https://git.kernel.org/linus/4cdabee7d6d2e439fea726a101e448c4ca6837f4
-  [2]: https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Dfc1120a7f5f2d4b601=
-003205c598077d3eb11ad2
-  [3]: https://github.com/ClangBuiltLinux/continuous-integration/blob/800d8=
-4bf8c55ee04c50ed4c78144a96d889a91c5/images/arm/rootfs.cpio
-  [4]: https://github.com/ClangBuiltLinux/tc-build
-  [5]: http://git.armlinux.org.uk/cgit/linux-arm.git/commit/?id=3D7b3948597=
-372e5a6b314208ac320362c204b7f0f
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1844597/+subscriptions
+> 
+>>>          trace_execute_ncq_command_read(ad->hba, port, ncq_tfs->tag,
+>>>                                         ncq_tfs->sector_count, ncq_tfs->lba);
+>>>          dma_acct_start(ide_state->blk, &ncq_tfs->acct,
+>>>
+> 
 
