@@ -2,50 +2,49 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5D9BC3A5A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 21:12:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CB4C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 21:16:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79CA12067B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 21:12:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79CA12067B
+	by mail.kernel.org (Postfix) with ESMTPS id 4CF9E20820
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 21:16:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CF9E20820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBQCA-0004lX-Dd
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 17:12:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48711)
+	id 1iBQGW-0002qu-7m
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 17:16:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49188)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iBQBC-000460-7f
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 17:11:03 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iBQEz-0006RX-HH
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 17:14:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iBQBB-0004Sn-4f
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 17:11:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44712)
+ (envelope-from <jsnow@redhat.com>) id 1iBQEy-0005vq-K6
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 17:14:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58628)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iBQB7-0004R7-DZ; Fri, 20 Sep 2019 17:10:57 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ id 1iBQEv-0005vE-RX; Fri, 20 Sep 2019 17:14:54 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 41A2D18C890D;
- Fri, 20 Sep 2019 21:10:56 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E212910DCC82;
+ Fri, 20 Sep 2019 21:14:52 +0000 (UTC)
 Received: from [10.18.17.38] (dhcp-17-38.bos.redhat.com [10.18.17.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 100D05C1B5;
- Fri, 20 Sep 2019 21:10:54 +0000 (UTC)
-Subject: Re: [Qemu-block] [PATCH] xen-block: treat XenbusStateUnknown the same
- as XenbusStateClosed
-To: Paul Durrant <paul.durrant@citrix.com>, xen-devel@lists.xenproject.org,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190918115702.38959-1-paul.durrant@citrix.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 28ADC60BF4;
+ Fri, 20 Sep 2019 21:14:52 +0000 (UTC)
+Subject: Re: [Qemu-devel] [PATCH v2 00/11] RFC crypto/luks: encryption key
+ managment using amend interface
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
+References: <20190912223028.18496-1-mlevitsk@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -121,18 +120,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <d02b4f9a-4277-6aaf-324d-2c7958878690@redhat.com>
-Date: Fri, 20 Sep 2019 17:10:54 -0400
+Message-ID: <632e3a8b-ee54-50e0-83a2-ea82ad8e061f@redhat.com>
+Date: Fri, 20 Sep 2019 17:14:51 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190918115702.38959-1-paul.durrant@citrix.com>
+In-Reply-To: <20190912223028.18496-1-mlevitsk@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Fri, 20 Sep 2019 21:10:56 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.64]); Fri, 20 Sep 2019 21:14:52 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -146,8 +145,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anthony Perard <anthony.perard@citrix.com>,
- Stefano Stabellini <sstabellini@kernel.org>, Mark Syms <mark.syms@citrix.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org,
  Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -155,45 +155,24 @@ Sender: "Qemu-devel"
 
 
 
-On 9/18/19 7:57 AM, Paul Durrant wrote:
-> When a frontend gracefully disconnects from an offline backend, it will
-> set its own state to XenbusStateClosed. The code in xen-block.c correctly
-> deals with this and sets the backend into XenbusStateClosed. Unfortunately
-> it is possible for toolstack to actually delete the frontend area
-> before the state key has been read, leading to an apparent frontend state
-> of XenbusStateUnknown. This prevents the backend state from transitioning
-> to XenbusStateClosed and hence leaves it limbo.
+On 9/12/19 6:30 PM, Maxim Levitsky wrote:
+> This patch series is continuation of my work to add encryption
+> key managment to luks/qcow2 with luks.
+> 
+> This is second version of this patch set.
+> The changes are mostly addressing the review feedback,
+> plus I tested (and fixed sadly) the somewhat ugly code
+> that allows to still write share a raw luks device,
+> while preveting the key managment from happening in this case,
+> as it is unsafe.
+> I added a new iotest dedicated to that as well.
+> 
+> Best regards,
+> 	Maxim Levitsky
 > 
 
-Does the 0 come from a read into de-allocated memory?
+What branch is this based on?
+It doesn't seem to apply to origin/master.
 
 --js
-
-> This patch simply treats a frontend state of XenbusStateUnknown the same
-> as XenbusStateClosed, which will unblock the backend in these circumstances.
-> 
-> Reported-by: Mark Syms <mark.syms@citrix.com>
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> ---
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> ---
->  hw/block/xen-block.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-> index f77343db60..879fc310a4 100644
-> --- a/hw/block/xen-block.c
-> +++ b/hw/block/xen-block.c
-> @@ -313,6 +313,7 @@ static void xen_block_frontend_changed(XenDevice *xendev,
->          break;
->  
->      case XenbusStateClosed:
-> +    case XenbusStateUnknown:
->          xen_block_disconnect(xendev, &local_err);
->          if (local_err) {
->              error_propagate(errp, local_err);
-> 
 
