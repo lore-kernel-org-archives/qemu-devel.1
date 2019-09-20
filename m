@@ -2,51 +2,51 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9DA2C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 12:43:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC6A0C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 12:48:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CB7B2086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 12:43:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CB7B2086A
+	by mail.kernel.org (Postfix) with ESMTPS id 7F5562073F
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 12:48:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F5562073F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBIG7-0005vd-Db
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 08:43:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47485)
+	id 1iBIL6-0000CV-Fr
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 08:48:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48491)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iBIDP-00041P-1L
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 08:40:48 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iBIJS-0007vi-OK
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 08:47:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iBIDN-00021r-QY
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 08:40:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54394)
+ (envelope-from <mreitz@redhat.com>) id 1iBIJQ-00072w-Nh
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 08:47:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47348)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iBIDL-0001yN-0X; Fri, 20 Sep 2019 08:40:43 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1iBIJJ-0006xZ-2w; Fri, 20 Sep 2019 08:46:55 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5A5FD3082E24;
- Fri, 20 Sep 2019 12:40:40 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8B767C057F88;
+ Fri, 20 Sep 2019 12:46:51 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.102])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 03ED219D7A;
- Fri, 20 Sep 2019 12:40:38 +0000 (UTC)
-Subject: Re: [PATCH v5 0/5] qcow2: async handling of fragmented io
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 82CB75C1B5;
+ Fri, 20 Sep 2019 12:46:40 +0000 (UTC)
+Subject: Re: [PATCH v11 04/14] block/backup: introduce BlockCopyState
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190916175324.18478-1-vsementsov@virtuozzo.com>
- <d4d62196-84c2-0a90-312d-391493eae158@redhat.com>
- <93e72727-c46c-d30a-1f38-634237186126@virtuozzo.com>
+References: <20190910102332.20560-1-vsementsov@virtuozzo.com>
+ <20190910102332.20560-5-vsementsov@virtuozzo.com>
+ <bafea6c6-38cc-1848-92ea-ec891457515a@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -73,18 +73,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d392d630-23e5-cc21-c8f5-8c2ec3d4f70b@redhat.com>
-Date: Fri, 20 Sep 2019 14:40:37 +0200
+Message-ID: <bb798ca2-dd22-9ffe-de08-a4d0d8891f30@redhat.com>
+Date: Fri, 20 Sep 2019 14:46:38 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <93e72727-c46c-d30a-1f38-634237186126@virtuozzo.com>
+In-Reply-To: <bafea6c6-38cc-1848-92ea-ec891457515a@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="gQVVQn1jLrKrynGEhsXwCIUYqdVVJbDT9"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+ boundary="tjxwYJODeXfTLvl3YwLDvYPNpFexwOdHl"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 20 Sep 2019 12:40:40 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Fri, 20 Sep 2019 12:46:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,113 +98,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ Denis Lunev <den@virtuozzo.com>,
+ "wencongyang2@huawei.com" <wencongyang2@huawei.com>,
+ "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Denis Lunev <den@virtuozzo.com>
+ "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gQVVQn1jLrKrynGEhsXwCIUYqdVVJbDT9
-Content-Type: multipart/mixed; boundary="ivCJpCefdAHR9xUIsmQQ09LN2qSH6hjLe";
+--tjxwYJODeXfTLvl3YwLDvYPNpFexwOdHl
+Content-Type: multipart/mixed; boundary="McdBk85pCsyMw8m2rKqdMQf74tdgIq9cC";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eblake@redhat.com" <eblake@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>,
+ "wencongyang2@huawei.com" <wencongyang2@huawei.com>,
+ "fam@euphon.net" <fam@euphon.net>, "stefanha@redhat.com"
+ <stefanha@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
  "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
-Message-ID: <d392d630-23e5-cc21-c8f5-8c2ec3d4f70b@redhat.com>
-Subject: Re: [PATCH v5 0/5] qcow2: async handling of fragmented io
-References: <20190916175324.18478-1-vsementsov@virtuozzo.com>
- <d4d62196-84c2-0a90-312d-391493eae158@redhat.com>
- <93e72727-c46c-d30a-1f38-634237186126@virtuozzo.com>
-In-Reply-To: <93e72727-c46c-d30a-1f38-634237186126@virtuozzo.com>
+Message-ID: <bb798ca2-dd22-9ffe-de08-a4d0d8891f30@redhat.com>
+Subject: Re: [PATCH v11 04/14] block/backup: introduce BlockCopyState
+References: <20190910102332.20560-1-vsementsov@virtuozzo.com>
+ <20190910102332.20560-5-vsementsov@virtuozzo.com>
+ <bafea6c6-38cc-1848-92ea-ec891457515a@virtuozzo.com>
+In-Reply-To: <bafea6c6-38cc-1848-92ea-ec891457515a@virtuozzo.com>
 
---ivCJpCefdAHR9xUIsmQQ09LN2qSH6hjLe
+--McdBk85pCsyMw8m2rKqdMQf74tdgIq9cC
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 20.09.19 13:53, Vladimir Sementsov-Ogievskiy wrote:
-> 20.09.2019 14:10, Max Reitz wrote:
->> On 16.09.19 19:53, Vladimir Sementsov-Ogievskiy wrote:
->>> Hi all!
->>>
->>> Here is an asynchronous scheme for handling fragmented qcow2
->>> reads and writes. Both qcow2 read and write functions loops through
->>> sequential portions of data. The series aim it to parallelize these
->>> loops iterations.
->>> It improves performance for fragmented qcow2 images, I've tested it
->>> as described below.
->>
->> Thanks again, applied to my block branch:
->>
->> https://git.xanclic.moe/XanClic/qemu/commits/branch/block
->=20
-> Thanks a lot!
->=20
->>
->>> v5: fix 026 and rebase on Max's block branch [perf results not update=
-d]:
->>>
->>> 01: new, prepare 026 to not fail
->>> 03: - drop read_encrypted blkdbg event [Kevin]
->>>      - assert((x & (BDRV_SECTOR_SIZE - 1)) =3D=3D 0) -> assert(QEMU_I=
-S_ALIGNED(x, BDRV_SECTOR_SIZE)) [rebase]
->>>      - full host offset in argument of qcow2_co_decrypt [rebase]
->>> 04: - substitute remaining qcow2_co_do_pwritev by qcow2_co_pwritev_ta=
-sk in comment [Max]
->>>      - full host offset in argument of qcow2_co_encrypt [rebase]
->>> 05: - Now patch don't affect 026 iotest, so its output is not changed=
+On 13.09.19 20:25, Vladimir Sementsov-Ogievskiy wrote:
+> 10.09.2019 13:23, Vladimir Sementsov-Ogievskiy wrote:
+>> Split copying code part from backup to "block-copy", including separat=
+e
+>> state structure and function renaming. This is needed to share it with=
 
->>>
->>> Rebase changes seems trivial, so, I've kept r-b marks.
+>> backup-top filter driver in further commits.
 >>
->> (For the record, I didn=E2=80=99t consider them trivial, or I=E2=80=99=
-d=E2=80=99ve applied
->> Maxim=E2=80=99s series on top of yours.  I consider a conflict to be t=
-rivially
->> resolvable only if there is only one way of doing it; but when I
->> resolved the conflicts myself, I resolved the one in patch 3 different=
-ly
->> from you =E2=80=93 I added an offset_in_cluster variable to
->> qcow2_co_preadv_encrypted().  Sure, it=E2=80=99s still simple and the =
-difference
->> is minor, but that was exactly where I thought that I can=E2=80=99t co=
-nsider
->> this trivial.)
+>> Notes:
 >>
->=20
-> Hmm. May be it's trivial enough to keep r-b (as my change is trivial it=
-self), but not
-> trivial enough to change alien patch on queuing? If you disagree, I'll =
-be more
-> careful on keeping r-b in changed patches, sorry.
+>> 1. As BlockCopyState keeps own BlockBackend objects, remaining
+>> job->common.blk users only use it to get bs by blk_bs() call, so clear=
 
-It doesn=E2=80=99t matter much to me, I diff all patches anyway. :-)
+>> job->commen.blk permissions set in block_job_create and add
+>> job->source_bs to be used instead of blk_bs(job->common.blk), to keep
+>> it more clear which bs we use when introduce backup-top filter in
+>> further commit.
+>>
+>> 2. Rename s/initializing_bitmap/skip_unallocated/ to sound a bit bette=
+r
+>> as interface to BlockCopyState
+>>
+>> 3. Split is not very clean: there left some duplicated fields, backup
+>> code uses some BlockCopyState fields directly, let's postpone it for
+>> further improvements and keep this comment simpler for review.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>=
+
+>> ---
+>=20
+>=20
+> [..]
+>=20
+>> +
+>> +static BlockCopyState *block_copy_state_new(
+>> +        BlockDriverState *source, BlockDriverState *target,
+>> +        int64_t cluster_size, BdrvRequestFlags write_flags,
+>> +        ProgressBytesCallbackFunc progress_bytes_callback,
+>> +        ProgressResetCallbackFunc progress_reset_callback,
+>> +        void *progress_opaque, Error **errp)
+>> +{
+>> +    BlockCopyState *s;
+>> +    int ret;
+>> +    uint64_t no_resize =3D BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE =
+|
+>> +                         BLK_PERM_WRITE_UNCHANGED | BLK_PERM_GRAPH_MO=
+D;
+>> +    BdrvDirtyBitmap *copy_bitmap;
+>> +
+>> +    copy_bitmap =3D bdrv_create_dirty_bitmap(source, cluster_size, NU=
+LL, errp);
+>> +    if (!copy_bitmap) {
+>> +        return NULL;
+>> +    }
+>> +    bdrv_disable_dirty_bitmap(copy_bitmap);
+>> +
+>> +    s =3D g_new(BlockCopyState, 1);
+>> +    *s =3D (BlockCopyState) {
+>> +        .source =3D blk_new(bdrv_get_aio_context(source),
+>> +                          BLK_PERM_CONSISTENT_READ, no_resize),
+>> +        .target =3D blk_new(bdrv_get_aio_context(target),
+>> +                          BLK_PERM_WRITE, no_resize),
+>> +        .copy_bitmap =3D copy_bitmap,
+>> +        .cluster_size =3D cluster_size,
+>> +        .len =3D bdrv_dirty_bitmap_size(copy_bitmap),
+>> +        .write_flags =3D write_flags,
+>> +        .use_copy_range =3D !(write_flags & BDRV_REQ_WRITE_COMPRESSED=
+),
+>> +        .progress_bytes_callback =3D progress_bytes_callback,
+>> +        .progress_reset_callback =3D progress_reset_callback,
+>> +        .progress_opaque =3D progress_opaque,
+>> +    };
+>> +
+>> +    s->copy_range_size =3D QEMU_ALIGN_UP(MIN(blk_get_max_transfer(s->=
+source),
+>> +                                           blk_get_max_transfer(s->ta=
+rget)),
+>> +                                       s->cluster_size);
+>=20
+> preexistent, but it obviously should be QEMU_ALIGN_DOWN. I can resend w=
+ith a separate
+> fix, it may be fixed while queuing (if resend is not needed for other r=
+easons) or
+> I'll send a follow-up fix later, whichever you prefer.
+
+Hm, true.  But then we=E2=80=99ll also need to handle the (unlikely, admi=
+ttedly)
+case where max_transfer < cluster_size so this would then return 0 (by
+setting use_copy_range =3D false).  So how about this:
+
+> diff --git a/block/backup.c b/block/backup.c
+> index e5bcfe7177..ba4a37dbb5 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -182,9 +182,13 @@ static BlockCopyState *block_copy_state_new(
+>          .progress_opaque =3D progress_opaque,
+>      };
+> =20
+> -    s->copy_range_size =3D QEMU_ALIGN_UP(MIN(blk_get_max_transfer(s->s=
+ource),
+> -                                           blk_get_max_transfer(s->tar=
+get)),
+> -                                       s->cluster_size);
+> +    s->copy_range_size =3D QEMU_ALIGN_DOWN(MIN(blk_get_max_transfer(s-=
+>source),
+> +                                             blk_get_max_transfer(s->t=
+arget)),
+> +                                         s->cluster_size);
+> +    if (s->copy_range_size =3D=3D 0) {
+> +        /* max_transfer < cluster_size */
+> +        s->use_copy_range =3D false;
+> +    }
+> =20
+>      /*
+>       * We just allow aio context change on our block backends. block_c=
+opy() user
 
 Max
 
 
---ivCJpCefdAHR9xUIsmQQ09LN2qSH6hjLe--
+--McdBk85pCsyMw8m2rKqdMQf74tdgIq9cC--
 
---gQVVQn1jLrKrynGEhsXwCIUYqdVVJbDT9
+--tjxwYJODeXfTLvl3YwLDvYPNpFexwOdHl
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2EyMUACgkQ9AfbAGHV
-z0B6xQf9EIpWQpqGumtaJf2LsNaoKT1WYaZyb1mi3ARqTPA3se8XoVTbipIUmWGL
-kJ0GN6UzFI4DxY3NRmmYOZFvo9x4QeKqvkgtCR9bK61uiCb/F61AN030wG02koib
-z9qLl6TL72NfbpkeIhw+S/kyKLSEbJjaelJA9IKW6szaM6WJiwWVuIsc8sFcXVDD
-ZQ0eRThxbvjly5LHLvvF7Hm/1HL3ZD//uZ8qeYt1fy+7hsT5rRpK9/nSdr0kVK4r
-xjY5ACujpzcfaFBbPNXutDhtXQn5wX5DnfLOCoKNxExkbnn+9ckkdTXHdx7dZbsb
-bk54LERRsccVne1d/TlKUjZ9lj1k/Q==
-=HQlZ
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2Eyi4ACgkQ9AfbAGHV
+z0B8SAf/TpP+fsPX5YRdiRyD8nMz/tl+oQLnNTlnv7B/1wIiULedSnnpzeMZ8jjd
+U9706m9tAZipL/4BdfgXxBgo9wR7E2Q8Ej/HsYDVmX1snMrJnh/o5ROL0/BCZXPv
+kymREIdzBJp47YfnS1hCuuL8ObCJdYwpPjLZ9zd8CDEgR9cDccCSVHW8bT98rj94
+IH8mIRmK9ASZ8wmyg8Br3Ukd6tPvH35Sejled+eYtUtbUN5iJ1vYUcSs517pnpe2
+3+6u2J9LZvkKxVd0AsySJJ2cgDuPeXmHtcyA/oExkbXs4KeiDlWly/mIxGFh5NOC
+5izPc710Lxyry14urJwVvKJz45lB8g==
+=N50x
 -----END PGP SIGNATURE-----
 
---gQVVQn1jLrKrynGEhsXwCIUYqdVVJbDT9--
+--tjxwYJODeXfTLvl3YwLDvYPNpFexwOdHl--
 
