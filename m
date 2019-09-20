@@ -2,52 +2,60 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65B15C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 14:38:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 915C3C3A5A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 14:39:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EEC52080F
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 14:38:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EEC52080F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 679EA2086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 14:39:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 679EA2086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBK3b-0003Ek-W1
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 10:38:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32974)
+	id 1iBK3x-0003bm-71
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 10:39:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33850)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iBJmo-0004tQ-8i
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 10:21:27 -0400
+ (envelope-from <pkrempa@redhat.com>) id 1iBJs7-0002PN-On
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 10:26:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iBJmn-000125-2r
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 10:21:26 -0400
-Received: from relay.sw.ru ([185.231.240.75]:43814)
+ (envelope-from <pkrempa@redhat.com>) id 1iBJs6-00034I-HK
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 10:26:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46532)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iBJmk-0000gG-FN; Fri, 20 Sep 2019 10:21:22 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iBJmO-0006b5-7C; Fri, 20 Sep 2019 17:21:00 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v13 12/15] block/io: refactor wait_serialising_requests
-Date: Fri, 20 Sep 2019 17:20:53 +0300
-Message-Id: <20190920142056.12778-13-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190920142056.12778-1-vsementsov@virtuozzo.com>
-References: <20190920142056.12778-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1iBJs6-000346-Cf
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 10:26:54 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B72BE59449;
+ Fri, 20 Sep 2019 14:26:53 +0000 (UTC)
+Received: from angien.brq.redhat.com (unknown [10.43.2.229])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BC57319D7A;
+ Fri, 20 Sep 2019 14:26:49 +0000 (UTC)
+From: Peter Krempa <pkrempa@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 2/2] qapi: Allow introspecting fix for savevm's cooperation
+ with blockdev
+Date: Fri, 20 Sep 2019 16:26:45 +0200
+Message-Id: <992ea9ca130b4fb6dbf82726aa3b1d8040c16944.1568989362.git.pkrempa@redhat.com>
+In-Reply-To: <cover.1568989362.git.pkrempa@redhat.com>
+References: <cover.1568989362.git.pkrempa@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Fri, 20 Sep 2019 14:26:53 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,77 +67,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
- wencongyang2@huawei.com, xiechanglong.d@gmail.com, qemu-devel@nongnu.org,
- armbru@redhat.com, jsnow@redhat.com, stefanha@redhat.com, den@openvz.org,
- mreitz@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Split out do_wait_serialising_requests with additional possibility to
-not actually wait but just check, that there is something to wait for.
+savevm was buggy as it considered all monitor owned block device nodes
+for snapshot. With introduction of -blockdev the common usage made all
+nodes including protocol nodes monitor owned and thus considered for
+snapshot. This was fixed but clients need to be able to detect whether
+this fix is present.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Since savevm does not have an QMP alternative add the feature for the
+'human-monitor-command' backdoor which is used to call this command in
+modern use.
+
+Signed-off-by: Peter Krempa <pkrempa@redhat.com>
 ---
- block/io.c | 24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
+ qapi/misc.json | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/block/io.c b/block/io.c
-index f8c3596131..f5f7b7357c 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -786,12 +786,13 @@ void bdrv_dec_in_flight(BlockDriverState *bs)
-     bdrv_wakeup(bs);
- }
- 
--static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-+static bool coroutine_fn do_wait_serialising_requests(BdrvTrackedRequest *self,
-+                                                      bool wait)
- {
-     BlockDriverState *bs = self->bs;
-     BdrvTrackedRequest *req;
-     bool retry;
--    bool waited = false;
-+    bool found = false;
- 
-     if (!atomic_read(&bs->serialising_in_flight)) {
-         return false;
-@@ -817,11 +818,13 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-                  * will wait for us as soon as it wakes up, then just go on
-                  * (instead of producing a deadlock in the former case). */
-                 if (!req->waiting_for) {
--                    self->waiting_for = req;
--                    qemu_co_queue_wait(&req->wait_queue, &bs->reqs_lock);
--                    self->waiting_for = NULL;
--                    retry = true;
--                    waited = true;
-+                    found = true;
-+                    if (wait) {
-+                        self->waiting_for = req;
-+                        qemu_co_queue_wait(&req->wait_queue, &bs->reqs_lock);
-+                        self->waiting_for = NULL;
-+                        retry = true;
-+                    }
-                     break;
-                 }
-             }
-@@ -829,7 +832,12 @@ static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-         qemu_co_mutex_unlock(&bs->reqs_lock);
-     } while (retry);
- 
--    return waited;
-+    return found;
-+}
-+
-+static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *self)
-+{
-+    return do_wait_serialising_requests(self, true);
- }
- 
- static int bdrv_check_byte_request(BlockDriverState *bs, int64_t offset,
--- 
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 6bd11f50e6..673445dfa9 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -1020,6 +1020,12 @@
+ #
+ # @cpu-index: The CPU to use for commands that require an implicit CPU
+ #
++# Features:
++# @savevm-blockdev-monitor-nodes: If present, the savevm monitor command=
+ only
++#                                 snapshots monitor owned nodes if they =
+have no
++#                                 parents. This allows to use 'savevm' w=
+ith
++#                                 -blockdev. (since 4.2)
++#
+ # Returns: the output of the command as a string
+ #
+ # Since: 0.14.0
+@@ -1047,7 +1053,8 @@
+ ##
+ { 'command': 'human-monitor-command',
+   'data': {'command-line': 'str', '*cpu-index': 'int'},
+-  'returns': 'str' }
++  'returns': 'str',
++  'features' : [ { 'name': 'savevm-blockdev-monitor-nodes' } ] }
+
+ ##
+ # @change:
+--=20
 2.21.0
 
 
