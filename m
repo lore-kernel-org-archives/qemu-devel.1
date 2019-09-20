@@ -2,68 +2,89 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAA0BC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:37:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC286C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:39:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93D992086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:37:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93D992086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 87CB42086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 09:39:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fh41yg/s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87CB42086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBFLv-0006vA-C6
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 05:37:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53006)
+	id 1iBFNT-000112-KB
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 05:38:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53206)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iBFDS-0005Ax-GY
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:28:39 -0400
+ (envelope-from <stefanha@gmail.com>) id 1iBFFV-0000g1-Pw
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:30:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iBFDR-0008Hx-Dz
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:28:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43006)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iBFDR-0008Hb-9k
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:28:37 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6B05E641C7;
- Fri, 20 Sep 2019 09:28:36 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-165.rdu2.redhat.com
- [10.10.120.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 83B0F60C80;
- Fri, 20 Sep 2019 09:28:23 +0000 (UTC)
-Subject: Re: [edk2-devel] [Qemu-devel] [PATCH 1/2] q35: implement 128K SMRAM
- at default SMBASE address
-To: Igor Mammedov <imammedo@redhat.com>
-References: <20190917130708.10281-1-imammedo@redhat.com>
- <20190917130708.10281-2-imammedo@redhat.com>
- <561f4440-7c06-10d7-80ce-bbfa810fec59@redhat.com>
- <20190920102855.3fe2b689@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <a581abbc-ec03-c332-b225-6f7cd3cfadae@redhat.com>
-Date: Fri, 20 Sep 2019 11:28:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <stefanha@gmail.com>) id 1iBFFU-00012Q-FR
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:30:45 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39249)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iBFFU-000128-A9
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 05:30:44 -0400
+Received: by mail-wm1-x341.google.com with SMTP id v17so1561746wml.4
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 02:30:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=G8RkydC9fyS+9DowRdyR75v2P4QWmuikrazCyvBJfZA=;
+ b=fh41yg/sM699N80Twp9hsxAHnC/EZSoGNfeTl16J3BjXdKzheFGQxlAkTUW8PoRdKJ
+ rECObB0tWyRyGr8rMbgwl1hNF9DNGnV/L+vH3vQeAyTKX7eA55NI8EaA+3gomHTYPdM8
+ ot74DCy+fNcGNl6Fn8Do4W4qUX9FQIVNodnmG9Vw8ZSOGstjhEn8moqKh/dqq2VBy37Y
+ lBV6fhLzcG0j/64eHVzErOrs741fF2LmNZtLo4G8b1pDxTaKuGD/PYfoZhnA9Uz4SLbe
+ VQnhrYdyNyi51+sSt42T/fi3ezjki+06KH6j3VmOPIXvpxXCimtKzEIWRZeKuVeCgEkL
+ r8Hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=G8RkydC9fyS+9DowRdyR75v2P4QWmuikrazCyvBJfZA=;
+ b=i99w3i7WuPXGzCN4bgEbS03SH80iBlMOeKSUEXRlUk3OfLebCnCB5GRiWQ7GKjl67C
+ 97+55yBz4trqfYkAHS9bJsSIzqbFLABgyLYV9JeHdbWmthK23UMU2nYOEOhhkxR5X6CY
+ QTwim/ts20593I6nED/DZQ/8bnrYIvgbbvXSSzW4plog7Wv3EZPS7ByNPU6xW1/t0E83
+ Dy7QGmGB1hnFqKCdRkbFRWD8Brd8SxA4MKL7gVSoeOPfu2ihskBJ+d/EM09QqFaFn2rE
+ kJMTPa5/eNaqHbPLXez+Adzub0MxKyBkDc5S+HtQd7vGLQqWf9g5Ox8VLI/Que8JMOy7
+ VZyg==
+X-Gm-Message-State: APjAAAWL9c9J7DU/V117WLb2MBYOYMmK4S4WAkTjTpQEbzMjQ2sqqMJL
+ JxfYYuHBRwtcglx/y+2Fiog=
+X-Google-Smtp-Source: APXvYqwiE10VLIi6pfrkyX3WMSNiY7FO0bqobAgG33T2NTHmOJWSLwda1HVIedq811NKD72cbmv5Dw==
+X-Received: by 2002:a1c:2d44:: with SMTP id t65mr2699212wmt.12.1568971842724; 
+ Fri, 20 Sep 2019 02:30:42 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id y12sm1574380wrn.74.2019.09.20.02.30.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 20 Sep 2019 02:30:41 -0700 (PDT)
+Date: Fri, 20 Sep 2019 10:30:40 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: "Oleinik, Alexander" <alxndr@bu.edu>
+Subject: Re: [Qemu-devel] [PATCH v3 16/22] fuzz: add fuzzer skeleton
+Message-ID: <20190920093040.GJ14365@stefanha-x1.localdomain>
+References: <20190918231846.22538-1-alxndr@bu.edu>
+ <20190918231846.22538-17-alxndr@bu.edu>
+ <20190919124824.GQ3606@stefanha-x1.localdomain>
+ <8e30396855a53bbc3b1de2468fabef314d1f8f07.camel@bu.edu>
 MIME-Version: 1.0
-In-Reply-To: <20190920102855.3fe2b689@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Fri, 20 Sep 2019 09:28:36 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="HSQ3hISbU3Um6hch"
+Content-Disposition: inline
+In-Reply-To: <8e30396855a53bbc3b1de2468fabef314d1f8f07.camel@bu.edu>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,52 +96,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yingwen.chen@intel.com, Brijesh Singh <brijesh.singh@amd.com>,
- devel@edk2.groups.io, phillip.goerl@oracle.com, qemu-devel@nongnu.org,
- alex.williamson@redhat.com, jiewen.yao@intel.com, jun.nakajima@intel.com,
- michael.d.kinney@intel.com, pbonzini@redhat.com, boris.ostrovsky@oracle.com,
- rfc@edk2.groups.io, joao.m.martins@oracle.com
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "bsd@redhat.com" <bsd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/20/19 10:28, Igor Mammedov wrote:
-> On Thu, 19 Sep 2019 19:02:07 +0200
-> "Laszlo Ersek" <lersek@redhat.com> wrote:
-> 
->> Hi Igor,
->>
->> (+Brijesh)
->>
->> long-ish pondering ahead, with a question at the end.
-> [...]
-> 
->> Finally: can you please remind me why we lock down 128KB (32 pages) at
->> 0x3_0000, and not just half of that? What do we need the range at
->> [0x4_0000..0x4_FFFF] for?
-> 
-> 
-> If I recall correctly, CPU consumes 64K of save/restore area.
-> The rest 64K are temporary RAM for using in SMI relocation handler,
-> if it's possible to get away without it then we can drop it and
-> lock only 64K required for CPU state. It won't help with SEV
-> conflict though as it's in the first 64K.
 
-OK. Let's go with 128KB for now. Shrinking the area is always easier
-than growing it.
+--HSQ3hISbU3Um6hch
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On QEMU side,  we can drop black-hole approach and allocate
-> dedicated SMRAM region, which explicitly gets mapped into
-> RAM address space and after SMI hanlder initialization, gets
-> unmapped (locked). So that SMRAM would be accessible only
-> from SMM context. That way RAM at 0x30000 could be used as
-> normal when SMRAM is unmapped.
+On Thu, Sep 19, 2019 at 01:49:09PM +0000, Oleinik, Alexander wrote:
+> On Thu, 2019-09-19 at 13:48 +0100, Stefan Hajnoczi wrote:
+> > > +static void usage(char *path)
+> > > +{
+> > > +    printf("Usage: %s --FUZZ_TARGET [LIBFUZZER ARGUMENTS]\n",
+> > > path);
+> > > +    printf("where --FUZZ_TARGET is one of:\n");
+> >=20
+> > Is the "--" prefix a libfuzzer requirement?  I would have expected
+> > either FUZZ_TARGET by itself or --fuzz-target=3DFUZZ_TARGET (a properly
+> > formatted long option) so that collisions with other command-line
+> > options are not possible.
+> Yes libfuzzer will only pass arguments that start with "--". I can
+> replace it with --fuzz-target=3DFUZZ_TARGET. Alternatively, I can try to
+> build separate binaries for each target. It might waste disk space, but
+> we wouldn't need arguments (--trace could be replace with TRACE=3D1 in
+> ENV). With this design, I'm not sure what to do with code such as
+> i440fx_fuzz.c which re-purposes some functions for multiple different
+> fuzz targets.
 
-I prefer the black-hole approach, introduced in your current patch
-series, if it can work. Way less opportunity for confusion.
+Building a single fuzzing binary with all targets feels natural.  Please
+support the --fuzz-target=3DTARGET syntax though.
 
-I've started work on the counterpart OVMF patches; I'll report back.
+> > A cleaner API:
+> >=20
+> >   /* Each fuzz target implements the following interface: */
+> >   typedef struct {
+> >       const char *name;        /* command-line option for this target
+> > */
+> >       const char *description; /* human-readable help text */
+> >=20
+> >       /* TODO documentation */
+> >       void (*pre_main)(void);
+> >=20
+> >       /* TODO documentation */
+> >       void (*pre_fuzz)(QTestState *);
+> >=20
+> >       /* TODO documentation */
+> >       void (*fuzz)(QTestState *, const unsigned char *, size_t);
+> >   } FuzzTarget;
+>=20
+> Sounds good. Should there also be argc and argv here?=20
 
-Thanks
-Laszlo
+If they are read-only and provided by the FuzzTarget, then yes.  The
+reason I consider this "cleaner" is because the FuzzTarget struct is
+stateless and just captures the information about the fuzz target
+instead of mixing it with runtime state.  But like I said, I didn't
+really understand the design of the struct so maybe I don't understand
+the full problem :).
+
+--HSQ3hISbU3Um6hch
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2EnEAACgkQnKSrs4Gr
+c8jIpQgAqQxSRWnibtnoec+sEQY8Imk0MrTC96ckkSQjUiqK5E5JpTbW1alYt228
+DWsNhd94bjQu/TX12S6UhUr78escJ2EcSuIMYXbwZV3ZZ7zVkQEW1qPZoM/T9BAc
+xc6stb/uiorIQ0z0qOYalShqrX9JUBf22Y6iWDOvGX/6/Ju1TnoYZPBDcL/ct08v
+P4kxhk7TKJV83r9OJpifDVEplxXlTI4T/G/HiWOFazfRMhHnrFo73YQ/hUEvXdkK
+WlniKEgU1CqVywD785LSP9EuiX/h5imK1Jr90SjcmmVNmO7p2KisTg3O7XSYAXqf
+szexV41mEnWLyh8bK6581vGXjt2JXQ==
+=cOOr
+-----END PGP SIGNATURE-----
+
+--HSQ3hISbU3Um6hch--
 
