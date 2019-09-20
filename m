@@ -6,91 +6,73 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80ACAC49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 04:26:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D470C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 04:38:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B1B92080F
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 04:26:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30C872073F
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 04:38:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aj.id.au header.i=@aj.id.au header.b="DsaXz8IB";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="zcCUfpDJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B1B92080F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aj.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="g2U9nS2V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30C872073F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBAVO-000535-Ba
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 00:26:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34050)
+	id 1iBAgj-0000Wc-VR
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 00:38:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35134)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrew@aj.id.au>) id 1iBARj-0002JC-GD
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 00:23:04 -0400
+ (envelope-from <joel.stan@gmail.com>) id 1iBAeK-0008KK-4c
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 00:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrew@aj.id.au>) id 1iBAFX-0000FS-3P
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 00:10:28 -0400
-Received: from wout4-smtp.messagingengine.com ([64.147.123.20]:54869)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrew@aj.id.au>)
- id 1iBAFV-0000D2-EF; Fri, 20 Sep 2019 00:10:25 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailout.west.internal (Postfix) with ESMTP id 8858A43B;
- Fri, 20 Sep 2019 00:10:23 -0400 (EDT)
-Received: from imap2 ([10.202.2.52])
- by compute4.internal (MEProxy); Fri, 20 Sep 2019 00:10:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aj.id.au; h=
- mime-version:message-id:in-reply-to:references:date:from:to:cc
- :subject:content-type:content-transfer-encoding; s=fm3; bh=UW1Cg
- mzJ7CdZcE8MiL6kgnKE/N4lIiJRMpjE0HFtCl4=; b=DsaXz8IBNKHv7T9zWfwtf
- FZOt5Y7XO7B6fRpz7omkuvp20iaGoNTrpEKIj5QgvCJNyBuy1qCKYdHNV4uvdXV1
- Ho5/16Sx1YLpojCutoqvTexX8UeMFKmQFnqFs9EgZHaUDSnGwjFwIwRaBOmSmwZc
- w1iLbMynKpb+EwdpUGJ6JygJGINT+VKE+3PZP+yq3V8HLEioJ5O93TEIuxkUP+Lj
- e9oEQjs8s8/s193G70re55sdbpi5g2eZKNpvcHW38BKx3z4x9MxbgvnJyESBnOAD
- hNQmbRf8pfw0+fRPGQ6yWjKeunhojz+uGUpTUMQy7yPoyiIq+N2qwj+T2IDCuIFC
- A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-transfer-encoding:content-type
- :date:from:in-reply-to:message-id:mime-version:references
- :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
- :x-sasl-enc; s=fm3; bh=UW1CgmzJ7CdZcE8MiL6kgnKE/N4lIiJRMpjE0HFtC
- l4=; b=zcCUfpDJghFAelT+A5siZrZk+qCrqdkBPh42N/6tKw2d5lqEi6jpivVYt
- xSwmPMihvyK5moG+Vuow9dSTUsiNnzxhh9YJ1fpQrYCxyworel4p+6Ly+rz9hkVC
- XABcVOWpZTBZTAO6bQrtlhpEGdpASJFmi9CrQ/1MoUucygUk7bAbyW1q4FHVtXvd
- 8k3osFsCkhV+7v/TvD8Qe2uEVs0ujsc6tRsWO1M9Y2En47QaDBKN6Pz68XeNMVN9
- uknO4BeqkLB01qSDQNr7UhJyqNlKAepaDrVjMGVWNsSXAxoiuhiif0E8aFVUjqSX
- +IKBBmRxHBDpdyoV636MrMuaem1LA==
-X-ME-Sender: <xms:LlGEXboU_Qk2lXc0-TW2Ot_Rxhud_wUWAtF54MPOXGbShCEw2oaNPQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrvddugdejlecutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
- fjughrpefofgggkfgjfhffhffvufgtgfesthhqredtreerjeenucfhrhhomhepfdetnhgu
- rhgvficulfgvfhhfvghrhidfuceorghnughrvgifsegrjhdrihgurdgruheqnecurfgrrh
- grmhepmhgrihhlfhhrohhmpegrnhgurhgvfiesrghjrdhiugdrrghunecuvehluhhsthgv
- rhfuihiivgeptd
-X-ME-Proxy: <xmx:LlGEXdHmqroc77K2MSlS64zJQPlBWqLBkkcpY3yTuD0afj-RGhANFg>
- <xmx:LlGEXVkVTkFSyzM81e0XQUFl7MHGU5BUlziWf-F55x3MDjlrDRXVIg>
- <xmx:LlGEXYmQQ7qtSkidxFDD85GfFhZbcKeac9dqmaUtrwVvlI_2gCtOIQ>
- <xmx:L1GEXYtLgMyK_jYSUc5y_i-9zTrm28XEvic08YL2Ens_N7hu3WIy1Q>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
- id 4A997E00A9; Fri, 20 Sep 2019 00:10:22 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.1.7-238-g170a812-fmstable-20190913v1
-Mime-Version: 1.0
-Message-Id: <139c3f7e-465e-4efb-b6c7-213dcd2ec6b7@www.fastmail.com>
-In-Reply-To: <20190919055002.6729-4-clg@kaod.org>
+ (envelope-from <joel.stan@gmail.com>) id 1iBAeJ-00045T-6K
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 00:36:04 -0400
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:45438)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
+ id 1iBAeC-00043y-3i; Fri, 20 Sep 2019 00:35:57 -0400
+Received: by mail-qt1-x843.google.com with SMTP id c21so7141506qtj.12;
+ Thu, 19 Sep 2019 21:35:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=P0HGbdxrmbTwLhsFf8fVFclc5uy3emLEDmnjj7AIK8M=;
+ b=g2U9nS2VednVRdiFMpV7J7Ba9Qm6fFmjdBb9Pp8+kg/7QygSNe+nebT3LpG21D7W0w
+ RIz2h4Wkg/14fOFEOFcytNSGAMIt1Xg98RpKKtxA01dKKTpN8adLxBt0Qdfm355Qc1i2
+ 7cgR7IvyEfU+IX5O2Atw/qUyQn0mQCHWV5pno=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=P0HGbdxrmbTwLhsFf8fVFclc5uy3emLEDmnjj7AIK8M=;
+ b=fFLoa1l69VW3c8TxbQ4rkyuApSI12Bhn1+ztTDE2qRx2p6joHJsEgrU4tKjX0UlCGW
+ ONkhUJQj0Ez4/k9zMG9QIWy9K6k/jYmomW6YBlNfgyTUyfnHXI9tr+NUMGS/4+0x5f02
+ cIr3mODB9mdzDg4HMaoBqXgldQTuTrDJgO3KJp7idLUN0iYh3hqvijw5E+7+s9COMDKu
+ lxnSJr46w+/8jLJSiXjV+BGcblWbdAgJjROSkb+xH8iDrgFAnNOUAOGaL1XMIRHLyJfY
+ MJSpm/HlEtRV/DxATf1GfttsVnB7zJsUe0ZY5YhhWbZHu5/JBabOA1r9dfJ13SARyFzi
+ nVSg==
+X-Gm-Message-State: APjAAAXhcZaclQ/7yGPnRpB+ZKGJAvZrz3sLJt/Tih2LzMWWtVOmxBUP
+ +HgyynoiSkVHovh1qWKHLAMRrLkxrq6y3I5jiqM=
+X-Google-Smtp-Source: APXvYqydi2r1niOdEcq7f/TqVh0U8iIb2UUeNyD7BU7sVZRo8JQctZPttneS+kVliQhurL2bGLWgIirKwEjjhPpr0Xc=
+X-Received: by 2002:ac8:2d8b:: with SMTP id p11mr1218945qta.220.1568954154594; 
+ Thu, 19 Sep 2019 21:35:54 -0700 (PDT)
+MIME-Version: 1.0
 References: <20190919055002.6729-1-clg@kaod.org>
- <20190919055002.6729-4-clg@kaod.org>
-Date: Fri, 20 Sep 2019 13:40:58 +0930
-From: "Andrew Jeffery" <andrew@aj.id.au>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- "Peter Maydell" <peter.maydell@linaro.org>
-Subject: Re: [PATCH 03/21] hw: aspeed_scu: Add AST2600 support
-Content-Type: text/plain;charset=utf-8
+ <20190919055002.6729-18-clg@kaod.org>
+In-Reply-To: <20190919055002.6729-18-clg@kaod.org>
+From: Joel Stanley <joel@jms.id.au>
+Date: Fri, 20 Sep 2019 04:35:43 +0000
+Message-ID: <CACPK8XffSK65RAc-kgbZrvxbr9cEF3uYEu6_tpN=9oDwrNgs-w@mail.gmail.com>
+Subject: Re: [PATCH 17/21] aspeed/soc: Add AST2600 support
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 64.147.123.20
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::843
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,79 +84,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On Thu, 19 Sep 2019, at 15:19, C=C3=A9dric Le Goater wrote:
-> From: Joel Stanley <joel@jms.id.au>
->=20
-> The SCU controller on the AST2600 SoC has extra registers. Increase
-> the number of regs of the model and introduce a new field in the class=
-
-> to customize the MemoryRegion operations depending on the SoC model.
->=20
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
-> [clg: - improved commit log
->       - changed vmstate version
->       - reworked model integration into new objet class ]
+On Thu, 19 Sep 2019 at 05:52, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>
+> Initial definitions for a simple machine using an AST2600 SoC (Cortex
+> CPU).
+>
+> The Cortex CPU and its interrupt controller are too complex to handle
+> in the common Aspeed SoC framework. We introduce a new Aspeed SoC
+> class with instance_init and realize handlers to handle the differences
+> with the AST2400 and the AST2500 SoCs. This will add extra work to
+> keep in sync both models with future extensions but it makes the code
+> clearer.
+>
 > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
->  include/hw/misc/aspeed_scu.h |   7 +-
->  hw/misc/aspeed_scu.c         | 190 +++++++++++++++++++++++++++++++++-=
--
->  2 files changed, 189 insertions(+), 8 deletions(-)
 
-...
+Reviewed-by: Joel Stanley <joel@jms.id.au>
 
-> +static void aspeed_ast2600_scu_write(void *opaque, hwaddr offset,=20
-> uint64_t data,
-> +                                     unsigned size)
-> +{
-> +    AspeedSCUState *s =3D ASPEED_SCU(opaque);
-> +    int reg =3D TO_REG(offset);
-> +
-> +    if (reg >=3D ASPEED_AST2600_SCU_NR_REGS) {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: Out-of-bounds write at offset 0x%"=20
-> HWADDR_PRIx "\n",
-> +                      __func__, offset);
-> +        return;
-> +    }
-> +
-> +    if (reg > PROT_KEY && !s->regs[PROT_KEY]) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: SCU is locked!\n",=20
-> __func__);
-> +    }
-> +
-> +    trace_aspeed_scu_write(offset, size, data);
-> +
-> +    switch (reg) {
-> +    case AST2600_PROT_KEY:
-> +        s->regs[reg] =3D (data =3D=3D ASPEED_SCU_PROT_KEY) ? 1 : 0;
-> +        return;
-> +    case AST2600_HW_STRAP1:
-> +    case AST2600_HW_STRAP2:
-> +        if (s->regs[reg + 2]) {
-> +            return;
-> +        }
-> +        /* fall through */
-> +    case AST2600_SYS_RST_CTRL:
-> +    case AST2600_SYS_RST_CTRL2:
-> +        /* W1S (Write 1 to set) registers */
-> +        s->regs[reg] |=3D data;
-> +        return;
-> +    case AST2600_SYS_RST_CTRL_CLR:
-> +    case AST2600_SYS_RST_CTRL2_CLR:
-> +    case AST2600_HW_STRAP1_CLR:
-> +    case AST2600_HW_STRAP2_CLR:
-> +        /* W1C (Write 1 to clear) registers */
-> +        s->regs[reg] &=3D ~data;
+One small addition below. If you don't resend I can do a follow up patch fo=
+r it:
 
-This clear should respect the protection register for each strap case.
+> +
+> +static const int aspeed_soc_ast2600_irqmap[] =3D {
 
-Andrew
+> +    [ASPEED_ETH1]      =3D 2,
+> +    [ASPEED_ETH2]      =3D 3,
+
+We need to add ETH3 and ETH4 here. They look like this:
+
+    [ASPEED_ETH3]      =3D 32,
+    [ASPEED_ETH4]      =3D 33,
 
