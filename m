@@ -6,77 +6,59 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8C62C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 06:37:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0706C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 07:06:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DF2D2080F
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 06:37:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DF2D2080F
+	by mail.kernel.org (Postfix) with ESMTPS id 85045206C2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 07:06:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85045206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBCY0-0005O6-Q5
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 02:37:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49790)
+	id 1iBCze-0008Dj-M0
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 03:06:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54486)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1iBCUA-0000dO-Cp
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 02:33:43 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1iBCys-0007PV-Ej
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:05:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1iBCDg-0002Cf-RQ
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 02:16:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47644)
+ (envelope-from <eric.auger@redhat.com>) id 1iBCyr-0006RM-B8
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 03:05:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53232)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iBCDg-0002Bx-K5
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 02:16:40 -0400
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1iBCyn-0006LN-Kd; Fri, 20 Sep 2019 03:05:21 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 61C4E4E919
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 06:16:39 +0000 (UTC)
-Received: by mail-pf1-f198.google.com with SMTP id f2so3956164pfk.13
- for <qemu-devel@nongnu.org>; Thu, 19 Sep 2019 23:16:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=63eRVRiPaHYQAoA4Qw85V6AzIpWXz87aoXIxFk5UGjM=;
- b=ZQlifqMJvlXqJp2DOLFRbqrfZgGE7yxqN3eYdodMoSd0/jBqvTvirFS1ybX64DpZdx
- tbKv+411vfYj9wMmWNEj09wzOJbH3q5+brTEcChpc7oITZHq6D0YNsmlPe0zUvvOXvoL
- ytXgaSzFbgfHXYYy5alwVTFnWRf12UWFEG+ltiW+dRq9SqqGxAPyf+bRP/rFMXQkrSv7
- LrS9VgcHkBLbpmxpX9Kb/Uq1XO7spf2pOF7o79fY5QWNaz4JlKHfASNXn5xpXJ9rR3id
- EL7g7g2za0nfrZkgAOVpNFcw02+3777akjwOs469vDl+e8eS6Y5FLQe6XxiVMG+q0PNE
- VVOg==
-X-Gm-Message-State: APjAAAVx9PlGu/VaBc/WFkG/yRsAunLxaPqgCf80xtWeGQqIsanKCiCO
- q3tBGE6Bxl16cUsFHxNq/MCLRUVbUoWjoDo3S6nOL+0VgI6qPg1sfHm/ujnQIjzmvTl3pCqKHm+
- egeR2PnGLhnJ7tHk=
-X-Received: by 2002:a17:90a:28c5:: with SMTP id
- f63mr2693192pjd.67.1568960198693; 
- Thu, 19 Sep 2019 23:16:38 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzxbcnICr/V90GshTFflbxvsv8yjc+JZulY2XZALIJnD02YkooYpv7/slAOOWoOBICJPAb6kQ==
-X-Received: by 2002:a17:90a:28c5:: with SMTP id
- f63mr2693166pjd.67.1568960198416; 
- Thu, 19 Sep 2019 23:16:38 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id v8sm1517528pje.6.2019.09.19.23.16.34
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Sep 2019 23:16:37 -0700 (PDT)
-Date: Fri, 20 Sep 2019 14:16:28 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id ABE3B86E86F;
+ Fri, 20 Sep 2019 07:05:20 +0000 (UTC)
+Received: from [10.36.117.220] (ovpn-117-220.ams2.redhat.com [10.36.117.220])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2016D19D7A;
+ Fri, 20 Sep 2019 07:05:09 +0000 (UTC)
 Subject: Re: [PATCH v2 0/5] Allow memory_region_register_iommu_notifier() to
  fail
-Message-ID: <20190920061628.GD12858@xz-x1>
+To: Peter Xu <peterx@redhat.com>
 References: <20190919121845.29520-1-eric.auger@redhat.com>
+ <20190920061628.GD12858@xz-x1>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <29a66cfd-b363-9c8a-4bc1-998ae4e3fbea@redhat.com>
+Date: Fri, 20 Sep 2019 09:05:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
+In-Reply-To: <20190920061628.GD12858@xz-x1>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190919121845.29520-1-eric.auger@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Fri, 20 Sep 2019 07:05:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,51 +79,64 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 19, 2019 at 02:18:40PM +0200, Eric Auger wrote:
-> This series allows the memory_region_register_iommu_notifier()
-> to fail. As of now, when a MAP notifier is attempted to be
-> registered along with SMMUv3, Intel iommu without caching mode
-> or AMD IOMMU, we exit in the IOMMU MR notify_flag_changed()
-> callback. In case of VFIO assigned device hotplug, this could be
-> handled more nicely directly within the VFIO code, simply rejecting
-> the hotplug without exiting. This is what the series achieves
-> by handling the memory_region_register_iommu_notifier() returned
-> value.
+Hi Peter,
 
-Could I ask what's the code path for ARM when the hot plug failed?  Is
-that vfio_realize() then vfio_connect_container() will fail with this?
+On 9/20/19 8:16 AM, Peter Xu wrote:
+> On Thu, Sep 19, 2019 at 02:18:40PM +0200, Eric Auger wrote:
+>> This series allows the memory_region_register_iommu_notifier()
+>> to fail. As of now, when a MAP notifier is attempted to be
+>> registered along with SMMUv3, Intel iommu without caching mode
+>> or AMD IOMMU, we exit in the IOMMU MR notify_flag_changed()
+>> callback. In case of VFIO assigned device hotplug, this could be
+>> handled more nicely directly within the VFIO code, simply rejecting
+>> the hotplug without exiting. This is what the series achieves
+>> by handling the memory_region_register_iommu_notifier() returned
+>> value.
+> 
+> Could I ask what's the code path for ARM when the hot plug failed?  Is
+> that vfio_realize() then vfio_connect_container() will fail with this?
+> 
+>     if (container->error) {
+>         ret = container->error;
+>         error_setg_errno(errp, -ret,
+>                          "memory listener initialization failed for container");
+>         goto listener_release_exit;
+>     }
+> 
+Yes that path is exercised.
 
-    if (container->error) {
-        ret = container->error;
-        error_setg_errno(errp, -ret,
-                         "memory listener initialization failed for container");
-        goto listener_release_exit;
-    }
+> If so, I would again suggest you to use Error** in patch 1.  IMHO we
+> can let vfio_listener_region_add() to be the first one to use the
+> Error** so that instead of this:
+> 
+>     /*
+>      * On the initfn path, store the first error in the container so we
+>      * can gracefully fail.  Runtime, there's not much we can do other
+>      * than throw a hardware error.
+>      */
+>     if (!container->initialized) {
+>         if (!container->error) {
+>             container->error = ret;
+>         }
+>     } else {
+>         hw_error("vfio: DMA mapping failed, unable to continue");
+>     }
 
-If so, I would again suggest you to use Error** in patch 1.  IMHO we
-can let vfio_listener_region_add() to be the first one to use the
-Error** so that instead of this:
+OK. I agree that's better. That's also more code change ;-)
 
-    /*
-     * On the initfn path, store the first error in the container so we
-     * can gracefully fail.  Runtime, there's not much we can do other
-     * than throw a hardware error.
-     */
-    if (!container->initialized) {
-        if (!container->error) {
-            container->error = ret;
-        }
-    } else {
-        hw_error("vfio: DMA mapping failed, unable to continue");
-    }
+But let's do it!
 
-We can also cache the Error** into container and return to user if the
-user is using QMP which should be better than the int number (or
-again, maybe return both errors?).  IIUC error_report() will not work
-for QMP.
+Thank you for the review!
 
-Regards,
+Best Regards
 
--- 
-Peter Xu
+Eric
+> 
+> We can also cache the Error** into container and return to user if the
+> user is using QMP which should be better than the int number (or
+> again, maybe return both errors?).  IIUC error_report() will not work
+> for QMP.
+> 
+> Regards,
+> 
 
