@@ -2,95 +2,124 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDA50C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 13:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91420C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 13:36:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A384E2086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 13:32:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A384E2086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4C2E9206B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 13:36:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="wdxXI4Sn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C2E9206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBJ17-0000l0-CN
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 09:32:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54759)
+	id 1iBJ5O-0004E5-Cb
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 09:36:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55058)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iBIz7-0007l0-E0
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 09:30:07 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iBJ1W-0001Ti-33
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 09:32:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iBIz6-000210-4E
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 09:30:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58602)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iBIz1-0001wW-F7; Fri, 20 Sep 2019 09:29:59 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 968911DB0;
- Fri, 20 Sep 2019 13:29:58 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.102])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3D2415D9CD;
- Fri, 20 Sep 2019 13:29:57 +0000 (UTC)
-Subject: Re: [PATCH v5 0/5] qcow2: async handling of fragmented io
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190916175324.18478-1-vsementsov@virtuozzo.com>
- <d4d62196-84c2-0a90-312d-391493eae158@redhat.com>
- <93e72727-c46c-d30a-1f38-634237186126@virtuozzo.com>
- <d392d630-23e5-cc21-c8f5-8c2ec3d4f70b@redhat.com>
- <ea14f4bc-9a0c-0147-e963-9019fc9f4f2b@virtuozzo.com>
- <9b56ef11-8c1e-fa48-d838-4fe3ee043474@redhat.com>
- <0baa8d6e-cb3b-9e20-be0e-324a3e270b87@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <a4407b8e-3766-5694-0bbd-71764e6ccca1@redhat.com>
-Date: Fri, 20 Sep 2019 15:29:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iBJ1U-0003sW-4f
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 09:32:33 -0400
+Received: from mail-he1eur04on0724.outbound.protection.outlook.com
+ ([2a01:111:f400:fe0d::724]:3854
+ helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iBJ1T-0003pL-IM; Fri, 20 Sep 2019 09:32:32 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Twa/zmRY/24QK2Cwy6ttuDrr3J0Lko/2rTYzvNmeIlTW2qk4cXV5YR+IRpv42KKSEaLa4m8ex7OZYaNrDNlQBcW2REi9wbAgKA3JPvfM4jDZo+2WQ973Ci4hAOAQ2p0XDWZ3moRvMmQ1itE33zqP4qdk0PSj36FW3Eh3Wsa+SjojtGT0OFxxpoUBMiKiNUgrdGiWRWuBkHunh97LDA/KnHB9WwlkVImJ4PzXQ3f8RcK70xHvW84T4K3uIWoyqTZGLEqUr5oT8qQV6QB39oPiDwMTgvc2ag3d+s/vkiM6/RGoZb6eAOPSEocfj/RMsI03O32CGTEd7i7de5RagE2NkQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4XnYw0I9Bn2E/4VGAxzlI+alEhBnD1rA+ikvHNg/cJ4=;
+ b=NE0CFtAdCl0vDuOHJSLZuSaY/h7jvcjDj3H8LnryCnqpGlNiTMuddLKiYf4B/bukWRxxWg0KonoQ3IJV3WBMzrlXhVAL0+Yuc4lE9HeGNj1vxTJaN22P2n4oP74wDHnnjsX+DI+e7EEZ7ETxCEuCbzBy+MbsG2oABLu50pT01RWOxzxB+D6t5FrpTdYU/GvbLR3YBEUb4+5y8Qmk6TVnVzC0CZjZxCpzRkcEX2R4Jjs6n6R2Yr2sBziLrCG9N+Xt7LGgb6SRQ2GG21+NKAEo/i2bhEe8ApV3HZiw0Atw4XU1/C0Pgb9a2qUAANo8SWh+pjYpiB59nritcdG66aB02g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4XnYw0I9Bn2E/4VGAxzlI+alEhBnD1rA+ikvHNg/cJ4=;
+ b=wdxXI4Sn2YSPusvFD9xc7gqLjIh4kCnR1IPOVQ0o8GWhxV/b3BRpECo9ZywONZFhsGmzcqWPeldkg5TNjexityPVlJ8F8cl4wl74/xBqDUtlPD9a3p2N18kl1HVU0XOSR0Phll/cP48wRdj9HSCmiuNgbbnI0PEx1flLAirHeQM=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB4201.eurprd08.prod.outlook.com (20.179.8.215) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2263.21; Fri, 20 Sep 2019 13:32:28 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2284.023; Fri, 20 Sep 2019
+ 13:32:28 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH v11 04/14] block/backup: introduce BlockCopyState
+Thread-Topic: [PATCH v11 04/14] block/backup: introduce BlockCopyState
+Thread-Index: AQHVZ8HWULZDkPZpMke6HdjhrfznqKcp8daAgAqhiQCAAAKhgIAAADEAgAAIaoCAAAGOgA==
+Date: Fri, 20 Sep 2019 13:32:28 +0000
+Message-ID: <aa260fb3-7eaf-3564-6183-85cade318227@virtuozzo.com>
+References: <20190910102332.20560-1-vsementsov@virtuozzo.com>
+ <20190910102332.20560-5-vsementsov@virtuozzo.com>
+ <bafea6c6-38cc-1848-92ea-ec891457515a@virtuozzo.com>
+ <bb798ca2-dd22-9ffe-de08-a4d0d8891f30@redhat.com>
+ <abf4fdcc-2ca3-7ec5-93ff-95be6b480a5d@virtuozzo.com>
+ <fbcb6733-b19f-e275-71cb-466238d8b193@virtuozzo.com>
+ <5d9c1263-c0d7-0f51-424a-25406ed435db@redhat.com>
+In-Reply-To: <5d9c1263-c0d7-0f51-424a-25406ed435db@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0501CA0015.eurprd05.prod.outlook.com
+ (2603:10a6:3:1a::25) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190920163225525
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 274edf95-5af5-4963-e5e9-08d73dcefaec
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DB8PR08MB4201; 
+x-ms-traffictypediagnostic: DB8PR08MB4201:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DB8PR08MB4201459B837EDBA25210D1E5C1880@DB8PR08MB4201.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:345;
+x-forefront-prvs: 0166B75B74
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(366004)(396003)(376002)(346002)(39850400004)(136003)(189003)(199004)(4326008)(256004)(66946007)(5660300002)(316002)(7416002)(54906003)(52116002)(6116002)(3846002)(66476007)(26005)(186003)(478600001)(476003)(64756008)(66556008)(6486002)(2616005)(8676002)(107886003)(6512007)(8936002)(86362001)(81156014)(81166006)(305945005)(2501003)(36756003)(71190400001)(486006)(25786009)(386003)(53546011)(229853002)(110136005)(6506007)(14454004)(2906002)(71200400001)(102836004)(6436002)(31686004)(66446008)(99286004)(6246003)(31696002)(66066001)(446003)(7736002)(11346002)(76176011);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4201;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: ujEQmBSvqT7MYKaa7twmerNe3fe/jYnW7kp2znJn3+ZA2FJUu3i2VQR3/utGexdp2pUPpRBO3xbmWSM3HcY3hkRZ/fZAebK1mrEadeifbktOrIP+/PSVT1LGqeBYU90FFWz30XGioDqBCcKoDxjTHz5nxVqcR35mgDaoiQTCSDGPaXg00W2zV2MEkRIAoQEsDP0R+5/xX9cAQzzNkH2Pp3tkyIIhXYU3WJuoZ9ahEglTUu9Q8rR7CYsUg6qfXp/d2haTIlW9SeKKfI4NNz+UyNWfIfmlsf9Wg4y4uu81ZI1wQTZbYlLytjZg0yFyi0MFZWjRI+tjDk59yBm5b09Y4d3LjASTWarlqqEQWiKp1KiST5AvEVJdZC8gHgeuI540GuUGAwptwkVcOnnTFTtZttBUKwutoA+RqHxuZWgKpz4=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2BF2CD9B968E004DABDB52534EE751F1@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <0baa8d6e-cb3b-9e20-be0e-324a3e270b87@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="6ra89j6dIYG7SFEfYSffrUJyYPwfaOnCk"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Fri, 20 Sep 2019 13:29:58 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 274edf95-5af5-4963-e5e9-08d73dcefaec
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Sep 2019 13:32:28.0192 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /4N8zRJH10QtfaS2QibutwBOQs+6ov3/nWT+T1tQmOaJ4CP+epYA5VY8SJpnkKIw/Moqq5Wgi+dN6YXYa9NboSc04AhG9E4SAfiCVVvJnfQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4201
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 2a01:111:f400:fe0d::724
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,155 +131,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ Denis Lunev <den@virtuozzo.com>,
+ "wencongyang2@huawei.com" <wencongyang2@huawei.com>,
+ "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Denis Lunev <den@virtuozzo.com>
+ "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6ra89j6dIYG7SFEfYSffrUJyYPwfaOnCk
-Content-Type: multipart/mixed; boundary="d67sKoZNE3T8OsngVggEZT7a9Yu4fsWpm";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
-Message-ID: <a4407b8e-3766-5694-0bbd-71764e6ccca1@redhat.com>
-Subject: Re: [PATCH v5 0/5] qcow2: async handling of fragmented io
-References: <20190916175324.18478-1-vsementsov@virtuozzo.com>
- <d4d62196-84c2-0a90-312d-391493eae158@redhat.com>
- <93e72727-c46c-d30a-1f38-634237186126@virtuozzo.com>
- <d392d630-23e5-cc21-c8f5-8c2ec3d4f70b@redhat.com>
- <ea14f4bc-9a0c-0147-e963-9019fc9f4f2b@virtuozzo.com>
- <9b56ef11-8c1e-fa48-d838-4fe3ee043474@redhat.com>
- <0baa8d6e-cb3b-9e20-be0e-324a3e270b87@virtuozzo.com>
-In-Reply-To: <0baa8d6e-cb3b-9e20-be0e-324a3e270b87@virtuozzo.com>
-
---d67sKoZNE3T8OsngVggEZT7a9Yu4fsWpm
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 20.09.19 15:26, Vladimir Sementsov-Ogievskiy wrote:
-> 20.09.2019 16:10, Max Reitz wrote:
->> On 20.09.19 14:53, Vladimir Sementsov-Ogievskiy wrote:
->>> 20.09.2019 15:40, Max Reitz wrote:
->>>> On 20.09.19 13:53, Vladimir Sementsov-Ogievskiy wrote:
->>>>> 20.09.2019 14:10, Max Reitz wrote:
->>>>>> On 16.09.19 19:53, Vladimir Sementsov-Ogievskiy wrote:
->>>>>>> Hi all!
->>>>>>>
->>>>>>> Here is an asynchronous scheme for handling fragmented qcow2
->>>>>>> reads and writes. Both qcow2 read and write functions loops throu=
-gh
->>>>>>> sequential portions of data. The series aim it to parallelize the=
-se
->>>>>>> loops iterations.
->>>>>>> It improves performance for fragmented qcow2 images, I've tested =
-it
->>>>>>> as described below.
->>>>>>
->>>>>> Thanks again, applied to my block branch:
->>>>>>
->>>>>> https://git.xanclic.moe/XanClic/qemu/commits/branch/block
->>>>>
->>>>> Thanks a lot!
->>>>>
->>>>>>
->>>>>>> v5: fix 026 and rebase on Max's block branch [perf results not up=
-dated]:
->>>>>>>
->>>>>>> 01: new, prepare 026 to not fail
->>>>>>> 03: - drop read_encrypted blkdbg event [Kevin]
->>>>>>>        - assert((x & (BDRV_SECTOR_SIZE - 1)) =3D=3D 0) -> assert(=
-QEMU_IS_ALIGNED(x, BDRV_SECTOR_SIZE)) [rebase]
->>>>>>>        - full host offset in argument of qcow2_co_decrypt [rebase=
-]
->>>>>>> 04: - substitute remaining qcow2_co_do_pwritev by qcow2_co_pwrite=
-v_task in comment [Max]
->>>>>>>        - full host offset in argument of qcow2_co_encrypt [rebase=
-]
->>>>>>> 05: - Now patch don't affect 026 iotest, so its output is not cha=
-nged
->>>>>>>
->>>>>>> Rebase changes seems trivial, so, I've kept r-b marks.
->>>>>>
->>>>>> (For the record, I didn=E2=80=99t consider them trivial, or I=E2=80=
-=99d=E2=80=99ve applied
->>>>>> Maxim=E2=80=99s series on top of yours.  I consider a conflict to =
-be trivially
->>>>>> resolvable only if there is only one way of doing it; but when I
->>>>>> resolved the conflicts myself, I resolved the one in patch 3 diffe=
-rently
->>>>>> from you =E2=80=93 I added an offset_in_cluster variable to
->>>>>> qcow2_co_preadv_encrypted().  Sure, it=E2=80=99s still simple and =
-the difference
->>>>>> is minor, but that was exactly where I thought that I can=E2=80=99=
-t consider
->>>>>> this trivial.)
->>>>>>
->>>>>
->>>>> Hmm. May be it's trivial enough to keep r-b (as my change is trivia=
-l itself), but not
->>>>> trivial enough to change alien patch on queuing? If you disagree, I=
-'ll be more
->>>>> careful on keeping r-b in changed patches, sorry.
->>>>
->>>> It doesn=E2=80=99t matter much to me, I diff all patches anyway. :-)=
-
->>>>
->>>
->>> then a bit offtopic:
->>>
->>> Which tools are you use?
->>>
->>> I've some scripts to compare different versions of one serie (or to c=
-heck, what
->>> was changed in patches during some porting process..).. The core thin=
-g is to filter
->>> some not interesting numbers and hashes, which makes diffs dirty, and=
- then call vimdiff.
->>> But maybe I've reinvented the wheel.
->>
->> Just kompare as a graphical diff tool; I just scroll past the hash dif=
-fs.
->>
->> But now that you gave me the idea, maybe I should write a script to
->> filter them...  (So, no, I don=E2=80=99t know of a tool that would do =
-that
->> already :-/)
->>
->=20
->=20
-> Then you may find my scripts somehow useful, at least as a hint (I'm af=
-raid code is not beautiful at all)
-
-Thanks! :-)
-
-Max
-
-
---d67sKoZNE3T8OsngVggEZT7a9Yu4fsWpm--
-
---6ra89j6dIYG7SFEfYSffrUJyYPwfaOnCk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2E1FMACgkQ9AfbAGHV
-z0CVzAgAmXysw/ZmqW+N6oGPxe4MFJUcWI4MIOvK7y9FmAeDZD6vyVdJoLaqgmNv
-D20i8v8ovjYvgSZbommG0kurk9QSSg26nkOZYNO5o74HeBjvC4tqXOqRiGGuwqpD
-SR1yBAqaxzZxkrl+GMsOozdi9PZ3/G2rM5vc5W4RLtSy+wYt/iqZH1zsB4NyMbuM
-Nav6W4/gSiEtkd/2f7XwyYZnny7Tu9MHl6oZt8Mp35aquEeiU35yqQstKddmRbrJ
-Xk6g2oEm3MJr4SZ+yijIM5thHJAncUzcbeR/7VhKUZYX1F7eQ8jysEBaGGcMHWP0
-CPK10b1rqyQ32UK0h7yQ1lD15/IK3A==
-=N2Rw
------END PGP SIGNATURE-----
-
---6ra89j6dIYG7SFEfYSffrUJyYPwfaOnCk--
+MjAuMDkuMjAxOSAxNjoyNiwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAyMC4wOS4xOSAxNDo1Niwg
+VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDIwLjA5LjIwMTkgMTU6NTYs
+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4gMjAuMDkuMjAxOSAxNTo0
+NiwgTWF4IFJlaXR6IHdyb3RlOg0KPj4+PiBPbiAxMy4wOS4xOSAyMDoyNSwgVmxhZGltaXIgU2Vt
+ZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+Pj4+IDEwLjA5LjIwMTkgMTM6MjMsIFZsYWRpbWly
+IFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4+Pj4gU3BsaXQgY29weWluZyBjb2RlIHBh
+cnQgZnJvbSBiYWNrdXAgdG8gImJsb2NrLWNvcHkiLCBpbmNsdWRpbmcgc2VwYXJhdGUNCj4+Pj4+
+PiBzdGF0ZSBzdHJ1Y3R1cmUgYW5kIGZ1bmN0aW9uIHJlbmFtaW5nLiBUaGlzIGlzIG5lZWRlZCB0
+byBzaGFyZSBpdCB3aXRoDQo+Pj4+Pj4gYmFja3VwLXRvcCBmaWx0ZXIgZHJpdmVyIGluIGZ1cnRo
+ZXIgY29tbWl0cy4NCj4+Pj4+Pg0KPj4+Pj4+IE5vdGVzOg0KPj4+Pj4+DQo+Pj4+Pj4gMS4gQXMg
+QmxvY2tDb3B5U3RhdGUga2VlcHMgb3duIEJsb2NrQmFja2VuZCBvYmplY3RzLCByZW1haW5pbmcN
+Cj4+Pj4+PiBqb2ItPmNvbW1vbi5ibGsgdXNlcnMgb25seSB1c2UgaXQgdG8gZ2V0IGJzIGJ5IGJs
+a19icygpIGNhbGwsIHNvIGNsZWFyDQo+Pj4+Pj4gam9iLT5jb21tZW4uYmxrIHBlcm1pc3Npb25z
+IHNldCBpbiBibG9ja19qb2JfY3JlYXRlIGFuZCBhZGQNCj4+Pj4+PiBqb2ItPnNvdXJjZV9icyB0
+byBiZSB1c2VkIGluc3RlYWQgb2YgYmxrX2JzKGpvYi0+Y29tbW9uLmJsayksIHRvIGtlZXANCj4+
+Pj4+PiBpdCBtb3JlIGNsZWFyIHdoaWNoIGJzIHdlIHVzZSB3aGVuIGludHJvZHVjZSBiYWNrdXAt
+dG9wIGZpbHRlciBpbg0KPj4+Pj4+IGZ1cnRoZXIgY29tbWl0Lg0KPj4+Pj4+DQo+Pj4+Pj4gMi4g
+UmVuYW1lIHMvaW5pdGlhbGl6aW5nX2JpdG1hcC9za2lwX3VuYWxsb2NhdGVkLyB0byBzb3VuZCBh
+IGJpdCBiZXR0ZXINCj4+Pj4+PiBhcyBpbnRlcmZhY2UgdG8gQmxvY2tDb3B5U3RhdGUNCj4+Pj4+
+Pg0KPj4+Pj4+IDMuIFNwbGl0IGlzIG5vdCB2ZXJ5IGNsZWFuOiB0aGVyZSBsZWZ0IHNvbWUgZHVw
+bGljYXRlZCBmaWVsZHMsIGJhY2t1cA0KPj4+Pj4+IGNvZGUgdXNlcyBzb21lIEJsb2NrQ29weVN0
+YXRlIGZpZWxkcyBkaXJlY3RseSwgbGV0J3MgcG9zdHBvbmUgaXQgZm9yDQo+Pj4+Pj4gZnVydGhl
+ciBpbXByb3ZlbWVudHMgYW5kIGtlZXAgdGhpcyBjb21tZW50IHNpbXBsZXIgZm9yIHJldmlldy4N
+Cj4+Pj4+Pg0KPj4+Pj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNr
+aXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+Pj4+PiAtLS0NCj4+Pj4+DQo+Pj4+Pg0K
+Pj4+Pj4gWy4uXQ0KPj4+Pj4NCj4+Pj4+PiArDQo+Pj4+Pj4gK3N0YXRpYyBCbG9ja0NvcHlTdGF0
+ZSAqYmxvY2tfY29weV9zdGF0ZV9uZXcoDQo+Pj4+Pj4gK8KgwqDCoMKgwqDCoMKgIEJsb2NrRHJp
+dmVyU3RhdGUgKnNvdXJjZSwgQmxvY2tEcml2ZXJTdGF0ZSAqdGFyZ2V0LA0KPj4+Pj4+ICvCoMKg
+wqDCoMKgwqDCoCBpbnQ2NF90IGNsdXN0ZXJfc2l6ZSwgQmRydlJlcXVlc3RGbGFncyB3cml0ZV9m
+bGFncywNCj4+Pj4+PiArwqDCoMKgwqDCoMKgwqAgUHJvZ3Jlc3NCeXRlc0NhbGxiYWNrRnVuYyBw
+cm9ncmVzc19ieXRlc19jYWxsYmFjaywNCj4+Pj4+PiArwqDCoMKgwqDCoMKgwqAgUHJvZ3Jlc3NS
+ZXNldENhbGxiYWNrRnVuYyBwcm9ncmVzc19yZXNldF9jYWxsYmFjaywNCj4+Pj4+PiArwqDCoMKg
+wqDCoMKgwqAgdm9pZCAqcHJvZ3Jlc3Nfb3BhcXVlLCBFcnJvciAqKmVycnApDQo+Pj4+Pj4gK3sN
+Cj4+Pj4+PiArwqDCoMKgIEJsb2NrQ29weVN0YXRlICpzOw0KPj4+Pj4+ICvCoMKgwqAgaW50IHJl
+dDsNCj4+Pj4+PiArwqDCoMKgIHVpbnQ2NF90IG5vX3Jlc2l6ZSA9IEJMS19QRVJNX0NPTlNJU1RF
+TlRfUkVBRCB8IEJMS19QRVJNX1dSSVRFIHwNCj4+Pj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIEJMS19QRVJNX1dSSVRFX1VOQ0hBTkdFRCB8IEJM
+S19QRVJNX0dSQVBIX01PRDsNCj4+Pj4+PiArwqDCoMKgIEJkcnZEaXJ0eUJpdG1hcCAqY29weV9i
+aXRtYXA7DQo+Pj4+Pj4gKw0KPj4+Pj4+ICvCoMKgwqAgY29weV9iaXRtYXAgPSBiZHJ2X2NyZWF0
+ZV9kaXJ0eV9iaXRtYXAoc291cmNlLCBjbHVzdGVyX3NpemUsIE5VTEwsIGVycnApOw0KPj4+Pj4+
+ICvCoMKgwqAgaWYgKCFjb3B5X2JpdG1hcCkgew0KPj4+Pj4+ICvCoMKgwqDCoMKgwqDCoCByZXR1
+cm4gTlVMTDsNCj4+Pj4+PiArwqDCoMKgIH0NCj4+Pj4+PiArwqDCoMKgIGJkcnZfZGlzYWJsZV9k
+aXJ0eV9iaXRtYXAoY29weV9iaXRtYXApOw0KPj4+Pj4+ICsNCj4+Pj4+PiArwqDCoMKgIHMgPSBn
+X25ldyhCbG9ja0NvcHlTdGF0ZSwgMSk7DQo+Pj4+Pj4gK8KgwqDCoCAqcyA9IChCbG9ja0NvcHlT
+dGF0ZSkgew0KPj4+Pj4+ICvCoMKgwqDCoMKgwqDCoCAuc291cmNlID0gYmxrX25ldyhiZHJ2X2dl
+dF9haW9fY29udGV4dChzb3VyY2UpLA0KPj4+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBCTEtfUEVSTV9DT05TSVNURU5UX1JFQUQsIG5vX3Jl
+c2l6ZSksDQo+Pj4+Pj4gK8KgwqDCoMKgwqDCoMKgIC50YXJnZXQgPSBibGtfbmV3KGJkcnZfZ2V0
+X2Fpb19jb250ZXh0KHRhcmdldCksDQo+Pj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIEJMS19QRVJNX1dSSVRFLCBub19yZXNpemUpLA0KPj4+
+Pj4+ICvCoMKgwqDCoMKgwqDCoCAuY29weV9iaXRtYXAgPSBjb3B5X2JpdG1hcCwNCj4+Pj4+PiAr
+wqDCoMKgwqDCoMKgwqAgLmNsdXN0ZXJfc2l6ZSA9IGNsdXN0ZXJfc2l6ZSwNCj4+Pj4+PiArwqDC
+oMKgwqDCoMKgwqAgLmxlbiA9IGJkcnZfZGlydHlfYml0bWFwX3NpemUoY29weV9iaXRtYXApLA0K
+Pj4+Pj4+ICvCoMKgwqDCoMKgwqDCoCAud3JpdGVfZmxhZ3MgPSB3cml0ZV9mbGFncywNCj4+Pj4+
+PiArwqDCoMKgwqDCoMKgwqAgLnVzZV9jb3B5X3JhbmdlID0gISh3cml0ZV9mbGFncyAmIEJEUlZf
+UkVRX1dSSVRFX0NPTVBSRVNTRUQpLA0KPj4+Pj4+ICvCoMKgwqDCoMKgwqDCoCAucHJvZ3Jlc3Nf
+Ynl0ZXNfY2FsbGJhY2sgPSBwcm9ncmVzc19ieXRlc19jYWxsYmFjaywNCj4+Pj4+PiArwqDCoMKg
+wqDCoMKgwqAgLnByb2dyZXNzX3Jlc2V0X2NhbGxiYWNrID0gcHJvZ3Jlc3NfcmVzZXRfY2FsbGJh
+Y2ssDQo+Pj4+Pj4gK8KgwqDCoMKgwqDCoMKgIC5wcm9ncmVzc19vcGFxdWUgPSBwcm9ncmVzc19v
+cGFxdWUsDQo+Pj4+Pj4gK8KgwqDCoCB9Ow0KPj4+Pj4+ICsNCj4+Pj4+PiArwqDCoMKgIHMtPmNv
+cHlfcmFuZ2Vfc2l6ZSA9IFFFTVVfQUxJR05fVVAoTUlOKGJsa19nZXRfbWF4X3RyYW5zZmVyKHMt
+PnNvdXJjZSksDQo+Pj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBibGtfZ2V0X21h
+eF90cmFuc2ZlcihzLT50YXJnZXQpKSwNCj4+Pj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzLT5j
+bHVzdGVyX3NpemUpOw0KPj4+Pj4NCj4+Pj4+IHByZWV4aXN0ZW50LCBidXQgaXQgb2J2aW91c2x5
+IHNob3VsZCBiZSBRRU1VX0FMSUdOX0RPV04uIEkgY2FuIHJlc2VuZCB3aXRoIGEgc2VwYXJhdGUN
+Cj4+Pj4+IGZpeCwgaXQgbWF5IGJlIGZpeGVkIHdoaWxlIHF1ZXVpbmcgKGlmIHJlc2VuZCBpcyBu
+b3QgbmVlZGVkIGZvciBvdGhlciByZWFzb25zKSBvcg0KPj4+Pj4gSSdsbCBzZW5kIGEgZm9sbG93
+LXVwIGZpeCBsYXRlciwgd2hpY2hldmVyIHlvdSBwcmVmZXIuDQo+Pj4+DQo+Pj4+IEhtLCB0cnVl
+LsKgIEJ1dCB0aGVuIHdl4oCZbGwgYWxzbyBuZWVkIHRvIGhhbmRsZSB0aGUgKHVubGlrZWx5LCBh
+ZG1pdHRlZGx5KQ0KPj4+PiBjYXNlIHdoZXJlIG1heF90cmFuc2ZlciA8IGNsdXN0ZXJfc2l6ZSBz
+byB0aGlzIHdvdWxkIHRoZW4gcmV0dXJuIDAgKGJ5DQo+Pj4+IHNldHRpbmcgdXNlX2NvcHlfcmFu
+Z2UgPSBmYWxzZSkuwqAgU28gaG93IGFib3V0IHRoaXM6DQo+Pj4NCj4+PiBEb25lIGluIFtQQVRD
+SCB2MTIgMC8yXSBiYWNrdXA6IGNvcHlfcmFuZ2UgZml4ZXMuDQo+Pj4gSWYgaXQgaXMgY29udmVu
+aWVudCBJJ2xsIHJlYmFzZSB0aGVzZSBzZXJpZXMgb24gIltQQVRDSCB2MTIgMC8yXSBiYWNrdXA6
+IGNvcHlfcmFuZ2UgZml4ZXMiDQo+IA0KPiBPaCwgZ29vZC4NCj4gDQo+IEkgdGhpbmsgdGFraW5n
+IGNvcHlfcmFuZ2UgZml4ZXMgZmlyc3Qgd291bGQgbWFrZSBtb3JlIHNlbnNlLiAgSXQgc2VlbXMN
+Cj4gdGhhdCBKb2huIHN0aWxsIGhhZCBzb21lIHN1Z2dlc3Rpb24gZm9yIGl0Li4uPw0KPiANCj4g
+TWF4DQo+IA0KDQpGaW5hbGx5LCBvbmx5IHdvcmRpbmcgb2YgdGhlIGNvbW1lbnQuIEkgdGhpbmss
+IEkgY2FuIHJlc2VuZCBjb21iaW5lZCBzZXJpZXMgd2l0aCBteSBmaW5hbCBzdWdnZXN0aW9uDQpv
+ZiB0aGUgY29tbWVudCAoYSBiaXQgdHdlYWtlZCBKb2huJ3Mgb25lKS4NCg0KLS0gDQpCZXN0IHJl
+Z2FyZHMsDQpWbGFkaW1pcg0K
 
