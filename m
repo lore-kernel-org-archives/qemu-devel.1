@@ -2,85 +2,56 @@ Return-Path: <SRS0=N0XV=XP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 659A1C49ED7
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 14:05:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8972C49ED7
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 14:19:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AD3320644
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 14:05:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AD3320644
+	by mail.kernel.org (Postfix) with ESMTPS id 6D442207E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Sep 2019 14:19:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D442207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBJX9-0004aW-94
-	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 10:05:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58452)
+	id 1iBJkT-0001TU-Eh
+	for qemu-devel@archiver.kernel.org; Fri, 20 Sep 2019 10:19:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59743)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iBJV4-0003dA-QA
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 10:03:07 -0400
+ (envelope-from <philmd@redhat.com>) id 1iBJed-0006oN-4Z
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 10:13:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iBJV3-0007Pz-Rr
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 10:03:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52756)
+ (envelope-from <philmd@redhat.com>) id 1iBJeZ-00051Z-QO
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 10:12:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:10230)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iBJV3-0007PY-MI
- for qemu-devel@nongnu.org; Fri, 20 Sep 2019 10:03:05 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iBJeZ-00051E-HT
+ for qemu-devel@nongnu.org; Fri, 20 Sep 2019 10:12:55 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DF18B86668
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 14:03:04 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id n3so1270945wmf.3
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 07:03:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=cLoiWjozIEej5d+FLXMIkj6zOMqsyfXL3YyshI0J/sY=;
- b=hnGBHCDfwuE1Xk1JYBJDrwVqNHSlRsGUul16v7Snr5Y1VMajXq/8OUkB19H3Kl/WpH
- VWYHQeSuZg71vb1A5ek72riIc2ala3BDET/XSPPBa7Ofxq+qeZbPkH62qSdQLbaIW3EG
- JJHt/RIj6eLhkdQKPn5mGEMllZjwMA9llNJOM8pPpXHEQJg74hnQfYJVwxlqX5yWh7nV
- SZzZEZYPSnF2XsZa7KLR9Vs9Z0iU60HV39Fut2B7+SIsCoFzmLAgjCghrLmQsSGJiIP+
- xaRXDILsyZ8MqhIQr66CsX9q+yZUwVnqZy8dVa6ek1geTzs0wtroKCDccIzWSFNesK1a
- mX9A==
-X-Gm-Message-State: APjAAAXF+p0dIDOcp2G9dWLWcAlsufL7AfxF31eot3II6FNtCWWK9j+r
- zAnf0gD3IkrAiRmEd8XerAE4+wna6cy+WXZHKW2LZFC5AKF8N0M6OBwoHi2qKPrUpaE9Xt1nkV/
- dAE320EXB0JNFw+M=
-X-Received: by 2002:adf:f112:: with SMTP id r18mr12693561wro.88.1568988183581; 
- Fri, 20 Sep 2019 07:03:03 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzkmkDs/Qr2cCV278FWpjxx4TxYqJHjlKw6FVMpwYVr/NC0XZ0iAAP2tujthTrPwPRnw3ynNw==
-X-Received: by 2002:adf:f112:: with SMTP id r18mr12693529wro.88.1568988183288; 
- Fri, 20 Sep 2019 07:03:03 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8?
- ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
- by smtp.gmail.com with ESMTPSA id l6sm2156950wmg.2.2019.09.20.07.03.00
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 20 Sep 2019 07:03:02 -0700 (PDT)
-Subject: Re: [PATCH 2/2] kvm: clear dirty bitmaps from all overlapping memslots
-To: Peter Xu <peterx@redhat.com>
-References: <1568974882-7419-1-git-send-email-pbonzini@redhat.com>
- <1568974882-7419-3-git-send-email-pbonzini@redhat.com>
- <20190920121813.GH12858@xz-x1>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <09f006cf-d1ee-4639-50c8-cf8eb95d4fc2@redhat.com>
-Date: Fri, 20 Sep 2019 16:03:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 40ADD18C8919;
+ Fri, 20 Sep 2019 14:12:54 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.24])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A24CC60C18;
+ Fri, 20 Sep 2019 14:12:51 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] memory: Replace DEBUG_UNASSIGNED printf calls by trace events
+Date: Fri, 20 Sep 2019 16:12:48 +0200
+Message-Id: <20190920141248.12887-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190920121813.GH12858@xz-x1>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Fri, 20 Sep 2019 14:12:54 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,37 +65,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org, qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: Laurent Desnogues <laurent.desnogues@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/09/19 14:18, Peter Xu wrote:
->   (1) memory region aliasing, hence multiple GPAs can point to the same
->       HVA/HPA so we need to clear the memslot dirty bits on all the
->       mapped GPAs, and,
-> 
->   (2) large log_clear() request which can cover more than one valid
->       kvm memslots.  Note that in this case, the mem slots can really
->       be having different HVAs so imho it should be a different issue
->       comparing to (1)
-> 
-> The commit message says it's solving problem (1).  However for what I
-> understand, we are actually doing well on issue (1) because in
-> memory_region_clear_dirty_bitmap() we iterate over all the flat views
-> so that we should have caught all the aliasing memory regions if there
-> are any.
+Now that the unassigned_access CPU hooks have been removed,
+the unassigned_mem_read/write functions are only used for
+debugging purpose.
+Simplify by converting them to in-place trace events.
 
-There could be two addresses pointing to the same HVA *in the same
-flatview*.  See for example 0xe0000..0xfffff and 0xffffe000..0xffffffff
-when a PC guest is started.  In this particular case
-0xffffe000..0xffffffff is ROM, so it's not an issue, but in other cases
-it may
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+Based-on: <20190920125008.13604-1-peter.maydell@linaro.org>
+https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg04668.html
+https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg03705.html
 
-> However this patch should perfectly fix problem (2).  Am I right?
+I first wrote:
 
-I hadn't thought of problem (2).  I guess without Igor's work for s390
-it does not exist?  But yes, it fixes it just the same.
+  These functions are declared using the CPUReadMemoryFunc/
+  CPUWriteMemoryFunc prototypes. Since it is confusing to
+  have such prototype only use for debugging, convert them
+  to in-place trace events.
 
-Paolo
+But it doesn't provide helpful information and is rather confusing.
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ memory.c     | 24 +++---------------------
+ trace-events |  2 ++
+ 2 files changed, 5 insertions(+), 21 deletions(-)
+
+diff --git a/memory.c b/memory.c
+index 93a05395cf..07e80a637a 100644
+--- a/memory.c
++++ b/memory.c
+@@ -35,8 +35,6 @@
+ #include "hw/boards.h"
+ #include "migration/vmstate.h"
+=20
+-//#define DEBUG_UNASSIGNED
+-
+ static unsigned memory_region_transaction_depth;
+ static bool memory_region_update_pending;
+ static bool ioeventfd_update_pending;
+@@ -1272,23 +1270,6 @@ static void iommu_memory_region_initfn(Object *obj=
+)
+     mr->is_iommu =3D true;
+ }
+=20
+-static uint64_t unassigned_mem_read(void *opaque, hwaddr addr,
+-                                    unsigned size)
+-{
+-#ifdef DEBUG_UNASSIGNED
+-    printf("Unassigned mem read " TARGET_FMT_plx "\n", addr);
+-#endif
+-    return 0;
+-}
+-
+-static void unassigned_mem_write(void *opaque, hwaddr addr,
+-                                 uint64_t val, unsigned size)
+-{
+-#ifdef DEBUG_UNASSIGNED
+-    printf("Unassigned mem write " TARGET_FMT_plx " =3D 0x%"PRIx64"\n", =
+addr, val);
+-#endif
+-}
+-
+ static bool unassigned_mem_accepts(void *opaque, hwaddr addr,
+                                    unsigned size, bool is_write,
+                                    MemTxAttrs attrs)
+@@ -1437,7 +1418,8 @@ MemTxResult memory_region_dispatch_read(MemoryRegio=
+n *mr,
+     MemTxResult r;
+=20
+     if (!memory_region_access_valid(mr, addr, size, false, attrs)) {
+-        *pval =3D unassigned_mem_read(mr, addr, size);
++        trace_memory_region_invalid_read(size, addr);
++        *pval =3D 0; /* FIXME now this value shouldn't be accessed in gu=
+est */
+         return MEMTX_DECODE_ERROR;
+     }
+=20
+@@ -1481,7 +1463,7 @@ MemTxResult memory_region_dispatch_write(MemoryRegi=
+on *mr,
+     unsigned size =3D memop_size(op);
+=20
+     if (!memory_region_access_valid(mr, addr, size, true, attrs)) {
+-        unassigned_mem_write(mr, addr, data, size);
++        trace_memory_region_invalid_write(size, addr, size << 1, data);
+         return MEMTX_DECODE_ERROR;
+     }
+=20
+diff --git a/trace-events b/trace-events
+index 823a4ae64e..83dbeb4b46 100644
+--- a/trace-events
++++ b/trace-events
+@@ -62,6 +62,8 @@ memory_region_tb_read(int cpu_index, uint64_t addr, uin=
+t64_t value, unsigned siz
+ memory_region_tb_write(int cpu_index, uint64_t addr, uint64_t value, uns=
+igned size) "cpu %d addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+ memory_region_ram_device_read(int cpu_index, void *mr, uint64_t addr, ui=
+nt64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRI=
+x64" size %u"
+ memory_region_ram_device_write(int cpu_index, void *mr, uint64_t addr, u=
+int64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PR=
+Ix64" size %u"
++memory_region_invalid_read(unsigned size, uint64_t addr) "invalid read s=
+ize %u addr 0x%"PRIx64
++memory_region_invalid_write(unsigned size, uint64_t addr, int fmt_width,=
+ uint64_t value) "invalid write size %u addr 0x%"PRIx64" value 0x%0*"PRIx=
+64
+ flatview_new(void *view, void *root) "%p (root %p)"
+ flatview_destroy(void *view, void *root) "%p (root %p)"
+ flatview_destroy_rcu(void *view, void *root) "%p (root %p)"
+--=20
+2.20.1
+
 
