@@ -2,93 +2,71 @@ Return-Path: <SRS0=nDBX=XQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 503F2C49ED7
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 09:15:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE061C49ED7
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 09:20:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1ED4D208C0
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 09:15:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ED4D208C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9C47820820
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 09:20:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C47820820
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBbTs-0002aX-9P
-	for qemu-devel@archiver.kernel.org; Sat, 21 Sep 2019 05:15:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39983)
+	id 1iBbZK-0005MY-Rs
+	for qemu-devel@archiver.kernel.org; Sat, 21 Sep 2019 05:20:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40403)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iBbT5-0001xn-8T
- for qemu-devel@nongnu.org; Sat, 21 Sep 2019 05:14:16 -0400
+ (envelope-from <th.huth@gmail.com>) id 1iBbWp-0004W1-4v
+ for qemu-devel@nongnu.org; Sat, 21 Sep 2019 05:18:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iBbT3-0000jt-Lt
- for qemu-devel@nongnu.org; Sat, 21 Sep 2019 05:14:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58776)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iBbT3-0000hz-EB
- for qemu-devel@nongnu.org; Sat, 21 Sep 2019 05:14:13 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 16F2CB62C
- for <qemu-devel@nongnu.org>; Sat, 21 Sep 2019 09:14:12 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id l3so2800137wmf.8
- for <qemu-devel@nongnu.org>; Sat, 21 Sep 2019 02:14:12 -0700 (PDT)
+ (envelope-from <th.huth@gmail.com>) id 1iBbWn-0002Kk-DU
+ for qemu-devel@nongnu.org; Sat, 21 Sep 2019 05:18:06 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:36149)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1iBbWn-0002KT-7L
+ for qemu-devel@nongnu.org; Sat, 21 Sep 2019 05:18:05 -0400
+Received: by mail-wm1-f67.google.com with SMTP id m18so4416272wmc.1
+ for <qemu-devel@nongnu.org>; Sat, 21 Sep 2019 02:18:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=FA+JzAgDMVZOdsDHL63KG1xPWkgSmQb1cJFkkfcNCLQ=;
- b=IDDbQnGkfef/GpIBUDuLU2rD44XnBkNc+J/Or590dADNHCon0567qzLyEv+3ZWDGfm
- m30Jz6Yklx/PsEGUExnWaUQ5/+muYIcIfPLnBXWIDno8syzIa3d0lGB4WxRLeGAEuuND
- jHY8WIAdp/cs0eqL3eHDNnqMDvyT9TUzEMhr2RlzEZN/YsL4IkRzuBzqnm4J5+JqyEFJ
- LrIVFcaNSVhrjVSOIRgBqcpZR9I70OPGjZ9qKz+mZwwtpYHp6R88vEybbs3fje7+NrIg
- +flzgknETISCwzgxIOoks70yFnSGbp7gxp+Nqhv1+RGw7McO2pBXmxhija3vxQVujmR8
- 2/aQ==
-X-Gm-Message-State: APjAAAUxYxfqcRdHU8It5XPmjw3bgNKEdWeES4DyAibbzl2QRmjHM7/M
- 6UeIfbsXMOOwjfUQSuEO0gAkm9ZHlJnrqsRdfiIsE2ZGxLi/nkHljXUq4zab1MA32nlVq/t09E3
- EEaNZl5FPaDwhTXo=
-X-Received: by 2002:a1c:4846:: with SMTP id v67mr6508570wma.120.1569057250831; 
- Sat, 21 Sep 2019 02:14:10 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyRnfBjWJXTC8ev3fUOGKKKcVQ+dT7peHSQsuaihl1qRWDxj+qjR3mmP9H/9GlM3AZAPt99ew==
-X-Received: by 2002:a1c:4846:: with SMTP id v67mr6508557wma.120.1569057250620; 
- Sat, 21 Sep 2019 02:14:10 -0700 (PDT)
-Received: from [192.168.1.40] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id v7sm5318893wru.87.2019.09.21.02.14.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 21 Sep 2019 02:14:09 -0700 (PDT)
-Subject: Re: [PATCH 5/5] .travis.yml: Build and install EDK2 roms
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Laszlo Ersek <lersek@redhat.com>
-References: <20190311003052.13778-1-philmd@redhat.com>
- <20190311003052.13778-6-philmd@redhat.com>
- <ecd8aaf1-f75e-abd0-48b1-e80a227f01c3@redhat.com>
- <19958c32-2df9-cccf-3f05-c2fa0fe3dec2@redhat.com>
- <b8aad7bf-1dec-5c1d-1b76-d15b639e4953@redhat.com>
- <87tvcsc8h2.fsf@zen.linaroharston>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <9408b4f3-081b-fe92-0368-7c79bb9abe24@redhat.com>
-Date: Sat, 21 Sep 2019 11:14:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ bh=YFkDlbtTLaDvMV/pREAHdafP45HpbWmWpHCAz24UooI=;
+ b=UmPq6v1MlBWx/PBFaIdJQ8RBsSxWwp8WoUtxrXkcGD3uZx9tw2eJf/Ryn3s9fDzBqi
+ CsrWE6CJds3f568zVAxSsYLs39gns4PxJh6UFOiLhi8p8HVTS7imsQemFFzgzgV1Psqh
+ yDvLd9GhF/JCjWs8Sd+DyWAa+4k2fMiRxQuWBzjqh/qvy+L62UthUh4AoMehlW0cYmvK
+ +d7NxP+i80xhGpFtVqp2i7rNbT9AqkhOHHCM4ffxurl6V6WgpzMopM3lf9OBOp2TBMjx
+ Je5EcfE3mBYluMW60YZTXqKzIAPBjdrQ/I/IfO6lX5KPjcW+La8snFzlRux3wG9zoA2f
+ TN0w==
+X-Gm-Message-State: APjAAAXooqgosoHVgs+X8JPIX112DlpYdyPT3TBwdAU9oHVLQ3cJX99z
+ 7yoTQKH7Pozt06qE5QYMD14PJQAT
+X-Google-Smtp-Source: APXvYqwxrFAONqztqFFfEz5Y19NfGk4MzQbIHiIiLqGfnrmE2vYajpsBP6/GYje3thvgwp5X5KA9qA==
+X-Received: by 2002:a1c:4886:: with SMTP id v128mr6574227wma.176.1569057483747; 
+ Sat, 21 Sep 2019 02:18:03 -0700 (PDT)
+Received: from thl530.multi.box (p5791DE0D.dip0.t-ipconnect.de.
+ [87.145.222.13])
+ by smtp.gmail.com with ESMTPSA id w4sm4763458wrv.66.2019.09.21.02.18.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 21 Sep 2019 02:18:03 -0700 (PDT)
+From: Thomas Huth <huth@tuxfamily.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/m68k/next-cube: Avoid static RTC variables and introduce
+ control register
+Date: Sat, 21 Sep 2019 11:17:38 +0200
+Message-Id: <20190921091738.26953-1-huth@tuxfamily.org>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <87tvcsc8h2.fsf@zen.linaroharston>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+ [fuzzy]
+X-Received-From: 209.85.128.67
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,145 +78,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, "Michael S . Tsirkin" <mst@redhat.com>,
- =?UTF-8?B?TWljaGFsIFByw612b3puw61r?= <mprivozn@redhat.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/14/19 8:44 PM, Alex Benn=C3=A9e wrote:
-> Laszlo Ersek <lersek@redhat.com> writes:
->> On 06/13/19 18:59, Philippe Mathieu-Daud=C3=A9 wrote:
->>> Hi Laszlo,
->>>
->>> On 3/12/19 5:29 PM, Laszlo Ersek wrote:
->>>> On 03/11/19 01:30, Philippe Mathieu-Daud=C3=A9 wrote:
->>>>> Add a job to build and install the EDK2 platform firmware binaries.
->>>>>
->>>>> This job is only triggered if the last commit matches the EDK2
->>>>> name (case insensitive), or when tag are created (such releases
->>>>> or release candidates).
->>>>>
->>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>>>> ---
->>>>>  .travis.yml | 21 +++++++++++++++++++++
->>>>>  1 file changed, 21 insertions(+)
->>>>>
->>>>> diff --git a/.travis.yml b/.travis.yml
->>>>> index e942175dd3..628cc52c99 100644
->>>>> --- a/.travis.yml
->>>>> +++ b/.travis.yml
->>>>> @@ -258,3 +258,24 @@ matrix:
->>>>>      - env:
->>>>>          - CONFIG=3D"--disable-system"
->>>>>          - TEST_CMD=3D"make -j3 check-tcg V=3D1"
->>>>> +
->>>>> +
->>>>> +    # EDK2 roms builds
->>>>> +    - if: tag IS present OR commit_message =3D~ /(edk2|EDK2)/
->>>>> +      env:
->>>>> +        - CONFIG=3D"--disable-system --disable-user --prefix=3D$PW=
-D/dist"
->>>>> +        - EDK2_BUILD_OPTIONS=3D"--quiet --silent"
->>>>> +      script:
->>>>> +        - git submodule update --init roms/edk2
->>>>> +        - make -j3
->>>>> +        - make -C roms efi -j2
->>>>> +        - make install
->>>>> +      addons:
->>>>> +        apt:
->>>>> +          packages:
->>>>> +            - dos2unix
->>>>> +            - gcc-aarch64-linux-gnu
->>>>> +            - gcc-arm-linux-gnueabihf
->>>>> +            - iasl
->>>>> +            - nasm
->>>>> +            - uuid-dev
->>>>>
->>>>
->>>> Regardless of what problem we're trying to address with "--quiet
->>>> --silent", those options are wrong. You certainly want detailed buil=
-d
->>>> logs for the case a CI job fails (at build time or at runtime).
->>>
->>> On Travis we get:
->>>
->>> The job exceeded the maximum log length, and has been terminated.
->>> (https://travis-ci.org/philmd/qemu/jobs/545329905)
->>>
->>> So I moved to GitLab, but we still get:
->>>
->>> "Job's log exceeded limit of 4194304 bytes."
->>> (https://gitlab.com/philmd/qemu/-/jobs/230772314)
->>>
->>> Regarding the options to pass to edk2-build.sh,
->>>
->>> $ build --help
->>>   -j LOGFILE, --log=3DLOGFILE
->>>                    Put log in specified file as well as on console.
->>>   -s, --silent     Make use of silent mode of (n)make.
->>>   -q, --quiet      Disable all messages except FATAL ERRORS.
->>>   -v, --verbose    Turn on verbose output with informational messages
->>>                    printed, including library instances selected, fin=
-al
->>>                    dependency expression, and warning messages, etc.
->>>
->>> '--log' duplicate the output, and I don't want to reduce the log
->>> details, so I understand I should use:
->>>
->>>   ./edk2-build.sh [...] --log=3Dbuild.log >/dev/null || cat build.log
->>>
->>> Is that correct? But then I'd need to modify Makefile.edk2 to redirec=
-t
->>> stdout.
->>
->> Would it be possible to invoke the outermost make like this?
->>
->>   make -C roms -j2 efi >make.roms.efi.log 2>&1 \
->>   || ( tail -c 2M make.roms.efi.log; false )
+Coverity currently complains that the "if (0x00 & (0x80 >> (phase - 8))"
+in next-cube.c can never be true. Right it is. The "0x00" is meant as value
+of the control register of the RTC, which is currently not implemented yet.
+Thus, let's add a register variable for this now. However, the RTC
+registers are currently defined as static variables in nextscr2_write(),
+which is quite ugly. Thus let's also move the RTC variables to the main
+machine state instead. In the long run, we should likely even refactor
+the whole RTC code into a separate device in a separate file, but that's
+something for calm winter nights later... as a first step, cleaning up
+the static variables and shutting up the warning from Coverity should
+be sufficient.
 
-The build gets killed:
+Signed-off-by: Thomas Huth <huth@tuxfamily.org>
+---
+ hw/m68k/next-cube.c | 72 +++++++++++++++++++++++++--------------------
+ 1 file changed, 40 insertions(+), 32 deletions(-)
 
-  No output has been received in the last 10m0s, this potentially
-  indicates a stalled build or something wrong with the build itself.
-  Check the details on how to adjust your build configuration on:
+diff --git a/hw/m68k/next-cube.c b/hw/m68k/next-cube.c
+index 9a4a7328f9..2f305afa9f 100644
+--- a/hw/m68k/next-cube.c
++++ b/hw/m68k/next-cube.c
+@@ -60,6 +60,15 @@ typedef struct next_dma {
+     uint32_t size;
+ } next_dma;
+ 
++typedef struct NextRtc {
++    uint8_t ram[32];
++    uint8_t command;
++    uint8_t value;
++    uint8_t status;
++    uint8_t control;
++    uint8_t retval;
++} NextRtc;
++
+ typedef struct {
+     MachineState parent;
+ 
+@@ -77,7 +86,7 @@ typedef struct {
+     uint32_t scr1;
+     uint32_t scr2;
+ 
+-    uint8_t rtc_ram[32];
++    NextRtc rtc;
+ } NeXTState;
+ 
+ /* Thanks to NeXT forums for this */
+@@ -105,11 +114,8 @@ static void nextscr2_write(NeXTState *s, uint32_t val, int size)
+     static int led;
+     static int phase;
+     static uint8_t old_scr2;
+-    static uint8_t rtc_command;
+-    static uint8_t rtc_value;
+-    static uint8_t rtc_status = 0x90;
+-    static uint8_t rtc_return;
+     uint8_t scr2_2;
++    NextRtc *rtc = &s->rtc;
+ 
+     if (size == 4) {
+         scr2_2 = (val >> 8) & 0xFF;
+@@ -135,52 +141,53 @@ static void nextscr2_write(NeXTState *s, uint32_t val, int size)
+         if (((old_scr2 & SCR2_RTCLK) != (scr2_2 & SCR2_RTCLK)) &&
+                 ((scr2_2 & SCR2_RTCLK) == 0)) {
+             if (phase < 8) {
+-                rtc_command = (rtc_command << 1) |
+-                              ((scr2_2 & SCR2_RTDATA) ? 1 : 0);
++                rtc->command = (rtc->command << 1) |
++                               ((scr2_2 & SCR2_RTDATA) ? 1 : 0);
+             }
+             if (phase >= 8 && phase < 16) {
+-                rtc_value = (rtc_value << 1) | ((scr2_2 & SCR2_RTDATA) ? 1 : 0);
++                rtc->value = (rtc->value << 1) |
++                             ((scr2_2 & SCR2_RTDATA) ? 1 : 0);
+ 
+                 /* if we read RAM register, output RT_DATA bit */
+-                if (rtc_command <= 0x1F) {
++                if (rtc->command <= 0x1F) {
+                     scr2_2 = scr2_2 & (~SCR2_RTDATA);
+-                    if (s->rtc_ram[rtc_command] & (0x80 >> (phase - 8))) {
++                    if (rtc->ram[rtc->command] & (0x80 >> (phase - 8))) {
+                         scr2_2 |= SCR2_RTDATA;
+                     }
+ 
+-                    rtc_return = (rtc_return << 1) |
+-                                 ((scr2_2 & SCR2_RTDATA) ? 1 : 0);
++                    rtc->retval = (rtc->retval << 1) |
++                                  ((scr2_2 & SCR2_RTDATA) ? 1 : 0);
+                 }
+                 /* read the status 0x30 */
+-                if (rtc_command == 0x30) {
++                if (rtc->command == 0x30) {
+                     scr2_2 = scr2_2 & (~SCR2_RTDATA);
+                     /* for now status = 0x98 (new rtc + FTU) */
+-                    if (rtc_status & (0x80 >> (phase - 8))) {
++                    if (rtc->status & (0x80 >> (phase - 8))) {
+                         scr2_2 |= SCR2_RTDATA;
+                     }
+ 
+-                    rtc_return = (rtc_return << 1) |
+-                                 ((scr2_2 & SCR2_RTDATA) ? 1 : 0);
++                    rtc->retval = (rtc->retval << 1) |
++                                  ((scr2_2 & SCR2_RTDATA) ? 1 : 0);
+                 }
+                 /* read the status 0x31 */
+-                if (rtc_command == 0x31) {
++                if (rtc->command == 0x31) {
+                     scr2_2 = scr2_2 & (~SCR2_RTDATA);
+                     /* for now 0x00 */
+-                    if (0x00 & (0x80 >> (phase - 8))) {
++                    if (rtc->control & (0x80 >> (phase - 8))) {
+                         scr2_2 |= SCR2_RTDATA;
+                     }
+-                    rtc_return = (rtc_return << 1) |
+-                                 ((scr2_2 & SCR2_RTDATA) ? 1 : 0);
++                    rtc->retval = (rtc->retval << 1) |
++                                  ((scr2_2 & SCR2_RTDATA) ? 1 : 0);
+                 }
+ 
+-                if ((rtc_command >= 0x20) && (rtc_command <= 0x2F)) {
++                if ((rtc->command >= 0x20) && (rtc->command <= 0x2F)) {
+                     scr2_2 = scr2_2 & (~SCR2_RTDATA);
+                     /* for now 0x00 */
+                     time_t time_h = time(NULL);
+                     struct tm *info = localtime(&time_h);
+                     int ret = 0;
+ 
+-                    switch (rtc_command) {
++                    switch (rtc->command) {
+                     case 0x20:
+                         ret = SCR2_TOBCD(info->tm_sec);
+                         break;
+@@ -205,22 +212,22 @@ static void nextscr2_write(NeXTState *s, uint32_t val, int size)
+                     if (ret & (0x80 >> (phase - 8))) {
+                         scr2_2 |= SCR2_RTDATA;
+                     }
+-                    rtc_return = (rtc_return << 1) |
+-                                 ((scr2_2 & SCR2_RTDATA) ? 1 : 0);
++                    rtc->retval = (rtc->retval << 1) |
++                                  ((scr2_2 & SCR2_RTDATA) ? 1 : 0);
+                 }
+ 
+             }
+ 
+             phase++;
+             if (phase == 16) {
+-                if (rtc_command >= 0x80 && rtc_command <= 0x9F) {
+-                    s->rtc_ram[rtc_command - 0x80] = rtc_value;
++                if (rtc->command >= 0x80 && rtc->command <= 0x9F) {
++                    rtc->ram[rtc->command - 0x80] = rtc->value;
+                 }
+                 /* write to x30 register */
+-                if (rtc_command == 0xB1) {
++                if (rtc->command == 0xB1) {
+                     /* clear FTU */
+-                    if (rtc_value & 0x04) {
+-                        rtc_status = rtc_status & (~0x18);
++                    if (rtc->value & 0x04) {
++                        rtc->status = rtc->status & (~0x18);
+                         s->int_status = s->int_status & (~0x04);
+                     }
+                 }
+@@ -229,8 +236,8 @@ static void nextscr2_write(NeXTState *s, uint32_t val, int size)
+     } else {
+         /* else end or abort */
+         phase = -1;
+-        rtc_command = 0;
+-        rtc_value = 0;
++        rtc->command = 0;
++        rtc->value = 0;
+     }
+     s->scr2 = val & 0xFFFF00FF;
+     s->scr2 |= scr2_2 << 8;
+@@ -881,9 +888,10 @@ static void next_cube_init(MachineState *machine)
+     /*     0x0000XX00 << vital bits */
+     ns->scr1 = 0x00011102;
+     ns->scr2 = 0x00ff0c80;
++    ns->rtc.status = 0x90;
+ 
+     /* Load RTC RAM - TODO: provide possibility to load contents from file */
+-    memcpy(ns->rtc_ram, rtc_ram2, 32);
++    memcpy(ns->rtc.ram, rtc_ram2, 32);
+ 
+     /* 64MB RAM starting at 0x04000000  */
+     memory_region_allocate_system_memory(ram, NULL, "next.ram", ram_size);
+-- 
+2.21.0
 
-https://docs.travis-ci.com/user/common-build-problems/#build-times-out-be=
-cause-no-output-was-received
-
-  The build has been terminated
-
-> Or something like:
->=20
->      after_failure:
->        - tail -c 2M make.roms.efi.log
->=20
-> as Cleber suggested for his acceptance tests. Generally we want to try
-> and make the builds less noisy and only echo relevant details when it
-> fails. However we've tended to turn up the noise so we can debug stuff
-> and that is just painful to browser on the Travis website.
-
-I'll try that.
-
->>>> The reason why I only include DEBUG firmware builds in the edk2 bund=
-ling
->>>> series is similar -- RELEASE builds lack DEBUG messages and ASSERT()=
-s,
->>>> and as such they are 100% unsupportable in my book. Bugs in software=
- are
->>>> the norm, not the exception, so we should allow (even force) the use=
-r
->>>> (and remote systems) to provide as much information as they can.
->>>
->>> Sure, we have the same book here ;)
->>>
->>> Regards,
->>>
->>> Phil.
->>>
-> --
-> Alex Benn=C3=A9e
->=20
 
