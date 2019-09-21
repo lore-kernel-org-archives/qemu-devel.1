@@ -2,79 +2,83 @@ Return-Path: <SRS0=nDBX=XQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BAA4C49ED7
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 04:46:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C94A3C49ED7
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 05:43:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 217CE2070C
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 04:46:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8AC0E21835
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 05:43:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="MRFtUGSV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 217CE2070C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j1zX/Bqa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AC0E21835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBXHZ-0004Nv-27
-	for qemu-devel@archiver.kernel.org; Sat, 21 Sep 2019 00:46:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45615)
+	id 1iBYAf-0005ZJ-NY
+	for qemu-devel@archiver.kernel.org; Sat, 21 Sep 2019 01:43:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53042)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <joel.stan@gmail.com>) id 1iBXA1-0008G7-JB
- for qemu-devel@nongnu.org; Sat, 21 Sep 2019 00:38:18 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1iBY9q-000572-KJ
+ for qemu-devel@nongnu.org; Sat, 21 Sep 2019 01:42:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <joel.stan@gmail.com>) id 1iBXA0-0001Go-F6
- for qemu-devel@nongnu.org; Sat, 21 Sep 2019 00:38:17 -0400
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:37651)
+ (envelope-from <bmeng.cn@gmail.com>) id 1iBY9p-00053l-AA
+ for qemu-devel@nongnu.org; Sat, 21 Sep 2019 01:42:10 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:42401)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
- id 1iBX9w-0001Ec-Q9; Sat, 21 Sep 2019 00:38:13 -0400
-Received: by mail-qt1-x843.google.com with SMTP id d2so11115733qtr.4;
- Fri, 20 Sep 2019 21:38:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=+PPsKOCTh5RSa57I+BSSqGAEMvAJw0T0QxLY5cxA0Ko=;
- b=MRFtUGSVZQpUyY/Os2YX8cazuEcWpdYcVYSyHGl5zjFiK3HbOqdJljJt5rNo+e+RWr
- cqRol28iYlkSVs/KX0BqlrUuG/KQMYgZavizbTrSgDDjIcoWBZxDkaq3OQicPGykVUGl
- 45IqBgMfyTbGmflaiqf3SyH+mrXX2cU3LBHbI=
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1iBY9p-00053Q-3g; Sat, 21 Sep 2019 01:42:09 -0400
+Received: by mail-pg1-x544.google.com with SMTP id z12so5032297pgp.9;
+ Fri, 20 Sep 2019 22:42:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:subject:date:message-id;
+ bh=ZhxeS5KvFiNdQD+MF8eDIJquaqEG3L5t9TLx8TUM7rU=;
+ b=j1zX/Bqap52XMXrDJTJBUG7l0lGs7fjejjM9PWLXIfi/NFqppU3nV2PxpdAClD1jX/
+ +ncTFQDCLu59O1Ly8cwORJwNyRUQRAcVG9efLDnZTB6dVGRNM3cwCJEcaS5xXLJau44z
+ rzOGbdVYij+Rc7Ao/qsmnXbPRoyJhQph2t5eedF7J2P48Jqtx4RkwZ59sp8hJbqRXSnK
+ sSnxlGow6fnNa3i4fNQJGWrDx8IU4N+GXn7H78on07VD0FcjL+ylN0pVSuuT2GJ3Kiem
+ RIE6gs6OXuxS30tucpjr6kMveOe00CIRgUhaMVa7m6s9Jn/FrZgslh46cEaC4RkF+ZIg
+ F1MQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=+PPsKOCTh5RSa57I+BSSqGAEMvAJw0T0QxLY5cxA0Ko=;
- b=syAgRT5iGNN2wvPKpuC3a2y8khnlM60R4sc7FsbJE34/VuLIBGGUbE91ahz06gjmId
- pcvikAZVI7z2WYwfqKpLMD8KC9lTBUqMEX5d3IcSi6TkRJNC2xWI4LTg+bXMSdow6Ehc
- AOWIzg+hDNwxW+i+PfXp45JdPimeBEyeaI3P4OG9WIeEISZanVwYCXKk0sNdysVmeGI0
- XyyI9DvWRGhkuWYy3XeiL6WY0iXwnXIXQEMBQGo8+/K0Yl8eTfeJhZOvG0ygSobqeSel
- B7egdkhPPlPqLew7tn89RsohkvJ0aiWjoLsTHFuzzDJZ7fZmpZtfN3Rl6Xx2U2kcwPrH
- V7Tw==
-X-Gm-Message-State: APjAAAUEo+koq6UO69CymcavEK0wg4CaKkZJmPO98cFVqPQbe56l0/lF
- 7JmMa5uaBTSc/OVOvAcZ4xaP1uldB2b0hbf065A=
-X-Google-Smtp-Source: APXvYqxHS86ERkC4rVC7pBQuN29N/ev7fB9wJGfVG36dku8/Kno9Yiw9bfVt0AETdpbZfaFpDiQ1N/8zIOmmTt5Gico=
-X-Received: by 2002:a0c:a9d3:: with SMTP id c19mr16159222qvb.172.1569040691160; 
- Fri, 20 Sep 2019 21:38:11 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190919055002.6729-1-clg@kaod.org>
- <20190919055002.6729-4-clg@kaod.org>
- <139c3f7e-465e-4efb-b6c7-213dcd2ec6b7@www.fastmail.com>
- <2a267d68-2463-ae0d-00d0-d9a33ba845b2@kaod.org>
-In-Reply-To: <2a267d68-2463-ae0d-00d0-d9a33ba845b2@kaod.org>
-From: Joel Stanley <joel@jms.id.au>
-Date: Sat, 21 Sep 2019 04:37:57 +0000
-Message-ID: <CACPK8Xd2aR9tJKfVjNn7ZCnNw1XK4X7A+fe-5Z62N_HyCOiAWQ@mail.gmail.com>
-Subject: Re: [PATCH 03/21] hw: aspeed_scu: Add AST2600 support
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ h=x-gm-message-state:from:to:subject:date:message-id;
+ bh=ZhxeS5KvFiNdQD+MF8eDIJquaqEG3L5t9TLx8TUM7rU=;
+ b=QiA/umrZ0bR0H4JNznAWUW2rHV/+zI9he4OHksUnjYPhxSnZ2+/2AXBgGBRX/FyA+o
+ UZ0L5d87Jbu/kqwHppLVZYqsN9SUMpQOXXbWoPI/uJ6YYXkZw1LGtkxALLAFJ+rHnyR3
+ jJN0Wk0cQrZeZ09pCTgGiiPuFZV4ORY0yTJHYH5FO9aCGY9KXMorUPr83AcYmuXCZoKC
+ UPmleXWYgnJxBS/SWqDe9AtQ430phDBpyYvXHfBPvpk1z3wg7AQh4pZBRZ9V2VQRmCaO
+ 9Sqwj5DKJXqsmajaxP+yQ9t2GqfXOArnCJzsUZaw+fqoaaS1M8yvn/pMzLdGMKT+IUvM
+ 3jpg==
+X-Gm-Message-State: APjAAAVtD3vuL/wfqKLXs986WcxLniVYEG8p7MHUVVZYXwXFXJOnRNwT
+ eSnpQxYvhrITozxT2cgmR64=
+X-Google-Smtp-Source: APXvYqw0BT5tdrgseXpiYnvmCaIhVRKO30aoi3disSxTWfZgf3HVdaINkQVwvAKXRV+7Gxe8Cb84cw==
+X-Received: by 2002:a17:90a:1609:: with SMTP id
+ n9mr8639149pja.64.1569044527026; 
+ Fri, 20 Sep 2019 22:42:07 -0700 (PDT)
+Received: from localhost.localdomain (unknown-224-80.windriver.com.
+ [147.11.224.80])
+ by smtp.gmail.com with ESMTPSA id d69sm3461953pfd.175.2019.09.20.22.42.06
+ (version=TLS1 cipher=AES128-SHA bits=128/128);
+ Fri, 20 Sep 2019 22:42:06 -0700 (PDT)
+From: Bin Meng <bmeng.cn@gmail.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
+Subject: [PATCH v2 1/2] riscv: hw: Drop "clock-frequency" property of cpu nodes
+Date: Fri, 20 Sep 2019 22:41:30 -0700
+Message-Id: <1569044491-7875-1-git-send-email-bmeng.cn@gmail.com>
+X-Mailer: git-send-email 1.7.1
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::843
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,61 +90,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 20 Sep 2019 at 15:15, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->
-> On 20/09/2019 06:10, Andrew Jeffery wrote:
-> >
-> >
-> > On Thu, 19 Sep 2019, at 15:19, C=C3=A9dric Le Goater wrote:
-> >> From: Joel Stanley <joel@jms.id.au>
-> >>
-> >> The SCU controller on the AST2600 SoC has extra registers. Increase
-> >> the number of regs of the model and introduce a new field in the class
-> >> to customize the MemoryRegion operations depending on the SoC model.
-> >>
-> >> +    switch (reg) {
-> >> +    case AST2600_PROT_KEY:
-> >> +        s->regs[reg] =3D (data =3D=3D ASPEED_SCU_PROT_KEY) ? 1 : 0;
-> >> +        return;
-> >> +    case AST2600_HW_STRAP1:
-> >> +    case AST2600_HW_STRAP2:
-> >> +        if (s->regs[reg + 2]) {
-> >> +            return;
-> >> +        }
-> >> +        /* fall through */
-> >> +    case AST2600_SYS_RST_CTRL:
-> >> +    case AST2600_SYS_RST_CTRL2:
-> >> +        /* W1S (Write 1 to set) registers */
-> >> +        s->regs[reg] |=3D data;
-> >> +        return;
-> >> +    case AST2600_SYS_RST_CTRL_CLR:
-> >> +    case AST2600_SYS_RST_CTRL2_CLR:
-> >> +    case AST2600_HW_STRAP1_CLR:
-> >> +    case AST2600_HW_STRAP2_CLR:
-> >> +        /* W1C (Write 1 to clear) registers */
-> >> +        s->regs[reg] &=3D ~data;
-> >
-> > This clear should respect the protection register for each strap case.
->
-> Joel,
->
-> You are the expert ! :)
+The "clock-frequency" property of cpu nodes isn't required. Drop it.
 
-Someone could implement this if they wanted to. In the future it might
-be useful to create a detailed model for the OTP and secure boot
-behavior, and that can affect the strapping.
+This is to keep in sync with Linux kernel commit below:
+https://patchwork.kernel.org/patch/11133031/
 
-However it is not critical for running guests under qemu. I think we
-should defer it until there is some guest code that needs the detailed
-behavior.
+Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Cheers,
+---
 
-Joel
+Changes in v2:
+- drop the one in spike and virt machines too
+
+ hw/riscv/sifive_u.c         | 2 --
+ hw/riscv/spike.c            | 2 --
+ hw/riscv/virt.c             | 2 --
+ include/hw/riscv/sifive_u.h | 1 -
+ include/hw/riscv/spike.h    | 4 ----
+ include/hw/riscv/virt.h     | 4 ----
+ 6 files changed, 15 deletions(-)
+
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 9f8e84b..02dd761 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -151,8 +151,6 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         char *isa;
+         qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+-                              SIFIVE_U_CLOCK_FREQ);
+         /* cpu 0 is the management hart that does not have mmu */
+         if (cpu != 0) {
+             qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+index d60415d..8bbffbc 100644
+--- a/hw/riscv/spike.c
++++ b/hw/riscv/spike.c
+@@ -102,8 +102,6 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
+         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+         qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+-                              SPIKE_CLOCK_FREQ);
+         qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+         qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+         qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index d36f562..1303061 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -161,8 +161,6 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+         qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+-                              VIRT_CLOCK_FREQ);
+         qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+         qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+         qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index e4df298..4850805 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -75,7 +75,6 @@ enum {
+ };
+ 
+ enum {
+-    SIFIVE_U_CLOCK_FREQ = 1000000000,
+     SIFIVE_U_HFCLK_FREQ = 33333333,
+     SIFIVE_U_RTCCLK_FREQ = 1000000
+ };
+diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
+index 03d8703..dc77042 100644
+--- a/include/hw/riscv/spike.h
++++ b/include/hw/riscv/spike.h
+@@ -38,10 +38,6 @@ enum {
+     SPIKE_DRAM
+ };
+ 
+-enum {
+-    SPIKE_CLOCK_FREQ = 1000000000
+-};
+-
+ #if defined(TARGET_RISCV32)
+ #define SPIKE_V1_09_1_CPU TYPE_RISCV_CPU_RV32GCSU_V1_09_1
+ #define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_RV32GCSU_V1_10_0
+diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
+index 6e5fbe5..68978a1 100644
+--- a/include/hw/riscv/virt.h
++++ b/include/hw/riscv/virt.h
+@@ -55,10 +55,6 @@ enum {
+     VIRTIO_NDEV = 0x35 /* Arbitrary maximum number of interrupts */
+ };
+ 
+-enum {
+-    VIRT_CLOCK_FREQ = 1000000000
+-};
+-
+ #define VIRT_PLIC_HART_CONFIG "MS"
+ #define VIRT_PLIC_NUM_SOURCES 127
+ #define VIRT_PLIC_NUM_PRIORITIES 7
+-- 
+2.7.4
+
 
