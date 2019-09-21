@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA172C49ED7
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 04:36:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39104C49ED7
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 04:39:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 786EF20C01
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 04:36:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1C7020C01
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 04:39:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z0hMLBXV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 786EF20C01
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PO0GiQse"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1C7020C01
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBX8N-0005oX-W6
-	for qemu-devel@archiver.kernel.org; Sat, 21 Sep 2019 00:36:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40654)
+	id 1iBXBS-0000iN-NM
+	for qemu-devel@archiver.kernel.org; Sat, 21 Sep 2019 00:39:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40660)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iBX5K-0003RG-55
+ (envelope-from <richard.henderson@linaro.org>) id 1iBX5K-0003RY-BL
  for qemu-devel@nongnu.org; Sat, 21 Sep 2019 00:33:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iBX5F-0006YC-9I
+ (envelope-from <richard.henderson@linaro.org>) id 1iBX5F-0006Y3-8Q
  for qemu-devel@nongnu.org; Sat, 21 Sep 2019 00:33:25 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:40856)
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:47014)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iBX5E-0006PW-Je
+ id 1iBX5E-0006QK-HN
  for qemu-devel@nongnu.org; Sat, 21 Sep 2019 00:33:20 -0400
-Received: by mail-pg1-x543.google.com with SMTP id w10so4977403pgj.7
- for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 21:33:05 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id q5so5852658pfg.13
+ for <qemu-devel@nongnu.org>; Fri, 20 Sep 2019 21:33:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=N6+9fuZx1kzSXVJeSDepo9XmkdWGsxo7WFnloubWcfk=;
- b=z0hMLBXVgkFabCj2zb7KnZQh8Ji4In3fIndCAOvLm2DJdOjdeNN3x3fbxYngDYttXd
- CqVx/U2H1QgguP5l39H7hOpWZOybYOhSmxzCUtEAu2fcyLe+k8iwsoz34Je3A3qW1Ilh
- 6aqH9bW/flNiyCjayuw8+IuhmmFqy3IrmIlG9KQmokLIk3FCOxqd6WZIgFXrK8w4NnvJ
- WM4FKHq3cXuEyUb0JCg4Nna3U/CS2wB++AekEGH/OaXSJkm5BXFsqg+BbogQWCz5TIZA
- nEOrCWP7fQ5Em49CMIGDtHzj4sH8FrM/p6sFEZze1t8tQrLn9X2p+q9Ej1SoFfFwEQFu
- 67uw==
+ bh=8832rs/gjYJtK2KCkPzbjErZga7EWVI26gkEzFEjWFQ=;
+ b=PO0GiQse2Tt2buMzBBQF17lZ2BDMqCf8+qVTGxSzCAQzsfwfnbeZvlxMEzupWX6wLH
+ 5j1MdnUOo5gN83hnqC8x1HzuoI5Z4GUpQTb/4RLZ/devOLCueelWgLKzGlt8RRiuMLWw
+ sI0fbHFdgZVUIB3KdZSys4UamvIKkcqXiQ5GwCNeC6b+3T9t7IIjFC9hcVn2j3PauHs8
+ lKCBtyemq+6SX1W0ao6sx5uzHbzkJ8lgf4XTGbugaW/Z/x2AGoK+4iaPbEj1mz0/mQlZ
+ R25hB3gjt3iSDkBzd37NQjjP1/mBdX6goqqU73oYR/DWVAjLYcEK+DmiBmsaPqowPMsi
+ zV8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=N6+9fuZx1kzSXVJeSDepo9XmkdWGsxo7WFnloubWcfk=;
- b=qQ0OYF3ucTozBYQSjonlO7YsGuDJ8d5wEIP7n+sVL7AYei9a8ZTLB/aRHp6Bf+svX0
- /pq0RzQFU7RP6KuYktMw84ZaH7a6X+8g6lzeS6GUmfnvByBltgKsuEzWCWSzPVdhNtsL
- tN7jiAbJ/j3VwSY4SIuq6s59zjVqCVxEzPhmj4tGOjrO/uo0kC4CDGJShBHsOpD8BYZZ
- O7x4yIMIxeUoaNiKqVaBZf6TtuWcYdNVtTyNJ2kiYrrbXVF21m25f3357KQbMY3Ccg9Z
- /n6v2mKVEDSg10rJCRYVmeafyBLU9oLx9OGR1Ry+gxyoX8zjBMJMvNMjVVsfuWGXg1Mx
- pU6w==
-X-Gm-Message-State: APjAAAU8xFJb3ZgtW3k6EPTERPeSk+P2dk2Htu4I4RVcUzXo4yBRORTn
- 8sY0QXs3IPlcGEaPKRwnf4HE8b1QsSA=
-X-Google-Smtp-Source: APXvYqwXhhGAAdUAQIAMTGhbatpRd3Lf9ItZRNQBJ/0xaE3W/4Jb5mDqrnN65osKhstN/G1ICGG8dg==
-X-Received: by 2002:a62:3c1:: with SMTP id 184mr21929919pfd.209.1569040384062; 
- Fri, 20 Sep 2019 21:33:04 -0700 (PDT)
+ bh=8832rs/gjYJtK2KCkPzbjErZga7EWVI26gkEzFEjWFQ=;
+ b=tVuv9+jTzqDyo7UxB13nPk+Z6JRpdphZt/agZSwyAGaJF8E2OidnOIc+eeHFbtzeqZ
+ eEVpX7pBqC1arzTG0cIDe4a6gxaxcXUklloFC7XSSwEUD62jivProMB5KywWnm1WKswq
+ dzT4rRpFOnrin6Pdel43XPnZwV2ZYJ+9WErP1ckho2WG9YZB1lxjtDsgXHVdoDCd7p0q
+ 1bgrTH/PeswywmjygkYirTOls5KPZyMKWIm6elR2ibqsp95O5O6SPAV7meY3TaF7wmjg
+ c89e27StsPTSxWQzt8V0vzzV9bwumbZceZAGx8VH/P2Zo0ccG18btEC57jCLazghfn5L
+ BHBg==
+X-Gm-Message-State: APjAAAWE7Crtgu/bP7EbYGy32dOz034GZlytCUmHcu4SiO5JJLNQv1cK
+ URI9LxTgOTBOO51lsr9sFY0ZJUterVU=
+X-Google-Smtp-Source: APXvYqyEAoWRisG1pyxAcwIk1bHr4UWk6rkI6/6B8WMjvhmPvJgtkgyZmQWwxnOp+hxbx1s+D+phJA==
+X-Received: by 2002:a63:1f1f:: with SMTP id f31mr18413877pgf.353.1569040385641; 
+ Fri, 20 Sep 2019 21:33:05 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id 193sm4179986pfc.59.2019.09.20.21.33.02
+ by smtp.gmail.com with ESMTPSA id 193sm4179986pfc.59.2019.09.20.21.33.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Sep 2019 21:33:03 -0700 (PDT)
+ Fri, 20 Sep 2019 21:33:05 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 3/7] target/alpha: Fix SWCR_TRAP_ENABLE_MASK
-Date: Fri, 20 Sep 2019 21:32:52 -0700
-Message-Id: <20190921043256.4575-4-richard.henderson@linaro.org>
+Subject: [PATCH 4/7] target/alpha: Handle SWCR_MAP_DMZ earlier
+Date: Fri, 20 Sep 2019 21:32:53 -0700
+Message-Id: <20190921043256.4575-5-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190921043256.4575-1-richard.henderson@linaro.org>
 References: <20190921043256.4575-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,77 +95,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The CONFIG_USER_ONLY adjustment blindly mashed the swcr
-exception enable bits into the fpcr exception disable bits.
-
-However, fpcr_exc_enable has already converted the exception
-disable bits into the exception status bits in order to make
-it easier to mask status bits at runtime.
-
-Instead, merge the swcr enable bits with the fpcr before we
-convert to status bits.
+Since we're converting the swcr to fpcr format for exceptions,
+it's trivial to add FPCR_DNZ to the set of fpcr bits overriden.
+No functional change.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/alpha/helper.c | 31 ++++++++++++++++++-------------
- 1 file changed, 18 insertions(+), 13 deletions(-)
+ target/alpha/helper.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/target/alpha/helper.c b/target/alpha/helper.c
-index 10602fb339..e21c488aa3 100644
+index e21c488aa3..2f959c65ef 100644
 --- a/target/alpha/helper.c
 +++ b/target/alpha/helper.c
-@@ -46,19 +46,8 @@ void cpu_alpha_store_fpcr(CPUAlphaState *env, uint64_t val)
-     uint32_t fpcr = val >> 32;
-     uint32_t t = 0;
- 
--    t |= CONVERT_BIT(fpcr, FPCR_INED, FPCR_INE);
--    t |= CONVERT_BIT(fpcr, FPCR_UNFD, FPCR_UNF);
--    t |= CONVERT_BIT(fpcr, FPCR_OVFD, FPCR_OVF);
--    t |= CONVERT_BIT(fpcr, FPCR_DZED, FPCR_DZE);
--    t |= CONVERT_BIT(fpcr, FPCR_INVD, FPCR_INV);
--
-+    /* Record the raw value before adjusting for linux-user.  */
-     env->fpcr = fpcr;
--    env->fpcr_exc_enable = ~t & FPCR_STATUS_MASK;
--
--    env->fpcr_dyn_round = rm_map[(fpcr & FPCR_DYN_MASK) >> FPCR_DYN_SHIFT];
--
--    env->fpcr_flush_to_zero = (fpcr & FPCR_UNFD) && (fpcr & FPCR_UNDZ);
--    env->fp_status.flush_inputs_to_zero = (fpcr & FPCR_DNZ) != 0;
- 
- #ifdef CONFIG_USER_ONLY
-     /*
-@@ -67,13 +56,29 @@ void cpu_alpha_store_fpcr(CPUAlphaState *env, uint64_t val)
-      * which point the kernel's handler would emulate and apply
+@@ -57,7 +57,7 @@ void cpu_alpha_store_fpcr(CPUAlphaState *env, uint64_t val)
       * the software exception mask.
       */
-+    uint32_t soft_fpcr = alpha_ieee_swcr_to_fpcr(env->swcr) >> 32;
-+    fpcr |= soft_fpcr & FPCR_STATUS_MASK;
-+#endif
-+
-+    t |= CONVERT_BIT(fpcr, FPCR_INED, FPCR_INE);
-+    t |= CONVERT_BIT(fpcr, FPCR_UNFD, FPCR_UNF);
-+    t |= CONVERT_BIT(fpcr, FPCR_OVFD, FPCR_OVF);
-+    t |= CONVERT_BIT(fpcr, FPCR_DZED, FPCR_DZE);
-+    t |= CONVERT_BIT(fpcr, FPCR_INVD, FPCR_INV);
-+
-+    env->fpcr_exc_enable = ~t & FPCR_STATUS_MASK;
-+
-+    env->fpcr_dyn_round = rm_map[(fpcr & FPCR_DYN_MASK) >> FPCR_DYN_SHIFT];
-+
-+    env->fpcr_flush_to_zero = (fpcr & FPCR_UNFD) && (fpcr & FPCR_UNDZ);
-+    env->fp_status.flush_inputs_to_zero = (fpcr & FPCR_DNZ) != 0;
-+#ifdef CONFIG_USER_ONLY
-     if (env->swcr & SWCR_MAP_DMZ) {
-         env->fp_status.flush_inputs_to_zero = 1;
-     }
+     uint32_t soft_fpcr = alpha_ieee_swcr_to_fpcr(env->swcr) >> 32;
+-    fpcr |= soft_fpcr & FPCR_STATUS_MASK;
++    fpcr |= soft_fpcr & (FPCR_STATUS_MASK | FPCR_DNZ);
+ #endif
+ 
+     t |= CONVERT_BIT(fpcr, FPCR_INED, FPCR_INE);
+@@ -73,9 +73,6 @@ void cpu_alpha_store_fpcr(CPUAlphaState *env, uint64_t val)
+     env->fpcr_flush_to_zero = (fpcr & FPCR_UNFD) && (fpcr & FPCR_UNDZ);
+     env->fp_status.flush_inputs_to_zero = (fpcr & FPCR_DNZ) != 0;
+ #ifdef CONFIG_USER_ONLY
+-    if (env->swcr & SWCR_MAP_DMZ) {
+-        env->fp_status.flush_inputs_to_zero = 1;
+-    }
      if (env->swcr & SWCR_MAP_UMZ) {
          env->fpcr_flush_to_zero = 1;
      }
--    env->fpcr_exc_enable &= ~(alpha_ieee_swcr_to_fpcr(env->swcr) >> 32);
- #endif
- }
- 
 -- 
 2.17.1
 
