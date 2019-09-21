@@ -2,91 +2,89 @@ Return-Path: <SRS0=nDBX=XQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C6E1C4360D
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 15:27:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BEF5C4360D
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 22:23:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4702A208C0
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 15:27:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0033208C0
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 22:23:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WGV7AXzr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4702A208C0
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hsE0noCJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0033208C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42450 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBhIQ-00071F-FW
-	for qemu-devel@archiver.kernel.org; Sat, 21 Sep 2019 11:27:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41492)
+	id 1iBnmc-0001BR-UG
+	for qemu-devel@archiver.kernel.org; Sat, 21 Sep 2019 18:23:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46980)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iBhHg-0006QW-0R
- for qemu-devel@nongnu.org; Sat, 21 Sep 2019 11:26:52 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iBnlW-0000jh-Me
+ for qemu-devel@nongnu.org; Sat, 21 Sep 2019 18:22:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iBhHf-00043l-3b
- for qemu-devel@nongnu.org; Sat, 21 Sep 2019 11:26:51 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:37520)
+ (envelope-from <richard.henderson@linaro.org>) id 1iBnlV-0006LS-Ay
+ for qemu-devel@nongnu.org; Sat, 21 Sep 2019 18:22:06 -0400
+Received: from mail-pg1-x52b.google.com ([2607:f8b0:4864:20::52b]:38192)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iBhHe-00043N-RN
- for qemu-devel@nongnu.org; Sat, 21 Sep 2019 11:26:50 -0400
-Received: by mail-pf1-x441.google.com with SMTP id y5so6470228pfo.4
- for <qemu-devel@nongnu.org>; Sat, 21 Sep 2019 08:26:50 -0700 (PDT)
+ id 1iBnlV-0006LE-42
+ for qemu-devel@nongnu.org; Sat, 21 Sep 2019 18:22:05 -0400
+Received: by mail-pg1-x52b.google.com with SMTP id x10so5794951pgi.5
+ for <qemu-devel@nongnu.org>; Sat, 21 Sep 2019 15:22:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ h=subject:from:to:cc:references:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=54rGvRC2DHDrzSXA4F9r+xIfJe2KBhX8HqaGRlC98Us=;
- b=WGV7AXzrPrHjbY72MWE3HQOyxMXk9Uv/QHqSWTx3J1wsWtTeXI3+i8G8Ybkm0PX5Oj
- wgA83b8J0ksXgdHT6du76U6IOfna6gOZltatny2qMiW1RT8dnGJGmIhza8hFiGQ055uZ
- dwjXc66SohjbF190q13QHPB+7WZRBjToSx77lpdgQJ11CEBbBayFl5NTh1/Y9CfEy+eT
- 0mHXdPrtKgAAYpbqtxEJxu8aswq2BE5YJ888lPbhznq/+H1XTR7pHI6H+rBqKIoIsMuT
- pOXhCf18QK72sg05A5BLprWQp/WMgPxri1+hOCLMXsUSoKMbJt+5d/vaSlw0rLVZwzgq
- uwzw==
+ bh=XA3QduPvib98slnfAWd5DCGDEAAkFgBrAwzCf8D60U4=;
+ b=hsE0noCJ2JL6uIDhIfwCgJal74OgLPJAyywrWh4YL/L23yPfCy62zWF14cNjw9bRGb
+ npqLaKpZcQxWhW3BQ43Wm8j4oSULOK8jZYLSXeVwwg74sK8WwZAeOWZqluiNjtX2AwTC
+ bwVBBGqaWwk4iDjqjAcjJODgtvzL8+gw/pJF5MrZBZGtLpK3FxSUoZyjDtr5Ivd0sU2o
+ dNSZu7Q+ek7S17CxP9+QB3rz+nLv0uR4gOPp9YxhjNAm7ItW7wGfHqWGq0oZ40dvEoih
+ sNLYNttjVeebtbqMg5YTxCex4iMQwku3uK/cLD2FtpOdJGI8Vtqld3qw4/LAQ+XNGneU
+ c5lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=54rGvRC2DHDrzSXA4F9r+xIfJe2KBhX8HqaGRlC98Us=;
- b=faQiZFMiOiaH7381fooHBApnM/vij9AZiGXnWxfAprF4cbEvHazGsJ905SvC3KYwPN
- Ws8Xing1hFZnETDhBqM71LXMe9SEWxPf/H2KRNWQ1/ZzBhXQ7vMdmjVMfFuSk5jXqSwm
- GWxNltlR38NcdzmBcEmKSN+dVXqVn4vDpsTeQeJvL5PZoZFzj2rpmXMj3UGgvf4WWV6N
- rcFYG6Vm4McSdEdSvNC3lZoNY6JAFrO5ColD4RWlbR5tqxdD6hVXpgfJonFG4RUkBYk/
- 8IKnz1GOCcpzqdtETFCXhD+FDVEbL7T6oYiTwJOM39x93MvJc1sFLl4IRav4bHL2pme+
- YkfA==
-X-Gm-Message-State: APjAAAWH/b+hAaimzOKZ7MERkoeVfZnjLc+WL20aw5Yrx7sn6J1z3d19
- kvL2zWQoEyOkfQ+p5Qy1wKx5IA==
-X-Google-Smtp-Source: APXvYqwat6KAQI6/zESyy8xzgC0+9aIyEtrZritqX18WpB85XHKLn5vrBZAEwFFxOXMI2JcenlB/mw==
-X-Received: by 2002:a65:6254:: with SMTP id q20mr21209552pgv.423.1569079609657; 
- Sat, 21 Sep 2019 08:26:49 -0700 (PDT)
+ bh=XA3QduPvib98slnfAWd5DCGDEAAkFgBrAwzCf8D60U4=;
+ b=KQ/1Rtki+aDjnvES3maGQDd4hCat4TZAHF3QcSqNNPID5G6FPhdPdlOZboxnjofktY
+ xMfQ2VcLms/XMUE5atL4VgbcKDUk8rg7cdlMbcB+wI4t/QPjdvp5YcWobdMvIsEil/2X
+ rzvpiyv2QGgmg1zrpYa7ofXCHbm2HM9teI1G0wb0JV2vrK0ZoXM3myTAXyKqRspCGK9S
+ RrLXNAOekrD8dCaq+hfpjKziCI5lvetW2wpunetPxHdvVHfKYvC/1x90+1mF7XdN8rh4
+ Wn3+DocUxpeyqYBEtdFVgJXC3dRbYSsbXEtc9iPlwf4st2lwcBtO2DAM+HqEgmG73Bvp
+ DVGQ==
+X-Gm-Message-State: APjAAAUxF1O7ApnXBoZwBr3no468OwDcHapHVo+d/h2bk64oKomzqhWU
+ ufyTJH7ks1UwGTV7mgDhF+dwvw==
+X-Google-Smtp-Source: APXvYqxPocooeSfPoIUyslnIGZlomdTEvoPlvz4oRdeKlR5bGY/Ib8yJ0NEnp0e7l80MSRBQCwF9ig==
+X-Received: by 2002:a63:c807:: with SMTP id z7mr22149831pgg.202.1569104523321; 
+ Sat, 21 Sep 2019 15:22:03 -0700 (PDT)
 Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id v18sm6083361pff.32.2019.09.21.08.26.48
+ by smtp.gmail.com with ESMTPSA id f15sm8604820pfd.141.2019.09.21.15.22.00
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sat, 21 Sep 2019 08:26:48 -0700 (PDT)
-Subject: Re: [PATCH] hw/arm/boot: Use the IEC binary prefix definitions
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-References: <20190921103405.19623-1-philmd@redhat.com>
+ Sat, 21 Sep 2019 15:22:02 -0700 (PDT)
+Subject: Re: [RFC v2 0/5] Move notdirty handling to cputlb
 From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+References: <20190918180251.32003-1-richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <089a9b68-b1bf-66a4-f696-9e7e28bf6c4e@linaro.org>
-Date: Sat, 21 Sep 2019 08:26:47 -0700
+Message-ID: <b5da3be9-3809-cc44-f7e0-a0b4571edb6b@linaro.org>
+Date: Sat, 21 Sep 2019 15:21:59 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190921103405.19623-1-philmd@redhat.com>
+In-Reply-To: <20190918180251.32003-1-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::441
+X-Received-From: 2607:f8b0:4864:20::52b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,20 +96,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
+Cc: pbonzini@redhat.com, alex.bennee@linaro.org, stefanha@redhat.com,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/21/19 3:34 AM, Philippe Mathieu-Daudé wrote:
-> IEC binary prefixes ease code review: the unit is explicit.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  hw/arm/boot.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+On 9/18/19 11:02 AM, Richard Henderson wrote:
+> However this time the changes are extremely minimal, and now
+> I really *really* don't understand why they don't work, because
+> as far as I can tell the new locking is *identical* with the
+> current i/o path.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+The difference was failing to set cpu->mem_io_pc, so that
+TARGET_HAS_PRECISE_SMC within tb_invalidate_phys_page_range__locked could look
+up the current TB, and potentially restore state and exit to the main loop.
+
+Version 3 will have this fixed.
 
 
 r~
