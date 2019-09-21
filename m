@@ -7,90 +7,90 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34D5DC49ED7
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 08:56:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D53E6C49ED7
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 09:00:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF6C8205F4
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 08:56:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 57D6F2073F
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Sep 2019 09:00:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QGarr5Tj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF6C8205F4
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aUboXIAc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57D6F2073F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBbBk-0000Y4-61
-	for qemu-devel@archiver.kernel.org; Sat, 21 Sep 2019 04:56:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38386)
+	id 1iBbFM-0002wV-1Q
+	for qemu-devel@archiver.kernel.org; Sat, 21 Sep 2019 05:00:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38573)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iBbAN-0007yj-21
- for qemu-devel@nongnu.org; Sat, 21 Sep 2019 04:54:56 -0400
+ (envelope-from <philmd@redhat.com>) id 1iBbEO-0002Ir-4Z
+ for qemu-devel@nongnu.org; Sat, 21 Sep 2019 04:59:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iBbAI-0000hs-Gg
- for qemu-devel@nongnu.org; Sat, 21 Sep 2019 04:54:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31311
+ (envelope-from <philmd@redhat.com>) id 1iBbEM-00023n-Lk
+ for qemu-devel@nongnu.org; Sat, 21 Sep 2019 04:59:03 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39446
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iBbAI-0000ha-Bz
- for qemu-devel@nongnu.org; Sat, 21 Sep 2019 04:54:50 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iBbCz-0001ZD-Sq
+ for qemu-devel@nongnu.org; Sat, 21 Sep 2019 04:59:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1569056089;
+ s=mimecast20190719; t=1569056257;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=lXbTEAxtaocxOW4ghQXcJ2LOZmb8OHO7E+Xhh/1eTyY=;
- b=QGarr5TjAyOK2HkQ3dcyk0OF7fvJHnMyx6bVkOOHuYXJmt34ZjSx27sHFBklaPSPuTc0pw
- Rv0xBMmgXQ8MuyLAdX7zTblT9gvcNVI/MuYx1xIB+eN+5pJ+QcAFq3LGed9J3qEUfzDBeT
- Z6MC10eWFLC0jzJBDO2FWeLNrsgN4TQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-332-Z8nPyM_sNBWVaKF6ZZK-wA-1; Sat, 21 Sep 2019 04:54:48 -0400
-Received: by mail-wm1-f70.google.com with SMTP id j125so2780100wmj.6
- for <qemu-devel@nongnu.org>; Sat, 21 Sep 2019 01:54:47 -0700 (PDT)
+ bh=nZP7iSd23tgch2qa52Pk26dO1viJ0auiAwhZFtvaKSg=;
+ b=aUboXIAcNV8w9CDhgkeOd186jVd8ATyoTsuz1wT5Dv55Frbm9zdg/VqD6APMZzOi3kE75t
+ T/RwSKDywxVnRRWbCHi27nqAjCyWiW441WLght3pGV1t2uGPoOFChiLmgtIJf6GugFucpz
+ 79tNz3kkHfsE5DC3Q3A/lF/7ybYYIog=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-178-xDkMP6hpPGC7mk8gAvkplg-1; Sat, 21 Sep 2019 04:57:33 -0400
+Received: by mail-wm1-f72.google.com with SMTP id m6so2037747wmf.2
+ for <qemu-devel@nongnu.org>; Sat, 21 Sep 2019 01:57:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Lsn/rbUrbW1N9QFgq8K+mavhIeKJJlWCo8Iru8CCkss=;
- b=MmoOsFsOV2Ax/qE7LrdYbycPEANzso7q3pnPXwq6X2w/+tHDAw+xqfM1ACaIeLbdX0
- Dbws/n2F1vpjauLzJ50iKNk/CDbF18C4B4k+Ln8UcXhmU3KKS6fOTfPrA/LrpYkLRku+
- 8hSoUA/pmRJbWMOqXDHTHgz5KFSlZ+sVuJVYBw5qvTlDhHDFhqrb+bPYlMrLDXma2P31
- p/zrjZyJNXVsywoVeUIj1B5KpsXYXzb5LtJRsRoGex09MtUaAeb9aSAirwngFVmZ5cIK
- OCiHknc9iBHkgA5hKqFi80eHiRP24tg2v1Q7V9nMvojH/2E79Udz9Bbs1ECQPqFXNBgQ
- jacw==
-X-Gm-Message-State: APjAAAUkV5kacxMc07dpidIzSduMtPGEmIxy0BUMSvXh8cLnipSeJy+b
- ZD3GInwdh8Inmn9LxZbOu6uj5nV+5N82eYtxXJ1lfZcFGo5nivZhHU6Zmecr7C9igR8OZ1nQYy4
- Jgp6MUrqIpSjiVTU=
-X-Received: by 2002:a1c:c78f:: with SMTP id x137mr6930696wmf.42.1569056086768; 
- Sat, 21 Sep 2019 01:54:46 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyG8EWqCan3/oysLvSlrdhL9qtSAIGgt93eXYoLI4vsN0bNt66elL0GRXmKWmBSHhI/s+IA1A==
-X-Received: by 2002:a1c:c78f:: with SMTP id x137mr6930688wmf.42.1569056086592; 
- Sat, 21 Sep 2019 01:54:46 -0700 (PDT)
+ bh=pcvleAXVCp+oXaCu+wDA9AxnnL0ehlMgml+8kc3cALc=;
+ b=mBy1/XnPqXNDiDnuerJI/IPaazSUp28eCUMsALwMY2PGXU/DecawU4ECuPQwW657wr
+ 5td+9u92iuaputmBDeIZQdWOJM4xQzuV1arqoT9ViZjgZg5RxO53uQhNPmnZLC9ZS0fb
+ YWR6AIOCrMZW65fknUPOJd5fmwMMa+GpHBVurEV0IbbTA3TsR1xJqKGHenUgykm7qanZ
+ UVraZB3zRNi4D9sSShH7KSDrvrPYYgkBuAYYRqSglGx3SlrJW2bO6Col7IoeWrJ64aH0
+ +Cf0UfKtmIF+O4sfAGfBEgY3wKjmYeq5TB4VTimFfHCMtcvwjXoCL2WTCfT8sQ/wvJE7
+ CVfg==
+X-Gm-Message-State: APjAAAWduuWodB4zDRqO/KoT6lbfTEYtGyut2yOzY4zt0oDXR/IS3zyp
+ bc0xCGX1yLyTa2z61V3cUU0lve+HadSGvFsc5ALlvHfSqpuu7V1tDAuWKFqnlx/pfRJaxbza1v/
+ O8upXQhuw20efoDc=
+X-Received: by 2002:a7b:cf12:: with SMTP id l18mr6972862wmg.25.1569056252435; 
+ Sat, 21 Sep 2019 01:57:32 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwvCqj3AolWXlUIAvFuAYYQ42T7XXUvMxhvSyZfLpNj9VMFyvt3sdlejPBW8d6YO6zqMCF9UA==
+X-Received: by 2002:a7b:cf12:: with SMTP id l18mr6972852wmg.25.1569056252279; 
+ Sat, 21 Sep 2019 01:57:32 -0700 (PDT)
 Received: from [192.168.1.40] (240.red-88-21-68.staticip.rima-tde.net.
  [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id b15sm4182207wmb.28.2019.09.21.01.54.45
+ by smtp.gmail.com with ESMTPSA id w12sm6411406wrg.47.2019.09.21.01.57.31
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 21 Sep 2019 01:54:45 -0700 (PDT)
-Subject: Re: [PATCH 5/7] target/alpha: Write to fpcr_flush_to_zero once
+ Sat, 21 Sep 2019 01:57:31 -0700 (PDT)
+Subject: Re: [PATCH 7/7] target/alpha: Tidy helper_fp_exc_raise_s
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190921043256.4575-1-richard.henderson@linaro.org>
- <20190921043256.4575-6-richard.henderson@linaro.org>
+ <20190921043256.4575-8-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <ebfe5441-ea3c-5019-7ea1-fd7db578f999@redhat.com>
-Date: Sat, 21 Sep 2019 10:54:45 +0200
+Message-ID: <075b9290-ef5d-89fc-c6a0-481ab1baeac4@redhat.com>
+Date: Sat, 21 Sep 2019 10:57:31 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190921043256.4575-6-richard.henderson@linaro.org>
+In-Reply-To: <20190921043256.4575-8-richard.henderson@linaro.org>
 Content-Language: en-US
-X-MC-Unique: Z8nPyM_sNBWVaKF6ZZK-wA-1
+X-MC-Unique: xDkMP6hpPGC7mk8gAvkplg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -113,42 +113,55 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/21/19 6:32 AM, Richard Henderson wrote:
-> Tidy the computation of the value; no functional change.
+> Remove a redundant masking of ignore.  Once that's gone it is
+> obvious that the system-mode inner test is redundant with the
+> outer test.  Move the fpcr_exc_enable masking up and tidy.
+>=20
+> No functional change.
 >=20
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 > ---
->  target/alpha/helper.c | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
+>  target/alpha/fpu_helper.c | 15 ++++-----------
+>  1 file changed, 4 insertions(+), 11 deletions(-)
 >=20
-> diff --git a/target/alpha/helper.c b/target/alpha/helper.c
-> index 2f959c65ef..1b3479738b 100644
-> --- a/target/alpha/helper.c
-> +++ b/target/alpha/helper.c
-> @@ -69,14 +69,13 @@ void cpu_alpha_store_fpcr(CPUAlphaState *env, uint64_=
-t val)
->      env->fpcr_exc_enable =3D ~t & FPCR_STATUS_MASK;
-> =20
->      env->fpcr_dyn_round =3D rm_map[(fpcr & FPCR_DYN_MASK) >> FPCR_DYN_SH=
-IFT];
-> -
-> -    env->fpcr_flush_to_zero =3D (fpcr & FPCR_UNFD) && (fpcr & FPCR_UNDZ)=
-;
->      env->fp_status.flush_inputs_to_zero =3D (fpcr & FPCR_DNZ) !=3D 0;
-> +
-> +    t =3D (fpcr & FPCR_UNFD) && (fpcr & FPCR_UNDZ);
->  #ifdef CONFIG_USER_ONLY
-> -    if (env->swcr & SWCR_MAP_UMZ) {
-> -        env->fpcr_flush_to_zero =3D 1;
-> -    }
-> +    t |=3D (env->swcr & SWCR_MAP_UMZ) !=3D 0;
+> diff --git a/target/alpha/fpu_helper.c b/target/alpha/fpu_helper.c
+> index 62a066d902..df8b58963b 100644
+> --- a/target/alpha/fpu_helper.c
+> +++ b/target/alpha/fpu_helper.c
+> @@ -90,25 +90,18 @@ void helper_fp_exc_raise_s(CPUAlphaState *env, uint32=
+_t ignore, uint32_t regno)
+>      uint32_t exc =3D env->error_code & ~ignore;
+>      if (exc) {
+>          env->fpcr |=3D exc;
+> -        exc &=3D ~ignore;
+> -#ifdef CONFIG_USER_ONLY
+> -        /*
+> -         * In user mode, the kernel's software handler only
+> -         * delivers a signal if the exception is enabled.
+> -         */
+> -        if (!(exc & env->fpcr_exc_enable)) {
+> -            return;
+> -        }
+> -#else
+> +        exc &=3D env->fpcr_exc_enable;
+>          /*
+>           * In system mode, the software handler gets invoked
+>           * for any non-ignored exception.
+> +         * In user mode, the kernel's software handler only
+> +         * delivers a signal if the exception is enabled.
+>           */
+> +#ifdef CONFIG_USER_ONLY
+>          if (!exc) {
+>              return;
+>          }
 >  #endif
-> +    env->fpcr_flush_to_zero =3D t;
+> -        exc &=3D env->fpcr_exc_enable;
+>          fp_exc_raise1(env, GETPC(), exc, regno, EXC_M_SWC);
+>      }
 >  }
-> =20
->  uint64_t helper_load_fpcr(CPUAlphaState *env)
 >=20
 
 
