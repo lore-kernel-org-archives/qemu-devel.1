@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8436EC4360D
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Sep 2019 02:16:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E041C4360D
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Sep 2019 02:20:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 509ED20820
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Sep 2019 02:16:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5233120820
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Sep 2019 02:20:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FwCIyVms"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 509ED20820
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q7U4GVl2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5233120820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBrQi-0000Ky-QT
-	for qemu-devel@archiver.kernel.org; Sat, 21 Sep 2019 22:16:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34070)
+	id 1iBrUM-0002CF-GU
+	for qemu-devel@archiver.kernel.org; Sat, 21 Sep 2019 22:20:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34360)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bmeng.cn@gmail.com>) id 1iBrPt-0008IS-0x
- for qemu-devel@nongnu.org; Sat, 21 Sep 2019 22:16:02 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1iBrTV-0001Xy-Tv
+ for qemu-devel@nongnu.org; Sat, 21 Sep 2019 22:19:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1iBrPr-0002Lf-ND
- for qemu-devel@nongnu.org; Sat, 21 Sep 2019 22:16:00 -0400
-Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:40537)
+ (envelope-from <bmeng.cn@gmail.com>) id 1iBrTU-0004f0-Jk
+ for qemu-devel@nongnu.org; Sat, 21 Sep 2019 22:19:45 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:43474)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1iBrPr-0002LZ-Gy; Sat, 21 Sep 2019 22:15:59 -0400
-Received: by mail-yb1-xb43.google.com with SMTP id t15so4132136ybg.7;
- Sat, 21 Sep 2019 19:15:59 -0700 (PDT)
+ id 1iBrTU-0004ep-Fc; Sat, 21 Sep 2019 22:19:44 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id m143so4125781ybf.10;
+ Sat, 21 Sep 2019 19:19:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=AM8w3LjGApQcfz+NpJm2Y4h+PzcZPMv96dW0YgWjkVA=;
- b=FwCIyVmsPnyx/9URJC5sjb33ALDbZ1aCOwCq81yc7x4cWwIxrcU8NJhU3/7qvNzK30
- Wz/N584qkjl71AmR+14dcIhxr8YTXxD70c2ktuHZviqIESqHXW1ohL7ZFAeoA9FPTQrT
- dwSoXBibAO9zp65V1jm5u+XJbKwpNFtV6yHtoxdrdQFMcKA4wVXc454PIq3brIH9jAfV
- +L3mUI7UN4M+Vam05t51tTO7jVvr3qy7egCz+GBK7TB7bAy/l3gzcYpsso51QAY0cMD3
- VGIv+m7s3nPu6Ma3E+7VnvPmNCgxIhcn88iW/UMvwnZ8YSfjIyFfv8wCfMJQCxhzZPfM
- hhFQ==
+ :cc; bh=5TXMBFJyTzsMHF0WmjbpGFRjjVz7dsOcEaBtbNDlHQw=;
+ b=q7U4GVl2j7cpZ2+rC7jr7zYzgvT3UTMJJPr5iS3uh7qB5vBC7h/kEx0bEqY+gbJLia
+ 9oo0LPylsyw0/vK0Hkbcjviv8MUV51E4eAe9SqY00QHTLPloongwSppQjz6O1aEsotlq
+ McIIFpjEFt/GVS2Q0+l58MOYLlrVSLLKmNUhKHKjZ1wPCz8KO6e8oDZyMyLuuafHPC3y
+ TYRih4wIlYDzjFXhAlomlJywdu1P8YRbV3abAs6HfPjv5P4hQRGsFn/27N6bcsu1GxBR
+ BuONyfj70QE4J/Ighc6omrmSUrmJOlmBahPA/mUe1Olmw94MdO7ixppWQt5/DKF5KUNC
+ s2Dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=AM8w3LjGApQcfz+NpJm2Y4h+PzcZPMv96dW0YgWjkVA=;
- b=SfKweCYhI6dLIL5HRWvi53rysJTIPc2sUXLESVlAtuEi8sAGVtFCPN3fV0qoNgXFkC
- eOOcw+Rxd4O5aKybSUA94DcYs6v7sWoFLg1/41cdT4UTZSeanfnB6mNhypuT0AZYJw1s
- TBD7AlQrGK8f/RDnHXi6YNn4P76cSCgunZHY8Qa3mMD7YBze3nVhtZ2ecSO8ntAJ0RwD
- N4KNqKwePjhBzd0oowDN9VLWKQy7y8tfhwmp1AQs2DGiy2sS1OYEmF5YwdgBfbHIGsKf
- AWG5z097PQYGSJzAgW/+Gfnzv3SuVKPzqPhjLf0um99qslBlbwncg6jhyBP0h4xQF8uO
- kr6w==
-X-Gm-Message-State: APjAAAX6GoR7WbP49apvUoz/01Ak4hjnI3bQdoGM4Tq8F8M8JzOptFa+
- 7cvcfiAR0poq8BgcFVWcEDu0GjHo/PKejzvzAQY=
-X-Google-Smtp-Source: APXvYqwQBSMtazlqFj2eiaEJqe7kcfs18gXyPM0kz4JE+zyR4IItdTZmTlZ7MXd4RIfVBJSNZrQkeAK2heac96Y0EKg=
-X-Received: by 2002:a25:9b85:: with SMTP id v5mr3385816ybo.65.1569118558803;
- Sat, 21 Sep 2019 19:15:58 -0700 (PDT)
+ bh=5TXMBFJyTzsMHF0WmjbpGFRjjVz7dsOcEaBtbNDlHQw=;
+ b=GKfpMiezuAgZkwgt6LwoGSj/u4gjgJBW1TUUUealpts/oOAHCG2PpzQeLXsez1mBoZ
+ AGkNcmjynEiUtUR+rMROvPe8iLHYI0SYts/F6TwvOsU6XNAGZoPK3wLGqmEkSlPgiRDw
+ 5h3AbuppFtqtaqWYe/RAVBFTTbwCqij4K7J/ZHmG3D34nulcCHI9qP4honxnx7JhYjbd
+ 2qUG9kuFWkdOJPqMQwAnqIO2w8diYIHx61q8pTfudzaHgmGKxyIbJfNDxS22lBM0xB4g
+ FFp51o4mXWq7nD4f53JzaKWdPXSWCCyP1wUlRxujf016Rb3waD00EmCdCWcLsj9bJZOa
+ lhYQ==
+X-Gm-Message-State: APjAAAVJg64dRDGEB+xwlcG21uPl569c5yAPq75e2l/KnCw3Nw92l5MM
+ T4q/uHWTXhbkcU1Yfy1n3lwYEenerTskjc05/cA=
+X-Google-Smtp-Source: APXvYqwVyG8B4L2MebuuuePpAScnJP2syqKiTeDv7GdkZ/SSZAML5L+QJLV6RAfk1KlpP8+Jv0aoQibUy9/StBjy8WM=
+X-Received: by 2002:a25:b911:: with SMTP id x17mr15163142ybj.29.1569118783462; 
+ Sat, 21 Sep 2019 19:19:43 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1568931866.git.alistair.francis@wdc.com>
- <0a5c141a26fada6d93d06e996a2f24e1b269ec50.1568931866.git.alistair.francis@wdc.com>
- <CAEUhbmVvDKQqQYE-riq=cvSrCe_NMoW_KDsLjh8CVHRUhJvk9A@mail.gmail.com>
- <CAKmqyKOofA3U+8kjMkzQ0sNd1=uwJHq3c9eaLZdoNCb7=e-PAw@mail.gmail.com>
-In-Reply-To: <CAKmqyKOofA3U+8kjMkzQ0sNd1=uwJHq3c9eaLZdoNCb7=e-PAw@mail.gmail.com>
+ <d3357e0b87cce025418f6383ce971246ded547bd.1568931866.git.alistair.francis@wdc.com>
+ <CAEUhbmV7Ao6L25HM+8AJLP8unn=HhvdRc1Kt+tUQgRB4S4zsBQ@mail.gmail.com>
+ <CAKmqyKO=PahfKej1Ch6=x3zcxN8R26Gkd9dsjScMSHPxitp=rA@mail.gmail.com>
+In-Reply-To: <CAKmqyKO=PahfKej1Ch6=x3zcxN8R26Gkd9dsjScMSHPxitp=rA@mail.gmail.com>
 From: Bin Meng <bmeng.cn@gmail.com>
-Date: Sun, 22 Sep 2019 10:15:46 +0800
-Message-ID: <CAEUhbmWu_OTGmUBTcMg9uvm36-fDQheSSiwH5mjnokJSrLvoBA@mail.gmail.com>
-Subject: Re: [PATCH v1 5/6] riscv/virt: Add the PFlash CFI01 device
+Date: Sun, 22 Sep 2019 10:19:31 +0800
+Message-ID: <CAEUhbmVO=POsb+Jpy12w=WD-vLM9Km0YrryaGYc1PLYdSzka5A@mail.gmail.com>
+Subject: Re: [PATCH v1 4/6] riscv/sifive_u: Add the start-in-flash property
 To: Alistair Francis <alistair23@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::b43
+X-Received-From: 2607:f8b0:4864:20::b42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,106 +96,114 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Sep 21, 2019 at 6:16 AM Alistair Francis <alistair23@gmail.com> wrote:
+On Sat, Sep 21, 2019 at 6:12 AM Alistair Francis <alistair23@gmail.com> wrote:
 >
 > On Thu, Sep 19, 2019 at 10:15 PM Bin Meng <bmeng.cn@gmail.com> wrote:
 > >
-> > On Fri, Sep 20, 2019 at 6:36 AM Alistair Francis
+> > On Fri, Sep 20, 2019 at 6:32 AM Alistair Francis
 > > <alistair.francis@wdc.com> wrote:
 > > >
-> > > Add the CFI01 PFlash to the RISC-V virt board. This is the same PFlash
-> > > from the ARM Virt board and the implementation is based on the ARM Virt
-> > > board. This allows users to specify flash files from the command line.
+> > > Add a property that when set to true QEMU will jump from the ROM code to
+> > > the start of flash memory instead of DRAM which is the default
+> > > behaviour.
 > > >
 > > > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > > > ---
-> > >  hw/riscv/Kconfig        |  1 +
-> > >  hw/riscv/virt.c         | 81 +++++++++++++++++++++++++++++++++++++++++
-> > >  include/hw/riscv/virt.h |  3 ++
-> > >  3 files changed, 85 insertions(+)
+> > >  hw/riscv/sifive_u.c         | 27 +++++++++++++++++++++++++++
+> > >  include/hw/riscv/sifive_u.h |  2 ++
+> > >  2 files changed, 29 insertions(+)
 > > >
-> > > diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
-> > > index fb19b2df3a..b12660b9f8 100644
-> > > --- a/hw/riscv/Kconfig
-> > > +++ b/hw/riscv/Kconfig
-> > > @@ -36,4 +36,5 @@ config RISCV_VIRT
-> > >      select SERIAL
-> > >      select VIRTIO_MMIO
-> > >      select PCI_EXPRESS_GENERIC_BRIDGE
-> > > +    select PFLASH_CFI01
-> > >      select SIFIVE
-> > > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> > > index d36f5625ec..ca002ecea7 100644
-> > > --- a/hw/riscv/virt.c
-> > > +++ b/hw/riscv/virt.c
-> > > @@ -26,6 +26,7 @@
-> > >  #include "hw/boards.h"
-> > >  #include "hw/loader.h"
-> > >  #include "hw/sysbus.h"
-> > > +#include "hw/qdev-properties.h"
-> > >  #include "hw/char/serial.h"
-> > >  #include "target/riscv/cpu.h"
-> > >  #include "hw/riscv/riscv_hart.h"
-> > > @@ -61,12 +62,72 @@ static const struct MemmapEntry {
-> > >      [VIRT_PLIC] =        {  0xc000000,     0x4000000 },
-> > >      [VIRT_UART0] =       { 0x10000000,         0x100 },
-> > >      [VIRT_VIRTIO] =      { 0x10001000,        0x1000 },
-> > > +    [VIRT_FLASH] =       { 0x20000000,     0x2000000 },
-> > >      [VIRT_DRAM] =        { 0x80000000,           0x0 },
-> > >      [VIRT_PCIE_MMIO] =   { 0x40000000,    0x40000000 },
-> > >      [VIRT_PCIE_PIO] =    { 0x03000000,    0x00010000 },
-> > >      [VIRT_PCIE_ECAM] =   { 0x30000000,    0x10000000 },
-> > >  };
+> > > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> > > index c3949fb316..b7cd3631cd 100644
+> > > --- a/hw/riscv/sifive_u.c
+> > > +++ b/hw/riscv/sifive_u.c
+> > > @@ -373,6 +373,10 @@ static void riscv_sifive_u_init(MachineState *machine)
+> > >                                         /* dtb: */
+> > >      };
 > > >
-> > > +#define VIRT_FLASH_SECTOR_SIZE (256 * KiB)
+> > > +    if (s->start_in_flash) {
+> > > +        reset_vec[6] = memmap[SIFIVE_U_FLASH0].base; /* start: .dword FLASH0_BASE */
+> > > +    }
 > > > +
-> > > +static PFlashCFI01 *virt_flash_create1(RISCVVirtState *s,
-> > > +                                       const char *name,
-> > > +                                       const char *alias_prop_name)
+> > >      /* copy in the reset vector in little_endian byte order */
+> > >      for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+> > >          reset_vec[i] = cpu_to_le32(reset_vec[i]);
+> > > @@ -544,8 +548,31 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+> > >          memmap[SIFIVE_U_GEM_MGMT].base, memmap[SIFIVE_U_GEM_MGMT].size);
+> > >  }
+> > >
+> > > +static bool virt_get_start_in_flash(Object *obj, Error **errp)
 > > > +{
-> > > +    /*
-> > > +     * Create a single flash device.  We use the same parameters as
-> > > +     * the flash devices on the ARM virt board.
-> > > +     */
-> > > +    DeviceState *dev = qdev_create(NULL, TYPE_PFLASH_CFI01);
+> > > +    SiFiveUState *s = RISCV_U_MACHINE(obj);
 > > > +
-> > > +    qdev_prop_set_uint64(dev, "sector-length", VIRT_FLASH_SECTOR_SIZE);
-> > > +    qdev_prop_set_uint8(dev, "width", 4);
-> > > +    qdev_prop_set_uint8(dev, "device-width", 2);
-> > > +    qdev_prop_set_bit(dev, "big-endian", false);
-> > > +    qdev_prop_set_uint16(dev, "id0", 0x89);
-> > > +    qdev_prop_set_uint16(dev, "id1", 0x18);
-> > > +    qdev_prop_set_uint16(dev, "id2", 0x00);
-> > > +    qdev_prop_set_uint16(dev, "id3", 0x00);
-> > > +    qdev_prop_set_string(dev, "name", name);
-> >
-> > alias_prop_name is unused? ARM virt has 2 more calls in the same function here.
->
-> Yep, you are right. I have removed this.
-
-Any reason of removing this?
-
->
-> >
-> > > +
-> > > +    return PFLASH_CFI01(dev);
+> > > +    return s->start_in_flash;
 > > > +}
 > > > +
-> > > +static void virt_flash_create(RISCVVirtState *s)
+> > > +static void virt_set_start_in_flash(Object *obj, bool value, Error **errp)
 > > > +{
-> > > +    s->flash[0] = virt_flash_create1(s, "virt.flash0", "pflash0");
-> > > +    s->flash[1] = virt_flash_create1(s, "virt.flash1", "pflash1");
+> > > +    SiFiveUState *s = RISCV_U_MACHINE(obj);
+> > > +
+> > > +    s->start_in_flash = value;
+> > > +}
+> > > +
+> > >  static void riscv_sifive_u_machine_instance_init(Object *obj)
+> > >  {
+> > > +    SiFiveUState *s = RISCV_U_MACHINE(obj);
+> > > +
+> > > +    s->start_in_flash = false;
+> > > +    object_property_add_bool(obj, "start-in-flash", virt_get_start_in_flash,
+> > > +                             virt_set_start_in_flash, NULL);
+> > > +    object_property_set_description(obj, "start-in-flash",
+> > > +                                    "Set on to tell QEMU's ROM to jump to " \
+> > > +                                    "flash. Otherwise QEMU will jump to DRAM",
+> > > +                                    NULL);
+> > >
+> > >  }
+> > >
+> > > diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+> > > index a921079fbe..2656b43c58 100644
+> > > --- a/include/hw/riscv/sifive_u.h
+> > > +++ b/include/hw/riscv/sifive_u.h
+> > > @@ -57,6 +57,8 @@ typedef struct SiFiveUState {
+> > >
+> > >      void *fdt;
+> > >      int fdt_size;
+> > > +
+> > > +    bool start_in_flash;
+> > >  } SiFiveUState;
+> > >
+> > >  enum {
 > >
-> > I don't think we should mirror what is used on ARM virt board to
-> > create 2 flash for sifive_u. For ARM virt, there are 2 flashes because
-> > they need distinguish secure and non-secure. For sifive_u, only one is
-> > enough.
+> > This patch chose a different way from the one used in patch "[v1,6/6]
+> > riscv/virt: Jump to pflash if specified":
+> >
+> > - this patch uses reset_vec[6] while patch [6/6] defines a variable start_addr
+> > - this patch adds a "start-in-flash" property to the machine, while
+> > patch [6/6] tests against drive IF_PFLASH
 >
-> I went back and forward about 1 or 2. Two seems more usable as maybe
-> someone wants to include two pflash files? The Xilinx machine also has
-> two so I'm kind of used to 2, but I'm not really fussed.
+> Yes, we do it differently for the sifive_u board as the sifive_u board
+> doesn't use pflash so there is no way to know if the user has loaded
+> anything into the SPI memory.
 >
-> Unless anyone else wants two I will change it to 1.
+
+OK.
+
+> >
+> > We should be consistent and I would prefer to use the patch [6/6] way.
+> > On Unleashed an SPI flash is mounted so we cannot add a PFlash to
+> > sifive_u machine like what was done on virt machine, so we should test
+> > IF_MTD instead. Thoughts?
+>
+> How would we test that?
+>
+> Right now I am loading the binary in SPI with the -device loader
+> option. The machine can't really know what is/isn't loaded there.
+>
+> It's not ideal, but I don't see a nicer way.
+
+I think we need write a SiFive SPI model to support this in a clean
+way. Ideally we should simulate the hardware boot workflow as
+documented in the FU540 manual chapter 6 "Boot Process".
 
 Regards,
 Bin
