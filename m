@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64FDEC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Sep 2019 04:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9100EC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Sep 2019 04:09:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3311720673
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Sep 2019 04:07:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4874B20673
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Sep 2019 04:09:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X9smUx9k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3311720673
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B6s6BW4W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4874B20673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iBt9p-0004UI-4B
-	for qemu-devel@archiver.kernel.org; Sun, 22 Sep 2019 00:07:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40891)
+	id 1iBtBv-00072r-3Y
+	for qemu-devel@archiver.kernel.org; Sun, 22 Sep 2019 00:09:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40955)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iBsxx-0001gd-VL
- for qemu-devel@nongnu.org; Sat, 21 Sep 2019 23:55:19 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iBsy3-0001qm-Uq
+ for qemu-devel@nongnu.org; Sat, 21 Sep 2019 23:55:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iBsxw-0008GQ-6C
- for qemu-devel@nongnu.org; Sat, 21 Sep 2019 23:55:17 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:36457)
+ (envelope-from <richard.henderson@linaro.org>) id 1iBsy1-0008JG-GW
+ for qemu-devel@nongnu.org; Sat, 21 Sep 2019 23:55:23 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:34347)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iBsxv-0008G4-V3
- for qemu-devel@nongnu.org; Sat, 21 Sep 2019 23:55:16 -0400
-Received: by mail-pg1-x544.google.com with SMTP id h17so3457796pgb.3
- for <qemu-devel@nongnu.org>; Sat, 21 Sep 2019 20:55:15 -0700 (PDT)
+ id 1iBsy1-0008Ip-7K
+ for qemu-devel@nongnu.org; Sat, 21 Sep 2019 23:55:21 -0400
+Received: by mail-pf1-x441.google.com with SMTP id b128so7003212pfa.1
+ for <qemu-devel@nongnu.org>; Sat, 21 Sep 2019 20:55:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=dpN/rK4KxftzjyqayID53P95kBVBbhlVooKl6DB2vE0=;
- b=X9smUx9k0xG6l1/ESGihAGGwsL7wG9kHAlKQerk6LIqJOJhr3/sRgvl/wwoiEKBSHu
- ACdzgQk+TqHAn0pgQohUJUJ0vkpQZaK/O9/OuO/JX8yQYdlWyllpsd9viGAUjsNpJ7zf
- JVOZur0sbBgKBVqpVVg5xO1BymhBS96DNg34RgczJ/PtY/uGjOH7M6nCvanKOmzZEPZg
- vjG9gsUapw7Ph10KlWeJRwDBM6TeUsGXH7NoAeOv14fIrF1RmT8HQly+gf0hPhB9Jnzl
- mxBMmZAvCGVSdbyrqlPxMS1Lj+AjuVgGTsqYSmQoDLEItx/5LEnMxZuyTMXpFraJ3FSk
- /Dkw==
+ bh=49dRujykpdSXqDpMsXZ6b2BPb+ubAPTXZdHimZ2XaMo=;
+ b=B6s6BW4WpagI+Iinjvq0hstwAHHDof3ua6qMfrz3QIHwv5KiIafB0vyc2gD/9AQaA8
+ H47qXXMloGakgK5QH6B/d8/R9NJE18SPOgJS/LSayRX4Inr/JvS9L+GtB9SVmtlp+R+z
+ AMPL8nvWTeZk1/pkNbFsb77TtQSymODuz2q1U1KJLWWGhsw05CW74Td6/vJdrr7Fc5Ig
+ WCI/jLyWG0fhwG8C5LsiGK/h+bXwueRkDWCQTSwFhD5IlWTX9CLOwa3lRF2H4CiQNi1k
+ QFmQv7UceEO6nrnNZFcagBRD48YksUi3q0ubmzbLGPU5oQh4JJFwQ8g/+JS/IBr9e1Pl
+ pQ2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=dpN/rK4KxftzjyqayID53P95kBVBbhlVooKl6DB2vE0=;
- b=cfRuDUF755ndVwHSgFCxtA9cyx0e2xv4pX1NtoBq7vU2S3gH48716BbBUSZuWVC+vJ
- fp6sRhEIDb0c91TFfOFAFZdLBnSe80aGnDqXQZziDA2tLiLcPgru/zxyNehVf/AZD+qu
- UfQxQpASl++2LTP+/UA7mrThmMZ+zcBpXXyrGicXoWckqKC11CjO0cBlVhnbKjK0sSId
- Neik4y+apsrH3NMoWLsujWZpFkfO6We0F4J+BiIDsXEFd9oSLkhwgCVIMPuC99ULilI8
- GkSgIUg9VmOux3swB1F0+eS7VeCGEPTb4K2xnJKvEZvOXvoVwpmUijL4eqrQEZc6hXHN
- RE3A==
-X-Gm-Message-State: APjAAAXucC/CnwMAK+qinKVsKKEcIjWVgYF2zbmXFLaxSCVS00hLACYH
- ZVPVbPh4ACGivfNZLESDO0j9I1DkUzU=
-X-Google-Smtp-Source: APXvYqxm6KLawvZ0wTuK7gtyK7AkNmT2PfnUGKG2UxINQ6KBd9ngjUNGnML3aH3cE7XyHpbqs3mcbQ==
-X-Received: by 2002:a62:7597:: with SMTP id
- q145mr25728808pfc.181.1569124514706; 
- Sat, 21 Sep 2019 20:55:14 -0700 (PDT)
+ bh=49dRujykpdSXqDpMsXZ6b2BPb+ubAPTXZdHimZ2XaMo=;
+ b=KKLhfbnc1lzsHc+w7PzkD8dqEDfTUds24+POmwGmUobV8pwIU6Kn1NC1kV3yP34pCA
+ JKOMqhtvirViJ7hrExKZwC9psWBkHuwoAFtj9OWs4fQiLE+bgK6Y+ZuGcpwCRGTuNODF
+ 1j4a3TRR6X3Yr4zN2EhNOa16nMrjWHB5acZeV/j+9cYt5IVxXb6ZtpRRzk0N9UkDLrhy
+ wWUgD5a0jD/pI8L+/jL0nsnLxh85co8hmfDsKEv16U0fsVflzQK1Qd+d0TQN8U15G8MR
+ WY9rJCAwdr9F9qKQE0xbPEXM5PlIzDtohanBfatOzmjfJcqpnQKwa/IVK5I1LK6Utb2g
+ 1Mrg==
+X-Gm-Message-State: APjAAAVqIxeQt7XaewoMzXAQteK27uR0s8NoFprrieMORkoMkjevqGpw
+ joGrTZ+5hZr36uIoH/WDTjPk09AWdHM=
+X-Google-Smtp-Source: APXvYqwNLW8esnopzsXANGX7MliCzhNlwb4zFgKUSg7BTSoAyVgkQTVliYJLRUo5vPV3IX/jHBJuaQ==
+X-Received: by 2002:a63:6193:: with SMTP id
+ v141mr23476545pgb.263.1569124519791; 
+ Sat, 21 Sep 2019 20:55:19 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id z4sm6452921pjt.17.2019.09.21.20.55.13
+ by smtp.gmail.com with ESMTPSA id z4sm6452921pjt.17.2019.09.21.20.55.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 21 Sep 2019 20:55:14 -0700 (PDT)
+ Sat, 21 Sep 2019 20:55:18 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 11/20] exec: Adjust notdirty tracing
-Date: Sat, 21 Sep 2019 20:54:49 -0700
-Message-Id: <20190922035458.14879-12-richard.henderson@linaro.org>
+Subject: [PATCH v3 15/20] cputlb: Merge and move
+ memory_notdirty_write_{prepare, complete}
+Date: Sat, 21 Sep 2019 20:54:53 -0700
+Message-Id: <20190922035458.14879-16-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190922035458.14879-1-richard.henderson@linaro.org>
 References: <20190922035458.14879-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::544
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,102 +98,290 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The memory_region_tb_read tracepoint is unreachable, since notdirty
-is supposed to apply only to writes.  The memory_region_tb_write
-tracepoint is mis-named, because notdirty is not only used for TB
-invalidation.  It is also used for e.g. VGA RAM updates and migration.
+Since 9458a9a1df1a, all readers of the dirty bitmaps wait
+for the rcu lock, which means that they wait until the end
+of any executing TranslationBlock.
 
-Replace memory_region_tb_write with memory_notdirty_write_access,
-and place it in memory_notdirty_write_prepare where it can catch
-all of the instances.  Add memory_notdirty_set_dirty to log when
-we no longer intercept writes to a page.
+As a consequence, there is no need for the actual access
+to happen in between the _prepare and _complete.  Therefore,
+we can improve things by merging the two functions into
+notdirty_write and dropping the NotDirtyInfo structure.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+In addition, the only users of notdirty_write are in cputlb.c,
+so move the merged function there.  Pass in the CPUIOTLBEntry
+from which the ram_addr_t may be computed.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- exec.c       | 3 +++
- memory.c     | 4 ----
- trace-events | 4 ++--
- 3 files changed, 5 insertions(+), 6 deletions(-)
+ include/exec/memory-internal.h | 65 -----------------------------
+ accel/tcg/cputlb.c             | 76 +++++++++++++++++++---------------
+ exec.c                         | 44 --------------------
+ 3 files changed, 42 insertions(+), 143 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 33bd0e36c1..7ce0515635 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2721,6 +2721,8 @@ void memory_notdirty_write_prepare(NotDirtyInfo *ndi,
-     ndi->size = size;
-     ndi->pages = NULL;
+diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
+index ef4fb92371..9fcc2af25c 100644
+--- a/include/exec/memory-internal.h
++++ b/include/exec/memory-internal.h
+@@ -49,70 +49,5 @@ void address_space_dispatch_free(AddressSpaceDispatch *d);
  
+ void mtree_print_dispatch(struct AddressSpaceDispatch *d,
+                           MemoryRegion *root);
+-
+-struct page_collection;
+-
+-/* Opaque struct for passing info from memory_notdirty_write_prepare()
+- * to memory_notdirty_write_complete(). Callers should treat all fields
+- * as private, with the exception of @active.
+- *
+- * @active is a field which is not touched by either the prepare or
+- * complete functions, but which the caller can use if it wishes to
+- * track whether it has called prepare for this struct and so needs
+- * to later call the complete function.
+- */
+-typedef struct {
+-    CPUState *cpu;
+-    struct page_collection *pages;
+-    ram_addr_t ram_addr;
+-    vaddr mem_vaddr;
+-    unsigned size;
+-    bool active;
+-} NotDirtyInfo;
+-
+-/**
+- * memory_notdirty_write_prepare: call before writing to non-dirty memory
+- * @ndi: pointer to opaque NotDirtyInfo struct
+- * @cpu: CPU doing the write
+- * @mem_vaddr: virtual address of write
+- * @ram_addr: the ram address of the write
+- * @size: size of write in bytes
+- *
+- * Any code which writes to the host memory corresponding to
+- * guest RAM which has been marked as NOTDIRTY must wrap those
+- * writes in calls to memory_notdirty_write_prepare() and
+- * memory_notdirty_write_complete():
+- *
+- *  NotDirtyInfo ndi;
+- *  memory_notdirty_write_prepare(&ndi, ....);
+- *  ... perform write here ...
+- *  memory_notdirty_write_complete(&ndi);
+- *
+- * These calls will ensure that we flush any TCG translated code for
+- * the memory being written, update the dirty bits and (if possible)
+- * remove the slowpath callback for writing to the memory.
+- *
+- * This must only be called if we are using TCG; it will assert otherwise.
+- *
+- * We may take locks in the prepare call, so callers must ensure that
+- * they don't exit (via longjump or otherwise) without calling complete.
+- *
+- * This call must only be made inside an RCU critical section.
+- * (Note that while we're executing a TCG TB we're always in an
+- * RCU critical section, which is likely to be the case for callers
+- * of these functions.)
+- */
+-void memory_notdirty_write_prepare(NotDirtyInfo *ndi,
+-                                   CPUState *cpu,
+-                                   vaddr mem_vaddr,
+-                                   ram_addr_t ram_addr,
+-                                   unsigned size);
+-/**
+- * memory_notdirty_write_complete: finish write to non-dirty memory
+- * @ndi: pointer to the opaque NotDirtyInfo struct which was initialized
+- * by memory_not_dirty_write_prepare().
+- */
+-void memory_notdirty_write_complete(NotDirtyInfo *ndi);
+-
+ #endif
+ #endif
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index 1a839c0f82..6f685cb93a 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -33,6 +33,7 @@
+ #include "exec/helper-proto.h"
+ #include "qemu/atomic.h"
+ #include "qemu/atomic128.h"
++#include "translate-all.h"
+ 
+ /* DEBUG defines, enable DEBUG_TLB_LOG to log to the CPU_LOG_MMU target */
+ /* #define DEBUG_TLB */
+@@ -1084,6 +1085,37 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
+     return qemu_ram_addr_from_host_nofail(p);
+ }
+ 
++static void notdirty_write(CPUState *cpu, vaddr mem_vaddr, unsigned size,
++                           CPUIOTLBEntry *iotlbentry, uintptr_t retaddr)
++{
++    ram_addr_t ram_addr = mem_vaddr + iotlbentry->addr;
++
 +    trace_memory_notdirty_write_access(mem_vaddr, ram_addr, size);
 +
-     assert(tcg_enabled());
-     if (!cpu_physical_memory_get_dirty_flag(ram_addr, DIRTY_MEMORY_CODE)) {
-         ndi->pages = page_collection_lock(ram_addr, ram_addr + size);
-@@ -2745,6 +2747,7 @@ void memory_notdirty_write_complete(NotDirtyInfo *ndi)
-     /* we remove the notdirty callback only if the code has been
-        flushed */
-     if (!cpu_physical_memory_is_clean(ndi->ram_addr)) {
-+        trace_memory_notdirty_set_dirty(ndi->mem_vaddr);
-         tlb_set_dirty(ndi->cpu, ndi->mem_vaddr);
-     }
- }
-diff --git a/memory.c b/memory.c
-index b9dd6b94ca..57c44c97db 100644
---- a/memory.c
-+++ b/memory.c
-@@ -438,7 +438,6 @@ static MemTxResult  memory_region_read_accessor(MemoryRegion *mr,
-         /* Accesses to code which has previously been translated into a TB show
-          * up in the MMIO path, as accesses to the io_mem_notdirty
-          * MemoryRegion. */
--        trace_memory_region_tb_read(get_cpu_index(), addr, tmp, size);
-     } else if (TRACE_MEMORY_REGION_OPS_READ_ENABLED) {
-         hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
-         trace_memory_region_ops_read(get_cpu_index(), mr, abs_addr, tmp, size);
-@@ -465,7 +464,6 @@ static MemTxResult memory_region_read_with_attrs_accessor(MemoryRegion *mr,
-         /* Accesses to code which has previously been translated into a TB show
-          * up in the MMIO path, as accesses to the io_mem_notdirty
-          * MemoryRegion. */
--        trace_memory_region_tb_read(get_cpu_index(), addr, tmp, size);
-     } else if (TRACE_MEMORY_REGION_OPS_READ_ENABLED) {
-         hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
-         trace_memory_region_ops_read(get_cpu_index(), mr, abs_addr, tmp, size);
-@@ -490,7 +488,6 @@ static MemTxResult memory_region_write_accessor(MemoryRegion *mr,
-         /* Accesses to code which has previously been translated into a TB show
-          * up in the MMIO path, as accesses to the io_mem_notdirty
-          * MemoryRegion. */
--        trace_memory_region_tb_write(get_cpu_index(), addr, tmp, size);
-     } else if (TRACE_MEMORY_REGION_OPS_WRITE_ENABLED) {
-         hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
-         trace_memory_region_ops_write(get_cpu_index(), mr, abs_addr, tmp, size);
-@@ -515,7 +512,6 @@ static MemTxResult memory_region_write_with_attrs_accessor(MemoryRegion *mr,
-         /* Accesses to code which has previously been translated into a TB show
-          * up in the MMIO path, as accesses to the io_mem_notdirty
-          * MemoryRegion. */
--        trace_memory_region_tb_write(get_cpu_index(), addr, tmp, size);
-     } else if (TRACE_MEMORY_REGION_OPS_WRITE_ENABLED) {
-         hwaddr abs_addr = memory_region_to_absolute_addr(mr, addr);
-         trace_memory_region_ops_write(get_cpu_index(), mr, abs_addr, tmp, size);
-diff --git a/trace-events b/trace-events
-index 823a4ae64e..20821ba545 100644
---- a/trace-events
-+++ b/trace-events
-@@ -52,14 +52,14 @@ dma_map_wait(void *dbs) "dbs=%p"
- find_ram_offset(uint64_t size, uint64_t offset) "size: 0x%" PRIx64 " @ 0x%" PRIx64
- find_ram_offset_loop(uint64_t size, uint64_t candidate, uint64_t offset, uint64_t next, uint64_t mingap) "trying size: 0x%" PRIx64 " @ 0x%" PRIx64 ", offset: 0x%" PRIx64" next: 0x%" PRIx64 " mingap: 0x%" PRIx64
- ram_block_discard_range(const char *rbname, void *hva, size_t length, bool need_madvise, bool need_fallocate, int ret) "%s@%p + 0x%zx: madvise: %d fallocate: %d ret: %d"
-+memory_notdirty_write_access(uint64_t vaddr, uint64_t ram_addr, unsigned size) "0x%" PRIx64 " ram_addr 0x%" PRIx64 " size %u"
-+memory_notdirty_set_dirty(uint64_t vaddr) "0x%" PRIx64
++    if (!cpu_physical_memory_get_dirty_flag(ram_addr, DIRTY_MEMORY_CODE)) {
++        struct page_collection *pages
++            = page_collection_lock(ram_addr, ram_addr + size);
++
++        /* We require mem_io_pc in tb_invalidate_phys_page_range.  */
++        cpu->mem_io_pc = retaddr;
++
++        tb_invalidate_phys_page_fast(pages, ram_addr, size);
++        page_collection_unlock(pages);
++    }
++
++    /*
++     * Set both VGA and migration bits for simplicity and to remove
++     * the notdirty callback faster.
++     */
++    cpu_physical_memory_set_dirty_range(ram_addr, size, DIRTY_CLIENTS_NOCODE);
++
++    /* We remove the notdirty callback only if the code has been flushed. */
++    if (!cpu_physical_memory_is_clean(ram_addr)) {
++        trace_memory_notdirty_set_dirty(mem_vaddr);
++        tlb_set_dirty(cpu, mem_vaddr);
++    }
++}
++
+ /*
+  * Probe for whether the specified guest access is permitted. If it is not
+  * permitted then an exception will be taken in the same way as if this
+@@ -1203,8 +1235,7 @@ void *tlb_vaddr_to_host(CPUArchState *env, abi_ptr addr,
+ /* Probe for a read-modify-write atomic operation.  Do not allow unaligned
+  * operations, or io operations to proceed.  Return the host address.  */
+ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+-                               TCGMemOpIdx oi, uintptr_t retaddr,
+-                               NotDirtyInfo *ndi)
++                               TCGMemOpIdx oi, uintptr_t retaddr)
+ {
+     size_t mmu_idx = get_mmuidx(oi);
+     uintptr_t index = tlb_index(env, mmu_idx, addr);
+@@ -1264,12 +1295,9 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
  
- # memory.c
- memory_region_ops_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
- memory_region_ops_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
- memory_region_subpage_read(int cpu_index, void *mr, uint64_t offset, uint64_t value, unsigned size) "cpu %d mr %p offset 0x%"PRIx64" value 0x%"PRIx64" size %u"
- memory_region_subpage_write(int cpu_index, void *mr, uint64_t offset, uint64_t value, unsigned size) "cpu %d mr %p offset 0x%"PRIx64" value 0x%"PRIx64" size %u"
--memory_region_tb_read(int cpu_index, uint64_t addr, uint64_t value, unsigned size) "cpu %d addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
--memory_region_tb_write(int cpu_index, uint64_t addr, uint64_t value, unsigned size) "cpu %d addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
- memory_region_ram_device_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
- memory_region_ram_device_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
- flatview_new(void *view, void *root) "%p (root %p)"
+     hostaddr = (void *)((uintptr_t)addr + tlbe->addend);
+ 
+-    ndi->active = false;
+     if (unlikely(tlb_addr & TLB_NOTDIRTY)) {
+-        ndi->active = true;
+-        memory_notdirty_write_prepare(ndi, env_cpu(env), addr,
+-                                      qemu_ram_addr_from_host_nofail(hostaddr),
+-                                      1 << s_bits);
++        notdirty_write(env_cpu(env), addr, 1 << s_bits,
++                       &env_tlb(env)->d[mmu_idx].iotlb[index], retaddr);
+     }
+ 
+     return hostaddr;
+@@ -1635,28 +1663,13 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
+             return;
+         }
+ 
+-        haddr = (void *)((uintptr_t)addr + entry->addend);
+-
+         /* Handle clean RAM pages.  */
+         if (tlb_addr & TLB_NOTDIRTY) {
+-            NotDirtyInfo ndi;
+-
+-            /* We require mem_io_pc in tb_invalidate_phys_page_range.  */
+-            env_cpu(env)->mem_io_pc = retaddr;
+-
+-            memory_notdirty_write_prepare(&ndi, env_cpu(env), addr,
+-                                          addr + iotlbentry->addr, size);
+-
+-            if (unlikely(tlb_addr & TLB_BSWAP)) {
+-                direct_swap(haddr, val);
+-            } else {
+-                direct(haddr, val);
+-            }
+-
+-            memory_notdirty_write_complete(&ndi);
+-            return;
++            notdirty_write(env_cpu(env), addr, size, iotlbentry, retaddr);
+         }
+ 
++        haddr = (void *)((uintptr_t)addr + entry->addend);
++
+         if (unlikely(tlb_addr & TLB_BSWAP)) {
+             direct_swap(haddr, val);
+         } else {
+@@ -1786,14 +1799,9 @@ void helper_be_stq_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
+ #define EXTRA_ARGS     , TCGMemOpIdx oi, uintptr_t retaddr
+ #define ATOMIC_NAME(X) \
+     HELPER(glue(glue(glue(atomic_ ## X, SUFFIX), END), _mmu))
+-#define ATOMIC_MMU_DECLS NotDirtyInfo ndi
+-#define ATOMIC_MMU_LOOKUP atomic_mmu_lookup(env, addr, oi, retaddr, &ndi)
+-#define ATOMIC_MMU_CLEANUP                              \
+-    do {                                                \
+-        if (unlikely(ndi.active)) {                     \
+-            memory_notdirty_write_complete(&ndi);       \
+-        }                                               \
+-    } while (0)
++#define ATOMIC_MMU_DECLS
++#define ATOMIC_MMU_LOOKUP atomic_mmu_lookup(env, addr, oi, retaddr)
++#define ATOMIC_MMU_CLEANUP
+ 
+ #define DATA_SIZE 1
+ #include "atomic_template.h"
+@@ -1821,7 +1829,7 @@ void helper_be_stq_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
+ #undef ATOMIC_MMU_LOOKUP
+ #define EXTRA_ARGS         , TCGMemOpIdx oi
+ #define ATOMIC_NAME(X)     HELPER(glue(glue(atomic_ ## X, SUFFIX), END))
+-#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, oi, GETPC(), &ndi)
++#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, oi, GETPC())
+ 
+ #define DATA_SIZE 1
+ #include "atomic_template.h"
+diff --git a/exec.c b/exec.c
+index 9c9cc811b3..090bcc05da 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2684,50 +2684,6 @@ ram_addr_t qemu_ram_addr_from_host(void *ptr)
+     return block->offset + offset;
+ }
+ 
+-/* Called within RCU critical section. */
+-void memory_notdirty_write_prepare(NotDirtyInfo *ndi,
+-                          CPUState *cpu,
+-                          vaddr mem_vaddr,
+-                          ram_addr_t ram_addr,
+-                          unsigned size)
+-{
+-    ndi->cpu = cpu;
+-    ndi->ram_addr = ram_addr;
+-    ndi->mem_vaddr = mem_vaddr;
+-    ndi->size = size;
+-    ndi->pages = NULL;
+-
+-    trace_memory_notdirty_write_access(mem_vaddr, ram_addr, size);
+-
+-    assert(tcg_enabled());
+-    if (!cpu_physical_memory_get_dirty_flag(ram_addr, DIRTY_MEMORY_CODE)) {
+-        ndi->pages = page_collection_lock(ram_addr, ram_addr + size);
+-        tb_invalidate_phys_page_fast(ndi->pages, ram_addr, size);
+-    }
+-}
+-
+-/* Called within RCU critical section. */
+-void memory_notdirty_write_complete(NotDirtyInfo *ndi)
+-{
+-    if (ndi->pages) {
+-        assert(tcg_enabled());
+-        page_collection_unlock(ndi->pages);
+-        ndi->pages = NULL;
+-    }
+-
+-    /* Set both VGA and migration bits for simplicity and to remove
+-     * the notdirty callback faster.
+-     */
+-    cpu_physical_memory_set_dirty_range(ndi->ram_addr, ndi->size,
+-                                        DIRTY_CLIENTS_NOCODE);
+-    /* we remove the notdirty callback only if the code has been
+-       flushed */
+-    if (!cpu_physical_memory_is_clean(ndi->ram_addr)) {
+-        trace_memory_notdirty_set_dirty(ndi->mem_vaddr);
+-        tlb_set_dirty(ndi->cpu, ndi->mem_vaddr);
+-    }
+-}
+-
+ /* Generate a debug exception if a watchpoint has been hit.  */
+ void cpu_check_watchpoint(CPUState *cpu, vaddr addr, vaddr len,
+                           MemTxAttrs attrs, int flags, uintptr_t ra)
 -- 
 2.17.1
 
