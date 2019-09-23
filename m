@@ -2,81 +2,58 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB321C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:43:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C85DC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:47:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 989162064A
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:43:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 989162064A
+	by mail.kernel.org (Postfix) with ESMTPS id E430F20820
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:47:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E430F20820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCJwO-0003DY-IQ
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 04:43:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43168)
+	id 1iCK0O-000676-2y
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 04:47:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43219)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1iCJOR-0002hc-VE
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:08:25 -0400
+ (envelope-from <david@redhat.com>) id 1iCJOV-0002oP-Jh
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:08:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1iCJOQ-0004Pv-Jb
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:08:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48878)
+ (envelope-from <david@redhat.com>) id 1iCJOU-0004TE-EX
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:08:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53742)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1iCJOQ-0004Oy-9J
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:08:22 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1iCJOU-0004Ss-9M; Mon, 23 Sep 2019 04:08:26 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5220C356F9
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 08:08:21 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id q10so4518755wro.22
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 01:08:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=xATpn9gkkJpKGqIBeLkk1WAFIkbpTrWqf1TP3ewJ8MQ=;
- b=bXlnxFDVjHaiv/t7Rmt8XzRU0V9hmwlZly6CiYbB9XYhuJczr/E//UybVlXbRvxcaD
- 7KH0RZn2VR9BRzmjv2nR290MZF6pQxVTVI1p7T/EkcvWo9bnixyg3hVzKFQ4t+FFRkVx
- ViTzKNUaG7ti9W36zR7o4Pwy9lYUFQy4jOPNOYmdgPpsekJMThVYqxL4wr0FtNMmlNv+
- KHfGTAtbftyjPqD48qkzJOfaEnFvt2ALhNJCkK/BOdLosPQGkp4dFQSVO+kHWfquJP88
- 0znAcIwpnj2LOP8JIp5ndFstWeVb15vg/M1DBpJidEWnGUvbzeFdpgqz6Uc6lbdXQxrC
- Tp0Q==
-X-Gm-Message-State: APjAAAVtdfBlhFbaF0HXAtVdrZvAm1rG8aoCfTgtm3Q9W7zZL4w8qnCo
- fbi8dy9Da0CsNAcqnBun9nZnZCxvnT4wHHH9p7UG+mLpsouHK0YM9QJ/Vc72Hk48kADtKjn//T/
- 5xvybP+iVm40Zn5g=
-X-Received: by 2002:a7b:cc97:: with SMTP id p23mr13245787wma.111.1569226099997; 
- Mon, 23 Sep 2019 01:08:19 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwSw72rrjmGFti2WyFLHYX6xQfFdgIsu2h5mkvpex9QcWhB8cRlq66pDD/tXbrQO1cXTT1lwA==
-X-Received: by 2002:a7b:cc97:: with SMTP id p23mr13245768wma.111.1569226099760; 
- Mon, 23 Sep 2019 01:08:19 -0700 (PDT)
-Received: from steredhat (host170-61-dynamic.36-79-r.retail.telecomitalia.it.
- [79.36.61.170])
- by smtp.gmail.com with ESMTPSA id s1sm24520280wrg.80.2019.09.23.01.08.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Sep 2019 01:08:19 -0700 (PDT)
-Date: Mon, 23 Sep 2019 10:08:16 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Subject: Re: [PATCH v3 2/2] target/i386: drop the duplicated definition of
- cpuid AVX512_VBMI marco
-Message-ID: <20190923080816.hzfzikw5mx4n3ejn@steredhat>
-References: <20190923063041.12420-1-tao3.xu@intel.com>
- <20190923063041.12420-3-tao3.xu@intel.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 911B310C092E;
+ Mon, 23 Sep 2019 08:08:25 +0000 (UTC)
+Received: from t460s.redhat.com (ovpn-116-207.ams2.redhat.com [10.36.116.207])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E46D519C78;
+ Mon, 23 Sep 2019 08:08:23 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+	qemu-devel@nongnu.org
+Subject: [PULL 26/30] s390x/tcg: MVZ: Fault-safe handling
+Date: Mon, 23 Sep 2019 10:07:08 +0200
+Message-Id: <20190923080712.23951-27-david@redhat.com>
+In-Reply-To: <20190923080712.23951-1-david@redhat.com>
+References: <20190923080712.23951-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190923063041.12420-3-tao3.xu@intel.com>
-User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Mon, 23 Sep 2019 08:08:25 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -90,59 +67,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, philmd@redhat.com,
- ehabkost@redhat.com, rth@twiddle.net
+Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 23, 2019 at 02:30:41PM +0800, Tao Xu wrote:
-> Drop the duplicated definition of cpuid AVX512_VBMI marco and rename it
-> as CPUID_7_0_ECX_AVX512_VBMI.
-> 
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> ---
->  target/i386/cpu.c           | 4 ++--
->  target/i386/cpu.h           | 3 +--
->  target/i386/hvf/x86_cpuid.c | 2 +-
->  3 files changed, 4 insertions(+), 5 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 9e0bac31e8..f87fe88259 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -2412,7 +2412,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
->              CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
->              CPUID_7_0_EBX_SMAP,
->          .features[FEAT_7_0_ECX] =
-> -            CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
-> +            CPUID_7_0_ECX_AVX512_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
->              CPUID_7_0_ECX_VBMI2 | CPUID_7_0_ECX_GFNI |
->              CPUID_7_0_ECX_VAES | CPUID_7_0_ECX_VPCLMULQDQ |
->              CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG |
-> @@ -2470,7 +2470,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
->              CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
->              CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
->          .features[FEAT_7_0_ECX] =
-> -            CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
-> +            CPUID_7_0_ECX_AVX512_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
->              CPUID_7_0_ECX_VBMI2 | CPUID_7_0_ECX_GFNI |
->              CPUID_7_0_ECX_VAES | CPUID_7_0_ECX_VPCLMULQDQ |
->              CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG |
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index fa4c4cad79..61f6287294 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -695,8 +695,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->  #define CPUID_7_0_EBX_AVX512VL          (1U << 31)
->  
->  /* AVX-512 Vector Byte Manipulation Instruction */
-> -#define CPUID_7_0_ECX_AVX512BMI         (1U << 1)
-> -#define CPUID_7_0_ECX_VBMI              (1U << 1)
-> +#define CPUID_7_0_ECX_AVX512_VBMI       (1U << 1)
+We can process a maximum of 256 bytes, crossing two pages.
 
-Since we're here, should we also update CPUID_7_0_ECX_VBMI2?
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/mem_helper.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-Thanks,
-Stefano
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 7c981f7902..b781362e16 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -553,13 +553,22 @@ void HELPER(mvo)(CPUS390XState *env, uint32_t l, ui=
+nt64_t dest, uint64_t src)
+ /* move zones  */
+ void HELPER(mvz)(CPUS390XState *env, uint32_t l, uint64_t dest, uint64_t=
+ src)
+ {
++    const int mmu_idx =3D cpu_mmu_index(env, false);
++    S390Access srca1, srca2, desta;
+     uintptr_t ra =3D GETPC();
+     int i;
+=20
+-    for (i =3D 0; i <=3D l; i++) {
+-        uint8_t b =3D cpu_ldub_data_ra(env, dest + i, ra) & 0x0f;
+-        b |=3D cpu_ldub_data_ra(env, src + i, ra) & 0xf0;
+-        cpu_stb_data_ra(env, dest + i, b, ra);
++    /* MVZ always copies one more byte than specified - maximum is 256 *=
+/
++    l++;
++
++    srca1 =3D access_prepare(env, src, l, MMU_DATA_LOAD, mmu_idx, ra);
++    srca2 =3D access_prepare(env, dest, l, MMU_DATA_LOAD, mmu_idx, ra);
++    desta =3D access_prepare(env, dest, l, MMU_DATA_STORE, mmu_idx, ra);
++    for (i =3D 0; i < l; i++) {
++        const uint8_t x =3D (access_get_byte(env, &srca1, i, ra) & 0xf0)=
+ |
++                          (access_get_byte(env, &srca2, i, ra) & 0x0f);
++
++        access_set_byte(env, &desta, i, x, ra);
+     }
+ }
+=20
+--=20
+2.21.0
+
 
