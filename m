@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B527AC4CECF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 16:31:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11457C4CEC4
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 16:35:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88AA620B7C
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 16:31:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88AA620B7C
+	by mail.kernel.org (Postfix) with ESMTPS id DA5FB2089F
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 16:35:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA5FB2089F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCREn-0006Is-P7
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 12:30:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57094)
+	id 1iCRJF-0001J4-Cr
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 12:35:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57117)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iCQxO-0002QV-Gi
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 12:12:59 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCQxP-0002RS-7G
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 12:13:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iCQxM-0003ix-QC
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCQxN-0003k8-7o
  for qemu-devel@nongnu.org; Mon, 23 Sep 2019 12:12:58 -0400
-Received: from relay.sw.ru ([185.231.240.75]:39492)
+Received: from relay.sw.ru ([185.231.240.75]:39508)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iCQxM-0003a5-F2; Mon, 23 Sep 2019 12:12:56 -0400
+ id 1iCQxM-0003a8-Tg; Mon, 23 Sep 2019 12:12:57 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iCQwz-0001Fp-Os; Mon, 23 Sep 2019 19:12:33 +0300
+ id 1iCQwy-0001Fp-Od; Mon, 23 Sep 2019 19:12:32 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v2 4/9] hw/core/loader-fit: fix freeing errp in fit_load_fdt
-Date: Mon, 23 Sep 2019 19:12:26 +0300
-Message-Id: <20190923161231.22028-5-vsementsov@virtuozzo.com>
+Subject: [RFC v2 2/9] qapi/error: add (Error **errp) cleaning APIs
+Date: Mon, 23 Sep 2019 19:12:24 +0300
+Message-Id: <20190923161231.22028-3-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190923161231.22028-1-vsementsov@virtuozzo.com>
 References: <20190923161231.22028-1-vsementsov@virtuozzo.com>
@@ -95,26 +95,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-fit_load_fdt forget to zero errp. Fix it.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/core/loader-fit.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/qapi/error.h | 22 ++++++++++++++++++++++
+ util/error.c         |  6 +++---
+ 2 files changed, 25 insertions(+), 3 deletions(-)
 
-diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
-index 953b16bc82..fe5bcc6700 100644
---- a/hw/core/loader-fit.c
-+++ b/hw/core/loader-fit.c
-@@ -200,7 +200,7 @@ static int fit_load_fdt(const struct fit_loader *ldr, const void *itb,
-     err = fit_image_addr(itb, img_off, "load", &load_addr, errp);
-     if (err == -ENOENT) {
-         load_addr = ROUND_UP(kernel_end, 64 * KiB) + (10 * MiB);
--        error_free(*errp);
-+        error_free_errp(errp);
-     } else if (err) {
-         error_prepend(errp, "unable to read FDT load address from FIT: ");
-         ret = err;
+diff --git a/include/qapi/error.h b/include/qapi/error.h
+index f6f4fa0fac..551385aa91 100644
+--- a/include/qapi/error.h
++++ b/include/qapi/error.h
+@@ -297,6 +297,28 @@ void warn_report_err(Error *err);
+  */
+ void error_report_err(Error *err);
+ 
++/*
++ * Functions to clean Error **errp: call corresponding Error *err cleaning
++ * function an set pointer to NULL
++ */
++static inline void error_free_errp(Error **errp)
++{
++    error_free(*errp_in);
++    *errp_in = NULL;
++}
++
++static inline void error_report_errp(Error **errp)
++{
++    error_report_err(*errp_in);
++    *errp_in = NULL;
++}
++
++static inline void warn_report_errp(Error **errp)
++{
++    warn_report_err(*errp_in);
++    *errp_in = NULL;
++}
++
+ /*
+  * Convenience function to error_prepend(), warn_report() and free @err.
+  */
+diff --git a/util/error.c b/util/error.c
+index d4532ce318..dfba091757 100644
+--- a/util/error.c
++++ b/util/error.c
+@@ -273,9 +273,9 @@ void error_free(Error *err)
+ 
+ void error_free_or_abort(Error **errp)
+ {
+-    assert(errp && *errp);
+-    error_free(*errp);
+-    *errp = NULL;
++    assert(errp_in && *errp_in);
++    error_free(*errp_in);
++    *errp_in = NULL;
+ }
+ 
+ void error_propagate(Error **dst_errp, Error *local_err)
 -- 
 2.21.0
 
