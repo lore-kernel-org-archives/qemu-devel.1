@@ -2,112 +2,82 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 203BCC4CEC4
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 18:38:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A09C4CECF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 18:48:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC47420882
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 18:38:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC47420882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E536220820
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 18:48:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n0Nyo+WZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E536220820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCTEc-0004dn-4O
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 14:38:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51223)
+	id 1iCTO5-0000zX-Or
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 14:48:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53218)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iCTCi-00031c-DD
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:36:57 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iCTLf-0007yi-0e
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:46:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iCTCh-000354-EI
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:36:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58512)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iCTCd-00033D-S5; Mon, 23 Sep 2019 14:36:52 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 25AAB898111;
- Mon, 23 Sep 2019 18:36:51 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-120.ams2.redhat.com [10.36.116.120])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0505E601B6;
- Mon, 23 Sep 2019 18:36:46 +0000 (UTC)
-Subject: Re: [PATCH 3/4] hw/arm: Move armv7m_nvic.c to hw/arm/ and always
- enable it for arm builds
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190921150420.30743-1-thuth@redhat.com>
- <20190921150420.30743-4-thuth@redhat.com>
- <CAFEAcA_6UxMBeyOMM0iT5cnCQEpWXfRO2XMuV9ez_0Su2osXNg@mail.gmail.com>
- <0389e9dc-7f78-5b27-4764-51f0bdef5bef@redhat.com>
- <CAFEAcA8XSQs=fw839O4+tTUqy-DpNh-jdHxQsfYQxm-nTbvH4Q@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <88bcb5b7-4f91-1cc2-39a1-bd919608737e@redhat.com>
-Date: Mon, 23 Sep 2019 20:36:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <peter.maydell@linaro.org>) id 1iCTLd-000782-LY
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:46:10 -0400
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:33195)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iCTLd-00077i-DW
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:46:09 -0400
+Received: by mail-ot1-x334.google.com with SMTP id g25so13112319otl.0
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 11:46:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=KMDbN0XbMZ7rBzqGtCLrNofny0/zzxmpSX7mG9zel2s=;
+ b=n0Nyo+WZNw/mDwitZSaK52HIQin/uriYLSURUSM1D+n1wEAy2xWLkjembti1ZGPtD2
+ /GCtzsNFv4ZF2Yz8/XOxeUJ/eROmeLY00rwYCf7d7Bw06od+MHUbevwBfAGJkU8YvwBh
+ SrjJBuaS8/khFc0T5h1Oj2yfqdh1ZRneXY1arTQACqmr0HKTDXjA18UOoK29lV247389
+ cqj0iIbw1uaHZFH9HRTYijKcYn6VEZgA7SCIq4/y6MxC1m1SYxV21+M9ngy9v9v2ntvf
+ 97ITlESQW6xcXUls0HKXgZLZ26ApS60aD6N9XfHxzaVHJzb9rdQrKm2EE/pEZSqzxsmt
+ +DQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=KMDbN0XbMZ7rBzqGtCLrNofny0/zzxmpSX7mG9zel2s=;
+ b=aMqM35SIY715SIxeDanYRdEV8dCUqxaEiaNIuJ6omsECXZgzytWgjNTRJBImCI+dPy
+ 4sdutHXBzm8DuusDLwnPpGCnyZDW5K+xgTjzHlc3dDivbvayG/cVheRHOgmBhOc6aakR
+ Ue7xg+TOnENa/lcOa+9urC4CWrtfz57hjP5m49v//7xzHYc+rBjl/grV7uiXbYx9xGLI
+ hBXzwRHi0jYuSU+wxXOZtt9xCW93wzL2/ZHmEKXf+Rh1gDRtg9i2KsmBToSJDi1LY6UG
+ HdYTeT6KQYY3G+4H0en5Ml/YCAZaQNOlYTwJYWqsjmsqEZNDaki6JBTEP21dMzZA4E3+
+ spyQ==
+X-Gm-Message-State: APjAAAU09wHt+lqu0qO+pRyjqj8v7WrU+EadBtwMfGV1zcQf2qxDjGB8
+ KP+yZgPYQV5QMLNAawXTlvP78H1XxAsgF2TwrdEDPg==
+X-Google-Smtp-Source: APXvYqyErsDcJeigQN1ipLpkCtJOicIb01dvc/BXC8I3y8hc1RtVU4HxH4ViH2Sl920eZ2YK62faInd/4dfoH0/TG+g=
+X-Received: by 2002:a9d:562:: with SMTP id 89mr1156080otw.232.1569264368542;
+ Mon, 23 Sep 2019 11:46:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8XSQs=fw839O4+tTUqy-DpNh-jdHxQsfYQxm-nTbvH4Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Mon, 23 Sep 2019 18:36:51 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+References: <20190921150420.30743-1-thuth@redhat.com>
+ <20190921150420.30743-3-thuth@redhat.com>
+ <bd6efd14-9200-98e2-4f76-dda101f85274@redhat.com>
+ <8585b93b-e239-829b-d634-b89941f27aed@redhat.com>
+In-Reply-To: <8585b93b-e239-829b-d634-b89941f27aed@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 23 Sep 2019 19:45:57 +0100
+Message-ID: <CAFEAcA9k59CRG23qP-o5PF0mdXvXpszhuxx+GpbpWO+hFdHOOA@mail.gmail.com>
+Subject: Re: [PATCH 2/4] target/arm: Move cortex-m related functions to new
+ file v7m.c
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,40 +89,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>,
+Cc: Auger Eric <eric.auger@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
  QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23/09/2019 20.27, Peter Maydell wrote:
-> On Mon, 23 Sep 2019 at 18:54, Thomas Huth <thuth@redhat.com> wrote:
->> Ok, then what would you suggest to solve the problem that this file ha=
-s
->> always to be linked into the binary? I can't use "obj-y +=3D ..." in
->> hw/intc/Makefile.objs since that would mean that the file also gets
->> compiled for non-Arm boards. Would you prefer a bunch of stubs instead
->> that get used if CONFIG_ARM_V7M is not set?
->=20
-> I thought obj-y was for only-this-target and obj-common-y was
-> for all-boards ?
+On Mon, 23 Sep 2019 at 19:09, Thomas Huth <thuth@redhat.com> wrote:
+> However, there's one thing I currently don't quite understand in this
+> code (since I'm not an ARM guy, sorry) : There are references to "v8" in
+> m_helper.c, too. Is that related to a separate CPU type, ie. should the
+> v8 code also be available when CONFIG_ARM_V7M is disabled? Or can the
+> code in m_helper.c be disabled completely if CONFIG_ARM_V7M is not set?
 
-Well, obj-y is for the current target that gets compiled. But if you use
-it in a Makefile that gets used by all targets, the file gets compiled
-for each target individually.
+QEMU's naming conventions here is a bit confusing, for
+historical reasons.
 
-Just try to change "obj-$(CONFIG_ARM_V7M) +=3D armv7m_nvic.o" into
-"obj-y +=3D armv7m_nvic.o" in hw/int/Makefile.objs, and you'll see it bre=
-ak:
+Architecturally what we have is:
+ * "M-profile" -- this is the flavour of Arm architecture for
+microcontrollers; it has some big differences from A and R
+profile (eg the exception mechanism is different and it has
+a built-in NVIC interrupt controller). All the Cortex-M<anything>
+CPUs are M-profile
+ * "Arm-v7M" -- this is the v7 flavour of the M-profile
+architecture, eg Cortex-M3.
+ * "Arm-v6M" -- this looks like it ought to mean "v6 flavour
+of M-profile", but if you look at what features it has it's
+more like "cut down version of v7M" (fewer instructions, cut
+down exception model, etc, but some things which on A-profile
+don't appear until v7A are present in v6M). Cortex-M0 and -M1.
+ * "Arm-v8M" -- v8 flavour of M-profile. The big change here
+is support for TrustZone. Cortex-M33. v8M comes in two
+sub-profiles: "mainline", which has all the features like v7M,
+and "baseline", which is cut-down in the same way v6M is a
+cut-down v7M.
 
-  CC      alpha-softmmu/hw/intc/armv7m_nvic.o
-In file included from include/hw/intc/armv7m_nvic.h:13,
-                 from hw/intc/armv7m_nvic.c:19:
-target/arm/cpu.h:1416: error: "FPCR_DZE" redefined [-Werror]
- #define FPCR_DZE    (1 << 9)    /* Divide by Zero exception trap enable =
-*/
+In QEMU, we implemented Cortex-M3 first, and then added -M0 and
+-M33 later. So mostly our function naming convention uses
+"v7m" when it means "any M-profile"; a few v8M-specific
+functions use a "v8m" prefix. Everything in m_helper.c is
+M-profile specific; most of it is used by all M-profile cores,
+and a few bits are v8M-only or v7M-and-v8M-mainline only.
 
- Thomas
+From a CONFIG switch point of view I don't think it's
+worth being able to #ifdef out the various flavours of
+M-profile individually.
+
+thanks
+-- PMM
 
