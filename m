@@ -2,62 +2,86 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE20C04EBF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21144C04EBF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:48:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3A6020820
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:47:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3A6020820
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E085D20820
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:48:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ap5cC+Qz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E085D20820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCOgX-0004jx-2r
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 09:47:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59460)
+	id 1iCOhs-0005l8-1o
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 09:48:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60029)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1iCOZv-0007Km-EG
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:40:36 -0400
+ (envelope-from <flukshun@gmail.com>) id 1iCOdv-0002xu-FU
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:44:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1iCOZu-0007YI-AI
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:40:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46720)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iCOZu-0007Y8-5P
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:40:34 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 69BEA81DE7;
- Mon, 23 Sep 2019 13:40:33 +0000 (UTC)
-Received: from dhcp-17-179.bos.redhat.com (dhcp-17-179.bos.redhat.com
- [10.18.17.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 49F9619C78;
- Mon, 23 Sep 2019 13:40:32 +0000 (UTC)
-From: Cleber Rosa <crosa@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
-Subject: [PULL 3/7] Acceptance test x86_cpu_model_versions: fix mismatches
- between test and messages
-Date: Mon, 23 Sep 2019 09:40:15 -0400
-Message-Id: <20190923134019.8548-4-crosa@redhat.com>
-In-Reply-To: <20190923134019.8548-1-crosa@redhat.com>
-References: <20190923134019.8548-1-crosa@redhat.com>
+ (envelope-from <flukshun@gmail.com>) id 1iCOdu-0008LK-1y
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:44:43 -0400
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:45858)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1iCOdt-0008L1-Rb
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:44:42 -0400
+Received: by mail-ot1-x32b.google.com with SMTP id 41so12089911oti.12
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 06:44:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:mime-version:content-transfer-encoding:to:from:in-reply-to
+ :cc:references:message-id:user-agent:subject:date;
+ bh=vqr0we6j3dSE53YXx7KMpTjh0xVWMVevJVSNY8rSHqs=;
+ b=Ap5cC+QzsvfD97/r2H//Ywrci1aDx2ceNbFCC8fQWFCQFIyhU0ZjujDUCbPGGHEgHQ
+ oXgShP2JrYM9Cdjn9oS7sCY5knFN0PSiuVm4GsP//M+VZSfGw2zqfWHxgA44wDcx15+J
+ YsO/cpCy+z7+aqerBhc/YgzAzQNxYjm6PJVDLVxU+fMOKBteLQhWV91w7WB3smj0hPbm
+ HIxYCBsmGi5Jx9azPC1AZmteSFXvTMal3RafgZcpz2UvwCGVM+s0Rd0gfOfx0ANpd9xJ
+ 7p7ZzsQP4j69yfeB7xc+uwQxajB2wkxNp4Uj1B3sBM3noZhQk8vR1+gZTCGYpsjAxelj
+ 1PCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:mime-version:content-transfer-encoding:to
+ :from:in-reply-to:cc:references:message-id:user-agent:subject:date;
+ bh=vqr0we6j3dSE53YXx7KMpTjh0xVWMVevJVSNY8rSHqs=;
+ b=OwUKx7jPH2dVmrg7VAlB8/qVBhHh/KurwlDkIr2MsqLEFcGdMjw84sGYRt5N05bdqV
+ lHAzaC7WJCGB1WoHOoZIRhGNbuskHHJ8+jlKrp+T3H53kvZVMW77T+tRX4yVKT/1lhUg
+ pH5N/6+3QacqSHTrkqoLSJcqBFigtIkSQ82Pt50x36IfySy/iRXEiaUXEiXJ7RdJmxmj
+ MvUzypyBABnvV75qAQwRNpZICk9hUDgAhtB9YWbZmk2azE5kcl5BpMt/PAeRY4fbqNer
+ UFN6ML++V4z+h0aM3qEu2wy9EpSUdc+CMO4MUtJqCFthmpTWi42sxb4EddJq8mszf8eH
+ CL2Q==
+X-Gm-Message-State: APjAAAU7WL7HMa3BeZZgz8qJEnTomwaBObbBIf/F5LVzMVoLkJGv59oK
+ 2rWSuO8hKXbKfmQHO8qc/9E=
+X-Google-Smtp-Source: APXvYqxy79rRBUtAx+M3Ol6ehoquoDkHnPHJIjRx2LFgeMvwhwmIAz4idASnRFqGXt/eRwxF/8K3LQ==
+X-Received: by 2002:a9d:19a8:: with SMTP id k37mr22215115otk.172.1569246280451; 
+ Mon, 23 Sep 2019 06:44:40 -0700 (PDT)
+Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
+ [76.251.165.188])
+ by smtp.gmail.com with ESMTPSA id z16sm3853406otq.78.2019.09.23.06.44.38
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Mon, 23 Sep 2019 06:44:39 -0700 (PDT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Mon, 23 Sep 2019 13:40:33 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+To: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20190920174219.22005-1-philmd@redhat.com>
+References: <20190920174219.22005-1-philmd@redhat.com>
+Message-ID: <156924627485.4270.10312153723917388232@sif>
+User-Agent: alot/0.7
+Subject: Re: [PATCH] .travis.yml: Test the release tarball
+Date: Mon, 23 Sep 2019 08:44:34 -0500
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,69 +93,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Aleksandar Rikalo <arikalo@wavecomp.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Michael Tokarev <mjt@tls.msk.ru>,
+ =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Bruce Rogers <brogers@suse.com>, Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This fixes a few mismatches between the test and the error messages
-produced in case of failures.
+Quoting Philippe Mathieu-Daud=C3=A9 (2019-09-20 12:42:19)
+> Add a job to generate the release tarball and build/install few
+> QEMU targets from it.
+> =
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Message-Id: <20190828193628.7687-3-crosa@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- tests/acceptance/x86_cpu_model_versions.py | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+> Ideally we should build the 'efi' target from the 'roms' directory,
+> but it is too time consuming.
 
-diff --git a/tests/acceptance/x86_cpu_model_versions.py b/tests/acceptanc=
-e/x86_cpu_model_versions.py
-index e6c76b0d4c..220d18f68d 100644
---- a/tests/acceptance/x86_cpu_model_versions.py
-+++ b/tests/acceptance/x86_cpu_model_versions.py
-@@ -280,7 +280,7 @@ class X86CPUModelAliases(avocado_qemu.Test):
-         vm.add_args('-cpu', 'Cascadelake-Server-v1,x-force-features=3Don=
-,check=3Doff,enforce=3Doff')
-         vm.launch()
-         self.assertFalse(get_cpu_prop(vm, 'arch-capabilities'),
--                         'pc-i440fx-4.1 + Cascadelake-Server-v1 should n=
-ot have arch-capabilities')
-+                         'pc-i440fx-4.0 + Cascadelake-Server-v1 should n=
-ot have arch-capabilities')
-         vm.shutdown()
-=20
-         vm =3D self.get_vm()
-@@ -289,14 +289,14 @@ class X86CPUModelAliases(avocado_qemu.Test):
-         vm.add_args('-cpu', 'Cascadelake-Server-v2,x-force-features=3Don=
-,check=3Doff,enforce=3Doff')
-         vm.launch()
-         self.assertTrue(get_cpu_prop(vm, 'arch-capabilities'),
--                         'pc-i440fx-4.1 + Cascadelake-Server-v1 should h=
-ave arch-capabilities')
-+                         'pc-i440fx-4.0 + Cascadelake-Server-v2 should h=
-ave arch-capabilities')
-         vm.shutdown()
-=20
-         # command line must override machine-type and versioned CPU mode=
-l:
-         vm =3D self.get_vm()
-         vm.add_args('-S')
-         vm.set_machine('pc-i440fx-4.0')
--        vm.add_args('-cpu', 'Cascadelake-Server,x-force-features=3Don,ch=
-eck=3Doff,enforce=3Doff,+arch-capabilities')
-+        vm.add_args('-cpu', 'Cascadelake-Server-v1,x-force-features=3Don=
-,check=3Doff,enforce=3Doff,+arch-capabilities')
-         vm.launch()
-         self.assertTrue(get_cpu_prop(vm, 'arch-capabilities'),
-                          'pc-i440fx-4.0 + Cascadelake-Server-v1,+arch-ca=
-pabilities should have arch-capabilities')
---=20
-2.21.0
+Individual targets might not be too bad. For instance:
 
+  make -f Makefile.edk2 ../pc-bios/edk2-x86_64-secure-code.fd.bz2
+
+builds in about 7m on my 2-core laptop, but the invocation is sort of hacky.
+Probably makes sense to expose via `make efi-<arch>` targets before adding
+such a test.
+
+Cases covered here seem like a good starting point. Just some minor comments
+below.
+
+> =
+
+> This job is only triggered when a tag starting with 'v' is pushed,
+> which is the case with release candidate tags.
+> =
+
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> This job is quick enough: Ran for 15 min 32 sec
+> https://travis-ci.org/philmd/qemu/jobs/587583631
+> =
+
+> Based-on: <20190912231202.12327-1-mdroth@linux.vnet.ibm.com>
+> "Fix tarball builds of UEFI/EDK2 firmware"
+> https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg02734.html
+> ---
+>  .travis.yml | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+> =
+
+> diff --git a/.travis.yml b/.travis.yml
+> index d0b9e099b9..a21f99d22d 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -339,3 +339,25 @@ matrix:
+>          - CONFIG=3D"--target-list=3Dxtensa-softmmu,arm-softmmu,aarch64-s=
+oftmmu,alpha-softmmu"
+>          - TEST_CMD=3D"make -j3 check-tcg V=3D1"
+>          - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
+> +
+> +
+> +    # Release builds
+> +    # The make-release script expect a QEMU version, so our tag must sta=
+rt with a 'v'
+> +    - if: tag IS present AND tag =3D~ ^v
+
+Might ^v be a bit too open-ended? Perhaps ^v\d+\. or something of the
+sort?
+
+> +      env:
+> +        # We want to build from the release tarball
+> +        - BUILD_DIR=3D"release/build/dir" SRC_DIR=3D"../../.."
+> +        - BASE_CONFIG=3D"--prefix=3D$PWD/dist"
+> +        - CONFIG=3D"--target-list=3Dx86_64-softmmu,aarch64-softmmu,armeb=
+-linux-user,ppc-linux-user"
+> +        - TEST_CMD=3D"make install -j3"
+> +        - QEMU_VERSION=3D"${TRAVIS_TAG:1}"
+> +        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
+> +      before_script:
+> +        - command -v ccache && ccache --zero-stats
+> +        - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
+> +      script:
+> +        - ${SRC_DIR}/scripts/make-release ${SRC_DIR} ${QEMU_VERSION}
+
+Same result currently, but the `make qemu-$version.tar.bz2` target is proba=
+bly
+more robust/stable to test with.
+
+> +        - ls -l qemu-${QEMU_VERSION}.tar.bz2
+> +        - tar -xf qemu-${QEMU_VERSION}.tar.bz2 && cd qemu-${QEMU_VERSION}
+> +        - ./configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && ex=
+it 1; }
+> +        - make install
+> -- =
+
+> 2.20.1
+>=20
 
