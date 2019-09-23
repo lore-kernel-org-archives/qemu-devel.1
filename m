@@ -2,79 +2,67 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBA5CC432C1
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 22:05:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE7AC432C1
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 22:07:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4CBB207FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 22:05:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q7Hg9WrI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4CBB207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id F0FEB207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 22:07:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0FEB207FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCWSx-00014e-MH
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 18:05:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55455)
+	id 1iCWUu-0002HN-Uy
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 18:07:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56197)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iCWRj-0000MG-MU
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 18:04:40 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iCWUE-0001pw-5N
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 18:07:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iCWRh-0001aA-9d
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 18:04:39 -0400
-Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:44982)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iCWRg-0001Z5-Nm
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 18:04:37 -0400
-Received: by mail-ot1-x336.google.com with SMTP id 21so13532747otj.11
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 15:04:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=fup9GzCC3x62mnSNCz3pTtcek4vX4r1E0cNBsg2TOGo=;
- b=q7Hg9WrIsfsz8G3Bc/FwJdURl2vvfikxPwN1yDqfLJjaRXDgTC3aSifumA0Fe8paKd
- Qgqnr9+QQAOenuTFhyPOVOmqpKDe1T7fecN1B5NH31TjRwjEWwAyyDpI0copbYdolO6o
- oguqBkb0m01bfSNkokGmPlK6E3/3iDS1kcnO4EXodhjT4pW2EoyigqsGai7PKEeXkuui
- OWHGDqwK8AUBzO/xrDM9LHFOu8EE+vZeEJFYbhKKC6Ju+r6V9Jg/oRluGyPyFLJHW5Pa
- 6zDrJgeuD1YDT2cv/PmjzVZvhmEy0WhLV3IDtQP8e1z+h3PidFgnZW8+ZdYLDhirefnG
- 49+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=fup9GzCC3x62mnSNCz3pTtcek4vX4r1E0cNBsg2TOGo=;
- b=CNytzimwgz04IQM11BfIjXleu9ycHkecJM8YxT0OIgiDldjQaRL0XAlsqdrKnahkaS
- rcnhhYs+DOVKyHjNGTDkIJ4Wh4JfCnHdDEIb2rDsWrkmzKhgA+SxVJI0wDCFB/Mh4GSW
- xgliCp/5amN+uenc8W0VSgZeWq/vd7kGZHQcFOSgjByy5uoA+fC1puCef9XrLcCV95o4
- Ucj10RbxHjOqRN+KCBcEMJjimAfhF6yXf4PKKkiCWqhrfu9e/hqBNTKDqloewz1qJGQM
- h5BPb/H69akHb39Gi6ogEdnox1h4/8KotdB5zQdlcDo3ifeaVq/5zK7XaTc0KYFKBenA
- qJzA==
-X-Gm-Message-State: APjAAAWYuToaH5mzsfLQq/MMs5+2NT1er8hpMjPkQtVKmjq8j2Kp/ny2
- 7TJPrt20BsQrBDBcecUWMO5jUlHY2YsTA2PAQ5l1yw==
-X-Google-Smtp-Source: APXvYqwvxQyzkJpIo0TFYLPPC/pR87vxILZKT71zRjdZT+VeE1xltg4rujTZtzyZ2V5MX7r3cGwKHUoKaXZ/6DkUZzw=
-X-Received: by 2002:a9d:6d0a:: with SMTP id o10mr360480otp.221.1569276275743; 
- Mon, 23 Sep 2019 15:04:35 -0700 (PDT)
+ (envelope-from <laurent@vivier.eu>) id 1iCWUC-0006nT-Vx
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 18:07:14 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:36271)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iCWUC-0006fv-Mh
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 18:07:12 -0400
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MfYHQ-1hfgmD0W4W-00fxIH; Tue, 24 Sep 2019 00:07:01 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] ui: fix keymap file search in input-barrier object
+Date: Tue, 24 Sep 2019 00:06:58 +0200
+Message-Id: <20190923220658.27007-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <20190923080712.23951-1-david@redhat.com>
-In-Reply-To: <20190923080712.23951-1-david@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 23 Sep 2019 23:04:23 +0100
-Message-ID: <CAFEAcA_zjiapxFAhB=XFEphcHEnkb=s-3TzPa6ZwEYEde-Hm6w@mail.gmail.com>
-Subject: Re: [PULL 00/30] s390x/tcg update
-To: David Hildenbrand <david@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::336
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:mSi8BYRgH1OAeHMEnXJMtlW5a8MRBrybG0+fUaQdttbIPIJiY/n
+ /cX3PelUfTEgjeLFTVVjH7zpFSUiu/8hTV/7C2Kkiv8fFnzMlcxJyYZ3X4tAmf4CdG+FteM
+ I1Ej8Wjpmq5vxdhveGG1awqPPL+YO1/bdQmBSmCGoMGaZUl/cdHt5rV+KHhnx4SrtNOE6UG
+ Wld4IzQRF3YssCmug2eOQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:IU5MZxMyJaQ=:M+O7TgQGFZEg+ZaUVGssQN
+ agT/SL4JJDujNIJ68ZTU+lXuzvEn8GEzhIYeAfKWJwBvNLlm2AsZR9cz70LwtzwFCer2PzGHH
+ hPFO9/Ige+JwPbetNwRMplMI4xBAgYNqzt/hKUsp3kSa0i0SIs1iXn+sRiYZKp8wOjuIC1u7Q
+ Ln62YHYR3dvGhr6lKr0TJYqMHfjt59Bs+YjLBEtOs2GLkIfxmNkppM7mt5WBrhPYRpJvhthFv
+ YJl6frr4lVM2RJQuBt2In4Iog8UjCyLHiqbHTD40gabprTmteCankRtYalmJNtGHLRiVw/ZqI
+ ivtDYOa/SyMNZKvVPtK6undJ+dKdMRFHZVwaj2W3Qrie+oeTnKcCRiAmrsuw+xbOCVxe00esG
+ shv0n+Ai/I1DPyS/JmEaOpRWQmtWGDmBDXwtq7/uQXH2vNfcktClMPulDjouVxC7/5OTzZJB8
+ drCaOZDhKVdwU3Z+m14iyuBlQQI2cRQwWYcgBTK+cGPKPe2bFSzNjFSP7WJw1QKPObqoLVNK9
+ TeBOyCKmq6jdi9RzVsfB4NFJ6q13A4ybXDpDl1H39P1YIv6Vh92UeKGI9vL6YJueNr/rbrEZM
+ 54dMF31l+XsTUZbT1a4s9U7OfA6pZVtsDtDBuiRwTu04eCyAqiPUuB6riELfYA5fcB4hJ9WE6
+ K4sP4AC86mdM7CzJ731CuONitCpy+zAnqR+EK3oOKpNGmhAiBUztLn3XXVU7CtRf5VjKSxX/f
+ C9HV5AhXg0BClzk3/UTPweITjdDb+MHHlNBcENVGWz+LIFz8c8ussTiiTI6ZTOZySuE5MJiEI
+ qIy8swcjKFjmbty0PnSr36g+RXCU1CG7LC7IjWRSCqFfmUYyuza7o7TEQc//Yu8KALwXOmAgr
+ Mh5V6h7fk/VWWVPbht4A==
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,42 +74,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Anthony PERARD <anthony.perard@citrix.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 23 Sep 2019 at 09:07, David Hildenbrand <david@redhat.com> wrote:
->
-> Hi Peter,
->
-> here is the updated tcg subset of the s390x update (including one more
-> test).
->
-> The following changes since commit 4300b7c2cd9f3f273804e8cca325842ccb93b1ad:
->
->   Merge remote-tracking branch 'remotes/cleber/tags/python-next-pull-request' into staging (2019-09-20 17:28:43 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/davidhildenbrand/qemu.git tags/s390x-tcg-2019-09-23
->
-> for you to fetch changes up to 5d69cbdfdd5cd6dadc9f0c986899844a0e4de703:
->
->   tests/tcg: target/s390x: Test MVC (2019-09-23 09:28:29 +0200)
->
-> ----------------------------------------------------------------
-> Fix a bunch of BUGs in the mem-helpers (including the MVC instruction),
-> especially, to make them behave correctly on faults.
->
+If we try to start QEMU with "-k en-us", qemu prints a message and exits
+with:
 
+    qemu-system-i386: could not read keymap file: 'en-us'
 
-Applied, thanks.
+It's because this function is called way too early, before
+qemu_add_data_dir() is called, and so qemu_find_file() fails.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
+To fix that, move init_keyboard_layout() from the class init function to the
+instance init function.
 
--- PMM
+Reported-by: Anthony PERARD <anthony.perard@citrix.com>
+Fixes: 6105683da35b ("ui: add an embedded Barrier client")
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ ui/input-barrier.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/ui/input-barrier.c b/ui/input-barrier.c
+index a2c961f285a4..fe35049b83a2 100644
+--- a/ui/input-barrier.c
++++ b/ui/input-barrier.c
+@@ -682,6 +682,13 @@ static void input_barrier_instance_init(Object *obj)
+ {
+     InputBarrier *ib = INPUT_BARRIER(obj);
+ 
++    /* always use generic keymaps */
++    if (keyboard_layout && !kbd_layout) {
++        /* We use X11 key id, so use VNC name2keysym */
++        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout,
++                                          &error_fatal);
++    }
++
+     ib->saddr.type = SOCKET_ADDRESS_TYPE_INET;
+     ib->saddr.u.inet.host = g_strdup("localhost");
+     ib->saddr.u.inet.port = g_strdup("24800");
+@@ -719,13 +726,6 @@ static void input_barrier_class_init(ObjectClass *oc, void *data)
+     UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
+ 
+     ucc->complete = input_barrier_complete;
+-
+-    /* always use generic keymaps */
+-    if (keyboard_layout) {
+-        /* We use X11 key id, so use VNC name2keysym */
+-        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout,
+-                                          &error_fatal);
+-    }
+ }
+ 
+ static const TypeInfo input_barrier_info = {
+-- 
+2.21.0
+
 
