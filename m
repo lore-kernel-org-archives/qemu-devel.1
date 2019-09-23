@@ -2,90 +2,66 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98CECC4CEC4
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 19:52:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBA25C4CECF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 19:56:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 680CC2064A
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 19:52:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 680CC2064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C11EB2064A
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 19:56:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C11EB2064A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCUOD-00038l-Jr
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 15:52:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33757)
+	id 1iCURJ-0004rB-RE
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 15:56:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34242)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iCUNF-0002c1-Iu
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 15:51:54 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iCUQa-000497-Gm
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 15:55:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iCUNE-00006c-8z
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 15:51:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:3425)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iCUNB-00005Q-5p; Mon, 23 Sep 2019 15:51:49 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 66FE8308FBA9;
- Mon, 23 Sep 2019 19:51:48 +0000 (UTC)
-Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A88D19D70;
- Mon, 23 Sep 2019 19:51:44 +0000 (UTC)
-Subject: Re: [PATCH v9 3/3] iotests: test nbd reconnect
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20190917171322.4127-1-vsementsov@virtuozzo.com>
- <20190917171322.4127-4-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <7f0a7890-7b3d-9fd7-954d-389a8e28106f@redhat.com>
-Date: Mon, 23 Sep 2019 14:51:43 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <no-reply@patchew.org>) id 1iCUQY-00011h-EC
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 15:55:19 -0400
+Resent-Date: Mon, 23 Sep 2019 15:55:19 -0400
+Resent-Message-Id: <E1iCUQY-00011h-EC@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21413)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iCUQY-00011R-5h
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 15:55:18 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1569268485; cv=none; d=zoho.com; s=zohoarc; 
+ b=XTUpMTcygsmgPGJVOAqF2wOmZv94Ni2KwiG4K+zQt/Qtnc8apigW7YhnfvYtUWbdHk+j0ZOBrzB6Ycy2ZUCMWf357ibHyXhgGAS1/VGW0HodOdGNyo8Tp1MfBmO6dUcmj5/2YmL6bUsa6lZc/wVHQ4ighlceLO215tiO+JyUcKg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1569268485;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=ZowL5kD8D/I1XlccHSDwaArtbMN0t46qn58vRA/4Ey4=; 
+ b=E2zSLRgU/IXw+B1EPDv9IYdlYW/u7rEevg/myT8UMDqxVMyvpiqWcBu4oT6IXBJ0oG7cq9EXjdqxRvycOHRLwImAWOaVPx3WLDXi08mBaYU3epusWzCV7uE8hkOm/QbtTv0XTEAlMVsNQlidcwzv8xzE9p5VKyGIGYKDRopmExc=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 15692684841031003.7561242766798;
+ Mon, 23 Sep 2019 12:54:44 -0700 (PDT)
+In-Reply-To: <20190923134019.8548-1-crosa@redhat.com>
+Subject: Re: [PULL 0/7] Python (acceptance tests) queue - 2019-09-23
+Message-ID: <156926848227.20054.4036071478637059341@1c8ae44fe5c0>
 MIME-Version: 1.0
-In-Reply-To: <20190917171322.4127-4-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="ardQwTDiQET4HsppFFtN8Qw00kPZZrhId"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Mon, 23 Sep 2019 19:51:48 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: crosa@redhat.com
+Date: Mon, 23 Sep 2019 12:54:44 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,197 +73,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org,
- stefanha@redhat.com, mreitz@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, peter.maydell@linaro.org, ehabkost@redhat.com,
+ arikalo@wavecomp.com, alex.bennee@linaro.org, qemu-devel@nongnu.org,
+ wainersm@redhat.com, wrampazz@redhat.com, crosa@redhat.com, philmd@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ardQwTDiQET4HsppFFtN8Qw00kPZZrhId
-Content-Type: multipart/mixed; boundary="xeqlz3oG02LS99AhuecQlD9tDrfmsZzQd";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com,
- kwolf@redhat.com, den@openvz.org
-Message-ID: <7f0a7890-7b3d-9fd7-954d-389a8e28106f@redhat.com>
-Subject: Re: [PATCH v9 3/3] iotests: test nbd reconnect
-References: <20190917171322.4127-1-vsementsov@virtuozzo.com>
- <20190917171322.4127-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20190917171322.4127-4-vsementsov@virtuozzo.com>
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkyMzEzNDAxOS44NTQ4
+LTEtY3Jvc2FAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
+bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
+bWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA5MjMxMzQwMTkuODU0OC0xLWNyb3NhQHJlZGhhdC5j
+b20KU3ViamVjdDogW1BVTEwgMC83XSBQeXRob24gKGFjY2VwdGFuY2UgdGVzdHMpIHF1ZXVlIC0g
+MjAxOS0wOS0yMwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
+L2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2Ny
+aXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQg
+PT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmIyMDBiOTEgQWNjZXB0YW5jZSB0
+ZXN0czogdXNlIGF2b2NhZG8udXRpbHMuc3NoIGZvciBTU0ggaW50ZXJhY3Rpb24KMzMzYjhmMSB0
+ZXN0cy9hY2NlcHRhbmNlOiBBZGQgbmV3IHRlc3QgY2FzZXMgaW4gbGludXhfc3NoX21pcHNfbWFs
+dGEucHkKY2I5ZTMyZSB0ZXN0cy9hY2NlcHRhbmNlOiBSZWZhY3RvciBhbmQgaW1wcm92ZSByZXBv
+cnRpbmcgaW4gbGludXhfc3NoX21pcHNfbWFsdGEucHkKYzViNDM2YSBBY2NlcHRhbmNlIHRlc3Qg
+eDg2X2NwdV9tb2RlbF92ZXJzaW9uczogc3BsaXQgaW50byBzbWFsbGVyIHRlc3RzCmViOWY1OTUg
+QWNjZXB0YW5jZSB0ZXN0IHg4Nl9jcHVfbW9kZWxfdmVyc2lvbnM6IGZpeCBtaXNtYXRjaGVzIGJl
+dHdlZW4gdGVzdCBhbmQgbWVzc2FnZXMKOGJiZDg4MiBBY2NlcHRhbmNlIHRlc3QgeDg2X2NwdV9t
+b2RlbF92ZXJzaW9uczogc2h1dGRvd24gVk1zCmM1ZjY3YjUgQWNjZXB0YW5jZSB0ZXN0IG1hY2hp
+bmVfbTY4a19uZXh0Y3ViZS5weTogcmVsYXggdGhlIGVycm9yIGNvZGUgcGF0dGVybgoKPT09IE9V
+VFBVVCBCRUdJTiA9PT0KMS83IENoZWNraW5nIGNvbW1pdCBjNWY2N2I1NTVkYWQgKEFjY2VwdGFu
+Y2UgdGVzdCBtYWNoaW5lX202OGtfbmV4dGN1YmUucHk6IHJlbGF4IHRoZSBlcnJvciBjb2RlIHBh
+dHRlcm4pCjIvNyBDaGVja2luZyBjb21taXQgOGJiZDg4MjhjZjFlIChBY2NlcHRhbmNlIHRlc3Qg
+eDg2X2NwdV9tb2RlbF92ZXJzaW9uczogc2h1dGRvd24gVk1zKQozLzcgQ2hlY2tpbmcgY29tbWl0
+IGViOWY1OTU1MDRiMiAoQWNjZXB0YW5jZSB0ZXN0IHg4Nl9jcHVfbW9kZWxfdmVyc2lvbnM6IGZp
+eCBtaXNtYXRjaGVzIGJldHdlZW4gdGVzdCBhbmQgbWVzc2FnZXMpCkVSUk9SOiBsaW5lIG92ZXIg
+OTAgY2hhcmFjdGVycwojMjU6IEZJTEU6IHRlc3RzL2FjY2VwdGFuY2UveDg2X2NwdV9tb2RlbF92
+ZXJzaW9ucy5weToyODM6CisgICAgICAgICAgICAgICAgICAgICAgICAgJ3BjLWk0NDBmeC00LjAg
+KyBDYXNjYWRlbGFrZS1TZXJ2ZXItdjEgc2hvdWxkIG5vdCBoYXZlIGFyY2gtY2FwYWJpbGl0aWVz
+JykKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzQ6IEZJTEU6IHRlc3RzL2FjY2Vw
+dGFuY2UveDg2X2NwdV9tb2RlbF92ZXJzaW9ucy5weToyOTI6CisgICAgICAgICAgICAgICAgICAg
+ICAgICAgJ3BjLWk0NDBmeC00LjAgKyBDYXNjYWRlbGFrZS1TZXJ2ZXItdjIgc2hvdWxkIGhhdmUg
+YXJjaC1jYXBhYmlsaXRpZXMnKQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0Mjog
+RklMRTogdGVzdHMvYWNjZXB0YW5jZS94ODZfY3B1X21vZGVsX3ZlcnNpb25zLnB5OjI5OToKKyAg
+ICAgICAgdm0uYWRkX2FyZ3MoJy1jcHUnLCAnQ2FzY2FkZWxha2UtU2VydmVyLXYxLHgtZm9yY2Ut
+ZmVhdHVyZXM9b24sY2hlY2s9b2ZmLGVuZm9yY2U9b2ZmLCthcmNoLWNhcGFiaWxpdGllcycpCgp0
+b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDI0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvNyBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNC83IENoZWNraW5nIGNvbW1pdCBjNWI0MzZhMDY2
+NmEgKEFjY2VwdGFuY2UgdGVzdCB4ODZfY3B1X21vZGVsX3ZlcnNpb25zOiBzcGxpdCBpbnRvIHNt
+YWxsZXIgdGVzdHMpCjUvNyBDaGVja2luZyBjb21taXQgY2I5ZTMyZWNhNzY0ICh0ZXN0cy9hY2Nl
+cHRhbmNlOiBSZWZhY3RvciBhbmQgaW1wcm92ZSByZXBvcnRpbmcgaW4gbGludXhfc3NoX21pcHNf
+bWFsdGEucHkpCjYvNyBDaGVja2luZyBjb21taXQgMzMzYjhmMTM2NjVlICh0ZXN0cy9hY2NlcHRh
+bmNlOiBBZGQgbmV3IHRlc3QgY2FzZXMgaW4gbGludXhfc3NoX21pcHNfbWFsdGEucHkpCjcvNyBD
+aGVja2luZyBjb21taXQgYjIwMGI5MTZlMGU4IChBY2NlcHRhbmNlIHRlc3RzOiB1c2UgYXZvY2Fk
+by51dGlscy5zc2ggZm9yIFNTSCBpbnRlcmFjdGlvbikKV0FSTklORzogbGluZSBvdmVyIDgwIGNo
+YXJhY3RlcnMKIzEyNjogRklMRTogdGVzdHMvYWNjZXB0YW5jZS9saW51eF9zc2hfbWlwc19tYWx0
+YS5weTo4NToKKyAgICAgICAgc3Rkb3V0X2xpbmVzID0gW2xpbmUucnN0cmlwKCkgZm9yIGxpbmUg
+aW4gcmVzdWx0LnN0ZG91dF90ZXh0LnNwbGl0bGluZXMoKV0KCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiMxMzA6IEZJTEU6IHRlc3RzL2FjY2VwdGFuY2UvbGludXhfc3NoX21pcHNf
+bWFsdGEucHk6ODg6CisgICAgICAgIHN0ZGVycl9saW5lcyA9IFtsaW5lLnJzdHJpcCgpIGZvciBs
+aW5lIGluIHJlc3VsdC5zdGRlcnJfdGV4dC5zcGxpdGxpbmVzKCldCgp0b3RhbDogMCBlcnJvcnMs
+IDIgd2FybmluZ3MsIDE1OCBsaW5lcyBjaGVja2VkCgpQYXRjaCA3LzcgaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
+L2xvZ3MvMjAxOTA5MjMxMzQwMTkuODU0OC0xLWNyb3NhQHJlZGhhdC5jb20vdGVzdGluZy5jaGVj
+a3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
+eSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
+Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
---xeqlz3oG02LS99AhuecQlD9tDrfmsZzQd
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 9/17/19 12:13 PM, Vladimir Sementsov-Ogievskiy wrote:
-> Add test, which starts backup to nbd target and restarts nbd server
-> during backup.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  tests/qemu-iotests/264        | 65 +++++++++++++++++++++++++++++++++++=
-
->  tests/qemu-iotests/264.out    | 12 +++++++
->  tests/qemu-iotests/group      |  1 +
->  tests/qemu-iotests/iotests.py |  4 +++
->  4 files changed, 82 insertions(+)
->  create mode 100755 tests/qemu-iotests/264
->  create mode 100644 tests/qemu-iotests/264.out
->=20
-
-> +import time
-> +
-> +import iotests
-> +from iotests import qemu_img_create, file_path, qemu_nbd_popen, log
-> +
-> +disk_a, disk_b, nbd_sock =3D file_path('disk_a', 'disk_b', 'nbd-sock')=
-
-> +
-> +qemu_img_create('-f', iotests.imgfmt, disk_a, '5M')
-> +qemu_img_create('-f', iotests.imgfmt, disk_b, '5M')
-> +srv =3D qemu_nbd_popen('-k', nbd_sock, '-f', iotests.imgfmt, disk_b)
-> +time.sleep(1)
-> +
-
-Hard-coded sleep times can be problematic (too long, and the test is no
-longer quick; too short, and heavy load can interfere); is there any way
-to poll for a completion event rather than just waiting one second?
-
-> +vm =3D iotests.VM().add_drive(disk_a)
-> +vm.launch()
-> +vm.hmp_qemu_io('drive0', 'write 0 5M')
-> +
-> +vm.qmp_log('blockdev-add', filters=3D[iotests.filter_qmp_testfiles],
-> +           **{'node_name': 'backup0',
-> +              'driver': 'raw',
-> +              'file': {'driver': 'nbd',
-> +                       'server': {'type': 'unix', 'path': nbd_sock},
-> +                       'reconnect-delay': 10}})
-> +vm.qmp_log('blockdev-backup', device=3D'drive0', sync=3D'full', target=
-=3D'backup0',
-> +           speed=3D(1 * 1024 * 1024))
-
-Throttling to make sure we are likely to still be going and thus test
-the reconnect logic.
-
-> +
-> +time.sleep(1)
-> +log('Kill NBD server')
-> +srv.kill()
-
-Again, that hard-coded sleep looks a bit risky.
-
-> +
-> +jobs =3D vm.qmp('query-block-jobs')['return']
-> +if jobs and jobs[0]['offset'] < jobs[0]['len']:
-> +    log('Backup job is still in progress')
-> +
-> +time.sleep(1)
-
-Why do we need yet another sleep?
-
-> +
-> +log('Start NBD server')
-> +srv =3D qemu_nbd_popen('-k', nbd_sock, '-f', iotests.imgfmt, disk_b)
-> +
-> +vm.qmp_log('block-job-set-speed', device=3D'drive0', speed=3D0)
-
-So here, you release the throttle to finish the job.
-
-> +e =3D vm.event_wait('BLOCK_JOB_COMPLETED')
-> +log('Backup completed: {}'.format(e['data']['offset']))
-> +
-> +vm.qmp_log('blockdev-del', node_name=3D'backup0')
-> +srv.kill()
-> +vm.shutdown()
-> diff --git a/tests/qemu-iotests/264.out b/tests/qemu-iotests/264.out
-> new file mode 100644
-> index 0000000000..4a2f4aa509
-> --- /dev/null
-> +++ b/tests/qemu-iotests/264.out
-> @@ -0,0 +1,12 @@
-> +{"execute": "blockdev-add", "arguments": {"driver": "raw", "file": {"d=
-river": "nbd", "reconnect-delay": 10, "server": {"path": "TEST_DIR/PID-nb=
-d-sock", "type": "unix"}}, "node-name": "backup0"}}
-> +{"return": {}}
-> +{"execute": "blockdev-backup", "arguments": {"device": "drive0", "spee=
-d": 1048576, "sync": "full", "target": "backup0"}}
-> +{"return": {}}
-> +Kill NBD server
-> +Backup job is still in progress
-> +Start NBD server
-> +{"execute": "block-job-set-speed", "arguments": {"device": "drive0", "=
-speed": 0}}
-> +{"return": {}}
-> +Backup completed: 5242880
-> +{"execute": "blockdev-del", "arguments": {"node-name": "backup0"}}
-> +{"return": {}}
-> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-> index 5d3da937e4..4f6dd6f153 100644
-> --- a/tests/qemu-iotests/group
-> +++ b/tests/qemu-iotests/group
-> @@ -275,5 +275,6 @@
->  258 rw quick
->  262 rw quick migration
->  263 rw quick
-> +264 rw quick
-
-With that many hard-coded sleeps, is it still quick?
-
-/me applies the patch and runs it...
-
-264      pass       [14:49:55] [14:50:01]   6s
-
-that's borderline enough that I would not call it quick.
-
-> =20
-> +def qemu_nbd_popen(*args):
-> +    '''Run qemu-nbd in daemon mode and return the parent's exit code''=
-'
-> +    return subprocess.Popen(qemu_nbd_args + ['--persistent'] + list(ar=
-gs))
-> +
-
-Should you also use a pid file here, and wait for the existence of the
-pid file before returning (rather than hard-coding sleep(1))?
-
->  def compare_images(img1, img2, fmt1=3Dimgfmt, fmt2=3Dimgfmt):
->      '''Return True if two image files are identical'''
->      return qemu_img('compare', '-f', fmt1,
->=20
-
-At any rate,
-
-Tested-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---xeqlz3oG02LS99AhuecQlD9tDrfmsZzQd--
-
---ardQwTDiQET4HsppFFtN8Qw00kPZZrhId
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2JIk8ACgkQp6FrSiUn
-Q2q+gwf7B6DwqTuQYwnXIjUIUguj3rmF53hwtgRGHxnviPqrlIcY8zRTV6Us6IW4
-EmrKSdkSCQvS/WvJejOrP/LxdbxK6Cs/xZ/otJH83slQbgpNA9ES68Z9lC34MU+1
-G1kheFbBbf7VqMgX+7TvbuP1AHphj3HVAz1RX8AhXXuheAMz+3HW/oi5wUvnI9gb
-SzYEPtGxF7xdYC+wHZO8ieB4VAXAASDObKNhTnmrklNu1fwQh5jOEZ9wxPXt4R4H
-XeEb11lfp60GYhXGmWImZkNGJ6NeAJQRxa8WSalN5pV9DZ8IAixPgEmjlSk4yPI/
-zxZRk/JX16+S0EaXkJndiH/qd91sGA==
-=6ALO
------END PGP SIGNATURE-----
-
---ardQwTDiQET4HsppFFtN8Qw00kPZZrhId--
 
