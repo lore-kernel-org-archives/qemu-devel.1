@@ -3,65 +3,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0BCCC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 06:16:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82266C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 06:32:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 972CA20835
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 06:16:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 972CA20835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 54A7920820
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 06:32:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54A7920820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCHeK-0006Yv-Kq
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 02:16:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53295)
+	id 1iCHtO-0000om-63
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 02:32:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57381)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dovgaluk@ispras.ru>) id 1iCHdc-00067J-A3
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 02:15:57 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1iCHs5-0000Ec-TG
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 02:30:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1iCHdb-0005DG-15
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 02:15:56 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:47590)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1iCHda-0005CH-Mr
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 02:15:54 -0400
-Received: from PASHAISP (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id DD6265400C4;
- Mon, 23 Sep 2019 09:15:50 +0300 (MSK)
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-To: "'Kevin Wolf'" <kwolf@redhat.com>
-References: <20190918093305.GF5207@localhost.localdomain>
- <001401d56e04$b93c02a0$2bb407e0$@ru>
- <20190918094436.GG5207@localhost.localdomain>
- <001501d56e06$bbd7aa30$3386fe90$@ru>
- <20190919085302.GA10163@localhost.localdomain>
- <001901d56ec9$620ae260$2620a720$@ru>
- <20190919112702.GC10163@localhost.localdomain>
- <001a01d56ee3$4354a530$c9fdef90$@ru>
- <20190919130005.GF10163@localhost.localdomain>
- <002401d56f84$83900e40$8ab02ac0$@ru>
- <20190920100150.GD5458@localhost.localdomain>
-In-Reply-To: <20190920100150.GD5458@localhost.localdomain>
-Subject: RE: [for-4.2 PATCH 3/6] replay: update docs for record/replay with
- block devices
-Date: Mon, 23 Sep 2019 09:15:51 +0300
-Message-ID: <000d01d571d6$5977a150$0c66e3f0$@ru>
+ (envelope-from <tao3.xu@intel.com>) id 1iCHs4-0004me-7W
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 02:30:53 -0400
+Received: from mga05.intel.com ([192.55.52.43]:4527)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iCHs3-0004l4-Va
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 02:30:52 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+ by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 22 Sep 2019 23:30:47 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,539,1559545200"; d="scan'208";a="182429829"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
+ by orsmga008.jf.intel.com with ESMTP; 22 Sep 2019 23:30:44 -0700
+From: Tao Xu <tao3.xu@intel.com>
+To: ehabkost@redhat.com, sgarzare@redhat.com, philmd@redhat.com,
+ pbonzini@redhat.com, rth@twiddle.net
+Subject: [PATCH v3 0/2] target/i386: cpu.h marcos clean up
+Date: Mon, 23 Sep 2019 14:30:39 +0800
+Message-Id: <20190923063041.12420-1-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Office Outlook 12.0
-Thread-Index: AdVvmnB6TEN7ehgJSlyfueQu1o/pZwCOu/0g
-Content-Language: ru
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 83.149.199.45
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,83 +65,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru, quintela@redhat.com,
- ciro.santilli@gmail.com, jasowang@redhat.com, crosthwaite.peter@gmail.com,
- qemu-devel@nongnu.org, armbru@redhat.com, alex.bennee@linaro.org,
- maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com,
- boost.lists@gmail.com, thomas.dullien@googlemail.com, pbonzini@redhat.com,
- mreitz@redhat.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com,
- rth@twiddle.net
+Cc: Tao Xu <tao3.xu@intel.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Kevin Wolf [mailto:kwolf@redhat.com]
-> Am 20.09.2019 um 09:25 hat Pavel Dovgalyuk geschrieben:
-> > > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > > Am 19.09.2019 um 14:10 hat Pavel Dovgalyuk geschrieben:
-> > > > > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > > > > diff --git a/block/block-backend.c b/block/block-backend.c
-> > > > > index 1c605d5444..c57d3d9fdf 100644
-> > > > > --- a/block/block-backend.c
-> > > > > +++ b/block/block-backend.c
-> > > > > @@ -17,6 +17,7 @@
-> > > > >  #include "block/throttle-groups.h"
-> > > > >  #include "hw/qdev-core.h"
-> > > > >  #include "sysemu/blockdev.h"
-> > > > > +#include "sysemu/replay.h"
-> > > > >  #include "sysemu/runstate.h"
-> > > > >  #include "qapi/error.h"
-> > > > >  #include "qapi/qapi-events-block.h"
-> > > > > @@ -808,6 +809,12 @@ void blk_remove_bs(BlockBackend *blk)
-> > > > >  int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp)
-> > > > >  {
-> > > > >      ThrottleGroupMember *tgm = &blk->public.throttle_group_member;
-> > > > > +
-> > > > > +    if (replay_mode != REPLAY_MODE_NONE && bs->drv != &bdrv_blkreplay) {
-> > > > > +        error_setg(errp, "Root node must be blkreplay");
-> > > > > +        return -ENOTSUP;
-> > > > > +    }
-> > > >
-> > > > I guess this is opposite direction - bs->drv is bdrv_file.
-> > > > And we should check its parent.
-> > >
-> > > If bs->drv is bdrv_file, you want this to fail because only
-> > > bdrv_blkreplay should be able to be attached to devices.
-> >
-> > There was a regular rr invocation (as described in docs).
-> > And bs->drv always was a pointer to bdrv_file: for original image,
-> > and for temporary snapshot.
-> 
-> Hm, what was the actual command line you used? I can see that you have a
-> separate -drive for the qcow2 file, so I can see how you get an unused
-> BlockBackend for the qcow2 node, but I don't see how it would be a file
-> node.
+Add some comments, clean up comments over 80 chars per line. And there
+is an extra line in comment of CPUID_8000_0008_EBX_WBNOINVD, remove
+the extra enter and spaces.
 
-The command line was almost the same as in docs:
+Drop the duplicated definition of cpuid AVX512_VBMI marco and rename it
+as CPUID_7_0_ECX_AVX512_VBMI.
 
--drive file=disk.img,format=raw,snapshot,id=img-direct \
--drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
--device virtio-blk-device,drive=img-blkreplay \
+Changelog:
+v3:
+    - split the patch into 2 patches. (Suggested by Stefano Garzarella
+      and Eduardo Habkost)
+v2:
+    - correct the comments over 80 chars per line. (Suggested by
+      Philippe Mathieu-Daudé)
 
-I've got the following blk_insert_bs invocations:
-1. bs=ptr1 bs->drv=&bdrv_file, bs->filename=disk.img
-2. bs=ptr2 bs->drv=&bdrv_file, bs->filename=<tmp filename>
-3. bs=ptr2 bs->drv=&bdrv_file, bs->filename=<tmp filename>
-4. bs=ptr2 bs->drv=&bdrv_file, bs->filename=<tmp filename>
-5. bs=ptr3 bs->drv=&bdrv_file, bs->filename=<tmp filename>
+Tao Xu (2):
+  target/i386: clean up comments over 80 chars per line
+  target/i386: drop the duplicated definition of cpuid AVX512_VBMI marco
 
-> Anyway, this leaves us two options: Either change the recommended
-> command line to use -blockdev for the qcow2 file so that no BlockBackend
-> is created for it (I think this might be preferable), or restrict the
-> error to when the BlockBackend is used.
-> 
-> The second option would probably have to be done in blk_attach_dev().
-> The problem with this is that the only expected error so far is that the
-> BlockBackend is already attached to a different device. So if you return
-> a new error there, you will have to touch its callers as well to have
-> this error correctly passed to the user.
+ target/i386/cpu.c           |   4 +-
+ target/i386/cpu.h           | 163 +++++++++++++++++++++++-------------
+ target/i386/hvf/x86_cpuid.c |   2 +-
+ 3 files changed, 109 insertions(+), 60 deletions(-)
 
-Pavel Dovgalyuk
+-- 
+2.20.1
 
 
