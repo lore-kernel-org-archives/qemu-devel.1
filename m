@@ -2,80 +2,69 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F5DAC4CEC4
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 18:35:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C718C4CEC4
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 18:37:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C74F20882
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 18:35:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T2Z2WF5H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C74F20882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0314F20882
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 18:37:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0314F20882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCTBX-0001Ug-K1
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 14:35:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50518)
+	id 1iCTCm-0002nW-Lj
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 14:37:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50912)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <incredible.tack@gmail.com>) id 1iCT8O-00089j-IQ
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:32:29 -0400
+ (envelope-from <lersek@redhat.com>) id 1iCTB4-0001b8-Rw
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:35:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <incredible.tack@gmail.com>) id 1iCT8N-00017o-6f
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:32:28 -0400
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:34744)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <incredible.tack@gmail.com>)
- id 1iCT8M-000176-KH
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:32:27 -0400
-Received: by mail-wr1-x42d.google.com with SMTP id a11so15164612wrx.1
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 11:32:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=d29nEeB5YOryZYGlPO9m05KJLr76l1/0Bo8CSidxGFE=;
- b=T2Z2WF5HXVcxv/cYhsuNu1iddHRgZJYqcyvjmtR8oy381mO1/sdFgyVcvmXp2ydyQq
- lz0C+1YtLZE4bpwc+XCGBrWbQDnby36n14lmm/Kkc4CaWLZ1RjCOnVLsIAxkgOaLUa6A
- SSIdxQo8UEUNZnrqIBmpb6SV9sLmpkCiOnUwiC8CYEO3da55gZLCbVR/c9ahSTGhQKJ3
- sn3KtpNMrTJOI0jXVC+TmuiPRlNE8wmB523rEOkQfLdebVSw7XPro8KplwAvxZjxqKx0
- bLAmYwSE/8QK5qMXFZyHC/Jwu/HM+C3F7xik23FojoZJ7JwpuL8QLbeCMX+8YXfn0l2Q
- fNPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=d29nEeB5YOryZYGlPO9m05KJLr76l1/0Bo8CSidxGFE=;
- b=c48zab1OJtTP2AAC3l1P7aCEx0TPUWxbxQUfccug6hdGIl1M2zqpXF678JwrIybs4R
- R0VrzgFkfzbJG3Ps+ZQ7KJz4/1N9jrDxTuYuLVYlLhsX/nNzwy6zf55h+KewWnynipKi
- Vy9F+L7ykEwXvN8Jb0W7Y/6ZIkn0EdeC+q+7Pff0uUeNMrNYOxEteMm7N5981L157Hk9
- WNHOggdPRtMqRE4IsvlK9Mbgi9mG5Zp3ql4wB5Z6YQf2nOFF1hh6TYbCvsdXGtva+Tfd
- 8egeezM6NM9RtXD4l3bM+RTou0E/DKM07Cg6kCp+hQKlRGxMKr0CNz7YVoankX18GE2q
- /yKQ==
-X-Gm-Message-State: APjAAAWZNF/qeXzP0bBIqBG4/0T9+/wS1pTvIumEPjEAwrme1Xlim5Wq
- Axti5oTaqHXh2ImwZ9Vahk2BUBE/wUUqqkuYhvG97mBX
-X-Google-Smtp-Source: APXvYqz36W4x8nOOFj8gvIu8tKq8Tu4VPM8cFjMmwXJjNcy2RQjE8Lp9VnPVjvpgyYKcOOUm46fh1pNnDMBec0bjCY4=
-X-Received: by 2002:adf:ee45:: with SMTP id w5mr629647wro.246.1569263544918;
- Mon, 23 Sep 2019 11:32:24 -0700 (PDT)
+ (envelope-from <lersek@redhat.com>) id 1iCTB2-0002TQ-Ti
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:35:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45902)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iCTB2-0002R7-Kv
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:35:12 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E8B7F197BCE0;
+ Mon, 23 Sep 2019 18:35:10 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-2.rdu2.redhat.com
+ [10.10.120.2])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AB3F45D9D5;
+ Mon, 23 Sep 2019 18:35:03 +0000 (UTC)
+Subject: Re: [edk2-devel] [Qemu-devel] [PATCH 1/2] q35: implement 128K SMRAM
+ at default SMBASE address
+From: Laszlo Ersek <lersek@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20190917130708.10281-1-imammedo@redhat.com>
+ <20190917130708.10281-2-imammedo@redhat.com>
+ <561f4440-7c06-10d7-80ce-bbfa810fec59@redhat.com>
+ <20190920102855.3fe2b689@redhat.com>
+ <a581abbc-ec03-c332-b225-6f7cd3cfadae@redhat.com>
+Message-ID: <c18f1ada-3eca-d5f1-da4f-e74181c5a862@redhat.com>
+Date: Mon, 23 Sep 2019 20:35:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-References: <CAHyh4xhYrUbK0aEJmKp3_kOJG2E+AQLMUjyf7_pXVJgbqgv5JA@mail.gmail.com>
- <20190923104245.GA2866@work-vm>
-In-Reply-To: <20190923104245.GA2866@work-vm>
-From: Jintack Lim <incredible.tack@gmail.com>
-Date: Mon, 23 Sep 2019 11:32:13 -0700
-Message-ID: <CAHyh4xiocOEqUxhL9LBuNxRHP1XQq5LT9j873KTUdv4CP_o+cQ@mail.gmail.com>
-Subject: Re: Migration failure when running nested VMs
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42d
+In-Reply-To: <a581abbc-ec03-c332-b225-6f7cd3cfadae@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Mon, 23 Sep 2019 18:35:11 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,98 +76,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Devel Mailing List <qemu-devel@nongnu.org>
+Cc: yingwen.chen@intel.com, Brijesh Singh <brijesh.singh@amd.com>,
+ devel@edk2.groups.io, phillip.goerl@oracle.com, qemu-devel@nongnu.org,
+ alex.williamson@redhat.com, jiewen.yao@intel.com, jun.nakajima@intel.com,
+ michael.d.kinney@intel.com, pbonzini@redhat.com, boris.ostrovsky@oracle.com,
+ rfc@edk2.groups.io, joao.m.martins@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 23, 2019 at 3:42 AM Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
->
-> * Jintack Lim (incredible.tack@gmail.com) wrote:
-> > Hi,
->
-> Copying in Paolo, since he recently did work to fix nested migration -
-> it was expected to be broken until pretty recently; but 4.1.0 qemu on
-> 5.3 kernel is pretty new, so I think I'd expected it to work.
->
+On 09/20/19 11:28, Laszlo Ersek wrote:
+> On 09/20/19 10:28, Igor Mammedov wrote:
+>> On Thu, 19 Sep 2019 19:02:07 +0200
+>> "Laszlo Ersek" <lersek@redhat.com> wrote:
+>>
+>>> Hi Igor,
+>>>
+>>> (+Brijesh)
+>>>
+>>> long-ish pondering ahead, with a question at the end.
+>> [...]
+>>
+>>> Finally: can you please remind me why we lock down 128KB (32 pages) at
+>>> 0x3_0000, and not just half of that? What do we need the range at
+>>> [0x4_0000..0x4_FFFF] for?
+>>
+>>
+>> If I recall correctly, CPU consumes 64K of save/restore area.
+>> The rest 64K are temporary RAM for using in SMI relocation handler,
+>> if it's possible to get away without it then we can drop it and
+>> lock only 64K required for CPU state. It won't help with SEV
+>> conflict though as it's in the first 64K.
+> 
+> OK. Let's go with 128KB for now. Shrinking the area is always easier
+> than growing it.
+> 
+>> On QEMU side,  we can drop black-hole approach and allocate
+>> dedicated SMRAM region, which explicitly gets mapped into
+>> RAM address space and after SMI hanlder initialization, gets
+>> unmapped (locked). So that SMRAM would be accessible only
+>> from SMM context. That way RAM at 0x30000 could be used as
+>> normal when SMRAM is unmapped.
+> 
+> I prefer the black-hole approach, introduced in your current patch
+> series, if it can work. Way less opportunity for confusion.
+> 
+> I've started work on the counterpart OVMF patches; I'll report back.
 
-Thank you, Dave. What Paolo proposed make migration work!
+I've got good results. For this (1/2) QEMU patch:
 
-> > I'm seeing VM live migration failure when a VM is running a nested VM.
-> > I'm using latest Linux kernel (v5.3) and QEMU (v4.1.0). I also tried
-> > v5.2, but the result was the same. Kernel versions in L1 and L2 VM are
-> > v4.18, but I don't think that matters.
-> >
-> > The symptom is that L2 VM kernel crashes in different places after
-> > migration but the call stack is mostly related to memory management
-> > like [1] and [2]. The kernel crash happens almost all the time. While
-> > L2 VM gets kernel panic, L1 VM runs fine after the migration. Both L1
-> > and L2 VM were doing nothing during migration.
-> >
-> > I found a few clues about this issue.
-> > 1) It happens with a relatively large memory for L1 (24G), but it does
-> > not with a smaller size (3G).
-> >
-> > 2) Dead migration worked; when I ran "stop" command in the qemu
-> > monitor for L1 first and did migration, migration worked always. It
-> > also worked when I only stopped L2 VM and kept L1 live during the
-> > migration.
-> >
-> > With those two clues, I guess maybe some dirty pages made by L2 are
-> > not transferred to the destination correctly, but I'm not really sure.
-> >
-> > 3) It happens on Intel(R) Xeon(R) Silver 4114 CPU, but it does not on
-> > Intel(R) Xeon(R) CPU E5-2630 v3 CPU.
-> >
-> > This makes me confused because I thought migrating nested state
-> > doesn't depend on the underlying hardware.. Anyways, L1-only migration
-> > with the large memory size (24G) works on both CPUs without any
-> > problem.
-> >
-> > I would appreciate any comments/suggestions to fix this problem.
->
-> Can you share the qemu command lines you're using for both L1 and L2
-> please ?
+Tested-by: Laszlo Ersek <lersek@redhat.com>
 
-Sure. I use the same QEMU command line for L1 and L2 except for cpu
-and memory allocation.
+I tested the following scenarios. In every case, I verified the OVMF
+log, and also the "info mtree" monitor command's result (i.e. whether
+"smbase-blackhole" / "smbase-window" were disabled or enabled). Mostly,
+I diffed these text files between the test scenarios (looking for
+desired / undesired differences). In the Linux guests, I checked /
+compared the dmesg too (wrt. the UEFI memmap).
 
-This is the one for running L1, and I use smaller cpu and memory size for L2.
-./qemu/x86_64-softmmu/qemu-system-x86_64 -smp 6 -m 24G -M
-q35,accel=kvm -cpu host -drive
-if=none,file=/vm_nfs/guest0.img,id=vda,cache=none,format=raw -device
-virtio-blk-pci,drive=vda --nographic -qmp
-unix:/var/run/qmp,server,wait -serial mon:stdio -netdev
-user,id=net0,hostfwd=tcp::2222-:22 -device
-virtio-net-pci,netdev=net0,mac=de:ad:be:ef:f2:12 -netdev
-tap,id=net1,vhost=on,helper=/srv/vm/qemu/qemu-bridge-helper -device
-virtio-net-pci,netdev=net1,disable-modern=off,disable-legacy=on,mac=de:ad:be:ef:f2:11
--monitor telnet:127.0.0.1:4444,server,nowait
+- unpatched OVMF (regression test), Fedora guest, normal boot and S3
 
-> Are there any dmesg entries around the time of the migration on either
-> the hosts or the L1 VMs?
+- patched OVMF, but feature disabled with "-global mch.smbase-smram=off"
+(another regression test), Fedora guest, normal boot and S3
 
-No, I didn't see anything special in L0 or L1 kernel log.
+- patched OVMF, feature enabled, Fedora and various Windows guests
+(win7, win8, win10 families, client/server), normal boot and S3
 
-> What guest OS are you running in L1 and L2?
->
+- a subset of the above guests, with S3 disabled (-global
+  ICH9-LPC.disable_s3=1), and obviously S3 resume not tested
 
-I'm using Linux v4.18 both in L1 and L2.
+SEV: used 5.2-ish Linux guest, with S3 disabled (no support under SEV
+for that now):
 
-Thanks,
-Jintack
+- unpatched OVMF (regression test), normal boot
 
-> Dave
->
-> > Thanks,
-> > Jintack
-> >
-> >
-> > [1]https://paste.ubuntu.com/p/XGDKH45yt4/
-> > [2]https://paste.ubuntu.com/p/CpbVTXJCyc/
-> >
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+- patched OVMF but feature disabled on the QEMU cmdline (another
+regression test), normal boot
+
+- patched OVMF, feature enabled, normal boot.
+
+I plan to post the OVMF patches tomorrow, for discussion.
+
+(It's likely too early to push these QEMU / edk2 patches right now -- we
+don't know yet if this path will take us to the destination. For now, it
+certainly looks great.)
+
+Thanks
+Laszlo
 
