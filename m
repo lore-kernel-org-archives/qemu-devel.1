@@ -2,118 +2,108 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3873BC04EBF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:41:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 234C8C04EBF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:43:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03D40205F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:41:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="AiEMpeVP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03D40205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id ED017205F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:43:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED017205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCNem-0000Au-Ea
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 08:41:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50849)
+	id 1iCNgk-00020t-5p
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 08:43:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51522)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <anton.nefedov@virtuozzo.com>) id 1iCNbt-00063v-8Z
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:38:34 -0400
+ (envelope-from <thuth@redhat.com>) id 1iCNfr-0001RS-0B
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:42:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <anton.nefedov@virtuozzo.com>) id 1iCNbr-0003Ga-V9
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:38:32 -0400
-Received: from mail-eopbgr40128.outbound.protection.outlook.com
- ([40.107.4.128]:55209 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
- id 1iCNbr-0003Fk-8S; Mon, 23 Sep 2019 08:38:31 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KKz+MT10T3Y9YpA043QeFbGLNQ8lHtW5Gh3VS0DaEpwpLy9tdIax+RZHjWGWNg4m/oXX1UVvX2bbw+ibKbfQ7LXt+t/8Om6heHmdqbaKv5pvDPYj7wSuuMkmP7c8xBb8kXNBQYur9UYD+JtmCKd/msGtv7xaQGu7pQsnP04jt211BAyhX4Tr2RerxNt0SKLf0unSJeyIgdhqMY6pwlikUlE6ZnjAw+qSaT4bY/k7NjfXDyyeovfCj/ASu+wz3bPLSjw86eHpxbs17KRe71GHSavw5ismUvtMEB8o1HdaKFp4qZTZsCUpaywIKgx4FuzoJtR4O/EMRyv8AuecCvQkdg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XS1jYCOcqazczm6LVE88WwqfprgajG4fsbmFBL9SEag=;
- b=YT20lA7aZSGSsXKtXN6PvaXJ3JVRDTnNJOYPpW5DTm2uytHr90mIbqmohakfF9JkOGOHEOdqlYdC66L9hbyCYO+BRixSo0OtaPm1Rh75Poc+P8WnjB1tN+vEPWQUswVM48Vs1XsR7YMYCAT9nfkFzvyyYmaIZkvplvQEjqTTX0itfpyKCNsU+Qd0o9y7vrN+0ljxJ9z0Ym0hYyK1me2ZdxMFsQtJyGH/877j2n/mWzX5pFnjm8ZYlEx4cmSyoCcnT8y9xvUDTJwsTm8f6dkxyV5Sv4qcizZcy3UHEx26699MSjC7Bo2XCVfNTJyMJby7QqmfsFaMxJGoAeV3unBtZw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XS1jYCOcqazczm6LVE88WwqfprgajG4fsbmFBL9SEag=;
- b=AiEMpeVP32s5GuOHQFFOjqV7k+12XBSeoKbbySrtVyVjqWiv/hAZ63wh2ilDUkdRrtTJSEBVigLo+Qk7fQ2EzS4h3uAej5zNbP+RaSZ3TFNPCjkuK9lX2syARzQ1Tbk3qw3Ar+aJeqWvwfpPvGthBrI8t3UO4+DYW1loga22BTc=
-Received: from AM6PR08MB5208.eurprd08.prod.outlook.com (10.255.122.155) by
- AM6PR08MB4439.eurprd08.prod.outlook.com (20.179.7.78) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2284.23; Mon, 23 Sep 2019 12:38:28 +0000
-Received: from AM6PR08MB5208.eurprd08.prod.outlook.com
- ([fe80::243c:9ff6:e242:c550]) by AM6PR08MB5208.eurprd08.prod.outlook.com
- ([fe80::243c:9ff6:e242:c550%6]) with mapi id 15.20.2284.023; Mon, 23 Sep 2019
- 12:38:28 +0000
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH v9 0/9] discard blockstats
-Thread-Topic: [PATCH v9 0/9] discard blockstats
-Thread-Index: AQHVZMxfg+HPfSnN606DpCBwMZ/jBac5MjYAgAAbxoA=
-Date: Mon, 23 Sep 2019 12:38:27 +0000
-Message-ID: <6a7cdf2a-06f1-f4fe-56b7-ef19caec83ba@virtuozzo.com>
-References: <20190906160120.70239-1-anton.nefedov@virtuozzo.com>
- <13885e81-16ae-f2f3-488c-b55fb76aaf4c@redhat.com>
-In-Reply-To: <13885e81-16ae-f2f3-488c-b55fb76aaf4c@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0285.eurprd05.prod.outlook.com
- (2603:10a6:7:93::16) To AM6PR08MB5208.eurprd08.prod.outlook.com
- (2603:10a6:20b:eb::27)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=anton.nefedov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c62ec845-259c-4f76-a1dc-08d74022ee7b
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(5600167)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
- SRVR:AM6PR08MB4439; 
-x-ms-traffictypediagnostic: AM6PR08MB4439:
-x-ms-exchange-purlcount: 2
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB443988AEE3F66684D991CCE3F8850@AM6PR08MB4439.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:669;
-x-forefront-prvs: 0169092318
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(396003)(376002)(136003)(366004)(39840400004)(346002)(189003)(199004)(229853002)(6436002)(81166006)(8676002)(6306002)(6486002)(81156014)(66066001)(66476007)(66556008)(64756008)(66446008)(966005)(52116002)(6512007)(4326008)(31686004)(2906002)(2501003)(53546011)(386003)(256004)(6506007)(36756003)(478600001)(76176011)(3846002)(486006)(71190400001)(44832011)(86362001)(31696002)(446003)(71200400001)(476003)(2616005)(11346002)(107886003)(6246003)(7736002)(99286004)(4744005)(25786009)(102836004)(305945005)(26005)(6116002)(5660300002)(186003)(316002)(66946007)(110136005)(54906003)(14454004)(8936002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4439;
- H:AM6PR08MB5208.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: hVwFeWkcJwPaUADo3np5EuUxBqbLXkWiwCJ8cZ9jpS2M2T20W4k0TKhJ4EtPwnno2+dGY9rOdTo580w6mFbq3q2uEz888VLcjFlvnLsgFsMciVwVvznmrje5rvajFvIONUp2wUp8TV3N1SG6d0OESDpldcfEzIEuhj1pxlZaCZWdbEFEdwos+6HdUBnbnxmauPpcQYt2R0wIDCgbbA7nFE+uf9z0VqTTHoTAhhHrhJzfhxTdw3L4oV+bdE2DXg/xpXPnQAp+DJgDP3vx6ztY5xEUef41bLfCRxQ5MksEhxGXUYgfdvTayq5rA+BgMBU1Yq7RFs517rz6mJzWmUsvf6MKjW8aRe3oSk7vz1Q+N0p7ZYXNoEtX0AZUeEwNwZRlArqfwhYePJSgC5z9nmxph0Srct6yXsvF62MmbxnZTWU=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C9725BB46EF037469162CF5AA989E51D@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <thuth@redhat.com>) id 1iCNfo-0004zl-KZ
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:42:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53946)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1iCNfo-0004z6-DK; Mon, 23 Sep 2019 08:42:36 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id F3F6A10C093A;
+ Mon, 23 Sep 2019 12:42:34 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-120.ams2.redhat.com [10.36.116.120])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9B68F5C1B2;
+ Mon, 23 Sep 2019 12:42:33 +0000 (UTC)
+Subject: Re: [PATCH] Disallow colons in the parameter of "-accel"
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190923121712.22971-1-thuth@redhat.com>
+ <CAFEAcA9jOD_mFOeVaAo5qsoj-Q0-U5qF8c85Am4ObgSn3b6irg@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <cff2b157-910a-a97d-3fe1-a862e781eac8@redhat.com>
+Date: Mon, 23 Sep 2019 14:42:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c62ec845-259c-4f76-a1dc-08d74022ee7b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Sep 2019 12:38:28.1463 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yWH+U0ifBv39cTb45DjqpFAZYwhcB9kBO+A1H9iYC7zpda/Abgp1Ucjye3rrqg4kXOuvTK1koHlSitBGjlar9FBAWjpOBAWsXW2mL7cLC/o=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4439
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.4.128
+In-Reply-To: <CAFEAcA9jOD_mFOeVaAo5qsoj-Q0-U5qF8c85Am4ObgSn3b6irg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Mon, 23 Sep 2019 12:42:35 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,28 +115,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "berto@igalia.com" <berto@igalia.com>, Denis Lunev <den@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-T24gMjMvOS8yMDE5IDE6NTkgUE0sIE1heCBSZWl0eiB3cm90ZToNCj4gT24gMDYuMDkuMTkgMTg6
-MDEsIEFudG9uIE5lZmVkb3Ygd3JvdGU6DQo+PiB2OToNCj4+ICAgLSBmaXhlZCBwYXRjaCA1IHNv
-IHRoZSBmaWVsZHMgYXJlIGFjdHVhbGx5IG51bWJlcmVkIGluIHNlY3RvcnMgbm90IGJsb2Nrcw0K
-Pj4gICAtIGZpeGVkIHBhdGNoIDcgYWNjb3JkaW5nbHkNCj4+ICAgLSBwYXRjaCA4OiBtYWtlIHN0
-YXQgZmllbGRzIHVuc2lnbmVkDQo+PiAgIC0gcWFwaSBwYXRjaGVzOiAic2luY2UgNC4xIiAtPiAi
-c2luY2UgNC4yIg0KPj4NCj4+IHY4OiBodHRwczovL2xpc3RzLmdudS5vcmcvYXJjaGl2ZS9odG1s
-L3FlbXUtZGV2ZWwvMjAxOS0wNS9tc2cwMzcwOS5odG1sDQo+IA0KPiBGb3IgdGhlIHJlY29yZDog
-TG9va3MgT0sgdG8gbWUsIGJ1dCBJIHN1cHBvc2UgeW91IHN0aWxsIHdhbnRlZCB0byBjaGFuZ2UN
-Cj4gcGF0Y2ggM+KAmXMgY29tbWl0IG1lc3NhZ2UuDQo+IA0KPiAoSSBzdGlsbCBkb27igJl0IGxp
-a2UgcGF0Y2ggOSB2ZXJ5IG11Y2gsIGJ1dCB0aGF0IHdvbuKAmXQgc3RvcCBtZSBmcm9tDQo+IHRh
-a2luZyBpdC4pDQo+IA0KDQpoaSwNCkkndmUgbm93IHJlc2VudCB0aGUgc2VyaWVzIHdpdGggdGhl
-IHVwZGF0ZWQgcGF0Y2ggMyBjb21taXQgbWVzc2FnZQ0KDQpodHRwczovL2xpc3RzLm5vbmdudS5v
-cmcvYXJjaGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAxOS0wOS9tc2cwNTA1MC5odG1sDQoNCnRoYW5r
-cywNCg==
+On 23/09/2019 14.23, Peter Maydell wrote:
+> On Mon, 23 Sep 2019 at 13:21, Thomas Huth <thuth@redhat.com> wrote:
+>>
+>> Everybody who used something like "-machine accel=3Dkvm:tcg" in the pa=
+st
+>> might be tempted to specify a similar list with the -accel parameter,
+>> too, for example "-accel kvm:tcg". However, this is not how this
+>> options is thought to be used, since each "-accel" should only take ca=
+re
+>> of one specific accelerator.
+>>
+>> In the long run, we really should rework the "-accel" code completely,
+>> so that it does not set "-machine accel=3D..." anymore internally, but
+>> is completely independent from "-machine". For the short run, let's
+>> make sure that users cannot use "-accel xyz:tcg", so that we avoid
+>> that we have to deal with such cases in the wild later.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  vl.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> diff --git a/vl.c b/vl.c
+>> index 630f5c5e9c..68f47a9c25 100644
+>> --- a/vl.c
+>> +++ b/vl.c
+>> @@ -3554,6 +3554,11 @@ int main(int argc, char **argv, char **envp)
+>>                      g_slist_free(accel_list);
+>>                      exit(0);
+>>                  }
+>> +                if (optarg && strchr(optarg, ':')) {
+>> +                    error_report("Don't use ':' with -accel, "
+>> +                                 "use -M accel=3D... in this case ins=
+tead");
+>> +                    exit(1);
+>> +                }
+>=20
+> This seems pretty ugly.
+
+Yes. The whole "-accel" option is currently ugly. My patch is just a
+temporary work-around to prevent that we later have to deal with the
+fact that users started to use this colon here in the wild and we would
+then have to fight to get rid of it again.
+
+> If -accel is the way we're recommending
+> users configure the accelerator then it should support syntax
+> for specifying everything we could do with the old -machine...
+> option.
+
+No, we certainly don't want to have the colon in here. The idea is
+rather that you could specify multiply "-accel" options one day, e.g.:
+
+ -accel tcg,tb-size=3D2048 -accel kvm,kernel_irqchip=3Don
+
+... and then the accelators are used with the right parameters in the
+order of availability.
+
+Per-accelerator parameters just don't work here if you allow the colon.
+
+(IMHO we should not have let the -accel code enter the repository in
+this shape, but rather insist on a proper implementation right from the
+start - but now that it's there, we have to deal with it and should make
+sure that it does not get worse)
+
+ Thomas
 
