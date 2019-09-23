@@ -2,62 +2,65 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C35C04EBF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:06:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B643C32755
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:09:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 868E720673
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:06:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 868E720673
+	by mail.kernel.org (Postfix) with ESMTPS id 03ECD20835
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:09:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03ECD20835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCO3L-0006mz-Iy
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 09:06:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53641)
+	id 1iCO68-00008S-2u
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 09:09:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54519)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCO00-0003q9-Gx
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:03:29 -0400
+ (envelope-from <armbru@redhat.com>) id 1iCO4q-0007fy-Nf
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:08:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCNzz-000457-2N
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:03:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60286)
+ (envelope-from <armbru@redhat.com>) id 1iCO4o-0005Nh-FL
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:08:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56424)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCNzy-00044z-QF
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:03:27 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCO4o-0005NZ-7h
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:08:26 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 12396356DC;
- Mon, 23 Sep 2019 13:03:26 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7936AA2667F;
+ Mon, 23 Sep 2019 13:08:25 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AC50060C63;
- Mon, 23 Sep 2019 13:03:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 65AA210016EB;
+ Mon, 23 Sep 2019 13:08:22 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 36574113864E; Mon, 23 Sep 2019 15:03:24 +0200 (CEST)
+ id E59FE113864E; Mon, 23 Sep 2019 15:08:20 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: Palmer Dabbelt <palmer@sifive.com>
-Subject: Re: [Qemu-devel] [PATCH] vl.c: Report unknown machines correctly
-References: <20190915202011.30459-1-palmer@sifive.com>
-Date: Mon, 23 Sep 2019 15:03:24 +0200
-In-Reply-To: <20190915202011.30459-1-palmer@sifive.com> (Palmer Dabbelt's
- message of "Sun, 15 Sep 2019 13:20:11 -0700")
-Message-ID: <8736gnnp0j.fsf@dusky.pond.sub.org>
+To: =?utf-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
+Subject: Re: [PATCH v4 15/24] audio: add mixing-engine option (documentation)
+References: <cover.1568927990.git.DirtY.iCE.hu@gmail.com>
+ <68c4b4bd438e9cb5c97aed32ee31e3dabd96cbf6.1568927990.git.DirtY.iCE.hu@gmail.com>
+Date: Mon, 23 Sep 2019 15:08:20 +0200
+In-Reply-To: <68c4b4bd438e9cb5c97aed32ee31e3dabd96cbf6.1568927990.git.DirtY.iCE.hu@gmail.com>
+ (=?utf-8?B?IkvFkXbDoWfDsywgWm9sdMOhbiIncw==?= message of "Thu, 19 Sep 2019
+ 23:24:23 +0200")
+Message-ID: <87sgonma7v.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Mon, 23 Sep 2019 13:03:26 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Mon, 23 Sep 2019 13:08:25 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -71,104 +74,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Palmer Dabbelt <palmer@sifive.com> writes:
+"K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n" <dirty.ice.hu@gmail.com> writes:
 
-> I was recently typing in a QEMU command line, and ended up with
-> something like
+> This will allow us to disable mixeng when we use a decent backend.
 >
->     qemu-system-riscv64 -machine virt ... -M 8G
+> Disabling mixeng have a few advantages:
+> * we no longer convert the audio output from one format to another, when
+>   the underlying audio system would just convert it to a third format.
+>   We no longer convert, only the underlying system, when needed.
+> * the underlying system probably has better resampling and sample format
+>   converting methods anyway...
+> * we may support formats that the mixeng currently does not support (S24
+>   or float samples, more than two channels)
+> * when using an audio server (like pulseaudio) different sound card
+>   outputs will show up as separate streams, even if we use only one
+>   backend
 >
-> which is, in retrospect, obviously incorrect: there is no "8G" machine.
-> I should have typed something like
+> Disadvantages:
+> * audio capturing no longer works (wavcapture, and vnc audio extension)
+> * some backends only support a single playback stream or very picky
+>   about the audio format.  In this case we can't disable mixeng.
 >
->     qemu-system-riscv64 -machine virt ... -m 8G
+> However mixeng is not removed, only made optional, so this shouldn't be
+> a big concern.
 >
-> but since QEMU was giving me the excessively unhelpful error message
->
->     qemu-system-riscv64: -machine virt: unsupported machine type
->     Use -machine help to list supported machines
->
-> I had to spend a few minutes scratching my head to figure out what was
-> going on.  For some reason I felt like I'd done that before, so I
-> figured I'd take a whack at fixing the problem this time.  It turns out
-> the error reporting for non-existant machines is just wrong: the invalid
-> machine is detected after we've lost the argument pointer, so it just
-> prints out the first instance of "-machine" instead of the one we're
-> actually looking for.
->
-> I've fixed this by just printing out "-machine $NAME" directly, but I
-> feel like there's a better way to do this.  Specifically, my issue is
-> that it always prints out "-machine" instead of "-M" -- that's actually
-> a regression for users just passing a single invalid machine via "-M",
-> which I assume is the more common case.
->
-> I'm not sure how to do this right, though, and my flight is boarding so
-> I figured I'd send this out as a way to ask the question.  I didn't have
-> time to run the test suite or figure out how to add a test for this, as
-> I'm assuming there's a better way to do it.
->
-> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+> Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.com>
 > ---
->  vl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/vl.c b/vl.c
-> index 630f5c5e9c..821a5d91c8 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2487,7 +2487,7 @@ static MachineClass *machine_parse(const char *name, GSList *machines)
->  
->      mc = find_machine(name, machines);
->      if (!mc) {
-> -        error_report("unsupported machine type");
-> +        error_printf("-machine %s: unsupported machine type\n", name);
->          error_printf("Use -machine help to list supported machines\n");
->          exit(1);
->      }
+> Notes:
+>     Changes from v1:
+>=20=20=20=20=20
+>     * renamed mixeng to mixing-engine
+>
+>  qapi/audio.json | 5 +++++
+>  qemu-options.hx | 6 ++++++
+>  2 files changed, 11 insertions(+)
+>
+> diff --git a/qapi/audio.json b/qapi/audio.json
+> index 9fefdf5186..0535eff794 100644
+> --- a/qapi/audio.json
+> +++ b/qapi/audio.json
+> @@ -11,6 +11,10 @@
+>  # General audio backend options that are used for both playback and
+>  # recording.
+>  #
+> +# @mixing-engine: use QEMU's mixing engine to mix all streams inside QEM=
+U. When
+> +#                 set to off, fixed-settings must be also off. Not every=
+ backend
+> +#                 compatible with the off setting (default on, since 4.2)
+> +#
 
-This is an instance of QemuOpts features undermining each other.
+Last sentence no verb.
 
-error_report() uses the "current location".  A few judiciously placed
-loc_FOO() ensure many error_report() just work.  For instance, anything
-within main()'s two loops over argv[] has the current location point to
-the current option or argument.
+Which backends are compatible?
 
-= QemuOpts feature #1: capture option location =
+What happens when you try the off setting with incompatible backends?
 
-A struct QemuOpts stores a complex option for later use.  Since many
-such later uses call error_report(), it captures the option's location,
-so you can make the current location point to it again.  It's even
-automatic with qemu_opts_foreach().
-
-= QemuOpts feature #2: option merging =
-
-You can request multiple options to be merged[*] by putting .merge_lists
-= true into the QemuOptsList.  qemu_machine_opts does.  -machine a=b
--machine x=y gets merged into -machine a=b,x=y.
-
-= The two feature don't want to play with each other =
-
-With option merging, we can have any number of *actual* option
-locations, but QemuOpts can capture just one, so we arbitrarily capture
-the first one.  In your example, that's "-machine virt", which is
-misleading, because the offending location is actually "-M 8G".
-
-By the time we realized the features don't play with each other, we were
-too deeply invested into both features to say "either feature is fine,
-but we can't have both".
-
-To make them play, we'd have to capture locations at the struct QemuOpt
-level instead.  Looks like an awful lot of work just to make a few error
-messages less confusing.  Makes me sad, because I do value decent error
-messages.
-
-
-
-[*] Multiple options with the same ID.  A detail that isn't relevant
-here, I think.  Can explain if you're curious.
+>  # @fixed-settings: use fixed settings for host input/output. When off,
+>  #                  frequency, channels and format must not be
+>  #                  specified (default true)
+> @@ -31,6 +35,7 @@
+>  ##
+>  { 'struct': 'AudiodevPerDirectionOptions',
+>    'data': {
+> +    '*mixing-engine':  'bool',
+>      '*fixed-settings': 'bool',
+>      '*frequency':      'uint32',
+>      '*channels':       'uint32',
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index bbfd936d29..395427422a 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -433,6 +433,7 @@ DEF("audiodev", HAS_ARG, QEMU_OPTION_audiodev,
+>      "                specifies the audio backend to use\n"
+>      "                id=3D identifier of the backend\n"
+>      "                timer-period=3D timer period in microseconds\n"
+> +    "                in|out.mixing-engine=3D use mixing engine to mix st=
+reams inside QEMU\n"
+>      "                in|out.fixed-settings=3D use fixed settings for hos=
+t audio\n"
+>      "                in|out.frequency=3D frequency to use with fixed set=
+tings\n"
+>      "                in|out.channels=3D number of channels to use with f=
+ixed settings\n"
+> @@ -503,6 +504,11 @@ Identifies the audio backend.
+>  Sets the timer @var{period} used by the audio subsystem in microseconds.
+>  Default is 10000 (10 ms).
+>=20=20
+> +@item in|out.mixing-engine=3Don|off
+> +Use QEMU's mixing engine to mix all streams inside QEMU.  When off,
+> +@var{fixed-settings} must be off too.  Not every backend is fully
+> +compatible with the off setting.  Default is on.
+> +
+>  @item in|out.fixed-settings=3Don|off
+>  Use fixed settings for host audio.  When off, it will change based on
+>  how the guest opens the sound card.  In this case you must not specify
 
