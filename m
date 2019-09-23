@@ -6,82 +6,81 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7084C4740C
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 09:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77789C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 09:53:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A1DC20835
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 09:53:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A1DC20835
+	by mail.kernel.org (Postfix) with ESMTPS id 495CF20835
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 09:53:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 495CF20835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCL1g-0004wO-3z
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 05:53:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58397)
+	id 1iCL23-0005No-8h
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 05:53:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58362)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iCKzw-0003Tr-GL
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 05:51:13 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iCKzr-0003P1-R4
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 05:51:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iCKzv-0003Go-4s
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 05:51:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60138)
+ (envelope-from <pbonzini@redhat.com>) id 1iCKzq-0003Ei-Lz
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 05:51:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55408)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iCKzs-0003F3-GN; Mon, 23 Sep 2019 05:51:08 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iCKzq-0003EP-D2
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 05:51:06 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ECC61C053B34;
- Mon, 23 Sep 2019 09:51:06 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.78])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D5BF510016EB;
- Mon, 23 Sep 2019 09:51:01 +0000 (UTC)
-Subject: Re: [Qemu-devel] [PATCH v6 0/8] Add Qemu to SeaBIOS LCHS interface
-To: Sam Eiderman <sameid@google.com>, qemu-devel@nongnu.org
-References: <20190827082427.64280-1-sameid@google.com>
-From: Max Reitz <mreitz@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 7BAF73B72D
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 09:51:05 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id j125so6396943wmj.6
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 02:51:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=kvEmVluppOWlY2Q472Ya1xN4mgYueD+ialW/NvCe4Kc=;
+ b=lAUL7iPildm93uEQZkDm9t+b4eOVKsYpxqXvb2fiW1BZ/CqGAKmr4pJRc2bcu5bNEO
+ pGDmW7D0fIpmbD6uqhcYJtnemGIySoKQ2Sc2TjmvV0Tb8rk4k/G6v0u8p4PZocteKUe1
+ w9GsamrKluw/xRqipb9EN69D6qLaz8hOj+IwwojaO5VCMftQP3EsPrMqIjP+TcQENCF4
+ kFcrI1Wzl0UckMgVpHcetQ7g2rIr8/eAK6/jbLbGk3rkEnhHMsB2E5Reeiv5iC7XUdBX
+ oIGTGmGe9ry/enqG5TvQHU5Nhz8Jh7CLkbhhnzeJ5enUEnEbpHw+/69jPwlLU59nR757
+ 3e6A==
+X-Gm-Message-State: APjAAAUx0Lx5uFdYb5m4cRgnKlgpL+gJsjxmDalOMyAfiZxFR5IwI29r
+ cN5OtnQUVMvUeahEFFo2OHoXvvBnaDDHhcAsX54Rok8VZPweuhEJSWWL5dxDHFdEJYcmvVquhL9
+ a4Nasloo5wA5/ye8=
+X-Received: by 2002:a5d:4b4e:: with SMTP id w14mr19996150wrs.191.1569232264171; 
+ Mon, 23 Sep 2019 02:51:04 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzNJRkgrThNDGiYikqI8RD+QEga20FmD3fEN4mvrHQJQqb6MZ6D+ED7X/qIhLQomycL7Omo3w==
+X-Received: by 2002:a5d:4b4e:: with SMTP id w14mr19996133wrs.191.1569232263855; 
+ Mon, 23 Sep 2019 02:51:03 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36?
+ ([2001:b07:6468:f312:9520:22e6:6416:5c36])
+ by smtp.gmail.com with ESMTPSA id s13sm9520304wmc.28.2019.09.23.02.51.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 23 Sep 2019 02:51:03 -0700 (PDT)
+Subject: Re: [PATCH v3 09/20] cputlb: Replace switches in load/store_helper
+ with callback
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190922035458.14879-1-richard.henderson@linaro.org>
+ <20190922035458.14879-10-richard.henderson@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <de51ae88-5bb3-07dc-18d8-ab96d14eb3bc@redhat.com>
-Date: Mon, 23 Sep 2019 11:50:59 +0200
+Message-ID: <f67383ec-9dc8-c040-8fd9-fb659b8cd2d4@redhat.com>
+Date: Mon, 23 Sep 2019 11:51:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190827082427.64280-1-sameid@google.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="7lGRogEDizVVYQO5WFLpmLbsMcAiwnoJL"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Mon, 23 Sep 2019 09:51:07 +0000 (UTC)
+In-Reply-To: <20190922035458.14879-10-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,134 +94,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, seabios@seabios.org,
- kevin@koconnor.net, liran.alon@oracle.com, kraxel@redhat.com,
- karl.heubaum@oracle.com
+Cc: alex.bennee@linaro.org, stefanha@redhat.com, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7lGRogEDizVVYQO5WFLpmLbsMcAiwnoJL
-Content-Type: multipart/mixed; boundary="c0oa1hrI8me5WDgvYk4Rxw9oq1OeEccmZ";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Sam Eiderman <sameid@google.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, seabios@seabios.org,
- kevin@koconnor.net, liran.alon@oracle.com, kraxel@redhat.com,
- karl.heubaum@oracle.com
-Message-ID: <de51ae88-5bb3-07dc-18d8-ab96d14eb3bc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 0/8] Add Qemu to SeaBIOS LCHS interface
-References: <20190827082427.64280-1-sameid@google.com>
-In-Reply-To: <20190827082427.64280-1-sameid@google.com>
+On 22/09/19 05:54, Richard Henderson wrote:
+> +/* Wrap the unaligned load helpers to that they have a common signature.  */
+> +static inline uint64_t wrap_ldub(const void *haddr)
+> +{
+> +    return ldub_p(haddr);
+> +}
+> +
+> +static inline uint64_t wrap_lduw_be(const void *haddr)
+> +{
+> +    return lduw_be_p(haddr);
+> +}
+> +
+> +static inline uint64_t wrap_lduw_le(const void *haddr)
+> +{
+> +    return lduw_le_p(haddr);
+> +}
+> +
+> +static inline uint64_t wrap_ldul_be(const void *haddr)
+> +{
+> +    return (uint32_t)ldl_be_p(haddr);
+> +}
+> +
+> +static inline uint64_t wrap_ldul_le(const void *haddr)
+> +{
+> +    return (uint32_t)ldl_le_p(haddr);
+> +}
 
---c0oa1hrI8me5WDgvYk4Rxw9oq1OeEccmZ
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Any reason to have these five functions (plus five for stores) instead
+of a pair
 
-On 27.08.19 10:24, Sam Eiderman via Qemu-devel wrote:
-> v1:
->=20
-> Non-standard logical geometries break under QEMU.
->=20
-> A virtual disk which contains an operating system which depends on
-> logical geometries (consistent values being reported from BIOS INT13
-> AH=3D08) will most likely break under QEMU/SeaBIOS if it has non-standa=
-rd
-> logical geometries - for example 56 SPT (sectors per track).
-> No matter what QEMU will guess - SeaBIOS, for large enough disks - will=
+static uint64_t ld_memop(const void *haddr, MemOp op)
+{
+}
 
-> use LBA translation, which will report 63 SPT instead.
->=20
-> In addition we can not enforce SeaBIOS to rely on phyiscal geometries a=
-t
-> all. A virtio-blk-pci virtual disk with 255 phyiscal heads can not
-> report more than 16 physical heads when moved to an IDE controller, the=
+static uint64_t st_memop(void *haddr, MemOp op, uint64_t val)
+{
+}
 
-> ATA spec allows a maximum of 16 heads - this is an artifact of
-> virtualization.
->=20
-> By supplying the logical geometies directly we are able to support such=
+that includes the switches?  Everything should be inlined just the same
+if you do
 
-> "exotic" disks.
->=20
-> We will use fw_cfg to do just that.
->=20
-> v2:
->=20
-> Fix missing parenthesis check in
->     "hd-geo-test: Add tests for lchs override"
->=20
-> v3:
->=20
-> * Rename fw_cfg key to "bios-geometry".
-> * Remove "extendible" interface.
-> * Add cpu_to_le32 fix as Laszlo suggested or big endian hosts
-> * Fix last qtest commit - automatic docker tester for some reason does =
-not have qemu-img set
->=20
-> v4:
->=20
-> * Change fw_cfg interface from mixed textual/binary to textual only
->=20
-> v5:
->=20
-> * Fix line > 80 chars in tests/hd-geo-test.c
->=20
-> v6:
->=20
-> * Small fixes for issues pointed by Max
-> * (&conf->conf)->lcyls to conf->conf.lcyls and so on
-> * Remove scsi_unrealize from everything other than scsi-hd
-> * Add proper include to sysemu.h
-> * scsi_device_unrealize() after scsi_device_purge_requests()
->=20
-> Sam Eiderman (8):
->   block: Refactor macros - fix tabbing
->   block: Support providing LCHS from user
->   bootdevice: Add interface to gather LCHS
->   scsi: Propagate unrealize() callback to scsi-hd
->   bootdevice: Gather LCHS from all relevant devices
->   bootdevice: Refactor get_boot_devices_list
->   bootdevice: FW_CFG interface for LCHS values
->   hd-geo-test: Add tests for lchs override
->=20
->  bootdevice.c             | 148 ++++++++--
->  hw/block/virtio-blk.c    |   6 +
->  hw/ide/qdev.c            |   7 +-
->  hw/nvram/fw_cfg.c        |  14 +-
->  hw/scsi/scsi-bus.c       |  16 ++
->  hw/scsi/scsi-disk.c      |  12 +
->  include/hw/block/block.h |  22 +-
->  include/hw/scsi/scsi.h   |   1 +
->  include/sysemu/sysemu.h  |   4 +
->  tests/Makefile.include   |   2 +-
->  tests/hd-geo-test.c      | 582 +++++++++++++++++++++++++++++++++++++++=
+        if (unlikely(tlb_addr & TLB_BSWAP)) {
+            st_memop(haddr, op ^ MO_BSWAP, val);
+        } else {
+            st_memop(haddr, op, val);
+        }
 
->  11 files changed, 773 insertions(+), 41 deletions(-)
+and the like.
 
-Acked-by: Max Reitz <mreitz@redhat.com>
+Paolo
 
+>  static inline uint64_t QEMU_ALWAYS_INLINE
+>  load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
+>              uintptr_t retaddr, MemOp op, bool code_read,
+> -            FullLoadHelper *full_load)
+> +            FullLoadHelper *full_load, LoadHelper *direct)
+>  {
+>      uintptr_t mmu_idx = get_mmuidx(oi);
+>      uintptr_t index = tlb_index(env, mmu_idx, addr);
+> @@ -1373,33 +1400,7 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
+>  
+>   do_aligned_access:
+>      haddr = (void *)((uintptr_t)addr + entry->addend);
+> -    switch (op) {
+> -    case MO_UB:
+> -        res = ldub_p(haddr);
+> -        break;
+> -    case MO_BEUW:
+> -        res = lduw_be_p(haddr);
+> -        break;
+> -    case MO_LEUW:
+> -        res = lduw_le_p(haddr);
+> -        break;
+> -    case MO_BEUL:
+> -        res = (uint32_t)ldl_be_p(haddr);
+> -        break;
+> -    case MO_LEUL:
+> -        res = (uint32_t)ldl_le_p(haddr);
+> -        break;
+> -    case MO_BEQ:
+> -        res = ldq_be_p(haddr);
+> -        break;
+> -    case MO_LEQ:
+> -        res = ldq_le_p(haddr);
+> -        break;
+> -    default:
+> -        g_assert_not_reached();
+> -    }
+> -
+> -    return res;
+> +    return direct(haddr);
 
---c0oa1hrI8me5WDgvYk4Rxw9oq1OeEccmZ--
-
---7lGRogEDizVVYQO5WFLpmLbsMcAiwnoJL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2IlYMACgkQ9AfbAGHV
-z0CDIAgAo1/Vrid3HmVOaCi7FqMrBso2HwWp3W0IH44ZQqFmMXSXBon3x298TJ0X
-e8BTB8VFw7TRsSGkYnE3pmK3qx8+8oMJgr2B2KiTSjIVxTa8p/5Ce4FqCYyBPS3H
-QVkfbYRejIol08QQEgKZqnL0L23MV60AO1vSKdbRaNbz3jHsxf1digFMdtt1me78
-9kZbpieFK+P6JpPc3iymb/OCDCw5hMB6ULOpY15e9MGGDIYk2vnBwJMhg3wkdM/P
-HrQp8SrJhh7lbDtLjan0gbXmu5dkRtHG8hhX/FVn3dxR+mcMxXdSI6b8LBo78UrY
-5q45UHNNDpkvCywyARFBHyhNIjmxMg==
-=S/Fq
------END PGP SIGNATURE-----
-
---7lGRogEDizVVYQO5WFLpmLbsMcAiwnoJL--
 
