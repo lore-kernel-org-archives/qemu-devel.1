@@ -2,79 +2,65 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C22C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 09:50:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 032C4C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 09:52:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D25B320835
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 09:50:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C089A20835
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 09:52:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CUiKO3MO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D25B320835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="klPDu/2V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C089A20835
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCKzd-00030L-RI
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 05:50:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58147)
+	id 1iCL1O-0004X3-Db
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 05:52:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58308)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iCKym-0002HV-V8
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 05:50:02 -0400
+ (envelope-from <qemu_oss@crudebyte.com>) id 1iCKzd-00039a-Oe
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 05:50:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iCKyk-0002lf-IV
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 05:50:00 -0400
-Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:43227)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iCKyi-0002kG-K2
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 05:49:58 -0400
-Received: by mail-ot1-x330.google.com with SMTP id o44so3059720ota.10
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 02:49:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=JbizzNlg2CKEas/rVo0NSsF/yuehxf4ZF3f8CiFItmg=;
- b=CUiKO3MOEoQf2iXgG1Qyd6a6OVHmvVQTD71RWnJA1XdfMSqqV/N7f3G4zhMBIGv7HJ
- gdBZcqz0TF+iaOjyrPNXwvhYqN+dvDsho8Wmm8BjhVSlw5O5iX7K+xDhuDVwmvnejebB
- HU7e/V6XZuUwqfBvLi3TES7nMtSS9FwNJGaFHO3N2q3yoXHnqkxHVzpEi5Krp34/xOCH
- q+bfZXjaKk1DG9Kk2mbR6pNkRAwPDlcmBQHMV2RdlOhX1Owp9lW04jnl4rAnd0KE1nY9
- aE9SbjwcOPg0xfqYv3fkm1YHBdvf1AG5PLAi/J9QVZFMIDLAXjB3YoRgm0wvNcz9RpJf
- OYsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=JbizzNlg2CKEas/rVo0NSsF/yuehxf4ZF3f8CiFItmg=;
- b=EbvIe2W+kECZebTx+DR9WNyb4yIBbblc82GTZjZuAYFOeTeHuEulNCJoknWsoDDsCu
- 7dhE4V2pF9ccAPNGo30P6soElkaRXTif+DRlH18GAdo/G1Mukmq88+FpOPLm2xHO6w+9
- WOV6Kf1V5C88SClUSV56Jo/KEEG/aycZ2U8sj6xjlR+z8O4B8yLigN+kcAy0a7+rTr/c
- Nf1o3WNf1R36F1nTe8hEG1Xvf2A1uLXw5XPucq3aRiZ+2qknsRYrMunTvLW1OlyUM015
- Ove8Zo9C+nN6GTm3tLkCyFkLK+dEwSXm2QHr3pxBHp9blD/0Dui3pyzD9dqBVp+ZqqmT
- rAxQ==
-X-Gm-Message-State: APjAAAU3Qj3kpH6yLlabh2ZX/p0tOCHhVtj4EecYkF5//I/ZEJthPQQ2
- jzhLugETK4cFKh2Lc+ZD3pbkmdLK8tjcEXQhbWT8sg==
-X-Google-Smtp-Source: APXvYqwH4pQkLQ5taKcJUg9XRXB/BhIVYIxwAC7U817o4dVSOApU152GGP0S8l5G8nrSnVLL7h31i9vzcJPoM1KvNz0=
-X-Received: by 2002:a9d:5e11:: with SMTP id d17mr21425570oti.135.1569232193829; 
- Mon, 23 Sep 2019 02:49:53 -0700 (PDT)
+ (envelope-from <qemu_oss@crudebyte.com>) id 1iCKzc-0003Ak-GS
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 05:50:53 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:54605)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1iCKzc-00039G-2k
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 05:50:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=uKDRbKJfOa5TqPEE9WaK9P7d9roXqodrrBQGJmXm+3Q=; b=klPDu/2VS6MtbH4QAYbsLDrAYn
+ bPI2PFQhss+2A+AitFdNqWXgPqmtGvtFVnL213pZGS4hlaxOQPR2ws7EBqYUSMzIbiAQQzHebQCqF
+ RMpBZPb2u7KJQVGTTMr9FKmhXzYKIafAW/ntmVkkH3AhK+PW/iik6IUz3Qs5ItsakipCa3oNX0Nxv
+ WqYmcE1LMhh92Nh851e5+PGG7Ekfi3x6gdE6SqNFiNXn7NM+kWXLY7YaBUJ/TPUdTyI+KaWXXggPw
+ Dmx6Xct01YBNSvrT1R2b89p3K1Sqx7yxQsb+QSP+FeTsRG4NCLxe/cTQHY45sJvTlzgX6qD3Ffsct
+ eA63TD2cGHT30zDSMMYOBUodaAks37JcVZiOwsYj6FwIOstO19iCoV/QNCmoOyHqs4sGGfi+sl0as
+ hnKjPViXPDeFiul286M+hI21mlKligFbjpRlAT2RxwAvGmUMyWqLEcmu0701NR5mwd0TdiQ4mlFys
+ rkoa5qb1PJfO/wKO0OtqAykU98iH6pXcdId0wUTYPumA3Sj/e+spYlObpQnsDd1k1PK7n+ZucXI3k
+ hme201QI2Ur/fixTRy7rS7rHO46Onjbova19LtLyaysKfQx9Zktxv433y3lWHMTwE0QdFK4PgK+79
+ d8soTXj7y7nB68AKjjvQYWiw5S65V59r65lbr4dpo=;
+To: qemu-devel@nongnu.org
+Subject: Re: [Qemu-devel] [PATCH v7 0/3] 9p: Fix file ID collisions
+Date: Mon, 23 Sep 2019 11:50:46 +0200
+Message-ID: <2376196.qMJLftDnS9@silver>
+In-Reply-To: <20190913190157.651fc3a6@bahia.lan>
+References: <cover.1567680121.git.qemu_oss@crudebyte.com>
+ <20190913190157.651fc3a6@bahia.lan>
 MIME-Version: 1.0
-References: <20190920162058.29743-1-kwolf@redhat.com>
-In-Reply-To: <20190920162058.29743-1-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 23 Sep 2019 10:49:42 +0100
-Message-ID: <CAFEAcA9_bvioJZBDK+VoPupL5_Hjyu1jvMn-7pCcXduV64UpXA@mail.gmail.com>
-Subject: Re: [PULL 0/4] Block layer patches
-To: Kevin Wolf <kwolf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::330
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 5.189.157.229
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,168 +72,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Antonios Motakis <antonios.motakis@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: Christian Schoenebeck <qemu_oss@crudebyte.com>
+From: Christian Schoenebeck via <qemu-devel@nongnu.org>
 
-On Fri, 20 Sep 2019 at 17:21, Kevin Wolf <kwolf@redhat.com> wrote:
->
-> The following changes since commit 521db80318d6c749a6f6c5a65a68397af9e3ef16:
->
->   Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2019-09-16' into staging (2019-09-16 15:25:55 +0100)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to d2c8c09fca9210d0f2399c8d570086a4a66bd22e:
->
->   iotests: Remove Python 2 compatibility code (2019-09-20 17:58:51 +0200)
->
-> ----------------------------------------------------------------
-> Block layer patches:
->
-> - Fix internal snapshots with typical -blockdev setups
-> - iotests: Require Python 3.6 or later
->
-> ----------------------------------------------------------------
-> Kevin Wolf (4):
->       block/snapshot: Restrict set of snapshot nodes
->       iotests: Test internal snapshots with -blockdev
->       iotests: Require Python 3.6 or later
->       iotests: Remove Python 2 compatibility code
+On Freitag, 13. September 2019 19:01:57 CEST Greg Kurz wrote:
+> So I did some changes in 1/3 and pushed everything to 9p-next. 
 
-Hi. This fails 'make check' on all the non-x86 Linux hosts:
-iotests 267 fails on aarch32, ppc64, s390x, aarch64.
-Sample output from the aarch32 run; others are similar
-but the listed snapshot size differs.
+I've reviewed your changes. Some notes:
 
-  TEST    iotest-qcow2: 267 [fail]
-QEMU          --
-"/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64"
--nodefaults -display none
--machine virt,accel=qtest
-QEMU_IMG      --
-"/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/../../qemu-img"
-QEMU_IO       --
-"/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/../../qemu-io"
- --cache writeback -f qcow2
-QEMU_NBD      --
-"/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/../../qemu-nbd"
-IMGFMT        -- qcow2 (compat=1.1)
-IMGPROTO      -- file
-PLATFORM      -- Linux/aarch64 mustang-maydell 4.15.0-51-generic
-TEST_DIR      --
-/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/scratch
-SOCKET_SCM_HELPER --
-/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/socket_scm_helper
+Patch 1:
+https://github.com/gkurz/qemu/commit/9295011c5a961603959b966c8aa6ad9840fe6db2
 
---- /home/peter.maydell/qemu/tests/qemu-iotests/267.out 2019-09-20
-17:54:40.127012142 +0000
-+++ /home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/267.out.bad
-      2019-09-20 18:02:11.756586745 +0000
-@@ -34,7 +34,7 @@
- (qemu) info snapshots
- List of snapshots present on all disks:
- ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+--        snap0               640 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
- (qemu) loadvm snap0
- (qemu) quit
+* Typo 1:
 
-@@ -45,7 +45,7 @@
- (qemu) info snapshots
- List of snapshots present on all disks:
- ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0               636 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+--        snap0               684 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
- (qemu) loadvm snap0
- (qemu) quit
+	error_append_hint(&local_err, "Valide options are: multidevs="
 
-@@ -70,7 +70,7 @@
- (qemu) info snapshots
- List of snapshots present on all disks:
- ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0               636 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+--        snap0               684 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
- (qemu) loadvm snap0
- (qemu) quit
+	Valide -> Valid
 
-@@ -95,7 +95,7 @@
- (qemu) info snapshots
- List of snapshots present on all disks:
- ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+--        snap0               640 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
- (qemu) loadvm snap0
- (qemu) quit
+* Typo 2 in log comment:
 
-@@ -106,7 +106,7 @@
- (qemu) info snapshots
- List of snapshots present on all disks:
- ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+--        snap0               640 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
- (qemu) loadvm snap0
- (qemu) quit
+	[groug: - Moved "multidevs" parsing the local backend.
+	->
+	[groug: - Moved "multidevs" parsing to the local backend.
 
-@@ -120,7 +120,7 @@
- (qemu) info snapshots
- List of snapshots present on all disks:
- ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+--        snap0               640 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
- (qemu) loadvm snap0
- (qemu) quit
+> I'll do some
+> more manual testing and issue a PR when I'm confident enough.
 
-@@ -135,7 +135,7 @@
- (qemu) info snapshots
- List of snapshots present on all disks:
- ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+--        snap0               640 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
- (qemu) loadvm snap0
- (qemu) quit
+That would be highly appreciated! So far I am the only one ever having tested 
+this patch set at all!
 
-@@ -146,14 +146,14 @@
- (qemu) info snapshots
- List of snapshots present on all disks:
- ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+--        snap0               640 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
- (qemu) loadvm snap0
- (qemu) quit
+> It would be nice to have some sort of automated test for that in 'make
+> check'. My first thought is to simulate a cross-device setup with the synth
+> backend, because it might be difficult to do this on a real filesystem
+> without requiring elevated privileges.
 
- Internal snapshots on overlay:
- Snapshot list:
- ID        TAG                 VM SIZE                DATE       VM CLOCK
--1         snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+1         snap0               640 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
- Internal snapshots on backing file:
-
- === -blockdev with NBD server on the backing file ===
-@@ -167,7 +167,7 @@
- (qemu) info snapshots
- List of snapshots present on all disks:
- ID        TAG                 VM SIZE                DATE       VM CLOCK
----        snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+--        snap0               640 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
- (qemu) loadvm snap0
- (qemu) quit
-
-@@ -178,5 +178,5 @@
- Internal snapshots on backing file:
- Snapshot list:
- ID        TAG                 VM SIZE                DATE       VM CLOCK
--1         snap0               591 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
-+1         snap0               640 KiB yyyy-mm-dd hh:mm:ss   00:00:00.000
- *** done
-Not run: 172 186 192 220
-Failures: 267
-Failed 1 of 104 iotests
+Hmm, since I neither haven't used the synth backend before, nor added qemu 
+test cases so far, I am yet missing the complete picture here. My initial 
+suggested approach would have been using loopback devices for simulating two 
+file systems, but yes that's probably not viable due to required permissions. 
+How would the synth backend help here? I mean you would need to simulate 
+specific inode numbers and device numbers in some way for the test cases.
 
 
-thanks
--- PMM
+
 
