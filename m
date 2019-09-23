@@ -2,65 +2,91 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8380C88CAB
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 20:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27051C4320D
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 20:54:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FDBF206C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 20:47:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FDBF206C2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id DB5B7207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 20:54:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB5B7207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCVF7-000267-Mh
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 16:47:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40666)
+	id 1iCVLx-0006Vp-LX
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 16:54:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39088)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iCVEF-0001cp-TO
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 16:46:41 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCUzd-00077L-Pp
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 16:31:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iCVED-0000TZ-Oa
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 16:46:39 -0400
-Resent-Date: Mon, 23 Sep 2019 16:46:39 -0400
-Resent-Message-Id: <E1iCVED-0000TZ-Oa@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21552)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iCVED-0000TI-JO; Mon, 23 Sep 2019 16:46:37 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1569271574; cv=none; d=zoho.com; s=zohoarc; 
- b=cckKefqyTDmq7IoAM9lTUpgCcC2vyEyOaW7NrzPJTRG2+MOs+lvcHKjaJcvBbqCOAmHq70+JsGURDLnjd2JNLhjxQOE3TjqarJN59ts+O8FUAMkz+S6mlA4KaZx1eH3LUN7bOP08EBd+UKmdSqT3cUGZiURZ0BETUH/HFNU7qSQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1569271574;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=7dTIf3J1noxTkhCVIsUNmH5cx4+SuxKzVDdWc9aIbz8=; 
- b=PWzWPKu0qTV4vhrqEqcOgYLKHbD/oum37TIUri7gRptYz/5qTk4DYmnsH88usKQt9oD50k76XI3ujMQiV1Aivkn7Eg7gTV3RJ2fmEpb0eyBnJL1bzZ7xhwv00jyFKbEWp772rcE7fEUz6PNwBQwQfO7og2noJeZ4gvXUdhRF1Z0=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 156927157298533.42848053937166;
- Mon, 23 Sep 2019 13:46:12 -0700 (PDT)
-In-Reply-To: <20190923080712.23951-1-david@redhat.com>
-Subject: Re: [PULL 00/30] s390x/tcg update
-Message-ID: <156927157151.20054.12597056234400748636@1c8ae44fe5c0>
+ (envelope-from <eblake@redhat.com>) id 1iCUzb-0000aJ-S4
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 16:31:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:3796)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iCUzS-0000Vf-3H; Mon, 23 Sep 2019 16:31:23 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DAE9E3090FC3;
+ Mon, 23 Sep 2019 20:31:19 +0000 (UTC)
+Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AD3F0601AF;
+ Mon, 23 Sep 2019 20:30:35 +0000 (UTC)
+Subject: Re: [RFC v2 7/9] Use auto-propagated errp
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20190923161231.22028-1-vsementsov@virtuozzo.com>
+ <20190923161231.22028-8-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <59c5ccc7-3d4c-9613-fcd3-97642c1394cd@redhat.com>
+Date: Mon, 23 Sep 2019 15:30:31 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: david@redhat.com
-Date: Mon, 23 Sep 2019 13:46:12 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <20190923161231.22028-8-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Mon, 23 Sep 2019 20:31:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
+X-Received-From: 209.132.183.28
+X-Mailman-Approved-At: Mon, 23 Sep 2019 16:51:49 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,116 +98,274 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, thuth@redhat.com, david@redhat.com,
- cohuck@redhat.com, qemu-devel@nongnu.org, qemu-s390x@nongnu.org,
- rth@twiddle.net
+Cc: stefanha@redhat.com, codyprime@gmail.com, jan.kiszka@siemens.com,
+ berto@igalia.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
+ arikalo@wavecomp.com, pasic@linux.ibm.com, hpoussin@reactos.org,
+ anthony.perard@citrix.com, samuel.thibault@ens-lyon.org, philmd@redhat.com,
+ green@moxielogic.com, lvivier@redhat.com, ehabkost@redhat.com,
+ xiechanglong.d@gmail.com, pl@kamp.de, dgilbert@redhat.com, b.galvani@gmail.com,
+ eric.auger@redhat.com, alex.williamson@redhat.com, ronniesahlberg@gmail.com,
+ jsnow@redhat.com, rth@twiddle.net, kwolf@redhat.com, andrew@aj.id.au,
+ crwulff@gmail.com, sundeep.lkml@gmail.com, michael@walle.cc,
+ qemu-ppc@nongnu.org, kbastian@mail.uni-paderborn.de, imammedo@redhat.com,
+ fam@euphon.net, peter.maydell@linaro.org, sheepdog@lists.wpkg.org,
+ david@redhat.com, palmer@sifive.com, thuth@redhat.com, jcmvbkbc@gmail.com,
+ den@openvz.org, hare@suse.com, sstabellini@kernel.org, arei.gonglei@huawei.com,
+ namei.unix@gmail.com, atar4qemu@gmail.com, farman@linux.ibm.com,
+ amit@kernel.org, sw@weilnetz.de, groug@kaod.org, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, peter.chubb@nicta.com.au, clg@kaod.org, shorne@gmail.com,
+ qemu-riscv@nongnu.org, cohuck@redhat.com, amarkovic@wavecomp.com,
+ aurelien@aurel32.net, pburton@wavecomp.com, sagark@eecs.berkeley.edu,
+ jasowang@redhat.com, kraxel@redhat.com, edgar.iglesias@gmail.com,
+ gxt@mprc.pku.edu.cn, ari@tuxera.com, quintela@redhat.com,
+ mdroth@linux.vnet.ibm.com, lersek@redhat.com, borntraeger@de.ibm.com,
+ antonynpavlov@gmail.com, dillaman@redhat.com, joel@jms.id.au,
+ xen-devel@lists.xenproject.org, integration@gluster.org, rjones@redhat.com,
+ Andrew.Baumann@microsoft.com, mreitz@redhat.com, walling@linux.ibm.com,
+ mst@redhat.com, mark.cave-ayland@ilande.co.uk, v.maffione@gmail.com,
+ marex@denx.de, armbru@redhat.com, marcandre.lureau@redhat.com,
+ alistair@alistair23.me, paul.durrant@citrix.com, pavel.dovgaluk@ispras.ru,
+ g.lettieri@iet.unipi.it, rizzo@iet.unipi.it, david@gibson.dropbear.id.au,
+ akrowiak@linux.ibm.com, berrange@redhat.com, xiaoguangrong.eric@gmail.com,
+ pmorel@linux.ibm.com, wencongyang2@huawei.com, jcd@tribudubois.net,
+ pbonzini@redhat.com, stefanb@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkyMzA4MDcxMi4yMzk1
-MS0xLWRhdmlkQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwOTIzMDgwNzEyLjIzOTUxLTEtZGF2aWRAcmVkaGF0
-LmNvbQpTdWJqZWN0OiBbUFVMTCAwMC8zMF0gczM5MHgvdGNnIHVwZGF0ZQpUeXBlOiBzZXJpZXMK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNl
-ID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
-bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBzOi8vZ2l0aHVi
-LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIw
-MTkwOTIzMDgwNzEyLjIzOTUxLTEtZGF2aWRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwOTIz
-MDgwNzEyLjIzOTUxLTEtZGF2aWRAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
-J3Rlc3QnCjg0NDQ1OTQgdGVzdHMvdGNnOiB0YXJnZXQvczM5MHg6IFRlc3QgTVZDCmVlMmVkNmQg
-dGVzdHMvdGNnOiB0YXJnZXQvczM5MHg6IFRlc3QgTVZPCjdiMGU4MGUgczM5MHgvdGNnOiBNVk86
-IEZhdWx0LXNhZmUgaGFuZGxpbmcKOTc5MGJlZCBzMzkweC90Y2c6IE1WU1Q6IEZhdWx0LXNhZmUg
-aGFuZGxpbmcKMTI2NThkMiBzMzkweC90Y2c6IE1WWjogRmF1bHQtc2FmZSBoYW5kbGluZwozNzFj
-YWUxIHMzOTB4L3RjZzogTVZOOiBGYXVsdC1zYWZlIGhhbmRsaW5nCjg3YTdjYmQgczM5MHgvdGNn
-OiBNVkNJTjogRmF1bHQtc2FmZSBoYW5kbGluZwoyMDBhMzlhIHMzOTB4L3RjZzogTkM6IEZhdWx0
-LXNhZmUgaGFuZGxpbmcKMDhjZTFkYiBzMzkweC90Y2c6IFhDOiBGYXVsdC1zYWZlIGhhbmRsaW5n
-CmVmMmViMGIgczM5MHgvdGNnOiBPQzogRmF1bHQtc2FmZSBoYW5kbGluZwoxYTAxZDc4IHMzOTB4
-L3RjZzogTVZDTFU6IEZhdWx0LXNhZmUgaGFuZGxpbmcKMjViYWFmZSBzMzkweC90Y2c6IE1WQzog
-RmF1bHQtc2FmZSBoYW5kbGluZyBvbiBkZXN0cnVjdGl2ZSBvdmVybGFwcwo4ODQ4ODMyIHMzOTB4
-L3RjZzogTVZDUy9NVkNQOiBVc2UgYWNjZXNzX21lbW1vdmUoKQpmYWUzNGY4IHMzOTB4L3RjZzog
-RmF1bHQtc2FmZSBtZW1tb3ZlCjRiYjdlMmQgczM5MHgvdGNnOiBGYXVsdC1zYWZlIG1lbXNldApk
-OTY1ZWMyIHMzOTB4L3RjZzogQWx3YXlzIHVzZSBNTVVfVVNFUl9JRFggZm9yIENPTkZJR19VU0VS
-X09OTFkKNWE1ZGNmMiBzMzkweC90Y2c6IE1WU1Q6IEZpeCBzdG9yaW5nIGJhY2sgdGhlIGFkZHJl
-c3NlcyB0byByZWdpc3RlcnMKNTdjNDU3OCBzMzkweC90Y2c6IE1WU1Q6IENoZWNrIGZvciBzcGVj
-aWZpY2F0aW9uIGV4Y2VwdGlvbnMKYjQ1ZDgyZSBzMzkweC90Y2c6IE1WQ1MvTVZDUDogUHJvcGVy
-bHkgd3JhcCB0aGUgbGVuZ3RoCjk2YTU5OTIgczM5MHgvdGNnOiBNVkNPUzogTGVuZ3RocyBhcmUg
-MzIgYml0IGluIDI0LzMxLWJpdCBtb2RlCjk3YThkYjcgczM5MHgvdGNnOiBNVkNTL01WQ1A6IENo
-ZWNrIGZvciBzcGVjaWFsIG9wZXJhdGlvbiBleGNlcHRpb25zCmJhMzdiZjAgczM5MHgvdGNnOiBN
-VkNMVS9NVkNMRTogUHJvY2VzcyBtYXggNGsgYnl0ZXMgYXQgYSB0aW1lCmYyZDM2YjMgczM5MHgv
-dGNnOiBNVlBHOiBQcm9wZXJseSB3cmFwIHRoZSBhZGRyZXNzZXMKMmI1ZDI5NSBzMzkweC90Y2c6
-IE1WUEc6IENoZWNrIGZvciBzcGVjaWZpY2F0aW9uIGV4Y2VwdGlvbnMKZThjYzg5MSBzMzkweC90
-Y2c6IE1WQzogVXNlIGlzX2Rlc3RydWN0aXZlX292ZXJsYXAoKQphZmM3YjMzIHMzOTB4L3RjZzog
-TVZDOiBJbmNyZW1lbnQgdGhlIGxlbmd0aCBvbmNlCjk3MjAwNTkgczM5MHgvdGNnOiBNVkNMOiBQ
-cm9jZXNzIG1heCA0ayBieXRlcyBhdCBhIHRpbWUKNmYwNWE1MiBzMzkweC90Y2c6IE1WQ0w6IERl
-dGVjdCBkZXN0cnVjdGl2ZSBvdmVybGFwcwpjZGVlYzUzIHMzOTB4L3RjZzogTVZDTDogWmVybyBv
-dXQgdW51c2VkIGJpdHMgb2YgYWRkcmVzcwpjNDkzOGVkIHMzOTB4L3RjZzogUmVzZXQgZXhjZXB0
-aW9uX2luZGV4IHRvIC0xIGluc3RlYWQgb2YgMAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8zMCBD
-aGVja2luZyBjb21taXQgYzQ5MzhlZGIxM2JjIChzMzkweC90Y2c6IFJlc2V0IGV4Y2VwdGlvbl9p
-bmRleCB0byAtMSBpbnN0ZWFkIG9mIDApCjIvMzAgQ2hlY2tpbmcgY29tbWl0IGNkZWVjNTMyYWQz
-NSAoczM5MHgvdGNnOiBNVkNMOiBaZXJvIG91dCB1bnVzZWQgYml0cyBvZiBhZGRyZXNzKQozLzMw
-IENoZWNraW5nIGNvbW1pdCA2ZjA1YTUyNGIyOTkgKHMzOTB4L3RjZzogTVZDTDogRGV0ZWN0IGRl
-c3RydWN0aXZlIG92ZXJsYXBzKQo0LzMwIENoZWNraW5nIGNvbW1pdCA5NzIwMDU5MmY2ODIgKHMz
-OTB4L3RjZzogTVZDTDogUHJvY2VzcyBtYXggNGsgYnl0ZXMgYXQgYSB0aW1lKQo1LzMwIENoZWNr
-aW5nIGNvbW1pdCBhZmM3YjMzYTVlNTUgKHMzOTB4L3RjZzogTVZDOiBJbmNyZW1lbnQgdGhlIGxl
-bmd0aCBvbmNlKQo2LzMwIENoZWNraW5nIGNvbW1pdCBlOGNjODkxMDc0YzMgKHMzOTB4L3RjZzog
-TVZDOiBVc2UgaXNfZGVzdHJ1Y3RpdmVfb3ZlcmxhcCgpKQo3LzMwIENoZWNraW5nIGNvbW1pdCAy
-YjVkMjk1MDRjZDAgKHMzOTB4L3RjZzogTVZQRzogQ2hlY2sgZm9yIHNwZWNpZmljYXRpb24gZXhj
-ZXB0aW9ucykKOC8zMCBDaGVja2luZyBjb21taXQgZjJkMzZiM2NjNjVlIChzMzkweC90Y2c6IE1W
-UEc6IFByb3Blcmx5IHdyYXAgdGhlIGFkZHJlc3NlcykKOS8zMCBDaGVja2luZyBjb21taXQgYmEz
-N2JmMDJhZjI0IChzMzkweC90Y2c6IE1WQ0xVL01WQ0xFOiBQcm9jZXNzIG1heCA0ayBieXRlcyBh
-dCBhIHRpbWUpCjEwLzMwIENoZWNraW5nIGNvbW1pdCA5N2E4ZGI3NTdhMDQgKHMzOTB4L3RjZzog
-TVZDUy9NVkNQOiBDaGVjayBmb3Igc3BlY2lhbCBvcGVyYXRpb24gZXhjZXB0aW9ucykKMTEvMzAg
-Q2hlY2tpbmcgY29tbWl0IDk2YTU5OTI5M2YzNiAoczM5MHgvdGNnOiBNVkNPUzogTGVuZ3RocyBh
-cmUgMzIgYml0IGluIDI0LzMxLWJpdCBtb2RlKQoxMi8zMCBDaGVja2luZyBjb21taXQgYjQ1ZDgy
-ZTJkZjg2IChzMzkweC90Y2c6IE1WQ1MvTVZDUDogUHJvcGVybHkgd3JhcCB0aGUgbGVuZ3RoKQox
-My8zMCBDaGVja2luZyBjb21taXQgNTdjNDU3ODMxMDZiIChzMzkweC90Y2c6IE1WU1Q6IENoZWNr
-IGZvciBzcGVjaWZpY2F0aW9uIGV4Y2VwdGlvbnMpCjE0LzMwIENoZWNraW5nIGNvbW1pdCA1YTVk
-Y2YyNzRhMDMgKHMzOTB4L3RjZzogTVZTVDogRml4IHN0b3JpbmcgYmFjayB0aGUgYWRkcmVzc2Vz
-IHRvIHJlZ2lzdGVycykKMTUvMzAgQ2hlY2tpbmcgY29tbWl0IGQ5NjVlYzI4ZGQ3YyAoczM5MHgv
-dGNnOiBBbHdheXMgdXNlIE1NVV9VU0VSX0lEWCBmb3IgQ09ORklHX1VTRVJfT05MWSkKMTYvMzAg
-Q2hlY2tpbmcgY29tbWl0IDRiYjdlMmQ3OWViOCAoczM5MHgvdGNnOiBGYXVsdC1zYWZlIG1lbXNl
-dCkKMTcvMzAgQ2hlY2tpbmcgY29tbWl0IGZhZTM0Zjg0MTc0MCAoczM5MHgvdGNnOiBGYXVsdC1z
-YWZlIG1lbW1vdmUpCjE4LzMwIENoZWNraW5nIGNvbW1pdCA4ODQ4ODMyMWZkMDcgKHMzOTB4L3Rj
-ZzogTVZDUy9NVkNQOiBVc2UgYWNjZXNzX21lbW1vdmUoKSkKMTkvMzAgQ2hlY2tpbmcgY29tbWl0
-IDI1YmFhZmUzZGM0NCAoczM5MHgvdGNnOiBNVkM6IEZhdWx0LXNhZmUgaGFuZGxpbmcgb24gZGVz
-dHJ1Y3RpdmUgb3ZlcmxhcHMpCjIwLzMwIENoZWNraW5nIGNvbW1pdCAxYTAxZDc4NGU1MjYgKHMz
-OTB4L3RjZzogTVZDTFU6IEZhdWx0LXNhZmUgaGFuZGxpbmcpCjIxLzMwIENoZWNraW5nIGNvbW1p
-dCBlZjJlYjBiODE0MzcgKHMzOTB4L3RjZzogT0M6IEZhdWx0LXNhZmUgaGFuZGxpbmcpCjIyLzMw
-IENoZWNraW5nIGNvbW1pdCAwOGNlMWRiMTY1ZjYgKHMzOTB4L3RjZzogWEM6IEZhdWx0LXNhZmUg
-aGFuZGxpbmcpCjIzLzMwIENoZWNraW5nIGNvbW1pdCAyMDBhMzlhNjY0NmMgKHMzOTB4L3RjZzog
-TkM6IEZhdWx0LXNhZmUgaGFuZGxpbmcpCjI0LzMwIENoZWNraW5nIGNvbW1pdCA4N2E3Y2JkNmVj
-YjggKHMzOTB4L3RjZzogTVZDSU46IEZhdWx0LXNhZmUgaGFuZGxpbmcpCjI1LzMwIENoZWNraW5n
-IGNvbW1pdCAzNzFjYWUxZDI3MmYgKHMzOTB4L3RjZzogTVZOOiBGYXVsdC1zYWZlIGhhbmRsaW5n
-KQoyNi8zMCBDaGVja2luZyBjb21taXQgMTI2NThkMjRmNzRjIChzMzkweC90Y2c6IE1WWjogRmF1
-bHQtc2FmZSBoYW5kbGluZykKMjcvMzAgQ2hlY2tpbmcgY29tbWl0IDk3OTBiZWRjZWFmYSAoczM5
-MHgvdGNnOiBNVlNUOiBGYXVsdC1zYWZlIGhhbmRsaW5nKQoyOC8zMCBDaGVja2luZyBjb21taXQg
-N2IwZTgwZTc3YWQxIChzMzkweC90Y2c6IE1WTzogRmF1bHQtc2FmZSBoYW5kbGluZykKMjkvMzAg
-Q2hlY2tpbmcgY29tbWl0IGVlMmVkNmQxYzhlMSAodGVzdHMvdGNnOiB0YXJnZXQvczM5MHg6IFRl
-c3QgTVZPKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
-SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyNDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3Rh
-bDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDI5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDI5LzMwIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjMwLzMwIENoZWNraW5nIGNvbW1pdCA4NDQ0NTk0ZDFl
-YmEgKHRlc3RzL3RjZzogdGFyZ2V0L3MzOTB4OiBUZXN0IE1WQykKV0FSTklORzogYWRkZWQsIG1v
-dmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwoj
-MzA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IHVzZSBzaWdhY3Rpb24gdG8gZXN0YWJs
-aXNoIHNpZ25hbCBoYW5kbGVyczsgc2lnbmFsIGlzIG5vdCBwb3J0YWJsZQojNjg6IEZJTEU6IHRl
-c3RzL3RjZy9zMzkweC9tdmMuYzozNDoKKyAgICBpZiAoc2lnbmFsKFNJR1NFR1YsIGhhbmRsZV9z
-aWdzZWd2KSA9PSBTSUdfRVJSKSB7Cgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDExMyBs
-aW5lcyBjaGVja2VkCgpQYXRjaCAzMC8zMCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBm
-dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA5MjMw
-ODA3MTIuMjM5NTEtMS1kYXZpZEByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1t
-ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
-cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAcmVkaGF0LmNvbQ==
+On 9/23/19 11:12 AM, Vladimir Sementsov-Ogievskiy wrote:
+> This commit is generated by command
+> 
+> git grep -l 'Error \*\*errp' | while read f; \
+> do spatch --sp-file \
+> scripts/coccinelle/auto-propagated-errp.cocci --in-place $f; done
+> 
 
+As mentioned in your cover letter, this fails syntax-check and
+compilation without squashing in some followups; if we can't improve the
+.cocci script to do it automatically, then manually squashing in
+cleanups (and documenting what types of cleanups they were) is fine.
+(The goal for a mechanical patch like this is to make it easy enough to
+automate downstream, even where the file contents are changed, but where
+the process for creating those changes are the same).
+
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+
+Spot-checking
+
+>  block/io.c                          |  11 +-
+
+>  block/nbd.c                         |  44 +++---
+
+>  qapi/qapi-visit-core.c              |  53 ++-----
+
+just to see how it looks.
+
+> +++ b/block/io.c
+> @@ -136,7 +136,6 @@ static void bdrv_merge_limits(BlockLimits *dst, const BlockLimits *src)
+>  void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
+>  {
+>      BlockDriver *drv = bs->drv;
+> -    Error *local_err = NULL;
+>  
+
+Umm, no insertion of ERR_FUNCTION_BEGIN().  Oops.
+
+>      memset(&bs->bl, 0, sizeof(bs->bl));
+>  
+> @@ -151,9 +150,8 @@ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
+>  
+>      /* Take some limits from the children as a default */
+>      if (bs->file) {
+> -        bdrv_refresh_limits(bs->file->bs, &local_err);
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> +        bdrv_refresh_limits(bs->file->bs, errp);
+> +        if (*errp) {
+>              return;
+>          }
+>          bdrv_merge_limits(&bs->bl, &bs->file->bs->bl);
+> @@ -166,9 +164,8 @@ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
+>      }
+>  
+>      if (bs->backing) {
+> -        bdrv_refresh_limits(bs->backing->bs, &local_err);
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> +        bdrv_refresh_limits(bs->backing->bs, errp);
+> +        if (*errp) {
+>              return;
+
+Rest of the changes in this file are good if the macro gets added correctly.
+
+>          }
+>          bdrv_merge_limits(&bs->bl, &bs->backing->bs->bl);
+
+> +++ b/block/nbd.c
+> @@ -808,7 +808,6 @@ static int nbd_co_receive_cmdread_reply(BDRVNBDState *s, uint64_t handle,
+>      NBDReplyChunkIter iter;
+>      NBDReply reply;
+>      void *payload = NULL;
+> -    Error *local_err = NULL;
+
+Recurring problem of not inserting the macro as expected.
+
+>  
+>      NBD_FOREACH_REPLY_CHUNK(s, iter, handle, s->info.structured_reply,
+>                              qiov, &reply, &payload)
+> @@ -827,20 +826,20 @@ static int nbd_co_receive_cmdread_reply(BDRVNBDState *s, uint64_t handle,
+>              break;
+>          case NBD_REPLY_TYPE_OFFSET_HOLE:
+>              ret = nbd_parse_offset_hole_payload(s, &reply.structured, payload,
+> -                                                offset, qiov, &local_err);
+> +                                                offset, qiov, errp);
+>              if (ret < 0) {
+>                  nbd_channel_error(s, ret);
+> -                nbd_iter_channel_error(&iter, ret, &local_err);
+> +                nbd_iter_channel_error(&iter, ret, errp);
+>              }
+>              break;
+>          default:
+>              if (!nbd_reply_type_is_error(chunk->type)) {
+>                  /* not allowed reply type */
+>                  nbd_channel_error(s, -EINVAL);
+> -                error_setg(&local_err,
+> +                error_setg(errp,
+>                             "Unexpected reply type: %d (%s) for CMD_READ",
+
+Could almost fold these lines (but I'm not asking you to; keeping this
+patch as mechanical as possible is fine).
+
+>                             chunk->type, nbd_reply_type_lookup(chunk->type));
+> -                nbd_iter_channel_error(&iter, -EINVAL, &local_err);
+> +                nbd_iter_channel_error(&iter, -EINVAL, errp);
+>              }
+>          }
+>  
+> @@ -861,7 +860,6 @@ static int nbd_co_receive_blockstatus_reply(BDRVNBDState *s,
+>      NBDReplyChunkIter iter;
+>      NBDReply reply;
+>      void *payload = NULL;
+> -    Error *local_err = NULL;
+>      bool received = false;
+
+Oops on the macro.
+
+> @@ -1174,15 +1172,13 @@ static QIOChannelSocket *nbd_establish_connection(SocketAddress *saddr,
+>                                                    Error **errp)
+>  {
+>      QIOChannelSocket *sioc;
+> -    Error *local_err = NULL;
+>  
+>      sioc = qio_channel_socket_new();
+>      qio_channel_set_name(QIO_CHANNEL(sioc), "nbd-client");
+>  
+> -    qio_channel_socket_connect_sync(sioc, saddr, &local_err);
+> -    if (local_err) {
+> +    qio_channel_socket_connect_sync(sioc, saddr, errp);
+> +    if (*errp) {
+>          object_unref(OBJECT(sioc));
+> -        error_propagate(errp, local_err);
+>          return NULL;
+
+But getting rid of error_propagate() is nice.
+
+Did you grep for instances of error_propagate() after your mechanical
+patch, to see what else the Coccinelle script might have missed?
+
+
+> +++ b/qapi/opts-visitor.c
+> @@ -275,6 +275,7 @@ opts_next_list(Visitor *v, GenericList *tail, size_t size)
+>  static void
+>  opts_check_list(Visitor *v, Error **errp)
+>  {
+> +	ERRP_FUNCTION_BEGIN();
+>      /*
+>       * Unvisited list elements will be reported later when checking
+>       * whether unvisited struct members remain.
+
+Here the macro got added, but with no obvious benefit later on (although
+we also argued that adding it even when it makes no difference is not
+bad, if that's easier to automate for style checking).
+
+> diff --git a/qapi/qapi-dealloc-visitor.c b/qapi/qapi-dealloc-visitor.c
+> index d192724b13..3ee4c7a2e7 100644
+> --- a/qapi/qapi-dealloc-visitor.c
+> +++ b/qapi/qapi-dealloc-visitor.c
+> @@ -25,6 +25,7 @@ struct QapiDeallocVisitor
+>  static void qapi_dealloc_start_struct(Visitor *v, const char *name, void **obj,
+>                                        size_t unused, Error **errp)
+>  {
+> +	ERRP_FUNCTION_BEGIN();
+>  }
+
+Here's an example where exempting empty functions would be nicer.
+
+
+> +++ b/qapi/qapi-visit-core.c
+> @@ -39,18 +39,15 @@ void visit_free(Visitor *v)
+>  void visit_start_struct(Visitor *v, const char *name, void **obj,
+>                          size_t size, Error **errp)
+>  {
+> -    Error *err = NULL;
+> -
+
+Oops, macro not added.
+
+>      trace_visit_start_struct(v, name, obj, size);
+>      if (obj) {
+>          assert(size);
+>          assert(!(v->type & VISITOR_OUTPUT) || *obj);
+>      }
+> -    v->start_struct(v, name, obj, size, &err);
+> +    v->start_struct(v, name, obj, size, errp);
+>      if (obj && (v->type & VISITOR_INPUT)) {
+> -        assert(!err != !*obj);
+> +        assert(!*errp != !*obj);
+>      }
+> -    error_propagate(errp, err);
+>  }
+
+But the cleanup is sane, once the macro is present.
+
+> @@ -152,12 +143,10 @@ void visit_type_int(Visitor *v, const char *name, int64_t *obj, Error **errp)
+>  static void visit_type_uintN(Visitor *v, uint64_t *obj, const char *name,
+>                               uint64_t max, const char *type, Error **errp)
+>  {
+> -    Error *err = NULL;
+>      uint64_t value = *obj;
+>  
+> -    v->type_uint64(v, name, &value, &err);
+> -    if (err) {
+> -        error_propagate(errp, err);
+> +    v->type_uint64(v, name, &value, errp);
+> +    if (*errp) {
+>      } else if (value > max) {
+>          error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+>                     name ? name : "null", type);
+
+Results in an empty if which looks funny.  This one could be a manual
+touchup later.
+
+> @@ -211,12 +200,10 @@ static void visit_type_intN(Visitor *v, int64_t *obj, const char *name,
+>                              int64_t min, int64_t max, const char *type,
+>                              Error **errp)
+>  {
+> -    Error *err = NULL;
+>      int64_t value = *obj;
+>  
+> -    v->type_int64(v, name, &value, &err);
+> -    if (err) {
+> -        error_propagate(errp, err);
+> +    v->type_int64(v, name, &value, errp);
+> +    if (*errp) {
+>      } else if (value < min || value > max) {
+
+and again
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
