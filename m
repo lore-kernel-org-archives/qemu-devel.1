@@ -2,78 +2,60 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF72CC04EBF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:25:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A67C04EBF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:26:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81749205F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:25:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81749205F4
+	by mail.kernel.org (Postfix) with ESMTPS id 7865120665
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:26:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7865120665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCOL5-0002uQ-Le
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 09:25:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56801)
+	id 1iCOMb-0004UR-Jl
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 09:26:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56887)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1iCOKC-0002MK-Fx
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:24:21 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1iCOKe-0002d8-HX
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:24:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1iCOKB-0007ip-IY
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:24:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49374)
+ (envelope-from <mlevitsk@redhat.com>) id 1iCOKd-0007vQ-H9
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:24:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:61055)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iCOKB-0007iS-CV
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:24:19 -0400
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+ id 1iCOKb-0007tr-EI; Mon, 23 Sep 2019 09:24:45 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5447B83F3D
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 13:24:18 +0000 (UTC)
-Received: by mail-pl1-f200.google.com with SMTP id d1so8563500plj.9
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 06:24:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=51Lvc+oZ4iF9OX/rYG0s6r+aSOXa7YFt6xtyTuSnSTA=;
- b=P2Y7uQIL5ev2Tgmu5WdXpuBWzeCZRVnaChmxqfhW/cS23YjjJRs9mAuVgRgluA8OQq
- LdNGVAfjKWPI2sJR9k/uAnhIPZnmygPbjBGkjgSFNNsGKBqOEJaB35PnBGz6hbtx86z0
- 589KmXaTIGvGU2Dmbcbr9fF//c4LyxXgiIBXLbJymO5QxBC1UwWyYBAueDQYV6s8mJj/
- MBkOqhTICrT7SHR7Sw/6PCbbAAabKoji1prHcfmiBVlFZtK0t6b4nawj4ZhFxOBBjK4I
- GdNbQcLp/zeADsd+9n5LOQ/dVJNCoBu2A5MYSqvF3Rc/eM5AaaRnNDElzfgp7japVhVv
- aUAA==
-X-Gm-Message-State: APjAAAVtrpMqt5G6+YcjlnapBUNzqfbU6jlCjbOp0aPbLb+8WeS515fZ
- Wzg3ZZ6o6Z/SVSrQBH6+yEeQWs2TLPesOVIj/QojCdhlf5LIS0kwrY6j7MuMp9yPCnDLcNs86tB
- OPDvFOhsLY3xbpAk=
-X-Received: by 2002:a63:364d:: with SMTP id d74mr9340803pga.416.1569245057771; 
- Mon, 23 Sep 2019 06:24:17 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwn7R8ExqL6dOo9RfNbf8CbbqOVquGI7iXg6B+P5lt0xSf+BoNvzTVs9iL98Hj+Fq3p4eit6w==
-X-Received: by 2002:a63:364d:: with SMTP id d74mr9340769pga.416.1569245057394; 
- Mon, 23 Sep 2019 06:24:17 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id h2sm18786911pfq.108.2019.09.23.06.24.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Sep 2019 06:24:16 -0700 (PDT)
-Date: Mon, 23 Sep 2019 21:24:07 +0800
-From: Peter Xu <peterx@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH 0/2] migration test tweeks
-Message-ID: <20190923132407.GA28074@xz-x1>
-References: <20190923131022.15498-1-dgilbert@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190923131022.15498-1-dgilbert@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+ by mx1.redhat.com (Postfix) with ESMTPS id ED2DE51EF3;
+ Mon, 23 Sep 2019 13:24:43 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3D3AF5D784;
+ Mon, 23 Sep 2019 13:24:39 +0000 (UTC)
+Message-ID: <4392e976d685934283633fba3ac516c25d71f4ea.camel@redhat.com>
+Subject: Re: [PATCH v2 01/11] qcrypto: add suport for amend options
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Date: Mon, 23 Sep 2019 16:24:38 +0300
+In-Reply-To: <29336f49-c364-1263-664b-61a4a02be0be@redhat.com>
+References: <20190912223028.18496-1-mlevitsk@redhat.com>
+ <20190912223028.18496-2-mlevitsk@redhat.com>
+ <29336f49-c364-1263-664b-61a4a02be0be@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Mon, 23 Sep 2019 13:24:43 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -87,38 +69,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, alex.bennee@linaro.org, qemu-devel@nongnu.org,
- quintela@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 23, 2019 at 02:10:20PM +0100, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Alex noticed that some of the postcopy tests would occasionally
-> hang; this series adds some checks to make them more likely
-> to assert than hang in some failure cases, and changes
-> the migration bandwidth so that under load it's much more likely
-> to manage to land in postcopy.
-> 
-> Dr. David Alan Gilbert (2):
->   tests/migration: Fail on unexpected migration states
->   tests/migration/postcopy: trim migration bandwidth
+On Mon, 2019-09-23 at 08:08 -0500, Eric Blake wrote:
+> On 9/12/19 5:30 PM, Maxim Levitsky wrote:
+> > This adds the qcrypto_amend_options and corresponding
+> > crypto driver callbacks for the  for encrypted
+>=20
+> grammar is off, did you miss a word where that double space is?
+>=20
+> > key managedment
+>=20
+> management
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
 
-I might be even more aggresive on patch 2 when turning down the
-bandwidth. :)
+Thank you!
+I'll try my best in the future to have less spelling and
+grammar errors like that. I need to double check every
+message prior to sending the patches.
 
-Another thing I thought about on the hang issue is that maybe we can
-give a timeout for the waits and when the timeout triggers before a
-directly assert in the test case we send sigabrt to QEMU (just like
-what kill_qemu does) then we could have a chance to see the cores.
-Not sure whether that could help, though.
+>=20
+> >=20
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > ---
+> >  crypto/block.c         | 31 +++++++++++++++++++++++++++++++
+> >  crypto/blockpriv.h     |  8 ++++++++
+> >  include/crypto/block.h | 22 ++++++++++++++++++++++
+> >  3 files changed, 61 insertions(+)
+> >=20
+> > diff --git a/crypto/block.c b/crypto/block.c
+> > index 325752871c..14b684de7f 100644
+> > --- a/crypto/block.c
+> > +++ b/crypto/block.c
+> > @@ -115,6 +115,37 @@ QCryptoBlock *qcrypto_block_create(QCryptoBlockC=
+reateOptions *options,
+> >  }
+> > =20
+> > =20
+> > +int qcrypto_block_amend_options(QCryptoBlock *block,
+> > +                                QCryptoBlockReadFunc readfunc,
+> > +                                QCryptoBlockWriteFunc writefunc,
+> > +                                void *opaque,
+> > +                                QCryptoBlockCreateOptions *options,
+> > +                                bool force,
+> > +                                Error **errp)
+> > +{
+> > +    if (options->format !=3D block->format) {
+> > +        error_setg(errp,
+> > +                   "Its not possible to change encryption format wit=
+h amend interface");
+> > +        return -1;
+>=20
+> "It's" (here, you want the form meaning "It is")
+>=20
+> Or reword the entire error to something shorter:
+>=20
+> error_setg(errp, "cannot amend encryption format")
 
-Regards,
 
--- 
-Peter Xu
+Same here.
+>=20
+
+
+Thanks for the review,
+Best regards,
+	Maxim Levitsky
+
+
 
