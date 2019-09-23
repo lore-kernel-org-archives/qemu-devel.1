@@ -2,76 +2,65 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D59C8C04EBF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 11:23:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4B20C04EBF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 11:28:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0F8320835
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 11:23:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0F8320835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7ED0D20882
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 11:28:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="RuklwlFs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ED0D20882
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCMR0-0003wb-RP
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 07:23:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41350)
+	id 1iCMW5-0005iR-ML
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 07:28:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42107)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCMPV-000339-T8
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 07:21:43 -0400
+ (envelope-from <qemu_oss@crudebyte.com>) id 1iCMVM-0005GK-Cj
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 07:27:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCMPT-0002Hj-3L
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 07:21:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60562)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCMPS-0002Gt-Rg
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 07:21:39 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3265230917EF;
- Mon, 23 Sep 2019 11:21:36 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3DD9610018F8;
- Mon, 23 Sep 2019 11:21:30 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C1695113864E; Mon, 23 Sep 2019 13:21:28 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Giuseppe Lettieri <giuseppe.lettieri@unipi.it>
-Subject: Re: [Qemu-devel] Is network backend netmap worth keeping?
-References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-28-armbru@redhat.com>
- <8c2a6fad-6ac1-21b1-c17c-e1bd5ac41c9f@redhat.com>
- <87a7ckrat7.fsf@dusky.pond.sub.org>
- <ee3709c9-f351-081a-3aeb-53b7b6036b0a@redhat.com>
- <87imr8l0ti.fsf_-_@dusky.pond.sub.org>
- <695325d7-a0c3-73c1-97ab-f62fb345c622@unipi.it>
- <87blwzho1y.fsf@dusky.pond.sub.org>
- <2fb98b77-efab-6092-dd5a-fa50c3c4b3f9@redhat.com>
- <58e7895e-4910-4d4c-79d8-dead7de69ab7@unipi.it>
- <87blvocpq2.fsf@dusky.pond.sub.org>
- <df94280b-13f6-1df3-f594-5eb0a614777d@unipi.it>
-Date: Mon, 23 Sep 2019 13:21:28 +0200
-In-Reply-To: <df94280b-13f6-1df3-f594-5eb0a614777d@unipi.it> (Giuseppe
- Lettieri's message of "Mon, 16 Sep 2019 16:45:43 +0200")
-Message-ID: <874l13qmvb.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <qemu_oss@crudebyte.com>) id 1iCMVL-0006dY-04
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 07:27:44 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:58263)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1iCMVK-0006d4-OL
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 07:27:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=iQsqsYll1i55WbC/AM87Id5KKbN0YRMriTpo9uxAwrY=; b=RuklwlFs0iv88y5AohT4HIztmL
+ swbIazUoHoyKLp2qXL2P/4Zu2/qqn9hkekEaiYLA1zmnkLixNwqyRsBN6AN0N6T69GgJs25a8UlJM
+ 4cOos0aWquusGqAt2JpSwBv2B35lGxHpw28Ar1OM6db3ufNHMSvWxTmaPgARMmhI50TObSUu0JEpC
+ udvT4Sm+nBeAXExqZaJMesqwML6eUI3+/215sFnw1EcnKiTW4hWu1JP+Xh7GdMg/Mkyg2YitBlRmo
+ irbmnxUJ3FME62akr+12iVWG2Df21CRrb16svWiCafyK8hGZcboPX2cmpR8YGpwKDTPiXCrQcSK17
+ +pBxJinBAqCuB7zCV7SkHdiVJ4SUlZd7HfBEgkG6Ek9FKVF7EbjJwGgKKbD153QQ3m7vNpV9omrot
+ ZbTBO8jCJj4h6BeMyo7Li98/WvbdW9HcrVniIplbnHL0DgvRGeNNxLTadse5fakvJBp5c15xvPMbz
+ VYKx9aL8H6OgjxQvo/C2UTNijgTcTe/0pSU1A8xz1N2LvUlAnwv1LID8lqfMSu1EOceJCb7EpKDii
+ KEHUNhpmrd9sTSkBXuEr2TkwO7dNW4fqY3es1QXasxy4/w04zkCm+lqBjL8seiXYtl4HkDxtYcMsz
+ 69sp7ZMKmqqGkJFPu/7CdBsKZ/ojvpF8P4QNNjJgU=;
+To: qemu-devel@nongnu.org
+Subject: Re: [Qemu-devel] [PATCH v6 0/4] 9p: Fix file ID collisions
+Date: Mon, 23 Sep 2019 13:27:37 +0200
+Message-ID: <5814161.pL1kAXq1mB@silver>
+In-Reply-To: <20190905145931.3748d5f2@bahia.lan>
+References: <cover.1566503584.git.qemu_oss@crudebyte.com>
+ <1897173.eDCz7oYxVq@silver> <20190905145931.3748d5f2@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Mon, 23 Sep 2019 11:21:36 +0000 (UTC)
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-Received-From: 5.189.157.229
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,216 +72,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud?= =?utf-8?Q?=C3=A9?= <philmd@redhat.com>,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- Vincenzo Maffione <v.maffione@gmail.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>
+Cc: berrange@redhat.com, stefanha@gmail.com,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
+ dgilbert@redhat.com, antonios.motakis@huawei.com, Ian Kelling <iank@fsf.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: Christian Schoenebeck <qemu_oss@crudebyte.com>
+From: Christian Schoenebeck via <qemu-devel@nongnu.org>
 
-Giuseppe Lettieri <giuseppe.lettieri@unipi.it> writes:
+On Donnerstag, 5. September 2019 14:59:31 CEST Greg Kurz wrote:
+> On Thu, 05 Sep 2019 14:25:13 +0200
+> 
+> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+> > On Mittwoch, 4. September 2019 15:02:30 CEST Christian Schoenebeck wrote:
+> > > > > Well, mailman is handling this correctly. It replaces the "From:"
+> > > > > field
+> > > > > with a placeholder and instead adds my actual email address as
+> > > > > "Reply-To:" field. That's the common way to handle this on mailing
+> > > > > lists,
+> > > > > as also mentioned here:
+> > > > > https://en.wikipedia.org/wiki/DMARC#From:_rewriting
+> > > > > 
+> > > > > So IMO patchew should automatically use the value of "Reply-To:" in
+> > > > > that
+> > > > > case as author of patches instead.
+> > > > > 
+> > > > > Reducing security cannot be the solution.
+> > > > 
+> > > > No, there's no need to reduce security.  Just change your local git
+> > > > configuration to produce a 'From:' line in the commit body..
+> > > 
+> > > Got it. :)
+> > > 
+> > > > >> How are you sending patches ? With git send-email ? If so, maybe
+> > > > >> you
+> > > > >> can
+> > > > >> pass something like --from='"Christian Schoenebeck"
+> > > > >> <qemu_oss@crudebyte.com>'. Since this is a different string, git
+> > > > >> will
+> > > > >> assume you're sending someone else's patch : it will automatically
+> > > > >> add
+> > > > >> an
+> > > > >> extra From: made out of the commit Author as recorded in the git
+> > > > >> tree.
+> > > > 
+> > > > I think it is probably as simple as a 'git config' command to tell git
+> > > > to always put a 'From:' in the body of self-authored patches when
+> > > > using
+> > > > git format-patch; however, as I don't suffer from munged emails, I
+> > > > haven't actually tested what that setting would be.
+> > 
+> > Well, I tried that Eric. The expected solution would be enabling this git
+> > setting:
+> > 
+> > git config [--global] format.from true
+> > https://git-scm.com/docs/git-config#Documentation/git-config.txt-formatfro
+> > m
+> > 
+> > But as you can already read from the manual, the overall behaviour of git
+> > regarding a separate "From:" line in the email body was intended solely
+> > for
+> > the use case sender != author. So in practice (at least in my git version)
+> > git always makes a raw string comparison between sender (name and email)
+> > string and author string and only adds the separate From: line to the
+> > body if they differ.
+> > 
+> > Hence also "git format-patch --from=" only works here if you use a
+> > different author string (name and email) there, otherwise on a perfect
+> > string match it is simply ignored and you end up with only one "From:" in
+> > the email header.
+> > 
+> > So eventually I added one extra character in my name for now and removed
+> > it
+> > manually in the dumped emails subsequently (see today's
+> > "[PATCH v7 0/3] 9p: Fix file ID collisions").
+> 
+> Hence my proposal in some other mail to pass a different string to
+> git send-email, but I guess this also works for git format-patch.
+> 
+> eg, adding double quotes around your "firstname name"
+> 
+>  --from='"Christian Schoenebeck" <qemu_oss@crudebyte.com>'
 
-> Il 13/09/19 15:04, Markus Armbruster ha scritto:
->>
->> What happens when I build with --enable-netmap=system on host A, then
->> run the resulting binary on some host B that doesn't have netmap
->> installed?
->>
->
-> Qemu will fail at startup, complaining that /dev/netmap does not exists.
->
->
->>
->> Yes.  We default to netmap=system, though.  If you break things by
->> passing arcane arguments to configure, you get to keep the pieces :)
->>
->>> If the option is only useful for developers to check that some qemu
->>> change does not break anything, then probably it should be enabled in
->>> some other, less visible way. What do you think?
->>
->> I think an --enable-netmap patterned after --enable-capstone and
->> --enable-slirp has sufficiently low visibility as long as the default is
->> sane.
->>
->> We clearly want configure to pick netmap=system when the system provides
->> netmap.
->>
->> What shall configure pick when the system doesn't provide it?  If you
->> think netmap=git is too dangerous for general audience, consider
->> disabling netmap then.  Experts can still compile-test with
->> --enable-netmap=git.  Our CI certainly should.
->>
->
-> OK, sounds reasonable. The attached patch will select system if netmap
-> is available, and git only if explicitly requested.
->
-> Cheers,
-> Giuseppe
->
-> -- 
-> Dr. Ing. Giuseppe Lettieri
-> Dipartimento di Ingegneria della Informazione
-> Universita' di Pisa
-> Largo Lucio Lazzarino 1, 56122 Pisa - Italy
-> Ph. : (+39) 050-2217.649 (direct) .599 (switch)
-> Fax : (+39) 050-2217.600
-> e-mail: g.lettieri@iet.unipi.it
->
->>From 4e93b5cc3ad68d92bc3562df3745e1d10dc08fc0 Mon Sep 17 00:00:00 2001
-> From: Giuseppe Lettieri <g.lettieri@iet.unipi.it>
-> Date: Mon, 2 Sep 2019 17:35:33 +0200
-> Subject: [PATCH] netmap: support git-submodule build otption
->
-> With this patch, netmap support can be enabled with
-> the following options to the configure script:
->
->   --enable-netmap[=system]
->
-> 	Use the host system netmap installation.
-> 	Fail if not found.
->
->   --enable-netmap=git
->
-> 	clone the official netmap repository on
-> 	github (mostly useful for CI)
->
-> system will also be automatically used if no option is
-> passed and netmap is available in the host system.
->
-> Signed-off-by: Giuseppe Lettieri <giuseppe.lettieri@unipi.it>
-> ---
->  .gitmodules |  3 +++
->  configure   | 68 ++++++++++++++++++++++++++++++++++++++++++++---------
->  netmap      |  1 +
->  3 files changed, 61 insertions(+), 11 deletions(-)
->  create mode 160000 netmap
->
-> diff --git a/.gitmodules b/.gitmodules
-> index c5c474169d..bf75dbc5e3 100644
-> --- a/.gitmodules
-> +++ b/.gitmodules
-> @@ -58,3 +58,6 @@
->  [submodule "roms/opensbi"]
->  	path = roms/opensbi
->  	url = 	https://git.qemu.org/git/opensbi.git
-> +[submodule "netmap"]
-> +	path = netmap
-> +	url = https://github.com/luigirizzo/netmap.git
-> diff --git a/configure b/configure
-> index 30aad233d1..5cb924985c 100755
-> --- a/configure
-> +++ b/configure
-> @@ -1133,6 +1133,10 @@ for opt do
->    ;;
->    --enable-netmap) netmap="yes"
->    ;;
-> +  --enable-netmap=git) netmap="git"
-> +  ;;
-> +  --enable-netmap=system) netmap="system"
-> +  ;;
->    --disable-xen) xen="no"
->    ;;
->    --enable-xen) xen="yes"
-> @@ -3314,8 +3318,9 @@ fi
->  # a minor/major version number. Minor new features will be marked with values up
->  # to 15, and if something happens that requires a change to the backend we will
->  # move above 15, submit the backend fixes and modify this two bounds.
-> -if test "$netmap" != "no" ; then
-> -  cat > $TMPC << EOF
-> +case "$netmap" in
-> +    "" | yes | system)
-> +      cat > $TMPC << EOF
->  #include <inttypes.h>
->  #include <net/if.h>
->  #include <net/netmap.h>
-> @@ -3325,15 +3330,56 @@ if test "$netmap" != "no" ; then
->  #endif
->  int main(void) { return 0; }
->  EOF
-> -  if compile_prog "" "" ; then
-> -    netmap=yes
-> -  else
-> -    if test "$netmap" = "yes" ; then
-> -      feature_not_found "netmap"
-> +      if compile_prog "" "" ; then
-> +        netmap_system=yes
-> +      else
-> +        netmap_system=no
-> +      fi
-> +      ;;
-> +esac
+Yeah, I will use that for now, since it just works^TM (I tested it).
 
-Is the indentation change intentional?
+Because for some reason my emails are still mangled on this list. Probably I 
+still have to drop more header fields from dkim's "h=..." setting. We'll see.
 
-> +
-> +case "$netmap" in
-> +  "" | yes)
-> +    if test "$netmap_system" = "yes"; then
-> +      netmap=system
-> +    elif test -e "${source_path}/.git" && test $git_update = 'yes' ; then
-> +      netmap=git
-> +    elif test -e "${source_path}/netmap/configure" ; then
-> +      netmap=internal
-> +    elif test -z "$netmap" ; then
-> +      netmap=no
-> +    else
-> +      feature_not_found "netmap" "Install netmap or git submodule"
->      fi
-> -    netmap=no
-> -  fi
-> -fi
-> +    ;;
-> +
-> +  system)
-> +    if test "$netmap_system" = "no"; then
-> +      feature_not_found "netmap" "Install netmap"
-> +    fi
-> +    ;;
-> +esac
-> +
-> +case "$netmap" in
-> +  git | internal)
-> +    if test "$netmap" = git; then
-> +      git_submodules="${git_submodules} netmap"
-> +    fi
-> +    mkdir -p netmap
-> +    QEMU_CFLAGS="$QEMU_CFLAGS -I\$(SRC_PATH)/netmap/sys"
-> +    ;;
-> +
-> +  system)
-> +    ;;
-> +
-> +  no)
-> +    ;;
-> +  *)
-> +    error_exit "Unknown state for netmap: $netmap"
-> +    ;;
-> +esac
-> +
-> +##########################################
->  
->  ##########################################
->  # libcap-ng library probe
-> @@ -6582,7 +6628,7 @@ if test "$vde" = "yes" ; then
->    echo "CONFIG_VDE=y" >> $config_host_mak
->    echo "VDE_LIBS=$vde_libs" >> $config_host_mak
->  fi
-> -if test "$netmap" = "yes" ; then
-> +if test "$netmap" != "no" ; then
->    echo "CONFIG_NETMAP=y" >> $config_host_mak
->  fi
->  if test "$l2tpv3" = "yes" ; then
-> diff --git a/netmap b/netmap
-> new file mode 160000
-> index 0000000000..137f537eae
-> --- /dev/null
-> +++ b/netmap
-> @@ -0,0 +1 @@
-> +Subproject commit 137f537eae513f02d5d6871d1f91c049e6345803
 
-Looks reasonable to me.  Please submit it as a patch.
+
 
