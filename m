@@ -2,61 +2,47 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35628C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70DC9C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:43:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 091E12064A
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:43:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 091E12064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 47B1C2064A
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:43:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47B1C2064A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCJvx-0002k1-QK
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 04:43:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43305)
+	id 1iCJwE-00032k-Tg
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 04:43:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48434)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iCJOe-0002yu-I1
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:08:37 -0400
+ (envelope-from <aik@ozlabs.ru>) id 1iCJun-0001bW-2t
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:41:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iCJOd-0004Wk-7X
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:08:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39090)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iCJOd-0004WM-2L; Mon, 23 Sep 2019 04:08:35 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 55995C0546FB;
- Mon, 23 Sep 2019 08:08:34 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CE9C719C78;
- Mon, 23 Sep 2019 08:08:29 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Subject: [PULL 29/30] tests/tcg: target/s390x: Test MVO
-Date: Mon, 23 Sep 2019 10:07:11 +0200
-Message-Id: <20190923080712.23951-30-david@redhat.com>
-In-Reply-To: <20190923080712.23951-1-david@redhat.com>
-References: <20190923080712.23951-1-david@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Mon, 23 Sep 2019 08:08:34 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+ (envelope-from <aik@ozlabs.ru>) id 1iCJul-0005s7-HF
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:41:48 -0400
+Received: from ozlabs.ru ([107.173.13.209]:44440)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <aik@ozlabs.ru>)
+ id 1iCJul-0005ll-Bn; Mon, 23 Sep 2019 04:41:47 -0400
+Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
+ by ozlabs.ru (Postfix) with ESMTP id B73ACAE80017;
+ Mon, 23 Sep 2019 04:40:39 -0400 (EDT)
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: qemu-devel@nongnu.org
+Subject: [PATCH qemu] ppc/kvm: Skip writing DPDES back when in run time state
+Date: Mon, 23 Sep 2019 18:41:10 +1000
+Message-Id: <20190923084110.34643-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 107.173.13.209
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,68 +54,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's add the simple test based on the example from the PoP.
+On POWER8 systems the Directed Privileged Door-bell Exception State
+register (DPDES) stores doorbell pending status, one bit per a thread
+of a core, set by "msgsndp" instruction. The register is shared among
+threads of the same core and KVM on POWER9 emulates it in a similar way
+(POWER9 does not have DPDES).
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
+DPDES is shared but QEMU assumes all SPRs are per thread so the only safe
+way to write DPDES back to VCPU before running a guest is doing so
+while all threads are pulled out of the guest so DPDES cannot change.
+There is only one situation when this condition is met: incoming migration
+when all threads are stopped. Otherwise any QEMU HMP/QMP command causing
+kvm_arch_put_registers() (for example printing registers or dumping memory)
+can clobber DPDES in a race with other vcpu threads.
+
+This changes DPDES handling so it is not written to KVM at runtime.
+
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- tests/tcg/s390x/Makefile.target |  1 +
- tests/tcg/s390x/mvo.c           | 25 +++++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
- create mode 100644 tests/tcg/s390x/mvo.c
+ target/ppc/kvm.c                | 5 +++++
+ target/ppc/translate_init.inc.c | 9 ++++-----
+ 2 files changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefile.t=
-arget
-index 151dc075aa..6a3bfa8b29 100644
---- a/tests/tcg/s390x/Makefile.target
-+++ b/tests/tcg/s390x/Makefile.target
-@@ -6,3 +6,4 @@ TESTS+=3Dipm
- TESTS+=3Dexrl-trt
- TESTS+=3Dexrl-trtr
- TESTS+=3Dpack
-+TESTS+=3Dmvo
-diff --git a/tests/tcg/s390x/mvo.c b/tests/tcg/s390x/mvo.c
-new file mode 100644
-index 0000000000..5546fe2a97
---- /dev/null
-+++ b/tests/tcg/s390x/mvo.c
-@@ -0,0 +1,25 @@
-+#include <stdint.h>
-+#include <stdio.h>
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 8c5b1f25cc95..820724cc7d15 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -993,6 +993,10 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+         }
+ 
+         kvm_set_one_reg(cs, KVM_REG_PPC_TB_OFFSET, &env->tb_env->tb_offset);
 +
-+int main(void)
-+{
-+    uint8_t dest[6] =3D {0xff, 0x77, 0x88, 0x99, 0x0c, 0xff};
-+    uint8_t src[5] =3D {0xee, 0x12, 0x34, 0x56, 0xee};
-+    uint8_t expected[6] =3D {0xff, 0x01, 0x23, 0x45, 0x6c, 0xff};
-+    int i;
-+
-+    asm volatile (
-+        "    mvo 0(4,%[dest]),0(3,%[src])\n"
-+        :
-+        : [dest] "d" (dest + 1),
-+          [src] "d" (src + 1)
-+        : "memory");
-+
-+    for (i =3D 0; i < sizeof(expected); i++) {
-+        if (dest[i] !=3D expected[i]) {
-+            fprintf(stderr, "bad data\n");
-+            return 1;
++        if (level > KVM_PUT_RUNTIME_STATE) {
++            kvm_put_one_spr(cs, KVM_REG_PPC_DPDES, SPR_DPDES);
 +        }
-+    }
-+    return 0;
-+}
---=20
-2.21.0
+ #endif /* TARGET_PPC64 */
+     }
+ 
+@@ -1297,6 +1301,7 @@ int kvm_arch_get_registers(CPUState *cs)
+         }
+ 
+         kvm_get_one_reg(cs, KVM_REG_PPC_TB_OFFSET, &env->tb_env->tb_offset);
++        kvm_get_one_spr(cs, KVM_REG_PPC_DPDES, SPR_DPDES);
+ #endif
+     }
+ 
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+index 0fb11c7ac6da..ba726dec4d00 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -8200,11 +8200,10 @@ static void gen_spr_power8_dpdes(CPUPPCState *env)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+     /* Directed Privileged Door-bell Exception State, used for IPI */
+-    spr_register_kvm_hv(env, SPR_DPDES, "DPDES",
+-                        SPR_NOACCESS, SPR_NOACCESS,
+-                        &spr_read_generic, SPR_NOACCESS,
+-                        &spr_read_generic, &spr_write_generic,
+-                        KVM_REG_PPC_DPDES, 0x00000000);
++    spr_register(env, SPR_DPDES, "DPDES",
++                 SPR_NOACCESS, SPR_NOACCESS,
++                 &spr_read_generic, SPR_NOACCESS,
++                 0x00000000);
+ #endif
+ }
+ 
+-- 
+2.17.1
 
 
