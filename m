@@ -2,82 +2,106 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCAEFC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:51:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E630C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:52:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A143320820
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:51:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A143320820
+	by mail.kernel.org (Postfix) with ESMTPS id F302B20820
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:52:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F302B20820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCK48-0000nh-8u
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 04:51:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46516)
+	id 1iCK4o-0001cb-0B
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 04:52:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1iCJiu-0006AQ-Fi
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:29:33 -0400
+ (envelope-from <thuth@redhat.com>) id 1iCK32-0000Ak-Rf
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:50:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1iCJiq-0007Yc-Ne
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:29:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34876)
+ (envelope-from <thuth@redhat.com>) id 1iCK31-0000q2-Hf
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:50:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51476)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1iCJio-0007XQ-PK
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:29:27 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1iCK2y-0000p6-Dy; Mon, 23 Sep 2019 04:50:16 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BCE6A83F4C
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 08:29:23 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id w10so4555752wrl.5
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 01:29:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=kikYKHfL3Ck2fN5906iWkH6+cgjWSLcj4UEJt3nusl4=;
- b=lt2bZPqHCPRpS1o1puqfXbhH1AmrLcfAQHCXzVgz6/3VaMPzdlVI4FznMiLYOVLcKi
- t8mFC2UyH2/4/a6euKh6hsOx3EzUfetXcLwpdK0iQKeiCuexe7iVLQFD1kiApm8gOdVo
- /5lNcUIeIQ27lxGJ/JUCpHyJb/8KTSGs0PKDN203ucN3zm5PYlpt14Zq/9oHGZBSs9EW
- x+5LD4IIcSYhwmy4CDEcj02zyS3VZpU9XaCL42wx9iV1TOM/7DxrfU/YFN76j5RBBGHb
- iUymb3ZGC8gfzyXEG4PKHGksa4w0aJMfXywLf8eX2daoa8vrpsYd90cDiGjNs+KxeVNS
- udeQ==
-X-Gm-Message-State: APjAAAWe1B9H8kofqV9wkKSEWFJ05p2ZVnpEj3Ow2AN5gVSd/MHJNNdV
- cI1atCH1mCNPYLKixdBFPKRxJILTX8gLqWNaP4BFlpeZ+gOG8Y/tpA9XASDRzK71Gb/VqkVqWPo
- 8RceHnMj5JZ70nAg=
-X-Received: by 2002:a1c:7ed7:: with SMTP id
- z206mr13700945wmc.124.1569227362481; 
- Mon, 23 Sep 2019 01:29:22 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzKX0HB9ZtvLtoSuZ2BX1CVOs4/0nzjuxdglPCbtiFmBe8VaHKy/UJBrfY1PW5dU113hHXcdQ==
-X-Received: by 2002:a1c:7ed7:: with SMTP id
- z206mr13700926wmc.124.1569227362235; 
- Mon, 23 Sep 2019 01:29:22 -0700 (PDT)
-Received: from steredhat (host170-61-dynamic.36-79-r.retail.telecomitalia.it.
- [79.36.61.170])
- by smtp.gmail.com with ESMTPSA id e6sm10312791wrp.91.2019.09.23.01.29.21
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Sep 2019 01:29:21 -0700 (PDT)
-Date: Mon, 23 Sep 2019 10:29:19 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH] hw/arm/boot: Use the IEC binary prefix definitions
-Message-ID: <20190923082919.y2fjn2y6t7lire3z@steredhat>
-References: <20190921103405.19623-1-philmd@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id EDA8918CB8E1;
+ Mon, 23 Sep 2019 08:50:14 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-120.ams2.redhat.com [10.36.116.120])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B7E6360852;
+ Mon, 23 Sep 2019 08:50:08 +0000 (UTC)
+Subject: Re: [PATCH 0/4] Make it possible to compile with CONFIG_ARM_V7M=n
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+References: <20190921150420.30743-1-thuth@redhat.com>
+ <faa7f493-6c40-a5ac-cc70-8cba6e016cb8@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <11706c6f-a2e4-f181-208e-a7357e0c8d57@redhat.com>
+Date: Mon, 23 Sep 2019 10:50:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190921103405.19623-1-philmd@redhat.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <faa7f493-6c40-a5ac-cc70-8cba6e016cb8@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Mon, 23 Sep 2019 08:50:15 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -92,88 +116,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Sep 21, 2019 at 12:34:04PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> IEC binary prefixes ease code review: the unit is explicit.
+On 23/09/2019 10.37, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Thomas,
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
->  hw/arm/boot.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+> On 9/21/19 5:04 PM, Thomas Huth wrote:
+>> We've got CONFIG_ARM_V7M, but it currently can't be disabled.
+>> Here are some patches that should allow to disable the switch
+>> (if the corresponding boards are disabled, too).
 >=20
-> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> index bf97ef3e33..59bb2fa0d3 100644
-> --- a/hw/arm/boot.c
-> +++ b/hw/arm/boot.c
+> What about the ARMv4/v5/v6/v7r?
 
-Very appreciated!
+We don't have config switches for these yet, do we? You started to
+introduce them in some of your TCG-disablement patches which are not
+merged yet, so that's something that should be addressed once they are
+merged, or directly in your series. Here, I wanted to provide you with
+these patches so that the arm_cpu_register() is available for your
+patches / later clean-up patches ... I mentioned that in the RFC cover
+letter
+(https://www.mail-archive.com/qemu-devel@nongnu.org/msg641907.html) but
+forgot to copy / update that paragraph for this cover letter here again :=
+-/
 
-What about fixing also this other line?
-
-@@ -575,7 +575,7 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_i=
-nfo *binfo,
-         goto fail;
-     }
-=20
--    if (scells < 2 && binfo->ram_size >=3D (1ULL << 32)) {
-+    if (scells < 2 && binfo->ram_size >=3D 4 * GiB) {
-         /* This is user error so deserves a friendlier error message
-          * than the failure of setprop_sized_cells would provide
-
-
-> @@ -1095,7 +1095,7 @@ static void arm_setup_direct_kernel_boot(ARMCPU *=
-cpu,
->       * we might still make a bad choice here.
->       */
->      info->initrd_start =3D info->loader_start +
-> -        MIN(info->ram_size / 2, 128 * 1024 * 1024);
-> +        MIN(info->ram_size / 2, 128 * MiB);
->      if (image_high_addr) {
->          info->initrd_start =3D MAX(info->initrd_start, image_high_addr=
-);
->      }
-> @@ -1155,13 +1155,13 @@ static void arm_setup_direct_kernel_boot(ARMCPU=
- *cpu,
->                   *
->                   * Let's play safe and prealign it to 2MB to give us s=
-ome space.
->                   */
-> -                align =3D 2 * 1024 * 1024;
-> +                align =3D 2 * MiB;
->              } else {
->                  /*
->                   * Some 32bit kernels will trash anything in the 4K pa=
-ge the
->                   * initrd ends in, so make sure the DTB isn't caught u=
-p in that.
->                   */
-> -                align =3D 4096;
-> +                align =3D 4 * KiB;
->              }
-> =20
->              /* Place the DTB after the initrd in memory with alignment=
-. */
-> @@ -1178,7 +1178,7 @@ static void arm_setup_direct_kernel_boot(ARMCPU *=
-cpu,
->                  info->loader_start + KERNEL_ARGS_ADDR;
->              fixupcontext[FIXUP_ARGPTR_HI] =3D
->                  (info->loader_start + KERNEL_ARGS_ADDR) >> 32;
-> -            if (info->ram_size >=3D (1ULL << 32)) {
-> +            if (info->ram_size >=3D 4 * GiB) {
->                  error_report("RAM size must be less than 4GB to boot"
->                               " Linux kernel using ATAGS (try passing a=
- device tree"
->                               " using -dtb)");
-
-With or without the new line fix:
-
-Acked-by: Stefano Garzarella <sgarzare@redhat.com>
-
-Thanks,
-Stefano
+ Thomas
 
