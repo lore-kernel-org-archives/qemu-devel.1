@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B41C04EBF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:47:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE20C04EBF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:47:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB72320820
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:47:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB72320820
+	by mail.kernel.org (Postfix) with ESMTPS id A3A6020820
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:47:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3A6020820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCOgN-0004Yi-PU
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 09:47:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59498)
+	id 1iCOgX-0004jx-2r
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 09:47:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59460)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1iCOZz-0007Pr-Fg
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:40:40 -0400
+ (envelope-from <crosa@redhat.com>) id 1iCOZv-0007Km-EG
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:40:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1iCOZy-0007ZS-8K
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:40:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47386)
+ (envelope-from <crosa@redhat.com>) id 1iCOZu-0007YI-AI
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:40:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46720)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iCOZy-0007ZG-0D
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:40:38 -0400
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iCOZu-0007Y8-5P
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:40:34 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4DD4B20E3;
- Mon, 23 Sep 2019 13:40:37 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 69BEA81DE7;
+ Mon, 23 Sep 2019 13:40:33 +0000 (UTC)
 Received: from dhcp-17-179.bos.redhat.com (dhcp-17-179.bos.redhat.com
  [10.18.17.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C6C019C58;
- Mon, 23 Sep 2019 13:40:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 49F9619C78;
+ Mon, 23 Sep 2019 13:40:32 +0000 (UTC)
 From: Cleber Rosa <crosa@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
  Eduardo Habkost <ehabkost@redhat.com>
-Subject: [PULL 6/7] tests/acceptance: Add new test cases in
- linux_ssh_mips_malta.py
-Date: Mon, 23 Sep 2019 09:40:18 -0400
-Message-Id: <20190923134019.8548-7-crosa@redhat.com>
+Subject: [PULL 3/7] Acceptance test x86_cpu_model_versions: fix mismatches
+ between test and messages
+Date: Mon, 23 Sep 2019 09:40:15 -0400
+Message-Id: <20190923134019.8548-4-crosa@redhat.com>
 In-Reply-To: <20190923134019.8548-1-crosa@redhat.com>
 References: <20190923134019.8548-1-crosa@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Mon, 23 Sep 2019 13:40:37 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Mon, 23 Sep 2019 13:40:33 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -69,8 +69,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>,
+Cc: Fam Zheng <fam@euphon.net>, Aleksandar Rikalo <arikalo@wavecomp.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Wainer dos Santos Moschetta <wainersm@redhat.com>,
  Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
@@ -80,77 +79,58 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+This fixes a few mismatches between the test and the error messages
+produced in case of failures.
 
-Add 15 new tests cases. They all rely on simple commands used for
-detecting hardware configuration information.
-
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <1564760158-27536-3-git-send-email-aleksandar.markovic@rt-rk.=
-com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Message-Id: <20190828193628.7687-3-crosa@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- tests/acceptance/linux_ssh_mips_malta.py | 45 ++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+ tests/acceptance/x86_cpu_model_versions.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptance/=
-linux_ssh_mips_malta.py
-index 7fc44f43d1..1d334432a0 100644
---- a/tests/acceptance/linux_ssh_mips_malta.py
-+++ b/tests/acceptance/linux_ssh_mips_malta.py
-@@ -154,6 +154,51 @@ class LinuxSSH(Test):
-             self.fail('"%s" output does not contain "%s"' % (cmd, exp))
+diff --git a/tests/acceptance/x86_cpu_model_versions.py b/tests/acceptanc=
+e/x86_cpu_model_versions.py
+index e6c76b0d4c..220d18f68d 100644
+--- a/tests/acceptance/x86_cpu_model_versions.py
++++ b/tests/acceptance/x86_cpu_model_versions.py
+@@ -280,7 +280,7 @@ class X86CPUModelAliases(avocado_qemu.Test):
+         vm.add_args('-cpu', 'Cascadelake-Server-v1,x-force-features=3Don=
+,check=3Doff,enforce=3Doff')
+         vm.launch()
+         self.assertFalse(get_cpu_prop(vm, 'arch-capabilities'),
+-                         'pc-i440fx-4.1 + Cascadelake-Server-v1 should n=
+ot have arch-capabilities')
++                         'pc-i440fx-4.0 + Cascadelake-Server-v1 should n=
+ot have arch-capabilities')
+         vm.shutdown()
 =20
-     def run_common_commands(self):
-+        self.ssh_command_output_contains(
-+            'cat /proc/cpuinfo',
-+            '24Kc')
-+        self.ssh_command_output_contains(
-+            'uname -m',
-+            'mips')
-+        self.ssh_command_output_contains(
-+            'uname -r',
-+            '3.2.0-4-4kc-malta')
-+        self.ssh_command_output_contains(
-+            'cat /proc/interrupts',
-+            'timer')
-+        self.ssh_command_output_contains(
-+            'cat /proc/interrupts',
-+            'i8042')
-+        self.ssh_command_output_contains(
-+            'cat /proc/interrupts',
-+            'serial')
-+        self.ssh_command_output_contains(
-+            'cat /proc/interrupts',
-+            'ata_piix')
-+        self.ssh_command_output_contains(
-+            'cat /proc/interrupts',
-+            'eth0')
-+        self.ssh_command_output_contains(
-+            'cat /proc/interrupts',
-+            'eth0')
-+        self.ssh_command_output_contains(
-+            'cat /proc/devices',
-+            'input')
-+        self.ssh_command_output_contains(
-+            'cat /proc/devices',
-+            'usb')
-+        self.ssh_command_output_contains(
-+            'cat /proc/devices',
-+            'fb')
-+        self.ssh_command_output_contains(
-+            'cat /proc/ioports',
-+            'serial')
-+        self.ssh_command_output_contains(
-+            'cat /proc/ioports',
-+            'ata_piix')
-+        self.ssh_command_output_contains(
-+            'cat /proc/ioports',
-+            'piix4_smbus')
-         self.ssh_command_output_contains(
-             'lspci -d 11ab:4620',
-             'GT-64120')
+         vm =3D self.get_vm()
+@@ -289,14 +289,14 @@ class X86CPUModelAliases(avocado_qemu.Test):
+         vm.add_args('-cpu', 'Cascadelake-Server-v2,x-force-features=3Don=
+,check=3Doff,enforce=3Doff')
+         vm.launch()
+         self.assertTrue(get_cpu_prop(vm, 'arch-capabilities'),
+-                         'pc-i440fx-4.1 + Cascadelake-Server-v1 should h=
+ave arch-capabilities')
++                         'pc-i440fx-4.0 + Cascadelake-Server-v2 should h=
+ave arch-capabilities')
+         vm.shutdown()
+=20
+         # command line must override machine-type and versioned CPU mode=
+l:
+         vm =3D self.get_vm()
+         vm.add_args('-S')
+         vm.set_machine('pc-i440fx-4.0')
+-        vm.add_args('-cpu', 'Cascadelake-Server,x-force-features=3Don,ch=
+eck=3Doff,enforce=3Doff,+arch-capabilities')
++        vm.add_args('-cpu', 'Cascadelake-Server-v1,x-force-features=3Don=
+,check=3Doff,enforce=3Doff,+arch-capabilities')
+         vm.launch()
+         self.assertTrue(get_cpu_prop(vm, 'arch-capabilities'),
+                          'pc-i440fx-4.0 + Cascadelake-Server-v1,+arch-ca=
+pabilities should have arch-capabilities')
 --=20
 2.21.0
 
