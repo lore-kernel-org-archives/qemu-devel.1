@@ -2,81 +2,60 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1C73C432C1
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 22:24:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B97A2C432C1
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 22:25:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E34E206C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 22:24:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NgJuH4J4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E34E206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8C93D206C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 22:25:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C93D206C2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=peff.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCWkU-0006CZ-DR
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 18:24:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58482)
+	id 1iCWlq-0007Jw-Ng
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 18:25:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58843)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iCWjJ-0005iE-8N
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 18:22:50 -0400
+ (envelope-from <peff@peff.net>) id 1iCWkm-0006gh-Ad
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 18:24:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iCWjH-0003oT-UU
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 18:22:48 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38793)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iCWAA-0001ZY-EN
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 17:46:31 -0400
-Received: by mail-ot1-x341.google.com with SMTP id e11so13539649otl.5
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 14:46:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=1lwzpWN8tjukbbISDvbnJRJp7+j23v5G7tQvo2iviAw=;
- b=NgJuH4J4A33lyPD33YF15BNN5RpNHLbOuf5gm0qILbL/ica6Cuc9Zmb5BoeJC/Pp6M
- 6eBAoOjf3wfumYLUsh4z4j3BGRNFyNGfwhsNopx8kE2yp8jIIumstlLJbrvhXBmOxqtc
- Ca7X5qxIHVtmUDwcJ3sfOVl/8fkjqa4TS0xNkgiuVI9tNeLGKrStTt6FOtiQFN4qTdBs
- dxklM/lynYEnNOJ+fUWdtxcCaPplYEfCRmw7Qj0c69MdtYhtXIO5cokxOxbD91dCTydE
- xB7iWiKfPU5y3D7ebnLAiHEFm6bkrG9Frp7P42C4CchQ4VYDheJ1acT6JGUkeTWHLkT8
- 9THw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=1lwzpWN8tjukbbISDvbnJRJp7+j23v5G7tQvo2iviAw=;
- b=aa0BDMuzcHCb8r/czrXfVGrWfw+rVLlMkw7fsaqBosF2RvBCmQ7wZtdD1beL/JgW5C
- A0i2G47KkLnN6wZa7iGBdeKp5+izXMyzil75bbF6RYuPmNMfiYyDpe7aZw/yRGpnKT7d
- Bd9HqrStuXNxx2/DQ1FaSR1YMtF99wxM4++oXmh01trvZgovosRypi+27ZIbh0PkvK7e
- 9/+OwLQeHAbk/mM7EKzYmD/MnxLJ8OFgNtRu7yQdVro13VLNGm2RNv5N7yq7WFYM1g4H
- luoCd+GjpHtCLrm/sFZZF2UGXvG4ede3WI3cPcJHwsvB2Jw7LKONZKsBQqT4kt7d4sAl
- nC/Q==
-X-Gm-Message-State: APjAAAUccSEV5ySAltekhMcyu7WkaC7wyPJKY+nPkhjCSnw3iX7GN6Ex
- 9egIQWqKiHmWpuZJ4a0tI6c7BmcNCcQ2yyF65QTN3g==
-X-Google-Smtp-Source: APXvYqzlviW3HUvhH+fobID+Iesir2GZbVjn9P0OyQFYL8SkBo09OrV9KfQruiYNxghNEMxTA6uf1Kx1Rls0R+BwCc4=
-X-Received: by 2002:a9d:6d0a:: with SMTP id o10mr304805otp.221.1569275188921; 
- Mon, 23 Sep 2019 14:46:28 -0700 (PDT)
+ (envelope-from <peff@peff.net>) id 1iCWkl-0004Zp-1g
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 18:24:20 -0400
+Received: from cloud.peff.net ([104.130.231.41]:49134)
+ by eggs.gnu.org with smtp (Exim 4.71) (envelope-from <peff@peff.net>)
+ id 1iCWkj-0004Yb-0s
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 18:24:18 -0400
+Received: (qmail 30872 invoked by uid 109); 23 Sep 2019 22:24:16 -0000
+Received: from Unknown (HELO peff.net) (10.0.1.2)
+ by cloud.peff.net (qpsmtpd/0.94) with SMTP; Mon, 23 Sep 2019 22:24:16 +0000
+Authentication-Results: cloud.peff.net; auth=none
+Received: (qmail 4891 invoked by uid 111); 23 Sep 2019 22:26:37 -0000
+Received: from sigill.intra.peff.net (HELO sigill.intra.peff.net) (10.0.0.7)
+ by peff.net (qpsmtpd/0.94) with (TLS_AES_256_GCM_SHA384 encrypted) ESMTPS;
+ Mon, 23 Sep 2019 18:26:37 -0400
+Authentication-Results: peff.net; auth=none
+Date: Mon, 23 Sep 2019 18:24:15 -0400
+From: Jeff King <peff@peff.net>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [Qemu-devel] [PATCH v6 0/4] 9p: Fix file ID collisions
+Message-ID: <20190923222415.GA22495@sigill.intra.peff.net>
+References: <cover.1566503584.git.qemu_oss@crudebyte.com>
+ <305577c2-709a-b632-4056-6582771176ac@redhat.com>
+ <20190909142511.GA20726@sigill.intra.peff.net>
+ <56046367.TiUlWITyhT@silver>
 MIME-Version: 1.0
-References: <cover.1568931866.git.alistair.francis@wdc.com>
- <0a5c141a26fada6d93d06e996a2f24e1b269ec50.1568931866.git.alistair.francis@wdc.com>
- <CAEUhbmVvDKQqQYE-riq=cvSrCe_NMoW_KDsLjh8CVHRUhJvk9A@mail.gmail.com>
- <CAKmqyKOofA3U+8kjMkzQ0sNd1=uwJHq3c9eaLZdoNCb7=e-PAw@mail.gmail.com>
-In-Reply-To: <CAKmqyKOofA3U+8kjMkzQ0sNd1=uwJHq3c9eaLZdoNCb7=e-PAw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 23 Sep 2019 22:46:17 +0100
-Message-ID: <CAFEAcA-uFPGf4BiDXH=Om3Df-xXrt7QwjzVF7E3kY4aMWMP4YQ@mail.gmail.com>
-Subject: Re: [PATCH v1 5/6] riscv/virt: Add the PFlash CFI01 device
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <56046367.TiUlWITyhT@silver>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 104.130.231.41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,42 +67,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>,
- Alistair Francis <alistair.francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>
+Cc: berrange@redhat.com, stefanha@gmail.com, Greg Kurz <groug@kaod.org>,
+ qemu-devel@nongnu.org, git@vger.kernel.org, antonios.motakis@huawei.com,
+ dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 20 Sep 2019 at 23:23, Alistair Francis <alistair23@gmail.com> wrote:
-> On Thu, Sep 19, 2019 at 10:15 PM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > I don't think we should mirror what is used on ARM virt board to
-> > create 2 flash for sifive_u. For ARM virt, there are 2 flashes because
-> > they need distinguish secure and non-secure. For sifive_u, only one is
-> > enough.
->
-> I went back and forward about 1 or 2. Two seems more usable as maybe
-> someone wants to include two pflash files? The Xilinx machine also has
-> two so I'm kind of used to 2, but I'm not really fussed.
+On Mon, Sep 23, 2019 at 01:19:18PM +0200, Christian Schoenebeck wrote:
 
-One of the reasons for having 2 on the Arm board (we do this
-even if we're not supporting secure vs non-secure) is that
-then you can use one for a fixed read-only BIOS image (backed
-by a file on the host filesystem shared between all VMs), and
-one backed by a read-write per-VM file providing permanent
-storage for BIOS environment variables. Notably UEFI likes to
-work this way, but the idea applies in theory to other
-boot loader or BIOSes I guess.
+> >  	if (cmit_fmt_is_mail(pp->fmt)) {
+> > -		if (pp->from_ident && ident_cmp(pp->from_ident, &ident)) {
+> > +		if (pp->always_use_in_body_from ||
+> > +		    (pp->from_ident && ident_cmp(pp->from_ident, &ident))) {
+> >  			struct strbuf buf = STRBUF_INIT;
+> > 
+> >  			strbuf_addstr(&buf, "From: ");
+> > 
+> > but most of the work would be ferrying that option from the command line
+> > down to the pretty-print code.
+> > 
+> > That would work in conjunction with "--from" to avoid a duplicate. It
+> > might require send-email learning about the option to avoid doing its
+> > own in-body-from management. If you only care about send-email, it might
+> > be easier to just add the option there.
+> 
+> Would it simplify the changes in git if that would be made a
+> "git config [--global]" setting only? That is, would that probably simplify 
+> that task to one simple function call there in pretty.c?
 
-I would suggest also checking with Markus that your code
-for instantiating the flash devices follows the current
-recommendations so the backing storage can be configured
-via -blockdev. (This is a fairly recent change from June or
-so; current-in-master virt and sbsa boards provide an example
-of doing the right thing, I think.)
+I think a config option would make sense, but we generally try to avoid
+adding a config option that doesn't have a matching command-line option.
 
-thanks
--- PMM
+I also think saving implementation work there is orthogonal. You can as
+easily make a global "always_use_in_body_from" as you can call a global
+config_get_bool("format-patch.always_use_in_body_from"). :)
+
+And anyway, it's not _that_ much work to pass it around. At least as
+much would go into writing documentation and tests. One of the reasons I
+left the patch above as a sketch is that I'm not 100% convinced this is
+a useful feature. Somebody caring enough about it to make a real patch
+would send a signal there.
+
+> On the other hand, considering the already existing --from argument and 
+> "format.from" config option:
+> https://git-scm.com/docs/git-config#Documentation/git-config.txt-formatfrom
+> 
+> Wouldn't it make sense to just drop the currently existing sender != author 
+> string comparison in git and simply always add the "From:" line to the email's 
+> body if "format.from yes" is used, instead of introducing a suggested 2nd 
+> (e.g. "always-from") option? I mean sure automatically removing redundant 
+> information in the generated emails if sender == author sounds nice on first 
+> thought, but does it address anything useful in practice to justify 
+> introduction of a 2nd related option?
+
+Yes, the resulting mail would be correct, in the sense that it could be
+applied just fine by git-am. But I think it would be uglier. IOW, I
+consider the presence of the in-body From to be a clue that something
+interesting is going on (like forwarding somebody else's patch). So from
+my perspective, it would just be useless noise. Other communities may
+have different opinions, though (I think I have seen some kernel folks
+always including all of the possible in-body headers, including Date).
+But it seems like it makes sense to keep both possibilities.
+
+-Peff
 
