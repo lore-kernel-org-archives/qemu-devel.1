@@ -2,89 +2,94 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13DB7C32755
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:58:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C026C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 14:01:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E064A20B7C
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:58:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E064A20B7C
+	by mail.kernel.org (Postfix) with ESMTPS id 5BFEC20640
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 14:01:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QdLOPPrx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BFEC20640
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCOrC-0004va-V4
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 09:58:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33899)
+	id 1iCOtj-0006On-Ue
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 10:01:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34013)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iCOqL-0004LV-Iw
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:57:34 -0400
+ (envelope-from <slp@redhat.com>) id 1iCOrP-0005Q9-JU
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:58:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iCOqK-0005SK-Li
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:57:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:14329)
+ (envelope-from <slp@redhat.com>) id 1iCOrO-0006LG-9K
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:58:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26976
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iCOqG-0005Qv-SN; Mon, 23 Sep 2019 09:57:29 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 824F08BA2DA;
- Mon, 23 Sep 2019 13:57:27 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.78])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 514DD19C77;
- Mon, 23 Sep 2019 13:57:26 +0000 (UTC)
-Subject: Re: [PATCH v5 5/5] iotests: use python logging for iotests.log()
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <20190917234549.22910-1-jsnow@redhat.com>
- <20190917234549.22910-6-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <c3472c92-a4ea-65bb-c5b9-94cb51873bd6@redhat.com>
-Date: Mon, 23 Sep 2019 15:57:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iCOrO-0006GS-2q
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:58:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1569247116;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=3kkbH6iUXtNoyhMC2VRcNsewmldMDekND0jT/ZVioSM=;
+ b=QdLOPPrxA7RrRYcXFJPezGMUoJ62lOAHa/exa1AbaNtTnwganXMkpzcRGrvsEJmW0ye+YW
+ tiXlaFmbPdz6GnOkhLo7TNfxT1h8ptdT4SZQ3tj8WIkbhxldIro7ZbA1ShJCACBQwj51vV
+ iaHmGpYnu6RHQNCbqOgbqSTfUNoTlbI=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-290-pFRV3Pm2PY6hrwu1nWCcZA-1; Mon, 23 Sep 2019 09:58:34 -0400
+X-MC-Unique: pFRV3Pm2PY6hrwu1nWCcZA-1
+Received: by mail-wm1-f69.google.com with SMTP id k9so6774859wmb.0
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 06:58:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=3kkbH6iUXtNoyhMC2VRcNsewmldMDekND0jT/ZVioSM=;
+ b=sz2gDmgYBlz8A3skirJoyA4ycUCEvSWbxiISf+ayYGFiU8L4/VwA4zNqXsSr5dkTAP
+ TrQp198I7Ly+U/QadnNbM+fY0Nw2MedyEmfgupxTDEZTwjp60uh7EPf7UhlTXW67xYrz
+ NPaTiRGJrOxr6VauwOPucvXtrBt5Ow6YHt7DtuX/4VMWgLFff+OpTwcmlilXD027hOdw
+ c29QwZ3JCP1X7bxhBl2o6Bh6ClR4Wb5kgTAWoiKVdHs2+96/s55VriKUf1w8sIu7X2hW
+ EZnu/zICy9oAhL8FX7wUe5xpzXHaAFfGbO55sg03StmEEk0GMrumBplzV5tWrqxPzjBW
+ AdpQ==
+X-Gm-Message-State: APjAAAXdkwRFdLHdQbXaFhqkG/89gZCzqoYE0/okNQ8oIsbMWCgF7Pew
+ ikGGKuUsAgp9TyjLKLgx2bCnyKRnUe/BsjSmXfdmD1Wih+ZYtQ9RsVB8ZZ9q9pDqA71QNRo9w2L
+ 3B6cvF59ROPMj/Gs=
+X-Received: by 2002:adf:dc91:: with SMTP id r17mr21568996wrj.22.1569247113422; 
+ Mon, 23 Sep 2019 06:58:33 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwbvuoJwpJW2Vc77wmyqk08NbCebiGVBxLclrTryZBP+ddDN3rhA7sOqwIU7unbjiT9FrLtcA==
+X-Received: by 2002:adf:dc91:: with SMTP id r17mr21568986wrj.22.1569247113218; 
+ Mon, 23 Sep 2019 06:58:33 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id b12sm10661681wrt.21.2019.09.23.06.58.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 23 Sep 2019 06:58:32 -0700 (PDT)
+References: <20190913120559.40835-1-slp@redhat.com>
+ <a51cbe82-9213-d535-a43b-57f68f78475d@gmail.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: Vasyl Vavrychuk <vvavrychuk@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3] virtio-mmio: implement modern (v2),
+ personality (virtio-1)
+In-reply-to: <a51cbe82-9213-d535-a43b-57f68f78475d@gmail.com>
+Date: Mon, 23 Sep 2019 15:58:28 +0200
+Message-ID: <87ef07cdx7.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190917234549.22910-6-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Kd1SorPp3agD6im7LIBdTpyV7vfNj3uD1"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Mon, 23 Sep 2019 13:57:27 +0000 (UTC)
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,67 +101,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Kd1SorPp3agD6im7LIBdTpyV7vfNj3uD1
-Content-Type: multipart/mixed; boundary="Id9zgBS4xnTrlxEjDaYoJF58IDMke48az";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Message-ID: <c3472c92-a4ea-65bb-c5b9-94cb51873bd6@redhat.com>
-Subject: Re: [PATCH v5 5/5] iotests: use python logging for iotests.log()
-References: <20190917234549.22910-1-jsnow@redhat.com>
- <20190917234549.22910-6-jsnow@redhat.com>
-In-Reply-To: <20190917234549.22910-6-jsnow@redhat.com>
-
---Id9zgBS4xnTrlxEjDaYoJF58IDMke48az
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 18.09.19 01:45, John Snow wrote:
-> We can turn logging on/off globally instead of per-function.
->=20
-> Remove use_log from run_job, and use python logging to turn on
-> diffable output when we run through a script entry point.
->=20
-> iotest 245 changes output order due to buffering reasons.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  tests/qemu-iotests/030        |  4 +--
->  tests/qemu-iotests/245        |  1 +
->  tests/qemu-iotests/245.out    | 24 ++++++++---------
->  tests/qemu-iotests/iotests.py | 49 +++++++++++++++++++++--------------=
-
->  4 files changed, 44 insertions(+), 34 deletions(-)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+--=-=-=
+Content-Type: text/plain
 
 
---Id9zgBS4xnTrlxEjDaYoJF58IDMke48az--
+Vasyl Vavrychuk <vvavrychuk@gmail.com> writes:
 
---Kd1SorPp3agD6im7LIBdTpyV7vfNj3uD1
+> Hi, Sergio,
+>
+>> For this reason, the v2 personality is disabled, keeping the legacy
+>> behavior as default. Machine types willing to use v2, can enable it
+>> using MachineClass's compat_props.
+> ...
+>> +    DEFINE_PROP_BOOL("force-legacy", VirtIOMMIOProxy, legacy, true),
+>
+> Currently, I am not enable to set "force-legacy" to false from command
+> line for
+> virt machine.
+
+You can disable force-legacy from the command line by passing "-global
+virtio-mmio.force-legacy=false".
+
+> I think, the "force-legacy" and compat_props should work the other way
+> around.
+>
+> The "force-legacy" should be set to false by default to select a new
+> behaviour.
+> Instead of this hw_compat_4_1 should be modified to keep the old behaviour:
+
+The decision to keep the legacy behavior as the default is because
+support for the non-legacy personality is not a widespread as it'd be
+desirable. Basically, only the Linux guest driver supports it (it's
+missing from every *BSD I checked, and also from TianoCore's EDK2).
+
+Sergio.
+
+--=-=-=
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2Iz0QACgkQ9AfbAGHV
-z0AyMAgAoJPGEvEEe0ztoNUuNvFnc6T0BEXtBbn7dINtC28LX7Xi6mIhwraO9gG5
-8LccRrTi8fXgABkIiW5WwHQmQVT41L0zAN3SL1OpWxs1gUiUDDvDLB2KOjBwOXsA
-lr7t2slp8SgiNVZAB0R/RleiNqkzxZvst7hHHOoSAwWt3dPrH0jt72d7xoG69Bfj
-i9AHBLAGbuM7NGlXXAUju/GrozGgnLKQS3bVQ7MF7JbHqV7vuS9em8wdRT3TrECc
-7qWC3kB226g0Oslroy+07q8dzI57Xoxi8aAoh8k0dHWdF5LX2RuM64oNj756KIV2
-shKnsTC2VdzuGvCTSq5kfiRiGqaobQ==
-=V172
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2Iz4QACgkQ9GknjS8M
+AjWAsw/9ESEs1+rDRtckdBk+NSqVLpGugdZff8Ql+hBPeBZR0Gg8Cx2REf7TAjMc
+eTzZNwooMpZenP2rLG1Lf70ZGrh5BDiNFjyYtD0+mxjuvUhqca+qVEJI5yMie5bF
++bqjPh8jaw7gKCudQWg+Yj2j8hV1yyl/KG7c4YcyQ3R1Ga//ZHzI3PXReRYhzrnT
+FlUqKSC4ILY2lbGhRmRzdUdnLMSOL/mx9qVpU/mmoGCqRo1+Uo8I4lN0CD//dxXb
+FT574tBzOEzAM09ytyz6zR0WY2xYpprk+ByGiEXt0ZNUSL14o5SaHCMvdYXPYVqv
+BNWIYZU+BgYNzXzZh+pq+UDfMP7iFFEKuHbDk7vA0+6tJ2u+LVY+EZLmaAc2NLHf
+qEHK6cfsup0Ry+91hzN65tX6Tz9ccaqY/C90fmjEyRdPIgvFt2LQOOBQTs7wu8zj
+kaPN2R5KcXUoD8Sw6n/f0Qj3lzY1pMNFSJpmhFEQ8RWyuMtuT+Uj5QcuG5TxAVQm
+vTRAhCVcBg4rCnADapyXpFE+rj6Zw+1/PNI7SbmX6byyhXXswsCN3yKfW4DIWABE
+UCUMHmeD6bnYRJBqwhwI5+wV2Z2Fw1faydWQ7Bi0/AmKKrRjq7cKwBLRTRZuiNMW
+LBlpL3dI1z1W1FXZBK+fE4Cn9f1Zu3OChqlHQ1leb4Z7rXknMgw=
+=Ff25
 -----END PGP SIGNATURE-----
+--=-=-=--
 
---Kd1SorPp3agD6im7LIBdTpyV7vfNj3uD1--
 
