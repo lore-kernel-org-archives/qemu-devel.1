@@ -2,51 +2,51 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A2F1C4CEC4
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 17:23:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40080C4CECF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 17:23:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E08B920820
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 17:23:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E08B920820
+	by mail.kernel.org (Postfix) with ESMTPS id 1680E20820
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 17:23:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1680E20820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCS3G-000065-Vj
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 13:23:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40932)
+	id 1iCS41-0000uq-8q
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 13:23:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iCS1q-0007Nc-Te
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 13:21:39 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iCS2p-0008Kv-L6
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 13:22:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iCS1p-0001CS-Qj
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 13:21:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43596)
+ (envelope-from <jsnow@redhat.com>) id 1iCS2o-0001iY-J1
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 13:22:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52024)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iCS1m-0001A1-8g; Mon, 23 Sep 2019 13:21:34 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iCS2o-0001i8-B6
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 13:22:38 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 91D6D18C4287;
- Mon, 23 Sep 2019 17:21:33 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A5F04301D67F;
+ Mon, 23 Sep 2019 17:22:37 +0000 (UTC)
 Received: from [10.18.17.231] (dhcp-17-231.bos.redhat.com [10.18.17.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1239A5B69A;
- Mon, 23 Sep 2019 17:21:32 +0000 (UTC)
-Subject: Re: [PATCH v5 1/5] iotests: remove 'linux' from default supported
- platforms
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-References: <20190917234549.22910-1-jsnow@redhat.com>
- <20190917234549.22910-2-jsnow@redhat.com>
- <a252472e-842a-8401-2743-e4ed948b066b@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CFBF419D70;
+ Mon, 23 Sep 2019 17:22:34 +0000 (UTC)
+Subject: Re: [PATCH 3/3] docker: remove unused debian-sid and debian-ports
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190920001413.22567-1-jsnow@redhat.com>
+ <20190920001413.22567-4-jsnow@redhat.com>
+ <03273f50-3146-328c-fe7c-e437d7b65e0a@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -122,17 +122,17 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <74dd6fa5-f268-7eb3-3b1f-e5c5112808fd@redhat.com>
-Date: Mon, 23 Sep 2019 13:21:32 -0400
+Message-ID: <8b228b95-fd6e-ffd0-0750-bc651a63fbd2@redhat.com>
+Date: Mon, 23 Sep 2019 13:22:34 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <a252472e-842a-8401-2743-e4ed948b066b@redhat.com>
+In-Reply-To: <03273f50-3146-328c-fe7c-e437d7b65e0a@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Mon, 23 Sep 2019 17:21:33 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Mon, 23 Sep 2019 17:22:37 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -147,65 +147,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/23/19 9:09 AM, Max Reitz wrote:
-> On 18.09.19 01:45, John Snow wrote:
->> verify_platform will check an explicit whitelist and blacklist instead=
-.
->> The default will now be assumed to be allowed to run anywhere.
->>
->> For tests that do not specify their platforms explicitly, this has the=
- effect of
->> enabling these tests on non-linux platforms. For tests that always spe=
-cified
->> linux explicitly, there is no change.
->>
->> For Python tests on FreeBSD at least; only seven python tests fail:
->> 045 147 149 169 194 199 211
->>
->> 045 and 149 appear to be misconfigurations,
->> 147 and 194 are the AF_UNIX path too long error,
->> 169 and 199 are bitmap migration bugs, and
->> 211 is a bug that shows up on Linux platforms, too.
->>
->> This is at least good evidence that these tests are not Linux-only. If
->> they aren't suitable for other platforms, they should be disabled on a
->> per-platform basis as appropriate.
->>
->> Therefore, let's switch these on and deal with the failures.
+On 9/21/19 5:53 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi John,
 >=20
-> What exactly do you mean by =E2=80=9Cdeal with the failures=E2=80=9D?  =
-Do you have a
-> reference to patches that deal with them, or are you or is someone else
-> working on them...?
+> On 9/20/19 2:14 AM, John Snow wrote:
+>> These are listed as "partial" images, but have no user.
+>> Remove them.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  tests/docker/Makefile.include                |  4 +--
+>>  tests/docker/dockerfiles/debian-ports.docker | 36 -------------------=
+-
+>>  tests/docker/dockerfiles/debian-sid.docker   | 35 -------------------
+>>  3 files changed, 2 insertions(+), 73 deletions(-)
+>>  delete mode 100644 tests/docker/dockerfiles/debian-ports.docker
+>>  delete mode 100644 tests/docker/dockerfiles/debian-sid.docker
 >=20
-> Apart from that, I am rather hesitant to take a patch through my tree
-> that not only may cause test failures on platforms that I will not or
-> actually cannot run tests on (like MacOS or Windows), but that actually
-> does introduce new failures as you describe.
+> Can you split this patch in 2, one per image? That will ease the revert=
+s.
 >=20
-> Well, at least it doesn=E2=80=99t introduce build failures because it a=
-ppears
-> there is no Python test that=E2=80=99s in the auto group, so I suppose =
-=E2=80=9Crather
-> hesitant=E2=80=9D is not an =E2=80=9CI won=E2=80=99t=E2=80=9D.
+> Once splitted feel free to add to each new patch:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 >=20
-> Max
+> Thanks,
+>=20
+> Phil.
 >=20
 
-This is why I didn't want this to be part of the logging series.
+Sounds good to me, thanks!
 
-There's basically no way to win and this series is egregiously beyond
-the five minutes I devoted to it.
-
-I'd rather we just merge the last version if we're not ready to enable
-testing on other platforms. It's wrong, but it was wrong anyway.
-
---js
 
