@@ -2,62 +2,101 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84403C04EBF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 14:48:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E05CC04EBF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 14:52:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5548B20578
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 14:48:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5548B20578
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id C409320578
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 14:52:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EORVKrGW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C409320578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCPdx-0001G7-GH
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 10:48:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41538)
+	id 1iCPhe-0003jW-32
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 10:52:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42010)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iCPcH-0000Iv-HX
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 10:47:06 -0400
+ (envelope-from <philmd@redhat.com>) id 1iCPfl-0002J2-Ph
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 10:50:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iCPcF-0000fB-UO
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 10:47:05 -0400
-Received: from 18.mo4.mail-out.ovh.net ([188.165.54.143]:36538)
+ (envelope-from <philmd@redhat.com>) id 1iCPfk-0002ER-OT
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 10:50:41 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54396
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iCPcF-0000eh-Mm
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 10:47:03 -0400
-Received: from player168.ha.ovh.net (unknown [10.109.143.223])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id 422B42081B3
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 16:47:01 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player168.ha.ovh.net (Postfix) with ESMTPSA id 0EFE5A0769B1;
- Mon, 23 Sep 2019 14:46:55 +0000 (UTC)
-Date: Mon, 23 Sep 2019 16:46:53 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [Qemu-devel] [PATCH v7 0/3] 9p: Fix file ID collisions
-Message-ID: <20190923164653.5b79797a@bahia.lan>
-In-Reply-To: <2537302.ZFCiNNprIf@silver>
-References: <cover.1567680121.git.qemu_oss@crudebyte.com>
- <2376196.qMJLftDnS9@silver> <20190923145611.7ca240e8@bahia.lan>
- <2537302.ZFCiNNprIf@silver>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iCPfk-0002Do-KH
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 10:50:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1569250239;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=mdFeExCw32J/66tvTWmcQHCCx94/AeBgk4A+Q6gTNUs=;
+ b=EORVKrGWhmFsmlfOXXgQoNkYjYXTCkZjcXDEolanndeqHWCJBuCI1YKYtQ9rmTds93h439
+ 2KncWjv9ZdRjkevOLvRvj4mCSutnF+l+WplvZ2foJv0+j4DYZ1or2oBydlACQ4TFw6B8Ic
+ sXpCM2bVldO+ehzK2DE3LXfyT1VXtNM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-53-tsehaL97O7irFrnLsy6t0Q-1; Mon, 23 Sep 2019 10:50:38 -0400
+Received: by mail-wm1-f72.google.com with SMTP id 190so6832450wme.4
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 07:50:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=6FHtdn929Y1JFOp+pGJ+LlPRgHOmWcAbNQIFojgmtlo=;
+ b=Oj3VCFS2os4QxywAN0K2/D1rT33pkeSQfJ2Zary2d6zkhSSmrtZxSIaemg5oWdFrN7
+ VUhu8DyWmOXUp4PMeI72XPFjs45T9Qt0gHO+TiSkS97XyPUFPwMI9ck2c9uRXZXfIDyT
+ AYAVciRjx10aTDSJPfvcm9FPBMFwNrA4RLkZLibpjnmHUzjQ9/6Imanu3D9KzoDOonbM
+ P/1hM/Aj4SIl3r/aenXCEnJzVpPmVOgvsoAapQ0sa52uoeWk/Llf7/AW2OBmWpD7z0CQ
+ +w6IdVu4y1YbWEjbp0NrT43L1T4IuKNVT3MZB/8XIeGNy09FwT9dU5eS8UGgjsenhii+
+ K1NA==
+X-Gm-Message-State: APjAAAUJwvQzKH289dyVbZmITZ9OhvMUgYwplrbqgPYm5+OvMB/tSf6+
+ IBPosQE0RvcBHq/rtR8WVpWNOeFWgvXaTrj+kxC3MbOaWlVJgSGZ2Nth5Abty8qjOOTE/OZbff7
+ Xupifw9NbLbAToNw=
+X-Received: by 2002:a5d:4a52:: with SMTP id v18mr5027362wrs.368.1569250236917; 
+ Mon, 23 Sep 2019 07:50:36 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzgNuhFe6Asz1ZpMgPsmcG5YBvtrCZJfwQXoWHqVKJmCNn/D8AhDLxoilrjF9Q4ohs/UtO2cg==
+X-Received: by 2002:a5d:4a52:: with SMTP id v18mr5027351wrs.368.1569250236730; 
+ Mon, 23 Sep 2019 07:50:36 -0700 (PDT)
+Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id v2sm21512022wmf.18.2019.09.23.07.50.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 23 Sep 2019 07:50:36 -0700 (PDT)
+Subject: Re: illegal hardware instruction during MIPS-I ELF linux user
+ emulation
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <tencent_5D6D8ED31E83C5675AB8AA3C@qq.com>
+ <c722d11e-e0ff-8a91-d8f3-ee0a31f1df33@redhat.com>
+ <CAFEAcA-iiLihZp-W_kjO3bJXza-+Q-eofagv8N_DbhkbdCUwPA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <97a2103b-8cc7-8526-1d79-3e023d27756e@redhat.com>
+Date: Mon, 23 Sep 2019 16:50:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 15772731796117363008
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdekgdejlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+In-Reply-To: <CAFEAcA-iiLihZp-W_kjO3bJXza-+Q-eofagv8N_DbhkbdCUwPA@mail.gmail.com>
+Content-Language: en-US
+X-MC-Unique: tsehaL97O7irFrnLsy6t0Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 188.165.54.143
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,114 +108,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, "Daniel P.
- =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, qemu-devel@nongnu.org,
- Antonios Motakis <antonios.motakis@huawei.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ Libo Zhou <zhlb29@foxmail.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 23 Sep 2019 16:06:13 +0200
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+On 9/23/19 4:42 PM, Peter Maydell wrote:
+> On Mon, 23 Sep 2019 at 15:40, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
+com> wrote:
+>> So currently there is no MIPS-I only CPU.
+>> Note that the code got written with MIPS32 in mind, and implementing
+>> MIPS-I requires a considerable amount of change in the codebase.
+>=20
+> ...but MIPS-I binaries should run on MIPS-II and newer CPUs, shouldn't
+> they?
 
-> On Montag, 23. September 2019 14:56:11 CEST Greg Kurz wrote:
-> > On Mon, 23 Sep 2019 11:50:46 +0200
-> > 
-> > Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > > On Freitag, 13. September 2019 19:01:57 CEST Greg Kurz wrote:
-> > > > So I did some changes in 1/3 and pushed everything to 9p-next.
-> > > 
-> > > I've reviewed your changes. Some notes:
-> > > 
-> > > Patch 1:
-> > > https://github.com/gkurz/qemu/commit/9295011c5a961603959b966c8aa6ad9840fe6
-> > > db2> 
-> > > * Typo 1:
-> > > 	error_append_hint(&local_err, "Valide options are: multidevs="
-> > > 	
-> > > 	Valide -> Valid
-> > > 
-> > > * Typo 2 in log comment:
-> > > 	[groug: - Moved "multidevs" parsing the local backend.
-> > > 	->
-> > > 	[groug: - Moved "multidevs" parsing to the local backend.
-> > 
-> > Fixed.
-> 
-> Thanks! Saw it, looks fine now.
-> 
-> > > > I'll do some
-> > > > more manual testing and issue a PR when I'm confident enough.
-> > > 
-> > > That would be highly appreciated! So far I am the only one ever having
-> > > tested this patch set at all!
-> > 
-> > Just to clarify, I won't thoroughly test it. My main concern is that it
-> > doesn't break things. 
-> 
-> So in other words you are only going to test the default behaviour
-> --multidevs=warn?
-> 
+Some MIPS-I instructions where removed for MIPS-II (as RFE) and they are
+not implemented. Also some CP0 registers are different.
 
-This I've already done, along with multidevs=forbid.
+>> IMO it is likely the RFE (Return from Exception) instruction.
+>=20
+> It seems unlikely that a linux userspace binary would be trying to
+> execute RFE...
 
-Now I plan to run the PJD test suite from Tuxera with a simple
-cross-device setup and --multidevs=remap. And that's it.
+Oh I thought it was system emulation, indeed it can't be RFE.
 
-> If yes, and since that would mean I was the only person ever having tested the 
-> actual fix, shouldn't --multidevs=remap|forbid better be marked as 
-> experimental (docs and runtime warning) for now? Maybe that would also 
-> anticipate receiving feedback from people actually using it later on.
-> 
+One GCC release targetting R3000 (Philips PR31700, Toshiba TX39) doesn't
+emit NOP for branch's delay slot. I remember QEMU fails to run the
+binaries it generates, but I don't remember how it fails.
 
-Makes sense. I don't think it is worth having a runtime warning,
-but I'll turn remap to x-remap and amend the docs.
+Libo, can you provide more information about the cross-compiler you use
+and the flags you use when calling it please?
 
-> > I usually rely on this:
-> > 
-> > https://www.tuxera.com/community/posix-test-suite/
-> 
-> Well, that website is far from being too verbose of what that test suite 
-> actually encompasses.
-> 
+Thanks,
 
-Yeah... this does a variety of tests I've never had time to
-audit, but it exercices many paths of the 9pfs code.
+Phil.
 
-> > > > It would be nice to have some sort of automated test for that in 'make
-> > > > check'. My first thought is to simulate a cross-device setup with the
-> > > > synth
-> > > > backend, because it might be difficult to do this on a real filesystem
-> > > > without requiring elevated privileges.
-> > > 
-> > > Hmm, since I neither haven't used the synth backend before, nor added qemu
-> > > test cases so far, I am yet missing the complete picture here. My initial
-> > > suggested approach would have been using loopback devices for simulating
-> > > two file systems, but yes that's probably not viable due to required
-> > > permissions. How would the synth backend help here? I mean you would need
-> > > to simulate specific inode numbers and device numbers in some way for the
-> > > test cases.
-> > The synth backend allows to simulate anything you want, provided you
-> > code it of course :)
-> > 
-> > It is currently used to run some 9p protocol conformance tests. Have a
-> > look at the backend code to get the idea.
-> > 
-> > hw/9pfs/9p-synth.h
-> > hw/9pfs/9p-synth.c
-> > 
-> > and the test program:
-> > 
-> > tests/virtio-9p-test.c
-> > 
-> > It currently doesn't care for st_dev/st_ino at all, but I guess
-> > it shouldn't be that hard to add the necessary bits.
-> 
-> I see. Well, I will look at it, but that will definitely not be one of my 
-> current high priority tasks that would happen in the next few weeks (simply 
-> due to my work load).
-> 
-
-Same here :)
 
