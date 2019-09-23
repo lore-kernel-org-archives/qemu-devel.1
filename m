@@ -2,84 +2,95 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF17EC32755
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:52:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 437A1C04EBF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:56:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84A4D20835
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:52:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84A4D20835
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1930520820
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:56:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1930520820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCNpQ-0006uV-Jy
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 08:52:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52413)
+	id 1iCNtg-0000RP-8Z
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 08:56:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52864)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iCNo5-0005oD-TJ
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:51:10 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCNsj-0008Ln-Iq
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:55:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iCNo4-0000G9-FK
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:51:09 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60836)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iCNo4-0000FR-9g
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:51:08 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iCNo1-0004w5-KB
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 12:51:05 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D90E52E81B7
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 12:51:02 +0000 (UTC)
+ (envelope-from <eblake@redhat.com>) id 1iCNsh-0001tM-Ep
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:55:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60260)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCNsh-0001su-6o
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:55:55 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id CF51E18C4281;
+ Mon, 23 Sep 2019 12:55:53 +0000 (UTC)
+Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2ECEA608C0;
+ Mon, 23 Sep 2019 12:55:50 +0000 (UTC)
+Subject: Re: [Qemu-devel] [PATCH 05/19] tests/qapi-schema: Demonstrate
+ insufficient 'if' checking
+To: Markus Armbruster <armbru@redhat.com>
+References: <20190914153506.2151-1-armbru@redhat.com>
+ <20190914153506.2151-6-armbru@redhat.com>
+ <ca7e3eba-98ba-56cb-574f-d9974f39122b@redhat.com>
+ <87r247ns68.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <b1cba22d-0cbb-7658-c5bf-32a48e9601a3@redhat.com>
+Date: Mon, 23 Sep 2019 07:55:49 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Sep 2019 12:38:02 -0000
-From: Frank Heimes <1842774@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: product=ubuntu-z-systems; status=Triaged; importance=High;
- assignee=frank.heimes@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=linux; component=main;
- status=In Progress; importance=High; assignee=canonical-kernel-team; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=linux;
- component=main; status=In Progress; importance=High;
- assignee=canonical-kernel-team; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=linux; 
- component=main; status=In Progress; importance=High;
- assignee=canonical-kernel-team; 
-X-Launchpad-Bug-Tags: architecture-s39064 bugnameltc-181268 severity-high
- targetmilestone-inin1910
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: andrew-cloke bugproxy frank-heimes
-X-Launchpad-Bug-Reporter: bugproxy (bugproxy)
-X-Launchpad-Bug-Modifier: Frank Heimes (frank-heimes)
-References: <156764756485.6162.5365845259935486076.malonedeb@soybean.canonical.com>
-Message-Id: <156924228502.32250.10595638828693152882.launchpad@wampee.canonical.com>
-Subject: [Bug 1842774] Re: Enhanced Hardware Support - Finalize Naming
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19048";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 68adce9ed8dcf409587cbffb25cf6a62239f0ad5
+In-Reply-To: <87r247ns68.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="JRNZzMdCak81U8XOaf9RcnQbD6C50ppbW"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Mon, 23 Sep 2019 12:55:53 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,72 +99,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1842774 <1842774@bugs.launchpad.net>
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
+ mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Information type changed from Private to Public
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JRNZzMdCak81U8XOaf9RcnQbD6C50ppbW
+Content-Type: multipart/mixed; boundary="NjS9aaFMjoLyvs6QcISewKDbXqwh3NBgc";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com,
+ mdroth@linux.vnet.ibm.com
+Message-ID: <b1cba22d-0cbb-7658-c5bf-32a48e9601a3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/19] tests/qapi-schema: Demonstrate
+ insufficient 'if' checking
+References: <20190914153506.2151-1-armbru@redhat.com>
+ <20190914153506.2151-6-armbru@redhat.com>
+ <ca7e3eba-98ba-56cb-574f-d9974f39122b@redhat.com>
+ <87r247ns68.fsf@dusky.pond.sub.org>
+In-Reply-To: <87r247ns68.fsf@dusky.pond.sub.org>
 
--- =
+--NjS9aaFMjoLyvs6QcISewKDbXqwh3NBgc
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1842774
+On 9/23/19 6:55 AM, Markus Armbruster wrote:
 
-Title:
-  Enhanced Hardware Support - Finalize Naming
+>>> +++ b/tests/qapi-schema/union-branch-if-invalid.json
+>>> @@ -0,0 +1,7 @@
+>>> +# Cover branch with invalid 'if'
+>>> +# FIXME not rejected, would generate '#if \n'
+>>> +{ 'enum': 'Branches', 'data': ['branch1'] }
+>>> +{ 'struct': 'Stru', 'data': { 'member': 'str' } }
+>>> +{ 'union': 'Uni',
+>>> +  'base': { 'tag': 'Branches' }, 'discriminator': 'tag',
+>>> +  'data': { 'branch1': { 'type': 'Stru', 'if': [''] } } }
+>>
+>> So you're pointing out a difference between an empty string and a stri=
+ng
+>> not containing a C macro name (possibly because later patches will giv=
+e
+>> them different error messages).
+>=20
+> Not sure I got this comment.
 
-Status in QEMU:
-  Incomplete
-Status in Ubuntu on IBM z Systems:
-  Triaged
-Status in linux package in Ubuntu:
-  In Progress
-Status in linux source package in Bionic:
-  In Progress
-Status in linux source package in Disco:
-  In Progress
+I was comparing:
 
-Bug description:
-  SRU Justification:
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +++ b/tests/qapi-schema/union-branch-if-invalid.json
+> +  'data': { 'branch1': { 'type': 'Stru', 'if': [''] } } }
 
-  [Impact]
+with:
 
-  * Add / activate support for IBM z15 and LinuxONE III systems
+> +++ b/tests/qapi-schema/alternate-branch-if-invalid.json
+> +  'data': { 'branch': { 'type': 'int', 'if': ' ' } } }
 
-  [Fix]
+Both of which produce invalid expansions, but because of the difference
+between empty string vs. all-whitespace might be fixed differently in
+later patches.  At any rate, nothing to change in those tests.
 
-  * a0e2251132995b962281aa80ab54a9288f9e0b6b a0e2251 "s390: add support
-  for IBM z15 machines"
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-  [Test Case]
 
-  * check and verify cpuinfo - regression testing is possible by
-  Canonical/me
+--NjS9aaFMjoLyvs6QcISewKDbXqwh3NBgc--
 
-  * functional testing is currently only doable by IBM
+--JRNZzMdCak81U8XOaf9RcnQbD6C50ppbW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  [Regression Potential]
+-----BEGIN PGP SIGNATURE-----
 
-  * There is regression potential with having new code in and the flags
-  added/active
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2IwNUACgkQp6FrSiUn
+Q2pfVQf/eZzYaIedVWjGlrjdlG5r7U4kpVdXRFbrskqr+6mej66iI1j4esNHei0m
+bv13/4ivwV6KpKm0AHBx87PBFIzK8grltDKrX37AjCyUEUUAv0kn5EjsH9ZSkE1n
+MkNHtqICfX0rjsyb9YOxeOmIu5Yg8E8K269srMwcnlspE4IKHPEbySmIG10vPGv4
+0gnzVAQGUqhwVUomQeVAeCEcSeNXZ64XX5E8kfBvN6oMQgAXXmzSjoHdDJXx+7A5
+TVQjF4YEMz6xXAqu1h7yZqQ4tO/sOzdzcJgI71Rfh47IxyF+SO5lsI6Fw9q/8ppT
+B3Ek/BJU9fJ3ccYgNiOTGjlZZrlaew==
+=7V9J
+-----END PGP SIGNATURE-----
 
-  * but the code changes are pretty straight forward, just add config,
-  cases and defs
-
-  * and are not used on existing systems, just on the new generation
-  that is not yet out in the field
-
-  [Other Info]
-
-  * SRU of LP 1842916 merged with (this) LP 1842774
-
-  __________
-
-  This feature request will provide the final naming of the next machine
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1842774/+subscriptions
+--JRNZzMdCak81U8XOaf9RcnQbD6C50ppbW--
 
