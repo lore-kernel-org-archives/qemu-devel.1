@@ -2,79 +2,110 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55FF8C4CECF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 17:54:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2E53C4CECF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 17:55:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2382720882
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 17:54:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="usm79w3J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2382720882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 67B6120882
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 17:55:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67B6120882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCSXs-0003E8-7i
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 13:54:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45035)
+	id 1iCSYX-00040E-SD
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 13:55:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iCSWs-0002g5-40
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 13:53:43 -0400
+ (envelope-from <thuth@redhat.com>) id 1iCSXT-00036f-P1
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 13:54:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iCSWr-0001FU-3p
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 13:53:42 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:39795)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iCSWq-0001F1-Sv; Mon, 23 Sep 2019 13:53:41 -0400
-Received: by mail-lf1-x143.google.com with SMTP id 72so10825605lfh.6;
- Mon, 23 Sep 2019 10:53:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=VldKBAk85sop/e+voE6z8Ho52l0yXVnctg44/nSITvs=;
- b=usm79w3Jerp08xKmkOFeH8iIOd6sYbzbCMio+K/ZvTEENucWeKYX90pBReBggPwMZY
- tjxHdgA/lrC05mXcxa5IeeIl8QDwbnWDb3TEtJ3cli4ztXa1ggbfwE12d7kqmWWt+JdT
- lV0Kwuwt9/lwkxtEYjR7YgeST9/8rB2lSs5bnFf1hdxR1pG4Y4J4DrhYoFLsKpTbhWzL
- tT9CnSWmv2bDFys4AVKu9/rmvKfMOPuhLAYWrGZB5ib7xeQKmI9MLqKPZCTJN2t/VS3B
- rWZ1FzqsOq3Db19/U1PbkOB2uwGYdTmRunoTwlXLLJNiFH/8Dzr+kqxowvxOtTLXWB7y
- NR/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=VldKBAk85sop/e+voE6z8Ho52l0yXVnctg44/nSITvs=;
- b=AxZyBgziCprigUHTmK6MiZEeQQRqjra0SyNzk7ySPCs370NFidxCFwWs0qYpIZRoLt
- /N56cT9+sW9IuQhy3/zVNZB6MKb+2SPrvEjk/arFJXjaO6HHlmCVYJqYaE1jMKSkJFJ+
- DS46zbPSJwwdSK9fLp3lXJY5cXxoqS0uevXqtK1rJNAuwfr6aH2no7zeHlQYykNPwtRu
- 8EzJA5w67GVTzLEp4XfNcaC8c3g1Hl9Yh8KxGeARrXUqrGmx21mB97GfTM/BUupie1+1
- 8TB32/v5eImvyhBpcmXv97Ue/NeWnqkUZkP7Kx5LRxVNYG7/X+dqVzEEKznEYqwxqCuT
- 9qrw==
-X-Gm-Message-State: APjAAAUU3+3XCqyFv/wzJzY0+Ce+4mhP2HswZHISABMREIMlDb3gIazR
- a2I1s6DYjIEdUXMzxI3J78oRxYXVztf2otq07l0=
-X-Google-Smtp-Source: APXvYqzdV1JtJ4XapgQPbv5dEwNHT6IHXVv6P/lF+nbyTnaVkj+0nRAiWiPV1jwoTGHMHkM4v7nEfeT3DtgFZYXmu4Q=
-X-Received: by 2002:ac2:5e9e:: with SMTP id b30mr484334lfq.5.1569261219826;
- Mon, 23 Sep 2019 10:53:39 -0700 (PDT)
+ (envelope-from <thuth@redhat.com>) id 1iCSXS-0001Wv-Nh
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 13:54:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55244)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1iCSXQ-0001Vk-F5; Mon, 23 Sep 2019 13:54:16 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5459F18C4286;
+ Mon, 23 Sep 2019 17:54:15 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-120.ams2.redhat.com [10.36.116.120])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0F6BD1001DC2;
+ Mon, 23 Sep 2019 17:54:08 +0000 (UTC)
+Subject: Re: [PATCH 3/4] hw/arm: Move armv7m_nvic.c to hw/arm/ and always
+ enable it for arm builds
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190921150420.30743-1-thuth@redhat.com>
+ <20190921150420.30743-4-thuth@redhat.com>
+ <CAFEAcA_6UxMBeyOMM0iT5cnCQEpWXfRO2XMuV9ez_0Su2osXNg@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <0389e9dc-7f78-5b27-4764-51f0bdef5bef@redhat.com>
+Date: Mon, 23 Sep 2019 19:54:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <cover.1568762497.git.alistair.francis@wdc.com>
- <mhng-a10f93b3-147d-42a0-8f24-6d4b1f3a214b@palmer-si-x1c4>
-In-Reply-To: <mhng-a10f93b3-147d-42a0-8f24-6d4b1f3a214b@palmer-si-x1c4>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 23 Sep 2019 10:53:11 -0700
-Message-ID: <CAKmqyKNXZjU715rOuwb980tA5uELdV3TJW4FYu5gK7ZMqAjqbA@mail.gmail.com>
-Subject: Re: [PATCH v1 0/2] RISC-V: Convert to do_transaction_failed hook
-To: Palmer Dabbelt <palmer@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::143
+In-Reply-To: <CAFEAcA_6UxMBeyOMM0iT5cnCQEpWXfRO2XMuV9ez_0Su2osXNg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Mon, 23 Sep 2019 17:54:15 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,52 +117,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 20, 2019 at 3:48 PM Palmer Dabbelt <palmer@sifive.com> wrote:
->
-> On Tue, 17 Sep 2019 16:22:56 PDT (-0700), Alistair Francis wrote:
-> > The do_unassigned_access hook has been deprecated and RISC-V is the last
-> > user of it. Let's instead update the RISC-V implementation to use
-> > do_transaction_failed instead.
-> >
-> > After this series I used the 'git grep' regexes in
-> > docs/devel/loads-stores.rst and these are the memory accesses inside
-> > target/riscv:
-> >
-> > monitor.c:102:        cpu_physical_memory_read(pte_addr, &pte, ptesize);
-> >
-> > cpu_helper.c:262:        target_ulong pte = address_space_ldl(cs->as, pte_addr, attrs, &res);
-> > cpu_helper.c:264:        target_ulong pte = address_space_ldq(cs->as, pte_addr, attrs, &res);
-> >
-> > translate.c:782:    ctx->opcode = cpu_ldl_code(env, ctx->base.pc_next);
-> >
-> > gdbstub.c:328:        env->fpr[n] = ldq_p(mem_buf); /* always 64-bit */
-> >
-> > All of these look safe to me.
-> >
-> > Palmer Dabbelt (2):
-> >   RISC-V: Handle bus errors in the page table walker
-> >   RISC-V: Implement cpu_do_transaction_failed
->
-> Can you Reviewed-By these, as they've still got my Author on them?  That way I
-> can pull them in :)
+On 23/09/2019 16.52, Peter Maydell wrote:
+> On Sat, 21 Sep 2019 at 16:04, Thomas Huth <thuth@redhat.com> wrote:
+>>
+>> qemu-system-arm/-aarch64 currently can't be built without setting the
+>> switch CONFIG_ARM_V7M=3Dy - which we currently always do in the config=
+ file
+>> default-configs/arm-softmmu.mak. This is because the code in target/ar=
+m/
+>> calls many functions from this armv7m_nvic.c, and thus linking fails
+>> without this file.
+>>
+>> So armv7m_nvic.c should not be under the CONFIG_ARM_V7M switch, but al=
+ways
+>> compiled for arm builds. Since we can not simply do this in hw/intc/ (=
+with
+>> "obj-y +=3D ..." it would get compiled for all other architectures, to=
+o),
+>> let's move the file to hw/arm/ instead and always enable it there.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  hw/arm/Makefile.objs           |  2 ++
+>>  hw/{intc =3D> arm}/armv7m_nvic.c |  0
+>>  hw/arm/trace-events            | 17 +++++++++++++++++
+>>  hw/intc/Makefile.objs          |  1 -
+>>  hw/intc/trace-events           | 17 -----------------
+>>  5 files changed, 19 insertions(+), 18 deletions(-)
+>>  rename hw/{intc =3D> arm}/armv7m_nvic.c (100%)
+>=20
+> Please don't move this file. This is an interrupt
+> controller (with some other functionality jammed into it)
+> and so it should be in hw/intc. It's true that it's rather
+> tightly-coupled to the CPU, but the same is true for our
+> GICv3 model.
 
-Richard and Philippe have both reviewed it, that should be enough. I'm
-not sure if I can review it with my SOB as well.
+Ok, then what would you suggest to solve the problem that this file has
+always to be linked into the binary? I can't use "obj-y +=3D ..." in
+hw/intc/Makefile.objs since that would mean that the file also gets
+compiled for non-Arm boards. Would you prefer a bunch of stubs instead
+that get used if CONFIG_ARM_V7M is not set?
 
-Alistair
-
->
-> >
-> >  target/riscv/cpu.c        |  2 +-
-> >  target/riscv/cpu.h        |  7 +++++--
-> >  target/riscv/cpu_helper.c | 23 ++++++++++++++++-------
-> >  3 files changed, 22 insertions(+), 10 deletions(-)
+ Thomas
 
