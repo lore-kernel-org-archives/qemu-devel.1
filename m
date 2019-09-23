@@ -2,139 +2,79 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4270C432C1
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 21:41:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBA5CC432C1
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 22:05:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0129206C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 21:41:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0129206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B4CBB207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 22:05:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q7Hg9WrI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4CBB207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCW5M-0002hW-T3
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 17:41:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48090)
+	id 1iCWSx-00014e-MH
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 18:05:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55455)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iCW4T-0002Dm-5r
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 17:40:38 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iCWRj-0000MG-MU
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 18:04:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iCW4R-0004ZF-OM
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 17:40:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44812)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iCW4O-00047p-EQ; Mon, 23 Sep 2019 17:40:32 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 80E6518C426E;
- Mon, 23 Sep 2019 21:40:31 +0000 (UTC)
-Received: from [10.18.17.231] (dhcp-17-231.bos.redhat.com [10.18.17.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DB6A360920;
- Mon, 23 Sep 2019 21:40:27 +0000 (UTC)
-Subject: Re: [Qemu-block] [PATCH v6 5/8] bootdevice: Gather LCHS from all
- relevant devices
-To: Sam Eiderman <sameid@google.com>, qemu-devel@nongnu.org
-References: <20190827082427.64280-1-sameid@google.com>
- <20190827082427.64280-6-sameid@google.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <4fa29595-c229-bc90-2a73-8d3581cc6a43@redhat.com>
-Date: Mon, 23 Sep 2019 17:40:27 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <peter.maydell@linaro.org>) id 1iCWRh-0001aA-9d
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 18:04:39 -0400
+Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:44982)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iCWRg-0001Z5-Nm
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 18:04:37 -0400
+Received: by mail-ot1-x336.google.com with SMTP id 21so13532747otj.11
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 15:04:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=fup9GzCC3x62mnSNCz3pTtcek4vX4r1E0cNBsg2TOGo=;
+ b=q7Hg9WrIsfsz8G3Bc/FwJdURl2vvfikxPwN1yDqfLJjaRXDgTC3aSifumA0Fe8paKd
+ Qgqnr9+QQAOenuTFhyPOVOmqpKDe1T7fecN1B5NH31TjRwjEWwAyyDpI0copbYdolO6o
+ oguqBkb0m01bfSNkokGmPlK6E3/3iDS1kcnO4EXodhjT4pW2EoyigqsGai7PKEeXkuui
+ OWHGDqwK8AUBzO/xrDM9LHFOu8EE+vZeEJFYbhKKC6Ju+r6V9Jg/oRluGyPyFLJHW5Pa
+ 6zDrJgeuD1YDT2cv/PmjzVZvhmEy0WhLV3IDtQP8e1z+h3PidFgnZW8+ZdYLDhirefnG
+ 49+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=fup9GzCC3x62mnSNCz3pTtcek4vX4r1E0cNBsg2TOGo=;
+ b=CNytzimwgz04IQM11BfIjXleu9ycHkecJM8YxT0OIgiDldjQaRL0XAlsqdrKnahkaS
+ rcnhhYs+DOVKyHjNGTDkIJ4Wh4JfCnHdDEIb2rDsWrkmzKhgA+SxVJI0wDCFB/Mh4GSW
+ xgliCp/5amN+uenc8W0VSgZeWq/vd7kGZHQcFOSgjByy5uoA+fC1puCef9XrLcCV95o4
+ Ucj10RbxHjOqRN+KCBcEMJjimAfhF6yXf4PKKkiCWqhrfu9e/hqBNTKDqloewz1qJGQM
+ h5BPb/H69akHb39Gi6ogEdnox1h4/8KotdB5zQdlcDo3ifeaVq/5zK7XaTc0KYFKBenA
+ qJzA==
+X-Gm-Message-State: APjAAAWYuToaH5mzsfLQq/MMs5+2NT1er8hpMjPkQtVKmjq8j2Kp/ny2
+ 7TJPrt20BsQrBDBcecUWMO5jUlHY2YsTA2PAQ5l1yw==
+X-Google-Smtp-Source: APXvYqwvxQyzkJpIo0TFYLPPC/pR87vxILZKT71zRjdZT+VeE1xltg4rujTZtzyZ2V5MX7r3cGwKHUoKaXZ/6DkUZzw=
+X-Received: by 2002:a9d:6d0a:: with SMTP id o10mr360480otp.221.1569276275743; 
+ Mon, 23 Sep 2019 15:04:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190827082427.64280-6-sameid@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Mon, 23 Sep 2019 21:40:31 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+References: <20190923080712.23951-1-david@redhat.com>
+In-Reply-To: <20190923080712.23951-1-david@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 23 Sep 2019 23:04:23 +0100
+Message-ID: <CAFEAcA_zjiapxFAhB=XFEphcHEnkb=s-3TzPa6ZwEYEde-Hm6w@mail.gmail.com>
+Subject: Re: [PULL 00/30] s390x/tcg update
+To: David Hildenbrand <david@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::336
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -146,116 +86,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org,
- Arbel Moshe <arbel.moshe@oracle.com>, seabios@seabios.org, kevin@koconnor.net,
- liran.alon@oracle.com, kraxel@redhat.com,
- Sam Eiderman <shmuel.eiderman@oracle.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, 23 Sep 2019 at 09:07, David Hildenbrand <david@redhat.com> wrote:
+>
+> Hi Peter,
+>
+> here is the updated tcg subset of the s390x update (including one more
+> test).
+>
+> The following changes since commit 4300b7c2cd9f3f273804e8cca325842ccb93b1ad:
+>
+>   Merge remote-tracking branch 'remotes/cleber/tags/python-next-pull-request' into staging (2019-09-20 17:28:43 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/davidhildenbrand/qemu.git tags/s390x-tcg-2019-09-23
+>
+> for you to fetch changes up to 5d69cbdfdd5cd6dadc9f0c986899844a0e4de703:
+>
+>   tests/tcg: target/s390x: Test MVC (2019-09-23 09:28:29 +0200)
+>
+> ----------------------------------------------------------------
+> Fix a bunch of BUGs in the mem-helpers (including the MVC instruction),
+> especially, to make them behave correctly on faults.
+>
 
 
-On 8/27/19 4:24 AM, Sam Eiderman via Qemu-block wrote:
-> From: Sam Eiderman <shmuel.eiderman@oracle.com>
-> 
-> Relevant devices are:
->     * ide-hd (and ide-cd, ide-drive)
->     * scsi-hd (and scsi-cd, scsi-disk, scsi-block)
->     * virtio-blk-pci
-> 
-> We do not call del_boot_device_lchs() for ide-* since we don't need to -
-> IDE block devices do not support unplugging.
-> 
-> Signed-off-by: Sam Eiderman <sameid@google.com>
-> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-> Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
-> Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+Applied, thanks.
 
-Acked-by: John Snow <jsnow@redhat.com>
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
 
-> ---
->  hw/block/virtio-blk.c |  6 ++++++
->  hw/ide/qdev.c         |  5 +++++
->  hw/scsi/scsi-disk.c   | 12 ++++++++++++
->  3 files changed, 23 insertions(+)
-> 
-> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> index 18851601cb..6d8ff34a16 100644
-> --- a/hw/block/virtio-blk.c
-> +++ b/hw/block/virtio-blk.c
-> @@ -1186,6 +1186,11 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
->      blk_set_guest_block_size(s->blk, s->conf.conf.logical_block_size);
->  
->      blk_iostatus_enable(s->blk);
-> +
-> +    add_boot_device_lchs(dev, "/disk@0,0",
-> +                         conf->conf.lcyls,
-> +                         conf->conf.lheads,
-> +                         conf->conf.lsecs);
->  }
->  
->  static void virtio_blk_device_unrealize(DeviceState *dev, Error **errp)
-> @@ -1193,6 +1198,7 @@ static void virtio_blk_device_unrealize(DeviceState *dev, Error **errp)
->      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
->      VirtIOBlock *s = VIRTIO_BLK(dev);
->  
-> +    del_boot_device_lchs(dev, "/disk@0,0");
->      virtio_blk_data_plane_destroy(s->dataplane);
->      s->dataplane = NULL;
->      qemu_del_vm_change_state_handler(s->change);
-> diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-> index 6dd219944f..2ffd387a73 100644
-> --- a/hw/ide/qdev.c
-> +++ b/hw/ide/qdev.c
-> @@ -220,6 +220,11 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
->  
->      add_boot_device_path(dev->conf.bootindex, &dev->qdev,
->                           dev->unit ? "/disk@1" : "/disk@0");
-> +
-> +    add_boot_device_lchs(&dev->qdev, dev->unit ? "/disk@1" : "/disk@0",
-> +                         dev->conf.lcyls,
-> +                         dev->conf.lheads,
-> +                         dev->conf.lsecs);
->  }
->  
->  static void ide_dev_get_bootindex(Object *obj, Visitor *v, const char *name,
-> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-> index 915641a0f1..d19896fe4d 100644
-> --- a/hw/scsi/scsi-disk.c
-> +++ b/hw/scsi/scsi-disk.c
-> @@ -35,6 +35,7 @@
->  #include "hw/block/block.h"
->  #include "hw/qdev-properties.h"
->  #include "sysemu/dma.h"
-> +#include "sysemu/sysemu.h"
->  #include "qemu/cutils.h"
->  #include "trace.h"
->  
-> @@ -2402,6 +2403,16 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
->      blk_set_guest_block_size(s->qdev.conf.blk, s->qdev.blocksize);
->  
->      blk_iostatus_enable(s->qdev.conf.blk);
-> +
-> +    add_boot_device_lchs(&dev->qdev, NULL,
-> +                         dev->conf.lcyls,
-> +                         dev->conf.lheads,
-> +                         dev->conf.lsecs);
-> +}
-> +
-> +static void scsi_unrealize(SCSIDevice *dev, Error **errp)
-> +{
-> +    del_boot_device_lchs(&dev->qdev, NULL);
->  }
->  
->  static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
-> @@ -3006,6 +3017,7 @@ static void scsi_hd_class_initfn(ObjectClass *klass, void *data)
->      SCSIDeviceClass *sc = SCSI_DEVICE_CLASS(klass);
->  
->      sc->realize      = scsi_hd_realize;
-> +    sc->unrealize    = scsi_unrealize;
->      sc->alloc_req    = scsi_new_request;
->      sc->unit_attention_reported = scsi_disk_unit_attention_reported;
->      dc->desc = "virtual SCSI disk";
-> 
+-- PMM
 
