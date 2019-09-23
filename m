@@ -2,115 +2,112 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 696EAC4CECF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 18:53:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16677C4CECF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 18:55:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B0D420820
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 18:53:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B0D420820
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id DA92F20820
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 18:55:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA92F20820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCTT9-0005X9-Jl
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 14:53:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54279)
+	id 1iCTUi-0007Wi-29
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 14:55:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54161)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iCTRT-0004EI-3D
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:52:12 -0400
+ (envelope-from <thuth@redhat.com>) id 1iCTQy-0003ls-NT
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:51:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iCTRS-0004SY-2K
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:52:10 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:55229)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iCTRR-0004J6-OU
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:52:09 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MHG0U-1iPgrc2Cw4-00DJep; Mon, 23 Sep 2019 20:51:56 +0200
-Subject: Re: [Qemu-devel] [PATCH v3] ui: add an embedded Barrier client
-To: Anthony PERARD <anthony.perard@citrix.com>
-References: <20190906083812.29487-1-laurent@vivier.eu>
- <20190923160751.GA212017@perard.uk.xensource.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
- WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
- SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
- UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
- Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
- JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
- q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
- RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
- 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
- LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
- dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
- CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
- ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
- HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
- rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
- jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
- NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
- WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
- lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
- BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
- gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
- +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
- rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
- 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
- wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
- ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
- d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
- 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
- tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
- inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
- 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
- VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
- US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
- w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
- FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
- hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
- ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
- ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
- OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
- JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
- ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <fd32b25d-e66d-6789-79ec-c26b9cd43645@vivier.eu>
-Date: Mon, 23 Sep 2019 20:51:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <thuth@redhat.com>) id 1iCTQx-0003hP-87
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:51:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51344)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1iCTQr-0003eF-8c; Mon, 23 Sep 2019 14:51:34 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1FD2318C892F;
+ Mon, 23 Sep 2019 18:51:32 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-120.ams2.redhat.com [10.36.116.120])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1D52519C58;
+ Mon, 23 Sep 2019 18:51:24 +0000 (UTC)
+Subject: Re: [PATCH 2/4] target/arm: Move cortex-m related functions to new
+ file v7m.c
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190921150420.30743-1-thuth@redhat.com>
+ <20190921150420.30743-3-thuth@redhat.com>
+ <bd6efd14-9200-98e2-4f76-dda101f85274@redhat.com>
+ <8585b93b-e239-829b-d634-b89941f27aed@redhat.com>
+ <CAFEAcA9k59CRG23qP-o5PF0mdXvXpszhuxx+GpbpWO+hFdHOOA@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <4841d83d-4d91-eef6-28aa-c920cb10d9c9@redhat.com>
+Date: Mon, 23 Sep 2019 20:51:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20190923160751.GA212017@perard.uk.xensource.com>
+In-Reply-To: <CAFEAcA9k59CRG23qP-o5PF0mdXvXpszhuxx+GpbpWO+hFdHOOA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:tk8cB0zOCFvTDv+YjSsQet5pfgUMRApPczXpOaf3crwZsRHPLp9
- rV1RI1kNZIYcpuL8f2gSRrX9fGA8cgzoKE+4pEfjrjN99eEMkiU2lmL0njbXheSI07O1710
- 5sC814y28bd516XCJHCeZ0k7Ee5d4I1dwn0vIKV8xXxtDC2Yuqn+L+Yu8miiHSFSm6zItKS
- dh/2UVYVeDwNgF2Ckp5mg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:5g1vZhm+nfE=:dzlIo1XHuKJ9dQyfk5EXk1
- XgXhft5Z4cBG32wadjClWUUg+upcp09All0LB1Sh1cLSvZcnejBO8C+1hv64tHpTVw3R6h9n9
- yzF2mcKNF5COJGUtRZO/N2AENhXyh8bo+lq19pyA71DzOnqhgitbhyFxINdiuMhsapfignR8B
- Y5i8h0ULzbn0qPkntfUZr75piCFprFsLy5s6ZPcvbtvTB7eOpJCIq8rX8QsCLR38cGkKykcPS
- /KS6ZNV6/Won7dRwjI38xSft6vDvWQRVm6pCUxXkSNragP2rzhJmzdZS9SuTrn7Gw94G5K1u4
- If3EJDsSo0gOEyFbkLst0e/IaNcjG869eUWIb/0LIga1F+Pr2jDpFjBVZk6XUf2hqK/tVsDAr
- vXfCgRU2vmtac7PalLchdfjxPwlULHGieDUk9JClbsN9SyHSN9hzOAe3Ckvhn0yDLBInr4/Dx
- hbwL8pO9/E7lqq6qv1nNIkSluSDXTrMdXkbKGGONmKmpSbwGsiGD8qjnOu1Vy7qZAo8nsjvFG
- OolcjMRHLsQYUHRig/7rGqsHCUUsjhhVupFEgN1Qln2QBZ9S/TzDtLyM/ik1UfELRxCBEEM72
- bE2hqjZz7aWHtfu7u/EO69Frs2NwinaRqi6l8exb4ll94FTg747r3/lJ398p4bJqbwipfVSEq
- BAud+dKj0iyUg0l/jt5RFlT2szJTxE0KOFvhwn6ZW36ShS2jwr6KWA9C6Dz22DvMMAopvQ5jW
- T4aUmFtIklpHYmzwB70B7dU89nWMHjvCnu81bRr+HQ/11uqaXHtoQBX+rLx/i36hr1uvf3if0
- bWxYo7jYr5cQ7LYyPx8VnxCvSjjPn9ouYBW2V736C9ImjHQksoUkRpfiaSZaVUlfCz1DbS6QY
- sS1cSZETksYWCBfavQa0zMq7EFNN+urauZUTYdlsE=
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Mon, 23 Sep 2019 18:51:32 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,47 +119,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Auger Eric <eric.auger@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 23/09/2019 à 18:07, Anthony PERARD a écrit :
-> Hi,
+On 23/09/2019 20.45, Peter Maydell wrote:
+> On Mon, 23 Sep 2019 at 19:09, Thomas Huth <thuth@redhat.com> wrote:
+>> However, there's one thing I currently don't quite understand in this
+>> code (since I'm not an ARM guy, sorry) : There are references to "v8" in
+>> m_helper.c, too. Is that related to a separate CPU type, ie. should the
+>> v8 code also be available when CONFIG_ARM_V7M is disabled? Or can the
+>> code in m_helper.c be disabled completely if CONFIG_ARM_V7M is not set?
 > 
-> Once this patch is applied, if we try to start QEMU with "-k en-us",
-> qemu print a message and exit:
->     qemu-system-i386: could not read keymap file: 'en-us'
+> QEMU's naming conventions here is a bit confusing, for
+> historical reasons.
 > 
-> See below,
+> Architecturally what we have is:
+>  * "M-profile" -- this is the flavour of Arm architecture for
+> microcontrollers; it has some big differences from A and R
+> profile (eg the exception mechanism is different and it has
+> a built-in NVIC interrupt controller). All the Cortex-M<anything>
+> CPUs are M-profile
+>  * "Arm-v7M" -- this is the v7 flavour of the M-profile
+> architecture, eg Cortex-M3.
+>  * "Arm-v6M" -- this looks like it ought to mean "v6 flavour
+> of M-profile", but if you look at what features it has it's
+> more like "cut down version of v7M" (fewer instructions, cut
+> down exception model, etc, but some things which on A-profile
+> don't appear until v7A are present in v6M). Cortex-M0 and -M1.
+>  * "Arm-v8M" -- v8 flavour of M-profile. The big change here
+> is support for TrustZone. Cortex-M33. v8M comes in two
+> sub-profiles: "mainline", which has all the features like v7M,
+> and "baseline", which is cut-down in the same way v6M is a
+> cut-down v7M.
 > 
-> On Fri, Sep 06, 2019 at 10:38:12AM +0200, Laurent Vivier wrote:
->> diff --git a/ui/input-barrier.c b/ui/input-barrier.c
->> new file mode 100644
->> index 000000000000..a2c961f285a4
->> --- /dev/null
->> +++ b/ui/input-barrier.c
->> +static void input_barrier_class_init(ObjectClass *oc, void *data)
->> +{
->> +    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
->> +
->> +    ucc->complete = input_barrier_complete;
->> +
->> +    /* always use generic keymaps */
->> +    if (keyboard_layout) {
->> +        /* We use X11 key id, so use VNC name2keysym */
->> +        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout,
->> +                                          &error_fatal);
+> In QEMU, we implemented Cortex-M3 first, and then added -M0 and
+> -M33 later. So mostly our function naming convention uses
+> "v7m" when it means "any M-profile"; a few v8M-specific
+> functions use a "v8m" prefix. Everything in m_helper.c is
+> M-profile specific; most of it is used by all M-profile cores,
+> and a few bits are v8M-only or v7M-and-v8M-mainline only.
 > 
-> I think it's because this function is called way to early, before
-> qemu_add_data_dir() is called, and so qemu_find_file() fails.
-> 
-> Can you fix it?
+> From a CONFIG switch point of view I don't think it's
+> worth being able to #ifdef out the various flavours of
+> M-profile individually.
 
-I'm going to have a look.
+Ok, thanks a lot for the explanation! It's much clearer to me now.
+So I think it likely would be best to disable the whole m_helper.c code
+instead of introducing a new file like v7m.c (but that likely requires a
+stub file instead or some #ifdeffing in translate.c).
 
-Thanks,
-Laurent
+It also sounds like CONFIG_ARM_V7M should rather be renamed to
+CONFIG_ARM_MPROFILE or something similar?
+
+ Thomas
 
