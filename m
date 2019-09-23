@@ -2,83 +2,65 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B549FC4CEC4
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 20:10:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8380C88CAB
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 20:47:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A8F7207FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 20:10:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lK7Lk0re"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A8F7207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8FDBF206C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 20:47:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FDBF206C2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCUem-00021g-D5
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 16:10:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36817)
+	id 1iCVF7-000267-Mh
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 16:47:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40666)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iCUdy-0001Yq-79
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 16:09:11 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iCVEF-0001cp-TO
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 16:46:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iCUdw-0006g8-Sx
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 16:09:10 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:41967)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iCUdw-0006ft-JV; Mon, 23 Sep 2019 16:09:08 -0400
-Received: by mail-lf1-x142.google.com with SMTP id r2so11118725lfn.8;
- Mon, 23 Sep 2019 13:09:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ZF1KUTZJcXM9LfX7+T1t8fDj2BRmNGXMx083Eh8oPEQ=;
- b=lK7Lk0relsQ4CXWHenQp4gr60qmdBXZyvrrnWEqBnGhSprm3eDMgBQxWtn181cjN5Z
- GMpOgnP6QQ2g9653Z3qEc62jszNzN/ZQs1RQLEDc7go0BXyBbmKQSbQ0LmFGH7YmDVXn
- BwlDMns1Bg2O6Nzd1LOh+97hWyb75pWkCGU1ldFRpdqimRkWfC/xoYFFAYGPpmliF4dP
- 042GDiksOr03728EqSJ8mYenjE7WT/eKl8cgaDW0VCS8x9eN//WuJ4LLIOQda+JI4N3k
- 5V5ho/f189RbRV5KFgks+Sz7eUNYjVjv1absvJv5xP0QsbVVUAWI14BP6uJ6nBcY4Oam
- LTgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ZF1KUTZJcXM9LfX7+T1t8fDj2BRmNGXMx083Eh8oPEQ=;
- b=U8SZ9FIFWZEC2VHI0vUVrgbGmpxi65ld0/YI5gd8KMgEVu/eDrR95hMIz5GHEwT+tO
- SPUtTRtkvjt6gYow13Goq0cA00sGC1Jsca0HNRGrmBTeUGGptI85qkDUymXK27y8nQXT
- ipVioa8KqomWt0b+vv4juY29BkLQytHG3nsBlJwILFeD91VveRZNONRygHej8UON2CZg
- T11GSAud/ShfB4v4wQ0ciyErGkwm7vV0EvgDhT/lR7J+JxsYmc0X/dUM84luHJG3050z
- /fnhLsENacP9T9W2Z8HGI7W0tgwgDX1TgkdQsyOTCJpmQ7n7Wci8JIJZG0TqMR/1t3JA
- /wlg==
-X-Gm-Message-State: APjAAAXzO/wmbz5wvv3FDHBjwT7L/3RdKN81CMDjFsODeIhc7l1kjJUi
- h/1MzI23C8d8TzAC+wsz5nJQSVcU6s7tEDwMcUk=
-X-Google-Smtp-Source: APXvYqyVwsaLtj0JUYdFdfixP5PYzxz4vwvLzdJxLntDdxJV1RDctFPRQLgj3zX+QiHiZt9im/5Q478g8wUiqbovdFU=
-X-Received: by 2002:a19:f11c:: with SMTP id p28mr796050lfh.44.1569269347466;
- Mon, 23 Sep 2019 13:09:07 -0700 (PDT)
+ (envelope-from <no-reply@patchew.org>) id 1iCVED-0000TZ-Oa
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 16:46:39 -0400
+Resent-Date: Mon, 23 Sep 2019 16:46:39 -0400
+Resent-Message-Id: <E1iCVED-0000TZ-Oa@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21552)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iCVED-0000TI-JO; Mon, 23 Sep 2019 16:46:37 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1569271574; cv=none; d=zoho.com; s=zohoarc; 
+ b=cckKefqyTDmq7IoAM9lTUpgCcC2vyEyOaW7NrzPJTRG2+MOs+lvcHKjaJcvBbqCOAmHq70+JsGURDLnjd2JNLhjxQOE3TjqarJN59ts+O8FUAMkz+S6mlA4KaZx1eH3LUN7bOP08EBd+UKmdSqT3cUGZiURZ0BETUH/HFNU7qSQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1569271574;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=7dTIf3J1noxTkhCVIsUNmH5cx4+SuxKzVDdWc9aIbz8=; 
+ b=PWzWPKu0qTV4vhrqEqcOgYLKHbD/oum37TIUri7gRptYz/5qTk4DYmnsH88usKQt9oD50k76XI3ujMQiV1Aivkn7Eg7gTV3RJ2fmEpb0eyBnJL1bzZ7xhwv00jyFKbEWp772rcE7fEUz6PNwBQwQfO7og2noJeZ4gvXUdhRF1Z0=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 156927157298533.42848053937166;
+ Mon, 23 Sep 2019 13:46:12 -0700 (PDT)
+In-Reply-To: <20190923080712.23951-1-david@redhat.com>
+Subject: Re: [PULL 00/30] s390x/tcg update
+Message-ID: <156927157151.20054.12597056234400748636@1c8ae44fe5c0>
 MIME-Version: 1.0
-References: <cover.1568931866.git.alistair.francis@wdc.com>
- <0a5c141a26fada6d93d06e996a2f24e1b269ec50.1568931866.git.alistair.francis@wdc.com>
- <CAEUhbmVvDKQqQYE-riq=cvSrCe_NMoW_KDsLjh8CVHRUhJvk9A@mail.gmail.com>
- <CAKmqyKOofA3U+8kjMkzQ0sNd1=uwJHq3c9eaLZdoNCb7=e-PAw@mail.gmail.com>
- <CAEUhbmWu_OTGmUBTcMg9uvm36-fDQheSSiwH5mjnokJSrLvoBA@mail.gmail.com>
-In-Reply-To: <CAEUhbmWu_OTGmUBTcMg9uvm36-fDQheSSiwH5mjnokJSrLvoBA@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 23 Sep 2019 13:08:41 -0700
-Message-ID: <CAKmqyKN8g767av=FeCe_UsapPd7cPCNGWzEx7ByF9QYu-3NbxQ@mail.gmail.com>
-Subject: Re: [PATCH v1 5/6] riscv/virt: Add the PFlash CFI01 device
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::142
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: david@redhat.com
+Date: Mon, 23 Sep 2019 13:46:12 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.55
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,123 +72,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@sifive.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, thuth@redhat.com, david@redhat.com,
+ cohuck@redhat.com, qemu-devel@nongnu.org, qemu-s390x@nongnu.org,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Sep 21, 2019 at 7:15 PM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> On Sat, Sep 21, 2019 at 6:16 AM Alistair Francis <alistair23@gmail.com> wrote:
-> >
-> > On Thu, Sep 19, 2019 at 10:15 PM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > >
-> > > On Fri, Sep 20, 2019 at 6:36 AM Alistair Francis
-> > > <alistair.francis@wdc.com> wrote:
-> > > >
-> > > > Add the CFI01 PFlash to the RISC-V virt board. This is the same PFlash
-> > > > from the ARM Virt board and the implementation is based on the ARM Virt
-> > > > board. This allows users to specify flash files from the command line.
-> > > >
-> > > > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > > > ---
-> > > >  hw/riscv/Kconfig        |  1 +
-> > > >  hw/riscv/virt.c         | 81 +++++++++++++++++++++++++++++++++++++++++
-> > > >  include/hw/riscv/virt.h |  3 ++
-> > > >  3 files changed, 85 insertions(+)
-> > > >
-> > > > diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
-> > > > index fb19b2df3a..b12660b9f8 100644
-> > > > --- a/hw/riscv/Kconfig
-> > > > +++ b/hw/riscv/Kconfig
-> > > > @@ -36,4 +36,5 @@ config RISCV_VIRT
-> > > >      select SERIAL
-> > > >      select VIRTIO_MMIO
-> > > >      select PCI_EXPRESS_GENERIC_BRIDGE
-> > > > +    select PFLASH_CFI01
-> > > >      select SIFIVE
-> > > > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> > > > index d36f5625ec..ca002ecea7 100644
-> > > > --- a/hw/riscv/virt.c
-> > > > +++ b/hw/riscv/virt.c
-> > > > @@ -26,6 +26,7 @@
-> > > >  #include "hw/boards.h"
-> > > >  #include "hw/loader.h"
-> > > >  #include "hw/sysbus.h"
-> > > > +#include "hw/qdev-properties.h"
-> > > >  #include "hw/char/serial.h"
-> > > >  #include "target/riscv/cpu.h"
-> > > >  #include "hw/riscv/riscv_hart.h"
-> > > > @@ -61,12 +62,72 @@ static const struct MemmapEntry {
-> > > >      [VIRT_PLIC] =        {  0xc000000,     0x4000000 },
-> > > >      [VIRT_UART0] =       { 0x10000000,         0x100 },
-> > > >      [VIRT_VIRTIO] =      { 0x10001000,        0x1000 },
-> > > > +    [VIRT_FLASH] =       { 0x20000000,     0x2000000 },
-> > > >      [VIRT_DRAM] =        { 0x80000000,           0x0 },
-> > > >      [VIRT_PCIE_MMIO] =   { 0x40000000,    0x40000000 },
-> > > >      [VIRT_PCIE_PIO] =    { 0x03000000,    0x00010000 },
-> > > >      [VIRT_PCIE_ECAM] =   { 0x30000000,    0x10000000 },
-> > > >  };
-> > > >
-> > > > +#define VIRT_FLASH_SECTOR_SIZE (256 * KiB)
-> > > > +
-> > > > +static PFlashCFI01 *virt_flash_create1(RISCVVirtState *s,
-> > > > +                                       const char *name,
-> > > > +                                       const char *alias_prop_name)
-> > > > +{
-> > > > +    /*
-> > > > +     * Create a single flash device.  We use the same parameters as
-> > > > +     * the flash devices on the ARM virt board.
-> > > > +     */
-> > > > +    DeviceState *dev = qdev_create(NULL, TYPE_PFLASH_CFI01);
-> > > > +
-> > > > +    qdev_prop_set_uint64(dev, "sector-length", VIRT_FLASH_SECTOR_SIZE);
-> > > > +    qdev_prop_set_uint8(dev, "width", 4);
-> > > > +    qdev_prop_set_uint8(dev, "device-width", 2);
-> > > > +    qdev_prop_set_bit(dev, "big-endian", false);
-> > > > +    qdev_prop_set_uint16(dev, "id0", 0x89);
-> > > > +    qdev_prop_set_uint16(dev, "id1", 0x18);
-> > > > +    qdev_prop_set_uint16(dev, "id2", 0x00);
-> > > > +    qdev_prop_set_uint16(dev, "id3", 0x00);
-> > > > +    qdev_prop_set_string(dev, "name", name);
-> > >
-> > > alias_prop_name is unused? ARM virt has 2 more calls in the same function here.
-> >
-> > Yep, you are right. I have removed this.
->
-> Any reason of removing this?
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkyMzA4MDcxMi4yMzk1
+MS0xLWRhdmlkQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
+b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
+cm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwOTIzMDgwNzEyLjIzOTUxLTEtZGF2aWRAcmVkaGF0
+LmNvbQpTdWJqZWN0OiBbUFVMTCAwMC8zMF0gczM5MHgvdGNnIHVwZGF0ZQpUeXBlOiBzZXJpZXMK
+Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNl
+ID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
+dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
+bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBzOi8vZ2l0aHVi
+LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIw
+MTkwOTIzMDgwNzEyLjIzOTUxLTEtZGF2aWRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwOTIz
+MDgwNzEyLjIzOTUxLTEtZGF2aWRAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
+J3Rlc3QnCjg0NDQ1OTQgdGVzdHMvdGNnOiB0YXJnZXQvczM5MHg6IFRlc3QgTVZDCmVlMmVkNmQg
+dGVzdHMvdGNnOiB0YXJnZXQvczM5MHg6IFRlc3QgTVZPCjdiMGU4MGUgczM5MHgvdGNnOiBNVk86
+IEZhdWx0LXNhZmUgaGFuZGxpbmcKOTc5MGJlZCBzMzkweC90Y2c6IE1WU1Q6IEZhdWx0LXNhZmUg
+aGFuZGxpbmcKMTI2NThkMiBzMzkweC90Y2c6IE1WWjogRmF1bHQtc2FmZSBoYW5kbGluZwozNzFj
+YWUxIHMzOTB4L3RjZzogTVZOOiBGYXVsdC1zYWZlIGhhbmRsaW5nCjg3YTdjYmQgczM5MHgvdGNn
+OiBNVkNJTjogRmF1bHQtc2FmZSBoYW5kbGluZwoyMDBhMzlhIHMzOTB4L3RjZzogTkM6IEZhdWx0
+LXNhZmUgaGFuZGxpbmcKMDhjZTFkYiBzMzkweC90Y2c6IFhDOiBGYXVsdC1zYWZlIGhhbmRsaW5n
+CmVmMmViMGIgczM5MHgvdGNnOiBPQzogRmF1bHQtc2FmZSBoYW5kbGluZwoxYTAxZDc4IHMzOTB4
+L3RjZzogTVZDTFU6IEZhdWx0LXNhZmUgaGFuZGxpbmcKMjViYWFmZSBzMzkweC90Y2c6IE1WQzog
+RmF1bHQtc2FmZSBoYW5kbGluZyBvbiBkZXN0cnVjdGl2ZSBvdmVybGFwcwo4ODQ4ODMyIHMzOTB4
+L3RjZzogTVZDUy9NVkNQOiBVc2UgYWNjZXNzX21lbW1vdmUoKQpmYWUzNGY4IHMzOTB4L3RjZzog
+RmF1bHQtc2FmZSBtZW1tb3ZlCjRiYjdlMmQgczM5MHgvdGNnOiBGYXVsdC1zYWZlIG1lbXNldApk
+OTY1ZWMyIHMzOTB4L3RjZzogQWx3YXlzIHVzZSBNTVVfVVNFUl9JRFggZm9yIENPTkZJR19VU0VS
+X09OTFkKNWE1ZGNmMiBzMzkweC90Y2c6IE1WU1Q6IEZpeCBzdG9yaW5nIGJhY2sgdGhlIGFkZHJl
+c3NlcyB0byByZWdpc3RlcnMKNTdjNDU3OCBzMzkweC90Y2c6IE1WU1Q6IENoZWNrIGZvciBzcGVj
+aWZpY2F0aW9uIGV4Y2VwdGlvbnMKYjQ1ZDgyZSBzMzkweC90Y2c6IE1WQ1MvTVZDUDogUHJvcGVy
+bHkgd3JhcCB0aGUgbGVuZ3RoCjk2YTU5OTIgczM5MHgvdGNnOiBNVkNPUzogTGVuZ3RocyBhcmUg
+MzIgYml0IGluIDI0LzMxLWJpdCBtb2RlCjk3YThkYjcgczM5MHgvdGNnOiBNVkNTL01WQ1A6IENo
+ZWNrIGZvciBzcGVjaWFsIG9wZXJhdGlvbiBleGNlcHRpb25zCmJhMzdiZjAgczM5MHgvdGNnOiBN
+VkNMVS9NVkNMRTogUHJvY2VzcyBtYXggNGsgYnl0ZXMgYXQgYSB0aW1lCmYyZDM2YjMgczM5MHgv
+dGNnOiBNVlBHOiBQcm9wZXJseSB3cmFwIHRoZSBhZGRyZXNzZXMKMmI1ZDI5NSBzMzkweC90Y2c6
+IE1WUEc6IENoZWNrIGZvciBzcGVjaWZpY2F0aW9uIGV4Y2VwdGlvbnMKZThjYzg5MSBzMzkweC90
+Y2c6IE1WQzogVXNlIGlzX2Rlc3RydWN0aXZlX292ZXJsYXAoKQphZmM3YjMzIHMzOTB4L3RjZzog
+TVZDOiBJbmNyZW1lbnQgdGhlIGxlbmd0aCBvbmNlCjk3MjAwNTkgczM5MHgvdGNnOiBNVkNMOiBQ
+cm9jZXNzIG1heCA0ayBieXRlcyBhdCBhIHRpbWUKNmYwNWE1MiBzMzkweC90Y2c6IE1WQ0w6IERl
+dGVjdCBkZXN0cnVjdGl2ZSBvdmVybGFwcwpjZGVlYzUzIHMzOTB4L3RjZzogTVZDTDogWmVybyBv
+dXQgdW51c2VkIGJpdHMgb2YgYWRkcmVzcwpjNDkzOGVkIHMzOTB4L3RjZzogUmVzZXQgZXhjZXB0
+aW9uX2luZGV4IHRvIC0xIGluc3RlYWQgb2YgMAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8zMCBD
+aGVja2luZyBjb21taXQgYzQ5MzhlZGIxM2JjIChzMzkweC90Y2c6IFJlc2V0IGV4Y2VwdGlvbl9p
+bmRleCB0byAtMSBpbnN0ZWFkIG9mIDApCjIvMzAgQ2hlY2tpbmcgY29tbWl0IGNkZWVjNTMyYWQz
+NSAoczM5MHgvdGNnOiBNVkNMOiBaZXJvIG91dCB1bnVzZWQgYml0cyBvZiBhZGRyZXNzKQozLzMw
+IENoZWNraW5nIGNvbW1pdCA2ZjA1YTUyNGIyOTkgKHMzOTB4L3RjZzogTVZDTDogRGV0ZWN0IGRl
+c3RydWN0aXZlIG92ZXJsYXBzKQo0LzMwIENoZWNraW5nIGNvbW1pdCA5NzIwMDU5MmY2ODIgKHMz
+OTB4L3RjZzogTVZDTDogUHJvY2VzcyBtYXggNGsgYnl0ZXMgYXQgYSB0aW1lKQo1LzMwIENoZWNr
+aW5nIGNvbW1pdCBhZmM3YjMzYTVlNTUgKHMzOTB4L3RjZzogTVZDOiBJbmNyZW1lbnQgdGhlIGxl
+bmd0aCBvbmNlKQo2LzMwIENoZWNraW5nIGNvbW1pdCBlOGNjODkxMDc0YzMgKHMzOTB4L3RjZzog
+TVZDOiBVc2UgaXNfZGVzdHJ1Y3RpdmVfb3ZlcmxhcCgpKQo3LzMwIENoZWNraW5nIGNvbW1pdCAy
+YjVkMjk1MDRjZDAgKHMzOTB4L3RjZzogTVZQRzogQ2hlY2sgZm9yIHNwZWNpZmljYXRpb24gZXhj
+ZXB0aW9ucykKOC8zMCBDaGVja2luZyBjb21taXQgZjJkMzZiM2NjNjVlIChzMzkweC90Y2c6IE1W
+UEc6IFByb3Blcmx5IHdyYXAgdGhlIGFkZHJlc3NlcykKOS8zMCBDaGVja2luZyBjb21taXQgYmEz
+N2JmMDJhZjI0IChzMzkweC90Y2c6IE1WQ0xVL01WQ0xFOiBQcm9jZXNzIG1heCA0ayBieXRlcyBh
+dCBhIHRpbWUpCjEwLzMwIENoZWNraW5nIGNvbW1pdCA5N2E4ZGI3NTdhMDQgKHMzOTB4L3RjZzog
+TVZDUy9NVkNQOiBDaGVjayBmb3Igc3BlY2lhbCBvcGVyYXRpb24gZXhjZXB0aW9ucykKMTEvMzAg
+Q2hlY2tpbmcgY29tbWl0IDk2YTU5OTI5M2YzNiAoczM5MHgvdGNnOiBNVkNPUzogTGVuZ3RocyBh
+cmUgMzIgYml0IGluIDI0LzMxLWJpdCBtb2RlKQoxMi8zMCBDaGVja2luZyBjb21taXQgYjQ1ZDgy
+ZTJkZjg2IChzMzkweC90Y2c6IE1WQ1MvTVZDUDogUHJvcGVybHkgd3JhcCB0aGUgbGVuZ3RoKQox
+My8zMCBDaGVja2luZyBjb21taXQgNTdjNDU3ODMxMDZiIChzMzkweC90Y2c6IE1WU1Q6IENoZWNr
+IGZvciBzcGVjaWZpY2F0aW9uIGV4Y2VwdGlvbnMpCjE0LzMwIENoZWNraW5nIGNvbW1pdCA1YTVk
+Y2YyNzRhMDMgKHMzOTB4L3RjZzogTVZTVDogRml4IHN0b3JpbmcgYmFjayB0aGUgYWRkcmVzc2Vz
+IHRvIHJlZ2lzdGVycykKMTUvMzAgQ2hlY2tpbmcgY29tbWl0IGQ5NjVlYzI4ZGQ3YyAoczM5MHgv
+dGNnOiBBbHdheXMgdXNlIE1NVV9VU0VSX0lEWCBmb3IgQ09ORklHX1VTRVJfT05MWSkKMTYvMzAg
+Q2hlY2tpbmcgY29tbWl0IDRiYjdlMmQ3OWViOCAoczM5MHgvdGNnOiBGYXVsdC1zYWZlIG1lbXNl
+dCkKMTcvMzAgQ2hlY2tpbmcgY29tbWl0IGZhZTM0Zjg0MTc0MCAoczM5MHgvdGNnOiBGYXVsdC1z
+YWZlIG1lbW1vdmUpCjE4LzMwIENoZWNraW5nIGNvbW1pdCA4ODQ4ODMyMWZkMDcgKHMzOTB4L3Rj
+ZzogTVZDUy9NVkNQOiBVc2UgYWNjZXNzX21lbW1vdmUoKSkKMTkvMzAgQ2hlY2tpbmcgY29tbWl0
+IDI1YmFhZmUzZGM0NCAoczM5MHgvdGNnOiBNVkM6IEZhdWx0LXNhZmUgaGFuZGxpbmcgb24gZGVz
+dHJ1Y3RpdmUgb3ZlcmxhcHMpCjIwLzMwIENoZWNraW5nIGNvbW1pdCAxYTAxZDc4NGU1MjYgKHMz
+OTB4L3RjZzogTVZDTFU6IEZhdWx0LXNhZmUgaGFuZGxpbmcpCjIxLzMwIENoZWNraW5nIGNvbW1p
+dCBlZjJlYjBiODE0MzcgKHMzOTB4L3RjZzogT0M6IEZhdWx0LXNhZmUgaGFuZGxpbmcpCjIyLzMw
+IENoZWNraW5nIGNvbW1pdCAwOGNlMWRiMTY1ZjYgKHMzOTB4L3RjZzogWEM6IEZhdWx0LXNhZmUg
+aGFuZGxpbmcpCjIzLzMwIENoZWNraW5nIGNvbW1pdCAyMDBhMzlhNjY0NmMgKHMzOTB4L3RjZzog
+TkM6IEZhdWx0LXNhZmUgaGFuZGxpbmcpCjI0LzMwIENoZWNraW5nIGNvbW1pdCA4N2E3Y2JkNmVj
+YjggKHMzOTB4L3RjZzogTVZDSU46IEZhdWx0LXNhZmUgaGFuZGxpbmcpCjI1LzMwIENoZWNraW5n
+IGNvbW1pdCAzNzFjYWUxZDI3MmYgKHMzOTB4L3RjZzogTVZOOiBGYXVsdC1zYWZlIGhhbmRsaW5n
+KQoyNi8zMCBDaGVja2luZyBjb21taXQgMTI2NThkMjRmNzRjIChzMzkweC90Y2c6IE1WWjogRmF1
+bHQtc2FmZSBoYW5kbGluZykKMjcvMzAgQ2hlY2tpbmcgY29tbWl0IDk3OTBiZWRjZWFmYSAoczM5
+MHgvdGNnOiBNVlNUOiBGYXVsdC1zYWZlIGhhbmRsaW5nKQoyOC8zMCBDaGVja2luZyBjb21taXQg
+N2IwZTgwZTc3YWQxIChzMzkweC90Y2c6IE1WTzogRmF1bHQtc2FmZSBoYW5kbGluZykKMjkvMzAg
+Q2hlY2tpbmcgY29tbWl0IGVlMmVkNmQxYzhlMSAodGVzdHMvdGNnOiB0YXJnZXQvczM5MHg6IFRl
+c3QgTVZPKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
+SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyNDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3Rh
+bDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDI5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDI5LzMwIGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjMwLzMwIENoZWNraW5nIGNvbW1pdCA4NDQ0NTk0ZDFl
+YmEgKHRlc3RzL3RjZzogdGFyZ2V0L3MzOTB4OiBUZXN0IE1WQykKV0FSTklORzogYWRkZWQsIG1v
+dmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwoj
+MzA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IHVzZSBzaWdhY3Rpb24gdG8gZXN0YWJs
+aXNoIHNpZ25hbCBoYW5kbGVyczsgc2lnbmFsIGlzIG5vdCBwb3J0YWJsZQojNjg6IEZJTEU6IHRl
+c3RzL3RjZy9zMzkweC9tdmMuYzozNDoKKyAgICBpZiAoc2lnbmFsKFNJR1NFR1YsIGhhbmRsZV9z
+aWdzZWd2KSA9PSBTSUdfRVJSKSB7Cgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDExMyBs
+aW5lcyBjaGVja2VkCgpQYXRjaCAzMC8zMCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09
+IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBm
+dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA5MjMw
+ODA3MTIuMjM5NTEtMS1kYXZpZEByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1t
+ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
+cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
+ZGV2ZWxAcmVkaGF0LmNvbQ==
 
-The way the virt machine was structured didn't work with the options.
-I have fixed that in v2 of the series.
-
-Alistair
-
->
-> >
-> > >
-> > > > +
-> > > > +    return PFLASH_CFI01(dev);
-> > > > +}
-> > > > +
-> > > > +static void virt_flash_create(RISCVVirtState *s)
-> > > > +{
-> > > > +    s->flash[0] = virt_flash_create1(s, "virt.flash0", "pflash0");
-> > > > +    s->flash[1] = virt_flash_create1(s, "virt.flash1", "pflash1");
-> > >
-> > > I don't think we should mirror what is used on ARM virt board to
-> > > create 2 flash for sifive_u. For ARM virt, there are 2 flashes because
-> > > they need distinguish secure and non-secure. For sifive_u, only one is
-> > > enough.
-> >
-> > I went back and forward about 1 or 2. Two seems more usable as maybe
-> > someone wants to include two pflash files? The Xilinx machine also has
-> > two so I'm kind of used to 2, but I'm not really fussed.
-> >
-> > Unless anyone else wants two I will change it to 1.
->
-> Regards,
-> Bin
 
