@@ -2,69 +2,89 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C718C4CEC4
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 18:37:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0EBC4CECF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 18:38:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0314F20882
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 18:37:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0314F20882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 79A6520882
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 18:38:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X7QiniTc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79A6520882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCTCm-0002nW-Lj
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 14:37:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50912)
+	id 1iCTEI-00044q-A8
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 14:38:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51149)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iCTB4-0001b8-Rw
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:35:16 -0400
+ (envelope-from <msys.mizuma@gmail.com>) id 1iCTCQ-0002nt-SU
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:36:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iCTB2-0002TQ-Ti
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:35:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45902)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iCTB2-0002R7-Kv
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:35:12 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E8B7F197BCE0;
- Mon, 23 Sep 2019 18:35:10 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-2.rdu2.redhat.com
- [10.10.120.2])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AB3F45D9D5;
- Mon, 23 Sep 2019 18:35:03 +0000 (UTC)
-Subject: Re: [edk2-devel] [Qemu-devel] [PATCH 1/2] q35: implement 128K SMRAM
- at default SMBASE address
-From: Laszlo Ersek <lersek@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-References: <20190917130708.10281-1-imammedo@redhat.com>
- <20190917130708.10281-2-imammedo@redhat.com>
- <561f4440-7c06-10d7-80ce-bbfa810fec59@redhat.com>
- <20190920102855.3fe2b689@redhat.com>
- <a581abbc-ec03-c332-b225-6f7cd3cfadae@redhat.com>
-Message-ID: <c18f1ada-3eca-d5f1-da4f-e74181c5a862@redhat.com>
-Date: Mon, 23 Sep 2019 20:35:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <msys.mizuma@gmail.com>) id 1iCTCO-0002xJ-CE
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:36:38 -0400
+Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:39829)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <msys.mizuma@gmail.com>)
+ id 1iCTCO-0002wp-6s
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 14:36:36 -0400
+Received: by mail-qt1-x841.google.com with SMTP id n7so18385048qtb.6
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 11:36:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=YabcjeTFAAe5ZMdv64YzXMDO2i14GHKKmFFTyjQnKMA=;
+ b=X7QiniTcJBk0fRmbeQkNylmFzYAw5Kc2QhnJf8bnNv1S0+mnP3sreyhHsjF2G2D1/o
+ cWux4wEU5yZGEU9z7iDp0jzXnarBK+0l5AJhE9r2aG378Gq6/RzW/sm6uaKiSG+H7TFE
+ wpv9m4E6pS0/i8F5o6l4tpAAlbWAm6V1YIRhmq5032hcEWdbopA/b4QzFmeivm/fZA7B
+ UqhHvFBl1UVJxXwdtaN4oaGRg3nqONIQZHTGONuDDKGzFKvMh2n2RyosmsE+vyhAmUop
+ 0Ew9zYBVM6pWlT7ZeJD0KzD0iHUchtcFfga140cV/hfb5SttclrWyErFVM+JZXc+93jF
+ ZC3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=YabcjeTFAAe5ZMdv64YzXMDO2i14GHKKmFFTyjQnKMA=;
+ b=sYEROq6g9Z2efNl8Sm87OUHqniY02d2ERy5F+peYdDFdRS3TyIocq4CvbfmBaWBcFo
+ 5Y0vbtELmJW5K6bJVBXoUppTGalvgPe3Ei9U8uNF38hHnEDUWK7LrEy+7xCGle7J5QAS
+ r8PyPx/vEd/2IASPSlhx9LoFtjIom91gKpbJuGcBVO9MairobOWkVU/pyYuwIVmFnnqk
+ fMKf2fCAutFaEf1G87VcLeRR/HdWFu33rl+gUXQNpcIGwg4rHC2KlTFWdYZu9mmf9lFq
+ yPevp/V1lMNNIC3QV57Y96GjDloPkebH3zie6rPkZWL3bSDoHFANLTItuIKmk9LBi2YJ
+ CLXQ==
+X-Gm-Message-State: APjAAAWZQDh8jwbGayv+Ad5o5hT6eTAbgmGaUqE6j+PI7V8eg05EQhs2
+ WH9Io5aD/NWaPxu74VfF9d6tMMY=
+X-Google-Smtp-Source: APXvYqy2fdEcXIWBoYXcRLxg+LPDS82nD9cShWd1OI3O5iWFeP629CE1bNoD9ZFsdCpJHcyEa9v21g==
+X-Received: by 2002:ac8:1c54:: with SMTP id j20mr1516904qtk.302.1569263795365; 
+ Mon, 23 Sep 2019 11:36:35 -0700 (PDT)
+Received: from gabell (nat-pool-bos-t.redhat.com. [66.187.233.206])
+ by smtp.gmail.com with ESMTPSA id 22sm5126837qkj.0.2019.09.23.11.36.34
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Mon, 23 Sep 2019 11:36:34 -0700 (PDT)
+Date: Mon, 23 Sep 2019 14:36:29 -0400
+From: Masayoshi Mizuma <msys.mizuma@gmail.com>
+To: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
+Subject: Re: [Qemu-devel] [RFC QEMU v2 1/2] arm/virt: Initialize generic
+ timer scale factor dynamically
+Message-ID: <20190923183628.4jj5yougeksylqrt@gabell>
+References: <1543352837-21529-1-git-send-email-bijan.mottahedeh@oracle.com>
+ <1543352837-21529-2-git-send-email-bijan.mottahedeh@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <a581abbc-ec03-c332-b225-6f7cd3cfadae@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Mon, 23 Sep 2019 18:35:11 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1543352837-21529-2-git-send-email-bijan.mottahedeh@oracle.com>
+User-Agent: NeoMutt/20180716
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::841
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,91 +96,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yingwen.chen@intel.com, Brijesh Singh <brijesh.singh@amd.com>,
- devel@edk2.groups.io, phillip.goerl@oracle.com, qemu-devel@nongnu.org,
- alex.williamson@redhat.com, jiewen.yao@intel.com, jun.nakajima@intel.com,
- michael.d.kinney@intel.com, pbonzini@redhat.com, boris.ostrovsky@oracle.com,
- rfc@edk2.groups.io, joao.m.martins@oracle.com
+Cc: qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/20/19 11:28, Laszlo Ersek wrote:
-> On 09/20/19 10:28, Igor Mammedov wrote:
->> On Thu, 19 Sep 2019 19:02:07 +0200
->> "Laszlo Ersek" <lersek@redhat.com> wrote:
->>
->>> Hi Igor,
->>>
->>> (+Brijesh)
->>>
->>> long-ish pondering ahead, with a question at the end.
->> [...]
->>
->>> Finally: can you please remind me why we lock down 128KB (32 pages) at
->>> 0x3_0000, and not just half of that? What do we need the range at
->>> [0x4_0000..0x4_FFFF] for?
->>
->>
->> If I recall correctly, CPU consumes 64K of save/restore area.
->> The rest 64K are temporary RAM for using in SMI relocation handler,
->> if it's possible to get away without it then we can drop it and
->> lock only 64K required for CPU state. It won't help with SEV
->> conflict though as it's in the first 64K.
+Hi,
+
+This issue remains on the latest qemu, right?
+Let me add some comments for the patch.
+
+On Tue, Nov 27, 2018 at 01:07:16PM -0800, Bijan Mottahedeh wrote:
+> Initialize the generic timer scale factor based on the counter frequency
+> register cntfrq_el0, and default to the current static value if necessary.
+> Always use the default value for TCG.
 > 
-> OK. Let's go with 128KB for now. Shrinking the area is always easier
-> than growing it.
+> Signed-off-by: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
+> ---
+>  hw/arm/virt.c          | 17 +++++++++++++++++
+>  target/arm/helper.c    | 19 ++++++++++++++++---
+>  target/arm/internals.h |  8 ++++++--
+>  target/arm/kvm64.c     |  1 +
+>  4 files changed, 40 insertions(+), 5 deletions(-)
 > 
->> On QEMU side,  we can drop black-hole approach and allocate
->> dedicated SMRAM region, which explicitly gets mapped into
->> RAM address space and after SMI hanlder initialization, gets
->> unmapped (locked). So that SMRAM would be accessible only
->> from SMM context. That way RAM at 0x30000 could be used as
->> normal when SMRAM is unmapped.
-> 
-> I prefer the black-hole approach, introduced in your current patch
-> series, if it can work. Way less opportunity for confusion.
-> 
-> I've started work on the counterpart OVMF patches; I'll report back.
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 281ddcd..792d223 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -59,6 +59,7 @@
+>  #include "qapi/visitor.h"
+>  #include "standard-headers/linux/input.h"
+>  #include "hw/arm/smmuv3.h"
+> +#include "target/arm/internals.h"
+>  
+>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+> @@ -1710,6 +1711,21 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
+>      return NULL;
+>  }
+>  
+> +static void set_system_clock_scale(void)
+> +{
+> +    unsigned long cntfrq_el0 = 0;
+> +
+> +#ifdef  CONFIG_KVM
+> +    asm volatile("mrs %0, cntfrq_el0" : "=r"(cntfrq_el0));
+> +#endif
+> +
+> +    if (cntfrq_el0 == 0) {
+> +        cntfrq_el0 = GTIMER_SCALE_DEF;
+> +    }
+> +
+> +    system_clock_scale = NANOSECONDS_PER_SECOND / (int)cntfrq_el0;
+> +}
+> +
+>  static void virt_machine_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc = MACHINE_CLASS(oc);
+> @@ -1736,6 +1752,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+>      assert(!mc->get_hotplug_handler);
+>      mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
+>      hc->plug = virt_machine_device_plug_cb;
+> +    set_system_clock_scale();
+>  }
+>  
+>  static const TypeInfo virt_machine_info = {
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 66afb08..6330586 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -18,6 +18,7 @@
+>  #include "sysemu/kvm.h"
+>  #include "fpu/softfloat.h"
+>  #include "qemu/range.h"
+> +#include "hw/arm/arm.h"
 
-I've got good results. For this (1/2) QEMU patch:
+arm.h is renamed to boot.h, so:
 
-Tested-by: Laszlo Ersek <lersek@redhat.com>
+#include "hw/arm/boot.h"
 
-I tested the following scenarios. In every case, I verified the OVMF
-log, and also the "info mtree" monitor command's result (i.e. whether
-"smbase-blackhole" / "smbase-window" were disabled or enabled). Mostly,
-I diffed these text files between the test scenarios (looking for
-desired / undesired differences). In the Linux guests, I checked /
-compared the dmesg too (wrt. the UEFI memmap).
+>  
+>  #define ARM_CPU_FREQ 1000000000 /* FIXME: 1 GHz, should be configurable */
+>  
+> @@ -1614,6 +1615,18 @@ static CPAccessResult gt_cntfrq_access(CPUARMState *env, const ARMCPRegInfo *ri,
+>      return CP_ACCESS_OK;
+>  }
+>  
+> +static void gt_cntfrq_reset(CPUARMState *env, const ARMCPRegInfo *ri)
+> +{
+> +    assert(GTIMER_SCALE);
+> +    assert(ri->fieldoffset);
+> +
+> +    if (cpreg_field_is_64bit(ri)) {
+> +        CPREG_FIELD64(env, ri) = NANOSECONDS_PER_SECOND / GTIMER_SCALE;
+> +    } else {
+> +        CPREG_FIELD32(env, ri) = NANOSECONDS_PER_SECOND / GTIMER_SCALE;
+> +    }
+> +}
+> +
+>  static CPAccessResult gt_counter_access(CPUARMState *env, int timeridx,
+>                                          bool isread)
+>  {
+> @@ -1709,7 +1722,7 @@ static CPAccessResult gt_stimer_access(CPUARMState *env,
+>      }
+>  }
+>  
+> -static uint64_t gt_get_countervalue(CPUARMState *env)
+> +uint64_t gt_get_countervalue(CPUARMState *env)
+>  {
+>      return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) / GTIMER_SCALE;
+>  }
+> @@ -1996,7 +2009,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+>        .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 0, .opc2 = 0,
+>        .access = PL1_RW | PL0_R, .accessfn = gt_cntfrq_access,
+>        .fieldoffset = offsetof(CPUARMState, cp15.c14_cntfrq),
+> -      .resetvalue = (1000 * 1000 * 1000) / GTIMER_SCALE,
+> +      .resetfn = gt_cntfrq_reset,
 
-- unpatched OVMF (regression test), Fedora guest, normal boot and S3
+Build error is here on the target aarch64-linux-user, like as:
 
-- patched OVMF, but feature disabled with "-global mch.smbase-smram=off"
-(another regression test), Fedora guest, normal boot and S3
+/home/foo/qemu/target/arm/helper.c:2901:18: error: 'gt_cntfrq_reset' undeclared here (not in a function); did you mean 'g_timer_reset'?
+       .resetfn = gt_cntfrq_reset,
+                  ^~~~~~~~~~~~~~~
 
-- patched OVMF, feature enabled, Fedora and various Windows guests
-(win7, win8, win10 families, client/server), normal boot and S3
+The issue doesn't affect to aarch64-linux-user, right?
+If so:
 
-- a subset of the above guests, with S3 disabled (-global
-  ICH9-LPC.disable_s3=1), and obviously S3 resume not tested
+#ifdef CONFIG_LINUX_USER
+      .resetvalue = (1000 * 1000 * 1000) / GTIMER_SCALE,
+#else
+      .resetfn = gt_cntfrq_reset,
+#endif
 
-SEV: used 5.2-ish Linux guest, with S3 disabled (no support under SEV
-for that now):
+>      },
+>      /* overall control: mostly access permissions */
+>      { .name = "CNTKCTL", .state = ARM_CP_STATE_BOTH,
+> @@ -2187,7 +2200,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+>        .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 0, .opc2 = 0,
+>        .type = ARM_CP_CONST, .access = PL0_R /* no PL1_RW in linux-user */,
+>        .fieldoffset = offsetof(CPUARMState, cp15.c14_cntfrq),
+> -      .resetvalue = NANOSECONDS_PER_SECOND / GTIMER_SCALE,
+> +      .resetfn = gt_cntfrq_reset,
 
-- unpatched OVMF (regression test), normal boot
+Same as above.
 
-- patched OVMF but feature disabled on the QEMU cmdline (another
-regression test), normal boot
+>      },
+>      { .name = "CNTVCT_EL0", .state = ARM_CP_STATE_AA64,
+>        .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 0, .opc2 = 2,
+> diff --git a/target/arm/internals.h b/target/arm/internals.h
+> index dc93577..b66a1fa 100644
+> --- a/target/arm/internals.h
+> +++ b/target/arm/internals.h
+> @@ -52,9 +52,13 @@ static inline bool excp_is_internal(int excp)
+>  }
+>  
+>  /* Scale factor for generic timers, ie number of ns per tick.
+> - * This gives a 62.5MHz timer.
+> + * Calculated dynamically based on CNTFRQ with a default value
+> + * that gives a 62.5MHZ timer.
+>   */
+> -#define GTIMER_SCALE 16
+> +#define GTIMER_SCALE        system_clock_scale
+> +#define GTIMER_SCALE_DEF    16
 
-- patched OVMF, feature enabled, normal boot.
+I think extern for system_clock_scale should be added here,
+otherwise the build error happens.
+If the issue doesn't affect to aarch64-linux-user, how about the following?
 
-I plan to post the OVMF patches tomorrow, for discussion.
+#ifndef CONFIG_LINUX_USER
+extern int system_clock_scale;
+#define GTIMER_SCALE        system_clock_scale
+#define GTIMER_SCALE_DEF    16
+#else
+#define GTIMER_SCALE        16
+#endif
 
-(It's likely too early to push these QEMU / edk2 patches right now -- we
-don't know yet if this path will take us to the destination. For now, it
-certainly looks great.)
+> +
+> +uint64_t gt_get_countervalue(CPUARMState *);
+>  
+>  /* Bit definitions for the v7M CONTROL register */
+>  FIELD(V7M_CONTROL, NPRIV, 0, 1)
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index e0b8246..5d1c394 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -485,6 +485,7 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>      set_feature(&features, ARM_FEATURE_NEON);
+>      set_feature(&features, ARM_FEATURE_AARCH64);
+>      set_feature(&features, ARM_FEATURE_PMU);
+> +    set_feature(&features, ARM_FEATURE_GENERIC_TIMER);
+>  
+>      ahcf->features = features;
 
-Thanks
-Laszlo
+Thanks,
+Masa
 
