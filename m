@@ -2,140 +2,83 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 142D6C4CECF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 19:57:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B549FC4CEC4
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 20:10:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD25D206C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 19:57:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD25D206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7A8F7207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 20:10:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lK7Lk0re"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A8F7207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCUSd-0005wb-6p
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 15:57:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34438)
+	id 1iCUem-00021g-D5
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 16:10:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36817)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iCURJ-00054a-7U
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 15:56:06 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iCUdy-0001Yq-79
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 16:09:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iCURI-0001Gy-8K
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 15:56:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58056)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iCURG-0001GJ-8m; Mon, 23 Sep 2019 15:56:02 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 857AD10C0515;
- Mon, 23 Sep 2019 19:56:01 +0000 (UTC)
-Received: from [10.18.17.231] (dhcp-17-231.bos.redhat.com [10.18.17.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 67BFB1001B05;
- Mon, 23 Sep 2019 19:55:58 +0000 (UTC)
-Subject: Re: [PATCH v2 03/16] tests/docker: remove python2.7 from docker9-mxe
-To: Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>
-References: <20190919171015.12681-1-alex.bennee@linaro.org>
- <20190919171015.12681-4-alex.bennee@linaro.org>
- <20190923194951.GD6528@dhcp-17-179.bos.redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <07293458-969b-9fb5-dea8-8008e6720c89@redhat.com>
-Date: Mon, 23 Sep 2019 15:55:58 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <alistair23@gmail.com>) id 1iCUdw-0006g8-Sx
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 16:09:10 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:41967)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1iCUdw-0006ft-JV; Mon, 23 Sep 2019 16:09:08 -0400
+Received: by mail-lf1-x142.google.com with SMTP id r2so11118725lfn.8;
+ Mon, 23 Sep 2019 13:09:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ZF1KUTZJcXM9LfX7+T1t8fDj2BRmNGXMx083Eh8oPEQ=;
+ b=lK7Lk0relsQ4CXWHenQp4gr60qmdBXZyvrrnWEqBnGhSprm3eDMgBQxWtn181cjN5Z
+ GMpOgnP6QQ2g9653Z3qEc62jszNzN/ZQs1RQLEDc7go0BXyBbmKQSbQ0LmFGH7YmDVXn
+ BwlDMns1Bg2O6Nzd1LOh+97hWyb75pWkCGU1ldFRpdqimRkWfC/xoYFFAYGPpmliF4dP
+ 042GDiksOr03728EqSJ8mYenjE7WT/eKl8cgaDW0VCS8x9eN//WuJ4LLIOQda+JI4N3k
+ 5V5ho/f189RbRV5KFgks+Sz7eUNYjVjv1absvJv5xP0QsbVVUAWI14BP6uJ6nBcY4Oam
+ LTgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ZF1KUTZJcXM9LfX7+T1t8fDj2BRmNGXMx083Eh8oPEQ=;
+ b=U8SZ9FIFWZEC2VHI0vUVrgbGmpxi65ld0/YI5gd8KMgEVu/eDrR95hMIz5GHEwT+tO
+ SPUtTRtkvjt6gYow13Goq0cA00sGC1Jsca0HNRGrmBTeUGGptI85qkDUymXK27y8nQXT
+ ipVioa8KqomWt0b+vv4juY29BkLQytHG3nsBlJwILFeD91VveRZNONRygHej8UON2CZg
+ T11GSAud/ShfB4v4wQ0ciyErGkwm7vV0EvgDhT/lR7J+JxsYmc0X/dUM84luHJG3050z
+ /fnhLsENacP9T9W2Z8HGI7W0tgwgDX1TgkdQsyOTCJpmQ7n7Wci8JIJZG0TqMR/1t3JA
+ /wlg==
+X-Gm-Message-State: APjAAAXzO/wmbz5wvv3FDHBjwT7L/3RdKN81CMDjFsODeIhc7l1kjJUi
+ h/1MzI23C8d8TzAC+wsz5nJQSVcU6s7tEDwMcUk=
+X-Google-Smtp-Source: APXvYqyVwsaLtj0JUYdFdfixP5PYzxz4vwvLzdJxLntDdxJV1RDctFPRQLgj3zX+QiHiZt9im/5Q478g8wUiqbovdFU=
+X-Received: by 2002:a19:f11c:: with SMTP id p28mr796050lfh.44.1569269347466;
+ Mon, 23 Sep 2019 13:09:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190923194951.GD6528@dhcp-17-179.bos.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Mon, 23 Sep 2019 19:56:01 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+References: <cover.1568931866.git.alistair.francis@wdc.com>
+ <0a5c141a26fada6d93d06e996a2f24e1b269ec50.1568931866.git.alistair.francis@wdc.com>
+ <CAEUhbmVvDKQqQYE-riq=cvSrCe_NMoW_KDsLjh8CVHRUhJvk9A@mail.gmail.com>
+ <CAKmqyKOofA3U+8kjMkzQ0sNd1=uwJHq3c9eaLZdoNCb7=e-PAw@mail.gmail.com>
+ <CAEUhbmWu_OTGmUBTcMg9uvm36-fDQheSSiwH5mjnokJSrLvoBA@mail.gmail.com>
+In-Reply-To: <CAEUhbmWu_OTGmUBTcMg9uvm36-fDQheSSiwH5mjnokJSrLvoBA@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 23 Sep 2019 13:08:41 -0700
+Message-ID: <CAKmqyKN8g767av=FeCe_UsapPd7cPCNGWzEx7ByF9QYu-3NbxQ@mail.gmail.com>
+Subject: Re: [PATCH v1 5/6] riscv/virt: Add the PFlash CFI01 device
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::142
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,30 +90,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, peter.maydell@linaro.org, qemu-arm@nongnu.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Sat, Sep 21, 2019 at 7:15 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> On Sat, Sep 21, 2019 at 6:16 AM Alistair Francis <alistair23@gmail.com> wrote:
+> >
+> > On Thu, Sep 19, 2019 at 10:15 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+> > >
+> > > On Fri, Sep 20, 2019 at 6:36 AM Alistair Francis
+> > > <alistair.francis@wdc.com> wrote:
+> > > >
+> > > > Add the CFI01 PFlash to the RISC-V virt board. This is the same PFlash
+> > > > from the ARM Virt board and the implementation is based on the ARM Virt
+> > > > board. This allows users to specify flash files from the command line.
+> > > >
+> > > > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > > > ---
+> > > >  hw/riscv/Kconfig        |  1 +
+> > > >  hw/riscv/virt.c         | 81 +++++++++++++++++++++++++++++++++++++++++
+> > > >  include/hw/riscv/virt.h |  3 ++
+> > > >  3 files changed, 85 insertions(+)
+> > > >
+> > > > diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
+> > > > index fb19b2df3a..b12660b9f8 100644
+> > > > --- a/hw/riscv/Kconfig
+> > > > +++ b/hw/riscv/Kconfig
+> > > > @@ -36,4 +36,5 @@ config RISCV_VIRT
+> > > >      select SERIAL
+> > > >      select VIRTIO_MMIO
+> > > >      select PCI_EXPRESS_GENERIC_BRIDGE
+> > > > +    select PFLASH_CFI01
+> > > >      select SIFIVE
+> > > > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> > > > index d36f5625ec..ca002ecea7 100644
+> > > > --- a/hw/riscv/virt.c
+> > > > +++ b/hw/riscv/virt.c
+> > > > @@ -26,6 +26,7 @@
+> > > >  #include "hw/boards.h"
+> > > >  #include "hw/loader.h"
+> > > >  #include "hw/sysbus.h"
+> > > > +#include "hw/qdev-properties.h"
+> > > >  #include "hw/char/serial.h"
+> > > >  #include "target/riscv/cpu.h"
+> > > >  #include "hw/riscv/riscv_hart.h"
+> > > > @@ -61,12 +62,72 @@ static const struct MemmapEntry {
+> > > >      [VIRT_PLIC] =        {  0xc000000,     0x4000000 },
+> > > >      [VIRT_UART0] =       { 0x10000000,         0x100 },
+> > > >      [VIRT_VIRTIO] =      { 0x10001000,        0x1000 },
+> > > > +    [VIRT_FLASH] =       { 0x20000000,     0x2000000 },
+> > > >      [VIRT_DRAM] =        { 0x80000000,           0x0 },
+> > > >      [VIRT_PCIE_MMIO] =   { 0x40000000,    0x40000000 },
+> > > >      [VIRT_PCIE_PIO] =    { 0x03000000,    0x00010000 },
+> > > >      [VIRT_PCIE_ECAM] =   { 0x30000000,    0x10000000 },
+> > > >  };
+> > > >
+> > > > +#define VIRT_FLASH_SECTOR_SIZE (256 * KiB)
+> > > > +
+> > > > +static PFlashCFI01 *virt_flash_create1(RISCVVirtState *s,
+> > > > +                                       const char *name,
+> > > > +                                       const char *alias_prop_name)
+> > > > +{
+> > > > +    /*
+> > > > +     * Create a single flash device.  We use the same parameters as
+> > > > +     * the flash devices on the ARM virt board.
+> > > > +     */
+> > > > +    DeviceState *dev = qdev_create(NULL, TYPE_PFLASH_CFI01);
+> > > > +
+> > > > +    qdev_prop_set_uint64(dev, "sector-length", VIRT_FLASH_SECTOR_SIZE);
+> > > > +    qdev_prop_set_uint8(dev, "width", 4);
+> > > > +    qdev_prop_set_uint8(dev, "device-width", 2);
+> > > > +    qdev_prop_set_bit(dev, "big-endian", false);
+> > > > +    qdev_prop_set_uint16(dev, "id0", 0x89);
+> > > > +    qdev_prop_set_uint16(dev, "id1", 0x18);
+> > > > +    qdev_prop_set_uint16(dev, "id2", 0x00);
+> > > > +    qdev_prop_set_uint16(dev, "id3", 0x00);
+> > > > +    qdev_prop_set_string(dev, "name", name);
+> > >
+> > > alias_prop_name is unused? ARM virt has 2 more calls in the same function here.
+> >
+> > Yep, you are right. I have removed this.
+>
+> Any reason of removing this?
 
+The way the virt machine was structured didn't work with the options.
+I have fixed that in v2 of the series.
 
-On 9/23/19 3:49 PM, Cleber Rosa wrote:
-> On Thu, Sep 19, 2019 at 06:10:02PM +0100, Alex Benn=C3=A9e wrote:
->> From: John Snow <jsnow@redhat.com>
->>
->> When it was based on docker8 which uses python-minimal, it needed this=
-.
->=20
-> Assuming this docker8 was a typo? I mean, s/docker8/debian8/ ?
->=20
-> - Cleber
->=20
+Alistair
 
-WHOOPS, yes, I keep typo-ing "docker" and "debian" as one another.
-
-"debian8", yes.
-
---js
+>
+> >
+> > >
+> > > > +
+> > > > +    return PFLASH_CFI01(dev);
+> > > > +}
+> > > > +
+> > > > +static void virt_flash_create(RISCVVirtState *s)
+> > > > +{
+> > > > +    s->flash[0] = virt_flash_create1(s, "virt.flash0", "pflash0");
+> > > > +    s->flash[1] = virt_flash_create1(s, "virt.flash1", "pflash1");
+> > >
+> > > I don't think we should mirror what is used on ARM virt board to
+> > > create 2 flash for sifive_u. For ARM virt, there are 2 flashes because
+> > > they need distinguish secure and non-secure. For sifive_u, only one is
+> > > enough.
+> >
+> > I went back and forward about 1 or 2. Two seems more usable as maybe
+> > someone wants to include two pflash files? The Xilinx machine also has
+> > two so I'm kind of used to 2, but I'm not really fussed.
+> >
+> > Unless anyone else wants two I will change it to 1.
+>
+> Regards,
+> Bin
 
