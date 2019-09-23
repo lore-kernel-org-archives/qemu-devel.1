@@ -2,61 +2,94 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84417C04EBF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:57:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 676F2C04EBF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:02:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1453620820
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:57:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1453620820
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id EF1F3207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:02:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF1F3207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCNuQ-00019E-0R
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 08:57:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52934)
+	id 1iCNzP-0002eD-Gy
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 09:02:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53223)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iCNtG-0000Ir-HW
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:56:31 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCNwt-00025x-GK
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:00:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iCNtF-00024o-1A
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:56:30 -0400
-Received: from 4.mo179.mail-out.ovh.net ([46.105.36.149]:48084)
+ (envelope-from <eblake@redhat.com>) id 1iCNwr-0002xz-E8
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:00:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:8361)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iCNtE-000220-RM
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:56:28 -0400
-Received: from player715.ha.ovh.net (unknown [10.109.146.86])
- by mo179.mail-out.ovh.net (Postfix) with ESMTP id A4FD8142B24
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 14:56:19 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player715.ha.ovh.net (Postfix) with ESMTPSA id 0F2D09F1EFF4;
- Mon, 23 Sep 2019 12:56:12 +0000 (UTC)
-Date: Mon, 23 Sep 2019 14:56:11 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [Qemu-devel] [PATCH v7 0/3] 9p: Fix file ID collisions
-Message-ID: <20190923145611.7ca240e8@bahia.lan>
-In-Reply-To: <2376196.qMJLftDnS9@silver>
-References: <cover.1567680121.git.qemu_oss@crudebyte.com>
- <20190913190157.651fc3a6@bahia.lan> <2376196.qMJLftDnS9@silver>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCNwo-0002vw-Ce
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:00:13 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 29988305FC56;
+ Mon, 23 Sep 2019 13:00:09 +0000 (UTC)
+Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C96986012D;
+ Mon, 23 Sep 2019 13:00:04 +0000 (UTC)
+Subject: Re: [Qemu-devel] [PATCH v2 13/16] docs/devel/qapi-code-gen: Rewrite
+ compatibility considerations
+To: Markus Armbruster <armbru@redhat.com>
+References: <20190910063724.28470-1-armbru@redhat.com>
+ <20190910063724.28470-14-armbru@redhat.com>
+ <60b61f7c-fe08-e78b-dd52-775959af99d9@redhat.com>
+ <87tv9g8cf4.fsf@dusky.pond.sub.org>
+ <f71d6dd3-c9f5-7b89-a536-cf7e9baaff51@redhat.com>
+ <87impjp77y.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <84f90c22-4983-dc9c-bf0e-5297b9ea7658@redhat.com>
+Date: Mon, 23 Sep 2019 08:00:04 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 13903456478732196160
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdekgdehkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+In-Reply-To: <87impjp77y.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="SPTnie9j44n3UFRDCTvfwE7UjA3rXvyym"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Mon, 23 Sep 2019 13:00:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.36.149
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,83 +101,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, "Daniel P.
- =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, qemu-devel@nongnu.org,
- Antonios Motakis <antonios.motakis@huawei.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
+ mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 23 Sep 2019 11:50:46 +0200
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SPTnie9j44n3UFRDCTvfwE7UjA3rXvyym
+Content-Type: multipart/mixed; boundary="2N2zf51N3NQJ47PrrEkQPnoCloPZa0MDQ";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
+ mdroth@linux.vnet.ibm.com
+Message-ID: <84f90c22-4983-dc9c-bf0e-5297b9ea7658@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 13/16] docs/devel/qapi-code-gen: Rewrite
+ compatibility considerations
+References: <20190910063724.28470-1-armbru@redhat.com>
+ <20190910063724.28470-14-armbru@redhat.com>
+ <60b61f7c-fe08-e78b-dd52-775959af99d9@redhat.com>
+ <87tv9g8cf4.fsf@dusky.pond.sub.org>
+ <f71d6dd3-c9f5-7b89-a536-cf7e9baaff51@redhat.com>
+ <87impjp77y.fsf@dusky.pond.sub.org>
+In-Reply-To: <87impjp77y.fsf@dusky.pond.sub.org>
 
-> On Freitag, 13. September 2019 19:01:57 CEST Greg Kurz wrote:
-> > So I did some changes in 1/3 and pushed everything to 9p-next. 
-> 
-> I've reviewed your changes. Some notes:
-> 
-> Patch 1:
-> https://github.com/gkurz/qemu/commit/9295011c5a961603959b966c8aa6ad9840fe6db2
-> 
-> * Typo 1:
-> 
-> 	error_append_hint(&local_err, "Valide options are: multidevs="
-> 
-> 	Valide -> Valid
-> 
-> * Typo 2 in log comment:
-> 
-> 	[groug: - Moved "multidevs" parsing the local backend.
-> 	->
-> 	[groug: - Moved "multidevs" parsing to the local backend.
-> 
+--2N2zf51N3NQJ47PrrEkQPnoCloPZa0MDQ
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Fixed.
+On 9/23/19 6:44 AM, Markus Armbruster wrote:
 
-> > I'll do some
-> > more manual testing and issue a PR when I'm confident enough.
-> 
-> That would be highly appreciated! So far I am the only one ever having tested 
-> this patch set at all!
-> 
+>>>> Worth mentioning that type names themselves are NOT part of the
+>>>> interface, and may be freely renamed?
+>>>
+>>> Care to suggest a suitable sentence?
+>>
+>> Although member names within a type cannot be changed without affectin=
+g
+>> compatibility,
+>=20
+> This part seems redundant with the previous paragraph.
+>=20
+>>                changes to type names themselves do not affect the
+>> protocol.  As such, complex types may be freely renamed or refactored,=
 
-Just to clarify, I won't thoroughly test it. My main concern is that it
-doesn't break things. I usually rely on this:
+>=20
+> All types (enums, structs, simple & flat unions, alternates) actually,
+> not just complex ones (structs, unions).
+>=20
+>> such as splitting members from one type into a common base type, as lo=
+ng
+>> as the resulting set of members remain compatible.
+>=20
+> What does it mean for a set of members to be compatible?  We don't
+> actually define that...
+>=20
+> What about:
+>=20
+>   Since type names are not visible in the Client JSON Protocol, types
+>   may be freely renamed.  Even certain refactorings are invisible, such=
 
-https://www.tuxera.com/community/posix-test-suite/
+>   as splitting members from one type into a common base type.
 
-> > It would be nice to have some sort of automated test for that in 'make
-> > check'. My first thought is to simulate a cross-device setup with the synth
-> > backend, because it might be difficult to do this on a real filesystem
-> > without requiring elevated privileges.
-> 
-> Hmm, since I neither haven't used the synth backend before, nor added qemu 
-> test cases so far, I am yet missing the complete picture here. My initial 
-> suggested approach would have been using loopback devices for simulating two 
-> file systems, but yes that's probably not viable due to required permissions. 
-> How would the synth backend help here? I mean you would need to simulate 
-> specific inode numbers and device numbers in some way for the test cases.
-> 
+Seems reasonable to me.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
-The synth backend allows to simulate anything you want, provided you
-code it of course :)
+--2N2zf51N3NQJ47PrrEkQPnoCloPZa0MDQ--
 
-It is currently used to run some 9p protocol conformance tests. Have a
-look at the backend code to get the idea.
+--SPTnie9j44n3UFRDCTvfwE7UjA3rXvyym
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-hw/9pfs/9p-synth.h
-hw/9pfs/9p-synth.c
+-----BEGIN PGP SIGNATURE-----
 
-and the test program:
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2IwdQACgkQp6FrSiUn
+Q2q09wf+OAF+HmkWrt8cq7IuR8289jKFIuZkGZTjQob1b5SMFLMu6HYOdUfTr6c7
+1z1eQSWQI2ubmkzfMWQaBpDnARGeM38z5yyRQuk3X40EDVTf0Il8jMX3UEBi5yMF
+xj1Zp2MzRmIoKcUk/imCU38dvh8sh3uz/rFhpDCd0PKAasQgSPvsreHzuffJpJ0u
+NNX6NC9qeQcRthed7z37mlZhyfTWNx/IuabFjNTZI5JsgghN0ObAXsyGt/VkmKOD
+zpUQNnwfKBAqIJg0at8Xs+ghBvxe8fhv8U+FL33oxYEomM4TjH1nxhVtsOaaWyHf
+/pmh/lC6gj6zdQ2RxhrSDPysCacEtA==
+=+qj3
+-----END PGP SIGNATURE-----
 
-tests/virtio-9p-test.c
-
-It currently doesn't care for st_dev/st_ino at all, but I guess
-it shouldn't be that hard to add the necessary bits.
-
-> 
-> 
-
+--SPTnie9j44n3UFRDCTvfwE7UjA3rXvyym--
 
