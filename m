@@ -2,48 +2,79 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C413AC04EBF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:34:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF25C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:35:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95967205F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:34:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95967205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7E3142089F
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:35:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ww6Jo+d+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E3142089F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCNXY-0001j9-HJ
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 08:34:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48172)
+	id 1iCNYp-0002hI-Ct
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 08:35:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48800)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <anton.nefedov@virtuozzo.com>) id 1iCNIF-0006th-S8
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:18:18 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iCNNa-0003Qa-4v
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:23:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <anton.nefedov@virtuozzo.com>) id 1iCNID-0001nA-AP
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:18:15 -0400
-Received: from relay.sw.ru ([185.231.240.75]:59126)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
- id 1iCNI7-0001hc-8w; Mon, 23 Sep 2019 08:18:07 -0400
-Received: from [172.16.25.154] (helo=xantnef-ws.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <anton.nefedov@virtuozzo.com>)
- id 1iCNI1-0007xx-O8; Mon, 23 Sep 2019 15:18:02 +0300
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v10 0/9] discard blockstats
-Date: Mon, 23 Sep 2019 15:17:28 +0300
-Message-Id: <20190923121737.83281-1-anton.nefedov@virtuozzo.com>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
+ (envelope-from <peter.maydell@linaro.org>) id 1iCNNY-00038q-Tu
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:23:45 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:44682)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iCNNY-00038X-Ob
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 08:23:44 -0400
+Received: by mail-ot1-x342.google.com with SMTP id 21so11847927otj.11
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 05:23:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=urlOqGf19tZHHy0Qjq++AtBU+IqZo0KLvFBHIIF6J1M=;
+ b=ww6Jo+d+HaFs0E53DrX65hMsfsxxeMvu45lb7/WdioG1RY4Fi4JJ7YdVCKPYb3aKpZ
+ xR1g7cuF3Q+4R7vtQVX9N7fXii6XPFm5K77vM0FZrbktoYxoc+DyoJauYWmE3FaIm6eP
+ +e5icFtXRzKhkGJl7HP8JU2oAyxZE/aiy9aZcBj6y5JXxSLvMYnL0qaJ12MXyM7+TLFQ
+ +ffno8B4JLIXQ4hS0PUGcuNv56+4sBwbqUtpDtHf5llsPufZEd7zMwMejur0cxAIr1Bh
+ WFxNiMwE7Y8vPurTUzCn1T1iMYWgS8Fuhl8wR7AmRrljTBFx3jwwjNdgx8sgKCYgT6su
+ F0Vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=urlOqGf19tZHHy0Qjq++AtBU+IqZo0KLvFBHIIF6J1M=;
+ b=lA6rNaktxMbYC7EYI3mKO1LBY1PmPL6d04HeOBQWatL4XSYCfHlSn80SgckW7kPHmU
+ 9yCI9Y2O3EXtfIiMxTXLNkfKj96X7moryrOMWpVxVfwQ81ANR5cGuszKZQtsfoLdVZ5k
+ 3ZqyUPHOorszSZbcZSn7ZifyRwYTpOObGEM9+FSChHDitq7cCxsOo8Ty0zzopkz60vCc
+ 86RCC25S5uAJdavdhwU+Tiy1Co1NLvt9q//hw9dDQXUA3H5s2f6GUiqeG5A3V+BtT2R0
+ jAA1iDSnZl9H6/73NDGwqsbxoqNme5NacxB/rCqqZaghJeqd9rXnRPjuzPondA1Tyesl
+ Hs1A==
+X-Gm-Message-State: APjAAAX4yztrKq+vIvWKCCfvp6REKxiEp2GIG29Kyj7630/9HmdCeIsA
+ WNBOB8yRGkxtzqfJa3OTKPrfckONJUuSq5zNd7EEyF2bPXg=
+X-Google-Smtp-Source: APXvYqy15j0sB6LR4FvCLmdIUl2D7xFMEPhKFgJUkq+p/AVyN8DQ0BNVivV1Y0LHo8MmHLP6BkVWVCyMyCm8FfKpFW8=
+X-Received: by 2002:a05:6830:1357:: with SMTP id
+ r23mr3755656otq.91.1569241423967; 
+ Mon, 23 Sep 2019 05:23:43 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190923121712.22971-1-thuth@redhat.com>
+In-Reply-To: <20190923121712.22971-1-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 23 Sep 2019 13:23:33 +0100
+Message-ID: <CAFEAcA9jOD_mFOeVaAo5qsoj-Q0-U5qF8c85Am4ObgSn3b6irg@mail.gmail.com>
+Subject: Re: [PATCH] Disallow colons in the parameter of "-accel"
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -55,123 +86,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
- den@virtuozzo.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- Anton Nefedov <anton.nefedov@virtuozzo.com>, pbonzini@redhat.com,
- jsnow@redhat.com
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v10:
-  - patch 3 commit message updated
+On Mon, 23 Sep 2019 at 13:21, Thomas Huth <thuth@redhat.com> wrote:
+>
+> Everybody who used something like "-machine accel=kvm:tcg" in the past
+> might be tempted to specify a similar list with the -accel parameter,
+> too, for example "-accel kvm:tcg". However, this is not how this
+> options is thought to be used, since each "-accel" should only take care
+> of one specific accelerator.
+>
+> In the long run, we really should rework the "-accel" code completely,
+> so that it does not set "-machine accel=..." anymore internally, but
+> is completely independent from "-machine". For the short run, let's
+> make sure that users cannot use "-accel xyz:tcg", so that we avoid
+> that we have to deal with such cases in the wild later.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  vl.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/vl.c b/vl.c
+> index 630f5c5e9c..68f47a9c25 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3554,6 +3554,11 @@ int main(int argc, char **argv, char **envp)
+>                      g_slist_free(accel_list);
+>                      exit(0);
+>                  }
+> +                if (optarg && strchr(optarg, ':')) {
+> +                    error_report("Don't use ':' with -accel, "
+> +                                 "use -M accel=... in this case instead");
+> +                    exit(1);
+> +                }
 
-v9: https://lists.nongnu.org/archive/html/qemu-devel/2019-09/msg01190.html
+This seems pretty ugly. If -accel is the way we're recommending
+users configure the accelerator then it should support syntax
+for specifying everything we could do with the old -machine...
+option. If it can't do that yet, we shouldn't switch over to it
+until it can.
 
-----
-
-qmp query-blockstats provides stats info for write/read/flush ops.
-
-Patches 1-7 implement the similar for discard (unmap) command for scsi
-and ide disks.
-Discard stat "unmap_ops / unmap_bytes" is supposed to account the ops that
-have completed without an error.
-
-However, discard operation is advisory. Specifically,
- - common block layer ignores ENOTSUP error code.
-   That might be returned if the block driver does not support discard,
-   or discard has been configured to be ignored.
- - format drivers such as qcow2 may ignore discard if they were configured
-   to ignore that, or if the corresponding area is already marked unused
-   (unallocated / zero clusters).
-
-And what is actually useful is the number of bytes actually discarded
-down on the host filesystem.
-To achieve that, driver-specific statistics has been added to blockstats
-(patch 9).
-With patch 8, file-posix driver accounts discard operations on its level too.
-
-query-blockstat result:
-
-(note the difference between blockdevice unmap and file discard stats. qcow2
-sends fewer ops down to the file as the clusters are actually unallocated
-on qcow2 level)
-
-    {
-      "device": "drive-scsi0-0-0-0",
-      "node-name": "#block159",
-      "stats": {
->       "invalid_unmap_operations": 0,
->       "failed_unmap_operations": 0,
-        "wr_highest_offset": 13411688448,
-        "rd_total_time_ns": 2859566315,
-        "rd_bytes": 103182336,
-        "rd_merged": 0,
-        "flush_operations": 19,
-        "invalid_wr_operations": 0,
-        "flush_total_time_ns": 23111608,
-        "failed_rd_operations": 0,
-        "failed_flush_operations": 0,
-        "invalid_flush_operations": 0,
-        "timed_stats": [
-          
-        ],
-        "wr_merged": 0,
-        "wr_bytes": 1702912,
->       "unmap_bytes": 11954954240,
->       "unmap_operations": 865,
-        "idle_time_ns": 2669508623,
-        "account_invalid": true,
->       "unmap_total_time_ns": 19698002,
-        "wr_operations": 143,
-        "failed_wr_operations": 0,
-        "rd_operations": 4816,
-        "account_failed": true,
->       "unmap_merged": 0,
-        "wr_total_time_ns": 1262686124,
-        "invalid_rd_operations": 0
-      },
-      "parent": {
->       "driver-specific": {
->         "discard-nb-failed": 0,
->         "discard-bytes-ok": 720896,
->         "driver": "file",
->         "discard-nb-ok": 8
->       },
-        "node-name": "#block009",
-        "stats": {
-        [..]
-        }
-      }
-    },
-    {
-      "device": "floppy0",
-
-Anton Nefedov (9):
-  qapi: group BlockDeviceStats fields
-  qapi: add unmap to BlockDeviceStats
-  block: add empty account cookie type
-  ide: account UNMAP (TRIM) operations
-  scsi: store unmap offset and nb_sectors in request struct
-  scsi: move unmap error checking to the complete callback
-  scsi: account unmap operations
-  file-posix: account discard operations
-  qapi: query-blockstat: add driver specific file-posix stats
-
- qapi/block-core.json       | 81 ++++++++++++++++++++++++++++++++------
- include/block/accounting.h |  2 +
- include/block/block.h      |  1 +
- include/block/block_int.h  |  1 +
- block.c                    |  9 +++++
- block/accounting.c         |  6 +++
- block/file-posix.c         | 54 ++++++++++++++++++++++++-
- block/qapi.c               | 11 ++++++
- hw/ide/core.c              | 12 ++++++
- hw/scsi/scsi-disk.c        | 34 ++++++++++------
- tests/qemu-iotests/227.out | 18 +++++++++
- 11 files changed, 206 insertions(+), 23 deletions(-)
-
--- 
-2.17.1
-
+thanks
+-- PMM
 
