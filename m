@@ -6,61 +6,106 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C21C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:59:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83C57C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 09:02:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E029F20820
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:59:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E029F20820
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 532BF20835
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 09:02:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 532BF20835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCKCA-0007Ns-Qu
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 04:59:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47554)
+	id 1iCKF2-0000Qp-13
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 05:02:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46957)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iCJoj-0003At-7l
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:35:34 -0400
+ (envelope-from <david@redhat.com>) id 1iCJlN-0008Nr-JG
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:32:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iCJoh-0001ww-E7
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:35:32 -0400
-Received: from mga01.intel.com ([192.55.52.88]:24355)
+ (envelope-from <david@redhat.com>) id 1iCJlM-00008T-EN
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:32:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45936)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iCJoh-0001un-5q
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:35:31 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 23 Sep 2019 01:35:26 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,539,1559545200"; d="scan'208";a="388411360"
-Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.214])
- ([10.239.196.214])
- by fmsmga005.fm.intel.com with ESMTP; 23 Sep 2019 01:35:23 -0700
-Subject: Re: [PATCH v3 2/2] target/i386: drop the duplicated definition of
- cpuid AVX512_VBMI marco
-To: Stefano Garzarella <sgarzare@redhat.com>
-References: <20190923063041.12420-1-tao3.xu@intel.com>
- <20190923063041.12420-3-tao3.xu@intel.com>
- <20190923080816.hzfzikw5mx4n3ejn@steredhat>
-From: Tao Xu <tao3.xu@intel.com>
-Message-ID: <b525b663-4a90-58b1-90e3-6c0b5b22e7d1@intel.com>
-Date: Mon, 23 Sep 2019 16:35:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iCJlM-00008D-6P
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:32:04 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7A55318CB8E1;
+ Mon, 23 Sep 2019 08:32:03 +0000 (UTC)
+Received: from [10.36.116.207] (ovpn-116-207.ams2.redhat.com [10.36.116.207])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 488D761F21;
+ Mon, 23 Sep 2019 08:31:59 +0000 (UTC)
+Subject: Re: [PATCH v3 07/20] exec: Cache TARGET_PAGE_MASK for
+ TARGET_PAGE_BITS_VARY
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190922035458.14879-1-richard.henderson@linaro.org>
+ <20190922035458.14879-8-richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <47d1d688-f89f-3c89-07a5-7d4a9816bf96@redhat.com>
+Date: Mon, 23 Sep 2019 10:31:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190923080816.hzfzikw5mx4n3ejn@steredhat>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190922035458.14879-8-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.88
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Mon, 23 Sep 2019 08:32:03 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,63 +117,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, philmd@redhat.com,
- ehabkost@redhat.com, rth@twiddle.net
+Cc: pbonzini@redhat.com, alex.bennee@linaro.org, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/23/2019 4:08 PM, Stefano Garzarella wrote:
-> On Mon, Sep 23, 2019 at 02:30:41PM +0800, Tao Xu wrote:
->> Drop the duplicated definition of cpuid AVX512_VBMI marco and rename it
->> as CPUID_7_0_ECX_AVX512_VBMI.
->>
->> Signed-off-by: Tao Xu <tao3.xu@intel.com>
->> ---
->>   target/i386/cpu.c           | 4 ++--
->>   target/i386/cpu.h           | 3 +--
->>   target/i386/hvf/x86_cpuid.c | 2 +-
->>   3 files changed, 4 insertions(+), 5 deletions(-)
->>
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index 9e0bac31e8..f87fe88259 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -2412,7 +2412,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
->>               CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
->>               CPUID_7_0_EBX_SMAP,
->>           .features[FEAT_7_0_ECX] =
->> -            CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
->> +            CPUID_7_0_ECX_AVX512_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
->>               CPUID_7_0_ECX_VBMI2 | CPUID_7_0_ECX_GFNI |
->>               CPUID_7_0_ECX_VAES | CPUID_7_0_ECX_VPCLMULQDQ |
->>               CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG |
->> @@ -2470,7 +2470,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
->>               CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
->>               CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
->>           .features[FEAT_7_0_ECX] =
->> -            CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
->> +            CPUID_7_0_ECX_AVX512_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
->>               CPUID_7_0_ECX_VBMI2 | CPUID_7_0_ECX_GFNI |
->>               CPUID_7_0_ECX_VAES | CPUID_7_0_ECX_VPCLMULQDQ |
->>               CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG |
->> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
->> index fa4c4cad79..61f6287294 100644
->> --- a/target/i386/cpu.h
->> +++ b/target/i386/cpu.h
->> @@ -695,8 +695,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->>   #define CPUID_7_0_EBX_AVX512VL          (1U << 31)
->>   
->>   /* AVX-512 Vector Byte Manipulation Instruction */
->> -#define CPUID_7_0_ECX_AVX512BMI         (1U << 1)
->> -#define CPUID_7_0_ECX_VBMI              (1U << 1)
->> +#define CPUID_7_0_ECX_AVX512_VBMI       (1U << 1)
+On 22.09.19 05:54, Richard Henderson wrote:
+> This eliminates a set of runtime shifts.  It turns out that we
+> require TARGET_PAGE_MASK more often than TARGET_PAGE_SIZE, so
+> redefine TARGET_PAGE_SIZE based on TARGET_PAGE_MASK instead of
+> the other way around.
 > 
-> Since we're here, should we also update CPUID_7_0_ECX_VBMI2?
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  include/exec/cpu-all.h | 8 ++++++--
+>  exec-vary.c            | 1 +
+>  2 files changed, 7 insertions(+), 2 deletions(-)
 > 
-> Thanks,
-> Stefano
+> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+> index 5246770271..2db73c7a27 100644
+> --- a/include/exec/cpu-all.h
+> +++ b/include/exec/cpu-all.h
+> @@ -213,19 +213,23 @@ static inline void stl_phys_notdirty(AddressSpace *as, hwaddr addr, uint32_t val
+>  typedef struct {
+>      bool decided;
+>      int bits;
+> +    target_long mask;
+>  } TargetPageBits;
+>  extern const TargetPageBits target_page;
+>  # ifdef CONFIG_DEBUG_TCG
+>  #  define TARGET_PAGE_BITS (assert(target_page.decided), target_page.bits)
+> +#  define TARGET_PAGE_MASK (assert(target_page.decided), target_page.mask)
+>  # else
+>  #  define TARGET_PAGE_BITS target_page.bits
+> +#  define TARGET_PAGE_MASK target_page.mask
+>  # endif
+> +# define TARGET_PAGE_SIZE  ((int)-TARGET_PAGE_MASK)
+>  #else
+>  #define TARGET_PAGE_BITS_MIN TARGET_PAGE_BITS
+> +#define TARGET_PAGE_SIZE   (1 << TARGET_PAGE_BITS)
+> +#define TARGET_PAGE_MASK   ((target_long)-1 << TARGET_PAGE_BITS)
+>  #endif
+>  
+> -#define TARGET_PAGE_SIZE (1 << TARGET_PAGE_BITS)
+> -#define TARGET_PAGE_MASK ((target_long)-1 << TARGET_PAGE_BITS)
+>  #define TARGET_PAGE_ALIGN(addr) \
+>      (((addr) + ~TARGET_PAGE_MASK) & TARGET_PAGE_MASK)
+>  
+> diff --git a/exec-vary.c b/exec-vary.c
+> index 67cdf57a9c..26daf281f2 100644
+> --- a/exec-vary.c
+> +++ b/exec-vary.c
+> @@ -83,5 +83,6 @@ void finalize_target_page_bits(void)
+>          init_target_page.bits = TARGET_PAGE_BITS_MIN;
+>      }
+>      init_target_page.decided = true;
+> +    init_target_page.mask = (target_long)-1 << init_target_page.bits;
+>  #endif
+>  }
 > 
-Thank you for reminding me. I check the vmbi2's flag is 'avx512_vbmi2'. 
-And linux kernel source and SDM also use AVX512_VBMI2. I will update this.
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+-- 
+
+Thanks,
+
+David / dhildenb
 
