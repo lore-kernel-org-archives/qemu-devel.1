@@ -2,57 +2,57 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5F90C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:33:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C30DC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:33:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 765A22064A
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:33:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 765A22064A
+	by mail.kernel.org (Postfix) with ESMTPS id 7075E2064A
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:33:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7075E2064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCJmF-0000QS-4A
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 04:32:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43134)
+	id 1iCJmS-0000fn-2I
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 04:33:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42910)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iCJOP-0002f8-P7
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:08:22 -0400
+ (envelope-from <david@redhat.com>) id 1iCJO1-0002C1-GE
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:07:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iCJOO-0004Nw-Le
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:08:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57090)
+ (envelope-from <david@redhat.com>) id 1iCJO0-0004BF-D7
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:07:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47270)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iCJOO-0004NI-G6; Mon, 23 Sep 2019 04:08:20 -0400
+ id 1iCJO0-0004Ax-85; Mon, 23 Sep 2019 04:07:56 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ADDED10CC1F0;
- Mon, 23 Sep 2019 08:08:19 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8138989810B;
+ Mon, 23 Sep 2019 08:07:55 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0989B19D70;
- Mon, 23 Sep 2019 08:08:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 174A019C78;
+ Mon, 23 Sep 2019 08:07:49 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL 23/30] s390x/tcg: NC: Fault-safe handling
-Date: Mon, 23 Sep 2019 10:07:05 +0200
-Message-Id: <20190923080712.23951-24-david@redhat.com>
+Subject: [PULL 15/30] s390x/tcg: Always use MMU_USER_IDX for CONFIG_USER_ONLY
+Date: Mon, 23 Sep 2019 10:06:57 +0200
+Message-Id: <20190923080712.23951-16-david@redhat.com>
 In-Reply-To: <20190923080712.23951-1-david@redhat.com>
 References: <20190923080712.23951-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Mon, 23 Sep 2019 08:08:19 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.67]); Mon, 23 Sep 2019 08:07:55 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -75,51 +75,64 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We can process a maximum of 256 bytes, crossing two pages.
+Although we basically ignore the index all the time for CONFIG_USER_ONLY,
+let's simply skip all the checks and always return MMU_USER_IDX in
+cpu_mmu_index() and get_mem_index().
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/mem_helper.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+ target/s390x/cpu.h       | 4 ++++
+ target/s390x/translate.c | 4 ++++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 0d4e0bc45a..a97e4aa535 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -329,17 +329,26 @@ static int mmu_idx_from_as(uint8_t as)
- static uint32_t do_helper_nc(CPUS390XState *env, uint32_t l, uint64_t de=
-st,
-                              uint64_t src, uintptr_t ra)
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 79202c0980..163dae13d7 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -328,6 +328,9 @@ extern const VMStateDescription vmstate_s390_cpu;
+=20
+ static inline int cpu_mmu_index(CPUS390XState *env, bool ifetch)
  {
-+    const int mmu_idx =3D cpu_mmu_index(env, false);
-+    S390Access srca1, srca2, desta;
-     uint32_t i;
-     uint8_t c =3D 0;
-=20
-     HELPER_LOG("%s l %d dest %" PRIx64 " src %" PRIx64 "\n",
-                __func__, l, dest, src);
-=20
--    for (i =3D 0; i <=3D l; i++) {
--        uint8_t x =3D cpu_ldub_data_ra(env, src + i, ra);
--        x &=3D cpu_ldub_data_ra(env, dest + i, ra);
-+    /* NC always processes one more byte than specified - maximum is 256=
- */
-+    l++;
-+
-+    srca1 =3D access_prepare(env, src, l, MMU_DATA_LOAD, mmu_idx, ra);
-+    srca2 =3D access_prepare(env, dest, l, MMU_DATA_LOAD, mmu_idx, ra);
-+    desta =3D access_prepare(env, dest, l, MMU_DATA_STORE, mmu_idx, ra);
-+    for (i =3D 0; i < l; i++) {
-+        const uint8_t x =3D access_get_byte(env, &srca1, i, ra) &
-+                          access_get_byte(env, &srca2, i, ra);
-+
-         c |=3D x;
--        cpu_stb_data_ra(env, dest + i, x, ra);
-+        access_set_byte(env, &desta, i, x, ra);
++#ifdef CONFIG_USER_ONLY
++    return MMU_USER_IDX;
++#else
+     if (!(env->psw.mask & PSW_MASK_DAT)) {
+         return MMU_REAL_IDX;
      }
-     return c !=3D 0;
+@@ -351,6 +354,7 @@ static inline int cpu_mmu_index(CPUS390XState *env, b=
+ool ifetch)
+     default:
+         abort();
+     }
++#endif
  }
+=20
+ static inline void cpu_get_tb_cpu_state(CPUS390XState* env, target_ulong=
+ *pc,
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index b0a2500e5f..a3e43ff9ec 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -318,6 +318,9 @@ static inline uint64_t ld_code4(CPUS390XState *env, u=
+int64_t pc)
+=20
+ static int get_mem_index(DisasContext *s)
+ {
++#ifdef CONFIG_USER_ONLY
++    return MMU_USER_IDX;
++#else
+     if (!(s->base.tb->flags & FLAG_MASK_DAT)) {
+         return MMU_REAL_IDX;
+     }
+@@ -333,6 +336,7 @@ static int get_mem_index(DisasContext *s)
+         tcg_abort();
+         break;
+     }
++#endif
+ }
+=20
+ static void gen_exception(int excp)
 --=20
 2.21.0
 
