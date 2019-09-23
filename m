@@ -2,79 +2,66 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11054C04EBF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 14:28:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D378C04EBF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 14:30:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE67720820
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 14:28:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oplEybGO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE67720820
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 490A821655
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 14:30:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 490A821655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCPJr-0006g2-Rg
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 10:28:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38404)
+	id 1iCPLn-0007k7-7F
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 10:30:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38771)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iCPIX-0005tI-1Z
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 10:26:41 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1iCPKr-0007D0-EK
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 10:29:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iCPIV-00059S-J6
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 10:26:40 -0400
-Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:46213)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iCPIV-000593-E0
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 10:26:39 -0400
-Received: by mail-oi1-x230.google.com with SMTP id k25so7688058oiw.13
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 07:26:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=pUJMIwlRC35F16IRiTlQDkb1yg7LBO645U7ovCDYNHY=;
- b=oplEybGOj94kRtAl4BAk7qozkQ5wwZHAIBCbTI24++1ZEMimGNWmG8T9MJQzVSuygc
- dABvyyzpx881DTImAelxjfs8xaBIQoAwgCW8Jc/opmHQli3cFHNMBtyCn/qsFHMYb9YB
- 187HBaKYObLcQXVwqSB0X1zozWMYEDx4w1ltHpXd/I2S5vAG+K9iGSQnqZYF18oF+7dC
- pRBp1MRuAMsE5ymirR6ECoPwMd1Y93RXy3Wi2I0qCd6IxhSolODnbyUIiHR8vPM1vKVt
- MAKfY6uERcCRmxmxKK4fXReLfuBGKajevx2vNgqlgEuHFHmsGK/s7t5LeBRCxh/1TUFP
- 3xJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=pUJMIwlRC35F16IRiTlQDkb1yg7LBO645U7ovCDYNHY=;
- b=r2NESlQfFqj+gh10rKZHFwGR2cMPvsvML5zI7nnKKJzWjVRgrY+tsQSab6upeKzboy
- vnMO8mrt7CbujofXga5JnLBJKHc+Sl9XJ8J6JA4TmQq1hrXp+l9kt4tWaFbY1uaJDf3a
- 8bCmo7rRAxDOZ05LHacqQSvKjExJB80hxt+KbNPvW2A72il3jmBGomRCJzSmea+2q4kr
- lG9GZnANd9KPh87cNwol4cqGxpCVsjyEbpIqH8rky8otmj/cv808QesOkH7jU0vaszZ1
- j/HbdM0EfN0wRvVo8JNFUYBeCzMOLGbVhMW25bcB7Db/zlhIgwn43cxAVcH/LWRIZEdQ
- tJbg==
-X-Gm-Message-State: APjAAAWv1xkNAH67Pm2HHEWMUSloxhgcnrS6Mm35NPYZ4fxulGaSzq3W
- 07hcwv9Vbl5C90fty7xkdC7zpsZr8pFTPdXWA9o9Xg==
-X-Google-Smtp-Source: APXvYqwbT+rb+p2T2DHMlCQ7A19q3SBaFY7NfS+flRFNR9vrv55gkSExQuB/frLaIPbizj1hPm2MLz/9MA2SmOYWgQo=
-X-Received: by 2002:aca:53d4:: with SMTP id h203mr268247oib.146.1569248796367; 
- Mon, 23 Sep 2019 07:26:36 -0700 (PDT)
+ (envelope-from <eric.auger@redhat.com>) id 1iCPKq-0006g8-6i
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 10:29:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52601)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1iCPKm-0006dU-1G; Mon, 23 Sep 2019 10:29:00 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4F6B730ADBAA;
+ Mon, 23 Sep 2019 14:28:59 +0000 (UTC)
+Received: from [10.36.116.30] (ovpn-116-30.ams2.redhat.com [10.36.116.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D8E7260FB6;
+ Mon, 23 Sep 2019 14:28:43 +0000 (UTC)
+Subject: Re: [PATCH 1/4] target/arm: Make cpu_register() and set_feature()
+ available for other files
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20190921150420.30743-1-thuth@redhat.com>
+ <20190921150420.30743-2-thuth@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <9457e42b-8550-561a-d2d0-7dce076af200@redhat.com>
+Date: Mon, 23 Sep 2019 16:28:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <20190923073921.13357-1-borntraeger@de.ibm.com>
-In-Reply-To: <20190923073921.13357-1-borntraeger@de.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 23 Sep 2019 15:26:25 +0100
-Message-ID: <CAFEAcA-nxLF2HooiEUkVAnL_q04zAOMzVkvfug7ed4Q0pXcrKQ@mail.gmail.com>
-Subject: Re: [PULL 0/5] s390x update
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::230
+In-Reply-To: <20190921150420.30743-2-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Mon, 23 Sep 2019 14:28:59 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,44 +73,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yifan Luo <luoyifan@cmss.chinamobile.com>, Thomas Huth <thuth@redhat.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 23 Sep 2019 at 08:39, Christian Borntraeger
-<borntraeger@de.ibm.com> wrote:
->
-> Peter,
->
-> here is the non-tcg subset of the s390x updates.
->
->
-> The following changes since commit 4300b7c2cd9f3f273804e8cca325842ccb93b1ad:
->
->   Merge remote-tracking branch 'remotes/cleber/tags/python-next-pull-request' into staging (2019-09-20 17:28:43 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/borntraeger/qemu.git tags/s390x-20190923
->
-> for you to fetch changes up to 7505deca0bfa859136ec6419dbafc504f22fcac2:
->
->   s390x/cpumodel: Add the z15 name to the description of gen15a (2019-09-23 09:15:28 +0200)
->
-> ----------------------------------------------------------------
-> - bugfixes in ccw bios
-> - gen15a is called z15
-> - officially require a 3.15 kernel or later for kvm
->
+Hi Thomas,
 
-Applied, thanks.
+On 9/21/19 5:04 PM, Thomas Huth wrote:
+> Move the common set_feature() and unset_feature() functions from cpu.c and
+> cpu64.c to internals.h, and make cpu_register() (renamed to arm_cpu_register())
+> available from there, too, so we can register CPUs also from other files
+> in the future.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
+Thanks
 
--- PMM
+Eric
+> ---
+>  target/arm/cpu.c       | 20 ++------------------
+>  target/arm/cpu64.c     | 17 +----------------
+>  target/arm/internals.h | 18 ++++++++++++++++++
+>  3 files changed, 21 insertions(+), 34 deletions(-)
+> 
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 2399c14471..f1f9eecdc8 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -614,16 +614,6 @@ static bool arm_cpu_virtio_is_big_endian(CPUState *cs)
+>  
+>  #endif
+>  
+> -static inline void set_feature(CPUARMState *env, int feature)
+> -{
+> -    env->features |= 1ULL << feature;
+> -}
+> -
+> -static inline void unset_feature(CPUARMState *env, int feature)
+> -{
+> -    env->features &= ~(1ULL << feature);
+> -}
+> -
+>  static int
+>  print_insn_thumb1(bfd_vma pc, disassemble_info *info)
+>  {
+> @@ -2515,12 +2505,6 @@ static void arm_max_initfn(Object *obj)
+>  
+>  #endif /* !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64) */
+>  
+> -struct ARMCPUInfo {
+> -    const char *name;
+> -    void (*initfn)(Object *obj);
+> -    void (*class_init)(ObjectClass *oc, void *data);
+> -};
+> -
+>  static const ARMCPUInfo arm_cpus[] = {
+>  #if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
+>      { .name = "arm926",      .initfn = arm926_initfn },
+> @@ -2681,7 +2665,7 @@ static void cpu_register_class_init(ObjectClass *oc, void *data)
+>      acc->info = data;
+>  }
+>  
+> -static void cpu_register(const ARMCPUInfo *info)
+> +void arm_cpu_register(const ARMCPUInfo *info)
+>  {
+>      TypeInfo type_info = {
+>          .parent = TYPE_ARM_CPU,
+> @@ -2722,7 +2706,7 @@ static void arm_cpu_register_types(void)
+>      type_register_static(&idau_interface_type_info);
+>  
+>      while (info->name) {
+> -        cpu_register(info);
+> +        arm_cpu_register(info);
+>          info++;
+>      }
+>  
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index d7f5bf610a..5239ba5529 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -21,6 +21,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "cpu.h"
+> +#include "internals.h"
+>  #include "qemu/module.h"
+>  #if !defined(CONFIG_USER_ONLY)
+>  #include "hw/loader.h"
+> @@ -29,16 +30,6 @@
+>  #include "kvm_arm.h"
+>  #include "qapi/visitor.h"
+>  
+> -static inline void set_feature(CPUARMState *env, int feature)
+> -{
+> -    env->features |= 1ULL << feature;
+> -}
+> -
+> -static inline void unset_feature(CPUARMState *env, int feature)
+> -{
+> -    env->features &= ~(1ULL << feature);
+> -}
+> -
+>  #ifndef CONFIG_USER_ONLY
+>  static uint64_t a57_a53_l2ctlr_read(CPUARMState *env, const ARMCPRegInfo *ri)
+>  {
+> @@ -396,12 +387,6 @@ static void aarch64_max_initfn(Object *obj)
+>      }
+>  }
+>  
+> -struct ARMCPUInfo {
+> -    const char *name;
+> -    void (*initfn)(Object *obj);
+> -    void (*class_init)(ObjectClass *oc, void *data);
+> -};
+> -
+>  static const ARMCPUInfo aarch64_cpus[] = {
+>      { .name = "cortex-a57",         .initfn = aarch64_a57_initfn },
+>      { .name = "cortex-a53",         .initfn = aarch64_a53_initfn },
+> diff --git a/target/arm/internals.h b/target/arm/internals.h
+> index 232d963875..e71196ed5f 100644
+> --- a/target/arm/internals.h
+> +++ b/target/arm/internals.h
+> @@ -1046,4 +1046,22 @@ void arm_log_exception(int idx);
+>  
+>  #endif /* !CONFIG_USER_ONLY */
+>  
+> +static inline void set_feature(CPUARMState *env, int feature)
+> +{
+> +    env->features |= 1ULL << feature;
+> +}
+> +
+> +static inline void unset_feature(CPUARMState *env, int feature)
+> +{
+> +    env->features &= ~(1ULL << feature);
+> +}
+> +
+> +struct ARMCPUInfo {
+> +    const char *name;
+> +    void (*initfn)(Object *obj);
+> +    void (*class_init)(ObjectClass *oc, void *data);
+> +};
+> +
+> +void arm_cpu_register(const ARMCPUInfo *info);
+> +
+>  #endif
+> 
 
