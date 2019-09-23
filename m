@@ -2,52 +2,50 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A2D7C432C1
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 21:34:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4270C432C1
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 21:41:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CAEE206C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 21:34:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CAEE206C2
+	by mail.kernel.org (Postfix) with ESMTPS id B0129206C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 21:41:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0129206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCVyi-0000gD-72
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 17:34:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47106)
+	id 1iCW5M-0002hW-T3
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 17:41:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48090)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iCVx4-0008LG-AX
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 17:32:59 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iCW4T-0002Dm-5r
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 17:40:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iCVx1-0001IW-R1
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 17:32:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36844)
+ (envelope-from <jsnow@redhat.com>) id 1iCW4R-0004ZF-OM
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 17:40:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44812)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iCVwv-0001FF-TE
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 17:32:51 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iCW4O-00047p-EQ; Mon, 23 Sep 2019 17:40:32 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5ED13368DA;
- Mon, 23 Sep 2019 21:32:48 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 80E6518C426E;
+ Mon, 23 Sep 2019 21:40:31 +0000 (UTC)
 Received: from [10.18.17.231] (dhcp-17-231.bos.redhat.com [10.18.17.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 14DB96012D;
- Mon, 23 Sep 2019 21:32:45 +0000 (UTC)
-Subject: Re: Debian support lifetime (was Re: [PATCH] docker: move tests from
- python2 to python3)
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20190920200049.27216-1-jsnow@redhat.com>
- <20190923145057.GC9445@dhcp-17-179.bos.redhat.com>
- <6ac39e69-4982-dc35-d853-fedbb1c12e1a@redhat.com>
- <20190923190533.GR5035@habkost.net>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DB6A360920;
+ Mon, 23 Sep 2019 21:40:27 +0000 (UTC)
+Subject: Re: [Qemu-block] [PATCH v6 5/8] bootdevice: Gather LCHS from all
+ relevant devices
+To: Sam Eiderman <sameid@google.com>, qemu-devel@nongnu.org
+References: <20190827082427.64280-1-sameid@google.com>
+ <20190827082427.64280-6-sameid@google.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -123,18 +121,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <0f7e2e17-73cd-5c44-f758-00d4d1156a58@redhat.com>
-Date: Mon, 23 Sep 2019 17:32:44 -0400
+Message-ID: <4fa29595-c229-bc90-2a73-8d3581cc6a43@redhat.com>
+Date: Mon, 23 Sep 2019 17:40:27 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190923190533.GR5035@habkost.net>
+In-Reply-To: <20190827082427.64280-6-sameid@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Mon, 23 Sep 2019 21:32:48 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Mon, 23 Sep 2019 21:40:31 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -148,132 +146,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org,
+ Arbel Moshe <arbel.moshe@oracle.com>, seabios@seabios.org, kevin@koconnor.net,
+ liran.alon@oracle.com, kraxel@redhat.com,
+ Sam Eiderman <shmuel.eiderman@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/23/19 3:05 PM, Eduardo Habkost wrote:
-> On Mon, Sep 23, 2019 at 01:19:41PM -0400, John Snow wrote:
->> On 9/23/19 10:50 AM, Cleber Rosa wrote:
-> [...]
->>>> diff --git a/tests/docker/dockerfiles/debian-xtensa-cross.docker b/tests/docker/dockerfiles/debian-xtensa-cross.docker
->>>> index b9c2e2e531..e6f93f65ee 100644
->>>> --- a/tests/docker/dockerfiles/debian-xtensa-cross.docker
->>>> +++ b/tests/docker/dockerfiles/debian-xtensa-cross.docker
->>>> @@ -18,7 +18,7 @@ RUN apt-get update && \
->>>>          flex \
->>>>          gettext \
->>>>          git \
->>>> -        python-minimal
->>>> +        python3-minimal
->>>
->>> I'm getting Python 3.5.3-1+deb9u1 here, so it LGTM.
->>>
->>
->> Oh, that's actually a bit of a problem. I tested on 3.5+, but I think
->> some people want 3.6+.
->>
->> I don't know much about Debian, but we either need to guarantee 3.6+ or
->> backtrack our plans to 3.5+.
+On 8/27/19 4:24 AM, Sam Eiderman via Qemu-block wrote:
+> From: Sam Eiderman <shmuel.eiderman@oracle.com>
 > 
-> Good catch.  I forgot we were going to keep 3.5 support because
-> of Debian 9.
+> Relevant devices are:
+>     * ide-hd (and ide-cd, ide-drive)
+>     * scsi-hd (and scsi-cd, scsi-disk, scsi-block)
+>     * virtio-blk-pci
 > 
-> Now, I'd like to clarify what the wording on our supported build
-> platforms documentation is supposed to mean for Debian.
+> We do not call del_boot_device_lchs() for ide-* since we don't need to -
+> IDE block devices do not support unplugging.
 > 
-> The document says:
+> Signed-off-by: Sam Eiderman <sameid@google.com>
+> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+> Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
+> Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+
+Acked-by: John Snow <jsnow@redhat.com>
+
+> ---
+>  hw/block/virtio-blk.c |  6 ++++++
+>  hw/ide/qdev.c         |  5 +++++
+>  hw/scsi/scsi-disk.c   | 12 ++++++++++++
+>  3 files changed, 23 insertions(+)
 > 
-> ] For distributions with frequent, short-lifetime releases, the project will
-> ] aim to support all versions that are not end of life by their respective
-> ] vendors. For the purposes of identifying supported software versions, the
-> ] project will look at Fedora, Ubuntu, and openSUSE distros. Other short-
-> ] lifetime distros will be assumed to ship similar software versions.
-> ] 
-
-Fedora has a release every 6-9 months, and averages a support lifetime
-of a little over a year, and never more than two years.
-
-Debian releases once every two years since 2005, and has a support cycle
-that averages about 3 years. (Notably, this means a release reaches EOL
-one year after the next release.)
-
-Ubuntu releases every six months, with support for just eight months.
-
-OpenSUSE has a release about every year or so; support is presently 18
-months.
-
-> ] For distributions with long-lifetime releases, the project will aim to support
-> ] the most recent major version at all times. Support for the previous major
-> ] version will be dropped 2 years after the new major version is released. For
-> ] the purposes of identifying supported software versions, the project will look
-> ] at RHEL, Debian, Ubuntu LTS, and SLES distros. Other long-lifetime distros will
-> ] be assumed to ship similar software versions.
+> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> index 18851601cb..6d8ff34a16 100644
+> --- a/hw/block/virtio-blk.c
+> +++ b/hw/block/virtio-blk.c
+> @@ -1186,6 +1186,11 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
+>      blk_set_guest_block_size(s->blk, s->conf.conf.logical_block_size);
+>  
+>      blk_iostatus_enable(s->blk);
+> +
+> +    add_boot_device_lchs(dev, "/disk@0,0",
+> +                         conf->conf.lcyls,
+> +                         conf->conf.lheads,
+> +                         conf->conf.lsecs);
+>  }
+>  
+>  static void virtio_blk_device_unrealize(DeviceState *dev, Error **errp)
+> @@ -1193,6 +1198,7 @@ static void virtio_blk_device_unrealize(DeviceState *dev, Error **errp)
+>      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+>      VirtIOBlock *s = VIRTIO_BLK(dev);
+>  
+> +    del_boot_device_lchs(dev, "/disk@0,0");
+>      virtio_blk_data_plane_destroy(s->dataplane);
+>      s->dataplane = NULL;
+>      qemu_del_vm_change_state_handler(s->change);
+> diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+> index 6dd219944f..2ffd387a73 100644
+> --- a/hw/ide/qdev.c
+> +++ b/hw/ide/qdev.c
+> @@ -220,6 +220,11 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
+>  
+>      add_boot_device_path(dev->conf.bootindex, &dev->qdev,
+>                           dev->unit ? "/disk@1" : "/disk@0");
+> +
+> +    add_boot_device_lchs(&dev->qdev, dev->unit ? "/disk@1" : "/disk@0",
+> +                         dev->conf.lcyls,
+> +                         dev->conf.lheads,
+> +                         dev->conf.lsecs);
+>  }
+>  
+>  static void ide_dev_get_bootindex(Object *obj, Visitor *v, const char *name,
+> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+> index 915641a0f1..d19896fe4d 100644
+> --- a/hw/scsi/scsi-disk.c
+> +++ b/hw/scsi/scsi-disk.c
+> @@ -35,6 +35,7 @@
+>  #include "hw/block/block.h"
+>  #include "hw/qdev-properties.h"
+>  #include "sysemu/dma.h"
+> +#include "sysemu/sysemu.h"
+>  #include "qemu/cutils.h"
+>  #include "trace.h"
+>  
+> @@ -2402,6 +2403,16 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
+>      blk_set_guest_block_size(s->qdev.conf.blk, s->qdev.blocksize);
+>  
+>      blk_iostatus_enable(s->qdev.conf.blk);
+> +
+> +    add_boot_device_lchs(&dev->qdev, NULL,
+> +                         dev->conf.lcyls,
+> +                         dev->conf.lheads,
+> +                         dev->conf.lsecs);
+> +}
+> +
+> +static void scsi_unrealize(SCSIDevice *dev, Error **errp)
+> +{
+> +    del_boot_device_lchs(&dev->qdev, NULL);
+>  }
+>  
+>  static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
+> @@ -3006,6 +3017,7 @@ static void scsi_hd_class_initfn(ObjectClass *klass, void *data)
+>      SCSIDeviceClass *sc = SCSI_DEVICE_CLASS(klass);
+>  
+>      sc->realize      = scsi_hd_realize;
+> +    sc->unrealize    = scsi_unrealize;
+>      sc->alloc_req    = scsi_new_request;
+>      sc->unit_attention_reported = scsi_disk_unit_attention_reported;
+>      dc->desc = "virtual SCSI disk";
 > 
-
-Here's an enumeration of supported long-lifetime build platforms as
-interpreted from the above text; using standard end-of-service dates
-(EOS) when available in preference to EOL dates for special support
-contracts.
-
-RHEL6: 2010 - 2016 [EOS: 2021]
-RHEL7: 2014 - 2021 [EOS: 2024+]
-RHEL8: 2019 - ??   [EOS: 2029+]
-
-Ubuntu 14.04 LTS: 2014-04 -- 2018-04 [EOS: 2019-04]
-Ubuntu 16.04 LTS: 2016-04 -- 2020-04 [EOS: 2021-04]
-Ubuntu 18.04 LTS: 2018-04 -- 2022-04 [EOS: 2023-04]
-Ubuntu 20.04 LTS: 2020-04 -- 2024-04 [EOS: 2025?]
-
-SLES 11: 2009 - 2016 [EOS: 2019]
-SLES 12: 2014 - 2020 [EOS: 2024]
-SLES 15: 2018 - ~2024? [EOS: 2028]
-
-Debian 8: 2015 - 2019 [EOL: 2018]
-Debian 9: 2017 - 2021 [EOL: ~2020]
-Debian 10: 2019 - ~2023? [EOL: ~2022]
-
-Whoops, our proclaimed support for Debian indeed carries on after its
-EOL by an entire year.
-
-> Debian 10 was released in July 2019.  Are we really willing to
-> support Debian 9 as a supported build platform until July 2021?
-> The Debian Project itself won't support Debian 9 after July 2020.
-> 
-> Even for other long-lifetime distros, I really think "2 years
-> after the new major version is released" is too long, and I'd
-> like to shorten this to 1 year.
-> 
-
-Two years for Debian feels too long, but one year for things like RHEL
-feels too short.
-
-We could treat Debian more like a "short cycle" distro in terms of our
-policy -- it stands out amongst the other long-term distros with its
-relatively short support lifespans.
-
-
-I'd recommend something like the following:
-
-For both enterprise distributions (Ubuntu LTS, RHEL, SLES) AND community
-distributions (Ubuntu Interim, Debian Stable, Fedora, OpenSUSE); QEMU
-will support previous releases for two years, until the end of standard
-service, or until EOL, whichever occurs first.
-
-In practice: this means 2 years for old versions of SLES, RHEL and
-Ubuntu LTS, but we expire alongside EOL for Debian, Fedora, Ubuntu
-(Interim), and OpenSUSE.
-
-... Or, more or less, it would be like treating Debian as a short-cycle
-project instead of a long-cycle one under our current rules.
-
---js
 
