@@ -2,87 +2,88 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AE7AC3A5A6
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 09:27:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B777C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 09:28:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9F3320673
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 09:26:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DNY2tMAH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9F3320673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C51E420673
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 09:28:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C51E420673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCKcV-0002lJ-3L
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 05:26:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55013)
+	id 1iCKdl-0003dr-TU
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 05:28:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55216)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1iCKbT-00023Y-8S
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 05:25:56 -0400
+ (envelope-from <philmd@redhat.com>) id 1iCKd2-0003FC-Ix
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 05:27:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1iCKbR-0001TN-Rq
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 05:25:55 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43807)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iCKbR-0001S8-HA
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 05:25:53 -0400
-Received: by mail-wr1-x444.google.com with SMTP id q17so13059855wrx.10
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 02:25:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=Di+FjqbLdJNjZf++OEu4rj9a0E/g9qvQ7pQiL7oy6PQ=;
- b=DNY2tMAHL8eVuk+ZqjGbMeF3rvLb0ZNOKz/syTaEGcPQwIBfaqyX6AdbIxeLNSP+Nf
- I5aMcOquXpl4dff6OgU0SvfPL3G8AmR6hEoZOZpNZBT3QhbqkSEJ2xRpwLKRMFbpzmL4
- r0ppbMOcItnrCGY6rdbpdyqekFXiRbw42qa4bA+Pid7jH1WSnXixGZUHrHkBIKb8VpQG
- TqeBNxbamDryx15bxSc81Jdj8n9XvRTbHKNV+GMqJN8I052oattigst/TJ8+uPX2462H
- Z90f0M6VQRIUg5ntxAve016Lp/WhIi4gP6RkzVVj/jDUnbjxNq1okv+0hNCRFaDb13qb
- SHDQ==
+ (envelope-from <philmd@redhat.com>) id 1iCKd0-0002It-Ah
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 05:27:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59748)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iCKd0-0002IY-3E
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 05:27:30 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D9D92883D7
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 09:27:28 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id j2so4608526wre.1
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 02:27:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=Di+FjqbLdJNjZf++OEu4rj9a0E/g9qvQ7pQiL7oy6PQ=;
- b=ko+mXEwq1onyKGmvmMi8d5qMI9lF/u/ZQbb0VIKqVD+PxiqAiTg1DwIFgUo3bIKjfB
- 1ONoKR+ngYs7R5grRue5Y233FgHYvsalHhOfVW/OvBvAoh0Oe3oPyX7eUWLEg3NH0KP+
- ouA6m2fV9N8pNI6iIkcS6+/tb+0fDFh+aenM9LiGIf1POGN5rIHHVXv1ek6kfJwbHa0s
- C1r/GYYqe0VmxyjZjuMN45TQ8VKZp9XqoWjRCqG5P8bGwKBsEsPa1R571TgI9xqS6Ybr
- NPx89kGv3/lPP13fe0Q1AyJOoA++Tak1znb1lzeWfzDO+JJXBocdXplqBzoak0UM7xmV
- U4aw==
-X-Gm-Message-State: APjAAAX/0d1IzJ8HoJBwEvrhsivvDUrsKxX4uQq11C8/q6USns4aSP1P
- 8VjMhJ4TzpcZkjYHv9l3Z9c=
-X-Google-Smtp-Source: APXvYqyWvIHn4VvgTL3yYvB4RdAOwPCARbMuwR1BSrORGVDYoPB1ClclRuK/+QUaHo6qIdz70D1eYg==
-X-Received: by 2002:adf:e5c2:: with SMTP id a2mr20228909wrn.320.1569230751763; 
- Mon, 23 Sep 2019 02:25:51 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id t1sm9590476wrn.57.2019.09.23.02.25.49
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Sep 2019 02:25:50 -0700 (PDT)
-Date: Mon, 23 Sep 2019 10:25:48 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Johannes Berg <johannes@sipsolutions.net>
-Subject: Re: [Qemu-devel] [RFC] contrib: add vhost-user-sim
-Message-ID: <20190923092548.GA26219@stefanha-x1.localdomain>
-References: <20190917122644.15736-1-johannes@sipsolutions.net>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=9Ua4U/U+FHij3vOY2LNNDQg4FMRZt4szrIMF4aMMhUA=;
+ b=QWhl9JahwNcOgiwyFGvKimAcNsuUJ3ZvcCUzbhXkVWlOBq6EgJKgkdeu87/9Izf40t
+ wOrliZwfq/fQVjJRIMlteSaZ/LX3AWxP4ronEku6Ct+o5p1bRr3r1Nr4AYBATYsMk+Mv
+ wkdqAYXe+ioEvO8RVyBV9/WnpGNkXld7Hwhlh/aEE+Zu7nLnI+zZPIEagq99RE/Oxn7o
+ jMhpznVwUnqXBCIXtdA/GyqSJWf0i9+mARQuLgR7XHJKTGk7KmDuSEV2HdnzUCiNtmjC
+ H4I4BZqCTap0k/p1yLyWbMrm+NV+RuejnAdEuPD7emcXhdcgSkv/uIWbXmJnh2My9C/a
+ 6xQg==
+X-Gm-Message-State: APjAAAU4QVcQKcwBqIG1nb6NL2Bdhx7+JJvoCbSLXxnR5BjxogsLcYa9
+ xK3C1jaarlIVLeIeAxoaMQVnclToTu7xiJ8r3gYGer1BKh3Cj+pbenFlvRywdAimnRRtooNgKmD
+ cAyXFvAAzogr1sjo=
+X-Received: by 2002:a1c:7f54:: with SMTP id a81mr13744581wmd.100.1569230847023; 
+ Mon, 23 Sep 2019 02:27:27 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzrJ1Lr6tRtZhMlLeEjHkrKqsvpErDPDVk6QtX9XGrN1RRQOomS+D0RwvbIjPBXoNoMObIoqQ==
+X-Received: by 2002:a1c:7f54:: with SMTP id a81mr13744517wmd.100.1569230845849; 
+ Mon, 23 Sep 2019 02:27:25 -0700 (PDT)
+Received: from [192.168.1.40] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id s12sm16634850wra.82.2019.09.23.02.27.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 23 Sep 2019 02:27:25 -0700 (PDT)
+Subject: Re: [PATCH v3 09/20] cputlb: Replace switches in load/store_helper
+ with callback
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190922035458.14879-1-richard.henderson@linaro.org>
+ <20190922035458.14879-10-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <47985091-499d-fff4-aba4-97be997a38a6@redhat.com>
+Date: Mon, 23 Sep 2019 11:27:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="y0ulUmNC+osPPQO6"
-Content-Disposition: inline
-In-Reply-To: <20190917122644.15736-1-johannes@sipsolutions.net>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+In-Reply-To: <20190922035458.14879-10-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,175 +95,382 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Johannes Berg <johannes.berg@intel.com>,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: pbonzini@redhat.com, alex.bennee@linaro.org, stefanha@redhat.com,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---y0ulUmNC+osPPQO6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Tue, Sep 17, 2019 at 02:26:44PM +0200, Johannes Berg wrote:
-> +static int unix_sock_new(const char *unix_fn)
+On 9/22/19 5:54 AM, Richard Henderson wrote:
+> Add a function parameter to perform the actual load/store to ram.
+> With optimization, this results in identical code.
+>=20
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  accel/tcg/cputlb.c | 159 +++++++++++++++++++++++----------------------
+>  1 file changed, 83 insertions(+), 76 deletions(-)
+>=20
+> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> index 2222b87764..b4a63d3928 100644
+> --- a/accel/tcg/cputlb.c
+> +++ b/accel/tcg/cputlb.c
+> @@ -1280,11 +1280,38 @@ static void *atomic_mmu_lookup(CPUArchState *en=
+v, target_ulong addr,
+> =20
+>  typedef uint64_t FullLoadHelper(CPUArchState *env, target_ulong addr,
+>                                  TCGMemOpIdx oi, uintptr_t retaddr);
+> +typedef uint64_t LoadHelper(const void *);
+> +
+> +/* Wrap the unaligned load helpers to that they have a common signatur=
+e.  */
+> +static inline uint64_t wrap_ldub(const void *haddr)
 > +{
-> +    int sock;
-> +    struct sockaddr_un un;
-> +    size_t len;
-> +
-> +    g_assert(unix_fn);
-> +
-> +    sock = socket(AF_UNIX, SOCK_STREAM, 0);
-> +    if (sock <= 0) {
-> +        perror("socket");
-> +        g_assert(0);
-> +        return -1;
-> +    }
-> +
-> +    un.sun_family = AF_UNIX;
-> +    (void)snprintf(un.sun_path, sizeof(un.sun_path), "%s", unix_fn);
-> +    len = sizeof(un.sun_family) + strlen(un.sun_path);
-
-According to unix(7):
-
-  The addrlen argument that describes the enclosing sockaddr_un
-  structure should have a value of at least:
-
-    offsetof(struct sockaddr_un, sun_path)+strlen(addr.sun_path)+1
-
-  or, more simply, addrlen can be specified as sizeof(struct sockaddr_un).
-
-Please either increase len by 1 or use sizeof(struct sockaddr_un).
-
-> +gboolean vu_net_client_connected(GIOChannel *src,
-> +                                 GIOCondition cond,
-> +                                 gpointer data)
-> +{
-> +    int lsock = g_io_channel_unix_get_fd(src);
-> +    int csock = accept(lsock, NULL, NULL);
-> +    VuNetDev *ndev;
-> +
-> +    if (csock < 0) {
-> +        fprintf(stderr, "Accept error %s\n", strerror(errno));
-> +        return TRUE;
-> +    }
-> +
-> +    ndev = g_new0(VuNetDev, 1);
-> +    if (!ndev) {
-
-g_new0() cannot return NULL, please remove this if statement.
-
-> +static int full_read(int fd, void *_buf, size_t len)
-> +{
-> +    unsigned char *buf = _buf;
-> +    ssize_t ret;
-> +
-> +    do {
-> +        ret = read(fd, buf, len);
-> +        if (ret > 0) {
-> +            buf += ret;
-> +            len -= ret;
-> +        } else if (ret == 0) {
-> +            return 0;
-> +        } else {
-> +            return -errno;
-> +        }
-
-Want to loop on EINTR?
-
-> +    } while (len > 0);
-> +
-> +    return buf - (unsigned char *)_buf;
+> +    return ldub_p(haddr);
 > +}
 > +
-> +static int full_write(int fd, const void *_buf, size_t len)
+> +static inline uint64_t wrap_lduw_be(const void *haddr)
 > +{
-> +    const unsigned char *buf = _buf;
-> +    ssize_t ret;
-> +
-> +    do {
-> +        ret = write(fd, buf, len);
-> +        if (ret > 0) {
-> +            buf += ret;
-> +            len -= ret;
-> +        } else if (ret == 0) {
-> +            return 0;
-> +        } else {
-> +            return -errno;
-
-EINTR?
-
-> +        }
-> +    } while (len > 0);
-> +
-> +    return buf - (const unsigned char *)_buf;
+> +    return lduw_be_p(haddr);
 > +}
 > +
-> +static void simtime_handle_message(SimTimeConnection *conn,
-> +                                   struct um_timetravel_msg *msg)
+> +static inline uint64_t wrap_lduw_le(const void *haddr)
 > +{
-> +    struct um_timetravel_msg resp = {
-> +        .op = UM_TIMETRAVEL_ACK,
-> +    };
+> +    return lduw_le_p(haddr);
+> +}
 > +
-> +    DPRINT(" %d | message %s (%lld, time=%lld)\n",
-> +           conn->idx, simtime_op_str(msg->op), msg->op, msg->time);
+> +static inline uint64_t wrap_ldul_be(const void *haddr)
+> +{
+> +    return (uint32_t)ldl_be_p(haddr);
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+> +}
 > +
-> +    switch (msg->op) {
-> +    case UM_TIMETRAVEL_REQUEST:
-> +        if (calendar_entry_remove(&conn->entry)) {
-> +            conn->entry.time = conn->offset + msg->time;
-> +            calendar_entry_add(&conn->entry);
-> +            DPRINT(" %d | calendar entry added for %lld\n", conn->idx, msg->time);
-> +        } else {
-> +            conn->entry.time = conn->offset + msg->time;
-> +            DPRINT(" %d | calendar entry time updated for %lld\n", conn->idx, msg->time);
-> +        }
-
-Just checking the expected semantics:
-
-If the entry was already added, then we update the time and it stays
-scheduled.  If the entry was not already added then we just stash away
-the time but don't schedule it?
-
-Also, are the DPRINT() messages swapped in the if ... else ... bodies?
-They seem to be talking about the other case.
-
-> +    conn = g_new0(SimTimeConnection, 1);
-> +    if (!conn) {
-> +        return TRUE;
-> +    }
-
-g_new0() does not fail.  If it did, then csock would be leaked here.
-Please drop the if statement.
-
-> diff --git a/include/standard-headers/linux/um_timetravel.h b/include/standard-headers/linux/um_timetravel.h
-> new file mode 100644
-> index 000000000000..3aaced426a92
-> --- /dev/null
-> +++ b/include/standard-headers/linux/um_timetravel.h
-> @@ -0,0 +1,107 @@
-
-Please use scripts/update-linux-headers.sh to import this header file
-with the necessary conversions (e.g. #include <linux/types.h> ->
-#include "standard-headers/linux/types.h", __u64 -> uint64_t).
-
---y0ulUmNC+osPPQO6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2Ij5wACgkQnKSrs4Gr
-c8hD5wgAhaB9+hHzH13S8jZod8OvJnsJZq+VobN+ab9LLyppYm/bLWqfyEepRBrv
-xuH3LWuqThNlxBxpFLthV+UTQ/2zOCPPNgWXz4YhuXWjHwRm8RwO+Pb/ePls4pLA
-sdz1Y0tvHwl0fLx1N1Sf2F8ECtNU6Pr/ZMmphfw3h1Si0Z2k9uIJg5VRKil0Yf3w
-mtND3ZtygIkEE5fJWrETFUiveYq1c/3Im+6so5INNKTnHiE+qcA7k1346P11Ua5H
-dBbVUNAOBuOTKq8nh3n/1IQuwYNjzYhkdwWdbdrQlc6jEgq2rHzoo9j3/0nwBl5R
-YK9pYNZiFFAkErinLU9ihKyYM4/YNw==
-=wOOM
------END PGP SIGNATURE-----
-
---y0ulUmNC+osPPQO6--
+> +static inline uint64_t wrap_ldul_le(const void *haddr)
+> +{
+> +    return (uint32_t)ldl_le_p(haddr);
+> +}
+> =20
+>  static inline uint64_t QEMU_ALWAYS_INLINE
+>  load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
+>              uintptr_t retaddr, MemOp op, bool code_read,
+> -            FullLoadHelper *full_load)
+> +            FullLoadHelper *full_load, LoadHelper *direct)
+>  {
+>      uintptr_t mmu_idx =3D get_mmuidx(oi);
+>      uintptr_t index =3D tlb_index(env, mmu_idx, addr);
+> @@ -1373,33 +1400,7 @@ load_helper(CPUArchState *env, target_ulong addr=
+, TCGMemOpIdx oi,
+> =20
+>   do_aligned_access:
+>      haddr =3D (void *)((uintptr_t)addr + entry->addend);
+> -    switch (op) {
+> -    case MO_UB:
+> -        res =3D ldub_p(haddr);
+> -        break;
+> -    case MO_BEUW:
+> -        res =3D lduw_be_p(haddr);
+> -        break;
+> -    case MO_LEUW:
+> -        res =3D lduw_le_p(haddr);
+> -        break;
+> -    case MO_BEUL:
+> -        res =3D (uint32_t)ldl_be_p(haddr);
+> -        break;
+> -    case MO_LEUL:
+> -        res =3D (uint32_t)ldl_le_p(haddr);
+> -        break;
+> -    case MO_BEQ:
+> -        res =3D ldq_be_p(haddr);
+> -        break;
+> -    case MO_LEQ:
+> -        res =3D ldq_le_p(haddr);
+> -        break;
+> -    default:
+> -        g_assert_not_reached();
+> -    }
+> -
+> -    return res;
+> +    return direct(haddr);
+>  }
+> =20
+>  /*
+> @@ -1415,7 +1416,8 @@ load_helper(CPUArchState *env, target_ulong addr,=
+ TCGMemOpIdx oi,
+>  static uint64_t full_ldub_mmu(CPUArchState *env, target_ulong addr,
+>                                TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+> -    return load_helper(env, addr, oi, retaddr, MO_UB, false, full_ldub=
+_mmu);
+> +    return load_helper(env, addr, oi, retaddr, MO_UB, false,
+> +                       full_ldub_mmu, wrap_ldub);
+>  }
+> =20
+>  tcg_target_ulong helper_ret_ldub_mmu(CPUArchState *env, target_ulong a=
+ddr,
+> @@ -1428,7 +1430,7 @@ static uint64_t full_le_lduw_mmu(CPUArchState *en=
+v, target_ulong addr,
+>                                   TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+>      return load_helper(env, addr, oi, retaddr, MO_LEUW, false,
+> -                       full_le_lduw_mmu);
+> +                       full_le_lduw_mmu, wrap_lduw_le);
+>  }
+> =20
+>  tcg_target_ulong helper_le_lduw_mmu(CPUArchState *env, target_ulong ad=
+dr,
+> @@ -1441,7 +1443,7 @@ static uint64_t full_be_lduw_mmu(CPUArchState *en=
+v, target_ulong addr,
+>                                   TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+>      return load_helper(env, addr, oi, retaddr, MO_BEUW, false,
+> -                       full_be_lduw_mmu);
+> +                       full_be_lduw_mmu, wrap_lduw_be);
+>  }
+> =20
+>  tcg_target_ulong helper_be_lduw_mmu(CPUArchState *env, target_ulong ad=
+dr,
+> @@ -1454,7 +1456,7 @@ static uint64_t full_le_ldul_mmu(CPUArchState *en=
+v, target_ulong addr,
+>                                   TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+>      return load_helper(env, addr, oi, retaddr, MO_LEUL, false,
+> -                       full_le_ldul_mmu);
+> +                       full_le_ldul_mmu, wrap_ldul_le);
+>  }
+> =20
+>  tcg_target_ulong helper_le_ldul_mmu(CPUArchState *env, target_ulong ad=
+dr,
+> @@ -1467,7 +1469,7 @@ static uint64_t full_be_ldul_mmu(CPUArchState *en=
+v, target_ulong addr,
+>                                   TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+>      return load_helper(env, addr, oi, retaddr, MO_BEUL, false,
+> -                       full_be_ldul_mmu);
+> +                       full_be_ldul_mmu, wrap_ldul_be);
+>  }
+> =20
+>  tcg_target_ulong helper_be_ldul_mmu(CPUArchState *env, target_ulong ad=
+dr,
+> @@ -1480,14 +1482,14 @@ uint64_t helper_le_ldq_mmu(CPUArchState *env, t=
+arget_ulong addr,
+>                             TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+>      return load_helper(env, addr, oi, retaddr, MO_LEQ, false,
+> -                       helper_le_ldq_mmu);
+> +                       helper_le_ldq_mmu, ldq_le_p);
+>  }
+> =20
+>  uint64_t helper_be_ldq_mmu(CPUArchState *env, target_ulong addr,
+>                             TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+>      return load_helper(env, addr, oi, retaddr, MO_BEQ, false,
+> -                       helper_be_ldq_mmu);
+> +                       helper_be_ldq_mmu, ldq_be_p);
+>  }
+> =20
+>  /*
+> @@ -1530,9 +1532,38 @@ tcg_target_ulong helper_be_ldsl_mmu(CPUArchState=
+ *env, target_ulong addr,
+>   * Store Helpers
+>   */
+> =20
+> +typedef void StoreHelper(void *, uint64_t);
+> +
+> +/* Wrap the unaligned store helpers to that they have a common signatu=
+re.  */
+> +static inline void wrap_stb(void *haddr, uint64_t val)
+> +{
+> +    stb_p(haddr, val);
+> +}
+> +
+> +static inline void wrap_stw_be(void *haddr, uint64_t val)
+> +{
+> +    stw_be_p(haddr, val);
+> +}
+> +
+> +static inline void wrap_stw_le(void *haddr, uint64_t val)
+> +{
+> +    stw_le_p(haddr, val);
+> +}
+> +
+> +static inline void wrap_stl_be(void *haddr, uint64_t val)
+> +{
+> +    stl_be_p(haddr, val);
+> +}
+> +
+> +static inline void wrap_stl_le(void *haddr, uint64_t val)
+> +{
+> +    stl_le_p(haddr, val);
+> +}
+> +
+>  static inline void QEMU_ALWAYS_INLINE
+>  store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
+> -             TCGMemOpIdx oi, uintptr_t retaddr, MemOp op)
+> +             TCGMemOpIdx oi, uintptr_t retaddr, MemOp op,
+> +             StoreHelper *direct)
+>  {
+>      uintptr_t mmu_idx =3D get_mmuidx(oi);
+>      uintptr_t index =3D tlb_index(env, mmu_idx, addr);
+> @@ -1657,74 +1688,49 @@ store_helper(CPUArchState *env, target_ulong ad=
+dr, uint64_t val,
+> =20
+>   do_aligned_access:
+>      haddr =3D (void *)((uintptr_t)addr + entry->addend);
+> -    switch (op) {
+> -    case MO_UB:
+> -        stb_p(haddr, val);
+> -        break;
+> -    case MO_BEUW:
+> -        stw_be_p(haddr, val);
+> -        break;
+> -    case MO_LEUW:
+> -        stw_le_p(haddr, val);
+> -        break;
+> -    case MO_BEUL:
+> -        stl_be_p(haddr, val);
+> -        break;
+> -    case MO_LEUL:
+> -        stl_le_p(haddr, val);
+> -        break;
+> -    case MO_BEQ:
+> -        stq_be_p(haddr, val);
+> -        break;
+> -    case MO_LEQ:
+> -        stq_le_p(haddr, val);
+> -        break;
+> -    default:
+> -        g_assert_not_reached();
+> -        break;
+> -    }
+> +    direct(haddr, val);
+>  }
+> =20
+>  void helper_ret_stb_mmu(CPUArchState *env, target_ulong addr, uint8_t =
+val,
+>                          TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+> -    store_helper(env, addr, val, oi, retaddr, MO_UB);
+> +    store_helper(env, addr, val, oi, retaddr, MO_UB, wrap_stb);
+>  }
+> =20
+>  void helper_le_stw_mmu(CPUArchState *env, target_ulong addr, uint16_t =
+val,
+>                         TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+> -    store_helper(env, addr, val, oi, retaddr, MO_LEUW);
+> +    store_helper(env, addr, val, oi, retaddr, MO_LEUW, wrap_stw_le);
+>  }
+> =20
+>  void helper_be_stw_mmu(CPUArchState *env, target_ulong addr, uint16_t =
+val,
+>                         TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+> -    store_helper(env, addr, val, oi, retaddr, MO_BEUW);
+> +    store_helper(env, addr, val, oi, retaddr, MO_BEUW, wrap_stw_be);
+>  }
+> =20
+>  void helper_le_stl_mmu(CPUArchState *env, target_ulong addr, uint32_t =
+val,
+>                         TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+> -    store_helper(env, addr, val, oi, retaddr, MO_LEUL);
+> +    store_helper(env, addr, val, oi, retaddr, MO_LEUL, wrap_stl_le);
+>  }
+> =20
+>  void helper_be_stl_mmu(CPUArchState *env, target_ulong addr, uint32_t =
+val,
+>                         TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+> -    store_helper(env, addr, val, oi, retaddr, MO_BEUL);
+> +    store_helper(env, addr, val, oi, retaddr, MO_BEUL, wrap_stl_be);
+>  }
+> =20
+>  void helper_le_stq_mmu(CPUArchState *env, target_ulong addr, uint64_t =
+val,
+>                         TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+> -    store_helper(env, addr, val, oi, retaddr, MO_LEQ);
+> +    store_helper(env, addr, val, oi, retaddr, MO_LEQ, stq_le_p);
+>  }
+> =20
+>  void helper_be_stq_mmu(CPUArchState *env, target_ulong addr, uint64_t =
+val,
+>                         TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+> -    store_helper(env, addr, val, oi, retaddr, MO_BEQ);
+> +    store_helper(env, addr, val, oi, retaddr, MO_BEQ, stq_be_p);
+>  }
+> =20
+>  /* First set of helpers allows passing in of OI and RETADDR.  This mak=
+es
+> @@ -1789,7 +1795,8 @@ void helper_be_stq_mmu(CPUArchState *env, target_=
+ulong addr, uint64_t val,
+>  static uint64_t full_ldub_cmmu(CPUArchState *env, target_ulong addr,
+>                                 TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+> -    return load_helper(env, addr, oi, retaddr, MO_8, true, full_ldub_c=
+mmu);
+> +    return load_helper(env, addr, oi, retaddr, MO_8, true,
+> +                       full_ldub_cmmu, wrap_ldub);
+>  }
+> =20
+>  uint8_t helper_ret_ldb_cmmu(CPUArchState *env, target_ulong addr,
+> @@ -1802,7 +1809,7 @@ static uint64_t full_le_lduw_cmmu(CPUArchState *e=
+nv, target_ulong addr,
+>                                    TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+>      return load_helper(env, addr, oi, retaddr, MO_LEUW, true,
+> -                       full_le_lduw_cmmu);
+> +                       full_le_lduw_cmmu, wrap_lduw_le);
+>  }
+> =20
+>  uint16_t helper_le_ldw_cmmu(CPUArchState *env, target_ulong addr,
+> @@ -1815,7 +1822,7 @@ static uint64_t full_be_lduw_cmmu(CPUArchState *e=
+nv, target_ulong addr,
+>                                    TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+>      return load_helper(env, addr, oi, retaddr, MO_BEUW, true,
+> -                       full_be_lduw_cmmu);
+> +                       full_be_lduw_cmmu, wrap_lduw_be);
+>  }
+> =20
+>  uint16_t helper_be_ldw_cmmu(CPUArchState *env, target_ulong addr,
+> @@ -1828,7 +1835,7 @@ static uint64_t full_le_ldul_cmmu(CPUArchState *e=
+nv, target_ulong addr,
+>                                    TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+>      return load_helper(env, addr, oi, retaddr, MO_LEUL, true,
+> -                       full_le_ldul_cmmu);
+> +                       full_le_ldul_cmmu, wrap_ldul_le);
+>  }
+> =20
+>  uint32_t helper_le_ldl_cmmu(CPUArchState *env, target_ulong addr,
+> @@ -1841,7 +1848,7 @@ static uint64_t full_be_ldul_cmmu(CPUArchState *e=
+nv, target_ulong addr,
+>                                    TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+>      return load_helper(env, addr, oi, retaddr, MO_BEUL, true,
+> -                       full_be_ldul_cmmu);
+> +                       full_be_ldul_cmmu, wrap_ldul_be);
+>  }
+> =20
+>  uint32_t helper_be_ldl_cmmu(CPUArchState *env, target_ulong addr,
+> @@ -1854,12 +1861,12 @@ uint64_t helper_le_ldq_cmmu(CPUArchState *env, =
+target_ulong addr,
+>                              TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+>      return load_helper(env, addr, oi, retaddr, MO_LEQ, true,
+> -                       helper_le_ldq_cmmu);
+> +                       helper_le_ldq_cmmu, ldq_le_p);
+>  }
+> =20
+>  uint64_t helper_be_ldq_cmmu(CPUArchState *env, target_ulong addr,
+>                              TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+>      return load_helper(env, addr, oi, retaddr, MO_BEQ, true,
+> -                       helper_be_ldq_cmmu);
+> +                       helper_be_ldq_cmmu, ldq_be_p);
+>  }
+>=20
 
