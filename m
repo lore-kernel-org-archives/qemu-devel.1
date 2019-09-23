@@ -2,61 +2,72 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39FF8C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:30:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D41BC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:31:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11CB220835
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:30:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11CB220835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 229882064A
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:31:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="mw7sODaF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 229882064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCJje-0006IA-19
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 04:30:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42877)
+	id 1iCJkY-0007Fv-Qh
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 04:31:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44334)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iCJNw-000265-8o
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:07:53 -0400
+ (envelope-from <zhlb29@foxmail.com>) id 1iCJV6-00014z-6I
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:15:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iCJNu-00048b-Qe
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:07:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41860)
+ (envelope-from <zhlb29@foxmail.com>) id 1iCJV4-0008Ty-Od
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:15:15 -0400
+Received: from smtpbg502.qq.com ([203.205.250.69]:34062 helo=smtpbg.qq.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iCJNu-00048N-FR; Mon, 23 Sep 2019 04:07:50 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C202F30833C1;
- Mon, 23 Sep 2019 08:07:49 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1FE2319D70;
- Mon, 23 Sep 2019 08:07:47 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Subject: [PULL 14/30] s390x/tcg: MVST: Fix storing back the addresses to
- registers
-Date: Mon, 23 Sep 2019 10:06:56 +0200
-Message-Id: <20190923080712.23951-15-david@redhat.com>
-In-Reply-To: <20190923080712.23951-1-david@redhat.com>
-References: <20190923080712.23951-1-david@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Mon, 23 Sep 2019 08:07:49 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+ (Exim 4.71) (envelope-from <zhlb29@foxmail.com>) id 1iCJV3-0008NS-P5
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:15:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+ s=s201512; t=1569226501;
+ bh=d2s29ko//k4w6JXneRyvSRWV9GBWz56FY5VFZl7qBfU=;
+ h=From:To:Subject:Mime-Version:Date:Message-ID;
+ b=mw7sODaFdlxsFX97OjH28XWFDsole301dJLJ5UVH1ldJHqE2RExUuFsfG1yA68bIY
+ kfQqsY3htVGlynQO29IK9rCrcy4oNFU1/ML9KYZEuMXQRhfHVUSGh6vhN4glgV63Ay
+ r7JhfRctd7aprIPpwreD8r+ssaO25WCKDp/zuKpI=
+X-QQ-SSF: 00000000000000F000000000000000G
+X-HAS-ATTACH: no
+X-QQ-BUSINESS-ORIGIN: 2
+X-Originating-IP: 124.200.70.7
+X-QQ-STYLE: 
+X-QQ-mid: webenglish1t1569226500t160112
+From: "=?ISO-8859-1?B?TGlibyBaaG91?=" <zhlb29@foxmail.com>
+To: "=?ISO-8859-1?B?QWxla3NhbmRhciYjMzg7bmJzcDtNYXJrb3ZpYw==?="
+ <aleksandar.m.mail@gmail.com>
+Subject: illegal hardware instruction during MIPS-I ELF linux user emulation
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: base64
+Date: Mon, 23 Sep 2019 16:15:00 +0800
+X-Priority: 3
+Message-ID: <tencent_5D6D8ED31E83C5675AB8AA3C@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
+ id ; Mon, 23 Sep 2019 16:15:00 +0800 (CST)
+Feedback-ID: webenglish:foxmail.com:bgweb:bgweb1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 203.205.250.69
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,133 +79,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: =?ISO-8859-1?B?cWVtdS1kZXZlbA==?= <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-24 and 31-bit address space handling is wrong when it comes to storing
-back the addresses to the register.
-
-While at it, read gprs 0 implicitly.
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/helper.h      |  2 +-
- target/s390x/insn-data.def |  2 +-
- target/s390x/mem_helper.c  | 26 +++++++++++---------------
- target/s390x/translate.c   |  8 ++++++--
- 4 files changed, 19 insertions(+), 19 deletions(-)
-
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index e9aff83b05..56e8149866 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -20,7 +20,7 @@ DEF_HELPER_FLAGS_4(mvn, TCG_CALL_NO_WG, void, env, i32,=
- i64, i64)
- DEF_HELPER_FLAGS_4(mvo, TCG_CALL_NO_WG, void, env, i32, i64, i64)
- DEF_HELPER_FLAGS_4(mvpg, TCG_CALL_NO_WG, i32, env, i64, i64, i64)
- DEF_HELPER_FLAGS_4(mvz, TCG_CALL_NO_WG, void, env, i32, i64, i64)
--DEF_HELPER_4(mvst, i64, env, i64, i64, i64)
-+DEF_HELPER_3(mvst, i32, env, i32, i32)
- DEF_HELPER_4(ex, void, env, i32, i64, i64)
- DEF_HELPER_FLAGS_4(stam, TCG_CALL_NO_WG, void, env, i32, i64, i32)
- DEF_HELPER_FLAGS_4(lam, TCG_CALL_NO_WG, void, env, i32, i64, i32)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index f421184fcd..449eee1662 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -637,7 +637,7 @@
- /* MOVE PAGE */
-     C(0xb254, MVPG,    RRE,   Z,   r1_o, r2_o, 0, 0, mvpg, 0)
- /* MOVE STRING */
--    C(0xb255, MVST,    RRE,   Z,   r1_o, r2_o, 0, 0, mvst, 0)
-+    C(0xb255, MVST,    RRE,   Z,   0, 0, 0, 0, mvst, 0)
- /* MOVE WITH OPTIONAL SPECIFICATION */
-     C(0xc800, MVCOS,   SSF,   MVCOS, la1, a2, 0, 0, mvcos, 0)
- /* MOVE WITH OFFSET */
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index ec27be174b..a24506676b 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -700,18 +700,18 @@ uint32_t HELPER(mvpg)(CPUS390XState *env, uint64_t =
-r0, uint64_t r1, uint64_t r2)
-     return 0; /* data moved */
- }
-=20
--/* string copy (c is string terminator) */
--uint64_t HELPER(mvst)(CPUS390XState *env, uint64_t c, uint64_t d, uint64=
-_t s)
-+/* string copy */
-+uint32_t HELPER(mvst)(CPUS390XState *env, uint32_t r1, uint32_t r2)
- {
-+    const uint64_t d =3D get_address(env, r1);
-+    const uint64_t s =3D get_address(env, r2);
-+    const uint8_t c =3D env->regs[0];
-     uintptr_t ra =3D GETPC();
-     uint32_t len;
-=20
--    if (c & 0xffffff00ull) {
-+    if (env->regs[0] & 0xffffff00ull) {
-         s390_program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO, ra);
-     }
--    c =3D c & 0xff;
--    d =3D wrap_address(env, d);
--    s =3D wrap_address(env, s);
-=20
-     /* Lest we fail to service interrupts in a timely manner, limit the
-        amount of work we're willing to do.  For now, let's cap at 8k.  *=
-/
-@@ -719,17 +719,13 @@ uint64_t HELPER(mvst)(CPUS390XState *env, uint64_t =
-c, uint64_t d, uint64_t s)
-         uint8_t v =3D cpu_ldub_data_ra(env, s + len, ra);
-         cpu_stb_data_ra(env, d + len, v, ra);
-         if (v =3D=3D c) {
--            /* Complete.  Set CC=3D1 and advance R1.  */
--            env->cc_op =3D 1;
--            env->retxl =3D s;
--            return d + len;
-+            set_address_zero(env, r1, d + len);
-+            return 1;
-         }
-     }
--
--    /* Incomplete.  Set CC=3D3 and signal to advance R1 and R2.  */
--    env->cc_op =3D 3;
--    env->retxl =3D s + len;
--    return d + len;
-+    set_address_zero(env, r1, d + len);
-+    set_address_zero(env, r2, s + len);
-+    return 3;
- }
-=20
- /* load access registers r1 to r3 from memory at a2 */
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 2927247c82..b0a2500e5f 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -3488,9 +3488,13 @@ static DisasJumpType op_mvpg(DisasContext *s, Disa=
-sOps *o)
-=20
- static DisasJumpType op_mvst(DisasContext *s, DisasOps *o)
- {
--    gen_helper_mvst(o->in1, cpu_env, regs[0], o->in1, o->in2);
-+    TCGv_i32 t1 =3D tcg_const_i32(get_field(s->fields, r1));
-+    TCGv_i32 t2 =3D tcg_const_i32(get_field(s->fields, r2));
-+
-+    gen_helper_mvst(cc_op, cpu_env, t1, t2);
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t2);
-     set_cc_static(s);
--    return_low128(o->in2);
-     return DISAS_NEXT;
- }
-=20
---=20
-2.21.0
+SGkgYWxsLAoKSSBoYXZlIGFuIGJpbmFyeSBmaWxlIGdlbmVyYXRlZCBieSBhIGNyb3NzIGNv
+bXBpbGVyLiBUaGUgJ2ZpbGUnIGNvbW1hbmQgc2F5cwoKJCBmaWxlIHRlc3QKdGVzdDogRUxG
+IDMyLWJpdCBMU0IgTFNCIGV4ZWN1dGFibGUsIE1JUFMsIE1JUFMtSSB2ZXJzaW9uIDEgKFNZ
+U1YpLCBzdGF0aWNhbGx5IGxpbmtlZCwgd2l0aCBkZWJ1Z19pbmZvLCBub3Qgc3RyaXBwZWQu
+CgpXaGVuIEkgZXhlY3V0ZWQgaXQgd2l0aAoKJC4vcWVtdS1taXBzZWwgdGVzdApxZW11OiB1
+bmNhdWdodCB0YXJnZXQgc2lnbmFsIDQgKElsbGVnYWwgaW5zdHJ1Y3Rpb24pIC0gY29yZSBk
+dW1wZWQKWzFdIDExMDg4IGlsbGVnYWwgaGFyZHdhcmUgaW5zdHJ1Y3Rpb24gKGNvcmUgZHVt
+cGVkKSAuL3FlbXUtbWlwc2VsIHRlc3QKCkhvd2V2ZXIsIHdoZW4gSSB1c2UgYW5vdGhlciBj
+cm9zcyBjb21waWxlciB0aGF0IGdlbmVyYXRlcyBNSVBTMzIgcmVsMiBiaW5hcmllcywgaXQg
+d29ya2VkIGZpbmUuCgpDYW4gYW55b25lIHRlbGwgbWUgd2hhdCdzIGdvaW5nIHdyb25nPwoK
+Q2hlZXJzLApMaWJvIFpob3U=
 
 
