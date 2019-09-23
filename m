@@ -2,65 +2,67 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4B20C04EBF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 11:28:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B5B5C04EBF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 11:32:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7ED0D20882
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 11:28:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="RuklwlFs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ED0D20882
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6EBBF20820
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 11:32:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EBBF20820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCMW5-0005iR-ML
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 07:28:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42107)
+	id 1iCMaG-0007V9-6t
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 07:32:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42303)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1iCMVM-0005GK-Cj
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 07:27:45 -0400
+ (envelope-from <armbru@redhat.com>) id 1iCMYE-0006ZS-22
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 07:30:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qemu_oss@crudebyte.com>) id 1iCMVL-0006dY-04
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 07:27:44 -0400
-Received: from kylie.crudebyte.com ([5.189.157.229]:58263)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
- id 1iCMVK-0006d4-OL
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 07:27:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=iQsqsYll1i55WbC/AM87Id5KKbN0YRMriTpo9uxAwrY=; b=RuklwlFs0iv88y5AohT4HIztmL
- swbIazUoHoyKLp2qXL2P/4Zu2/qqn9hkekEaiYLA1zmnkLixNwqyRsBN6AN0N6T69GgJs25a8UlJM
- 4cOos0aWquusGqAt2JpSwBv2B35lGxHpw28Ar1OM6db3ufNHMSvWxTmaPgARMmhI50TObSUu0JEpC
- udvT4Sm+nBeAXExqZaJMesqwML6eUI3+/215sFnw1EcnKiTW4hWu1JP+Xh7GdMg/Mkyg2YitBlRmo
- irbmnxUJ3FME62akr+12iVWG2Df21CRrb16svWiCafyK8hGZcboPX2cmpR8YGpwKDTPiXCrQcSK17
- +pBxJinBAqCuB7zCV7SkHdiVJ4SUlZd7HfBEgkG6Ek9FKVF7EbjJwGgKKbD153QQ3m7vNpV9omrot
- ZbTBO8jCJj4h6BeMyo7Li98/WvbdW9HcrVniIplbnHL0DgvRGeNNxLTadse5fakvJBp5c15xvPMbz
- VYKx9aL8H6OgjxQvo/C2UTNijgTcTe/0pSU1A8xz1N2LvUlAnwv1LID8lqfMSu1EOceJCb7EpKDii
- KEHUNhpmrd9sTSkBXuEr2TkwO7dNW4fqY3es1QXasxy4/w04zkCm+lqBjL8seiXYtl4HkDxtYcMsz
- 69sp7ZMKmqqGkJFPu/7CdBsKZ/ojvpF8P4QNNjJgU=;
-To: qemu-devel@nongnu.org
-Subject: Re: [Qemu-devel] [PATCH v6 0/4] 9p: Fix file ID collisions
-Date: Mon, 23 Sep 2019 13:27:37 +0200
-Message-ID: <5814161.pL1kAXq1mB@silver>
-In-Reply-To: <20190905145931.3748d5f2@bahia.lan>
-References: <cover.1566503584.git.qemu_oss@crudebyte.com>
- <1897173.eDCz7oYxVq@silver> <20190905145931.3748d5f2@bahia.lan>
+ (envelope-from <armbru@redhat.com>) id 1iCMYC-0000AY-6N
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 07:30:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39646)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>)
+ id 1iCMYB-0000AR-VH; Mon, 23 Sep 2019 07:30:40 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4E5EA3064FD2;
+ Mon, 23 Sep 2019 11:30:39 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EA36F5C1B2;
+ Mon, 23 Sep 2019 11:30:38 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 75F80113864E; Mon, 23 Sep 2019 13:30:37 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Replace '-machine accel=xyz' with '-accel
+ xyz'
+References: <20190904052739.22123-1-thuth@redhat.com>
+ <5e8d67e5-842f-7cea-28a5-f07050615c38@redhat.com>
+Date: Mon, 23 Sep 2019 13:30:37 +0200
+In-Reply-To: <5e8d67e5-842f-7cea-28a5-f07050615c38@redhat.com> (Paolo
+ Bonzini's message of "Mon, 9 Sep 2019 19:06:26 +0200")
+Message-ID: <87wodzp7vm.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Mon, 23 Sep 2019 11:30:39 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.189.157.229
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,94 +74,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, stefanha@gmail.com,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
- dgilbert@redhat.com, antonios.motakis@huawei.com, Ian Kelling <iank@fsf.org>
+Cc: qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: Christian Schoenebeck <qemu_oss@crudebyte.com>
-From: Christian Schoenebeck via <qemu-devel@nongnu.org>
 
-On Donnerstag, 5. September 2019 14:59:31 CEST Greg Kurz wrote:
-> On Thu, 05 Sep 2019 14:25:13 +0200
-> 
-> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > On Mittwoch, 4. September 2019 15:02:30 CEST Christian Schoenebeck wrote:
-> > > > > Well, mailman is handling this correctly. It replaces the "From:"
-> > > > > field
-> > > > > with a placeholder and instead adds my actual email address as
-> > > > > "Reply-To:" field. That's the common way to handle this on mailing
-> > > > > lists,
-> > > > > as also mentioned here:
-> > > > > https://en.wikipedia.org/wiki/DMARC#From:_rewriting
-> > > > > 
-> > > > > So IMO patchew should automatically use the value of "Reply-To:" in
-> > > > > that
-> > > > > case as author of patches instead.
-> > > > > 
-> > > > > Reducing security cannot be the solution.
-> > > > 
-> > > > No, there's no need to reduce security.  Just change your local git
-> > > > configuration to produce a 'From:' line in the commit body..
-> > > 
-> > > Got it. :)
-> > > 
-> > > > >> How are you sending patches ? With git send-email ? If so, maybe
-> > > > >> you
-> > > > >> can
-> > > > >> pass something like --from='"Christian Schoenebeck"
-> > > > >> <qemu_oss@crudebyte.com>'. Since this is a different string, git
-> > > > >> will
-> > > > >> assume you're sending someone else's patch : it will automatically
-> > > > >> add
-> > > > >> an
-> > > > >> extra From: made out of the commit Author as recorded in the git
-> > > > >> tree.
-> > > > 
-> > > > I think it is probably as simple as a 'git config' command to tell git
-> > > > to always put a 'From:' in the body of self-authored patches when
-> > > > using
-> > > > git format-patch; however, as I don't suffer from munged emails, I
-> > > > haven't actually tested what that setting would be.
-> > 
-> > Well, I tried that Eric. The expected solution would be enabling this git
-> > setting:
-> > 
-> > git config [--global] format.from true
-> > https://git-scm.com/docs/git-config#Documentation/git-config.txt-formatfro
-> > m
-> > 
-> > But as you can already read from the manual, the overall behaviour of git
-> > regarding a separate "From:" line in the email body was intended solely
-> > for
-> > the use case sender != author. So in practice (at least in my git version)
-> > git always makes a raw string comparison between sender (name and email)
-> > string and author string and only adds the separate From: line to the
-> > body if they differ.
-> > 
-> > Hence also "git format-patch --from=" only works here if you use a
-> > different author string (name and email) there, otherwise on a perfect
-> > string match it is simply ignored and you end up with only one "From:" in
-> > the email header.
-> > 
-> > So eventually I added one extra character in my name for now and removed
-> > it
-> > manually in the dumped emails subsequently (see today's
-> > "[PATCH v7 0/3] 9p: Fix file ID collisions").
-> 
-> Hence my proposal in some other mail to pass a different string to
-> git send-email, but I guess this also works for git format-patch.
-> 
-> eg, adding double quotes around your "firstname name"
-> 
->  --from='"Christian Schoenebeck" <qemu_oss@crudebyte.com>'
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Yeah, I will use that for now, since it just works^TM (I tested it).
+> On 04/09/19 07:27, Thomas Huth wrote:
+>> We've got a separate option to configure the accelerator nowadays, which
+>> is shorter to type and the preferred way of specifying an accelerator.
+>> Use it in the source and examples to show that it is the favored option.
+>> (However, do not touch the places yet which also specify other machine
+>> options or multiple accelerators - these are currently still better
+>> handled with one single "-machine" statement instead)
+>>=20
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  python/qemu/qtest.py                | 2 +-
+>>  qemu-deprecated.texi                | 3 +--
+>>  qemu-options.hx                     | 2 +-
+>>  tests/libqtest.c                    | 2 +-
+>>  tests/migration/guestperf/engine.py | 2 +-
+>>  tests/qemu-iotests/172              | 2 +-
+>>  6 files changed, 6 insertions(+), 7 deletions(-)
+>>=20
+>> diff --git a/python/qemu/qtest.py b/python/qemu/qtest.py
+>> index eebcc233ed..3f1d2cb325 100644
+>> --- a/python/qemu/qtest.py
+>> +++ b/python/qemu/qtest.py
+>> @@ -96,7 +96,7 @@ class QEMUQtestMachine(QEMUMachine):
+>>      def _base_args(self):
+>>          args =3D super(QEMUQtestMachine, self)._base_args()
+>>          args.extend(['-qtest', 'unix:path=3D' + self._qtest_path,
+>> -                     '-machine', 'accel=3Dqtest'])
+>> +                     '-accel', 'qtest'])
+>>          return args
+>>=20=20
+>>      def _pre_launch(self):
+>> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+>> index 00a4b6f350..0982e41698 100644
+>> --- a/qemu-deprecated.texi
+>> +++ b/qemu-deprecated.texi
+>> @@ -26,8 +26,7 @@ The @option{enforce-config-section} parameter is repla=
+ced by the
+>>=20=20
+>>  @subsection -no-kvm (since 1.3.0)
+>>=20=20
+>> -The ``-no-kvm'' argument is now a synonym for setting
+>> -``-machine accel=3Dtcg''.
+>> +The ``-no-kvm'' argument is now a synonym for setting ``-accel tcg''.
+>>=20=20
+>>  @subsection -usbdevice (since 2.10.0)
+>>=20=20
+>> diff --git a/qemu-options.hx b/qemu-options.hx
+>> index 09e6439646..e0bba2abd1 100644
+>> --- a/qemu-options.hx
+>> +++ b/qemu-options.hx
+>> @@ -4156,7 +4156,7 @@ STEXI
+>>  Enable FIPS 140-2 compliance mode.
+>>  ETEXI
+>>=20=20
+>> -HXCOMM Deprecated by -machine accel=3Dtcg property
+>> +HXCOMM Deprecated by -accel tcg
+>>  DEF("no-kvm", 0, QEMU_OPTION_no_kvm, "", QEMU_ARCH_I386)
+>>=20=20
+>>  DEF("msg", HAS_ARG, QEMU_OPTION_msg,
+>> diff --git a/tests/libqtest.c b/tests/libqtest.c
+>> index 2713b86cf7..67e39c59e7 100644
+>> --- a/tests/libqtest.c
+>> +++ b/tests/libqtest.c
+>> @@ -238,7 +238,7 @@ QTestState *qtest_init_without_qmp_handshake(const c=
+har *extra_args)
+>>                                "-qtest-log %s "
+>>                                "-chardev socket,path=3D%s,id=3Dchar0 "
+>>                                "-mon chardev=3Dchar0,mode=3Dcontrol "
+>> -                              "-machine accel=3Dqtest "
+>> +                              "-accel qtest "
+>>                                "-display none "
+>>                                "%s", qemu_binary, socket_path,
+>>                                getenv("QTEST_LOG") ? "/dev/fd/2" : "/dev=
+/null",
+>> diff --git a/tests/migration/guestperf/engine.py b/tests/migration/guest=
+perf/engine.py
+>> index f13dbea800..1dd04ce33b 100644
+>> --- a/tests/migration/guestperf/engine.py
+>> +++ b/tests/migration/guestperf/engine.py
+>> @@ -287,7 +287,7 @@ class Engine(object):
+>>              cmdline =3D "'" + cmdline + "'"
+>>=20=20
+>>          argv =3D [
+>> -            "-machine", "accel=3Dkvm",
+>> +            "-accel", "kvm",
+>>              "-cpu", "host",
+>>              "-kernel", self._kernel,
+>>              "-initrd", self._initrd,
+>> diff --git a/tests/qemu-iotests/172 b/tests/qemu-iotests/172
+>> index ba7dad9057..d67997e5f6 100755
+>> --- a/tests/qemu-iotests/172
+>> +++ b/tests/qemu-iotests/172
+>> @@ -55,7 +55,7 @@ do_run_qemu()
+>>              done
+>>          fi
+>>          echo quit
+>> -    ) | $QEMU -machine accel=3Dqtest -nographic -monitor stdio -serial =
+none "$@"
+>> +    ) | $QEMU -accel qtest -nographic -monitor stdio -serial none "$@"
+>>      echo
+>>  }
+>>=20=20
+>>=20
+>
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+>
+> Thanks.  While "-accel kvm:tcg" is not going to be supported, the above
+> replacement are all good.
 
-Because for some reason my emails are still mangled on this list. Probably I 
-still have to drop more header fields from dkim's "h=..." setting. We'll see.
+-accel is yet another convenience option.  We have so many of them.  I
+dislike the complexity they add to the CLI.  Here's how this one got in:
 
+commit 8d4e9146b3568022ea5730d92841345d41275d66
+Author: KONRAD Frederic <fred.konrad@greensocs.com>
+Date:   Thu Feb 23 18:29:08 2017 +0000
 
+    tcg: add options for enabling MTTCG
+=20=20=20=20
+    We know there will be cases where MTTCG won't work until additional work
+    is done in the front/back ends to support. It will however be useful to
+    be able to turn it on.
+=20=20=20=20
+    As a result MTTCG will default to off unless the combination is
+    supported. However the user can turn it on for the sake of testing.
+=20=20=20=20
+    Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
+    [AJB: move to -accel tcg,thread=3Dmulti|single, defaults]
+    Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+    Reviewed-by: Richard Henderson <rth@twiddle.net>
 
+Not a peep on why the existing options are so insufficient we must have
+another one.
+
+Our CLI will remain the steaming mess it has become until we reform the
+habits that got us there.
+
+No objection to your patch.
 
