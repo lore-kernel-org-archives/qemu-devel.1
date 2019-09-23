@@ -2,87 +2,88 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07765C04EBF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:10:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C5E9C04EBF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:13:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE38220835
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:10:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE38220835
+	by mail.kernel.org (Postfix) with ESMTPS id 4AC3620835
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:13:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AC3620835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCO6q-0000jF-QK
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 09:10:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54500)
+	id 1iCO9h-0003Kl-7f
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 09:13:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54732)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iCO4n-0007a1-Iv
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:08:26 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iCO6I-0000fa-NT
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:09:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iCO4m-0005NC-GQ
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:08:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:12321)
+ (envelope-from <mreitz@redhat.com>) id 1iCO6H-0005ts-IH
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:09:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37504)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iCO4j-0005MZ-Nm; Mon, 23 Sep 2019 09:08:21 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iCO6F-0005sn-4Y; Mon, 23 Sep 2019 09:09:55 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BE6823C92D;
- Mon, 23 Sep 2019 13:08:20 +0000 (UTC)
-Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CE5CA10013D9;
- Mon, 23 Sep 2019 13:08:15 +0000 (UTC)
-Subject: Re: [PATCH v2 01/11] qcrypto: add suport for amend options
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20190912223028.18496-1-mlevitsk@redhat.com>
- <20190912223028.18496-2-mlevitsk@redhat.com>
-From: Eric Blake <eblake@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 6100710CC1FB;
+ Mon, 23 Sep 2019 13:09:54 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6C11C19C58;
+ Mon, 23 Sep 2019 13:09:50 +0000 (UTC)
+Subject: Re: [PATCH v5 1/5] iotests: remove 'linux' from default supported
+ platforms
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20190917234549.22910-1-jsnow@redhat.com>
+ <20190917234549.22910-2-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <29336f49-c364-1263-664b-61a4a02be0be@redhat.com>
-Date: Mon, 23 Sep 2019 08:08:12 -0500
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <a252472e-842a-8401-2743-e4ed948b066b@redhat.com>
+Date: Mon, 23 Sep 2019 15:09:48 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190912223028.18496-2-mlevitsk@redhat.com>
+In-Reply-To: <20190917234549.22910-2-jsnow@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="iUGTTnk9YFpSxZimChNkXrsm3DSJJP3QJ"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Mon, 23 Sep 2019 13:08:20 +0000 (UTC)
+ boundary="APmUgLsi7mXelWLWL6JvlLQrSwxXx40Jn"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Mon, 23 Sep 2019 13:09:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,107 +97,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---iUGTTnk9YFpSxZimChNkXrsm3DSJJP3QJ
-Content-Type: multipart/mixed; boundary="JVCtDtOddfrqefqA7fIrsgCuFie8APiZi";
+--APmUgLsi7mXelWLWL6JvlLQrSwxXx40Jn
+Content-Type: multipart/mixed; boundary="8w791jTtwUR381mGtTNTCkRAj92ukMkHz";
  protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-block@nongnu.org, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
- <berrange@redhat.com>, John Snow <jsnow@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <29336f49-c364-1263-664b-61a4a02be0be@redhat.com>
-Subject: Re: [PATCH v2 01/11] qcrypto: add suport for amend options
-References: <20190912223028.18496-1-mlevitsk@redhat.com>
- <20190912223028.18496-2-mlevitsk@redhat.com>
-In-Reply-To: <20190912223028.18496-2-mlevitsk@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Message-ID: <a252472e-842a-8401-2743-e4ed948b066b@redhat.com>
+Subject: Re: [PATCH v5 1/5] iotests: remove 'linux' from default supported
+ platforms
+References: <20190917234549.22910-1-jsnow@redhat.com>
+ <20190917234549.22910-2-jsnow@redhat.com>
+In-Reply-To: <20190917234549.22910-2-jsnow@redhat.com>
 
---JVCtDtOddfrqefqA7fIrsgCuFie8APiZi
+--8w791jTtwUR381mGtTNTCkRAj92ukMkHz
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 9/12/19 5:30 PM, Maxim Levitsky wrote:
-> This adds the qcrypto_amend_options and corresponding
-> crypto driver callbacks for the  for encrypted
+On 18.09.19 01:45, John Snow wrote:
+> verify_platform will check an explicit whitelist and blacklist instead.=
 
-grammar is off, did you miss a word where that double space is?
-
-> key managedment
-
-management
-
+> The default will now be assumed to be allowed to run anywhere.
 >=20
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> For tests that do not specify their platforms explicitly, this has the =
+effect of
+> enabling these tests on non-linux platforms. For tests that always spec=
+ified
+> linux explicitly, there is no change.
+>=20
+> For Python tests on FreeBSD at least; only seven python tests fail:
+> 045 147 149 169 194 199 211
+>=20
+> 045 and 149 appear to be misconfigurations,
+> 147 and 194 are the AF_UNIX path too long error,
+> 169 and 199 are bitmap migration bugs, and
+> 211 is a bug that shows up on Linux platforms, too.
+>=20
+> This is at least good evidence that these tests are not Linux-only. If
+> they aren't suitable for other platforms, they should be disabled on a
+> per-platform basis as appropriate.
+>=20
+> Therefore, let's switch these on and deal with the failures.
+
+What exactly do you mean by =E2=80=9Cdeal with the failures=E2=80=9D?  Do=
+ you have a
+reference to patches that deal with them, or are you or is someone else
+working on them...?
+
+Apart from that, I am rather hesitant to take a patch through my tree
+that not only may cause test failures on platforms that I will not or
+actually cannot run tests on (like MacOS or Windows), but that actually
+does introduce new failures as you describe.
+
+Well, at least it doesn=E2=80=99t introduce build failures because it app=
+ears
+there is no Python test that=E2=80=99s in the auto group, so I suppose =E2=
+=80=9Crather
+hesitant=E2=80=9D is not an =E2=80=9CI won=E2=80=99t=E2=80=9D.
+
+Max
+
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  crypto/block.c         | 31 +++++++++++++++++++++++++++++++
->  crypto/blockpriv.h     |  8 ++++++++
->  include/crypto/block.h | 22 ++++++++++++++++++++++
->  3 files changed, 61 insertions(+)
->=20
-> diff --git a/crypto/block.c b/crypto/block.c
-> index 325752871c..14b684de7f 100644
-> --- a/crypto/block.c
-> +++ b/crypto/block.c
-> @@ -115,6 +115,37 @@ QCryptoBlock *qcrypto_block_create(QCryptoBlockCre=
-ateOptions *options,
->  }
-> =20
-> =20
-> +int qcrypto_block_amend_options(QCryptoBlock *block,
-> +                                QCryptoBlockReadFunc readfunc,
-> +                                QCryptoBlockWriteFunc writefunc,
-> +                                void *opaque,
-> +                                QCryptoBlockCreateOptions *options,
-> +                                bool force,
-> +                                Error **errp)
-> +{
-> +    if (options->format !=3D block->format) {
-> +        error_setg(errp,
-> +                   "Its not possible to change encryption format with =
-amend interface");
-> +        return -1;
-
-"It's" (here, you want the form meaning "It is")
-
-Or reword the entire error to something shorter:
-
-error_setg(errp, "cannot amend encryption format")
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+>  tests/qemu-iotests/iotests.py | 16 +++++++++++-----
+>  1 file changed, 11 insertions(+), 5 deletions(-)
 
 
---JVCtDtOddfrqefqA7fIrsgCuFie8APiZi--
+--8w791jTtwUR381mGtTNTCkRAj92ukMkHz--
 
---iUGTTnk9YFpSxZimChNkXrsm3DSJJP3QJ
+--APmUgLsi7mXelWLWL6JvlLQrSwxXx40Jn
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2Iw7wACgkQp6FrSiUn
-Q2ryCwf+MmXWH19E1HgzE+x+BfNK6rJwKfsKSM8L6LlQmedqAO8Se9ipuAlpnJP4
-dwwXD70d0//LHdIF5dGmGUKYr1XrIOfpYxvn+azQFkGoDn0WnYR6W9Di2YkXT0Oq
-Ygr31yjZsKgLcnLboQlP6jRRIqoZPKzFFDOXgfWwF3FwJ+xwTc58TpilLfQwsAkO
-zm128bv6nNdxouyTJHNy43/5gPu/2QyUBWqiBGoBW2n6nR3ptoWYCsr/FN6Ty2uK
-zeqAG7wE4jHDbb46DSygMwBR/GxU+0GaiOgCB/LkYLvuyQMMOp5L4/3oJk+xG3nD
-OvR0fC1GO3cmU+hdvs6IVVuChb2IdQ==
-=NAdF
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2IxBwACgkQ9AfbAGHV
+z0BZewf/SkTFIiPWUVRLL5Tduo9N/kEpJNjvjzUZQhfNmyCRnijuzS7aLAy1kH6b
+xxeBi5GwSAbefst6HuHIH1XqK0V172HDWM6Bktxg9LgKkx1tDWpeb36/c/8t++kh
+kFiTXQzikYcaMYNp3hjGkOllUMjd2FEPAW4J2C6remscrwhK01FpFaaIlxvgITua
+5hpPDRacPA6hGIN1Qx0Z9F9bTfsUxKL1tdiHolI39YG25vZ1m694SczOkLCGhoXA
+v5mlInDl4Y8do99POUeQ5oMIlzIcSR8ADHRARz0cfxdzyy0UkNX2mQ7eJjIekkQp
+nN8NmBmh/ceLEse3TaK7GgM2p1xZPg==
+=+SD9
 -----END PGP SIGNATURE-----
 
---iUGTTnk9YFpSxZimChNkXrsm3DSJJP3QJ--
+--APmUgLsi7mXelWLWL6JvlLQrSwxXx40Jn--
 
