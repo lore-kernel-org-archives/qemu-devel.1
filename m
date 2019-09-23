@@ -4,105 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEBF4C49ED7
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:50:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCAEFC3A5A6
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:51:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A69CB20820
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:50:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A69CB20820
+	by mail.kernel.org (Postfix) with ESMTPS id A143320820
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:51:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A143320820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53829 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCK3U-0008Ss-4p
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 04:50:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46147)
+	id 1iCK48-0000nh-8u
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 04:51:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46516)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iCJg7-000328-7P
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:26:41 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1iCJiu-0006AQ-Fi
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:29:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iCJg4-0006mi-KV
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:26:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52560)
+ (envelope-from <sgarzare@redhat.com>) id 1iCJiq-0007Yc-Ne
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:29:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34876)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iCJg4-0006mY-CJ
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:26:36 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1iCJio-0007XQ-PK
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:29:27 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 942F4A26684;
- Mon, 23 Sep 2019 08:26:35 +0000 (UTC)
-Received: from [10.36.116.207] (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 618E760C5E;
- Mon, 23 Sep 2019 08:26:31 +0000 (UTC)
-Subject: Re: [PATCH v3 02/20] exec: Split out variable page size support to
- exec-vary.c
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190922035458.14879-1-richard.henderson@linaro.org>
- <20190922035458.14879-3-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <b0ac3ea7-3aa1-60b5-127a-6476003adaca@redhat.com>
-Date: Mon, 23 Sep 2019 10:26:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id BCE6A83F4C
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 08:29:23 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id w10so4555752wrl.5
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 01:29:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=kikYKHfL3Ck2fN5906iWkH6+cgjWSLcj4UEJt3nusl4=;
+ b=lt2bZPqHCPRpS1o1puqfXbhH1AmrLcfAQHCXzVgz6/3VaMPzdlVI4FznMiLYOVLcKi
+ t8mFC2UyH2/4/a6euKh6hsOx3EzUfetXcLwpdK0iQKeiCuexe7iVLQFD1kiApm8gOdVo
+ /5lNcUIeIQ27lxGJ/JUCpHyJb/8KTSGs0PKDN203ucN3zm5PYlpt14Zq/9oHGZBSs9EW
+ x+5LD4IIcSYhwmy4CDEcj02zyS3VZpU9XaCL42wx9iV1TOM/7DxrfU/YFN76j5RBBGHb
+ iUymb3ZGC8gfzyXEG4PKHGksa4w0aJMfXywLf8eX2daoa8vrpsYd90cDiGjNs+KxeVNS
+ udeQ==
+X-Gm-Message-State: APjAAAWe1B9H8kofqV9wkKSEWFJ05p2ZVnpEj3Ow2AN5gVSd/MHJNNdV
+ cI1atCH1mCNPYLKixdBFPKRxJILTX8gLqWNaP4BFlpeZ+gOG8Y/tpA9XASDRzK71Gb/VqkVqWPo
+ 8RceHnMj5JZ70nAg=
+X-Received: by 2002:a1c:7ed7:: with SMTP id
+ z206mr13700945wmc.124.1569227362481; 
+ Mon, 23 Sep 2019 01:29:22 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzKX0HB9ZtvLtoSuZ2BX1CVOs4/0nzjuxdglPCbtiFmBe8VaHKy/UJBrfY1PW5dU113hHXcdQ==
+X-Received: by 2002:a1c:7ed7:: with SMTP id
+ z206mr13700926wmc.124.1569227362235; 
+ Mon, 23 Sep 2019 01:29:22 -0700 (PDT)
+Received: from steredhat (host170-61-dynamic.36-79-r.retail.telecomitalia.it.
+ [79.36.61.170])
+ by smtp.gmail.com with ESMTPSA id e6sm10312791wrp.91.2019.09.23.01.29.21
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 23 Sep 2019 01:29:21 -0700 (PDT)
+Date: Mon, 23 Sep 2019 10:29:19 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH] hw/arm/boot: Use the IEC binary prefix definitions
+Message-ID: <20190923082919.y2fjn2y6t7lire3z@steredhat>
+References: <20190921103405.19623-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190922035458.14879-3-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Mon, 23 Sep 2019 08:26:35 +0000 (UTC)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190921103405.19623-1-philmd@redhat.com>
+User-Agent: NeoMutt/20180716
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -117,133 +92,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, alex.bennee@linaro.org, stefanha@redhat.com
+Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22.09.19 05:54, Richard Henderson wrote:
-> The next patch will play a trick with "const" that will
-> confuse the compiler about the uses of target_page_bits
-> within exec.c.  Moving everything to a new file prevents
-> this confusion.
+On Sat, Sep 21, 2019 at 12:34:04PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> IEC binary prefixes ease code review: the unit is explicit.
 >=20
-> No functional change so far.
->=20
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 > ---
->  Makefile.target       |  2 +-
->  include/qemu-common.h |  6 +++++
->  exec-vary.c           | 57 +++++++++++++++++++++++++++++++++++++++++++
->  exec.c                | 34 --------------------------
->  4 files changed, 64 insertions(+), 35 deletions(-)
->  create mode 100644 exec-vary.c
+>  hw/arm/boot.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 >=20
-> diff --git a/Makefile.target b/Makefile.target
-> index 5e916230c4..ca3d14efe1 100644
-> --- a/Makefile.target
-> +++ b/Makefile.target
-> @@ -107,7 +107,7 @@ obj-y +=3D trace/
-> =20
->  #########################################################
->  # cpu emulator library
-> -obj-y +=3D exec.o
-> +obj-y +=3D exec.o exec-vary.o
->  obj-y +=3D accel/
->  obj-$(CONFIG_TCG) +=3D tcg/tcg.o tcg/tcg-op.o tcg/tcg-op-vec.o tcg/tcg=
--op-gvec.o
->  obj-$(CONFIG_TCG) +=3D tcg/tcg-common.o tcg/optimize.o
-> diff --git a/include/qemu-common.h b/include/qemu-common.h
-> index 8d84db90b0..082da59e85 100644
-> --- a/include/qemu-common.h
-> +++ b/include/qemu-common.h
-> @@ -74,6 +74,12 @@ void cpu_exec_step_atomic(CPUState *cpu);
->   */
->  bool set_preferred_target_page_bits(int bits);
-> =20
-> +/**
-> + * finalize_target_page_bits:
-> + * Commit the final value set by set_preferred_target_page_bits.
-> + */
-> +void finalize_target_page_bits(void);
-> +
->  /**
->   * Sends a (part of) iovec down a socket, yielding when the socket is =
-full, or
->   * Receives data into a (part of) iovec from a socket,
-> diff --git a/exec-vary.c b/exec-vary.c
-> new file mode 100644
-> index 0000000000..48c0ab306c
-> --- /dev/null
-> +++ b/exec-vary.c
-> @@ -0,0 +1,57 @@
-> +/*
-> + * Variable page size handling
-> + *
-> + *  Copyright (c) 2003 Fabrice Bellard
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/li=
-censes/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "exec/exec-all.h"
-> +
-> +#ifdef TARGET_PAGE_BITS_VARY
-> +int target_page_bits;
-> +bool target_page_bits_decided;
-> +#endif
-> +
-> +bool set_preferred_target_page_bits(int bits)
-> +{
-> +    /*
-> +     * The target page size is the lowest common denominator for all
-> +     * the CPUs in the system, so we can only make it smaller, never
-> +     * larger. And we can't make it smaller once we've committed to
-> +     * a particular size.
-> +     */
-> +#ifdef TARGET_PAGE_BITS_VARY
-> +    assert(bits >=3D TARGET_PAGE_BITS_MIN);
-> +    if (target_page_bits =3D=3D 0 || target_page_bits > bits) {
-> +        if (target_page_bits_decided) {
-> +            return false;
-> +        }
-> +        target_page_bits =3D bits;
-> +    }
-> +#endif
-> +    return true;
-> +}
-> +
-> +void finalize_target_page_bits(void)
-> +{
-> +#ifdef TARGET_PAGE_BITS_VARY
-> +    if (target_page_bits =3D=3D 0) {
-> +        target_page_bits =3D TARGET_PAGE_BITS_MIN;
-> +    }
-> +    target_page_bits_decided =3D true;
-> +#endif
-> +}
+> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> index bf97ef3e33..59bb2fa0d3 100644
+> --- a/hw/arm/boot.c
+> +++ b/hw/arm/boot.c
 
-I wonder if it would be nicer to handle this in the header file instead,
-providing dummy functions there.
+Very appreciated!
 
---=20
+What about fixing also this other line?
+
+@@ -575,7 +575,7 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_i=
+nfo *binfo,
+         goto fail;
+     }
+=20
+-    if (scells < 2 && binfo->ram_size >=3D (1ULL << 32)) {
++    if (scells < 2 && binfo->ram_size >=3D 4 * GiB) {
+         /* This is user error so deserves a friendlier error message
+          * than the failure of setprop_sized_cells would provide
+
+
+> @@ -1095,7 +1095,7 @@ static void arm_setup_direct_kernel_boot(ARMCPU *=
+cpu,
+>       * we might still make a bad choice here.
+>       */
+>      info->initrd_start =3D info->loader_start +
+> -        MIN(info->ram_size / 2, 128 * 1024 * 1024);
+> +        MIN(info->ram_size / 2, 128 * MiB);
+>      if (image_high_addr) {
+>          info->initrd_start =3D MAX(info->initrd_start, image_high_addr=
+);
+>      }
+> @@ -1155,13 +1155,13 @@ static void arm_setup_direct_kernel_boot(ARMCPU=
+ *cpu,
+>                   *
+>                   * Let's play safe and prealign it to 2MB to give us s=
+ome space.
+>                   */
+> -                align =3D 2 * 1024 * 1024;
+> +                align =3D 2 * MiB;
+>              } else {
+>                  /*
+>                   * Some 32bit kernels will trash anything in the 4K pa=
+ge the
+>                   * initrd ends in, so make sure the DTB isn't caught u=
+p in that.
+>                   */
+> -                align =3D 4096;
+> +                align =3D 4 * KiB;
+>              }
+> =20
+>              /* Place the DTB after the initrd in memory with alignment=
+. */
+> @@ -1178,7 +1178,7 @@ static void arm_setup_direct_kernel_boot(ARMCPU *=
+cpu,
+>                  info->loader_start + KERNEL_ARGS_ADDR;
+>              fixupcontext[FIXUP_ARGPTR_HI] =3D
+>                  (info->loader_start + KERNEL_ARGS_ADDR) >> 32;
+> -            if (info->ram_size >=3D (1ULL << 32)) {
+> +            if (info->ram_size >=3D 4 * GiB) {
+>                  error_report("RAM size must be less than 4GB to boot"
+>                               " Linux kernel using ATAGS (try passing a=
+ device tree"
+>                               " using -dtb)");
+
+With or without the new line fix:
+
+Acked-by: Stefano Garzarella <sgarzare@redhat.com>
 
 Thanks,
-
-David / dhildenb
+Stefano
 
