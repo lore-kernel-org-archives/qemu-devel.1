@@ -2,91 +2,90 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52263C4CEC4
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 16:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7D6AC4CEC4
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 16:59:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BE8F20882
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 16:57:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iGhRGSur"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BE8F20882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id AA25620882
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 16:59:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA25620882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCRe1-0004bq-MF
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 12:57:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34030)
+	id 1iCRgj-0007WT-TR
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 12:59:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36088)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iCRN5-0005e0-6n
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 12:39:33 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iCRXc-0005mQ-Vt
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 12:50:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iCRN3-0003sQ-3h
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 12:39:31 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38417)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iCRN1-0003ru-6M
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 12:39:27 -0400
-Received: by mail-wr1-x443.google.com with SMTP id l11so14738264wrx.5
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 09:39:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=IFm5yY/29subTcXqJqo4PofXOnZaqQJjrhJJ/cRg9L0=;
- b=iGhRGSurAHgp+Xt5KOPkzdcMRjMoIBWY4G8hdyqMRHdyQD2CdWGYZYVVP3J/F+SgSL
- UvF0sARis5/1hoIHmmkO6Ox7MZ+I05EbqFmBrn0W/mkkPf3nv5XDOMcBAVCbgzhYbOIu
- ehAN5ZbmkIBRrriBILCkYUIsbnYyBXl0bwM2MR6p23Alyb2kthCSZR13c0u8I1HnNPWC
- Aom6wZa3a2W4YgwHwwwFxs+EJKQpxgIq+bPl8UF99Dqn90GIqWQMSl0PEGVEiFETHAmw
- w7hZKJKjS6iKf8UkmW7DRSgS2KnOwJnKengl6xKyJFn+U3HKov0kWRQTTBM0to2bevp9
- ppAg==
+ (envelope-from <pbonzini@redhat.com>) id 1iCRXb-0000gY-TI
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 12:50:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40370)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iCRXb-0000g6-Nv
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 12:50:23 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E0A9E76520
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 16:50:22 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id r21so5209370wme.5
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 09:50:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=IFm5yY/29subTcXqJqo4PofXOnZaqQJjrhJJ/cRg9L0=;
- b=KU7+EoeOf7e38JZdSxXgGh+NyiIcZ+hH5axitxN9tS8i517IjCuw8d17vvLjJjcxRO
- bB90kOmxinNM+6CLQ/0Pop48mca3WsO/9sMvLrho+bAUKxlzG2LY33r4Dg8v+r9iSrpE
- 7WeUtJuWo6k+NoG1Oy5/uYltVfgfOaQ2ASjZ2vTVlV3CAhyfLXWSMtXQHRXGkWfd7Vfe
- DSlFuXnUiaZQcXPTyxMPMflYZM/GB4wvMaNPTPDwQ0GBYD1nqNN52bUs08FLmqY2DiuQ
- i000cyi7E2WRndjJswSkGgSS5k6ZepgwaQxRJVnUbAUvSb5ls/of0ySBuT6yE9s1A8Rp
- Xe/A==
-X-Gm-Message-State: APjAAAXz26n46yn9zpepMPCVjZAc04DfieY+dd7dBax6ZemTg95LGKow
- m1MAkVX0NPO0awbW+Neb4z6U+g==
-X-Google-Smtp-Source: APXvYqyZWR+1p7gZdNG/px3snHwUUMeTPxppappGWh6qyOkyugsJH5ToskVz5VvSf3Dk8SZoV7MHXQ==
-X-Received: by 2002:a05:6000:a:: with SMTP id h10mr273296wrx.226.1569256765830; 
- Mon, 23 Sep 2019 09:39:25 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id v7sm12833502wru.87.2019.09.23.09.39.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Sep 2019 09:39:25 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 81FEE1FF87;
- Mon, 23 Sep 2019 17:39:24 +0100 (BST)
-References: <20190921043256.4575-1-richard.henderson@linaro.org>
- <20190921043256.4575-7-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 6/7] target/alpha: Mask IOV exception with INV for
- user-only
-In-reply-to: <20190921043256.4575-7-richard.henderson@linaro.org>
-Date: Mon, 23 Sep 2019 17:39:24 +0100
-Message-ID: <87muevarwj.fsf@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=+9MIoogSi04qbEM4kUnN48So0U0Za51LpTDDBnnhERA=;
+ b=DO1Dbq39tPxk2Q5nv2m8dBqfNlbft0VsiusHq8ctr+PVImeBuClSbb4y0nsD8iiyDF
+ oSQ83R9F7RR8h2oG67BQRtYhTe0cdpJyMVDp/lqQ8X9L0EMqF4pgxMZSzYayC+RSE9WN
+ q8DL9Viaodco6hU+xqXeY/tgXSdaEZvzmIpIoWBmCl66E63DJHASUGW28wkDzx1Ve43l
+ oxxd9RFX8WjLjzh7xxbaXLulmAJXNXjGGE3ZTxFer+8Ow9RXfUZHIBuW0fhms/zvML7e
+ HS/ZxHFE+7lJ4z7dSN63Guhue5QkB9CJPT6yohWfP2sK6eNeKKVaXzgWf4Ax3tPLrV2o
+ toJw==
+X-Gm-Message-State: APjAAAWOOJ4YXEJGO5lG/UwTleWbgwK9GiGPEYDfmwkpJJMX5fP2QRjh
+ umEO/65wA1i9qk0nKeIlOOkfqoSlrHttRv1QZIIxEs/ALj2/hkuCy3upcTYXs058RkVBEDMbHgB
+ L2LO0DTRVhvN7HD4=
+X-Received: by 2002:a5d:4590:: with SMTP id p16mr339547wrq.82.1569257421620;
+ Mon, 23 Sep 2019 09:50:21 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzKf5tlCunYpfP2+gEF9p2nNs0Zgjkqc4GGmDcoGkUtQ8lz1WDlOmgRr9QnvczcTL/4ful1SA==
+X-Received: by 2002:a5d:4590:: with SMTP id p16mr339532wrq.82.1569257421383;
+ Mon, 23 Sep 2019 09:50:21 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36?
+ ([2001:b07:6468:f312:9520:22e6:6416:5c36])
+ by smtp.gmail.com with ESMTPSA id e3sm6929448wme.39.2019.09.23.09.50.20
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 23 Sep 2019 09:50:20 -0700 (PDT)
+Subject: Re: [PATCH v3 18/20] cputlb: Remove tb_invalidate_phys_page_range
+ is_cpu_write_access
+To: Richard Henderson <richard.henderson@linaro.org>,
+ David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190922035458.14879-1-richard.henderson@linaro.org>
+ <20190922035458.14879-19-richard.henderson@linaro.org>
+ <4926b925-7019-3146-c9c7-a7fe18b8c378@redhat.com>
+ <5410485a-d14b-57ad-67a2-c4eb876417af@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <83a40fac-cfb1-1a5c-dd15-dff32529eeb2@redhat.com>
+Date: Mon, 23 Sep 2019 18:50:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <5410485a-d14b-57ad-67a2-c4eb876417af@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,51 +97,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 23/09/19 18:05, Richard Henderson wrote:
+> On 9/23/19 1:52 AM, David Hildenbrand wrote:
+>>> -    tb_invalidate_phys_page_range__locked(pages, p, start, end,
+>>> -                                          is_cpu_write_access);
+>>> +    tb_invalidate_phys_page_range__locked(pages, p, start, end, 0);
+>>
+>> I'd prefer "false" to highlight the semantics, but as it's and int ...
+>>
+>> Reviewed-by: David Hildenbrand <david@redhat.com>
+> 
+> I did think of that, but then the next patch changes this last argument to
+> "uintptr_t retaddr", so then it's not really a boolean argument anymore, and
+> "0" is exactly what we want.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Yeah, 0 is fine here.
 
-> The kernel masks the integer overflow exception with the
-> software invalid exception mask.  Include IOV in the set
-> of exception bits masked by fpcr_exc_enable.
->
-> Fixes the new float_convs test.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Paolo
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  target/alpha/helper.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/target/alpha/helper.c b/target/alpha/helper.c
-> index 1b3479738b..55d7274d94 100644
-> --- a/target/alpha/helper.c
-> +++ b/target/alpha/helper.c
-> @@ -58,6 +58,13 @@ void cpu_alpha_store_fpcr(CPUAlphaState *env, uint64_t=
- val)
->       */
->      uint32_t soft_fpcr =3D alpha_ieee_swcr_to_fpcr(env->swcr) >> 32;
->      fpcr |=3D soft_fpcr & (FPCR_STATUS_MASK | FPCR_DNZ);
-> +
-> +    /*
-> +     * The IOV exception is disabled by the kernel with SWCR_TRAP_ENABLE=
-_INV,
-> +     * which got mapped by alpha_ieee_swcr_to_fpcr to FPCR_INVD.
-> +     * Add FPCR_IOV to fpcr_exc_enable so that it is handled identically.
-> +     */
-> +    t |=3D CONVERT_BIT(soft_fpcr, FPCR_INVD, FPCR_IOV);
->  #endif
->
->      t |=3D CONVERT_BIT(fpcr, FPCR_INED, FPCR_INE);
-
-
---
-Alex Benn=C3=A9e
 
