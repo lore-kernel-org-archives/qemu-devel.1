@@ -2,102 +2,65 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4773BC4CECF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 16:10:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DD66C4CECF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 16:13:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 109A420835
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 16:10:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="beR1D8bx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 109A420835
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 03BC02089F
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 16:13:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03BC02089F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCQui-0007fs-HG
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 12:10:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56219)
+	id 1iCQxQ-00029y-S2
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 12:13:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56593)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <anthony.perard@citrix.com>) id 1iCQsZ-0006Q9-Ir
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 12:08:00 -0400
+ (envelope-from <crosa@redhat.com>) id 1iCQvV-0000c4-Fv
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 12:11:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <anthony.perard@citrix.com>) id 1iCQsW-0000SV-1u
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 12:07:59 -0400
-Received: from esa6.hc3370-68.iphmx.com ([216.71.155.175]:42822)
+ (envelope-from <crosa@redhat.com>) id 1iCQvT-0002EG-B5
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 12:11:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60834)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
- id 1iCQsV-0000LX-PQ
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 12:07:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=citrix.com; s=securemail; t=1569254875;
- h=date:from:to:cc:subject:message-id:references:
- mime-version:in-reply-to;
- bh=kYTPq/m6mJCnPR7CzZJFQy2xo0zfrgZrJFhqDjT/k8Y=;
- b=beR1D8bxa/lSpc2GwtVs1yvQNOcXW8KPHmagjvAxItf0KVG+NNpS9aGE
- ccSmhpHLVFtNDDt/MklAMxPU7lP5ZU5XTU0e8VYU1rSWzSAPU4cTKTVLV
- DKWtoYuNaPoV1vFWWFWXEjmDNan8puTDTBnXbjB1+a1gDP1nHtJc741NO s=;
-Authentication-Results: esa6.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none;
- spf=None smtp.pra=anthony.perard@citrix.com;
- spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
- spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa6.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- anthony.perard@citrix.com) identity=pra;
- client-ip=162.221.158.21; receiver=esa6.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="anthony.perard@citrix.com";
- x-conformance=sidf_compatible
-Received-SPF: Pass (esa6.hc3370-68.iphmx.com: domain of
- anthony.perard@citrix.com designates 162.221.158.21 as
- permitted sender) identity=mailfrom;
- client-ip=162.221.158.21; receiver=esa6.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="anthony.perard@citrix.com";
- x-conformance=sidf_compatible; x-record-type="v=spf1";
- x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
- ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
- ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
- ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
-Received-SPF: None (esa6.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- postmaster@mail.citrix.com) identity=helo;
- client-ip=162.221.158.21; receiver=esa6.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="postmaster@mail.citrix.com";
- x-conformance=sidf_compatible
-IronPort-SDR: 2BFSpX+i73kp32ExYqoDKlY6D6EFe7b5FXPqnOQsUMsxW4kjD5YG4T2ggHH1Psxz/sUFZMUNm2
- 3PPusrciR3Kpk19s1Nhvuuv41z0Wc7vMajdAZWiN2/P1PJPYMorFrfhTKcb/I1uW2GmvHZNe2w
- V/Op37tShBGEzGqyzGKtwQcjvWmG3jbTR0wSpleja4MbpkzyGnUL+IIx1uhPFC5eioopLgGo0s
- 8rEE6NabbO1TjEej58wNEwfsncD7m5SfOzc7U2nkM0101hMc55OAaUUmQJ6FB+WcOAXZk6HoQu
- TCY=
-X-SBRS: 2.7
-X-MesageID: 6208294
-X-Ironport-Server: esa6.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.64,541,1559534400"; 
-   d="scan'208";a="6208294"
-Date: Mon, 23 Sep 2019 17:07:51 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-To: Laurent Vivier <laurent@vivier.eu>
-Subject: Re: [Qemu-devel] [PATCH v3] ui: add an embedded Barrier client
-Message-ID: <20190923160751.GA212017@perard.uk.xensource.com>
-References: <20190906083812.29487-1-laurent@vivier.eu>
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iCQvT-0002CZ-1E
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 12:10:59 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B63FC5859E;
+ Mon, 23 Sep 2019 16:10:57 +0000 (UTC)
+Received: from dhcp-17-179.bos.redhat.com (dhcp-17-179.bos.redhat.com
+ [10.18.17.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AFC91100197A;
+ Mon, 23 Sep 2019 16:10:52 +0000 (UTC)
+Date: Mon, 23 Sep 2019 12:10:50 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH v2 1/5] docker: move tests from python2 to python3
+Message-ID: <20190923161050.GA29623@dhcp-17-179.bos.redhat.com>
+References: <20190920221255.30412-1-jsnow@redhat.com>
+ <20190920221255.30412-2-jsnow@redhat.com>
+ <4ed65a51-051c-0a61-d63c-042306740a7d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20190906083812.29487-1-laurent@vivier.eu>
-User-Agent: Mutt/1.12.2 (2019-09-21)
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.155.175
+In-Reply-To: <4ed65a51-051c-0a61-d63c-042306740a7d@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Mon, 23 Sep 2019 16:10:57 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,70 +72,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On Sat, Sep 21, 2019 at 10:48:06AM +0200, Philippe Mathieu-Daud=E9 wrote:
+> On 9/21/19 12:12 AM, John Snow wrote:
+> > As part of the push to drop python2 support, replace any explicit pyt=
+hon2
+> > dependencies with python3 versions.
+> >=20
+> > For centos, python2 still exists as an implicit dependency, but by ad=
+ding
+> > python3 we will be able to build even if the configure script begins =
+to
+> > require python 3.5+.
+> >=20
+> > Tested with centos7, fedora, ubuntu, ubuntu1804, and debian 9 (amd64)=
+.
+> > Tested under a custom configure script that requires Python 3.5+.
+> >=20
+> > the travis dockerfile is also moved to using python3, which was teste=
+d
+> > by running `make docker-test-build@travis`, which I hope is sufficien=
+t.
+> >=20
+> > Signed-off-by: John Snow <jsnow@redhat.com>
+>=20
+> > Message-id: 20190920200049.27216-1-jsnow@redhat.com
+>   ^ remove
+>=20
+> v1 has:
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>=20
+> > ---
+> >  tests/docker/dockerfiles/centos7.docker             | 2 +-
+> >  tests/docker/dockerfiles/debian-ports.docker        | 2 +-
+> >  tests/docker/dockerfiles/debian-sid.docker          | 2 +-
+> >  tests/docker/dockerfiles/debian-xtensa-cross.docker | 2 +-
+> >  tests/docker/dockerfiles/debian10.docker            | 2 +-
+> >  tests/docker/dockerfiles/debian8.docker             | 3 +--
+>=20
+> If you queue this patch at the end of your series, no need to patch
+> debian8.docker.
+>
 
-Once this patch is applied, if we try to start QEMU with "-k en-us",
-qemu print a message and exit:
-    qemu-system-i386: could not read keymap file: 'en-us'
+Yep, agreed.
 
-See below,
-
-On Fri, Sep 06, 2019 at 10:38:12AM +0200, Laurent Vivier wrote:
-> diff --git a/ui/input-barrier.c b/ui/input-barrier.c
-> new file mode 100644
-> index 000000000000..a2c961f285a4
-> --- /dev/null
-> +++ b/ui/input-barrier.c
-> +static void input_barrier_class_init(ObjectClass *oc, void *data)
-> +{
-> +    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
-> +
-> +    ucc->complete = input_barrier_complete;
-> +
-> +    /* always use generic keymaps */
-> +    if (keyboard_layout) {
-> +        /* We use X11 key id, so use VNC name2keysym */
-> +        kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout,
-> +                                          &error_fatal);
-
-I think it's because this function is called way to early, before
-qemu_add_data_dir() is called, and so qemu_find_file() fails.
-
-Can you fix it?
-
-Thanks.
-
-> +    }
-> +}
-> +
-> +static const TypeInfo input_barrier_info = {
-> +    .name = TYPE_INPUT_BARRIER,
-> +    .parent = TYPE_OBJECT,
-> +    .class_size = sizeof(InputBarrierClass),
-> +    .class_init = input_barrier_class_init,
-> +    .instance_size = sizeof(InputBarrier),
-> +    .instance_init = input_barrier_instance_init,
-> +    .instance_finalize = input_barrier_instance_finalize,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { TYPE_USER_CREATABLE },
-> +        { }
-> +    }
-> +};
-> +
-> +static void register_types(void)
-> +{
-> +    type_register_static(&input_barrier_info);
-> +}
-> +
-> +type_init(register_types);
-
--- 
-Anthony PERARD
+- Cleber.
 
