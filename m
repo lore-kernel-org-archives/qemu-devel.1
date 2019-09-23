@@ -2,93 +2,82 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5202C4320D
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 23:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AA4FC432C1
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 23:09:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72D6320820
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 23:09:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 455BB20820
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 23:09:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yYk9Oyl+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72D6320820
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="am+XxRM+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 455BB20820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCXST-0004dz-OZ
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 19:09:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35770)
+	id 1iCXSa-0004li-5H
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 19:09:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35801)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iCXJb-0005Y2-2v
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 19:00:20 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iCXJe-0005aR-S8
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 19:00:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iCXJX-00081x-Mj
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 19:00:18 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41518)
+ (envelope-from <richard.henderson@linaro.org>) id 1iCXJc-000848-OI
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 19:00:22 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:44475)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iCXJX-00081D-B3
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 19:00:15 -0400
-Received: by mail-wr1-x443.google.com with SMTP id h7so15724475wrw.8
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 16:00:15 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iCXJa-00082r-Qo
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 19:00:19 -0400
+Received: by mail-pf1-x441.google.com with SMTP id q21so10116973pfn.11
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 16:00:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=nT3xBaCVZhKK+bbM2D8EcQqUQ4OfyQS+TZn4Ujy4sco=;
- b=yYk9Oyl+LLaS4s8kIinyrdZYHrqkfFQs3CxSszgAi/WEwB5voqhQ9fLr8pjuo8Kdum
- owiLiMRkxSWBo4va7yptPf0JyafbMMiG0xPRo4nCYmF4w/DkhMvMJJ/6kbicS//ogzm+
- xlPYY6Ze4sPHgRh8t2QrZt7rL+sJ+IoNwcUwCViOQu0Vo4ouSOPbrGQ03QRwhVklqxP6
- 9J+LytGsmd1qQOPi11cz40YYBnO6TNQBUf4ZOJWRpGzfUGh1Kibp8/Y+Tp66MNERHmzD
- UZcufdHyto0dJS5+chOLMSVeG33hGpaBjnxO2dAN+H84wvP+2ojrslltYaNo+RCIQ7T2
- Yy/A==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=ZrzbwlEBbf7uMlVZ6ux04nTJ7ryFvejwhV3RoIkuh+Y=;
+ b=am+XxRM+JrVixgKCMDimb2Q7W2/kA98/Ptb7MWISR3xysxT1SxJd0eMEMwREVhqqwq
+ TJ1k7En2xDfdGNRRtjpE8+2boRhCIf5BWxh28x6Ft4MPHMF78RlQkVvPskqoQI5y7ZrP
+ tB7DDgjfPbWgoD6ZG0YmcVUKHUNEw9Vg+jH3Kl49sAJPVm4P7lnkEomnoKI+hl74nrt+
+ +GPbj1OdaVOhiEfqasSB7SJzpSBnu+nxB09MMYQlp7WZFXJ30Xbj2RWnj74GaXJQeWjp
+ Btssdx9x+mhXTUg9R/68Ewjh3O9JHXZrRsWW3DVSpKwmsOtNu+BZoQ7vo86hJkTru8HD
+ hvMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=nT3xBaCVZhKK+bbM2D8EcQqUQ4OfyQS+TZn4Ujy4sco=;
- b=Qv8jb9Ptwa1VpwPyQAwSxtGeGfVxUJc9qFWNHcSbr9tbUTxF6UoJET6Ctltkb6738E
- UcFWND/mpb8vZyLkE/EA2brYhHm3mMa7uRTDHNqR824lF0+IAUN6U/GrfcJFRg1p8zGn
- IIP7ZgCdandmGD1HdzsY5WmFrV4pmEfCPxtL+GYyflzJ+Obxia4V/aTMVBBsF2amFy47
- EsaUc2/nr1P4pBKvFCIYzTe/VlqaBQ+LfWvLu5kpdufEaj/C1oO+WoBwtg836gtWyqwZ
- GE7Kx9ZTOt0ouugbYTn22Mdl6ywmlFurPeVLVtI3PFmt7NSkjKZefiLYKHa632D49KHO
- ProA==
-X-Gm-Message-State: APjAAAWJhEadbj7ZLm+4bz6L4pMVZuNLDX067hL8pWFzocv7XAOo5X1P
- czbt+NymLljV0a8g3gJD+8+K+g==
-X-Google-Smtp-Source: APXvYqz7iGbh/fFrwp9cjYdOFbH4GXZkzIIjTkVnCvClIvvCDgFyWBhNRKqmqjGmNItNxe8oxPL+7g==
-X-Received: by 2002:a05:6000:1002:: with SMTP id
- a2mr1166588wrx.272.1569279613923; 
- Mon, 23 Sep 2019 16:00:13 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id o19sm16812013wro.50.2019.09.23.16.00.13
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=ZrzbwlEBbf7uMlVZ6ux04nTJ7ryFvejwhV3RoIkuh+Y=;
+ b=Ax9jBDeS6gUA7e6PIkAjOjBvM9NBFMQ2kBwaVc0gcZzc1KtGyT+MgMjmkwv+qYSRNN
+ tLqTpqst/0jTLaJiv5ADBd203cCMMq3Hj8mJaPapuRF5Yz+bOu8ySYVfpl9wNouIBm/Y
+ 1ZtJKFhDUm72BhizXF75/GLrtOxZGAbMot/iaMpx6lI+vAa6oacdxOFvoAMuBGkTMbN6
+ HGmbH6We54md8Mt2F0v8P/mNdgiv93B446qV1HeNPHVPjiglZiTbkMg1opHPNuMzO199
+ oiglhia2lUMFVGwlXUP3fjKRhD5GnxOwYctkhPY1aoRqX0ZKkL94/KuD2R+jNgVXD99w
+ r4dw==
+X-Gm-Message-State: APjAAAWCP5NMarVLmJnPxpnjRR1U90TxM6oX/IzHYh9XjBgkXQQnjmqN
+ eJZyHmsM+ykF1oIzwnoErLqDvVE5Xkk=
+X-Google-Smtp-Source: APXvYqzrTiiZXJnWMJsgoJDyMYc8ECFY4zupYUk1qjGN0QwO/3svaGnNVXsZbONN0ZiOfp2Xee+75w==
+X-Received: by 2002:a63:fc60:: with SMTP id r32mr2359913pgk.160.1569279617065; 
+ Mon, 23 Sep 2019 16:00:17 -0700 (PDT)
+Received: from localhost.localdomain ([12.206.46.59])
+ by smtp.gmail.com with ESMTPSA id 74sm11674810pfy.78.2019.09.23.16.00.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Sep 2019 16:00:13 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 802911FF87;
- Tue, 24 Sep 2019 00:00:12 +0100 (BST)
-References: <20190919171015.12681-1-alex.bennee@linaro.org>
- <20190919171015.12681-5-alex.bennee@linaro.org>
- <20190923205115.GE6528@dhcp-17-179.bos.redhat.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Cleber Rosa <crosa@redhat.com>
-Subject: Re: [PATCH v2 04/16] tests/docker: reduce scary warnings from
- failed inspect
-In-reply-to: <20190923205115.GE6528@dhcp-17-179.bos.redhat.com>
-Date: Tue, 24 Sep 2019 00:00:12 +0100
-Message-ID: <87h852boub.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+ Mon, 23 Sep 2019 16:00:16 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 06/16] cputlb: Introduce TLB_BSWAP
+Date: Mon, 23 Sep 2019 15:59:54 -0700
+Message-Id: <20190923230004.9231-7-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190923230004.9231-1-richard.henderson@linaro.org>
+References: <20190923230004.9231-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,103 +89,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, peter.maydell@linaro.org, qemu-arm@nongnu.org,
- Philippe =?utf-8?Q?Mathieu?= =?utf-8?Q?-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, alex.bennee@linaro.org, stefanha@redhat.com,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Handle bswap on ram directly in load/store_helper.  This fixes a
+bug with the previous implementation in that one cannot use the
+I/O path for RAM.
 
-Cleber Rosa <crosa@redhat.com> writes:
+Fixes: a26fc6f5152b47f1
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ include/exec/cpu-all.h |  4 ++-
+ accel/tcg/cputlb.c     | 62 ++++++++++++++++++++++--------------------
+ 2 files changed, 36 insertions(+), 30 deletions(-)
 
-> On Thu, Sep 19, 2019 at 06:10:03PM +0100, Alex Benn=C3=A9e wrote:
->> There is a race here in the clean-up code so lets just accept that
->> sometimes the active task we just looked up might have finished before
->> we got to inspect it.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  tests/docker/docker.py | 32 ++++++++++++++++++--------------
->>  1 file changed, 18 insertions(+), 14 deletions(-)
->>
->> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
->> index 29613afd489..4dca6006d2f 100755
->> --- a/tests/docker/docker.py
->> +++ b/tests/docker/docker.py
->> @@ -235,20 +235,24 @@ class Docker(object):
->>          if not only_active:
->>              cmd.append("-a")
->>          for i in self._output(cmd).split():
->> -            resp =3D self._output(["inspect", i])
->> -            labels =3D json.loads(resp)[0]["Config"]["Labels"]
->> -            active =3D json.loads(resp)[0]["State"]["Running"]
->> -            if not labels:
->> -                continue
->> -            instance_uuid =3D labels.get("com.qemu.instance.uuid", None)
->> -            if not instance_uuid:
->> -                continue
->> -            if only_known and instance_uuid not in self._instances:
->> -                continue
->> -            print("Terminating", i)
->> -            if active:
->> -                self._do(["kill", i])
->> -            self._do(["rm", i])
->> +            try:
->> +                resp =3D self._output(["inspect", i])
->> +                labels =3D json.loads(resp)[0]["Config"]["Labels"]
->> +                active =3D json.loads(resp)[0]["State"]["Running"]
->> +                if not labels:
->> +                    continue
->> +                instance_uuid =3D labels.get("com.qemu.instance.uuid", =
-None)
->> +                if not instance_uuid:
->> +                    continue
->> +                if only_known and instance_uuid not in self._instances:
->> +                    continue
->> +                print("Terminating", i)
->> +                if active:
->> +                    self._do(["kill", i])
->> +                    self._do(["rm", i])
->
-> Both podman and docker seem to handle "rm -f $INSTANCE" well, which
-> would by itself consolidate the two commands in one and minimize the
-> race condition.
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index e0c8dc540c..d148bded35 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -335,12 +335,14 @@ CPUArchState *cpu_copy(CPUArchState *env);
+ #define TLB_MMIO            (1 << (TARGET_PAGE_BITS_MIN - 3))
+ /* Set if TLB entry contains a watchpoint.  */
+ #define TLB_WATCHPOINT      (1 << (TARGET_PAGE_BITS_MIN - 4))
++/* Set if TLB entry requires byte swap.  */
++#define TLB_BSWAP           (1 << (TARGET_PAGE_BITS_MIN - 5))
+ 
+ /* Use this mask to check interception with an alignment mask
+  * in a TCG backend.
+  */
+ #define TLB_FLAGS_MASK \
+-    (TLB_INVALID_MASK | TLB_NOTDIRTY | TLB_MMIO | TLB_WATCHPOINT)
++    (TLB_INVALID_MASK | TLB_NOTDIRTY | TLB_MMIO | TLB_WATCHPOINT | TLB_BSWAP)
+ 
+ /**
+  * tlb_hit_page: return true if page aligned @addr is a hit against the
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index 430ba4a69d..f634edb4f4 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -737,8 +737,7 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
+         address |= TLB_INVALID_MASK;
+     }
+     if (attrs.byte_swap) {
+-        /* Force the access through the I/O slow path.  */
+-        address |= TLB_MMIO;
++        address |= TLB_BSWAP;
+     }
+     if (!memory_region_is_ram(section->mr) &&
+         !memory_region_is_romd(section->mr)) {
+@@ -901,10 +900,6 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+     bool locked = false;
+     MemTxResult r;
+ 
+-    if (iotlbentry->attrs.byte_swap) {
+-        op ^= MO_BSWAP;
+-    }
+-
+     section = iotlb_to_section(cpu, iotlbentry->addr, iotlbentry->attrs);
+     mr = section->mr;
+     mr_offset = (iotlbentry->addr & TARGET_PAGE_MASK) + addr;
+@@ -947,10 +942,6 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+     bool locked = false;
+     MemTxResult r;
+ 
+-    if (iotlbentry->attrs.byte_swap) {
+-        op ^= MO_BSWAP;
+-    }
+-
+     section = iotlb_to_section(cpu, iotlbentry->addr, iotlbentry->attrs);
+     mr = section->mr;
+     mr_offset = (iotlbentry->addr & TARGET_PAGE_MASK) + addr;
+@@ -1133,8 +1124,8 @@ void *probe_access(CPUArchState *env, target_ulong addr, int size,
+                              wp_access, retaddr);
+     }
+ 
+-    if (tlb_addr & (TLB_NOTDIRTY | TLB_MMIO)) {
+-        /* I/O access */
++    /* Reject I/O access, or other required slow-path.  */
++    if (tlb_addr & (TLB_NOTDIRTY | TLB_MMIO | TLB_BSWAP)) {
+         return NULL;
+     }
+ 
+@@ -1344,6 +1335,7 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
+     /* Handle anything that isn't just a straight memory access.  */
+     if (unlikely(tlb_addr & ~TARGET_PAGE_MASK)) {
+         CPUIOTLBEntry *iotlbentry;
++        bool need_swap;
+ 
+         /* For anything that is unaligned, recurse through full_load.  */
+         if ((addr & (size - 1)) != 0) {
+@@ -1357,17 +1349,22 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
+             /* On watchpoint hit, this will longjmp out.  */
+             cpu_check_watchpoint(env_cpu(env), addr, size,
+                                  iotlbentry->attrs, BP_MEM_READ, retaddr);
+-
+-            /* The backing page may or may not require I/O.  */
+-            tlb_addr &= ~TLB_WATCHPOINT;
+-            if ((tlb_addr & ~TARGET_PAGE_MASK) == 0) {
+-                goto do_aligned_access;
+-            }
+         }
+ 
++        need_swap = size > 1 && (tlb_addr & TLB_BSWAP);
++
+         /* Handle I/O access.  */
+-        return io_readx(env, iotlbentry, mmu_idx, addr,
+-                        retaddr, access_type, op);
++        if (likely(tlb_addr & TLB_MMIO)) {
++            return io_readx(env, iotlbentry, mmu_idx, addr, retaddr,
++                            access_type, op ^ (need_swap * MO_BSWAP));
++        }
++
++        haddr = (void *)((uintptr_t)addr + entry->addend);
++
++        if (unlikely(need_swap)) {
++            return load_memop(haddr, op ^ MO_BSWAP);
++        }
++        return load_memop(haddr, op);
+     }
+ 
+     /* Handle slow unaligned access (it spans two pages or IO).  */
+@@ -1394,7 +1391,6 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
+         return res & MAKE_64BIT_MASK(0, size * 8);
+     }
+ 
+- do_aligned_access:
+     haddr = (void *)((uintptr_t)addr + entry->addend);
+     return load_memop(haddr, op);
+ }
+@@ -1592,6 +1588,7 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
+     /* Handle anything that isn't just a straight memory access.  */
+     if (unlikely(tlb_addr & ~TARGET_PAGE_MASK)) {
+         CPUIOTLBEntry *iotlbentry;
++        bool need_swap;
+ 
+         /* For anything that is unaligned, recurse through byte stores.  */
+         if ((addr & (size - 1)) != 0) {
+@@ -1605,16 +1602,24 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
+             /* On watchpoint hit, this will longjmp out.  */
+             cpu_check_watchpoint(env_cpu(env), addr, size,
+                                  iotlbentry->attrs, BP_MEM_WRITE, retaddr);
+-
+-            /* The backing page may or may not require I/O.  */
+-            tlb_addr &= ~TLB_WATCHPOINT;
+-            if ((tlb_addr & ~TARGET_PAGE_MASK) == 0) {
+-                goto do_aligned_access;
+-            }
+         }
+ 
++        need_swap = size > 1 && (tlb_addr & TLB_BSWAP);
++
+         /* Handle I/O access.  */
+-        io_writex(env, iotlbentry, mmu_idx, val, addr, retaddr, op);
++        if (likely(tlb_addr & (TLB_MMIO | TLB_NOTDIRTY))) {
++            io_writex(env, iotlbentry, mmu_idx, val, addr, retaddr,
++                      op ^ (need_swap * MO_BSWAP));
++            return;
++        }
++
++        haddr = (void *)((uintptr_t)addr + entry->addend);
++
++        if (unlikely(need_swap)) {
++            store_memop(haddr, val, op ^ MO_BSWAP);
++        } else {
++            store_memop(haddr, val, op);
++        }
+         return;
+     }
+ 
+@@ -1683,7 +1688,6 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
+         return;
+     }
+ 
+- do_aligned_access:
+     haddr = (void *)((uintptr_t)addr + entry->addend);
+     store_memop(haddr, val, op);
+ }
+-- 
+2.17.1
 
-It's the self.__output which is the real race condition because
-check_output complains if the command doesn't succeed with 0. What we
-really need is to find somewhat of filtering the ps just for qemu
-instances and then just rm -f them as you suggest.
-
->
-> For unexisting containers, and no other errors, podman will return "1
-> if one of the specified containers did not exist, and no other
-> failure", as per its man page.  I couldn't find any guarantee that
-> docker will also return 1 on a similar situation, but that's what
-> I've experienced too:
->
->  $ docker rm -f CONTAINER_IS_NOW_FONE
->  Error response from daemon: No such container: CONTAINER_IS_NOW_GONE
->  $ echo $?
->  1
->
-> Maybe waiving exit status 1 and nothing else would do the trick here
-> and not hide other real problems?
->
-> - Cleber.
->
->> +            except subprocess.CalledProcessError:
->> +                # i likely finished running before we got here
->> +                pass
->>
->>      def clean(self):
->>          self._do_kill_instances(False, False)
->> --
->> 2.20.1
->>
->>
-
-
---
-Alex Benn=C3=A9e
 
