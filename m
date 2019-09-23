@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27051C4320D
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 20:54:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60637C4332C
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 20:54:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB5B7207FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 20:54:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB5B7207FD
+	by mail.kernel.org (Postfix) with ESMTPS id 338B4207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 20:54:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 338B4207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCVLx-0006Vp-LX
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 16:54:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39088)
+	id 1iCVM5-0006dx-Rs
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 16:54:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34769)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iCUzd-00077L-Pp
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 16:31:35 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCUUg-0006gX-2z
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 15:59:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iCUzb-0000aJ-S4
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 16:31:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:3796)
+ (envelope-from <eblake@redhat.com>) id 1iCUUe-00022S-Rk
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 15:59:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44822)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iCUzS-0000Vf-3H; Mon, 23 Sep 2019 16:31:23 -0400
+ id 1iCUUY-00020p-SV; Mon, 23 Sep 2019 15:59:27 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DAE9E3090FC3;
- Mon, 23 Sep 2019 20:31:19 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9320D8A1C8C;
+ Mon, 23 Sep 2019 19:59:24 +0000 (UTC)
 Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AD3F0601AF;
- Mon, 23 Sep 2019 20:30:35 +0000 (UTC)
-Subject: Re: [RFC v2 7/9] Use auto-propagated errp
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 321B26017E;
+ Mon, 23 Sep 2019 19:58:11 +0000 (UTC)
+Subject: Re: [RFC v2 1/9] error: auto propagated local_err
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org
 References: <20190923161231.22028-1-vsementsov@virtuozzo.com>
- <20190923161231.22028-8-vsementsov@virtuozzo.com>
+ <20190923161231.22028-2-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -72,18 +72,18 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <59c5ccc7-3d4c-9613-fcd3-97642c1394cd@redhat.com>
-Date: Mon, 23 Sep 2019 15:30:31 -0500
+Message-ID: <b345e88b-f426-5bcc-cf2f-4774d5b98bcb@redhat.com>
+Date: Mon, 23 Sep 2019 14:58:10 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190923161231.22028-8-vsementsov@virtuozzo.com>
+In-Reply-To: <20190923161231.22028-2-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Mon, 23 Sep 2019 20:31:20 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Mon, 23 Sep 2019 19:59:26 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-Mailman-Approved-At: Mon, 23 Sep 2019 16:51:49 -0400
@@ -134,235 +134,117 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/23/19 11:12 AM, Vladimir Sementsov-Ogievskiy wrote:
-> This commit is generated by command
+> Here is introduced ERRP_FUNCTION_BEGIN macro, to be used at start of
+> any function with errp parameter.
 > 
-> git grep -l 'Error \*\*errp' | while read f; \
-> do spatch --sp-file \
-> scripts/coccinelle/auto-propagated-errp.cocci --in-place $f; done
+> It has three goals:
 > 
+> 1. Fix issue with error_fatal & error_append_hint: user can't see these
+> hints, because exit() happens in error_setg earlier than hint is
+> appended. [Reported by Greg Kurz]
+> 
+> 2. Fix issue with error_abort & error_propagate: when we wrap
+> error_abort by local_err+error_propagate, resulting coredump will
+> refer to error_propagate and not to the place where error happened.
+> (the macro itself don't fix the issue, but it allows to [3.] drop all
 
-As mentioned in your cover letter, this fails syntax-check and
-compilation without squashing in some followups; if we can't improve the
-.cocci script to do it automatically, then manually squashing in
-cleanups (and documenting what types of cleanups they were) is fine.
-(The goal for a mechanical patch like this is to make it easy enough to
-automate downstream, even where the file contents are changed, but where
-the process for creating those changes are the same).
+doesn't
 
+> local_err+error_propagate pattern, which will definitely fix the issue)
+> [Reported by Kevin Wolf]
+> 
+> 3. Drop local_err+error_propagate pattern, which is used to workaround
+> void functions with errp parameter, when caller wants to know resulting
+> status. (Note: actually these functions should be merely updated to
+
+Maybe:
+
+s/should/could/
+
+> return int error code).
+> 
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
-
-Spot-checking
-
->  block/io.c                          |  11 +-
-
->  block/nbd.c                         |  44 +++---
-
->  qapi/qapi-visit-core.c              |  53 ++-----
-
-just to see how it looks.
-
-> +++ b/block/io.c
-> @@ -136,7 +136,6 @@ static void bdrv_merge_limits(BlockLimits *dst, const BlockLimits *src)
->  void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
->  {
->      BlockDriver *drv = bs->drv;
-> -    Error *local_err = NULL;
+>  include/qapi/error.h | 37 +++++++++++++++++++++++++++++++++++++
+>  1 file changed, 37 insertions(+)
+> 
+> diff --git a/include/qapi/error.h b/include/qapi/error.h
+> index 3f95141a01..f6f4fa0fac 100644
+> --- a/include/qapi/error.h
+> +++ b/include/qapi/error.h
+> @@ -322,6 +322,43 @@ void error_set_internal(Error **errp,
+>                          ErrorClass err_class, const char *fmt, ...)
+>      GCC_FMT_ATTR(6, 7);
 >  
+> +typedef struct ErrorPropagator {
+> +    Error *local_err;
+> +    Error **errp;
+> +} ErrorPropagator;
+> +
+> +static inline void error_propagator_cleanup(ErrorPropagator *prop)
+> +{
+> +    error_propagate(prop->errp, prop->local_err);
+> +}
+> +
+> +G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagator, error_propagator_cleanup);
+> +
+> +/*
+> + * ERRP_FUNCTION_BEGIN
+> + *
+> + * This macro MUST be the first line of EACH function with Error **errp
+> + * parameter.
 
-Umm, no insertion of ERR_FUNCTION_BEGIN().  Oops.
+Maybe s/EACH function/ANY non-empty function/ (allowing our stub
+functions to be exemptions).
 
->      memset(&bs->bl, 0, sizeof(bs->bl));
->  
-> @@ -151,9 +150,8 @@ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
->  
->      /* Take some limits from the children as a default */
->      if (bs->file) {
-> -        bdrv_refresh_limits(bs->file->bs, &local_err);
-> -        if (local_err) {
-> -            error_propagate(errp, local_err);
-> +        bdrv_refresh_limits(bs->file->bs, errp);
-> +        if (*errp) {
->              return;
->          }
->          bdrv_merge_limits(&bs->bl, &bs->file->bs->bl);
-> @@ -166,9 +164,8 @@ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
->      }
->  
->      if (bs->backing) {
-> -        bdrv_refresh_limits(bs->backing->bs, &local_err);
-> -        if (local_err) {
-> -            error_propagate(errp, local_err);
-> +        bdrv_refresh_limits(bs->backing->bs, errp);
-> +        if (*errp) {
->              return;
+> + *
+> + * If errp is NULL or points to error_fatal, it is rewritten to point to
 
-Rest of the changes in this file are good if the macro gets added correctly.
+s/to/to a/
 
->          }
->          bdrv_merge_limits(&bs->bl, &bs->backing->bs->bl);
+> + * local Error object, which will be automatically propagated to original
 
-> +++ b/block/nbd.c
-> @@ -808,7 +808,6 @@ static int nbd_co_receive_cmdread_reply(BDRVNBDState *s, uint64_t handle,
->      NBDReplyChunkIter iter;
->      NBDReply reply;
->      void *payload = NULL;
-> -    Error *local_err = NULL;
+s/to/to the/
 
-Recurring problem of not inserting the macro as expected.
+> + * errp on function exit (see error_propagator_cleanup).
+> + *
+> + * After invocation of this macro it is always safe to dereference errp
+> + * (as it's not NULL anymore) and to append hint (by error_append_hint)
 
->  
->      NBD_FOREACH_REPLY_CHUNK(s, iter, handle, s->info.structured_reply,
->                              qiov, &reply, &payload)
-> @@ -827,20 +826,20 @@ static int nbd_co_receive_cmdread_reply(BDRVNBDState *s, uint64_t handle,
->              break;
->          case NBD_REPLY_TYPE_OFFSET_HOLE:
->              ret = nbd_parse_offset_hole_payload(s, &reply.structured, payload,
-> -                                                offset, qiov, &local_err);
-> +                                                offset, qiov, errp);
->              if (ret < 0) {
->                  nbd_channel_error(s, ret);
-> -                nbd_iter_channel_error(&iter, ret, &local_err);
-> +                nbd_iter_channel_error(&iter, ret, errp);
->              }
->              break;
->          default:
->              if (!nbd_reply_type_is_error(chunk->type)) {
->                  /* not allowed reply type */
->                  nbd_channel_error(s, -EINVAL);
-> -                error_setg(&local_err,
-> +                error_setg(errp,
->                             "Unexpected reply type: %d (%s) for CMD_READ",
+s/append hint/append hints/
 
-Could almost fold these lines (but I'm not asking you to; keeping this
-patch as mechanical as possible is fine).
+> + * (as, if it was error_fatal, we swapped it by local_error to be
 
->                             chunk->type, nbd_reply_type_lookup(chunk->type));
-> -                nbd_iter_channel_error(&iter, -EINVAL, &local_err);
-> +                nbd_iter_channel_error(&iter, -EINVAL, errp);
->              }
->          }
->  
-> @@ -861,7 +860,6 @@ static int nbd_co_receive_blockstatus_reply(BDRVNBDState *s,
->      NBDReplyChunkIter iter;
->      NBDReply reply;
->      void *payload = NULL;
-> -    Error *local_err = NULL;
->      bool received = false;
+s/by local_error/with a local error/
 
-Oops on the macro.
+> + * propagated on cleanup).
+> + *
+> + * Note: we don't wrap error_abort case, as we want resulting coredump
+> + * to point to the place where the error happened, not to error_propagate.
 
-> @@ -1174,15 +1172,13 @@ static QIOChannelSocket *nbd_establish_connection(SocketAddress *saddr,
->                                                    Error **errp)
->  {
->      QIOChannelSocket *sioc;
-> -    Error *local_err = NULL;
->  
->      sioc = qio_channel_socket_new();
->      qio_channel_set_name(QIO_CHANNEL(sioc), "nbd-client");
->  
-> -    qio_channel_socket_connect_sync(sioc, saddr, &local_err);
-> -    if (local_err) {
-> +    qio_channel_socket_connect_sync(sioc, saddr, errp);
-> +    if (*errp) {
->          object_unref(OBJECT(sioc));
-> -        error_propagate(errp, local_err);
->          return NULL;
+s/wrap/wrap the/
 
-But getting rid of error_propagate() is nice.
+> + */
+> +#define ERRP_FUNCTION_BEGIN() \
+> +g_auto(ErrorPropagator) __auto_errp_prop = {.errp = errp}; \
+> +Error **__local_errp_unused __attribute__ ((unused)) = \
+> +    (errp = (errp == NULL || *errp == error_fatal ? \
+> +             &__auto_errp_prop.local_err : errp))
 
-Did you grep for instances of error_propagate() after your mechanical
-patch, to see what else the Coccinelle script might have missed?
+I'm not sold on why we need the dummy declaration (yeah, I know it's so
+that you don't have to fight the battle of mixing declarations and
+statements - but this is in a macro call whose usage LOOKS like a
+statement rather than a declaration, so we're already on fuzzy ground).
+We could make this macro expansion one line shorter and still be
+correct, but I'm not going to insist (we'll see what consensus is,
+and/or what Markus says).
 
-
-> +++ b/qapi/opts-visitor.c
-> @@ -275,6 +275,7 @@ opts_next_list(Visitor *v, GenericList *tail, size_t size)
->  static void
->  opts_check_list(Visitor *v, Error **errp)
->  {
-> +	ERRP_FUNCTION_BEGIN();
->      /*
->       * Unvisited list elements will be reported later when checking
->       * whether unvisited struct members remain.
-
-Here the macro got added, but with no obvious benefit later on (although
-we also argued that adding it even when it makes no difference is not
-bad, if that's easier to automate for style checking).
-
-> diff --git a/qapi/qapi-dealloc-visitor.c b/qapi/qapi-dealloc-visitor.c
-> index d192724b13..3ee4c7a2e7 100644
-> --- a/qapi/qapi-dealloc-visitor.c
-> +++ b/qapi/qapi-dealloc-visitor.c
-> @@ -25,6 +25,7 @@ struct QapiDeallocVisitor
->  static void qapi_dealloc_start_struct(Visitor *v, const char *name, void **obj,
->                                        size_t unused, Error **errp)
->  {
-> +	ERRP_FUNCTION_BEGIN();
->  }
-
-Here's an example where exempting empty functions would be nicer.
-
-
-> +++ b/qapi/qapi-visit-core.c
-> @@ -39,18 +39,15 @@ void visit_free(Visitor *v)
->  void visit_start_struct(Visitor *v, const char *name, void **obj,
->                          size_t size, Error **errp)
->  {
-> -    Error *err = NULL;
-> -
-
-Oops, macro not added.
-
->      trace_visit_start_struct(v, name, obj, size);
->      if (obj) {
->          assert(size);
->          assert(!(v->type & VISITOR_OUTPUT) || *obj);
->      }
-> -    v->start_struct(v, name, obj, size, &err);
-> +    v->start_struct(v, name, obj, size, errp);
->      if (obj && (v->type & VISITOR_INPUT)) {
-> -        assert(!err != !*obj);
-> +        assert(!*errp != !*obj);
->      }
-> -    error_propagate(errp, err);
->  }
-
-But the cleanup is sane, once the macro is present.
-
-> @@ -152,12 +143,10 @@ void visit_type_int(Visitor *v, const char *name, int64_t *obj, Error **errp)
->  static void visit_type_uintN(Visitor *v, uint64_t *obj, const char *name,
->                               uint64_t max, const char *type, Error **errp)
->  {
-> -    Error *err = NULL;
->      uint64_t value = *obj;
->  
-> -    v->type_uint64(v, name, &value, &err);
-> -    if (err) {
-> -        error_propagate(errp, err);
-> +    v->type_uint64(v, name, &value, errp);
-> +    if (*errp) {
->      } else if (value > max) {
->          error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
->                     name ? name : "null", type);
-
-Results in an empty if which looks funny.  This one could be a manual
-touchup later.
-
-> @@ -211,12 +200,10 @@ static void visit_type_intN(Visitor *v, int64_t *obj, const char *name,
->                              int64_t min, int64_t max, const char *type,
->                              Error **errp)
->  {
-> -    Error *err = NULL;
->      int64_t value = *obj;
->  
-> -    v->type_int64(v, name, &value, &err);
-> -    if (err) {
-> -        error_propagate(errp, err);
-> +    v->type_int64(v, name, &value, errp);
-> +    if (*errp) {
->      } else if (value < min || value > max) {
-
-and again
+> +
+> +
+>  /*
+>   * Special error destination to abort on error.
+>   * See error_setg() and error_propagate() for details.
+> 
 
 -- 
 Eric Blake, Principal Software Engineer
