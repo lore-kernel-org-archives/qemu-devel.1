@@ -2,69 +2,73 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F626C04EBF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F79AC04EBF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:56:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 024DC20820
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:55:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 024DC20820
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3F11E2054F
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 13:56:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F11E2054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCOoU-0002py-1u
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 09:55:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33536)
+	id 1iCOpc-0003qx-De
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 09:56:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33700)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iCOni-0002Qo-Ep
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:54:52 -0400
+ (envelope-from <bounces@canonical.com>) id 1iCOos-0003Pa-4B
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:56:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iCOng-0004RM-6k
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:54:49 -0400
-Resent-Date: Mon, 23 Sep 2019 09:54:49 -0400
-Resent-Message-Id: <E1iCOng-0004RM-6k@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21421)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iCOnf-0004HI-Rl
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:54:48 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1569246857; cv=none; d=zoho.com; s=zohoarc; 
- b=LD2n8q+P/BdhoDtsj3D6SRIIvtr1dXNeJyOn90WWymN3Zdp1jirB5RMxCjzCRvO8G8d1NdL5bzAhJkDxNSVE+pwi3VI+P7KAecKdisprn55bXbYuCYbywQ9Zah2ZipmYyYxdpj9Ayz21l25nn/394q7WKgRFkHSO4g53Q+w9/Z0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1569246857;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=Iw5NCVchp9GH2E18UDVkZBOOOKYVHdN550zI93na1PM=; 
- b=GVfwnvlwsCzbHhQrrLvcpsVrKU/ok9xlItC5UCW2kQg/F/hHcAaYAG3gfUlFxVYBHMxHBcNagv1yl7yN1HhxUmQDLam8pVJ1qe75NgOKAwQtT7/ZbP5I7zI3leJ6GvCDJX5dHkdCVbju8U3tD6njRWznR3YTTKbtdBQwvTyNhS0=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 156924685614673.47288349063626;
- Mon, 23 Sep 2019 06:54:16 -0700 (PDT)
-In-Reply-To: <20190923080712.23951-1-david@redhat.com>
-Subject: Re: [PULL 00/30] s390x/tcg update
-Message-ID: <156924685454.19233.12305057264498670385@1c8ae44fe5c0>
+ (envelope-from <bounces@canonical.com>) id 1iCOoq-0004qg-S0
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:56:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46454)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iCOoq-0004qC-MH
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 09:56:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iCOoo-0005Dz-Uh
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 13:55:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id CFE9E2E80C9
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 13:55:58 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: david@redhat.com
-Date: Mon, 23 Sep 2019 06:54:16 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 23 Sep 2019 13:43:47 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: arm
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ilg karl-erik-zimmerman pmaydell
+X-Launchpad-Bug-Reporter: Liviu Ionescu (ilg)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <20130826101205.25802.19011.malonedeb@soybean.canonical.com>
+Message-Id: <156924622799.5337.3996293478856402411.malone@chaenomeles.canonical.com>
+Subject: [Bug 1216845] Re: qemu-system-arm semihosting always calls exit(0)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19048";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 30fe523a58212f371d83ca2169b0cefed247c6b2
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.54
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -73,116 +77,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, thuth@redhat.com, david@redhat.com,
- cohuck@redhat.com, qemu-devel@nongnu.org, qemu-s390x@nongnu.org,
- rth@twiddle.net
+Reply-To: Bug 1216845 <1216845@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkyMzA4MDcxMi4yMzk1
-MS0xLWRhdmlkQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwOTIzMDgwNzEyLjIzOTUxLTEtZGF2aWRAcmVkaGF0
-LmNvbQpTdWJqZWN0OiBbUFVMTCAwMC8zMF0gczM5MHgvdGNnIHVwZGF0ZQpUeXBlOiBzZXJpZXMK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNl
-ID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
-bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBzOi8vZ2l0aHVi
-LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIw
-MTkwOTIzMDgwNzEyLjIzOTUxLTEtZGF2aWRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTkwOTIz
-MDgwNzEyLjIzOTUxLTEtZGF2aWRAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
-J3Rlc3QnCjJjYzRjYTcgdGVzdHMvdGNnOiB0YXJnZXQvczM5MHg6IFRlc3QgTVZDCmU5ZTcxYzUg
-dGVzdHMvdGNnOiB0YXJnZXQvczM5MHg6IFRlc3QgTVZPCjk2ZWNkYzcgczM5MHgvdGNnOiBNVk86
-IEZhdWx0LXNhZmUgaGFuZGxpbmcKOTAzNzBjNSBzMzkweC90Y2c6IE1WU1Q6IEZhdWx0LXNhZmUg
-aGFuZGxpbmcKMGQ3YTczOSBzMzkweC90Y2c6IE1WWjogRmF1bHQtc2FmZSBoYW5kbGluZwo2OWUw
-YjQ0IHMzOTB4L3RjZzogTVZOOiBGYXVsdC1zYWZlIGhhbmRsaW5nCjc1MmY3ZDcgczM5MHgvdGNn
-OiBNVkNJTjogRmF1bHQtc2FmZSBoYW5kbGluZwpkMTNmYjc2IHMzOTB4L3RjZzogTkM6IEZhdWx0
-LXNhZmUgaGFuZGxpbmcKMzVmNWVhYyBzMzkweC90Y2c6IFhDOiBGYXVsdC1zYWZlIGhhbmRsaW5n
-CjllMThjMDkgczM5MHgvdGNnOiBPQzogRmF1bHQtc2FmZSBoYW5kbGluZwpjMDBkN2ViIHMzOTB4
-L3RjZzogTVZDTFU6IEZhdWx0LXNhZmUgaGFuZGxpbmcKYzRkMGY2ZiBzMzkweC90Y2c6IE1WQzog
-RmF1bHQtc2FmZSBoYW5kbGluZyBvbiBkZXN0cnVjdGl2ZSBvdmVybGFwcwphMjM3NzUwIHMzOTB4
-L3RjZzogTVZDUy9NVkNQOiBVc2UgYWNjZXNzX21lbW1vdmUoKQoxYTUyNjU0IHMzOTB4L3RjZzog
-RmF1bHQtc2FmZSBtZW1tb3ZlCjIzYTc5ZmUgczM5MHgvdGNnOiBGYXVsdC1zYWZlIG1lbXNldAow
-Y2Y0NTU3IHMzOTB4L3RjZzogQWx3YXlzIHVzZSBNTVVfVVNFUl9JRFggZm9yIENPTkZJR19VU0VS
-X09OTFkKYjQ5ZDhkYSBzMzkweC90Y2c6IE1WU1Q6IEZpeCBzdG9yaW5nIGJhY2sgdGhlIGFkZHJl
-c3NlcyB0byByZWdpc3RlcnMKMGZmZTk5OCBzMzkweC90Y2c6IE1WU1Q6IENoZWNrIGZvciBzcGVj
-aWZpY2F0aW9uIGV4Y2VwdGlvbnMKZmE4MzlkNyBzMzkweC90Y2c6IE1WQ1MvTVZDUDogUHJvcGVy
-bHkgd3JhcCB0aGUgbGVuZ3RoCjA2NGIwZDggczM5MHgvdGNnOiBNVkNPUzogTGVuZ3RocyBhcmUg
-MzIgYml0IGluIDI0LzMxLWJpdCBtb2RlCjlmNzc3OGYgczM5MHgvdGNnOiBNVkNTL01WQ1A6IENo
-ZWNrIGZvciBzcGVjaWFsIG9wZXJhdGlvbiBleGNlcHRpb25zCmUzOWU1YWEgczM5MHgvdGNnOiBN
-VkNMVS9NVkNMRTogUHJvY2VzcyBtYXggNGsgYnl0ZXMgYXQgYSB0aW1lCmE0NjgyM2IgczM5MHgv
-dGNnOiBNVlBHOiBQcm9wZXJseSB3cmFwIHRoZSBhZGRyZXNzZXMKYjY2NjE0NyBzMzkweC90Y2c6
-IE1WUEc6IENoZWNrIGZvciBzcGVjaWZpY2F0aW9uIGV4Y2VwdGlvbnMKYmIzOGY1MiBzMzkweC90
-Y2c6IE1WQzogVXNlIGlzX2Rlc3RydWN0aXZlX292ZXJsYXAoKQoyZWM2ZWIxIHMzOTB4L3RjZzog
-TVZDOiBJbmNyZW1lbnQgdGhlIGxlbmd0aCBvbmNlCjAyNDBhOTIgczM5MHgvdGNnOiBNVkNMOiBQ
-cm9jZXNzIG1heCA0ayBieXRlcyBhdCBhIHRpbWUKYWU0NjU4MiBzMzkweC90Y2c6IE1WQ0w6IERl
-dGVjdCBkZXN0cnVjdGl2ZSBvdmVybGFwcwoxZjQyMTdmIHMzOTB4L3RjZzogTVZDTDogWmVybyBv
-dXQgdW51c2VkIGJpdHMgb2YgYWRkcmVzcwoxNDVlMDRmIHMzOTB4L3RjZzogUmVzZXQgZXhjZXB0
-aW9uX2luZGV4IHRvIC0xIGluc3RlYWQgb2YgMAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8zMCBD
-aGVja2luZyBjb21taXQgMTQ1ZTA0ZmQ1YjQ2IChzMzkweC90Y2c6IFJlc2V0IGV4Y2VwdGlvbl9p
-bmRleCB0byAtMSBpbnN0ZWFkIG9mIDApCjIvMzAgQ2hlY2tpbmcgY29tbWl0IDFmNDIxN2ZlOThi
-ZiAoczM5MHgvdGNnOiBNVkNMOiBaZXJvIG91dCB1bnVzZWQgYml0cyBvZiBhZGRyZXNzKQozLzMw
-IENoZWNraW5nIGNvbW1pdCBhZTQ2NTgyYWU5ZmMgKHMzOTB4L3RjZzogTVZDTDogRGV0ZWN0IGRl
-c3RydWN0aXZlIG92ZXJsYXBzKQo0LzMwIENoZWNraW5nIGNvbW1pdCAwMjQwYTkyMmE1ZDMgKHMz
-OTB4L3RjZzogTVZDTDogUHJvY2VzcyBtYXggNGsgYnl0ZXMgYXQgYSB0aW1lKQo1LzMwIENoZWNr
-aW5nIGNvbW1pdCAyZWM2ZWIxZjQ2MTYgKHMzOTB4L3RjZzogTVZDOiBJbmNyZW1lbnQgdGhlIGxl
-bmd0aCBvbmNlKQo2LzMwIENoZWNraW5nIGNvbW1pdCBiYjM4ZjUyMzhmMjAgKHMzOTB4L3RjZzog
-TVZDOiBVc2UgaXNfZGVzdHJ1Y3RpdmVfb3ZlcmxhcCgpKQo3LzMwIENoZWNraW5nIGNvbW1pdCBi
-NjY2MTQ3MTAyOTEgKHMzOTB4L3RjZzogTVZQRzogQ2hlY2sgZm9yIHNwZWNpZmljYXRpb24gZXhj
-ZXB0aW9ucykKOC8zMCBDaGVja2luZyBjb21taXQgYTQ2ODIzYmE1NTI3IChzMzkweC90Y2c6IE1W
-UEc6IFByb3Blcmx5IHdyYXAgdGhlIGFkZHJlc3NlcykKOS8zMCBDaGVja2luZyBjb21taXQgZTM5
-ZTVhYTFmYjI5IChzMzkweC90Y2c6IE1WQ0xVL01WQ0xFOiBQcm9jZXNzIG1heCA0ayBieXRlcyBh
-dCBhIHRpbWUpCjEwLzMwIENoZWNraW5nIGNvbW1pdCA5Zjc3NzhmZDAxNTQgKHMzOTB4L3RjZzog
-TVZDUy9NVkNQOiBDaGVjayBmb3Igc3BlY2lhbCBvcGVyYXRpb24gZXhjZXB0aW9ucykKMTEvMzAg
-Q2hlY2tpbmcgY29tbWl0IDA2NGIwZDg4NDBkYyAoczM5MHgvdGNnOiBNVkNPUzogTGVuZ3RocyBh
-cmUgMzIgYml0IGluIDI0LzMxLWJpdCBtb2RlKQoxMi8zMCBDaGVja2luZyBjb21taXQgZmE4Mzlk
-NzY0YTc0IChzMzkweC90Y2c6IE1WQ1MvTVZDUDogUHJvcGVybHkgd3JhcCB0aGUgbGVuZ3RoKQox
-My8zMCBDaGVja2luZyBjb21taXQgMGZmZTk5ODlhMTUyIChzMzkweC90Y2c6IE1WU1Q6IENoZWNr
-IGZvciBzcGVjaWZpY2F0aW9uIGV4Y2VwdGlvbnMpCjE0LzMwIENoZWNraW5nIGNvbW1pdCBiNDlk
-OGRhOTQ3NzQgKHMzOTB4L3RjZzogTVZTVDogRml4IHN0b3JpbmcgYmFjayB0aGUgYWRkcmVzc2Vz
-IHRvIHJlZ2lzdGVycykKMTUvMzAgQ2hlY2tpbmcgY29tbWl0IDBjZjQ1NTc0NDBiMyAoczM5MHgv
-dGNnOiBBbHdheXMgdXNlIE1NVV9VU0VSX0lEWCBmb3IgQ09ORklHX1VTRVJfT05MWSkKMTYvMzAg
-Q2hlY2tpbmcgY29tbWl0IDIzYTc5ZmUzODJlOCAoczM5MHgvdGNnOiBGYXVsdC1zYWZlIG1lbXNl
-dCkKMTcvMzAgQ2hlY2tpbmcgY29tbWl0IDFhNTI2NTQxNTZkNyAoczM5MHgvdGNnOiBGYXVsdC1z
-YWZlIG1lbW1vdmUpCjE4LzMwIENoZWNraW5nIGNvbW1pdCBhMjM3NzUwYTJhYTUgKHMzOTB4L3Rj
-ZzogTVZDUy9NVkNQOiBVc2UgYWNjZXNzX21lbW1vdmUoKSkKMTkvMzAgQ2hlY2tpbmcgY29tbWl0
-IGM0ZDBmNmZhMzYzYyAoczM5MHgvdGNnOiBNVkM6IEZhdWx0LXNhZmUgaGFuZGxpbmcgb24gZGVz
-dHJ1Y3RpdmUgb3ZlcmxhcHMpCjIwLzMwIENoZWNraW5nIGNvbW1pdCBjMDBkN2ViZWEyZTAgKHMz
-OTB4L3RjZzogTVZDTFU6IEZhdWx0LXNhZmUgaGFuZGxpbmcpCjIxLzMwIENoZWNraW5nIGNvbW1p
-dCA5ZTE4YzA5OThhODkgKHMzOTB4L3RjZzogT0M6IEZhdWx0LXNhZmUgaGFuZGxpbmcpCjIyLzMw
-IENoZWNraW5nIGNvbW1pdCAzNWY1ZWFjYmViMTIgKHMzOTB4L3RjZzogWEM6IEZhdWx0LXNhZmUg
-aGFuZGxpbmcpCjIzLzMwIENoZWNraW5nIGNvbW1pdCBkMTNmYjc2NjI3YTggKHMzOTB4L3RjZzog
-TkM6IEZhdWx0LXNhZmUgaGFuZGxpbmcpCjI0LzMwIENoZWNraW5nIGNvbW1pdCA3NTJmN2Q3NWFk
-M2QgKHMzOTB4L3RjZzogTVZDSU46IEZhdWx0LXNhZmUgaGFuZGxpbmcpCjI1LzMwIENoZWNraW5n
-IGNvbW1pdCA2OWUwYjQ0ZmViNGQgKHMzOTB4L3RjZzogTVZOOiBGYXVsdC1zYWZlIGhhbmRsaW5n
-KQoyNi8zMCBDaGVja2luZyBjb21taXQgMGQ3YTczOTYzN2RlIChzMzkweC90Y2c6IE1WWjogRmF1
-bHQtc2FmZSBoYW5kbGluZykKMjcvMzAgQ2hlY2tpbmcgY29tbWl0IDkwMzcwYzVmN2U5MiAoczM5
-MHgvdGNnOiBNVlNUOiBGYXVsdC1zYWZlIGhhbmRsaW5nKQoyOC8zMCBDaGVja2luZyBjb21taXQg
-OTZlY2RjNzFhOWExIChzMzkweC90Y2c6IE1WTzogRmF1bHQtc2FmZSBoYW5kbGluZykKMjkvMzAg
-Q2hlY2tpbmcgY29tbWl0IGU5ZTcxYzU2ODJhYiAodGVzdHMvdGNnOiB0YXJnZXQvczM5MHg6IFRl
-c3QgTVZPKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
-SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyNDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3Rh
-bDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDI5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDI5LzMwIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjMwLzMwIENoZWNraW5nIGNvbW1pdCAyY2M0Y2E3ZThk
-NzEgKHRlc3RzL3RjZzogdGFyZ2V0L3MzOTB4OiBUZXN0IE1WQykKV0FSTklORzogYWRkZWQsIG1v
-dmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwoj
-MzA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IHVzZSBzaWdhY3Rpb24gdG8gZXN0YWJs
-aXNoIHNpZ25hbCBoYW5kbGVyczsgc2lnbmFsIGlzIG5vdCBwb3J0YWJsZQojNjg6IEZJTEU6IHRl
-c3RzL3RjZy9zMzkweC9tdmMuYzozNDoKKyAgICBpZiAoc2lnbmFsKFNJR1NFR1YsIGhhbmRsZV9z
-aWdzZWd2KSA9PSBTSUdfRVJSKSB7Cgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDExMyBs
-aW5lcyBjaGVja2VkCgpQYXRjaCAzMC8zMCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBm
-dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA5MjMw
-ODA3MTIuMjM5NTEtMS1kYXZpZEByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1t
-ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
-cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAcmVkaGF0LmNvbQ==
+https://patchew.org/QEMU/20190916141544.17540-1-peter.maydell@linaro.org/
+is a patchset which adds semihosting v2 support to QEMU. With those
+patches and a guest binary which understands semihosting v2 and knows
+how to probe for the existence of the EXIT_EXTENDED extension, arm guest
+binaries will be able to pass a non-zero exit status.
 
+
+** Changed in: qemu
+       Status: Confirmed =3D> In Progress
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1216845
+
+Title:
+  qemu-system-arm semihosting always calls exit(0)
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  In my embedded ARM project I have a bunch of unit tests that I run in
+  a POSIX synthetic environment, and, as usual for POSIX processes,
+  these tests return 0 for success and !=3D0 for error.
+
+  Now I expanded the testing environment to run some of these tests
+  compiled for ARM, under QEMU, with the tracing messages forwarded via
+  the semihosting API.
+
+  Up to now everything is fine with the emulation.
+
+  However I have a problem with passing the failure code back to the
+  operating system, to drive the continuous integration framework.
+
+  I checked the arm-semi.c code and for SYS_EXIT and I discovered that
+  the parameter passed is ignored and it always calls exit(0):
+
+      case SYS_EXIT:
+          gdb_exit(env, 0);
+          exit(0);
+
+  To solve my problem I temporarily made a patch, and for cases that
+  should return non zero codes, I call an unsupported BKPT instruction,
+  which makes QEMU abort, and pass an non zero code (1) back to the
+  operating system.
+
+      qemu: Unsupported SemiHosting SWI 0xf1
+
+  This kludge is more or less functional, but is quite inconvenient.
+
+  After checking the ARM manuals, I discovered that SYS_EXIT is not
+  standard, and the 0x18 code used for it originally was used for
+  angel_SWIreason_ReportException, which has a slightly different
+  purpose.
+
+  Now the question:
+
+  Would it be possible to no longer ignore the code passed to 0x18, and
+  if it is non zero, to call exit() with a different value?
+
+  The suggested rule would be:
+
+  if (code =3D=3D0 || code =3D=3D 0x20026)
+    exit(0);
+  elif (code < 256)
+    exit(code);
+  else
+    exit(1);
+
+  The value 0x20026 means ADP_Stopped_ApplicationExit, and, if I
+  understood it right, it means that the program terminated
+  successfully. If this is not true, it can be removed from the first
+  conditional statement.
+
+  What do you think? Can this be added to arm-semi.c?
+
+  =
+
+  Regards,
+
+  Liviu
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1216845/+subscriptions
 
