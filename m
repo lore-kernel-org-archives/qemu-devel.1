@@ -2,77 +2,110 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A728C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEBF4C49ED7
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:50:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4631D20820
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:48:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="itq2CRxz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4631D20820
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id A69CB20820
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:50:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A69CB20820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53829 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCK0l-0006bQ-7j
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 04:47:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45590)
+	id 1iCK3U-0008Ss-4p
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 04:50:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46147)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sameid@google.com>) id 1iCJdU-0000Bg-C4
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:23:57 -0400
+ (envelope-from <david@redhat.com>) id 1iCJg7-000328-7P
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:26:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sameid@google.com>) id 1iCJdS-0005zC-VO
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:23:56 -0400
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:36313)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sameid@google.com>) id 1iCJdS-0005yc-P6
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:23:54 -0400
-Received: by mail-qk1-x741.google.com with SMTP id y189so14472153qkc.3
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 01:23:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=zup5OGjRbCC5y3n0ahrU1EueS2lu3LX/Bqx9s4Gt/2g=;
- b=itq2CRxzraAJu+//qZiNpTMbhEXJSLP8V1lALxxFWSKAkS310btzkD70mLZ3lMFhah
- yFRspVPO4cteyqJPcoDhlIrcKPNKT7XJ3UCjdAB+qTwm1aqpWhM19mR4Ppe9BEnkQ/I8
- T37BLQdnkP4ZcHr/I5cakIbVnHAjcCbOlO3np+uITURD1jpx92GsMl4Axys1PDy4bglM
- PswXpHYCS2edC06nSuAsuCMSC2bOjB7k3HRDCY56DY/Uped9XcM3Ab+ezTGeiOLdfhcJ
- oEhd4wR5xIN8Z6QE1192VErk3bFAfCku4vnF7moGVhUfA+Dun9297g17PDMjWu8ecEp8
- 1GJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=zup5OGjRbCC5y3n0ahrU1EueS2lu3LX/Bqx9s4Gt/2g=;
- b=Kkm23akj5DQsIpqrgNmeCOylWBWPDj9aUCq21N0O39vYzl4a+odhG32OnBKNjMMr/G
- zTYpYxITagYRk7vPHWuViQJPxAs2N0FHFPeKs4lwcN1s0E50e/u5tTq6kOR8qpazZNvn
- VPDBRbB3bqCRTxQNuCQufIBJY9iEGrrRJzv9vrZqm5FAZL8V03CRicdFrNUxJYSStiAK
- 6RDboFG/OoI+pHuPMTI8cCJkEkjaOpdk5R1oGHTYWeYT3wyktNa28fLuU9wv84x2XpjQ
- Vs726TGFVJKBygA97Jr9/a1MB3bz88NCOyEf3N0XlXH7D9KAU9zhKQdNFSOmwlsOd4O4
- xfnQ==
-X-Gm-Message-State: APjAAAXe/d+oivDKtdyDXE2W8vx1ZtRKyEIsssM35reu1m3cE8+8gyey
- xrEVAISY4pc/TzAdB5zWZC8r3Pxk+JjZ5u6oRodWrEUU
-X-Google-Smtp-Source: APXvYqyB6HCUztMzv7U2NekC9ZcVe5ksO/AStIyrWwFmODwWjwEd/pcZeN4AUc/n2zNrmELLSCtmoZsCAZMtJgU9Rvw=
-X-Received: by 2002:a37:bd45:: with SMTP id n66mr15420969qkf.272.1569227032943; 
- Mon, 23 Sep 2019 01:23:52 -0700 (PDT)
+ (envelope-from <david@redhat.com>) id 1iCJg4-0006mi-KV
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:26:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52560)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iCJg4-0006mY-CJ
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:26:36 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 942F4A26684;
+ Mon, 23 Sep 2019 08:26:35 +0000 (UTC)
+Received: from [10.36.116.207] (ovpn-116-207.ams2.redhat.com [10.36.116.207])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 618E760C5E;
+ Mon, 23 Sep 2019 08:26:31 +0000 (UTC)
+Subject: Re: [PATCH v3 02/20] exec: Split out variable page size support to
+ exec-vary.c
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190922035458.14879-1-richard.henderson@linaro.org>
+ <20190922035458.14879-3-richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <b0ac3ea7-3aa1-60b5-127a-6476003adaca@redhat.com>
+Date: Mon, 23 Sep 2019 10:26:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190827082427.64280-1-sameid@google.com>
- <CAFr6bUky8Au-v6Y4yF+Ucg6H7Upc619WLR6tPzp3d6qy80+bsg@mail.gmail.com>
-In-Reply-To: <CAFr6bUky8Au-v6Y4yF+Ucg6H7Upc619WLR6tPzp3d6qy80+bsg@mail.gmail.com>
-Date: Mon, 23 Sep 2019 11:23:41 +0300
-Message-ID: <CAFr6bUmYT-U0eURtM5K=G0SNT7cRcW6jxUArUFqqEzxX5gbQFw@mail.gmail.com>
-Subject: Re: [PATCH v6 0/8] Add Qemu to SeaBIOS LCHS interface
-To: qemu-devel@nongnu.org
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::741
+In-Reply-To: <20190922035458.14879-3-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Mon, 23 Sep 2019 08:26:35 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,97 +117,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, seabios@seabios.org,
- Kevin OConnor <kevin@koconnor.net>, liran.alon@oracle.com, kraxel@redhat.com,
- Karl Heubaum <karl.heubaum@oracle.com>
+Cc: pbonzini@redhat.com, alex.bennee@linaro.org, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: Sam Eiderman <sameid@google.com>
-From: Sam Eiderman via <qemu-devel@nongnu.org>
 
-Gentle ping
+On 22.09.19 05:54, Richard Henderson wrote:
+> The next patch will play a trick with "const" that will
+> confuse the compiler about the uses of target_page_bits
+> within exec.c.  Moving everything to a new file prevents
+> this confusion.
+>=20
+> No functional change so far.
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  Makefile.target       |  2 +-
+>  include/qemu-common.h |  6 +++++
+>  exec-vary.c           | 57 +++++++++++++++++++++++++++++++++++++++++++
+>  exec.c                | 34 --------------------------
+>  4 files changed, 64 insertions(+), 35 deletions(-)
+>  create mode 100644 exec-vary.c
+>=20
+> diff --git a/Makefile.target b/Makefile.target
+> index 5e916230c4..ca3d14efe1 100644
+> --- a/Makefile.target
+> +++ b/Makefile.target
+> @@ -107,7 +107,7 @@ obj-y +=3D trace/
+> =20
+>  #########################################################
+>  # cpu emulator library
+> -obj-y +=3D exec.o
+> +obj-y +=3D exec.o exec-vary.o
+>  obj-y +=3D accel/
+>  obj-$(CONFIG_TCG) +=3D tcg/tcg.o tcg/tcg-op.o tcg/tcg-op-vec.o tcg/tcg=
+-op-gvec.o
+>  obj-$(CONFIG_TCG) +=3D tcg/tcg-common.o tcg/optimize.o
+> diff --git a/include/qemu-common.h b/include/qemu-common.h
+> index 8d84db90b0..082da59e85 100644
+> --- a/include/qemu-common.h
+> +++ b/include/qemu-common.h
+> @@ -74,6 +74,12 @@ void cpu_exec_step_atomic(CPUState *cpu);
+>   */
+>  bool set_preferred_target_page_bits(int bits);
+> =20
+> +/**
+> + * finalize_target_page_bits:
+> + * Commit the final value set by set_preferred_target_page_bits.
+> + */
+> +void finalize_target_page_bits(void);
+> +
+>  /**
+>   * Sends a (part of) iovec down a socket, yielding when the socket is =
+full, or
+>   * Receives data into a (part of) iovec from a socket,
+> diff --git a/exec-vary.c b/exec-vary.c
+> new file mode 100644
+> index 0000000000..48c0ab306c
+> --- /dev/null
+> +++ b/exec-vary.c
+> @@ -0,0 +1,57 @@
+> +/*
+> + * Variable page size handling
+> + *
+> + *  Copyright (c) 2003 Fabrice Bellard
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/li=
+censes/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "exec/exec-all.h"
+> +
+> +#ifdef TARGET_PAGE_BITS_VARY
+> +int target_page_bits;
+> +bool target_page_bits_decided;
+> +#endif
+> +
+> +bool set_preferred_target_page_bits(int bits)
+> +{
+> +    /*
+> +     * The target page size is the lowest common denominator for all
+> +     * the CPUs in the system, so we can only make it smaller, never
+> +     * larger. And we can't make it smaller once we've committed to
+> +     * a particular size.
+> +     */
+> +#ifdef TARGET_PAGE_BITS_VARY
+> +    assert(bits >=3D TARGET_PAGE_BITS_MIN);
+> +    if (target_page_bits =3D=3D 0 || target_page_bits > bits) {
+> +        if (target_page_bits_decided) {
+> +            return false;
+> +        }
+> +        target_page_bits =3D bits;
+> +    }
+> +#endif
+> +    return true;
+> +}
+> +
+> +void finalize_target_page_bits(void)
+> +{
+> +#ifdef TARGET_PAGE_BITS_VARY
+> +    if (target_page_bits =3D=3D 0) {
+> +        target_page_bits =3D TARGET_PAGE_BITS_MIN;
+> +    }
+> +    target_page_bits_decided =3D true;
+> +#endif
+> +}
 
-On Wed, Sep 11, 2019 at 5:36 PM Sam Eiderman <sameid@google.com> wrote:
->
-> Gentle ping
->
-> On Tue, Aug 27, 2019, 11:24 Sam Eiderman <sameid@google.com> wrote:
->>
->> v1:
->>
->> Non-standard logical geometries break under QEMU.
->>
->> A virtual disk which contains an operating system which depends on
->> logical geometries (consistent values being reported from BIOS INT13
->> AH=08) will most likely break under QEMU/SeaBIOS if it has non-standard
->> logical geometries - for example 56 SPT (sectors per track).
->> No matter what QEMU will guess - SeaBIOS, for large enough disks - will
->> use LBA translation, which will report 63 SPT instead.
->>
->> In addition we can not enforce SeaBIOS to rely on phyiscal geometries at
->> all. A virtio-blk-pci virtual disk with 255 phyiscal heads can not
->> report more than 16 physical heads when moved to an IDE controller, the
->> ATA spec allows a maximum of 16 heads - this is an artifact of
->> virtualization.
->>
->> By supplying the logical geometies directly we are able to support such
->> "exotic" disks.
->>
->> We will use fw_cfg to do just that.
->>
->> v2:
->>
->> Fix missing parenthesis check in
->>     "hd-geo-test: Add tests for lchs override"
->>
->> v3:
->>
->> * Rename fw_cfg key to "bios-geometry".
->> * Remove "extendible" interface.
->> * Add cpu_to_le32 fix as Laszlo suggested or big endian hosts
->> * Fix last qtest commit - automatic docker tester for some reason does not have qemu-img set
->>
->> v4:
->>
->> * Change fw_cfg interface from mixed textual/binary to textual only
->>
->> v5:
->>
->> * Fix line > 80 chars in tests/hd-geo-test.c
->>
->> v6:
->>
->> * Small fixes for issues pointed by Max
->> * (&conf->conf)->lcyls to conf->conf.lcyls and so on
->> * Remove scsi_unrealize from everything other than scsi-hd
->> * Add proper include to sysemu.h
->> * scsi_device_unrealize() after scsi_device_purge_requests()
->>
->> Sam Eiderman (8):
->>   block: Refactor macros - fix tabbing
->>   block: Support providing LCHS from user
->>   bootdevice: Add interface to gather LCHS
->>   scsi: Propagate unrealize() callback to scsi-hd
->>   bootdevice: Gather LCHS from all relevant devices
->>   bootdevice: Refactor get_boot_devices_list
->>   bootdevice: FW_CFG interface for LCHS values
->>   hd-geo-test: Add tests for lchs override
->>
->>  bootdevice.c             | 148 ++++++++--
->>  hw/block/virtio-blk.c    |   6 +
->>  hw/ide/qdev.c            |   7 +-
->>  hw/nvram/fw_cfg.c        |  14 +-
->>  hw/scsi/scsi-bus.c       |  16 ++
->>  hw/scsi/scsi-disk.c      |  12 +
->>  include/hw/block/block.h |  22 +-
->>  include/hw/scsi/scsi.h   |   1 +
->>  include/sysemu/sysemu.h  |   4 +
->>  tests/Makefile.include   |   2 +-
->>  tests/hd-geo-test.c      | 582 +++++++++++++++++++++++++++++++++++++++
->>  11 files changed, 773 insertions(+), 41 deletions(-)
->>
->> --
->> 2.23.0.187.g17f5b7556c-goog
->>
+I wonder if it would be nicer to handle this in the header file instead,
+providing dummy functions there.
+
+--=20
+
+Thanks,
+
+David / dhildenb
 
