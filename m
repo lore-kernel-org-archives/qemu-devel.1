@@ -2,57 +2,65 @@ Return-Path: <SRS0=aFsj=XS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7C1CC04EBF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:03:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4A74C04EBF
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:06:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B8B220835
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:03:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B8B220835
+	by mail.kernel.org (Postfix) with ESMTPS id 9098420820
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 12:06:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9098420820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCN46-0007ME-H5
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 08:03:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45339)
+	id 1iCN6r-0000lb-En
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 08:06:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45582)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iCMye-0003bq-Rh
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 07:58:01 -0400
+ (envelope-from <armbru@redhat.com>) id 1iCN0P-0005AU-6d
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 07:59:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iCMyd-0007Gc-Ij
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 07:58:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57383)
+ (envelope-from <armbru@redhat.com>) id 1iCN0O-0001Vm-8y
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 07:59:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53650)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iCMyY-000710-FA; Mon, 23 Sep 2019 07:57:56 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCN0O-0001VL-3p
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 07:59:48 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2B23A10DCC81;
- Mon, 23 Sep 2019 11:57:52 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.78])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 73E6D600C4;
- Mon, 23 Sep 2019 11:57:49 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 4/4] iotests: Add test for failing mirror complete
-Date: Mon, 23 Sep 2019 13:57:28 +0200
-Message-Id: <20190923115728.28250-5-mreitz@redhat.com>
-In-Reply-To: <20190923115728.28250-1-mreitz@redhat.com>
-References: <20190923115728.28250-1-mreitz@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 6CC5E30860DD;
+ Mon, 23 Sep 2019 11:59:47 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9934860BF7;
+ Mon, 23 Sep 2019 11:59:44 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 24764113864E; Mon, 23 Sep 2019 13:59:43 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 13/19] qapi: Normalize 'if' in check_exprs(),
+ like other sugar
+References: <20190914153506.2151-1-armbru@redhat.com>
+ <20190914153506.2151-14-armbru@redhat.com>
+ <60d81331-ea7b-a375-cb68-e2fff7d54ccb@redhat.com>
+Date: Mon, 23 Sep 2019 13:59:43 +0200
+In-Reply-To: <60d81331-ea7b-a375-cb68-e2fff7d54ccb@redhat.com> (Eric Blake's
+ message of "Tue, 17 Sep 2019 13:14:52 -0500")
+Message-ID: <87k19znryo.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Mon, 23 Sep 2019 11:57:52 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Mon, 23 Sep 2019 11:59:47 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -66,95 +74,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Tested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
----
- tests/qemu-iotests/041     | 44 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/041.out |  4 ++--
- 2 files changed, 46 insertions(+), 2 deletions(-)
+Eric Blake <eblake@redhat.com> writes:
 
-diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-index 8568426311..d7be30b62b 100755
---- a/tests/qemu-iotests/041
-+++ b/tests/qemu-iotests/041
-@@ -1121,6 +1121,50 @@ class TestOrphanedSource(iotests.QMPTestCase):
-                              target=3D'dest-ro')
-         self.assert_qmp(result, 'error/class', 'GenericError')
-=20
-+    def test_failing_permission_in_complete(self):
-+        self.assert_no_active_block_jobs()
-+
-+        # Unshare consistent-read on the target
-+        # (The mirror job does not care)
-+        result =3D self.vm.qmp('blockdev-add',
-+                             driver=3D'blkdebug',
-+                             node_name=3D'dest-perm',
-+                             image=3D'dest',
-+                             unshare_child_perms=3D['consistent-read'])
-+        self.assert_qmp(result, 'return', {})
-+
-+        result =3D self.vm.qmp('blockdev-mirror', job_id=3D'job', device=
-=3D'src',
-+                             sync=3D'full', target=3D'dest',
-+                             filter_node_name=3D'mirror-filter')
-+        self.assert_qmp(result, 'return', {})
-+
-+        # Require consistent-read on the source
-+        # (We can only add this node once the job has started, or it
-+        # will complain that it does not want to run on non-root nodes)
-+        result =3D self.vm.qmp('blockdev-add',
-+                             driver=3D'blkdebug',
-+                             node_name=3D'src-perm',
-+                             image=3D'src',
-+                             take_child_perms=3D['consistent-read'])
-+        self.assert_qmp(result, 'return', {})
-+
-+        # While completing, mirror will attempt to replace src by
-+        # dest, which must fail because src-perm requires
-+        # consistent-read but dest-perm does not share it; thus
-+        # aborting the job when it is supposed to complete
-+        self.complete_and_wait('job',
-+                               completion_error=3D'Operation not permitt=
-ed')
-+
-+        # Assert that all of our nodes are still there (except for the
-+        # mirror filter, which should be gone despite the failure)
-+        nodes =3D self.vm.qmp('query-named-block-nodes')['return']
-+        nodes =3D [node['node-name'] for node in nodes]
-+
-+        for expect in ('src', 'src-perm', 'dest', 'dest-perm'):
-+            self.assertTrue(expect in nodes, '%s disappeared' % expect)
-+        self.assertFalse('mirror-filter' in nodes,
-+                         'Mirror filter node did not disappear')
-+
- if __name__ =3D=3D '__main__':
-     iotests.main(supported_fmts=3D['qcow2', 'qed'],
-                  supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/041.out b/tests/qemu-iotests/041.out
-index 2c448b4239..f496be9197 100644
---- a/tests/qemu-iotests/041.out
-+++ b/tests/qemu-iotests/041.out
-@@ -1,5 +1,5 @@
--........................................................................=
-..................
-+........................................................................=
-...................
- ----------------------------------------------------------------------
--Ran 90 tests
-+Ran 91 tests
-=20
- OK
---=20
-2.21.0
+> On 9/14/19 10:35 AM, Markus Armbruster wrote:
+>> We normalize shorthand to longhand forms in check_expr(): enumeration
+>> values with normalize_enum(), feature values with
+>> normalize_features(), struct members, union branches and alternate
+>> branches with normalize_members().  If conditions are an exception: we
+>> normalize them in QAPISchemaEntity.check() and
+>> QAPISchemaMember.__init(), with listify_cond().  The idea goes back to
+>> commit 2cbc94376e "qapi: pass 'if' condition into QAPISchemaEntity
+>> objects", v3.0.0.
+>> 
+>> Normalize in check_expr() instead, with new helper normalize_if().
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  scripts/qapi/common.py | 26 +++++++++++++++-----------
+>>  1 file changed, 15 insertions(+), 11 deletions(-)
+>> 
+>
+> Definitely more consistent.
+>
+>
+>> @@ -904,6 +905,7 @@ def check_union(expr, info):
+>>          check_known_keys(info, "member '%s' of union '%s'" % (key, name),
+>>                           value, ['type'], ['if'])
+>>          check_if(value, info)
+>> +        normalize_if(value)
+>
+> Is it worth combining check_if() and normalize_if() into a single helper
+> function, since they always seem to be paired?
 
+The normalize_{enum,members,features}() are similarly paired with
+check_keys().  I sidestepped the question whether checking and
+normalizing should be fused.  We can revisit it later.
+
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
 
