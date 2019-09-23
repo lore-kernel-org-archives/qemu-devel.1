@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FAD8C3A5A6
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:14:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00CA7C3A5A6
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:15:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5678220820
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:14:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5678220820
+	by mail.kernel.org (Postfix) with ESMTPS id C76EB2087C
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Sep 2019 08:15:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C76EB2087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCJUV-0008CQ-4Z
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 04:14:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42627)
+	id 1iCJUx-0000Nl-FI
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 04:15:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42579)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iCJNX-0001c9-0i
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:07:29 -0400
+ (envelope-from <david@redhat.com>) id 1iCJNS-0001Ut-Qy
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:07:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iCJNV-0003y5-O2
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:07:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39650)
+ (envelope-from <david@redhat.com>) id 1iCJNR-0003vH-OK
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 04:07:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59756)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iCJNV-0003x9-G7; Mon, 23 Sep 2019 04:07:25 -0400
+ id 1iCJNR-0003uz-JC; Mon, 23 Sep 2019 04:07:21 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C1C5D308FF32;
- Mon, 23 Sep 2019 08:07:24 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D5F7C315C02A;
+ Mon, 23 Sep 2019 08:07:20 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1ED1219C78;
- Mon, 23 Sep 2019 08:07:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 37BFE19C78;
+ Mon, 23 Sep 2019 08:07:19 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL 04/30] s390x/tcg: MVCL: Process max 4k bytes at a time
-Date: Mon, 23 Sep 2019 10:06:46 +0200
-Message-Id: <20190923080712.23951-5-david@redhat.com>
+Subject: [PULL 02/30] s390x/tcg: MVCL: Zero out unused bits of address
+Date: Mon, 23 Sep 2019 10:06:44 +0200
+Message-Id: <20190923080712.23951-3-david@redhat.com>
 In-Reply-To: <20190923080712.23951-1-david@redhat.com>
 References: <20190923080712.23951-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Mon, 23 Sep 2019 08:07:24 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Mon, 23 Sep 2019 08:07:20 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -75,97 +75,59 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Process max 4k bytes at a time, writing back registers between the
-accesses. The instruction is interruptible.
-    "For operands longer than 2K bytes, access exceptions are not
-    recognized for locations more than 2K bytes beyond the current locati=
-on
-    being processed."
-Note that on z/Architecture, 2k vs. 4k access cannot get differentiated a=
-s
-long as pages are not crossed. This seems to be a leftover from ESA/390.
-Simply stay within single pages.
-
-MVCL handling is quite different than MVCLE/MVCLU handling, so split up
-the handlers.
-
-Defer interrupt handling, as that will require more thought, add a TODO
-for that.
+We have to zero out unused bits in 24 and 31-bit addressing mode.
+Provide a new helper.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/mem_helper.c | 44 +++++++++++++++++++++++++++++++++------
- 1 file changed, 38 insertions(+), 6 deletions(-)
+ target/s390x/mem_helper.c | 23 +++++++++++++++++++++--
+ 1 file changed, 21 insertions(+), 2 deletions(-)
 
 diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 223312a4b1..58ab2e48e3 100644
+index 39ee9b3175..b02ad148e5 100644
 --- a/target/s390x/mem_helper.c
 +++ b/target/s390x/mem_helper.c
-@@ -798,19 +798,51 @@ uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t =
-r1, uint32_t r2)
-     uint64_t srclen =3D env->regs[r2 + 1] & 0xffffff;
-     uint64_t src =3D get_address(env, r2);
-     uint8_t pad =3D env->regs[r2 + 1] >> 24;
--    uint32_t cc;
-+    uint32_t cc, cur_len;
-=20
-     if (is_destructive_overlap(env, dest, src, MIN(srclen, destlen))) {
-         cc =3D 3;
-+    } else if (srclen =3D=3D destlen) {
-+        cc =3D 0;
-+    } else if (destlen < srclen) {
-+        cc =3D 1;
-     } else {
--        cc =3D do_mvcl(env, &dest, &destlen, &src, &srclen, pad, 1, ra);
-+        cc =3D 2;
-     }
-=20
--    env->regs[r1 + 1] =3D deposit64(env->regs[r1 + 1], 0, 24, destlen);
--    env->regs[r2 + 1] =3D deposit64(env->regs[r2 + 1], 0, 24, srclen);
--    set_address_zero(env, r1, dest);
--    set_address_zero(env, r2, src);
-+    /* We might have to zero-out some bits even if there was no action. =
-*/
-+    if (unlikely(!destlen || cc =3D=3D 3)) {
-+        set_address_zero(env, r2, src);
-+        set_address_zero(env, r1, dest);
-+        return cc;
-+    } else if (!srclen) {
-+        set_address_zero(env, r2, src);
-+    }
-=20
-+    /*
-+     * Only perform one type of type of operation (move/pad) in one step=
-.
-+     * Stay within single pages.
-+     */
-+    while (destlen) {
-+        cur_len =3D MIN(destlen, -(dest | TARGET_PAGE_MASK));
-+        if (!srclen) {
-+            fast_memset(env, dest, pad, cur_len, ra);
-+        } else {
-+            cur_len =3D MIN(MIN(srclen, -(src | TARGET_PAGE_MASK)), cur_=
-len);
-+
-+            fast_memmove(env, dest, src, cur_len, ra);
-+            src =3D wrap_address(env, src + cur_len);
-+            srclen -=3D cur_len;
-+            env->regs[r2 + 1] =3D deposit64(env->regs[r2 + 1], 0, 24, sr=
-clen);
-+            set_address_zero(env, r2, src);
-+        }
-+        dest =3D wrap_address(env, dest + cur_len);
-+        destlen -=3D cur_len;
-+        env->regs[r1 + 1] =3D deposit64(env->regs[r1 + 1], 0, 24, destle=
-n);
-+        set_address_zero(env, r1, dest);
-+
-+        /* TODO: Deliver interrupts. */
-+    }
-     return cc;
+@@ -469,6 +469,25 @@ static inline uint64_t get_address(CPUS390XState *en=
+v, int reg)
+     return wrap_address(env, env->regs[reg]);
  }
 =20
++/*
++ * Store the address to the given register, zeroing out unused leftmost
++ * bits in bit positions 32-63 (24-bit and 31-bit mode only).
++ */
++static inline void set_address_zero(CPUS390XState *env, int reg,
++                                    uint64_t address)
++{
++    if (env->psw.mask & PSW_MASK_64) {
++        env->regs[reg] =3D address;
++    } else {
++        if (!(env->psw.mask & PSW_MASK_32)) {
++            address &=3D 0x00ffffff;
++        } else {
++            address &=3D 0x7fffffff;
++        }
++        env->regs[reg] =3D deposit64(env->regs[reg], 0, 32, address);
++    }
++}
++
+ static inline void set_address(CPUS390XState *env, int reg, uint64_t add=
+ress)
+ {
+     if (env->psw.mask & PSW_MASK_64) {
+@@ -772,8 +791,8 @@ uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t r1=
+, uint32_t r2)
+=20
+     env->regs[r1 + 1] =3D deposit64(env->regs[r1 + 1], 0, 24, destlen);
+     env->regs[r2 + 1] =3D deposit64(env->regs[r2 + 1], 0, 24, srclen);
+-    set_address(env, r1, dest);
+-    set_address(env, r2, src);
++    set_address_zero(env, r1, dest);
++    set_address_zero(env, r2, src);
+=20
+     return cc;
+ }
 --=20
 2.21.0
 
