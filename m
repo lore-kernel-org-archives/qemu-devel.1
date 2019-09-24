@@ -2,141 +2,59 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F2FC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:20:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EED9DC432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:22:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BCBF214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:20:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="etUHRYg4";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="NeH9htpl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BCBF214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id C43F32064A
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:22:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C43F32064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCkk8-0006da-Qo
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:20:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56037)
+	id 1iCklf-00083R-9h
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:22:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51574)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=1633f89ff=Anup.Patel@wdc.com>)
- id 1iCkc5-0000Xv-1l
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:12:21 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCk6b-0006Al-Sx
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:39:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=1633f89ff=Anup.Patel@wdc.com>)
- id 1iCkc3-0002v1-0r
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:12:16 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:42656)
+ (envelope-from <eblake@redhat.com>) id 1iCk6a-00020H-2N
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:39:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58176)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=1633f89ff=Anup.Patel@wdc.com>)
- id 1iCkbv-0002pB-TT; Tue, 24 Sep 2019 09:12:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1569330728; x=1600866728;
- h=from:to:cc:subject:date:message-id:
- content-transfer-encoding:mime-version;
- bh=sOZDNnFj2RaXKg4BqQV4BM1YNOfwyp6dIUaP+YfiUOA=;
- b=etUHRYg4bKrGcO8oxk6MIwVfnKn5On6uimcOYjMNFIXx2nGGiRMlKheb
- ZUTtv5oMQfa+oSDpgyGKbPfsxFHvbPapx154CP+r7Y59IJpshx5YVIMKn
- 7fj9oxRkofOn4cYG6E8uyKkvn3+ol+CvNen+hR7OQaOtB7YR1dMUHl+BE
- mGlAwuwCgldYtRHoj8deHQ08/XxQaY9Kkb8V2Be6xEesDP42Ajg15Cam7
- 8BzqfZ87Mo5Ro7/rVBKOMTAHLw2B9d6tCscLGqqBA0hPjsIPhO9Zi8KX0
- thQfKDrh9fgbfuuEm5BPBSyecum+jlEMHJT56bVRmQsnDeUKHVAS1rBSv A==;
-IronPort-SDR: MoLcxNKp6uYD385kCBGmFj94FQd3ReAXrPRVQFC/sIZvUuMi77I6QvvCiG6Dw4lOwKJTRpovKX
- OV6ax5ddKIcb2EGbtfBKzyChfbpex8bix+TWe0LCUYTW/i/2LUQkxcPh3uxDiA8LpQZyou8zcy
- OHNa7Mb0ck9VB+9yNXgXflLMBbttjLMFA02dDW/te8Dd85Qs+TAYeFa+h8YicvM4kpw40FY7+N
- nc6A4korp5wn7g16/mDMMf94KjlbNxvgpQtQoyEej0x7GhB/XJIsjX/7ZNSgSqgAqZPphbYDKU
- YRw=
-X-IronPort-AV: E=Sophos;i="5.64,544,1559491200"; d="scan'208";a="118970940"
-Received: from mail-by2nam03lp2058.outbound.protection.outlook.com (HELO
- NAM03-BY2-obe.outbound.protection.outlook.com) ([104.47.42.58])
- by ob1.hgst.iphmx.com with ESMTP; 24 Sep 2019 21:11:59 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n28XsGHExklmLfHyp33hBqyw3X3+Kgikui9BiW5HlYDeRRxFPxyJscsnXSZumULQlkQZdh3OZ6iAXb6cUqhMuYUmu/DZgAXhF65fPrRWa/Vg9NGOo61H5AMB/JBOAJtzHsbnXoDtNGnlHz46jrptvv77AcDuM+heRK+SKmKKYPYTW5757B7Hw2vh8ByGv8EciK0GNbA/EocuMImgUADVHtJQuFM5jEM+SD6IfLZful7QNwqxdy/eozJegSROJUXuGaa3GoE/jWgT9tO0d2dx6OTpVfBV5KwL+AQWAOPsEdj6p4yMGisIWi3KRAmKTpzeZmKNTNlZxyUMixoFsU/6Nw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MFMTf9FB4jd7cxmHM9GoS8TqjRe4+/7fDWsZIr79Nb0=;
- b=GPKwPxBlPa8uRwyInYUwDbuID0ju/h1WhZsI07GkXH4KaJqXg7BJQ4PKUJVPtsIwHi63sdqGhomAmqIyvDfXMJ8rsLaVVqiN3P0DlozXrkh7iTzTNsqCw8Nm8LKupY2dzEW4rwZ06IzeK7FZ8+WFsk5PCS3V/82+ulsJ4PipITmhAVHIY0VoXc8QgS5sz2KyQxxy+rYVPwO9kQKEx6qoDj2abAwmYtbHQj2KdcSn3qFbrnP6G2x2PLNhzY15lTIhOCvwtU//BlhYP9seTvDTshLyuwEaXSW+Si3WSsO1lGuA+DH28vbB0n9QmDiBrH+p+QJX3231ueTe0iYZnMdGEw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MFMTf9FB4jd7cxmHM9GoS8TqjRe4+/7fDWsZIr79Nb0=;
- b=NeH9htplXssFxZiP9pTu0Fot2svh9g1kFFY3tCa8wcRu7zFZQoq7fYgdw12AkhvloxVRwOiW/8Tx+4xOE4ZQUOqkJ0XNV71FsOW/qiApU/4PetIKKRJGxRh3aRFLRCg3M218TfAdLVDe+7L7PV8RzBj8hDfIkQzYBrW5y9ONtPk=
-Received: from MN2PR04MB6061.namprd04.prod.outlook.com (20.178.246.15) by
- MN2PR04MB6318.namprd04.prod.outlook.com (52.132.168.21) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2284.20; Tue, 24 Sep 2019 13:11:57 +0000
-Received: from MN2PR04MB6061.namprd04.prod.outlook.com
- ([fe80::e1a5:8de2:c3b1:3fb0]) by MN2PR04MB6061.namprd04.prod.outlook.com
- ([fe80::e1a5:8de2:c3b1:3fb0%7]) with mapi id 15.20.2284.023; Tue, 24 Sep 2019
- 13:11:57 +0000
-From: Anup Patel <Anup.Patel@wdc.com>
-To: Peter Maydell <peter.maydell@linaro.org>, Palmer Dabbelt
- <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Sagar
- Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann
- <kbastian@mail.uni-paderborn.de>
-Subject: [PATCH v2 0/2] RTC support for QEMU RISC-V virt machine
-Thread-Topic: [PATCH v2 0/2] RTC support for QEMU RISC-V virt machine
-Thread-Index: AQHVctmkW8P3iH8gtEirKQ31pP1PTw==
-Date: Tue, 24 Sep 2019 13:11:57 +0000
-Message-ID: <20190924131131.118155-1-anup.patel@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: MA1PR01CA0148.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a00:71::18) To MN2PR04MB6061.namprd04.prod.outlook.com
- (2603:10b6:208:d8::15)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Anup.Patel@wdc.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 2.17.1
-x-originating-ip: [49.207.51.80]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 5c08830f-ab2e-445a-daae-08d740f0c6dc
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(5600167)(711020)(4605104)(1401327)(4618075)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
- SRVR:MN2PR04MB6318; 
-x-ms-traffictypediagnostic: MN2PR04MB6318:
-x-ms-exchange-purlcount: 1
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR04MB6318B708AF3606ED21B392568D840@MN2PR04MB6318.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-forefront-prvs: 0170DAF08C
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(4636009)(346002)(376002)(366004)(396003)(39860400002)(136003)(199004)(189003)(8676002)(25786009)(476003)(305945005)(8936002)(81156014)(81166006)(6512007)(36756003)(3846002)(6116002)(6306002)(6436002)(5660300002)(110136005)(54906003)(44832011)(71190400001)(71200400001)(2616005)(486006)(316002)(256004)(66066001)(7736002)(14444005)(6486002)(50226002)(6506007)(66946007)(1076003)(14454004)(64756008)(2906002)(186003)(99286004)(102836004)(966005)(2171002)(386003)(52116002)(26005)(478600001)(66476007)(66556008)(86362001)(55236004)(66446008)(4326008);
- DIR:OUT; SFP:1102; SCL:1; SRVR:MN2PR04MB6318;
- H:MN2PR04MB6061.namprd04.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: KX8cgI2ut+PdDZn4e76d6FS+Krnd9YCcZrab07hjOUQHOAgYEHf99Y0AZ5LHn5FxqqwYifUOdsyh3dIUOV51ibSxtn4UPiamHt4vybpgIwHwjePSFuynkXvyxaN1mDd9xZwpaRUBLosaekFJmXbJAK4w/YJ6rf6dYxxZgvQZ09ZUwArv6FI/o9gRZl3rYuLf50gNJ25jm5M3b5vHTnyMT6lcP/ut6Mu3Smq5dU67+zNhoHVuuQdDJS4ufBBaBDu+Xq1nH9d3JzScV+eNRgtrDn6/DQhUb8cah5gjI02doILjqhludjdo7PiUYva6Gm42IKXzmx2z20KMEA/nWpRaXiFU3PvRGYBA39wncZmw0tguHRB8J9Fwf3v4nuzxlJPB7uw32CkyK6h0mouzWm6rlDQu3aGQsAfvmpMJL6ZZ6rwewhDSKOLOJKN+V7EHFNL4E8ovuyXiQ2p6Trfc5vXWkw==
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iCk6W-0001w2-O7; Tue, 24 Sep 2019 08:39:40 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 13687756;
+ Tue, 24 Sep 2019 12:39:40 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-249.phx2.redhat.com [10.3.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 91B3460BFB;
+ Tue, 24 Sep 2019 12:39:39 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 3/4] nbd: Grab aio context lock in more places
+Date: Tue, 24 Sep 2019 07:39:32 -0500
+Message-Id: <20190924123933.10607-4-eblake@redhat.com>
+In-Reply-To: <20190924123933.10607-1-eblake@redhat.com>
+References: <20190924123933.10607-1-eblake@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5c08830f-ab2e-445a-daae-08d740f0c6dc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Sep 2019 13:11:57.4292 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yFMCvPFs4E8gyloNZuqzsEOZib4ZLSGy4BbrvnexMkKAHg7xB1s1GTszNWnYM4i7rZ09Mcd0w1SzXwJKb1xVdg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6318
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.154.42
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Tue, 24 Sep 2019 12:39:40 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,44 +66,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Atish Patra <Atish.Patra@wdc.com>, Anup Patel <Anup.Patel@wdc.com>,
- "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Anup Patel <anup@brainfault.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>,
+ Sergio Lopez <slp@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series adds RTC device to QEMU RISC-V virt machine. We have
-selected Goldfish RTC device model for this. It's a pretty simple
-synthetic device with few MMIO registers and no dependency external
-clock. The driver for Goldfish RTC is already available in Linux so
-we just need to enable it in Kconfig for RISCV and also update Linux
-defconfigs.
+When iothreads are in use, the failure to grab the aio context results
+in an assertion failure when trying to unlock things during blk_unref,
+when trying to unlock a mutex that was not locked.  In short, all
+calls to nbd_export_put need to done while within the correct aio
+context.  But since nbd_export_put can recursively reach itself via
+nbd_export_close, and recursively grabbing the context would deadlock,
+we can't do the context grab directly in those functions, but must do
+so in their callers.
 
-We have tested this series with Linux-5.3 plus defconfig changes
-available in 'goldfish_rtc_v1' branch of:
-https://github.com/avpatel/linux.git
+Hoist the use of the correct aio_context from nbd_export_new() to its
+caller qmp_nbd_server_add().  Then tweak qmp_nbd_server_remove(),
+nbd_eject_notifier(), and nbd_esport_close_all() to grab the right
+context, so that all callers during qemu now own the context before
+nbd_export_put() can call blk_unref().
 
-Changes since v1:
- - Removed redundant object properties from Goldfish RTC emulation
- - Added vmstate for Goldfish RTC
+Remaining uses in qemu-nbd don't matter (since that use case does not
+support iothreads).
 
-Anup Patel (2):
-  hw: timer: Add Goldfish RTC device
-  riscv: virt: Use Goldfish RTC device
+Suggested-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20190917023917.32226-1-eblake@redhat.com>
+Reviewed-by: Sergio Lopez <slp@redhat.com>
+---
+ include/block/nbd.h |  1 +
+ blockdev-nbd.c      | 14 ++++++++++++--
+ nbd/server.c        | 22 ++++++++++++++++++----
+ 3 files changed, 31 insertions(+), 6 deletions(-)
 
- hw/riscv/Kconfig                |   1 +
- hw/riscv/virt.c                 |  15 ++
- hw/timer/Kconfig                |   3 +
- hw/timer/Makefile.objs          |   1 +
- hw/timer/goldfish_rtc.c         | 278 ++++++++++++++++++++++++++++++++
- include/hw/riscv/virt.h         |   2 +
- include/hw/timer/goldfish_rtc.h |  46 ++++++
- 7 files changed, 346 insertions(+)
- create mode 100644 hw/timer/goldfish_rtc.c
- create mode 100644 include/hw/timer/goldfish_rtc.h
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 21550747cf35..316fd705a9e4 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -340,6 +340,7 @@ void nbd_export_put(NBDExport *exp);
 
---
-2.17.1
+ BlockBackend *nbd_export_get_blockdev(NBDExport *exp);
+
++AioContext *nbd_export_aio_context(NBDExport *exp);
+ NBDExport *nbd_export_find(const char *name);
+ void nbd_export_close_all(void);
+
+diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+index 213f226ac1c4..6a8b206e1d74 100644
+--- a/blockdev-nbd.c
++++ b/blockdev-nbd.c
+@@ -151,6 +151,7 @@ void qmp_nbd_server_add(const char *device, bool has_=
+name, const char *name,
+     BlockBackend *on_eject_blk;
+     NBDExport *exp;
+     int64_t len;
++    AioContext *aio_context;
+
+     if (!nbd_server) {
+         error_setg(errp, "NBD server not running");
+@@ -173,11 +174,13 @@ void qmp_nbd_server_add(const char *device, bool ha=
+s_name, const char *name,
+         return;
+     }
+
++    aio_context =3D bdrv_get_aio_context(bs);
++    aio_context_acquire(aio_context);
+     len =3D bdrv_getlength(bs);
+     if (len < 0) {
+         error_setg_errno(errp, -len,
+                          "Failed to determine the NBD export's length");
+-        return;
++        goto out;
+     }
+
+     if (!has_writable) {
+@@ -190,13 +193,16 @@ void qmp_nbd_server_add(const char *device, bool ha=
+s_name, const char *name,
+     exp =3D nbd_export_new(bs, 0, len, name, NULL, bitmap, !writable, !w=
+ritable,
+                          NULL, false, on_eject_blk, errp);
+     if (!exp) {
+-        return;
++        goto out;
+     }
+
+     /* The list of named exports has a strong reference to this export n=
+ow and
+      * our only way of accessing it is through nbd_export_find(), so we =
+can drop
+      * the strong reference that is @exp. */
+     nbd_export_put(exp);
++
++ out:
++    aio_context_release(aio_context);
+ }
+
+ void qmp_nbd_server_remove(const char *name,
+@@ -204,6 +210,7 @@ void qmp_nbd_server_remove(const char *name,
+                            Error **errp)
+ {
+     NBDExport *exp;
++    AioContext *aio_context;
+
+     if (!nbd_server) {
+         error_setg(errp, "NBD server not running");
+@@ -220,7 +227,10 @@ void qmp_nbd_server_remove(const char *name,
+         mode =3D NBD_SERVER_REMOVE_MODE_SAFE;
+     }
+
++    aio_context =3D nbd_export_aio_context(exp);
++    aio_context_acquire(aio_context);
+     nbd_export_remove(exp, mode, errp);
++    aio_context_release(aio_context);
+ }
+
+ void qmp_nbd_server_stop(Error **errp)
+diff --git a/nbd/server.c b/nbd/server.c
+index 31d624e146cb..d8d1e6245532 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1461,7 +1461,12 @@ static void blk_aio_detach(void *opaque)
+ static void nbd_eject_notifier(Notifier *n, void *data)
+ {
+     NBDExport *exp =3D container_of(n, NBDExport, eject_notifier);
++    AioContext *aio_context;
++
++    aio_context =3D exp->ctx;
++    aio_context_acquire(aio_context);
+     nbd_export_close(exp);
++    aio_context_release(aio_context);
+ }
+
+ NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
+@@ -1480,12 +1485,11 @@ NBDExport *nbd_export_new(BlockDriverState *bs, u=
+int64_t dev_offset,
+      * NBD exports are used for non-shared storage migration.  Make sure
+      * that BDRV_O_INACTIVE is cleared and the image is ready for write
+      * access since the export could be available before migration hando=
+ver.
++     * ctx was acquired in the caller.
+      */
+     assert(name);
+     ctx =3D bdrv_get_aio_context(bs);
+-    aio_context_acquire(ctx);
+     bdrv_invalidate_cache(bs, NULL);
+-    aio_context_release(ctx);
+
+     /* Don't allow resize while the NBD server is running, otherwise we =
+don't
+      * care what happens with the node. */
+@@ -1493,7 +1497,7 @@ NBDExport *nbd_export_new(BlockDriverState *bs, uin=
+t64_t dev_offset,
+     if (!readonly) {
+         perm |=3D BLK_PERM_WRITE;
+     }
+-    blk =3D blk_new(bdrv_get_aio_context(bs), perm,
++    blk =3D blk_new(ctx, perm,
+                   BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
+                   BLK_PERM_WRITE | BLK_PERM_GRAPH_MOD);
+     ret =3D blk_insert_bs(blk, bs, errp);
+@@ -1560,7 +1564,7 @@ NBDExport *nbd_export_new(BlockDriverState *bs, uin=
+t64_t dev_offset,
+     }
+
+     exp->close =3D close;
+-    exp->ctx =3D blk_get_aio_context(blk);
++    exp->ctx =3D ctx;
+     blk_add_aio_context_notifier(blk, blk_aio_attached, blk_aio_detach, =
+exp);
+
+     if (on_eject_blk) {
+@@ -1593,6 +1597,12 @@ NBDExport *nbd_export_find(const char *name)
+     return NULL;
+ }
+
++AioContext *
++nbd_export_aio_context(NBDExport *exp)
++{
++    return exp->ctx;
++}
++
+ void nbd_export_close(NBDExport *exp)
+ {
+     NBDClient *client, *next;
+@@ -1687,9 +1697,13 @@ BlockBackend *nbd_export_get_blockdev(NBDExport *e=
+xp)
+ void nbd_export_close_all(void)
+ {
+     NBDExport *exp, *next;
++    AioContext *aio_context;
+
+     QTAILQ_FOREACH_SAFE(exp, &exports, next, next) {
++        aio_context =3D exp->ctx;
++        aio_context_acquire(aio_context);
+         nbd_export_close(exp);
++        aio_context_release(aio_context);
+     }
+ }
+
+--=20
+2.21.0
+
 
