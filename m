@@ -2,75 +2,62 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61008C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:44:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85E75C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:45:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 376252168B
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:44:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 376252168B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cloudbasesolutions.com
+	by mail.kernel.org (Postfix) with ESMTPS id 58ADE2168B
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:45:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58ADE2168B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCl6q-0004xP-0b
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:44:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45452)
+	id 1iCl84-0006ZH-PO
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:45:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52303)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iCjQ7-0006Yr-BD
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:55:53 -0400
+ (envelope-from <slp@redhat.com>) id 1iCkBu-0002iM-E9
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:45:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iCjQ2-00019x-MG
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:55:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56636)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iCjQ0-000192-8y
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:55:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iCjPx-0002pq-L6
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 11:55:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 99BA52E80CB
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 11:55:41 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Sep 2019 11:40:48 -0000
-From: Adrian Vladu <avladu@cloudbasesolutions.com>
+ (envelope-from <slp@redhat.com>) id 1iCkBs-0004ZU-GT
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:45:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49392)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iCkBr-0004Xu-H1
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:45:12 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id CE74030860CB;
+ Tue, 24 Sep 2019 12:45:10 +0000 (UTC)
+Received: from dritchie.redhat.com (unknown [10.33.36.128])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8135160852;
+ Tue, 24 Sep 2019 12:45:04 +0000 (UTC)
+From: Sergio Lopez <slp@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: mingw32 msys windows
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: avladu
-X-Launchpad-Bug-Reporter: Adrian Vladu (avladu)
-X-Launchpad-Bug-Modifier: Adrian Vladu (avladu)
-References: <156932212305.13447.6077258015607645915.malonedeb@gac.canonical.com>
-Message-Id: <156932524866.26657.15632302261189242465.launchpad@soybean.canonical.com>
-Subject: [Bug 1845185] Re: Cannot build qemu utils (qemu-img.exe, qemu-edid.exe,
- qemu-io.exe) statically with MSYS2 on Windows because intl and iconv
- libs are not loaded
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19048";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 2bc4bf8ed26980f529072bd01b7f1d812c81739c
+Subject: [PATCH v4 1/8] hw/i386: Factorize PVH related functions
+Date: Tue, 24 Sep 2019 14:44:26 +0200
+Message-Id: <20190924124433.96810-2-slp@redhat.com>
+In-Reply-To: <20190924124433.96810-1-slp@redhat.com>
+References: <20190924124433.96810-1-slp@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Tue, 24 Sep 2019 12:45:10 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-X-Mailman-Approved-At: Tue, 24 Sep 2019 09:10:43 -0400
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,92 +66,340 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1845185 <1845185@bugs.launchpad.net>
+Cc: Sergio Lopez <slp@redhat.com>, ehabkost@redhat.com, kvm@vger.kernel.org,
+ mst@redhat.com, lersek@redhat.com, mtosatti@redhat.com, kraxel@redhat.com,
+ pbonzini@redhat.com, imammedo@redhat.com, philmd@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Tags added: mingw32 msys windows
+Extract PVH related functions from pc.c, and put them in pvh.c, so
+they can be shared with other components.
 
--- =
+Signed-off-by: Sergio Lopez <slp@redhat.com>
+---
+ hw/i386/Makefile.objs |   1 +
+ hw/i386/pc.c          | 120 +++++-------------------------------------
+ hw/i386/pvh.c         | 113 +++++++++++++++++++++++++++++++++++++++
+ hw/i386/pvh.h         |  10 ++++
+ 4 files changed, 136 insertions(+), 108 deletions(-)
+ create mode 100644 hw/i386/pvh.c
+ create mode 100644 hw/i386/pvh.h
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1845185
+diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
+index 5d9c9efd5f..c5f20bbd72 100644
+--- a/hw/i386/Makefile.objs
++++ b/hw/i386/Makefile.objs
+@@ -1,5 +1,6 @@
+ obj-$(CONFIG_KVM) +=3D kvm/
+ obj-y +=3D multiboot.o
++obj-y +=3D pvh.o
+ obj-y +=3D pc.o
+ obj-$(CONFIG_I440FX) +=3D pc_piix.o
+ obj-$(CONFIG_Q35) +=3D pc_q35.o
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index bad866fe44..10e4ced0c6 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -42,6 +42,7 @@
+ #include "elf.h"
+ #include "migration/vmstate.h"
+ #include "multiboot.h"
++#include "pvh.h"
+ #include "hw/timer/mc146818rtc.h"
+ #include "hw/dma/i8257.h"
+ #include "hw/timer/i8254.h"
+@@ -116,9 +117,6 @@ static struct e820_entry *e820_table;
+ static unsigned e820_entries;
+ struct hpet_fw_config hpet_cfg =3D {.count =3D UINT8_MAX};
+=20
+-/* Physical Address of PVH entry point read from kernel ELF NOTE */
+-static size_t pvh_start_addr;
+-
+ GlobalProperty pc_compat_4_1[] =3D {};
+ const size_t pc_compat_4_1_len =3D G_N_ELEMENTS(pc_compat_4_1);
+=20
+@@ -1076,109 +1074,6 @@ struct setup_data {
+     uint8_t data[0];
+ } __attribute__((packed));
+=20
+-
+-/*
+- * The entry point into the kernel for PVH boot is different from
+- * the native entry point.  The PVH entry is defined by the x86/HVM
+- * direct boot ABI and is available in an ELFNOTE in the kernel binary.
+- *
+- * This function is passed to load_elf() when it is called from
+- * load_elfboot() which then additionally checks for an ELF Note of
+- * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
+- * parse the PVH entry address from the ELF Note.
+- *
+- * Due to trickery in elf_opts.h, load_elf() is actually available as
+- * load_elf32() or load_elf64() and this routine needs to be able
+- * to deal with being called as 32 or 64 bit.
+- *
+- * The address of the PVH entry point is saved to the 'pvh_start_addr'
+- * global variable.  (although the entry point is 32-bit, the kernel
+- * binary can be either 32-bit or 64-bit).
+- */
+-static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
+-{
+-    size_t *elf_note_data_addr;
+-
+-    /* Check if ELF Note header passed in is valid */
+-    if (arg1 =3D=3D NULL) {
+-        return 0;
+-    }
+-
+-    if (is64) {
+-        struct elf64_note *nhdr64 =3D (struct elf64_note *)arg1;
+-        uint64_t nhdr_size64 =3D sizeof(struct elf64_note);
+-        uint64_t phdr_align =3D *(uint64_t *)arg2;
+-        uint64_t nhdr_namesz =3D nhdr64->n_namesz;
+-
+-        elf_note_data_addr =3D
+-            ((void *)nhdr64) + nhdr_size64 +
+-            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
+-    } else {
+-        struct elf32_note *nhdr32 =3D (struct elf32_note *)arg1;
+-        uint32_t nhdr_size32 =3D sizeof(struct elf32_note);
+-        uint32_t phdr_align =3D *(uint32_t *)arg2;
+-        uint32_t nhdr_namesz =3D nhdr32->n_namesz;
+-
+-        elf_note_data_addr =3D
+-            ((void *)nhdr32) + nhdr_size32 +
+-            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
+-    }
+-
+-    pvh_start_addr =3D *elf_note_data_addr;
+-
+-    return pvh_start_addr;
+-}
+-
+-static bool load_elfboot(const char *kernel_filename,
+-                   int kernel_file_size,
+-                   uint8_t *header,
+-                   size_t pvh_xen_start_addr,
+-                   FWCfgState *fw_cfg)
+-{
+-    uint32_t flags =3D 0;
+-    uint32_t mh_load_addr =3D 0;
+-    uint32_t elf_kernel_size =3D 0;
+-    uint64_t elf_entry;
+-    uint64_t elf_low, elf_high;
+-    int kernel_size;
+-
+-    if (ldl_p(header) !=3D 0x464c457f) {
+-        return false; /* no elfboot */
+-    }
+-
+-    bool elf_is64 =3D header[EI_CLASS] =3D=3D ELFCLASS64;
+-    flags =3D elf_is64 ?
+-        ((Elf64_Ehdr *)header)->e_flags : ((Elf32_Ehdr *)header)->e_flag=
+s;
+-
+-    if (flags & 0x00010004) { /* LOAD_ELF_HEADER_HAS_ADDR */
+-        error_report("elfboot unsupported flags =3D %x", flags);
+-        exit(1);
+-    }
+-
+-    uint64_t elf_note_type =3D XEN_ELFNOTE_PHYS32_ENTRY;
+-    kernel_size =3D load_elf(kernel_filename, read_pvh_start_addr,
+-                           NULL, &elf_note_type, &elf_entry,
+-                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
+-                           0, 0);
+-
+-    if (kernel_size < 0) {
+-        error_report("Error while loading elf kernel");
+-        exit(1);
+-    }
+-    mh_load_addr =3D elf_low;
+-    elf_kernel_size =3D elf_high - elf_low;
+-
+-    if (pvh_start_addr =3D=3D 0) {
+-        error_report("Error loading uncompressed kernel without PVH ELF =
+Note");
+-        exit(1);
+-    }
+-    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
+-    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
+-    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
+-
+-    return true;
+-}
+-
+ static void load_linux(PCMachineState *pcms,
+                        FWCfgState *fw_cfg)
+ {
+@@ -1218,6 +1113,9 @@ static void load_linux(PCMachineState *pcms,
+     if (ldl_p(header+0x202) =3D=3D 0x53726448) {
+         protocol =3D lduw_p(header+0x206);
+     } else {
++        size_t pvh_start_addr;
++        uint32_t mh_load_addr =3D 0;
++        uint32_t elf_kernel_size =3D 0;
+         /*
+          * This could be a multiboot kernel. If it is, let's stop treati=
+ng it
+          * like a Linux kernel.
+@@ -1235,10 +1133,16 @@ static void load_linux(PCMachineState *pcms,
+          * If load_elfboot() is successful, populate the fw_cfg info.
+          */
+         if (pcmc->pvh_enabled &&
+-            load_elfboot(kernel_filename, kernel_size,
+-                         header, pvh_start_addr, fw_cfg)) {
++            pvh_load_elfboot(kernel_filename,
++                             &mh_load_addr, &elf_kernel_size)) {
+             fclose(f);
+=20
++            pvh_start_addr =3D pvh_get_start_addr();
++
++            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
++            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
++            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
++
+             fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
+                 strlen(kernel_cmdline) + 1);
+             fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdlin=
+e);
+diff --git a/hw/i386/pvh.c b/hw/i386/pvh.c
+new file mode 100644
+index 0000000000..1c81727811
+--- /dev/null
++++ b/hw/i386/pvh.c
+@@ -0,0 +1,113 @@
++/*
++ * PVH Boot Helper
++ *
++ * Copyright (C) 2019 Oracle
++ * Copyright (C) 2019 Red Hat, Inc
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/units.h"
++#include "qemu/error-report.h"
++#include "hw/loader.h"
++#include "cpu.h"
++#include "elf.h"
++#include "pvh.h"
++
++static size_t pvh_start_addr;
++
++size_t pvh_get_start_addr(void)
++{
++    return pvh_start_addr;
++}
++
++/*
++ * The entry point into the kernel for PVH boot is different from
++ * the native entry point.  The PVH entry is defined by the x86/HVM
++ * direct boot ABI and is available in an ELFNOTE in the kernel binary.
++ *
++ * This function is passed to load_elf() when it is called from
++ * load_elfboot() which then additionally checks for an ELF Note of
++ * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
++ * parse the PVH entry address from the ELF Note.
++ *
++ * Due to trickery in elf_opts.h, load_elf() is actually available as
++ * load_elf32() or load_elf64() and this routine needs to be able
++ * to deal with being called as 32 or 64 bit.
++ *
++ * The address of the PVH entry point is saved to the 'pvh_start_addr'
++ * global variable.  (although the entry point is 32-bit, the kernel
++ * binary can be either 32-bit or 64-bit).
++ */
++
++static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
++{
++    size_t *elf_note_data_addr;
++
++    /* Check if ELF Note header passed in is valid */
++    if (arg1 =3D=3D NULL) {
++        return 0;
++    }
++
++    if (is64) {
++        struct elf64_note *nhdr64 =3D (struct elf64_note *)arg1;
++        uint64_t nhdr_size64 =3D sizeof(struct elf64_note);
++        uint64_t phdr_align =3D *(uint64_t *)arg2;
++        uint64_t nhdr_namesz =3D nhdr64->n_namesz;
++
++        elf_note_data_addr =3D
++            ((void *)nhdr64) + nhdr_size64 +
++            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
++    } else {
++        struct elf32_note *nhdr32 =3D (struct elf32_note *)arg1;
++        uint32_t nhdr_size32 =3D sizeof(struct elf32_note);
++        uint32_t phdr_align =3D *(uint32_t *)arg2;
++        uint32_t nhdr_namesz =3D nhdr32->n_namesz;
++
++        elf_note_data_addr =3D
++            ((void *)nhdr32) + nhdr_size32 +
++            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
++    }
++
++    pvh_start_addr =3D *elf_note_data_addr;
++
++    return pvh_start_addr;
++}
++
++bool pvh_load_elfboot(const char *kernel_filename,
++                      uint32_t *mh_load_addr,
++                      uint32_t *elf_kernel_size)
++{
++    uint64_t elf_entry;
++    uint64_t elf_low, elf_high;
++    int kernel_size;
++    uint64_t elf_note_type =3D XEN_ELFNOTE_PHYS32_ENTRY;
++
++    kernel_size =3D load_elf(kernel_filename, read_pvh_start_addr,
++                           NULL, &elf_note_type, &elf_entry,
++                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
++                           0, 0);
++
++    if (kernel_size < 0) {
++        error_report("Error while loading elf kernel");
++        return false;
++    }
++
++    if (pvh_start_addr =3D=3D 0) {
++        error_report("Error loading uncompressed kernel without PVH ELF =
+Note");
++        return false;
++    }
++
++    if (mh_load_addr) {
++        *mh_load_addr =3D elf_low;
++    }
++
++    if (elf_kernel_size) {
++        *elf_kernel_size =3D elf_high - elf_low;
++    }
++
++    return true;
++}
+diff --git a/hw/i386/pvh.h b/hw/i386/pvh.h
+new file mode 100644
+index 0000000000..ada67ff6e8
+--- /dev/null
++++ b/hw/i386/pvh.h
+@@ -0,0 +1,10 @@
++#ifndef HW_I386_PVH_H
++#define HW_I386_PVH_H
++
++size_t pvh_get_start_addr(void);
++
++bool pvh_load_elfboot(const char *kernel_filename,
++                      uint32_t *mh_load_addr,
++                      uint32_t *elf_kernel_size);
++
++#endif
+--=20
+2.21.0
 
-Title:
-  Cannot build qemu utils (qemu-img.exe, qemu-edid.exe, qemu-io.exe)
-  statically with MSYS2 on Windows because intl and iconv libs are not
-  loaded
-
-Status in QEMU:
-  New
-
-Bug description:
-  Using MSYS2 and mingw32 instructions from
-  https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2, I could not
-  statically build the qemu-utils using the latest qemu master branch.
-
-  Steps to reproduce the issue:
-  1. Install MSYS2 on a Windows 10 x64 box
-  2. Install required mingw64 toolchain: pacman -S base-devel mingw-w64-x86=
-_64-toolchain git python mingw-w64-x86_64-glib2 mingw64/mingw-w64-x86_64-gt=
-k3 mingw64/mingw-w64-x86_64-SDL2
-  3. clone qemu
-  4. Run configure for static build for the tools only
-  =C2=A0=C2=A0./configure --disable-user --disable-system --disable-docs --=
-enable-tools  --disable-guest-agent --disable-capstone --disable-sheepdog -=
--enable-debug --static
-  =C2=A0=C2=A0# I had to remove sheepdog, capstone and guest agent because =
-other errors popped out, but let's not go in the rabbit hole.
-  5. Run 'make -j'. the following errors appeared, signaling that intl lib =
-is not loaded. If I add intl lib, iconv lib needs to be loaded too.
-
-  make: *** [/home/ader1990/qemu/rules.mak:124: qemu-img.exe] Error 1
-  make: *** Waiting for unfinished jobs....
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1522): unde=
-fined reference to `libintl_sprintf'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x154f): unde=
-fined reference to `libintl_sprintf'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x157e): unde=
-fined reference to `libintl_sprintf'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15ad): unde=
-fined reference to `libintl_sprintf'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15dc): unde=
-fined reference to `libintl_sprintf'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1622): more=
- undefined references to `libintl_sprintf' follow
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x43): undefi=
-ned reference to `libintl_textdomain'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x52): undefi=
-ned reference to `libintl_gettext'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x203): undef=
-ined reference to `libintl_bindtextdomain'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x21e): undef=
-ined reference to `libintl_bind_textdomain_codeset'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x2c1): undef=
-ined reference to `libintl_dgettext'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x4e1): undef=
-ined reference to `libintl_dcgettext'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x53a): undef=
-ined reference to `libintl_dngettext'
-
-  Patch to fix the issue (added intl and iconv to the libs):
-
-  diff --git a/configure b/configure
-  index 30aad233d1..e2ab8ef026 100755
-  --- a/configure
-  +++ b/configure
-  @@ -920,7 +920,7 @@ if test "$mingw32" =3D "yes" ; then
-  =C2=A0=C2=A0=C2=A0DSOSUF=3D".dll"
-  =C2=A0=C2=A0=C2=A0# MinGW needs -mthreads for TLS and macro _MT.
-  =C2=A0=C2=A0=C2=A0QEMU_CFLAGS=3D"-mthreads $QEMU_CFLAGS"
-  -  LIBS=3D"-lwinmm -lws2_32 -liphlpapi $LIBS"
-  +  LIBS=3D"-lwinmm -lws2_32 -liphlpapi -lintl -liconv $LIBS"
-  =C2=A0=C2=A0=C2=A0write_c_skeleton;
-  =C2=A0=C2=A0=C2=A0if compile_prog "" "-liberty" ; then
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0LIBS=3D"-liberty $LIBS"
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1845185/+subscriptions
 
