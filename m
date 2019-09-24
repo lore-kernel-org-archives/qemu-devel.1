@@ -6,56 +6,55 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F817C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 12:37:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 790EDC432C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 12:37:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8C02214DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 12:37:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8C02214DA
+	by mail.kernel.org (Postfix) with ESMTPS id 4DDDB214DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 12:37:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DDDB214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCk4X-0003PU-MR
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 08:37:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50375)
+	id 1iCk4f-0003TL-Go
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 08:37:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50377)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCk0i-0001IE-ET
+ (envelope-from <armbru@redhat.com>) id 1iCk0i-0001IG-Ea
  for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCk0g-0006sN-5f
+ (envelope-from <armbru@redhat.com>) id 1iCk0g-0006sH-58
  for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49338)
+Received: from mx1.redhat.com ([209.132.183.28]:39081)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCk0f-0006r2-TA
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCk0f-0006rM-T7
  for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:38 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3ABA080F91
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 12:33:36 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6654218C8914;
+ Tue, 24 Sep 2019 12:33:36 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D761D194B2;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D75825C1B2;
  Tue, 24 Sep 2019 12:33:35 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5104D11386A6; Tue, 24 Sep 2019 14:33:34 +0200 (CEST)
+ id 42B1F1138660; Tue, 24 Sep 2019 14:33:34 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 04/37] qapi: Drop check_type()'s redundant parameter
- @allow_optional
-Date: Tue, 24 Sep 2019 14:33:01 +0200
-Message-Id: <20190924123334.30645-5-armbru@redhat.com>
+Subject: [PULL 02/37] make check-unit: use after free in test-opts-visitor
+Date: Tue, 24 Sep 2019 14:32:59 +0200
+Message-Id: <20190924123334.30645-3-armbru@redhat.com>
 In-Reply-To: <20190924123334.30645-1-armbru@redhat.com>
 References: <20190924123334.30645-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 24 Sep 2019 12:33:36 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Tue, 24 Sep 2019 12:33:36 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -70,99 +69,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-check_type() uses @allow_optional only when @value is a dictionary and
-@allow_dict is True.  All callers that pass allow_dict=3DTrue also pass
-allow_optional=3DTrue.
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 
-Therefore, @allow_optional is always True when check_type() uses it.
-Drop the redundant parameter.
+In the struct OptsVisitor, the 'repeated_opts' member points to a list
+in the 'unprocessed_opts' hash table after the list has been destroyed.
+A subsequent call to visit_type_int() references the deleted list.
+It results in use-after-free issue reproduced by running the test case
+under the Valgrind: valgrind tests/test-opts-visitor.
+A new mode ListMode::LM_TRAVERSED is declared to mark the list
+traversal completed.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20190913201349.24332-3-armbru@redhat.com>
+Suggested-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-Id: <1565024586-387112-1-git-send-email-andrey.shinkevich@virtuoz=
+zo.com>
 ---
- scripts/qapi/common.py | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ qapi/opts-visitor.c | 26 ++++++++++++++++++++++----
+ 1 file changed, 22 insertions(+), 4 deletions(-)
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index d61bfdc526..9aefcfe015 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -783,9 +783,8 @@ def check_if(expr, info):
-         check_if_str(ifcond, info)
+diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
+index 324b197495..5fe0276c1c 100644
+--- a/qapi/opts-visitor.c
++++ b/qapi/opts-visitor.c
+@@ -24,7 +24,8 @@ enum ListMode
+ {
+     LM_NONE,             /* not traversing a list of repeated options */
 =20
+-    LM_IN_PROGRESS,      /* opts_next_list() ready to be called.
++    LM_IN_PROGRESS,      /*
++                          * opts_next_list() ready to be called.
+                           *
+                           * Generating the next list link will consume t=
+he most
+                           * recently parsed QemuOpt instance of the repe=
+ated
+@@ -36,7 +37,8 @@ enum ListMode
+                           * LM_UNSIGNED_INTERVAL.
+                           */
 =20
--def check_type(info, source, value, allow_array=3DFalse,
--               allow_dict=3DFalse, allow_optional=3DFalse,
--               allow_metas=3D[]):
-+def check_type(info, source, value,
-+               allow_array=3DFalse, allow_dict=3DFalse, allow_metas=3D[]=
-):
-     global all_names
+-    LM_SIGNED_INTERVAL,  /* opts_next_list() has been called.
++    LM_SIGNED_INTERVAL,  /*
++                          * opts_next_list() has been called.
+                           *
+                           * Generating the next list link will consume t=
+he most
+                           * recently stored element from the signed inte=
+rval,
+@@ -48,7 +50,14 @@ enum ListMode
+                           * next element of the signed interval.
+                           */
 =20
-     if value is None:
-@@ -821,7 +820,7 @@ def check_type(info, source, value, allow_array=3DFal=
-se,
-     # value is a dictionary, check that each member is okay
-     for (key, arg) in value.items():
-         check_name(info, "Member of %s" % source, key,
--                   allow_optional=3Dallow_optional)
-+                   allow_optional=3DTrue)
-         if c_name(key, False) =3D=3D 'u' or c_name(key, False).startswit=
-h('has_'):
-             raise QAPISemError(info, "Member of %s uses reserved name '%=
-s'"
-                                % (source, key))
-@@ -843,14 +842,14 @@ def check_command(expr, info):
-     if boxed:
-         args_meta +=3D ['union', 'alternate']
-     check_type(info, "'data' for command '%s'" % name,
--               expr.get('data'), allow_dict=3Dnot boxed, allow_optional=3D=
-True,
-+               expr.get('data'), allow_dict=3Dnot boxed,
-                allow_metas=3Dargs_meta)
-     returns_meta =3D ['union', 'struct']
-     if name in returns_whitelist:
-         returns_meta +=3D ['built-in', 'alternate', 'enum']
-     check_type(info, "'returns' for command '%s'" % name,
-                expr.get('returns'), allow_array=3DTrue,
--               allow_optional=3DTrue, allow_metas=3Dreturns_meta)
-+               allow_metas=3Dreturns_meta)
+-    LM_UNSIGNED_INTERVAL /* Same as above, only for an unsigned interval=
+. */
++    LM_UNSIGNED_INTERVAL, /* Same as above, only for an unsigned interva=
+l. */
++
++    LM_TRAVERSED          /*
++                           * opts_next_list() has been called.
++                           *
++                           * No more QemuOpt instance in the list.
++                           * The traversal has been completed.
++                           */
+ };
 =20
+ typedef enum ListMode ListMode;
+@@ -238,6 +247,8 @@ opts_next_list(Visitor *v, GenericList *tail, size_t =
+size)
+     OptsVisitor *ov =3D to_ov(v);
 =20
- def check_event(expr, info):
-@@ -861,7 +860,7 @@ def check_event(expr, info):
-     if boxed:
-         meta +=3D ['union', 'alternate']
-     check_type(info, "'data' for event '%s'" % name,
--               expr.get('data'), allow_dict=3Dnot boxed, allow_optional=3D=
-True,
-+               expr.get('data'), allow_dict=3Dnot boxed,
-                allow_metas=3Dmeta)
+     switch (ov->list_mode) {
++    case LM_TRAVERSED:
++        return NULL;
+     case LM_SIGNED_INTERVAL:
+     case LM_UNSIGNED_INTERVAL:
+         if (ov->list_mode =3D=3D LM_SIGNED_INTERVAL) {
+@@ -258,6 +269,8 @@ opts_next_list(Visitor *v, GenericList *tail, size_t =
+size)
+         opt =3D g_queue_pop_head(ov->repeated_opts);
+         if (g_queue_is_empty(ov->repeated_opts)) {
+             g_hash_table_remove(ov->unprocessed_opts, opt->name);
++            ov->repeated_opts =3D NULL;
++            ov->list_mode =3D LM_TRAVERSED;
+             return NULL;
+         }
+         break;
+@@ -289,7 +302,8 @@ opts_end_list(Visitor *v, void **obj)
 =20
-=20
-@@ -889,7 +888,7 @@ def check_union(expr, info):
-     else:
-         # The object must have a string or dictionary 'base'.
-         check_type(info, "'base' for union '%s'" % name,
--                   base, allow_dict=3DTrue, allow_optional=3DTrue,
-+                   base, allow_dict=3DTrue,
-                    allow_metas=3D['struct'])
-         if not base:
-             raise QAPISemError(info, "Flat union '%s' must have a base"
-@@ -1012,7 +1011,7 @@ def check_struct(expr, info):
-     features =3D expr.get('features')
-=20
-     check_type(info, "'data' for struct '%s'" % name, members,
--               allow_dict=3DTrue, allow_optional=3DTrue)
-+               allow_dict=3DTrue)
-     check_type(info, "'base' for struct '%s'" % name, expr.get('base'),
-                allow_metas=3D['struct'])
-=20
+     assert(ov->list_mode =3D=3D LM_IN_PROGRESS ||
+            ov->list_mode =3D=3D LM_SIGNED_INTERVAL ||
+-           ov->list_mode =3D=3D LM_UNSIGNED_INTERVAL);
++           ov->list_mode =3D=3D LM_UNSIGNED_INTERVAL ||
++           ov->list_mode =3D=3D LM_TRAVERSED);
+     ov->repeated_opts =3D NULL;
+     ov->list_mode =3D LM_NONE;
+ }
+@@ -306,6 +320,10 @@ lookup_scalar(const OptsVisitor *ov, const char *nam=
+e, Error **errp)
+         list =3D lookup_distinct(ov, name, errp);
+         return list ? g_queue_peek_tail(list) : NULL;
+     }
++    if (ov->list_mode =3D=3D LM_TRAVERSED) {
++        error_setg(errp, "Fewer list elements than expected");
++        return NULL;
++    }
+     assert(ov->list_mode =3D=3D LM_IN_PROGRESS);
+     return g_queue_peek_head(ov->repeated_opts);
+ }
 --=20
 2.21.0
 
