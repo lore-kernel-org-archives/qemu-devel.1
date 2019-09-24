@@ -2,59 +2,57 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98881C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:38:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D27C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:39:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BA072168B
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:38:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BA072168B
+	by mail.kernel.org (Postfix) with ESMTPS id DBCD72168B
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:39:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBCD72168B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCl1t-00080C-Tg
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:38:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58654)
+	id 1iCl2c-0000ah-61
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:39:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51510)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCkrt-00006L-PT
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:40 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCk6X-00065c-DJ
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:39:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCkrr-0001Q0-P5
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47576)
+ (envelope-from <eblake@redhat.com>) id 1iCk6V-0001vs-Ul
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:39:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42752)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCkrr-0001Pg-Hc
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:35 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iCk6T-0001sJ-3I; Tue, 24 Sep 2019 08:39:37 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C0B7C7FDF4;
- Tue, 24 Sep 2019 13:28:34 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D565C60BFB;
- Tue, 24 Sep 2019 13:28:31 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5F1191138660; Tue, 24 Sep 2019 15:28:30 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 6DB9F10DCC9F;
+ Tue, 24 Sep 2019 12:39:36 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-249.phx2.redhat.com [10.3.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D99EF60C5D;
+ Tue, 24 Sep 2019 12:39:35 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 02/25] qapi: Rename .owner to .defined_in
-Date: Tue, 24 Sep 2019 15:28:07 +0200
-Message-Id: <20190924132830.15835-3-armbru@redhat.com>
-In-Reply-To: <20190924132830.15835-1-armbru@redhat.com>
-References: <20190924132830.15835-1-armbru@redhat.com>
+Subject: [PULL 1/4] nbd/client: Add hint when TLS is missing
+Date: Tue, 24 Sep 2019 07:39:30 -0500
+Message-Id: <20190924123933.10607-2-eblake@redhat.com>
+In-Reply-To: <20190924123933.10607-1-eblake@redhat.com>
+References: <20190924123933.10607-1-eblake@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 24 Sep 2019 13:28:34 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Tue, 24 Sep 2019 12:39:36 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -69,177 +67,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>,
+ Tingting Mao <timao@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QAPISchemaMember.owner is the name of the defining entity.  That's a
-confusing name when an object type inherits members from a base type.
-Rename it to .defined_in.  Rename .set_owner() and ._pretty_owner() to
-match.
+I received an off-list report of failure to connect to an NBD server
+expecting an x509 certificate, when the client was attempting something
+similar to this command line:
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+$ ./x86_64-softmmu/qemu-system-x86_64 -name 'blah' -machine q35 -nodefaul=
+ts \
+  -object tls-creds-x509,id=3Dtls0,endpoint=3Dclient,dir=3D$path_to_certs=
+ \
+  -device virtio-scsi-pci,id=3Dvirtio_scsi_pci0,bus=3Dpcie.0,addr=3D0x6 \
+  -drive id=3Ddrive_image1,if=3Dnone,snapshot=3Doff,aio=3Dthreads,cache=3D=
+none,format=3Draw,file=3Dnbd:localhost:9000,werror=3Dstop,rerror=3Dstop,t=
+ls-creds=3Dtls0 \
+  -device scsi-hd,id=3Dimage1,drive=3Ddrive_image1,bootindex=3D0
+qemu-system-x86_64: -drive id=3Ddrive_image1,if=3Dnone,snapshot=3Doff,aio=
+=3Dthreads,cache=3Dnone,format=3Draw,file=3Dnbd:localhost:9000,werror=3Ds=
+top,rerror=3Dstop,tls-creds=3Dtls0: TLS negotiation required before optio=
+n 7 (go)
+server reported: Option 0x7 not permitted before TLS
+
+The problem?  As specified, -drive is trying to pass tls-creds to the
+raw format driver instead of the nbd protocol driver, but before we
+get to the point where we can detect that raw doesn't know what to do
+with tls-creds, the nbd driver has already failed because the server
+complained.  The fix to the broken command line?  Pass
+'...,file.tls-creds=3Dtls0' to ensure the tls-creds option is handed to
+nbd, not raw.  But since the error message was rather cryptic, I'm
+trying to improve the error message.
+
+With this patch, the error message adds a line:
+
+qemu-system-x86_64: -drive id=3Ddrive_image1,if=3Dnone,snapshot=3Doff,aio=
+=3Dthreads,cache=3Dnone,format=3Draw,file=3Dnbd:localhost:9000,werror=3Ds=
+top,rerror=3Dstop,tls-creds=3Dtls0: TLS negotiation required before optio=
+n 7 (go)
+Did you forget a valid tls-creds?
+server reported: Option 0x7 not permitted before TLS
+
+And with luck, someone grepping for that error message will find this
+commit message and figure out their command line mistake.  Sadly, the
+only mention of file.tls-creds in our docs relates to an --image-opts
+use of PSK encryption with qemu-img as the client, rather than x509
+certificate encryption with qemu-kvm as the client.
+
+CC: Tingting Mao <timao@redhat.com>
+CC: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20190907172055.26870-1-eblake@redhat.com>
+[eblake: squash in iotest 233 fix]
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- scripts/qapi/common.py | 61 +++++++++++++++++++++---------------------
- 1 file changed, 31 insertions(+), 30 deletions(-)
+ nbd/client.c               | 1 +
+ tests/qemu-iotests/233.out | 2 ++
+ 2 files changed, 3 insertions(+)
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 155b87b825..bfb3e8a493 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -1319,7 +1319,7 @@ class QAPISchemaEnumType(QAPISchemaType):
-         QAPISchemaType.__init__(self, name, info, doc, ifcond)
-         for m in members:
-             assert isinstance(m, QAPISchemaEnumMember)
--            m.set_owner(name)
-+            m.set_defined_in(name)
-         assert prefix is None or isinstance(prefix, str)
-         self.members =3D members
-         self.prefix =3D prefix
-@@ -1405,13 +1405,13 @@ class QAPISchemaObjectType(QAPISchemaType):
-         assert base is None or isinstance(base, str)
-         for m in local_members:
-             assert isinstance(m, QAPISchemaObjectTypeMember)
--            m.set_owner(name)
-+            m.set_defined_in(name)
-         if variants is not None:
-             assert isinstance(variants, QAPISchemaObjectTypeVariants)
--            variants.set_owner(name)
-+            variants.set_defined_in(name)
-         for f in features:
-             assert isinstance(f, QAPISchemaFeature)
--            f.set_owner(name)
-+            f.set_defined_in(name)
-         self._base_name =3D base
-         self.base =3D None
-         self.local_members =3D local_members
-@@ -1521,15 +1521,16 @@ class QAPISchemaMember(object):
-         assert isinstance(name, str)
-         self.name =3D name
-         self.ifcond =3D ifcond or []
--        self.owner =3D None
-+        self.defined_in =3D None
-=20
--    def set_owner(self, name):
--        assert not self.owner
--        self.owner =3D name
-+    def set_defined_in(self, name):
-+        assert not self.defined_in
-+        self.defined_in =3D name
-=20
-     def check_clash(self, info, seen):
-         cname =3D c_name(self.name)
--        if cname.lower() !=3D cname and self.owner not in name_case_whit=
-elist:
-+        if (cname.lower() !=3D cname
-+                and self.defined_in not in name_case_whitelist):
-             raise QAPISemError(info,
-                                "%s should not use uppercase" % self.desc=
-ribe())
-         if cname in seen:
-@@ -1537,27 +1538,27 @@ class QAPISchemaMember(object):
-                                (self.describe(), seen[cname].describe())=
-)
-         seen[cname] =3D self
-=20
--    def _pretty_owner(self):
--        owner =3D self.owner
--        if owner.startswith('q_obj_'):
-+    def _pretty_defined_in(self):
-+        defined_in =3D self.defined_in
-+        if defined_in.startswith('q_obj_'):
-             # See QAPISchema._make_implicit_object_type() - reverse the
-             # mapping there to create a nice human-readable description
--            owner =3D owner[6:]
--            if owner.endswith('-arg'):
--                return '(parameter of %s)' % owner[:-4]
--            elif owner.endswith('-base'):
--                return '(base of %s)' % owner[:-5]
-+            defined_in =3D defined_in[6:]
-+            if defined_in.endswith('-arg'):
-+                return '(parameter of %s)' % defined_in[:-4]
-+            elif defined_in.endswith('-base'):
-+                return '(base of %s)' % defined_in[:-5]
-             else:
--                assert owner.endswith('-wrapper')
-+                assert defined_in.endswith('-wrapper')
-                 # Unreachable and not implemented
-                 assert False
--        if owner.endswith('Kind'):
-+        if defined_in.endswith('Kind'):
-             # See QAPISchema._make_implicit_enum_type()
--            return '(branch of %s)' % owner[:-4]
--        return '(%s of %s)' % (self.role, owner)
-+            return '(branch of %s)' % defined_in[:-4]
-+        return '(%s of %s)' % (self.role, defined_in)
-=20
-     def describe(self):
--        return "'%s' %s" % (self.name, self._pretty_owner())
-+        return "'%s' %s" % (self.name, self._pretty_defined_in())
-=20
-=20
- class QAPISchemaEnumMember(QAPISchemaMember):
-@@ -1578,7 +1579,7 @@ class QAPISchemaObjectTypeMember(QAPISchemaMember):
-         self.optional =3D optional
-=20
-     def check(self, schema):
--        assert self.owner
-+        assert self.defined_in
-         self.type =3D schema.lookup_type(self._type_name)
-         assert self.type
-=20
-@@ -1598,9 +1599,9 @@ class QAPISchemaObjectTypeVariants(object):
-         self.tag_member =3D tag_member
-         self.variants =3D variants
-=20
--    def set_owner(self, name):
-+    def set_defined_in(self, name):
-         for v in self.variants:
--            v.set_owner(name)
-+            v.set_defined_in(name)
-=20
-     def check(self, schema, seen):
-         if not self.tag_member:    # flat union
-@@ -1616,7 +1617,7 @@ class QAPISchemaObjectTypeVariants(object):
-                 if m.name not in cases:
-                     v =3D QAPISchemaObjectTypeVariant(m.name, 'q_empty',
-                                                     m.ifcond)
--                    v.set_owner(self.tag_member.owner)
-+                    v.set_defined_in(self.tag_member.defined_in)
-                     self.variants.append(v)
-         assert self.variants
-         for v in self.variants:
-@@ -1648,8 +1649,8 @@ class QAPISchemaAlternateType(QAPISchemaType):
-         QAPISchemaType.__init__(self, name, info, doc, ifcond)
-         assert isinstance(variants, QAPISchemaObjectTypeVariants)
-         assert variants.tag_member
--        variants.set_owner(name)
--        variants.tag_member.set_owner(self.name)
-+        variants.set_defined_in(name)
-+        variants.tag_member.set_defined_in(self.name)
-         self.variants =3D variants
-=20
-     def check(self, schema):
-@@ -1829,7 +1830,7 @@ class QAPISchema(object):
-                 for v in values]
-=20
-     def _make_implicit_enum_type(self, name, info, ifcond, values):
--        # See also QAPISchemaObjectTypeMember._pretty_owner()
-+        # See also QAPISchemaObjectTypeMember._pretty_defined_in()
-         name =3D name + 'Kind'   # Use namespace reserved by add_name()
-         self._def_entity(QAPISchemaEnumType(
-             name, info, None, ifcond, self._make_enum_members(values), N=
-one))
-@@ -1845,7 +1846,7 @@ class QAPISchema(object):
-                                    role, members):
-         if not members:
-             return None
--        # See also QAPISchemaObjectTypeMember._pretty_owner()
-+        # See also QAPISchemaObjectTypeMember._pretty_defined_in()
-         name =3D 'q_obj_%s-%s' % (name, role)
-         typ =3D self.lookup_entity(name, QAPISchemaObjectType)
-         if typ:
+diff --git a/nbd/client.c b/nbd/client.c
+index b9dc829175f9..f6733962b49b 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -204,6 +204,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, NBDO=
+ptionReply *reply,
+     case NBD_REP_ERR_TLS_REQD:
+         error_setg(errp, "TLS negotiation required before option %" PRIu=
+32
+                    " (%s)", reply->option, nbd_opt_lookup(reply->option)=
+);
++        error_append_hint(errp, "Did you forget a valid tls-creds?\n");
+         break;
+
+     case NBD_REP_ERR_UNKNOWN:
+diff --git a/tests/qemu-iotests/233.out b/tests/qemu-iotests/233.out
+index 24321efa113b..c3c344811b2b 100644
+--- a/tests/qemu-iotests/233.out
++++ b/tests/qemu-iotests/233.out
+@@ -21,8 +21,10 @@ server reported: TLS not configured
+
+ =3D=3D check plain client to TLS server fails =3D=3D
+ qemu-img: Could not open 'nbd://localhost:PORT': TLS negotiation require=
+d before option 7 (go)
++Did you forget a valid tls-creds?
+ server reported: Option 0x7 not permitted before TLS
+ qemu-nbd: TLS negotiation required before option 3 (list)
++Did you forget a valid tls-creds?
+ server reported: Option 0x3 not permitted before TLS
+
+ =3D=3D check TLS works =3D=3D
 --=20
 2.21.0
 
