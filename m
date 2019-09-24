@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37EF6C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 22:39:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 317A3C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 22:43:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED89F2146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 22:39:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB7D12146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 22:43:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YxM6ebf1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED89F2146E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xM454+Ti"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB7D12146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCtTM-0004UT-Ub
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 18:39:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56784)
+	id 1iCtWU-0007IJ-4t
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 18:43:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56803)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iCs5B-0003M3-1C
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:10:59 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iCs5G-0003QI-Gu
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:11:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iCs50-0007Yk-UG
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:10:48 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:37123)
+ (envelope-from <alex.bennee@linaro.org>) id 1iCs56-0007a6-Dk
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:10:54 -0400
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:55156)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iCs50-0007YF-M1
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:10:38 -0400
-Received: by mail-wr1-x435.google.com with SMTP id i1so3660626wro.4
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 14:10:38 -0700 (PDT)
+ id 1iCs56-0007ZV-7N
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:10:44 -0400
+Received: by mail-wm1-x329.google.com with SMTP id p7so1899671wmp.4
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 14:10:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=hyz9bk4RuUadsEQ7ebSCzQj2HLMqLMmwaGBTYzwPdF0=;
- b=YxM6ebf1DdR7DJ3pffm0GCCUuKVqC0zRX7hyMuAnzsycODo/dkQGOIit0WTQGVdAVQ
- E8El4M0iXrqfoHxS4q+eNOQ6ql6zgKLb49GgTg9I6GjdKrh9G2KcLGX9pQ/fozQZWS1g
- fOcjDV7oMgO+KVAPjVkuQ9GlI9BjIWWKi9wjY/yWoRWQYvJUlt6eEWsWeWlUAY901Wrz
- 3teAf5UhIeshNf/0PP2AO8837/aYOB5smDMcFMxfC5Q/abghNwkxLq136jjwDGBxQoqH
- E8O0dr4Jp89P7HidCz3dHb9Wh7cHT+bh7ivi112nA7doEwWz9pzq4/JqarOilUU+DitH
- TEAg==
+ bh=LQ7TtxdapHJhHWaN1sxRJBzcLqET+HVNb/Sa2fGG/OA=;
+ b=xM454+TiZaJ2N6S6EChoA7grql6I6QTY6DcfY6Ae24pM0E4FVAXYLdQCHjXIvHjzRH
+ 1cuyPn+fnzgG0wxu0H7IjrFceHwJvh1Ch2xU1Vmt0bHRd3hvJAL3ofDcW5P39VVy2PNo
+ vegdG9+GlaULxm3Wz9zp3jJO1Vo2MZadqSVuy1TtIpORMhVZA5KKwfvnumPWEpCJfoIp
+ RuQuI5Fc2vGKtrmiIRBBEw8aBFLZDuVQr/zyDLySxeqtVn+uDYEurO0oKNLJXBBT45tA
+ QOMlos19MB+bmQl9UjThSwuEUReHvtxMEvgWBzBvI4XxubDKs5EvFq28/SZiesZLnJ+W
+ CamA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=hyz9bk4RuUadsEQ7ebSCzQj2HLMqLMmwaGBTYzwPdF0=;
- b=l04m28fwXrVV9RvNJXJ2n/13xU5DxCOfldzywAhMTpRq+HCGPHxI3daIexhqY8lXOh
- 7PvQR2nsn9Rx9nPYW331q4vRBp+cdawzIkWkLq7J8NgmygQ/xtBavwle1bNTCNnSCDwI
- rG0GzW5IlavwJaskSr6EkUi5u3KOmZejxyqdapmvGGsLkP/Q/9s+klhY9uexG3tNXQFy
- k/k0OSlig9OCVd8j/4oPXnikBIZXHpsSvZ6QB2GHmKTSfPXiwT2ALrgBDPZYUVxngt39
- WPKPiMhVhkHywF5fSQB1Me6HlaaerRqchgPGSSjTzayTRSSRih7qVgbY+pE8yXnlSbTB
- UB5w==
-X-Gm-Message-State: APjAAAW4pjoXSlFpIPTxMI9zKENYj+WAZWrMKA+ZdqKVx5ojQsIOrcf7
- vi+6BIcncvUE9uX1PYV8D/ZSlGXjouo7nA==
-X-Google-Smtp-Source: APXvYqy0kGxDnweU3UbC5QC9Sbk29LCedUOcwQv0ZQKaOvjLayz8LWeIV4x2R5ktwaYseh/PR0efNQ==
-X-Received: by 2002:adf:e390:: with SMTP id e16mr4647234wrm.29.1569359437553; 
- Tue, 24 Sep 2019 14:10:37 -0700 (PDT)
+ bh=LQ7TtxdapHJhHWaN1sxRJBzcLqET+HVNb/Sa2fGG/OA=;
+ b=G7zbOPP+dOS1XDCEe7h4sTDbOENH6q78XSBfJk+uvsaM1klwZof+nmTZtN8G9a8U6H
+ BAxDJ4cKKv+5HCdRSTgvB527/NhwvYx5iKt3U3rZNbR2IimLDpBWLvwWtbMPGFUwj7nP
+ rpwgLk2qH0V/BReMGgyajlLB6eI1BobU7EFo7sDh1K/xaUHsTlrRc2eMJ2HIUsTtPgDV
+ XcaFpbyyjenkS09qoY7X5atEKV5s+MW+5GZc2yr8IC1j1EEEVnzNyRAqgtluz29UG7Rg
+ tQ8YFlL48/QzdbmNjQ75PtEqyD1GNwip7iVXtKeNhy+eTJd9gpXZFeMbbQR84tWMlFkK
+ uRfA==
+X-Gm-Message-State: APjAAAVSWB82hjQDXitR/kFeLeRcE8RRYT/6MmF/U/Z0aggNV2pVtG46
+ xd5q4ghe1sNeygApChpTMzhgzQ==
+X-Google-Smtp-Source: APXvYqygDsVm+eRqBa8IuGwIHekVuI5yc2o/QZtoMX5MVcT0GI70uwUHOV5vh9VDOYbzLmF+waIeHw==
+X-Received: by 2002:a1c:a94b:: with SMTP id s72mr2606313wme.9.1569359440899;
+ Tue, 24 Sep 2019 14:10:40 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a10sm3731588wrm.52.2019.09.24.14.10.33
+ by smtp.gmail.com with ESMTPSA id j1sm5122072wrg.24.2019.09.24.14.10.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Tue, 24 Sep 2019 14:10:35 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 1536E1FF9E;
- Tue, 24 Sep 2019 22:01:08 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id D29B51FFB7;
+ Tue, 24 Sep 2019 22:01:09 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v3 14/33] tests/docker: remove python2.7 from debian9-mxe
-Date: Tue, 24 Sep 2019 22:00:47 +0100
-Message-Id: <20190924210106.27117-15-alex.bennee@linaro.org>
+Subject: [PATCH  v3 32/33] docker: move tests from python2 to python3
+Date: Tue, 24 Sep 2019 22:01:05 +0100
+Message-Id: <20190924210106.27117-33-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190924210106.27117-1-alex.bennee@linaro.org>
 References: <20190924210106.27117-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::435
+X-Received-From: 2a00:1450:4864:20::329
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,32 +105,127 @@ Sender: "Qemu-devel"
 
 From: John Snow <jsnow@redhat.com>
 
-When it was based on debian8 which uses python-minimal, it needed this.
-It no longer does.
+As part of the push to drop python2 support, replace any explicit python2
+dependencies with python3 versions.
 
-Goodbye, python2.7.
+For centos, python2 still exists as an implicit dependency, but by adding
+python3 we will be able to build even if the configure script begins to
+require python 3.5+.
+
+Tested with centos7, fedora, ubuntu, ubuntu1804, and debian 9 (amd64).
+Tested under a custom configure script that requires Python 3.5+.
+
+the travis dockerfile is also moved to using python3, which was tested
+by running `make docker-test-build@travis`, which I hope is sufficient.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
-Message-Id: <20190918222546.11696-1-jsnow@redhat.com>
-[AJB: fixed up commit message]
+Message-Id: <20190923181140.7235-7-jsnow@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/dockerfiles/debian9-mxe.docker | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ tests/docker/dockerfiles/centos7.docker             | 2 +-
+ tests/docker/dockerfiles/debian-xtensa-cross.docker | 2 +-
+ tests/docker/dockerfiles/debian10.docker            | 2 +-
+ tests/docker/dockerfiles/debian9.docker             | 2 +-
+ tests/docker/dockerfiles/travis.docker              | 2 +-
+ tests/docker/dockerfiles/ubuntu.docker              | 2 +-
+ tests/docker/dockerfiles/ubuntu1804.docker          | 2 +-
+ 7 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/tests/docker/dockerfiles/debian9-mxe.docker b/tests/docker/dockerfiles/debian9-mxe.docker
-index 7431168dad9..62ff1cecf2d 100644
---- a/tests/docker/dockerfiles/debian9-mxe.docker
-+++ b/tests/docker/dockerfiles/debian9-mxe.docker
-@@ -16,7 +16,6 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C6BF758A33A3A276 &&
- RUN apt-get update && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
-     apt-get install -y --no-install-recommends \
--        libpython2.7-stdlib \
-         $(apt-get -s install -y --no-install-recommends gw32.shared-mingw-w64 | egrep "^Inst mxe-x86-64-unknown-" | cut -d\  -f2)
+diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/dockerfiles/centos7.docker
+index e0b9d7dbe9f..953637065c4 100644
+--- a/tests/docker/dockerfiles/centos7.docker
++++ b/tests/docker/dockerfiles/centos7.docker
+@@ -25,6 +25,7 @@ ENV PACKAGES \
+     nettle-devel \
+     perl-Test-Harness \
+     pixman-devel \
++    python3 \
+     SDL-devel \
+     spice-glib-devel \
+     spice-server-devel \
+@@ -34,4 +35,3 @@ ENV PACKAGES \
+     zlib-devel
+ RUN yum install -y $PACKAGES
+ RUN rpm -q $PACKAGES | sort > /packages.txt
+-
+diff --git a/tests/docker/dockerfiles/debian-xtensa-cross.docker b/tests/docker/dockerfiles/debian-xtensa-cross.docker
+index b9c2e2e5317..e6f93f65ee2 100644
+--- a/tests/docker/dockerfiles/debian-xtensa-cross.docker
++++ b/tests/docker/dockerfiles/debian-xtensa-cross.docker
+@@ -18,7 +18,7 @@ RUN apt-get update && \
+         flex \
+         gettext \
+         git \
+-        python-minimal
++        python3-minimal
  
--ENV PATH $PATH:/usr/lib/mxe/usr/bin/ 
-+ENV PATH $PATH:/usr/lib/mxe/usr/bin/
+ ENV CPU_LIST csp dc232b dc233c
+ ENV TOOLCHAIN_RELEASE 2018.02
+diff --git a/tests/docker/dockerfiles/debian10.docker b/tests/docker/dockerfiles/debian10.docker
+index 30a78813f27..dad498b52e3 100644
+--- a/tests/docker/dockerfiles/debian10.docker
++++ b/tests/docker/dockerfiles/debian10.docker
+@@ -26,7 +26,7 @@ RUN apt update && \
+         git \
+         pkg-config \
+         psmisc \
+-        python \
++        python3 \
+         python3-sphinx \
+         texinfo \
+         $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)
+diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/dockerfiles/debian9.docker
+index b36f1d4ed83..8cbd742bb5f 100644
+--- a/tests/docker/dockerfiles/debian9.docker
++++ b/tests/docker/dockerfiles/debian9.docker
+@@ -26,7 +26,7 @@ RUN apt update && \
+         git \
+         pkg-config \
+         psmisc \
+-        python \
++        python3 \
+         python3-sphinx \
+         texinfo \
+         $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)
+diff --git a/tests/docker/dockerfiles/travis.docker b/tests/docker/dockerfiles/travis.docker
+index e72dc85ca7a..ea14da29d97 100644
+--- a/tests/docker/dockerfiles/travis.docker
++++ b/tests/docker/dockerfiles/travis.docker
+@@ -5,7 +5,7 @@ ENV LC_ALL en_US.UTF-8
+ RUN sed -i "s/# deb-src/deb-src/" /etc/apt/sources.list
+ RUN apt-get update
+ RUN apt-get -y build-dep qemu
+-RUN apt-get -y install device-tree-compiler python2.7 python-yaml dh-autoreconf gdb strace lsof net-tools gcovr
++RUN apt-get -y install device-tree-compiler python3 python3-yaml dh-autoreconf gdb strace lsof net-tools gcovr
+ # Travis tools require PhantomJS / Neo4j / Maven accessible
+ # in their PATH (QEMU build won't access them).
+ ENV PATH /usr/local/phantomjs/bin:/usr/local/phantomjs:/usr/local/neo4j-3.2.7/bin:/usr/local/maven-3.5.2/bin:/usr/local/cmake-3.9.2/bin:/usr/local/clang-5.0.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
+index a4f601395c8..f4864922240 100644
+--- a/tests/docker/dockerfiles/ubuntu.docker
++++ b/tests/docker/dockerfiles/ubuntu.docker
+@@ -60,7 +60,7 @@ ENV PACKAGES flex bison \
+     libvte-2.91-dev \
+     libxen-dev \
+     make \
+-    python-yaml \
++    python3-yaml \
+     python3-sphinx \
+     sparse \
+     texinfo \
+diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/dockerfiles/ubuntu1804.docker
+index 883f9bcf31c..3cc4f492c4a 100644
+--- a/tests/docker/dockerfiles/ubuntu1804.docker
++++ b/tests/docker/dockerfiles/ubuntu1804.docker
+@@ -47,7 +47,7 @@ ENV PACKAGES flex bison \
+     libvte-2.91-dev \
+     libxen-dev \
+     make \
+-    python-yaml \
++    python3-yaml \
+     python3-sphinx \
+     sparse \
+     texinfo \
 -- 
 2.20.1
 
