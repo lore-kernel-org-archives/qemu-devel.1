@@ -2,90 +2,90 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 035ABC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:16:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05FB3C432C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:18:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE9A52146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:16:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="okw/qoRU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE9A52146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 84D562146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:18:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84D562146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCsAb-00083Z-IW
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 17:16:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55603)
+	id 1iCsCg-0001Ps-E4
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 17:18:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55979)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iCrw3-0002Zx-KN
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:25 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCryl-0005Ez-Ee
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:04:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iCrw0-0004Uk-MI
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:23 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:46901)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iCrvy-0004T8-Lk
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:19 -0400
-Received: by mail-wr1-x436.google.com with SMTP id o18so3608426wrv.13
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 14:01:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=b6FIcOabpKRLlHH33rbrRAMy6kyScJiPH3lkiBmUDds=;
- b=okw/qoRUVaUP/y63sa59+x14iASUzjA997Bg85Hb/qlfO3by5/lp2CZCX/bsr21heB
- NyjeN9zGqqv6Jz/r2BTHxnkp/KzgYuPQyxdFmv6KBfpOPwDbUk366khyDIj21MJu0o7J
- dJBc9ifuK5Uz1M9RgNTxqc5kf67lSfeNJeF5fn/a00Mo4n4N5e2uFWTvvHdPUDSlfvdV
- wBfqHexJjL4GkpSzVuq4T5QZjdB4yyxZd5vAKBsWNXRTjDIRGMmoVNgw5Pszxf48lnvu
- vMwg36FNRl5UBA4RkY8EfjSj3gse3Ij3XWgbIbB7Ngg6MaZbcL75b2GtoHoH4Hq5KKCU
- lSWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=b6FIcOabpKRLlHH33rbrRAMy6kyScJiPH3lkiBmUDds=;
- b=BVvuFyQWChSx99IE63NFmLIN2R0b4Yg3iHUsVQVJDAuvGcuMsB+S78E659S+WfjjUJ
- SfKkgN7J29CKOv/nR3qA5DMLmeLTH9SrCxBWhgD1TukfGz19GtEkjzI5m4zpT2nHX3Qw
- JkgIc9+yrdhf9AD4uVF/WKeyCUdTElCihB/RpErvrtCV99B2979nB3oR5qcNKPywj7gC
- 0aX18IcPC6eB4A8jIOcLQsV1te7KQlYo6oVVaT1wcYSawO6NrHfFglwMBtWUUnefoZmp
- pWiVFvXsmigxDOOjC/tHGqlvgmQ6OIekWY4y/Ct4k5LeIF2oqmdjadqbtWZisKvCsFsH
- CDSA==
-X-Gm-Message-State: APjAAAWzIhcwh1XpKLEw5pyPm5h0iipr2C8yDyd6VZcxnwt6D5is8TI5
- +zu6YEPIMb3h+5l4a8gDPRbm4w==
-X-Google-Smtp-Source: APXvYqx7vw2SVlCw+GiALEYH1OQxA7QfRBWPOlfklIqIeVkQEJyv/bduR6GWphoQCluFWaLeJrR1cg==
-X-Received: by 2002:adf:ed05:: with SMTP id a5mr4850644wro.35.1569358875236;
- Tue, 24 Sep 2019 14:01:15 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id n22sm998996wmk.19.2019.09.24.14.01.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 24 Sep 2019 14:01:11 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B4C091FF9A;
- Tue, 24 Sep 2019 22:01:07 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 10/33] migration/postcopy: Recognise the recovery states as
- 'in_postcopy'
-Date: Tue, 24 Sep 2019 22:00:43 +0100
-Message-Id: <20190924210106.27117-11-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190924210106.27117-1-alex.bennee@linaro.org>
-References: <20190924210106.27117-1-alex.bennee@linaro.org>
+ (envelope-from <eblake@redhat.com>) id 1iCryi-0005B9-RB
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:04:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56774)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iCryf-00059J-Ga; Tue, 24 Sep 2019 17:04:05 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A0FF420FF;
+ Tue, 24 Sep 2019 21:04:04 +0000 (UTC)
+Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 86E58608C0;
+ Tue, 24 Sep 2019 21:04:00 +0000 (UTC)
+Subject: Re: [PATCH v3 18/25] block: Fix error_append_hint usage
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
+ <20190924200902.4703-19-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <94edc340-5cc0-d6ed-67c0-e8030a3bc38a@redhat.com>
+Date: Tue, 24 Sep 2019 16:03:59 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::436
+In-Reply-To: <20190924200902.4703-19-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="5pRWrNbAXgTTzL09u36fPA27zGLyVo8Oe"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Tue, 24 Sep 2019 21:04:04 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,55 +97,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Juan Quintela <quintela@redhat.com>, jsnow@redhat.com, f4bug@amsat.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ integration@gluster.org, qemu-block@nongnu.org,
+ Jeff Cody <codyprime@gmail.com>, Greg Kurz <groug@kaod.org>,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5pRWrNbAXgTTzL09u36fPA27zGLyVo8Oe
+Content-Type: multipart/mixed; boundary="ktkysQrLLXPoRIp4hbPyzHt0b3U4GPcb6";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, Jeff Cody <codyprime@gmail.com>,
+ Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
+ integration@gluster.org, John Snow <jsnow@redhat.com>
+Message-ID: <94edc340-5cc0-d6ed-67c0-e8030a3bc38a@redhat.com>
+Subject: Re: [PATCH v3 18/25] block: Fix error_append_hint usage
+References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
+ <20190924200902.4703-19-vsementsov@virtuozzo.com>
+In-Reply-To: <20190924200902.4703-19-vsementsov@virtuozzo.com>
 
-Various parts of the migration code do different things when they're
-in postcopy mode; prior to this patch this has been 'postcopy-active'.
-This patch extends 'in_postcopy' to include 'postcopy-paused' and
-'postcopy-recover'.
+--ktkysQrLLXPoRIp4hbPyzHt0b3U4GPcb6
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-In particular, when you set the max-postcopy-bandwidth parameter, this
-only affects the current migration fd if we're 'in_postcopy';
-this leads to a race in the postcopy recovery test where it increases
-the speed from 4k/sec to unlimited, but that increase can get ignored
-if the change is made between the point at which the reconnection
-happens and it transitions back to active.
+On 9/24/19 3:08 PM, Vladimir Sementsov-Ogievskiy wrote:
+> If we want append hint to errp, we must use ERRP_FUNCTION_BEGIN macro.
+> Otherwise hint will not be appended in case of errp =3D=3D &fatal_err
+> (program will exit before error_append_hint() call). Fix such cases.
+>=20
+> This commit (together with its neighbors) was generated by
+>=20
+> git grep -l 'error_append_hint(errp' | while read f; do \
+> spatch --sp-file scripts/coccinelle/fix-error_append_hint-usage.cocci \=
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20190923174942.12182-1-dgilbert@redhat.com>
----
- migration/migration.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+> --in-place $f; done
+>=20
+> and then
+>=20
+> ./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+>=20
+> (auto-msg was a file with this commit message)
+>=20
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 01863a95f5f..5f7e4d15e95 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1659,7 +1659,14 @@ bool migration_in_postcopy(void)
- {
-     MigrationState *s = migrate_get_current();
- 
--    return (s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
-+    switch (s->state) {
-+    case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-+    case MIGRATION_STATUS_POSTCOPY_PAUSED:
-+    case MIGRATION_STATUS_POSTCOPY_RECOVER:
-+        return true;
-+    default:
-+        return false;
-+    }
- }
- 
- bool migration_in_postcopy_after_devices(MigrationState *s)
--- 
-2.20.1
+Your automation is cool!
 
+> Still, for backporting it may be more comfortable to use only the first=
+
+> command and then do one huge commit.
+>=20
+> Reported-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/backup.c       | 1 +
+>  block/dirty-bitmap.c | 1 +
+>  block/file-posix.c   | 3 +++
+>  block/gluster.c      | 2 ++
+>  block/qcow.c         | 1 +
+>  block/qcow2.c        | 1 +
+>  block/vhdx-log.c     | 1 +
+>  block/vpc.c          | 1 +
+>  8 files changed, 11 insertions(+)
+
+$ git grep -p 'error_append_hint(errp' block/ | grep '\.c=3D' | wc -l
+
+produces 11 hits, very nicely matching up with your patch.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--ktkysQrLLXPoRIp4hbPyzHt0b3U4GPcb6--
+
+--5pRWrNbAXgTTzL09u36fPA27zGLyVo8Oe
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KhL8ACgkQp6FrSiUn
+Q2oYiQf8Cb85Lqc+efoQLGZtoEJiCGKs+3TyrkS2VDD3gUoKkccM/iCbz98trc8S
+Hzvqc12Ia7rm/Ik0Kp9sPrda1yP2zhcJfon3n9OqFV62GlYm878uTzgZtYDbjZEv
+Xrd4GDaEEp7GdXpNAbr9Q+lHZf4/86jJRQtIPujS3BxNqqF9SZ4LJS3w6aBhr/Zw
+Ljbb642ai5XM5NdM8EMwPSRyqgOuV/wOAFG+bkE3KiC63FYN2n0St+o+AzW+og2s
+OOe6hBgi2GlQOEHnhrVUSHiu6M3Wpr+NOUG1vDHi93Elqy3sqT+PtDG9oAomuiYV
+gpqcsjzJElmSeUpFtJiheNniisetfw==
+=ORAG
+-----END PGP SIGNATURE-----
+
+--5pRWrNbAXgTTzL09u36fPA27zGLyVo8Oe--
 
