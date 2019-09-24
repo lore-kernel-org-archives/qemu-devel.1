@@ -2,61 +2,85 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDE90C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:45:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 354F4C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:46:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3C1A2146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:45:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3C1A2146E
+	by mail.kernel.org (Postfix) with ESMTPS id 0899520872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:46:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0899520872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCl8Z-0007D0-7c
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:45:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58735)
+	id 1iCl9T-00082n-Pw
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:46:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55794)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCkrz-0000Cc-32
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:47 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iCkab-0007Xl-37
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:10:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCkru-0001SB-FR
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45424)
+ (envelope-from <pbonzini@redhat.com>) id 1iCkaT-0002H6-D7
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:10:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50542)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCkrt-0001R0-P6
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:38 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iCkaT-0002GM-4v
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:10:37 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A8EBE308FF30;
- Tue, 24 Sep 2019 13:28:36 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4FA5F5C1B2;
- Tue, 24 Sep 2019 13:28:36 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 7F9FB11385D4; Tue, 24 Sep 2019 15:28:30 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 11/25] qapi: Report invalid '*' prefix like any other invalid
- name
-Date: Tue, 24 Sep 2019 15:28:16 +0200
-Message-Id: <20190924132830.15835-12-armbru@redhat.com>
-In-Reply-To: <20190924132830.15835-1-armbru@redhat.com>
-References: <20190924132830.15835-1-armbru@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 1061BC055673
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 13:10:36 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id 190so926193wme.4
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 06:10:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Q0MJSSKSV6Cq9kr0Fbr8b6Bqd4XX1IZh6fNcOtMVgFA=;
+ b=K15S5taqfD0zhWV5apIdss3SB5+kLmGTOg3MDnrnYXf23G58VZtIDzKNdHz8I/FTK+
+ jO9/ucJeZ9qvCNBoj5uy876xUA3xpAYk57s/k0AVtnGSHljzmbHDSalfsaamXtNdFVyw
+ XamZ6YEvIeSxlkU/g0g/yVi+VX9xPhxRyzK6m/P3hUS2dDxOXxNXgFq2J87+ogIVPCcS
+ yiWjqu+uT/tWQRIjYpGUqsUf7pNzsRfgso4f4SnfQQWqFUEMCNDC93BVIvnBO7PjQV+Y
+ CwAOitTdufBZiWaBWcDN3AyiqPffIPWyjG5pKl0OGHIlew6JieqQjYHwhUjrIk/m3xPf
+ 1hBw==
+X-Gm-Message-State: APjAAAVaUpR8nQn1M4/S9s8EJfjBVm2D+qav9d3BgG3M4s95GqZXBd+U
+ Be65tSwHnpWDzFIAphaa/cW5XX5qgObw+S3eOCHBfDcCox/wbx8JhYMsO9XT7im9mGNm1jEDZNE
+ sVC/dT292ce/2S0o=
+X-Received: by 2002:a7b:cbc5:: with SMTP id n5mr2857062wmi.31.1569330634633;
+ Tue, 24 Sep 2019 06:10:34 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwT50WNRh9TiZTaR+GDMyzI/HA/Ucnwa1fcbZCxIjKtaggqpyZFT6A1MN41iIYAAfZYqHmqfA==
+X-Received: by 2002:a7b:cbc5:: with SMTP id n5mr2857028wmi.31.1569330634348;
+ Tue, 24 Sep 2019 06:10:34 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36?
+ ([2001:b07:6468:f312:9520:22e6:6416:5c36])
+ by smtp.gmail.com with ESMTPSA id j26sm3660988wrd.2.2019.09.24.06.10.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 24 Sep 2019 06:10:33 -0700 (PDT)
+Subject: Re: [PATCH v4 7/8] docs/microvm.txt: document the new microvm machine
+ type
+To: Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
+References: <20190924124433.96810-1-slp@redhat.com>
+ <20190924124433.96810-8-slp@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <23a6e891-c3ba-3991-d627-433eb1fe156d@redhat.com>
+Date: Tue, 24 Sep 2019 15:10:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Tue, 24 Sep 2019 13:28:36 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190924124433.96810-8-slp@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -70,95 +94,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: ehabkost@redhat.com, kvm@vger.kernel.org, mst@redhat.com, lersek@redhat.com,
+ mtosatti@redhat.com, kraxel@redhat.com, imammedo@redhat.com, philmd@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The special "does not allow optional name" error is well meant, but
-confusing in practice.  Drop it.
+On 24/09/19 14:44, Sergio Lopez wrote:
+> +Microvm is a machine type inspired by both NEMU and Firecracker, and
+> +constructed after the machine model implemented by the latter.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- scripts/qapi/common.py                                   | 6 ++----
- tests/qapi-schema/bad-ident.err                          | 2 +-
- tests/qapi-schema/flat-union-discriminator-bad-name.err  | 2 +-
- tests/qapi-schema/flat-union-discriminator-bad-name.json | 2 +-
- tests/qapi-schema/union-optional-branch.err              | 2 +-
- 5 files changed, 6 insertions(+), 8 deletions(-)
+I would say it's inspired by Firecracker only.  The NEMU virt machine
+had virtio-pci and ACPI.
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 6c870da50b..39eb6de4a6 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -723,11 +723,8 @@ def check_name_str(name, info, source,
-     global valid_name
-     membername =3D name
-=20
--    if name.startswith('*'):
-+    if allow_optional and name.startswith('*'):
-         membername =3D name[1:]
--        if not allow_optional:
--            raise QAPISemError(info, "%s does not allow optional name '%=
-s'"
--                               % (source, name))
-     # Enum members can start with a digit, because the generated C
-     # code always prefixes it with the enum name
-     if enum_member and membername[0].isdigit():
-@@ -740,6 +737,7 @@ def check_name_str(name, info, source,
-     if not permit_upper and name.lower() !=3D name:
-         raise QAPISemError(
-             info, "%s uses uppercase in name '%s'" % (source, name))
-+    assert not membername.startswith('*')
-=20
-=20
- def add_name(name, info, meta):
-diff --git a/tests/qapi-schema/bad-ident.err b/tests/qapi-schema/bad-iden=
-t.err
-index 6878889854..ddc96bd3a9 100644
---- a/tests/qapi-schema/bad-ident.err
-+++ b/tests/qapi-schema/bad-ident.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/bad-ident.json: In struct '*oops':
--tests/qapi-schema/bad-ident.json:2: 'struct' does not allow optional nam=
-e '*oops'
-+tests/qapi-schema/bad-ident.json:2: 'struct' uses invalid name '*oops'
-diff --git a/tests/qapi-schema/flat-union-discriminator-bad-name.err b/te=
-sts/qapi-schema/flat-union-discriminator-bad-name.err
-index f7f64c5c1a..44e41883b1 100644
---- a/tests/qapi-schema/flat-union-discriminator-bad-name.err
-+++ b/tests/qapi-schema/flat-union-discriminator-bad-name.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/flat-union-discriminator-bad-name.json: In union 'MyUn=
-ion':
--tests/qapi-schema/flat-union-discriminator-bad-name.json:7: discriminato=
-r of flat union 'MyUnion' does not allow optional name '*switch'
-+tests/qapi-schema/flat-union-discriminator-bad-name.json:7: discriminato=
-r of flat union 'MyUnion' uses invalid name '*switch'
-diff --git a/tests/qapi-schema/flat-union-discriminator-bad-name.json b/t=
-ests/qapi-schema/flat-union-discriminator-bad-name.json
-index 66376084fc..ea84b75cac 100644
---- a/tests/qapi-schema/flat-union-discriminator-bad-name.json
-+++ b/tests/qapi-schema/flat-union-discriminator-bad-name.json
-@@ -1,5 +1,5 @@
- # discriminator '*switch' isn't a member of base, 'switch' is
--# reports "does not allow optional name", which is good enough
-+# reports "uses invalid name", which is good enough
- { 'enum': 'Enum', 'data': [ 'one', 'two' ] }
- { 'struct': 'Base',
-   'data': { '*switch': 'Enum' } }
-diff --git a/tests/qapi-schema/union-optional-branch.err b/tests/qapi-sch=
-ema/union-optional-branch.err
-index a5677f74bc..8e9b18d7c6 100644
---- a/tests/qapi-schema/union-optional-branch.err
-+++ b/tests/qapi-schema/union-optional-branch.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/union-optional-branch.json: In union 'Union':
--tests/qapi-schema/union-optional-branch.json:2: member of union 'Union' =
-does not allow optional name '*a'
-+tests/qapi-schema/union-optional-branch.json:2: member of union 'Union' =
-uses invalid name '*a'
---=20
-2.21.0
+> +It's main purpose is providing users a minimalist machine type free
+> +from the burden of legacy compatibility,
+
+I think this is too strong, especially if you keep the PIC and PIT. :)
+Maybe just "It's a minimalist machine type without PCI support designed
+for short-lived guests".
+
+> +serving as a stepping stone
+> +for future projects aiming at improving boot times, reducing the
+> +attack surface and slimming down QEMU's footprint.
+
+"Microvm also establishes a baseline for benchmarking QEMU and operating
+systems, since it is optimized for both boot time and footprint".
+
+> +The microvm machine type supports the following devices:
+> +
+> + - ISA bus
+> + - i8259 PIC
+> + - LAPIC (implicit if using KVM)
+> + - IOAPIC (defaults to kernel_irqchip_split = true)
+> + - i8254 PIT
+
+Do we need the PIT?  And perhaps the PIC even?
+
+Paolo
+
+> + - MC146818 RTC (optional)
+> + - kvmclock (if using KVM)
+> + - fw_cfg
+> + - One ISA serial port (optional)
+> + - Up to eight virtio-mmio devices (configured by the user)
+> +
 
 
