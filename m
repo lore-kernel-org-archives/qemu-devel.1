@@ -2,46 +2,45 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF03C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:22:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B47C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:22:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5E8C20872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:22:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5E8C20872
+	by mail.kernel.org (Postfix) with ESMTPS id C08E820872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:22:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C08E820872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCrKR-0006Jf-Ke
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:22:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44021)
+	id 1iCrKk-0006k9-Sq
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:22:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43757)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iCr8N-0000sA-Qk
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:05 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCr8B-0000YL-Ke
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:09:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iCr8L-00030F-OO
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:03 -0400
-Received: from relay.sw.ru ([185.231.240.75]:38124)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCr89-0002sl-W1
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:09:51 -0400
+Received: from relay.sw.ru ([185.231.240.75]:38068)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iCr8L-0002tJ-FP
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:01 -0400
+ id 1iCr89-0002rd-Nn; Tue, 24 Sep 2019 16:09:49 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iCr8A-0001Mk-2O; Tue, 24 Sep 2019 23:09:50 +0300
+ id 1iCr88-0001Mk-Aq; Tue, 24 Sep 2019 23:09:48 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 16/25] virtio: Fix error_append_hint usage
-Date: Tue, 24 Sep 2019 23:08:53 +0300
-Message-Id: <20190924200902.4703-17-vsementsov@virtuozzo.com>
+Subject: [PATCH v3 10/25] arm: Fix error_append_hint usage
+Date: Tue, 24 Sep 2019 23:08:47 +0300
+Message-Id: <20190924200902.4703-11-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190924200902.4703-1-vsementsov@virtuozzo.com>
 References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
@@ -60,8 +59,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, Greg Kurz <groug@kaod.org>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, vsementsov@virtuozzo.com,
+ Greg Kurz <groug@kaod.org>, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -88,29 +87,21 @@ command and then do one huge commit.
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/virtio/virtio-pci.c | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/intc/arm_gicv3_kvm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index c6b47a9c73..291044c4e4 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1525,6 +1525,7 @@ static void virtio_pci_pre_plugged(DeviceState *d, Error **errp)
- /* This is called by virtio-bus just after the device is plugged. */
- static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
- {
-+    ERRP_FUNCTION_BEGIN();
-     VirtIOPCIProxy *proxy = VIRTIO_PCI(d);
-     VirtioBusState *bus = &proxy->bus;
-     bool legacy = virtio_pci_legacy(proxy);
-@@ -1684,6 +1685,7 @@ static void virtio_pci_device_unplugged(DeviceState *d)
+diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+index 9c7f4ab871..42487fc62b 100644
+--- a/hw/intc/arm_gicv3_kvm.c
++++ b/hw/intc/arm_gicv3_kvm.c
+@@ -766,6 +766,7 @@ static void vm_change_state_handler(void *opaque, int running,
  
- static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
+ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
  {
 +    ERRP_FUNCTION_BEGIN();
-     VirtIOPCIProxy *proxy = VIRTIO_PCI(pci_dev);
-     VirtioPCIClass *k = VIRTIO_PCI_GET_CLASS(pci_dev);
-     bool pcie_port = pci_bus_is_express(pci_get_bus(pci_dev)) &&
+     GICv3State *s = KVM_ARM_GICV3(dev);
+     KVMARMGICv3Class *kgc = KVM_ARM_GICV3_GET_CLASS(s);
+     bool multiple_redist_region_allowed;
 -- 
 2.21.0
 
