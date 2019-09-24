@@ -2,91 +2,90 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10365C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 22:54:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B94C9C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 22:54:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE56720872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 22:54:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE56720872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 7E49020872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 22:54:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JoiF21wB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E49020872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCthX-000447-OD
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 18:54:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56391)
+	id 1iCthg-0004CG-7i
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 18:54:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43754)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iCs2R-0000Uw-0F
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:08:00 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iCtfh-0001YE-0f
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 18:52:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iCs2P-0006XH-Nn
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:07:58 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:36386
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1iCs2M-0006WB-Tc; Tue, 24 Sep 2019 17:07:55 -0400
-Received: from host86-138-245-63.range86-138.btcentralplus.com
- ([86.138.245.63] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1iCs0L-0000oA-V2; Tue, 24 Sep 2019 22:05:50 +0100
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, pc@us.ibm.com, david@gibson.dropbear.id.au
-References: <20190924153556.27575-1-mark.cave-ayland@ilande.co.uk>
- <20190924153556.27575-2-mark.cave-ayland@ilande.co.uk>
- <e4e2220b-d23b-aa54-2c46-c937bd0efe86@linaro.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <e4ba6c27-e57a-de8f-c993-4172db2ea01a@ilande.co.uk>
-Date: Tue, 24 Sep 2019 22:05:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <alex.bennee@linaro.org>) id 1iCtff-0003Qa-BS
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 18:52:36 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:51552)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iCtff-0003Pu-4I
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 18:52:35 -0400
+Received: by mail-wm1-f65.google.com with SMTP id 7so2224301wme.1
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 15:52:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=NUugoBhEbrlg67mSoN0zDVzqKc0iZQAyUuDcywtPlx4=;
+ b=JoiF21wBKZVIfLMzhR+dd8EM0bFzxsn4N4flAg0GggES2zVxn7Ad9AdpiTDCw/iFnz
+ 39ecEKTg3weXpFPi6bboDNwcShOZCgL+Mqu6eX9c896Bo6Yi8TF5danhSmpxxNC8bE4Q
+ H3Z9enczuqwwInM/nTG9bhVTaSM8LV9xEj+Dkp4cyG4qH4jYmJ0SuH+egQ1ha6k82HQG
+ EYAxJJIBefh7+2tbD+L7rKS0AEcY1zH+5bcXWSeJ/DOM7nKqG8gG3ept35rGGrVndRsR
+ DOBDeHR03ksoo/19m/6MlqQcFVeQo5PAJEONrG6aZJNkoYlnqQv9it5ufdEHs6ltNSmI
+ AZbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=NUugoBhEbrlg67mSoN0zDVzqKc0iZQAyUuDcywtPlx4=;
+ b=QyVggufQHRZEAFzus93zTfPBswVNU9PaVR0PUWYiLWKy5TDZzCHHo6n0Jvg9D9yA6f
+ PfEOpoV7+0z1D79Uxps08hsx5zJmxnXuYjkn4UIfp/+XO31cyordAKj2rAzxHieOZp20
+ KfD3fNMK3C62cxHItGd7C4Ay4XrI+48HXrtmE/dDxRLAcUwhump3GO0fiZeV9DbB/4+q
+ Rln9+qtm1jbtgQXyA8bcycqmxTq4ZGQfcxCaREr5qUkdh1jEJPY0FiBHdNtuGhGWwEVk
+ pxdiy31CmzknF2K2ieV2MTmeIBfv2QVUpDbLRbprJSEQAFeZBNrIWDc0qjyjrh4UCkok
+ 5YkA==
+X-Gm-Message-State: APjAAAULHgxipTilhK32bAt5M1+weaR8qkZsRyHPbytxG5WVtpLNpP/U
+ 6LipBJ88GnFo4AlWktBDUnTjsEIXu+loKA==
+X-Google-Smtp-Source: APXvYqwovsC6RFP5IJpS9Dhft0hon1KBf6S+l5GtjPhOK9dsb2t1NNcZWakCQZ1p7iglTJ33U6VlGQ==
+X-Received: by 2002:a1c:a94b:: with SMTP id s72mr2830454wme.9.1569362001655;
+ Tue, 24 Sep 2019 14:53:21 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id g4sm3868127wrw.9.2019.09.24.14.53.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 24 Sep 2019 14:53:20 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id F3D191FF87;
+ Tue, 24 Sep 2019 22:53:19 +0100 (BST)
+References: <20190923230004.9231-1-richard.henderson@linaro.org>
+ <20190923230004.9231-8-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v4 07/16] exec: Adjust notdirty tracing
+In-reply-to: <20190923230004.9231-8-richard.henderson@linaro.org>
+Date: Tue, 24 Sep 2019 22:53:19 +0100
+Message-ID: <87wodx9x9s.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <e4e2220b-d23b-aa54-2c46-c937bd0efe86@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.138.245.63
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH 1/7] target/ppc: introduce get_dfp{64,128}() helper
- functions
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
+ [fuzzy]
+X-Received-From: 209.85.128.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,114 +97,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/09/2019 20:21, Richard Henderson wrote:
 
-> On 9/24/19 8:35 AM, Mark Cave-Ayland wrote:
->> +static void get_dfp64(uint64_t *dst, uint64_t *dfp)
->> +{
->> +    dst[0] = dfp[0];
->> +}
->> +
->> +static void get_dfp128(uint64_t *dst, uint64_t *dfp)
->> +{
->> +    dst[0] = dfp[HI_IDX];
->> +    dst[1] = dfp[LO_IDX];
->> +}
-> 
-> I'm not keen on this.  I would prefer some type difference that prevents you
-> from getting the arguments the wrong way around.
-> 
-> I'm thinking that a combination helper like
-> 
-> static void get_dfp64(decNumber *out, uint64_t *in)
-> {
->     union {
->        uint64_t i;
->        decimal64 d;
->     } u;
-> 
->     u.i = *in;
->     decimal64ToNumber(&u.d, out);
-> }
-> 
->> @@ -129,7 +140,7 @@ static void dfp_prepare_decimal64(struct PPC_DFP *dfp, uint64_t *a,
->>      dfp->env = env;
->>  
->>      if (a) {
->> -        dfp->a64[0] = *a;
->> +        get_dfp64(dfp->a64, a);
->>          decimal64ToNumber((decimal64 *)dfp->a64, &dfp->a);
->>      } else {
->>          dfp->a64[0] = 0;
-> 
-> becomes
-> 
->     get_dfp64(&dfp->a, a);
-> 
-> and that might clean up a lot of the code.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Right, and in fact I had a similar thought myself regarding type safety since one of
-the issues with working with the existing code in dfp_helper.c is that everything
-uses a uint64_t * which makes it really difficult to figure out why things are
-crashing if you make a typo :/
+> The memory_region_tb_read tracepoint is unreachable, since notdirty
+> is supposed to apply only to writes.  The memory_region_tb_write
+> tracepoint is mis-named, because notdirty is not only used for TB
+> invalidation.  It is also used for e.g. VGA RAM updates and migration.
+>
+> Replace memory_region_tb_write with memory_notdirty_write_access,
+> and place it in memory_notdirty_write_prepare where it can catch
+> all of the instances.  Add memory_notdirty_set_dirty to log when
+> we no longer intercept writes to a page.
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Note that this patch simply introduces the helpers without making changes to the
-existing logic which is why both arguments are still uint64_t *. The real work is
-done in patch 3 where ppc_fptr_t type is introduced, and also see the switch from
-uint64_t * to ppc_vsr_t in patch 5.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-With the full patchset applied you'll see that get_dfp64() and friends are in exactly
-the same form you show above, and if I swap the arguments then the compiler does
-actually complain, although somewhat cryptically.
+> ---
+>  exec.c       | 3 +++
+>  memory.c     | 4 ----
+>  trace-events | 4 ++--
+>  3 files changed, 5 insertions(+), 6 deletions(-)
+>
+> diff --git a/exec.c b/exec.c
+> index 8b998974f8..5f2587b621 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -2755,6 +2755,8 @@ void memory_notdirty_write_prepare(NotDirtyInfo *nd=
+i,
+>      ndi->size =3D size;
+>      ndi->pages =3D NULL;
+>
+> +    trace_memory_notdirty_write_access(mem_vaddr, ram_addr, size);
+> +
+>      assert(tcg_enabled());
+>      if (!cpu_physical_memory_get_dirty_flag(ram_addr, DIRTY_MEMORY_CODE)=
+) {
+>          ndi->pages =3D page_collection_lock(ram_addr, ram_addr + size);
+> @@ -2779,6 +2781,7 @@ void memory_notdirty_write_complete(NotDirtyInfo *n=
+di)
+>      /* we remove the notdirty callback only if the code has been
+>         flushed */
+>      if (!cpu_physical_memory_is_clean(ndi->ram_addr)) {
+> +        trace_memory_notdirty_set_dirty(ndi->mem_vaddr);
+>          tlb_set_dirty(ndi->cpu, ndi->mem_vaddr);
+>      }
+>  }
+> diff --git a/memory.c b/memory.c
+> index b9dd6b94ca..57c44c97db 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -438,7 +438,6 @@ static MemTxResult  memory_region_read_accessor(Memor=
+yRegion *mr,
+>          /* Accesses to code which has previously been translated into a =
+TB show
+>           * up in the MMIO path, as accesses to the io_mem_notdirty
+>           * MemoryRegion. */
+> -        trace_memory_region_tb_read(get_cpu_index(), addr, tmp, size);
+>      } else if (TRACE_MEMORY_REGION_OPS_READ_ENABLED) {
+>          hwaddr abs_addr =3D memory_region_to_absolute_addr(mr, addr);
+>          trace_memory_region_ops_read(get_cpu_index(), mr, abs_addr, tmp,=
+ size);
+> @@ -465,7 +464,6 @@ static MemTxResult memory_region_read_with_attrs_acce=
+ssor(MemoryRegion *mr,
+>          /* Accesses to code which has previously been translated into a =
+TB show
+>           * up in the MMIO path, as accesses to the io_mem_notdirty
+>           * MemoryRegion. */
+> -        trace_memory_region_tb_read(get_cpu_index(), addr, tmp, size);
+>      } else if (TRACE_MEMORY_REGION_OPS_READ_ENABLED) {
+>          hwaddr abs_addr =3D memory_region_to_absolute_addr(mr, addr);
+>          trace_memory_region_ops_read(get_cpu_index(), mr, abs_addr, tmp,=
+ size);
+> @@ -490,7 +488,6 @@ static MemTxResult memory_region_write_accessor(Memor=
+yRegion *mr,
+>          /* Accesses to code which has previously been translated into a =
+TB show
+>           * up in the MMIO path, as accesses to the io_mem_notdirty
+>           * MemoryRegion. */
+> -        trace_memory_region_tb_write(get_cpu_index(), addr, tmp, size);
+>      } else if (TRACE_MEMORY_REGION_OPS_WRITE_ENABLED) {
+>          hwaddr abs_addr =3D memory_region_to_absolute_addr(mr, addr);
+>          trace_memory_region_ops_write(get_cpu_index(), mr, abs_addr, tmp=
+, size);
+> @@ -515,7 +512,6 @@ static MemTxResult memory_region_write_with_attrs_acc=
+essor(MemoryRegion *mr,
+>          /* Accesses to code which has previously been translated into a =
+TB show
+>           * up in the MMIO path, as accesses to the io_mem_notdirty
+>           * MemoryRegion. */
+> -        trace_memory_region_tb_write(get_cpu_index(), addr, tmp, size);
+>      } else if (TRACE_MEMORY_REGION_OPS_WRITE_ENABLED) {
+>          hwaddr abs_addr =3D memory_region_to_absolute_addr(mr, addr);
+>          trace_memory_region_ops_write(get_cpu_index(), mr, abs_addr, tmp=
+, size);
+> diff --git a/trace-events b/trace-events
+> index 823a4ae64e..20821ba545 100644
+> --- a/trace-events
+> +++ b/trace-events
+> @@ -52,14 +52,14 @@ dma_map_wait(void *dbs) "dbs=3D%p"
+>  find_ram_offset(uint64_t size, uint64_t offset) "size: 0x%" PRIx64 " @ 0=
+x%" PRIx64
+>  find_ram_offset_loop(uint64_t size, uint64_t candidate, uint64_t offset,=
+ uint64_t next, uint64_t mingap) "trying size: 0x%" PRIx64 " @ 0x%" PRIx64 =
+", offset: 0x%" PRIx64" next: 0x%" PRIx64 " mingap: 0x%" PRIx64
+>  ram_block_discard_range(const char *rbname, void *hva, size_t length, bo=
+ol need_madvise, bool need_fallocate, int ret) "%s@%p + 0x%zx: madvise: %d =
+fallocate: %d ret: %d"
+> +memory_notdirty_write_access(uint64_t vaddr, uint64_t ram_addr, unsigned=
+ size) "0x%" PRIx64 " ram_addr 0x%" PRIx64 " size %u"
+> +memory_notdirty_set_dirty(uint64_t vaddr) "0x%" PRIx64
+>
+>  # memory.c
+>  memory_region_ops_read(int cpu_index, void *mr, uint64_t addr, uint64_t =
+value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size=
+ %u"
+>  memory_region_ops_write(int cpu_index, void *mr, uint64_t addr, uint64_t=
+ value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" siz=
+e %u"
+>  memory_region_subpage_read(int cpu_index, void *mr, uint64_t offset, uin=
+t64_t value, unsigned size) "cpu %d mr %p offset 0x%"PRIx64" value 0x%"PRIx=
+64" size %u"
+>  memory_region_subpage_write(int cpu_index, void *mr, uint64_t offset, ui=
+nt64_t value, unsigned size) "cpu %d mr %p offset 0x%"PRIx64" value 0x%"PRI=
+x64" size %u"
+> -memory_region_tb_read(int cpu_index, uint64_t addr, uint64_t value, unsi=
+gned size) "cpu %d addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+> -memory_region_tb_write(int cpu_index, uint64_t addr, uint64_t value, uns=
+igned size) "cpu %d addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+>  memory_region_ram_device_read(int cpu_index, void *mr, uint64_t addr, ui=
+nt64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx6=
+4" size %u"
+>  memory_region_ram_device_write(int cpu_index, void *mr, uint64_t addr, u=
+int64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx=
+64" size %u"
+>  flatview_new(void *view, void *root) "%p (root %p)"
 
->> @@ -617,10 +626,12 @@ uint32_t helper_##op(CPUPPCState *env, uint64_t *a, uint64_t *b)         \
->>  {                                                                        \
->>      struct PPC_DFP dfp;                                                  \
->>      unsigned k;                                                          \
->> +    uint64_t a64;                                                        \
->>                                                                           \
->>      dfp_prepare_decimal##size(&dfp, 0, b, env);                          \
->>                                                                           \
->> -    k = *a & 0x3F;                                                       \
->> +    get_dfp64(&a64, a);                                                  \
->> +    k = a64 & 0x3F;                                                      \
->>                                                                           \
->>      if (unlikely(decNumberIsSpecial(&dfp.b))) {                          \
->>          dfp.crbf = 1;                                                    \
-> 
-> Whereas cases like this, where a scalar is being passed in, I don't think that
-> re-using the same helper is appropriate.  Ideally, they would be passed in by
-> value, and not by reference at all.  That, of course, requires changes to the
-> translator beyond the scope of this patch.
 
-Agreed. I was really keen to avoid any translator changes if possible since the PPC
-translator code tends to be quite tricky which is why I went with the above approach.
-
->>  void helper_dctqpq(CPUPPCState *env, uint64_t *t, uint64_t *b)
->>  {
->>      struct PPC_DFP dfp;
->> +    uint64_t b64;
->>      dfp_prepare_decimal128(&dfp, 0, 0, env);
->> -    decimal64ToNumber((decimal64 *)b, &dfp.t);
->> +    get_dfp64(&b64, b);
->> +    decimal64ToNumber((decimal64 *)&b64, &dfp.t);
-> 
-> This would become
-> 
->     get_dfp64(&dfp.t, b);
-> 
-> with no intermediate b64 temp.
-
-Funnily enough that did cross my mind, but I wasn't 100% sure that this wasn't doing
-something extra within libdecnumber. If you think it makes sense then I can easily
-add it into a v2.
-
-
-ATB,
-
-Mark.
+--
+Alex Benn=C3=A9e
 
