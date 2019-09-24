@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0B8EC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 07:51:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E17FC432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 07:52:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 945BA20673
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 07:51:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 945BA20673
+	by mail.kernel.org (Postfix) with ESMTPS id 40C1820673
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 07:52:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40C1820673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCfbO-00075c-Kx
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 03:51:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42379)
+	id 1iCfcb-0007ve-8O
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 03:52:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42518)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iCfY6-0005FC-Ht
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:47:51 -0400
+ (envelope-from <david@redhat.com>) id 1iCfZG-0005vY-Im
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:49:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iCfY4-00070L-Hr
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:47:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35650)
+ (envelope-from <david@redhat.com>) id 1iCfZD-0007oC-Vs
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:49:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40564)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iCfY0-0006xx-43
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:47:46 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iCfZD-0007mR-2q
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:48:59 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1387E302C096;
- Tue, 24 Sep 2019 07:47:42 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9F69989AC7;
+ Tue, 24 Sep 2019 07:48:54 +0000 (UTC)
 Received: from [10.36.116.87] (ovpn-116-87.ams2.redhat.com [10.36.116.87])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DCB2F6017E;
- Tue, 24 Sep 2019 07:47:40 +0000 (UTC)
-Subject: Re: [PATCH v4 04/16] cputlb: Use optimize_away in load/store_helpers
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8A9015D721;
+ Tue, 24 Sep 2019 07:48:44 +0000 (UTC)
+Subject: Re: [PATCH v4 05/16] cputlb: Split out load/store_memop
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190923230004.9231-1-richard.henderson@linaro.org>
- <20190923230004.9231-5-richard.henderson@linaro.org>
+ <20190923230004.9231-6-richard.henderson@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -91,18 +91,18 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <7575480c-3024-e63e-9f97-555be5c47ed5@redhat.com>
-Date: Tue, 24 Sep 2019 09:47:40 +0200
+Message-ID: <59d38e37-8416-dc9f-5b47-942228759a09@redhat.com>
+Date: Tue, 24 Sep 2019 09:48:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190923230004.9231-5-richard.henderson@linaro.org>
+In-Reply-To: <20190923230004.9231-6-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Tue, 24 Sep 2019 07:47:42 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Tue, 24 Sep 2019 07:48:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -122,37 +122,92 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 24.09.19 00:59, Richard Henderson wrote:
-> Increase the current runtime assert to a compile-time assert.
+> We will shortly be using these more than once.
 > 
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  accel/tcg/cputlb.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+>  accel/tcg/cputlb.c | 110 +++++++++++++++++++++++----------------------
+>  1 file changed, 57 insertions(+), 53 deletions(-)
 > 
 > diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index 2222b87764..e529af6d09 100644
+> index e529af6d09..430ba4a69d 100644
 > --- a/accel/tcg/cputlb.c
 > +++ b/accel/tcg/cputlb.c
-> @@ -1396,7 +1396,7 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
->          res = ldq_le_p(haddr);
->          break;
->      default:
-> -        g_assert_not_reached();
-> +        optimize_away();
->      }
+> @@ -1281,6 +1281,29 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+>  typedef uint64_t FullLoadHelper(CPUArchState *env, target_ulong addr,
+>                                  TCGMemOpIdx oi, uintptr_t retaddr);
 >  
->      return res;
-> @@ -1680,8 +1680,7 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
->          stq_le_p(haddr, val);
->          break;
->      default:
-> -        g_assert_not_reached();
-> -        break;
+> +static inline uint64_t QEMU_ALWAYS_INLINE
+> +load_memop(const void *haddr, MemOp op)
+> +{
+> +    switch (op) {
+> +    case MO_UB:
+> +        return ldub_p(haddr);
+> +    case MO_BEUW:
+> +        return lduw_be_p(haddr);
+> +    case MO_LEUW:
+> +        return lduw_le_p(haddr);
+> +    case MO_BEUL:
+> +        return (uint32_t)ldl_be_p(haddr);
+> +    case MO_LEUL:
+> +        return (uint32_t)ldl_le_p(haddr);
+> +    case MO_BEQ:
+> +        return ldq_be_p(haddr);
+> +    case MO_LEQ:
+> +        return ldq_le_p(haddr);
+> +    default:
 > +        optimize_away();
->      }
+> +    }
+> +}
+> +
+>  static inline uint64_t QEMU_ALWAYS_INLINE
+>  load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
+>              uintptr_t retaddr, MemOp op, bool code_read,
+> @@ -1373,33 +1396,7 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
+>  
+>   do_aligned_access:
+>      haddr = (void *)((uintptr_t)addr + entry->addend);
+> -    switch (op) {
+> -    case MO_UB:
+> -        res = ldub_p(haddr);
+> -        break;
+> -    case MO_BEUW:
+> -        res = lduw_be_p(haddr);
+> -        break;
+> -    case MO_LEUW:
+> -        res = lduw_le_p(haddr);
+> -        break;
+> -    case MO_BEUL:
+> -        res = (uint32_t)ldl_be_p(haddr);
+> -        break;
+> -    case MO_LEUL:
+> -        res = (uint32_t)ldl_le_p(haddr);
+> -        break;
+> -    case MO_BEQ:
+> -        res = ldq_be_p(haddr);
+> -        break;
+> -    case MO_LEQ:
+> -        res = ldq_le_p(haddr);
+> -        break;
+> -    default:
+> -        optimize_away();
+> -    }
+> -
+> -    return res;
+> +    return load_memop(haddr, op);
 >  }
 >  
-> 
+>  /*
+> @@ -1415,7 +1412,8 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
+>  static uint64_t full_ldub_mmu(CPUArchState *env, target_ulong addr,
+>                                TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+> -    return load_helper(env, addr, oi, retaddr, MO_UB, false, full_ldub_mmu);
+> +    return load_helper(env, addr, oi, retaddr, MO_UB, false,
+> +                       full_ldub_mmu);
+
+Unnecessary change.
+
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
 
