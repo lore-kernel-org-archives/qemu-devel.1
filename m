@@ -2,90 +2,53 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBFA7C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:09:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC412C432C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:11:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91B56214DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:09:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91B56214DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BFB8D207FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:11:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFB8D207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCr7h-00086G-Oj
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:09:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43334)
+	id 1iCr9w-0002Yd-Dw
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:11:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43640)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iCr6J-0006uQ-58
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:07:56 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCr84-0000Mb-1c
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:09:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iCr6I-0002FT-2w
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:07:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47442)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCr82-0002oO-AE
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:09:43 -0400
+Received: from relay.sw.ru ([185.231.240.75]:38016)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCr6H-0002EI-R7
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:07:54 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 788128980F9;
- Tue, 24 Sep 2019 18:49:44 +0000 (UTC)
-Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 10D045D9DC;
- Tue, 24 Sep 2019 18:49:39 +0000 (UTC)
-Subject: Re: [PATCH 22/25] qapi: Eliminate check_keys(), rename
- check_known_keys()
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-23-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <4b9f8e7b-64e3-e70d-119a-1d9a84587ce6@redhat.com>
-Date: Tue, 24 Sep 2019 13:49:38 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iCr82-0002nL-3F
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:09:42 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iCr7z-0001Mk-Pq; Tue, 24 Sep 2019 23:09:39 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 01/25] errp: rename errp to errp_in where it is IN-argument
+Date: Tue, 24 Sep 2019 23:08:38 +0300
+Message-Id: <20190924200902.4703-2-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190924200902.4703-1-vsementsov@virtuozzo.com>
+References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20190924132830.15835-23-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="kfQb6i60DPTpQeeefXjqhzaNQbJilWMQO"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Tue, 24 Sep 2019 18:49:52 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,68 +60,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: vsementsov@virtuozzo.com, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kfQb6i60DPTpQeeefXjqhzaNQbJilWMQO
-Content-Type: multipart/mixed; boundary="k8A0Gig8HYCgLAqWz9MKoH5rsi3bEvH9j";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <4b9f8e7b-64e3-e70d-119a-1d9a84587ce6@redhat.com>
-Subject: Re: [PATCH 22/25] qapi: Eliminate check_keys(), rename
- check_known_keys()
-References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-23-armbru@redhat.com>
-In-Reply-To: <20190924132830.15835-23-armbru@redhat.com>
+Error **errp is almost always OUT-argument: it's assumed to be NULL, or
+pointer to NULL-initialized pointer, or pointer to error_abort or
+error_fatal, for callee to report error.
 
---k8A0Gig8HYCgLAqWz9MKoH5rsi3bEvH9j
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+But very few functions instead get Error **errp as IN-argument:
+it's assumed to be set, and callee should clean it.
+In such cases, rename errp to errp_in.
 
-On 9/24/19 8:28 AM, Markus Armbruster wrote:
-> check_keys() has become a trivial wrapper for check_known_keys().
-> Eliminate it.
->=20
-> This makes its name available.  Rename check_known_keys().
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  scripts/qapi/common.py | 40 +++++++++++++++++++++-------------------
->  1 file changed, 21 insertions(+), 19 deletions(-)
->=20
-
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ include/monitor/hmp.h |  2 +-
+ include/qapi/error.h  |  2 +-
+ ui/vnc.h              |  2 +-
+ monitor/hmp-cmds.c    |  8 ++++----
+ ui/vnc.c              | 10 +++++-----
+ util/error.c          |  8 ++++----
+ 6 files changed, 16 insertions(+), 16 deletions(-)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
+index a0e9511440..f929814f1a 100644
+--- a/include/monitor/hmp.h
++++ b/include/monitor/hmp.h
+@@ -16,7 +16,7 @@
+ 
+ #include "qemu/readline.h"
+ 
+-void hmp_handle_error(Monitor *mon, Error **errp);
++void hmp_handle_error(Monitor *mon, Error **errp_in);
+ 
+ void hmp_info_name(Monitor *mon, const QDict *qdict);
+ void hmp_info_version(Monitor *mon, const QDict *qdict);
+diff --git a/include/qapi/error.h b/include/qapi/error.h
+index 3f95141a01..9376f59c35 100644
+--- a/include/qapi/error.h
++++ b/include/qapi/error.h
+@@ -283,7 +283,7 @@ void error_free(Error *err);
+ /*
+  * Convenience function to assert that *@errp is set, then silently free it.
+  */
+-void error_free_or_abort(Error **errp);
++void error_free_or_abort(Error **errp_in);
+ 
+ /*
+  * Convenience function to warn_report() and free @err.
+diff --git a/ui/vnc.h b/ui/vnc.h
+index fea79c2fc9..00e0b48f2f 100644
+--- a/ui/vnc.h
++++ b/ui/vnc.h
+@@ -547,7 +547,7 @@ uint32_t read_u32(uint8_t *data, size_t offset);
+ 
+ /* Protocol stage functions */
+ void vnc_client_error(VncState *vs);
+-size_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp);
++size_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp_in);
+ 
+ void start_client_init(VncState *vs);
+ void start_auth_vnc(VncState *vs);
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index b2551c16d1..941d5d0a45 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -60,11 +60,11 @@
+ #include <spice/enums.h>
+ #endif
+ 
+-void hmp_handle_error(Monitor *mon, Error **errp)
++void hmp_handle_error(Monitor *mon, Error **errp_in)
+ {
+-    assert(errp);
+-    if (*errp) {
+-        error_reportf_err(*errp, "Error: ");
++    assert(errp_in);
++    if (*errp_in) {
++        error_reportf_err(*errp_in, "Error: ");
+     }
+ }
+ 
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 87b8045afe..9d6384d9b1 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -1312,7 +1312,7 @@ void vnc_disconnect_finish(VncState *vs)
+     g_free(vs);
+ }
+ 
+-size_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp)
++size_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp_in)
+ {
+     if (ret <= 0) {
+         if (ret == 0) {
+@@ -1320,14 +1320,14 @@ size_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp)
+             vnc_disconnect_start(vs);
+         } else if (ret != QIO_CHANNEL_ERR_BLOCK) {
+             trace_vnc_client_io_error(vs, vs->ioc,
+-                                      errp ? error_get_pretty(*errp) :
++                                      errp_in ? error_get_pretty(*errp_in) :
+                                       "Unknown");
+             vnc_disconnect_start(vs);
+         }
+ 
+-        if (errp) {
+-            error_free(*errp);
+-            *errp = NULL;
++        if (errp_in) {
++            error_free(*errp_in);
++            *errp_in = NULL;
+         }
+         return 0;
+     }
+diff --git a/util/error.c b/util/error.c
+index d4532ce318..b3ff3832d6 100644
+--- a/util/error.c
++++ b/util/error.c
+@@ -271,11 +271,11 @@ void error_free(Error *err)
+     }
+ }
+ 
+-void error_free_or_abort(Error **errp)
++void error_free_or_abort(Error **errp_in)
+ {
+-    assert(errp && *errp);
+-    error_free(*errp);
+-    *errp = NULL;
++    assert(errp_in && *errp_in);
++    error_free(*errp_in);
++    *errp_in = NULL;
+ }
+ 
+ void error_propagate(Error **dst_errp, Error *local_err)
+-- 
+2.21.0
 
-
---k8A0Gig8HYCgLAqWz9MKoH5rsi3bEvH9j--
-
---kfQb6i60DPTpQeeefXjqhzaNQbJilWMQO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KZUIACgkQp6FrSiUn
-Q2qwkgf8DDTR9gDRub6Am2eL+IPYA3xIx7QC4nP4cpX34WBIKgWhLX/goo/M3gPv
-gMCi1C9HiKD8S1Ns3uI3ojHh8+tFiZ2OMwLZodHzdwiJutwz1sB4L2zpDFrD2SrN
-SldnUrHnoHxIFnfor0dwgv4NT/9ZP1fIhjbsEfu1rCg3XwyXsQgbXTAQQlBoGHMZ
-W4lieZI6wb5ei3JqkGUnFI7pxdMhTprzImgLPgYfTDR1/xUggyLDXgC/ZEkpi/gm
-COA0dH7N7KfAMCQ+JoYi+D8u+yqMJH6l6J4HmPCE2E0K0TgVe/7Hk6HEC2tP77yQ
-jRHK/u93H2qMiLZG376GboxlqGR3/w==
-=wuHY
------END PGP SIGNATURE-----
-
---kfQb6i60DPTpQeeefXjqhzaNQbJilWMQO--
 
