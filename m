@@ -6,56 +6,55 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D055C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:11:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EBEDC432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:11:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC8382146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:11:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC8382146E
+	by mail.kernel.org (Postfix) with ESMTPS id 6A24E2146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:11:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A24E2146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCkax-00076u-3J
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:11:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50651)
+	id 1iCkay-000779-NH
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:11:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50448)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCk0r-0001Nm-NF
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:53 -0400
+ (envelope-from <armbru@redhat.com>) id 1iCk0k-0001Ia-Ke
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCk0k-0006zs-Ne
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53444)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCk0k-0006x7-AG
+ (envelope-from <armbru@redhat.com>) id 1iCk0h-0006ts-9f
  for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:42 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+Received: from mx1.redhat.com ([209.132.183.28]:39886)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCk0g-0006sS-O5
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:39 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2A57D8A1C82
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 12:33:41 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 08E922A09A1
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 12:33:38 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C7B656017E;
- Tue, 24 Sep 2019 12:33:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A4BA760C80;
+ Tue, 24 Sep 2019 12:33:37 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5A93B1136431; Tue, 24 Sep 2019 14:33:35 +0200 (CEST)
+ id 7A36811385CB; Tue, 24 Sep 2019 14:33:34 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 37/37] qapi: Assert .visit() and .check_clash() run only after
- .check()
-Date: Tue, 24 Sep 2019 14:33:34 +0200
-Message-Id: <20190924123334.30645-38-armbru@redhat.com>
+Subject: [PULL 10/37] qapi: Permit 'boxed' with empty type
+Date: Tue, 24 Sep 2019 14:33:07 +0200
+Message-Id: <20190924123334.30645-11-armbru@redhat.com>
 In-Reply-To: <20190924123334.30645-1-armbru@redhat.com>
 References: <20190924123334.30645-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Tue, 24 Sep 2019 12:33:41 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Tue, 24 Sep 2019 12:33:38 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -74,104 +73,252 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Easy since the previous commit provides .checked.
+We reject empty types with 'boxed': true.  We don't really need that
+to work, but making it work is actually simpler than rejecting it, so
+do that.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20190914153506.2151-20-armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20190913201349.24332-9-armbru@redhat.com>
 ---
- scripts/qapi/common.py | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ tests/test-qmp-cmds.c                   |  4 ++++
+ scripts/qapi/commands.py                |  4 ++--
+ scripts/qapi/common.py                  | 14 ++------------
+ scripts/qapi/events.py                  | 10 +++++-----
+ tests/Makefile.include                  |  1 -
+ tests/qapi-schema/args-boxed-empty.err  |  1 -
+ tests/qapi-schema/args-boxed-empty.exit |  1 -
+ tests/qapi-schema/args-boxed-empty.json |  3 ---
+ tests/qapi-schema/args-boxed-empty.out  |  0
+ tests/qapi-schema/qapi-schema-test.json |  2 ++
+ tests/qapi-schema/qapi-schema-test.out  |  4 ++++
+ 11 files changed, 19 insertions(+), 25 deletions(-)
+ delete mode 100644 tests/qapi-schema/args-boxed-empty.err
+ delete mode 100644 tests/qapi-schema/args-boxed-empty.exit
+ delete mode 100644 tests/qapi-schema/args-boxed-empty.json
+ delete mode 100644 tests/qapi-schema/args-boxed-empty.out
 
+diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
+index ab389f42da..36fdf5b115 100644
+--- a/tests/test-qmp-cmds.c
++++ b/tests/test-qmp-cmds.c
+@@ -97,6 +97,10 @@ void qmp_boxed_union(UserDefListUnion *arg, Error **er=
+rp)
+ {
+ }
+=20
++void qmp_boxed_empty(Empty1 *arg, Error **errp)
++{
++}
++
+ __org_qemu_x_Union1 *qmp___org_qemu_x_command(__org_qemu_x_EnumList *a,
+                                               __org_qemu_x_StructList *b=
+,
+                                               __org_qemu_x_Union2 *c,
+diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+index b929e07be4..7e3dd1068a 100644
+--- a/scripts/qapi/commands.py
++++ b/scripts/qapi/commands.py
+@@ -30,7 +30,7 @@ def gen_call(name, arg_type, boxed, ret_type):
+=20
+     argstr =3D ''
+     if boxed:
+-        assert arg_type and not arg_type.is_empty()
++        assert arg_type
+         argstr =3D '&arg, '
+     elif arg_type:
+         assert not arg_type.variants
+@@ -96,7 +96,7 @@ def gen_marshal_decl(name):
+=20
+=20
+ def gen_marshal(name, arg_type, boxed, ret_type):
+-    have_args =3D arg_type and not arg_type.is_empty()
++    have_args =3D boxed or (arg_type and not arg_type.is_empty())
+=20
+     ret =3D mcgen('''
+=20
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index c199a2b58c..b00caacca3 100644
+index 0fb1d1956a..c5c71287c3 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -1190,7 +1190,7 @@ class QAPISchemaEntity(object):
-         return not self.info
-=20
-     def visit(self, visitor):
--        pass
-+        assert self._checked
-=20
-=20
- class QAPISchemaVisitor(object):
-@@ -1245,6 +1245,7 @@ class QAPISchemaInclude(QAPISchemaEntity):
-         self.fname =3D fname
-=20
-     def visit(self, visitor):
-+        QAPISchemaEntity.visit(self, visitor)
-         visitor.visit_include(self.fname, self.info)
-=20
-=20
-@@ -1309,6 +1310,7 @@ class QAPISchemaBuiltinType(QAPISchemaType):
-         return self.json_type()
-=20
-     def visit(self, visitor):
-+        QAPISchemaType.visit(self, visitor)
-         visitor.visit_builtin_type(self.name, self.info, self.json_type(=
-))
-=20
-=20
-@@ -1344,6 +1346,7 @@ class QAPISchemaEnumType(QAPISchemaType):
-         return 'string'
-=20
-     def visit(self, visitor):
-+        QAPISchemaType.visit(self, visitor)
-         visitor.visit_enum_type(self.name, self.info, self.ifcond,
-                                 self.members, self.prefix)
-=20
-@@ -1386,6 +1389,7 @@ class QAPISchemaArrayType(QAPISchemaType):
-         return 'array of ' + elt_doc_type
-=20
-     def visit(self, visitor):
-+        QAPISchemaType.visit(self, visitor)
-         visitor.visit_array_type(self.name, self.info, self.ifcond,
-                                  self.element_type)
-=20
-@@ -1461,6 +1465,7 @@ class QAPISchemaObjectType(QAPISchemaType):
-     # and update seen to track the members seen so far. Report any error=
-s
-     # on behalf of info, which is not necessarily self.info
-     def check_clash(self, info, seen):
-+        assert self._checked
-         assert not self.variants       # not implemented
-         for m in self.members:
-             m.check_clash(info, seen)
-@@ -1498,6 +1503,7 @@ class QAPISchemaObjectType(QAPISchemaType):
-         return 'object'
-=20
-     def visit(self, visitor):
-+        QAPISchemaType.visit(self, visitor)
-         visitor.visit_object_type(self.name, self.info, self.ifcond,
-                                   self.base, self.local_members, self.va=
-riants,
-                                   self.features)
-@@ -1665,6 +1671,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
-         return 'value'
-=20
-     def visit(self, visitor):
-+        QAPISchemaType.visit(self, visitor)
-         visitor.visit_alternate_type(self.name, self.info, self.ifcond,
-                                      self.variants)
-=20
-@@ -1698,6 +1705,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
-             assert isinstance(self.ret_type, QAPISchemaType)
-=20
-     def visit(self, visitor):
-+        QAPISchemaEntity.visit(self, visitor)
-         visitor.visit_command(self.name, self.info, self.ifcond,
-                               self.arg_type, self.ret_type,
-                               self.gen, self.success_response,
-@@ -1723,6 +1731,7 @@ class QAPISchemaEvent(QAPISchemaEntity):
+@@ -1687,12 +1687,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
+             self.arg_type =3D schema.lookup_type(self._arg_type_name)
+             assert isinstance(self.arg_type, QAPISchemaObjectType)
+             self.arg_type.check(schema)
+-            if self.boxed:
+-                if self.arg_type.is_empty():
+-                    raise QAPISemError(self.info,
+-                                       "Cannot use 'boxed' with empty ty=
+pe")
+-            else:
+-                assert not self.arg_type.variants
++            assert not self.arg_type.variants or self.boxed
+         elif self.boxed:
+             raise QAPISemError(self.info, "Use of 'boxed' requires 'data=
+'")
+         if self._ret_type_name:
+@@ -1721,12 +1716,7 @@ class QAPISchemaEvent(QAPISchemaEntity):
+             self.arg_type =3D schema.lookup_type(self._arg_type_name)
+             assert isinstance(self.arg_type, QAPISchemaObjectType)
+             self.arg_type.check(schema)
+-            if self.boxed:
+-                if self.arg_type.is_empty():
+-                    raise QAPISemError(self.info,
+-                                       "Cannot use 'boxed' with empty ty=
+pe")
+-            else:
+-                assert not self.arg_type.variants
++            assert not self.arg_type.variants or self.boxed
+         elif self.boxed:
              raise QAPISemError(self.info, "Use of 'boxed' requires 'data=
 '")
 =20
-     def visit(self, visitor):
-+        QAPISchemaEntity.visit(self, visitor)
-         visitor.visit_event(self.name, self.info, self.ifcond,
-                             self.arg_type, self.boxed)
+diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+index b732581046..e0abfef7b0 100644
+--- a/scripts/qapi/events.py
++++ b/scripts/qapi/events.py
+@@ -65,6 +65,8 @@ def gen_event_send(name, arg_type, boxed, event_enum_na=
+me, event_emit):
+     # practice, we can rename our local variables with a leading _ prefi=
+x,
+     # or split the code into a wrapper function that creates a boxed
+     # 'param' object then calls another to do the real work.
++    have_args =3D boxed or (arg_type and not arg_type.is_empty())
++
+     ret =3D mcgen('''
 =20
+ %(proto)s
+@@ -73,15 +75,13 @@ def gen_event_send(name, arg_type, boxed, event_enum_=
+name, event_emit):
+ ''',
+                 proto=3Dbuild_event_send_proto(name, arg_type, boxed))
+=20
+-    if arg_type and not arg_type.is_empty():
++    if have_args:
+         ret +=3D mcgen('''
+     QObject *obj;
+     Visitor *v;
+ ''')
+         if not boxed:
+             ret +=3D gen_param_var(arg_type)
+-    else:
+-        assert not boxed
+=20
+     ret +=3D mcgen('''
+=20
+@@ -90,7 +90,7 @@ def gen_event_send(name, arg_type, boxed, event_enum_na=
+me, event_emit):
+ ''',
+                  name=3Dname)
+=20
+-    if arg_type and not arg_type.is_empty():
++    if have_args:
+         ret +=3D mcgen('''
+     v =3D qobject_output_visitor_new(&obj);
+ ''')
+@@ -121,7 +121,7 @@ def gen_event_send(name, arg_type, boxed, event_enum_=
+name, event_emit):
+                  event_emit=3Devent_emit,
+                  c_enum=3Dc_enum_const(event_enum_name, name))
+=20
+-    if arg_type and not arg_type.is_empty():
++    if have_args:
+         ret +=3D mcgen('''
+     visit_free(v);
+ ''')
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 8585e7ed26..2c3adb1530 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -311,7 +311,6 @@ qapi-schema +=3D args-array-empty.json
+ qapi-schema +=3D args-array-unknown.json
+ qapi-schema +=3D args-bad-boxed.json
+ qapi-schema +=3D args-boxed-anon.json
+-qapi-schema +=3D args-boxed-empty.json
+ qapi-schema +=3D args-boxed-string.json
+ qapi-schema +=3D args-int.json
+ qapi-schema +=3D args-invalid.json
+diff --git a/tests/qapi-schema/args-boxed-empty.err b/tests/qapi-schema/a=
+rgs-boxed-empty.err
+deleted file mode 100644
+index 039603e85c..0000000000
+--- a/tests/qapi-schema/args-boxed-empty.err
++++ /dev/null
+@@ -1 +0,0 @@
+-tests/qapi-schema/args-boxed-empty.json:3: Cannot use 'boxed' with empty=
+ type
+diff --git a/tests/qapi-schema/args-boxed-empty.exit b/tests/qapi-schema/=
+args-boxed-empty.exit
+deleted file mode 100644
+index d00491fd7e..0000000000
+--- a/tests/qapi-schema/args-boxed-empty.exit
++++ /dev/null
+@@ -1 +0,0 @@
+-1
+diff --git a/tests/qapi-schema/args-boxed-empty.json b/tests/qapi-schema/=
+args-boxed-empty.json
+deleted file mode 100644
+index 52717e065f..0000000000
+--- a/tests/qapi-schema/args-boxed-empty.json
++++ /dev/null
+@@ -1,3 +0,0 @@
+-# 'boxed' requires a non-empty type
+-{ 'struct': 'Empty', 'data': {} }
+-{ 'command': 'foo', 'boxed': true, 'data': 'Empty' }
+diff --git a/tests/qapi-schema/args-boxed-empty.out b/tests/qapi-schema/a=
+rgs-boxed-empty.out
+deleted file mode 100644
+index e69de29bb2..0000000000
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
+qapi-schema-test.json
+index 0fadb4ddd7..e6dbbbd328 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -149,6 +149,7 @@
+ { 'command': 'guest-sync', 'data': { 'arg': 'any' }, 'returns': 'any' }
+ { 'command': 'boxed-struct', 'boxed': true, 'data': 'UserDefZero' }
+ { 'command': 'boxed-union', 'data': 'UserDefListUnion', 'boxed': true }
++{ 'command': 'boxed-empty', 'boxed': true, 'data': 'Empty1' }
+=20
+ # Smoke test on out-of-band and allow-preconfig-test
+ { 'command': 'test-flags-command', 'allow-oob': true, 'allow-preconfig':=
+ true }
+@@ -181,6 +182,7 @@
+   'data': { 'a' : 'EventStructOne', 'b' : 'str', '*c': 'str', '*enum3': =
+'EnumOne' } }
+ { 'event': 'EVENT_E', 'boxed': true, 'data': 'UserDefZero' }
+ { 'event': 'EVENT_F', 'boxed': true, 'data': 'UserDefFlatUnion' }
++{ 'event': 'EVENT_G', 'boxed': true, 'data': 'Empty1' }
+=20
+ # test that we correctly compile downstream extensions, as well as munge
+ # ticklish names
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
+api-schema-test.out
+index 5470a525f5..fb00a21996 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -221,6 +221,8 @@ command boxed-struct UserDefZero -> None
+    gen=3DTrue success_response=3DTrue boxed=3DTrue oob=3DFalse preconfig=
+=3DFalse
+ command boxed-union UserDefListUnion -> None
+    gen=3DTrue success_response=3DTrue boxed=3DTrue oob=3DFalse preconfig=
+=3DFalse
++command boxed-empty Empty1 -> None
++   gen=3DTrue success_response=3DTrue boxed=3DTrue oob=3DFalse preconfig=
+=3DFalse
+ command test-flags-command None -> None
+    gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DTrue preconfig=
+=3DTrue
+ object UserDefOptions
+@@ -254,6 +256,8 @@ event EVENT_E UserDefZero
+    boxed=3DTrue
+ event EVENT_F UserDefFlatUnion
+    boxed=3DTrue
++event EVENT_G Empty1
++   boxed=3DTrue
+ enum __org.qemu_x-Enum
+     member __org.qemu_x-value
+ object __org.qemu_x-Base
 --=20
 2.21.0
 
