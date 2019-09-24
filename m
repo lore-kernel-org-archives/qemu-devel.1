@@ -2,70 +2,101 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F68C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:25:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E15EC432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:34:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C496820872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:25:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C496820872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 29A7A214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:34:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="YCYszaQB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29A7A214AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCiwe-0008Ki-0m
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 07:25:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41440)
+	id 1iCj5k-0004Py-9z
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 07:34:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42199)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1iCiva-0007ZX-3y
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:24:19 -0400
+ (envelope-from <anthony.perard@citrix.com>) id 1iCj2L-0002Oy-5X
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1iCivY-00032a-O8
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:24:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:62044)
+ (envelope-from <anthony.perard@citrix.com>) id 1iCj2J-0005GD-FY
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:16 -0400
+Received: from esa2.hc3370-68.iphmx.com ([216.71.145.153]:17963)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1iCivV-00031a-MM; Tue, 24 Sep 2019 07:24:13 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 02A7B7FDE9;
- Tue, 24 Sep 2019 11:24:13 +0000 (UTC)
-Received: from [10.36.116.30] (ovpn-116-30.ams2.redhat.com [10.36.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 87E365C1B2;
- Tue, 24 Sep 2019 11:24:03 +0000 (UTC)
-Subject: Re: [PATCH 2/4] target/arm: Move cortex-m related functions to new
- file v7m.c
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20190921150420.30743-1-thuth@redhat.com>
- <20190921150420.30743-3-thuth@redhat.com>
- <bd6efd14-9200-98e2-4f76-dda101f85274@redhat.com>
- <8585b93b-e239-829b-d634-b89941f27aed@redhat.com>
- <5b967a2a-e1db-9a9f-7590-fc6905354f7a@redhat.com>
- <240ae462-9f6e-bb1f-3657-1baaba4051ca@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <74706e48-31c9-c7d2-e700-e6b702f7560a@redhat.com>
-Date: Tue, 24 Sep 2019 13:24:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
+ id 1iCj2J-0005Fj-3R
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1569324676;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=1fLJMTliI1vK08faPR4VUIwhEhfNNpZZbP4jagQup3M=;
+ b=YCYszaQBpYeVnlO6Dn9zWntPpySIzAVfUPaTNXf+pPHSQbnK6MmAv0Ms
+ IBahwY9hKqiDJr37zhi4Nm21Dp8Aw2gzGGxmHDSLe1g53+XQQRzo89862
+ mJxk0Qch8bH1t1g4D6sacxgv7YidJ/ueHsrpKL8szkFZRZ7R+nDH+6M2o c=;
+Authentication-Results: esa2.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=anthony.perard@citrix.com;
+ spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa2.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ anthony.perard@citrix.com) identity=pra;
+ client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible
+Received-SPF: Pass (esa2.hc3370-68.iphmx.com: domain of
+ anthony.perard@citrix.com designates 162.221.158.21 as
+ permitted sender) identity=mailfrom;
+ client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
+Received-SPF: None (esa2.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: zQ+7TjXT5X9FCZjSpRAdICG/WkfHuexnxj8DB6Vb0CEetuZMn4DZCFhNOZuy7URZhkhqw1ffep
+ i1teA1hYmyKHswVZq9Ny+lS492y3fRXUsmiUL5alaiJlwNFcNsKG39/KPveoo+qVEYr+qDTBE/
+ mwSozZ7jgrqWvVKjMoXwG31kmDi0kf10eP4KQ4q0SJTqg4cvdAqEfeifrql1kcn3KeaRrNRM64
+ uYgi6j2urGYObf1XtgmJY7474pey+1aAXalMIGxVoIbwDxJ/wkFjkmDwRbN2GmYNTGkeNuHHiM
+ rR8=
+X-SBRS: 2.7
+X-MesageID: 5977594
+X-Ironport-Server: esa2.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.64,543,1559534400"; 
+   d="scan'208";a="5977594"
+From: Anthony PERARD <anthony.perard@citrix.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PULL 0/7] xen queue 2019-09-24
+Date: Tue, 24 Sep 2019 12:30:19 +0100
+Message-ID: <20190924113026.255634-1-anthony.perard@citrix.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-In-Reply-To: <240ae462-9f6e-bb1f-3657-1baaba4051ca@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 24 Sep 2019 11:24:13 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 216.71.145.153
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,131 +108,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Thomas,
+The following changes since commit 2f93a3ecdd3bb060bd04f698ccafe66efd98563a:
 
-On 9/24/19 1:06 PM, Thomas Huth wrote:
-> On 24/09/2019 13.02, Auger Eric wrote:
->> Hi Thomas,
->>
->> On 9/23/19 8:09 PM, Thomas Huth wrote:
->>> On 23/09/2019 16.31, Auger Eric wrote:
->>>> Hi Thomas,
->>>>
->>>> On 9/21/19 5:04 PM, Thomas Huth wrote:
->>>>> We are going to make CONFIG_ARM_V7M optional, so the related cortex-m
->>>>> CPUs should only be created if the switch is enabled. This can best
->>>>> be done if the code resides in a separate file, thus move the related
->>>>> functions to a new file v7m.c which only gets compiled if CONFIG_ARM_V7M
->>>>> is enabled.
->>>>>
->>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>>> ---
->>>>>  target/arm/Makefile.objs |   1 +
->>>>>  target/arm/cpu.c         | 146 -----------------------------
->>>>>  target/arm/v7m.c         | 193 +++++++++++++++++++++++++++++++++++++++
->>>>>  3 files changed, 194 insertions(+), 146 deletions(-)
->>>>>  create mode 100644 target/arm/v7m.c
->>> [...]
->>>>> diff --git a/target/arm/v7m.c b/target/arm/v7m.c
->>>>> new file mode 100644
->>>>> index 0000000000..505043febe
->>>>> --- /dev/null
->>>>> +++ b/target/arm/v7m.c
->>>>> @@ -0,0 +1,193 @@
->>>>> +/*
->>>>> + * ARM v7m helpers.
->>>>> + *
->>>>> + * This code is licensed under the GNU GPL v2 or later.
->>>>> + *
->>>>> + * SPDX-License-Identifier: GPL-2.0-or-later
->>>>> + */
->>>>> +
->>>>> +#include "qemu/osdep.h"
->>>>> +#include "qemu/qemu-print.h"
->>>>> +#include "qemu-common.h"
->>>>> +#include "target/arm/idau.h"
->>>>> +#include "qemu/module.h"
->>>>> +#include "qapi/error.h"
->>>>> +#include "qapi/visitor.h"
->>>>> +#include "cpu.h"
->>>>> +#include "internals.h"
->>>>> +#include "exec/exec-all.h"
->>>>> +#include "hw/qdev-properties.h"
->>>>> +#if !defined(CONFIG_USER_ONLY)
->>>>> +#include "hw/loader.h"
->>>>> +#include "hw/boards.h"
->>>>> +#endif
->>>>> +#include "sysemu/sysemu.h"
->>>>> +#include "sysemu/tcg.h"
->>>>> +#include "sysemu/hw_accel.h"
->>>>> +#include "disas/capstone.h"
->>>>> +#include "fpu/softfloat.h"
->>>>
->>>> I guess some of those headers are not needed.
->>>
->>> Yeah, I just copy-n-pasted from the source file ... I'll check what can
->>> be omitted (if this patch series has a chance at all...)
->>>
->>>>> +
->>>>> +#if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
->>>>> +
->>>>> +static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
->>>>> +{
->>>>> +    CPUClass *cc = CPU_GET_CLASS(cs);
->>>>> +    ARMCPU *cpu = ARM_CPU(cs);
->>>>> +    CPUARMState *env = &cpu->env;
->>>>> +    bool ret = false;
->>>>> +
->>>>> +    /*
->>>>> +     * ARMv7-M interrupt masking works differently than -A or -R.
->>>>> +     * There is no FIQ/IRQ distinction. Instead of I and F bits
->>>>> +     * masking FIQ and IRQ interrupts, an exception is taken only
->>>>> +     * if it is higher priority than the current execution priority
->>>>> +     * (which depends on state like BASEPRI, FAULTMASK and the
->>>>> +     * currently active exception).
->>>>> +     */
->>>>> +    if (interrupt_request & CPU_INTERRUPT_HARD
->>>>> +        && (armv7m_nvic_can_take_pending_exception(env->nvic))) {
->>>>
->>>> so what is the status wrt m_helper.c which stays unconditionally
->>>> compiled. m_helper functions seem to called from target/arm/translate.c
->>>> mostly. Have you abandoned the stub idea. It may be confusing to have 2
->>>> different helper files. At least a comment explaining where a new helper
->>>> shall go may be useful.
->>>
->>> All the HELPER() functions should definitely stay in m_helper.c. They
->>> are required for linking. Or do you prefer a stub file instead? Then we
->>> could maybe make the whole m_helper.c conditional in the Makefile.objs
->>> instead.
->>
->> I was simply referring to your previous approach:
->>
->> Applying [Qemu-devel] [RFC PATCH 3/3] target/arm: Make m_helper.c
->> optional via CONFIG_ARM_V7M seems to fix the issue
->> https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg00333.html
->>
->> It seems to work fine as it removes the call to armv7m_nvic.c functions
->> so no need to move the interrupt controller code?
-> 
-> Yes, but then we either need stubs in a separate file, or have to put
-> lots of #ifdefs into translate.c ... none of those solutions seem to be
-> really perfect :-(
-Yep, the separate stub file looked cleaner to me.
+  Merge remote-tracking branch 'remotes/davidhildenbrand/tags/s390x-tcg-2019-09-23' into staging (2019-09-23 15:44:52 +0100)
 
-> Anyway, Philippe is currently respinning his series (I think), so I'll
-> postpone my work now to avoid to interfere with him.
-OK
+are available in the Git repository at:
 
-Thanks
+  https://xenbits.xen.org/git-http/people/aperard/qemu-dm.git tags/pull-xen-20190924
 
-Eric
-> 
->  Thomas
-> 
+for you to fetch changes up to 6bd6b955c0b2666263700d39db153ab43c5e0c9e:
+
+  xen-bus: only set the xen device frontend state if it is missing (2019-09-24 12:21:29 +0100)
+
+----------------------------------------------------------------
+Xen queue
+
+* Update of maintainer email address
+* Fixes for xen-bus and xen-block
+
+----------------------------------------------------------------
+Mark Syms (1):
+      xen-bus: only set the xen device frontend state if it is missing
+
+Paul Durrant (6):
+      xen-bus: check whether the frontend is active during device reset...
+      xen / notify: introduce a new XenWatchList abstraction
+      xen: introduce separate XenWatchList for XenDevice objects
+      xen: perform XenDevice clean-up in XenBus watch handler
+      MAINTAINERS: update my email address
+      xen-block: treat XenbusStateUnknown the same as XenbusStateClosed
+
+ MAINTAINERS              |   2 +-
+ hw/block/xen-block.c     |   1 +
+ hw/xen/trace-events      |   9 +-
+ hw/xen/xen-bus.c         | 316 ++++++++++++++++++++++++++++++++++-------------
+ include/hw/xen/xen-bus.h |   8 +-
+ include/qemu/notify.h    |   2 +
+ util/notify.c            |   5 +
+ 7 files changed, 249 insertions(+), 94 deletions(-)
 
