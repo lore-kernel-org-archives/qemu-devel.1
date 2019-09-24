@@ -2,52 +2,66 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11892C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:31:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29FA6C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:32:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6B602146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:31:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6B602146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id F23042146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:31:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F23042146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCrSx-0007Hz-Iv
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:31:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44131)
+	id 1iCrTa-0007kQ-Dv
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:31:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49520)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iCr8Z-0000zm-AN
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:17 -0400
+ (envelope-from <armbru@redhat.com>) id 1iCrH1-0002iS-Lp
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:19:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iCr8W-000397-G1
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:14 -0400
-Received: from relay.sw.ru ([185.231.240.75]:38136)
+ (envelope-from <armbru@redhat.com>) id 1iCrH0-0007es-Pj
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:18:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49354)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iCr8W-0002u5-8q; Tue, 24 Sep 2019 16:10:12 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iCr8A-0001Mk-JZ; Tue, 24 Sep 2019 23:09:50 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 18/25] block: Fix error_append_hint usage
-Date: Tue, 24 Sep 2019 23:08:55 +0300
-Message-Id: <20190924200902.4703-19-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190924200902.4703-1-vsementsov@virtuozzo.com>
-References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCrH0-0007ei-Kk
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:18:58 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E74C630820C9;
+ Tue, 24 Sep 2019 20:18:57 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D5C319C58;
+ Tue, 24 Sep 2019 20:18:55 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id E51C7113864E; Tue, 24 Sep 2019 22:18:53 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH 03/25] qapi: New QAPISourceInfo, replacing dict
+References: <20190924132830.15835-1-armbru@redhat.com>
+ <20190924132830.15835-4-armbru@redhat.com>
+ <4ff086cb-7c96-a25a-be19-d78af40afd9b@redhat.com>
+Date: Tue, 24 Sep 2019 22:18:53 +0200
+In-Reply-To: <4ff086cb-7c96-a25a-be19-d78af40afd9b@redhat.com> (Eric Blake's
+ message of "Tue, 24 Sep 2019 09:51:40 -0500")
+Message-ID: <87ftkla1n6.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Tue, 24 Sep 2019 20:18:57 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,168 +73,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- vsementsov@virtuozzo.com, qemu-block@nongnu.org,
- Jeff Cody <codyprime@gmail.com>, Greg Kurz <groug@kaod.org>,
- Max Reitz <mreitz@redhat.com>, integration@gluster.org,
- John Snow <jsnow@redhat.com>
+Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want append hint to errp, we must use ERRP_FUNCTION_BEGIN macro.
-Otherwise hint will not be appended in case of errp == &fatal_err
-(program will exit before error_append_hint() call). Fix such cases.
+Eric Blake <eblake@redhat.com> writes:
 
-This commit (together with its neighbors) was generated by
+> On 9/24/19 8:28 AM, Markus Armbruster wrote:
+>> We track source locations with a dict of the form
+>> 
+>>     {'file': FNAME, 'line': LINENO, parent': PARENT}
+>
+> Missing ' on parent
+>
+>> 
+>> where PARENT is None for the main file, and the include directive's
+>> source location for included files.
+>> 
+>> This is servicable enough, but the next commit will add information,
+>
+> serviceable
 
-git grep -l 'error_append_hint(errp' | while read f; do \
-spatch --sp-file scripts/coccinelle/fix-error_append_hint-usage.cocci \
---in-place $f; done
+Will fix both.
 
-and then
+>> and that's going to come out cleaner if we turn this into a class.  So
+>> do that.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  scripts/qapi/common.py | 69 +++++++++++++++++++++++++-----------------
+>>  1 file changed, 41 insertions(+), 28 deletions(-)
+>> 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
-
-(auto-msg was a file with this commit message)
-
-Still, for backporting it may be more comfortable to use only the first
-command and then do one huge commit.
-
-Reported-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/backup.c       | 1 +
- block/dirty-bitmap.c | 1 +
- block/file-posix.c   | 3 +++
- block/gluster.c      | 2 ++
- block/qcow.c         | 1 +
- block/qcow2.c        | 1 +
- block/vhdx-log.c     | 1 +
- block/vpc.c          | 1 +
- 8 files changed, 11 insertions(+)
-
-diff --git a/block/backup.c b/block/backup.c
-index 763f0d7ff6..8cb0201833 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -583,6 +583,7 @@ static const BlockJobDriver backup_job_driver = {
- static int64_t backup_calculate_cluster_size(BlockDriverState *target,
-                                              Error **errp)
- {
-+    ERRP_FUNCTION_BEGIN();
-     int ret;
-     BlockDriverInfo bdi;
- 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 134e0c9a0c..eba47490ea 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -237,6 +237,7 @@ static bool bdrv_dirty_bitmap_recording(BdrvDirtyBitmap *bitmap)
- int bdrv_dirty_bitmap_check(const BdrvDirtyBitmap *bitmap, uint32_t flags,
-                             Error **errp)
- {
-+    ERRP_FUNCTION_BEGIN();
-     if ((flags & BDRV_BITMAP_BUSY) && bdrv_dirty_bitmap_busy(bitmap)) {
-         error_setg(errp, "Bitmap '%s' is currently in use by another"
-                    " operation and cannot be used", bitmap->name);
-diff --git a/block/file-posix.c b/block/file-posix.c
-index f12c06de2d..46818fe4fc 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -320,6 +320,7 @@ static bool raw_is_io_aligned(int fd, void *buf, size_t len)
- 
- static void raw_probe_alignment(BlockDriverState *bs, int fd, Error **errp)
- {
-+    ERRP_FUNCTION_BEGIN();
-     BDRVRawState *s = bs->opaque;
-     char *buf;
-     size_t max_align = MAX(MAX_BLOCKSIZE, getpagesize());
-@@ -817,6 +818,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
-                                 uint64_t new_perm, uint64_t new_shared,
-                                 Error **errp)
- {
-+    ERRP_FUNCTION_BEGIN();
-     BDRVRawState *s = bs->opaque;
-     int ret = 0;
-     Error *local_err = NULL;
-@@ -2232,6 +2234,7 @@ static int64_t raw_get_allocated_file_size(BlockDriverState *bs)
- static int coroutine_fn
- raw_co_create(BlockdevCreateOptions *options, Error **errp)
- {
-+    ERRP_FUNCTION_BEGIN();
-     BlockdevCreateOptionsFile *file_opts;
-     Error *local_err = NULL;
-     int fd;
-diff --git a/block/gluster.c b/block/gluster.c
-index 64028b2cba..7023807326 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -419,6 +419,7 @@ out:
- static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
-                                            Error **errp)
- {
-+    ERRP_FUNCTION_BEGIN();
-     struct glfs *glfs;
-     int ret;
-     int old_errno;
-@@ -694,6 +695,7 @@ static int qemu_gluster_parse(BlockdevOptionsGluster *gconf,
-                               const char *filename,
-                               QDict *options, Error **errp)
- {
-+    ERRP_FUNCTION_BEGIN();
-     int ret;
-     if (filename) {
-         ret = qemu_gluster_parse_uri(gconf, filename);
-diff --git a/block/qcow.c b/block/qcow.c
-index 5bdf72ba33..33a004350b 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -117,6 +117,7 @@ static QemuOptsList qcow_runtime_opts = {
- static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
-                      Error **errp)
- {
-+    ERRP_FUNCTION_BEGIN();
-     BDRVQcowState *s = bs->opaque;
-     unsigned int len, i, shift;
-     int ret;
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 4d16393e61..d9aac1186d 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1207,6 +1207,7 @@ static int qcow2_update_options(BlockDriverState *bs, QDict *options,
- static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-                                       int flags, Error **errp)
- {
-+    ERRP_FUNCTION_BEGIN();
-     BDRVQcow2State *s = bs->opaque;
-     unsigned int len, i;
-     int ret = 0;
-diff --git a/block/vhdx-log.c b/block/vhdx-log.c
-index fdd3a7adc3..24e5efb46c 100644
---- a/block/vhdx-log.c
-+++ b/block/vhdx-log.c
-@@ -748,6 +748,7 @@ exit:
- int vhdx_parse_log(BlockDriverState *bs, BDRVVHDXState *s, bool *flushed,
-                    Error **errp)
- {
-+    ERRP_FUNCTION_BEGIN();
-     int ret = 0;
-     VHDXHeader *hdr;
-     VHDXLogSequence logs = { 0 };
-diff --git a/block/vpc.c b/block/vpc.c
-index 5cd3890780..b12a2d964a 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -971,6 +971,7 @@ static int calculate_rounded_image_size(BlockdevCreateOptionsVpc *vpc_opts,
- static int coroutine_fn vpc_co_create(BlockdevCreateOptions *opts,
-                                       Error **errp)
- {
-+    ERRP_FUNCTION_BEGIN();
-     BlockdevCreateOptionsVpc *vpc_opts;
-     BlockBackend *blk = NULL;
-     BlockDriverState *bs = NULL;
--- 
-2.21.0
-
+Thanks!
 
