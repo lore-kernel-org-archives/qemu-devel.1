@@ -2,62 +2,81 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0887FC432C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:37:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D26D4C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:38:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBF232053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:37:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBF232053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9CED02053B
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:38:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j4yagwqX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CED02053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iClwN-0005Y7-9P
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 10:37:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58733)
+	id 1iClxF-0006RT-2J
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 10:38:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38254)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCkrz-0000CU-0l
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:50 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iCla9-0001Ka-6V
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:14:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCkru-0001Rs-22
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39966)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCkrt-0001Qx-Ht
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:37 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 911AD30860D5;
- Tue, 24 Sep 2019 13:28:36 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3575A60BFB;
- Tue, 24 Sep 2019 13:28:36 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 791CB11385A7; Tue, 24 Sep 2019 15:28:30 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 09/25] qapi: Improve reporting of invalid name errors
-Date: Tue, 24 Sep 2019 15:28:14 +0200
-Message-Id: <20190924132830.15835-10-armbru@redhat.com>
-In-Reply-To: <20190924132830.15835-1-armbru@redhat.com>
-References: <20190924132830.15835-1-armbru@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iCla7-00006p-SX
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:14:20 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:42276)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iCla7-00006F-LV
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:14:19 -0400
+Received: by mail-oi1-x244.google.com with SMTP id i185so1748321oif.9
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 07:14:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Mhd/FJiamKV8bgwxvhSM1XmfViMLPDMRpLbPk1h8UFQ=;
+ b=j4yagwqXqS6lcOkOx5LSGKWlLY7JFtE0BSiUDKdT/0FUEo1UqAlkUOmbTGRRCzlYQd
+ 0tH7T1+Gffnwm7zqlAzsr8aoQsWIMlsiFYsW1Ii58h7uXiPoElHc8mwCXHRugHNH4eim
+ fI38tAv+rKuucYWaAa1KAfpC80eYWTfqeF2a6kOcA4zNzKhAWp7b9ULGsPrDeEdPMAd5
+ dVToJBdinNNvbzgJkJOM+NNBgeN5Aw6o+4mNwuvXHZjbmiFDC4ifq2As5wVh0MHO8rRW
+ BEtnDgNNrNoOozizNFmaIQBn1OZngb016lQmCXLeudMN6LAdO4KTi2/Hi/juPoAoFAY4
+ z+wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Mhd/FJiamKV8bgwxvhSM1XmfViMLPDMRpLbPk1h8UFQ=;
+ b=dEOmwlRM1EBsj7WULPAob3dIO/FPdk2C7crygiY+Kjf8K0Dwv74T58Y6sYG10FSnau
+ u+BP3qr/GxXYdQsMEpUBBXFW9BWKyZSBPs/rQriqFS5VjLeTpwjP7+zjwtfb/f9ecJCo
+ iojkV1Axs0yOGslAON+8CYMq8e8fD8QZ2nM6CQMzvYnoKzrbI42mr+Y8GHB4+7DN7JHu
+ IN6ea8yy9ujIaNI5EAavmIGcS3TX9PwPJ8G4PY7X5crxYOZ6BmnhFWU4pJ8hQFkoxxem
+ kHYow3R6clWlqTdcc7BUJCzm//vXZptFO2DLf4KZG+oaEh3A+Kptp85k/gIPltCQmZ9n
+ QKXw==
+X-Gm-Message-State: APjAAAXt3HfcI5iBJ/HMEtssabjMdBFasEYR/BbaTqO6Op3QO+uqlEb4
+ WP5n6cH2Iky0Cg2ddGEsRCG38B8DnnhjvBzv/qftng==
+X-Google-Smtp-Source: APXvYqyCHKxkL301M500Wq7L6Lv/EDs9iq+Q0krCF/oLYOe5OqnzTO2xYvrOB+osqHBO3nNrhIrC40YpcSs8q8zYVvw=
+X-Received: by 2002:aca:50d8:: with SMTP id e207mr255616oib.48.1569334458739; 
+ Tue, 24 Sep 2019 07:14:18 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Tue, 24 Sep 2019 13:28:36 +0000 (UTC)
+References: <20190924141228.25009-1-philmd@redhat.com>
+In-Reply-To: <20190924141228.25009-1-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 24 Sep 2019 15:14:07 +0100
+Message-ID: <CAFEAcA9a-OdpzLgqeO+iRTr3PNYxGZ+ECX_GVOQD0NLNk8OynA@mail.gmail.com>
+Subject: Re: [PATCH] hw/timer/pl031: Add warning "do not use as model to
+ implement a RTC"
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,163 +88,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Split check_name() into check_name_is_str() and check_name_str(), keep
-check_name() as a wrapper.
+On Tue, 24 Sep 2019 at 15:12, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> Peter said we should "not use the pl031 as a good model of how
+> to do an RTC, it has some definite flaws."
+> Add this information to the PL031 header for other developers.
 
-Move add_name()'s call into its caller check_exprs(), and inline.
+Lots of our code is less than great. I'm not sure this
+specific case really justifies blazoning it in a comment header
+at the top of the file... (If you do want to put in a comment,
+being more specific about exactly what the problems are would
+be better.)
 
-This permits delaying check_name_str() there, so its error message
-gains an "in definition" line.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- scripts/qapi/common.py                   | 20 ++++++++++++++++----
- tests/qapi-schema/bad-ident.err          |  1 +
- tests/qapi-schema/command-int.err        |  1 +
- tests/qapi-schema/redefined-builtin.err  |  1 +
- tests/qapi-schema/redefined-command.err  |  1 +
- tests/qapi-schema/redefined-event.err    |  1 +
- tests/qapi-schema/redefined-type.err     |  1 +
- tests/qapi-schema/reserved-command-q.err |  1 +
- tests/qapi-schema/reserved-type-kind.err |  1 +
- tests/qapi-schema/reserved-type-list.err |  1 +
- 10 files changed, 25 insertions(+), 4 deletions(-)
-
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 25818b0ea0..fdc4379eff 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -707,11 +707,22 @@ valid_name =3D re.compile(r'^(__[a-zA-Z0-9.-]+_)?'
-=20
- def check_name(name, info, source,
-                allow_optional=3DFalse, enum_member=3DFalse, permit_upper=
-=3DFalse):
-+    check_name_is_str(name, info, source)
-+    check_name_str(name, info, source,
-+                   allow_optional, enum_member, permit_upper)
-+
-+
-+def check_name_is_str(name, info, source):
-+    if not isinstance(name, str):
-+        raise QAPISemError(info, "%s requires a string name" % source)
-+
-+
-+def check_name_str(name, info, source,
-+                   allow_optional=3DFalse, enum_member=3DFalse,
-+                   permit_upper=3DFalse):
-     global valid_name
-     membername =3D name
-=20
--    if not isinstance(name, str):
--        raise QAPISemError(info, "%s requires a string name" % source)
-     if name.startswith('*'):
-         membername =3D name[1:]
-         if not allow_optional:
-@@ -733,7 +744,6 @@ def check_name(name, info, source,
-=20
- def add_name(name, info, meta):
-     global all_names
--    check_name(name, info, "'%s'" % meta, permit_upper=3DTrue)
-     # FIXME should reject names that differ only in '_' vs. '.'
-     # vs. '-', because they're liable to clash in generated C.
-     if name in all_names:
-@@ -1148,8 +1158,10 @@ def check_exprs(exprs):
-             raise QAPISemError(info, "expression is missing metatype")
-         normalize_if(expr)
-         name =3D expr[meta]
--        add_name(name, info, meta)
-+        check_name_is_str(name, info, "'%s'" % meta)
-         info.set_defn(meta, name)
-+        check_name_str(name, info, "'%s'" % meta, permit_upper=3DTrue)
-+        add_name(name, info, meta)
-         if doc and doc.symbol !=3D name:
-             raise QAPISemError(
-                 info,
-diff --git a/tests/qapi-schema/bad-ident.err b/tests/qapi-schema/bad-iden=
-t.err
-index c4190602b5..6878889854 100644
---- a/tests/qapi-schema/bad-ident.err
-+++ b/tests/qapi-schema/bad-ident.err
-@@ -1 +1,2 @@
-+tests/qapi-schema/bad-ident.json: In struct '*oops':
- tests/qapi-schema/bad-ident.json:2: 'struct' does not allow optional nam=
-e '*oops'
-diff --git a/tests/qapi-schema/command-int.err b/tests/qapi-schema/comman=
-d-int.err
-index 0f9300679b..56b45bf656 100644
---- a/tests/qapi-schema/command-int.err
-+++ b/tests/qapi-schema/command-int.err
-@@ -1 +1,2 @@
-+tests/qapi-schema/command-int.json: In command 'int':
- tests/qapi-schema/command-int.json:2: built-in 'int' is already defined
-diff --git a/tests/qapi-schema/redefined-builtin.err b/tests/qapi-schema/=
-redefined-builtin.err
-index b2757225c4..67775fdb41 100644
---- a/tests/qapi-schema/redefined-builtin.err
-+++ b/tests/qapi-schema/redefined-builtin.err
-@@ -1 +1,2 @@
-+tests/qapi-schema/redefined-builtin.json: In struct 'size':
- tests/qapi-schema/redefined-builtin.json:2: built-in 'size' is already d=
-efined
-diff --git a/tests/qapi-schema/redefined-command.err b/tests/qapi-schema/=
-redefined-command.err
-index 82ae256e63..b77a05d354 100644
---- a/tests/qapi-schema/redefined-command.err
-+++ b/tests/qapi-schema/redefined-command.err
-@@ -1 +1,2 @@
-+tests/qapi-schema/redefined-command.json: In command 'foo':
- tests/qapi-schema/redefined-command.json:3: command 'foo' is already def=
-ined
-diff --git a/tests/qapi-schema/redefined-event.err b/tests/qapi-schema/re=
-defined-event.err
-index 35429cb481..fd02d38157 100644
---- a/tests/qapi-schema/redefined-event.err
-+++ b/tests/qapi-schema/redefined-event.err
-@@ -1 +1,2 @@
-+tests/qapi-schema/redefined-event.json: In event 'EVENT_A':
- tests/qapi-schema/redefined-event.json:3: event 'EVENT_A' is already def=
-ined
-diff --git a/tests/qapi-schema/redefined-type.err b/tests/qapi-schema/red=
-efined-type.err
-index 06ea78c478..89acc82c2d 100644
---- a/tests/qapi-schema/redefined-type.err
-+++ b/tests/qapi-schema/redefined-type.err
-@@ -1 +1,2 @@
-+tests/qapi-schema/redefined-type.json: In enum 'foo':
- tests/qapi-schema/redefined-type.json:3: struct 'foo' is already defined
-diff --git a/tests/qapi-schema/reserved-command-q.err b/tests/qapi-schema=
-/reserved-command-q.err
-index f939e044eb..0844e14b26 100644
---- a/tests/qapi-schema/reserved-command-q.err
-+++ b/tests/qapi-schema/reserved-command-q.err
-@@ -1 +1,2 @@
-+tests/qapi-schema/reserved-command-q.json: In command 'q-unix':
- tests/qapi-schema/reserved-command-q.json:5: 'command' uses invalid name=
- 'q-unix'
-diff --git a/tests/qapi-schema/reserved-type-kind.err b/tests/qapi-schema=
-/reserved-type-kind.err
-index 0a38efaad8..8d21479000 100644
---- a/tests/qapi-schema/reserved-type-kind.err
-+++ b/tests/qapi-schema/reserved-type-kind.err
-@@ -1 +1,2 @@
-+tests/qapi-schema/reserved-type-kind.json: In enum 'UnionKind':
- tests/qapi-schema/reserved-type-kind.json:2: enum 'UnionKind' should not=
- end in 'Kind'
-diff --git a/tests/qapi-schema/reserved-type-list.err b/tests/qapi-schema=
-/reserved-type-list.err
-index 4510fa6d90..2bdd7d8a06 100644
---- a/tests/qapi-schema/reserved-type-list.err
-+++ b/tests/qapi-schema/reserved-type-list.err
-@@ -1 +1,2 @@
-+tests/qapi-schema/reserved-type-list.json: In struct 'FooList':
- tests/qapi-schema/reserved-type-list.json:5: struct 'FooList' should not=
- end in 'List'
---=20
-2.21.0
-
+thanks
+-- PMM
 
