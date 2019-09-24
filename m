@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D12EC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:27:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD35C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:28:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E8B420872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:27:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E8B420872
+	by mail.kernel.org (Postfix) with ESMTPS id 467CD20872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:28:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 467CD20872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCrOm-0003UF-WD
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:27:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44077)
+	id 1iCrQ7-0004gA-5H
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:28:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43963)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iCr8P-0000uB-AW
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:06 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCr8L-0000ox-OC
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iCr8N-000321-RQ
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:05 -0400
-Received: from relay.sw.ru ([185.231.240.75]:38168)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCr8K-0002zJ-Aj
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:01 -0400
+Received: from relay.sw.ru ([185.231.240.75]:38076)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iCr8N-0002ud-D0
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:03 -0400
+ id 1iCr8K-0002s8-3K
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:00 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iCr8B-0001Mk-Ry; Tue, 24 Sep 2019 23:09:51 +0300
+ id 1iCr88-0001Mk-Hi; Tue, 24 Sep 2019 23:09:48 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 22/25] Migration: Fix error_append_hint usage
-Date: Tue, 24 Sep 2019 23:08:59 +0300
-Message-Id: <20190924200902.4703-23-vsementsov@virtuozzo.com>
+Subject: [PATCH v3 11/25] SmartFusion2: Fix error_append_hint usage
+Date: Tue, 24 Sep 2019 23:08:48 +0300
+Message-Id: <20190924200902.4703-12-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190924200902.4703-1-vsementsov@virtuozzo.com>
 References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
@@ -60,9 +60,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, Greg Kurz <groug@kaod.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, vsementsov@virtuozzo.com,
+ Greg Kurz <groug@kaod.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -89,21 +88,21 @@ command and then do one huge commit.
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- migration/migration.c | 1 +
+ hw/misc/msf2-sysreg.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 01863a95f5..031b85e670 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -971,6 +971,7 @@ static bool migrate_caps_check(bool *cap_list,
-                                MigrationCapabilityStatusList *params,
-                                Error **errp)
+diff --git a/hw/misc/msf2-sysreg.c b/hw/misc/msf2-sysreg.c
+index ddc5a30c80..a2f5310fe0 100644
+--- a/hw/misc/msf2-sysreg.c
++++ b/hw/misc/msf2-sysreg.c
+@@ -127,6 +127,7 @@ static Property msf2_sysreg_properties[] = {
+ 
+ static void msf2_sysreg_realize(DeviceState *dev, Error **errp)
  {
 +    ERRP_FUNCTION_BEGIN();
-     MigrationCapabilityStatusList *cap;
-     bool old_postcopy_cap;
-     MigrationIncomingState *mis = migration_incoming_get_current();
+     MSF2SysregState *s = MSF2_SYSREG(dev);
+ 
+     if ((s->apb0div > 32 || !is_power_of_2(s->apb0div))
 -- 
 2.21.0
 
