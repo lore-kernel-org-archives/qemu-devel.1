@@ -2,59 +2,121 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D921C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:29:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0967C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:32:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5221420872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:29:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5221420872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5A25120872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:32:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="qSUocq1f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A25120872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCnhI-0001Dw-Vz
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:29:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48439)
+	id 1iCnjc-0002fZ-JX
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:32:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52597)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoheyi@huawei.com>) id 1iCmfH-0001Tw-1c
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:23:46 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCn1p-0007XP-6f
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:47:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1iCmfB-0006nU-Mm
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:23:42 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2240 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
- id 1iCmez-0006ft-T2; Tue, 24 Sep 2019 11:23:26 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 62FD0D73C3932A7CBA5E;
- Tue, 24 Sep 2019 23:23:22 +0800 (CST)
-Received: from linux-Bxxcye.huawei.com (10.175.104.222) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.439.0; Tue, 24 Sep 2019 23:23:15 +0800
-From: Heyi Guo <guoheyi@huawei.com>
-To: <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>,
- <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>
-Subject: [RFC PATCH 03/12] arm/sdei: add support to handle SDEI requests from
- guest
-Date: Tue, 24 Sep 2019 23:21:42 +0800
-Message-ID: <1569338511-3572-4-git-send-email-guoheyi@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1569338511-3572-1-git-send-email-guoheyi@huawei.com>
-References: <1569338511-3572-1-git-send-email-guoheyi@huawei.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCn1m-0002h0-2B
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:47:00 -0400
+Received: from mail-eopbgr50105.outbound.protection.outlook.com
+ ([40.107.5.105]:9460 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iCn1L-0002Uy-Gq; Tue, 24 Sep 2019 11:46:31 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=blHgSySHwAX4kEX7kvUANwg31VINdefegNExgcjlOpxetC4WipWqO7hyup4yHWzrOJ6MQ5K5QYb5x09CANJNGd/6wtbeuxtquxVapYBWR7RimSOkygzGIHr4JtNbMIdYNt13S1XWJc44+Djx6ajjrGGIlhcIMX3ubWJ8dP812M5iTm0Qh85UhCRkhIBS8gQJTuOChPZJxIiNB0oj6WD1w2ZE+hSW8Mf1n+nnkFIVTaziWWYU+mztBC05WlA6y9bF3nHM4FbTa2DmDpfT/rWbuKvzN1HCPS+QbsESXdjKRkHAaAbKmP0dJNJ/C4Y/QecPRe+ZciXDzT6vAzMsDnT2lQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QQ9GUuh2TyVUJeJNFFC6pXqFoWbr+xXWfE+1U4lNj1E=;
+ b=ZJg2lMaxkuvuUVb/s0pRgTv0y+98u1Ku36UWgzXT7vSYCDhKu2ospHFwkpzHsKlr9QCG/K4nRybGG+xkmwH71VVoNVnjylebQRWKA1w25d0zG2TshqWyrQD1ObJ2932+9O8ClBYFoY/fWcj5CrbBTtEGSRuV9LgSFw0S1PtzH2pwUveIs1+Qkhvi1iNIWwS9a4beDZK22ry//9w3+iIma4BdygC9cWoWDBvOCnpQOxSR6lVl2jvlGwIL8W6n6kTVN2iWg+zePe1ghvhVfZH1VWSYtERwiXLCwHtg7qoM5YAMp0iOks9Z5QybZOk4XD3L9ZLlfwt/497kmBLGc7wjKQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QQ9GUuh2TyVUJeJNFFC6pXqFoWbr+xXWfE+1U4lNj1E=;
+ b=qSUocq1f1bTVIO/lTuf1+v9oIr2+EaQYeD6KIp6Qj0GbvB3VT95Zh2Y9I5esUfY1iojLGgGQo9LN0yxqqbC2oTusOnAbNMMzOeU6IJ/u0i26zFaQRoK6kMbNKla0eq31G5+HoP8DDnSApvfK5NY8oZP3cv9F9UIPgFeQscmDLRs=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB4203.eurprd08.prod.outlook.com (20.179.11.18) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2284.26; Tue, 24 Sep 2019 15:46:28 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2284.023; Tue, 24 Sep 2019
+ 15:46:28 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: Re: [RFC v2 0/9] error: auto propagated local_err
+Thread-Topic: [RFC v2 0/9] error: auto propagated local_err
+Thread-Index: AQHVcioNiDMY2yo+Z0yF9jZaFGvJZ6c5qyCAgAFm+wD//+MaAIAANo8A///OUYA=
+Date: Tue, 24 Sep 2019 15:46:27 +0000
+Message-ID: <824bb514-fc6f-7adc-4f4f-97dd758fb04d@virtuozzo.com>
+References: <20190923161231.22028-1-vsementsov@virtuozzo.com>
+ <d1527fdc-b5e8-093a-9206-6f7ceeece2ac@redhat.com>
+ <84c9e5dd-3e0f-94e1-5da1-2c7baa594bf1@virtuozzo.com>
+ <22191b09-822a-1f54-dcaa-3726c833805b@redhat.com>
+ <97b77e48-b370-a596-0a06-9ceaaf6bc72e@virtuozzo.com>
+In-Reply-To: <97b77e48-b370-a596-0a06-9ceaaf6bc72e@virtuozzo.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR09CA0068.eurprd09.prod.outlook.com
+ (2603:10a6:7:3d::12) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190924184618996
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 7d19856f-cec3-4ada-9621-08d741065c78
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DB8PR08MB4203; 
+x-ms-traffictypediagnostic: DB8PR08MB4203:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DB8PR08MB4203188355D83BE29E2323A2C1840@DB8PR08MB4203.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-forefront-prvs: 0170DAF08C
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(39850400004)(366004)(396003)(136003)(346002)(189003)(199004)(31696002)(7736002)(14454004)(6486002)(6506007)(386003)(7336002)(256004)(305945005)(31686004)(53546011)(7276002)(7416002)(81166006)(316002)(86362001)(54906003)(6116002)(2906002)(5660300002)(76176011)(99286004)(478600001)(25786009)(110136005)(2501003)(6246003)(229853002)(7366002)(7406005)(8936002)(6436002)(8676002)(102836004)(81156014)(52116002)(45426003)(66476007)(66556008)(66446008)(476003)(446003)(3846002)(66066001)(36756003)(6512007)(2616005)(64756008)(11346002)(186003)(71190400001)(4326008)(26005)(66946007)(71200400001)(486006);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4203;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: gkEd5VhN042Em+SNYYlMnaPUieq+wCSwxbLM9SiCgx6+GMD+x27RLHQUEYUN7Zd5NaFp53Xu2WoWc75vEGdkvQN1yn5tSEfvLqgjoetCk5nhDbw6c98C6pr492/leEAU040q1D8JLJfxmvOt6b1NC5BtBi+jCFUj9bFlIzLmSuaTQwXsYE3O2jAEm5ZvAoC8boIo0VYC36kp19cSDGY/vh3JmqKMrelGLJPI5xCK/Orc4tB2jT/brbsgo2YzrhlQQdyZy4HNMH6P71peSvUaAyPv+gML7QKhWnm3BiOA+C3vNKXDB0Ri+OG2NZ0sumbPUXhg8AtvZA4GHerqKlDuU+crgvPHcp+7EY/tiQDucRHifEIPf3Q9HtUuU7XQQ1kowXEot+7ShTfViAPiCkOfjk8CK0mCfgsCwOFEdUvJJnA=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <1762D7B37FC658489165B19AF619C313@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.104.222]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.191
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7d19856f-cec3-4ada-9621-08d741065c78
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Sep 2019 15:46:27.8754 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 4lS8HcPb5rxJzLV+DCKkAzTLNzC9I4z3QtkCg41ypqZdbJF9EQ7SmFaYx+O+xOo8M20olfgWl2G4gOGEdWsj69A8V1VjQVBybC0bGwqoNy0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4203
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.5.105
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,1022 +128,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark
- Rutland <mark.rutland@arm.com>, Peter Maydell <peter.maydell@linaro.org>,
- James Morse <james.morse@arm.com>, Marc Zyngier <marc.zyngier@arm.com>,
- Jingyi Wang <wangjingyi11@huawei.com>, Heyi Guo <guoheyi@huawei.com>,
- wanghaibin.wang@huawei.com, Dave Martin <Dave.Martin@arm.com>
+Cc: "stefanha@redhat.com" <stefanha@redhat.com>,
+ "codyprime@gmail.com" <codyprime@gmail.com>,
+ "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>,
+ "berto@igalia.com" <berto@igalia.com>,
+ "zhang.zhanghailiang@huawei.com" <zhang.zhanghailiang@huawei.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "arikalo@wavecomp.com" <arikalo@wavecomp.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+ "hpoussin@reactos.org" <hpoussin@reactos.org>,
+ "anthony.perard@citrix.com" <anthony.perard@citrix.com>,
+ "samuel.thibault@ens-lyon.org" <samuel.thibault@ens-lyon.org>,
+ "philmd@redhat.com" <philmd@redhat.com>,
+ "green@moxielogic.com" <green@moxielogic.com>,
+ "lvivier@redhat.com" <lvivier@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>,
+ "pl@kamp.de" <pl@kamp.de>, "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "b.galvani@gmail.com" <b.galvani@gmail.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "ronniesahlberg@gmail.com" <ronniesahlberg@gmail.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>,
+ "kwolf@redhat.com" <kwolf@redhat.com>, "andrew@aj.id.au" <andrew@aj.id.au>,
+ "crwulff@gmail.com" <crwulff@gmail.com>,
+ "sundeep.lkml@gmail.com" <sundeep.lkml@gmail.com>,
+ "michael@walle.cc" <michael@walle.cc>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ "kbastian@mail.uni-paderborn.de" <kbastian@mail.uni-paderborn.de>,
+ "imammedo@redhat.com" <imammedo@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
+ "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "sheepdog@lists.wpkg.org" <sheepdog@lists.wpkg.org>,
+ "david@redhat.com" <david@redhat.com>, "palmer@sifive.com" <palmer@sifive.com>,
+ "thuth@redhat.com" <thuth@redhat.com>,
+ "jcmvbkbc@gmail.com" <jcmvbkbc@gmail.com>, "hare@suse.com" <hare@suse.com>,
+ "sstabellini@kernel.org" <sstabellini@kernel.org>,
+ "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
+ "namei.unix@gmail.com" <namei.unix@gmail.com>,
+ "atar4qemu@gmail.com" <atar4qemu@gmail.com>,
+ "farman@linux.ibm.com" <farman@linux.ibm.com>,
+ "amit@kernel.org" <amit@kernel.org>, "sw@weilnetz.de" <sw@weilnetz.de>,
+ "groug@kaod.org" <groug@kaod.org>,
+ "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "peter.chubb@nicta.com.au" <peter.chubb@nicta.com.au>,
+ "clg@kaod.org" <clg@kaod.org>, "shorne@gmail.com" <shorne@gmail.com>,
+ "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "amarkovic@wavecomp.com" <amarkovic@wavecomp.com>,
+ "aurelien@aurel32.net" <aurelien@aurel32.net>,
+ "pburton@wavecomp.com" <pburton@wavecomp.com>,
+ "sagark@eecs.berkeley.edu" <sagark@eecs.berkeley.edu>,
+ "jasowang@redhat.com" <jasowang@redhat.com>,
+ "kraxel@redhat.com" <kraxel@redhat.com>,
+ "edgar.iglesias@gmail.com" <edgar.iglesias@gmail.com>,
+ "gxt@mprc.pku.edu.cn" <gxt@mprc.pku.edu.cn>, "ari@tuxera.com" <ari@tuxera.com>,
+ "quintela@redhat.com" <quintela@redhat.com>,
+ "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
+ "lersek@redhat.com" <lersek@redhat.com>,
+ "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
+ "antonynpavlov@gmail.com" <antonynpavlov@gmail.com>,
+ "dillaman@redhat.com" <dillaman@redhat.com>, "joel@jms.id.au" <joel@jms.id.au>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+ "integration@gluster.org" <integration@gluster.org>,
+ "rjones@redhat.com" <rjones@redhat.com>,
+ "Andrew.Baumann@microsoft.com" <Andrew.Baumann@microsoft.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "walling@linux.ibm.com" <walling@linux.ibm.com>,
+ Denis Lunev <den@virtuozzo.com>, "mst@redhat.com" <mst@redhat.com>,
+ "mark.cave-ayland@ilande.co.uk" <mark.cave-ayland@ilande.co.uk>,
+ "v.maffione@gmail.com" <v.maffione@gmail.com>, "marex@denx.de" <marex@denx.de>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
+ "alistair@alistair23.me" <alistair@alistair23.me>,
+ "paul.durrant@citrix.com" <paul.durrant@citrix.com>,
+ "pavel.dovgaluk@ispras.ru" <pavel.dovgaluk@ispras.ru>,
+ "g.lettieri@iet.unipi.it" <g.lettieri@iet.unipi.it>,
+ "rizzo@iet.unipi.it" <rizzo@iet.unipi.it>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+ "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
+ "pmorel@linux.ibm.com" <pmorel@linux.ibm.com>,
+ "wencongyang2@huawei.com" <wencongyang2@huawei.com>,
+ "jcd@tribudubois.net" <jcd@tribudubois.net>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "stefanb@linux.ibm.com" <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add support for all interfaces defined in ARM SDEI 1.0 spec.
-
-http://infocenter.arm.com/help/topic/com.arm.doc.den0054a/ARM_DEN0054A_Software_Delegated_Exception_Interface.pdf
-
-The exit reason KVM_EXIT_HYPERCALL is used to indicate it is an
-HVC/SMC forward, and the structure kvm_run->hypercall is used to pass
-arguments and return values between KVM and qemu:
-Input:
-  nr: the immediate value of SMC/HVC calls; not really used today.
-  args[6]: x0..x5 (This is not fully conform with SMCCC which requires
-           x6 as argument as well, but we can use GET_ONE_REG ioctl
-           for such rare case).
-Return:
-  args[0..3]: x0..x3 as defined in SMCCC. We rely on KVM to extract
-              args[0..3] and write them to x0..x3 when hypercall exit
-              returns.
-
-Signed-off-by: Heyi Guo <guoheyi@huawei.com>
-Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Dave Martin <Dave.Martin@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: James Morse <james.morse@arm.com>
----
- target/arm/sdei.c | 911 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- target/arm/sdei.h |  34 ++
- 2 files changed, 945 insertions(+)
- create mode 100644 target/arm/sdei.h
-
-diff --git a/target/arm/sdei.c b/target/arm/sdei.c
-index 7f12d69..b40fa36 100644
---- a/target/arm/sdei.c
-+++ b/target/arm/sdei.c
-@@ -29,6 +29,7 @@
- #include "sysemu/sysemu.h"
- #include "sysemu/reset.h"
- #include "qemu/error-report.h"
-+#include "sdei.h"
- #include "sdei_int.h"
- #include "internals.h"
- #include "hw/boards.h"
-@@ -84,6 +85,12 @@ static void qemu_sde_cpu_init(QemuSDEState *s)
-     }
- }
- 
-+static inline QemuSDECpu *get_sde_cpu(QemuSDEState *s, CPUState *cs)
-+{
-+    assert(cs->cpu_index < s->sdei_max_cpus);
-+    return &s->sde_cpus[cs->cpu_index];
-+}
-+
- static bool is_valid_event_number(int32_t event)
- {
-     int32_t slot_id;
-@@ -122,6 +129,910 @@ static QemuSDEProp *get_sde_prop_no_lock(QemuSDEState *s, int32_t event)
-     return &s->sde_props_state[SDEI_EVENT_TO_SLOT(event)];
- }
- 
-+static QemuSDEProp *get_sde_prop(QemuSDEState *s, int32_t event)
-+{
-+    QemuSDEProp *sde_props = s->sde_props_state;
-+
-+    if (!is_valid_event_number(event)) {
-+        return NULL;
-+    }
-+
-+    event = SDEI_EVENT_TO_SLOT(event);
-+
-+    qemu_mutex_lock(&sde_props[event].lock);
-+    if (sde_props[event].event_id < 0) {
-+        qemu_mutex_unlock(&sde_props[event].lock);
-+        return NULL;
-+    }
-+    return &sde_props[event];
-+}
-+
-+static void put_sde_prop(QemuSDEProp *prop)
-+{
-+    qemu_mutex_unlock(&prop->lock);
-+}
-+
-+static void sde_slot_lock(QemuSDE *sde, CPUState *cs)
-+{
-+    qemu_mutex_lock(&sde->lock);
-+}
-+
-+static void sde_slot_unlock(QemuSDE *sde, CPUState *cs)
-+{
-+    qemu_mutex_unlock(&sde->lock);
-+}
-+
-+/*
-+ * It will always return a pointer to a preallocated sde; event number must be
-+ * validated before calling this function.
-+ */
-+static QemuSDE *get_sde_no_check(QemuSDEState *s, int32_t event, CPUState *cs)
-+{
-+    QemuSDE **array = s->sde_cpus[cs->cpu_index].private_sde_array;
-+    int32_t sde_index = SDEI_EVENT_TO_SLOT(event);
-+    QemuSDE *sde;
-+
-+    if (SDEI_IS_SHARED_EVENT(event)) {
-+        array = s->shared_sde_array;
-+        sde_index -= PRIVATE_SLOT_COUNT;
-+    }
-+
-+    sde = array[sde_index];
-+    sde_slot_lock(sde, cs);
-+    return sde;
-+}
-+
-+static void put_sde(QemuSDE *sde, CPUState *cs)
-+{
-+    sde_slot_unlock(sde, cs);
-+}
-+
-+static inline bool is_sde_nested(QemuSDECpu *sde_cpu)
-+{
-+    return sde_cpu->critical_running_event >= 0 &&
-+           sde_cpu->normal_running_event >= 0;
-+}
-+
-+static int32_t get_running_sde(QemuSDEState *s, CPUState *cs)
-+{
-+    QemuSDECpu *sde_cpu = get_sde_cpu(s, cs);
-+
-+    if (sde_cpu->critical_running_event >= 0) {
-+        return sde_cpu->critical_running_event;
-+    }
-+    return sde_cpu->normal_running_event;
-+}
-+
-+static void override_return_value(CPUState *cs, uint64_t *args)
-+{
-+    CPUARMState *env = &ARM_CPU(cs)->env;
-+    int i;
-+
-+    for (i = 0; i < 4; i++) {
-+        args[i] = env->xregs[i];
-+    }
-+}
-+
-+static void sde_save_cpu_ctx(CPUState *cs, QemuSDECpu *sde_cpu, bool critical)
-+{
-+    CPUARMState *env = &ARM_CPU(cs)->env;
-+    QemuSDECpuCtx *ctx = &sde_cpu->ctx[critical ? 1 : 0];
-+
-+    memcpy(ctx->xregs, env->xregs, sizeof(ctx->xregs));
-+    ctx->pc = env->pc;
-+    ctx->pstate = pstate_read(env);
-+}
-+
-+static void sde_restore_cpu_ctx(QemuSDEState *s, CPUState *cs, bool critical)
-+{
-+    CPUARMState *env = &ARM_CPU(cs)->env;
-+    QemuSDECpu *sde_cpu = get_sde_cpu(s, cs);
-+    QemuSDECpuCtx *ctx = &sde_cpu->ctx[critical ? 1 : 0];
-+
-+    /*
-+     * TODO: we need to optimize to only restore affected registers by calling
-+     * ioctl individialy
-+     */
-+    kvm_arch_get_registers(cs);
-+
-+    env->aarch64 = ((ctx->pstate & PSTATE_nRW) == 0);
-+    memcpy(env->xregs, ctx->xregs, sizeof(ctx->xregs));
-+    env->pc = ctx->pc;
-+    pstate_write(env, ctx->pstate);
-+    aarch64_restore_sp(env, (env->pstate >> 2) & 3);
-+}
-+
-+static void sde_restore_cpu_ctx_for_resume(QemuSDEState *s,
-+                                           CPUState *cs,
-+                                           bool critical,
-+                                           uint64_t resume_addr)
-+{
-+    CPUARMState *env = &ARM_CPU(cs)->env;
-+    QemuSDECpu *sde_cpu = get_sde_cpu(s, cs);
-+    QemuSDECpuCtx *ctx = &sde_cpu->ctx[critical ? 1 : 0];
-+
-+    /*
-+     * TODO: we need to optimize to only restore affected registers by calling
-+     * ioctl individialy
-+     */
-+    kvm_arch_get_registers(cs);
-+
-+    memcpy(env->xregs, ctx->xregs, sizeof(ctx->xregs));
-+    env->pc = resume_addr;
-+    env->aarch64 = 1;
-+    /* Constructe pstate in pstate_read() */
-+    env->daif = 0xF << 6;
-+    /* Clear nRW/M[4] and M[3:0] */
-+    env->pstate &= ~0x1F;
-+    /* Set exception mode to EL1h */
-+    env->pstate |= PSTATE_MODE_EL1h;
-+    env->elr_el[1] = ctx->pc;
-+    env->banked_spsr[KVM_SPSR_EL1 + 1] = ctx->pstate;
-+    aarch64_restore_sp(env, 1);
-+}
-+
-+static void sde_build_cpu_ctx(CPUState *cs, QemuSDECpu *sde_cpu, QemuSDE *sde)
-+{
-+    CPUARMState *env = &ARM_CPU(cs)->env;
-+
-+    env->xregs[0] = sde->prop->event_id;
-+    env->xregs[1] = sde->ep_argument;
-+    env->xregs[2] = env->pc;
-+    env->xregs[3] = pstate_read(env);
-+    env->pc = sde->ep_address;
-+    env->aarch64 = 1;
-+    /* Constructe pstate in pstate_read() */
-+    env->daif = 0xF << 6;
-+    /* Clear nRW/M[4] and M[3:0] */
-+    env->pstate &= ~0x1F;
-+    /* Set exception mode to EL1h */
-+    env->pstate |= PSTATE_MODE_EL1h;
-+    aarch64_restore_sp(env, 1);
-+}
-+
-+static void trigger_sde(CPUState *cs, run_on_cpu_data data)
-+{
-+    QemuSDEState *s = sde_state;
-+    QemuSDECpu *sde_cpu = get_sde_cpu(s, cs);
-+    int32_t event = data.host_int;
-+    QemuSDE *sde;
-+
-+    assert(cs == current_cpu);
-+
-+    if (sde_cpu->masked || sde_cpu->critical_running_event >= 0) {
-+        return;
-+    }
-+
-+    sde = get_sde_no_check(s, event, cs);
-+    if (sde->event_id == SDEI_INVALID_EVENT_ID) {
-+        /* Some race condition happens! */
-+        put_sde(sde, cs);
-+        return;
-+    }
-+
-+    if (sde_cpu->normal_running_event >= 0 && !sde->prop->is_critical) {
-+        put_sde(sde, cs);
-+        return;
-+    }
-+
-+    if (!sde->enabled || !sde->pending || sde->running) {
-+        /* Some race condition happens! */
-+        put_sde(sde, cs);
-+        return;
-+    }
-+
-+    sde->pending = false;
-+    sde->running = true;
-+
-+    if (sde->prop->is_critical) {
-+        sde_cpu->critical_running_event = sde->prop->event_id;
-+    } else {
-+        sde_cpu->normal_running_event = sde->prop->event_id;
-+    }
-+
-+    kvm_arch_get_registers(cs);
-+    sde_save_cpu_ctx(cs, sde_cpu, sde->prop->is_critical);
-+    sde_build_cpu_ctx(cs, sde_cpu, sde);
-+    kvm_arch_put_registers(cs, 1);
-+    put_sde(sde, cs);
-+}
-+
-+static int64_t dispatch_single(QemuSDEState *s, QemuSDE *sde, CPUState *cs)
-+{
-+    int32_t event = sde->prop->event_id;
-+    bool pending = sde->pending;
-+    bool enabled = sde->enabled;
-+    CPUState *target = sde->target_cpu;
-+    put_sde(sde, cs);
-+
-+    if (pending && enabled) {
-+        /*
-+         * TODO: we need to find a free-unmasked PE to trigger for shared
-+         * unpinned event
-+         */
-+        async_run_on_cpu(target, trigger_sde,
-+                         RUN_ON_CPU_HOST_INT(event));
-+    }
-+    return SDEI_SUCCESS;
-+}
-+
-+static void dispatch_cpu(QemuSDEState *s, CPUState *cs, bool is_critical)
-+{
-+    QemuSDE *sde;
-+    int i;
-+
-+    for (i = 0; i < PRIVATE_SLOT_COUNT + SHARED_SLOT_COUNT; i++) {
-+        sde = get_sde_no_check(s, i, cs);
-+        if (sde->event_id == SDEI_INVALID_EVENT_ID) {
-+            put_sde(sde, cs);
-+            continue;
-+        }
-+        if (sde->prop->is_critical != is_critical) {
-+            put_sde(sde, cs);
-+            continue;
-+        }
-+        if (!sde->enabled || !sde->pending || sde->running ||
-+            sde->target_cpu != cs) {
-+            put_sde(sde, cs);
-+            continue;
-+        }
-+
-+        dispatch_single(s, sde, cs);
-+    }
-+}
-+
-+static int32_t sdei_alloc_event_num(QemuSDEState *s, bool is_critical,
-+                                    bool is_shared, int intid)
-+{
-+    int index;
-+    int start = 0;
-+    int count = PRIVATE_SLOT_COUNT;
-+    int32_t event;
-+    QemuSDEProp *sde_props = s->sde_props_state;
-+
-+    if (is_shared) {
-+        start = PRIVATE_SLOT_COUNT;
-+        count = PRIVATE_SLOT_COUNT + SHARED_SLOT_COUNT;
-+    }
-+
-+    qemu_mutex_lock(&s->sdei_interrupt_bind_lock);
-+    for (index = start; index < count; index++) {
-+        qemu_mutex_lock(&sde_props[index].lock);
-+        if (sde_props[index].interrupt == intid) {
-+            event = sde_props[index].event_id;
-+            qemu_mutex_unlock(&sde_props[index].lock);
-+            qemu_mutex_unlock(&s->sdei_interrupt_bind_lock);
-+            return event;
-+        }
-+        qemu_mutex_unlock(&sde_props[index].lock);
-+    }
-+
-+    for (index = start; index < count; index++) {
-+        qemu_mutex_lock(&sde_props[index].lock);
-+        if (sde_props[index].event_id < 0) {
-+            event = sde_props[index].event_id = 0x40000000 | index;
-+            sde_props[index].interrupt = intid;
-+            sde_props[index].is_shared = is_shared;
-+            sde_props[index].is_critical = is_critical;
-+            s->irq_map[intid] = event;
-+            qemu_mutex_unlock(&sde_props[index].lock);
-+            qemu_mutex_unlock(&s->sdei_interrupt_bind_lock);
-+            return event;
-+        }
-+        qemu_mutex_unlock(&sde_props[index].lock);
-+    }
-+    qemu_mutex_unlock(&s->sdei_interrupt_bind_lock);
-+    return SDEI_OUT_OF_RESOURCE;
-+}
-+
-+static int32_t sdei_free_event_num_locked(QemuSDEState *s, QemuSDEProp *prop)
-+{
-+    int32_t ret = SDEI_SUCCESS;
-+    if (atomic_read(&prop->refcount) > 0) {
-+        ret = SDEI_DENIED;
-+        goto unlock_return;
-+    }
-+
-+    s->irq_map[prop->interrupt] = SDEI_INVALID_EVENT_ID;
-+    prop->event_id = SDEI_INVALID_EVENT_ID;
-+    prop->interrupt = SDEI_INVALID_INTERRUPT;
-+
-+unlock_return:
-+    qemu_mutex_unlock(&prop->lock);
-+    qemu_mutex_unlock(&s->sdei_interrupt_bind_lock);
-+    return ret;
-+}
-+
-+typedef int64_t (*sdei_single_function)(QemuSDEState *s,
-+                                        CPUState *cs,
-+                                        struct kvm_run *run);
-+
-+static int64_t sdei_version(QemuSDEState *s, CPUState *cs, struct kvm_run *run)
-+{
-+    return (1ULL << SDEI_VERSION_MAJOR_SHIFT) |
-+           (0ULL << SDEI_VERSION_MINOR_SHIFT);
-+}
-+
-+static int64_t unregister_single_sde(QemuSDEState *s, int32_t event,
-+                                     CPUState *cs, bool force)
-+{
-+    QemuSDE     *sde;
-+    QemuSDEProp *prop;
-+    int         ret = 0;
-+
-+    prop = get_sde_prop(s, event);
-+    if (!prop) {
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+
-+    sde = get_sde_no_check(s, event, cs);
-+    if (sde->event_id == SDEI_INVALID_EVENT_ID) {
-+        put_sde(sde, cs);
-+        put_sde_prop(prop);
-+        return SDEI_DENIED;
-+    }
-+
-+    if (sde->running && !force) {
-+        sde->unregister_pending = true;
-+        ret = SDEI_PENDING;
-+    } else {
-+        atomic_dec(&prop->refcount);
-+        sde->event_id = SDEI_INVALID_EVENT_ID;
-+        sde->enabled = false;
-+        sde->running = false;
-+        sde->pending = false;
-+        sde->unregister_pending = false;
-+    }
-+    put_sde(sde, cs);
-+    put_sde_prop(prop);
-+    return ret;
-+}
-+
-+static int64_t sdei_private_reset_common(QemuSDEState *s, CPUState *cs,
-+                                         bool force)
-+{
-+    int64_t ret = SDEI_SUCCESS;
-+    int i;
-+
-+    for (i = 0; i < PRIVATE_SLOT_COUNT; i++) {
-+        int64_t ret1;
-+        ret1 = unregister_single_sde(s, i, cs, force);
-+        /* Ignore other return values in reset interface */
-+        if (ret1 == SDEI_PENDING) {
-+            ret = SDEI_DENIED;
-+        }
-+    }
-+
-+    return ret;
-+}
-+
-+static int64_t sdei_shared_reset_common(QemuSDEState *s, CPUState *cs,
-+                                        bool force)
-+{
-+    int             i;
-+    QemuSDEProp     *prop;
-+    int32_t         start_event = PRIVATE_SLOT_COUNT;
-+    int64_t         ret = SDEI_SUCCESS;
-+
-+    for (i = start_event; i < PRIVATE_SLOT_COUNT + SHARED_SLOT_COUNT; i++) {
-+        int64_t ret1 = unregister_single_sde(s, i, cs, force);
-+        /* Ignore other return values in reset interface */
-+        if (ret1 == SDEI_PENDING) {
-+            ret = SDEI_DENIED;
-+        }
-+    }
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    for (i = 0; i < PRIVATE_SLOT_COUNT + SHARED_SLOT_COUNT; i++) {
-+        qemu_mutex_lock(&s->sdei_interrupt_bind_lock);
-+        prop = get_sde_prop(s, i);
-+        if (!prop || prop->interrupt == SDEI_INVALID_INTERRUPT) {
-+            if (prop) {
-+                put_sde_prop(prop);
-+            }
-+            qemu_mutex_unlock(&s->sdei_interrupt_bind_lock);
-+            continue;
-+        }
-+        ret |= sdei_free_event_num_locked(s, prop);
-+    }
-+
-+    return ret ? SDEI_DENIED : SDEI_SUCCESS;
-+}
-+
-+
-+static int64_t sdei_event_register(QemuSDEState *s, CPUState *cs,
-+                                   struct kvm_run *run)
-+{
-+    QemuSDE *sde;
-+    QemuSDEProp *prop;
-+    CPUState *target = cs;
-+    uint64_t *args = (uint64_t *)run->hypercall.args;
-+    int32_t event = args[1];
-+    uint64_t rm_mode = SDEI_EVENT_REGISTER_RM_PE;
-+
-+    prop = get_sde_prop(s, event);
-+    if (!prop) {
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+
-+    sde = get_sde_no_check(s, event, cs);
-+    if (sde->event_id != SDEI_INVALID_EVENT_ID) {
-+        put_sde(sde, cs);
-+        put_sde_prop(prop);
-+        return SDEI_DENIED;
-+    }
-+
-+    if (prop->is_shared) {
-+        rm_mode = args[4] & 1ULL;
-+        if (rm_mode == SDEI_EVENT_REGISTER_RM_PE) {
-+            target = arm_get_cpu_by_id(args[5]);
-+            if (!target) {
-+                put_sde_prop(prop);
-+                return SDEI_INVALID_PARAMETERS;
-+            }
-+        }
-+    }
-+
-+    sde->target_cpu = target;
-+    sde->ep_address = args[2];
-+    sde->ep_argument = args[3];
-+    sde->prop = prop;
-+    sde->routing_mode = rm_mode;
-+    sde->event_id = prop->event_id;
-+
-+    put_sde(sde, cs);
-+    atomic_inc(&prop->refcount);
-+    put_sde_prop(prop);
-+
-+    return SDEI_SUCCESS;
-+}
-+
-+static int64_t sdei_event_enable(QemuSDEState *s, CPUState *cs,
-+                                 struct kvm_run *run)
-+{
-+    QemuSDE *sde;
-+    uint64_t *args = (uint64_t *)(run->hypercall.args);
-+    int32_t event = args[1];
-+
-+    if (!is_valid_event_number(event)) {
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+    sde = get_sde_no_check(s, event, cs);
-+    if (sde->event_id == SDEI_INVALID_EVENT_ID) {
-+        put_sde(sde, cs);
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+
-+    sde->enabled = true;
-+    return dispatch_single(s, sde, cs);
-+}
-+
-+static int64_t sdei_event_disable(QemuSDEState *s, CPUState *cs,
-+                                  struct kvm_run *run)
-+{
-+    QemuSDE *sde;
-+    uint64_t *args = (uint64_t *)run->hypercall.args;
-+    int32_t event = args[1];
-+
-+    if (!is_valid_event_number(event)) {
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+    sde = get_sde_no_check(s, event, cs);
-+    if (sde->event_id == SDEI_INVALID_EVENT_ID) {
-+        put_sde(sde, cs);
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+
-+    sde->enabled = false;
-+    put_sde(sde, cs);
-+    return SDEI_SUCCESS;
-+}
-+
-+static int64_t sdei_event_context(QemuSDEState *s, CPUState *cs,
-+                                  struct kvm_run *run)
-+{
-+    QemuSDECpu *sde_cpu = get_sde_cpu(s, cs);
-+    uint64_t *args = (uint64_t *)(run->hypercall.args);
-+    uint32_t param_id = args[1];
-+    int critical;
-+    QemuSDECpuCtx *ctx;
-+
-+    if (param_id >= SDEI_PARAM_MAX) {
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+
-+    if (sde_cpu->critical_running_event >= 0) {
-+        critical = 1;
-+    } else if (sde_cpu->normal_running_event >= 0) {
-+        critical = 0;
-+    } else {
-+        return SDEI_DENIED;
-+    }
-+
-+    ctx = &sde_cpu->ctx[critical];
-+    return ctx->xregs[param_id];
-+}
-+
-+static int64_t sdei_event_complete(QemuSDEState *s, CPUState *cs,
-+                                   struct kvm_run *run)
-+{
-+    QemuSDE *sde;
-+    QemuSDECpu *cpu = get_sde_cpu(s, cs);
-+    int32_t event;
-+    uint64_t *args = (uint64_t *)(run->hypercall.args);
-+    bool is_critical;
-+
-+    event = get_running_sde(s, cs);
-+    if (event < 0) {
-+        return SDEI_DENIED;
-+    }
-+
-+    assert(is_valid_event_number(event));
-+    sde = get_sde_no_check(s, event, cs);
-+    assert(sde->event_id != SDEI_INVALID_EVENT_ID);
-+
-+    sde->running = false;
-+    is_critical = sde->prop->is_critical;
-+    if (sde->unregister_pending) {
-+        atomic_dec(&sde->prop->refcount);
-+        sde->event_id = SDEI_INVALID_EVENT_ID;
-+        sde->unregister_pending = false;
-+    }
-+    put_sde(sde, cs);
-+
-+    sde_restore_cpu_ctx(s, cs, is_critical);
-+
-+    kvm_arch_put_registers(cs, 1);
-+    override_return_value(cs, args);
-+    if (cpu->critical_running_event >= 0) {
-+        cpu->critical_running_event = SDEI_INVALID_EVENT_ID;
-+    } else {
-+        cpu->normal_running_event = SDEI_INVALID_EVENT_ID;
-+    }
-+
-+    /* TODO: we should not queue more than one sde in work queue */
-+    dispatch_cpu(s, cs, true);
-+    if (cpu->critical_running_event < 0 && cpu->normal_running_event < 0) {
-+        dispatch_cpu(s, cs, false);
-+    }
-+    return args[0];
-+}
-+
-+static int64_t sdei_event_complete_and_resume(QemuSDEState *s, CPUState *cs,
-+                                              struct kvm_run *run)
-+{
-+    QemuSDE *sde;
-+    QemuSDECpu *cpu = get_sde_cpu(s, cs);
-+    int32_t event;
-+    uint64_t *args = (uint64_t *)(run->hypercall.args);
-+    bool is_critical;
-+    uint64_t resume_addr = args[1];
-+
-+    event = get_running_sde(s, cs);
-+    if (event < 0) {
-+        return SDEI_DENIED;
-+    }
-+
-+    assert(is_valid_event_number(event));
-+    sde = get_sde_no_check(s, event, cs);
-+    assert(sde->event_id != SDEI_INVALID_EVENT_ID);
-+
-+    sde->running = false;
-+    is_critical = sde->prop->is_critical;
-+
-+    if (sde->unregister_pending) {
-+        atomic_dec(&sde->prop->refcount);
-+        sde->event_id = SDEI_INVALID_EVENT_ID;
-+        sde->unregister_pending = false;
-+    }
-+    put_sde(sde, cs);
-+
-+    sde_restore_cpu_ctx_for_resume(s, cs, is_critical, resume_addr);
-+    kvm_arch_put_registers(cs, 1);
-+
-+    override_return_value(cs, args);
-+    if (cpu->critical_running_event >= 0) {
-+        cpu->critical_running_event = SDEI_INVALID_EVENT_ID;
-+    } else {
-+        cpu->normal_running_event = SDEI_INVALID_EVENT_ID;
-+    }
-+
-+    dispatch_cpu(s, cs, true);
-+    if (cpu->critical_running_event < 0 && cpu->normal_running_event < 0) {
-+        dispatch_cpu(s, cs, false);
-+    }
-+    return args[0];
-+}
-+
-+static int64_t sdei_event_unregister(QemuSDEState *s, CPUState *cs,
-+                                     struct kvm_run *run)
-+{
-+    uint64_t        *args = (uint64_t *)(run->hypercall.args);
-+    int32_t         event = args[1];
-+
-+    return unregister_single_sde(s, event, cs, false);
-+}
-+
-+static int64_t sdei_event_status(QemuSDEState *s, CPUState *cs,
-+                                 struct kvm_run *run)
-+{
-+    QemuSDE *sde;
-+    uint64_t *args = (uint64_t *)(run->hypercall.args);
-+    int32_t event = args[1];
-+    int64_t status = 0;
-+
-+    if (!is_valid_event(s, event)) {
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+
-+    sde = get_sde_no_check(s, event, cs);
-+    if (sde->event_id == SDEI_INVALID_EVENT_ID) {
-+        put_sde(sde, cs);
-+        return status;
-+    }
-+
-+    status |= SDEI_EVENT_STATUS_REGISTERED;
-+    if (sde->enabled) {
-+        status |= SDEI_EVENT_STATUS_ENABLED;
-+    }
-+    if (sde->running) {
-+        status |= SDEI_EVENT_STATUS_RUNNING;
-+    }
-+    put_sde(sde, cs);
-+    return status;
-+}
-+
-+static int64_t sdei_event_get_info(QemuSDEState *s, CPUState *cs,
-+                                   struct kvm_run *run)
-+{
-+    QemuSDEProp *prop;
-+    QemuSDE *sde;
-+    uint64_t *args = (uint64_t *)(run->hypercall.args);
-+    int32_t event = args[1];
-+    uint32_t info = args[2];
-+    int64_t ret;
-+
-+    if (info > SDEI_EVENT_INFO_EV_ROUTING_AFF) {
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+
-+    prop = get_sde_prop(s, event);
-+    if (!prop) {
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+
-+    switch (info) {
-+    case SDEI_EVENT_INFO_EV_TYPE:
-+        ret = prop->is_shared;
-+        break;
-+    case SDEI_EVENT_INFO_EV_SIGNALED:
-+        ret = (event == SDEI_STD_EVT_SOFTWARE_SIGNAL) ? 1 : 0;
-+        break;
-+    case SDEI_EVENT_INFO_EV_PRIORITY:
-+        ret = prop->is_critical;
-+        break;
-+    case SDEI_EVENT_INFO_EV_ROUTING_MODE:
-+    case SDEI_EVENT_INFO_EV_ROUTING_AFF:
-+        ret = SDEI_INVALID_PARAMETERS;
-+        if (!prop->is_shared) {
-+            break;
-+        }
-+        sde = get_sde_no_check(s, event, cs);
-+        if (sde->event_id == SDEI_INVALID_EVENT_ID) {
-+            put_sde(sde, cs);
-+            ret = SDEI_DENIED;
-+            break;
-+        }
-+        if (info == SDEI_EVENT_INFO_EV_ROUTING_MODE) {
-+            ret = sde->routing_mode;
-+        } else if (sde->routing_mode == SDEI_EVENT_REGISTER_RM_PE) {
-+            ret = ARM_CPU(sde->target_cpu)->mp_affinity;
-+        }
-+        put_sde(sde, cs);
-+        break;
-+    default:
-+        ret = SDEI_NOT_SUPPORTED;
-+    }
-+    put_sde_prop(prop);
-+    return ret;
-+}
-+
-+static int64_t sdei_event_routing_set(QemuSDEState *s, CPUState *cs,
-+                                      struct kvm_run *run)
-+{
-+    QemuSDE *sde;
-+    CPUState *target = cs;
-+    uint64_t *args = (uint64_t *)run->hypercall.args;
-+    int32_t event = args[1];
-+    uint64_t mode = args[2];
-+    uint64_t affinity = args[3];
-+
-+    if (mode & ~1ULL) {
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+    if (mode == SDEI_EVENT_REGISTER_RM_PE) {
-+        target = arm_get_cpu_by_id(affinity);
-+        if (!target) {
-+            return SDEI_INVALID_PARAMETERS;
-+        }
-+    }
-+
-+    if (!is_valid_event(s, event) || !SDEI_IS_SHARED_EVENT(event)) {
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+
-+    sde = get_sde_no_check(s, event, cs);
-+    if (sde->event_id == SDEI_INVALID_EVENT_ID) {
-+        put_sde(sde, cs);
-+        return SDEI_DENIED;
-+    }
-+    if (sde->enabled || sde->running ||
-+        sde->pending || sde->unregister_pending) {
-+        put_sde(sde, cs);
-+        return SDEI_DENIED;
-+    }
-+
-+    sde->target_cpu = target;
-+    sde->routing_mode = mode;
-+    put_sde(sde, cs);
-+
-+    return SDEI_SUCCESS;
-+}
-+
-+static int64_t sdei_event_pe_mask(QemuSDEState *s, CPUState *cs,
-+                                  struct kvm_run *run)
-+{
-+    QemuSDECpu *sde_cpu;
-+
-+    sde_cpu = get_sde_cpu(s, cs);
-+    if (sde_cpu->masked) {
-+        return 0;
-+    }
-+    sde_cpu->masked = true;
-+    return 1;
-+}
-+
-+static int64_t sdei_event_pe_unmask(QemuSDEState *s, CPUState *cs,
-+                                    struct kvm_run *run)
-+{
-+    QemuSDECpu *sde_cpu;
-+
-+    sde_cpu = get_sde_cpu(s, cs);
-+    sde_cpu->masked = false;
-+    dispatch_cpu(s, cs, true);
-+    dispatch_cpu(s, cs, false);
-+    return SDEI_SUCCESS;
-+}
-+
-+static int64_t sdei_event_interrupt_bind(QemuSDEState *s, CPUState *cs,
-+                                         struct kvm_run *run)
-+{
-+    uint64_t *args = (uint64_t *)(run->hypercall.args);
-+    uint32_t intid = args[1];
-+
-+    if (intid < GIC_NR_SGIS || intid >= GIC_MAXIRQ) {
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+    return sdei_alloc_event_num(s, false, intid >= 32, intid);
-+}
-+
-+static int64_t sdei_event_interrupt_release(QemuSDEState *s, CPUState *cs,
-+                                            struct kvm_run *run)
-+{
-+    QemuSDEProp *prop;
-+    uint64_t *args = (uint64_t *)(run->hypercall.args);
-+    int32_t event = args[1];
-+
-+    qemu_mutex_lock(&s->sdei_interrupt_bind_lock);
-+    prop = get_sde_prop(s, event);
-+    if (!prop) {
-+        qemu_mutex_unlock(&s->sdei_interrupt_bind_lock);
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+
-+    return sdei_free_event_num_locked(s, prop);
-+}
-+
-+static int64_t sdei_event_signal(QemuSDEState *s, CPUState *cs,
-+                                 struct kvm_run *run)
-+{
-+    QemuSDE *sde;
-+    CPUState *target_cpu;
-+    uint64_t *args = (uint64_t *)(run->hypercall.args);
-+    int32_t event = args[1];
-+
-+    if (event != SDEI_STD_EVT_SOFTWARE_SIGNAL) {
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+
-+    target_cpu = arm_get_cpu_by_id(args[2]);
-+    if (!target_cpu) {
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+
-+    sde = get_sde_no_check(s, event, target_cpu);
-+    if (sde->event_id == SDEI_INVALID_EVENT_ID) {
-+        put_sde(sde, cs);
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+
-+    sde->pending = true;
-+    return dispatch_single(s, sde, target_cpu);
-+}
-+
-+static int64_t sdei_features(QemuSDEState *s, CPUState *cs, struct kvm_run *run)
-+{
-+    uint64_t *args = (uint64_t *)(run->hypercall.args);
-+    uint32_t feature = args[1];
-+
-+    switch (feature) {
-+    case SDEI_FEATURE_BIND_SLOTS:
-+        return ((SHARED_SLOT_COUNT - PLAT_SHARED_SLOT_COUNT) << 16) |
-+               (PRIVATE_SLOT_COUNT - PLAT_PRIVATE_SLOT_COUNT);
-+    default:
-+        return SDEI_INVALID_PARAMETERS;
-+    }
-+}
-+
-+static int64_t sdei_private_reset(QemuSDEState *s, CPUState *cs,
-+                                  struct kvm_run *run)
-+{
-+    return sdei_private_reset_common(s, cs, false);
-+}
-+
-+static int64_t sdei_shared_reset(QemuSDEState *s, CPUState *cs,
-+                                 struct kvm_run *run)
-+{
-+    return sdei_shared_reset_common(s, cs, false);
-+}
-+
-+static sdei_single_function sdei_functions[] = {
-+    sdei_version,
-+    sdei_event_register,
-+    sdei_event_enable,
-+    sdei_event_disable,
-+    sdei_event_context,
-+    sdei_event_complete,
-+    sdei_event_complete_and_resume,
-+    sdei_event_unregister,
-+    sdei_event_status,
-+    sdei_event_get_info,
-+    sdei_event_routing_set,
-+    sdei_event_pe_mask,
-+    sdei_event_pe_unmask,
-+    sdei_event_interrupt_bind,
-+    sdei_event_interrupt_release,
-+    sdei_event_signal,
-+    sdei_features,
-+    sdei_private_reset,
-+    sdei_shared_reset,
-+};
-+
-+void sdei_handle_request(CPUState *cs, struct kvm_run *run)
-+{
-+    uint32_t func_id = run->hypercall.args[0];
-+
-+    if (!sde_state) {
-+        run->hypercall.args[0] = SDEI_NOT_SUPPORTED;
-+        return;
-+    }
-+
-+    if (func_id < SDEI_1_0_FN_BASE || func_id > SDEI_MAX_REQ) {
-+        error_report("Invalid SDEI function ID: 0x%x", func_id);
-+        run->hypercall.args[0] = SDEI_INVALID_PARAMETERS;
-+        return;
-+    }
-+
-+    func_id -= SDEI_1_0_FN_BASE;
-+    if (func_id < ARRAY_SIZE(sdei_functions) && sdei_functions[func_id]) {
-+        run->hypercall.args[0] = sdei_functions[func_id](sde_state, cs, run);
-+    } else {
-+        run->hypercall.args[0] = SDEI_NOT_SUPPORTED;
-+    }
-+}
-+
- static void qemu_shared_sde_init(QemuSDEState *s)
- {
-     int i;
-diff --git a/target/arm/sdei.h b/target/arm/sdei.h
-new file mode 100644
-index 0000000..a69a0e4
---- /dev/null
-+++ b/target/arm/sdei.h
-@@ -0,0 +1,34 @@
-+/*
-+ * ARM SDEI emulation external interfaces
-+ *
-+ * Copyright (c) 2019 HUAWEI TECHNOLOGIES CO., LTD.
-+ *
-+ * Authors:
-+ *    Heyi Guo <guoheyi@huawei.com>
-+ *    Jingyi Wang <wangjingyi11@huawei.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef QEMU_SDEI_H
-+#define QEMU_SDEI_H
-+
-+#include <linux/kvm.h>
-+#include <linux/arm_sdei.h>
-+#include "hw/core/cpu.h"
-+
-+#define SDEI_MAX_REQ        SDEI_1_0_FN(0x12)
-+
-+void sdei_handle_request(CPUState *cs, struct kvm_run *run);
-+
-+#endif
--- 
-1.8.3.1
-
+MjQuMDkuMjAxOSAxODo0NCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
+MjQuMDkuMjAxOSAxODoyOCwgRXJpYyBCbGFrZSB3cm90ZToNCj4+IE9uIDkvMjQvMTkgOToxMiBB
+TSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+DQo+Pj4+PiAzLiBXaGF0
+IHRvIGRvIHdpdGggaHVnZSBhdXRvLWdlbmVyYXRlZCBjb21taXQgMDc/IFNob3VsZCBJIHNwbGl0
+IGl0DQo+Pj4+PiBwZXItbWFpbnRhaW5lciBvciBwZXItc3Vic3lzdGVtLCBvciBsZWF2ZSBpdCBh
+cy1pcz8NCj4+Pj4NCj4+Pj4gSXQncyBiaWcuIEknZCBzcGxpdCBpdCBpbnRvIG11bHRpcGxlIHBh
+dGNoZXMgKGFuZCByZWR1Y2UgdGhlIGNjIC0gZXhjZXB0DQo+Pj4+IGZvciB0aGUgY292ZXIgbGV0
+dGVyLCB0aGUgcmVzdCBvZiB0aGUgcGF0Y2hlcyBjYW4gYmUgbGltaXRlZCB0byB0aGUNCj4+Pj4g
+YWN0dWFsIG1haW50YWluZXIvc3Vic3lzdGVtIGFmZmVjdGVkIHJhdGhlciB0aGFuIGV2ZXJ5b25l
+IGludm9sdmVkDQo+Pj4+IGFueXdoZXJlIGVsc2UgaW4gdGhlIHNlcmllcy4gV2l0aCB0aGUgY3Vy
+cmVudCBsYXJnZSBjYywgYW55b25lIHRoYXQNCj4+Pj4gcmVwbGllcyBnZXRzIHNldmVyYWwgbWFp
+bCBib3VuY2VzIGFib3V0ICJ0b28gbWFueSByZWNpcGllbnRzIikuwqAgSXQgbWF5DQo+Pj4+IGJl
+IGVhc2llciB0byBzcGxpdCBhbG9uZyBkaXJlY3RvcnkgYm91bmRhcmllcyB0aGFuIGJ5IG1haW50
+YWluZXINCj4+Pj4gYm91bmRhcmllcy7CoCBNYXJrdXMgaGFzIGFwcGxpZWQgbGFyZ2UgdHJlZS13
+aWRlIENvY2NpbmVsbGUgY2xlYW51cHMNCj4+Pj4gYmVmb3JlLCBtYXliZSBoZSBoYXMgc29tZSBh
+ZHZpY2UuDQo+Pj4NCj4+Pg0KPj4+IElmIHNwbGl0IGJ5IHN1YnN5c3RlbSBpdCB3b3VsZCBiZSAy
+MDArIHBhdGNoZXM6DQo+Pj4gZ2l0IGRpZmYgLS1uYW1lLW9ubHkgfCB3aGlsZSByZWFkIGY7IGRv
+IHNjcmlwdHMvZ2V0X21haW50YWluZXIucGwgLWYgJGYgLS1zdWJzeXN0ZW0gLS1uby1yb2xlc3Rh
+dHMgMj4vZGV2L251bGwgfCBncmVwIC12IEAgfCBoZWFkIC0xOyBkb25lIHwgc29ydCB8IHVuaXEg
+fCB3YyAtbA0KPj4+IDIwNQ0KPj4+DQo+Pj4NCj4+PiBUcnkgdG8gbG9vayBhdCBsYXJnZXIgc3Vi
+c3lzdGVtOg0KPj4+IGdpdCBkaWZmIC0tbmFtZS1vbmx5IHwgd2hpbGUgcmVhZCBmOyBkbyBzY3Jp
+cHRzL2dldF9tYWludGFpbmVyLnBsIC1mICRmIC0tc3Vic3lzdGVtIC0tbm8tcm9sZXN0YXRzIDI+
+L2Rldi9udWxsIHwgZ3JlcCAtdiBAIHwgdGFpbCAtMiB8IGhlYWQgLTE7IGRvbmUgfCBzb3J0IHwg
+dW5pcSB8IHdjIC1sDQo+Pj4gMTM5DQo+Pj4NCj4+PiBzdGlsbCB0b28gbWFueS4uIE9yIGlzIGl0
+IE9LPw0KPj4NCj4+IEhtbSAtIHRoYXQgYmVjb21lcyBhIHRyYWRlb2ZmIGluIGxlbmd0aCBvZiB0
+aGUgc2VyaWVzICh3aGVyZSBpbmRpdmlkdWFsDQo+PiBwYXRjaGVzIG1heSBiZSByZXZpZXdlZCBm
+YXN0LCBidXQgd2hlcmUgdGhlIG92ZXJhbGwgcHJvY2VzcyBtYXkgYmUNCj4+IGJvZ2dlZCBkb3du
+IGJ5IHNoZWVyIGxlbmd0aCksIHZzLiBsZW5ndGggb2YgaW5kaXZpZHVhbCBlbWFpbHMgKHdoZXJl
+IHRoZQ0KPj4gZW1haWwgaXRzZWxmIGlzIGRhdW50aW5nLCBidXQgYXMgdGhlIHJldmlldyBpcyBt
+ZWNoYW5pY2FsIGFuZCBkb25lIGJ5DQo+PiBhdXRvbWF0aW9uLCBpdCBiZWNvbWVzIGEgbWF0dGVy
+IG9mIHNwb3QtY2hlY2tpbmcgaWYgd2UgdHJ1c3QgdGhhdCB0aGUNCj4+IGF1dG9tYXRpb24gd2Fz
+IGRvbmUgY29ycmVjdGx5KS7CoCBZb3UgY2FuIHByb2JhYmx5IGdyb3VwIGl0IGluIGZld2VyDQo+
+PiBwYXRjaGVzLCBieSBqb2luaW5nIHNtYWxsZXIgcGF0Y2hlcyBhY3Jvc3MgYSBjb3VwbGUgb2Yg
+c3Vic3lzdGVtcy7CoCBJdCdzDQo+PiBhbiBhcnQgZm9ybSwgdGhlcmUncyBwcm9iYWJseSBzZXZl
+cmFsIHdheXMgdG8gZG8gaXQgdGhhdCB3b3VsZCB3b3JrLCBhbmQNCj4+IGl0IGNvbWVzIGRvd24g
+dG8gYSBqdWRnbWVudCBjYWxsIG9uIGhvdyBtdWNoIHdvcmsgeW91IHdhbnQgdG8gZG8gdG8gdHJ5
+DQo+PiBhbmQgcmVkdWNlIG90aGVyJ3Mgd29yayBpbiByZXZpZXdpbmcgaXQuwqAgTWF5YmUgZXZl
+biBhbiBvZmYtaGFuZCBzcGxpdA0KPj4gb2YgZ2F0aGVyaW5nIGZpbGVzIHVudGlsIHlvdSByZWFj
+aCBhYm91dCA1MDAgb3Igc28gbGluZXMgcGVyIGRpZmYuwqAgSQ0KPj4gd2lzaCBJIGhhZCBlYXNp
+ZXIgYWR2aWNlIG9uIGhvdyB0byB0YWNrbGUgdGhpcyBzb3J0IG9mIHByb2plY3QgaW4gdGhlDQo+
+PiB3YXkgdGhhdCB3aWxsIGdldCB0aGUgZmFzdGVzdCByZXNwb25zZSB0aW1lLg0KPj4NCj4+DQo+
+Pj4+PiDCoMKgIHZsLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCAxMyArLQ0KPj4+Pj4g
+wqDCoCBzY3JpcHRzL2NvY2NpbmVsbGUvYXV0by1wcm9wYWdhdGVkLWVycnAuY29jY2kgfMKgIDgy
+ICsrKysrKysNCj4+Pj4+IMKgwqAgMzE5IGZpbGVzIGNoYW5nZWQsIDI3MjkgaW5zZXJ0aW9ucygr
+KSwgNDI0NSBkZWxldGlvbnMoLSkNCj4+Pj4+IMKgwqAgY3JlYXRlIG1vZGUgMTAwNjQ0IHNjcmlw
+dHMvY29jY2luZWxsZS9hdXRvLXByb3BhZ2F0ZWQtZXJycC5jb2NjaQ0KPj4+Pg0KPj4+PiBUaGUg
+ZGlmZnN0YXQgaXMgaHVnZSwgYnV0IHByb21pc2luZy4NCj4+DQo+PiBXZSBhbHNvIGxlYXJuZWQg
+aW4gcmV2aWV3cyBvZiA3LzkgdGhhdCB0aGUgZGlmZnN0YXQgaGVyZSBpcyBtaXNsZWFkaW5nLA0K
+Pj4gdGhlIG51bWJlciBvZiBpbnNlcnRpb25zIHdpbGwgZGVmaW5pdGVseSBiZSBpbmNyZWFzaW5n
+IG9uY2UgdGhlDQo+PiBDb2NjaW5lbGxlIHNjcmlwdCBpcyBmaXhlZCB0byBpbnNlcnQgdGhlIG1h
+Y3JvIGluIG1vcmUgZnVuY3Rpb25zLCBidXQNCj4+IGhvcGVmdWxseSBpdCdzIHN0aWxsIGEgbmV0
+IHJlZHVjdGlvbiBpbiBvdmVyYWxsIGxpbmVzLg0KPj4NCj4gDQo+IE5vIGhvcGUgZm9yIHVzOiB3
+aXRoIGZpeGVkIHNjcmlwdCBJIG5vdyBzZWUNCj4gDQo+IDkxOSBmaWxlcyBjaGFuZ2VkLCA2NDI1
+IGluc2VydGlvbnMoKyksIDQyMzQgZGVsZXRpb25zKC0pDQo+IA0KDQpBbHNvLCBJIGhhdmUgYWRk
+IGluY2x1ZGUgInFhcGkvZXJyb3IuaCIgdG8gZmlsZXMsIHdoZXJlIGVycnAgb25seSBwYXNzZWQN
+CnRvIGNhbGxlZCBmdW5jdGlvbnMgKG9yIGZvciBmdW5jdGlvbnMsIHdoaWNoIGFyZSBub3Qgc2lt
+cGxlIHN0dWJzKToNCg0KIyBnaXQgZGlmZiB8IGdyZXAgJysjaW5jbHVkZScgfCB3YyAtbA0KMjUz
+DQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
 
