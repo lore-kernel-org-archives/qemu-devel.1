@@ -2,96 +2,83 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41196C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 00:45:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2BB1C432C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 00:58:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 069C6207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 00:45:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB9402146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 00:58:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k1F3lQfz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 069C6207FD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oFL/UHHp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB9402146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCYwz-0006Go-2g
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 20:45:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47328)
+	id 1iCZAQ-00015Q-B1
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 20:58:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50511)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iCYvm-0005nf-VB
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 20:43:53 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1iCZ9Q-0008Vd-88
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 20:57:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iCYvl-0005V7-9j
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 20:43:50 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44722)
+ (envelope-from <bmeng.cn@gmail.com>) id 1iCZ9O-0004lP-OT
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 20:57:56 -0400
+Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:44799)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1iCYvl-0005Uk-1Q
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 20:43:49 -0400
-Received: by mail-wr1-x444.google.com with SMTP id i18so15831737wru.11
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 17:43:48 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1iCZ9O-0004kl-Jj; Mon, 23 Sep 2019 20:57:54 -0400
+Received: by mail-yb1-xb44.google.com with SMTP id f1so82138ybq.11;
+ Mon, 23 Sep 2019 17:57:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:subject:to:cc:references:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=wURrAhaxCbiqzjAikjDaa7fw+MWZZ6YslWE1/obZGD0=;
- b=k1F3lQfzKNt4MLkTYOPSyqLdPHy4pCSNIE0gVLvu10hAack9tnrreiYWv7OCZhoo8T
- NdUGkW+t09dz25iNMD1a3z721B7TAcUL4akNL74mGsK2xbCZS+IRB7Qj8MpUkkLlAA1T
- PafWdtDX3RO4loNz3KoDf4gSTRbdYhrqN/2OV1XLENcy3y5UJqS1p1DUyX4qIxxXy7Qc
- EvFKubagAUSzCd88ieXE1e3n5r6nJ4WnfKGLHQZbUXnbI1hientd2n3X7RuQGFQ+shgH
- MtHkARunqp3TIq3ZNNTJ31IVilfSBOx9BadKjhcZIMCj194ovPbf+yOe/qx092TURLeF
- JaQw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=VIZeAomfu3Do3BOQPSHJ7yIbnXXg4+3vqgDyioWKyZU=;
+ b=oFL/UHHpDMTH3J6ih4Baeotq3iUiG05YHX1TQS+tuwWvMJ2jNK/E/N8Pkwzdv2uvWh
+ pdceYf2sfb1BBQcJke/jdU4QWVk55J+7BztjId2Ds8Ssx0kCxJDTAiowaAqHMDGaFHoG
+ oPdAHCSFlITm71SgqixHLD4MNL5ZDNM7FAQ+nr4DwOROtu2YbNmzS7yJz9j1WHzFk0QH
+ rKEvgMciBJRpQIjzxsNPsum/YQ9Mhhurg7JIvWJ42L/eCy2yvzrSdpczGK9UXDe/tsSH
+ ghVoYokjy3wTcJkrrLXOoVPUqHlYS4DT8uQrYOQG4wHkkccWSlJshP++D2wwnB7DPC8z
+ Ei4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:subject:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=wURrAhaxCbiqzjAikjDaa7fw+MWZZ6YslWE1/obZGD0=;
- b=KfSyF0TMLCxNkv/BUraiveO6iIcVP+5v6okEphPOQ0b14cM9HjLrIzkM1ZHQL2emP/
- xPVmCrDuspDQMZQJBmBT3GxfbRd2LEU7Mcm+8J/D7S9Ql524Zhlnc3QHhAGbPsFyhgkQ
- 9PohJDH2WnDl+Wxv927BRkL91bOxLrmxmXBM27k7RLGnmlotLLEOgNHtM0LTyUwGN4SB
- qUmlWywD13DweT0iGkdvRkBEK3kJBfsjC7WXzv08H8qOYn2RUmUHsgGIe1bn58fl3kAf
- JoawO2vfH1vTHUgI+FHXFtLHQDewzY0qMHxkESuz6TVpwSd7rB7ExE/OaqQOUtDAXL9Q
- a2XA==
-X-Gm-Message-State: APjAAAVqH04ezBLcQNLX5hlvjj7T6sSOM/gi6Wg5048VoeWT2AYNl/CN
- wKtHWHy9/XQK6Yb7+ssQJjo=
-X-Google-Smtp-Source: APXvYqzFt8zEiXvGP/oCC5oRdy+tzLaeuVqdzm8FAv9OnVH4DjXgalw2iwLCy8ItC90dkbvmlX8fFw==
-X-Received: by 2002:adf:f58c:: with SMTP id f12mr53596wro.38.1569285827649;
- Mon, 23 Sep 2019 17:43:47 -0700 (PDT)
-Received: from ?IPv6:fd00:835b:d940:d4fc:1::d3?
- (2a01-036c-0113-40af-0001-0000-0000-00d3.pool6.digikabel.hu.
- [2a01:36c:113:40af:1::d3])
- by smtp.gmail.com with ESMTPSA id f8sm40229wmb.37.2019.09.23.17.43.46
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 23 Sep 2019 17:43:47 -0700 (PDT)
-From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
-X-Google-Original-From: =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=
- <DirtY.iCE.hu@gmail.com>
-Subject: Re: [PATCH v4 21/24] paaudio: channel-map option
-To: Markus Armbruster <armbru@redhat.com>
-References: <cover.1568927990.git.DirtY.iCE.hu@gmail.com>
- <8f650662fd6cc50baaede260581aeb560eed44fb.1568927990.git.DirtY.iCE.hu@gmail.com>
- <87o8zbma1m.fsf@dusky.pond.sub.org>
-Message-ID: <55ea6ac9-9651-e322-fd84-22b4bedb3a93@gmail.com>
-Date: Tue, 24 Sep 2019 02:43:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=VIZeAomfu3Do3BOQPSHJ7yIbnXXg4+3vqgDyioWKyZU=;
+ b=DctszgYfAOZ0LiGcTaxVvw3hfJzdAWEfvbGNX2wv6mJd+vtiN2YK1cMpxCSnebEEPm
+ 58EfRGP0iTjsZvpiHb+rNlKuqYfyr9lxuHmm99t7Zc0HB9PFvNgOlZzfMKmoWAsP310Z
+ Em53+J/P6uHsqXX4SP0QfVvjx6+DAaKocoDXE0G+/izukVDtfKD94JfyZOGXo9sSLirT
+ 89JYTao5njHpV3RBgp4dZHrFZsOw9OjQ2LuhIV8GlrNrpriSB2wksePoHnNMIR6VOCHj
+ lSiigGZN2/oIIOZL0kwpk8+iLExYd/Ygg/wsYIHuU6gew7BXrHh66qMNaNR2Rptj9CXr
+ kIiw==
+X-Gm-Message-State: APjAAAWr6FXqY03TtvaP/KGoUVw+AAVd1c4Ntxr244bATuXj5lUJ2Yyz
+ eIDrSSWUe0YtxFCWgM+xpOVYIoG68CX0yCPGcxI=
+X-Google-Smtp-Source: APXvYqxzNwJyY20dPMP5gMzhB3V2SWRuPCoJ9EHRO0sN5xBlvOmEoZnBVDYAQBrB1Q56/BCbxJFDEiNEi+6zJZciBRs=
+X-Received: by 2002:a25:a345:: with SMTP id d63mr249133ybi.65.1569286673368;
+ Mon, 23 Sep 2019 17:57:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87o8zbma1m.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <cover.1568931866.git.alistair.francis@wdc.com>
+ <d3357e0b87cce025418f6383ce971246ded547bd.1568931866.git.alistair.francis@wdc.com>
+ <CAEUhbmV7Ao6L25HM+8AJLP8unn=HhvdRc1Kt+tUQgRB4S4zsBQ@mail.gmail.com>
+ <CAKmqyKO=PahfKej1Ch6=x3zcxN8R26Gkd9dsjScMSHPxitp=rA@mail.gmail.com>
+ <CAEUhbmVO=POsb+Jpy12w=WD-vLM9Km0YrryaGYc1PLYdSzka5A@mail.gmail.com>
+ <CAKmqyKMf+KFQGZCZ9oGLAeGeQkSdrinXDSkpWEGRVjgjDfPAtg@mail.gmail.com>
+In-Reply-To: <CAKmqyKMf+KFQGZCZ9oGLAeGeQkSdrinXDSkpWEGRVjgjDfPAtg@mail.gmail.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Tue, 24 Sep 2019 08:57:43 +0800
+Message-ID: <CAEUhbmX9=XskYKs=7rmrSCeVj1qbpyK8YTuD-ZZUdSUg9U-aLA@mail.gmail.com>
+Subject: Re: [PATCH v1 4/6] riscv/sifive_u: Add the start-in-flash property
+To: Alistair Francis <alistair23@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::b44
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,150 +90,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Chih-Min Chao <chihmin.chao@sifive.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-09-23 15:12, Markus Armbruster wrote:
-> "Kővágó, Zoltán" <dirty.ice.hu@gmail.com> writes:
-> 
->> Add an option to change the channel map used by pulseaudio.  If not
->> specified, falls back to an OSS compatible channel map.
->>
->> Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
->> ---
->>   audio/paaudio.c | 18 ++++++++++++++----
->>   qapi/audio.json |  7 +++++--
->>   qemu-options.hx |  9 +++++++++
->>   3 files changed, 28 insertions(+), 6 deletions(-)
->>
->> diff --git a/audio/paaudio.c b/audio/paaudio.c
->> index d195b1caa8..20402b0718 100644
->> --- a/audio/paaudio.c
->> +++ b/audio/paaudio.c
->> @@ -338,17 +338,27 @@ static pa_stream *qpa_simple_new (
->>           pa_stream_direction_t dir,
->>           const char *dev,
->>           const pa_sample_spec *ss,
->> -        const pa_channel_map *map,
->> +        const char *map,
->>           const pa_buffer_attr *attr,
->>           int *rerror)
->>   {
->>       int r;
->>       pa_stream *stream;
->>       pa_stream_flags_t flags;
->> +    pa_channel_map pa_map;
->>   
->>       pa_threaded_mainloop_lock(c->mainloop);
->>   
->> -    stream = pa_stream_new(c->context, name, ss, map);
->> +    if (map && !pa_channel_map_parse(&pa_map, map)) {
->> +        dolog("Invalid channel map specified: '%s'\n", map);
->> +        map = NULL;
->> +    }
->> +    if (!map) {
->> +        pa_channel_map_init_extend(&pa_map, ss->channels,
->> +                                   PA_CHANNEL_MAP_OSS);
->> +    }
->> +
->> +    stream = pa_stream_new(c->context, name, ss, &pa_map);
->>       if (!stream) {
->>           goto fail;
->>       }
->> @@ -421,7 +431,7 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
->>           PA_STREAM_PLAYBACK,
->>           ppdo->has_name ? ppdo->name : NULL,
->>           &ss,
->> -        NULL,                   /* channel map */
->> +        ppdo->has_channel_map ? ppdo->channel_map : NULL,
->>           &ba,                    /* buffering attributes */
->>           &error
->>           );
->> @@ -470,7 +480,7 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
->>           PA_STREAM_RECORD,
->>           ppdo->has_name ? ppdo->name : NULL,
->>           &ss,
->> -        NULL,                   /* channel map */
->> +        ppdo->has_channel_map ? ppdo->channel_map : NULL,
->>           &ba,                    /* buffering attributes */
->>           &error
->>           );
->> diff --git a/qapi/audio.json b/qapi/audio.json
->> index 0535eff794..07003808cb 100644
->> --- a/qapi/audio.json
->> +++ b/qapi/audio.json
->> @@ -214,13 +214,16 @@
->>   # @latency: latency you want PulseAudio to achieve in microseconds
->>   #           (default 15000)
->>   #
->> +# @channel-map: channel map to use (default: OSS compatible map, since: 4.2)
->> +#
->>   # Since: 4.0
->>   ##
->>   { 'struct': 'AudiodevPaPerDirectionOptions',
->>     'base': 'AudiodevPerDirectionOptions',
->>     'data': {
->> -    '*name': 'str',
->> -    '*latency': 'uint32' } }
->> +    '*name':        'str',
->> +    '*latency':     'uint32',
->> +    '*channel-map': 'str' } }
->>   
->>   ##
->>   # @AudiodevPaOptions:
->> diff --git a/qemu-options.hx b/qemu-options.hx
->> index 395427422a..f3bc342f98 100644
->> --- a/qemu-options.hx
->> +++ b/qemu-options.hx
->> @@ -471,6 +471,7 @@ DEF("audiodev", HAS_ARG, QEMU_OPTION_audiodev,
->>       "-audiodev pa,id=id[,prop[=value][,...]]\n"
->>       "                server= PulseAudio server address\n"
->>       "                in|out.name= source/sink device name\n"
->> +    "                in|out.channel-map= channel map to use\n"
->>   #endif
->>   #ifdef CONFIG_AUDIO_SDL
->>       "-audiodev sdl,id=id[,prop[=value][,...]]\n"
->> @@ -636,6 +637,14 @@ Sets the PulseAudio @var{server} to connect to.
->>   @item in|out.name=@var{sink}
->>   Use the specified source/sink for recording/playback.
->>   
->> +@item in|out.channel-map=@var{map}
->> +Use the specified channel map.  The default is an OSS compatible
->> +channel map.  Do not forget to escape commas inside the map:
-> 
-> Awkward.
-> 
->> +
->> +@example
->> +-audiodev pa,id=example,sink.channel-map=front-left,,front-right
->> +@end example
-> 
-> Makes me realize new AudiodevPaPerDirectionOptions member @channel-map
-> is a list encoded in a string.  QAPI heavily frowns upon encoding stuff
-> in strings.  Any reason why you can't (or don't want to) make it
-> ['str']?
+On Tue, Sep 24, 2019 at 1:51 AM Alistair Francis <alistair23@gmail.com> wrote:
+>
+> On Sat, Sep 21, 2019 at 7:19 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+> >
+> > On Sat, Sep 21, 2019 at 6:12 AM Alistair Francis <alistair23@gmail.com> wrote:
+> > >
+> > > On Thu, Sep 19, 2019 at 10:15 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+> > > >
+> > > > On Fri, Sep 20, 2019 at 6:32 AM Alistair Francis
+> > > > <alistair.francis@wdc.com> wrote:
+> > > > >
+> > > > > Add a property that when set to true QEMU will jump from the ROM code to
+> > > > > the start of flash memory instead of DRAM which is the default
+> > > > > behaviour.
+> > > > >
+> > > > > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > > > > ---
+> > > > >  hw/riscv/sifive_u.c         | 27 +++++++++++++++++++++++++++
+> > > > >  include/hw/riscv/sifive_u.h |  2 ++
+> > > > >  2 files changed, 29 insertions(+)
+> > > > >
+> > > > > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> > > > > index c3949fb316..b7cd3631cd 100644
+> > > > > --- a/hw/riscv/sifive_u.c
+> > > > > +++ b/hw/riscv/sifive_u.c
+> > > > > @@ -373,6 +373,10 @@ static void riscv_sifive_u_init(MachineState *machine)
+> > > > >                                         /* dtb: */
+> > > > >      };
+> > > > >
+> > > > > +    if (s->start_in_flash) {
+> > > > > +        reset_vec[6] = memmap[SIFIVE_U_FLASH0].base; /* start: .dword FLASH0_BASE */
+> > > > > +    }
+> > > > > +
+> > > > >      /* copy in the reset vector in little_endian byte order */
+> > > > >      for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+> > > > >          reset_vec[i] = cpu_to_le32(reset_vec[i]);
+> > > > > @@ -544,8 +548,31 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+> > > > >          memmap[SIFIVE_U_GEM_MGMT].base, memmap[SIFIVE_U_GEM_MGMT].size);
+> > > > >  }
+> > > > >
+> > > > > +static bool virt_get_start_in_flash(Object *obj, Error **errp)
+> > > > > +{
+> > > > > +    SiFiveUState *s = RISCV_U_MACHINE(obj);
+> > > > > +
+> > > > > +    return s->start_in_flash;
+> > > > > +}
+> > > > > +
+> > > > > +static void virt_set_start_in_flash(Object *obj, bool value, Error **errp)
+> > > > > +{
+> > > > > +    SiFiveUState *s = RISCV_U_MACHINE(obj);
+> > > > > +
+> > > > > +    s->start_in_flash = value;
+> > > > > +}
+> > > > > +
+> > > > >  static void riscv_sifive_u_machine_instance_init(Object *obj)
+> > > > >  {
+> > > > > +    SiFiveUState *s = RISCV_U_MACHINE(obj);
+> > > > > +
+> > > > > +    s->start_in_flash = false;
+> > > > > +    object_property_add_bool(obj, "start-in-flash", virt_get_start_in_flash,
+> > > > > +                             virt_set_start_in_flash, NULL);
+> > > > > +    object_property_set_description(obj, "start-in-flash",
+> > > > > +                                    "Set on to tell QEMU's ROM to jump to " \
+> > > > > +                                    "flash. Otherwise QEMU will jump to DRAM",
+> > > > > +                                    NULL);
+> > > > >
+> > > > >  }
+> > > > >
+> > > > > diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+> > > > > index a921079fbe..2656b43c58 100644
+> > > > > --- a/include/hw/riscv/sifive_u.h
+> > > > > +++ b/include/hw/riscv/sifive_u.h
+> > > > > @@ -57,6 +57,8 @@ typedef struct SiFiveUState {
+> > > > >
+> > > > >      void *fdt;
+> > > > >      int fdt_size;
+> > > > > +
+> > > > > +    bool start_in_flash;
+> > > > >  } SiFiveUState;
+> > > > >
+> > > > >  enum {
+> > > >
+> > > > This patch chose a different way from the one used in patch "[v1,6/6]
+> > > > riscv/virt: Jump to pflash if specified":
+> > > >
+> > > > - this patch uses reset_vec[6] while patch [6/6] defines a variable start_addr
+> > > > - this patch adds a "start-in-flash" property to the machine, while
+> > > > patch [6/6] tests against drive IF_PFLASH
+> > >
+> > > Yes, we do it differently for the sifive_u board as the sifive_u board
+> > > doesn't use pflash so there is no way to know if the user has loaded
+> > > anything into the SPI memory.
+> > >
+> >
+> > OK.
+> >
+> > > >
+> > > > We should be consistent and I would prefer to use the patch [6/6] way.
+> > > > On Unleashed an SPI flash is mounted so we cannot add a PFlash to
+> > > > sifive_u machine like what was done on virt machine, so we should test
+> > > > IF_MTD instead. Thoughts?
+> > >
+> > > How would we test that?
+> > >
+> > > Right now I am loading the binary in SPI with the -device loader
+> > > option. The machine can't really know what is/isn't loaded there.
+> > >
+> > > It's not ideal, but I don't see a nicer way.
+> >
+> > I think we need write a SiFive SPI model to support this in a clean
+> > way. Ideally we should simulate the hardware boot workflow as
+> > documented in the FU540 manual chapter 6 "Boot Process".
+>
+> I really didn't want to do this. For me it's low priority and there
+> are enough other things to work on rather then adding SiFive device
+> models. Maybe someone who works at SiFive would be able to do this?
+>
+> My hope with this series is that we could unblock firmware developers
+> (oreboot and coreboot) while the SPI model is written.
+>
 
-Hmm, I don't think it's used too frequently on structs parsed by qapi 
-opts visitor. What would be the command line format in that case? 
-Something like this?
+OK, so let's set the expectation that this is a temporary flash
+solution and will be changed in the future when the SiFive SPI model
+is ready.
 
--audiodev 
-pa,id=example,sink.channel-map=front-left,sink.channel-map=front-right
-
-I think it's simply a string because while conceptually it's a string, 
-we don't try to interpret it, we just pass the string to 
-pa_channel_map_parse.  Of course we could take a list and instead either 
-rebuild the string or reimplement half of pa_channel_map_parse by 
-manually calling pa_channel_position_from_string.
-Oh now that I looked again at the pulseaudio docs, channel-map doesn't 
-have to be a list, it can be also a "well-known mapping name".
-
-> 
->> +
->>   @end table
->>   
->>   @item -audiodev sdl,id=@var{id}[,@var{prop}[=@var{value}][,...]]
-
+Regards,
+Bin
 
