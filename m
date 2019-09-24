@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A595C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 19:43:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF079C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 19:47:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6052214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 19:43:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6052214AF
+	by mail.kernel.org (Postfix) with ESMTPS id B37682146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 19:47:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B37682146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCqiK-0003iM-3s
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 15:43:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34242)
+	id 1iCqmo-0006R2-HK
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 15:47:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34798)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iCqhO-00032H-VX
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 15:42:12 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCqkB-0004va-4i
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 15:45:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iCqhM-0002U3-5G
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 15:42:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44496)
+ (envelope-from <eblake@redhat.com>) id 1iCqkA-00046h-6S
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 15:45:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34168)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCqhL-0002Tj-R1
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 15:42:08 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCqk9-00045c-Pj
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 15:45:02 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E907B19D369;
- Tue, 24 Sep 2019 18:46:44 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B0F1A3B3C0;
+ Tue, 24 Sep 2019 19:45:00 +0000 (UTC)
 Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BE25E600CC;
- Tue, 24 Sep 2019 18:46:38 +0000 (UTC)
-Subject: Re: [PATCH 21/25] qapi: Avoid redundant definition references in
- error messages
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2EF4060C80;
+ Tue, 24 Sep 2019 19:44:57 +0000 (UTC)
+Subject: Re: [PATCH 23/25] qapi: Improve reporting of missing documentation
+ comment
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-22-armbru@redhat.com>
+ <20190924132830.15835-24-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -72,18 +72,18 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <1e6435a5-b059-ba0a-f881-8c7512560df1@redhat.com>
-Date: Tue, 24 Sep 2019 13:46:37 -0500
+Message-ID: <29c8fce1-57ec-1f6c-d895-dc134850533c@redhat.com>
+Date: Tue, 24 Sep 2019 14:44:57 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190924132830.15835-22-armbru@redhat.com>
+In-Reply-To: <20190924132830.15835-24-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="17X3jkg5qB8qQbhrXbfQCTTbmimVqMnkT"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+ boundary="9CZFvylDzJjQ0oAxvER2shQVrAuoYXzc7"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Tue, 24 Sep 2019 18:46:53 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Tue, 24 Sep 2019 19:45:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,119 +103,34 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---17X3jkg5qB8qQbhrXbfQCTTbmimVqMnkT
-Content-Type: multipart/mixed; boundary="HW5pj7C9nNMdxZy7omsghS4TNZqyvAbCH";
+--9CZFvylDzJjQ0oAxvER2shQVrAuoYXzc7
+Content-Type: multipart/mixed; boundary="lO2UFxDVfFk9FiyiUt5E2milWyKu03qmT";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <1e6435a5-b059-ba0a-f881-8c7512560df1@redhat.com>
-Subject: Re: [PATCH 21/25] qapi: Avoid redundant definition references in
- error messages
+Message-ID: <29c8fce1-57ec-1f6c-d895-dc134850533c@redhat.com>
+Subject: Re: [PATCH 23/25] qapi: Improve reporting of missing documentation
+ comment
 References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-22-armbru@redhat.com>
-In-Reply-To: <20190924132830.15835-22-armbru@redhat.com>
+ <20190924132830.15835-24-armbru@redhat.com>
+In-Reply-To: <20190924132830.15835-24-armbru@redhat.com>
 
---HW5pj7C9nNMdxZy7omsghS4TNZqyvAbCH
+--lO2UFxDVfFk9FiyiUt5E2milWyKu03qmT
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 9/24/19 8:28 AM, Markus Armbruster wrote:
-> Many error messages refer to the offending definition even though
-> they're preceded by an "in definition" line.  Rephrase them.
-
-This is the cleanup promised earlier in the series.
-
+> Have check_exprs() check this later, so the error message gains an "in
+> definition line".  Tweak the error message.
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  scripts/qapi/common.py                        | 113 +++++++-----------=
-
->  tests/qapi-schema/alternate-array.err         |   2 +-
-
->  def check_command(expr, info):
-> -    name =3D expr['command']
->      args =3D expr.get('data')
->      boxed =3D expr.get('boxed', False)
-> =20
->      if boxed and args is None:
->          raise QAPISemError(info, "'boxed': true requires 'data'")
-> -    check_type(args, info, "'data' for command '%s'" % name,
-> -               allow_dict=3Dnot boxed)
-> -    check_type(expr.get('returns'), info,
-> -               "'returns' for command '%s'" % name,
-> -               allow_array=3DTrue)
-> +    check_type(expr.get('data'), info, "'data'", allow_dict=3Dnot boxe=
-d)
-> +    check_type(expr.get('returns'), info, "'returns'", allow_array=3DT=
-rue)
-
-Why are you repeating expr.get('dat') here instead of reusing args?  I
-guess it adds consistency with the expr.get('returns') in the next line.
-
-> =20
-> =20
->  def check_event(expr, info):
-> -    name =3D expr['event']
->      args =3D expr.get('data')
->      boxed =3D expr.get('boxed', False)
-> =20
->      if boxed and args is None:
->          raise QAPISemError(info, "'boxed': true requires 'data'")
-> -    check_type(args, info, "'data' for event '%s'" % name,
-> -               allow_dict=3Dnot boxed)
-> +    check_type(expr.get('data'), info, "'data'", allow_dict=3Dnot boxe=
-d)
-Again, why not reuse args?
-
-
-> +++ b/tests/qapi-schema/args-member-case.err
-> @@ -1,2 +1,2 @@
->  tests/qapi-schema/args-member-case.json: In command 'no-way-this-will-=
-get-whitelisted':
-> -tests/qapi-schema/args-member-case.json:2: member of 'data' for comman=
-d 'no-way-this-will-get-whitelisted' uses uppercase in name 'Arg'
-> +tests/qapi-schema/args-member-case.json:2: 'data' member 'Arg' uses up=
-percase in name 'Arg'
-
-Better, but still feels redundant for calling out 'Arg' twice.  Maybe
-you further clean this one later?
-
-> +++ b/tests/qapi-schema/enum-member-case.err
-> @@ -1,2 +1,2 @@
->  tests/qapi-schema/enum-member-case.json: In enum 'NoWayThisWillGetWhit=
-elisted':
-> -tests/qapi-schema/enum-member-case.json:4: member of enum 'NoWayThisWi=
-llGetWhitelisted' uses uppercase in name 'Value'
-> +tests/qapi-schema/enum-member-case.json:4: 'data' member uses uppercas=
-e in name 'Value'
-
-Here's a similar error about uppercase that does not have the
-redundancy, for comparison.
-
-
-> +++ b/tests/qapi-schema/union-branch-case.err
-> @@ -1,2 +1,2 @@
->  tests/qapi-schema/union-branch-case.json: In union 'Uni':
-> -tests/qapi-schema/union-branch-case.json:2: member of union 'Uni' uses=
- uppercase in name 'Branch'
-> +tests/qapi-schema/union-branch-case.json:2: 'data' member 'Branch' use=
-s uppercase in name 'Branch'
-
-Another related one.
-
-> +++ b/tests/qapi-schema/union-optional-branch.err
-> @@ -1,2 +1,2 @@
->  tests/qapi-schema/union-optional-branch.json: In union 'Union':
-> -tests/qapi-schema/union-optional-branch.json:2: member of union 'Union=
-' uses invalid name '*a'
-> +tests/qapi-schema/union-optional-branch.json:2: 'data' member '*a' use=
-s invalid name '*a'
-
-Similar type of redundancy, but this time not related to uppercase.
-
-Overall an improvement.
+>  scripts/qapi/common.py            | 18 ++++++++----------
+>  tests/qapi-schema/doc-missing.err |  3 ++-
+>  2 files changed, 10 insertions(+), 11 deletions(-)
+>=20
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -225,24 +140,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---HW5pj7C9nNMdxZy7omsghS4TNZqyvAbCH--
+--lO2UFxDVfFk9FiyiUt5E2milWyKu03qmT--
 
---17X3jkg5qB8qQbhrXbfQCTTbmimVqMnkT
+--9CZFvylDzJjQ0oAxvER2shQVrAuoYXzc7
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KZI0ACgkQp6FrSiUn
-Q2rCbgf/c7D38Ld1Vvns7oy0n8hRtloYSsZ6k72iqr1BGOW7zwE9T3qRz342syfP
-qEzrLLZ2e/90VA2LetdMviKtRjHvyNds648+eVAZQ7cwJrX8IRDE0bWnmnlfUV3R
-4j0JQF4wi8/0owIsYqCbkUL7vJSrw1JAdGxs+b5Q6Nt4v4gAnw4EKAZYxPB+pzxE
-uuCz5IDeNrGGs8g9uv9neD8VPm7XknTCKohgFcR8QUMSt+IhhEO4EEJ+XE/rOHNc
-zS2UpiXWrw5gGlYZSaSaona9xxO1AzhBmkectQKRKhxb0psv2h3b1qf3/gf6wGSO
-KaxD6lbbZF8iFchvt72/4lDbP/ux1A==
-=OY0e
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KcjkACgkQp6FrSiUn
+Q2rz3wgAp4czeFFacX4DbvZb4iqH7TQbEDrfCEKmJSmG6xnaA+7j+KkC3mmjP8gn
+zdpYU5LwWeMWRMNfsR3Ecbo/D556U93yrHqY7rKguf01x8BiYuCRGJcQCpHghdIO
+mQizRDd0QBeEJz6WP5pH9uNFxkuBqg8oLX+GqHb24lXMV7gSQp+c0zctegJaV72H
+typS9Dw4QDZ0CpN1lHGHBb77FW4n+uQ1788K9wwfEbfls4Gr9a/YSdeSyVGpfnRL
+MUoq/bgSsue/XBVfaXCd/hKkfRB6243PuEhj77FV77rVgRiNJ47j+7W29VfLkzxN
+CYATMLhwd9bm0r2N/iQUx8nWoQcVNA==
+=U4Po
 -----END PGP SIGNATURE-----
 
---17X3jkg5qB8qQbhrXbfQCTTbmimVqMnkT--
+--9CZFvylDzJjQ0oAxvER2shQVrAuoYXzc7--
 
