@@ -2,86 +2,87 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26BD9C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 15:53:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 084DFC432C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 15:54:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F20CB214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 15:52:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F20CB214AF
+	by mail.kernel.org (Postfix) with ESMTPS id CE0D1214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 15:54:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE0D1214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCn7a-0005qH-Ju
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 11:52:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49223)
+	id 1iCn9A-0007td-4w
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 11:54:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43274)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iCmkJ-0006Ph-1K
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:28:56 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCmAM-0003q5-Lu
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:51:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iCmkH-0008S7-KP
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:28:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59664)
+ (envelope-from <eblake@redhat.com>) id 1iCmAL-0006B3-4x
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:51:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50812)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iCmkH-0008Rt-FQ
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:28:53 -0400
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCmAK-0006Ae-Sp
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:51:45 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 70B5E61D25
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 15:28:52 +0000 (UTC)
-Received: by mail-wm1-f72.google.com with SMTP id r21so193870wme.5
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 08:28:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=u34+nYWV7mjyL83tYY3SBkBCSHfmr4/0yuzhRqpY+/U=;
- b=C6fT1oSp35sbF4bXTO8SA75/4qrZmOqvaCI73becdokijr1B0YrPoyWCqqoHaZGvr9
- ZdOrDNFuHCPmjlOBIrocyjFQ8Q2gq2o5InrY8yQcfiU34NOpAIxRyT/vOrRX3Prv9bWe
- LYlIR8MUyI0v/8Msx59sD1GqsiTUYOa35bR5456ry48E2jFHZFWDkGa8xZtmTRL9FyTp
- ZTzRJ5lK5I2/t08Eybiu0VdnpYWToVGyuK+QG6z9uApFWMVGvjr4qqoXUQ/+Tvz5SA6S
- 3KZMY3wlHntSaq2o9jOaVKG8PgSy9sDzWqRPM6V2hOGPskvT4qK7QhynEg8EN2EwqIAN
- rYcg==
-X-Gm-Message-State: APjAAAWU2toKRiVkt/A7AN7/B3PKqiAhOcOb1cPK+du/T3YgfQ70xGSr
- 3TsZ85QyjAtMBPvq3K5U2GzU6eorQ1SaXsMa2CF3tzZIIw0FS0ZxM0zayvtjM3i1gzZ3pbXWcAd
- YnH73jaDghMf5ydY=
-X-Received: by 2002:adf:f708:: with SMTP id r8mr2841707wrp.187.1569338930955; 
- Tue, 24 Sep 2019 08:28:50 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzQSUn+XtPrMw8u3vvNWkU9tlKiZ9m/5P70EhI5jPlhgCTC7UmvM2HAjarNvrgcAk7ogV+CWQ==
-X-Received: by 2002:adf:f708:: with SMTP id r8mr2841680wrp.187.1569338930741; 
- Tue, 24 Sep 2019 08:28:50 -0700 (PDT)
-Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id y14sm3130854wrd.84.2019.09.24.08.28.49
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 24 Sep 2019 08:28:49 -0700 (PDT)
-Subject: Re: [PATCH v2 0/2] edk2 build scripts: eliminate python 2 dependency
-To: John Snow <jsnow@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- qemu devel list <qemu-devel@nongnu.org>
-References: <20190920083808.21399-1-lersek@redhat.com>
- <364077b0-455a-b65a-dbc8-a8b0409c287e@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <3cfa97be-ab31-ece1-40e0-af6f5b07b574@redhat.com>
-Date: Tue, 24 Sep 2019 17:28:49 +0200
+ by mx1.redhat.com (Postfix) with ESMTPS id DAF5285550;
+ Tue, 24 Sep 2019 14:51:43 +0000 (UTC)
+Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 61C3619C6A;
+ Tue, 24 Sep 2019 14:51:41 +0000 (UTC)
+Subject: Re: [PATCH 03/25] qapi: New QAPISourceInfo, replacing dict
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190924132830.15835-1-armbru@redhat.com>
+ <20190924132830.15835-4-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <4ff086cb-7c96-a25a-be19-d78af40afd9b@redhat.com>
+Date: Tue, 24 Sep 2019 09:51:40 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <364077b0-455a-b65a-dbc8-a8b0409c287e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190924132830.15835-4-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="I5bCauHbQtKkNrr0cfzlwzbtZp73jQNse"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Tue, 24 Sep 2019 14:51:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,47 +96,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/20/19 6:06 PM, John Snow wrote:
-> On 9/20/19 4:38 AM, Laszlo Ersek wrote:
->> v1 URL:
->> http://mid.mail-archive.com/20190918171141.15957-1-lersek@redhat.com
->>
->> Updates are noted on each patch.
->>
->> Cc: Eduardo Habkost <ehabkost@redhat.com>
->> Cc: John Snow <jsnow@redhat.com>
->> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>
->> Thanks
->> Laszlo
->>
->> Laszlo Ersek (2):
->>   edk2 build scripts: honor external BaseTools flags with
->>     uefi-test-tools
->>   edk2 build scripts: work around TianoCore#1607 without forcing Pytho=
-n
->>     2
->>
->>  roms/Makefile                  |  1 +
->>  roms/edk2-build.sh             |  4 ++--
->>  roms/edk2-funcs.sh             | 17 +++++++++++++++++
->>  tests/uefi-test-tools/Makefile |  5 ++++-
->>  tests/uefi-test-tools/build.sh |  6 ++++--
->>  5 files changed, 28 insertions(+), 5 deletions(-)
->>
->=20
-> Thank you again!
->=20
-> I'm sure we'll find all of the rough spots during the rc process, so I
-> am quite content for now.
->=20
-> Reviewed-by: John Snow <jsnow@redhat.com>
->=20
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--I5bCauHbQtKkNrr0cfzlwzbtZp73jQNse
+Content-Type: multipart/mixed; boundary="qAlyguDQa4LijQYLxFKQOl7gNiXVu1Kof";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+Message-ID: <4ff086cb-7c96-a25a-be19-d78af40afd9b@redhat.com>
+Subject: Re: [PATCH 03/25] qapi: New QAPISourceInfo, replacing dict
+References: <20190924132830.15835-1-armbru@redhat.com>
+ <20190924132830.15835-4-armbru@redhat.com>
+In-Reply-To: <20190924132830.15835-4-armbru@redhat.com>
 
-Thanks, queued on edk2-next.
+--qAlyguDQa4LijQYLxFKQOl7gNiXVu1Kof
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 9/24/19 8:28 AM, Markus Armbruster wrote:
+> We track source locations with a dict of the form
+>=20
+>     {'file': FNAME, 'line': LINENO, parent': PARENT}
+
+Missing ' on parent
+
+>=20
+> where PARENT is None for the main file, and the include directive's
+> source location for included files.
+>=20
+> This is servicable enough, but the next commit will add information,
+
+serviceable
+
+> and that's going to come out cleaner if we turn this into a class.  So
+> do that.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  scripts/qapi/common.py | 69 +++++++++++++++++++++++++-----------------=
+
+>  1 file changed, 41 insertions(+), 28 deletions(-)
+>=20
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--qAlyguDQa4LijQYLxFKQOl7gNiXVu1Kof--
+
+--I5bCauHbQtKkNrr0cfzlwzbtZp73jQNse
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KLXwACgkQp6FrSiUn
+Q2q2FAgAqjxVMnmTtx4OrhAAr6BWrqvjEp4VpSzQLHUBJKm/xocFL58t7VZoFc9k
+2djyD0aj0fMy4J7XOK7a6TiaS4pkR1SQePS9+8Um/HEUp4Oy0AC3n+402+AAURYm
+TzueuteZm6B+QERtIYxgMOtFVtwJTAHa3Y2jeYARsdWw17zZK+kfYu0AQ3ipa6/D
+aE6Og4uc/Zb3jj28wPm1dGrs9skQDyagBbVLkVWZidgTQvHMa+rK7n1umGPwRmGz
+ZL+dFjC5aO71HY9RjSme37x/K06xeyQw4PIl/OtyKELqYvHYZgNVyNIucXrH946k
+bTFQH+nfuewb+TZDs3XrEpZDJfNogg==
+=InqA
+-----END PGP SIGNATURE-----
+
+--I5bCauHbQtKkNrr0cfzlwzbtZp73jQNse--
 
