@@ -2,74 +2,65 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61821C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:13:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2BD3C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:14:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0678A214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:13:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0678A214AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cloudbasesolutions.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8DF172146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:14:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DF172146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCkd7-0000ws-5O
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:13:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38056)
+	id 1iCkeL-0002LO-00
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:14:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50642)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iCiTx-0004p5-Bs
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 06:55:49 -0400
+ (envelope-from <armbru@redhat.com>) id 1iCk0r-0001NF-5X
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iCiTt-00069O-NQ
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 06:55:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47222)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iCiTt-00068M-EX
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 06:55:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iCiTr-000555-TU
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 10:55:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id DD5662E806E
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 10:55:39 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Sep 2019 10:48:42 -0000
-From: Adrian Vladu <avladu@cloudbasesolutions.com>
+ (envelope-from <armbru@redhat.com>) id 1iCk0k-0006zI-HL
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46520)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCk0j-0006wX-Vg
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:42 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id EAF8830A7B99
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 12:33:40 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 941FE608C2;
+ Tue, 24 Sep 2019 12:33:40 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 0EB241136428; Tue, 24 Sep 2019 14:33:35 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: avladu
-X-Launchpad-Bug-Reporter: Adrian Vladu (avladu)
-X-Launchpad-Bug-Modifier: Adrian Vladu (avladu)
-Message-Id: <156932212305.13447.6077258015607645915.malonedeb@gac.canonical.com>
-Subject: [Bug 1845185] [NEW] Cannot build qemu utils (qemu-img.exe,
- qemu-edid.exe,
- qemu-io.exe) statically with MSYS2 on Windows because intl and iconv libs are
- not loaded
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19048";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 19cc770427a9163f551e3c427de812fff3f6675b
+Subject: [PULL 28/37] qapi: Fix broken discriminator error messages
+Date: Tue, 24 Sep 2019 14:33:25 +0200
+Message-Id: <20190924123334.30645-29-armbru@redhat.com>
+In-Reply-To: <20190924123334.30645-1-armbru@redhat.com>
+References: <20190924123334.30645-1-armbru@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Tue, 24 Sep 2019 12:33:40 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-X-Mailman-Approved-At: Tue, 24 Sep 2019 09:10:43 -0400
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,252 +69,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1845185 <1845185@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+check_union() checks the discriminator exists in base and makes sense.
+Two error messages mention the base.  These are broken for anonymous
+bases, as demonstrated by tests flat-union-invalid-discriminator and
+flat-union-invalid-if-discriminator.err.  The third one doesn't
+bother.
 
-Using MSYS2 and mingw32 instructions from
-https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2, I could not
-statically build the qemu-utils using the latest qemu master branch.
+First broken when commit ac4338f8eb "qapi: Allow anonymous base for
+flat union" (v2.6.0) neglected to adjust the "not a member of base"
+error message.  Commit ccadd6bcba "qapi: Add 'if' to implicit struct
+members" (v4.0.0) then cloned the flawed error message.
 
-Steps to reproduce the issue:
-1. Install MSYS2 on a Windows 10 x64 box
-2. Install required mingw64 toolchain: pacman -S base-devel mingw-w64-x86_6=
-4-toolchain git python mingw-w64-x86_64-glib2 mingw64/mingw-w64-x86_64-gtk3=
- mingw64/mingw-w64-x86_64-SDL2
-3. clone qemu
-4. Run configure for static build for the tools only
-=C2=A0=C2=A0./configure --disable-user --disable-system --disable-docs --en=
-able-tools  --disable-guest-agent --disable-capstone --disable-sheepdog --e=
-nable-debug --static
-=C2=A0=C2=A0# I had to remove sheepdog, capstone and guest agent because ot=
-her errors popped out, but let's not go in the rabbit hole.
-5. Run 'make -j'. the following errors appeared, signaling that intl lib is=
- not loaded. If I add intl lib, iconv lib needs to be loaded too.
+Dumb them down not to mention the base.
 
-make: *** [/home/ader1990/qemu/rules.mak:124: qemu-img.exe] Error 1
-make: *** Waiting for unfinished jobs....
-C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1522): undefi=
-ned reference to `libintl_sprintf'
-C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x154f): undefi=
-ned reference to `libintl_sprintf'
-C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x157e): undefi=
-ned reference to `libintl_sprintf'
-C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15ad): undefi=
-ned reference to `libintl_sprintf'
-C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15dc): undefi=
-ned reference to `libintl_sprintf'
-C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1622): more u=
-ndefined references to `libintl_sprintf' follow
-C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x43): undefine=
-d reference to `libintl_textdomain'
-C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x52): undefine=
-d reference to `libintl_gettext'
-C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x203): undefin=
-ed reference to `libintl_bindtextdomain'
-C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x21e): undefin=
-ed reference to `libintl_bind_textdomain_codeset'
-C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x2c1): undefin=
-ed reference to `libintl_dgettext'
-C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x4e1): undefin=
-ed reference to `libintl_dcgettext'
-C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x53a): undefin=
-ed reference to `libintl_dngettext'
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20190914153506.2151-11-armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ scripts/qapi/common.py                                   | 9 ++++-----
+ tests/qapi-schema/flat-union-invalid-discriminator.err   | 2 +-
+ tests/qapi-schema/flat-union-invalid-discriminator.json  | 1 -
+ .../qapi-schema/flat-union-invalid-if-discriminator.err  | 2 +-
+ .../qapi-schema/flat-union-invalid-if-discriminator.json | 1 -
+ tests/qapi-schema/flat-union-optional-discriminator.err  | 2 +-
+ tests/qapi-schema/union-base-empty.err                   | 2 +-
+ 7 files changed, 8 insertions(+), 11 deletions(-)
 
-Patch to fix the issue (added intl and iconv to the libs):
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index ef7c7be4fd..a58e904978 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -877,14 +877,13 @@ def check_union(expr, info):
+         discriminator_value =3D base_members.get(discriminator)
+         if not discriminator_value:
+             raise QAPISemError(info,
+-                               "Discriminator '%s' is not a member of ba=
+se "
+-                               "struct '%s'"
+-                               % (discriminator, base))
++                               "Discriminator '%s' is not a member of 'b=
+ase'"
++                               % discriminator)
+         if discriminator_value.get('if'):
+             raise QAPISemError(
+                 info,
+-                "The discriminator %s.%s for union %s must not be condit=
+ional"
+-                % (base, discriminator, name))
++                "The discriminator '%s' for union %s must not be conditi=
+onal"
++                % (discriminator, name))
+         enum_define =3D enum_types.get(discriminator_value['type'])
+         # Do not allow string discriminator
+         if not enum_define:
+diff --git a/tests/qapi-schema/flat-union-invalid-discriminator.err b/tes=
+ts/qapi-schema/flat-union-invalid-discriminator.err
+index 947a6b73aa..495d5a520e 100644
+--- a/tests/qapi-schema/flat-union-invalid-discriminator.err
++++ b/tests/qapi-schema/flat-union-invalid-discriminator.err
+@@ -1 +1 @@
+-tests/qapi-schema/flat-union-invalid-discriminator.json:11: Discriminato=
+r 'enum_wrong' is not a member of base struct 'OrderedDict([('enum1', {'t=
+ype': 'TestEnum'})])'
++tests/qapi-schema/flat-union-invalid-discriminator.json:10: Discriminato=
+r 'enum_wrong' is not a member of 'base'
+diff --git a/tests/qapi-schema/flat-union-invalid-discriminator.json b/te=
+sts/qapi-schema/flat-union-invalid-discriminator.json
+index de86cf0760..c4fce97362 100644
+--- a/tests/qapi-schema/flat-union-invalid-discriminator.json
++++ b/tests/qapi-schema/flat-union-invalid-discriminator.json
+@@ -1,4 +1,3 @@
+-# FIXME error message shows base as OrderedDict
+ { 'enum': 'TestEnum',
+   'data': [ 'value1', 'value2' ] }
+=20
+diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.err b/=
+tests/qapi-schema/flat-union-invalid-if-discriminator.err
+index ec04c4840c..cc5c3fb80b 100644
+--- a/tests/qapi-schema/flat-union-invalid-if-discriminator.err
++++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.err
+@@ -1 +1 @@
+-tests/qapi-schema/flat-union-invalid-if-discriminator.json:11: The discr=
+iminator OrderedDict([('enum1', OrderedDict([('type', 'TestEnum'), ('if',=
+ 'FOO')]))]).enum1 for union TestUnion must not be conditional
++tests/qapi-schema/flat-union-invalid-if-discriminator.json:10: The discr=
+iminator 'enum1' for union TestUnion must not be conditional
+diff --git a/tests/qapi-schema/flat-union-invalid-if-discriminator.json b=
+/tests/qapi-schema/flat-union-invalid-if-discriminator.json
+index bbaa9a3f82..e49992b798 100644
+--- a/tests/qapi-schema/flat-union-invalid-if-discriminator.json
++++ b/tests/qapi-schema/flat-union-invalid-if-discriminator.json
+@@ -1,4 +1,3 @@
+-# FIXME error message shows base as OrderedDict
+ { 'enum': 'TestEnum',
+   'data': [ 'value1', 'value2' ] }
+=20
+diff --git a/tests/qapi-schema/flat-union-optional-discriminator.err b/te=
+sts/qapi-schema/flat-union-optional-discriminator.err
+index 8b4a4ba847..45f5407c34 100644
+--- a/tests/qapi-schema/flat-union-optional-discriminator.err
++++ b/tests/qapi-schema/flat-union-optional-discriminator.err
+@@ -1 +1 @@
+-tests/qapi-schema/flat-union-optional-discriminator.json:7: Discriminato=
+r 'switch' is not a member of base struct 'Base'
++tests/qapi-schema/flat-union-optional-discriminator.json:7: Discriminato=
+r 'switch' is not a member of 'base'
+diff --git a/tests/qapi-schema/union-base-empty.err b/tests/qapi-schema/u=
+nion-base-empty.err
+index 7695806d81..9453720ede 100644
+--- a/tests/qapi-schema/union-base-empty.err
++++ b/tests/qapi-schema/union-base-empty.err
+@@ -1 +1 @@
+-tests/qapi-schema/union-base-empty.json:5: Discriminator 'type' is not a=
+ member of base struct 'Empty'
++tests/qapi-schema/union-base-empty.json:5: Discriminator 'type' is not a=
+ member of 'base'
+--=20
+2.21.0
 
-diff --git a/configure b/configure
-index 30aad233d1..e2ab8ef026 100755
---- a/configure
-+++ b/configure
-@@ -920,7 +920,7 @@ if test "$mingw32" =3D "yes" ; then
-=C2=A0=C2=A0=C2=A0DSOSUF=3D".dll"
-=C2=A0=C2=A0=C2=A0# MinGW needs -mthreads for TLS and macro _MT.
-=C2=A0=C2=A0=C2=A0QEMU_CFLAGS=3D"-mthreads $QEMU_CFLAGS"
--  LIBS=3D"-lwinmm -lws2_32 -liphlpapi $LIBS"
-+  LIBS=3D"-lwinmm -lws2_32 -liphlpapi -lintl -liconv $LIBS"
-=C2=A0=C2=A0=C2=A0write_c_skeleton;
-=C2=A0=C2=A0=C2=A0if compile_prog "" "-liberty" ; then
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0LIBS=3D"-liberty $LIBS"
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Description changed:
-
-  Using MSYS2 and mingw32 instructions from
-  https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2, I could not
-  statically build the qemu-utils using the latest qemu master branch.
-  =
-
-  Steps to reproduce the issue:
-  1. Install MSYS2 on a Windows 10 x64 box
-  2. Install required mingw64 toolchain: pacman -S base-devel mingw-w64-x86=
-_64-toolchain git python mingw-w64-x86_64-glib2 mingw64/mingw-w64-x86_64-gt=
-k3 mingw64/mingw-w64-x86_64-SDL2
-  3. clone qemu
-  4. Run configure for static build for the tools only
--   ./configure --disable-user --disable-system --disable-docs --enable-too=
-ls  --disable-guest-agent --disable-capstone --disable-sheepdog --enable-de=
-bug --static
--   # I had to remove sheepdog, capstone and guest agent because other erro=
-rs popped out, but this not the purpose of this bug report
-- 5. Run 'make -j'. the following errors appeared, signaling that intl lib =
-is not loaded. If I add intl lib, iconv lib need to be loaded too.
-+ =C2=A0=C2=A0./configure --disable-user --disable-system --disable-docs --=
-enable-tools  --disable-guest-agent --disable-capstone --disable-sheepdog -=
--enable-debug --static
-+ =C2=A0=C2=A0# I had to remove sheepdog, capstone and guest agent because =
-other errors popped out, but let's not go in the rabbit hole.
-+ 5. Run 'make -j'. the following errors appeared, signaling that intl lib =
-is not loaded. If I add intl lib, iconv lib needs to be loaded too.
-  =
-
-  make: *** [/home/ader1990/qemu/rules.mak:124: qemu-img.exe] Error 1
-  make: *** Waiting for unfinished jobs....
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1522): unde=
-fined reference to `libintl_sprintf'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x154f): unde=
-fined reference to `libintl_sprintf'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x157e): unde=
-fined reference to `libintl_sprintf'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15ad): unde=
-fined reference to `libintl_sprintf'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15dc): unde=
-fined reference to `libintl_sprintf'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1622): more=
- undefined references to `libintl_sprintf' follow
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x43): undefi=
-ned reference to `libintl_textdomain'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x52): undefi=
-ned reference to `libintl_gettext'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x203): undef=
-ined reference to `libintl_bindtextdomain'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x21e): undef=
-ined reference to `libintl_bind_textdomain_codeset'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x2c1): undef=
-ined reference to `libintl_dgettext'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x4e1): undef=
-ined reference to `libintl_dcgettext'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x53a): undef=
-ined reference to `libintl_dngettext'
-  =
-
-- =
-
-  Patch to fix the issue (added intl and iconv to the libs):
-  =
-
-  diff --git a/configure b/configure
-  index 30aad233d1..e2ab8ef026 100755
-  --- a/configure
-  +++ b/configure
-  @@ -920,7 +920,7 @@ if test "$mingw32" =3D "yes" ; then
--    DSOSUF=3D".dll"
--    # MinGW needs -mthreads for TLS and macro _MT.
--    QEMU_CFLAGS=3D"-mthreads $QEMU_CFLAGS"
-+ =C2=A0=C2=A0=C2=A0DSOSUF=3D".dll"
-+ =C2=A0=C2=A0=C2=A0# MinGW needs -mthreads for TLS and macro _MT.
-+ =C2=A0=C2=A0=C2=A0QEMU_CFLAGS=3D"-mthreads $QEMU_CFLAGS"
-  -  LIBS=3D"-lwinmm -lws2_32 -liphlpapi $LIBS"
-  +  LIBS=3D"-lwinmm -lws2_32 -liphlpapi -lintl -liconv $LIBS"
--    write_c_skeleton;
--    if compile_prog "" "-liberty" ; then
--      LIBS=3D"-liberty $LIBS"
-+ =C2=A0=C2=A0=C2=A0write_c_skeleton;
-+ =C2=A0=C2=A0=C2=A0if compile_prog "" "-liberty" ; then
-+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0LIBS=3D"-liberty $LIBS"
-
-** Summary changed:
-
-- Cannot build qemu utils (qemu-img.exe, qemu-edid.exe, qemu-io.exe) static=
-ally with MSYS2 on Windows
-+ Cannot build qemu utils (qemu-img.exe, qemu-edid.exe, qemu-io.exe) static=
-ally with MSYS2 on Windows because intl and iconv libs are not loaded
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1845185
-
-Title:
-  Cannot build qemu utils (qemu-img.exe, qemu-edid.exe, qemu-io.exe)
-  statically with MSYS2 on Windows because intl and iconv libs are not
-  loaded
-
-Status in QEMU:
-  New
-
-Bug description:
-  Using MSYS2 and mingw32 instructions from
-  https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2, I could not
-  statically build the qemu-utils using the latest qemu master branch.
-
-  Steps to reproduce the issue:
-  1. Install MSYS2 on a Windows 10 x64 box
-  2. Install required mingw64 toolchain: pacman -S base-devel mingw-w64-x86=
-_64-toolchain git python mingw-w64-x86_64-glib2 mingw64/mingw-w64-x86_64-gt=
-k3 mingw64/mingw-w64-x86_64-SDL2
-  3. clone qemu
-  4. Run configure for static build for the tools only
-  =C2=A0=C2=A0./configure --disable-user --disable-system --disable-docs --=
-enable-tools  --disable-guest-agent --disable-capstone --disable-sheepdog -=
--enable-debug --static
-  =C2=A0=C2=A0# I had to remove sheepdog, capstone and guest agent because =
-other errors popped out, but let's not go in the rabbit hole.
-  5. Run 'make -j'. the following errors appeared, signaling that intl lib =
-is not loaded. If I add intl lib, iconv lib needs to be loaded too.
-
-  make: *** [/home/ader1990/qemu/rules.mak:124: qemu-img.exe] Error 1
-  make: *** Waiting for unfinished jobs....
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1522): unde=
-fined reference to `libintl_sprintf'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x154f): unde=
-fined reference to `libintl_sprintf'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x157e): unde=
-fined reference to `libintl_sprintf'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15ad): unde=
-fined reference to `libintl_sprintf'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15dc): unde=
-fined reference to `libintl_sprintf'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1622): more=
- undefined references to `libintl_sprintf' follow
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x43): undefi=
-ned reference to `libintl_textdomain'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x52): undefi=
-ned reference to `libintl_gettext'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x203): undef=
-ined reference to `libintl_bindtextdomain'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x21e): undef=
-ined reference to `libintl_bind_textdomain_codeset'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x2c1): undef=
-ined reference to `libintl_dgettext'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x4e1): undef=
-ined reference to `libintl_dcgettext'
-  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x53a): undef=
-ined reference to `libintl_dngettext'
-
-  Patch to fix the issue (added intl and iconv to the libs):
-
-  diff --git a/configure b/configure
-  index 30aad233d1..e2ab8ef026 100755
-  --- a/configure
-  +++ b/configure
-  @@ -920,7 +920,7 @@ if test "$mingw32" =3D "yes" ; then
-  =C2=A0=C2=A0=C2=A0DSOSUF=3D".dll"
-  =C2=A0=C2=A0=C2=A0# MinGW needs -mthreads for TLS and macro _MT.
-  =C2=A0=C2=A0=C2=A0QEMU_CFLAGS=3D"-mthreads $QEMU_CFLAGS"
-  -  LIBS=3D"-lwinmm -lws2_32 -liphlpapi $LIBS"
-  +  LIBS=3D"-lwinmm -lws2_32 -liphlpapi -lintl -liconv $LIBS"
-  =C2=A0=C2=A0=C2=A0write_c_skeleton;
-  =C2=A0=C2=A0=C2=A0if compile_prog "" "-liberty" ; then
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0LIBS=3D"-liberty $LIBS"
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1845185/+subscriptions
 
