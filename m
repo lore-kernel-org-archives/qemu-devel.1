@@ -2,120 +2,91 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63951C432C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:54:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8437BC4320D
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:57:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F64A222C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:54:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Ctn+/Nnc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F64A222C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5C7DD21841
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:57:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C7DD21841
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCo5C-0006Oz-Am
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:54:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52133)
+	id 1iCo8I-0001Ow-Qe
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:57:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33630)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iCmzY-0005hb-CF
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:44:41 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iCnra-0002u0-MN
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 12:40:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iCmzW-0001T6-Le
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:44:40 -0400
-Received: from mail-eopbgr10114.outbound.protection.outlook.com
- ([40.107.1.114]:58375 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iCmzF-0001KR-M2; Tue, 24 Sep 2019 11:44:22 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CIN8FEVyMq9zzDQj3/JR5PG5cFEhGpCIQOhJqV6Zi6aoaWwF9YvA2VD0uYu7GCfUvPVcAMw9k3lN8oWFuKBP2EgMtigU/8nCIhx1OP1GluJdi58bLl99v7I1Mv7etVMfFoQA2rdtEuRaZWWliCjcdPMiUoOSOCR637/mIT6Hsu2mNBXkpxh/LE0mvBCp81YCOrJXOGq5mT/VfYck1ouJpHcobZe/pDZNujg63VvhjSAvNltKG7S6Hf7a0FjeoBR/BgN2yBh04UchXsvdseXEIVU6INVBzELxZClhlf5q6kwVg/xpfFQ6mqUUy1rqnc3DOew1ikpCUrqFZouXJ/a63Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jtvaAOFSWQShvdYli2h1DMsogbMNuGaeeEBtgDwSVdI=;
- b=oMeWSlRhU7fO76lKNMZjU8QV7lQ4PEO17ssRlH+3+oaOYXdEtgHxr+sTtJsENR2iZm+LLLftVR1HEWVyhq/KI+q8D2BdznzkX2ePCng29MnIM7CpCFJYlQGECEpyMNJK3DqYBFgvipjCqmHbthIY0AguNCd516qMXhABUqVEm6giQIa+qE1JJCW2tl7e55H43mDcL/4yKBQ8culO/R/WCyXEbEDcrYOZtEtblJuE91++9Ww/4xT2bQNtlkDITqbvgkCVEvEzFHe7hnCxrT3mcM2DHaLPpuXQZ8H6l3j4EhZpeOz0U5/nWR9/oTQ5w1+STBkwmKoqbyyMAuY+aMhMnw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jtvaAOFSWQShvdYli2h1DMsogbMNuGaeeEBtgDwSVdI=;
- b=Ctn+/Nncs/KKbAJ9XYltiDsm13OnYeo9tEIGOLq42rEFBiHLcypzbpxCmReNvB+ovBUIiBhjtriLY8Fp4RRd/Bg+k7LBQ7b7XPe40PU5PXr4SXdsBAbGhKI1jc6kdZs8nefusrSSH3qWMchkzT7uGpymmLw/ySgxADW3qYRoYOs=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5337.eurprd08.prod.outlook.com (52.133.243.73) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2284.22; Tue, 24 Sep 2019 15:44:18 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2284.023; Tue, 24 Sep 2019
- 15:44:18 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Subject: Re: [RFC v2 0/9] error: auto propagated local_err
-Thread-Topic: [RFC v2 0/9] error: auto propagated local_err
-Thread-Index: AQHVcioNiDMY2yo+Z0yF9jZaFGvJZ6c5qyCAgAFm+wD//+MaAIAABEQA
-Date: Tue, 24 Sep 2019 15:44:18 +0000
-Message-ID: <97b77e48-b370-a596-0a06-9ceaaf6bc72e@virtuozzo.com>
-References: <20190923161231.22028-1-vsementsov@virtuozzo.com>
- <d1527fdc-b5e8-093a-9206-6f7ceeece2ac@redhat.com>
- <84c9e5dd-3e0f-94e1-5da1-2c7baa594bf1@virtuozzo.com>
- <22191b09-822a-1f54-dcaa-3726c833805b@redhat.com>
-In-Reply-To: <22191b09-822a-1f54-dcaa-3726c833805b@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1P18901CA0014.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:3:8b::24) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190924184408309
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d372e8c5-ad1f-4844-9b39-08d741060f07
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB5337; 
-x-ms-traffictypediagnostic: DB8PR08MB5337:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DB8PR08MB5337AE8A858F0348452593B2C1840@DB8PR08MB5337.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-forefront-prvs: 0170DAF08C
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(366004)(39850400004)(396003)(376002)(346002)(136003)(189003)(199004)(229853002)(71200400001)(14454004)(71190400001)(64756008)(99286004)(478600001)(52116002)(81156014)(446003)(7366002)(66556008)(7416002)(7276002)(256004)(486006)(7336002)(45426003)(86362001)(53546011)(6506007)(26005)(305945005)(2616005)(76176011)(31686004)(8936002)(81166006)(66446008)(8676002)(186003)(11346002)(31696002)(2906002)(7406005)(386003)(2501003)(36756003)(5660300002)(4326008)(6436002)(102836004)(476003)(7736002)(3846002)(66476007)(25786009)(316002)(66066001)(6486002)(6246003)(6512007)(66946007)(6116002)(54906003)(110136005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5337;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: vpdKp2GZB6HBV3owJKeCMxLcOTlxzFSUAGFEICZV3e2EmaiWVMngHkQWWNU/8XsIemQm9uQe68l0OMrECf9oV7PSuTGSSw7ikbAyLp+MXksyEmCR03Cte5fa2w1uDaJLmS9QHWhjKojMOI8FEeqcuspOGvx8rvko5SHSBnZ8JwWS/83IXCu7TQ+JRwGmD67vhfxtzdcmp7VuhlRVVy+2ArTjm+yfFQFk/BpEF5NssSegrs/fWucQJcm3qV6aTFbSA+kla5OH0/R0EtNSrNT6ks0Mzxru6TSr3yqYIku5HCfVUJBkT13/ub87LWWKGHNEtvuXbvR7A0bcSA7I6w9yNAvZRd3Zw9kw9akry46Dix3fFh9jVZ2GsOpc2hxQBPtF/whdUK4nZX9QZATuZOShupJHL+W1r+o2cqng+5jOpns=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <5E5FEBF655307A49B3A44F5E718496B3@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <pbonzini@redhat.com>) id 1iCnrZ-0004Bt-23
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 12:40:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:4580)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iCnrY-0004BS-Nf
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 12:40:28 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AA2FE87638
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 16:40:27 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id c188so288822wmd.9
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 09:40:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=eS+CIoFof7zcv8exRAEa/0As+ciSjYoFHaD79dw/+EU=;
+ b=qpGiIM9Mb3KQ8GfRE7sybZ3nvQMYX2MhAJBwCA/NPYnal5ta7exCWIi7F+8jiTMipR
+ jZnqCmARNLyCEm9EiKR9CO+Vegw9bqGVdVMriSjuENiMIApqfdfEr1/habjgMWC6wzrE
+ UM63iralBqIaPyC/jGq6UdohfdniK/5nGoEimQK26UK7D+5Z7r70ct22v2GS7Wf0xc9f
+ NLvveTRJdrwguNAWRBBkiwylktwk2vNZllBsz3bCJSIVlE2Q2wiR6IfMK8nLVztVkqaF
+ XTCVoytfulkZvqOmQatsXDxT636KHB4b0/0q0L1z9QUsiyplffsSddtlvdTh7G+XM+ZI
+ aQxA==
+X-Gm-Message-State: APjAAAVBcAASoOxTRKkRXRWaCe+219p5dCnQifvBFwkhDvaEM3HZTqVF
+ AO5+w+w0QiFH7vorejoMQwlpfRTsuiLJNz6TpV1cx5k8AMNQuSA7kMWsDnxrBkGDECCCAN2dgh4
+ xABvT/1hYaUZLajw=
+X-Received: by 2002:a05:6000:1632:: with SMTP id
+ v18mr3375035wrb.233.1569343226299; 
+ Tue, 24 Sep 2019 09:40:26 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx3XAWrTal+QH2Gj16vKQrlrCqCOekmPDl6uxf0ahMcbnneBUT1mNyfZyVE/28zKcIT2/YbOQ==
+X-Received: by 2002:a05:6000:1632:: with SMTP id
+ v18mr3375007wrb.233.1569343225987; 
+ Tue, 24 Sep 2019 09:40:25 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36?
+ ([2001:b07:6468:f312:9520:22e6:6416:5c36])
+ by smtp.gmail.com with ESMTPSA id z1sm2939953wre.40.2019.09.24.09.40.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 24 Sep 2019 09:40:25 -0700 (PDT)
+Subject: Re: [PATCH v4 1/2] vfio: Turn the container error into an Error handle
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
+ alex.williamson@redhat.com, peterx@redhat.com, aik@ozlabs.ru,
+ david@gibson.dropbear.id.au
+References: <20190924082517.13724-1-eric.auger@redhat.com>
+ <20190924082517.13724-2-eric.auger@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <2068b2a4-768f-ef66-2b30-58b3ad203164@redhat.com>
+Date: Tue, 24 Sep 2019 18:40:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d372e8c5-ad1f-4844-9b39-08d741060f07
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Sep 2019 15:44:18.0465 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: U8sRYUpouOont3+xCuHJhh+RUJqw0ijlRmnePEW2xyvtaN/Xcc+ZtPyTe1yBrQRfZ5OyNc+kTuTvM0+g0niY0GKxxw1m4ChAaVoHoPBjgvM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5337
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.1.114
+In-Reply-To: <20190924082517.13724-2-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,147 +98,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "stefanha@redhat.com" <stefanha@redhat.com>,
- "codyprime@gmail.com" <codyprime@gmail.com>,
- "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>,
- "berto@igalia.com" <berto@igalia.com>,
- "zhang.zhanghailiang@huawei.com" <zhang.zhanghailiang@huawei.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "arikalo@wavecomp.com" <arikalo@wavecomp.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
- "hpoussin@reactos.org" <hpoussin@reactos.org>,
- "anthony.perard@citrix.com" <anthony.perard@citrix.com>,
- "samuel.thibault@ens-lyon.org" <samuel.thibault@ens-lyon.org>,
- "philmd@redhat.com" <philmd@redhat.com>,
- "green@moxielogic.com" <green@moxielogic.com>,
- "lvivier@redhat.com" <lvivier@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>,
- "pl@kamp.de" <pl@kamp.de>, "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "b.galvani@gmail.com" <b.galvani@gmail.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "ronniesahlberg@gmail.com" <ronniesahlberg@gmail.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>,
- "kwolf@redhat.com" <kwolf@redhat.com>, "andrew@aj.id.au" <andrew@aj.id.au>,
- "crwulff@gmail.com" <crwulff@gmail.com>,
- "sundeep.lkml@gmail.com" <sundeep.lkml@gmail.com>,
- "michael@walle.cc" <michael@walle.cc>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- "kbastian@mail.uni-paderborn.de" <kbastian@mail.uni-paderborn.de>,
- "imammedo@redhat.com" <imammedo@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "sheepdog@lists.wpkg.org" <sheepdog@lists.wpkg.org>,
- "david@redhat.com" <david@redhat.com>, "palmer@sifive.com" <palmer@sifive.com>,
- "thuth@redhat.com" <thuth@redhat.com>,
- "jcmvbkbc@gmail.com" <jcmvbkbc@gmail.com>, "hare@suse.com" <hare@suse.com>,
- "sstabellini@kernel.org" <sstabellini@kernel.org>,
- "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
- "namei.unix@gmail.com" <namei.unix@gmail.com>,
- "atar4qemu@gmail.com" <atar4qemu@gmail.com>,
- "farman@linux.ibm.com" <farman@linux.ibm.com>,
- "amit@kernel.org" <amit@kernel.org>, "sw@weilnetz.de" <sw@weilnetz.de>,
- "groug@kaod.org" <groug@kaod.org>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "peter.chubb@nicta.com.au" <peter.chubb@nicta.com.au>,
- "clg@kaod.org" <clg@kaod.org>, "shorne@gmail.com" <shorne@gmail.com>,
- "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "amarkovic@wavecomp.com" <amarkovic@wavecomp.com>,
- "aurelien@aurel32.net" <aurelien@aurel32.net>,
- "pburton@wavecomp.com" <pburton@wavecomp.com>,
- "sagark@eecs.berkeley.edu" <sagark@eecs.berkeley.edu>,
- "jasowang@redhat.com" <jasowang@redhat.com>,
- "kraxel@redhat.com" <kraxel@redhat.com>,
- "edgar.iglesias@gmail.com" <edgar.iglesias@gmail.com>,
- "gxt@mprc.pku.edu.cn" <gxt@mprc.pku.edu.cn>, "ari@tuxera.com" <ari@tuxera.com>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "lersek@redhat.com" <lersek@redhat.com>,
- "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
- "antonynpavlov@gmail.com" <antonynpavlov@gmail.com>,
- "dillaman@redhat.com" <dillaman@redhat.com>, "joel@jms.id.au" <joel@jms.id.au>,
- "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
- "integration@gluster.org" <integration@gluster.org>,
- "rjones@redhat.com" <rjones@redhat.com>,
- "Andrew.Baumann@microsoft.com" <Andrew.Baumann@microsoft.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "walling@linux.ibm.com" <walling@linux.ibm.com>,
- Denis Lunev <den@virtuozzo.com>, "mst@redhat.com" <mst@redhat.com>,
- "mark.cave-ayland@ilande.co.uk" <mark.cave-ayland@ilande.co.uk>,
- "v.maffione@gmail.com" <v.maffione@gmail.com>, "marex@denx.de" <marex@denx.de>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "alistair@alistair23.me" <alistair@alistair23.me>,
- "paul.durrant@citrix.com" <paul.durrant@citrix.com>,
- "pavel.dovgaluk@ispras.ru" <pavel.dovgaluk@ispras.ru>,
- "g.lettieri@iet.unipi.it" <g.lettieri@iet.unipi.it>,
- "rizzo@iet.unipi.it" <rizzo@iet.unipi.it>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
- "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
- "pmorel@linux.ibm.com" <pmorel@linux.ibm.com>,
- "wencongyang2@huawei.com" <wencongyang2@huawei.com>,
- "jcd@tribudubois.net" <jcd@tribudubois.net>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "stefanb@linux.ibm.com" <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjQuMDkuMjAxOSAxODoyOCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gOS8yNC8xOSA5OjEyIEFN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPiANCj4+Pj4gMy4gV2hhdCB0
-byBkbyB3aXRoIGh1Z2UgYXV0by1nZW5lcmF0ZWQgY29tbWl0IDA3PyBTaG91bGQgSSBzcGxpdCBp
-dA0KPj4+PiBwZXItbWFpbnRhaW5lciBvciBwZXItc3Vic3lzdGVtLCBvciBsZWF2ZSBpdCBhcy1p
-cz8NCj4+Pg0KPj4+IEl0J3MgYmlnLiBJJ2Qgc3BsaXQgaXQgaW50byBtdWx0aXBsZSBwYXRjaGVz
-IChhbmQgcmVkdWNlIHRoZSBjYyAtIGV4Y2VwdA0KPj4+IGZvciB0aGUgY292ZXIgbGV0dGVyLCB0
-aGUgcmVzdCBvZiB0aGUgcGF0Y2hlcyBjYW4gYmUgbGltaXRlZCB0byB0aGUNCj4+PiBhY3R1YWwg
-bWFpbnRhaW5lci9zdWJzeXN0ZW0gYWZmZWN0ZWQgcmF0aGVyIHRoYW4gZXZlcnlvbmUgaW52b2x2
-ZWQNCj4+PiBhbnl3aGVyZSBlbHNlIGluIHRoZSBzZXJpZXMuIFdpdGggdGhlIGN1cnJlbnQgbGFy
-Z2UgY2MsIGFueW9uZSB0aGF0DQo+Pj4gcmVwbGllcyBnZXRzIHNldmVyYWwgbWFpbCBib3VuY2Vz
-IGFib3V0ICJ0b28gbWFueSByZWNpcGllbnRzIikuICBJdCBtYXkNCj4+PiBiZSBlYXNpZXIgdG8g
-c3BsaXQgYWxvbmcgZGlyZWN0b3J5IGJvdW5kYXJpZXMgdGhhbiBieSBtYWludGFpbmVyDQo+Pj4g
-Ym91bmRhcmllcy4gIE1hcmt1cyBoYXMgYXBwbGllZCBsYXJnZSB0cmVlLXdpZGUgQ29jY2luZWxs
-ZSBjbGVhbnVwcw0KPj4+IGJlZm9yZSwgbWF5YmUgaGUgaGFzIHNvbWUgYWR2aWNlLg0KPj4NCj4+
-DQo+PiBJZiBzcGxpdCBieSBzdWJzeXN0ZW0gaXQgd291bGQgYmUgMjAwKyBwYXRjaGVzOg0KPj4g
-Z2l0IGRpZmYgLS1uYW1lLW9ubHkgfCB3aGlsZSByZWFkIGY7IGRvIHNjcmlwdHMvZ2V0X21haW50
-YWluZXIucGwgLWYgJGYgLS1zdWJzeXN0ZW0gLS1uby1yb2xlc3RhdHMgMj4vZGV2L251bGwgfCBn
-cmVwIC12IEAgfCBoZWFkIC0xOyBkb25lIHwgc29ydCB8IHVuaXEgfCB3YyAtbA0KPj4gMjA1DQo+
-Pg0KPj4NCj4+IFRyeSB0byBsb29rIGF0IGxhcmdlciBzdWJzeXN0ZW06DQo+PiBnaXQgZGlmZiAt
-LW5hbWUtb25seSB8IHdoaWxlIHJlYWQgZjsgZG8gc2NyaXB0cy9nZXRfbWFpbnRhaW5lci5wbCAt
-ZiAkZiAtLXN1YnN5c3RlbSAtLW5vLXJvbGVzdGF0cyAyPi9kZXYvbnVsbCB8IGdyZXAgLXYgQCB8
-IHRhaWwgLTIgfCBoZWFkIC0xOyBkb25lIHwgc29ydCB8IHVuaXEgfCB3YyAtbA0KPj4gMTM5DQo+
-Pg0KPj4gc3RpbGwgdG9vIG1hbnkuLiBPciBpcyBpdCBPSz8NCj4gDQo+IEhtbSAtIHRoYXQgYmVj
-b21lcyBhIHRyYWRlb2ZmIGluIGxlbmd0aCBvZiB0aGUgc2VyaWVzICh3aGVyZSBpbmRpdmlkdWFs
-DQo+IHBhdGNoZXMgbWF5IGJlIHJldmlld2VkIGZhc3QsIGJ1dCB3aGVyZSB0aGUgb3ZlcmFsbCBw
-cm9jZXNzIG1heSBiZQ0KPiBib2dnZWQgZG93biBieSBzaGVlciBsZW5ndGgpLCB2cy4gbGVuZ3Ro
-IG9mIGluZGl2aWR1YWwgZW1haWxzICh3aGVyZSB0aGUNCj4gZW1haWwgaXRzZWxmIGlzIGRhdW50
-aW5nLCBidXQgYXMgdGhlIHJldmlldyBpcyBtZWNoYW5pY2FsIGFuZCBkb25lIGJ5DQo+IGF1dG9t
-YXRpb24sIGl0IGJlY29tZXMgYSBtYXR0ZXIgb2Ygc3BvdC1jaGVja2luZyBpZiB3ZSB0cnVzdCB0
-aGF0IHRoZQ0KPiBhdXRvbWF0aW9uIHdhcyBkb25lIGNvcnJlY3RseSkuICBZb3UgY2FuIHByb2Jh
-Ymx5IGdyb3VwIGl0IGluIGZld2VyDQo+IHBhdGNoZXMsIGJ5IGpvaW5pbmcgc21hbGxlciBwYXRj
-aGVzIGFjcm9zcyBhIGNvdXBsZSBvZiBzdWJzeXN0ZW1zLiAgSXQncw0KPiBhbiBhcnQgZm9ybSwg
-dGhlcmUncyBwcm9iYWJseSBzZXZlcmFsIHdheXMgdG8gZG8gaXQgdGhhdCB3b3VsZCB3b3JrLCBh
-bmQNCj4gaXQgY29tZXMgZG93biB0byBhIGp1ZGdtZW50IGNhbGwgb24gaG93IG11Y2ggd29yayB5
-b3Ugd2FudCB0byBkbyB0byB0cnkNCj4gYW5kIHJlZHVjZSBvdGhlcidzIHdvcmsgaW4gcmV2aWV3
-aW5nIGl0LiAgTWF5YmUgZXZlbiBhbiBvZmYtaGFuZCBzcGxpdA0KPiBvZiBnYXRoZXJpbmcgZmls
-ZXMgdW50aWwgeW91IHJlYWNoIGFib3V0IDUwMCBvciBzbyBsaW5lcyBwZXIgZGlmZi4gIEkNCj4g
-d2lzaCBJIGhhZCBlYXNpZXIgYWR2aWNlIG9uIGhvdyB0byB0YWNrbGUgdGhpcyBzb3J0IG9mIHBy
-b2plY3QgaW4gdGhlDQo+IHdheSB0aGF0IHdpbGwgZ2V0IHRoZSBmYXN0ZXN0IHJlc3BvbnNlIHRp
-bWUuDQo+IA0KPiANCj4+Pj4gICAgdmwuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIHwgIDEzICstDQo+Pj4+ICAgIHNjcmlwdHMvY29jY2luZWxsZS9hdXRvLXByb3Bh
-Z2F0ZWQtZXJycC5jb2NjaSB8ICA4MiArKysrKysrDQo+Pj4+ICAgIDMxOSBmaWxlcyBjaGFuZ2Vk
-LCAyNzI5IGluc2VydGlvbnMoKyksIDQyNDUgZGVsZXRpb25zKC0pDQo+Pj4+ICAgIGNyZWF0ZSBt
-b2RlIDEwMDY0NCBzY3JpcHRzL2NvY2NpbmVsbGUvYXV0by1wcm9wYWdhdGVkLWVycnAuY29jY2kN
-Cj4+Pg0KPj4+IFRoZSBkaWZmc3RhdCBpcyBodWdlLCBidXQgcHJvbWlzaW5nLg0KPiANCj4gV2Ug
-YWxzbyBsZWFybmVkIGluIHJldmlld3Mgb2YgNy85IHRoYXQgdGhlIGRpZmZzdGF0IGhlcmUgaXMg
-bWlzbGVhZGluZywNCj4gdGhlIG51bWJlciBvZiBpbnNlcnRpb25zIHdpbGwgZGVmaW5pdGVseSBi
-ZSBpbmNyZWFzaW5nIG9uY2UgdGhlDQo+IENvY2NpbmVsbGUgc2NyaXB0IGlzIGZpeGVkIHRvIGlu
-c2VydCB0aGUgbWFjcm8gaW4gbW9yZSBmdW5jdGlvbnMsIGJ1dA0KPiBob3BlZnVsbHkgaXQncyBz
-dGlsbCBhIG5ldCByZWR1Y3Rpb24gaW4gb3ZlcmFsbCBsaW5lcy4NCj4gDQoNCk5vIGhvcGUgZm9y
-IHVzOiB3aXRoIGZpeGVkIHNjcmlwdCBJIG5vdyBzZWUNCg0KOTE5IGZpbGVzIGNoYW5nZWQsIDY0
-MjUgaW5zZXJ0aW9ucygrKSwgNDIzNCBkZWxldGlvbnMoLSkNCg0KLS0gDQpCZXN0IHJlZ2FyZHMs
-DQpWbGFkaW1pcg0K
+On 24/09/19 10:25, Eric Auger wrote:
+> The container error integer field is currently used to store
+> the first error potentially encountered during any
+> vfio_listener_region_add() call. However this fails to propagate
+> detailed error messages up to the vfio_connect_container caller.
+> Instead of using an integer, let's use an Error handle.
+> 
+> Messages are slightly reworded to accomodate the propagation.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v3 -> v4:
+> - remove ret useless assignments and restore hw_error()
+> - remove mr local variable
+> - trace [start, end] instead of [start, size] and improve
+>   the message for overalp with existing DMA host window
+> ---
+>  hw/vfio/common.c              | 43 +++++++++++++++++++++++------------
+>  hw/vfio/spapr.c               |  4 +++-
+>  include/hw/vfio/vfio-common.h |  2 +-
+>  3 files changed, 32 insertions(+), 17 deletions(-)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 3e03c495d8..cebbb1c28a 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -509,6 +509,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>      int ret;
+>      VFIOHostDMAWindow *hostwin;
+>      bool hostwin_found;
+> +    Error *err = NULL;
+>  
+>      if (vfio_listener_skipped_section(section)) {
+>          trace_vfio_listener_region_add_skip(
+> @@ -543,13 +544,20 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>                                 hostwin->max_iova - hostwin->min_iova + 1,
+>                                 section->offset_within_address_space,
+>                                 int128_get64(section->size))) {
+> -                ret = -1;
+> +                error_setg(&err,
+> +                    "region [0x%"PRIx64",0x%"PRIx64"] overlaps with existing"
+> +                    "host DMA window [0x%"PRIx64",0x%"PRIx64"]",
+> +                    section->offset_within_address_space,
+> +                    section->offset_within_address_space +
+> +                        int128_get64(section->size) - 1,
+> +                    hostwin->min_iova, hostwin->max_iova);
+>                  goto fail;
+>              }
+>          }
+>  
+>          ret = vfio_spapr_create_window(container, section, &pgsize);
+>          if (ret) {
+> +            error_setg_errno(&err, -ret, "Failed to create SPAPR window");
+>              goto fail;
+>          }
+>  
+> @@ -594,10 +602,8 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>      }
+>  
+>      if (!hostwin_found) {
+> -        error_report("vfio: IOMMU container %p can't map guest IOVA region"
+> -                     " 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx,
+> -                     container, iova, end);
+> -        ret = -EFAULT;
+> +        error_setg(&err, "Container %p can't map guest IOVA region"
+> +                   " 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx, container, iova, end);
+>          goto fail;
+>      }
+>  
+> @@ -664,11 +670,12 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>      ret = vfio_dma_map(container, iova, int128_get64(llsize),
+>                         vaddr, section->readonly);
+>      if (ret) {
+> -        error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
+> -                     "0x%"HWADDR_PRIx", %p) = %d (%m)",
+> -                     container, iova, int128_get64(llsize), vaddr, ret);
+> +        error_setg(&err, "vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
+> +                   "0x%"HWADDR_PRIx", %p) = %d (%m)",
+> +                   container, iova, int128_get64(llsize), vaddr, ret);
+>          if (memory_region_is_ram_device(section->mr)) {
+>              /* Allow unexpected mappings not to be fatal for RAM devices */
+> +            error_report_err(err);
+>              return;
+>          }
+>          goto fail;
+> @@ -688,9 +695,14 @@ fail:
+>       */
+>      if (!container->initialized) {
+>          if (!container->error) {
+> -            container->error = ret;
+> +            error_propagate_prepend(&container->error, err,
+> +                                    "Region %s: ",
+> +                                    memory_region_name(section->mr));
+> +        } else {
+> +            error_free(err);
+>          }
+>      } else {
+> +        error_report_err(err);
+>          hw_error("vfio: DMA mapping failed, unable to continue");
+>      }
+>  }
+> @@ -1251,6 +1263,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>      container = g_malloc0(sizeof(*container));
+>      container->space = space;
+>      container->fd = fd;
+> +    container->error = NULL;
+>      QLIST_INIT(&container->giommu_list);
+>      QLIST_INIT(&container->hostwin_list);
+>  
+> @@ -1308,9 +1321,9 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>                                       &address_space_memory);
+>              if (container->error) {
+>                  memory_listener_unregister(&container->prereg_listener);
+> -                ret = container->error;
+> -                error_setg(errp,
+> -                    "RAM memory listener initialization failed for container");
+> +                ret = -1;
+> +                error_propagate_prepend(errp, container->error,
+> +                    "RAM memory listener initialization failed: ");
+>                  goto free_container_exit;
+>              }
+>          }
+> @@ -1365,9 +1378,9 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>      memory_listener_register(&container->listener, container->space->as);
+>  
+>      if (container->error) {
+> -        ret = container->error;
+> -        error_setg_errno(errp, -ret,
+> -                         "memory listener initialization failed for container");
+> +        ret = -1;
+> +        error_propagate_prepend(errp, container->error,
+> +            "memory listener initialization failed: ");
+>          goto listener_release_exit;
+>      }
+>  
+> diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
+> index 96c0ad9d9b..e853eebe11 100644
+> --- a/hw/vfio/spapr.c
+> +++ b/hw/vfio/spapr.c
+> @@ -17,6 +17,7 @@
+>  #include "hw/hw.h"
+>  #include "exec/ram_addr.h"
+>  #include "qemu/error-report.h"
+> +#include "qapi/error.h"
+>  #include "trace.h"
+>  
+>  static bool vfio_prereg_listener_skipped_section(MemoryRegionSection *section)
+> @@ -85,7 +86,8 @@ static void vfio_prereg_listener_region_add(MemoryListener *listener,
+>           */
+>          if (!container->initialized) {
+>              if (!container->error) {
+> -                container->error = ret;
+> +                error_setg_errno(&container->error, -ret,
+> +                                 "Memory registering failed");
+>              }
+>          } else {
+>              hw_error("vfio: Memory registering failed, unable to continue");
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index 9107bd41c0..fd564209ac 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -71,7 +71,7 @@ typedef struct VFIOContainer {
+>      MemoryListener listener;
+>      MemoryListener prereg_listener;
+>      unsigned iommu_type;
+> -    int error;
+> +    Error *error;
+>      bool initialized;
+>      unsigned long pgsizes;
+>      QLIST_HEAD(, VFIOGuestIOMMU) giommu_list;
+> 
+
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
