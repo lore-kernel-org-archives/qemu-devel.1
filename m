@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FBADC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 18:01:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC954C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 18:03:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DA9F214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 18:01:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DA9F214AF
+	by mail.kernel.org (Postfix) with ESMTPS id 9B68F214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 18:03:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B68F214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCp8I-0003NF-JK
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 14:01:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46367)
+	id 1iCp9d-0004ay-MZ
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 14:03:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46931)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iCp6V-0001nQ-5z
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 14:00:00 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCp8O-0003bu-DO
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 14:01:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iCp6S-0004F2-VP
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 13:59:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57042)
+ (envelope-from <eblake@redhat.com>) id 1iCp8N-00052Z-DF
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 14:01:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49834)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCp6S-0004Es-N7
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 13:59:56 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCp8N-00052N-3o
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 14:01:55 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A80BF3090FC6;
- Tue, 24 Sep 2019 17:59:55 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5658A88382B;
+ Tue, 24 Sep 2019 18:01:54 +0000 (UTC)
 Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DA75D54527;
- Tue, 24 Sep 2019 17:59:50 +0000 (UTC)
-Subject: Re: [PATCH 17/25] qapi: Move context-free checking to the proper place
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E3E1F10013D9;
+ Tue, 24 Sep 2019 18:01:49 +0000 (UTC)
+Subject: Re: [PATCH 18/25] qapi: Improve reporting of invalid 'if' errors
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-18-armbru@redhat.com>
+ <20190924132830.15835-19-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -71,18 +71,18 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <6f4e6ae8-f831-2191-f3b7-ea62a1c2ac7e@redhat.com>
-Date: Tue, 24 Sep 2019 12:59:49 -0500
+Message-ID: <9592f8e4-f587-d82d-a789-96e32637ab62@redhat.com>
+Date: Tue, 24 Sep 2019 13:01:48 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190924132830.15835-18-armbru@redhat.com>
+In-Reply-To: <20190924132830.15835-19-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="vgOsYuv54IR79oOzu159QMbJCRazYI4lw"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Tue, 24 Sep 2019 17:59:55 +0000 (UTC)
+ boundary="sUlVk1Ttw2h0gAxfelZSAVbwmiWq8J50z"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Tue, 24 Sep 2019 18:01:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,40 +102,38 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vgOsYuv54IR79oOzu159QMbJCRazYI4lw
-Content-Type: multipart/mixed; boundary="zwCgBUID844FEwz3VW0j0dOADANf51UyL";
+--sUlVk1Ttw2h0gAxfelZSAVbwmiWq8J50z
+Content-Type: multipart/mixed; boundary="IOt8b4xe1LyvDCkEuYhF6hiOkryrFWYhX";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <6f4e6ae8-f831-2191-f3b7-ea62a1c2ac7e@redhat.com>
-Subject: Re: [PATCH 17/25] qapi: Move context-free checking to the proper
- place
+Message-ID: <9592f8e4-f587-d82d-a789-96e32637ab62@redhat.com>
+Subject: Re: [PATCH 18/25] qapi: Improve reporting of invalid 'if' errors
 References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-18-armbru@redhat.com>
-In-Reply-To: <20190924132830.15835-18-armbru@redhat.com>
+ <20190924132830.15835-19-armbru@redhat.com>
+In-Reply-To: <20190924132830.15835-19-armbru@redhat.com>
 
---zwCgBUID844FEwz3VW0j0dOADANf51UyL
+--IOt8b4xe1LyvDCkEuYhF6hiOkryrFWYhX
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 9/24/19 8:28 AM, Markus Armbruster wrote:
-> QAPISchemaCommand.check() and QAPISchemaEvent().check() check 'data'
-> is present when 'boxed': true.  That's context-free.  Move to
-> check_command() and check_event().
+> Move check_if() from check_keys() to check_exprs() and call it later,
+> so its error messages gain an "in definition" line.
 >=20
-> Tweak the error message while there.
->=20
-> check_exprs() & friends now check exactly what qapi-code-gen.txt calls
-> the second layer of syntax.
+> Checking values in a function named check_keys() is unclean anyway.
+> The original sin was commit 0545f6b887 "qapi: Better error messages
+> for bad expressions", which checks the value of key 'name'.  More
+> sinning in commit 2cbf09925a "qapi: More rigorous checking for type
+> safety bypass", commit c818408e44 "qapi: Implement boxed types for
+> commands/events", and commit 967c885108 "qapi: add 'if' to top-level
+> expressions".  This commit does penance for the latter.  The next
+> commits will do penance for the others.
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  scripts/qapi/common.py                  | 16 ++++++++--------
->  tests/qapi-schema/event-boxed-empty.err |  2 +-
->  2 files changed, 9 insertions(+), 9 deletions(-)
->=20
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -145,24 +143,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---zwCgBUID844FEwz3VW0j0dOADANf51UyL--
+--IOt8b4xe1LyvDCkEuYhF6hiOkryrFWYhX--
 
---vgOsYuv54IR79oOzu159QMbJCRazYI4lw
+--sUlVk1Ttw2h0gAxfelZSAVbwmiWq8J50z
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KWZUACgkQp6FrSiUn
-Q2ok1gf/QUK+cyO0Ybk2IELzXbuGdvclQzx0NovbKZHlhLZjd0SLhl/8y5nhu0XB
-L9Yy7vvu0jBT5lXh9MQamG9nYxHmHMNGP/FMxD/Q9+mvN2BsuxZngatxUmOkTVEH
-kXsMQEke+c2PQ+i8DGWPKCB824xLYXsNhftPtaSGVw4MvH8YG4ITmww2B4ywwcCm
-bIJrvHJIq5TScbdqMKpvum67LKc49Vm1hXDu2UGqjSsD+EpXh47F4yMNxsrnAYV4
-PI9i7NHK3sBmQUddGXVZFJSsUiqGKuz9AoO+oebs6NWheVk7pIldbHAhCVGdi6z8
-emKmGAmiO4kdoUdlRAWilLryx1+Wlw==
-=8ntp
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KWgwACgkQp6FrSiUn
+Q2rjeQf8D/XiLyXX45ngtLNsJ+EmdUgCLfHFtUT268QEflpY6k20vj7gffJEj9EV
+fVY2laIDOtPKx+Gx24gkyL9Dhar16yacRkf+iDTFoyFlDOWMcaajnVVZZmMHK3g6
+GFqDVfxmy/IViIisk5lU8KIXCrCH7rALoUYm4XHSTjSuJNSMXG8TS+aA9MaGYQGx
+c8eoe/iFWmlk/bkzz2A8mNYuV5pt0qHk9tAwRQIpmiY5Lwag2p3ECKrGFZgNzIws
+0uhQTxVKlCaPquRSmyzZ+QqyN6ZMgg2qDUppVvr6uthGTXZ+fFjYuH1DqTbvsEos
+60duyeDLwYB5y2J75Pysai7XFpGUPQ==
+=vjFL
 -----END PGP SIGNATURE-----
 
---vgOsYuv54IR79oOzu159QMbJCRazYI4lw--
+--sUlVk1Ttw2h0gAxfelZSAVbwmiWq8J50z--
 
