@@ -6,47 +6,46 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02AE8C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:53:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38AE7C432C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:53:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC5D7207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:53:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC5D7207FD
+	by mail.kernel.org (Postfix) with ESMTPS id 0470A207FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:53:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0470A207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCro2-00043V-Ii
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:53:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53857)
+	id 1iCrom-0005N1-N2
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:53:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53269)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iCrkh-00012s-6w
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:49:41 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCrhN-0006Ue-3h
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:46:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iCrkf-0007y2-3M
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:49:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:26371)
+ (envelope-from <eblake@redhat.com>) id 1iCrhL-0006Dt-C2
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:46:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47436)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iCrkX-0007rQ-JR; Tue, 24 Sep 2019 16:49:30 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1iCrhF-0006BH-PL; Tue, 24 Sep 2019 16:46:05 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 679C920EB;
- Tue, 24 Sep 2019 20:49:27 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A43738535C;
+ Tue, 24 Sep 2019 20:46:04 +0000 (UTC)
 Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E68460852;
- Tue, 24 Sep 2019 20:48:49 +0000 (UTC)
-Subject: Re: [PATCH v3 05/25] scripts: add coccinelle script to fix
- error_append_hint usage
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 35BCA5D721;
+ Tue, 24 Sep 2019 20:46:01 +0000 (UTC)
+Subject: Re: [PATCH v3 04/25] error: auto propagated local_err
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org
 References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
- <20190924200902.4703-6-vsementsov@virtuozzo.com>
+ <20190924200902.4703-5-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -73,18 +72,18 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <1626833c-a19a-bba1-7194-932b873bc490@redhat.com>
-Date: Tue, 24 Sep 2019 15:48:48 -0500
+Message-ID: <329dc766-b052-e35c-c709-84d3fd1af0f7@redhat.com>
+Date: Tue, 24 Sep 2019 15:46:00 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190924200902.4703-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20190924200902.4703-5-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Tue, 24 Sep 2019 20:49:27 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Tue, 24 Sep 2019 20:46:05 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -126,51 +125,65 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/24/19 3:08 PM, Vladimir Sementsov-Ogievskiy wrote:
-> error_append_hint will not work, if errp == &fatal_error, as program
-> will exit before error_append_hint call. Fix this by use of special
-> macro ERRP_FUNCTION_BEGIN.
+> Here is introduced ERRP_FUNCTION_BEGIN macro, to be used at start of
+> functions with errp parameter.
+> 
+> It has three goals:
+> 
+> 1. Fix issue with error_fatal & error_append_hint: user can't see these
+> hints, because exit() happens in error_setg earlier than hint is
+> appended. [Reported by Greg Kurz]
+> 
+> 2. Fix issue with error_abort & error_propagate: when we wrap
+> error_abort by local_err+error_propagate, resulting coredump will
+> refer to error_propagate and not to the place where error happened.
+> (the macro itself doesn't fix the issue, but it allows to [3.] drop all
+> local_err+error_propagate pattern, which will definitely fix the issue)
+> [Reported by Kevin Wolf]
+> 
+> 3. Drop local_err+error_propagate pattern, which is used to workaround
+> void functions with errp parameter, when caller wants to know resulting
+> status. (Note: actually these functions could be merely updated to
+> return int error code).
 > 
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
-
-With the approach of a partial cleanup (rather than globally enforcing
-it for all functions with errp parameter), we'll probably be rerunning
-this Coccinelle script regularly, to track down any regressions.
+> 
 
 
-> +++ b/scripts/coccinelle/fix-error_append_hint-usage.cocci
-> @@ -0,0 +1,25 @@
-> +@rule0@
-> +// Add invocation to errp-functions
-> +identifier fn;
-> +@@
+> +/*
+> + * ERRP_FUNCTION_BEGIN
+> + *
+> + * This macro is created to be the first line of a function with Error **errp
+> + * parameter.
+
+Since you're going with the reduced scope of only touching functions
+with error_append_hint, we may want to tweak this sentence to call out
+only the functions that REQUIRE the use of this macro (if they contain
+*errp or error_apend_hint), while mentioning that it is still safe to
+use on any function with an errp parameter.
+
+I'm hoping Markus will be able to chime in with his preferences soon.
+
+
+> + *
+> + * If errp is NULL or points to error_fatal, it is rewritten to point to a
+> + * local Error object, which will be automatically propagated to the original
+> + * errp on function exit (see error_propagator_cleanup).
+> + *
+> + * After invocation of this macro it is always safe to dereference errp
+> + * (as it's not NULL anymore) and to append hints (by error_append_hint)
+> + * (as, if it was error_fatal, we swapped it with a local_error to be
+> + * propagated on cleanup).
+> + *
+> + * Note: we don't wrap the error_abort case, as we want resulting coredump
+> + * to point to the place where the error happened, not to error_propagate.
+> + */
+> +#define ERRP_FUNCTION_BEGIN() \
+> +g_auto(ErrorPropagator) __auto_errp_prop = {.errp = errp}; \
+> +errp = ((errp == NULL || *errp == error_fatal) ? \
+> +    &__auto_errp_prop.local_err : errp)
 > +
-> + fn(..., Error **errp, ...)
-> + {
-> ++   ERRP_FUNCTION_BEGIN();
-> +    <+...
-> +    error_append_hint(errp, ...);
-> +    ...+>
-> + }
-
-Does not catch the case that we want to also use the macro for any use
-of *errp, but we can augment that later.
-
-> +
-> +@@
-> +// Drop doubled invocation
-> +identifier rule0.fn;
-> +@@
-> +
-> + fn(...)
-> +{
-> +    ERRP_FUNCTION_BEGIN();
-> +-   ERRP_FUNCTION_BEGIN();
-> +    ...
-> +}
-
-This is smaller than the script you posted in v2, and thus I'm a bit
-more confident in stating that it looks correct and idempotent.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
