@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0E61C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 06:35:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15E03C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 06:37:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9595C20665
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 06:35:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9595C20665
+	by mail.kernel.org (Postfix) with ESMTPS id 86C0520665
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 06:37:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86C0520665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCeQ9-0000Hk-8t
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 02:35:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59286)
+	id 1iCeRk-00024m-Fs
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 02:37:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59264)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1iCeBE-0003hh-NA
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 02:20:10 -0400
+ (envelope-from <kraxel@redhat.com>) id 1iCeBC-0003eY-7h
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 02:20:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1iCeBC-0000uP-LK
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 02:20:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45990)
+ (envelope-from <kraxel@redhat.com>) id 1iCeB7-0000sX-Th
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 02:20:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52576)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iCeBC-0000u7-8S
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 02:20:06 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iCeB7-0000re-5k
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 02:20:01 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 84F7D18CB8E9;
- Tue, 24 Sep 2019 06:20:05 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4A6248535C;
+ Tue, 24 Sep 2019 06:20:00 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-47.ams2.redhat.com
  [10.36.116.47])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DD2505D71C;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B2689601A5;
  Tue, 24 Sep 2019 06:19:58 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 24EDB9C75; Tue, 24 Sep 2019 08:19:52 +0200 (CEST)
+ id D97D79CA5; Tue, 24 Sep 2019 08:19:51 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 15/16] audio: common rate control code for timer based outputs
-Date: Tue, 24 Sep 2019 08:19:50 +0200
-Message-Id: <20190924061951.27916-16-kraxel@redhat.com>
+Subject: [PULL 09/16] paaudio: port to the new audio backend api
+Date: Tue, 24 Sep 2019 08:19:44 +0200
+Message-Id: <20190924061951.27916-10-kraxel@redhat.com>
 In-Reply-To: <20190924061951.27916-1-kraxel@redhat.com>
 References: <20190924061951.27916-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Tue, 24 Sep 2019 06:20:05 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Tue, 24 Sep 2019 06:20:00 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -77,370 +77,841 @@ Sender: "Qemu-devel"
 
 From: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.ice.hu@gmail.com>
 
-This commit removes the ad-hoc rate-limiting code from noaudio and
-wavaudio, and replaces them with a (slightly modified) code from
-spiceaudio.  This way multiple write calls (for example when the
-circular buffer wraps around) do not cause problems.
-
 Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.com=
 >
-Message-id: fd0fe5b95b13fa26d09ae77a72f99d0ea411de14.1568927990.git.DirtY=
+Message-id: 21fe8f2cf949039c8c40a0352590c593b104917d.1568927990.git.DirtY=
 .iCE.hu@gmail.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- audio/audio_int.h  |  9 ++++++++
- audio/audio.c      | 30 +++++++++++++++++++++++++++
- audio/noaudio.c    | 49 ++++++++++++++++++++------------------------
- audio/spiceaudio.c | 51 ++++++++--------------------------------------
- audio/wavaudio.c   | 21 +++++++++----------
- 5 files changed, 79 insertions(+), 81 deletions(-)
+ configure            |   5 -
+ audio/audio_pt_int.h |  22 ---
+ audio/audio_pt_int.c | 173 --------------------
+ audio/paaudio.c      | 372 ++++++-------------------------------------
+ audio/Makefile.objs  |   1 -
+ 5 files changed, 45 insertions(+), 528 deletions(-)
+ delete mode 100644 audio/audio_pt_int.h
+ delete mode 100644 audio/audio_pt_int.c
 
-diff --git a/audio/audio_int.h b/audio/audio_int.h
-index 20021df9e8be..778615ccafa4 100644
---- a/audio/audio_int.h
-+++ b/audio/audio_int.h
-@@ -242,6 +242,15 @@ void *audio_calloc (const char *funcname, int nmemb,=
- size_t size);
+diff --git a/configure b/configure
+index 30544f52e630..397bb476e196 100755
+--- a/configure
++++ b/configure
+@@ -297,7 +297,6 @@ host_cc=3D"cc"
+ libs_cpu=3D""
+ libs_softmmu=3D""
+ libs_tools=3D""
+-audio_pt_int=3D""
+ audio_win_int=3D""
+ libs_qga=3D""
+ debug_info=3D"yes"
+@@ -3388,7 +3387,6 @@ for drv in $audio_drv_list; do
+     pa | try-pa)
+     if $pkg_config libpulse --exists; then
+         pulse_libs=3D$($pkg_config libpulse --libs)
+-        audio_pt_int=3D"yes"
+         if test "$drv" =3D "try-pa"; then
+             audio_drv_list=3D$(echo "$audio_drv_list" | sed -e 's/try-pa=
+/pa/')
+         fi
+@@ -6611,9 +6609,6 @@ echo "PULSE_LIBS=3D$pulse_libs" >> $config_host_mak
+ echo "COREAUDIO_LIBS=3D$coreaudio_libs" >> $config_host_mak
+ echo "DSOUND_LIBS=3D$dsound_libs" >> $config_host_mak
+ echo "OSS_LIBS=3D$oss_libs" >> $config_host_mak
+-if test "$audio_pt_int" =3D "yes" ; then
+-  echo "CONFIG_AUDIO_PT_INT=3Dy" >> $config_host_mak
+-fi
+ if test "$audio_win_int" =3D "yes" ; then
+   echo "CONFIG_AUDIO_WIN_INT=3Dy" >> $config_host_mak
+ fi
+diff --git a/audio/audio_pt_int.h b/audio/audio_pt_int.h
+deleted file mode 100644
+index 4c0c15b9af94..000000000000
+--- a/audio/audio_pt_int.h
++++ /dev/null
+@@ -1,22 +0,0 @@
+-#ifndef QEMU_AUDIO_PT_INT_H
+-#define QEMU_AUDIO_PT_INT_H
+-
+-#include <pthread.h>
+-
+-struct audio_pt {
+-    const char *drv;
+-    pthread_t thread;
+-    pthread_cond_t cond;
+-    pthread_mutex_t mutex;
+-};
+-
+-int audio_pt_init (struct audio_pt *, void *(*) (void *), void *,
+-                   const char *, const char *);
+-int audio_pt_fini (struct audio_pt *, const char *);
+-int audio_pt_lock (struct audio_pt *, const char *);
+-int audio_pt_unlock (struct audio_pt *, const char *);
+-int audio_pt_wait (struct audio_pt *, const char *);
+-int audio_pt_unlock_and_signal (struct audio_pt *, const char *);
+-int audio_pt_join (struct audio_pt *, void **, const char *);
+-
+-#endif /* QEMU_AUDIO_PT_INT_H */
+diff --git a/audio/audio_pt_int.c b/audio/audio_pt_int.c
+deleted file mode 100644
+index 9f9d44ad4a63..000000000000
+--- a/audio/audio_pt_int.c
++++ /dev/null
+@@ -1,173 +0,0 @@
+-#include "qemu/osdep.h"
+-#include "audio.h"
+-
+-#define AUDIO_CAP "audio-pt"
+-
+-#include "audio_int.h"
+-#include "audio_pt_int.h"
+-
+-static void GCC_FMT_ATTR(3, 4) logerr (struct audio_pt *pt, int err,
+-                                       const char *fmt, ...)
+-{
+-    va_list ap;
+-
+-    va_start (ap, fmt);
+-    AUD_vlog (pt->drv, fmt, ap);
+-    va_end (ap);
+-
+-    AUD_log (NULL, "\n");
+-    AUD_log (pt->drv, "Reason: %s\n", strerror (err));
+-}
+-
+-int audio_pt_init (struct audio_pt *p, void *(*func) (void *),
+-                   void *opaque, const char *drv, const char *cap)
+-{
+-    int err, err2;
+-    const char *efunc;
+-    sigset_t set, old_set;
+-
+-    p->drv =3D drv;
+-
+-    err =3D sigfillset (&set);
+-    if (err) {
+-        logerr(p, errno, "%s(%s): sigfillset failed", cap, __func__);
+-        return -1;
+-    }
+-
+-    err =3D pthread_mutex_init (&p->mutex, NULL);
+-    if (err) {
+-        efunc =3D "pthread_mutex_init";
+-        goto err0;
+-    }
+-
+-    err =3D pthread_cond_init (&p->cond, NULL);
+-    if (err) {
+-        efunc =3D "pthread_cond_init";
+-        goto err1;
+-    }
+-
+-    err =3D pthread_sigmask (SIG_BLOCK, &set, &old_set);
+-    if (err) {
+-        efunc =3D "pthread_sigmask";
+-        goto err2;
+-    }
+-
+-    err =3D pthread_create (&p->thread, NULL, func, opaque);
+-
+-    err2 =3D pthread_sigmask (SIG_SETMASK, &old_set, NULL);
+-    if (err2) {
+-        logerr(p, err2, "%s(%s): pthread_sigmask (restore) failed",
+-               cap, __func__);
+-        /* We have failed to restore original signal mask, all bets are =
+off,
+-           so terminate the process */
+-        exit (EXIT_FAILURE);
+-    }
+-
+-    if (err) {
+-        efunc =3D "pthread_create";
+-        goto err2;
+-    }
+-
+-    return 0;
+-
+- err2:
+-    err2 =3D pthread_cond_destroy (&p->cond);
+-    if (err2) {
+-        logerr(p, err2, "%s(%s): pthread_cond_destroy failed", cap, __fu=
+nc__);
+-    }
+-
+- err1:
+-    err2 =3D pthread_mutex_destroy (&p->mutex);
+-    if (err2) {
+-        logerr(p, err2, "%s(%s): pthread_mutex_destroy failed", cap, __f=
+unc__);
+-    }
+-
+- err0:
+-    logerr(p, err, "%s(%s): %s failed", cap, __func__, efunc);
+-    return -1;
+-}
+-
+-int audio_pt_fini (struct audio_pt *p, const char *cap)
+-{
+-    int err, ret =3D 0;
+-
+-    err =3D pthread_cond_destroy (&p->cond);
+-    if (err) {
+-        logerr(p, err, "%s(%s): pthread_cond_destroy failed", cap, __fun=
+c__);
+-        ret =3D -1;
+-    }
+-
+-    err =3D pthread_mutex_destroy (&p->mutex);
+-    if (err) {
+-        logerr(p, err, "%s(%s): pthread_mutex_destroy failed", cap, __fu=
+nc__);
+-        ret =3D -1;
+-    }
+-    return ret;
+-}
+-
+-int audio_pt_lock (struct audio_pt *p, const char *cap)
+-{
+-    int err;
+-
+-    err =3D pthread_mutex_lock (&p->mutex);
+-    if (err) {
+-        logerr(p, err, "%s(%s): pthread_mutex_lock failed", cap, __func_=
+_);
+-        return -1;
+-    }
+-    return 0;
+-}
+-
+-int audio_pt_unlock (struct audio_pt *p, const char *cap)
+-{
+-    int err;
+-
+-    err =3D pthread_mutex_unlock (&p->mutex);
+-    if (err) {
+-        logerr(p, err, "%s(%s): pthread_mutex_unlock failed", cap, __fun=
+c__);
+-        return -1;
+-    }
+-    return 0;
+-}
+-
+-int audio_pt_wait (struct audio_pt *p, const char *cap)
+-{
+-    int err;
+-
+-    err =3D pthread_cond_wait (&p->cond, &p->mutex);
+-    if (err) {
+-        logerr(p, err, "%s(%s): pthread_cond_wait failed", cap, __func__=
+);
+-        return -1;
+-    }
+-    return 0;
+-}
+-
+-int audio_pt_unlock_and_signal (struct audio_pt *p, const char *cap)
+-{
+-    int err;
+-
+-    err =3D pthread_mutex_unlock (&p->mutex);
+-    if (err) {
+-        logerr(p, err, "%s(%s): pthread_mutex_unlock failed", cap, __fun=
+c__);
+-        return -1;
+-    }
+-    err =3D pthread_cond_signal (&p->cond);
+-    if (err) {
+-        logerr(p, err, "%s(%s): pthread_cond_signal failed", cap, __func=
+__);
+-        return -1;
+-    }
+-    return 0;
+-}
+-
+-int audio_pt_join (struct audio_pt *p, void **arg, const char *cap)
+-{
+-    int err;
+-    void *ret;
+-
+-    err =3D pthread_join (p->thread, &ret);
+-    if (err) {
+-        logerr(p, err, "%s(%s): pthread_join failed", cap, __func__);
+-        return -1;
+-    }
+-    *arg =3D ret;
+-    return 0;
+-}
+diff --git a/audio/paaudio.c b/audio/paaudio.c
+index bfef9acaadd0..75fce5320269 100644
+--- a/audio/paaudio.c
++++ b/audio/paaudio.c
+@@ -9,7 +9,6 @@
 =20
- void audio_run(AudioState *s, const char *msg);
+ #define AUDIO_CAP "pulseaudio"
+ #include "audio_int.h"
+-#include "audio_pt_int.h"
 =20
-+typedef struct RateCtl {
-+    int64_t start_ticks;
-+    int64_t bytes_sent;
-+} RateCtl;
-+
-+void audio_rate_start(RateCtl *rate);
-+size_t audio_rate_get_bytes(struct audio_pcm_info *info, RateCtl *rate,
-+                            size_t bytes_avail);
-+
- #define VOICE_ENABLE 1
- #define VOICE_DISABLE 2
- #define VOICE_VOLUME 3
-diff --git a/audio/audio.c b/audio/audio.c
-index ba07fb77dd4f..fab1e3571838 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -2051,3 +2051,33 @@ const char *audio_get_id(QEMUSoundCard *card)
-         return "";
-     }
- }
-+
-+void audio_rate_start(RateCtl *rate)
-+{
-+    memset(rate, 0, sizeof(RateCtl));
-+    rate->start_ticks =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+}
-+
-+size_t audio_rate_get_bytes(struct audio_pcm_info *info, RateCtl *rate,
-+                            size_t bytes_avail)
-+{
-+    int64_t now;
-+    int64_t ticks;
-+    int64_t bytes;
-+    int64_t samples;
-+    size_t ret;
-+
-+    now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    ticks =3D now - rate->start_ticks;
-+    bytes =3D muldiv64(ticks, info->bytes_per_second, NANOSECONDS_PER_SE=
-COND);
-+    samples =3D (bytes - rate->bytes_sent) >> info->shift;
-+    if (samples < 0 || samples > 65536) {
-+        AUD_log(NULL, "Resetting rate control (%" PRId64 " samples)\n", =
-samples);
-+        audio_rate_start(rate);
-+        samples =3D 0;
-+    }
-+
-+    ret =3D MIN(samples << info->shift, bytes_avail);
-+    rate->bytes_sent +=3D ret;
-+    return ret;
-+}
-diff --git a/audio/noaudio.c b/audio/noaudio.c
-index b054fd225b66..9f1cc67df942 100644
---- a/audio/noaudio.c
-+++ b/audio/noaudio.c
-@@ -33,33 +33,27 @@
+ typedef struct PAConnection {
+     char *server;
+@@ -30,28 +29,16 @@ typedef struct {
 =20
- typedef struct NoVoiceOut {
+ typedef struct {
      HWVoiceOut hw;
--    int64_t old_ticks;
-+    RateCtl rate;
- } NoVoiceOut;
+-    size_t done;
+-    size_t live;
+-    size_t decr;
+-    size_t rpos;
+     pa_stream *stream;
+-    void *pcm_buf;
+-    struct audio_pt pt;
+     paaudio *g;
+     size_t samples;
+ } PAVoiceOut;
 =20
- typedef struct NoVoiceIn {
+ typedef struct {
      HWVoiceIn hw;
--    int64_t old_ticks;
-+    RateCtl rate;
- } NoVoiceIn;
-=20
- static size_t no_write(HWVoiceOut *hw, void *buf, size_t len)
- {
-     NoVoiceOut *no =3D (NoVoiceOut *) hw;
--    int64_t now;
--    int64_t ticks;
--    int64_t bytes;
--
--    now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
--    ticks =3D now - no->old_ticks;
--    bytes =3D muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER=
-_SECOND);
--
--    no->old_ticks =3D now;
--    return MIN(len, bytes);
-+    return audio_rate_get_bytes(&hw->info, &no->rate, len);
+-    size_t done;
+-    size_t dead;
+-    size_t incr;
+-    size_t wpos;
+     pa_stream *stream;
+-    void *pcm_buf;
+-    struct audio_pt pt;
+     const void *read_data;
+-    size_t read_index, read_length;
++    size_t read_length;
+     paaudio *g;
+     size_t samples;
+ } PAVoiceIn;
+@@ -89,298 +76,96 @@ static inline int PA_STREAM_IS_GOOD(pa_stream_state_=
+t x)
  }
-=20
- static int no_init_out(HWVoiceOut *hw, struct audsettings *as, void *drv=
-_opaque)
- {
-+    NoVoiceOut *no =3D (NoVoiceOut *) hw;
-+
-     audio_pcm_init_info (&hw->info, as);
-     hw->samples =3D 1024;
-+    audio_rate_start(&no->rate);
-     return 0;
- }
-=20
-@@ -70,15 +64,21 @@ static void no_fini_out (HWVoiceOut *hw)
-=20
- static int no_ctl_out (HWVoiceOut *hw, int cmd, ...)
- {
--    (void) hw;
--    (void) cmd;
-+    NoVoiceOut *no =3D (NoVoiceOut *) hw;
-+
-+    if (cmd =3D=3D VOICE_ENABLE) {
-+        audio_rate_start(&no->rate);
-+    }
-     return 0;
- }
-=20
- static int no_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_o=
-paque)
- {
-+    NoVoiceIn *no =3D (NoVoiceIn *) hw;
-+
-     audio_pcm_init_info (&hw->info, as);
-     hw->samples =3D 1024;
-+    audio_rate_start(&no->rate);
-     return 0;
- }
-=20
-@@ -89,25 +89,20 @@ static void no_fini_in (HWVoiceIn *hw)
-=20
- static size_t no_read(HWVoiceIn *hw, void *buf, size_t size)
- {
--    size_t to_clear;
-     NoVoiceIn *no =3D (NoVoiceIn *) hw;
-+    int64_t bytes =3D audio_rate_get_bytes(&hw->info, &no->rate, size);
-=20
--    int64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
--    int64_t ticks =3D now - no->old_ticks;
--    int64_t bytes =3D
--        muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECON=
-D);
--
--    no->old_ticks =3D now;
--    to_clear =3D MIN(bytes, size);
--
--    audio_pcm_info_clear_buf(&hw->info, buf, to_clear >> hw->info.shift)=
-;
--    return to_clear;
-+    audio_pcm_info_clear_buf(&hw->info, buf, bytes >> hw->info.shift);
-+    return bytes;
- }
-=20
- static int no_ctl_in (HWVoiceIn *hw, int cmd, ...)
- {
--    (void) hw;
--    (void) cmd;
-+    NoVoiceIn *no =3D (NoVoiceIn *) hw;
-+
-+    if (cmd =3D=3D VOICE_ENABLE) {
-+        audio_rate_start(&no->rate);
-+    }
-     return 0;
- }
-=20
-diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
-index ff4e4dcbb022..4ce4f94c6dca 100644
---- a/audio/spiceaudio.c
-+++ b/audio/spiceaudio.c
-@@ -40,15 +40,10 @@
- #define LINE_IN_SAMPLES (256 * 4)
  #endif
 =20
--typedef struct SpiceRateCtl {
--    int64_t               start_ticks;
--    int64_t               bytes_sent;
--} SpiceRateCtl;
--
- typedef struct SpiceVoiceOut {
-     HWVoiceOut            hw;
-     SpicePlaybackInstance sin;
--    SpiceRateCtl          rate;
-+    RateCtl               rate;
-     int                   active;
-     uint32_t              *frame;
-     uint32_t              fpos;
-@@ -58,7 +53,7 @@ typedef struct SpiceVoiceOut {
- typedef struct SpiceVoiceIn {
-     HWVoiceIn             hw;
-     SpiceRecordInstance   sin;
--    SpiceRateCtl          rate;
-+    RateCtl               rate;
-     int                   active;
- } SpiceVoiceIn;
+-#define CHECK_SUCCESS_GOTO(c, rerror, expression, label)        \
++#define CHECK_SUCCESS_GOTO(c, expression, label, msg)           \
+     do {                                                        \
+         if (!(expression)) {                                    \
+-            if (rerror) {                                       \
+-                *(rerror) =3D pa_context_errno ((c)->context);    \
+-            }                                                   \
++            qpa_logerr(pa_context_errno((c)->context), msg);    \
+             goto label;                                         \
+         }                                                       \
+     } while (0)
 =20
-@@ -89,32 +84,6 @@ static void spice_audio_fini (void *opaque)
-     /* nothing */
- }
+-#define CHECK_DEAD_GOTO(c, stream, rerror, label)                       =
+\
++#define CHECK_DEAD_GOTO(c, stream, label, msg)                          =
+\
+     do {                                                                =
+\
+         if (!(c)->context || !PA_CONTEXT_IS_GOOD (pa_context_get_state((=
+c)->context)) || \
+             !(stream) || !PA_STREAM_IS_GOOD (pa_stream_get_state ((strea=
+m)))) { \
+             if (((c)->context && pa_context_get_state ((c)->context) =3D=
+=3D PA_CONTEXT_FAILED) || \
+                 ((stream) && pa_stream_get_state ((stream)) =3D=3D PA_ST=
+REAM_FAILED)) { \
+-                if (rerror) {                                           =
+\
+-                    *(rerror) =3D pa_context_errno ((c)->context);      =
+  \
+-                }                                                       =
+\
++                qpa_logerr(pa_context_errno((c)->context), msg);        =
+\
+             } else {                                                    =
+\
+-                if (rerror) {                                           =
+\
+-                    *(rerror) =3D PA_ERR_BADSTATE;                      =
+  \
+-                }                                                       =
+\
++                qpa_logerr(PA_ERR_BADSTATE, msg);                       =
+\
+             }                                                           =
+\
+             goto label;                                                 =
+\
+         }                                                               =
+\
+     } while (0)
 =20
--static void rate_start (SpiceRateCtl *rate)
--{
--    memset (rate, 0, sizeof (*rate));
--    rate->start_ticks =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
--}
--
--static int rate_get_samples (struct audio_pcm_info *info, SpiceRateCtl *=
-rate)
--{
--    int64_t now;
--    int64_t ticks;
--    int64_t bytes;
--    int64_t samples;
--
--    now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
--    ticks =3D now - rate->start_ticks;
--    bytes =3D muldiv64(ticks, info->bytes_per_second, NANOSECONDS_PER_SE=
-COND);
--    samples =3D (bytes - rate->bytes_sent) >> info->shift;
--    if (samples < 0 || samples > 65536) {
--        error_report("Resetting rate control (%" PRId64 " samples)", sam=
-ples);
--        rate_start(rate);
--        samples =3D 0;
--    }
--    rate->bytes_sent +=3D samples << info->shift;
--    return samples;
--}
--
- /* playback */
-=20
- static int line_out_init(HWVoiceOut *hw, struct audsettings *as,
-@@ -154,7 +123,6 @@ static void line_out_fini (HWVoiceOut *hw)
- static void *line_out_get_buffer(HWVoiceOut *hw, size_t *size)
+-static int qpa_simple_read (PAVoiceIn *p, void *data, size_t length, int=
+ *rerror)
++static size_t qpa_read(HWVoiceIn *hw, void *data, size_t length)
  {
-     SpiceVoiceOut *out =3D container_of(hw, SpiceVoiceOut, hw);
--    size_t decr;
++    PAVoiceIn *p =3D (PAVoiceIn *) hw;
+     PAConnection *c =3D p->g->conn;
++    size_t l;
++    int r;
 =20
-     if (!out->frame) {
-         spice_server_playback_get_buffer(&out->sin, &out->frame, &out->f=
-size);
-@@ -162,12 +130,10 @@ static void *line_out_get_buffer(HWVoiceOut *hw, si=
-ze_t *size)
-     }
+     pa_threaded_mainloop_lock(c->mainloop);
 =20
-     if (out->frame) {
--        decr =3D rate_get_samples(&hw->info, &out->rate);
--        decr =3D MIN(out->fsize - out->fpos, decr);
+-    CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
++    CHECK_DEAD_GOTO(c, p->stream, unlock_and_fail,
++                    "pa_threaded_mainloop_lock failed\n");
+=20
+-    while (length > 0) {
+-        size_t l;
 -
--        *size =3D decr << hw->info.shift;
-+        *size =3D audio_rate_get_bytes(
-+            &hw->info, &out->rate, (out->fsize - out->fpos) << hw->info.=
-shift);
-     } else {
--        rate_start(&out->rate);
-+        audio_rate_start(&out->rate);
-     }
-     return out->frame + out->fpos;
- }
-@@ -197,7 +163,7 @@ static int line_out_ctl (HWVoiceOut *hw, int cmd, ...=
-)
-             break;
-         }
-         out->active =3D 1;
--        rate_start (&out->rate);
-+        audio_rate_start(&out->rate);
-         spice_server_playback_start (&out->sin);
-         break;
-     case VOICE_DISABLE:
-@@ -273,8 +239,7 @@ static void line_in_fini (HWVoiceIn *hw)
- static size_t line_in_read(HWVoiceIn *hw, void *buf, size_t len)
- {
-     SpiceVoiceIn *in =3D container_of (hw, SpiceVoiceIn, hw);
--    uint64_t delta_samp =3D rate_get_samples(&hw->info, &in->rate);
--    uint64_t to_read =3D MIN(len >> 2, delta_samp);
-+    uint64_t to_read =3D audio_rate_get_bytes(&hw->info, &in->rate, len)=
- >> 2;
-     size_t ready =3D spice_server_record_get_samples(&in->sin, buf, to_r=
-ead);
-=20
-     /* XXX: do we need this? */
-@@ -296,7 +261,7 @@ static int line_in_ctl (HWVoiceIn *hw, int cmd, ...)
-             break;
-         }
-         in->active =3D 1;
--        rate_start (&in->rate);
-+        audio_rate_start(&in->rate);
-         spice_server_record_start (&in->sin);
-         break;
-     case VOICE_DISABLE:
-diff --git a/audio/wavaudio.c b/audio/wavaudio.c
-index 78af2f1338d2..85f5ff9c28bc 100644
---- a/audio/wavaudio.c
-+++ b/audio/wavaudio.c
-@@ -35,21 +35,15 @@
- typedef struct WAVVoiceOut {
-     HWVoiceOut hw;
-     FILE *f;
--    int64_t old_ticks;
-+    RateCtl rate;
-     int total_samples;
- } WAVVoiceOut;
-=20
- static size_t wav_write_out(HWVoiceOut *hw, void *buf, size_t len)
- {
-     WAVVoiceOut *wav =3D (WAVVoiceOut *) hw;
--    int64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
--    int64_t ticks =3D now - wav->old_ticks;
--    int64_t bytes =3D
--        muldiv64(ticks, hw->info.bytes_per_second, NANOSECONDS_PER_SECON=
-D);
+-        while (!p->read_data) {
+-            int r;
 -
--    bytes =3D MIN(bytes, len);
--    bytes =3D bytes >> hw->info.shift << hw->info.shift;
--    wav->old_ticks =3D now;
-+    int64_t bytes =3D audio_rate_get_bytes(&hw->info, &wav->rate, len);
-+    assert(bytes >> hw->info.shift << hw->info.shift =3D=3D bytes);
-=20
-     if (bytes && fwrite(buf, bytes, 1, wav->f) !=3D 1) {
-         dolog("wav_write_out: fwrite of %" PRId64 " bytes failed\nReason=
-: %s\n",
-@@ -130,6 +124,8 @@ static int wav_init_out(HWVoiceOut *hw, struct audset=
-tings *as,
-                strerror(errno));
-         return -1;
-     }
-+
-+    audio_rate_start(&wav->rate);
-     return 0;
- }
-=20
-@@ -179,8 +175,11 @@ static void wav_fini_out (HWVoiceOut *hw)
-=20
- static int wav_ctl_out (HWVoiceOut *hw, int cmd, ...)
- {
--    (void) hw;
--    (void) cmd;
-+    WAVVoiceOut *wav =3D (WAVVoiceOut *) hw;
-+
-+    if (cmd =3D=3D VOICE_ENABLE) {
-+        audio_rate_start(&wav->rate);
+-            r =3D pa_stream_peek (p->stream, &p->read_data, &p->read_len=
+gth);
+-            CHECK_SUCCESS_GOTO(c, rerror, r =3D=3D 0, unlock_and_fail);
+-
+-            if (!p->read_data) {
+-                pa_threaded_mainloop_wait(c->mainloop);
+-                CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
+-            } else {
+-                p->read_index =3D 0;
+-            }
+-        }
+-
+-        l =3D p->read_length < length ? p->read_length : length;
+-        memcpy (data, (const uint8_t *) p->read_data+p->read_index, l);
+-
+-        data =3D (uint8_t *) data + l;
+-        length -=3D l;
+-
+-        p->read_index +=3D l;
+-        p->read_length -=3D l;
++    if (!p->read_length) {
++        r =3D pa_stream_peek(p->stream, &p->read_data, &p->read_length);
++        CHECK_SUCCESS_GOTO(c, r =3D=3D 0, unlock_and_fail,
++                           "pa_stream_peek failed\n");
 +    }
-     return 0;
+=20
+-        if (!p->read_length) {
+-            int r;
++    l =3D MIN(p->read_length, length);
++    memcpy(data, p->read_data, l);
+=20
+-            r =3D pa_stream_drop (p->stream);
+-            p->read_data =3D NULL;
+-            p->read_length =3D 0;
+-            p->read_index =3D 0;
++    p->read_data +=3D l;
++    p->read_length -=3D l;
+=20
+-            CHECK_SUCCESS_GOTO(c, rerror, r =3D=3D 0, unlock_and_fail);
+-        }
++    if (!p->read_length) {
++        r =3D pa_stream_drop(p->stream);
++        CHECK_SUCCESS_GOTO(c, r =3D=3D 0, unlock_and_fail,
++                           "pa_stream_drop failed\n");
+     }
+=20
+     pa_threaded_mainloop_unlock(c->mainloop);
+-    return 0;
++    return l;
+=20
+ unlock_and_fail:
+     pa_threaded_mainloop_unlock(c->mainloop);
+-    return -1;
++    return 0;
  }
+=20
+-static int qpa_simple_write (PAVoiceOut *p, const void *data, size_t len=
+gth, int *rerror)
++static size_t qpa_write(HWVoiceOut *hw, void *data, size_t length)
+ {
++    PAVoiceOut *p =3D (PAVoiceOut *) hw;
+     PAConnection *c =3D p->g->conn;
++    size_t l;
++    int r;
+=20
+     pa_threaded_mainloop_lock(c->mainloop);
+=20
+-    CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
++    CHECK_DEAD_GOTO(c, p->stream, unlock_and_fail,
++                    "pa_threaded_mainloop_lock failed\n");
+=20
+-    while (length > 0) {
+-        size_t l;
+-        int r;
++    l =3D pa_stream_writable_size(p->stream);
+=20
+-        while (!(l =3D pa_stream_writable_size (p->stream))) {
+-            pa_threaded_mainloop_wait(c->mainloop);
+-            CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
+-        }
++    CHECK_SUCCESS_GOTO(c, l !=3D (size_t) -1, unlock_and_fail,
++                       "pa_stream_writable_size failed\n");
+=20
+-        CHECK_SUCCESS_GOTO(c, rerror, l !=3D (size_t) -1, unlock_and_fai=
+l);
+-
+-        if (l > length) {
+-            l =3D length;
+-        }
+-
+-        r =3D pa_stream_write (p->stream, data, l, NULL, 0LL, PA_SEEK_RE=
+LATIVE);
+-        CHECK_SUCCESS_GOTO(c, rerror, r >=3D 0, unlock_and_fail);
+-
+-        data =3D (const uint8_t *) data + l;
+-        length -=3D l;
++    if (l > length) {
++        l =3D length;
+     }
+=20
++    r =3D pa_stream_write(p->stream, data, l, NULL, 0LL, PA_SEEK_RELATIV=
+E);
++    CHECK_SUCCESS_GOTO(c, r >=3D 0, unlock_and_fail, "pa_stream_write fa=
+iled\n");
++
+     pa_threaded_mainloop_unlock(c->mainloop);
+-    return 0;
++    return l;
+=20
+ unlock_and_fail:
+     pa_threaded_mainloop_unlock(c->mainloop);
+-    return -1;
+-}
+-
+-static void *qpa_thread_out (void *arg)
+-{
+-    PAVoiceOut *pa =3D arg;
+-    HWVoiceOut *hw =3D &pa->hw;
+-
+-    if (audio_pt_lock(&pa->pt, __func__)) {
+-        return NULL;
+-    }
+-
+-    for (;;) {
+-        size_t decr, to_mix, rpos;
+-
+-        for (;;) {
+-            if (pa->done) {
+-                goto exit;
+-            }
+-
+-            if (pa->live > 0) {
+-                break;
+-            }
+-
+-            if (audio_pt_wait(&pa->pt, __func__)) {
+-                goto exit;
+-            }
+-        }
+-
+-        decr =3D to_mix =3D MIN(pa->live, pa->samples >> 5);
+-        rpos =3D pa->rpos;
+-
+-        if (audio_pt_unlock(&pa->pt, __func__)) {
+-            return NULL;
+-        }
+-
+-        while (to_mix) {
+-            int error;
+-            size_t chunk =3D MIN (to_mix, hw->samples - rpos);
+-            struct st_sample *src =3D hw->mix_buf + rpos;
+-
+-            hw->clip (pa->pcm_buf, src, chunk);
+-
+-            if (qpa_simple_write (pa, pa->pcm_buf,
+-                                  chunk << hw->info.shift, &error) < 0) =
+{
+-                qpa_logerr (error, "pa_simple_write failed\n");
+-                return NULL;
+-            }
+-
+-            rpos =3D (rpos + chunk) % hw->samples;
+-            to_mix -=3D chunk;
+-        }
+-
+-        if (audio_pt_lock(&pa->pt, __func__)) {
+-            return NULL;
+-        }
+-
+-        pa->rpos =3D rpos;
+-        pa->live -=3D decr;
+-        pa->decr +=3D decr;
+-    }
+-
+- exit:
+-    audio_pt_unlock(&pa->pt, __func__);
+-    return NULL;
+-}
+-
+-static size_t qpa_run_out(HWVoiceOut *hw, size_t live)
+-{
+-    size_t decr;
+-    PAVoiceOut *pa =3D (PAVoiceOut *) hw;
+-
+-    if (audio_pt_lock(&pa->pt, __func__)) {
+-        return 0;
+-    }
+-
+-    decr =3D MIN (live, pa->decr);
+-    pa->decr -=3D decr;
+-    pa->live =3D live - decr;
+-    hw->rpos =3D pa->rpos;
+-    if (pa->live > 0) {
+-        audio_pt_unlock_and_signal(&pa->pt, __func__);
+-    }
+-    else {
+-        audio_pt_unlock(&pa->pt, __func__);
+-    }
+-    return decr;
+-}
+-
+-/* capture */
+-static void *qpa_thread_in (void *arg)
+-{
+-    PAVoiceIn *pa =3D arg;
+-    HWVoiceIn *hw =3D &pa->hw;
+-
+-    if (audio_pt_lock(&pa->pt, __func__)) {
+-        return NULL;
+-    }
+-
+-    for (;;) {
+-        size_t incr, to_grab, wpos;
+-
+-        for (;;) {
+-            if (pa->done) {
+-                goto exit;
+-            }
+-
+-            if (pa->dead > 0) {
+-                break;
+-            }
+-
+-            if (audio_pt_wait(&pa->pt, __func__)) {
+-                goto exit;
+-            }
+-        }
+-
+-        incr =3D to_grab =3D MIN(pa->dead, pa->samples >> 5);
+-        wpos =3D pa->wpos;
+-
+-        if (audio_pt_unlock(&pa->pt, __func__)) {
+-            return NULL;
+-        }
+-
+-        while (to_grab) {
+-            int error;
+-            size_t chunk =3D MIN (to_grab, hw->samples - wpos);
+-            void *buf =3D advance (pa->pcm_buf, wpos);
+-
+-            if (qpa_simple_read (pa, buf,
+-                                 chunk << hw->info.shift, &error) < 0) {
+-                qpa_logerr (error, "pa_simple_read failed\n");
+-                return NULL;
+-            }
+-
+-            hw->conv (hw->conv_buf + wpos, buf, chunk);
+-            wpos =3D (wpos + chunk) % hw->samples;
+-            to_grab -=3D chunk;
+-        }
+-
+-        if (audio_pt_lock(&pa->pt, __func__)) {
+-            return NULL;
+-        }
+-
+-        pa->wpos =3D wpos;
+-        pa->dead -=3D incr;
+-        pa->incr +=3D incr;
+-    }
+-
+- exit:
+-    audio_pt_unlock(&pa->pt, __func__);
+-    return NULL;
+-}
+-
+-static size_t qpa_run_in(HWVoiceIn *hw)
+-{
+-    size_t live, incr, dead;
+-    PAVoiceIn *pa =3D (PAVoiceIn *) hw;
+-
+-    if (audio_pt_lock(&pa->pt, __func__)) {
+-        return 0;
+-    }
+-
+-    live =3D audio_pcm_hw_get_live_in (hw);
+-    dead =3D hw->samples - live;
+-    incr =3D MIN (dead, pa->incr);
+-    pa->incr -=3D incr;
+-    pa->dead =3D dead - incr;
+-    hw->wpos =3D pa->wpos;
+-    if (pa->dead > 0) {
+-        audio_pt_unlock_and_signal(&pa->pt, __func__);
+-    }
+-    else {
+-        audio_pt_unlock(&pa->pt, __func__);
+-    }
+-    return incr;
++    return 0;
+ }
+=20
+ static pa_sample_format_t audfmt_to_pa (AudioFormat afmt, int endianness=
+)
+@@ -468,13 +253,6 @@ static void stream_state_cb (pa_stream *s, void * us=
+erdata)
+     }
+ }
+=20
+-static void stream_request_cb (pa_stream *s, size_t length, void *userda=
+ta)
+-{
+-    PAConnection *c =3D userdata;
+-
+-    pa_threaded_mainloop_signal(c->mainloop, 0);
+-}
+-
+ static pa_stream *qpa_simple_new (
+         PAConnection *c,
+         const char *name,
+@@ -497,8 +275,6 @@ static pa_stream *qpa_simple_new (
+     }
+=20
+     pa_stream_set_state_callback(stream, stream_state_cb, c);
+-    pa_stream_set_read_callback(stream, stream_request_cb, c);
+-    pa_stream_set_write_callback(stream, stream_request_cb, c);
+=20
+     flags =3D
+         PA_STREAM_INTERPOLATE_TIMING
+@@ -579,28 +355,9 @@ static int qpa_init_out(HWVoiceOut *hw, struct audse=
+ttings *as,
+     hw->samples =3D pa->samples =3D audio_buffer_samples(
+         qapi_AudiodevPaPerDirectionOptions_base(ppdo),
+         &obt_as, ppdo->buffer_length);
+-    pa->pcm_buf =3D audio_calloc(__func__, hw->samples, 1 << hw->info.sh=
+ift);
+-    pa->rpos =3D hw->rpos;
+-    if (!pa->pcm_buf) {
+-        dolog("Could not allocate buffer (%zu bytes)\n",
+-              hw->samples << hw->info.shift);
+-        goto fail2;
+-    }
+-
+-    if (audio_pt_init(&pa->pt, qpa_thread_out, hw, AUDIO_CAP, __func__))=
+ {
+-        goto fail3;
+-    }
+=20
+     return 0;
+=20
+- fail3:
+-    g_free (pa->pcm_buf);
+-    pa->pcm_buf =3D NULL;
+- fail2:
+-    if (pa->stream) {
+-        pa_stream_unref (pa->stream);
+-        pa->stream =3D NULL;
+-    }
+  fail1:
+     return -1;
+ }
+@@ -647,28 +404,9 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsett=
+ings *as, void *drv_opaque)
+     hw->samples =3D pa->samples =3D audio_buffer_samples(
+         qapi_AudiodevPaPerDirectionOptions_base(ppdo),
+         &obt_as, ppdo->buffer_length);
+-    pa->pcm_buf =3D audio_calloc(__func__, hw->samples, 1 << hw->info.sh=
+ift);
+-    pa->wpos =3D hw->wpos;
+-    if (!pa->pcm_buf) {
+-        dolog("Could not allocate buffer (%zu bytes)\n",
+-              hw->samples << hw->info.shift);
+-        goto fail2;
+-    }
+-
+-    if (audio_pt_init(&pa->pt, qpa_thread_in, hw, AUDIO_CAP, __func__)) =
+{
+-        goto fail3;
+-    }
+=20
+     return 0;
+=20
+- fail3:
+-    g_free (pa->pcm_buf);
+-    pa->pcm_buf =3D NULL;
+- fail2:
+-    if (pa->stream) {
+-        pa_stream_unref (pa->stream);
+-        pa->stream =3D NULL;
+-    }
+  fail1:
+     return -1;
+ }
+@@ -696,42 +434,22 @@ static void qpa_simple_disconnect(PAConnection *c, =
+pa_stream *stream)
+=20
+ static void qpa_fini_out (HWVoiceOut *hw)
+ {
+-    void *ret;
+     PAVoiceOut *pa =3D (PAVoiceOut *) hw;
+=20
+-    audio_pt_lock(&pa->pt, __func__);
+-    pa->done =3D 1;
+-    audio_pt_unlock_and_signal(&pa->pt, __func__);
+-    audio_pt_join(&pa->pt, &ret, __func__);
+-
+     if (pa->stream) {
+         qpa_simple_disconnect(pa->g->conn, pa->stream);
+         pa->stream =3D NULL;
+     }
+-
+-    audio_pt_fini(&pa->pt, __func__);
+-    g_free (pa->pcm_buf);
+-    pa->pcm_buf =3D NULL;
+ }
+=20
+ static void qpa_fini_in (HWVoiceIn *hw)
+ {
+-    void *ret;
+     PAVoiceIn *pa =3D (PAVoiceIn *) hw;
+=20
+-    audio_pt_lock(&pa->pt, __func__);
+-    pa->done =3D 1;
+-    audio_pt_unlock_and_signal(&pa->pt, __func__);
+-    audio_pt_join(&pa->pt, &ret, __func__);
+-
+     if (pa->stream) {
+         qpa_simple_disconnect(pa->g->conn, pa->stream);
+         pa->stream =3D NULL;
+     }
+-
+-    audio_pt_fini(&pa->pt, __func__);
+-    g_free (pa->pcm_buf);
+-    pa->pcm_buf =3D NULL;
+ }
+=20
+ static int qpa_ctl_out (HWVoiceOut *hw, int cmd, ...)
+@@ -1005,12 +723,12 @@ static void qpa_audio_fini (void *opaque)
+ static struct audio_pcm_ops qpa_pcm_ops =3D {
+     .init_out =3D qpa_init_out,
+     .fini_out =3D qpa_fini_out,
+-    .run_out  =3D qpa_run_out,
++    .write    =3D qpa_write,
+     .ctl_out  =3D qpa_ctl_out,
+=20
+     .init_in  =3D qpa_init_in,
+     .fini_in  =3D qpa_fini_in,
+-    .run_in   =3D qpa_run_in,
++    .read     =3D qpa_read,
+     .ctl_in   =3D qpa_ctl_in
+ };
+=20
+diff --git a/audio/Makefile.objs b/audio/Makefile.objs
+index dca87f63470d..d7490a379f3e 100644
+--- a/audio/Makefile.objs
++++ b/audio/Makefile.objs
+@@ -2,7 +2,6 @@ common-obj-y =3D audio.o audio_legacy.o noaudio.o wavaudi=
+o.o mixeng.o
+ common-obj-$(CONFIG_SPICE) +=3D spiceaudio.o
+ common-obj-$(CONFIG_AUDIO_COREAUDIO) +=3D coreaudio.o
+ common-obj-$(CONFIG_AUDIO_DSOUND) +=3D dsoundaudio.o
+-common-obj-$(CONFIG_AUDIO_PT_INT) +=3D audio_pt_int.o
+ common-obj-$(CONFIG_AUDIO_WIN_INT) +=3D audio_win_int.o
+ common-obj-y +=3D wavcapture.o
 =20
 --=20
 2.18.1
