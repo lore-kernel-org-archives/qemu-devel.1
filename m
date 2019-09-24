@@ -2,66 +2,53 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29FA6C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:32:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4D45C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:32:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F23042146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:31:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F23042146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8645F2146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:32:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8645F2146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCrTa-0007kQ-Dv
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:31:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49520)
+	id 1iCrUS-00006F-HN
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:32:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43980)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCrH1-0002iS-Lp
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:19:00 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCr8M-0000qB-J4
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCrH0-0007es-Pj
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:18:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49354)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCr8K-0002zi-PR
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:02 -0400
+Received: from relay.sw.ru ([185.231.240.75]:38094)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCrH0-0007ei-Kk
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:18:58 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E74C630820C9;
- Tue, 24 Sep 2019 20:18:57 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D5C319C58;
- Tue, 24 Sep 2019 20:18:55 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id E51C7113864E; Tue, 24 Sep 2019 22:18:53 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 03/25] qapi: New QAPISourceInfo, replacing dict
-References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-4-armbru@redhat.com>
- <4ff086cb-7c96-a25a-be19-d78af40afd9b@redhat.com>
-Date: Tue, 24 Sep 2019 22:18:53 +0200
-In-Reply-To: <4ff086cb-7c96-a25a-be19-d78af40afd9b@redhat.com> (Eric Blake's
- message of "Tue, 24 Sep 2019 09:51:40 -0500")
-Message-ID: <87ftkla1n6.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iCr8K-0002sb-Hp
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:00 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iCr89-0001Mk-70; Tue, 24 Sep 2019 23:09:49 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 13/25] SCSI: Fix error_append_hint usage
+Date: Tue, 24 Sep 2019 23:08:50 +0300
+Message-Id: <20190924200902.4703-14-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190924200902.4703-1-vsementsov@virtuozzo.com>
+References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 24 Sep 2019 20:18:57 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,40 +60,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ vsementsov@virtuozzo.com, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+If we want append hint to errp, we must use ERRP_FUNCTION_BEGIN macro.
+Otherwise hint will not be appended in case of errp == &fatal_err
+(program will exit before error_append_hint() call). Fix such cases.
 
-> On 9/24/19 8:28 AM, Markus Armbruster wrote:
->> We track source locations with a dict of the form
->> 
->>     {'file': FNAME, 'line': LINENO, parent': PARENT}
->
-> Missing ' on parent
->
->> 
->> where PARENT is None for the main file, and the include directive's
->> source location for included files.
->> 
->> This is servicable enough, but the next commit will add information,
->
-> serviceable
+This commit (together with its neighbors) was generated by
 
-Will fix both.
+git grep -l 'error_append_hint(errp' | while read f; do \
+spatch --sp-file scripts/coccinelle/fix-error_append_hint-usage.cocci \
+--in-place $f; done
 
->> and that's going to come out cleaner if we turn this into a class.  So
->> do that.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  scripts/qapi/common.py | 69 +++++++++++++++++++++++++-----------------
->>  1 file changed, 41 insertions(+), 28 deletions(-)
->> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+and then
 
-Thanks!
+./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+
+(auto-msg was a file with this commit message)
+
+Still, for backporting it may be more comfortable to use only the first
+command and then do one huge commit.
+
+Reported-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ hw/scsi/scsi-disk.c    | 1 +
+ hw/scsi/scsi-generic.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 915641a0f1..72ac308b6c 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -2597,6 +2597,7 @@ static int get_device_type(SCSIDiskState *s)
+ 
+ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
+ {
++    ERRP_FUNCTION_BEGIN();
+     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
+     AioContext *ctx;
+     int sg_version;
+diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+index e7798ebcd0..e955f4e0a5 100644
+--- a/hw/scsi/scsi-generic.c
++++ b/hw/scsi/scsi-generic.c
+@@ -653,6 +653,7 @@ static void scsi_generic_reset(DeviceState *dev)
+ 
+ static void scsi_generic_realize(SCSIDevice *s, Error **errp)
+ {
++    ERRP_FUNCTION_BEGIN();
+     int rc;
+     int sg_version;
+     struct sg_scsi_id scsiid;
+-- 
+2.21.0
+
 
