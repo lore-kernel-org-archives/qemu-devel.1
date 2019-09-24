@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5E15C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:29:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6459C4320D
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:29:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8D11214DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:29:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8D11214DA
+	by mail.kernel.org (Postfix) with ESMTPS id 8DF32214DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:29:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DF32214DA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iClos-0006qo-2g
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 10:29:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58543)
+	id 1iClp5-00079u-MH
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 10:29:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58481)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iCkrN-0007zA-Q9
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:08 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iCkrH-0007xe-8B
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iCkrK-0001Ek-0H
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:05 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:46878 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iCkrD-0001B3-Nl
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:27:58 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:34195 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iCkrG-0001Al-U0
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:00 -0400
+ id 1iCkrC-0000o3-Ml
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:27:55 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id DB1561A221B;
+ by mail.rt-rk.com (Postfix) with ESMTP id 7F6F61A227F;
  Tue, 24 Sep 2019 15:26:48 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id A759C1A1D45;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 5BAD61A1FB9;
  Tue, 24 Sep 2019 15:26:48 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 08/11] target/mips: msa: Split helpers for PCNT.<B|H|W|D>
-Date: Tue, 24 Sep 2019 15:26:39 +0200
-Message-Id: <1569331602-2586-9-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH 02/11] target/mips: Clean up internal.h
+Date: Tue, 24 Sep 2019 15:26:33 +0200
+Message-Id: <1569331602-2586-3-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1569331602-2586-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1569331602-2586-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -69,244 +69,125 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Achieves clearer code and slightly better performance.
+Mostly fix errors and warnings reported by 'checkpatch.pl -f'.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/helper.h     |   6 +-
- target/mips/msa_helper.c | 143 ++++++++++++++++++++++++-----------------------
- target/mips/translate.c  |  19 ++++++-
- 3 files changed, 95 insertions(+), 73 deletions(-)
+ target/mips/internal.h | 60 +++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 37 insertions(+), 23 deletions(-)
 
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index d709083..18e4c7a 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -788,6 +788,11 @@ DEF_HELPER_3(msa_nlzc_h, void, env, i32, i32)
- DEF_HELPER_3(msa_nlzc_w, void, env, i32, i32)
- DEF_HELPER_3(msa_nlzc_d, void, env, i32, i32)
+diff --git a/target/mips/internal.h b/target/mips/internal.h
+index 685e8d6..3f435b5 100644
+--- a/target/mips/internal.h
++++ b/target/mips/internal.h
+@@ -1,4 +1,5 @@
+-/* mips internal definitions and helpers
++/*
++ * MIPS internal definitions and helpers
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or later.
+  * See the COPYING file in the top-level directory.
+@@ -9,8 +10,10 @@
  
-+DEF_HELPER_3(msa_pcnt_b, void, env, i32, i32)
-+DEF_HELPER_3(msa_pcnt_h, void, env, i32, i32)
-+DEF_HELPER_3(msa_pcnt_w, void, env, i32, i32)
-+DEF_HELPER_3(msa_pcnt_d, void, env, i32, i32)
-+
+ #include "fpu/softfloat-helpers.h"
  
- DEF_HELPER_4(msa_andi_b, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_ori_b, void, env, i32, i32, i32)
-@@ -946,7 +951,6 @@ DEF_HELPER_4(msa_bmnz_v, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_bmz_v, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_bsel_v, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_fill_df, void, env, i32, i32, i32)
--DEF_HELPER_4(msa_pcnt_df, void, env, i32, i32, i32)
- 
- DEF_HELPER_4(msa_copy_s_b, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_copy_s_h, void, env, i32, i32, i32)
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 8c27c1b..fe27efc 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -207,6 +207,80 @@ void helper_msa_nlzc_d(CPUMIPSState *env, uint32_t wd, uint32_t ws)
-     pwd->d[1]  = msa_nlzc_df(DF_DOUBLE, pws->d[1]);
+-/* MMU types, the first four entries have the same layout as the
+-   CP0C0_MT field.  */
++/*
++ * MMU types, the first four entries have the same layout as the
++ * CP0C0_MT field.
++ */
+ enum mips_mmu_types {
+     MMU_TYPE_NONE,
+     MMU_TYPE_R4000,
+@@ -160,9 +163,11 @@ static inline bool cpu_mips_hw_interrupts_enabled(CPUMIPSState *env)
+         !(env->CP0_Status & (1 << CP0St_EXL)) &&
+         !(env->CP0_Status & (1 << CP0St_ERL)) &&
+         !(env->hflags & MIPS_HFLAG_DM) &&
+-        /* Note that the TCStatus IXMT field is initialized to zero,
+-           and only MT capable cores can set it to one. So we don't
+-           need to check for MT capabilities here.  */
++        /*
++         * Note that the TCStatus IXMT field is initialized to zero,
++         * and only MT capable cores can set it to one. So we don't
++         * need to check for MT capabilities here.
++         */
+         !(env->active_tc.CP0_TCStatus & (1 << CP0TCSt_IXMT));
  }
  
-+static inline int64_t msa_pcnt_df(uint32_t df, int64_t arg)
-+{
-+    uint64_t x;
-+
-+    x = UNSIGNED(arg, df);
-+
-+    x = (x & 0x5555555555555555ULL) + ((x >>  1) & 0x5555555555555555ULL);
-+    x = (x & 0x3333333333333333ULL) + ((x >>  2) & 0x3333333333333333ULL);
-+    x = (x & 0x0F0F0F0F0F0F0F0FULL) + ((x >>  4) & 0x0F0F0F0F0F0F0F0FULL);
-+    x = (x & 0x00FF00FF00FF00FFULL) + ((x >>  8) & 0x00FF00FF00FF00FFULL);
-+    x = (x & 0x0000FFFF0000FFFFULL) + ((x >> 16) & 0x0000FFFF0000FFFFULL);
-+    x = (x & 0x00000000FFFFFFFFULL) + ((x >> 32));
-+
-+    return x;
-+}
-+
-+void helper_msa_pcnt_b(CPUMIPSState *env, uint32_t wd, uint32_t ws)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+
-+    pwd->b[0]  = msa_pcnt_df(DF_BYTE, pws->b[0]);
-+    pwd->b[1]  = msa_pcnt_df(DF_BYTE, pws->b[1]);
-+    pwd->b[2]  = msa_pcnt_df(DF_BYTE, pws->b[2]);
-+    pwd->b[3]  = msa_pcnt_df(DF_BYTE, pws->b[3]);
-+    pwd->b[4]  = msa_pcnt_df(DF_BYTE, pws->b[4]);
-+    pwd->b[5]  = msa_pcnt_df(DF_BYTE, pws->b[5]);
-+    pwd->b[6]  = msa_pcnt_df(DF_BYTE, pws->b[6]);
-+    pwd->b[7]  = msa_pcnt_df(DF_BYTE, pws->b[7]);
-+    pwd->b[8]  = msa_pcnt_df(DF_BYTE, pws->b[8]);
-+    pwd->b[9]  = msa_pcnt_df(DF_BYTE, pws->b[9]);
-+    pwd->b[10] = msa_pcnt_df(DF_BYTE, pws->b[10]);
-+    pwd->b[11] = msa_pcnt_df(DF_BYTE, pws->b[11]);
-+    pwd->b[12] = msa_pcnt_df(DF_BYTE, pws->b[12]);
-+    pwd->b[13] = msa_pcnt_df(DF_BYTE, pws->b[13]);
-+    pwd->b[14] = msa_pcnt_df(DF_BYTE, pws->b[14]);
-+    pwd->b[15] = msa_pcnt_df(DF_BYTE, pws->b[15]);
-+}
-+
-+void helper_msa_pcnt_h(CPUMIPSState *env, uint32_t wd, uint32_t ws)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+
-+    pwd->h[0]  = msa_pcnt_df(DF_HALF, pws->h[0]);
-+    pwd->h[1]  = msa_pcnt_df(DF_HALF, pws->h[1]);
-+    pwd->h[2]  = msa_pcnt_df(DF_HALF, pws->h[2]);
-+    pwd->h[3]  = msa_pcnt_df(DF_HALF, pws->h[3]);
-+    pwd->h[4]  = msa_pcnt_df(DF_HALF, pws->h[4]);
-+    pwd->h[5]  = msa_pcnt_df(DF_HALF, pws->h[5]);
-+    pwd->h[6]  = msa_pcnt_df(DF_HALF, pws->h[6]);
-+    pwd->h[7]  = msa_pcnt_df(DF_HALF, pws->h[7]);
-+}
-+
-+void helper_msa_pcnt_w(CPUMIPSState *env, uint32_t wd, uint32_t ws)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+
-+    pwd->w[0]  = msa_pcnt_df(DF_WORD, pws->w[0]);
-+    pwd->w[1]  = msa_pcnt_df(DF_WORD, pws->w[1]);
-+    pwd->w[2]  = msa_pcnt_df(DF_WORD, pws->w[2]);
-+    pwd->w[3]  = msa_pcnt_df(DF_WORD, pws->w[3]);
-+}
-+
-+void helper_msa_pcnt_d(CPUMIPSState *env, uint32_t wd, uint32_t ws)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+
-+    pwd->d[0]  = msa_pcnt_df(DF_DOUBLE, pws->d[0]);
-+    pwd->d[1]  = msa_pcnt_df(DF_DOUBLE, pws->d[1]);
-+}
-+
+@@ -177,14 +182,18 @@ static inline bool cpu_mips_hw_interrupts_pending(CPUMIPSState *env)
+     status = env->CP0_Status & CP0Ca_IP_mask;
  
- /*
-  * Bit Move
-@@ -2648,22 +2722,6 @@ void helper_msa_move_v(CPUMIPSState *env, uint32_t wd, uint32_t ws)
-     msa_move_v(pwd, pws);
- }
- 
--static inline int64_t msa_pcnt_df(uint32_t df, int64_t arg)
--{
--    uint64_t x;
--
--    x = UNSIGNED(arg, df);
--
--    x = (x & 0x5555555555555555ULL) + ((x >>  1) & 0x5555555555555555ULL);
--    x = (x & 0x3333333333333333ULL) + ((x >>  2) & 0x3333333333333333ULL);
--    x = (x & 0x0F0F0F0F0F0F0F0FULL) + ((x >>  4) & 0x0F0F0F0F0F0F0F0FULL);
--    x = (x & 0x00FF00FF00FF00FFULL) + ((x >>  8) & 0x00FF00FF00FF00FFULL);
--    x = (x & 0x0000FFFF0000FFFFULL) + ((x >> 16) & 0x0000FFFF0000FFFFULL);
--    x = (x & 0x00000000FFFFFFFFULL) + ((x >> 32));
--
--    return x;
--}
--
- void helper_msa_fill_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-                         uint32_t rs)
- {
-@@ -2696,59 +2754,6 @@ void helper_msa_fill_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+     if (env->CP0_Config3 & (1 << CP0C3_VEIC)) {
+-        /* A MIPS configured with a vectorizing external interrupt controller
+-           will feed a vector into the Cause pending lines. The core treats
+-           the status lines as a vector level, not as indiviual masks.  */
++        /*
++         * A MIPS configured with a vectorizing external interrupt controller
++         * will feed a vector into the Cause pending lines. The core treats
++         * the status lines as a vector level, not as indiviual masks.
++         */
+         r = pending > status;
+     } else {
+-        /* A MIPS configured with compatibility or VInt (Vectored Interrupts)
+-           treats the pending lines as individual interrupt lines, the status
+-           lines are individual masks.  */
++        /*
++         * A MIPS configured with compatibility or VInt (Vectored Interrupts)
++         * treats the pending lines as individual interrupt lines, the status
++         * lines are individual masks.
++         */
+         r = (pending & status) != 0;
      }
- }
+     return r;
+@@ -275,12 +284,14 @@ static inline int mips_vpe_active(CPUMIPSState *env)
+         active = 0;
+     }
  
--#define MSA_UNOP_DF(func) \
--void helper_msa_ ## func ## _df(CPUMIPSState *env, uint32_t df,         \
--                              uint32_t wd, uint32_t ws)                 \
--{                                                                       \
--    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);                          \
--    wr_t *pws = &(env->active_fpu.fpr[ws].wr);                          \
--                                                                        \
--    switch (df) {                                                       \
--    case DF_BYTE:                                                       \
--        pwd->b[0]  = msa_ ## func ## _df(df, pws->b[0]);                \
--        pwd->b[1]  = msa_ ## func ## _df(df, pws->b[1]);                \
--        pwd->b[2]  = msa_ ## func ## _df(df, pws->b[2]);                \
--        pwd->b[3]  = msa_ ## func ## _df(df, pws->b[3]);                \
--        pwd->b[4]  = msa_ ## func ## _df(df, pws->b[4]);                \
--        pwd->b[5]  = msa_ ## func ## _df(df, pws->b[5]);                \
--        pwd->b[6]  = msa_ ## func ## _df(df, pws->b[6]);                \
--        pwd->b[7]  = msa_ ## func ## _df(df, pws->b[7]);                \
--        pwd->b[8]  = msa_ ## func ## _df(df, pws->b[8]);                \
--        pwd->b[9]  = msa_ ## func ## _df(df, pws->b[9]);                \
--        pwd->b[10] = msa_ ## func ## _df(df, pws->b[10]);               \
--        pwd->b[11] = msa_ ## func ## _df(df, pws->b[11]);               \
--        pwd->b[12] = msa_ ## func ## _df(df, pws->b[12]);               \
--        pwd->b[13] = msa_ ## func ## _df(df, pws->b[13]);               \
--        pwd->b[14] = msa_ ## func ## _df(df, pws->b[14]);               \
--        pwd->b[15] = msa_ ## func ## _df(df, pws->b[15]);               \
--        break;                                                          \
--    case DF_HALF:                                                       \
--        pwd->h[0] = msa_ ## func ## _df(df, pws->h[0]);                 \
--        pwd->h[1] = msa_ ## func ## _df(df, pws->h[1]);                 \
--        pwd->h[2] = msa_ ## func ## _df(df, pws->h[2]);                 \
--        pwd->h[3] = msa_ ## func ## _df(df, pws->h[3]);                 \
--        pwd->h[4] = msa_ ## func ## _df(df, pws->h[4]);                 \
--        pwd->h[5] = msa_ ## func ## _df(df, pws->h[5]);                 \
--        pwd->h[6] = msa_ ## func ## _df(df, pws->h[6]);                 \
--        pwd->h[7] = msa_ ## func ## _df(df, pws->h[7]);                 \
--        break;                                                          \
--    case DF_WORD:                                                       \
--        pwd->w[0] = msa_ ## func ## _df(df, pws->w[0]);                 \
--        pwd->w[1] = msa_ ## func ## _df(df, pws->w[1]);                 \
--        pwd->w[2] = msa_ ## func ## _df(df, pws->w[2]);                 \
--        pwd->w[3] = msa_ ## func ## _df(df, pws->w[3]);                 \
--        break;                                                          \
--    case DF_DOUBLE:                                                     \
--        pwd->d[0] = msa_ ## func ## _df(df, pws->d[0]);                 \
--        pwd->d[1] = msa_ ## func ## _df(df, pws->d[1]);                 \
--        break;                                                          \
--    default:                                                            \
--        assert(0);                                                      \
--    }                                                                   \
--}
+-    /* Now verify that there are active thread contexts in the VPE.
 -
--MSA_UNOP_DF(pcnt)
--#undef MSA_UNOP_DF
- 
- #define FLOAT_ONE32 make_float32(0x3f8 << 20)
- #define FLOAT_ONE64 make_float64(0x3ffULL << 52)
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 6de4609..0d06ba9 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -28958,9 +28958,6 @@ static void gen_msa_2r(CPUMIPSState *env, DisasContext *ctx)
- #endif
-         gen_helper_msa_fill_df(cpu_env, tdf, twd, tws); /* trs */
-         break;
--    case OPC_PCNT_df:
--        gen_helper_msa_pcnt_df(cpu_env, tdf, twd, tws);
--        break;
-     case OPC_NLOC_df:
-         switch (df) {
-         case DF_BYTE:
-@@ -28993,6 +28990,22 @@ static void gen_msa_2r(CPUMIPSState *env, DisasContext *ctx)
-             break;
+-       This assumes the CPU model will internally reschedule threads
+-       if the active one goes to sleep. If there are no threads available
+-       the active one will be in a sleeping state, and we can turn off
+-       the entire VPE.  */
++    /*
++     * Now verify that there are active thread contexts in the VPE.
++     *
++     * This assumes the CPU model will internally reschedule threads
++     * if the active one goes to sleep. If there are no threads available
++     * the active one will be in a sleeping state, and we can turn off
++     * the entire VPE.
++     */
+     if (!(env->active_tc.CP0_TCStatus & (1 << CP0TCSt_A))) {
+         /* TC is not activated.  */
+         active = 0;
+@@ -326,7 +337,8 @@ static inline void compute_hflags(CPUMIPSState *env)
+     if (!(env->CP0_Status & (1 << CP0St_EXL)) &&
+         !(env->CP0_Status & (1 << CP0St_ERL)) &&
+         !(env->hflags & MIPS_HFLAG_DM)) {
+-        env->hflags |= (env->CP0_Status >> CP0St_KSU) & MIPS_HFLAG_KSU;
++        env->hflags |= (env->CP0_Status >> CP0St_KSU) &
++                       MIPS_HFLAG_KSU;
+     }
+ #if defined(TARGET_MIPS64)
+     if ((env->insn_flags & ISA_MIPS3) &&
+@@ -403,10 +415,12 @@ static inline void compute_hflags(CPUMIPSState *env)
+             env->hflags |= MIPS_HFLAG_COP1X;
          }
-         break;
-+    case OPC_PCNT_df:
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_helper_msa_pcnt_b(cpu_env, twd, tws);
-+            break;
-+        case DF_HALF:
-+            gen_helper_msa_pcnt_h(cpu_env, twd, tws);
-+            break;
-+        case DF_WORD:
-+            gen_helper_msa_pcnt_w(cpu_env, twd, tws);
-+            break;
-+        case DF_DOUBLE:
-+            gen_helper_msa_pcnt_d(cpu_env, twd, tws);
-+            break;
-+        }
-+        break;
-     default:
-         MIPS_INVAL("MSA instruction");
-         generate_exception_end(ctx, EXCP_RI);
+     } else if (env->insn_flags & ISA_MIPS4) {
+-        /* All supported MIPS IV CPUs use the XX (CU3) to enable
+-           and disable the MIPS IV extensions to the MIPS III ISA.
+-           Some other MIPS IV CPUs ignore the bit, so the check here
+-           would be too restrictive for them.  */
++        /*
++         * All supported MIPS IV CPUs use the XX (CU3) to enable
++         * and disable the MIPS IV extensions to the MIPS III ISA.
++         * Some other MIPS IV CPUs ignore the bit, so the check here
++         * would be too restrictive for them.
++         */
+         if (env->CP0_Status & (1U << CP0St_CU3)) {
+             env->hflags |= MIPS_HFLAG_COP1X;
+         }
 -- 
 2.7.4
 
