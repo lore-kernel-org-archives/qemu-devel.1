@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDDBEC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 22:31:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EE0EC432C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 22:32:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 454142146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 22:31:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 248E02146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 22:32:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AXSpLfYc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 454142146E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xtCRAeaA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 248E02146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCsDe-0002ME-Qf
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 17:19:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55645)
+	id 1iCtMP-0007GK-Oq
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 18:32:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56681)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iCrw4-0002au-L8
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:25 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iCs4x-00035n-7A
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:10:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iCrw2-0004Wx-Dk
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:24 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41527)
+ (envelope-from <alex.bennee@linaro.org>) id 1iCs4w-0007Vj-2Z
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:10:34 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:34855)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iCrw2-0004Vh-1O
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:22 -0400
-Received: by mail-wr1-x443.google.com with SMTP id h7so3622528wrw.8
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 14:01:21 -0700 (PDT)
+ id 1iCs4v-0007Uf-SQ
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:10:34 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id v8so3652779wrt.2
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 14:10:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Nw6PVinSAUrcIMGIAvVonphLXCK81yYui4fSQKYKk34=;
- b=AXSpLfYcj/xcmzMtw+K4+NWtnz7PgT/2uX1kAYlDKCIwZH1yWEk2PYNhMqSr1sSFJO
- 1povLVEasmA4SzJAJAh6ozR07ELQ9UeDF68pS1UGbGjBiyWPr2sBtI4dFyFHfEYyWJpt
- EmMP+iPPSuqMmueUS+uGpq42H1rAMsqwqgDcr2dSgQQ0bNsbaVnMII1XCuILGbGWWsWO
- AC7tYBxQ53lLHVM1thPeArtuJEWGuXbGaCFEJtO6eZeJBhrQ7jEMS/HiU2imn3Kwa/07
- ClLS/ptniLJE8kT8HkhKflnIDKiah0Bkl3gIrLir1dTSGVZIX9RiYLIuAlDzTzSFz3oK
- ASDg==
+ bh=6+idHhTAwwZaYQkSKifAY2XlNpSeZuGlnlutrp4cNmk=;
+ b=xtCRAeaAaHX/8PacqUPFbx6iKKEMd+NlMli/2OyLSPE81ilbTCyHMELR/GZXlxYv6S
+ bW/J3+kTH4Q5mKqozQ4UQCoDU0P6R7tQn9MEucPsuuYY+XRdPGq5Wvj7CJjoxIO7H8Ah
+ Dp3O/+F9Uelo71WqwM+/eUtxro4acXIHS6h2cuC/nobQ2s0TgMOoV+H2btwYop9MT+mT
+ wXo88LXOjD8bIYh8KAXzVc9HsgQETEqMJz9hbSCT98NVgjlnb3PoiMUBFb3kQbd6aLfJ
+ 7MZhJCF2N528/ASZtGl0ZM5Zxcs7gdM4/Wpmnvyo3ysp4KBre2p1cesDWEYV5GK/FU87
+ XMww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Nw6PVinSAUrcIMGIAvVonphLXCK81yYui4fSQKYKk34=;
- b=jkMxBspoGGAI3lA05JKRyfe7YAs6Ljr9a+aooWiOBnXR3ncIhaAEI4J+j7wIYuoUEi
- hVS9JL613zo7eP0sjgu1Vxtlr1NflKeb8ZlMcx9OOrUzMEBjIJZaMgEpTcuSL8EVIV+d
- JyKfNgcV8wNq0EP5k6gbU7RI21fb9s0FVtcmhcEKuhbcgbBxy8xrAP1gTRnJ0Ph74kZr
- IvZq6h/3qVoZFQ/cEEUjHrkKK135UiAZ/yxDYgWa0YfytiKT0fvLE+LZdb5So05FeMK5
- CM8WPzpAqQnQS4b0tjzTFb13HrRwbkezG7N4ITLFDJSFnN3MPZ/iIV+h6zylgEEwNTKt
- VKSg==
-X-Gm-Message-State: APjAAAXyuLhAC1urcfepuyY9ymFWai56uwjaUEqc0aEYq0GaXh1Xdq2h
- cr2qhS5ZEB9gPxOoLmLj0nCHeQ==
-X-Google-Smtp-Source: APXvYqyf6oztHkdD+I7LRAQ8MFyV7dwMMo7kCQdpfHqPkGzvX2Zcpfy3b+igeAeY08F3Dc25UdIWkg==
-X-Received: by 2002:adf:fe92:: with SMTP id l18mr4574664wrr.369.1569358880701; 
- Tue, 24 Sep 2019 14:01:20 -0700 (PDT)
+ bh=6+idHhTAwwZaYQkSKifAY2XlNpSeZuGlnlutrp4cNmk=;
+ b=OIKUYsKfVtdPmN7Xup6dqYAXTtWV4/ncChalWR8iv4PFgdXeyYLrE6HpO473NIdCDv
+ aTzS926OoC/cxWagDjJARrjRf9RF0oxbZxzfDk1MgzFINdcAfZGHg36AdF+yup+12nk/
+ +2BOVw30E/3/DmFjFwReTwKROFtz2LbxaPGY6dOveDjyafhdSyvpU14EdQIC9KA10BQd
+ C8oHzCL34DJn3umSLvvrttWfDTt5af0h0c9NKbLrZUD0FqvXwazDOPpWC1VnnDyn339q
+ /G4+U6WUjFvrbSMz632UKXBESTkeb+R+sf2f9GrA/6hNgnFtTant+CRDzJEYslDZkRbT
+ T2ug==
+X-Gm-Message-State: APjAAAUXki4eFFU5Smq8xr1xcxs9dJU6vsrkoeLDaupP3LblGgb+Vie7
+ WxcPEFSMgPDYF9majjA5oiS62w==
+X-Google-Smtp-Source: APXvYqwDldWOhc94Lv35jAJgNa5DDF/dWNVNoWgVwCo8NR54FRVO7OJeaLOR/PdiaAXPqbsY/p3QxQ==
+X-Received: by 2002:a5d:4a03:: with SMTP id m3mr4893611wrq.182.1569359432689; 
+ Tue, 24 Sep 2019 14:10:32 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id l10sm4654754wrh.20.2019.09.24.14.01.12
+ by smtp.gmail.com with ESMTPSA id x6sm1390148wmf.35.2019.09.24.14.10.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 24 Sep 2019 14:01:17 -0700 (PDT)
+ Tue, 24 Sep 2019 14:10:32 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id CD5021FF8F;
- Tue, 24 Sep 2019 22:01:08 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 5B0471FFB1;
+ Tue, 24 Sep 2019 22:01:09 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 21/33] tests/tcg: add simple record/replay smoke test for
- aarch64
-Date: Tue, 24 Sep 2019 22:00:54 +0100
-Message-Id: <20190924210106.27117-22-alex.bennee@linaro.org>
+Subject: [PATCH  v3 27/33] docker: remove debian8-mxe definitions
+Date: Tue, 24 Sep 2019 22:01:00 +0100
+Message-Id: <20190924210106.27117-28-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190924210106.27117-1-alex.bennee@linaro.org>
 References: <20190924210106.27117-1-alex.bennee@linaro.org>
@@ -85,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::42c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,60 +96,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, jsnow@redhat.com, f4bug@amsat.org,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
- Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Fam Zheng <fam@euphon.net>, jsnow@redhat.com, f4bug@amsat.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds two new tests that re-use the memory test to check basic
-record replay functionality is still working. We have to define our
-own runners rather than using the default pattern as we want to change
-the test name but re-use the memory binary.
+From: John Snow <jsnow@redhat.com>
 
-We declare the test binaries as PHONY as they don't rely exist.
+We don't have a debian8-mxe dockerfile anymore.
 
-[AJB: A better test would output some sort of timer value or other
-otherwise variable value so we could compare the record and replay
-outputs and ensure they match]
-
+Fixes: 67bd36beda1ae
+Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20190923181140.7235-2-jsnow@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 ---
- tests/tcg/aarch64/Makefile.softmmu-target | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ tests/docker/Makefile.include | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/tcg/aarch64/Makefile.softmmu-target b/tests/tcg/aarch64/Makefile.softmmu-target
-index 4c4aaf61dd3..b4b39579634 100644
---- a/tests/tcg/aarch64/Makefile.softmmu-target
-+++ b/tests/tcg/aarch64/Makefile.softmmu-target
-@@ -32,3 +32,24 @@ memory: CFLAGS+=-DCHECK_UNALIGNED=1
- 
- # Running
- QEMU_OPTS+=-M virt -cpu max -display none -semihosting-config enable=on,target=native,chardev=output -kernel
-+
-+# Simple Record/Replay Test
-+.PHONY: memory-record
-+run-memory-record: memory-record memory
-+	$(call run-test, $<, \
-+	  $(QEMU) -monitor none -display none \
-+		  -chardev file$(COMMA)path=$<.out$(COMMA)id=output \
-+		  -icount shift=5$(COMMA)rr=record$(COMMA)rrfile=record.bin \
-+	   	  $(QEMU_OPTS) memory, \
-+	  "$< on $(TARGET_NAME)")
-+
-+.PHONY: memory-replay
-+run-memory-replay: memory-replay run-memory-record
-+	$(call run-test, $<, \
-+	  $(QEMU) -monitor none -display none \
-+		  -chardev file$(COMMA)path=$<.out$(COMMA)id=output \
-+		  -icount shift=5$(COMMA)rr=replay$(COMMA)rrfile=record.bin \
-+	   	  $(QEMU_OPTS) memory, \
-+	  "$< on $(TARGET_NAME)")
-+
-+TESTS+=memory-record memory-replay
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index e85e73025ba..47d2273f29d 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -7,7 +7,7 @@ DOCKER_FILES_DIR := $(SRC_PATH)/tests/docker/dockerfiles
+ DOCKER_DEPRECATED_IMAGES := debian
+ # we don't run tests on intermediate images (used as base by another image)
+ DOCKER_PARTIAL_IMAGES := debian debian8 debian9 debian10 debian-sid
+-DOCKER_PARTIAL_IMAGES += debian8-mxe debian9-mxe debian-ports debian-bootstrap
++DOCKER_PARTIAL_IMAGES += debian9-mxe debian-ports debian-bootstrap
+ DOCKER_IMAGES := $(filter-out $(DOCKER_DEPRECATED_IMAGES),$(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker)))))
+ DOCKER_TARGETS := $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
+ # Use a global constant ccache directory to speed up repetitive builds
 -- 
 2.20.1
 
