@@ -6,45 +6,46 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56A87C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 18:09:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2C0EC4320D
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 18:14:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31946214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 18:09:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31946214AF
+	by mail.kernel.org (Postfix) with ESMTPS id D5181214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 18:14:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5181214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCpFZ-0000Jl-2v
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 14:09:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47518)
+	id 1iCpKP-0003Pg-Dr
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 14:14:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48097)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iCpDl-0007cW-TQ
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 14:07:30 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCpJO-0002vj-En
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 14:13:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iCpDk-00081V-UU
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 14:07:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36570)
+ (envelope-from <eblake@redhat.com>) id 1iCpJM-0001PS-Nn
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 14:13:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42120)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCpDk-00081N-LD
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 14:07:28 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCpJM-0001Oy-Es
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 14:13:16 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DC452C057867;
- Tue, 24 Sep 2019 18:07:27 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6EA1410DCC98;
+ Tue, 24 Sep 2019 18:13:15 +0000 (UTC)
 Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 46CFE60A97;
- Tue, 24 Sep 2019 18:07:22 +0000 (UTC)
-Subject: Re: [PATCH 19/25] qapi: Improve reporting of invalid flags
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0AA2161559;
+ Tue, 24 Sep 2019 18:13:12 +0000 (UTC)
+Subject: Re: [PATCH 20/25] qapi: Improve reporting of missing / unknown
+ definition keys
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-20-armbru@redhat.com>
+ <20190924132830.15835-21-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -71,18 +72,18 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <4d3b7c95-87dd-d41f-1ad5-ba917287a432@redhat.com>
-Date: Tue, 24 Sep 2019 13:07:22 -0500
+Message-ID: <cda1aa80-5328-3cb8-002c-efaaf7933346@redhat.com>
+Date: Tue, 24 Sep 2019 13:13:12 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190924132830.15835-20-armbru@redhat.com>
+In-Reply-To: <20190924132830.15835-21-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="Db8WC1MCWiZgvKpAigzfOdhVFSH5DhOGe"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Tue, 24 Sep 2019 18:07:27 +0000 (UTC)
+ boundary="NPYxHyIwTu01ACr3VivtMAlecgJI9Pwdw"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Tue, 24 Sep 2019 18:13:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,56 +103,49 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Db8WC1MCWiZgvKpAigzfOdhVFSH5DhOGe
-Content-Type: multipart/mixed; boundary="hD3M0lcJEYZTWDx0uIwuqf7P0sHkfkrPl";
+--NPYxHyIwTu01ACr3VivtMAlecgJI9Pwdw
+Content-Type: multipart/mixed; boundary="1pRw2mAxOXXZy0MI1tlfDn0F7bNn9jzTL";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <4d3b7c95-87dd-d41f-1ad5-ba917287a432@redhat.com>
-Subject: Re: [PATCH 19/25] qapi: Improve reporting of invalid flags
+Message-ID: <cda1aa80-5328-3cb8-002c-efaaf7933346@redhat.com>
+Subject: Re: [PATCH 20/25] qapi: Improve reporting of missing / unknown
+ definition keys
 References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-20-armbru@redhat.com>
-In-Reply-To: <20190924132830.15835-20-armbru@redhat.com>
+ <20190924132830.15835-21-armbru@redhat.com>
+In-Reply-To: <20190924132830.15835-21-armbru@redhat.com>
 
---hD3M0lcJEYZTWDx0uIwuqf7P0sHkfkrPl
+--1pRw2mAxOXXZy0MI1tlfDn0F7bNn9jzTL
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 9/24/19 8:28 AM, Markus Armbruster wrote:
-> Split check_flags() off check_keys() and have check_exprs() call it
-> later, so its error messages gain an "in definition" line.  Tweak the
-> error messages.
+> Have check_exprs() call check_keys() later, so its error messages gain
+> an "in definition" line.
 >=20
-> Checking values in a function named check_keys() is unclean anyway.
+> Both check_keys() and check_name_is_str() check the definition's name
+> is a string.  Since check_keys() now runs after check_name_is_str()
+> rather than before, its check is dead.  Bury it.  Checking values in
+> check_keys() is unclean anyway.
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  scripts/qapi/common.py                     | 22 ++++++++++++----------=
 
->  tests/qapi-schema/allow-preconfig-test.err |  3 ++-
->  tests/qapi-schema/args-bad-boxed.err       |  3 ++-
->  tests/qapi-schema/oob-test.err             |  3 ++-
->  tests/qapi-schema/type-bypass-bad-gen.err  |  3 ++-
->  5 files changed, 20 insertions(+), 14 deletions(-)
->=20
+> +++ b/scripts/qapi/common.py
+> @@ -905,8 +905,6 @@ def check_known_keys(value, info, source, required,=
+ optional):
+> =20
+>  def check_keys(expr, info, meta, required, optional=3D[]):
+>      name =3D expr[meta]
+> -    if not isinstance(name, str):
+> -        raise QAPISemError(info, "'%s' key must have a string value" %=
+ meta)
 
-> +
-> +def check_flags(expr, info):
-> +    for key in ['gen', 'success-response']:
-> +        if key in expr and expr[key] is not False:
-
-Is it any more pythonic and/or a micro-optimization to compress this to:
-
-if expr.get(key, False) is not False:
-
-> +            raise QAPISemError(
-> +                info, "flag '%s' may only use false value" % key)
-> +    for key in ['boxed', 'allow-oob', 'allow-preconfig']:
-> +        if key in expr and expr[key] is not True:
-
-and here too.
+Should this be replaced with an assert?  But I'm also okay just dropping
+it, since our testsuite shows that we still flag the problems that this
+message was originally used for.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -161,24 +155,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---hD3M0lcJEYZTWDx0uIwuqf7P0sHkfkrPl--
+--1pRw2mAxOXXZy0MI1tlfDn0F7bNn9jzTL--
 
---Db8WC1MCWiZgvKpAigzfOdhVFSH5DhOGe
+--NPYxHyIwTu01ACr3VivtMAlecgJI9Pwdw
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KW1oACgkQp6FrSiUn
-Q2qkhggAnC7kdWegKgrFr9COZmg1ZRvYO0gKV14JrSc412O0WYTEimCRCyZzMSah
-nCmg+hLwDZH3KwVffMZtYMn42/8hC1wVx83E1O6kZupa5V0WvTON3Izipjp4Z0v2
-Zet8MnEd1xBmE0WBvFq3856uLxqM5cedxbSAdLub0+9vdyNfSNRIgkxqEjzkGSBP
-AfcAdr2TW8QzpBhn9V2Q3DqszfGmIh+k7Tw/bdVxv495W9nGATb5gzzRiuxkLPp0
-vsH4GK7N4ppwVpSU6NRw5lR52goedr+a1uqnxthB/XkMIPN9g/WCsB2OvfBi9GLe
-e4BRDTWtBTqGe/Ak4kWNRgNZYvWEsA==
-=mH+X
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KXLgACgkQp6FrSiUn
+Q2ofWgf+LstzubYXSgFYM8Q5XEuWTEddyk1INXyidegXKdpr2KDwDlmnbmvWAxT0
+FSJa5PPSsr1iWvh8rTQj6+hLfjarmvQej10kdhBvv/aG1XGqgLUXWaQoWIj75uYo
++jVb99d/s0IzEUfMURbi0CdjTG9i/Mx2HP41lcW4cihMdKqhP57Sxn7z+joWTz68
+jTjnNr5QVN3Lu0jLFQRz+1RJLXF0bwk9KTqaqw9tHHd3ZM+AK7MNE46TxMrKAJO7
+VfjGqPhQE9WUdkbglGwyVW3vcVuQgG7+EK4khx5JFNxXVfxXj/SCX0TR6dOkLxHN
+PyYA4imOdDuurG3z5PmkoHFIUpeOEg==
+=ZsA7
 -----END PGP SIGNATURE-----
 
---Db8WC1MCWiZgvKpAigzfOdhVFSH5DhOGe--
+--NPYxHyIwTu01ACr3VivtMAlecgJI9Pwdw--
 
