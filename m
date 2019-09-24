@@ -6,74 +6,64 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F05B7C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:47:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74383C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:51:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C53CD20872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:47:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C53CD20872
+	by mail.kernel.org (Postfix) with ESMTPS id 4890420872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:51:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4890420872
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCdfm-0003qw-PD
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 01:47:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55605)
+	id 1iCdjU-0005qm-G4
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 01:51:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55887)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iCde5-0002v3-6v
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:45:54 -0400
+ (envelope-from <bounces@canonical.com>) id 1iCdii-0005Rd-Ew
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:50:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iCde4-0001I2-0U
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:45:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45566)
+ (envelope-from <bounces@canonical.com>) id 1iCdih-0003pK-DZ
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:50:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46234)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iCde3-0001HZ-Hm
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:45:51 -0400
+ id 1iCdih-0003p8-8I
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:50:39 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iCde1-00034r-DR
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 05:45:49 +0000
+ id 1iCdig-0003Zl-EM
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 05:50:38 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 392782E80E4
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 05:45:49 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 6AB202E80C8
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 05:50:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Sep 2019 05:37:15 -0000
-From: Thomas Huth <1842774@bugs.launchpad.net>
+Date: Tue, 24 Sep 2019 05:43:50 -0000
+From: Thomas Huth <1824704@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=ubuntu-z-systems; status=Triaged; importance=High;
- assignee=frank.heimes@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=linux; component=main;
- status=In Progress; importance=High; assignee=canonical-kernel-team; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=linux;
- component=main; status=In Progress; importance=High;
- assignee=canonical-kernel-team; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=linux; 
- component=main; status=In Progress; importance=High;
- assignee=canonical-kernel-team; 
-X-Launchpad-Bug-Tags: architecture-s39064 bugnameltc-181268 severity-high
- targetmilestone-inin1910
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: andrew-cloke bugproxy frank-heimes th-huth
-X-Launchpad-Bug-Reporter: bugproxy (bugproxy)
+X-Launchpad-Bug-Commenters: drjs5x th-huth
+X-Launchpad-Bug-Reporter: mustafa (drjs5x)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <156764756485.6162.5365845259935486076.malonedeb@soybean.canonical.com>
-Message-Id: <156930343520.13411.17857665560777317112.malone@gac.canonical.com>
-Subject: [Bug 1842774] Re: Enhanced Hardware Support - Finalize Naming
+References: <155524844990.21262.8108456842078597088.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156930383152.4548.11951777620383164964.malone@chaenomeles.canonical.com>
+Subject: [Bug 1824704] Re: -k tr not working after v20171217! turkish keyboard
+ dont working
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19048";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 8e9f0dbc3973580b8f776f3694c28c1b13694fcc
+X-Launchpad-Hash: e704d3ede1d7b87db15d359b475f481c8ee1ce0a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -86,73 +76,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1842774 <1842774@bugs.launchpad.net>
+Reply-To: Bug 1824704 <1824704@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Patch a0e2251132995b9 is a kernel patch, thus this is certainly not
-something we need to track in the upstream QEMU bugtracker.
+Can you find out which commit broke the keyboard for you? (By using "git
+bisect" for example)
 
-** No longer affects: qemu
+** Information type changed from Private Security to Public
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1842774
+https://bugs.launchpad.net/bugs/1824704
 
 Title:
-  Enhanced Hardware Support - Finalize Naming
+  -k tr not working after v20171217! turkish keyboard dont working
 
-Status in Ubuntu on IBM z Systems:
-  Triaged
-Status in linux package in Ubuntu:
-  In Progress
-Status in linux source package in Bionic:
-  In Progress
-Status in linux source package in Disco:
-  In Progress
+Status in QEMU:
+  New
 
 Bug description:
-  SRU Justification:
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  hi qemu
 
-  [Impact]
+  -k tr not working after v20171217! turkish keyboard dont working
 
-  * Add / activate support for IBM z15 and LinuxONE III systems
+  last working without proplem at v20171217!
 
-  [Fix]
+  after this version  tr keyboard proplem.
+  freedos  , winpe  ,  linux images   all dont working tr  turkish keyboard.
 
-  * a0e2251132995b962281aa80ab54a9288f9e0b6b a0e2251 "s390: add support
-  for IBM z15 machines"
+  example   press key " =C3=A7 "  show " , "
+  example 2 press key " . "  show " =C3=A7 "
 
-  [Test Case]
+  tr keyboard work  always "en-us" kbd.
+  :((((((((
 
-  * check and verify cpuinfo - regression testing is possible by
-  Canonical/me
+  please fix this critical bug.
 
-  * functional testing is currently only doable by IBM
-
-  [Regression Potential]
-
-  * There is regression potential with having new code in and the flags
-  added/active
-
-  * but the code changes are pretty straight forward, just add config,
-  cases and defs
-
-  * and are not used on existing systems, just on the new generation
-  that is not yet out in the field
-
-  [Other Info]
-
-  * SRU of LP 1842916 merged with (this) LP 1842774
-
-  __________
-
-  This feature request will provide the final naming of the next machine
+  Sincerely
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/ubuntu-z-systems/+bug/1842774/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1824704/+subscriptions
 
