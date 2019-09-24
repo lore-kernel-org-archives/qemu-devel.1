@@ -2,63 +2,95 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36337C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 23:46:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BE82C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 23:48:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED72D207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 23:46:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED72D207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 42551207FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 23:48:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rMkQP6Uz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42551207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCu12-0005Ys-4A
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 19:14:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46800)
+	id 1iCuXx-0005IX-Ag
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 19:48:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50853)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1iCtu1-0002FJ-Qo
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 19:07:27 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iCu1o-0006GZ-8e
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 19:15:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1iCtu0-0003AI-Hb
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 19:07:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47514)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1iCttx-00037f-C5; Tue, 24 Sep 2019 19:07:21 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5D7C57622B;
- Tue, 24 Sep 2019 23:07:18 +0000 (UTC)
-Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BA46219C7F;
- Tue, 24 Sep 2019 23:07:12 +0000 (UTC)
-Date: Tue, 24 Sep 2019 15:31:44 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v4 0/2] Allow memory_region_register_iommu_notifier() to
- fail
-Message-ID: <20190924153144.0a656a41@x1.home>
-In-Reply-To: <20190924082517.13724-1-eric.auger@redhat.com>
-References: <20190924082517.13724-1-eric.auger@redhat.com>
-Organization: Red Hat
+ (envelope-from <richard.henderson@linaro.org>) id 1iCu1n-0007jh-3I
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 19:15:28 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:41216)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iCu1m-0007jL-Qy
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 19:15:27 -0400
+Received: by mail-pl1-x644.google.com with SMTP id t10so1588506plr.8
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 16:15:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Q2k3GUr3SAzAjwy6rPxhiGuKjd66qeUszHaOxEKx8rY=;
+ b=rMkQP6UzR5MaO7TRZuHXnGLGxOIGWK1nVJacz1rbhSxewgbElrmeUVdrFuu/mQjry+
+ zSjnlG6SmqzQIMo+EAGdaDOh1ewgy2notRomg31+qhTv/GG1LnUTOdlxYXV/YjCbTcDm
+ rlTwhiifDp7TtJUoURrlxCFF9H6kezkmuvy1XQ++h2blZlGAtz+GDuaf52zd1DjiCqqA
+ JaJ9Th1AnRKITwlZtLOYYzHf2UefonmDx3B8WiinVrrxdWmMgDexp1QsZGbSm5CFR0F5
+ GpIykBwv6Q2+FGUDRbdFLkjlaVz3Ec7Aay2Nps79IX+r/Sl2PBO1/EbTr0nGBZryplDp
+ Ewlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Q2k3GUr3SAzAjwy6rPxhiGuKjd66qeUszHaOxEKx8rY=;
+ b=r1qzDZip2jb+sV2Dj6zfQRsloWTRj+0yH7G6uxYF8jAi2y8gB0uPniQTlyPjRbMzmB
+ XkXMkUZrr41NaWD4LpzAhwmovMnFX8sXtZqS8OB5EhFVKdOdvhHhR7dp8N92FcA9vyOl
+ O+PhE0GrNIutniqAxpQ5qkHAc+AVG+E6JA822RTvqs5EdqoNz/GSjiLrsuWGVUfDabAL
+ xJO7JSpCMUOU9jdWHAvFZ9x9pM/trPxAa0Hr6vsr2IUyXNLKUcsTs/Y5SIc/HL8Z1w2H
+ mAC4RUqV69YYtRgub+GCzDJV9bTCNH/A3mkDsw9H8acTYVv/GgWC1gd1p2EDMDHdzsHD
+ t4lA==
+X-Gm-Message-State: APjAAAUzn7ivmho7aGeoLD1MZZRiGuIpoZmgtffVQZaQjsHN/Twe6YdM
+ ZuC+KM5l6T+glud41IrPwawfsXCkGXU=
+X-Google-Smtp-Source: APXvYqzno6UY8XO/fYdl0gEn4M0qrvRkQ/FPCI49iGOhmOLbrWD+KgvkZQUdwtooZYgqXaXBRhbuuQ==
+X-Received: by 2002:a17:902:b482:: with SMTP id
+ y2mr5057574plr.334.1569360573206; 
+ Tue, 24 Sep 2019 14:29:33 -0700 (PDT)
+Received: from [172.20.32.216] ([12.157.10.114])
+ by smtp.gmail.com with ESMTPSA id q20sm3311132pfl.79.2019.09.24.14.29.31
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 24 Sep 2019 14:29:32 -0700 (PDT)
+Subject: Re: [PATCH 1/7] target/ppc: introduce get_dfp{64,128}() helper
+ functions
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org, pc@us.ibm.com, david@gibson.dropbear.id.au
+References: <20190924153556.27575-1-mark.cave-ayland@ilande.co.uk>
+ <20190924153556.27575-2-mark.cave-ayland@ilande.co.uk>
+ <e4e2220b-d23b-aa54-2c46-c937bd0efe86@linaro.org>
+ <e4ba6c27-e57a-de8f-c993-4172db2ea01a@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <af723c90-4dc3-c45d-b3fa-75d7a7097833@linaro.org>
+Date: Tue, 24 Sep 2019 14:29:30 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <e4ba6c27-e57a-de8f-c993-4172db2ea01a@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Tue, 24 Sep 2019 23:07:18 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,88 +102,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, aik@ozlabs.ru, qemu-devel@nongnu.org,
- peterx@redhat.com, qemu-arm@nongnu.org, pbonzini@redhat.com,
- david@gibson.dropbear.id.au, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 24 Sep 2019 10:25:15 +0200
-Eric Auger <eric.auger@redhat.com> wrote:
+On 9/24/19 2:05 PM, Mark Cave-Ayland wrote:
+> With the full patchset applied you'll see that get_dfp64() and friends are
+> in exactly the same form you show above, and if I swap the arguments then
+> the compiler does actually complain, although somewhat cryptically.
+Oh, good.  I'll finish reading the whole set before making too many more
+comments ahead of your actual steps.
 
-> This series allows the memory_region_register_iommu_notifier()
-> to fail. As of now, when a MAP notifier is attempted to be
-> registered along with SMMUv3 or AMD IOMMU, we exit in the IOMMU
-> MR notify_flag_changed() callback.
-> 
-> In case of VFIO assigned device hotplug, this could be handled
-> more nicely directly within the VFIO code, simply rejecting
-> the hotplug without exiting. This is what the series achieves
-> by handling the memory_region_register_iommu_notifier() returned
-> value and Error object.
-> 
-> To propagate errors collected during vfio_listener_region_add()
-> we now store the error handle inside the VFIO container instead
-> of a returned value.
-> 
-> The message now is:
-> (QEMU) device_add id=hot0 driver=vfio-pci host=0000:89:00.0 bus=pcie.1
-> {"error": {"class": "GenericError", "desc": "vfio 0000:89:00.0: failed
-> to setup container for group 2: memory listener initialization failed:
-> Region smmuv3-iommu-memory-region-0-6: device 01.00.0 requires iommu MAP
-> notifier which is not currently supported"}}
-> 
-> Best Regards
-> 
-> Eric
-> 
-> This series can be found at:
-> https://github.com/eauger/qemu/tree/v4.1.0_register_iommu_notifier_fail_v4
-> 
-> History:
-> 
-> v3 -> v4:
-> - added Peter's R-b on 2d patch
-> - 1st patch: restore hw_error, remove useless ret assignment, improve
->   DMA host window error message, remove local mr variable
-> 
-> v2 -> v3:
-> - also pass an Error handle (suggested by Peter)
-> 
-> v1 -> v2:
-> - Intel IOMMU now handles the problem differently with machine init done
->   notifier and machine hotplug allowed hook.
-> - use assert(!ret)
-> - message rewording in SMMUv3
-> 
-> Follow-up of "VFIO/SMMUv3: Fail on VFIO/HW nested paging detection"
-> https://patchew.org/QEMU/20190829090141.21821-1-eric.auger@redhat.com/
-> 
-> 
-> Eric Auger (2):
->   vfio: Turn the container error into an Error handle
->   memory: allow memory_region_register_iommu_notifier() to fail
-> 
->  exec.c                        | 10 +++++--
->  hw/arm/smmuv3.c               | 18 ++++++------
->  hw/i386/amd_iommu.c           | 17 +++++++-----
->  hw/i386/intel_iommu.c         |  8 ++++--
->  hw/ppc/spapr_iommu.c          |  8 ++++--
->  hw/vfio/common.c              | 52 +++++++++++++++++++++++------------
->  hw/vfio/spapr.c               |  4 ++-
->  hw/virtio/vhost.c             |  9 ++++--
->  include/exec/memory.h         | 21 ++++++++++----
->  include/hw/vfio/vfio-common.h |  2 +-
->  memory.c                      | 31 +++++++++++++--------
->  11 files changed, 120 insertions(+), 60 deletions(-)
 
-For series,
-
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
-
-Paolo, would this go in through you given the memory API changes and
-greater girth in patch 2/2?  Thanks,
-
-Alex
+r~
 
