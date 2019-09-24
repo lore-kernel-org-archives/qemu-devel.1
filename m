@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 547BCC432C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:13:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F2FEC432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:14:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B04D20872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:13:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C9C1020872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:14:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="G9hv2TGn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B04D20872
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K8sq2zWu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9C1020872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCs7u-0005SG-FZ
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 17:13:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55531)
+	id 1iCs8N-00064E-6w
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 17:14:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55565)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iCrw1-0002YN-Ox
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:23 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iCrw2-0002Ys-Jc
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iCrw0-0004UP-E0
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:21 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39980)
+ (envelope-from <alex.bennee@linaro.org>) id 1iCrw0-0004V7-Q5
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:22 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44416)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iCrvy-0004Ss-IJ
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:18 -0400
-Received: by mail-wr1-x443.google.com with SMTP id l3so3621159wru.7
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 14:01:14 -0700 (PDT)
+ id 1iCrw0-0004SH-De
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:20 -0400
+Received: by mail-wr1-x441.google.com with SMTP id i18so3603129wru.11
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 14:01:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=xmyA2KCLeLU2xSd1cjULfKDT3lF0lDQIQyf5XM38R7k=;
- b=G9hv2TGn0glkGjNVwQCWoqI9R/TEONefekZWgQAUERv8b51D9x0flZX97leiKcQfMZ
- RRXaBfzdsShSJeO0tRYws3ZYmCifZsxZUKNwuhXZQGwhTMoCOdztK6H0ZgfwkLNaIWgC
- nqLkHoIxle4x7T4Hl/vYW9ifSLZXxPAJlVfF6ze4y8GRTVibWJGzAgbHIK2iBVklA1NV
- EtVuWKBI3l33fYPPGhGAzFNZSVM440+cMieHThn+xaXZ2xfd4xrHT3/TtEVVYrwh8tff
- YGNRL0XkPIB1fReYkaixhmb0cRuI1wL/wd6dXiH4UEiGzcau8L2bakI8Sd09IkxmK2VC
- TQxg==
+ bh=hZ13oH0NrkJmOGqXttosTEow//UtkytE3cMegchFT1g=;
+ b=K8sq2zWu35ZcJN7+uSClRFErzby3kvqCvCrFoLehZuE/BXvL2wJo0N5Gnqj/VEU4Gk
+ A7zgzDrL7gNnUXmWF3dz4YV0Unteb2RHt2F7U4HOkw80b/1GIw/kzUo8P0qeMh6UlnTQ
+ JOIjRaJ/fxmd+nY1OCUrQIAibMbiBEp5WuetL6XX6NiWWZUmU9zJoPYVR2BaavZIViPv
+ trrHsjf+KVSiyLzGtDD3II5Mh/xvCsgwpNVsRPf5mwAufquMa55S+HNiSXDOGZt+WRTc
+ 0SUazoGqeAQReuZIg5WrHXXPJkeYGTvf7vgbS7Kx5ADmfuZeVar223gZotxn+aqHMEMI
+ E9JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xmyA2KCLeLU2xSd1cjULfKDT3lF0lDQIQyf5XM38R7k=;
- b=drzuzMUN2uTdnoJO50XbMBBLl8rpdm2dyTXqjS9fuT3ZciDQCivM/ttmHjDqv1YWN2
- rM+19fhRzmRnUeakBWnu4VwQ8blliGBkt8cIDhKzVltNPEM4kQ0rc4bc+w9pk2aGJBnS
- u+J+CZiQM5guei6EudX+qoutEqKExmPK+km4bKctRbjtEspN8ynXmVhZuVIFTJY8AQWe
- iBewV1n8AEKCTznU46kjrOk7nKid+MIIahymQ10b3Be4CQBUJSHnzTZMlIWD7zkwlflZ
- phhwCcTWOyCeukFZOfUFwUdnjjf/NDDitBSCvkNQXtVT+lS7Y1WVbsQ2pql831SBMTfy
- IBSw==
-X-Gm-Message-State: APjAAAWz/KI0JF9BGEiI12bTe6PG6FDF96mD/gSHNPnWyZmEz1RdRRpt
- t4chlorOTG5BtdytY551yuLmtwb28MpNvA==
-X-Google-Smtp-Source: APXvYqy09QuIjqyBNVMeKxim7Wi7R8p+0Y0yunfpWWYl/gd+9vh3L+dDnMGbO0EsQetRQtrMRC9Aiw==
-X-Received: by 2002:a5d:67c3:: with SMTP id n3mr4354206wrw.294.1569358873737; 
- Tue, 24 Sep 2019 14:01:13 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id m16sm1066930wml.11.2019.09.24.14.01.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ bh=hZ13oH0NrkJmOGqXttosTEow//UtkytE3cMegchFT1g=;
+ b=hpj4NXGQ6BmTI4YHPNZVBZcVGNOtSGwnA1ugOhfA3+/qyWSVQTBlEO4AVs8TM4csC0
+ Yd1dHbYzWIKjFIAb7bKEYUOP8r48VH6EU30B1UBGcc6p9Vs9slW7HsvALmiEtlqFjmbu
+ jzNdygFrjcUmv/7+N2R7NG+TlHh1ixpt1cZG5Z+49TCC+rIwHcsGxuYVq+YpI84mVanR
+ /l2yVmAJ2RkSa34K/VkvREeHy/3XthCntEFoWlGGUkAQMyDBGkpij8JqVZ2HxvCN+anY
+ PKwb2mfLKTJ9i2rSR1NdOYj6WyOAu0lmWSjjYJgL6dZrEFYU5PHIhcpHOWEu9MwHwkFr
+ I5PQ==
+X-Gm-Message-State: APjAAAWLyEG9SWP9Tvtqbrg1LHmhpPpFIXY8q+cOMA5pBGElQ+KcqWSP
+ otMbdn/wFQj/FzRS8hJwF+0j3MWIqubylw==
+X-Google-Smtp-Source: APXvYqyvwmk0JpRm7vbBHK0wOFr3pFoWn4QlkGfNEZofGZih0+mljLe/yweiKsdyuo9wFxJ0pRSLdA==
+X-Received: by 2002:a5d:42cf:: with SMTP id t15mr4812854wrr.64.1569358870994; 
  Tue, 24 Sep 2019 14:01:10 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id l6sm1719246wmg.2.2019.09.24.14.01.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 24 Sep 2019 14:01:09 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 73EA71FF96;
+ by zen.linaroharston (Postfix) with ESMTP id 352831FF91;
  Tue, 24 Sep 2019 22:01:07 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v3 07/33] target/alpha: Tidy helper_fp_exc_raise_s
-Date: Tue, 24 Sep 2019 22:00:40 +0100
-Message-Id: <20190924210106.27117-8-alex.bennee@linaro.org>
+Subject: [PATCH  v3 04/33] target/alpha: Handle SWCR_MAP_DMZ earlier
+Date: Tue, 24 Sep 2019 22:00:37 +0100
+Message-Id: <20190924210106.27117-5-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190924210106.27117-1-alex.bennee@linaro.org>
 References: <20190924210106.27117-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,53 +105,40 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Remove a redundant masking of ignore.  Once that's gone it is
-obvious that the system-mode inner test is redundant with the
-outer test.  Move the fpcr_exc_enable masking up and tidy.
-
+Since we're converting the swcr to fpcr format for exceptions,
+it's trivial to add FPCR_DNZ to the set of fpcr bits overriden.
 No functional change.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20190921043256.4575-8-richard.henderson@linaro.org>
+Message-Id: <20190921043256.4575-5-richard.henderson@linaro.org>
 ---
- target/alpha/fpu_helper.c | 15 ++++-----------
- 1 file changed, 4 insertions(+), 11 deletions(-)
+ target/alpha/helper.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/target/alpha/fpu_helper.c b/target/alpha/fpu_helper.c
-index 62a066d9020..df8b58963ba 100644
---- a/target/alpha/fpu_helper.c
-+++ b/target/alpha/fpu_helper.c
-@@ -90,25 +90,18 @@ void helper_fp_exc_raise_s(CPUAlphaState *env, uint32_t ignore, uint32_t regno)
-     uint32_t exc = env->error_code & ~ignore;
-     if (exc) {
-         env->fpcr |= exc;
--        exc &= ~ignore;
--#ifdef CONFIG_USER_ONLY
--        /*
--         * In user mode, the kernel's software handler only
--         * delivers a signal if the exception is enabled.
--         */
--        if (!(exc & env->fpcr_exc_enable)) {
--            return;
--        }
--#else
-+        exc &= env->fpcr_exc_enable;
-         /*
-          * In system mode, the software handler gets invoked
-          * for any non-ignored exception.
-+         * In user mode, the kernel's software handler only
-+         * delivers a signal if the exception is enabled.
-          */
-+#ifdef CONFIG_USER_ONLY
-         if (!exc) {
-             return;
-         }
+diff --git a/target/alpha/helper.c b/target/alpha/helper.c
+index e21c488aa32..2f959c65efb 100644
+--- a/target/alpha/helper.c
++++ b/target/alpha/helper.c
+@@ -57,7 +57,7 @@ void cpu_alpha_store_fpcr(CPUAlphaState *env, uint64_t val)
+      * the software exception mask.
+      */
+     uint32_t soft_fpcr = alpha_ieee_swcr_to_fpcr(env->swcr) >> 32;
+-    fpcr |= soft_fpcr & FPCR_STATUS_MASK;
++    fpcr |= soft_fpcr & (FPCR_STATUS_MASK | FPCR_DNZ);
  #endif
--        exc &= env->fpcr_exc_enable;
-         fp_exc_raise1(env, GETPC(), exc, regno, EXC_M_SWC);
+ 
+     t |= CONVERT_BIT(fpcr, FPCR_INED, FPCR_INE);
+@@ -73,9 +73,6 @@ void cpu_alpha_store_fpcr(CPUAlphaState *env, uint64_t val)
+     env->fpcr_flush_to_zero = (fpcr & FPCR_UNFD) && (fpcr & FPCR_UNDZ);
+     env->fp_status.flush_inputs_to_zero = (fpcr & FPCR_DNZ) != 0;
+ #ifdef CONFIG_USER_ONLY
+-    if (env->swcr & SWCR_MAP_DMZ) {
+-        env->fp_status.flush_inputs_to_zero = 1;
+-    }
+     if (env->swcr & SWCR_MAP_UMZ) {
+         env->fpcr_flush_to_zero = 1;
      }
- }
 -- 
 2.20.1
 
