@@ -2,61 +2,104 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74138C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:45:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46405C432C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:46:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46FD42146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:45:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46FD42146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 143202146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:46:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="INBoDTDB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 143202146E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCjGX-0007XO-5r
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 07:45:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42475)
+	id 1iCjH0-0007sx-Re
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 07:46:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42233)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1iCj2i-0002l5-Au
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:43 -0400
+ (envelope-from <anthony.perard@citrix.com>) id 1iCj2N-0002P7-HA
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1iCj2g-0005Rx-4e
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54354)
+ (envelope-from <anthony.perard@citrix.com>) id 1iCj2K-0005HO-RZ
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:18 -0400
+Received: from esa2.hc3370-68.iphmx.com ([216.71.145.153]:17965)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>)
- id 1iCj2c-0005Pz-Jw; Tue, 24 Sep 2019 07:31:34 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DE3798830A;
- Tue, 24 Sep 2019 11:31:33 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2B72661F21;
- Tue, 24 Sep 2019 11:31:29 +0000 (UTC)
-From: Andrew Jones <drjones@redhat.com>
-To: qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org
-Subject: [PATCH v4 7/9] target/arm/kvm: scratch vcpu: Preserve input
- kvm_vcpu_init features
-Date: Tue, 24 Sep 2019 13:31:03 +0200
-Message-Id: <20190924113105.19076-8-drjones@redhat.com>
-In-Reply-To: <20190924113105.19076-1-drjones@redhat.com>
-References: <20190924113105.19076-1-drjones@redhat.com>
+ (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
+ id 1iCj2K-0005G2-Gu
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1569324677;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=cVm1E9SWn59HiRBpcK9hd5UAXK2JM4SVNjHe+W2XCbI=;
+ b=INBoDTDBmfqp+z03s1DCgOrKz+D/pyGW6W0MrgjioFc7YmwIHUw2GNLX
+ TeQyoEs2GOHKwqE4euMghvv+lQhn5Vj6q3NLrNmNnjts785zIPHnaAo8c
+ Yq80av2tn1B8bQcNkFQLlxmT6P7A17jxc4hwTw4Ycqv3PxIjW/gvw67/x o=;
+Authentication-Results: esa2.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=anthony.perard@citrix.com;
+ spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa2.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ anthony.perard@citrix.com) identity=pra;
+ client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible
+Received-SPF: Pass (esa2.hc3370-68.iphmx.com: domain of
+ anthony.perard@citrix.com designates 162.221.158.21 as
+ permitted sender) identity=mailfrom;
+ client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
+Received-SPF: None (esa2.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: g1E08A7/TG9MA9xEBIV2QzhKpXyy+CjQC6yimgr4WuSbjTXUzfI/Mtcb+a5KWb/Vw/9sZFZyyN
+ GhHZ5A8aPuFPV4BUW7qeE7qKf00OWceeburPZujocYAROIWca+9C+jVEZ0dbJYwG2qczAH/Ewp
+ /ryEzvkUonppPXniep5zlonqRt5is266W+cHn/sRf9Eg1M4D8z0xb/o+hAhdzd6f/iiVOXg+w1
+ AAkba9mtClJ0YcWWUX1w8SeIbdlUtZ7pfqPuo6HO9gT7TA9/kCgvVKKl09xNcM+vEJUSWsOkvt
+ o+k=
+X-SBRS: 2.7
+X-MesageID: 5977601
+X-Ironport-Server: esa2.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.64,543,1559534400"; 
+   d="scan'208";a="5977601"
+From: Anthony PERARD <anthony.perard@citrix.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PULL 6/7] xen-block: treat XenbusStateUnknown the same as
+ XenbusStateClosed
+Date: Tue, 24 Sep 2019 12:30:25 +0100
+Message-ID: <20190924113026.255634-7-anthony.perard@citrix.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20190924113026.255634-1-anthony.perard@citrix.com>
+References: <20190924113026.255634-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Tue, 24 Sep 2019 11:31:33 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 216.71.145.153
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,127 +111,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, armbru@redhat.com,
- eric.auger@redhat.com, imammedo@redhat.com, alex.bennee@linaro.org,
- Dave.Martin@arm.com
+Cc: Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-kvm_arm_create_scratch_host_vcpu() takes a struct kvm_vcpu_init
-parameter. Rather than just using it as an output parameter to
-pass back the preferred target, use it also as an input parameter,
-allowing a caller to pass a selected target if they wish and to
-also pass cpu features. If the caller doesn't want to select a
-target they can pass -1 for the target which indicates they want
-to use the preferred target and have it passed back like before.
+From: Paul Durrant <paul.durrant@citrix.com>
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+When a frontend gracefully disconnects from an offline backend, it will
+set its own state to XenbusStateClosed. The code in xen-block.c correctly
+deals with this and sets the backend into XenbusStateClosed. Unfortunately
+it is possible for toolstack to actually delete the frontend area
+before the state key has been read, leading to an apparent frontend state
+of XenbusStateUnknown. This prevents the backend state from transitioning
+to XenbusStateClosed and hence leaves it limbo.
+
+This patch simply treats a frontend state of XenbusStateUnknown the same
+as XenbusStateClosed, which will unblock the backend in these circumstances.
+
+Reported-by: Mark Syms <mark.syms@citrix.com>
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Message-Id: <20190918115702.38959-1-paul.durrant@citrix.com>
+Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
 ---
- target/arm/kvm.c   | 20 +++++++++++++++-----
- target/arm/kvm32.c |  6 +++++-
- target/arm/kvm64.c |  6 +++++-
- 3 files changed, 25 insertions(+), 7 deletions(-)
+ hw/block/xen-block.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 72569f71236e..7a540d9591f9 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -66,7 +66,7 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *c=
-pus_to_try,
-                                       int *fdarray,
-                                       struct kvm_vcpu_init *init)
- {
--    int ret, kvmfd =3D -1, vmfd =3D -1, cpufd =3D -1;
-+    int ret =3D 0, kvmfd =3D -1, vmfd =3D -1, cpufd =3D -1;
-=20
-     kvmfd =3D qemu_open("/dev/kvm", O_RDWR);
-     if (kvmfd < 0) {
-@@ -86,7 +86,14 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *=
-cpus_to_try,
-         goto finish;
-     }
-=20
--    ret =3D ioctl(vmfd, KVM_ARM_PREFERRED_TARGET, init);
-+    if (init->target =3D=3D -1) {
-+        struct kvm_vcpu_init preferred;
-+
-+        ret =3D ioctl(vmfd, KVM_ARM_PREFERRED_TARGET, &preferred);
-+        if (!ret) {
-+            init->target =3D preferred.target;
-+        }
-+    }
-     if (ret >=3D 0) {
-         ret =3D ioctl(cpufd, KVM_ARM_VCPU_INIT, init);
-         if (ret < 0) {
-@@ -98,10 +105,12 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t=
- *cpus_to_try,
-          * creating one kind of guest CPU which is its preferred
-          * CPU type.
-          */
-+        struct kvm_vcpu_init try;
-+
-         while (*cpus_to_try !=3D QEMU_KVM_ARM_TARGET_NONE) {
--            init->target =3D *cpus_to_try++;
--            memset(init->features, 0, sizeof(init->features));
--            ret =3D ioctl(cpufd, KVM_ARM_VCPU_INIT, init);
-+            try.target =3D *cpus_to_try++;
-+            memcpy(try.features, init->features, sizeof(init->features))=
-;
-+            ret =3D ioctl(cpufd, KVM_ARM_VCPU_INIT, &try);
-             if (ret >=3D 0) {
-                 break;
-             }
-@@ -109,6 +118,7 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t =
-*cpus_to_try,
-         if (ret < 0) {
-             goto err;
-         }
-+        init->target =3D try.target;
-     } else {
-         /* Treat a NULL cpus_to_try argument the same as an empty
-          * list, which means we will fail the call since this must
-diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
-index 2451a2d4bbef..32bf8d6757c4 100644
---- a/target/arm/kvm32.c
-+++ b/target/arm/kvm32.c
-@@ -53,7 +53,11 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures =
-*ahcf)
-         QEMU_KVM_ARM_TARGET_CORTEX_A15,
-         QEMU_KVM_ARM_TARGET_NONE
-     };
--    struct kvm_vcpu_init init;
-+    /*
-+     * target =3D -1 informs kvm_arm_create_scratch_host_vcpu()
-+     * to use the preferred target
-+     */
-+    struct kvm_vcpu_init init =3D { .target =3D -1, };
-=20
-     if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) =
-{
-         return false;
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index fc62bab8684e..f96649ae0349 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -502,7 +502,11 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeature=
-s *ahcf)
-         KVM_ARM_TARGET_CORTEX_A57,
-         QEMU_KVM_ARM_TARGET_NONE
-     };
--    struct kvm_vcpu_init init;
-+    /*
-+     * target =3D -1 informs kvm_arm_create_scratch_host_vcpu()
-+     * to use the preferred target
-+     */
-+    struct kvm_vcpu_init init =3D { .target =3D -1, };
-=20
-     if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) =
-{
-         return false;
---=20
-2.20.1
+diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
+index f77343db60..879fc310a4 100644
+--- a/hw/block/xen-block.c
++++ b/hw/block/xen-block.c
+@@ -313,6 +313,7 @@ static void xen_block_frontend_changed(XenDevice *xendev,
+         break;
+ 
+     case XenbusStateClosed:
++    case XenbusStateUnknown:
+         xen_block_disconnect(xendev, &local_err);
+         if (local_err) {
+             error_propagate(errp, local_err);
+-- 
+Anthony PERARD
 
 
