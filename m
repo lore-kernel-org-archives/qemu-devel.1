@@ -6,80 +6,68 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC756C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 17:06:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C90B3C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 17:11:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A24CB2064A
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 17:06:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A24CB2064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9B077207FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 17:11:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B077207FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCoH0-0001Un-HR
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 13:06:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54724)
+	id 1iCoLg-0006f3-I3
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 13:11:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56849)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iCnBW-0002OV-Vk
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:57:05 -0400
+ (envelope-from <bounces@canonical.com>) id 1iCnK6-0008Sr-2B
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 12:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iCnBT-0000zZ-UT
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:57:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56898)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iCnBT-0000xA-Ii
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:56:59 -0400
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E7EEC7FDCA
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 15:56:56 +0000 (UTC)
-Received: by mail-qt1-f198.google.com with SMTP id y10so2476540qti.1
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 08:56:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=l3tIqcGMb/otnY2p0zARiTOKlmtvbRBPPKhUXkgpAFE=;
- b=Pc3NoT70UDHy1o1W7k8PZLhNyr9mSTSSS+lfatG8xlbIKugvnUtyDRvZBVNLMfKG38
- H7bkmMNNH/Z98KVqBLp2hSV1neGZsnk6tmJBvo9pRTUwF+rbkJudcf1RraNzbERXdFNc
- KaHQwubGgX9pQdogzf4dj3hQpnjRaaWHUfRunK4vD8QQ0w17QfI0NkwY229HkkOmt4ig
- B9Kuj/zH+0PnQpotciuwMFvuH8fNFMG4IVW22XPuE3oZj2UU99eJphxwTjocoX7chx4U
- InVVEeq2/yRjoZgVolMGtszKrZg3Er1LfsLkoExPoSdqHL0QEhm6RdUPkExQHTX+St1o
- v79w==
-X-Gm-Message-State: APjAAAXCeZIY2WRcJcIwT+YuQGMfOdSLbx/FkX6vbX9bBdrjs4je2XXG
- zGYoh6qoE3zQgJ/VfLwFOZnE62gam3vJoGPHMNhIVQtvBbHH8GBFI7hffaFgQXJSmRYpj34ibKH
- 69URABR4wY4/E74w=
-X-Received: by 2002:ac8:78c:: with SMTP id l12mr3622384qth.132.1569340616002; 
- Tue, 24 Sep 2019 08:56:56 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxm2DihXhnOeJmJQ2xBVSw0bZic/2AOqtToaoKi/gR/K9zgZbRei3Nf9ESlKf2kfn34KqnqUw==
-X-Received: by 2002:ac8:78c:: with SMTP id l12mr3622357qth.132.1569340615729; 
- Tue, 24 Sep 2019 08:56:55 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
- by smtp.gmail.com with ESMTPSA id j137sm1200393qke.64.2019.09.24.08.56.52
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 24 Sep 2019 08:56:54 -0700 (PDT)
-Date: Tue, 24 Sep 2019 11:56:50 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: asan: false positive? (Was Re: [Qemu-devel] [PATCH v2] vhost-user:
- save features if the char dev is closed)
-Message-ID: <20190924115524-mutt-send-email-mst@kernel.org>
-References: <20190918084834.9729-1-amorenoz@redhat.com>
- <156882660456.17151.6049472857437201023@5dec9699b7de>
+ (envelope-from <bounces@canonical.com>) id 1iCnK3-0007Fk-Hz
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 12:05:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54214)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iCnK3-0007FL-Ck
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 12:05:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iCnK1-0006Do-R8
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 16:05:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id C81442E8019
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 16:05:49 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <156882660456.17151.6049472857437201023@5dec9699b7de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 24 Sep 2019 15:54:58 -0000
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: ppc64 testcase
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: 7-pc mark-cave-ayland philmd
+X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
+X-Launchpad-Bug-Modifier: Mark Cave-Ayland (mark-cave-ayland)
+References: <156711057074.6835.13599471410604217618.malonedeb@soybean.canonical.com>
+Message-Id: <156934049814.14091.15173209336921636139.malone@gac.canonical.com>
+Subject: [Bug 1841990] Re: instruction 'denbcdq' misbehaving
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19048";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 1a93da4f79a65dc4f83e20e2e540111ed72c0d67
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,46 +76,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ddstreet@canonical.com, Peter Maydell <peter.maydell@linaro.org>,
- amorenoz@redhat.com, pezhang@redhat.com
+Reply-To: Bug 1841990 <1841990@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 18, 2019 at 10:10:05AM -0700, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20190918084834.9729-1-amorenoz@redhat.com/
-> 
-> 
-> 
-> Hi,
-> 
-> This series failed the asan build test. Please find the testing commands and
-> their output below. If you have Docker installed, you can probably reproduce it
-> locally.
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> export ARCH=x86_64
-> make docker-image-fedora V=1 NETWORK=1
-> time make docker-test-debug@fedora TARGET_LIST=x86_64-softmmu J=14 NETWORK=1
-> === TEST SCRIPT END ===
-> 
->   CC      qobject/qlit.o
->   CC      qobject/qjson.o
-> 
-> Encoding error:
-> 'utf-8' codec can't decode byte 0x95 in position 799: invalid start byte
-> The full traceback has been saved in /tmp/sphinx-err-mhg776xj.log, if you want to report the issue to the developers.
->   CC      qobject/qobject.o
-> 
-> 
-> The full log is available at
-> http://patchew.org/logs/20190918084834.9729-1-amorenoz@redhat.com/testing.asan/?type=message.
+Sorry I didn't get a chance to look at this before I went away on
+holiday, however I've just posted a patchset at
+https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg05577.html
+which should resolve the issue for you.
 
-What happened here?
-Does anyone know?
+With the above patchset applied I now see the following results with
+your test program:
 
-> ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
+LE host:
+$ ../qemu-ppc64le -L /usr/powerpc64le-linux-gnu -cpu power9 test-denbcdqle
+0x00000000000000000000000000000000
+0x0000000000000000000000000000000c
+0x22080000000000000000000000000000
+$ ../qemu-ppc64le -L /usr/powerpc64le-linux-gnu -cpu power9 test-denbcdqle 1
+0x00000000000000000000000000000001
+0x0000000000000000000000000000001c
+0x22080000000000000000000000000001
+$ ../qemu-ppc64le -L /usr/powerpc64le-linux-gnu -cpu power9 test-denbcdqle =
+$(seq 0 99)
+0x00000000000000000000000000000064
+0x0000000000000000000000000000100c
+0x22080000000000000000000000000080
+
+BE host:
+$ ../qemu-ppc64 -L /usr/powerpc64-linux-gnu -cpu power9 test-denbcdq
+0x00000000000000000000000000000000
+0x000000000000000c0000000000000000
+0x00000000000000002208000000000000
+$ ../qemu-ppc64 -L /usr/powerpc64-linux-gnu -cpu power9 test-denbcdq 1
+0x00000000000000010000000000000000
+0x000000000000001c0000000000000000
+0x00000000000000012208000000000000
+$ ../qemu-ppc64 -L /usr/powerpc64-linux-gnu -cpu power9 test-denbcdq $(seq =
+0 99)
+0x00000000000000640000000000000000
+0x000000000000100c0000000000000000
+0x00000000000000802208000000000000
+
+If you could confirm that the BE host results above match those on real
+hardware then that would be great as I've switched over to use macros
+that should do the right thing regardless of host endian.
+
+Finally if you have access to a more comprehensive test suite then that
+would be helpful to test more of the 64-bit DFP number paths and some of
+more esoteric DFP instructions.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1841990
+
+Title:
+  instruction 'denbcdq' misbehaving
+
+Status in QEMU:
+  New
+
+Bug description:
+  Instruction 'denbcdq' appears to have no effect.  Test case attached.
+
+  On ppc64le native:
+  --
+  gcc -g -O -mcpu=3Dpower9 bcdcfsq.c test-denbcdq.c -o test-denbcdq
+  $ ./test-denbcdq
+  0x00000000000000000000000000000000
+  0x0000000000000000000000000000000c
+  0x22080000000000000000000000000000
+  $ ./test-denbcdq 1
+  0x00000000000000000000000000000001
+  0x0000000000000000000000000000001c
+  0x22080000000000000000000000000001
+  $ ./test-denbcdq $(seq 0 99)
+  0x00000000000000000000000000000064
+  0x0000000000000000000000000000100c
+  0x22080000000000000000000000000080
+  --
+
+  With "qemu-ppc64le -cpu power9"
+  --
+  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq
+  0x00000000000000000000000000000000
+  0x0000000000000000000000000000000c
+  0x0000000000000000000000000000000c
+  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq 1
+  0x00000000000000000000000000000001
+  0x0000000000000000000000000000001c
+  0x0000000000000000000000000000001c
+  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq $(seq 100)
+  0x00000000000000000000000000000064
+  0x0000000000000000000000000000100c
+  0x0000000000000000000000000000100c
+  --
+
+  I started looking at the code, but I got confused rather quickly.
+  Could be related to endianness? I think denbcdq arrived on the scene
+  before little-endian was a big deal.  Maybe something to do with
+  utilizing implicit floating-point register pairs...  I don't think the
+  right data is getting to helper_denbcdq, which would point back to the
+  gen_fprp_ptr uses in dfp-impl.inc.c (GEN_DFP_T_FPR_I32_Rc).  (Maybe?)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1841990/+subscriptions
 
