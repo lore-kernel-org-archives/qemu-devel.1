@@ -2,59 +2,89 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8161EC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:22:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 583EBC432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:23:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A56620872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:22:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A56620872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0B02420872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:23:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B02420872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCnaL-0001Oz-VM
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:22:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48383)
+	id 1iCnau-0002DI-Jq
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:23:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51071)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoheyi@huawei.com>) id 1iCmfE-0001QR-AF
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:23:42 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCmuF-00083c-63
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:39:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1iCmfB-0006nJ-EI
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:23:40 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:46766 helo=huawei.com)
+ (envelope-from <eblake@redhat.com>) id 1iCmuE-00064K-3K
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:39:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40854)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
- id 1iCmf4-0006hV-QG; Tue, 24 Sep 2019 11:23:31 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 652C98126B7940A2D8D7;
- Tue, 24 Sep 2019 23:23:27 +0800 (CST)
-Received: from linux-Bxxcye.huawei.com (10.175.104.222) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.439.0; Tue, 24 Sep 2019 23:23:18 +0800
-From: Heyi Guo <guoheyi@huawei.com>
-To: <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>,
- <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>
-Subject: [RFC PATCH 07/12] arm/sdei: override qemu_irq handler when binding
- interrupt
-Date: Tue, 24 Sep 2019 23:21:46 +0800
-Message-ID: <1569338511-3572-8-git-send-email-guoheyi@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1569338511-3572-1-git-send-email-guoheyi@huawei.com>
-References: <1569338511-3572-1-git-send-email-guoheyi@huawei.com>
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCmuD-00063n-QR
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:39:10 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DF81D308404F;
+ Tue, 24 Sep 2019 15:39:08 +0000 (UTC)
+Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C1C545D9CA;
+ Tue, 24 Sep 2019 15:39:02 +0000 (UTC)
+Subject: Re: [PATCH 07/25] qapi: Improve reporting of member name clashes
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190924132830.15835-1-armbru@redhat.com>
+ <20190924132830.15835-8-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <c5b42cb1-ecea-4478-49cf-25dc149b717d@redhat.com>
+Date: Tue, 24 Sep 2019 10:38:57 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.104.222]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20190924132830.15835-8-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="lyCE85bppkd8jI8sYbSzQkLjO9Td2qqJt"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Tue, 24 Sep 2019 15:39:08 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.35
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,253 +96,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>,
- James Morse <james.morse@arm.com>, Heyi Guo <guoheyi@huawei.com>,
- wanghaibin.wang@huawei.com, Dave Martin <Dave.Martin@arm.com>
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Override qemu_irq handler to support trigger SDEI event transparently
-after guest binds interrupt to SDEI event. We don't have good way to
-get GIC device and to guarantee SDEI device is initialized after GIC,
-so we search GIC in system bus when the first SDEI request happens or
-in VMSTATE post_load().
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--lyCE85bppkd8jI8sYbSzQkLjO9Td2qqJt
+Content-Type: multipart/mixed; boundary="p6i5DpkMZvdEIzVDGAxv4ktLJUTXVHfWw";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+Message-ID: <c5b42cb1-ecea-4478-49cf-25dc149b717d@redhat.com>
+Subject: Re: [PATCH 07/25] qapi: Improve reporting of member name clashes
+References: <20190924132830.15835-1-armbru@redhat.com>
+ <20190924132830.15835-8-armbru@redhat.com>
+In-Reply-To: <20190924132830.15835-8-armbru@redhat.com>
 
-Signed-off-by: Heyi Guo <guoheyi@huawei.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Dave Martin <Dave.Martin@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: James Morse <james.morse@arm.com>
----
- target/arm/sdei.c     | 137 ++++++++++++++++++++++++++++++++++++++++++++++++--
- target/arm/sdei_int.h |   3 ++
- 2 files changed, 137 insertions(+), 3 deletions(-)
+--p6i5DpkMZvdEIzVDGAxv4ktLJUTXVHfWw
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/arm/sdei.c b/target/arm/sdei.c
-index 088ed76..9ceb131 100644
---- a/target/arm/sdei.c
-+++ b/target/arm/sdei.c
-@@ -85,6 +85,24 @@ static void qemu_sde_cpu_init(QemuSDEState *s)
-     }
- }
- 
-+static int gic_int_to_irq(int num_irq, int intid, int cpu)
-+{
-+    if (intid >= GIC_INTERNAL) {
-+        return intid - GIC_INTERNAL;
-+    }
-+    return num_irq - GIC_INTERNAL + cpu * GIC_INTERNAL + intid;
-+}
-+
-+static int irq_to_gic_int(int num_irq, int irq, int *cpu)
-+{
-+    if (irq < num_irq - GIC_INTERNAL) {
-+        return irq + GIC_INTERNAL;
-+    }
-+    irq -= num_irq - GIC_INTERNAL;
-+    *cpu = irq / GIC_INTERNAL;
-+    return irq % GIC_INTERNAL;
-+}
-+
- static inline QemuSDECpu *get_sde_cpu(QemuSDEState *s, CPUState *cs)
- {
-     assert(cs->cpu_index < s->sdei_max_cpus);
-@@ -381,6 +399,76 @@ static void dispatch_cpu(QemuSDEState *s, CPUState *cs, bool is_critical)
-     }
- }
- 
-+static void qemu_sdei_irq_handler(void *opaque, int irq, int level)
-+{
-+    int cpu = 0;
-+    irq = irq_to_gic_int(sde_state->num_irq, irq, &cpu);
-+    trigger_sdei_by_irq(cpu, irq);
-+}
-+
-+static void override_qemu_irq(QemuSDEState *s, int32_t event, uint32_t intid)
-+{
-+    qemu_irq irq;
-+    QemuSDE *sde;
-+    CPUState *cs;
-+    int cpu;
-+
-+    /* SPI */
-+    if (intid >= GIC_INTERNAL) {
-+        cs = arm_get_cpu_by_id(0);
-+        irq = qdev_get_gpio_in(s->gic_dev,
-+                               gic_int_to_irq(s->num_irq, intid, 0));
-+        if (irq) {
-+            qemu_irq_intercept_in(&irq, qemu_sdei_irq_handler, 1);
-+        }
-+        sde = get_sde_no_check(s, event, cs);
-+        sde->irq = irq;
-+        put_sde(sde, cs);
-+        return;
-+    }
-+    /* PPI */
-+    for (cpu = 0; cpu < s->sdei_max_cpus; cpu++) {
-+        cs = arm_get_cpu_by_id(cpu);
-+        irq = qdev_get_gpio_in(s->gic_dev,
-+                               gic_int_to_irq(s->num_irq, intid, cpu));
-+        if (irq) {
-+            qemu_irq_intercept_in(&irq, qemu_sdei_irq_handler, 1);
-+        }
-+        sde = get_sde_no_check(s, event, cs);
-+        sde->irq = irq;
-+        put_sde(sde, cs);
-+    }
-+}
-+
-+static void restore_qemu_irq(QemuSDEState *s, int32_t event, uint32_t intid)
-+{
-+    QemuSDE *sde;
-+    CPUState *cs;
-+    int cpu;
-+
-+    /* SPI */
-+    if (intid >= GIC_INTERNAL) {
-+        cs = arm_get_cpu_by_id(0);
-+        sde = get_sde_no_check(s, event, cs);
-+        if (sde->irq) {
-+            qemu_irq_remove_intercept(&sde->irq, 1);
-+            sde->irq = NULL;
-+        }
-+        put_sde(sde, cs);
-+        return;
-+    }
-+    /* PPI */
-+    for (cpu = 0; cpu < s->sdei_max_cpus; cpu++) {
-+        cs = arm_get_cpu_by_id(cpu);
-+        sde = get_sde_no_check(s, event, cs);
-+        if (sde->irq) {
-+            qemu_irq_remove_intercept(&sde->irq, 1);
-+            sde->irq = NULL;
-+        }
-+        put_sde(sde, cs);
-+    }
-+}
-+
- static int32_t sdei_alloc_event_num(QemuSDEState *s, bool is_critical,
-                                     bool is_shared, int intid)
- {
-@@ -414,6 +502,7 @@ static int32_t sdei_alloc_event_num(QemuSDEState *s, bool is_critical,
-             sde_props[index].interrupt = intid;
-             sde_props[index].is_shared = is_shared;
-             sde_props[index].is_critical = is_critical;
-+            override_qemu_irq(s, event, intid);
-             s->irq_map[intid] = event;
-             qemu_mutex_unlock(&sde_props[index].lock);
-             qemu_mutex_unlock(&s->sdei_interrupt_bind_lock);
-@@ -433,6 +522,7 @@ static int32_t sdei_free_event_num_locked(QemuSDEState *s, QemuSDEProp *prop)
-         goto unlock_return;
-     }
- 
-+    restore_qemu_irq(s, prop->event_id, prop->interrupt);
-     s->irq_map[prop->interrupt] = SDEI_INVALID_EVENT_ID;
-     prop->event_id = SDEI_INVALID_EVENT_ID;
-     prop->interrupt = SDEI_INVALID_INTERRUPT;
-@@ -929,13 +1019,33 @@ static int64_t sdei_event_pe_unmask(QemuSDEState *s, CPUState *cs,
-     return SDEI_SUCCESS;
- }
- 
-+static int dev_walkerfn(DeviceState *dev, void *opaque)
-+{
-+    QemuSDEState *s = opaque;
-+
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_ARM_GICV3_COMMON)) {
-+        GICv3State *gic = ARM_GICV3_COMMON(dev);
-+        s->num_irq = gic->num_irq;
-+        s->gic_dev = dev;
-+        return -1;
-+    }
-+
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_ARM_GIC_COMMON)) {
-+        GICState *gic = ARM_GIC_COMMON(dev);
-+        s->num_irq = gic->num_irq;
-+        s->gic_dev = dev;
-+        return -1;
-+    }
-+    return 0;
-+}
-+
- static int64_t sdei_event_interrupt_bind(QemuSDEState *s, CPUState *cs,
-                                          struct kvm_run *run)
- {
-     uint64_t *args = (uint64_t *)(run->hypercall.args);
-     uint32_t intid = args[1];
- 
--    if (intid < GIC_NR_SGIS || intid >= GIC_MAXIRQ) {
-+    if (intid < GIC_NR_SGIS || intid >= s->num_irq) {
-         return SDEI_INVALID_PARAMETERS;
-     }
-     return sdei_alloc_event_num(s, false, intid >= 32, intid);
-@@ -1042,6 +1152,17 @@ void sdei_handle_request(CPUState *cs, struct kvm_run *run)
-         return;
-     }
- 
-+    if (!sde_state->gic_dev) {
-+        /* Search for ARM GIC device */
-+        qbus_walk_children(sysbus_get_default(), dev_walkerfn,
-+                           NULL, NULL, NULL, sde_state);
-+        if (!sde_state->gic_dev) {
-+            error_report("Cannot find ARM GIC device!");
-+            run->hypercall.args[0] = SDEI_NOT_SUPPORTED;
-+            return;
-+        }
-+    }
-+
-     if (func_id < SDEI_1_0_FN_BASE || func_id > SDEI_MAX_REQ) {
-         error_report("Invalid SDEI function ID: 0x%x", func_id);
-         run->hypercall.args[0] = SDEI_INVALID_PARAMETERS;
-@@ -1198,9 +1319,19 @@ static int qemu_sdei_post_load(void *opaque, int version_id)
-         }
-     }
- 
-+    /* Search for ARM GIC device */
-+    qbus_walk_children(sysbus_get_default(), dev_walkerfn,
-+                       NULL, NULL, NULL, s);
-+    if (!s->gic_dev) {
-+        error_report("Cannot find ARM GIC device!");
-+        return 0;
-+    }
-+
-     for (i = 0; i < PRIVATE_SLOT_COUNT + SHARED_SLOT_COUNT; i++) {
--        if (sde_props[i].interrupt != SDEI_INVALID_INTERRUPT) {
--            s->irq_map[sde_props[i].interrupt] = sde_props[i].event_id;
-+        int intid = sde_props[i].interrupt;
-+        if (intid != SDEI_INVALID_INTERRUPT) {
-+            s->irq_map[intid] = sde_props[i].event_id;
-+            override_qemu_irq(s, sde_props[i].event_id, intid);
-         }
-     }
- 
-diff --git a/target/arm/sdei_int.h b/target/arm/sdei_int.h
-index 7f69507..3930591 100644
---- a/target/arm/sdei_int.h
-+++ b/target/arm/sdei_int.h
-@@ -63,6 +63,7 @@ typedef struct QemuSDEProp {
- typedef struct QemuSDE {
-     QemuSDEProp     *prop;
-     CPUState        *target_cpu;
-+    qemu_irq        irq;
-     QemuMutex       lock;
-     bool            enabled;
-     bool            running;
-@@ -95,9 +96,11 @@ typedef struct QemuSDECpu {
- 
- typedef struct QemuSDEState {
-     DeviceState     parent_obj;
-+    DeviceState     *gic_dev;
-     QemuSDEProp     sde_props_state[PRIVATE_SLOT_COUNT + SHARED_SLOT_COUNT];
-     QemuSDECpu      *sde_cpus;
-     int             sdei_max_cpus;
-+    int             num_irq;
-     QemuSDE         *shared_sde_array[SHARED_SLOT_COUNT];
-     int32_t         irq_map[GIC_MAXIRQ];
-     QemuMutex       sdei_interrupt_bind_lock;
--- 
-1.8.3.1
+On 9/24/19 8:28 AM, Markus Armbruster wrote:
+> We report name clashes like this:
+>=20
+>     struct-base-clash.json: In struct 'Sub':
+>     struct-base-clash.json:5: 'name' (member of Sub) collides with 'nam=
+e' (member of Base)
+>=20
+> The "(member of Sub)" is redundant with "In struct 'Sub'".  Comes from
+> QAPISchemaMember.describe().  Pass info to it, so it can detect the
+> redundancy and avoid it.  Result:
+>=20
+>     struct-base-clash.json: In struct 'Sub':
+>     struct-base-clash.json:5: member 'name' collides with member 'name'=
+ of type 'Base'
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
+The resulting error messages are indeed nicer.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--p6i5DpkMZvdEIzVDGAxv4ktLJUTXVHfWw--
+
+--lyCE85bppkd8jI8sYbSzQkLjO9Td2qqJt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KOJEACgkQp6FrSiUn
+Q2rPXwf/WyUmMhwWQGPR3j056bKaFna4NGm0Jv/DgiAP6M29gPZW0Dtz1Joik9WA
+MLGSPigFRELemcoJY4/S3EICkZSnpdPK1lPfb+K4l/uIbqb2Tc+kTb5w1lqbcJIn
+OFhiuafdZt5f3f33IEfACPrh3LjWjJYJXkpDvKAuN1K0jGfTxZnzcaQqgEUTl6Ty
+1DqLfuB0M6Rn2NGv7fT8MBT+3ezZpmOt0kDo8VvXE/9ArjEvvhsNMu2Wo0+RfuJt
+VbNUTbJZBOAZALlBep+pVKwzFIedUXgqm9fzGB+9TENFmr2lahmp0cYnO2hl7gqm
+ku81pUc7+fUf3LdWAodhpldwZlE20Q==
+=IbQR
+-----END PGP SIGNATURE-----
+
+--lyCE85bppkd8jI8sYbSzQkLjO9Td2qqJt--
 
