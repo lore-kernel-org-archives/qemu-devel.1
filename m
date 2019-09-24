@@ -2,89 +2,89 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB717C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:53:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F14C0C4320D
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:53:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4E872054F
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:53:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4E872054F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id BE765217D9
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:53:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="auHJ8O5e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE765217D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCo3z-00058b-GA
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:53:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33559)
+	id 1iCo4H-0005Rf-6i
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:53:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53253)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iCnr9-0002Ug-NJ
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 12:40:04 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iCn5k-0003Gi-UP
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:51:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iCnr8-0003qN-Lz
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 12:40:03 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:35886
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1iCnr6-0003nZ-1q; Tue, 24 Sep 2019 12:40:00 -0400
-Received: from host86-138-245-63.range86-138.btcentralplus.com
- ([86.138.245.63] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1iCnpE-0007qW-15; Tue, 24 Sep 2019 17:38:04 +0100
-To: Paul Clarke <pc@us.ibm.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- david@gibson.dropbear.id.au
-References: <20190924153556.27575-1-mark.cave-ayland@ilande.co.uk>
- <fcc3b597-856f-23bd-bc56-d886f021a2f4@us.ibm.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <42934b76-1a54-1bf9-ef29-96d34e6c76c6@ilande.co.uk>
-Date: Tue, 24 Sep 2019 17:37:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <alex.bennee@linaro.org>) id 1iCn5j-0005L8-Pa
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:51:04 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39475)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iCn5j-0005Kg-Iw
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:51:03 -0400
+Received: by mail-wm1-x342.google.com with SMTP id v17so608085wml.4
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 08:51:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=r4SgzmwKdxJQB93mBgpVTzOKIPOHeR4CeMYrV4uJR0Q=;
+ b=auHJ8O5eyKjvfnsYc82om9b5DrpvuTeHwOtNJ4whlYFkLZKb1azhkrK4r0ZD+6D/a5
+ gdSFqxBbRh5XRvlbyMEAtc5wfQR9yr2MY6NJG8G1pzXy0wDWmkjO9VYtdHCFQRQLXz9E
+ WIpSU/IGia36+O7cUbBdaXwtKkGfVCf4Rh0JBLOVG41hk9aTZYM/p4K1YjPdoAXDXVOF
+ T1j+yS/I4XLExQYeWp7MwGI11ybRZYg5bLqcFnCwCTUCbkbQVpaEiois2gfLPqNhEpkI
+ oIphoPEFBZoX3U3hMBNt8AUNkckmMvm6bbSPdCjh/jfzlvErwYqUuNP+KDoLyMh8/97o
+ eoaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=r4SgzmwKdxJQB93mBgpVTzOKIPOHeR4CeMYrV4uJR0Q=;
+ b=aIvOxr+xPB9riXbt7nhDzvQpetlT5oOj17huQGZC/zYLbqIGAvWsr562Zl3aRLV1ra
+ Rfx8N2AJk64iZXvhyg5PPblqYncu0KJbUlnOotLNT+vdvLwuug3Ug5ZML4CPj7s+Okq8
+ UCDByWVPiz7VuSULssJ55kqQaMhCJvNzFcfPcyiXwZGje6QI+XzrPBftMwFkUwy9DSrC
+ 90QUWcwfFVDo+A5bZgupvbtzm3RI/sGll3n5Vvolh2JKgqqnNO2iDUWdqMXydS9KqHfE
+ 6RCayG4JoZmGQcWOfs/6e2TVmgbf1jgPN0cZs3TiFjPV0WRZOr5z58RaN5o+spAQKW0p
+ ks+A==
+X-Gm-Message-State: APjAAAVW+VXOLXetT3ZfFyZ4gK22lm/zBcsjjdA5UVO1TMDIl09pjCgA
+ R6sWrMpzUpoSX7oX2Nv/U/3Dow==
+X-Google-Smtp-Source: APXvYqz1OKYwBYcNukMm+r++0i5TeQaeyCP2llM2+/whE/lQTp7h50YIZGOt6RwTlV33gKFBU3jPAw==
+X-Received: by 2002:a1c:1a45:: with SMTP id a66mr821057wma.102.1569340262134; 
+ Tue, 24 Sep 2019 08:51:02 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id g11sm181183wmh.45.2019.09.24.08.51.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 24 Sep 2019 08:51:01 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id E0FFE1FF87;
+ Tue, 24 Sep 2019 16:51:00 +0100 (BST)
+References: <20190923230004.9231-1-richard.henderson@linaro.org>
+ <20190923230004.9231-6-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v4 05/16] cputlb: Split out load/store_memop
+In-reply-to: <20190923230004.9231-6-richard.henderson@linaro.org>
+Date: Tue, 24 Sep 2019 16:51:00 +0100
+Message-ID: <871rw5bsm3.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <fcc3b597-856f-23bd-bc56-d886f021a2f4@us.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 86.138.245.63
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH 0/7] target/ppc: DFP fixes and improvements
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,26 +96,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/09/2019 17:30, Paul Clarke wrote:
 
-> Mark,
-> 
-> What tree / branch would these patches apply to?  (I've tried qemu master, dgibson master and ppc-for-4.2, or I'm doing something wrong.)
-> 
-> PC
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Hi Paul,
+> We will shortly be using these more than once.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+<snip>
+>  }
+>
+>  /*
+> @@ -1415,7 +1412,8 @@ load_helper(CPUArchState *env, target_ulong addr, T=
+CGMemOpIdx oi,
+>  static uint64_t full_ldub_mmu(CPUArchState *env, target_ulong addr,
+>                                TCGMemOpIdx oi, uintptr_t retaddr)
+>  {
+> -    return load_helper(env, addr, oi, retaddr, MO_UB, false, full_ldub_m=
+mu);
+> +    return load_helper(env, addr, oi, retaddr, MO_UB, false,
+> +                       full_ldub_mmu);
 
-I've just checked my local repo and I can confirm they are based on qemu master
-commit 8dc57281b8 "Merge remote-tracking branch
-'remotes/cleber/tags/python-next-pull-request' into staging".
+This is an unrelated change, otherwise:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 
-ATB,
+>  }
+>
+>  tcg_target_ulong helper_ret_ldub_mmu(CPUArchState *env, target_ulong add=
+r,
+> @@ -1530,6 +1528,36 @@ tcg_target_ulong helper_be_ldsl_mmu(CPUArchState *=
+env, target_ulong addr,
+>   * Store Helpers
+>   */
+>
+> +static inline void QEMU_ALWAYS_INLINE
+> +store_memop(void *haddr, uint64_t val, MemOp op)
+> +{
+> +    switch (op) {
+> +    case MO_UB:
+> +        stb_p(haddr, val);
+> +        break;
+> +    case MO_BEUW:
+> +        stw_be_p(haddr, val);
+> +        break;
+> +    case MO_LEUW:
+> +        stw_le_p(haddr, val);
+> +        break;
+> +    case MO_BEUL:
+> +        stl_be_p(haddr, val);
+> +        break;
+> +    case MO_LEUL:
+> +        stl_le_p(haddr, val);
+> +        break;
+> +    case MO_BEQ:
+> +        stq_be_p(haddr, val);
+> +        break;
+> +    case MO_LEQ:
+> +        stq_le_p(haddr, val);
+> +        break;
+> +    default:
+> +        optimize_away();
+> +    }
+> +}
+> +
+>  static inline void QEMU_ALWAYS_INLINE
+>  store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
+>               TCGMemOpIdx oi, uintptr_t retaddr, MemOp op)
+> @@ -1657,31 +1685,7 @@ store_helper(CPUArchState *env, target_ulong addr,=
+ uint64_t val,
+>
+>   do_aligned_access:
+>      haddr =3D (void *)((uintptr_t)addr + entry->addend);
+> -    switch (op) {
+> -    case MO_UB:
+> -        stb_p(haddr, val);
+> -        break;
+> -    case MO_BEUW:
+> -        stw_be_p(haddr, val);
+> -        break;
+> -    case MO_LEUW:
+> -        stw_le_p(haddr, val);
+> -        break;
+> -    case MO_BEUL:
+> -        stl_be_p(haddr, val);
+> -        break;
+> -    case MO_LEUL:
+> -        stl_le_p(haddr, val);
+> -        break;
+> -    case MO_BEQ:
+> -        stq_be_p(haddr, val);
+> -        break;
+> -    case MO_LEQ:
+> -        stq_le_p(haddr, val);
+> -        break;
+> -    default:
+> -        optimize_away();
+> -    }
+> +    store_memop(haddr, val, op);
+>  }
+>
+>  void helper_ret_stb_mmu(CPUArchState *env, target_ulong addr, uint8_t va=
+l,
 
-Mark.
+
+--
+Alex Benn=C3=A9e
 
