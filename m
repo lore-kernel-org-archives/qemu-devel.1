@@ -2,66 +2,89 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 607C5C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:02:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 429B6C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:04:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C8F320872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:02:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C8F320872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0A72020872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:04:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c4GaNm6t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A72020872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCrwc-0002W4-EA
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 17:01:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55207)
+	id 1iCrz6-0004pD-93
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 17:04:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55469)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCruL-0001Z9-DE
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:59:38 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iCrvy-0002XF-Ut
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCruJ-0003kO-Hn
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:59:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53714)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCruJ-0003k1-CQ
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:59:35 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2D553300D1C2;
- Tue, 24 Sep 2019 20:59:34 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F01B95D9D5;
- Tue, 24 Sep 2019 20:59:33 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C35F9113864E; Tue, 24 Sep 2019 22:59:32 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 25/25] qapi: Improve source file read error handling
-References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-26-armbru@redhat.com>
- <24b79697-39bb-0154-3d3d-fd98ea8a9d5e@redhat.com>
-Date: Tue, 24 Sep 2019 22:59:32 +0200
-In-Reply-To: <24b79697-39bb-0154-3d3d-fd98ea8a9d5e@redhat.com> (Eric Blake's
- message of "Tue, 24 Sep 2019 14:57:09 -0500")
-Message-ID: <87v9th76mj.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <alex.bennee@linaro.org>) id 1iCrvw-0004TD-2i
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:18 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38055)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iCrvq-0004Ru-6Z
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:12 -0400
+Received: by mail-wr1-x441.google.com with SMTP id l11so3630374wrx.5
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 14:01:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=/xkUA4er3qxVvIJWrvA6CYF5PpbAnHAJvGVcHOa9aSM=;
+ b=c4GaNm6tcl2yLcAnJxhd2m1u+F8q148fzdagCmY0QNv4feVIUw9QcEBpUrSAHA6hsU
+ 0afwlRrj/xlKo+23JzAo04SGeSz/yS1j8EVeqTmM2L0HF8itXCAVS4Qx4Q6UE1w3zzf3
+ TEmgi+pXzreq0B4QKI8ZxCkOLZC3n/g7Rrh8nkAukEQJst80z5wtkiLm+EcNlUwLz3vw
+ wPygkyjxBUWoJoxlYeHZbt2DUdJaBxLn5q1nRyrdiiXbPP1/eYeFpSOejQ/hEu2en3AQ
+ sQAJWEgiLWHC09L4n2LARNCuMHu+m1Zp78Xoec3KgKGcxmAb0LFKzjrzdjAZCnyZjy3Z
+ StZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=/xkUA4er3qxVvIJWrvA6CYF5PpbAnHAJvGVcHOa9aSM=;
+ b=VqOnPTxdqyRaudarkM0ELWc+LlAMY4mhoCYm6bsZ84DXXktKmRDoGABnhEbsrhZBWj
+ 0cM+w8m1h5NdED8tW6hv4xAIgc9F6LwRwuJjVt5K3XH/QeWjVxfBe9PmvTCnU6bNVyhp
+ 3eicuFVL43lsLXaGjZK/thmcoXg36ayGOgC0hVT80aEuNcKjrxUQgYhwCMGhgCP5zGAu
+ ruIDlVMuE9mfDdW6PdLikG8GMcUlfB0ckr+uVdXLlwaqnOu0bWV/RULLCvnhuZPLgJFZ
+ 4DK57wNpTeWusvKOLMA9bJ0J7030TAk9S2aN04tLJ3v+KHMi+cKnd9D5t7sI8UIJWTf3
+ PvSg==
+X-Gm-Message-State: APjAAAVuQCKlXNqCUqBZHBIr0XADafnrb9zAjpYqoNDidlD7yQvZgCdH
+ yf9sb13kvqaVJm8YCyluQoEiQw==
+X-Google-Smtp-Source: APXvYqyEmJ/JHHYvtpw3KjuSmIurkmGOQ6vwmRyWIMJhBTvXjVgFJL+OMFZtSN+u2wUmuOeUeFMfkg==
+X-Received: by 2002:adf:9cc7:: with SMTP id h7mr4696640wre.193.1569358868771; 
+ Tue, 24 Sep 2019 14:01:08 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id y5sm1434588wma.14.2019.09.24.14.01.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 24 Sep 2019 14:01:07 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 0E2A41FF8F;
+ Tue, 24 Sep 2019 22:01:07 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v3 02/33] target/alpha: Fix SWCR_MAP_UMZ
+Date: Tue, 24 Sep 2019 22:00:35 +0100
+Message-Id: <20190924210106.27117-3-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190924210106.27117-1-alex.bennee@linaro.org>
+References: <20190924210106.27117-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 24 Sep 2019 20:59:34 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,42 +96,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
- mdroth@linux.vnet.ibm.com
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>, jsnow@redhat.com,
+ f4bug@amsat.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+From: Richard Henderson <richard.henderson@linaro.org>
 
-> On 9/24/19 8:28 AM, Markus Armbruster wrote:
->> qap-gen.py crashes when it can't open the main schema file, and when
->
-> qapi-gen.py
+We were setting the wrong bit.  The fp_status.flush_to_zero
+setting is overwritten by either the constant 1 or the value
+of fpcr_flush_to_zero depending on bits within an fp insn.
 
-Will fix.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Message-Id: <20190921043256.4575-3-richard.henderson@linaro.org>
+---
+ target/alpha/helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->> it can't read from any schema file.  Lazy.
->> 
->> Change QAPISchema.__init__() to take a file name instead of a file
->> object.  Move the open code from _include() to __init__(), so it's
->> used for the main schema file, too.
->> 
->> Move the read into the try for good measure, and rephrase the error
->> message.
->> 
->> Reporting open or read failure for the main schema file needs a
->> QAPISourceInfo representing "no source".  Make QAPISourceInfo cope
->> with fname=None.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  scripts/qapi/common.py                | 46 +++++++++++++++------------
->>  tests/qapi-schema/include-no-file.err |  2 +-
->>  2 files changed, 27 insertions(+), 21 deletions(-)
->> 
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+diff --git a/target/alpha/helper.c b/target/alpha/helper.c
+index 6c1703682e0..10602fb3394 100644
+--- a/target/alpha/helper.c
++++ b/target/alpha/helper.c
+@@ -71,7 +71,7 @@ void cpu_alpha_store_fpcr(CPUAlphaState *env, uint64_t val)
+         env->fp_status.flush_inputs_to_zero = 1;
+     }
+     if (env->swcr & SWCR_MAP_UMZ) {
+-        env->fp_status.flush_to_zero = 1;
++        env->fpcr_flush_to_zero = 1;
+     }
+     env->fpcr_exc_enable &= ~(alpha_ieee_swcr_to_fpcr(env->swcr) >> 32);
+ #endif
+-- 
+2.20.1
 
-Thanks!
 
