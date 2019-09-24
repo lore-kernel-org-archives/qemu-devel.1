@@ -2,79 +2,62 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70D65C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:07:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A34BDC432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:08:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BC5820872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:07:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D76320872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:08:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JU57ynTz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BC5820872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="P4ykigGq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D76320872
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCd2d-0006xe-7K
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 01:07:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52081)
+	id 1iCd49-0008Po-I9
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 01:08:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51589)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iCczW-0004SW-85
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:04:01 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iCcvm-0001GD-8C
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:00:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iCczU-0003Yt-VQ
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:03:57 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:43725)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iCczU-0003Uc-Jl; Tue, 24 Sep 2019 01:03:56 -0400
-Received: by mail-lj1-x244.google.com with SMTP id n14so442514ljj.10;
- Mon, 23 Sep 2019 22:03:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=vMy0hE377EdIQzisWHOHk32ZjceNv6dInUCOb3CZ2FM=;
- b=JU57ynTzcQjD3acUNVuM4fsZi+CtA/cpf5czweTMeIXmUXYjesgHngCqy6WJsNTn5g
- A30v/LEjwZtCLIJAk2SR39AY39bQq4aABP6eepBeITgc/V67lwSYyNPne0jRuTEjXQpC
- mKutqvJVwRLBnSVoY1K8GghkTNOTZBhM92vVxifugKMZH8l/Ms9EUUrp5hTCekUi5wkv
- hNap+Qd3Pbtb/ocxoiVikQLqwdnilmtkmYTgG7CCWnzdkABQJvfWpL3VJg2azzxpzmuy
- e5paspT9u/P1/7a7op99bw5UjqrAKMCshvNQmFegQ/eHT31jvFBEaw6eNS2aFxJHrPR9
- Fx+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=vMy0hE377EdIQzisWHOHk32ZjceNv6dInUCOb3CZ2FM=;
- b=bZULb/ws0pMX0+jAcUD0QJSLRqs/kfV7kxQ/j+PW9CBt/fBYT5iPrDsRp8vOq1f2Kx
- bx8j988mOalWmogW6MFDTsKbjTzsijEfIS8dHZw82tDTiWofPrcgffvdiD7DpSbN/I/Q
- ffdOb+SAxtE5x8P8IgGJIIFx6LxyJsfQExWh9avOPUF2mDmaBImT8fBonoXTNChQbLGY
- FvfVGigJqZiXlVscjpfgbRKaVRYjfdDlbrHNESTr1MzQYLxsP1og78QwFxo8oxmvK2Sx
- mfcMv4nRyB1CfUOdwhW20U8l8s181KDcnRDousGHlPMFP5aXetxOD5KMXOKIDdvK1dJ7
- 4g2Q==
-X-Gm-Message-State: APjAAAW5X7heqmlNJg0F2xsVm/2ggL2GFSBpRqPqwiv47nhbWfjoGFUH
- YBoGjAX6oFu0+PdL+tmBFLM8tFlUyeJB4Ruor9s=
-X-Google-Smtp-Source: APXvYqwAXTnHIjwRR6ENN1i0qIqtB+OQPn1AypUIBJgpsDy2S8T4/AZpFw9H0ly/fOPbZQwOa0kFFvt+++1KYbcKkIo=
-X-Received: by 2002:a2e:91c7:: with SMTP id u7mr594338ljg.146.1569301435037;
- Mon, 23 Sep 2019 22:03:55 -0700 (PDT)
+ (envelope-from <dgibson@ozlabs.org>) id 1iCcvk-0001w2-8G
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:00:06 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:41027 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iCcvj-0001rh-21; Tue, 24 Sep 2019 01:00:04 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46cps84lN4z9sP7; Tue, 24 Sep 2019 14:59:56 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1569301196;
+ bh=v/bvaDusoHtbVksWbv6wuUI+7+7m/wPijmJz4VnYCZc=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=P4ykigGqfYouPQOdvx7GGht/pBgm/2er/rLUTnRFXu69awdO+gHVObQu2sZQvWJvs
+ WDHWAngYpeH7P7e8dYLxLVieMjEZtg2TtuVUJqZP8LHvMjNJ3JUM+Loy8JGjCf4JEX
+ j3Qe61iwx/CSER1fkD6/HWMNC12cxkf3dMztOHeY=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: qemu-ppc@nongnu.org,
+	clg@kaod.org
+Subject: [PATCH 4/4] xics: Merge TYPE_ICS_BASE and TYPE_ICS_SIMPLE classes
+Date: Tue, 24 Sep 2019 14:59:52 +1000
+Message-Id: <20190924045952.11412-5-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190924045952.11412-1-david@gibson.dropbear.id.au>
+References: <20190924045952.11412-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-References: <1569301232-7128-1-git-send-email-guoren@kernel.org>
-In-Reply-To: <1569301232-7128-1-git-send-email-guoren@kernel.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 23 Sep 2019 22:03:27 -0700
-Message-ID: <CAKmqyKO9=FuqsEDbuA_iw3+W8fpcGxudxV76vu2ZucRLeExQUA@mail.gmail.com>
-Subject: Re: [PATCH] target/riscv: Bugfix reserved bits in PTE for RV64
-To: guoren@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::244
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,49 +69,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- Palmer Dabbelt <palmer@sifive.com>, "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Guo Ren <ren_guo@c-sky.com>
+Cc: gkurz@kaod.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 23, 2019 at 10:01 PM <guoren@kernel.org> wrote:
->
-> From: Guo Ren <ren_guo@c-sky.com>
->
-> Highest 10 bits of PTE are reserved in riscv-privileged, ref: [1], so we
-> need to ignore them. They can not be a part of ppn.
->
-> 1: The RISC-V Instruction Set Manual, Volume II: Privileged Architecture
->    4.4 Sv39: Page-Based 39-bit Virtual-Memory System
->    4.5 Sv48: Page-Based 48-bit Virtual-Memory System
->
-> Signed-off-by: Guo Ren <ren_guo@c-sky.com>
-> Reviewed-by: Liu Zhiwei <zhiwei_liu@c-sky.com>
-> ---
->  target/riscv/cpu_helper.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> index 87dd6a6..3c5e8f6 100644
-> --- a/target/riscv/cpu_helper.c
-> +++ b/target/riscv/cpu_helper.c
-> @@ -260,6 +260,7 @@ restart:
->          target_ulong pte = ldl_phys(cs->as, pte_addr);
->  #elif defined(TARGET_RISCV64)
->          target_ulong pte = ldq_phys(cs->as, pte_addr);
-> +        pte = pte << 10 >> 10;
+TYPE_ICS_SIMPLE is the only subtype of TYPE_ICS_BASE that's ever
+instantiated, and the only one we're ever likely to want.  The
+existence of different classes is just a hang over from when we
+(misguidedly) had separate subtypes for the KVM and non-KVM version of
+the device.
 
-You can just AND with a mask instead of shifting both directions.
+So, collapse the two classes together into just TYPE_ICS.
 
-Alistair
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/intc/xics.c        | 57 ++++++++++++++++---------------------------
+ hw/ppc/pnv_psi.c      |  2 +-
+ hw/ppc/spapr_irq.c    |  4 +--
+ include/hw/ppc/xics.h | 17 ++-----------
+ 4 files changed, 26 insertions(+), 54 deletions(-)
 
->  #endif
->          hwaddr ppn = pte >> PTE_PPN_SHIFT;
->
-> --
-> 2.7.4
->
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index 9ae51bbc76..388dbba870 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -555,7 +555,7 @@ static void ics_reset_irq(ICSIRQState *irq)
+=20
+ static void ics_reset(DeviceState *dev)
+ {
+-    ICSState *ics =3D ICS_BASE(dev);
++    ICSState *ics =3D ICS(dev);
+     int i;
+     uint8_t flags[ics->nr_irqs];
+=20
+@@ -573,7 +573,7 @@ static void ics_reset(DeviceState *dev)
+     if (kvm_irqchip_in_kernel()) {
+         Error *local_err =3D NULL;
+=20
+-        ics_set_kvm_state(ICS_BASE(dev), &local_err);
++        ics_set_kvm_state(ICS(dev), &local_err);
+         if (local_err) {
+             error_report_err(local_err);
+         }
+@@ -587,7 +587,7 @@ static void ics_reset_handler(void *dev)
+=20
+ static void ics_realize(DeviceState *dev, Error **errp)
+ {
+-    ICSState *ics =3D ICS_BASE(dev);
++    ICSState *ics =3D ICS(dev);
+     Error *local_err =3D NULL;
+     Object *obj;
+=20
+@@ -609,26 +609,14 @@ static void ics_realize(DeviceState *dev, Error **e=
+rrp)
+     qemu_register_reset(ics_reset_handler, ics);
+ }
+=20
+-static void ics_simple_class_init(ObjectClass *klass, void *data)
++static void ics_instance_init(Object *obj)
+ {
+-}
+-
+-static const TypeInfo ics_simple_info =3D {
+-    .name =3D TYPE_ICS_SIMPLE,
+-    .parent =3D TYPE_ICS_BASE,
+-    .instance_size =3D sizeof(ICSState),
+-    .class_init =3D ics_simple_class_init,
+-    .class_size =3D sizeof(ICSStateClass),
+-};
+-
+-static void ics_base_instance_init(Object *obj)
+-{
+-    ICSState *ics =3D ICS_BASE(obj);
++    ICSState *ics =3D ICS(obj);
+=20
+     ics->offset =3D XICS_IRQ_BASE;
+ }
+=20
+-static int ics_base_pre_save(void *opaque)
++static int ics_pre_save(void *opaque)
+ {
+     ICSState *ics =3D opaque;
+=20
+@@ -639,7 +627,7 @@ static int ics_base_pre_save(void *opaque)
+     return 0;
+ }
+=20
+-static int ics_base_post_load(void *opaque, int version_id)
++static int ics_post_load(void *opaque, int version_id)
+ {
+     ICSState *ics =3D opaque;
+=20
+@@ -657,7 +645,7 @@ static int ics_base_post_load(void *opaque, int versi=
+on_id)
+     return 0;
+ }
+=20
+-static const VMStateDescription vmstate_ics_base_irq =3D {
++static const VMStateDescription vmstate_ics_irq =3D {
+     .name =3D "ics/irq",
+     .version_id =3D 2,
+     .minimum_version_id =3D 1,
+@@ -671,46 +659,44 @@ static const VMStateDescription vmstate_ics_base_ir=
+q =3D {
+     },
+ };
+=20
+-static const VMStateDescription vmstate_ics_base =3D {
++static const VMStateDescription vmstate_ics =3D {
+     .name =3D "ics",
+     .version_id =3D 1,
+     .minimum_version_id =3D 1,
+-    .pre_save =3D ics_base_pre_save,
+-    .post_load =3D ics_base_post_load,
++    .pre_save =3D ics_pre_save,
++    .post_load =3D ics_post_load,
+     .fields =3D (VMStateField[]) {
+         /* Sanity check */
+         VMSTATE_UINT32_EQUAL(nr_irqs, ICSState, NULL),
+=20
+         VMSTATE_STRUCT_VARRAY_POINTER_UINT32(irqs, ICSState, nr_irqs,
+-                                             vmstate_ics_base_irq,
++                                             vmstate_ics_irq,
+                                              ICSIRQState),
+         VMSTATE_END_OF_LIST()
+     },
+ };
+=20
+-static Property ics_base_properties[] =3D {
++static Property ics_properties[] =3D {
+     DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
+-static void ics_base_class_init(ObjectClass *klass, void *data)
++static void ics_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+=20
+     dc->realize =3D ics_realize;
+-    dc->props =3D ics_base_properties;
++    dc->props =3D ics_properties;
+     dc->reset =3D ics_reset;
+-    dc->vmsd =3D &vmstate_ics_base;
++    dc->vmsd =3D &vmstate_ics;
+ }
+=20
+-static const TypeInfo ics_base_info =3D {
+-    .name =3D TYPE_ICS_BASE,
++static const TypeInfo ics_info =3D {
++    .name =3D TYPE_ICS,
+     .parent =3D TYPE_DEVICE,
+-    .abstract =3D true,
+     .instance_size =3D sizeof(ICSState),
+-    .instance_init =3D ics_base_instance_init,
+-    .class_init =3D ics_base_class_init,
+-    .class_size =3D sizeof(ICSStateClass),
++    .instance_init =3D ics_instance_init,
++    .class_init =3D ics_class_init,
+ };
+=20
+ static const TypeInfo xics_fabric_info =3D {
+@@ -749,8 +735,7 @@ void ics_set_irq_type(ICSState *ics, int srcno, bool =
+lsi)
+=20
+ static void xics_register_types(void)
+ {
+-    type_register_static(&ics_simple_info);
+-    type_register_static(&ics_base_info);
++    type_register_static(&ics_info);
+     type_register_static(&icp_info);
+     type_register_static(&xics_fabric_info);
+ }
+diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+index 8ea81e9d8e..a997f16bb4 100644
+--- a/hw/ppc/pnv_psi.c
++++ b/hw/ppc/pnv_psi.c
+@@ -469,7 +469,7 @@ static void pnv_psi_power8_instance_init(Object *obj)
+     Pnv8Psi *psi8 =3D PNV8_PSI(obj);
+=20
+     object_initialize_child(obj, "ics-psi",  &psi8->ics, sizeof(psi8->ic=
+s),
+-                            TYPE_ICS_SIMPLE, &error_abort, NULL);
++                            TYPE_ICS, &error_abort, NULL);
+ }
+=20
+ static const uint8_t irq_to_xivr[] =3D {
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index ac189c5796..6c45d2a3c0 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -98,7 +98,7 @@ static void spapr_irq_init_xics(SpaprMachineState *spap=
+r, int nr_irqs,
+     Object *obj;
+     Error *local_err =3D NULL;
+=20
+-    obj =3D object_new(TYPE_ICS_SIMPLE);
++    obj =3D object_new(TYPE_ICS);
+     object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
+     object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
+                                    &error_fatal);
+@@ -109,7 +109,7 @@ static void spapr_irq_init_xics(SpaprMachineState *sp=
+apr, int nr_irqs,
+         return;
+     }
+=20
+-    spapr->ics =3D ICS_BASE(obj);
++    spapr->ics =3D ICS(obj);
+=20
+     xics_spapr_init(spapr);
+ }
+diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+index 92628e7cab..d8cf206a69 100644
+--- a/include/hw/ppc/xics.h
++++ b/include/hw/ppc/xics.h
+@@ -89,21 +89,8 @@ struct PnvICPState {
+     uint32_t links[3];
+ };
+=20
+-#define TYPE_ICS_BASE "ics-base"
+-#define ICS_BASE(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS_BASE)
+-
+-/* Retain ics for sPAPR for migration from existing sPAPR guests */
+-#define TYPE_ICS_SIMPLE "ics"
+-#define ICS_SIMPLE(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS_SIMPLE)
+-
+-#define ICS_BASE_CLASS(klass) \
+-     OBJECT_CLASS_CHECK(ICSStateClass, (klass), TYPE_ICS_BASE)
+-#define ICS_BASE_GET_CLASS(obj) \
+-     OBJECT_GET_CLASS(ICSStateClass, (obj), TYPE_ICS_BASE)
+-
+-struct ICSStateClass {
+-    DeviceClass parent_class;
+-};
++#define TYPE_ICS "ics"
++#define ICS(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS)
+=20
+ struct ICSState {
+     /*< private >*/
+--=20
+2.21.0
+
 
