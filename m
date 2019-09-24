@@ -2,62 +2,79 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B306C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:06:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70D65C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:07:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 337D520872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:06:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3BC5820872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:07:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="O54prG5r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 337D520872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JU57ynTz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BC5820872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCd24-0006WC-BH
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 01:06:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51590)
+	id 1iCd2d-0006xe-7K
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 01:07:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52081)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iCcvm-0001GE-8e
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:00:07 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iCczW-0004SW-85
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:04:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iCcvk-0001wP-Et
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:00:06 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:54705 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iCcvj-0001rj-DV; Tue, 24 Sep 2019 01:00:04 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46cps82hvMz9sDB; Tue, 24 Sep 2019 14:59:56 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1569301196;
- bh=NvzW3pnMMJChizCRdRFvUt5F8TLEmnoMIBQj4iEAKrA=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=O54prG5rBf/QhOYKtPtaBC8J/MnLepKXEPiKqb3iVA80pz9Wc694HfeTazRg3A6GP
- 6lHT6o3eiiGAx7Wxb0D2mDfFq8H9HtNH1FzzYntOYfkkteU+8ZUyrxUC15XcdD0f98
- C4eh739OMtJRA+C2PUtJsgdI8V8IezhfcYvaDfnY=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: qemu-ppc@nongnu.org,
-	clg@kaod.org
-Subject: [PATCH 2/4] xics: Merge reset and realize hooks
-Date: Tue, 24 Sep 2019 14:59:50 +1000
-Message-Id: <20190924045952.11412-3-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190924045952.11412-1-david@gibson.dropbear.id.au>
-References: <20190924045952.11412-1-david@gibson.dropbear.id.au>
+ (envelope-from <alistair23@gmail.com>) id 1iCczU-0003Yt-VQ
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:03:57 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:43725)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1iCczU-0003Uc-Jl; Tue, 24 Sep 2019 01:03:56 -0400
+Received: by mail-lj1-x244.google.com with SMTP id n14so442514ljj.10;
+ Mon, 23 Sep 2019 22:03:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=vMy0hE377EdIQzisWHOHk32ZjceNv6dInUCOb3CZ2FM=;
+ b=JU57ynTzcQjD3acUNVuM4fsZi+CtA/cpf5czweTMeIXmUXYjesgHngCqy6WJsNTn5g
+ A30v/LEjwZtCLIJAk2SR39AY39bQq4aABP6eepBeITgc/V67lwSYyNPne0jRuTEjXQpC
+ mKutqvJVwRLBnSVoY1K8GghkTNOTZBhM92vVxifugKMZH8l/Ms9EUUrp5hTCekUi5wkv
+ hNap+Qd3Pbtb/ocxoiVikQLqwdnilmtkmYTgG7CCWnzdkABQJvfWpL3VJg2azzxpzmuy
+ e5paspT9u/P1/7a7op99bw5UjqrAKMCshvNQmFegQ/eHT31jvFBEaw6eNS2aFxJHrPR9
+ Fx+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=vMy0hE377EdIQzisWHOHk32ZjceNv6dInUCOb3CZ2FM=;
+ b=bZULb/ws0pMX0+jAcUD0QJSLRqs/kfV7kxQ/j+PW9CBt/fBYT5iPrDsRp8vOq1f2Kx
+ bx8j988mOalWmogW6MFDTsKbjTzsijEfIS8dHZw82tDTiWofPrcgffvdiD7DpSbN/I/Q
+ ffdOb+SAxtE5x8P8IgGJIIFx6LxyJsfQExWh9avOPUF2mDmaBImT8fBonoXTNChQbLGY
+ FvfVGigJqZiXlVscjpfgbRKaVRYjfdDlbrHNESTr1MzQYLxsP1og78QwFxo8oxmvK2Sx
+ mfcMv4nRyB1CfUOdwhW20U8l8s181KDcnRDousGHlPMFP5aXetxOD5KMXOKIDdvK1dJ7
+ 4g2Q==
+X-Gm-Message-State: APjAAAW5X7heqmlNJg0F2xsVm/2ggL2GFSBpRqPqwiv47nhbWfjoGFUH
+ YBoGjAX6oFu0+PdL+tmBFLM8tFlUyeJB4Ruor9s=
+X-Google-Smtp-Source: APXvYqwAXTnHIjwRR6ENN1i0qIqtB+OQPn1AypUIBJgpsDy2S8T4/AZpFw9H0ly/fOPbZQwOa0kFFvt+++1KYbcKkIo=
+X-Received: by 2002:a2e:91c7:: with SMTP id u7mr594338ljg.146.1569301435037;
+ Mon, 23 Sep 2019 22:03:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+References: <1569301232-7128-1-git-send-email-guoren@kernel.org>
+In-Reply-To: <1569301232-7128-1-git-send-email-guoren@kernel.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 23 Sep 2019 22:03:27 -0700
+Message-ID: <CAKmqyKO9=FuqsEDbuA_iw3+W8fpcGxudxV76vu2ZucRLeExQUA@mail.gmail.com>
+Subject: Re: [PATCH] target/riscv: Bugfix reserved bits in PTE for RV64
+To: guoren@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
+X-Received-From: 2a00:1450:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,189 +86,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: gkurz@kaod.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmer@sifive.com>, "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Guo Ren <ren_guo@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently TYPE_XICS_BASE and TYPE_XICS_SIMPLE have their own reset and
-realize methods, using the standard technique for having the subtype
-call the supertype's methods before doing its own thing.
+On Mon, Sep 23, 2019 at 10:01 PM <guoren@kernel.org> wrote:
+>
+> From: Guo Ren <ren_guo@c-sky.com>
+>
+> Highest 10 bits of PTE are reserved in riscv-privileged, ref: [1], so we
+> need to ignore them. They can not be a part of ppn.
+>
+> 1: The RISC-V Instruction Set Manual, Volume II: Privileged Architecture
+>    4.4 Sv39: Page-Based 39-bit Virtual-Memory System
+>    4.5 Sv48: Page-Based 48-bit Virtual-Memory System
+>
+> Signed-off-by: Guo Ren <ren_guo@c-sky.com>
+> Reviewed-by: Liu Zhiwei <zhiwei_liu@c-sky.com>
+> ---
+>  target/riscv/cpu_helper.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+> index 87dd6a6..3c5e8f6 100644
+> --- a/target/riscv/cpu_helper.c
+> +++ b/target/riscv/cpu_helper.c
+> @@ -260,6 +260,7 @@ restart:
+>          target_ulong pte = ldl_phys(cs->as, pte_addr);
+>  #elif defined(TARGET_RISCV64)
+>          target_ulong pte = ldq_phys(cs->as, pte_addr);
+> +        pte = pte << 10 >> 10;
 
-But TYPE_XICS_SIMPLE is the only subtype of TYPE_XICS_BASE ever
-instantiated, so there's no point having the split here.  Merge them
-together into just ics_reset() and ics_realize() functions.
+You can just AND with a mask instead of shifting both directions.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/intc/xics.c        | 97 ++++++++++++++++---------------------------
- include/hw/ppc/xics.h |  3 --
- 2 files changed, 35 insertions(+), 65 deletions(-)
+Alistair
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 93139b0189..db0e532bd9 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -548,68 +548,13 @@ static void ics_eoi(ICSState *ics, uint32_t nr)
-     }
- }
-=20
--static void ics_simple_reset(DeviceState *dev)
--{
--    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(dev);
--
--    icsc->parent_reset(dev);
--
--    if (kvm_irqchip_in_kernel()) {
--        Error *local_err =3D NULL;
--
--        ics_set_kvm_state(ICS_BASE(dev), &local_err);
--        if (local_err) {
--            error_report_err(local_err);
--        }
--    }
--}
--
--static void ics_simple_reset_handler(void *dev)
--{
--    ics_simple_reset(dev);
--}
--
--static void ics_simple_realize(DeviceState *dev, Error **errp)
--{
--    ICSState *ics =3D ICS_SIMPLE(dev);
--    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(ics);
--    Error *local_err =3D NULL;
--
--    icsc->parent_realize(dev, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        return;
--    }
--
--    qemu_register_reset(ics_simple_reset_handler, ics);
--}
--
--static void ics_simple_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc =3D DEVICE_CLASS(klass);
--    ICSStateClass *isc =3D ICS_BASE_CLASS(klass);
--
--    device_class_set_parent_realize(dc, ics_simple_realize,
--                                    &isc->parent_realize);
--    device_class_set_parent_reset(dc, ics_simple_reset,
--                                  &isc->parent_reset);
--}
--
--static const TypeInfo ics_simple_info =3D {
--    .name =3D TYPE_ICS_SIMPLE,
--    .parent =3D TYPE_ICS_BASE,
--    .instance_size =3D sizeof(ICSState),
--    .class_init =3D ics_simple_class_init,
--    .class_size =3D sizeof(ICSStateClass),
--};
--
- static void ics_reset_irq(ICSIRQState *irq)
- {
-     irq->priority =3D 0xff;
-     irq->saved_priority =3D 0xff;
- }
-=20
--static void ics_base_reset(DeviceState *dev)
-+static void ics_reset(DeviceState *dev)
- {
-     ICSState *ics =3D ICS_BASE(dev);
-     int i;
-@@ -625,17 +570,31 @@ static void ics_base_reset(DeviceState *dev)
-         ics_reset_irq(ics->irqs + i);
-         ics->irqs[i].flags =3D flags[i];
-     }
-+
-+    if (kvm_irqchip_in_kernel()) {
-+        Error *local_err =3D NULL;
-+
-+        ics_set_kvm_state(ICS_BASE(dev), &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+        }
-+    }
-+}
-+
-+static void ics_reset_handler(void *dev)
-+{
-+    ics_reset(dev);
- }
-=20
--static void ics_base_realize(DeviceState *dev, Error **errp)
-+static void ics_realize(DeviceState *dev, Error **errp)
- {
-     ICSState *ics =3D ICS_BASE(dev);
-+    Error *local_err =3D NULL;
-     Object *obj;
--    Error *err =3D NULL;
-=20
--    obj =3D object_property_get_link(OBJECT(dev), ICS_PROP_XICS, &err);
-+    obj =3D object_property_get_link(OBJECT(dev), ICS_PROP_XICS, &local_=
-err);
-     if (!obj) {
--        error_propagate_prepend(errp, err,
-+        error_propagate_prepend(errp, local_err,
-                                 "required link '" ICS_PROP_XICS
-                                 "' not found: ");
-         return;
-@@ -647,8 +606,22 @@ static void ics_base_realize(DeviceState *dev, Error=
- **errp)
-         return;
-     }
-     ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
-+
-+    qemu_register_reset(ics_reset_handler, ics);
-+}
-+
-+static void ics_simple_class_init(ObjectClass *klass, void *data)
-+{
- }
-=20
-+static const TypeInfo ics_simple_info =3D {
-+    .name =3D TYPE_ICS_SIMPLE,
-+    .parent =3D TYPE_ICS_BASE,
-+    .instance_size =3D sizeof(ICSState),
-+    .class_init =3D ics_simple_class_init,
-+    .class_size =3D sizeof(ICSStateClass),
-+};
-+
- static void ics_base_instance_init(Object *obj)
- {
-     ICSState *ics =3D ICS_BASE(obj);
-@@ -725,9 +698,9 @@ static void ics_base_class_init(ObjectClass *klass, v=
-oid *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-=20
--    dc->realize =3D ics_base_realize;
-+    dc->realize =3D ics_realize;
-     dc->props =3D ics_base_properties;
--    dc->reset =3D ics_base_reset;
-+    dc->reset =3D ics_reset;
-     dc->vmsd =3D &vmstate_ics_base;
- }
-=20
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 34d7985b7c..0eb39c2561 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -103,9 +103,6 @@ struct PnvICPState {
-=20
- struct ICSStateClass {
-     DeviceClass parent_class;
--
--    DeviceRealize parent_realize;
--    DeviceReset parent_reset;
- };
-=20
- struct ICSState {
---=20
-2.21.0
-
+>  #endif
+>          hwaddr ppn = pte >> PTE_PPN_SHIFT;
+>
+> --
+> 2.7.4
+>
 
