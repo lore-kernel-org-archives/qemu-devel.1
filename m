@@ -2,90 +2,80 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31210C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 10:14:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5CE5C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 10:18:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03DC2214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 10:14:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03DC2214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AC9012146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 10:18:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vhWA8wh5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC9012146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iChqB-0000je-0i
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 06:14:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60511)
+	id 1iChuG-0002HJ-H3
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 06:18:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33076)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iChod-00084a-QO
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 06:13:04 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iChtO-0001n6-PD
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 06:17:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iChob-00059E-Nu
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 06:13:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52338)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iChoX-00058T-UH; Tue, 24 Sep 2019 06:12:58 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 73770300413C;
- Tue, 24 Sep 2019 10:12:56 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.108])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DD6915D713;
- Tue, 24 Sep 2019 10:12:51 +0000 (UTC)
-Subject: Re: [PATCH v4 02/10] block: reverse order for reopen commits
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20190807141226.193501-1-vsementsov@virtuozzo.com>
- <20190807141226.193501-3-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <8aa8b6f1-0698-fa97-64e7-1dd251d0eeee@redhat.com>
-Date: Tue, 24 Sep 2019 12:12:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <peter.maydell@linaro.org>) id 1iChtM-0006n8-FT
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 06:17:58 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35027)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iChtK-0006mf-Rp
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 06:17:55 -0400
+Received: by mail-oi1-x243.google.com with SMTP id x3so1145478oig.2
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 03:17:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=vMxtvy0rw2lyWXDK5oniU3gJXXXxaKgUBTxBrFjsHa4=;
+ b=vhWA8wh5C+JmrRJAAKgUkQN7lUSxfOxyyINRHnxZuiNGqqaZEsyzwYNEeZIMAxuiCw
+ aVLZ6fIjrxakBbc0QWDvbXSG0uilLlr7cZHrdmdscJSM/bpmMtjWz3re+ZbfXrZkAhvD
+ ueZzqnilBMaHGysYziwS5jhEIOL1DTortcZ/qkw559Ds6f4dQ1AueeV3ubrysnymux4g
+ X448BVnjOLfzA6RrRI5XyVmgQziCtrCwiw4gObHsxGlY+HBsgaFq5M9MSjHmRLtUyiOi
+ xRG7bqCmYf0lR9TuO/jfjoy0GBiYaaO/hfaUEJtMhEFFJ2jCkNqeBSb3JbEk2YUh8axd
+ uGFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=vMxtvy0rw2lyWXDK5oniU3gJXXXxaKgUBTxBrFjsHa4=;
+ b=GbviR+SCTnPi9VujhHn2kMvNr7gfjr4bambRIhuAZo1UNoSXDlMKz29eV09gwP7fOh
+ ES1NFXnaME4wY6+D/x2lb6fJ4RGxFyv+DttlScr/cLS2WoPPFiRSAcvaHx+gKiHSQ8Ab
+ ZZ9hP83Fetb5JE06gtLG4yXS9HfZ93zTGSfjf7uwTVUPC+DtH4d/WSd3ogYm39UNZVFB
+ HzY0aaMKc2BUZxF2a27ipo0k7edozPe33wUJwaSbOX3KlRDNGAnzJDK4fGsOGnc4oPcv
+ Wvj4trgpbkE2/aUMtdy6+cjHKOdMSf1Yx+5dnrjUyOFf5rXxtsVtAbcP7V2oR9g2H/oQ
+ 92kQ==
+X-Gm-Message-State: APjAAAX6sERSXO8Nh4zZJ41MHCwTz+VpAWqvzl5XABgw+gExB4wifCO2
+ nVlWEp/iIosQItDaSHL4IHLafVFgRpsPdn73X2xcrQ==
+X-Google-Smtp-Source: APXvYqy9d6peXmtJfnXkc98WUviS8PSVNb2emDbZdbo8/pvkKpMLvh9VbQ0lfr4hkg4ExRTYlPilhpdt46/xjppt3Ow=
+X-Received: by 2002:aca:53d4:: with SMTP id h203mr1350159oib.146.1569320273846; 
+ Tue, 24 Sep 2019 03:17:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190807141226.193501-3-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="r5dtV5m5P9VSnyV5DYeIAjeg9JcLyMtFT"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Tue, 24 Sep 2019 10:12:56 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+References: <20190918145640.17349-1-palmer@sifive.com>
+ <20190918145640.17349-12-palmer@sifive.com>
+In-Reply-To: <20190918145640.17349-12-palmer@sifive.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 24 Sep 2019 11:17:42 +0100
+Message-ID: <CAFEAcA_6AuqCvbvHVS9Vdwd3AOrp16Fy7Xj29497-xGMw+aXkQ@mail.gmail.com>
+Subject: Re: [PULL 11/48] riscv: Resolve full path of the given bios image
+To: Palmer Dabbelt <palmer@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,119 +87,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
- den@openvz.org
+Cc: Alistair Francis <alistair.francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---r5dtV5m5P9VSnyV5DYeIAjeg9JcLyMtFT
-Content-Type: multipart/mixed; boundary="9c3vNvdaAfwFOTKEsv3ZmvlVMLJalTfEP";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, fam@euphon.net,
- kwolf@redhat.com, den@openvz.org
-Message-ID: <8aa8b6f1-0698-fa97-64e7-1dd251d0eeee@redhat.com>
-Subject: Re: [PATCH v4 02/10] block: reverse order for reopen commits
-References: <20190807141226.193501-1-vsementsov@virtuozzo.com>
- <20190807141226.193501-3-vsementsov@virtuozzo.com>
-In-Reply-To: <20190807141226.193501-3-vsementsov@virtuozzo.com>
-
---9c3vNvdaAfwFOTKEsv3ZmvlVMLJalTfEP
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 07.08.19 16:12, Vladimir Sementsov-Ogievskiy wrote:
-> It's needed to fix reopening qcow2 with bitmaps to RW. Currently it
-> can't work, as qcow2 needs write access to file child, to mark bitmaps
-> in-image with IN_USE flag. But usually children goes after parents in
-> reopen queue and file child is still RO on qcow2 reopen commit. Reverse=
-
-> reopen order to fix it.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Wed, 18 Sep 2019 at 16:35, Palmer Dabbelt <palmer@sifive.com> wrote:
+>
+> From: Bin Meng <bmeng.cn@gmail.com>
+>
+> At present when "-bios image" is supplied, we just use the straight
+> path without searching for the configured data directories. Like
+> "-bios default", we add the same logic so that "-L" actually works.
+>
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 > ---
->  block.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
->=20
-> diff --git a/block.c b/block.c
-> index 696162cd7a..d59f9f97cb 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -3476,10 +3476,16 @@ int bdrv_reopen_multiple(BlockReopenQueue *bs_q=
-ueue, Error **errp)
->          bs_entry->perms_checked =3D true;
+>  hw/riscv/boot.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+> index 10f7991490..2e92fb0680 100644
+> --- a/hw/riscv/boot.c
+> +++ b/hw/riscv/boot.c
+> @@ -72,14 +72,14 @@ void riscv_find_and_load_firmware(MachineState *machine,
+>          firmware_filename = riscv_find_firmware(default_machine_firmware);
+>      } else {
+>          firmware_filename = machine->firmware;
+> +        if (strcmp(firmware_filename, "none")) {
+> +            firmware_filename = riscv_find_firmware(firmware_filename);
+> +        }
 >      }
-> =20
-> -    /* If we reach this point, we have success and just need to apply =
-the
-> -     * changes
-> +    /*
-> +     * If we reach this point, we have success and just need to apply =
-the
-> +     * changes.
-> +     *
-> +     * Reverse order is used to comfort qcow2 driver: on commit it nee=
-d to write
-> +     * IN_USE flag to the image, to mark bitmaps in the image as inval=
-id. But
-> +     * children are usually goes after parents in reopen-queue, so go =
-from last
-> +     * to first element.
->       */
-> -    QTAILQ_FOREACH(bs_entry, bs_queue, entry) {
-> +    QTAILQ_FOREACH_REVERSE(bs_entry, bs_queue, entry) {
->          bdrv_reopen_commit(&bs_entry->state);
+>
+>      if (strcmp(firmware_filename, "none")) {
+>          /* If not "none" load the firmware */
+>          riscv_load_firmware(firmware_filename, firmware_load_addr);
+> -    }
+> -
+> -    if (!strcmp(machine->firmware, "default")) {
+>          g_free(firmware_filename);
 >      }
+>  }
 
-I suppose this works, but only because everything but the IN_USE thing
-actually behaves correctly.  In theory, all the work is done by the time
-=2Eprepare is through, so we can call commit in any order anyway.
+Hi; Coverity (CID 1405786) thinks this introduces a possible
+memory leak, because it's not sure that memory allocated
+and returned by the call to riscv_find_firmware() is
+guaranteed to be freed before the end of the function.
+I think it might be a false positive, but I wasn't entirely
+sure, so maybe this code could be rephrased to be clearer?
+I think the root of the problem is that we have a local
+variable 'firmware_filename' which might point to memory
+allocated-and-to-be-freed, or might point to memory which
+must not be freed (machine->firmware), and then you have
+to check the flow of logic through the code quite carefully
+to figure out whether the condition under which we choose
+to call g_free() is exactly equivalent to the condition
+where we set firmware_filename to point to allocated memory...
 
-So I=E2=80=99m still of the opinion that writing IN_USE in commit is just=
- plain
-wrong.
-
-It feels like you=E2=80=99re trying to work around wrongs in reopen by pi=
-ling
-more wrongs on top.  I don=E2=80=99t like reopen already, and I don=E2=80=
-=99t think this
-makes it any better.
-
-I don=E2=80=99t like how the comment implies that everything is just as i=
-t
-should be, but that isn=E2=80=99t the real problem here, so whatever.
-
-
-Well, at least the change is simple, and it doesn=E2=80=99t make things w=
-orse
-than they actually are already (that is, wrong), so
-
-Acked-by: Max Reitz <mreitz@redhat.com>
-
-
---9c3vNvdaAfwFOTKEsv3ZmvlVMLJalTfEP--
-
---r5dtV5m5P9VSnyV5DYeIAjeg9JcLyMtFT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2J7CIACgkQ9AfbAGHV
-z0CnbAf+MI+l9TcrrMVQg41g51R7pl9HZXtlUDWOY0U5TpkkIfsH1KFDtLKBk5RH
-/eMILFt9wyM2lCm6bp+Dws4btnfFejuIonZUZ2EeArdGOTbPEHPEW2PmHT1ZlAAy
-DnSgZnyfAj/SboCio9Vx9rUhw4WBr7tqcVOTCpWXfPjqCK449cK08IkcRqKwaGl0
-IbDCoc6f2WnO6Oqn7feDeRCV1W+82t+hxZAPxAXj5+/+9hlMA4pDjjlhiRZmXMjK
-2RjrP5vUZpnFMGzYjFPFieCPJdgohZLirCBbvqJ1TphzWo8CUW7IzDZJbKKAKvbU
-mmIsE/T8tgzJdfWscb1AHRbUzgo+mQ==
-=w85i
------END PGP SIGNATURE-----
-
---r5dtV5m5P9VSnyV5DYeIAjeg9JcLyMtFT--
+thanks
+-- PMM
 
