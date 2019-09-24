@@ -8,84 +8,84 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2530C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 00:22:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41196C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 00:45:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F70B20820
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 00:22:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 069C6207FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 00:45:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n6s1MO+v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F70B20820
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k1F3lQfz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 069C6207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCYbT-0001mg-N2
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 20:22:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45649)
+	id 1iCYwz-0006Go-2g
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 20:45:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47328)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iCYaV-0001ID-3z
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 20:21:52 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1iCYvm-0005nf-VB
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 20:43:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iCYaT-0003iT-Oq
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 20:21:50 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44607)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1iCYvl-0005V7-9j
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 20:43:50 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44722)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1iCYaT-0003hn-Gs
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 20:21:49 -0400
-Received: by mail-wr1-x444.google.com with SMTP id i18so15801881wru.11
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 17:21:48 -0700 (PDT)
+ id 1iCYvl-0005Uk-1Q
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 20:43:49 -0400
+Received: by mail-wr1-x444.google.com with SMTP id i18so15831737wru.11
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 17:43:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:subject:to:cc:references:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=sJdgx4ciKOmuKUEE9HKzQAogTH2GvjXcD8DcJEoYEDs=;
- b=n6s1MO+vX/3Co30GoTEA1id800RHFkXVnV6xTqS1DjJMr3idfFo8ghOr5nuv06GsKP
- 6TIg2Urn8DefUS66y1As1vLLJ9qarS1uxW3QM0XTAvbCmd5A3XA75YAZ2tiOiEe0ZghF
- 0icHhakmvSlnxPBYixy3nJtgnjdGjhcULJobSP8V6Zmy3O2HMMT9wmdPDtw9hsUxPTbn
- 0DOb3672fswQxipcgEko8Wp6SvYabjauLXVFloh27QtfM4nMRz8GBFBW/YMrNsOrQR2z
- /fWhofsm9MRV8bMbuCtpVA8YyXzDt6uTSIs4CYI0STSQqo+/Omyu7Fnc73yZkoQlatbw
- zUBA==
+ bh=wURrAhaxCbiqzjAikjDaa7fw+MWZZ6YslWE1/obZGD0=;
+ b=k1F3lQfzKNt4MLkTYOPSyqLdPHy4pCSNIE0gVLvu10hAack9tnrreiYWv7OCZhoo8T
+ NdUGkW+t09dz25iNMD1a3z721B7TAcUL4akNL74mGsK2xbCZS+IRB7Qj8MpUkkLlAA1T
+ PafWdtDX3RO4loNz3KoDf4gSTRbdYhrqN/2OV1XLENcy3y5UJqS1p1DUyX4qIxxXy7Qc
+ EvFKubagAUSzCd88ieXE1e3n5r6nJ4WnfKGLHQZbUXnbI1hientd2n3X7RuQGFQ+shgH
+ MtHkARunqp3TIq3ZNNTJ31IVilfSBOx9BadKjhcZIMCj194ovPbf+yOe/qx092TURLeF
+ JaQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:subject:to:cc:references:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=sJdgx4ciKOmuKUEE9HKzQAogTH2GvjXcD8DcJEoYEDs=;
- b=OQ36VJa7Z0hmILWa/0IqrCbcTlBRCAzSzld+5L/nnCFgFeb8LtrrP8hwTvDa43+nMl
- IFvkIRL4lnvdhhmMoDETWBmuowPfbg/0C2BY9BDk2pYZSxynx5B84hqNFaepgZYI8afL
- Syye9U6ooUZ9LgjzJrGTFCLqSQs5426qNxful4kSiU+KiqerYerM8AMUUSVFHbKtogTj
- ia4SrPYJsFqAGHzVep/SK6b2LXl7T0r73LYe3466TKK1QVnAEvhAKhNYS3HOIUC0e0l/
- EbzqSiQS/J9MdCiv8RW+0AAfvvSMuHvtc00ZAyhfxrwMto+1kkAhoAHcF4OslQKnWL+1
- W8/Q==
-X-Gm-Message-State: APjAAAWyalRNdscqAcjUrdCkwxH+pQ45HUb/MtSUuHQBaGbbWOcfyrTV
- RDoxJYu4ndI79rV7R6Tsf+q9QWBJ
-X-Google-Smtp-Source: APXvYqyIb1T2S9fR7NSYcTvf0lucKSbzARbZ1bht8LYyfJANqAde4tAdwexmfvs3x1zt/S8/OL6u2A==
-X-Received: by 2002:adf:bb8e:: with SMTP id q14mr13444wrg.74.1569284507747;
- Mon, 23 Sep 2019 17:21:47 -0700 (PDT)
+ bh=wURrAhaxCbiqzjAikjDaa7fw+MWZZ6YslWE1/obZGD0=;
+ b=KfSyF0TMLCxNkv/BUraiveO6iIcVP+5v6okEphPOQ0b14cM9HjLrIzkM1ZHQL2emP/
+ xPVmCrDuspDQMZQJBmBT3GxfbRd2LEU7Mcm+8J/D7S9Ql524Zhlnc3QHhAGbPsFyhgkQ
+ 9PohJDH2WnDl+Wxv927BRkL91bOxLrmxmXBM27k7RLGnmlotLLEOgNHtM0LTyUwGN4SB
+ qUmlWywD13DweT0iGkdvRkBEK3kJBfsjC7WXzv08H8qOYn2RUmUHsgGIe1bn58fl3kAf
+ JoawO2vfH1vTHUgI+FHXFtLHQDewzY0qMHxkESuz6TVpwSd7rB7ExE/OaqQOUtDAXL9Q
+ a2XA==
+X-Gm-Message-State: APjAAAVqH04ezBLcQNLX5hlvjj7T6sSOM/gi6Wg5048VoeWT2AYNl/CN
+ wKtHWHy9/XQK6Yb7+ssQJjo=
+X-Google-Smtp-Source: APXvYqzFt8zEiXvGP/oCC5oRdy+tzLaeuVqdzm8FAv9OnVH4DjXgalw2iwLCy8ItC90dkbvmlX8fFw==
+X-Received: by 2002:adf:f58c:: with SMTP id f12mr53596wro.38.1569285827649;
+ Mon, 23 Sep 2019 17:43:47 -0700 (PDT)
 Received: from ?IPv6:fd00:835b:d940:d4fc:1::d3?
  (2a01-036c-0113-40af-0001-0000-0000-00d3.pool6.digikabel.hu.
  [2a01:36c:113:40af:1::d3])
- by smtp.gmail.com with ESMTPSA id o22sm46530wra.96.2019.09.23.17.21.46
+ by smtp.gmail.com with ESMTPSA id f8sm40229wmb.37.2019.09.23.17.43.46
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 23 Sep 2019 17:21:47 -0700 (PDT)
+ Mon, 23 Sep 2019 17:43:47 -0700 (PDT)
 From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
 X-Google-Original-From: =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=
  <DirtY.iCE.hu@gmail.com>
-Subject: Re: [PATCH v4 15/24] audio: add mixing-engine option (documentation)
+Subject: Re: [PATCH v4 21/24] paaudio: channel-map option
 To: Markus Armbruster <armbru@redhat.com>
 References: <cover.1568927990.git.DirtY.iCE.hu@gmail.com>
- <68c4b4bd438e9cb5c97aed32ee31e3dabd96cbf6.1568927990.git.DirtY.iCE.hu@gmail.com>
- <87sgonma7v.fsf@dusky.pond.sub.org>
-Message-ID: <4d24c95c-0e98-2646-0b1a-6c7b3afe0e90@gmail.com>
-Date: Tue, 24 Sep 2019 02:21:32 +0200
+ <8f650662fd6cc50baaede260581aeb560eed44fb.1568927990.git.DirtY.iCE.hu@gmail.com>
+ <87o8zbma1m.fsf@dusky.pond.sub.org>
+Message-ID: <55ea6ac9-9651-e322-fd84-22b4bedb3a93@gmail.com>
+Date: Tue, 24 Sep 2019 02:43:32 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
  Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <87sgonma7v.fsf@dusky.pond.sub.org>
+In-Reply-To: <87o8zbma1m.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -108,114 +108,145 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-09-23 15:08, Markus Armbruster wrote:
+On 2019-09-23 15:12, Markus Armbruster wrote:
 > "Kővágó, Zoltán" <dirty.ice.hu@gmail.com> writes:
 > 
->> This will allow us to disable mixeng when we use a decent backend.
->>
->> Disabling mixeng have a few advantages:
->> * we no longer convert the audio output from one format to another, when
->>    the underlying audio system would just convert it to a third format.
->>    We no longer convert, only the underlying system, when needed.
->> * the underlying system probably has better resampling and sample format
->>    converting methods anyway...
->> * we may support formats that the mixeng currently does not support (S24
->>    or float samples, more than two channels)
->> * when using an audio server (like pulseaudio) different sound card
->>    outputs will show up as separate streams, even if we use only one
->>    backend
->>
->> Disadvantages:
->> * audio capturing no longer works (wavcapture, and vnc audio extension)
->> * some backends only support a single playback stream or very picky
->>    about the audio format.  In this case we can't disable mixeng.
->>
->> However mixeng is not removed, only made optional, so this shouldn't be
->> a big concern.
+>> Add an option to change the channel map used by pulseaudio.  If not
+>> specified, falls back to an OSS compatible channel map.
 >>
 >> Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 >> ---
+>>   audio/paaudio.c | 18 ++++++++++++++----
+>>   qapi/audio.json |  7 +++++--
+>>   qemu-options.hx |  9 +++++++++
+>>   3 files changed, 28 insertions(+), 6 deletions(-)
 >>
->> Notes:
->>      Changes from v1:
->>      
->>      * renamed mixeng to mixing-engine
->>
->>   qapi/audio.json | 5 +++++
->>   qemu-options.hx | 6 ++++++
->>   2 files changed, 11 insertions(+)
->>
+>> diff --git a/audio/paaudio.c b/audio/paaudio.c
+>> index d195b1caa8..20402b0718 100644
+>> --- a/audio/paaudio.c
+>> +++ b/audio/paaudio.c
+>> @@ -338,17 +338,27 @@ static pa_stream *qpa_simple_new (
+>>           pa_stream_direction_t dir,
+>>           const char *dev,
+>>           const pa_sample_spec *ss,
+>> -        const pa_channel_map *map,
+>> +        const char *map,
+>>           const pa_buffer_attr *attr,
+>>           int *rerror)
+>>   {
+>>       int r;
+>>       pa_stream *stream;
+>>       pa_stream_flags_t flags;
+>> +    pa_channel_map pa_map;
+>>   
+>>       pa_threaded_mainloop_lock(c->mainloop);
+>>   
+>> -    stream = pa_stream_new(c->context, name, ss, map);
+>> +    if (map && !pa_channel_map_parse(&pa_map, map)) {
+>> +        dolog("Invalid channel map specified: '%s'\n", map);
+>> +        map = NULL;
+>> +    }
+>> +    if (!map) {
+>> +        pa_channel_map_init_extend(&pa_map, ss->channels,
+>> +                                   PA_CHANNEL_MAP_OSS);
+>> +    }
+>> +
+>> +    stream = pa_stream_new(c->context, name, ss, &pa_map);
+>>       if (!stream) {
+>>           goto fail;
+>>       }
+>> @@ -421,7 +431,7 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
+>>           PA_STREAM_PLAYBACK,
+>>           ppdo->has_name ? ppdo->name : NULL,
+>>           &ss,
+>> -        NULL,                   /* channel map */
+>> +        ppdo->has_channel_map ? ppdo->channel_map : NULL,
+>>           &ba,                    /* buffering attributes */
+>>           &error
+>>           );
+>> @@ -470,7 +480,7 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
+>>           PA_STREAM_RECORD,
+>>           ppdo->has_name ? ppdo->name : NULL,
+>>           &ss,
+>> -        NULL,                   /* channel map */
+>> +        ppdo->has_channel_map ? ppdo->channel_map : NULL,
+>>           &ba,                    /* buffering attributes */
+>>           &error
+>>           );
 >> diff --git a/qapi/audio.json b/qapi/audio.json
->> index 9fefdf5186..0535eff794 100644
+>> index 0535eff794..07003808cb 100644
 >> --- a/qapi/audio.json
 >> +++ b/qapi/audio.json
->> @@ -11,6 +11,10 @@
->>   # General audio backend options that are used for both playback and
->>   # recording.
+>> @@ -214,13 +214,16 @@
+>>   # @latency: latency you want PulseAudio to achieve in microseconds
+>>   #           (default 15000)
 >>   #
->> +# @mixing-engine: use QEMU's mixing engine to mix all streams inside QEMU. When
->> +#                 set to off, fixed-settings must be also off. Not every backend
->> +#                 compatible with the off setting (default on, since 4.2)
+>> +# @channel-map: channel map to use (default: OSS compatible map, since: 4.2)
 >> +#
-> 
-> Last sentence no verb.
-> 
-> Which backends are compatible?
-
-Actually that's a simplification, it depends on a few things.  When 
-mixeng is off, qemu will try to use the same format as the emulated 
-sound card, and if the backend doesn't support that format, it won't 
-work (no audio).  Also attaching multiple sound cards to the same 
-audiodev might not work, if the backend doesn't support multiple 
-playback streams.  If you use pulseaudio, it'll work without problems, 
-if you use alsa, it depends on your device.  If you use a hw: device 
-directly, you'll likely only be able to use one emulated sound card with 
-a few selected audio formats.  If you use dmix: (and plug), alsa will 
-handle the conversion and mixing, so it will work no matter what format 
-the emulated sound card uses.  With OSS the situation is probably 
-similar, it depends on the kernel/hw what works and what not.  wav and 
-spice certainly doesn't support multiple streams.  I'm not completely 
-sure about the other backends right now, but I think dsound and 
-coreaudio can handle the necessary sample format conversions and mixing.
-
-> What happens when you try the off setting with incompatible backends?
-See above.
-
-> 
->>   # @fixed-settings: use fixed settings for host input/output. When off,
->>   #                  frequency, channels and format must not be
->>   #                  specified (default true)
->> @@ -31,6 +35,7 @@
+>>   # Since: 4.0
 >>   ##
->>   { 'struct': 'AudiodevPerDirectionOptions',
+>>   { 'struct': 'AudiodevPaPerDirectionOptions',
+>>     'base': 'AudiodevPerDirectionOptions',
 >>     'data': {
->> +    '*mixing-engine':  'bool',
->>       '*fixed-settings': 'bool',
->>       '*frequency':      'uint32',
->>       '*channels':       'uint32',
+>> -    '*name': 'str',
+>> -    '*latency': 'uint32' } }
+>> +    '*name':        'str',
+>> +    '*latency':     'uint32',
+>> +    '*channel-map': 'str' } }
+>>   
+>>   ##
+>>   # @AudiodevPaOptions:
 >> diff --git a/qemu-options.hx b/qemu-options.hx
->> index bbfd936d29..395427422a 100644
+>> index 395427422a..f3bc342f98 100644
 >> --- a/qemu-options.hx
 >> +++ b/qemu-options.hx
->> @@ -433,6 +433,7 @@ DEF("audiodev", HAS_ARG, QEMU_OPTION_audiodev,
->>       "                specifies the audio backend to use\n"
->>       "                id= identifier of the backend\n"
->>       "                timer-period= timer period in microseconds\n"
->> +    "                in|out.mixing-engine= use mixing engine to mix streams inside QEMU\n"
->>       "                in|out.fixed-settings= use fixed settings for host audio\n"
->>       "                in|out.frequency= frequency to use with fixed settings\n"
->>       "                in|out.channels= number of channels to use with fixed settings\n"
->> @@ -503,6 +504,11 @@ Identifies the audio backend.
->>   Sets the timer @var{period} used by the audio subsystem in microseconds.
->>   Default is 10000 (10 ms).
+>> @@ -471,6 +471,7 @@ DEF("audiodev", HAS_ARG, QEMU_OPTION_audiodev,
+>>       "-audiodev pa,id=id[,prop[=value][,...]]\n"
+>>       "                server= PulseAudio server address\n"
+>>       "                in|out.name= source/sink device name\n"
+>> +    "                in|out.channel-map= channel map to use\n"
+>>   #endif
+>>   #ifdef CONFIG_AUDIO_SDL
+>>       "-audiodev sdl,id=id[,prop[=value][,...]]\n"
+>> @@ -636,6 +637,14 @@ Sets the PulseAudio @var{server} to connect to.
+>>   @item in|out.name=@var{sink}
+>>   Use the specified source/sink for recording/playback.
 >>   
->> +@item in|out.mixing-engine=on|off
->> +Use QEMU's mixing engine to mix all streams inside QEMU.  When off,
->> +@var{fixed-settings} must be off too.  Not every backend is fully
->> +compatible with the off setting.  Default is on.
+>> +@item in|out.channel-map=@var{map}
+>> +Use the specified channel map.  The default is an OSS compatible
+>> +channel map.  Do not forget to escape commas inside the map:
+> 
+> Awkward.
+> 
 >> +
->>   @item in|out.fixed-settings=on|off
->>   Use fixed settings for host audio.  When off, it will change based on
->>   how the guest opens the sound card.  In this case you must not specify
+>> +@example
+>> +-audiodev pa,id=example,sink.channel-map=front-left,,front-right
+>> +@end example
+> 
+> Makes me realize new AudiodevPaPerDirectionOptions member @channel-map
+> is a list encoded in a string.  QAPI heavily frowns upon encoding stuff
+> in strings.  Any reason why you can't (or don't want to) make it
+> ['str']?
+
+Hmm, I don't think it's used too frequently on structs parsed by qapi 
+opts visitor. What would be the command line format in that case? 
+Something like this?
+
+-audiodev 
+pa,id=example,sink.channel-map=front-left,sink.channel-map=front-right
+
+I think it's simply a string because while conceptually it's a string, 
+we don't try to interpret it, we just pass the string to 
+pa_channel_map_parse.  Of course we could take a list and instead either 
+rebuild the string or reimplement half of pa_channel_map_parse by 
+manually calling pa_channel_position_from_string.
+Oh now that I looked again at the pulseaudio docs, channel-map doesn't 
+have to be a list, it can be also a "well-known mapping name".
+
+> 
+>> +
+>>   @end table
+>>   
+>>   @item -audiodev sdl,id=@var{id}[,@var{prop}[=@var{value}][,...]]
 
 
