@@ -2,59 +2,94 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7739DC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 23:04:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEBDCC432C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 23:06:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A3C4207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 23:04:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A3C4207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A916D2064A
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 23:06:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h+zEpaXg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A916D2064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCtr6-0006Pr-53
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 19:04:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45701)
+	id 1iCtsz-0000dg-QS
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 19:06:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36679)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iCtom-0004gW-0F
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 19:02:02 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iCtQP-0002jM-0h
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 18:36:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iCtok-0000Y8-Ly
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 19:01:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58694)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iCtoe-0000U1-E5; Tue, 24 Sep 2019 19:01:52 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9D604A2892A;
- Tue, 24 Sep 2019 23:01:50 +0000 (UTC)
-Received: from probe.bos.redhat.com (dhcp-17-231.bos.redhat.com [10.18.17.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9984E60603;
- Tue, 24 Sep 2019 23:01:49 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/1] dirty-bitmaps: remove deprecated autoload parameter
-Date: Tue, 24 Sep 2019 19:01:43 -0400
-Message-Id: <20190924230143.22551-2-jsnow@redhat.com>
-In-Reply-To: <20190924230143.22551-1-jsnow@redhat.com>
-References: <20190924230143.22551-1-jsnow@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1iCtQN-0001rk-Q3
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 18:36:48 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:33839)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iCtQN-0001nW-K3
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 18:36:47 -0400
+Received: by mail-pf1-f195.google.com with SMTP id b128so2189006pfa.1
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 15:36:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=q3E+tLqCWUDQTPWISOun8wsnLQJ/9VZo9+vIlBqeaLo=;
+ b=h+zEpaXgMrVdmO70TOX7b/KK3/AZxhjwFMdL2kECVDFAboUcVZUaaxEXASckODyivN
+ PvQnTi2lvKlhG/CjeKc3jAfsNyq9adJlpA4Yb6ktCDjKDvOKuQztIhLqC2OTnZ+30Y6A
+ SUiqFl2FCXW2fQ6mUlwjEhnI3kJN8VnUSQtk8b28L5/31uu/Jy6XSc8+d860EAhzT7Lc
+ a7g6mtH3BleGV6oLMsqR0GIuiSJePvDrr0BwGNQPLnKF+YWwsBxJbgAvqY5nOpBCoUr5
+ XCNSHRHpzoH4sB99nJRnu8JKVPfAcqVoRyN49DnRRQ9GbaaXWgIAbpdCwraYpoXQeUJE
+ XMxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=q3E+tLqCWUDQTPWISOun8wsnLQJ/9VZo9+vIlBqeaLo=;
+ b=eaHKpXHzeQCbPiuSXMhujIBJrkvA7bSMKAkUQkDsOYkZmiWrukNDeB4RrkWjFZUJGS
+ +iUQ0eg2seyidsF362Z5n7yTdyPCH4kegl/fGYLH9qPv8KdoHuqATQN3QpZ7ym/1hoII
+ xi7q9+y4E822cZwNgIuHLv4/h9AtzUVOqjvQCv7J5OTD74hcx5NcQV5C+5dI3DjuDnsC
+ 7dfT3qbNQqxL/1r3SCq6R+O71XFD04OVTRMPLjEpw2fPDvOgxFTrupLjy8YXqGAaYzZS
+ 5CKuvAGs71HRGAZofCLQQJTRlcr8hboN1PE2R6DhQf93L1k/6bCwR191SRvCwfiXMfC0
+ jdSw==
+X-Gm-Message-State: APjAAAXnRPqtyn1ULuO7Z8SjnnUGO3+7slNDUf+LGqrmIH5JWPI7+oEZ
+ r5+BRI3FGqw3jeiB46t0dKUrEeJsSu8=
+X-Google-Smtp-Source: APXvYqwCIwCEZH1v56iNfBMplyGbmW258sTFaNrj4KSiuHRMRKFmtSHe/tgAFjW9N9fvVByeMaHihQ==
+X-Received: by 2002:a17:90a:fd86:: with SMTP id
+ cx6mr2368480pjb.61.1569360797611; 
+ Tue, 24 Sep 2019 14:33:17 -0700 (PDT)
+Received: from [172.20.32.216] ([12.157.10.114])
+ by smtp.gmail.com with ESMTPSA id z13sm6310653pfq.121.2019.09.24.14.33.16
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 24 Sep 2019 14:33:16 -0700 (PDT)
+Subject: Re: [PATCH 3/7] target/ppc: update {get, set}_dfp{64, 128}() helper
+ functions to read/write DFP numbers correctly
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org, pc@us.ibm.com, david@gibson.dropbear.id.au
+References: <20190924153556.27575-1-mark.cave-ayland@ilande.co.uk>
+ <20190924153556.27575-4-mark.cave-ayland@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <ea275839-b588-57db-2755-90fc9f01f2c2@linaro.org>
+Date: Tue, 24 Sep 2019 14:33:14 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Tue, 24 Sep 2019 23:01:50 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190924153556.27575-4-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+ [fuzzy]
+X-Received-From: 209.85.210.195
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,132 +101,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Daniel P . Berrange" <berrange@redhat.com>, qemu-block@nongnu.org,
- libvir-list@redhat.com, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This parameter has been deprecated since 2.12.0 and is eligible for
-removal. Remove this parameter as it is actually completely ignored;
-let's not give false hope.
+On 9/24/19 8:35 AM, Mark Cave-Ayland wrote:
+> Since commit ef96e3ae96 "target/ppc: move FP and VMX registers into aligned vsr
+> register array" FP registers are no longer stored consecutively in memory and so
+> the current method of combining FP register pairs into DFP numbers is incorrect.
+> 
+> Firstly update the definition of the dh_*_fprp defines in helper.h to reflect
+> that FP registers are now stored as part of an array of ppc_vsr_t elements
+> rather than plain uint64_t elements, and then introduce a new ppc_fprp_t type
+> which conceptually represents a DFP even-odd register pair to be consumed by the
+> DFP helper functions.
+> 
+> Finally update the new DFP {get,set}_dfp{64,128}() helper functions to convert
+> between DFP numbers and DFP even-odd register pairs correctly, making use of the
+> existing VsrD() macro to access the correct elements regardless of host endian.
+> 
+> Fixes: ef96e3ae96 "target/ppc: move FP and VMX registers into aligned vsr register array"
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  target/ppc/cpu.h        |  1 +
+>  target/ppc/dfp_helper.c | 80 +++++++++++++++++++++--------------------
+>  target/ppc/helper.h     |  2 +-
+>  3 files changed, 44 insertions(+), 39 deletions(-)
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- qemu-deprecated.texi | 20 +++++++++++++++-----
- qapi/block-core.json |  6 +-----
- blockdev.c           |  6 ------
- 3 files changed, 16 insertions(+), 16 deletions(-)
+Yay!  I really was getting ahead of things.
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 01245e0b1c..d60246d5d6 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -149,11 +149,6 @@ QEMU 4.1 has three options, please migrate to one of=
- these three:
-=20
- @section QEMU Machine Protocol (QMP) commands
-=20
--@subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
--
--"autoload" parameter is now ignored. All bitmaps are automatically loade=
-d
--from qcow2 images.
--
- @subsection query-block result field dirty-bitmaps[i].status (since 4.0)
-=20
- The ``status'' field of the ``BlockDirtyInfo'' structure, returned by
-@@ -356,3 +351,18 @@ existing CPU models.  Management software that needs=
- runnability
- guarantees must resolve the CPU model aliases using te
- ``alias-of'' field returned by the ``query-cpu-definitions'' QMP
- command.
-+
-+
-+@node Recently removed features
-+@appendix Recently removed features
-+
-+What follows is a record of recently removed, formerly deprecated
-+features that serves as a record for users who have encountered
-+trouble after a recent upgrade.
-+
-+@section QEMU Machine Protocol (QMP) commands
-+
-+@subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
-+
-+"autoload" parameter is now ignored. All bitmaps are automatically loade=
-d
-+from qcow2 images.
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index e6edd641f1..e4975ece4a 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1987,10 +1987,6 @@
- #              Qcow2 disks support persistent bitmaps. Default is false =
-for
- #              block-dirty-bitmap-add. (Since: 2.10)
- #
--# @autoload: ignored and deprecated since 2.12.
--#            Currently, all dirty tracking bitmaps are loaded from Qcow2=
- on
--#            open.
--#
- # @disabled: the bitmap is created in the disabled state, which means th=
-at
- #            it will not track drive changes. The bitmap may be enabled =
-with
- #            block-dirty-bitmap-enable. Default is false. (Since: 4.0)
-@@ -1999,7 +1995,7 @@
- ##
- { 'struct': 'BlockDirtyBitmapAdd',
-   'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
--            '*persistent': 'bool', '*autoload': 'bool', '*disabled': 'bo=
-ol' } }
-+            '*persistent': 'bool', '*disabled': 'bool' } }
-=20
- ##
- # @BlockDirtyBitmapMergeSource:
-diff --git a/blockdev.c b/blockdev.c
-index fbef6845c8..93804da840 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1966,7 +1966,6 @@ static void block_dirty_bitmap_add_prepare(BlkActio=
-nState *common,
-     qmp_block_dirty_bitmap_add(action->node, action->name,
-                                action->has_granularity, action->granular=
-ity,
-                                action->has_persistent, action->persisten=
-t,
--                               action->has_autoload, action->autoload,
-                                action->has_disabled, action->disabled,
-                                &local_err);
-=20
-@@ -2858,7 +2857,6 @@ out:
- void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-                                 bool has_granularity, uint32_t granulari=
-ty,
-                                 bool has_persistent, bool persistent,
--                                bool has_autoload, bool autoload,
-                                 bool has_disabled, bool disabled,
-                                 Error **errp)
- {
-@@ -2890,10 +2888,6 @@ void qmp_block_dirty_bitmap_add(const char *node, =
-const char *name,
-         persistent =3D false;
-     }
-=20
--    if (has_autoload) {
--        warn_report("Autoload option is deprecated and its value is igno=
-red");
--    }
--
-     if (!has_disabled) {
-         disabled =3D false;
-     }
---=20
-2.21.0
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
+
+r~
 
