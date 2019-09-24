@@ -2,84 +2,87 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D916FC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE58DC432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:36:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB7F820872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:34:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB7F820872
+	by mail.kernel.org (Postfix) with ESMTPS id 829ED20872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:36:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 829ED20872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48179 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCnm1-0005Pu-Ii
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:34:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48704)
+	id 1iCnnS-0006yn-W3
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:36:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52814)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iCmgg-0002dp-9m
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:25:11 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCn2z-0008KR-R4
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:48:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iCmgd-0007Mq-Au
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:25:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57862)
+ (envelope-from <eblake@redhat.com>) id 1iCn2x-0003f9-Vk
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:48:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39764)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iCmgd-0007MW-2D
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:25:07 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCn2x-0003db-MT
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:48:11 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7A3233CA16
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 15:25:05 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id n3so204042wmf.3
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 08:25:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:to:from:subject:openpgp:message-id:date
- :user-agent:mime-version:content-language:content-transfer-encoding;
- bh=owKx3AAO13+eF6I46DWBkgO2nLulV/QmbRVj1+UqhuQ=;
- b=gqiHPRfszNnFWC1yaLFfnt0WoGv5LMfZeJaxLQp5ZPGJYrGbb9fIxEuH+omV/BsADW
- 9xXY5QBp19ItVJLwl/ROx7WKAsXlYCsfkg8O87QxWgf5iGBNN+aeg5OEMuhVc4Ks0N+f
- uqxmEU/cmtbtt9t4dMVxUWX1ByM39ckaxKmGCuCVwPYttpnJN1WhV6FKWiuE7ZfSrfdO
- h5pGTlY/fND/jZ8wD6RGLYDadG8q/UGKiasylWFKjIf6MUkw683KN7duc34zngZaUU+h
- hxeW2XqZpNpCWwd2EDW11J4UPWI+QX325anhPZL7fKKhAhnqfWLtJHcl6mutZHy3UdHz
- areA==
-X-Gm-Message-State: APjAAAVkrAiApRcbv9BbYYhRr1I5KGgpfTzGJA9VNTn5W9L4FXYm+YKt
- p6RMUbwgERTWKUJxi62Agcx1eDHOQMAx42fJ5KtXq3mSrdOW4oL5wa6tt1t8mmwH24T8q5nQ7Oh
- HQsHcL7entMtiLAw=
-X-Received: by 2002:adf:f5cc:: with SMTP id k12mr2824406wrp.278.1569338704271; 
- Tue, 24 Sep 2019 08:25:04 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwUB061y3gFcqRKNZVA0qo8OM+ZkPCpIptj4Qhb3ge80Fktj+jNoWL/vJC/84atFfTvebwNAQ==
-X-Received: by 2002:adf:f5cc:: with SMTP id k12mr2824378wrp.278.1569338703968; 
- Tue, 24 Sep 2019 08:25:03 -0700 (PDT)
-Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id g24sm2984805wrb.35.2019.09.24.08.25.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 24 Sep 2019 08:25:03 -0700 (PDT)
-To: QEMU Developers <qemu-devel@nongnu.org>, John Snow <jsnow@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Fam Zheng <fam@euphon.net>, "Daniel P. Berrange" <berrange@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Subject: docker: how to use it when developing on QEMU?
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <44be7ab6-c648-9109-3d05-1afc57e9b021@redhat.com>
-Date: Tue, 24 Sep 2019 17:25:02 +0200
+ by mx1.redhat.com (Postfix) with ESMTPS id BA9C83090FC6;
+ Tue, 24 Sep 2019 15:48:10 +0000 (UTC)
+Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 15C8860BFB;
+ Tue, 24 Sep 2019 15:48:05 +0000 (UTC)
+Subject: Re: [PATCH 09/25] qapi: Improve reporting of invalid name errors
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190924132830.15835-1-armbru@redhat.com>
+ <20190924132830.15835-10-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <b6b30042-ade4-6e2f-390d-fbd48515c29e@redhat.com>
+Date: Tue, 24 Sep 2019 10:48:04 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20190924132830.15835-10-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="pf8ARXa6q5plPXFTC5Tjp5eRqxE67gACI"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Tue, 24 Sep 2019 15:48:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,79 +96,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Recently more developers are enthusiast to use Docker/Podman,
-and have been confused by the different configurations currently in the
-QEMU repository.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pf8ARXa6q5plPXFTC5Tjp5eRqxE67gACI
+Content-Type: multipart/mixed; boundary="rMt61s3JOKWE4cFC8MfOkolNYPOzr5FHQ";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+Message-ID: <b6b30042-ade4-6e2f-390d-fbd48515c29e@redhat.com>
+Subject: Re: [PATCH 09/25] qapi: Improve reporting of invalid name errors
+References: <20190924132830.15835-1-armbru@redhat.com>
+ <20190924132830.15835-10-armbru@redhat.com>
+In-Reply-To: <20190924132830.15835-10-armbru@redhat.com>
 
-There are at least 3 kind of categories I use:
+--rMt61s3JOKWE4cFC8MfOkolNYPOzr5FHQ
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-1/ Image used to build QEMU
+On 9/24/19 8:28 AM, Markus Armbruster wrote:
+> Split check_name() into check_name_is_str() and check_name_str(), keep
+> check_name() as a wrapper.
+>=20
+> Move add_name()'s call into its caller check_exprs(), and inline.
+>=20
+> This permits delaying check_name_str() there, so its error message
+> gains an "in definition" line.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
-These images should be restricted/updated to our "supported targets".
-They are useful to (cross)build QEMU on variety of
-host/target/distributions/distrib_versions.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Example:
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-- cross build Cris binary using the Fedora 30 toolchain on a Ubuntu
-18.04 x86_64.
-  host:Ubuntu18.04/x86_64 docker_image:fedora-cris-cross
 
-- cross build MinGW64 binary using Debian 9 MXE toolchain on a Ubuntu
-aarch64:
-  host:Ubuntu18.04/x86_64 docker_image:debian-win64-cross
+--rMt61s3JOKWE4cFC8MfOkolNYPOzr5FHQ--
 
-An image can not be meant to use on a daily basis, but to avoid
-regression previous to release (I'd run them only on release candidate).
+--pf8ARXa6q5plPXFTC5Tjp5eRqxE67gACI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Example: building QEMU for the Gentoo PlayStation2 port:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg574468.html
+-----BEGIN PGP SIGNATURE-----
 
-2/ Image used to build test program used by QEMU
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KOrQACgkQp6FrSiUn
+Q2ojVAgAkgJzGgcUFOnYkle+GEPYeYgKn+f52d8czqQVgN/Sdg1SN+hcjxryCo5U
+AVBoBsaFNGX51Zu6WgHXYm0oqY4nxEBZt6hc6uIDm/FZARju9is8Z2dv35R4teRK
+p0xkHJi6JTVguncJwGbzYKiEIABikq6ukZggftQtqmDHu31srazHtC97Zyr8cp0l
+pwSUaAYT9p1iWts6tvsmWYpk67/P7gXKB5h1nMpzFPdMFBgOwjolc9H4XtCFq/93
+g0rf2mc687voT16iiU3neVRQ68pzlqCpWvqSojCIv2WRsfh/qQH9wpHHrPdEKSHf
+VW0MKtob/OT3803FXQCOVzqwXxASFw==
+=0Ovf
+-----END PGP SIGNATURE-----
 
-These images provide enough to build binaries you can then use to test
-QEMU. If you want to build more of these binaries, there is probably a
-better way. Here we are only interested in testing.
-
-Example:
-
-- Test PowerPC Linux-user binaries with qemu-powerpc-linux-user
-  docker_image:debian-powerpc-user-cross
-
-- Build EDK2 payload for Virt/AArch64
-  It currently doesn't build with Fedora 30 and I'v to use a Fedora 29
-image.
-
-Another case I had is when I tried to build a kernel for the Mipssim
-machine (supported by QEMU). The Linux kernel code has been removed, so
-I had to checkout an old kernel which is not buildable with my recent
-host GCC. Using a docker based on a very old distribution worked. Anyway
-Thomas Huth found it is easier to use buildroot for pre-3.6 kernels.
-
-Similarly, I am testing QEMU port from Stefan Weil, and he shared a
-working binary supporting the MIPS AR7 target. To be able to use this
-QEMU I use Debian Lenny and set
-DEB_URL=https://snapshot.debian.org/archive/debian/20091004T111800Z.
-Yes, this will instanciate a Debian from 10 years ago.
-
-3/ Bisecting
-
-Another of my docker uses is when bisecting before QEMU v3. I use image
-using snapshot slighly older than the QEMU release, so my bisect script
-can run without worrying about the library API incompatibilities or
-newer GCC warnings.
-
-So not all image have the same use. While they might not be useful to
-build the latest QEMU, there are still useful for day-to-day development.
-
-Anyhow I agree we should document that better. Maybe the wiki is a good
-starting point.
-
-Regards,
-
-Phil.
+--pf8ARXa6q5plPXFTC5Tjp5eRqxE67gACI--
 
