@@ -2,65 +2,80 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B3E0C432C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 09:37:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36CD7C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 09:38:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3472A2146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 09:37:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1A212146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 09:38:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="IPC0MD9+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3472A2146E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PgWVLxOF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1A212146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iChGO-0002dK-Cr
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 05:37:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54918)
+	id 1iChH3-0003Dg-Sc
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 05:38:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55480)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1iChA8-0000kY-UQ
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 05:31:14 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iChFu-0002LQ-0u
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 05:37:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qemu_oss@crudebyte.com>) id 1iChA6-0006dp-Kj
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 05:31:12 -0400
-Received: from kylie.crudebyte.com ([5.189.157.229]:55461)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
- id 1iChA6-0006dJ-3k
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 05:31:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=B5zWF0zV/SItj5b9EyKGgdCoRTe/3+py+UlNEnItMWk=; b=IPC0MD9+E1OAQcgfoWnakDHivf
- o6C54TbauKLLslhSL33GGAfSZ7Ue8FXlFCG9v6hvFELQi70Idv88RsJjvZxlg+uuWfYprvEloanLJ
- xKAhmvIWi47BZzCe8ME0C2fG7R2xF0w9nM0jQF1WG9adPXSa9N17VDFg9NX4TDcktP6PnXHWcH7XT
- d1YrctRB+pmV75lkMAaZI8J7rJkawwTpNz605lPIJhQx/QHszc/EFnlzCZHdUdjSeMTi6FRAxKH4X
- N80bOFvQBVVIGbKAEbGiISG57MCbexqo/IReCps7fXi8kqKDOhKQF3HYbrk4YtHiJz3rcXYMZzNlN
- VHPNMG0MaTUoGO7Xh6x1MLgVpMSRIDR7fGbECSwALoBU1kOBVcemALWwNkAUvqysJuiD2kYpL8bKx
- WUiC7bfhEym7j1LacjJ4ST3sfIdZWLZtkWo78f7LLcMbgZJc0C/vc0pItqFj5G3zXoTOzYHzemzKb
- IOq47L+Rfh0DVrUIeq5IMBzieKC1otnTwIvS/zVERulIQh5ugg6gAVhrq68RaXgHzHkHzji7dQbmC
- dXzlya/GbxLLPMrUSQAlXURKsRaAdYA7rTCAbodb8gFf7qv39D39710eJHBY8WUPncOqIAD8FMp8b
- quHsTwsVp8NMD3CCQRsF61vUbfOs10JBayRpYpLgU=;
-To: qemu-devel@nongnu.org
-Subject: Re: [Qemu-devel] [PATCH v7 0/3] 9p: Fix file ID collisions
-Date: Tue, 24 Sep 2019 11:31:06 +0200
-Message-ID: <1590425.yRI6RxI3rl@silver>
-In-Reply-To: <20190923185012.06131248@bahia.lan>
-References: <cover.1567680121.git.qemu_oss@crudebyte.com>
- <7439377.rdf1oF7g69@silver> <20190923185012.06131248@bahia.lan>
+ (envelope-from <peter.maydell@linaro.org>) id 1iChFs-0008AU-G9
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 05:37:09 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42347)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iChFs-0008AP-AS
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 05:37:08 -0400
+Received: by mail-ot1-x344.google.com with SMTP id c10so875691otd.9
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 02:37:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=j6ljvtPLA42uZWyboGvieEJKtnNxN6pEL4wxfndceg0=;
+ b=PgWVLxOFLYWDsRXszkryibvAeeqRauEk3muaAW7wtfBI1l8QBv43d8Y3H7UoPjL5q/
+ CjHz7hXj5eyxsoBCJXvZsMnrJzmHx4w4zYY/0cnwul673Gujt8K2pQV+GV4rPR8ejdrw
+ BqCUt/7pWwliUrCQRJmOH7LTNPlZ1s4fOFegCpXLymXDMAtNhzQES1XA+Pj7FPOslDHG
+ MwyqfAVAzf8QHtp1IWjL8RhEFo30zj5f5S6C7KVN7QdzP9kGEvx/fD+k3YvW8fD1jadf
+ zmufVGyGOQVosOLO0SA90+jf+xwebj3iX1WTTzD316BWAlpKhvEux2Ab7vMwvy094GPR
+ WrYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=j6ljvtPLA42uZWyboGvieEJKtnNxN6pEL4wxfndceg0=;
+ b=L/DSF1EUetUO9GBL5qJvqV/Na2NUxD6B2eprPLcpA0jSkpB+0YdBM3h8gKOCygljph
+ XUCBH+YQugGkCmDlQA847v497i+n7TnPzrbYVAHCh38O81jxtARlODCOIl9CcdiBJE8a
+ VSIiEyXfYzb1OMrIxGxmralTzyhrPAoJFjtFbqaLk6yve7ZMognhGVR8VJ2gDKDhSGmi
+ hOGOHinmptQpUtV0jn+NBlX/qG7CVOxa0tAjixs4hbwjIqcRK57iNLW1mwPLPb+PAD5D
+ Hh1jUrmLN52p9aSdQrEA+hxbypwLu+PN9BA41s9gUGk1e3qddMQWERBuJdz5SYgKEwMV
+ ZaXg==
+X-Gm-Message-State: APjAAAXLhegOyx/xR0HZdrYIPF5BXkPIPvyEPHO9TO1Tq/HnAhBQYT+j
+ AeknIZ3cxsxFXow4Jivz0ymTj1rLJnkYsvzA0t6K3Q==
+X-Google-Smtp-Source: APXvYqxgXkKMo6R0Adi4XojUYmOBkBOfcwJpfSPK/ceS+50Gk75Db8A4a4rV7sMMssMZFaV+Z9AUaTMS32IGxqHGoCk=
+X-Received: by 2002:a9d:562:: with SMTP id 89mr1118343otw.232.1569317827214;
+ Tue, 24 Sep 2019 02:37:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.189.157.229
+References: <tencent_28AAA62B694825C348B1DF49@qq.com>
+ <CAFEAcA8+bK0UyUWbXOiutyQZkCMSB_0Be7pJLKONSpA3CV9Pbw@mail.gmail.com>
+ <tencent_0084E0586ADE9B2D30176A53@qq.com>
+In-Reply-To: <tencent_0084E0586ADE9B2D30176A53@qq.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 24 Sep 2019 10:36:55 +0100
+Message-ID: <CAFEAcA_Jadb7A1588uWwmURz1N2G5ycsLcA+3N2Rb+NqyynPRQ@mail.gmail.com>
+Subject: Re: illegal hardware instruction during MIPS-I ELF linux useremulation
+To: Libo Zhou <zhlb29@foxmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,61 +87,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Antonios Motakis <antonios.motakis@huawei.com>
+Cc: Philippe Mathieu-Daud <philmd@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: Christian Schoenebeck <qemu_oss@crudebyte.com>
-From: Christian Schoenebeck via <qemu-devel@nongnu.org>
 
-On Montag, 23. September 2019 18:50:12 CEST Greg Kurz wrote:
-> > > > If yes, and since that would mean I was the only person ever having
-> > > > tested
-> > > > the actual fix, shouldn't --multidevs=remap|forbid better be marked as
-> > > > experimental (docs and runtime warning) for now? Maybe that would also
-> > > > anticipate receiving feedback from people actually using it later on.
-> > > 
-> > > Makes sense. I don't think it is worth having a runtime warning,
-> > > but I'll turn remap to x-remap and amend the docs.
-> > 
-> > Mwa, I would like to veto against your "x-remap" plan though. Keep in mind
-> > I also have to send out a patch for libvirt for this fix. Even I would
-> > not have read "x" to stand for "experimental". So I would definitely
-> > favor a runtime warning instead of renaming that parameter.
-> 
-> Hmmm... I don't see the point in adding a warning for a feature that
-> is only active if the user explicitly asks for it. 
+On Tue, 24 Sep 2019 at 02:10, Libo Zhou <zhlb29@foxmail.com> wrote:
+>
+> > Can you run QEMU with some debugging options:
+>
+> > qemu-mipsel -d in_asm,exec,cpu,unimp,guest_errors,nochain -D debug.log
+> > -singlestep test
+>
+> > and then put the resulting debug.log somewhere we can get it?
+> > (it'll probably be quite large)
+>
+> The logging only shows this little information. It seems like only -d cpu works for a short while.
 
-Because many people might be using this option without ever reading the docs, 
-e.g. because of being suggested by copy & paste tutorials or any stack*.com 
-forum.
+> ----------------
+> IN: main
+> 0x00400094:  dmult.g    zero,sp,s8
 
-> And, anyway, this
-> still is an experimental feature, right ? 
+I think "dmult.g" is an instruction specific to the Loongson CPU; it
+is not in MIPS-I or even any of the other standard MIPS instruction
+sets, which is why the default CPU for qemu-mipsel doesn't accept it
+and is generating the SIGILL.
 
-No, it is not a feature. It is still a fix. :) I cannot use 9p without this 
-fix at all, so it is not some optional "feature" for me.
+Something odd is going on here, because this doesn't seem to match
+the disassembly of the test binary that you gave previously.
 
-x-remap would just make things unnecessarily more complicated without adding 
-anything useful.
-
-A warning/info log could be used to motivate people providing feedback and 
-make them clearly aware about their current version still being an 
-experimental fix in their specific qemu version. That warning/info is just a 
-one line change that can easily be dropped at some point in future after this 
-qid fix proofed to be reliable (i.e. from users' feedback and test cases).
-
-> Not sure it is time to have
-> libvirt to support it yet.
-
-Most people are using libvirt xml configs instead of calling qemu directly 
-with command line options. So of course I will suggest a libvirt patch as soon 
-as this patch set is pulled on qemu side.
-
-
-
+thanks
+-- PMM
 
