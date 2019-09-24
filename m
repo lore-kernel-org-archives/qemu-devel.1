@@ -2,88 +2,86 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67D27C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:10:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E04BC432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:11:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AA7820673
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:10:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AA7820673
+	by mail.kernel.org (Postfix) with ESMTPS id 329C520673
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:11:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 329C520673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCnO3-0003n2-0n
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:09:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47112)
+	id 1iCnPJ-0005ZP-Q6
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:11:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50669)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iCmZE-0003uU-1w
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:17:29 -0400
+ (envelope-from <philmd@redhat.com>) id 1iCmr9-0004wU-LA
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:36:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iCmZB-0002yJ-0t
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:17:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50511)
+ (envelope-from <philmd@redhat.com>) id 1iCmr6-0004av-Uz
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:35:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37820)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCmZA-0002y6-OL
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:17:24 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iCmr6-0004aO-Ms
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:35:56 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 95F1910C0949;
- Tue, 24 Sep 2019 15:17:23 +0000 (UTC)
-Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B2715D713;
- Tue, 24 Sep 2019 15:17:17 +0000 (UTC)
-Subject: Re: [PATCH 06/25] qapi: Change frontend error messages to start with
- lower case
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-7-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <ab13d1b0-319c-1f57-de17-1718090f0e25@redhat.com>
-Date: Tue, 24 Sep 2019 10:17:16 -0500
+ by mx1.redhat.com (Postfix) with ESMTPS id D2ED7356DC
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 15:35:54 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id o8so223397wmc.2
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 08:35:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=QHTF5TZ3u6p0eTxztfRkWdp1fMmQkgylQz3ME9vePMM=;
+ b=f5acdy9P/bXYZA2OQrb5S+L4QnZY3vE1Sx1qq2OUD/x1aPpMF3uwUAW1RgL7I3tCtk
+ NF3wigeGaSfRXHz1tN3R1P6mvrcilkaXDJl4kYsgFJeWbWAAFk8JpT5/gUdWqeA8HoKG
+ cDwJ+sazv+GeWIAQ2AsftnR8HbsKGqZhw/LtF4UdNgDkWMGls0WpiMDF0gp61d+eh04H
+ 1qQCKYzA4k02Se8SbH4qRsRtPWIa/f0gwcSeZQr0R9vBAtox/WFmrEE2nx0lgPJo//zw
+ dX7PhLjpOdYgM5XjgxvU6tVCI5Bl2T/B32BKs7fdDUpJjH1Sp2tMvpV5stlzu6mEtwgk
+ ay0g==
+X-Gm-Message-State: APjAAAVAv2ElBUKfZ5PVKy6Uvatf0wNNeM0brIb3XjS6lqcCPj9GcBj9
+ bbbGvT4PW6S5/MGfg9cpcb/j8iuzUJDPDtOs8/XT8vSBZD0TW6LMMDcINvbQjwWqRYWb805NGOi
+ T1OcLz9AkeQr7oM0=
+X-Received: by 2002:a1c:f714:: with SMTP id v20mr746883wmh.55.1569339353642;
+ Tue, 24 Sep 2019 08:35:53 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxGg3+adJOwFP+eM11P3r5a8I5fFFRyteVoe4K7ufjJlzPZ2ZAF6L8Clkji+dh/gdJJBW/dIQ==
+X-Received: by 2002:a1c:f714:: with SMTP id v20mr746869wmh.55.1569339353480;
+ Tue, 24 Sep 2019 08:35:53 -0700 (PDT)
+Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id b22sm353247wmj.36.2019.09.24.08.35.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 24 Sep 2019 08:35:52 -0700 (PDT)
+Subject: Re: [PATCH] COLO-compare: Fix incorrect `if` logic
+To: Fan Yang <Fan_Yang@sjtu.edu.cn>, qemu-devel@nongnu.org,
+ Zhang Chen <chen.zhang@intel.com>, Li Zhijian <lizhijian@cn.fujitsu.com>,
+ Jason Wang <jasowang@redhat.com>
+References: <m2y2yd9482.fsf@Fans-Air.ipads-lab.se.sjtu.edu.cn>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <6d23190f-e68a-3000-c288-84f2e0d50b07@redhat.com>
+Date: Tue, 24 Sep 2019 17:35:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190924132830.15835-7-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="f7t42RFnQ0kovlYmr60JHTJWmzPXC3Bv5"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Tue, 24 Sep 2019 15:17:23 +0000 (UTC)
+In-Reply-To: <m2y2yd9482.fsf@Fans-Air.ipads-lab.se.sjtu.edu.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,141 +95,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---f7t42RFnQ0kovlYmr60JHTJWmzPXC3Bv5
-Content-Type: multipart/mixed; boundary="andyITz8RukCEKGyuXmttpnXhWStfXyhj";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <ab13d1b0-319c-1f57-de17-1718090f0e25@redhat.com>
-Subject: Re: [PATCH 06/25] qapi: Change frontend error messages to start with
- lower case
-References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-7-armbru@redhat.com>
-In-Reply-To: <20190924132830.15835-7-armbru@redhat.com>
+Hi Fan,
 
---andyITz8RukCEKGyuXmttpnXhWStfXyhj
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+you forgot to Cc the maintainers (doing that for you):
 
-On 9/24/19 8:28 AM, Markus Armbruster wrote:
-> Starting error messages with a capital letter complicates things when
-> text can get interpolated both at the beginning and in the middle of
-> an error message.  The next patch will do that.  Switch to lower case
-> to keep it simpler.
+./scripts/get_maintainer.pl -f net/colo-compare.c
+Zhang Chen <chen.zhang@intel.com> (supporter:COLO Proxy)
+Li Zhijian <lizhijian@cn.fujitsu.com> (supporter:COLO Proxy)
+Jason Wang <jasowang@redhat.com> (maintainer:Network device ba...)
+qemu-devel@nongnu.org (open list:All patches CC here)
+
+On 9/24/19 4:08 PM, Fan Yang wrote:
+> 'colo_mark_tcp_pkt' should return 'true' when packets are the same, and
+> 'false' otherwise.  However, it returns 'true' when
+> 'colo_compare_packet_payload' returns non-zero while
+> 'colo_compare_packet_payload' is just a 'memcmp'.  The result is that
+> COLO-compare reports inconsistent TCP packets when they are actually
+> the same.
 >=20
-> For what it's worth, the GNU Coding Standards advise the message
-> "should not begin with a capital letter when it follows a program name
-> and/or file name, because that isn=E2=80=99t the beginning of a sentenc=
-e. (The
-> sentence conceptually starts at the beginning of the line.)"
 
-We're inconsistent throughout the code base, but this is one place where
-I like the GCS rationale.  Fixing it everywhere may not be worth the
-churn, but fixing it within the subset of the qapi generator is worthwhil=
-e.
+Fixes: f449c9e549c
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Fan Yang <Fan_Yang@sjtu.edu.cn>
 > ---
->  scripts/qapi/common.py                        | 175 +++++++++---------=
-
->  tests/qapi-schema/alternate-any.err           |   2 +-
-
->  tests/qapi-schema/unknown-expr-key.err        |   2 +-
->  125 files changed, 215 insertions(+), 204 deletions(-)
->  create mode 100644 tests/qapi-schema/escape-too-big.err
->  create mode 100644 tests/qapi-schema/string-control.err
->  create mode 100644 tests/qapi-schema/string-unclosed.err
->  create mode 100644 tests/qapi-schema/string-unicode.err
-
-Umm, what's going on here?
-
-You'll want to either drop these files (if they were leftovers in your
-working directory from previous points in time), or defer their addition
-to when the corresponding actual tests exist.
-
->      def get_doc(self, info):
->          if self.val !=3D '##':
-> -            raise QAPIParseError(self, "Junk after '##' at start of "
-> -                                 "documentation comment")
-> +            raise QAPIParseError(
-> +                self, "junk after '##' at start of documentation comme=
-nt")
-
-Reformatting like this also makes grepping for a particular message easie=
-r.
-
-
-> @@ -868,8 +869,8 @@ def check_union(expr, info):
->          enum_values =3D members.keys()
->          allow_metas =3D ['built-in', 'union', 'alternate', 'struct', '=
-enum']
->          if base is not None:
-> -            raise QAPISemError(info, "Simple union '%s' must not have =
-a base" %
-> -                               name)
-> +            raise QAPISemError(
-> +                info, "simple union '%s' must not have a base" % name)=
-
+>  net/colo-compare.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/net/colo-compare.c b/net/colo-compare.c
+> index 7489840bde..7ee17f2cf8 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -319,7 +319,7 @@ static bool colo_mark_tcp_pkt(Packet *ppkt, Packet =
+*spkt,
+>      *mark =3D 0;
 > =20
-
-A bit odd that you reformat here to get the second argument all on one
-line...
-
->      # Else, it's a flat union.
->      else:
-> @@ -878,46 +879,47 @@ def check_union(expr, info):
->                     base, allow_dict=3Dname,
->                     allow_metas=3D['struct'])
->          if not base:
-> -            raise QAPISemError(info, "Flat union '%s' must have a base=
-"
-> +            raise QAPISemError(info, "flat union '%s' must have a base=
-"
->                                 % name)
-
-=2E..but not here.  The reformatting is not the primary focus of the
-patch, and doesn't hurt semantically whether or not you do it, but maybe
-it is worth calling out in the commit message the criteria you used for
-deciding when to reformat, and/or make the patch strive for more
-consistency.  I'll leave that up to you; fixing the spurious new files,
-and making your choice of where to place the linebreaks, doesn't affect
-my ability to offer:
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---andyITz8RukCEKGyuXmttpnXhWStfXyhj--
-
---f7t42RFnQ0kovlYmr60JHTJWmzPXC3Bv5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KM30ACgkQp6FrSiUn
-Q2qCkAf+K00zIkmYtRD1o6TORt9rtrTifgTvHJYJtznJyg8h+m+Affy8HNazXymH
-azYp8sub+cKs0MmkDlg++c8pvEpq+vklwXpRdAMnRnxCvZllPmbTDPL6hwydQaDc
-YPDMSpoowyle2iAmIlS/lPv4JODGdKjdd3u1wIVOhR3+AmuVZ7sBqsHn9gmPYAWJ
-hKe/gEdJh0smHKUhin06NT2rtrzJctsVdg4wVx1UkpTUNrx2fmfxsvKWIHQInzso
-9pYXT8meU8anJWUi2UetUY91nRnraKOcTiyfZ3qgjCG+VrmXqm+naU+2uoza7Izx
-jiwNjOxYCx0+9QZYaeiVNuUSybPOHA==
-=2V4d
------END PGP SIGNATURE-----
-
---f7t42RFnQ0kovlYmr60JHTJWmzPXC3Bv5--
+>      if (ppkt->tcp_seq =3D=3D spkt->tcp_seq && ppkt->seq_end =3D=3D spk=
+t->seq_end) {
+> -        if (colo_compare_packet_payload(ppkt, spkt,
+> +        if (!colo_compare_packet_payload(ppkt, spkt,
+>                                          ppkt->header_size, spkt->heade=
+r_size,
+>                                          ppkt->payload_size)) {
+>              *mark =3D COLO_COMPARE_FREE_SECONDARY | COLO_COMPARE_FREE_=
+PRIMARY;
+> @@ -329,7 +329,7 @@ static bool colo_mark_tcp_pkt(Packet *ppkt, Packet =
+*spkt,
+> =20
+>      /* one part of secondary packet payload still need to be compared =
+*/
+>      if (!after(ppkt->seq_end, spkt->seq_end)) {
+> -        if (colo_compare_packet_payload(ppkt, spkt,
+> +        if (!colo_compare_packet_payload(ppkt, spkt,
+>                                          ppkt->header_size + ppkt->offs=
+et,
+>                                          spkt->header_size + spkt->offs=
+et,
+>                                          ppkt->payload_size - ppkt->off=
+set)) {
+> @@ -348,7 +348,7 @@ static bool colo_mark_tcp_pkt(Packet *ppkt, Packet =
+*spkt,
+>          /* primary packet is longer than secondary packet, compare
+>           * the same part and mark the primary packet offset
+>           */
+> -        if (colo_compare_packet_payload(ppkt, spkt,
+> +        if (!colo_compare_packet_payload(ppkt, spkt,
+>                                          ppkt->header_size + ppkt->offs=
+et,
+>                                          spkt->header_size + spkt->offs=
+et,
+>                                          spkt->payload_size - spkt->off=
+set)) {
+>=20
 
