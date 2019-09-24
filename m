@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CC49C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:12:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 547BCC432C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:13:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 289C020872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:12:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B04D20872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:13:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pKPeRsF/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 289C020872
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="G9hv2TGn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B04D20872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCs6v-00045J-4V
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 17:12:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55600)
+	id 1iCs7u-0005SG-FZ
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 17:13:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55531)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iCrw3-0002Zv-K1
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:25 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iCrw0-0004Ux-Nb
+ (envelope-from <alex.bennee@linaro.org>) id 1iCrw1-0002YN-Ox
  for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:23 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42829)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <alex.bennee@linaro.org>) id 1iCrw0-0004UP-E0
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:21 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39980)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iCrvy-0004Sx-Nk
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:20 -0400
-Received: by mail-wr1-x444.google.com with SMTP id n14so3613631wrw.9
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 14:01:15 -0700 (PDT)
+ id 1iCrvy-0004Ss-IJ
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:01:18 -0400
+Received: by mail-wr1-x443.google.com with SMTP id l3so3621159wru.7
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 14:01:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=qpjzxuCVbEO2kl81iU00jC8CtR9OdcVESI3+fE5EiS0=;
- b=pKPeRsF/oGKSNDTR34gOEPv2+ulkAyGB0bnajyyGqYscVH+DrRsMorWiOrR3ZfnQ7h
- LC+RCn3sXVaqzmUcImoWYFqs2UVYcusj9Sf9e60bVipgIYSWFzsTbf2sS8h2WhieTx46
- K/X0N+s1kHb1X+Aq4BdpnuV3W3hrM2U+pewTuLrafZzKZTXaT/t2nFQDJ/nRW8fi7PR4
- T+QJhooXdb1GzRDTF6hR7UXZf4srjw9kexP+L0KK4gatIL/6g2P/ZtLlRc2puk6/efNV
- VCLHm8lgtnTvFxUqrLExW3VkH6g9P4U6iOSMONiJ8A5y+po5Rde8c3JXYG6FjeK4KapS
- NVNQ==
+ bh=xmyA2KCLeLU2xSd1cjULfKDT3lF0lDQIQyf5XM38R7k=;
+ b=G9hv2TGn0glkGjNVwQCWoqI9R/TEONefekZWgQAUERv8b51D9x0flZX97leiKcQfMZ
+ RRXaBfzdsShSJeO0tRYws3ZYmCifZsxZUKNwuhXZQGwhTMoCOdztK6H0ZgfwkLNaIWgC
+ nqLkHoIxle4x7T4Hl/vYW9ifSLZXxPAJlVfF6ze4y8GRTVibWJGzAgbHIK2iBVklA1NV
+ EtVuWKBI3l33fYPPGhGAzFNZSVM440+cMieHThn+xaXZ2xfd4xrHT3/TtEVVYrwh8tff
+ YGNRL0XkPIB1fReYkaixhmb0cRuI1wL/wd6dXiH4UEiGzcau8L2bakI8Sd09IkxmK2VC
+ TQxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=qpjzxuCVbEO2kl81iU00jC8CtR9OdcVESI3+fE5EiS0=;
- b=Eq5xM6FWt3PjqTKpb/l5hFwVM31XPymiNpP8QruVz956IKxTqO79TlF3+hPCRInnB4
- GTVRICe49ch9rtJz3UnTaWiKLVZOScVaiZSncYgH6HhiL1Ea7m43dVfv0ahyIU/o8Yf9
- nOappNwjJH8MhbdAP1tUXjhuwu/DlMTo1yxm42+3XJ8If3tpcRG0PV+f3fAniULSQ+rt
- MGu6W4YxYx3548jjpPqjXS4nEaLjc+N99nZZPGUUwA1bDzIxaBgmlnjMrE0M6HAJuZsx
- gfVPI0lWh/XtGiIxtn72RFz+TMHg6unbAYFNTSEDfTy+XgbuNqbGRZe1Rt+zjFArsGlU
- eGmw==
-X-Gm-Message-State: APjAAAUzDKY2AqDaEWQD+92wgH8halgXrDNLCh9bTE7+pFvmS5qieGXc
- oycY2ssEEjDg/oXk+TWQT6mnEw==
-X-Google-Smtp-Source: APXvYqzJ0+Kptgtx/JiJfBV5wIvbPP563fbIS/GNxnoxq4hz2ZUhXut5b5NDY2CyvGqxMPLCTskKSw==
-X-Received: by 2002:adf:a50d:: with SMTP id i13mr4561123wrb.152.1569358874310; 
- Tue, 24 Sep 2019 14:01:14 -0700 (PDT)
+ bh=xmyA2KCLeLU2xSd1cjULfKDT3lF0lDQIQyf5XM38R7k=;
+ b=drzuzMUN2uTdnoJO50XbMBBLl8rpdm2dyTXqjS9fuT3ZciDQCivM/ttmHjDqv1YWN2
+ rM+19fhRzmRnUeakBWnu4VwQ8blliGBkt8cIDhKzVltNPEM4kQ0rc4bc+w9pk2aGJBnS
+ u+J+CZiQM5guei6EudX+qoutEqKExmPK+km4bKctRbjtEspN8ynXmVhZuVIFTJY8AQWe
+ iBewV1n8AEKCTznU46kjrOk7nKid+MIIahymQ10b3Be4CQBUJSHnzTZMlIWD7zkwlflZ
+ phhwCcTWOyCeukFZOfUFwUdnjjf/NDDitBSCvkNQXtVT+lS7Y1WVbsQ2pql831SBMTfy
+ IBSw==
+X-Gm-Message-State: APjAAAWz/KI0JF9BGEiI12bTe6PG6FDF96mD/gSHNPnWyZmEz1RdRRpt
+ t4chlorOTG5BtdytY551yuLmtwb28MpNvA==
+X-Google-Smtp-Source: APXvYqy09QuIjqyBNVMeKxim7Wi7R8p+0Y0yunfpWWYl/gd+9vh3L+dDnMGbO0EsQetRQtrMRC9Aiw==
+X-Received: by 2002:a5d:67c3:: with SMTP id n3mr4354206wrw.294.1569358873737; 
+ Tue, 24 Sep 2019 14:01:13 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id l10sm4654530wrh.20.2019.09.24.14.01.09
+ by smtp.gmail.com with ESMTPSA id m16sm1066930wml.11.2019.09.24.14.01.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Tue, 24 Sep 2019 14:01:10 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 892C01FF98;
+ by zen.linaroharston (Postfix) with ESMTP id 73EA71FF96;
  Tue, 24 Sep 2019 22:01:07 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 08/33] tests/migration: Fail on unexpected migration states
-Date: Tue, 24 Sep 2019 22:00:41 +0100
-Message-Id: <20190924210106.27117-9-alex.bennee@linaro.org>
+Subject: [PATCH  v3 07/33] target/alpha: Tidy helper_fp_exc_raise_s
+Date: Tue, 24 Sep 2019 22:00:40 +0100
+Message-Id: <20190924210106.27117-8-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190924210106.27117-1-alex.bennee@linaro.org>
 References: <20190924210106.27117-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,98 +96,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Juan Quintela <quintela@redhat.com>, jsnow@redhat.com, f4bug@amsat.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>, jsnow@redhat.com,
+ f4bug@amsat.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-We've got various places where we wait for a migration to enter
-a given state; but if we enter an unexpected state we tend to fail
-in odd ways; add a mechanism for explicitly testing for any state
-which we shouldn't be in.
+Remove a redundant masking of ignore.  Once that's gone it is
+obvious that the system-mode inner test is redundant with the
+outer test.  Move the fpcr_exc_enable masking up and tidy.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+No functional change.
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20190923131022.15498-2-dgilbert@redhat.com>
+Message-Id: <20190921043256.4575-8-richard.henderson@linaro.org>
 ---
- tests/migration-test.c | 23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
+ target/alpha/fpu_helper.c | 15 ++++-----------
+ 1 file changed, 4 insertions(+), 11 deletions(-)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 258aa064d48..9c62ee5331b 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -255,15 +255,19 @@ static void read_blocktime(QTestState *who)
- }
- 
- static void wait_for_migration_status(QTestState *who,
--                                      const char *goal)
-+                                      const char *goal,
-+                                      const char **ungoals)
- {
-     while (true) {
-         bool completed;
-         char *status;
-+        const char **ungoal;
- 
-         status = migrate_query_status(who);
-         completed = strcmp(status, goal) == 0;
--        g_assert_cmpstr(status, !=,  "failed");
-+        for (ungoal = ungoals; *ungoal; ungoal++) {
-+            g_assert_cmpstr(status, !=,  *ungoal);
-+        }
-         g_free(status);
-         if (completed) {
+diff --git a/target/alpha/fpu_helper.c b/target/alpha/fpu_helper.c
+index 62a066d9020..df8b58963ba 100644
+--- a/target/alpha/fpu_helper.c
++++ b/target/alpha/fpu_helper.c
+@@ -90,25 +90,18 @@ void helper_fp_exc_raise_s(CPUAlphaState *env, uint32_t ignore, uint32_t regno)
+     uint32_t exc = env->error_code & ~ignore;
+     if (exc) {
+         env->fpcr |= exc;
+-        exc &= ~ignore;
+-#ifdef CONFIG_USER_ONLY
+-        /*
+-         * In user mode, the kernel's software handler only
+-         * delivers a signal if the exception is enabled.
+-         */
+-        if (!(exc & env->fpcr_exc_enable)) {
+-            return;
+-        }
+-#else
++        exc &= env->fpcr_exc_enable;
+         /*
+          * In system mode, the software handler gets invoked
+          * for any non-ignored exception.
++         * In user mode, the kernel's software handler only
++         * delivers a signal if the exception is enabled.
+          */
++#ifdef CONFIG_USER_ONLY
+         if (!exc) {
              return;
-@@ -274,7 +278,8 @@ static void wait_for_migration_status(QTestState *who,
- 
- static void wait_for_migration_complete(QTestState *who)
- {
--    wait_for_migration_status(who, "completed");
-+    wait_for_migration_status(who, "completed",
-+                              (const char * []) { "failed", NULL });
+         }
+ #endif
+-        exc &= env->fpcr_exc_enable;
+         fp_exc_raise1(env, GETPC(), exc, regno, EXC_M_SWC);
+     }
  }
- 
- static void wait_for_migration_pass(QTestState *who)
-@@ -809,7 +814,9 @@ static void test_postcopy_recovery(void)
-      * Wait until postcopy is really started; we can only run the
-      * migrate-pause command during a postcopy
-      */
--    wait_for_migration_status(from, "postcopy-active");
-+    wait_for_migration_status(from, "postcopy-active",
-+                              (const char * []) { "failed",
-+                                                  "completed", NULL });
- 
-     /*
-      * Manually stop the postcopy migration. This emulates a network
-@@ -822,7 +829,9 @@ static void test_postcopy_recovery(void)
-      * migrate-recover command can only succeed if destination machine
-      * is in the paused state
-      */
--    wait_for_migration_status(to, "postcopy-paused");
-+    wait_for_migration_status(to, "postcopy-paused",
-+                              (const char * []) { "failed", "active",
-+                                                  "completed", NULL });
- 
-     /*
-      * Create a new socket to emulate a new channel that is different
-@@ -836,7 +845,9 @@ static void test_postcopy_recovery(void)
-      * Try to rebuild the migration channel using the resume flag and
-      * the newly created channel
-      */
--    wait_for_migration_status(from, "postcopy-paused");
-+    wait_for_migration_status(from, "postcopy-paused",
-+                              (const char * []) { "failed", "active",
-+                                                  "completed", NULL });
-     migrate(from, uri, "{'resume': true}");
-     g_free(uri);
- 
 -- 
 2.20.1
 
