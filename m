@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03392C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 07:25:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 057C2C4320D
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 07:27:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD64D214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 07:25:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD64D214AF
+	by mail.kernel.org (Postfix) with ESMTPS id D3AA8214D9
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 07:26:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3AA8214D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCfCb-00072u-RO
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 03:25:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39196)
+	id 1iCfDv-00086u-0W
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 03:26:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39379)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1iCfBf-0006Ys-Tc
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:24:40 -0400
+ (envelope-from <quintela@redhat.com>) id 1iCfCl-0007N8-Cl
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:25:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1iCfBd-00019Y-EP
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:24:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44584)
+ (envelope-from <quintela@redhat.com>) id 1iCfCk-0001g8-BL
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:25:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56566)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iCfBd-00018v-8p
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:24:37 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iCfCk-0001ft-6C
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:25:46 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8CBCF8980E1;
- Tue, 24 Sep 2019 07:24:35 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7C459301D67F;
+ Tue, 24 Sep 2019 07:25:45 +0000 (UTC)
 Received: from redhat.com (ovpn-117-109.ams2.redhat.com [10.36.117.109])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 04BAD60852;
- Tue, 24 Sep 2019 07:24:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D845A60F9E;
+ Tue, 24 Sep 2019 07:25:41 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: "Dr. David Alan Gilbert \(git\)" <dgilbert@redhat.com>
-Subject: Re: [PATCH 1/2] tests/migration: Fail on unexpected migration states
-In-Reply-To: <20190923131022.15498-2-dgilbert@redhat.com> (David Alan
- Gilbert's message of "Mon, 23 Sep 2019 14:10:21 +0100")
+Subject: Re: [PATCH 2/2] tests/migration/postcopy: trim migration bandwidth
+In-Reply-To: <20190923131022.15498-3-dgilbert@redhat.com> (David Alan
+ Gilbert's message of "Mon, 23 Sep 2019 14:10:22 +0100")
 References: <20190923131022.15498-1-dgilbert@redhat.com>
- <20190923131022.15498-2-dgilbert@redhat.com>
+ <20190923131022.15498-3-dgilbert@redhat.com>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-Date: Tue, 24 Sep 2019 09:24:32 +0200
-Message-ID: <87r24640nj.fsf@trasno.org>
+Date: Tue, 24 Sep 2019 09:25:39 +0200
+Message-ID: <87mueu40lo.fsf@trasno.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Tue, 24 Sep 2019 07:24:35 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Tue, 24 Sep 2019 07:25:45 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -79,24 +79,13 @@ Sender: "Qemu-devel"
 "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
 > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >
-> We've got various places where we wait for a migration to enter
-> a given state; but if we enter an unexpected state we tend to fail
-> in odd ways; add a mechanism for explicitly testing for any state
-> which we shouldn't be in.
+> On slow hosts with tcg we were sometimes finding that the migration
+> would complete during precopy and never get into the postcopy test.
+> Trim back the bandwidth a bit to make that much less likely.
 >
 > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-> -    wait_for_migration_status(from, "postcopy-active");
-> +    wait_for_migration_status(from, "postcopy-active",
-> +                              (const char * []) { "failed",
-> +                                                  "completed", NULL });
->  
 
-I really preffer not to use that kind of casts.
-
-const char *ungoals[] = { "failed", "completed", NULL };
-
-but as it is you who are doing the patches, I will not complain O:-)
 
