@@ -2,89 +2,90 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE535C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 22:44:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2A01C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 22:45:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 831972146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 22:44:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IxICYUxP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 831972146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 671CE20665
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 22:45:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 671CE20665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCtXc-0008UQ-6k
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 18:44:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56804)
+	id 1iCtZC-0001X8-Ls
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 18:45:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56354)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iCs5G-0003QK-IL
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:11:04 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCs2A-0000CQ-Kg
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:07:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iCs56-0007aE-Mi
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:10:54 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:39654)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iCs56-0007Zw-G5
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:10:44 -0400
-Received: by mail-wr1-x435.google.com with SMTP id r3so3648220wrj.6
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 14:10:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=PeXbOtrBZF+8O5whsej0UzKUBQHCTeTmZtfTgjX8/9A=;
- b=IxICYUxPXcggMr8qGX5+yGX3rpelSb40/1xJyrENWeKkyJB/CM5dE6toSqA9pIQLuu
- QA8oxX0KKJDHaC9ALx42h9hr5fc7+nY2MFGC4CyPRRneGls0xxcwpNpQBlYofnsZzZZT
- DoSjPG7xZmEX/2OSTjTnuzCI9/De2HAMJljYNKENZ1vDWB+Q5HIvZjR+v/M/LsETSljP
- Iqj/qDbJqgbi1E9xrcbHAfP92G0et2p+pr30oGUuvfDu6abHmAu+ZOKxmY875VTwJZ7C
- Bi3SqWZ9XK17A8p9KKRmuYHDUVD40YbAM7CEz01E4cGtTg4fsxFREOJup+cN+7GfE7lc
- JUgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=PeXbOtrBZF+8O5whsej0UzKUBQHCTeTmZtfTgjX8/9A=;
- b=cq3vzhuEpoGuJ2mjsLyKjbD12WFzr3O9ItzBk+2ajDugb0B66dms8wRv9WmbsyxpEP
- ojFZ/1HMPL705eFIo3r+377ChmhukSmfQkcYr7pTd4SxcP5FEmDXAEuXOu68LoThCsNo
- IdCsLTgpsj7tubDJqAxO2TdrQT3s09+EzPgkj4uOAxdJdD6mA2CoIDhUtWFzhmTrpXe2
- 3vqX1lDQkjnSUVGBaddcqYVbRWCcZX0aRHBph3F9Tdn5rYrO9Q9/YxrEqKb9S7+6gfYp
- +GK4HdMswe9MQA6zqMUdUQweLIXiAW3EUEsahXlzSf+4RVFArr81R6Lqed6gqtO6EvVn
- 7Wvg==
-X-Gm-Message-State: APjAAAW0ArKBR/7uXkGQns5cZ7vIT0Ekiyw80jRmzluQ4WBboxSfVnWD
- Vu3yUcot0URxEwgmenqrBsJGKg==
-X-Google-Smtp-Source: APXvYqzgDbgQMGaOvtgmqN48PYfnd0Sc/G3LQyWC0VnbjKyXAUHzso2UxLlobJ+eo0A6fCCIFIc0cA==
-X-Received: by 2002:adf:b648:: with SMTP id i8mr4455366wre.372.1569359443311; 
- Tue, 24 Sep 2019 14:10:43 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y13sm5145416wrg.8.2019.09.24.14.10.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 24 Sep 2019 14:10:41 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 7170F1FF87;
- Tue, 24 Sep 2019 22:01:09 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v3 28/33] docker: removed unused debian8 partial image
-Date: Tue, 24 Sep 2019 22:01:01 +0100
-Message-Id: <20190924210106.27117-29-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190924210106.27117-1-alex.bennee@linaro.org>
-References: <20190924210106.27117-1-alex.bennee@linaro.org>
+ (envelope-from <eblake@redhat.com>) id 1iCs29-0006Rx-DY
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:07:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60348)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCs29-0006RO-3j
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 17:07:41 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 55217302246D;
+ Tue, 24 Sep 2019 21:07:40 +0000 (UTC)
+Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C1F63600C8;
+ Tue, 24 Sep 2019 21:07:39 +0000 (UTC)
+Subject: Re: [PATCH v3 23/25] Sockets: Fix error_append_hint usage
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
+ <20190924200902.4703-24-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <7642a14d-e96b-0bf1-08ab-95761869c9b7@redhat.com>
+Date: Tue, 24 Sep 2019 16:07:38 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::435
+In-Reply-To: <20190924200902.4703-24-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="gDTTx1FbR37FnidvUB7hgvIyCjkgmm7ww"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Tue, 24 Sep 2019 21:07:40 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,83 +97,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Fam Zheng <fam@euphon.net>, jsnow@redhat.com, f4bug@amsat.org
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: John Snow <jsnow@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--gDTTx1FbR37FnidvUB7hgvIyCjkgmm7ww
+Content-Type: multipart/mixed; boundary="Y2YUb7UrVTpyOxzP5GVtcKtY5g5MSxjqC";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <7642a14d-e96b-0bf1-08ab-95761869c9b7@redhat.com>
+Subject: Re: [PATCH v3 23/25] Sockets: Fix error_append_hint usage
+References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
+ <20190924200902.4703-24-vsementsov@virtuozzo.com>
+In-Reply-To: <20190924200902.4703-24-vsementsov@virtuozzo.com>
 
-debian8 partial base is also not consumed by any image, so remove it.
-For QEMU's development cycle, we only support debian9 (stretch) and
-debian10 (buster).
+--Y2YUb7UrVTpyOxzP5GVtcKtY5g5MSxjqC
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190923181140.7235-3-jsnow@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/docker/Makefile.include           |  2 +-
- tests/docker/dockerfiles/debian8.docker | 34 -------------------------
- 2 files changed, 1 insertion(+), 35 deletions(-)
- delete mode 100644 tests/docker/dockerfiles/debian8.docker
+On 9/24/19 3:09 PM, Vladimir Sementsov-Ogievskiy wrote:
+> If we want append hint to errp, we must use ERRP_FUNCTION_BEGIN macro.
+> Otherwise hint will not be appended in case of errp =3D=3D &fatal_err
+> (program will exit before error_append_hint() call). Fix such cases.
+>=20
+> This commit (together with its neighbors) was generated by
+>=20
+> git grep -l 'error_append_hint(errp' | while read f; do \
+> spatch --sp-file scripts/coccinelle/fix-error_append_hint-usage.cocci \=
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 47d2273f29d..82d5a8a5393 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -6,7 +6,7 @@ DOCKER_SUFFIX := .docker
- DOCKER_FILES_DIR := $(SRC_PATH)/tests/docker/dockerfiles
- DOCKER_DEPRECATED_IMAGES := debian
- # we don't run tests on intermediate images (used as base by another image)
--DOCKER_PARTIAL_IMAGES := debian debian8 debian9 debian10 debian-sid
-+DOCKER_PARTIAL_IMAGES := debian debian9 debian10 debian-sid
- DOCKER_PARTIAL_IMAGES += debian9-mxe debian-ports debian-bootstrap
- DOCKER_IMAGES := $(filter-out $(DOCKER_DEPRECATED_IMAGES),$(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker)))))
- DOCKER_TARGETS := $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
-diff --git a/tests/docker/dockerfiles/debian8.docker b/tests/docker/dockerfiles/debian8.docker
-deleted file mode 100644
-index 1212a85c35b..00000000000
---- a/tests/docker/dockerfiles/debian8.docker
-+++ /dev/null
-@@ -1,34 +0,0 @@
--#
--# Docker multiarch cross-compiler target
--#
--# This docker target is builds on Debian and Emdebian's cross compiler targets
--# to build distro with a selection of cross compilers for building test binaries.
--#
--# On its own you can't build much but the docker-foo-cross targets
--# build on top of the base debian image.
--#
--FROM debian:jessie-slim
--
--MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
--
--# Duplicate deb line as deb-src
--RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
--
--# Setup some basic tools we need
--RUN apt update && \
--    DEBIAN_FRONTEND=noninteractive apt-get install -yy eatmydata && \
--    DEBIAN_FRONTEND=noninteractive eatmydata \
--    apt-get install -y --no-install-recommends \
--        bison \
--        binutils-multiarch \
--        build-essential \
--        ca-certificates \
--        clang \
--        curl \
--        flex \
--        gettext \
--        git \
--        gnupg \
--        pkg-config \
--        python-minimal
--
--- 
-2.20.1
+> --in-place $f; done
+>=20
+> and then
+>=20
+> ./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+>=20
+> (auto-msg was a file with this commit message)
+>=20
+> Still, for backporting it may be more comfortable to use only the first=
 
+> command and then do one huge commit.
+>=20
+> Reported-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  util/qemu-sockets.c | 2 ++
+>  1 file changed, 2 insertions(+)
+
+git grep -p 'error_append_hint(errp' util/*sockets*
+
+nicely shows these same two functions.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--Y2YUb7UrVTpyOxzP5GVtcKtY5g5MSxjqC--
+
+--gDTTx1FbR37FnidvUB7hgvIyCjkgmm7ww
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KhZsACgkQp6FrSiUn
+Q2pECQf9H9Tg4EEJ9DZ6Mzjtp+Vltrzu5P6whzBmzrp+An68s4XEaP0HD5TQSIJn
+qx/LM0P4ILw+Z965eDDT8VS/VD8wK8ua0ytDwgStrdhuaDD5gmX3qb0YydtzOOXU
+NkSVjXoiqrh/0FafGCNKhNI5KfX6BLlIxFLlL/UXlxUpd1PLPAh7l/gi2zUsSoBW
+3+DsCYBz3CTL+/Aj+2i8u0irxEfSneckpnR6M6CCkItJYJ+r/ZZYUbKSUvQ4hefd
+htIMJMKRunySSnnI/HXIk82+zJIxPxYYLwq+BVuCsW+gT6QtBzCyQqESEriP5Ulg
+ov4/sGMPhu+SIpspLwZLu3roJZVn6A==
+=Rrxm
+-----END PGP SIGNATURE-----
+
+--gDTTx1FbR37FnidvUB7hgvIyCjkgmm7ww--
 
