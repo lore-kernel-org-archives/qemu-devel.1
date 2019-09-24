@@ -2,46 +2,45 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27362C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:23:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6D26C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:24:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECC6520872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:23:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECC6520872
+	by mail.kernel.org (Postfix) with ESMTPS id 78B0D20872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:24:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78B0D20872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCrLW-0007oZ-Gp
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:23:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44084)
+	id 1iCrM6-0000Zh-2p
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:24:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44144)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iCr8P-0000uW-D8
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:06 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCr8a-000121-He
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iCr8O-00032I-10
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:05 -0400
-Received: from relay.sw.ru ([185.231.240.75]:38174)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCr8Z-00039z-8e
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:16 -0400
+Received: from relay.sw.ru ([185.231.240.75]:38178)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iCr8N-0002un-G6
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:03 -0400
+ id 1iCr8X-0002v0-Np; Tue, 24 Sep 2019 16:10:14 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iCr8C-0001Mk-2A; Tue, 24 Sep 2019 23:09:52 +0300
+ id 1iCr8C-0001Mk-AA; Tue, 24 Sep 2019 23:09:52 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 23/25] Sockets: Fix error_append_hint usage
-Date: Tue, 24 Sep 2019 23:09:00 +0300
-Message-Id: <20190924200902.4703-24-vsementsov@virtuozzo.com>
+Subject: [PATCH v3 24/25] nbd: Fix error_append_hint usage
+Date: Tue, 24 Sep 2019 23:09:01 +0300
+Message-Id: <20190924200902.4703-25-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190924200902.4703-1-vsementsov@virtuozzo.com>
 References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
@@ -60,9 +59,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Greg Kurz <groug@kaod.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: vsementsov@virtuozzo.com, Greg Kurz <groug@kaod.org>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -89,29 +86,34 @@ command and then do one huge commit.
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- util/qemu-sockets.c | 2 ++
- 1 file changed, 2 insertions(+)
+ nbd/client.c | 1 +
+ nbd/server.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index 98ff3a1cce..fb21b78369 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -860,6 +860,7 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
-                              int num,
-                              Error **errp)
+diff --git a/nbd/client.c b/nbd/client.c
+index b9dc829175..4d90a26c00 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -153,6 +153,7 @@ static int nbd_receive_option_reply(QIOChannel *ioc, uint32_t opt,
+ static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply,
+                                 bool strict, Error **errp)
  {
 +    ERRP_FUNCTION_BEGIN();
-     struct sockaddr_un un;
-     int sock, fd;
-     char *pathbuf = NULL;
-@@ -935,6 +936,7 @@ err:
+     g_autofree char *msg = NULL;
  
- static int unix_connect_saddr(UnixSocketAddress *saddr, Error **errp)
+     if (!(reply->type & (1 << 31))) {
+diff --git a/nbd/server.c b/nbd/server.c
+index 28c3c8be85..09565ad8dc 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1616,6 +1616,7 @@ void nbd_export_close(NBDExport *exp)
+ 
+ void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp)
  {
 +    ERRP_FUNCTION_BEGIN();
-     struct sockaddr_un un;
-     int sock, rc;
-     size_t pathlen;
+     if (mode == NBD_SERVER_REMOVE_MODE_HARD || QTAILQ_EMPTY(&exp->clients)) {
+         nbd_export_close(exp);
+         return;
 -- 
 2.21.0
 
