@@ -2,51 +2,51 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33197C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:41:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2466AC432C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:42:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 010CA2146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:41:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 010CA2146E
+	by mail.kernel.org (Postfix) with ESMTPS id EA46F2146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:42:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA46F2146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCrcK-0001lB-EA
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:41:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52427)
+	id 1iCrdK-0002O8-Js
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:42:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52593)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iCraR-00008H-GN
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:39:04 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCrbL-00010o-QY
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:40:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iCraQ-0001lR-Ch
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:39:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43990)
+ (envelope-from <eblake@redhat.com>) id 1iCrbK-0002E0-OF
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:39:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54066)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCraQ-0001kw-4F
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:39:02 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCrbI-0002Bo-Pc
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:39:58 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4B356109EFCA;
- Tue, 24 Sep 2019 20:39:01 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B260F3175296;
+ Tue, 24 Sep 2019 20:39:55 +0000 (UTC)
 Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C747C600C8;
- Tue, 24 Sep 2019 20:39:00 +0000 (UTC)
-Subject: Re: [PATCH v3 02/25] hw/core/loader-fit: fix freeing errp in
- fit_load_fdt
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E5A3600C8;
+ Tue, 24 Sep 2019 20:39:55 +0000 (UTC)
+Subject: Re: [PATCH v3 03/25] net/net: fix local variable shadowing in
+ net_client_init
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org
 References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
- <20190924200902.4703-3-vsementsov@virtuozzo.com>
+ <20190924200902.4703-4-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -73,18 +73,18 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <1f007fe0-d6bb-db19-835f-9cb4043f9b66@redhat.com>
-Date: Tue, 24 Sep 2019 15:38:59 -0500
+Message-ID: <2032f138-7857-d07c-9c42-0f66ee0c87b3@redhat.com>
+Date: Tue, 24 Sep 2019 15:39:54 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190924200902.4703-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20190924200902.4703-4-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="rrhhb6KTBcI1FSfP37h0Pt3EJfberXc6h"
+ boundary="09XZ4blHz7KUgWMKx2y5AyFwvWlCm1ss7"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Tue, 24 Sep 2019 20:39:01 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Tue, 24 Sep 2019 20:39:55 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,61 +98,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
- Paul Burton <pburton@wavecomp.com>
+Cc: Jason Wang <jasowang@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rrhhb6KTBcI1FSfP37h0Pt3EJfberXc6h
-Content-Type: multipart/mixed; boundary="p9eoBcvJA8k4YUtKC094BbLIXAX4kubt6";
+--09XZ4blHz7KUgWMKx2y5AyFwvWlCm1ss7
+Content-Type: multipart/mixed; boundary="8yTzYD1co1wKTstsZhFu0OItMpaKxOCAY";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org
-Cc: Paul Burton <pburton@wavecomp.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>
-Message-ID: <1f007fe0-d6bb-db19-835f-9cb4043f9b66@redhat.com>
-Subject: Re: [PATCH v3 02/25] hw/core/loader-fit: fix freeing errp in
- fit_load_fdt
+Cc: Jason Wang <jasowang@redhat.com>
+Message-ID: <2032f138-7857-d07c-9c42-0f66ee0c87b3@redhat.com>
+Subject: Re: [PATCH v3 03/25] net/net: fix local variable shadowing in
+ net_client_init
 References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
- <20190924200902.4703-3-vsementsov@virtuozzo.com>
-In-Reply-To: <20190924200902.4703-3-vsementsov@virtuozzo.com>
+ <20190924200902.4703-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20190924200902.4703-4-vsementsov@virtuozzo.com>
 
---p9eoBcvJA8k4YUtKC094BbLIXAX4kubt6
+--8yTzYD1co1wKTstsZhFu0OItMpaKxOCAY
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 9/24/19 3:08 PM, Vladimir Sementsov-Ogievskiy wrote:
-> fit_load_fdt forget to zero errp. Fix it.
+> Don't shadow Error *err: it's a bad thing.
 >=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
 > ---
->  hw/core/loader-fit.c | 1 +
->  1 file changed, 1 insertion(+)
+>  net/net.c | 17 +++++++----------
+>  1 file changed, 7 insertions(+), 10 deletions(-)
 >=20
-> diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
-> index 953b16bc82..11e4fad595 100644
-> --- a/hw/core/loader-fit.c
-> +++ b/hw/core/loader-fit.c
-> @@ -201,6 +201,7 @@ static int fit_load_fdt(const struct fit_loader *ld=
-r, const void *itb,
->      if (err =3D=3D -ENOENT) {
->          load_addr =3D ROUND_UP(kernel_end, 64 * KiB) + (10 * MiB);
->          error_free(*errp);
-> +        *errp =3D NULL;
 
-Actually, let's drop my R-b - I think we have a bigger bug here.  We are
-blindly dereferencing *errp even if the caller passed in NULL.  The
-correct way to write this function requires either the use of local_err
-or the addition of auto-propagation.
-
-(In v2, you still had this bug - your addition of error_free_errp(errp)
-would still blindly dereference *errp, unless you tweak the
-implementation of error_free_errp to tolerate a NULL pointer input)
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -160,24 +140,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---p9eoBcvJA8k4YUtKC094BbLIXAX4kubt6--
+--8yTzYD1co1wKTstsZhFu0OItMpaKxOCAY--
 
---rrhhb6KTBcI1FSfP37h0Pt3EJfberXc6h
+--09XZ4blHz7KUgWMKx2y5AyFwvWlCm1ss7
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KfuQACgkQp6FrSiUn
-Q2qCVgf/Uw5rv5tj8eJv4vQ8qVhSROK9lMdaM1izIZ1ycRjauGY/1y368ntMRMqZ
-YU8r9GNzV/ceLAKMzq91v5gMo+QeFxyjLHMpNFVIKPQp3lrkbr4mQ0co/cQHHFSb
-ogm/9IcTL1cN2B+QQlKvzDIoNWdgaAFX+wWrXJNqIYtUwTkevGoFhUuS38t8NSf/
-VDdA290ZoBN0YvjgCucALX+vBMrNH+HybBGTxHxSpNlOy3hM0fIT48lqvWj1O2Tt
-SzFrzS1Uq6DECnF9YEdHdVddoCH2O6qsfvjl1gSW+8iOjCHK3oSQHjBo8D/5mBFo
-cXuB8n7bzFn4SVIVrvNEgs0z9XT1tw==
-=mQMh
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KfxoACgkQp6FrSiUn
+Q2qk5Qf9HMltl85aAPUPWX9ne/WXPkSCpC192zRO5pYwskZQM7eiBGRjKHbyCLHA
+aTNBWfkumP3OErVfHVU3tqs56tDta+cnvmwxcDWnnY2UED5BUTqEU7tGAVUqG6OO
++aDVJ38RXlOWTLEXLpnDQTCpQVbW8JPlyZn1PNMNHNJZ0+PxU7eHqJW0uAXhNaj0
+g9rlRJc3+W5OJXeXE4MS1iGkXZE+ddtEjyha1OmYRebmrgWJ3+961EaWsuijWbS6
+p6BtfO8iHn3yFfFEGRa0Fa+UQl3P3U0+vVgjsP4fMacPSf0DZO/fzAqQzQEkzI8x
+FFTI8kSrkusy2o9oURsB5bpBv/XsPA==
+=nQci
 -----END PGP SIGNATURE-----
 
---rrhhb6KTBcI1FSfP37h0Pt3EJfberXc6h--
+--09XZ4blHz7KUgWMKx2y5AyFwvWlCm1ss7--
 
