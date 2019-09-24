@@ -2,92 +2,118 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09776C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 19:23:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6B08C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 19:28:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBFA1207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 19:23:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 639D1207FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 19:28:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sfHRs8pI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBFA1207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="CwFe9f9f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 639D1207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCqOv-00007W-0r
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 15:23:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57522)
+	id 1iCqTl-0001N8-7v
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 15:28:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57947)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iCqNR-0007el-Da
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 15:21:34 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCqSm-0000r3-Dz
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 15:27:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iCqNN-0001c8-RD
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 15:21:30 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:46808)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iCqNN-0001br-Kc
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 15:21:29 -0400
-Received: by mail-pl1-x642.google.com with SMTP id q24so1366956plr.13
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 12:21:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Hcr/1mHm+yGJGONH9wsQlfBTqXyvN4VTA+blD+3eg9U=;
- b=sfHRs8pI7N8NrM/QIrtUMv1JHHuj9GhRWizzp9hZE4gBRhGbnpPZE02ohwb74Ey692
- O+m0JdMmMiklt9Li+lFc6lw1pnpWPO6ebeUZ9Jc4PdIhIO3yUA1c9qyCKrVYe5M5j7+q
- 8xknmrZmoHiPLUaOI5x307kui2+wISTWO6UEqMOUZqBGbpZk2Oh0bNKd9Qvgx1EomAsE
- DEC7fEZHRX7AZsBogMq8VCxNOARDj53Giu4rX6HjxRb2oSKsllzFrUAu6czuyTIntKps
- 7Hkg7hvkKnq5esrKSqRRVL3tZIcZyrCFf9O3x/B06WvHeH68EAE1W3H+ohsuvR3Yg2w7
- /lgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Hcr/1mHm+yGJGONH9wsQlfBTqXyvN4VTA+blD+3eg9U=;
- b=W1YlAlzIAxIL2ya9fVTlwxnUOYVcTJBwSMtBS9IF60uzxykjr7/iyxuvgvCPDbVsr+
- 0rs1KITn+pq+xWadMV24fIq6wssHPhCRSXRlhBWcdMm6HMTquZYb246HRDSchqo2kLJ0
- qWRUfqFGEi1jOphTp2zqIOwf+C8HNMP1LSAh+joxuJm3RgaS4rFqIH8VRyJlpZy7M5Fu
- gWy2Fn5rEwFIKaC1G2LcgHY4qR8Fq6kJf4UM2S4L0p9UjI8qWHR1bz+ptvUUJ2rpDLTn
- zCRlfldwWaLQhvq3MNSr6kOnZAjNTiKD8e6Ix1Ygn9VdRKmR8BRFFr1jHwdobWgMdNfL
- DmGg==
-X-Gm-Message-State: APjAAAWh+mRRdW311fKinK7/2Ub9d6YdlkA6BIwKBRUhHitv/BjWhzIe
- HQn63YGppJcxkvV9Ud3CIoqEFg==
-X-Google-Smtp-Source: APXvYqx41oxZ58RaZdxcj+j3zQe4R5nwVWiSLjIKnLDbRywRqN3U3A2T6LdJx9jdw/4K0WV0ro1BQA==
-X-Received: by 2002:a17:902:144:: with SMTP id 62mr4895524plb.70.1569352888233; 
- Tue, 24 Sep 2019 12:21:28 -0700 (PDT)
-Received: from [172.20.32.216] ([12.157.10.118])
- by smtp.gmail.com with ESMTPSA id i16sm3485074pfa.184.2019.09.24.12.21.25
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 24 Sep 2019 12:21:26 -0700 (PDT)
-Subject: Re: [PATCH 1/7] target/ppc: introduce get_dfp{64,128}() helper
- functions
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, pc@us.ibm.com, david@gibson.dropbear.id.au
-References: <20190924153556.27575-1-mark.cave-ayland@ilande.co.uk>
- <20190924153556.27575-2-mark.cave-ayland@ilande.co.uk>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <e4e2220b-d23b-aa54-2c46-c937bd0efe86@linaro.org>
-Date: Tue, 24 Sep 2019 12:21:23 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190924153556.27575-2-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCqSl-0002um-Fg
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 15:27:04 -0400
+Received: from mail-he1eur02on0720.outbound.protection.outlook.com
+ ([2a01:111:f400:fe05::720]:57900
+ helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iCqSf-0002ow-7v; Tue, 24 Sep 2019 15:26:58 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bjFWN054Cas185dk5ZlSQD69BG37HOqcPxUvoyqBvkAFqkL1NhuNwli2XUVgOsK139/b7K7BHmozO97XL+vwb0pQkR/PqVlKsk3OwFFYCdlsHtc6JNDK2pwJzGmSl9sT/1WEAJsHqtqQydGWAG/usMVdSkGX8QDymSUpWCk8ldW1V8FVktB88WwmB7nheb+xx3SZHs34Fap0k2Df46uDxBJZjcoTDb17erOykKIJi+uD+sQ6f13iSpV214kIJvSAdn4A3JWC5rrXwZEVI8cFvXptNdBIGB18rgAjyJixrT+xtEw0jB9lYLiAldSyy2/5m2UyvKwx26hu1E5kKhw4Jg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nhaHmE4QtiGf76nS6fasiTL2h1omsuJcAKJYwo6eOxw=;
+ b=IMUqfGr3cdkhOpHl0jSYd4CHO7BH0BJxospd0F5OQc4BCtEk1rZdaeRepxlcKkdUm181xDetyjL/gGyKXPbIPEsRLRabo4S/hGED/hxYd5RndFetwPcu2Mnd3gYdsjZA7JXMBlIbSSB8vnKYIxfYpCNtWaEHB6K1xxH37nVrJvwhWwJXCU8r2HMklzluEN+2oy3iTCxrg8Jr3BXsIuFWaWlkjr59Zb1aDuh9TWYDVCdWsGnI5P1zLcxx5y/8tBPzokdCq0liA4cZ5eimQhM0hFKzM73CrmTvaWWtgK8tSNNp6pvTy65xPJOgD4Wq1fuyHNKmawNbfLVOnHmKoFmsHw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nhaHmE4QtiGf76nS6fasiTL2h1omsuJcAKJYwo6eOxw=;
+ b=CwFe9f9fGIjJIZLbcyIW3/Kcf8fBk3dl4ji25Dtb96EpzjF4NLGuwE4NkzNZ+dxrWvqU2ciA2OyVgcvOsBOYDsT7XFOIGzEfUIHT0gOxYyuYvzqKEd0RVqCWNLZLjaE6/Q6noP2Rs7KGtB2dfpbgs0En4KHuKhpibmUIxvAQ61s=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB5241.eurprd08.prod.outlook.com (10.255.16.145) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2284.18; Tue, 24 Sep 2019 19:26:33 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2284.023; Tue, 24 Sep 2019
+ 19:26:33 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: Re: [PATCH 0/2] enhance iotest 223 coverage
+Thread-Topic: [PATCH 0/2] enhance iotest 223 coverage
+Thread-Index: AQHVcuzA/guIV4TSrkyAW36PHjteH6c7NhUA
+Date: Tue, 24 Sep 2019 19:26:33 +0000
+Message-ID: <8463a76e-74d7-7785-79f4-563cd78182a5@virtuozzo.com>
+References: <20190924143522.22902-1-eblake@redhat.com>
+In-Reply-To: <20190924143522.22902-1-eblake@redhat.com>
+Accept-Language: ru-RU, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::642
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0303.eurprd05.prod.outlook.com
+ (2603:10a6:7:93::34) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190924222630777
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c0630604-c0ff-4bd3-139b-08d741251ba8
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(5600167)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
+ SRVR:DB8PR08MB5241; 
+x-ms-traffictypediagnostic: DB8PR08MB5241:
+x-microsoft-antispam-prvs: <DB8PR08MB524163D5B371B0C46D0D8823C1840@DB8PR08MB5241.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 0170DAF08C
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(376002)(396003)(366004)(346002)(39850400004)(199004)(189003)(316002)(2906002)(478600001)(14454004)(25786009)(7736002)(81166006)(81156014)(8676002)(2501003)(305945005)(8936002)(4744005)(31696002)(66556008)(256004)(14444005)(4326008)(86362001)(102836004)(26005)(386003)(6506007)(186003)(5660300002)(52116002)(99286004)(66066001)(76176011)(66446008)(64756008)(71190400001)(66946007)(31686004)(66476007)(476003)(486006)(11346002)(2616005)(446003)(36756003)(71200400001)(6512007)(110136005)(54906003)(229853002)(6436002)(6486002)(3846002)(6116002)(6246003);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5241;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: k41mNtJFBTmnOQr8AknGmuI0ItIXLzqTzfD/y2u3BmWh6hZuzjsGsRdwrCnpiDtQnknkW2xXM+nxUbDLAYdV+kBJejmHJFfIkUzy3q93+wEW5MYnIcq9GfhNICKbzcPuaww8yZ69zbsTi8NaQcMhRE/iDMyLa9uERR4R/s+b9lJW4T6qohESYqbc4dpA6lKd4Zaa2xzlU8+7E6/uJTzkv5SN7D2w0ZLz9vOVzHKsCpU/IvZKpL+vik5Z0niq18IgfF3AKzvzpYojHcC6nC4HATTjb5I7fZH73SYp/KHxhQR98qzRFgOW9Lcmv2rrSaODkbxuJBmxX9mcoavK10SHuAnTy+zP5B8Ltg1HHBbOYBSJ7DLCdqrvUAISHz3O3rehbX6zhN9Qd0OIZQZoQhd64g9hgkEkXOhKQNRSg6Zsxjg=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <827A8896DD1D934395E0BB391755C3D7@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c0630604-c0ff-4bd3-139b-08d741251ba8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Sep 2019 19:26:33.0820 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 71/QX5fcbG83TyXu2w497Ac4S1+n8fJhrwhZ9/RcRuiDvex+p1/thTj1yp5F3Ccn+5NxfhOrBjDiJGpDQ86+TkPhhyV71fSqPVlBJH6mSAc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5241
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 2a01:111:f400:fe05::720
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,89 +125,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/24/19 8:35 AM, Mark Cave-Ayland wrote:
-> +static void get_dfp64(uint64_t *dst, uint64_t *dfp)
-> +{
-> +    dst[0] = dfp[0];
-> +}
-> +
-> +static void get_dfp128(uint64_t *dst, uint64_t *dfp)
-> +{
-> +    dst[0] = dfp[HI_IDX];
-> +    dst[1] = dfp[LO_IDX];
-> +}
-
-I'm not keen on this.  I would prefer some type difference that prevents you
-from getting the arguments the wrong way around.
-
-I'm thinking that a combination helper like
-
-static void get_dfp64(decNumber *out, uint64_t *in)
-{
-    union {
-       uint64_t i;
-       decimal64 d;
-    } u;
-
-    u.i = *in;
-    decimal64ToNumber(&u.d, out);
-}
-
-> @@ -129,7 +140,7 @@ static void dfp_prepare_decimal64(struct PPC_DFP *dfp, uint64_t *a,
->      dfp->env = env;
->  
->      if (a) {
-> -        dfp->a64[0] = *a;
-> +        get_dfp64(dfp->a64, a);
->          decimal64ToNumber((decimal64 *)dfp->a64, &dfp->a);
->      } else {
->          dfp->a64[0] = 0;
-
-becomes
-
-    get_dfp64(&dfp->a, a);
-
-and that might clean up a lot of the code.
-
-> @@ -617,10 +626,12 @@ uint32_t helper_##op(CPUPPCState *env, uint64_t *a, uint64_t *b)         \
->  {                                                                        \
->      struct PPC_DFP dfp;                                                  \
->      unsigned k;                                                          \
-> +    uint64_t a64;                                                        \
->                                                                           \
->      dfp_prepare_decimal##size(&dfp, 0, b, env);                          \
->                                                                           \
-> -    k = *a & 0x3F;                                                       \
-> +    get_dfp64(&a64, a);                                                  \
-> +    k = a64 & 0x3F;                                                      \
->                                                                           \
->      if (unlikely(decNumberIsSpecial(&dfp.b))) {                          \
->          dfp.crbf = 1;                                                    \
-
-Whereas cases like this, where a scalar is being passed in, I don't think that
-re-using the same helper is appropriate.  Ideally, they would be passed in by
-value, and not by reference at all.  That, of course, requires changes to the
-translator beyond the scope of this patch.
-
->  void helper_dctqpq(CPUPPCState *env, uint64_t *t, uint64_t *b)
->  {
->      struct PPC_DFP dfp;
-> +    uint64_t b64;
->      dfp_prepare_decimal128(&dfp, 0, 0, env);
-> -    decimal64ToNumber((decimal64 *)b, &dfp.t);
-> +    get_dfp64(&b64, b);
-> +    decimal64ToNumber((decimal64 *)&b64, &dfp.t);
-
-This would become
-
-    get_dfp64(&dfp.t, b);
-
-with no intermediate b64 temp.
-
-
-r~
+MjQuMDkuMjAxOSAxNzozNSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gQ29tbWl0IDUwNjkwMmM2IGRy
+b3BwZWQgbm9uLWlvdGhyZWFkIGNvdmVyYWdlIGluIG9yZGVyIHRvIHRlc3QgaW90aHJlYWQsDQo+
+IGJldHRlciBpcyB0byBydW4gdGhpbmdzIHR3aWNlLiAgSW4gZG9pbmcgdGhpcywgSSBmb3VuZCBp
+dCBlYXNpZXIgdG8NCj4gZWRpdCB0aGUgdGVzdCB3aGVuIHRoZSBsb2cgc2hvd3Mgd2hhdCBjb21t
+YW5kcyB3ZXJlIHRyaWdnZXJpbmcgdmFyaW91cw0KPiByZXNwb25zZXMuDQoNCkRpZCB5b3UgY29u
+c2lkZXIgYWRkaW5nIC1pb3RocmVhZCB0byB0ZXN0cy9xZW11LWlvdGVzdHMvY2hlY2sgaW5zdGVh
+ZCwgdG8gYmUNCmFibGUgdG8gcnVuIGFueSAob3Igc29tZSkgdGVzdHMgd2l0aCBvciB3aXRob3V0
+IGlvdGhyZWFkPw0KDQo+IA0KPiBFcmljIEJsYWtlICgyKToNCj4gICAgdGVzdHM6IE1ha2UgaW90
+ZXN0IDIyMyBlYXNpZXIgdG8gZWRpdA0KPiAgICB0ZXN0czogTW9yZSBpb3Rlc3QgMjIzIGltcHJv
+dmVtZW50cw0KPiANCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMjIzICAgICB8IDExNCArKysrKysr
+KysrKysrKysrKysrKysrKystLS0tLS0NCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMjIzLm91dCB8
+IDEzOCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICAgMiBmaWxlcyBj
+aGFuZ2VkLCAyMzEgaW5zZXJ0aW9ucygrKSwgMjEgZGVsZXRpb25zKC0pDQo+IA0KDQoNCi0tIA0K
+QmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
 
