@@ -2,60 +2,103 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32519C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:40:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AE75C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:43:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC9E2214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:40:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC9E2214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 16782214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:43:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="AzWRIHCz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16782214AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCjB9-0001S6-7V
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 07:40:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42464)
+	id 1iCjE4-0004fc-Oi
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 07:43:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42275)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1iCj2g-0002is-04
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:43 -0400
+ (envelope-from <anthony.perard@citrix.com>) id 1iCj2O-0002PV-Cx
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1iCj2b-0005Pr-M3
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50680)
+ (envelope-from <anthony.perard@citrix.com>) id 1iCj2K-0005HA-GG
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:20 -0400
+Received: from esa2.hc3370-68.iphmx.com ([216.71.145.153]:17963)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>)
- id 1iCj2S-0005LK-QR; Tue, 24 Sep 2019 07:31:25 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 13E9B10DCC98;
- Tue, 24 Sep 2019 11:31:24 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C98F55D71C;
- Tue, 24 Sep 2019 11:31:21 +0000 (UTC)
-From: Andrew Jones <drjones@redhat.com>
-To: qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org
-Subject: [PATCH v4 4/9] target/arm/cpu64: max cpu: Introduce sve<N> properties
-Date: Tue, 24 Sep 2019 13:31:00 +0200
-Message-Id: <20190924113105.19076-5-drjones@redhat.com>
-In-Reply-To: <20190924113105.19076-1-drjones@redhat.com>
-References: <20190924113105.19076-1-drjones@redhat.com>
+ (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
+ id 1iCj2K-0005Fj-6l
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1569324677;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=V2U8e+HabmdsYmqhlEYja60hkM+cXhexkTTFzMhph6o=;
+ b=AzWRIHCzIw4jdoDl3yOfRrs5zF1grQ4fEFmi0lDvBWQaJSs/9xY6lPGF
+ 8pk0/keOtsqXDS61mToqqyE2rx870l2xcrmK1l8fHPn+GjoUwYUHu0zXJ
+ O6yoHH4X/CIJRXDgTtJtJtZUdcbMKaVUtluTcrPIk5CBmF5x4fACF9oSs o=;
+Authentication-Results: esa2.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=anthony.perard@citrix.com;
+ spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa2.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ anthony.perard@citrix.com) identity=pra;
+ client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible
+Received-SPF: Pass (esa2.hc3370-68.iphmx.com: domain of
+ anthony.perard@citrix.com designates 162.221.158.21 as
+ permitted sender) identity=mailfrom;
+ client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
+Received-SPF: None (esa2.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: dTgdXBjAfZSQKKdPxguNNicmHzVINOidnNlI99CdZGJ1no/tvOOLuQmjLrEzZW3UrwZjZXNHDh
+ 3xCHu+LcGBgk0wjkYNN0lvqh558z5q4Z3nYwAX1PLxwe8ClA5hJk5iaboXAcQtDqaS0+S2q7ai
+ 4TEfUC/jzkqydd//J0Nc6qKXVa8QoCAwHds6+I3rKNxJzIqeJXbHg5Z2yqxRuxaNwUKj+MfdOx
+ XOCWFcHysxuivn1dt9Nzyg0eSim+ca6zKg1zjVJtNJgZH8SpZDDBS95XHtZUmauqP1p8uxlvPO
+ 0xs=
+X-SBRS: 2.7
+X-MesageID: 5977600
+X-Ironport-Server: esa2.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.64,543,1559534400"; 
+   d="scan'208";a="5977600"
+From: Anthony PERARD <anthony.perard@citrix.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PULL 3/7] xen: introduce separate XenWatchList for XenDevice objects
+Date: Tue, 24 Sep 2019 12:30:22 +0100
+Message-ID: <20190924113026.255634-4-anthony.perard@citrix.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20190924113026.255634-1-anthony.perard@citrix.com>
+References: <20190924113026.255634-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Tue, 24 Sep 2019 11:31:24 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 216.71.145.153
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,940 +110,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, armbru@redhat.com,
- eric.auger@redhat.com, imammedo@redhat.com, alex.bennee@linaro.org,
- Dave.Martin@arm.com
+Cc: Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce cpu properties to give fine control over SVE vector lengths.
-We introduce a property for each valid length up to the current
-maximum supported, which is 2048-bits. The properties are named, e.g.
-sve128, sve256, sve384, sve512, ..., where the number is the number of
-bits. See the updates to docs/arm-cpu-features.rst for a description
-of the semantics and for example uses.
+From: Paul Durrant <paul.durrant@citrix.com>
 
-Note, as sve-max-vq is still present and we'd like to be able to
-support qmp_query_cpu_model_expansion with guests launched with e.g.
--cpu max,sve-max-vq=3D8 on their command lines, then we do allow
-sve-max-vq and sve<N> properties to be provided at the same time, but
-this is not recommended, and is why sve-max-vq is not mentioned in the
-document.  If sve-max-vq is provided then it enables all lengths smaller
-than and including the max and disables all lengths larger. It also has
-the side-effect that no larger lengths may be enabled and that the max
-itself cannot be disabled. Smaller non-power-of-two lengths may,
-however, be disabled, e.g. -cpu max,sve-max-vq=3D4,sve384=3Doff provides =
-a
-guest the vector lengths 128, 256, and 512 bits.
+This patch uses the XenWatchList abstraction to add a separate watch list
+for each device. This is more scalable than walking a single notifier
+list for all watches and is also necessary to implement a bug-fix in a
+subsequent patch.
 
-This patch has been co-authored with Richard Henderson, who reworked
-the target/arm/cpu64.c changes in order to push all the validation and
-auto-enabling/disabling steps into the finalizer, resulting in a nice
-LOC reduction.
-
-Signed-off-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
+Message-Id: <20190913082159.31338-3-paul.durrant@citrix.com>
+Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
 ---
- docs/arm-cpu-features.rst | 157 +++++++++++++++++++++++++++++--
- target/arm/cpu.c          |  19 ++++
- target/arm/cpu.h          |  19 ++++
- target/arm/cpu64.c        | 190 +++++++++++++++++++++++++++++++++++++-
- target/arm/helper.c       |  13 ++-
- target/arm/monitor.c      |  12 +++
- tests/arm-cpu-features.c  | 189 +++++++++++++++++++++++++++++++++++++
- 7 files changed, 587 insertions(+), 12 deletions(-)
+ hw/xen/trace-events      |  2 ++
+ hw/xen/xen-bus.c         | 72 ++++++++++++++++++++++++++++++++--------
+ include/hw/xen/xen-bus.h |  2 ++
+ 3 files changed, 62 insertions(+), 14 deletions(-)
 
-diff --git a/docs/arm-cpu-features.rst b/docs/arm-cpu-features.rst
-index c79dcffb5556..1262fddc6201 100644
---- a/docs/arm-cpu-features.rst
-+++ b/docs/arm-cpu-features.rst
-@@ -48,18 +48,28 @@ block in the script for usage) is used to issue the Q=
-MP commands.
-       (QEMU) query-cpu-model-expansion type=3Dfull model=3D{"name":"max"=
-}
-       { "return": {
-         "model": { "name": "max", "props": {
--        "pmu": true, "aarch64": true
-+        "sve1664": true, "pmu": true, "sve1792": true, "sve1920": true,
-+        "sve128": true, "aarch64": true, "sve1024": true, "sve": true,
-+        "sve640": true, "sve768": true, "sve1408": true, "sve256": true,
-+        "sve1152": true, "sve512": true, "sve384": true, "sve1536": true=
-,
-+        "sve896": true, "sve1280": true, "sve2048": true
-       }}}}
-=20
--We see that the `max` CPU type has the `pmu` and `aarch64` CPU features.
--We also see that the CPU features are enabled, as they are all `true`.
-+We see that the `max` CPU type has the `pmu`, `aarch64`, `sve`, and many
-+`sve<N>` CPU features.  We also see that all the CPU features are
-+enabled, as they are all `true`.  (The `sve<N>` CPU features are all
-+optional SVE vector lengths.  See "SVE CPU Properties".)
-=20
- (2) Let's try to disable the PMU::
-=20
-       (QEMU) query-cpu-model-expansion type=3Dfull model=3D{"name":"max"=
-,"props":{"pmu":false}}
-       { "return": {
-         "model": { "name": "max", "props": {
--        "pmu": false, "aarch64": true
-+        "sve1664": true, "pmu": false, "sve1792": true, "sve1920": true,
-+        "sve128": true, "aarch64": true, "sve1024": true, "sve": true,
-+        "sve640": true, "sve768": true, "sve1408": true, "sve256": true,
-+        "sve1152": true, "sve512": true, "sve384": true, "sve1536": true=
-,
-+        "sve896": true, "sve1280": true, "sve2048": true
-       }}}}
-=20
- We see it worked, as `pmu` is now `false`.
-@@ -75,7 +85,22 @@ We see it worked, as `pmu` is now `false`.
- It looks like this feature is limited to a configuration we do not
- currently have.
-=20
--(4) Let's try probing CPU features for the Cortex-A15 CPU type::
-+(4) Let's disable `sve` and see what happens to all the optional SVE
-+    vector lengths::
-+
-+      (QEMU) query-cpu-model-expansion type=3Dfull model=3D{"name":"max"=
-,"props":{"sve":false}}
-+      { "return": {
-+        "model": { "name": "max", "props": {
-+        "sve1664": false, "pmu": true, "sve1792": false, "sve1920": fals=
-e,
-+        "sve128": false, "aarch64": true, "sve1024": false, "sve": false=
-,
-+        "sve640": false, "sve768": false, "sve1408": false, "sve256": fa=
-lse,
-+        "sve1152": false, "sve512": false, "sve384": false, "sve1536": f=
-alse,
-+        "sve896": false, "sve1280": false, "sve2048": false
-+      }}}}
-+
-+As expected they are now all `false`.
-+
-+(5) Let's try probing CPU features for the Cortex-A15 CPU type::
-=20
-       (QEMU) query-cpu-model-expansion type=3Dfull model=3D{"name":"cort=
-ex-a15"}
-       {"return": {"model": {"name": "cortex-a15", "props": {"pmu": true}=
-}}}
-@@ -131,7 +156,125 @@ After determining which CPU features are available =
-and supported for a
- given CPU type, then they may be selectively enabled or disabled on the
- QEMU command line with that CPU type::
-=20
--  $ qemu-system-aarch64 -M virt -cpu max,pmu=3Doff
-+  $ qemu-system-aarch64 -M virt -cpu max,pmu=3Doff,sve=3Don,sve128=3Don,=
-sve256=3Don
-+
-+The example above disables the PMU and enables the first two SVE vector
-+lengths for the `max` CPU type.  Note, the `sve=3Don` isn't actually
-+necessary, because, as we observed above with our probe of the `max` CPU
-+type, `sve` is already on by default.  Also, based on our probe of
-+defaults, it would seem we need to disable many SVE vector lengths, rath=
-er
-+than only enabling the two we want.  This isn't the case, because, as
-+disabling many SVE vector lengths would be quite verbose, the `sve<N>` C=
-PU
-+properties have special semantics (see "SVE CPU Property Parsing
-+Semantics").
-+
-+SVE CPU Properties
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+There are two types of SVE CPU properties: `sve` and `sve<N>`.  The firs=
-t
-+is used to enable or disable the entire SVE feature, just as the `pmu`
-+CPU property completely enables or disables the PMU.  The second type
-+is used to enable or disable specific vector lengths, where `N` is the
-+number of bits of the length.  The `sve<N>` CPU properties have special
-+dependencies and constraints, see "SVE CPU Property Dependencies and
-+Constraints" below.  Additionally, as we want all supported vector lengt=
-hs
-+to be enabled by default, then, in order to avoid overly verbose command
-+lines (command lines full of `sve<N>=3Doff`, for all `N` not wanted), we
-+provide the parsing semantics listed in "SVE CPU Property Parsing
-+Semantics".
-+
-+SVE CPU Property Dependencies and Constraints
-+---------------------------------------------
-+
-+  1) At least one vector length must be enabled when `sve` is enabled.
-+
-+  2) If a vector length `N` is enabled, then all power-of-two vector
-+     lengths smaller than `N` must also be enabled.  E.g. if `sve512`
-+     is enabled, then `sve128` and `sve256` must also be enabled,
-+     but `sve384` is not required.
-+
-+SVE CPU Property Parsing Semantics
-+----------------------------------
-+
-+  1) If SVE is disabled (`sve=3Doff`), then which SVE vector lengths
-+     are enabled or disabled is irrelevant to the guest, as the entire
-+     SVE feature is disabled and that disables all vector lengths for
-+     the guest.  However QEMU will still track any `sve<N>` CPU
-+     properties provided by the user.  If later an `sve=3Don` is provide=
-d,
-+     then the guest will get only the enabled lengths.
-+
-+  2) If SVE is enabled (`sve=3Don`), but no `sve<N>` CPU properties are
-+     provided, then all supported vector lengths are enabled.
-+
-+  3) If SVE is enabled, then an error is generated when attempting to
-+     disable the last enabled vector length (see constraint (1) of "SVE
-+     CPU Property Dependencies and Constraints").
-+
-+  4) If one or more `sve<N>` CPU properties are set `off`, but no `sve<N=
->`,
-+     CPU properties are set `on`, then the specified vector lengths are
-+     disabled but the default for any unspecified lengths remains enable=
-d.
-+     Disabling a power-of-two vector length also disables all vector
-+     lengths larger than the power-of-two length (see constraint (2) of
-+     "SVE CPU Property Dependencies and Constraints").
-+
-+  5) If one or more `sve<N>` CPU properties are set to `on`, then they
-+     are enabled and all unspecified lengths default to disabled, except
-+     for the required lengths per constraint (2) of "SVE CPU Property
-+     Dependencies and Constraints", which will even be auto-enabled if
-+     they were not explicitly enabled.
-+
-+  6) If SVE was disabled (`sve=3Doff`), allowing all vector lengths to b=
-e
-+     explicitly disabled (i.e. avoiding the error specified in (3) of
-+     "SVE CPU Property Parsing Semantics"), then if later an `sve=3Don` =
-is
-+     provided an error will be generated.  To avoid this error, one must
-+     enable at least one vector length prior to enabling SVE.
-+
-+SVE CPU Property Examples
-+-------------------------
-+
-+  1) Disable SVE::
-+
-+     $ qemu-system-aarch64 -M virt -cpu max,sve=3Doff
-+
-+  2) Implicitly enable all vector lengths for the `max` CPU type::
-+
-+     $ qemu-system-aarch64 -M virt -cpu max
-+
-+  3) Only enable the 128-bit vector length::
-+
-+     $ qemu-system-aarch64 -M virt -cpu max,sve128=3Don
-+
-+  4) Disable the 256-bit vector length and all larger vector lengths
-+     since 256 is a power-of-two (this results in only the 128-bit lengt=
-h
-+     being enabled)::
-+
-+     $ qemu-system-aarch64 -M virt -cpu max,sve256=3Doff
-+
-+  5) Enable the 128-bit, 256-bit, and 512-bit vector lengths::
-+
-+     $ qemu-system-aarch64 -M virt -cpu max,sve128=3Don,sve256=3Don,sve5=
-12=3Don
-+
-+  6) The same as (5), but since the 128-bit and 256-bit vector
-+     lengths are required for the 512-bit vector length to be enabled,
-+     then allow them to be auto-enabled::
-+
-+     $ qemu-system-aarch64 -M virt -cpu max,sve512=3Don
-+
-+  7) Do the same as (6), but by first disabling SVE and then re-enabling=
- it::
-+
-+     $ qemu-system-aarch64 -M virt -cpu max,sve=3Doff,sve512=3Don,sve=3D=
-on
-+
-+  8) Force errors regarding the last vector length::
-+
-+     $ qemu-system-aarch64 -M virt -cpu max,sve128=3Doff
-+     $ qemu-system-aarch64 -M virt -cpu max,sve=3Doff,sve128=3Doff,sve=3D=
-on
-+
-+SVE CPU Property Recommendations
-+--------------------------------
-=20
--The example above disables the PMU for the `max` CPU type.
-+The examples in "SVE CPU Property Examples" exhibit many ways to select
-+vector lengths which developers may find useful in order to avoid overly
-+verbose command lines.  However, the recommended way to select vector
-+lengths is to explicitly enable each desired length.  Therefore only
-+example's (1), (3), and (5) exhibit recommended uses of the properties.
-=20
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 73be2ebfdd39..522fed95b339 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1199,6 +1199,19 @@ static void arm_cpu_finalizefn(Object *obj)
- #endif
- }
-=20
-+void arm_cpu_finalize_features(ARMCPU *cpu, Error **errp)
-+{
-+    Error *local_err =3D NULL;
-+
-+    if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
-+        arm_cpu_sve_finalize(cpu, &local_err);
-+        if (local_err !=3D NULL) {
-+            error_propagate(errp, local_err);
-+            return;
-+        }
-+    }
-+}
-+
- static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+diff --git a/hw/xen/trace-events b/hw/xen/trace-events
+index ac8d9c20d2..80ce3dafad 100644
+--- a/hw/xen/trace-events
++++ b/hw/xen/trace-events
+@@ -29,6 +29,8 @@ xen_device_backend_changed(const char *type, char *name) "type: %s name: %s"
+ xen_device_frontend_state(const char *type, char *name, const char *state) "type: %s name: %s -> %s"
+ xen_device_frontend_changed(const char *type, char *name) "type: %s name: %s"
+ xen_device_unplug(const char *type, char *name) "type: %s name: %s"
++xen_device_add_watch(const char *type, char *name, const char *node, const char *key) "type: %s name: %s node: %s key: %s"
++xen_device_remove_watch(const char *type, char *name, const char *node, const char *key) "type: %s name: %s node: %s key: %s"
+ 
+ # xen-bus-helper.c
+ xs_node_create(const char *node) "%s"
+diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+index 28efaccff2..810a4e2df3 100644
+--- a/hw/xen/xen-bus.c
++++ b/hw/xen/xen-bus.c
+@@ -235,11 +235,11 @@ static void watch_list_remove(XenWatchList *watch_list, XenWatch *watch,
+ 
+ static XenWatch *xen_bus_add_watch(XenBus *xenbus, const char *node,
+                                    const char *key, XenWatchHandler handler,
+-                                   void *opaque, Error **errp)
++                                   Error **errp)
  {
-     CPUState *cs =3D CPU(dev);
-@@ -1255,6 +1268,12 @@ static void arm_cpu_realizefn(DeviceState *dev, Er=
-ror **errp)
-         return;
+     trace_xen_bus_add_watch(node, key);
+ 
+-    return watch_list_add(xenbus->watch_list, node, key, handler, opaque,
++    return watch_list_add(xenbus->watch_list, node, key, handler, xenbus,
+                           errp);
+ }
+ 
+@@ -433,7 +433,7 @@ static void xen_bus_realize(BusState *bus, Error **errp)
+ 
+     xenbus->backend_watch =
+         xen_bus_add_watch(xenbus, "", /* domain root node */
+-                          "backend", xen_bus_enumerate, xenbus, &local_err);
++                          "backend", xen_bus_enumerate, &local_err);
+     if (local_err) {
+         /* This need not be treated as a hard error so don't propagate */
+         error_reportf_err(local_err,
+@@ -621,6 +621,31 @@ static void xen_device_backend_changed(void *opaque)
      }
-=20
-+    arm_cpu_finalize_features(cpu, &local_err);
-+    if (local_err !=3D NULL) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-     if (arm_feature(env, ARM_FEATURE_AARCH64) &&
-         cpu->has_vfp !=3D cpu->has_neon) {
-         /*
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 297ad5e47ad8..11162484465a 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -184,8 +184,13 @@ typedef struct {
-=20
- #ifdef TARGET_AARCH64
- # define ARM_MAX_VQ    16
-+void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp);
-+uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t vq);
- #else
- # define ARM_MAX_VQ    1
-+static inline void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp) { }
-+static inline uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t=
- vq)
-+{ return 0; }
- #endif
-=20
- typedef struct ARMVectorReg {
-@@ -915,6 +920,18 @@ struct ARMCPU {
-=20
-     /* Used to set the maximum vector length the cpu will support.  */
-     uint32_t sve_max_vq;
-+
-+    /*
-+     * In sve_vq_map each set bit is a supported vector length of
-+     * (bit-number + 1) * 16 bytes, i.e. each bit number + 1 is the vect=
-or
-+     * length in quadwords.
-+     *
-+     * While processing properties during initialization, corresponding
-+     * sve_vq_init bits are set for bits in sve_vq_map that have been
-+     * set by properties.
-+     */
-+    DECLARE_BITMAP(sve_vq_map, ARM_MAX_VQ);
-+    DECLARE_BITMAP(sve_vq_init, ARM_MAX_VQ);
- };
-=20
- void arm_cpu_post_init(Object *obj);
-@@ -1834,6 +1851,8 @@ static inline int arm_feature(CPUARMState *env, int=
- feature)
-     return (env->features & (1ULL << feature)) !=3D 0;
  }
-=20
-+void arm_cpu_finalize_features(ARMCPU *cpu, Error **errp);
-+
- #if !defined(CONFIG_USER_ONLY)
- /* Return true if exception levels below EL3 are in secure state,
-  * or would be following an exception return to that level.
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 8cdb0c79fa7a..606e3eceb9c0 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -256,11 +256,152 @@ static void aarch64_a72_initfn(Object *obj)
-     define_arm_cp_regs(cpu, cortex_a72_a57_a53_cp_reginfo);
- }
-=20
-+void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
+ 
++static XenWatch *xen_device_add_watch(XenDevice *xendev, const char *node,
++                                      const char *key,
++                                      XenWatchHandler handler,
++                                      Error **errp)
 +{
-+    /*
-+     * If any vector lengths are explicitly enabled with sve<N> properti=
-es,
-+     * then all other lengths are implicitly disabled.  If sve-max-vq is
-+     * specified then it is the same as explicitly enabling all lengths
-+     * up to and including the specified maximum, which means all larger
-+     * lengths will be implicitly disabled.  If no sve<N> properties
-+     * are enabled and sve-max-vq is not specified, then all lengths not
-+     * explicitly disabled will be enabled.  Additionally, all power-of-=
-two
-+     * vector lengths less than the maximum enabled length will be
-+     * automatically enabled and all vector lengths larger than the larg=
-est
-+     * disabled power-of-two vector length will be automatically disable=
-d.
-+     * Errors are generated if the user provided input that interferes w=
-ith
-+     * any of the above.  Finally, if SVE is not disabled, then at least=
- one
-+     * vector length must be enabled.
-+     */
-+    DECLARE_BITMAP(tmp, ARM_MAX_VQ);
-+    uint32_t vq, max_vq =3D 0;
++    const char *type = object_get_typename(OBJECT(xendev));
 +
-+    /*
-+     * Process explicit sve<N> properties.
-+     * From the properties, sve_vq_map<N> implies sve_vq_init<N>.
-+     * Check first for any sve<N> enabled.
-+     */
-+    if (!bitmap_empty(cpu->sve_vq_map, ARM_MAX_VQ)) {
-+        max_vq =3D find_last_bit(cpu->sve_vq_map, ARM_MAX_VQ) + 1;
++    trace_xen_device_add_watch(type, xendev->name, node, key);
 +
-+        if (cpu->sve_max_vq && max_vq > cpu->sve_max_vq) {
-+            error_setg(errp, "cannot enable sve%d", max_vq * 128);
-+            error_append_hint(errp, "sve%d is larger than the maximum ve=
-ctor "
-+                              "length, sve-max-vq=3D%d (%d bits)\n",
-+                              max_vq * 128, cpu->sve_max_vq,
-+                              cpu->sve_max_vq * 128);
-+            return;
-+        }
-+
-+        /* Propagate enabled bits down through required powers-of-two. *=
-/
-+        for (vq =3D pow2floor(max_vq); vq >=3D 1; vq >>=3D 1) {
-+            if (!test_bit(vq - 1, cpu->sve_vq_init)) {
-+                set_bit(vq - 1, cpu->sve_vq_map);
-+            }
-+        }
-+    } else if (cpu->sve_max_vq =3D=3D 0) {
-+        /*
-+         * No explicit bits enabled, and no implicit bits from sve-max-v=
-q.
-+         */
-+        if (!cpu_isar_feature(aa64_sve, cpu)) {
-+            /* SVE is disabled and so are all vector lengths.  Good. */
-+            return;
-+        }
-+
-+        /* Disabling a power-of-two disables all larger lengths. */
-+        if (test_bit(0, cpu->sve_vq_init)) {
-+            error_setg(errp, "cannot disable sve128");
-+            error_append_hint(errp, "Disabling sve128 results in all vec=
-tor "
-+                              "lengths being disabled.\n");
-+            error_append_hint(errp, "With SVE enabled, at least one vect=
-or "
-+                              "length must be enabled.\n");
-+            return;
-+        }
-+        for (vq =3D 2; vq <=3D ARM_MAX_VQ; vq <<=3D 1) {
-+            if (test_bit(vq - 1, cpu->sve_vq_init)) {
-+                break;
-+            }
-+        }
-+        max_vq =3D vq <=3D ARM_MAX_VQ ? vq - 1 : ARM_MAX_VQ;
-+
-+        bitmap_complement(cpu->sve_vq_map, cpu->sve_vq_init, max_vq);
-+        max_vq =3D find_last_bit(cpu->sve_vq_map, max_vq) + 1;
-+    }
-+
-+    /*
-+     * Process the sve-max-vq property.
-+     * Note that we know from the above that no bit above
-+     * sve-max-vq is currently set.
-+     */
-+    if (cpu->sve_max_vq !=3D 0) {
-+        max_vq =3D cpu->sve_max_vq;
-+
-+        if (!test_bit(max_vq - 1, cpu->sve_vq_map) &&
-+            test_bit(max_vq - 1, cpu->sve_vq_init)) {
-+            error_setg(errp, "cannot disable sve%d", max_vq * 128);
-+            error_append_hint(errp, "The maximum vector length must be "
-+                              "enabled, sve-max-vq=3D%d (%d bits)\n",
-+                              max_vq, max_vq * 128);
-+            return;
-+        }
-+
-+        /* Set all bits not explicitly set within sve-max-vq. */
-+        bitmap_complement(tmp, cpu->sve_vq_init, max_vq);
-+        bitmap_or(cpu->sve_vq_map, cpu->sve_vq_map, tmp, max_vq);
-+    }
-+
-+    /*
-+     * We should know what max-vq is now.  Also, as we're done
-+     * manipulating sve-vq-map, we ensure any bits above max-vq
-+     * are clear, just in case anybody looks.
-+     */
-+    assert(max_vq !=3D 0);
-+    bitmap_clear(cpu->sve_vq_map, max_vq, ARM_MAX_VQ - max_vq);
-+
-+    /* Ensure all required powers-of-two are enabled. */
-+    for (vq =3D pow2floor(max_vq); vq >=3D 1; vq >>=3D 1) {
-+        if (!test_bit(vq - 1, cpu->sve_vq_map)) {
-+            error_setg(errp, "cannot disable sve%d", vq * 128);
-+            error_append_hint(errp, "sve%d is required as it "
-+                              "is a power-of-two length smaller than "
-+                              "the maximum, sve%d\n",
-+                              vq * 128, max_vq * 128);
-+            return;
-+        }
-+    }
-+
-+    /* From now on sve_max_vq is the actual maximum supported length. */
-+    cpu->sve_max_vq =3D max_vq;
++    return watch_list_add(xendev->watch_list, node, key, handler, xendev,
++                          errp);
 +}
 +
-+uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t vq)
++static void xen_device_remove_watch(XenDevice *xendev, XenWatch *watch,
++                                    Error **errp)
 +{
-+    uint32_t bitnum;
++    const char *type = object_get_typename(OBJECT(xendev));
 +
-+    /*
-+     * We allow vq =3D=3D ARM_MAX_VQ + 1 to be input because the caller =
-may want
-+     * to find the maximum vq enabled, which may be ARM_MAX_VQ, but this
-+     * function always returns the next smaller than the input.
-+     */
-+    assert(vq && vq <=3D ARM_MAX_VQ + 1);
++    trace_xen_device_remove_watch(type, xendev->name, watch->node,
++                                  watch->key);
 +
-+    bitnum =3D find_last_bit(cpu->sve_vq_map, vq - 1);
-+    return bitnum =3D=3D vq - 1 ? 0 : bitnum + 1;
++    watch_list_remove(xendev->watch_list, watch, errp);
 +}
 +
- static void cpu_max_get_sve_max_vq(Object *obj, Visitor *v, const char *=
-name,
-                                    void *opaque, Error **errp)
++
+ static void xen_device_backend_create(XenDevice *xendev, Error **errp)
  {
-     ARMCPU *cpu =3D ARM_CPU(obj);
--    visit_type_uint32(v, name, &cpu->sve_max_vq, errp);
-+    uint32_t value;
-+
-+    /* All vector lengths are disabled when SVE is off. */
-+    if (!cpu_isar_feature(aa64_sve, cpu)) {
-+        value =3D 0;
-+    } else {
-+        value =3D cpu->sve_max_vq;
-+    }
-+    visit_type_uint32(v, name, &value, errp);
- }
-=20
- static void cpu_max_set_sve_max_vq(Object *obj, Visitor *v, const char *=
-name,
-@@ -279,6 +420,44 @@ static void cpu_max_set_sve_max_vq(Object *obj, Visi=
-tor *v, const char *name,
-     error_propagate(errp, err);
- }
-=20
-+static void cpu_arm_get_sve_vq(Object *obj, Visitor *v, const char *name=
-,
-+                               void *opaque, Error **errp)
-+{
-+    ARMCPU *cpu =3D ARM_CPU(obj);
-+    uint32_t vq =3D atoi(&name[3]) / 128;
-+    bool value;
-+
-+    /* All vector lengths are disabled when SVE is off. */
-+    if (!cpu_isar_feature(aa64_sve, cpu)) {
-+        value =3D false;
-+    } else {
-+        value =3D test_bit(vq - 1, cpu->sve_vq_map);
-+    }
-+    visit_type_bool(v, name, &value, errp);
-+}
-+
-+static void cpu_arm_set_sve_vq(Object *obj, Visitor *v, const char *name=
-,
-+                               void *opaque, Error **errp)
-+{
-+    ARMCPU *cpu =3D ARM_CPU(obj);
-+    uint32_t vq =3D atoi(&name[3]) / 128;
-+    Error *err =3D NULL;
-+    bool value;
-+
-+    visit_type_bool(v, name, &value, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+
-+    if (value) {
-+        set_bit(vq - 1, cpu->sve_vq_map);
-+    } else {
-+        clear_bit(vq - 1, cpu->sve_vq_map);
-+    }
-+    set_bit(vq - 1, cpu->sve_vq_init);
-+}
-+
- static void cpu_arm_get_sve(Object *obj, Visitor *v, const char *name,
-                             void *opaque, Error **errp)
- {
-@@ -315,6 +494,7 @@ static void cpu_arm_set_sve(Object *obj, Visitor *v, =
-const char *name,
- static void aarch64_max_initfn(Object *obj)
- {
-     ARMCPU *cpu =3D ARM_CPU(obj);
-+    uint32_t vq;
-=20
-     if (kvm_enabled()) {
-         kvm_arm_set_cpu_features_from_host(cpu);
-@@ -418,11 +598,17 @@ static void aarch64_max_initfn(Object *obj)
-         cpu->dcz_blocksize =3D 7; /*  512 bytes */
- #endif
-=20
--        cpu->sve_max_vq =3D ARM_MAX_VQ;
-         object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve=
-_max_vq,
-                             cpu_max_set_sve_max_vq, NULL, NULL, &error_f=
-atal);
-         object_property_add(obj, "sve", "bool", cpu_arm_get_sve,
-                             cpu_arm_set_sve, NULL, NULL, &error_fatal);
-+
-+        for (vq =3D 1; vq <=3D ARM_MAX_VQ; ++vq) {
-+            char name[8];
-+            sprintf(name, "sve%d", vq * 128);
-+            object_property_add(obj, name, "bool", cpu_arm_get_sve_vq,
-+                                cpu_arm_set_sve_vq, NULL, NULL, &error_f=
-atal);
-+        }
+     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
+@@ -645,9 +670,9 @@ static void xen_device_backend_create(XenDevice *xendev, Error **errp)
      }
- }
-=20
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 507026c9154b..f33284c247d5 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -5351,6 +5351,13 @@ int sve_exception_el(CPUARMState *env, int el)
-     return 0;
- }
-=20
-+static uint32_t sve_zcr_get_valid_len(ARMCPU *cpu, uint32_t start_len)
-+{
-+    uint32_t start_vq =3D (start_len & 0xf) + 1;
-+
-+    return arm_cpu_vq_map_next_smaller(cpu, start_vq + 1) - 1;
-+}
-+
- /*
-  * Given that SVE is enabled, return the vector length for EL.
-  */
-@@ -5360,13 +5367,13 @@ uint32_t sve_zcr_len_for_el(CPUARMState *env, int=
- el)
-     uint32_t zcr_len =3D cpu->sve_max_vq - 1;
-=20
-     if (el <=3D 1) {
--        zcr_len =3D MIN(zcr_len, 0xf & (uint32_t)env->vfp.zcr_el[1]);
-+        zcr_len =3D sve_zcr_get_valid_len(cpu, env->vfp.zcr_el[1]);
+ 
+     xendev->backend_state_watch =
+-        xen_bus_add_watch(xenbus, xendev->backend_path,
+-                          "state", xen_device_backend_changed,
+-                          xendev, &local_err);
++        xen_device_add_watch(xendev, xendev->backend_path,
++                             "state", xen_device_backend_changed,
++                             &local_err);
+     if (local_err) {
+         error_propagate_prepend(errp, local_err,
+                                 "failed to watch backend state: ");
+@@ -655,9 +680,9 @@ static void xen_device_backend_create(XenDevice *xendev, Error **errp)
      }
-     if (el <=3D 2 && arm_feature(env, ARM_FEATURE_EL2)) {
--        zcr_len =3D MIN(zcr_len, 0xf & (uint32_t)env->vfp.zcr_el[2]);
-+        zcr_len =3D sve_zcr_get_valid_len(cpu, env->vfp.zcr_el[2]);
+ 
+     xendev->backend_online_watch =
+-        xen_bus_add_watch(xenbus, xendev->backend_path,
+-                          "online", xen_device_backend_changed,
+-                          xendev, &local_err);
++        xen_device_add_watch(xendev, xendev->backend_path,
++                             "online", xen_device_backend_changed,
++                             &local_err);
+     if (local_err) {
+         error_propagate_prepend(errp, local_err,
+                                 "failed to watch backend online: ");
+@@ -671,12 +696,12 @@ static void xen_device_backend_destroy(XenDevice *xendev)
+     Error *local_err = NULL;
+ 
+     if (xendev->backend_online_watch) {
+-        xen_bus_remove_watch(xenbus, xendev->backend_online_watch, NULL);
++        xen_device_remove_watch(xendev, xendev->backend_online_watch, NULL);
+         xendev->backend_online_watch = NULL;
      }
-     if (arm_feature(env, ARM_FEATURE_EL3)) {
--        zcr_len =3D MIN(zcr_len, 0xf & (uint32_t)env->vfp.zcr_el[3]);
-+        zcr_len =3D sve_zcr_get_valid_len(cpu, env->vfp.zcr_el[3]);
+ 
+     if (xendev->backend_state_watch) {
+-        xen_bus_remove_watch(xenbus, xendev->backend_state_watch, NULL);
++        xen_device_remove_watch(xendev, xendev->backend_state_watch, NULL);
+         xendev->backend_state_watch = NULL;
      }
-     return zcr_len;
- }
-diff --git a/target/arm/monitor.c b/target/arm/monitor.c
-index 4fddb6c252a3..e912ed2cefa0 100644
---- a/target/arm/monitor.c
-+++ b/target/arm/monitor.c
-@@ -90,6 +90,8 @@ GICCapabilityList *qmp_query_gic_capabilities(Error **e=
-rrp)
-     return head;
- }
-=20
-+QEMU_BUILD_BUG_ON(ARM_MAX_VQ > 16);
-+
- /*
-  * These are cpu model features we want to advertise. The order here
-  * matters as this is the order in which qmp_query_cpu_model_expansion
-@@ -98,6 +100,9 @@ GICCapabilityList *qmp_query_gic_capabilities(Error **=
-errp)
-  */
- static const char *cpu_model_advertised_features[] =3D {
-     "aarch64", "pmu", "sve",
-+    "sve128", "sve256", "sve384", "sve512",
-+    "sve640", "sve768", "sve896", "sve1024", "sve1152", "sve1280",
-+    "sve1408", "sve1536", "sve1664", "sve1792", "sve1920", "sve2048",
-     NULL
- };
-=20
-@@ -185,6 +190,9 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(=
-CpuModelExpansionType type,
-         if (!err) {
-             visit_check_struct(visitor, &err);
-         }
-+        if (!err) {
-+            arm_cpu_finalize_features(ARM_CPU(obj), &err);
-+        }
-         visit_end_struct(visitor, NULL);
-         visit_free(visitor);
-         if (err) {
-@@ -192,6 +200,10 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion=
-(CpuModelExpansionType type,
-             error_propagate(errp, err);
-             return NULL;
-         }
-+    } else {
-+        Error *err =3D NULL;
-+        arm_cpu_finalize_features(ARM_CPU(obj), &err);
-+        assert(err =3D=3D NULL);
+ 
+@@ -812,8 +837,8 @@ static void xen_device_frontend_create(XenDevice *xendev, Error **errp)
      }
-=20
-     expansion_info =3D g_new0(CpuModelExpansionInfo, 1);
-diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
-index 202bc0e3e823..9a2dd402b769 100644
---- a/tests/arm-cpu-features.c
-+++ b/tests/arm-cpu-features.c
-@@ -13,6 +13,18 @@
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qjson.h"
-=20
-+#if __SIZEOF_LONG__ =3D=3D 8
-+#define BIT(n) (1UL << (n))
-+#else
-+#define BIT(n) (1ULL << (n))
-+#endif
-+
-+/*
-+ * We expect the SVE max-vq to be 16. Also it must be <=3D 64
-+ * for our test code, otherwise 'vls' can't just be a uint64_t.
-+ */
-+#define SVE_MAX_VQ 16
-+
- #define MACHINE    "-machine virt,gic-version=3Dmax "
- #define QUERY_HEAD "{ 'execute': 'query-cpu-model-expansion', " \
-                      "'arguments': { 'type': 'full', "
-@@ -157,6 +169,173 @@ static void assert_bad_props(QTestState *qts, const=
- char *cpu_type)
-     qobject_unref(resp);
- }
-=20
-+static uint64_t resp_get_sve_vls(QDict *resp)
-+{
-+    QDict *props;
-+    const QDictEntry *e;
-+    uint64_t vls =3D 0;
-+    int n =3D 0;
-+
-+    g_assert(resp);
-+    g_assert(resp_has_props(resp));
-+
-+    props =3D resp_get_props(resp);
-+
-+    for (e =3D qdict_first(props); e; e =3D qdict_next(props, e)) {
-+        if (strlen(e->key) > 3 && !strncmp(e->key, "sve", 3) &&
-+            g_ascii_isdigit(e->key[3])) {
-+            char *endptr;
-+            int bits;
-+
-+            bits =3D g_ascii_strtoll(&e->key[3], &endptr, 10);
-+            if (!bits || *endptr !=3D '\0') {
-+                continue;
-+            }
-+
-+            if (qdict_get_bool(props, e->key)) {
-+                vls |=3D BIT((bits / 128) - 1);
-+            }
-+            ++n;
-+        }
+ 
+     xendev->frontend_state_watch =
+-        xen_bus_add_watch(xenbus, xendev->frontend_path, "state",
+-                          xen_device_frontend_changed, xendev, &local_err);
++        xen_device_add_watch(xendev, xendev->frontend_path, "state",
++                             xen_device_frontend_changed, &local_err);
+     if (local_err) {
+         error_propagate_prepend(errp, local_err,
+                                 "failed to watch frontend state: ");
+@@ -826,7 +851,8 @@ static void xen_device_frontend_destroy(XenDevice *xendev)
+     Error *local_err = NULL;
+ 
+     if (xendev->frontend_state_watch) {
+-        xen_bus_remove_watch(xenbus, xendev->frontend_state_watch, NULL);
++        xen_device_remove_watch(xendev, xendev->frontend_state_watch,
++                                NULL);
+         xendev->frontend_state_watch = NULL;
+     }
+ 
+@@ -1122,6 +1148,16 @@ static void xen_device_unrealize(DeviceState *dev, Error **errp)
+         xendev->xgth = NULL;
+     }
+ 
++    if (xendev->watch_list) {
++        watch_list_destroy(xendev->watch_list);
++        xendev->watch_list = NULL;
 +    }
 +
-+    g_assert(n =3D=3D SVE_MAX_VQ);
-+
-+    return vls;
-+}
-+
-+#define assert_sve_vls(qts, cpu_type, expected_vls, fmt, ...)          \
-+({                                                                     \
-+    QDict *_resp =3D do_query(qts, cpu_type, fmt, ##__VA_ARGS__);       =
- \
-+    g_assert(_resp);                                                   \
-+    g_assert(resp_has_props(_resp));                                   \
-+    g_assert(resp_get_sve_vls(_resp) =3D=3D expected_vls);              =
-   \
-+    qobject_unref(_resp);                                              \
-+})
-+
-+static void sve_tests_default(QTestState *qts, const char *cpu_type)
-+{
-+    /*
-+     * With no sve-max-vq or sve<N> properties on the command line
-+     * the default is to have all vector lengths enabled. This also
-+     * tests that 'sve' is 'on' by default.
-+     */
-+    assert_sve_vls(qts, cpu_type, BIT(SVE_MAX_VQ) - 1, NULL);
-+
-+    /* With SVE off, all vector lengths should also be off. */
-+    assert_sve_vls(qts, cpu_type, 0, "{ 'sve': false }");
-+
-+    /* With SVE on, we must have at least one vector length enabled. */
-+    assert_error(qts, cpu_type, "cannot disable sve128", "{ 'sve128': fa=
-lse }");
-+
-+    /*
-+     * -----------------------------------------------------------------=
-----
-+     *               power-of-two(vq)   all-power-            can      c=
-an
-+     *                                  of-two(< vq)        enable   dis=
-able
-+     * -----------------------------------------------------------------=
-----
-+     * vq < max_vq      no                MUST*              yes      ye=
-s
-+     * vq < max_vq      yes               MUST*              yes      no
-+     * -----------------------------------------------------------------=
-----
-+     * vq =3D=3D max_vq     n/a               MUST*              yes**  =
-  yes**
-+     * -----------------------------------------------------------------=
-----
-+     * vq > max_vq      n/a               no                 no       ye=
-s
-+     * vq > max_vq      n/a               yes                yes      ye=
-s
-+     * -----------------------------------------------------------------=
-----
-+     *
-+     * [*] "MUST" means this requirement must already be satisfied,
-+     *     otherwise 'max_vq' couldn't itself be enabled.
-+     *
-+     * [**] Not testable with the QMP interface, only with the command l=
-ine.
-+     */
-+
-+    /* max_vq :=3D 8 */
-+    assert_sve_vls(qts, cpu_type, 0x8b, "{ 'sve1024': true }");
-+
-+    /* max_vq :=3D 8, vq < max_vq, !power-of-two(vq) */
-+    assert_sve_vls(qts, cpu_type, 0x8f,
-+                   "{ 'sve1024': true, 'sve384': true }");
-+    assert_sve_vls(qts, cpu_type, 0x8b,
-+                   "{ 'sve1024': true, 'sve384': false }");
-+
-+    /* max_vq :=3D 8, vq < max_vq, power-of-two(vq) */
-+    assert_sve_vls(qts, cpu_type, 0x8b,
-+                   "{ 'sve1024': true, 'sve256': true }");
-+    assert_error(qts, cpu_type, "cannot disable sve256",
-+                 "{ 'sve1024': true, 'sve256': false }");
-+
-+    /* max_vq :=3D 3, vq > max_vq, !all-power-of-two(< vq) */
-+    assert_error(qts, cpu_type, "cannot disable sve512",
-+                 "{ 'sve384': true, 'sve512': false, 'sve640': true }");
-+
-+    /*
-+     * We can disable power-of-two vector lengths when all larger length=
-s
-+     * are also disabled. We only need to disable the power-of-two lengt=
-h,
-+     * as all non-enabled larger lengths will then be auto-disabled.
-+     */
-+    assert_sve_vls(qts, cpu_type, 0x7, "{ 'sve512': false }");
-+
-+    /* max_vq :=3D 3, vq > max_vq, all-power-of-two(< vq) */
-+    assert_sve_vls(qts, cpu_type, 0x1f,
-+                   "{ 'sve384': true, 'sve512': true, 'sve640': true }")=
-;
-+    assert_sve_vls(qts, cpu_type, 0xf,
-+                   "{ 'sve384': true, 'sve512': true, 'sve640': false }"=
-);
-+}
-+
-+static void sve_tests_sve_max_vq_8(const void *data)
-+{
-+    QTestState *qts;
-+
-+    qts =3D qtest_init(MACHINE "-cpu max,sve-max-vq=3D8");
-+
-+    assert_sve_vls(qts, "max", BIT(8) - 1, NULL);
-+
-+    /*
-+     * Disabling the max-vq set by sve-max-vq is not allowed, but
-+     * of course enabling it is OK.
-+     */
-+    assert_error(qts, "max", "cannot disable sve1024", "{ 'sve1024': fal=
-se }");
-+    assert_sve_vls(qts, "max", 0xff, "{ 'sve1024': true }");
-+
-+    /*
-+     * Enabling anything larger than max-vq set by sve-max-vq is not
-+     * allowed, but of course disabling everything larger is OK.
-+     */
-+    assert_error(qts, "max", "cannot enable sve1152", "{ 'sve1152': true=
- }");
-+    assert_sve_vls(qts, "max", 0xff, "{ 'sve1152': false }");
-+
-+    /*
-+     * We can disable non power-of-two lengths smaller than the max-vq
-+     * set by sve-max-vq, but not power-of-two lengths.
-+     */
-+    assert_sve_vls(qts, "max", 0xfb, "{ 'sve384': false }");
-+    assert_error(qts, "max", "cannot disable sve256", "{ 'sve256': false=
- }");
-+
-+    qtest_quit(qts);
-+}
-+
-+static void sve_tests_sve_off(const void *data)
-+{
-+    QTestState *qts;
-+
-+    qts =3D qtest_init(MACHINE "-cpu max,sve=3Doff");
-+
-+    /* SVE is off, so the map should be empty. */
-+    assert_sve_vls(qts, "max", 0, NULL);
-+
-+    /* The map stays empty even if we turn lengths on or off. */
-+    assert_sve_vls(qts, "max", 0, "{ 'sve128': true }");
-+    assert_sve_vls(qts, "max", 0, "{ 'sve128': false }");
-+
-+    /* With SVE re-enabled we should get all vector lengths enabled. */
-+    assert_sve_vls(qts, "max", BIT(SVE_MAX_VQ) - 1, "{ 'sve': true }");
-+
-+    /* Or enable SVE with just specific vector lengths. */
-+    assert_sve_vls(qts, "max", 0x3,
-+                   "{ 'sve': true, 'sve128': true, 'sve256': true }");
-+
-+    qtest_quit(qts);
-+}
-+
- static void test_query_cpu_model_expansion(const void *data)
- {
-     QTestState *qts;
-@@ -180,9 +359,12 @@ static void test_query_cpu_model_expansion(const voi=
-d *data)
-     if (g_str_equal(qtest_get_arch(), "aarch64")) {
-         assert_has_feature(qts, "max", "aarch64");
-         assert_has_feature(qts, "max", "sve");
-+        assert_has_feature(qts, "max", "sve128");
-         assert_has_feature(qts, "cortex-a57", "pmu");
-         assert_has_feature(qts, "cortex-a57", "aarch64");
-=20
-+        sve_tests_default(qts, "max");
-+
-         /* Test that features that depend on KVM generate errors without=
-. */
-         assert_error(qts, "max",
-                      "'aarch64' feature cannot be disabled "
-@@ -234,6 +416,13 @@ int main(int argc, char **argv)
-     qtest_add_data_func("/arm/query-cpu-model-expansion",
-                         NULL, test_query_cpu_model_expansion);
-=20
-+    if (g_str_equal(qtest_get_arch(), "aarch64")) {
-+        qtest_add_data_func("/arm/max/query-cpu-model-expansion/sve-max-=
-vq-8",
-+                            NULL, sve_tests_sve_max_vq_8);
-+        qtest_add_data_func("/arm/max/query-cpu-model-expansion/sve-off"=
-,
-+                            NULL, sve_tests_sve_off);
++    if (xendev->xsh) {
++        xs_close(xendev->xsh);
++        xendev->xsh = NULL;
 +    }
 +
-     if (kvm_available) {
-         qtest_add_data_func("/arm/kvm/query-cpu-model-expansion",
-                             NULL, test_query_cpu_model_expansion_kvm);
---=20
-2.20.1
+     g_free(xendev->name);
+     xendev->name = NULL;
+ }
+@@ -1164,6 +1200,14 @@ static void xen_device_realize(DeviceState *dev, Error **errp)
+ 
+     trace_xen_device_realize(type, xendev->name);
+ 
++    xendev->xsh = xs_open(0);
++    if (!xendev->xsh) {
++        error_setg_errno(errp, errno, "failed xs_open");
++        goto unrealize;
++    }
++
++    xendev->watch_list = watch_list_create(xendev->xsh);
++
+     xendev->xgth = xengnttab_open(NULL, 0);
+     if (!xendev->xgth) {
+         error_setg_errno(errp, errno, "failed xengnttab_open");
+diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
+index 88b84e29bb..0d198148f6 100644
+--- a/include/hw/xen/xen-bus.h
++++ b/include/hw/xen/xen-bus.h
+@@ -22,6 +22,8 @@ typedef struct XenDevice {
+     DeviceState qdev;
+     domid_t frontend_id;
+     char *name;
++    struct xs_handle *xsh;
++    XenWatchList *watch_list;
+     char *backend_path, *frontend_path;
+     enum xenbus_state backend_state, frontend_state;
+     Notifier exit;
+-- 
+Anthony PERARD
 
 
