@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE84CC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 12:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62366C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 12:46:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A115A207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 12:46:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A115A207FD
+	by mail.kernel.org (Postfix) with ESMTPS id 36AD2207FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 12:46:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36AD2207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCkD8-0002g1-UP
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 08:46:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50438)
+	id 1iCkDD-0002tS-Dw
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 08:46:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50418)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCk0k-0001IX-CG
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:48 -0400
+ (envelope-from <armbru@redhat.com>) id 1iCk0j-0001IT-JI
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCk0h-0006te-AQ
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37008)
+ (envelope-from <armbru@redhat.com>) id 1iCk0g-0006t6-NX
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55460)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCk0g-0006sR-Oj
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:39 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCk0g-0006rs-Ec
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:38 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0A66410CC1EE
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 12:33:38 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B3A152BF73
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 12:33:37 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A72695D9DC;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B2F95D721;
  Tue, 24 Sep 2019 12:33:37 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 813F211385D4; Tue, 24 Sep 2019 14:33:34 +0200 (CEST)
+ id 567B911386A7; Tue, 24 Sep 2019 14:33:34 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 11/37] qapi: Permit alternates with just one branch
-Date: Tue, 24 Sep 2019 14:33:08 +0200
-Message-Id: <20190924123334.30645-12-armbru@redhat.com>
+Subject: [PULL 05/37] qapi: Drop support for boxed alternate arguments
+Date: Tue, 24 Sep 2019 14:33:02 +0200
+Message-Id: <20190924123334.30645-6-armbru@redhat.com>
 In-Reply-To: <20190924123334.30645-1-armbru@redhat.com>
 References: <20190924123334.30645-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Tue, 24 Sep 2019 12:33:38 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Tue, 24 Sep 2019 12:33:37 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -73,121 +73,164 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A union or alternate without branches makes no sense and doesn't work:
-it can't be instantiated.  A union or alternate with just one branch
-works, but is degenerate.  We accept the former, but reject the
-latter.  Weird.  docs/devel/qapi-code-gen.txt doesn't mention the
-difference.  It claims an alternate definition is "is similar to a
-simple union type".
+Commands and events can define their argument type inline (default) or
+by referring to another type ('boxed': true, since commit c818408e44
+"qapi: Implement boxed types for commands/events", v2.7.0).  The
+unboxed inline definition is an (anonymous) struct type.  The boxed
+type may be a struct, union, or alternate type.
 
-Permit degenerate alternates to make them consistent with unions.
+The latter is problematic: docs/interop/qemu-spec.txt requires the
+value of the 'data' key to be a json-object, but any non-degenerate
+alternate type has at least one branch that isn't.
+
+Fortunately, we haven't made use of alternates in this context outside
+tests/.  Drop support for them.
+
+QAPISchemaAlternateType.is_empty() is now unused.  Drop it, too.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20190913201349.24332-10-armbru@redhat.com>
+Message-Id: <20190913201349.24332-4-armbru@redhat.com>
 ---
- scripts/qapi/common.py                  | 6 ++----
- tests/qapi-schema/alternate-empty.err   | 2 +-
- tests/qapi-schema/alternate-empty.json  | 4 ++--
- tests/qapi-schema/qapi-schema-test.json | 4 +++-
- tests/qapi-schema/qapi-schema-test.out  | 6 ++++--
- 5 files changed, 12 insertions(+), 10 deletions(-)
+ docs/devel/qapi-code-gen.txt            | 12 ++++++------
+ scripts/qapi/common.py                  | 15 ++++-----------
+ tests/qapi-schema/qapi-schema-test.json |  2 +-
+ tests/qapi-schema/qapi-schema-test.out  |  2 +-
+ 4 files changed, 12 insertions(+), 19 deletions(-)
 
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index e8ec8ac1de..3d3931fb7a 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -612,9 +612,9 @@ the command.  Normally, 'data' is a dictionary for an=
+ anonymous type,
+ or names a struct type (possibly empty, but not a union), and its
+ members are passed as separate arguments to this function.  If the
+ command definition includes a key 'boxed' with the boolean value true,
+-then 'data' is instead the name of any non-empty complex type
+-(struct, union, or alternate), and a pointer to that QAPI type is
+-passed as a single argument.
++then 'data' is instead the name of any non-empty complex type (struct
++or union), and a pointer to that QAPI type is passed as a single
++argument.
+=20
+ The generator also emits a marshalling function that extracts
+ arguments for the user's function out of an input QDict, calls the
+@@ -714,9 +714,9 @@ The generator emits a function to send the event.  No=
+rmally, 'data' is
+ a dictionary for an anonymous type, or names a struct type (possibly
+ empty, but not a union), and its members are passed as separate
+ arguments to this function.  If the event definition includes a key
+-'boxed' with the boolean value true, then 'data' is instead the name of
+-any non-empty complex type (struct, union, or alternate), and a
+-pointer to that QAPI type is passed as a single argument.
++'boxed' with the boolean value true, then 'data' is instead the name
++of any non-empty complex type (struct or union), and a pointer to that
++QAPI type is passed as a single argument.
+=20
+=20
+ =3D=3D=3D Features =3D=3D=3D
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index c5c71287c3..99db18f3d6 100644
+index 9aefcfe015..54d02458b5 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -920,11 +920,9 @@ def check_alternate(expr, info):
-     members =3D expr['data']
-     types_seen =3D {}
+@@ -840,7 +840,7 @@ def check_command(expr, info):
 =20
--    # Check every branch; require at least two branches
--    if len(members) < 2:
-+    if len(members) =3D=3D 0:
-         raise QAPISemError(info,
--                           "Alternate '%s' should have at least two bran=
-ches "
--                           "in 'data'" % name)
-+                           "Alternate '%s' cannot have empty 'data'" % n=
-ame)
-     for (key, value) in members.items():
-         check_name(info, "Member of alternate '%s'" % name, key)
-         check_known_keys(info,
-diff --git a/tests/qapi-schema/alternate-empty.err b/tests/qapi-schema/al=
-ternate-empty.err
-index bb06c5bfec..86dbc666eb 100644
---- a/tests/qapi-schema/alternate-empty.err
-+++ b/tests/qapi-schema/alternate-empty.err
-@@ -1 +1 @@
--tests/qapi-schema/alternate-empty.json:2: Alternate 'Alt' should have at=
- least two branches in 'data'
-+tests/qapi-schema/alternate-empty.json:2: Alternate 'Alt' cannot have em=
-pty 'data'
-diff --git a/tests/qapi-schema/alternate-empty.json b/tests/qapi-schema/a=
-lternate-empty.json
-index fff15baf16..9f445474e6 100644
---- a/tests/qapi-schema/alternate-empty.json
-+++ b/tests/qapi-schema/alternate-empty.json
-@@ -1,2 +1,2 @@
--# alternates must list at least two types to be useful
--{ 'alternate': 'Alt', 'data': { 'i': 'int' } }
-+# alternates cannot be empty
-+{ 'alternate': 'Alt', 'data': { } }
+     args_meta =3D ['struct']
+     if boxed:
+-        args_meta +=3D ['union', 'alternate']
++        args_meta +=3D ['union']
+     check_type(info, "'data' for command '%s'" % name,
+                expr.get('data'), allow_dict=3Dnot boxed,
+                allow_metas=3Dargs_meta)
+@@ -858,7 +858,7 @@ def check_event(expr, info):
+=20
+     meta =3D ['struct']
+     if boxed:
+-        meta +=3D ['union', 'alternate']
++        meta +=3D ['union']
+     check_type(info, "'data' for event '%s'" % name,
+                expr.get('data'), allow_dict=3Dnot boxed,
+                allow_metas=3Dmeta)
+@@ -1690,9 +1690,6 @@ class QAPISchemaAlternateType(QAPISchemaType):
+         visitor.visit_alternate_type(self.name, self.info, self.ifcond,
+                                      self.variants)
+=20
+-    def is_empty(self):
+-        return False
+-
+=20
+ class QAPISchemaCommand(QAPISchemaEntity):
+     def __init__(self, name, info, doc, ifcond, arg_type, ret_type,
+@@ -1714,15 +1711,13 @@ class QAPISchemaCommand(QAPISchemaEntity):
+         QAPISchemaEntity.check(self, schema)
+         if self._arg_type_name:
+             self.arg_type =3D schema.lookup_type(self._arg_type_name)
+-            assert (isinstance(self.arg_type, QAPISchemaObjectType) or
+-                    isinstance(self.arg_type, QAPISchemaAlternateType))
++            assert isinstance(self.arg_type, QAPISchemaObjectType)
+             self.arg_type.check(schema)
+             if self.boxed:
+                 if self.arg_type.is_empty():
+                     raise QAPISemError(self.info,
+                                        "Cannot use 'boxed' with empty ty=
+pe")
+             else:
+-                assert not isinstance(self.arg_type, QAPISchemaAlternate=
+Type)
+                 assert not self.arg_type.variants
+         elif self.boxed:
+             raise QAPISemError(self.info, "Use of 'boxed' requires 'data=
+'")
+@@ -1750,15 +1745,13 @@ class QAPISchemaEvent(QAPISchemaEntity):
+         QAPISchemaEntity.check(self, schema)
+         if self._arg_type_name:
+             self.arg_type =3D schema.lookup_type(self._arg_type_name)
+-            assert (isinstance(self.arg_type, QAPISchemaObjectType) or
+-                    isinstance(self.arg_type, QAPISchemaAlternateType))
++            assert isinstance(self.arg_type, QAPISchemaObjectType)
+             self.arg_type.check(schema)
+             if self.boxed:
+                 if self.arg_type.is_empty():
+                     raise QAPISemError(self.info,
+                                        "Cannot use 'boxed' with empty ty=
+pe")
+             else:
+-                assert not isinstance(self.arg_type, QAPISchemaAlternate=
+Type)
+                 assert not self.arg_type.variants
+         elif self.boxed:
+             raise QAPISemError(self.info, "Use of 'boxed' requires 'data=
+'")
 diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
 qapi-schema-test.json
-index e6dbbbd328..8b0d47c4ab 100644
+index c6d59acc3e..0fadb4ddd7 100644
 --- a/tests/qapi-schema/qapi-schema-test.json
 +++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -186,19 +186,21 @@
+@@ -180,7 +180,7 @@
+ { 'event': 'EVENT_D',
+   'data': { 'a' : 'EventStructOne', 'b' : 'str', '*c': 'str', '*enum3': =
+'EnumOne' } }
+ { 'event': 'EVENT_E', 'boxed': true, 'data': 'UserDefZero' }
+-{ 'event': 'EVENT_F', 'boxed': true, 'data': 'UserDefAlternate' }
++{ 'event': 'EVENT_F', 'boxed': true, 'data': 'UserDefFlatUnion' }
 =20
  # test that we correctly compile downstream extensions, as well as munge
  # ticklish names
-+# also test union and alternate with just one branch
- { 'enum': '__org.qemu_x-Enum', 'data': [ '__org.qemu_x-value' ] }
- { 'struct': '__org.qemu_x-Base',
-   'data': { '__org.qemu_x-member1': '__org.qemu_x-Enum' } }
- { 'struct': '__org.qemu_x-Struct', 'base': '__org.qemu_x-Base',
-   'data': { '__org.qemu_x-member2': 'str', '*wchar-t': 'int' } }
- { 'union': '__org.qemu_x-Union1', 'data': { '__org.qemu_x-branch': 'str'=
- } }
-+{ 'alternate': '__org.qemu_x-Alt1', 'data': { '__org.qemu_x-branch': 'st=
-r' } }
- { 'struct': '__org.qemu_x-Struct2',
-   'data': { 'array': ['__org.qemu_x-Union1'] } }
- { 'union': '__org.qemu_x-Union2', 'base': '__org.qemu_x-Base',
-   'discriminator': '__org.qemu_x-member1',
-   'data': { '__org.qemu_x-value': '__org.qemu_x-Struct2' } }
- { 'alternate': '__org.qemu_x-Alt',
--  'data': { '__org.qemu_x-branch': 'str', 'b': '__org.qemu_x-Base' } }
-+  'data': { '__org.qemu_x-branch': '__org.qemu_x-Base' } }
- { 'event': '__ORG.QEMU_X-EVENT', 'data': '__org.qemu_x-Struct' }
- { 'command': '__org.qemu_x-command',
-   'data': { 'a': ['__org.qemu_x-Enum'], 'b': ['__org.qemu_x-Struct'],
 diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
 api-schema-test.out
-index fb00a21996..bea7976bbb 100644
+index 85d510bc00..5470a525f5 100644
 --- a/tests/qapi-schema/qapi-schema-test.out
 +++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -274,6 +274,9 @@ object __org.qemu_x-Union1
-     member type: __org.qemu_x-Union1Kind optional=3DFalse
-     tag type
-     case __org.qemu_x-branch: q_obj_str-wrapper
-+alternate __org.qemu_x-Alt1
-+    tag type
-+    case __org.qemu_x-branch: str
- array __org.qemu_x-Union1List __org.qemu_x-Union1
- object __org.qemu_x-Struct2
-     member array: __org.qemu_x-Union1List optional=3DFalse
-@@ -283,8 +286,7 @@ object __org.qemu_x-Union2
-     case __org.qemu_x-value: __org.qemu_x-Struct2
- alternate __org.qemu_x-Alt
-     tag type
--    case __org.qemu_x-branch: str
--    case b: __org.qemu_x-Base
-+    case __org.qemu_x-branch: __org.qemu_x-Base
- event __ORG.QEMU_X-EVENT __org.qemu_x-Struct
+@@ -252,7 +252,7 @@ event EVENT_D q_obj_EVENT_D-arg
     boxed=3DFalse
- array __org.qemu_x-EnumList __org.qemu_x-Enum
+ event EVENT_E UserDefZero
+    boxed=3DTrue
+-event EVENT_F UserDefAlternate
++event EVENT_F UserDefFlatUnion
+    boxed=3DTrue
+ enum __org.qemu_x-Enum
+     member __org.qemu_x-value
 --=20
 2.21.0
 
