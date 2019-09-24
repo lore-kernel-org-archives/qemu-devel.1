@@ -2,58 +2,88 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61026C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:50:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07792C432C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:50:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 347502146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:50:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 347502146E
+	by mail.kernel.org (Postfix) with ESMTPS id CF5442146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:50:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF5442146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCjKh-0002Ad-Os
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 07:50:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42351)
+	id 1iCjL3-0002Xw-BQ
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 07:50:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44712)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1iCj2U-0002Vj-LG
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:28 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iCjIZ-0001Dd-Gf
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:48:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1iCj2S-0005MG-Ks
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39656)
+ (envelope-from <pbonzini@redhat.com>) id 1iCjIW-0005T9-T1
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:48:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:10393)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>)
- id 1iCj2N-0005J2-SZ; Tue, 24 Sep 2019 07:31:20 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iCjIW-0005Nx-Kt
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:48:00 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1D0A9806A5F;
- Tue, 24 Sep 2019 11:31:19 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0430661559;
- Tue, 24 Sep 2019 11:31:16 +0000 (UTC)
-From: Andrew Jones <drjones@redhat.com>
-To: qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org
-Subject: [PATCH v4 2/9] tests: arm: Introduce cpu feature tests
-Date: Tue, 24 Sep 2019 13:30:58 +0200
-Message-Id: <20190924113105.19076-3-drjones@redhat.com>
-In-Reply-To: <20190924113105.19076-1-drjones@redhat.com>
-References: <20190924113105.19076-1-drjones@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 4B32681F31
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 11:47:57 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id t185so706489wmg.4
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 04:47:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ZmUP3dVjUP6Ph1ks37nxU36pehuOEitrpcwdPaj7Rqk=;
+ b=p+cy6aVbtl6y9QXqtLwjDF96DFDhzs+pywiwtmnjfvDLYGzhPoU4paLG0B7cGRJ/dy
+ WY0VvOMiTS0cY+ogCpicuxqdWwRv/cGq1guDU94HHoW6Ah3Qf45Z+i6muJVZUylZ7CdS
+ RgS3Ro2qlu0JdvqAl4u5i3f9u57nD0vOt4RwxkqOljkVIzSOpPxqYK5gLzEZBECpB/Mi
+ hgRds7uWU1wutpmvPayyca0hM5FQCViS2YrvL1rddRSJ+NWYsRef+dQrjhHMxc3zyYn4
+ rJI+cVLJhLpbhyY4jmpcvXl9HQV8gKkTqD+4hv6Ejwc8lyzxX1nz0HC6aFZR+gjE82HT
+ k3pw==
+X-Gm-Message-State: APjAAAWP8e6QOXh7kPtS1mS5Wgk9P239LV14z1eHGxi29w8g+IU6RFS4
+ L3+4QymASxQQt3ruo7lEmQTWFzVIhqRcjLcpy7kaXPrEquVQs/IwuysfUURTW/xpCZ3s6s+h053
+ D8+qEjyXMkZFyMdE=
+X-Received: by 2002:adf:e48f:: with SMTP id i15mr221727wrm.26.1569325675881;
+ Tue, 24 Sep 2019 04:47:55 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwYN5lvbTvdGpga0JogVxl1P6Rka6ib4+wnTWx99krQzs82kmUGoXEcVhEeux3fSgMEAVgYvw==
+X-Received: by 2002:adf:e48f:: with SMTP id i15mr221708wrm.26.1569325675548;
+ Tue, 24 Sep 2019 04:47:55 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36?
+ ([2001:b07:6468:f312:9520:22e6:6416:5c36])
+ by smtp.gmail.com with ESMTPSA id b144sm1252690wmb.3.2019.09.24.04.47.54
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 24 Sep 2019 04:47:55 -0700 (PDT)
+Subject: Re: [edk2-devel] [Qemu-devel] [PATCH 1/2] q35: implement 128K SMRAM
+ at default SMBASE address
+To: Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+References: <20190917130708.10281-1-imammedo@redhat.com>
+ <20190917130708.10281-2-imammedo@redhat.com>
+ <561f4440-7c06-10d7-80ce-bbfa810fec59@redhat.com>
+ <20190920102855.3fe2b689@redhat.com>
+ <a581abbc-ec03-c332-b225-6f7cd3cfadae@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <6799e19d-1aa8-ee09-9ef4-2533a7241360@redhat.com>
+Date: Tue, 24 Sep 2019 13:47:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Tue, 24 Sep 2019 11:31:19 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <a581abbc-ec03-c332-b225-6f7cd3cfadae@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -67,321 +97,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, armbru@redhat.com,
- eric.auger@redhat.com, imammedo@redhat.com, alex.bennee@linaro.org,
- Dave.Martin@arm.com
+Cc: yingwen.chen@intel.com, Brijesh Singh <brijesh.singh@amd.com>,
+ devel@edk2.groups.io, phillip.goerl@oracle.com, qemu-devel@nongnu.org,
+ alex.williamson@redhat.com, jiewen.yao@intel.com, jun.nakajima@intel.com,
+ michael.d.kinney@intel.com, boris.ostrovsky@oracle.com, rfc@edk2.groups.io,
+ joao.m.martins@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that Arm CPUs have advertised features lets add tests to ensure
-we maintain their expected availability with and without KVM.
+On 20/09/19 11:28, Laszlo Ersek wrote:
+>> On QEMU side,  we can drop black-hole approach and allocate
+>> dedicated SMRAM region, which explicitly gets mapped into
+>> RAM address space and after SMI hanlder initialization, gets
+>> unmapped (locked). So that SMRAM would be accessible only
+>> from SMM context. That way RAM at 0x30000 could be used as
+>> normal when SMRAM is unmapped.
+>
+> I prefer the black-hole approach, introduced in your current patch
+> series, if it can work. Way less opportunity for confusion.
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
----
- tests/Makefile.include   |   5 +-
- tests/arm-cpu-features.c | 242 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 246 insertions(+), 1 deletion(-)
- create mode 100644 tests/arm-cpu-features.c
+Another possibility would be to alias the 0xA0000..0xBFFFF SMRAM to
+0x30000..0x4FFFF (only when in SMM).
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 793632ca72a5..3eee8fdf9637 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -258,6 +258,7 @@ check-qtest-sparc64-$(CONFIG_ISA_TESTDEV) =3D tests/e=
-ndianness-test$(EXESUF)
- check-qtest-sparc64-y +=3D tests/prom-env-test$(EXESUF)
- check-qtest-sparc64-y +=3D tests/boot-serial-test$(EXESUF)
-=20
-+check-qtest-arm-y +=3D tests/arm-cpu-features$(EXESUF)
- check-qtest-arm-y +=3D tests/microbit-test$(EXESUF)
- check-qtest-arm-y +=3D tests/m25p80-test$(EXESUF)
- check-qtest-arm-y +=3D tests/test-arm-mptimer$(EXESUF)
-@@ -265,7 +266,8 @@ check-qtest-arm-y +=3D tests/boot-serial-test$(EXESUF=
-)
- check-qtest-arm-y +=3D tests/hexloader-test$(EXESUF)
- check-qtest-arm-$(CONFIG_PFLASH_CFI02) +=3D tests/pflash-cfi02-test$(EXE=
-SUF)
-=20
--check-qtest-aarch64-y =3D tests/numa-test$(EXESUF)
-+check-qtest-aarch64-y +=3D tests/arm-cpu-features$(EXESUF)
-+check-qtest-aarch64-y +=3D tests/numa-test$(EXESUF)
- check-qtest-aarch64-y +=3D tests/boot-serial-test$(EXESUF)
- check-qtest-aarch64-y +=3D tests/migration-test$(EXESUF)
- # TODO: once aarch64 TCG is fixed on ARM 32 bit host, make test uncondit=
-ional
-@@ -828,6 +830,7 @@ tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o=
- $(test-util-obj-y)
- tests/numa-test$(EXESUF): tests/numa-test.o
- tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o te=
-sts/acpi-utils.o
- tests/cdrom-test$(EXESUF): tests/cdrom-test.o tests/boot-sector.o $(libq=
-os-obj-y)
-+tests/arm-cpu-features$(EXESUF): tests/arm-cpu-features.o
-=20
- tests/migration/stress$(EXESUF): tests/migration/stress.o
- 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,=
-"LINK","$(TARGET_DIR)$@")
-diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
-new file mode 100644
-index 000000000000..198ff6d6b495
---- /dev/null
-+++ b/tests/arm-cpu-features.c
-@@ -0,0 +1,242 @@
-+/*
-+ * Arm CPU feature test cases
-+ *
-+ * Copyright (c) 2019 Red Hat Inc.
-+ * Authors:
-+ *  Andrew Jones <drjones@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qjson.h"
-+
-+#define MACHINE    "-machine virt,gic-version=3Dmax "
-+#define QUERY_HEAD "{ 'execute': 'query-cpu-model-expansion', " \
-+                     "'arguments': { 'type': 'full', "
-+#define QUERY_TAIL "}}"
-+
-+static QDict *do_query_no_props(QTestState *qts, const char *cpu_type)
-+{
-+    return qtest_qmp(qts, QUERY_HEAD "'model': { 'name': %s }"
-+                          QUERY_TAIL, cpu_type);
-+}
-+
-+static QDict *do_query(QTestState *qts, const char *cpu_type,
-+                       const char *fmt, ...)
-+{
-+    QDict *resp;
-+
-+    if (fmt) {
-+        QDict *args;
-+        va_list ap;
-+
-+        va_start(ap, fmt);
-+        args =3D qdict_from_vjsonf_nofail(fmt, ap);
-+        va_end(ap);
-+
-+        resp =3D qtest_qmp(qts, QUERY_HEAD "'model': { 'name': %s, "
-+                                                    "'props': %p }"
-+                              QUERY_TAIL, cpu_type, args);
-+    } else {
-+        resp =3D do_query_no_props(qts, cpu_type);
-+    }
-+
-+    return resp;
-+}
-+
-+static const char *resp_get_error(QDict *resp)
-+{
-+    QDict *qdict;
-+
-+    g_assert(resp);
-+
-+    qdict =3D qdict_get_qdict(resp, "error");
-+    if (qdict) {
-+        return qdict_get_str(qdict, "desc");
-+    }
-+    return NULL;
-+}
-+
-+#define assert_error(qts, cpu_type, expected_error, fmt, ...)          \
-+({                                                                     \
-+    QDict *_resp;                                                      \
-+    const char *_error;                                                \
-+                                                                       \
-+    _resp =3D do_query(qts, cpu_type, fmt, ##__VA_ARGS__);              =
- \
-+    g_assert(_resp);                                                   \
-+    _error =3D resp_get_error(_resp);                                   =
- \
-+    g_assert(_error);                                                  \
-+    g_assert(g_str_equal(_error, expected_error));                     \
-+    qobject_unref(_resp);                                              \
-+})
-+
-+static bool resp_has_props(QDict *resp)
-+{
-+    QDict *qdict;
-+
-+    g_assert(resp);
-+
-+    if (!qdict_haskey(resp, "return")) {
-+        return false;
-+    }
-+    qdict =3D qdict_get_qdict(resp, "return");
-+
-+    if (!qdict_haskey(qdict, "model")) {
-+        return false;
-+    }
-+    qdict =3D qdict_get_qdict(qdict, "model");
-+
-+    return qdict_haskey(qdict, "props");
-+}
-+
-+static QDict *resp_get_props(QDict *resp)
-+{
-+    QDict *qdict;
-+
-+    g_assert(resp);
-+    g_assert(resp_has_props(resp));
-+
-+    qdict =3D qdict_get_qdict(resp, "return");
-+    qdict =3D qdict_get_qdict(qdict, "model");
-+    qdict =3D qdict_get_qdict(qdict, "props");
-+    return qdict;
-+}
-+
-+#define assert_has_feature(qts, cpu_type, feature)                     \
-+({                                                                     \
-+    QDict *_resp =3D do_query_no_props(qts, cpu_type);                  =
- \
-+    g_assert(_resp);                                                   \
-+    g_assert(resp_has_props(_resp));                                   \
-+    g_assert(qdict_get(resp_get_props(_resp), feature));               \
-+    qobject_unref(_resp);                                              \
-+})
-+
-+#define assert_has_not_feature(qts, cpu_type, feature)                 \
-+({                                                                     \
-+    QDict *_resp =3D do_query_no_props(qts, cpu_type);                  =
- \
-+    g_assert(_resp);                                                   \
-+    g_assert(resp_has_props(_resp));                                   \
-+    g_assert(!qdict_get(resp_get_props(_resp), feature));              \
-+    qobject_unref(_resp);                                              \
-+})
-+
-+static void assert_type_full(QTestState *qts)
-+{
-+    const char *error;
-+    QDict *resp;
-+
-+    resp =3D qtest_qmp(qts, "{ 'execute': 'query-cpu-model-expansion', "
-+                            "'arguments': { 'type': 'static', "
-+                                           "'model': { 'name': 'foo' }}}=
-");
-+    g_assert(resp);
-+    error =3D resp_get_error(resp);
-+    g_assert(error);
-+    g_assert(g_str_equal(error,
-+                         "The requested expansion type is not supported"=
-));
-+    qobject_unref(resp);
-+}
-+
-+static void assert_bad_props(QTestState *qts, const char *cpu_type)
-+{
-+    const char *error;
-+    QDict *resp;
-+
-+    resp =3D qtest_qmp(qts, "{ 'execute': 'query-cpu-model-expansion', "
-+                            "'arguments': { 'type': 'full', "
-+                                           "'model': { 'name': %s, "
-+                                                      "'props': false }}=
-}",
-+                     cpu_type);
-+    g_assert(resp);
-+    error =3D resp_get_error(resp);
-+    g_assert(error);
-+    g_assert(g_str_equal(error,
-+                         "Invalid parameter type for 'props', expected: =
-dict"));
-+    qobject_unref(resp);
-+}
-+
-+static void test_query_cpu_model_expansion(const void *data)
-+{
-+    QTestState *qts;
-+
-+    qts =3D qtest_init(MACHINE "-cpu max");
-+
-+    /* Test common query-cpu-model-expansion input validation */
-+    assert_type_full(qts);
-+    assert_bad_props(qts, "max");
-+    assert_error(qts, "foo", "The CPU type 'foo' is not a recognized "
-+                 "ARM CPU type", NULL);
-+    assert_error(qts, "max", "Parameter 'not-a-prop' is unexpected",
-+                 "{ 'not-a-prop': false }");
-+    assert_error(qts, "host", "The CPU type 'host' requires KVM", NULL);
-+
-+    /* Test expected feature presence/absence for some cpu types */
-+    assert_has_feature(qts, "max", "pmu");
-+    assert_has_feature(qts, "cortex-a15", "pmu");
-+    assert_has_not_feature(qts, "cortex-a15", "aarch64");
-+
-+    if (g_str_equal(qtest_get_arch(), "aarch64")) {
-+        assert_has_feature(qts, "max", "aarch64");
-+        assert_has_feature(qts, "cortex-a57", "pmu");
-+        assert_has_feature(qts, "cortex-a57", "aarch64");
-+
-+        /* Test that features that depend on KVM generate errors without=
-. */
-+        assert_error(qts, "max",
-+                     "'aarch64' feature cannot be disabled "
-+                     "unless KVM is enabled and 32-bit EL1 "
-+                     "is supported",
-+                     "{ 'aarch64': false }");
-+    }
-+
-+    qtest_quit(qts);
-+}
-+
-+static void test_query_cpu_model_expansion_kvm(const void *data)
-+{
-+    QTestState *qts;
-+
-+    qts =3D qtest_init(MACHINE "-accel kvm -cpu host");
-+
-+    assert_has_feature(qts, "host", "pmu");
-+
-+    if (g_str_equal(qtest_get_arch(), "aarch64")) {
-+        assert_has_feature(qts, "host", "aarch64");
-+
-+        assert_error(qts, "cortex-a15",
-+            "We cannot guarantee the CPU type 'cortex-a15' works "
-+            "with KVM on this host", NULL);
-+    } else {
-+        assert_error(qts, "host",
-+                     "'pmu' feature not supported by KVM on this host",
-+                     "{ 'pmu': true }");
-+    }
-+
-+    qtest_quit(qts);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    bool kvm_available =3D false;
-+
-+    if (!access("/dev/kvm",  R_OK | W_OK)) {
-+#if defined(HOST_AARCH64)
-+        kvm_available =3D g_str_equal(qtest_get_arch(), "aarch64");
-+#elif defined(HOST_ARM)
-+        kvm_available =3D g_str_equal(qtest_get_arch(), "arm");
-+#endif
-+    }
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    qtest_add_data_func("/arm/query-cpu-model-expansion",
-+                        NULL, test_query_cpu_model_expansion);
-+
-+    if (kvm_available) {
-+        qtest_add_data_func("/arm/kvm/query-cpu-model-expansion",
-+                            NULL, test_query_cpu_model_expansion_kvm);
-+    }
-+
-+    return g_test_run();
-+}
---=20
-2.20.1
+I'm not super enthusiastic about adding this kind of QEMU-only feature.
+ The alternative would be to implement VT-d range locking through the
+intel-iommu device's PCI configuration space (which includes _adding_
+the configuration space, i.e. making the IOMMU a PCI device in the first
+place, and the support to the firmware for configuring the VT-d BAR at
+0xfed90000).  This would be the right way to do it, but it would entail
+a lot of work throughout the stack. :(  So I guess some variant of this
+would be okay, as long as it's peppered with "this is not how real
+hardware does it" comments in both QEMU and EDK2.
+
+Thanks,
+
+Paolo
+
+> I've started work on the counterpart OVMF patches; I'll report back.
 
 
