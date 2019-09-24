@@ -2,60 +2,56 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02FF2C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:50:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6925BC432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:50:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD37F207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:50:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD37F207FD
+	by mail.kernel.org (Postfix) with ESMTPS id 3E682207FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:50:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E682207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCm8u-0001Eq-VB
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 10:50:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58802)
+	id 1iCm9P-0001mY-88
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 10:50:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42849)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCks2-0000Gc-Kx
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:51 -0400
+ (envelope-from <imammedo@redhat.com>) id 1iCm6u-0007ww-9q
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:48:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCkry-0001V8-It
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53404)
+ (envelope-from <imammedo@redhat.com>) id 1iCm6t-0003zk-0I
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:48:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41050)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCkrx-0001UL-VY
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:42 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1iCm6s-0003zM-NM; Tue, 24 Sep 2019 10:48:10 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DC0B31918649;
- Tue, 24 Sep 2019 13:28:40 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 376985D9CA;
- Tue, 24 Sep 2019 13:28:38 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id B54D91136425; Tue, 24 Sep 2019 15:28:30 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 06A37302246D;
+ Tue, 24 Sep 2019 14:48:10 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8474910013D9;
+ Tue, 24 Sep 2019 14:48:04 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 25/25] qapi: Improve source file read error handling
-Date: Tue, 24 Sep 2019 15:28:30 +0200
-Message-Id: <20190924132830.15835-26-armbru@redhat.com>
-In-Reply-To: <20190924132830.15835-1-armbru@redhat.com>
-References: <20190924132830.15835-1-armbru@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Tue, 24 Sep 2019 13:28:40 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Subject: [PATCH v7 2/4] kvm: clear dirty bitmaps from all overlapping memslots
+Date: Tue, 24 Sep 2019 10:47:49 -0400
+Message-Id: <20190924144751.24149-3-imammedo@redhat.com>
+In-Reply-To: <20190924144751.24149-1-imammedo@redhat.com>
+References: <20190924144751.24149-1-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Tue, 24 Sep 2019 14:48:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -69,134 +65,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com, peterx@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qap-gen.py crashes when it can't open the main schema file, and when
-it can't read from any schema file.  Lazy.
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Change QAPISchema.__init__() to take a file name instead of a file
-object.  Move the open code from _include() to __init__(), so it's
-used for the main schema file, too.
+Currently MemoryRegionSection has 1:1 mapping to KVMSlot.
+However next patch will allow splitting MemoryRegionSection into
+several KVMSlot-s, make sure that kvm_physical_log_slot_clear()
+is able to handle such 1:N mapping.
 
-Move the read into the try for good measure, and rephrase the error
-message.
-
-Reporting open or read failure for the main schema file needs a
-QAPISourceInfo representing "no source".  Make QAPISourceInfo cope
-with fname=3DNone.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- scripts/qapi/common.py                | 46 +++++++++++++++------------
- tests/qapi-schema/include-no-file.err |  2 +-
- 2 files changed, 27 insertions(+), 21 deletions(-)
+ accel/kvm/kvm-all.c | 36 ++++++++++++++++++++++--------------
+ 1 file changed, 22 insertions(+), 14 deletions(-)
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index c38e7cf27d..0c169a640e 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -53,7 +53,12 @@ class QAPISourceInfo(object):
-         return info
-=20
-     def loc(self):
--        return '%s:%d' % (self.fname, self.line)
-+        if self.fname is None:
-+            return sys.argv[0]
-+        ret =3D self.fname
-+        if self.line is not None:
-+            ret +=3D ':%d' % self.line
-+        return ret
-=20
-     def in_defn(self):
-         if self.defn_name:
-@@ -382,14 +387,26 @@ class QAPIDoc(object):
-=20
- class QAPISchemaParser(object):
-=20
--    def __init__(self, fp, previously_included=3D[], incl_info=3DNone):
--        self.fname =3D fp.name
--        previously_included.append(os.path.abspath(fp.name))
--        self.src =3D fp.read()
-+    def __init__(self, fname, previously_included=3D[], incl_info=3DNone=
-):
-+        previously_included.append(os.path.abspath(fname))
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index e9e6086c09..315a91557f 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -588,8 +588,8 @@ static int kvm_log_clear_one_slot(KVMSlot *mem, int as_id, uint64_t start, uint6
+      * satisfy the KVM interface requirement.  Firstly, do the start
+      * page alignment on 64 host pages
+      */
+-    bmap_start = (start - mem->start_addr) & KVM_CLEAR_LOG_MASK;
+-    start_delta = start - mem->start_addr - bmap_start;
++    bmap_start = start & KVM_CLEAR_LOG_MASK;
++    start_delta = start - bmap_start;
+     bmap_start /= psize;
+ 
+     /*
+@@ -693,8 +693,8 @@ static int kvm_physical_log_clear(KVMMemoryListener *kml,
+                                   MemoryRegionSection *section)
+ {
+     KVMState *s = kvm_state;
+-    uint64_t start, size;
+-    KVMSlot *mem = NULL;
++    uint64_t start, size, offset, count;
++    KVMSlot *mem;
+     int ret, i;
+ 
+     if (!s->manual_dirty_log_protect) {
+@@ -712,22 +712,30 @@ static int kvm_physical_log_clear(KVMMemoryListener *kml,
+ 
+     kvm_slots_lock(kml);
+ 
+-    /* Find any possible slot that covers the section */
+     for (i = 0; i < s->nr_slots; i++) {
+         mem = &kml->slots[i];
+-        if (mem->start_addr <= start &&
+-            start + size <= mem->start_addr + mem->memory_size) {
++        /* Discard slots that are empty or do not overlap the section */
++        if (!mem->memory_size ||
++            mem->start_addr > start + size - 1 ||
++            start > mem->start_addr + mem->memory_size - 1) {
++            continue;
++        }
 +
-+        try:
-+            if sys.version_info[0] >=3D 3:
-+                fp =3D open(fname, 'r', encoding=3D'utf-8')
-+            else:
-+                fp =3D open(fname, 'r')
-+            self.src =3D fp.read()
-+        except IOError as e:
-+            raise QAPISemError(incl_info or QAPISourceInfo(None, None, N=
-one),
-+                               "can't read %s file '%s': %s"
-+                               % ("include" if incl_info else "schema",
-+                                  fname,
-+                                  e.strerror))
-+
-         if self.src =3D=3D '' or self.src[-1] !=3D '\n':
-             self.src +=3D '\n'
-         self.cursor =3D 0
--        self.info =3D QAPISourceInfo(self.fname, 1, incl_info)
-+        self.info =3D QAPISourceInfo(fname, 1, incl_info)
-         self.line_pos =3D 0
-         self.exprs =3D []
-         self.docs =3D []
-@@ -413,7 +430,7 @@ class QAPISchemaParser(object):
-                 if not isinstance(include, str):
-                     raise QAPISemError(info,
-                                        "value of 'include' must be a str=
-ing")
--                incl_fname =3D os.path.join(os.path.dirname(self.fname),
-+                incl_fname =3D os.path.join(os.path.dirname(fname),
-                                           include)
-                 self.exprs.append({'expr': {'include': incl_fname},
-                                    'info': info})
-@@ -465,14 +482,7 @@ class QAPISchemaParser(object):
-         if incl_abs_fname in previously_included:
-             return None
-=20
--        try:
--            if sys.version_info[0] >=3D 3:
--                fobj =3D open(incl_fname, 'r', encoding=3D'utf-8')
--            else:
--                fobj =3D open(incl_fname, 'r')
--        except IOError as e:
--            raise QAPISemError(info, "%s: %s" % (e.strerror, incl_fname)=
-)
--        return QAPISchemaParser(fobj, previously_included, info)
-+        return QAPISchemaParser(incl_fname, previously_included, info)
-=20
-     def _pragma(self, name, value, info):
-         global doc_required, returns_whitelist, name_case_whitelist
-@@ -1723,11 +1733,7 @@ class QAPISchemaEvent(QAPISchemaEntity):
- class QAPISchema(object):
-     def __init__(self, fname):
-         self.fname =3D fname
--        if sys.version_info[0] >=3D 3:
--            f =3D open(fname, 'r', encoding=3D'utf-8')
--        else:
--            f =3D open(fname, 'r')
--        parser =3D QAPISchemaParser(f)
-+        parser =3D QAPISchemaParser(fname)
-         exprs =3D check_exprs(parser.exprs)
-         self.docs =3D parser.docs
-         self._entity_list =3D []
-diff --git a/tests/qapi-schema/include-no-file.err b/tests/qapi-schema/in=
-clude-no-file.err
-index e42bcf4bc1..0a6c6bb4a9 100644
---- a/tests/qapi-schema/include-no-file.err
-+++ b/tests/qapi-schema/include-no-file.err
-@@ -1 +1 @@
--tests/qapi-schema/include-no-file.json:1: No such file or directory: tes=
-ts/qapi-schema/include-no-file-sub.json
-+tests/qapi-schema/include-no-file.json:1: can't read include file 'tests=
-/qapi-schema/include-no-file-sub.json': No such file or directory
---=20
-2.21.0
++        if (start >= mem->start_addr) {
++            /* The slot starts before section or is aligned to it.  */
++            offset = start - mem->start_addr;
++            count = MIN(mem->memory_size - offset, size);
++        } else {
++            /* The slot starts after section.  */
++            offset = 0;
++            count = MIN(mem->memory_size, size - (mem->start_addr - start));
++        }
++        ret = kvm_log_clear_one_slot(mem, kml->as_id, offset, count);
++        if (ret < 0) {
+             break;
+         }
+     }
+ 
+-    /*
+-     * We should always find one memslot until this point, otherwise
+-     * there could be something wrong from the upper layer
+-     */
+-    assert(mem && i != s->nr_slots);
+-    ret = kvm_log_clear_one_slot(mem, kml->as_id, start, size);
+-
+     kvm_slots_unlock(kml);
+ 
+     return ret;
+-- 
+2.18.1
 
 
