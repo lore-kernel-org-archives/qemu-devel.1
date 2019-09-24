@@ -2,55 +2,62 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6459C4320D
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:29:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9731C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:32:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DF32214DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:29:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DF32214DA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id ABF26214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:32:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABF26214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iClp5-00079u-MH
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 10:29:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58481)
+	id 1iCls0-0001ah-44
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 10:32:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58784)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iCkrH-0007xe-8B
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:01 -0400
+ (envelope-from <armbru@redhat.com>) id 1iCks1-0000FS-RX
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iCkrD-0001B3-Nl
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:27:58 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:34195 helo=mail.rt-rk.com)
+ (envelope-from <armbru@redhat.com>) id 1iCkrv-0001TD-LW
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54610)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iCkrC-0000o3-Ml
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:27:55 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 7F6F61A227F;
- Tue, 24 Sep 2019 15:26:48 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 5BAD61A1FB9;
- Tue, 24 Sep 2019 15:26:48 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCkrv-0001Rz-5E
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:39 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E85553091786;
+ Tue, 24 Sep 2019 13:28:37 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B4D2760BFB;
+ Tue, 24 Sep 2019 13:28:37 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 8CB6211384AA; Tue, 24 Sep 2019 15:28:30 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 02/11] target/mips: Clean up internal.h
-Date: Tue, 24 Sep 2019 15:26:33 +0200
-Message-Id: <1569331602-2586-3-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1569331602-2586-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1569331602-2586-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
+Subject: [PATCH 15/25] qapi: Inline check_name() into check_union()
+Date: Tue, 24 Sep 2019 15:28:20 +0200
+Message-Id: <20190924132830.15835-16-armbru@redhat.com>
+In-Reply-To: <20190924132830.15835-1-armbru@redhat.com>
+References: <20190924132830.15835-1-armbru@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Tue, 24 Sep 2019 13:28:37 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,133 +69,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+check_name() consists of check_name_is_str() and check_name_str().
+check_union() relies on the latter to catch optional discriminators.
+The next commit will replace that by a more straightforward check.
+Inlining check_name() into check_union() now should make that easier
+to review.
 
-Mostly fix errors and warnings reported by 'checkpatch.pl -f'.
-
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- target/mips/internal.h | 60 +++++++++++++++++++++++++++++++-------------------
- 1 file changed, 37 insertions(+), 23 deletions(-)
+ scripts/qapi/common.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index 685e8d6..3f435b5 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -1,4 +1,5 @@
--/* mips internal definitions and helpers
-+/*
-+ * MIPS internal definitions and helpers
-  *
-  * This work is licensed under the terms of the GNU GPL, version 2 or later.
-  * See the COPYING file in the top-level directory.
-@@ -9,8 +10,10 @@
- 
- #include "fpu/softfloat-helpers.h"
- 
--/* MMU types, the first four entries have the same layout as the
--   CP0C0_MT field.  */
-+/*
-+ * MMU types, the first four entries have the same layout as the
-+ * CP0C0_MT field.
-+ */
- enum mips_mmu_types {
-     MMU_TYPE_NONE,
-     MMU_TYPE_R4000,
-@@ -160,9 +163,11 @@ static inline bool cpu_mips_hw_interrupts_enabled(CPUMIPSState *env)
-         !(env->CP0_Status & (1 << CP0St_EXL)) &&
-         !(env->CP0_Status & (1 << CP0St_ERL)) &&
-         !(env->hflags & MIPS_HFLAG_DM) &&
--        /* Note that the TCStatus IXMT field is initialized to zero,
--           and only MT capable cores can set it to one. So we don't
--           need to check for MT capabilities here.  */
-+        /*
-+         * Note that the TCStatus IXMT field is initialized to zero,
-+         * and only MT capable cores can set it to one. So we don't
-+         * need to check for MT capabilities here.
-+         */
-         !(env->active_tc.CP0_TCStatus & (1 << CP0TCSt_IXMT));
- }
- 
-@@ -177,14 +182,18 @@ static inline bool cpu_mips_hw_interrupts_pending(CPUMIPSState *env)
-     status = env->CP0_Status & CP0Ca_IP_mask;
- 
-     if (env->CP0_Config3 & (1 << CP0C3_VEIC)) {
--        /* A MIPS configured with a vectorizing external interrupt controller
--           will feed a vector into the Cause pending lines. The core treats
--           the status lines as a vector level, not as indiviual masks.  */
-+        /*
-+         * A MIPS configured with a vectorizing external interrupt controller
-+         * will feed a vector into the Cause pending lines. The core treats
-+         * the status lines as a vector level, not as indiviual masks.
-+         */
-         r = pending > status;
-     } else {
--        /* A MIPS configured with compatibility or VInt (Vectored Interrupts)
--           treats the pending lines as individual interrupt lines, the status
--           lines are individual masks.  */
-+        /*
-+         * A MIPS configured with compatibility or VInt (Vectored Interrupts)
-+         * treats the pending lines as individual interrupt lines, the status
-+         * lines are individual masks.
-+         */
-         r = (pending & status) != 0;
-     }
-     return r;
-@@ -275,12 +284,14 @@ static inline int mips_vpe_active(CPUMIPSState *env)
-         active = 0;
-     }
- 
--    /* Now verify that there are active thread contexts in the VPE.
--
--       This assumes the CPU model will internally reschedule threads
--       if the active one goes to sleep. If there are no threads available
--       the active one will be in a sleeping state, and we can turn off
--       the entire VPE.  */
-+    /*
-+     * Now verify that there are active thread contexts in the VPE.
-+     *
-+     * This assumes the CPU model will internally reschedule threads
-+     * if the active one goes to sleep. If there are no threads available
-+     * the active one will be in a sleeping state, and we can turn off
-+     * the entire VPE.
-+     */
-     if (!(env->active_tc.CP0_TCStatus & (1 << CP0TCSt_A))) {
-         /* TC is not activated.  */
-         active = 0;
-@@ -326,7 +337,8 @@ static inline void compute_hflags(CPUMIPSState *env)
-     if (!(env->CP0_Status & (1 << CP0St_EXL)) &&
-         !(env->CP0_Status & (1 << CP0St_ERL)) &&
-         !(env->hflags & MIPS_HFLAG_DM)) {
--        env->hflags |= (env->CP0_Status >> CP0St_KSU) & MIPS_HFLAG_KSU;
-+        env->hflags |= (env->CP0_Status >> CP0St_KSU) &
-+                       MIPS_HFLAG_KSU;
-     }
- #if defined(TARGET_MIPS64)
-     if ((env->insn_flags & ISA_MIPS3) &&
-@@ -403,10 +415,12 @@ static inline void compute_hflags(CPUMIPSState *env)
-             env->hflags |= MIPS_HFLAG_COP1X;
-         }
-     } else if (env->insn_flags & ISA_MIPS4) {
--        /* All supported MIPS IV CPUs use the XX (CU3) to enable
--           and disable the MIPS IV extensions to the MIPS III ISA.
--           Some other MIPS IV CPUs ignore the bit, so the check here
--           would be too restrictive for them.  */
-+        /*
-+         * All supported MIPS IV CPUs use the XX (CU3) to enable
-+         * and disable the MIPS IV extensions to the MIPS III ISA.
-+         * Some other MIPS IV CPUs ignore the bit, so the check here
-+         * would be too restrictive for them.
-+         */
-         if (env->CP0_Status & (1U << CP0St_CU3)) {
-             env->hflags |= MIPS_HFLAG_COP1X;
-         }
--- 
-2.7.4
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 2dd794dfe7..f5599559ac 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -896,8 +896,10 @@ def check_union(expr, info):
+=20
+         # The value of member 'discriminator' must name a non-optional
+         # member of the base struct.
+-        check_name(discriminator, info,
+-                   "discriminator of flat union '%s'" % name)
++        check_name_is_str(discriminator, info,
++                          "discriminator of flat union '%s'" % name)
++        check_name_str(discriminator, info,
++                       "discriminator of flat union '%s'" % name)
+         discriminator_value =3D base_members.get(discriminator)
+         if not discriminator_value:
+             raise QAPISemError(info,
+--=20
+2.21.0
 
 
