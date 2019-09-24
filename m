@@ -2,59 +2,60 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62366C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 12:46:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3739C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 12:46:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36AD2207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 12:46:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36AD2207FD
+	by mail.kernel.org (Postfix) with ESMTPS id 9A96B207FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 12:46:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A96B207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCkDD-0002tS-Dw
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 08:46:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50418)
+	id 1iCkDG-000300-12
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 08:46:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50518)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCk0j-0001IT-JI
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:46 -0400
+ (envelope-from <armbru@redhat.com>) id 1iCk0n-0001Je-L0
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCk0g-0006t6-NX
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55460)
+ (envelope-from <armbru@redhat.com>) id 1iCk0i-0006vP-Jc
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53422)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCk0g-0006rs-Ec
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:38 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCk0i-0006uE-4g
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:40 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B3A152BF73
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 12:33:37 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 546608AC6F9
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 12:33:39 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B2F95D721;
- Tue, 24 Sep 2019 12:33:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F31BF5C207;
+ Tue, 24 Sep 2019 12:33:38 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 567B911386A7; Tue, 24 Sep 2019 14:33:34 +0200 (CEST)
+ id A34B311384AA; Tue, 24 Sep 2019 14:33:34 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/37] qapi: Drop support for boxed alternate arguments
-Date: Tue, 24 Sep 2019 14:33:02 +0200
-Message-Id: <20190924123334.30645-6-armbru@redhat.com>
+Subject: [PULL 15/37] docs/devel/qapi-code-gen: Rewrite compatibility
+ considerations
+Date: Tue, 24 Sep 2019 14:33:12 +0200
+Message-Id: <20190924123334.30645-16-armbru@redhat.com>
 In-Reply-To: <20190924123334.30645-1-armbru@redhat.com>
 References: <20190924123334.30645-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Tue, 24 Sep 2019 12:33:37 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Tue, 24 Sep 2019 12:33:39 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -73,164 +74,160 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commands and events can define their argument type inline (default) or
-by referring to another type ('boxed': true, since commit c818408e44
-"qapi: Implement boxed types for commands/events", v2.7.0).  The
-unboxed inline definition is an (anonymous) struct type.  The boxed
-type may be a struct, union, or alternate type.
+We have some compatibility advice buried in sections "Enumeration
+types" and "Struct types".  Compatibility is actually about commands
+and events.  It devolves to the types used there.  All kinds of types,
+not just enumerations and structs.
 
-The latter is problematic: docs/interop/qemu-spec.txt requires the
-value of the 'data' key to be a json-object, but any non-degenerate
-alternate type has at least one branch that isn't.
-
-Fortunately, we haven't made use of alternates in this context outside
-tests/.  Drop support for them.
-
-QAPISchemaAlternateType.is_empty() is now unused.  Drop it, too.
+Replace the existing advice by a new section "Compatibility
+considerations".
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20190913201349.24332-4-armbru@redhat.com>
+Message-Id: <20190913201349.24332-14-armbru@redhat.com>
+[Squash in paragraph on invisible schema changes, as per Eric's review]
 ---
- docs/devel/qapi-code-gen.txt            | 12 ++++++------
- scripts/qapi/common.py                  | 15 ++++-----------
- tests/qapi-schema/qapi-schema-test.json |  2 +-
- tests/qapi-schema/qapi-schema-test.out  |  2 +-
- 4 files changed, 12 insertions(+), 19 deletions(-)
+ docs/devel/qapi-code-gen.txt | 99 +++++++++++++++++++++++-------------
+ 1 file changed, 64 insertions(+), 35 deletions(-)
 
 diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index e8ec8ac1de..3d3931fb7a 100644
+index 663ef10a56..ac36ed34e3 100644
 --- a/docs/devel/qapi-code-gen.txt
 +++ b/docs/devel/qapi-code-gen.txt
-@@ -612,9 +612,9 @@ the command.  Normally, 'data' is a dictionary for an=
- anonymous type,
- or names a struct type (possibly empty, but not a union), and its
- members are passed as separate arguments to this function.  If the
- command definition includes a key 'boxed' with the boolean value true,
--then 'data' is instead the name of any non-empty complex type
--(struct, union, or alternate), and a pointer to that QAPI type is
--passed as a single argument.
-+then 'data' is instead the name of any non-empty complex type (struct
-+or union), and a pointer to that QAPI type is passed as a single
-+argument.
+@@ -178,14 +178,11 @@ While the C code starts numbering at 0, it is bette=
+r to use explicit
+ comparisons to enum values than implicit comparisons to 0; the C code
+ will also include a generated enum member ending in _MAX for tracking
+ the size of the enum, useful when using common functions for
+-converting between strings and enum values.  Since the wire format
+-always passes by name, it is acceptable to reorder or add new
+-enumeration members in any location without breaking clients of Client
+-JSON Protocol; however, removing enum values would break
+-compatibility.  For any struct that has a member that will only contain
+-a finite set of string values, using an enum type for that member is
+-better than open-coding the member to be type 'str'.
++converting between strings and enum values.
 =20
- The generator also emits a marshalling function that extracts
- arguments for the user's function out of an input QDict, calls the
-@@ -714,9 +714,9 @@ The generator emits a function to send the event.  No=
-rmally, 'data' is
- a dictionary for an anonymous type, or names a struct type (possibly
- empty, but not a union), and its members are passed as separate
- arguments to this function.  If the event definition includes a key
--'boxed' with the boolean value true, then 'data' is instead the name of
--any non-empty complex type (struct, union, or alternate), and a
--pointer to that QAPI type is passed as a single argument.
-+'boxed' with the boolean value true, then 'data' is instead the name
-+of any non-empty complex type (struct or union), and a pointer to that
-+QAPI type is passed as a single argument.
++For any struct that has a member that will only contain a finite set
++of string values, using an enum type for that member is better than
++open-coding the member to be type 'str'.
 =20
+ =3D=3D=3D Struct types =3D=3D=3D
 =20
- =3D=3D=3D Features =3D=3D=3D
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 9aefcfe015..54d02458b5 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -840,7 +840,7 @@ def check_command(expr, info):
+@@ -203,34 +200,6 @@ name.  An example of a struct is:
+ The use of '*' as a prefix to the name means the member is optional in
+ the corresponding JSON protocol usage.
 =20
-     args_meta =3D ['struct']
-     if boxed:
--        args_meta +=3D ['union', 'alternate']
-+        args_meta +=3D ['union']
-     check_type(info, "'data' for command '%s'" % name,
-                expr.get('data'), allow_dict=3Dnot boxed,
-                allow_metas=3Dargs_meta)
-@@ -858,7 +858,7 @@ def check_event(expr, info):
-=20
-     meta =3D ['struct']
-     if boxed:
--        meta +=3D ['union', 'alternate']
-+        meta +=3D ['union']
-     check_type(info, "'data' for event '%s'" % name,
-                expr.get('data'), allow_dict=3Dnot boxed,
-                allow_metas=3Dmeta)
-@@ -1690,9 +1690,6 @@ class QAPISchemaAlternateType(QAPISchemaType):
-         visitor.visit_alternate_type(self.name, self.info, self.ifcond,
-                                      self.variants)
-=20
--    def is_empty(self):
--        return False
+-The default initialization value of an optional argument should not be c=
+hanged
+-between versions of QEMU unless the new default maintains backward
+-compatibility to the user-visible behavior of the old default.
 -
+-With proper documentation, this policy still allows some flexibility; fo=
+r
+-example, documenting that a default of 0 picks an optimal buffer size al=
+lows
+-one release to declare the optimal size at 512 while another release dec=
+lares
+-the optimal size at 4096 - the user-visible behavior is not the bytes us=
+ed by
+-the buffer, but the fact that the buffer was optimal size.
+-
+-On input structures (only mentioned in the 'data' side of a command), ch=
+anging
+-from mandatory to optional is safe (older clients will supply the option=
+, and
+-newer clients can benefit from the default); changing from optional to
+-mandatory is backwards incompatible (older clients may be omitting the o=
+ption,
+-and must continue to work).
+-
+-On output structures (only mentioned in the 'returns' side of a command)=
+,
+-changing from mandatory to optional is in general unsafe (older clients =
+may be
+-expecting the member, and could crash if it is missing), although it
+-can be done if the only way that the optional argument will be omitted
+-is when it is triggered by the presence of a new input flag to the
+-command that older clients don't know to send.  Changing from optional
+-to mandatory is safe.
+-
+-A structure that is used in both input and output of various commands
+-must consider the backwards compatibility constraints of both directions
+-of use.
+-
+ A struct definition can specify another struct as its base.
+ In this case, the members of the base type are included as top-level mem=
+bers
+ of the new struct's dictionary in the Client JSON Protocol wire
+@@ -1037,6 +1006,66 @@ the names of built-in types.  Clients should exami=
+ne member
+ "json-type" instead of hard-coding names of built-in types.
 =20
- class QAPISchemaCommand(QAPISchemaEntity):
-     def __init__(self, name, info, doc, ifcond, arg_type, ret_type,
-@@ -1714,15 +1711,13 @@ class QAPISchemaCommand(QAPISchemaEntity):
-         QAPISchemaEntity.check(self, schema)
-         if self._arg_type_name:
-             self.arg_type =3D schema.lookup_type(self._arg_type_name)
--            assert (isinstance(self.arg_type, QAPISchemaObjectType) or
--                    isinstance(self.arg_type, QAPISchemaAlternateType))
-+            assert isinstance(self.arg_type, QAPISchemaObjectType)
-             self.arg_type.check(schema)
-             if self.boxed:
-                 if self.arg_type.is_empty():
-                     raise QAPISemError(self.info,
-                                        "Cannot use 'boxed' with empty ty=
-pe")
-             else:
--                assert not isinstance(self.arg_type, QAPISchemaAlternate=
-Type)
-                 assert not self.arg_type.variants
-         elif self.boxed:
-             raise QAPISemError(self.info, "Use of 'boxed' requires 'data=
-'")
-@@ -1750,15 +1745,13 @@ class QAPISchemaEvent(QAPISchemaEntity):
-         QAPISchemaEntity.check(self, schema)
-         if self._arg_type_name:
-             self.arg_type =3D schema.lookup_type(self._arg_type_name)
--            assert (isinstance(self.arg_type, QAPISchemaObjectType) or
--                    isinstance(self.arg_type, QAPISchemaAlternateType))
-+            assert isinstance(self.arg_type, QAPISchemaObjectType)
-             self.arg_type.check(schema)
-             if self.boxed:
-                 if self.arg_type.is_empty():
-                     raise QAPISemError(self.info,
-                                        "Cannot use 'boxed' with empty ty=
-pe")
-             else:
--                assert not isinstance(self.arg_type, QAPISchemaAlternate=
-Type)
-                 assert not self.arg_type.variants
-         elif self.boxed:
-             raise QAPISemError(self.info, "Use of 'boxed' requires 'data=
-'")
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
-qapi-schema-test.json
-index c6d59acc3e..0fadb4ddd7 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -180,7 +180,7 @@
- { 'event': 'EVENT_D',
-   'data': { 'a' : 'EventStructOne', 'b' : 'str', '*c': 'str', '*enum3': =
-'EnumOne' } }
- { 'event': 'EVENT_E', 'boxed': true, 'data': 'UserDefZero' }
--{ 'event': 'EVENT_F', 'boxed': true, 'data': 'UserDefAlternate' }
-+{ 'event': 'EVENT_F', 'boxed': true, 'data': 'UserDefFlatUnion' }
 =20
- # test that we correctly compile downstream extensions, as well as munge
- # ticklish names
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-index 85d510bc00..5470a525f5 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -252,7 +252,7 @@ event EVENT_D q_obj_EVENT_D-arg
-    boxed=3DFalse
- event EVENT_E UserDefZero
-    boxed=3DTrue
--event EVENT_F UserDefAlternate
-+event EVENT_F UserDefFlatUnion
-    boxed=3DTrue
- enum __org.qemu_x-Enum
-     member __org.qemu_x-value
++=3D=3D Compatibility considerations =3D=3D
++
++Maintaining backward compatibility at the Client JSON Protocol level
++while evolving the schema requires some care.  This section is about
++syntactic compatibility, which is necessary, but not sufficient, for
++actual compatibility.
++
++Clients send commands with argument data, and receive command
++responses with return data and events with event data.
++
++Adding opt-in functionality to the send direction is backwards
++compatible: adding commands, optional arguments, enumeration values,
++union and alternate branches; turning an argument type into an
++alternate of that type; making mandatory arguments optional.  Clients
++oblivious of the new functionality continue to work.
++
++Incompatible changes include removing commands, command arguments,
++enumeration values, union and alternate branches, adding mandatory
++command arguments, and making optional arguments mandatory.
++
++The specified behavior of an absent optional argument should remain
++the same.  With proper documentation, this policy still allows some
++flexibility; for example, when an optional 'buffer-size' argument is
++specified to default to a sensible buffer size, the actual default
++value can still be changed.  The specified default behavior is not the
++exact size of the buffer, only that the default size is sensible.
++
++Adding functionality to the receive direction is generally backwards
++compatible: adding events, adding return and event data members.
++Clients are expected to ignore the ones they don't know.
++
++Removing "unreachable" stuff like events that can't be triggered
++anymore, optional return or event data members that can't be sent
++anymore, and return or event data member (enumeration) values that
++can't be sent anymore makes no difference to clients, except for
++introspection.  The latter can conceivably confuse clients, so tread
++carefully.
++
++Incompatible changes include removing return and event data members.
++
++Any change to a command definition's 'data' or one of the types used
++there (recursively) needs to consider send direction compatibility.
++
++Any change to a command definition's 'return', an event definition's
++'data', or one of the types used there (recursively) needs to consider
++receive direction compatibility.
++
++Any change to types used in both contexts need to consider both.
++
++Members of enumeration types, complex types and alternate types may be
++reordered freely.  For enumerations and alternate types, this doesn't
++affect the wire encoding.  For complex types, this might make the
++implementation emit JSON object members in a different order, which
++the Client JSON Protocol permits.
++
++Since type names are not visible in the Client JSON Protocol, types
++may be freely renamed.  Even certain refactorings are invisible, such
++as splitting members from one type into a common base type.
++
++
+ =3D=3D Code generation =3D=3D
+=20
+ The QAPI code generator qapi-gen.py generates code and documentation
 --=20
 2.21.0
 
