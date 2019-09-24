@@ -4,85 +4,83 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC3ECC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:06:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54A4CC432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:07:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 321FF20673
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:06:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 321FF20673
+	by mail.kernel.org (Postfix) with ESMTPS id 26EE120673
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:07:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26EE120673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCnKZ-0008Qe-7q
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:06:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45675)
+	id 1iCnLw-0001Ba-Vh
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:07:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45795)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iCmPh-0002bU-5D
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:07:38 -0400
+ (envelope-from <philmd@redhat.com>) id 1iCmQj-0003w5-Pb
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:08:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iCmPf-0006HL-MO
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:07:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40150)
+ (envelope-from <philmd@redhat.com>) id 1iCmQh-0006lS-VI
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:08:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53970)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCmPf-0006H0-Ci
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:07:35 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iCmQh-0006kg-MN
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:08:39 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B03C2898115;
- Tue, 24 Sep 2019 15:07:34 +0000 (UTC)
-Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 42358608C0;
- Tue, 24 Sep 2019 15:07:18 +0000 (UTC)
-Subject: Re: [PATCH 05/25] qapi: Clean up member name case checking
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-6-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <67f5d0d5-b78e-b126-6fe5-4078ceed6f23@redhat.com>
-Date: Tue, 24 Sep 2019 10:07:17 -0500
+ by mx1.redhat.com (Postfix) with ESMTPS id 44D513B708
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 15:08:37 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id w10so706211wrl.5
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 08:08:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=/eLWCNCbBZEZVnzV9wLsZW+54PNGqBeL1MsCH5zOS4Y=;
+ b=rfplqAQmaNVEasnk39dx2E77ufCBU3CUWP6UVeVrmnN0exucu6pwIDFCeOSoNM4bOL
+ EKQ+9qtEamPsV9dQmUEUd1s7R0SA04IT6LtMe1eHmZB0opgmS53W2pAtGnvjhl3zCE4d
+ TO23YOb/oaXc/E2bNms3wjVeOjxdFU895BOOGyTloxWsw4Pi9VCAuG0JNTAW/Qqj7Iqs
+ 2nNVyrHQ7X/K+pl98qN/EUscY9oIjwdHMhjjhVts3B8cnDSTgCx9HPH/NCpsVC8eNyMJ
+ jKqTsNemDT7Q6KuDvZHzkjTM1cgTIW//pnNdD5/S/3rwxUqZHuPBSCE1e0XAUNnuZRuY
+ sRpQ==
+X-Gm-Message-State: APjAAAXFDHfwl/yy+zJbf+HhPb+BKJisFtuF29+xlIAc1mZSljo6uoOj
+ s5hk1hHTzXUINv2gv303+xlrq0bg3fAy+oBXJqTwZMdKZ2O4308fwxZ+Yc13K9fakzI1Bax/NH2
+ YBWnpvUiGqRk7TlI=
+X-Received: by 2002:a1c:7c15:: with SMTP id x21mr589604wmc.154.1569337715873; 
+ Tue, 24 Sep 2019 08:08:35 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwTIpheVzgqx6KYwvvuV99hl6AXului8OsBumqocX4VdN6fRPrSA4saLdx3L/kT6J9ul1NOfw==
+X-Received: by 2002:a1c:7c15:: with SMTP id x21mr589575wmc.154.1569337715658; 
+ Tue, 24 Sep 2019 08:08:35 -0700 (PDT)
+Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id i1sm403255wmb.19.2019.09.24.08.08.34
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 24 Sep 2019 08:08:34 -0700 (PDT)
+Subject: Re: [PATCH v3 6/6] docker: move tests from python2 to python3
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20190923181140.7235-1-jsnow@redhat.com>
+ <20190923181140.7235-7-jsnow@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <8723e5c0-7336-3d5b-e8b0-92bea31b350b@redhat.com>
+Date: Tue, 24 Sep 2019 17:08:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190924132830.15835-6-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="jUdmxgYwL1D6PyxbQcpYOqXhvl9WKzt0W"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Tue, 24 Sep 2019 15:07:34 +0000 (UTC)
+In-Reply-To: <20190923181140.7235-7-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,162 +94,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jUdmxgYwL1D6PyxbQcpYOqXhvl9WKzt0W
-Content-Type: multipart/mixed; boundary="67RD5h14iQO8hFrbXw75WqZBrolKZfB7s";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <67f5d0d5-b78e-b126-6fe5-4078ceed6f23@redhat.com>
-Subject: Re: [PATCH 05/25] qapi: Clean up member name case checking
-References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-6-armbru@redhat.com>
-In-Reply-To: <20190924132830.15835-6-armbru@redhat.com>
+On 9/23/19 8:11 PM, John Snow wrote:
+> As part of the push to drop python2 support, replace any explicit pytho=
+n2
+> dependencies with python3 versions.
+>=20
+> For centos, python2 still exists as an implicit dependency, but by addi=
+ng
+> python3 we will be able to build even if the configure script begins to
+> require python 3.5+.
+>=20
+> Tested with centos7, fedora, ubuntu, ubuntu1804, and debian 9 (amd64).
+> Tested under a custom configure script that requires Python 3.5+.
+>=20
+> the travis dockerfile is also moved to using python3, which was tested
+> by running `make docker-test-build@travis`, which I hope is sufficient.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
 
---67RD5h14iQO8hFrbXw75WqZBrolKZfB7s
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+It seems this one already has:
 
-On 9/24/19 8:28 AM, Markus Armbruster wrote:
-> QAPISchemaMember.check_clash() checks for member names that map to the
-> same c_name().  Takes care of rejecting duplicate names.
->=20
-> It also checks a naming rule: no uppercase in member names.  That's a
-> rather odd place to do it.  Enforcing naming rules is
-> check_name_str()'s job.
->=20
-> qapi-code-gen.txt specifies the name case rule applies to the name as
-> it appears in the schema.  check_clash() checks c_name(name) instead.
-> No difference, as c_name() leaves alone case, but unclean.
->=20
-> Move the name case check into check_name_str(), less the c_name().
-> New argument @permit_upper suppresses it.  Pass permit_upper=3DTrue for=
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Tested-by: Cleber Rosa <crosa@redhat.com>
 
-> definitions (which are not members), and when the member's owner is
-> whitelisted with pragma name-case-whitelist.
->=20
-> Bonus: name-case-whitelist now applies to a union's inline base, too.
-> Update qapi/qapi-schema.json pragma to whitelist union CpuInfo instead
-> of CpuInfo's implicit base type's name q_obj_CpuInfo-base.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
-
-> +++ b/qapi/qapi-schema.json
-> @@ -71,7 +71,7 @@
->          'QapiErrorClass',           # all members, visible through err=
-ors
->          'UuidInfo',                 # UUID, visible through query-uuid=
-
->          'X86CPURegister32',         # all members, visible indirectly =
-through qom-get
-> -        'q_obj_CpuInfo-base'        # CPU, visible through query-cpu
-> +        'CpuInfo'                   # CPU, visible through query-cpu
-
-Yes, much nicer.
-
->      ] } }
+>  tests/docker/dockerfiles/centos7.docker             | 2 +-
+>  tests/docker/dockerfiles/debian-xtensa-cross.docker | 2 +-
+>  tests/docker/dockerfiles/debian10.docker            | 2 +-
+>  tests/docker/dockerfiles/debian9.docker             | 2 +-
+>  tests/docker/dockerfiles/travis.docker              | 2 +-
+>  tests/docker/dockerfiles/ubuntu.docker              | 2 +-
+>  tests/docker/dockerfiles/ubuntu1804.docker          | 2 +-
+>  7 files changed, 7 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/doc=
+kerfiles/centos7.docker
+> index e0b9d7dbe9..953637065c 100644
+> --- a/tests/docker/dockerfiles/centos7.docker
+> +++ b/tests/docker/dockerfiles/centos7.docker
+> @@ -25,6 +25,7 @@ ENV PACKAGES \
+>      nettle-devel \
+>      perl-Test-Harness \
+>      pixman-devel \
+> +    python3 \
+>      SDL-devel \
+>      spice-glib-devel \
+>      spice-server-devel \
+> @@ -34,4 +35,3 @@ ENV PACKAGES \
+>      zlib-devel
+>  RUN yum install -y $PACKAGES
+>  RUN rpm -q $PACKAGES | sort > /packages.txt
+> -
+> diff --git a/tests/docker/dockerfiles/debian-xtensa-cross.docker b/test=
+s/docker/dockerfiles/debian-xtensa-cross.docker
+> index b9c2e2e531..e6f93f65ee 100644
+> --- a/tests/docker/dockerfiles/debian-xtensa-cross.docker
+> +++ b/tests/docker/dockerfiles/debian-xtensa-cross.docker
+> @@ -18,7 +18,7 @@ RUN apt-get update && \
+>          flex \
+>          gettext \
+>          git \
+> -        python-minimal
+> +        python3-minimal
 > =20
->  # Documentation generated with qapi-gen.py is in source order, with
-> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> index f0e7d5ad34..ed4bff4479 100644
-> --- a/scripts/qapi/common.py
-> +++ b/scripts/qapi/common.py
-> @@ -704,8 +704,8 @@ valid_name =3D re.compile(r'^(__[a-zA-Z0-9.-]+_)?'
->                          '[a-zA-Z][a-zA-Z0-9_-]*$')
-> =20
-> =20
-> -def check_name(info, source, name, allow_optional=3DFalse,
-> -               enum_member=3DFalse):
-> +def check_name(info, source, name,
-> +               allow_optional=3DFalse, enum_member=3DFalse, permit_upp=
-er=3DFalse):
->      global valid_name
->      membername =3D name
-> =20
-> @@ -725,11 +725,14 @@ def check_name(info, source, name, allow_optional=
-=3DFalse,
->      if not valid_name.match(membername) or \
->         c_name(membername, False).startswith('q_'):
->          raise QAPISemError(info, "%s uses invalid name '%s'" % (source=
-, name))
-> +    if not permit_upper and name.lower() !=3D name:
-> +        raise QAPISemError(
-> +            info, "%s uses uppercase in name '%s'" % (source, name))
-> =20
-> =20
->  def add_name(name, info, meta):
->      global all_names
-> -    check_name(info, "'%s'" % meta, name)
-> +    check_name(info, "'%s'" % meta, name, permit_upper=3DTrue)
->      # FIXME should reject names that differ only in '_' vs. '.'
->      # vs. '-', because they're liable to clash in generated C.
->      if name in all_names:
-> @@ -797,10 +800,12 @@ def check_type(info, source, value,
->          raise QAPISemError(info,
->                             "%s should be an object or type name" % sou=
-rce)
-> =20
-> +    permit_upper =3D allow_dict in name_case_whitelist
-> +
-
-so allow_dict changes from a bool to a string to be looked up...
-
->      # value is a dictionary, check that each member is okay
->      for (key, arg) in value.items():
->          check_name(info, "Member of %s" % source, key,
-> -                   allow_optional=3DTrue)
-> +                   allow_optional=3DTrue, permit_upper=3Dpermit_upper)=
-
->          if c_name(key, False) =3D=3D 'u' or c_name(key, False).startsw=
-ith('has_'):
->              raise QAPISemError(info, "Member of %s uses reserved name =
-'%s'"
->                                 % (source, key))
-> @@ -870,7 +875,7 @@ def check_union(expr, info):
->      else:
->          # The object must have a string or dictionary 'base'.
->          check_type(info, "'base' for union '%s'" % name,
-> -                   base, allow_dict=3DTrue,
-> +                   base, allow_dict=3Dname,
-
-=2E..and this is an example client affected by the change.  That threw me=
-
-for a bit, but seems to work.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---67RD5h14iQO8hFrbXw75WqZBrolKZfB7s--
-
---jUdmxgYwL1D6PyxbQcpYOqXhvl9WKzt0W
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KMSUACgkQp6FrSiUn
-Q2rSmAf/YdkoBNcvlWIe2euJa5Fbtaia7FH91LxANrsYOBWp5A+I4B+IUalXdQLw
-0G9E/yUWd3MjnBrEsJsEn8vyF9n++XFaSqYtxfQlrlr4R/C9a+Vf9ieoAW6Gcmy9
-I2CLuu2JUINrqTpWBcb/JgAKk8i0NdonEpudD219opbIKwGIOsCoJWdxFnGA6vmW
-h5iAQ2uM0pkmiJ0IN+vuc+cf85UCoozCsH/ONwJ8UfPCF2yxL5IiKKrCF5alIdG6
-3VUe8MA9pQqV39wqT39uoKSzCUBDdT5nAgxPkhke8DUIbmZgjPdG6Z6ZsnszF+aU
-R6K8OUAPLI5aorJjpt70n4CS9IurXQ==
-=v+Z+
------END PGP SIGNATURE-----
-
---jUdmxgYwL1D6PyxbQcpYOqXhvl9WKzt0W--
+>  ENV CPU_LIST csp dc232b dc233c
+>  ENV TOOLCHAIN_RELEASE 2018.02
+> diff --git a/tests/docker/dockerfiles/debian10.docker b/tests/docker/do=
+ckerfiles/debian10.docker
+> index 30a78813f2..dad498b52e 100644
+> --- a/tests/docker/dockerfiles/debian10.docker
+> +++ b/tests/docker/dockerfiles/debian10.docker
+> @@ -26,7 +26,7 @@ RUN apt update && \
+>          git \
+>          pkg-config \
+>          psmisc \
+> -        python \
+> +        python3 \
+>          python3-sphinx \
+>          texinfo \
+>          $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cu=
+t -d\  -f2)
+> diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/doc=
+kerfiles/debian9.docker
+> index b36f1d4ed8..8cbd742bb5 100644
+> --- a/tests/docker/dockerfiles/debian9.docker
+> +++ b/tests/docker/dockerfiles/debian9.docker
+> @@ -26,7 +26,7 @@ RUN apt update && \
+>          git \
+>          pkg-config \
+>          psmisc \
+> -        python \
+> +        python3 \
+>          python3-sphinx \
+>          texinfo \
+>          $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cu=
+t -d\  -f2)
+> diff --git a/tests/docker/dockerfiles/travis.docker b/tests/docker/dock=
+erfiles/travis.docker
+> index e72dc85ca7..ea14da29d9 100644
+> --- a/tests/docker/dockerfiles/travis.docker
+> +++ b/tests/docker/dockerfiles/travis.docker
+> @@ -5,7 +5,7 @@ ENV LC_ALL en_US.UTF-8
+>  RUN sed -i "s/# deb-src/deb-src/" /etc/apt/sources.list
+>  RUN apt-get update
+>  RUN apt-get -y build-dep qemu
+> -RUN apt-get -y install device-tree-compiler python2.7 python-yaml dh-a=
+utoreconf gdb strace lsof net-tools gcovr
+> +RUN apt-get -y install device-tree-compiler python3 python3-yaml dh-au=
+toreconf gdb strace lsof net-tools gcovr
+>  # Travis tools require PhantomJS / Neo4j / Maven accessible
+>  # in their PATH (QEMU build won't access them).
+>  ENV PATH /usr/local/phantomjs/bin:/usr/local/phantomjs:/usr/local/neo4=
+j-3.2.7/bin:/usr/local/maven-3.5.2/bin:/usr/local/cmake-3.9.2/bin:/usr/lo=
+cal/clang-5.0.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sb=
+in:/bin
+> diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dock=
+erfiles/ubuntu.docker
+> index a4f601395c..f486492224 100644
+> --- a/tests/docker/dockerfiles/ubuntu.docker
+> +++ b/tests/docker/dockerfiles/ubuntu.docker
+> @@ -60,7 +60,7 @@ ENV PACKAGES flex bison \
+>      libvte-2.91-dev \
+>      libxen-dev \
+>      make \
+> -    python-yaml \
+> +    python3-yaml \
+>      python3-sphinx \
+>      sparse \
+>      texinfo \
+> diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/=
+dockerfiles/ubuntu1804.docker
+> index 883f9bcf31..3cc4f492c4 100644
+> --- a/tests/docker/dockerfiles/ubuntu1804.docker
+> +++ b/tests/docker/dockerfiles/ubuntu1804.docker
+> @@ -47,7 +47,7 @@ ENV PACKAGES flex bison \
+>      libvte-2.91-dev \
+>      libxen-dev \
+>      make \
+> -    python-yaml \
+> +    python3-yaml \
+>      python3-sphinx \
+>      sparse \
+>      texinfo \
+>=20
 
