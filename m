@@ -2,87 +2,142 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBA60C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:03:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 692A7C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:04:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 957C12064A
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:03:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 957C12064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2F56F217D7
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:04:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="V14XvdUT";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="tICtW9og"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F56F217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iClPG-0006Qf-Cj
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 10:03:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57190)
+	id 1iClR0-00083R-U7
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 10:04:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56050)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iCkjj-00070M-Nu
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:20:13 -0400
+ (envelope-from <prvs=1633f89ff=Anup.Patel@wdc.com>)
+ id 1iCkc6-0000Zj-CG
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:12:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iCkjh-0006ni-Ko
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:20:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37508)
+ (envelope-from <prvs=1633f89ff=Anup.Patel@wdc.com>)
+ id 1iCkc5-0002wU-0l
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:12:18 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:59729)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iCkjh-0006n4-BT
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:20:09 -0400
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 237372BF73
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 13:20:07 +0000 (UTC)
-Received: by mail-wm1-f72.google.com with SMTP id n3so7196wmf.3
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 06:20:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=iMkGwJ185A3EufEUUOg0LyczKk+WAbEF69Eb8rs7OnA=;
- b=QSnvEv3FNIKSzMBnOza2tD6ODnLlOVC2feBrlSh9rL2ccVCSiUHAYZ+TE3m346OjzS
- W8/cnsIW/v2rj7WbeI/44BZ0OC6W77DbDPFkA9RBw6Qpt6ryg3VC43dZXS0x1/AAp2yZ
- QMOLCk17MtszB5oza1LoP7WWyJ7NZoypohshH7SsknSKmnC3uBAfRZhR5ngg+nyFj4SV
- 5qpMcihXl86nYp5in1sS+DdW33PWiJwhQixHXISwtI+mIMOcHjAyOuzoesIk2hPAZr9S
- 5nHnzWVAnEUzYXmRkTCRTuN3Mlss7IYx47IJdRlQJd8gVMZoySwAnugpDhHqvCZr+JTh
- HoFg==
-X-Gm-Message-State: APjAAAUBYN/v9NiHxbL/aG48sIVi2RDR19L8GQGNiLFw9jnyDVmehLn8
- HL2ZYaZzyWVbGPXNEP9Sa+i30G7pQzcJFAKvJzsD0AFK9h9F+Pskd3twmDulo/CzehQz7Vo/ITf
- 5LPzRxNgPrwrxvtk=
-X-Received: by 2002:adf:fc05:: with SMTP id i5mr2366589wrr.134.1569331205860; 
- Tue, 24 Sep 2019 06:20:05 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyyaMvjwlFdhIxoFxQoMzGVN/wkrgJ63ddXRIQ10afUGF5nNdfveLzzGE6odTQNJVQshW/Bbg==
-X-Received: by 2002:adf:fc05:: with SMTP id i5mr2366565wrr.134.1569331205606; 
- Tue, 24 Sep 2019 06:20:05 -0700 (PDT)
-Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id v7sm2055981wru.87.2019.09.24.06.20.04
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 24 Sep 2019 06:20:04 -0700 (PDT)
-Subject: Re: [PATCH v4 2/8] hw/i386: Factorize e820 related functions
-To: Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
-References: <20190924124433.96810-1-slp@redhat.com>
- <20190924124433.96810-3-slp@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <474e1e49-6ae6-bf94-1a92-07c0142aff40@redhat.com>
-Date: Tue, 24 Sep 2019 15:20:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20190924124433.96810-3-slp@redhat.com>
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.71) (envelope-from <prvs=1633f89ff=Anup.Patel@wdc.com>)
+ id 1iCkbz-0002rk-EJ; Tue, 24 Sep 2019 09:12:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1569330765; x=1600866765;
+ h=from:to:cc:subject:date:message-id:references:
+ in-reply-to:content-transfer-encoding:mime-version;
+ bh=YjRlnmJ8YkdtsmNOvvOzVJi1LZ55WMensqP3Mc6kIk8=;
+ b=V14XvdUTWBB3+xHbs0env0kV1ks+H7ez6J380kjgkhDQgLMeAMR0YQHh
+ qgRDOXwWOZbQUtt2n1VoxZwgtc7d2Ts0aNy8WhSbjm6yE1xwRxxApjncm
+ ogwhOweNRQcnodXeymTP5JSVDY9BVsJZBuFwjtFkr03fwEdGwH9VSOjVk
+ Q7Mia3h513wRmQkSf4Jz0KyNCLhw1bQwaGeF9LVccWFu05ulYgER1Zil9
+ mkXEDDCGFhfRdp2vam6XH09UYJ0MBrvN35fAeyTlk3EYRClC8mqpLpzka
+ aaE7Ebn8+G68mvZprznIL4ftSmwGiKiZsjY8dY8gky7phtBB1y3JP3sTk g==;
+IronPort-SDR: qg7vqfWNM10mICx27KvVsP2FqOA1IZItjbIESsw5V3+56LdpK+xvVzsDYlOPHg7oLQcR0u1zff
+ 9PBv6+l+lxsNfRzOdC2Y4vkvvRnM7T12h2FpL+BPMrW01hmwZB2Wr+QPKP8WOHLb7Uvpvso1p2
+ oWRZVC4cr4OswPagVZ/z2fn3GfgzaM0LV6jbfZERTcMjN5NHu4dsyMIoo3oAMX9w4mciJro7p5
+ s7QivoDY9qM6yYS7rwLRl5WS31GxWUdaIqGCOErwOo/1/AKNSROb/p1UTRj7yP6sIf3IYBvAob
+ u2I=
+X-IronPort-AV: E=Sophos;i="5.64,544,1559491200"; d="scan'208";a="219807936"
+Received: from mail-by2nam03lp2056.outbound.protection.outlook.com (HELO
+ NAM03-BY2-obe.outbound.protection.outlook.com) ([104.47.42.56])
+ by ob1.hgst.iphmx.com with ESMTP; 24 Sep 2019 21:12:40 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FqQF9WME8UebDcDddN1ChEPrqZhFC4cDB51/fRIcFDXnyPDXzgYFy6LZVsD+bTRxlTn/b2Wv8pj5a3bsqt0YXN356mrvrwPkzmEWrEjnUdt5OypU8ORBCXH/Fb4V91MYZ46YRupWS2sCM6BiFlrHGIyqWPDPgv3mgpBZiBOSxMknJGVkq8hqUpWXy5KK54zGDMbyj7cPkj/6yGCE4QnObOYYrbNAo4RY29XBw0bvwsDFABaOiWka6Fgm5vpqsRxlUz82GdNKjzQBLTFlUf2lfctVghb2h22ONK5DS1hNVe9oG2IHNgUhtPSVW/l9EupSx9SV9+VQ/i+B6mKWRcv0bA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9QFalQcva71sTGAhg6PdUkHuKxqhy6hkayNCFUhn99w=;
+ b=XyuNjcvN3I6IYAW6pM5B5VE4HisV6XZMauCsnYulWV0DfVPypEVTsljGUQig9upusxsA8D8aniAbm+EcYCOC9Z3BjusQCDIuIa696ORC71HSL8dZrkuYCiWFf3WHr6ndaONL67/WHjkv4/5v41yTwGeqXKuFni3WcwbM0au1Yq/CyEteuuHXdXn3G7RPO/3zngrS367d21W7Rqm6GlubutevaMiKn98e2Lwae5NTrTeX0QRSkBGju8np14DdVO26hPdk11iUWyTS8qCfcWZivYEE73Y2fHCVdZ44xMX4ecXgkfZS/eV2HxuygwsU+rP4+dAWltp34RLgWFLuHzDptQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9QFalQcva71sTGAhg6PdUkHuKxqhy6hkayNCFUhn99w=;
+ b=tICtW9ogUJkNnltUAgoLsw8Xk1iP3B9oRSC8UYlXfTBre2KWpgKNfpF/ftFCNOKeDdOobHy85CFOCl64K/nAaqcIZLZ4FhCrI1w0Z9rMjUaKWoffBOjrEqC4djdl83iKQnUpdHS3v9bKc1+DG7tL2HqxV4+mvuuNTeU/HFg8kBs=
+Received: from MN2PR04MB6061.namprd04.prod.outlook.com (20.178.246.15) by
+ MN2PR04MB6318.namprd04.prod.outlook.com (52.132.168.21) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2284.20; Tue, 24 Sep 2019 13:12:07 +0000
+Received: from MN2PR04MB6061.namprd04.prod.outlook.com
+ ([fe80::e1a5:8de2:c3b1:3fb0]) by MN2PR04MB6061.namprd04.prod.outlook.com
+ ([fe80::e1a5:8de2:c3b1:3fb0%7]) with mapi id 15.20.2284.023; Tue, 24 Sep 2019
+ 13:12:07 +0000
+From: Anup Patel <Anup.Patel@wdc.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Palmer Dabbelt
+ <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Sagar
+ Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann
+ <kbastian@mail.uni-paderborn.de>
+Subject: [PATCH v2 2/2] riscv: virt: Use Goldfish RTC device
+Thread-Topic: [PATCH v2 2/2] riscv: virt: Use Goldfish RTC device
+Thread-Index: AQHVctmqoY2WGh0s9UytwrGPM+rJ5g==
+Date: Tue, 24 Sep 2019 13:12:07 +0000
+Message-ID: <20190924131131.118155-3-anup.patel@wdc.com>
+References: <20190924131131.118155-1-anup.patel@wdc.com>
+In-Reply-To: <20190924131131.118155-1-anup.patel@wdc.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: MA1PR01CA0148.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a00:71::18) To MN2PR04MB6061.namprd04.prod.outlook.com
+ (2603:10b6:208:d8::15)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Anup.Patel@wdc.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: git-send-email 2.17.1
+x-originating-ip: [49.207.51.80]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 49b4d693-1c5c-48da-b059-08d740f0cd1f
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(5600167)(711020)(4605104)(1401327)(4618075)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
+ SRVR:MN2PR04MB6318; 
+x-ms-traffictypediagnostic: MN2PR04MB6318:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MN2PR04MB6318D2B9461ED39766CEA91A8D840@MN2PR04MB6318.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:131;
+x-forefront-prvs: 0170DAF08C
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(4636009)(346002)(376002)(366004)(396003)(39860400002)(136003)(199004)(189003)(8676002)(25786009)(476003)(305945005)(8936002)(81156014)(81166006)(6512007)(36756003)(3846002)(6116002)(6436002)(5660300002)(110136005)(54906003)(44832011)(71190400001)(71200400001)(2616005)(486006)(316002)(256004)(66066001)(7736002)(6486002)(11346002)(50226002)(446003)(6506007)(66946007)(1076003)(14454004)(64756008)(2906002)(186003)(99286004)(102836004)(2171002)(386003)(52116002)(26005)(478600001)(66476007)(76176011)(66556008)(86362001)(55236004)(66446008)(4326008);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:MN2PR04MB6318;
+ H:MN2PR04MB6061.namprd04.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: s5A/bhsJTGu73adFdjsOABdc1CXMM1e6h4fqz3odkzAKfNNmR4g1cvLTZCCUUjhciLU7cNv4bdYO+GQ7LLAB55BOc3k20SWsMMLIIedmbFJ5JMuY50d+HaWFgTxTaiz0aVj+IX9H9sjrshn8r+JJtt0Jvl3RyDamJozbFSaCAolnR64eWPPfRZD2sLMz9Q4aW9aH2AivhwoJOhGjopa4cGbyLXAcd1AhBtqZE6Hd+utFRL3FOl8p7DgeLSzvWKyYuMI+ZQD/odYyNYtWgANHK50H6YDSLX2lp2kZ67b/6btV3brb7Nak5TQpm9gMOAPyBg1wGlX+1KS9N5tXY45frIMI+SlVKQ2WA5Yy7kDA55ojHpCCMxoVx6MHHgf6Y16eYtGkXZ2qmL9vQW8SlIrytbtKKkrBvSp6lZykm4ON8XM=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 49b4d693-1c5c-48da-b059-08d740f0cd1f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Sep 2019 13:12:07.5628 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 43XNRYKuCe6tK0qcbAjPkCi6EwQ8tU49knAaMrhf2xMZJr4KvFzk5Fz48O/N92+3c1lm0ziIjgW02aSYnNpstQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6318
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 68.232.143.124
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,298 +149,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, kvm@vger.kernel.org, mst@redhat.com,
- mtosatti@redhat.com, kraxel@redhat.com, pbonzini@redhat.com,
- imammedo@redhat.com, lersek@redhat.com, rth@twiddle.net
+Cc: Atish Patra <Atish.Patra@wdc.com>, Anup Patel <Anup.Patel@wdc.com>,
+ "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Anup Patel <anup@brainfault.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/24/19 2:44 PM, Sergio Lopez wrote:
-> Extract e820 related functions from pc.c, and put them in e820.c, so
-> they can be shared with other components.
-> 
-> Signed-off-by: Sergio Lopez <slp@redhat.com>
-> ---
->  hw/i386/Makefile.objs |  1 +
->  hw/i386/e820.c        | 99 +++++++++++++++++++++++++++++++++++++++++++
->  hw/i386/e820.h        | 11 +++++
->  hw/i386/pc.c          | 66 +----------------------------
->  include/hw/i386/pc.h  | 11 -----
->  target/i386/kvm.c     |  1 +
->  6 files changed, 114 insertions(+), 75 deletions(-)
->  create mode 100644 hw/i386/e820.c
->  create mode 100644 hw/i386/e820.h
-> 
-> diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
-> index c5f20bbd72..149712db07 100644
-> --- a/hw/i386/Makefile.objs
-> +++ b/hw/i386/Makefile.objs
-> @@ -2,6 +2,7 @@ obj-$(CONFIG_KVM) += kvm/
->  obj-y += multiboot.o
->  obj-y += pvh.o
->  obj-y += pc.o
-> +obj-y += e820.o
+We extend QEMU RISC-V virt machine by adding Goldfish RTC device
+to it. This will allow Guest Linux to sync it's local date/time
+with Host date/time via RTC device.
 
-Isn't that commit d6d059ca07ae907b8945f88c382fb54d43f9f03a?
-I'm confuse now.
+Signed-off-by: Anup Patel <anup.patel@wdc.com>
+---
+ hw/riscv/Kconfig        |  1 +
+ hw/riscv/virt.c         | 15 +++++++++++++++
+ include/hw/riscv/virt.h |  2 ++
+ 3 files changed, 18 insertions(+)
 
->  obj-$(CONFIG_I440FX) += pc_piix.o
->  obj-$(CONFIG_Q35) += pc_q35.o
->  obj-y += fw_cfg.o pc_sysfw.o
-> diff --git a/hw/i386/e820.c b/hw/i386/e820.c
-> new file mode 100644
-> index 0000000000..d5c5c0d528
-> --- /dev/null
-> +++ b/hw/i386/e820.c
-> @@ -0,0 +1,99 @@
-> +/*
-> + * Copyright (c) 2003-2004 Fabrice Bellard
-> + * Copyright (c) 2019 Red Hat, Inc.
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/cutils.h"
-> +#include "qemu/units.h"
-> +
-> +#include "hw/i386/e820.h"
-> +#include "hw/i386/fw_cfg.h"
-> +
-> +#define E820_NR_ENTRIES		16
-> +
-> +struct e820_entry {
-> +    uint64_t address;
-> +    uint64_t length;
-> +    uint32_t type;
-> +} QEMU_PACKED __attribute((__aligned__(4)));
-> +
-> +struct e820_table {
-> +    uint32_t count;
-> +    struct e820_entry entry[E820_NR_ENTRIES];
-> +} QEMU_PACKED __attribute((__aligned__(4)));
-> +
-> +static struct e820_table e820_reserve;
-> +static struct e820_entry *e820_table;
-> +static unsigned e820_entries;
-> +
-> +int e820_add_entry(uint64_t address, uint64_t length, uint32_t type)
-> +{
-> +    int index = le32_to_cpu(e820_reserve.count);
-> +    struct e820_entry *entry;
-> +
-> +    if (type != E820_RAM) {
-> +        /* old FW_CFG_E820_TABLE entry -- reservations only */
-> +        if (index >= E820_NR_ENTRIES) {
-> +            return -EBUSY;
-> +        }
-> +        entry = &e820_reserve.entry[index++];
-> +
-> +        entry->address = cpu_to_le64(address);
-> +        entry->length = cpu_to_le64(length);
-> +        entry->type = cpu_to_le32(type);
-> +
-> +        e820_reserve.count = cpu_to_le32(index);
-> +    }
-> +
-> +    /* new "etc/e820" file -- include ram too */
-> +    e820_table = g_renew(struct e820_entry, e820_table, e820_entries + 1);
-> +    e820_table[e820_entries].address = cpu_to_le64(address);
-> +    e820_table[e820_entries].length = cpu_to_le64(length);
-> +    e820_table[e820_entries].type = cpu_to_le32(type);
-> +    e820_entries++;
-> +
-> +    return e820_entries;
-> +}
-> +
-> +int e820_get_num_entries(void)
-> +{
-> +    return e820_entries;
-> +}
-> +
-> +bool e820_get_entry(int idx, uint32_t type, uint64_t *address, uint64_t *length)
-> +{
-> +    if (idx < e820_entries && e820_table[idx].type == cpu_to_le32(type)) {
-> +        *address = le64_to_cpu(e820_table[idx].address);
-> +        *length = le64_to_cpu(e820_table[idx].length);
-> +        return true;
-> +    }
-> +    return false;
-> +}
-> +
-> +void e820_create_fw_entry(FWCfgState *fw_cfg)
-> +{
-> +    fw_cfg_add_bytes(fw_cfg, FW_CFG_E820_TABLE,
-> +                     &e820_reserve, sizeof(e820_reserve));
-> +    fw_cfg_add_file(fw_cfg, "etc/e820", e820_table,
-> +                    sizeof(struct e820_entry) * e820_entries);
-> +}
-> diff --git a/hw/i386/e820.h b/hw/i386/e820.h
-> new file mode 100644
-> index 0000000000..569d1f0ab5
-> --- /dev/null
-> +++ b/hw/i386/e820.h
-> @@ -0,0 +1,11 @@
-> +/* e820 types */
-> +#define E820_RAM        1
-> +#define E820_RESERVED   2
-> +#define E820_ACPI       3
-> +#define E820_NVS        4
-> +#define E820_UNUSABLE   5
-> +
-> +int e820_add_entry(uint64_t address, uint64_t length, uint32_t type);
-> +int e820_get_num_entries(void);
-> +bool e820_get_entry(int idx, uint32_t type, uint64_t *address, uint64_t *length);
-> +void e820_create_fw_entry(FWCfgState *fw_cfg);
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 10e4ced0c6..3920aa7e85 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -30,6 +30,7 @@
->  #include "hw/i386/apic.h"
->  #include "hw/i386/topology.h"
->  #include "hw/i386/fw_cfg.h"
-> +#include "hw/i386/e820.h"
->  #include "sysemu/cpus.h"
->  #include "hw/block/fdc.h"
->  #include "hw/ide.h"
-> @@ -99,22 +100,6 @@
->  #define DPRINTF(fmt, ...)
->  #endif
->  
-> -#define E820_NR_ENTRIES		16
-> -
-> -struct e820_entry {
-> -    uint64_t address;
-> -    uint64_t length;
-> -    uint32_t type;
-> -} QEMU_PACKED __attribute((__aligned__(4)));
-> -
-> -struct e820_table {
-> -    uint32_t count;
-> -    struct e820_entry entry[E820_NR_ENTRIES];
-> -} QEMU_PACKED __attribute((__aligned__(4)));
-> -
-> -static struct e820_table e820_reserve;
-> -static struct e820_entry *e820_table;
-> -static unsigned e820_entries;
->  struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
->  
->  GlobalProperty pc_compat_4_1[] = {};
-> @@ -878,50 +863,6 @@ static void handle_a20_line_change(void *opaque, int irq, int level)
->      x86_cpu_set_a20(cpu, level);
->  }
->  
-> -int e820_add_entry(uint64_t address, uint64_t length, uint32_t type)
-> -{
-> -    int index = le32_to_cpu(e820_reserve.count);
-> -    struct e820_entry *entry;
-> -
-> -    if (type != E820_RAM) {
-> -        /* old FW_CFG_E820_TABLE entry -- reservations only */
-> -        if (index >= E820_NR_ENTRIES) {
-> -            return -EBUSY;
-> -        }
-> -        entry = &e820_reserve.entry[index++];
-> -
-> -        entry->address = cpu_to_le64(address);
-> -        entry->length = cpu_to_le64(length);
-> -        entry->type = cpu_to_le32(type);
-> -
-> -        e820_reserve.count = cpu_to_le32(index);
-> -    }
-> -
-> -    /* new "etc/e820" file -- include ram too */
-> -    e820_table = g_renew(struct e820_entry, e820_table, e820_entries + 1);
-> -    e820_table[e820_entries].address = cpu_to_le64(address);
-> -    e820_table[e820_entries].length = cpu_to_le64(length);
-> -    e820_table[e820_entries].type = cpu_to_le32(type);
-> -    e820_entries++;
-> -
-> -    return e820_entries;
-> -}
-> -
-> -int e820_get_num_entries(void)
-> -{
-> -    return e820_entries;
-> -}
-> -
-> -bool e820_get_entry(int idx, uint32_t type, uint64_t *address, uint64_t *length)
-> -{
-> -    if (idx < e820_entries && e820_table[idx].type == cpu_to_le32(type)) {
-> -        *address = le64_to_cpu(e820_table[idx].address);
-> -        *length = le64_to_cpu(e820_table[idx].length);
-> -        return true;
-> -    }
-> -    return false;
-> -}
-> -
->  /* Calculates initial APIC ID for a specific CPU index
->   *
->   * Currently we need to be able to calculate the APIC ID from the CPU index
-> @@ -1024,10 +965,7 @@ static FWCfgState *bochs_bios_init(AddressSpace *as, PCMachineState *pcms)
->                       acpi_tables, acpi_tables_len);
->      fw_cfg_add_i32(fw_cfg, FW_CFG_IRQ0_OVERRIDE, kvm_allows_irq0_override());
->  
-> -    fw_cfg_add_bytes(fw_cfg, FW_CFG_E820_TABLE,
-> -                     &e820_reserve, sizeof(e820_reserve));
-> -    fw_cfg_add_file(fw_cfg, "etc/e820", e820_table,
-> -                    sizeof(struct e820_entry) * e820_entries);
-> +    e820_create_fw_entry(fw_cfg);
->  
->      fw_cfg_add_bytes(fw_cfg, FW_CFG_HPET, &hpet_cfg, sizeof(hpet_cfg));
->      /* allocate memory for the NUMA channel: one (64bit) word for the number
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 19a837889d..062feeb69e 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -291,17 +291,6 @@ void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_memory);
->  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
->                         const CPUArchIdList *apic_ids, GArray *entry);
->  
-> -/* e820 types */
-> -#define E820_RAM        1
-> -#define E820_RESERVED   2
-> -#define E820_ACPI       3
-> -#define E820_NVS        4
-> -#define E820_UNUSABLE   5
-> -
-> -int e820_add_entry(uint64_t, uint64_t, uint32_t);
-> -int e820_get_num_entries(void);
-> -bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-> -
->  extern GlobalProperty pc_compat_4_1[];
->  extern const size_t pc_compat_4_1_len;
->  
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 8023c679ea..8ce56db7d4 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -41,6 +41,7 @@
->  #include "hw/i386/apic-msidef.h"
->  #include "hw/i386/intel_iommu.h"
->  #include "hw/i386/x86-iommu.h"
-> +#include "hw/i386/e820.h"
->  
->  #include "hw/pci/pci.h"
->  #include "hw/pci/msi.h"
-> 
+diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
+index fb19b2df3a..b33753c780 100644
+--- a/hw/riscv/Kconfig
++++ b/hw/riscv/Kconfig
+@@ -34,6 +34,7 @@ config RISCV_VIRT
+     select PCI
+     select HART
+     select SERIAL
++    select GOLDFISH_RTC
+     select VIRTIO_MMIO
+     select PCI_EXPRESS_GENERIC_BRIDGE
+     select SIFIVE
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index d36f5625ec..95c42ab993 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -57,6 +57,7 @@ static const struct MemmapEntry {
+     [VIRT_DEBUG] =3D       {        0x0,         0x100 },
+     [VIRT_MROM] =3D        {     0x1000,       0x11000 },
+     [VIRT_TEST] =3D        {   0x100000,        0x1000 },
++    [VIRT_RTC] =3D         {   0x101000,        0x1000 },
+     [VIRT_CLINT] =3D       {  0x2000000,       0x10000 },
+     [VIRT_PLIC] =3D        {  0xc000000,     0x4000000 },
+     [VIRT_UART0] =3D       { 0x10000000,         0x100 },
+@@ -310,6 +311,17 @@ static void create_fdt(RISCVVirtState *s, const struct=
+ MemmapEntry *memmap,
+     qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle)=
+;
+     qemu_fdt_setprop_cell(fdt, nodename, "interrupts", UART0_IRQ);
+=20
++    nodename =3D g_strdup_printf("/rtc@%lx",
++        (long)memmap[VIRT_RTC].base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_string(fdt, nodename, "compatible",
++        "google,goldfish-rtc");
++    qemu_fdt_setprop_cells(fdt, nodename, "reg",
++        0x0, memmap[VIRT_RTC].base,
++        0x0, memmap[VIRT_RTC].size);
++    qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle)=
+;
++    qemu_fdt_setprop_cell(fdt, nodename, "interrupts", RTC_IRQ);
++
+     qemu_fdt_add_subnode(fdt, "/chosen");
+     qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", nodename);
+     if (cmdline) {
+@@ -496,6 +508,9 @@ static void riscv_virt_board_init(MachineState *machine=
+)
+         0, qdev_get_gpio_in(DEVICE(s->plic), UART0_IRQ), 399193,
+         serial_hd(0), DEVICE_LITTLE_ENDIAN);
+=20
++    sysbus_create_simple("goldfish_rtc", memmap[VIRT_RTC].base,
++        qdev_get_gpio_in(DEVICE(s->plic), RTC_IRQ));
++
+     g_free(plic_hart_config);
+ }
+=20
+diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
+index 6e5fbe5d3b..e6423258d3 100644
+--- a/include/hw/riscv/virt.h
++++ b/include/hw/riscv/virt.h
+@@ -37,6 +37,7 @@ enum {
+     VIRT_DEBUG,
+     VIRT_MROM,
+     VIRT_TEST,
++    VIRT_RTC,
+     VIRT_CLINT,
+     VIRT_PLIC,
+     VIRT_UART0,
+@@ -49,6 +50,7 @@ enum {
+=20
+ enum {
+     UART0_IRQ =3D 10,
++    RTC_IRQ =3D 11,
+     VIRTIO_IRQ =3D 1, /* 1 to 8 */
+     VIRTIO_COUNT =3D 8,
+     PCIE_IRQ =3D 0x20, /* 32 to 35 */
+--=20
+2.17.1
+
 
