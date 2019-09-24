@@ -2,81 +2,60 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 255F7C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:55:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E722FC432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:57:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE33821655
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:55:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tCVn6uMX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE33821655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B9718214DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 11:57:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9718214DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCjPR-0005c0-0s
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 07:55:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42564)
+	id 1iCjRb-0007Zx-Uv
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 07:57:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42428)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iCj2v-0002uh-Kk
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:55 -0400
+ (envelope-from <drjones@redhat.com>) id 1iCj2c-0002fe-IF
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iCj2t-0005XJ-Ms
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:53 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:39307)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iCj2t-0005Wb-G5
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:51 -0400
-Received: by mail-oi1-x241.google.com with SMTP id w144so1300604oia.6
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 04:31:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ZX/sfhc/UD7CgQ9oz2If/j5Rjj05DiSODMTlkmUefsA=;
- b=tCVn6uMXjX0k3NyeqcRdshSU5XoA/viR1pXp8BghSrysbeUUMm2Qy1BaiMptmqhYtR
- neUydApAr2pDdiSd83Xro6Ifl7XXRwTMq8vha2Ug+0kciI9Y4gdfWXY8ruhx/0zUnzjG
- sKd6GDcHzSVy9gLiad35Pb/FE1e1XH6h9XY02WsJpqUdF6BbGXrYWZ8onTweZc2ghmaF
- 75fjq4XfJ4P0CMEdeYyyUBI9AZ6AVruD2dDWpYk9ldhj8Sal5C4wVRT2MnplzimqnhR5
- KWlri/eUKBiyPZ2Bl9E0Es8j1bxrdDiZf5cQ2pa3hASoBio9AqpMrQyj9cP4u154uINt
- KUmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ZX/sfhc/UD7CgQ9oz2If/j5Rjj05DiSODMTlkmUefsA=;
- b=p8amxDVXAFnKAOV1k437k6j4VK4O201flyybA32gRPXnEKc7BLtAmq1Z/2bsmenbZh
- xbj0HoaH+cZt/flSLPJ9kqwzqmUcgYFm+d9KbHm6Rm9IC9IWroJ5gA5M+GhTAaSWQS9+
- VG1bB25YXXSmh8Ox/QCiLKR08/8H/kGJQm3dSQOaH4VqzmwJpgJWt6vQ2Yn2g6wgINv5
- 2bs1m2cuPW8t/PxXVQLwPJQ/+U9uajN1/ddgz7REfzdiOO+T23XH/+1AXyUj0na46hZ1
- MpYDwFQveOBIqxiOInm/rdOVhUWXC0EXcDlp750K65r9SXxMvr9lwMRMFoJyzbpAnoDM
- rIfA==
-X-Gm-Message-State: APjAAAUNPT3l8I8QC0XlVKkegC7ki5ComLRUqBAwFjMhD+AiiBkafWWd
- krAr7uzWW3AD+luKhH+qEPW8LlBx0Z8Xi/5RYg+Jxg==
-X-Google-Smtp-Source: APXvYqwXw6YYiajd/OKORTyQ0C+H/EI1PpISIsDvE+ZwLTiWtbc/emSjnRubEy4FE/qCeLhw9RqypefVY+lt1pYdZkc=
-X-Received: by 2002:aca:b48a:: with SMTP id d132mr1676947oif.98.1569324710181; 
- Tue, 24 Sep 2019 04:31:50 -0700 (PDT)
+ (envelope-from <drjones@redhat.com>) id 1iCj2b-0005Pa-2V
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:31:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33196)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>)
+ id 1iCj2V-0005N3-88; Tue, 24 Sep 2019 07:31:27 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 76D7B5859E;
+ Tue, 24 Sep 2019 11:31:26 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5AD7A61559;
+ Tue, 24 Sep 2019 11:31:24 +0000 (UTC)
+From: Andrew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org
+Subject: [PATCH v4 5/9] target/arm/kvm64: Add kvm_arch_get/put_sve
+Date: Tue, 24 Sep 2019 13:31:01 +0200
+Message-Id: <20190924113105.19076-6-drjones@redhat.com>
+In-Reply-To: <20190924113105.19076-1-drjones@redhat.com>
+References: <20190924113105.19076-1-drjones@redhat.com>
 MIME-Version: 1.0
-References: <20190924084201.107958-1-anup.patel@wdc.com>
- <20190924084201.107958-2-anup.patel@wdc.com>
- <CAFEAcA-cm2GaKHg7_VcSb-OHp8GA9KuWiyWbc6r3F1p7tLc35A@mail.gmail.com>
- <MN2PR04MB60610CCAEED38F30F9B274208D840@MN2PR04MB6061.namprd04.prod.outlook.com>
-In-Reply-To: <MN2PR04MB60610CCAEED38F30F9B274208D840@MN2PR04MB6061.namprd04.prod.outlook.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Sep 2019 12:31:38 +0100
-Message-ID: <CAFEAcA_nG5F-bXykXPmgXuiM-i0jHvm-BvHVF1CvjpBeNHOjRA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] hw: timer: Add Goldfish RTC device
-To: Anup Patel <Anup.Patel@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Tue, 24 Sep 2019 11:31:26 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,124 +67,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Atish Patra <Atish.Patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Anup Patel <anup@brainfault.org>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, armbru@redhat.com,
+ eric.auger@redhat.com, imammedo@redhat.com, alex.bennee@linaro.org,
+ Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 24 Sep 2019 at 12:17, Anup Patel <Anup.Patel@wdc.com> wrote:
->
->
->
-> > -----Original Message-----
-> > From: Peter Maydell <peter.maydell@linaro.org>
-> > Sent: Tuesday, September 24, 2019 3:21 PM
-> > To: Anup Patel <Anup.Patel@wdc.com>
-> > Cc: Palmer Dabbelt <palmer@sifive.com>; Alistair Francis
-> > <Alistair.Francis@wdc.com>; Sagar Karandikar <sagark@eecs.berkeley.edu>;
-> > Bastian Koppelmann <kbastian@mail.uni-paderborn.de>; Atish Patra
-> > <Atish.Patra@wdc.com>; qemu-riscv@nongnu.org; qemu-
-> > devel@nongnu.org; Anup Patel <anup@brainfault.org>
-> > Subject: Re: [PATCH 1/2] hw: timer: Add Goldfish RTC device
-> >
-> > On Tue, 24 Sep 2019 at 09:45, Anup Patel <Anup.Patel@wdc.com> wrote:
-> > >
-> > > This patch adds model for Google Goldfish virtual platform RTC device.
-> > >
-> > > We will be adding Goldfish RTC device to the QEMU RISC-V virt machine
-> > > for providing real date-time to Guest Linux. The corresponding Linux
-> > > driver for Goldfish RTC device is already available in upstream Linux.
-> > >
-> > > For now, VM migration support is not available for Goldfish RTC device
-> > > but it will be added later when we implement VM migration for KVM RISC-
-> > V.
-> > >
-> > > Signed-off-by: Anup Patel <anup.patel@wdc.com>
+These are the SVE equivalents to kvm_arch_get/put_fpsimd. Note, the
+swabbing is different than it is for fpsmid because the vector format
+is a little-endian stream of words.
 
-> > > ---
-> > > +
-> > > +static Property goldfish_rtc_properties[] = {
-> > > +    DEFINE_PROP_UINT64("tick-offset", GoldfishRTCState, tick_offset, 0),
-> > > +    DEFINE_PROP_UINT64("alarm-next", GoldfishRTCState, alarm_next, 0),
-> > > +    DEFINE_PROP_UINT32("alarm-running", GoldfishRTCState,
-> > alarm_running, 0),
-> > > +    DEFINE_PROP_UINT32("irq-pending", GoldfishRTCState, irq_pending,
-> > 0),
-> > > +    DEFINE_PROP_UINT32("irq-enabled", GoldfishRTCState, irq_enabled,
-> > 0),
-> > > +    DEFINE_PROP_END_OF_LIST(),
-> > > +};
-> >
-> > What are all these properties trying to do ?
->
-> Argh, I forgot to remove these before sending.
->
-> I will drop these in next revision.
->
-> >
-> > > +
-> > > +static void goldfish_rtc_class_init(ObjectClass *klass, void *data) {
-> > > +    DeviceClass *dc = DEVICE_CLASS(klass);
-> > > +    dc->props = goldfish_rtc_properties;
-> >
-> > Missing reset function.
->
-> Sure, I will add it. I got confused because I saw reset function in HPET
-> but not in PL031.
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/kvm64.c | 137 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 133 insertions(+), 4 deletions(-)
 
-Yeah, the lack of reset is a bug in the pl031. I did have
-a draft set of patches where I tried to fix that, but I
-got stuck because it was a bit unclear what I ought to be
-resetting. In a real hardware pl031 there is no persistent
-storage of the RTC value -- it's just a 1Hz counter, really,
-and guest firmware will write to it on startup (from some
-other real RTC). In QEMU we use it as a sort of "RTC for a
-VM", and back it with the QEMU RTC clock, so it doesn't
-behave quite as the hardware does but more like "view that
-you'd see from a combination of h/w and firmware behaviour".
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 28f6db57d5ee..ea454c613919 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -671,11 +671,12 @@ int kvm_arch_destroy_vcpu(CPUState *cs)
+ bool kvm_arm_reg_syncs_via_cpreg_list(uint64_t regidx)
+ {
+     /* Return true if the regidx is a register we should synchronize
+-     * via the cpreg_tuples array (ie is not a core reg we sync by
+-     * hand in kvm_arch_get/put_registers())
++     * via the cpreg_tuples array (ie is not a core or sve reg that
++     * we sync by hand in kvm_arch_get/put_registers())
+      */
+     switch (regidx & KVM_REG_ARM_COPROC_MASK) {
+     case KVM_REG_ARM_CORE:
++    case KVM_REG_ARM64_SVE:
+         return false;
+     default:
+         return true;
+@@ -761,6 +762,78 @@ static int kvm_arch_put_fpsimd(CPUState *cs)
+     return 0;
+ }
+=20
++/*
++ * SVE registers are encoded in KVM's memory in an endianness-invariant =
+format.
++ * The byte at offset i from the start of the in-memory representation c=
+ontains
++ * the bits [(7 + 8 * i) : (8 * i)] of the register value. As this means=
+ the
++ * lowest offsets are stored in the lowest memory addresses, then that n=
+early
++ * matches QEMU's representation, which is to use an array of host-endia=
+n
++ * uint64_t's, where the lower offsets are at the lower indices. To comp=
+lete
++ * the translation we just need to byte swap the uint64_t's on big-endia=
+n hosts.
++ */
++static uint64_t *sve_bswap64(uint64_t *dst, uint64_t *src, int nr)
++{
++#ifdef HOST_WORDS_BIGENDIAN
++    int i;
++
++    for (i =3D 0; i < nr; ++i) {
++        dst[i] =3D bswap64(src[i]);
++    }
++
++    return dst;
++#else
++    return src;
++#endif
++}
++
++/*
++ * KVM SVE registers come in slices where ZREGs have a slice size of 204=
+8 bits
++ * and PREGS and the FFR have a slice size of 256 bits. However we simpl=
+y hard
++ * code the slice index to zero for now as it's unlikely we'll need more=
+ than
++ * one slice for quite some time.
++ */
++static int kvm_arch_put_sve(CPUState *cs)
++{
++    ARMCPU *cpu =3D ARM_CPU(cs);
++    CPUARMState *env =3D &cpu->env;
++    uint64_t tmp[ARM_MAX_VQ * 2];
++    uint64_t *r;
++    struct kvm_one_reg reg;
++    int n, ret;
++
++    for (n =3D 0; n < KVM_ARM64_SVE_NUM_ZREGS; ++n) {
++        r =3D sve_bswap64(tmp, &env->vfp.zregs[n].d[0], cpu->sve_max_vq =
+* 2);
++        reg.addr =3D (uintptr_t)r;
++        reg.id =3D KVM_REG_ARM64_SVE_ZREG(n, 0);
++        ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
++        if (ret) {
++            return ret;
++        }
++    }
++
++    for (n =3D 0; n < KVM_ARM64_SVE_NUM_PREGS; ++n) {
++        r =3D sve_bswap64(tmp, r =3D &env->vfp.pregs[n].p[0],
++                        DIV_ROUND_UP(cpu->sve_max_vq, 8));
++        reg.addr =3D (uintptr_t)r;
++        reg.id =3D KVM_REG_ARM64_SVE_PREG(n, 0);
++        ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
++        if (ret) {
++            return ret;
++        }
++    }
++
++    r =3D sve_bswap64(tmp, &env->vfp.pregs[FFR_PRED_NUM].p[0],
++                    DIV_ROUND_UP(cpu->sve_max_vq, 8));
++    reg.addr =3D (uintptr_t)r;
++    reg.id =3D KVM_REG_ARM64_SVE_FFR(0);
++    ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
++    if (ret) {
++        return ret;
++    }
++
++    return 0;
++}
++
+ int kvm_arch_put_registers(CPUState *cs, int level)
+ {
+     struct kvm_one_reg reg;
+@@ -855,7 +928,11 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+         }
+     }
+=20
+-    ret =3D kvm_arch_put_fpsimd(cs);
++    if (cpu_isar_feature(aa64_sve, cpu)) {
++        ret =3D kvm_arch_put_sve(cs);
++    } else {
++        ret =3D kvm_arch_put_fpsimd(cs);
++    }
+     if (ret) {
+         return ret;
+     }
+@@ -918,6 +995,54 @@ static int kvm_arch_get_fpsimd(CPUState *cs)
+     return 0;
+ }
+=20
++/*
++ * KVM SVE registers come in slices where ZREGs have a slice size of 204=
+8 bits
++ * and PREGS and the FFR have a slice size of 256 bits. However we simpl=
+y hard
++ * code the slice index to zero for now as it's unlikely we'll need more=
+ than
++ * one slice for quite some time.
++ */
++static int kvm_arch_get_sve(CPUState *cs)
++{
++    ARMCPU *cpu =3D ARM_CPU(cs);
++    CPUARMState *env =3D &cpu->env;
++    struct kvm_one_reg reg;
++    uint64_t *r;
++    int n, ret;
++
++    for (n =3D 0; n < KVM_ARM64_SVE_NUM_ZREGS; ++n) {
++        r =3D &env->vfp.zregs[n].d[0];
++        reg.addr =3D (uintptr_t)r;
++        reg.id =3D KVM_REG_ARM64_SVE_ZREG(n, 0);
++        ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
++        if (ret) {
++            return ret;
++        }
++        sve_bswap64(r, r, cpu->sve_max_vq * 2);
++    }
++
++    for (n =3D 0; n < KVM_ARM64_SVE_NUM_PREGS; ++n) {
++        r =3D &env->vfp.pregs[n].p[0];
++        reg.addr =3D (uintptr_t)r;
++        reg.id =3D KVM_REG_ARM64_SVE_PREG(n, 0);
++        ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
++        if (ret) {
++            return ret;
++        }
++        sve_bswap64(r, r, DIV_ROUND_UP(cpu->sve_max_vq, 8));
++    }
++
++    r =3D &env->vfp.pregs[FFR_PRED_NUM].p[0];
++    reg.addr =3D (uintptr_t)r;
++    reg.id =3D KVM_REG_ARM64_SVE_FFR(0);
++    ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
++    if (ret) {
++        return ret;
++    }
++    sve_bswap64(r, r, DIV_ROUND_UP(cpu->sve_max_vq, 8));
++
++    return 0;
++}
++
+ int kvm_arch_get_registers(CPUState *cs)
+ {
+     struct kvm_one_reg reg;
+@@ -1012,7 +1137,11 @@ int kvm_arch_get_registers(CPUState *cs)
+         env->spsr =3D env->banked_spsr[i];
+     }
+=20
+-    ret =3D kvm_arch_get_fpsimd(cs);
++    if (cpu_isar_feature(aa64_sve, cpu)) {
++        ret =3D kvm_arch_get_sve(cs);
++    } else {
++        ret =3D kvm_arch_get_fpsimd(cs);
++    }
+     if (ret) {
+         return ret;
+     }
+--=20
+2.20.1
 
-TLDR: don't use the pl031 code as a good model of how to do an RTC,
-it has some definite flaws. x86 or ppc RTC handling is
-probably a better place to look.
-
-Another random question -- is there an existing RTC device
-we could put in the riscv board rather than adding a new
-model of this goldfish device? Put another way, what are
-the merits of using goldfish in particular?
-
-We should probably document this device in docs/specs since it's
-a pure-virtual device. (You have a link to the URL for the
-GOLDFISH-VIRTUAL-HARDWARE.TXT for the android emulator, but that
-doesn't seem to match the implementation here -- the doc says the
-alarm registers are non-functional but this code does something with
-them.)
-
-> > If you don't want to implement migration support now you should at least
-> > put in something that block migration.
-> > (Personally I prefer to just write the vmstate, it's as easy as writing the code
-> > to block migrations.)
->
-> Okay, I will add vmstate.
->
-> Is there a way to unit test the vmstate part ?
-> OR
-> Are you fine if we test-n-fix it later ?
-
-Test and fix later is fine. That said, I've just remembered
-that for an RTC migration is potentially a tricky area
-because you typically don't want a vmsave-vmload to
-give you the same RTC value after load that there was on
-store, you want it to still be following the host RTC.
-We got that wrong on the PL031 and had to put in some ugly
-workarounds to maintain migration compatibility when we fixed it.
-So maybe it would be better to mark as non-migratable for now.
-
-thanks
--- PMM
 
