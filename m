@@ -4,62 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB83EC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:25:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E606C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:27:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF6062064A
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:25:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF6062064A
+	by mail.kernel.org (Postfix) with ESMTPS id 1044E2064A
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:27:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1044E2064A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCdKG-0004ut-Pz
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 01:25:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53520)
+	id 1iCdMD-00069e-5z
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 01:27:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53864)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iCdJ2-00041x-DW
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:24:09 -0400
+ (envelope-from <clg@kaod.org>) id 1iCdLC-0005ho-CZ
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:26:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iCdJ0-00065i-Uv
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:24:08 -0400
-Received: from 9.mo4.mail-out.ovh.net ([46.105.40.176]:55910)
+ (envelope-from <clg@kaod.org>) id 1iCdLB-0000J5-4E
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:26:22 -0400
+Received: from 2.mo177.mail-out.ovh.net ([178.33.109.80]:60602)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iCdIx-00063E-Hv
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:24:04 -0400
-Received: from player688.ha.ovh.net (unknown [10.108.54.94])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id 20626208272
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 07:23:59 +0200 (CEST)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iCdLA-0000IW-Uf
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:26:21 -0400
+Received: from player734.ha.ovh.net (unknown [10.108.42.170])
+ by mo177.mail-out.ovh.net (Postfix) with ESMTP id 4E50A10B563
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 07:26:19 +0200 (CEST)
 Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
  (Authenticated sender: clg@kaod.org)
- by player688.ha.ovh.net (Postfix) with ESMTPSA id 27A64A10E125;
- Tue, 24 Sep 2019 05:23:56 +0000 (UTC)
-Subject: Re: [PATCH 1/4] xics: Eliminate 'reject', 'resend' and 'eoi' class
- hooks
+ by player734.ha.ovh.net (Postfix) with ESMTPSA id 3B6FFA156E9F;
+ Tue, 24 Sep 2019 05:26:15 +0000 (UTC)
+Subject: Re: [PATCH 2/4] xics: Merge reset and realize hooks
 To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org
 References: <20190924045952.11412-1-david@gibson.dropbear.id.au>
- <20190924045952.11412-2-david@gibson.dropbear.id.au>
+ <20190924045952.11412-3-david@gibson.dropbear.id.au>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <a90952f0-3647-9b1f-cbbe-2744a24091a5@kaod.org>
-Date: Tue, 24 Sep 2019 07:23:55 +0200
+Message-ID: <f7fd584c-c4bb-d8b0-a06c-e3fd88088208@kaod.org>
+Date: Tue, 24 Sep 2019 07:26:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190924045952.11412-2-david@gibson.dropbear.id.au>
+In-Reply-To: <20190924045952.11412-3-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Ovh-Tracer-Id: 12136919524700621576
+X-Ovh-Tracer-Id: 12176326019262548744
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdelgdelkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdelgdellecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.40.176
+X-Received-From: 178.33.109.80
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,196 +76,186 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 24/09/2019 06:59, David Gibson wrote:
-> Currently ics_reject(), ics_resend() and ics_eoi() indirect through
-> class methods.  But there's only one implementation of each method,
-> the one in TYPE_ICS_SIMPLE.  TYPE_ICS_BASE has no implementation, but
-> it's never instantiated, and has no other subtypes.
+> Currently TYPE_XICS_BASE and TYPE_XICS_SIMPLE have their own reset and
+> realize methods, using the standard technique for having the subtype
+> call the supertype's methods before doing its own thing.
 >=20
-> So clean up by eliminating the method and just having ics_reject(),
-> ics_resend() and ics_eoi() contain the logic directly.
+> But TYPE_XICS_SIMPLE is the only subtype of TYPE_XICS_BASE ever
+> instantiated, so there's no point having the split here.  Merge them
+> together into just ics_reset() and ics_realize() functions.
 >=20
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+
 
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
 C.
 
-
 > ---
->  hw/intc/trace-events  |  4 ++--
->  hw/intc/xics.c        | 54 +++++++++++--------------------------------
->  include/hw/ppc/xics.h |  4 ----
->  3 files changed, 15 insertions(+), 47 deletions(-)
+>  hw/intc/xics.c        | 97 ++++++++++++++++---------------------------
+>  include/hw/ppc/xics.h |  3 --
+>  2 files changed, 35 insertions(+), 65 deletions(-)
 >=20
-> diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-> index 719f46b516..fdc716c2cc 100644
-> --- a/hw/intc/trace-events
-> +++ b/hw/intc/trace-events
-> @@ -70,8 +70,8 @@ xics_ics_simple_set_irq_msi(int srcno, int nr) "set_i=
-rq_msi: srcno %d [irq 0x%x]
->  xics_masked_pending(void) "set_irq_msi: masked pending"
->  xics_ics_simple_set_irq_lsi(int srcno, int nr) "set_irq_lsi: srcno %d =
-[irq 0x%x]"
->  xics_ics_simple_write_xive(int nr, int srcno, int server, uint8_t prio=
-rity) "ics_write_xive: irq 0x%x [src %d] server 0x%x prio 0x%x"
-> -xics_ics_simple_reject(int nr, int srcno) "reject irq 0x%x [src %d]"
-> -xics_ics_simple_eoi(int nr) "ics_eoi: irq 0x%x"
-> +xics_ics_reject(int nr, int srcno) "reject irq 0x%x [src %d]"
-> +xics_ics_eoi(int nr) "ics_eoi: irq 0x%x"
-> =20
->  # s390_flic_kvm.c
->  flic_create_device(int err) "flic: create device failed %d"
 > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index b2fca2975c..93139b0189 100644
+> index 93139b0189..db0e532bd9 100644
 > --- a/hw/intc/xics.c
 > +++ b/hw/intc/xics.c
-> @@ -98,32 +98,8 @@ void ics_pic_print_info(ICSState *ics, Monitor *mon)
->  #define XISR(icp)   (((icp)->xirr) & XISR_MASK)
->  #define CPPR(icp)   (((icp)->xirr) >> 24)
+> @@ -548,68 +548,13 @@ static void ics_eoi(ICSState *ics, uint32_t nr)
+>      }
+>  }
 > =20
-> -static void ics_reject(ICSState *ics, uint32_t nr)
+> -static void ics_simple_reset(DeviceState *dev)
 > -{
-> -    ICSStateClass *k =3D ICS_BASE_GET_CLASS(ics);
+> -    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(dev);
 > -
-> -    if (k->reject) {
-> -        k->reject(ics, nr);
+> -    icsc->parent_reset(dev);
+> -
+> -    if (kvm_irqchip_in_kernel()) {
+> -        Error *local_err =3D NULL;
+> -
+> -        ics_set_kvm_state(ICS_BASE(dev), &local_err);
+> -        if (local_err) {
+> -            error_report_err(local_err);
+> -        }
 > -    }
 > -}
 > -
-> -void ics_resend(ICSState *ics)
+> -static void ics_simple_reset_handler(void *dev)
 > -{
-> -    ICSStateClass *k =3D ICS_BASE_GET_CLASS(ics);
-> -
-> -    if (k->resend) {
-> -        k->resend(ics);
-> -    }
+> -    ics_simple_reset(dev);
 > -}
 > -
-> -static void ics_eoi(ICSState *ics, int nr)
+> -static void ics_simple_realize(DeviceState *dev, Error **errp)
 > -{
-> -    ICSStateClass *k =3D ICS_BASE_GET_CLASS(ics);
+> -    ICSState *ics =3D ICS_SIMPLE(dev);
+> -    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(ics);
+> -    Error *local_err =3D NULL;
 > -
-> -    if (k->eoi) {
-> -        k->eoi(ics, nr);
+> -    icsc->parent_realize(dev, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> -        return;
 > -    }
+> -
+> -    qemu_register_reset(ics_simple_reset_handler, ics);
 > -}
-> +static void ics_reject(ICSState *ics, uint32_t nr);
-> +static void ics_eoi(ICSState *ics, uint32_t nr);
-> =20
->  static void icp_check_ipi(ICPState *icp)
+> -
+> -static void ics_simple_class_init(ObjectClass *klass, void *data)
+> -{
+> -    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> -    ICSStateClass *isc =3D ICS_BASE_CLASS(klass);
+> -
+> -    device_class_set_parent_realize(dc, ics_simple_realize,
+> -                                    &isc->parent_realize);
+> -    device_class_set_parent_reset(dc, ics_simple_reset,
+> -                                  &isc->parent_reset);
+> -}
+> -
+> -static const TypeInfo ics_simple_info =3D {
+> -    .name =3D TYPE_ICS_SIMPLE,
+> -    .parent =3D TYPE_ICS_BASE,
+> -    .instance_size =3D sizeof(ICSState),
+> -    .class_init =3D ics_simple_class_init,
+> -    .class_size =3D sizeof(ICSStateClass),
+> -};
+> -
+>  static void ics_reset_irq(ICSIRQState *irq)
 >  {
-> @@ -427,7 +403,7 @@ Object *icp_create(Object *cpu, const char *type, X=
-ICSFabric *xi, Error **errp)
->  /*
->   * ICS: Source layer
->   */
-> -static void ics_simple_resend_msi(ICSState *ics, int srcno)
-> +static void ics_resend_msi(ICSState *ics, int srcno)
->  {
->      ICSIRQState *irq =3D ics->irqs + srcno;
-> =20
-> @@ -440,7 +416,7 @@ static void ics_simple_resend_msi(ICSState *ics, in=
-t srcno)
->      }
+>      irq->priority =3D 0xff;
+>      irq->saved_priority =3D 0xff;
 >  }
 > =20
-> -static void ics_simple_resend_lsi(ICSState *ics, int srcno)
-> +static void ics_resend_lsi(ICSState *ics, int srcno)
+> -static void ics_base_reset(DeviceState *dev)
+> +static void ics_reset(DeviceState *dev)
 >  {
->      ICSIRQState *irq =3D ics->irqs + srcno;
-> =20
-> @@ -478,7 +454,7 @@ static void ics_simple_set_irq_lsi(ICSState *ics, i=
-nt srcno, int val)
->      } else {
->          irq->status &=3D ~XICS_STATUS_ASSERTED;
->      }
-> -    ics_simple_resend_lsi(ics, srcno);
-> +    ics_resend_lsi(ics, srcno);
->  }
-> =20
->  void ics_simple_set_irq(void *opaque, int srcno, int val)
-> @@ -512,7 +488,7 @@ static void ics_simple_write_xive_msi(ICSState *ics=
-, int srcno)
-> =20
->  static void ics_simple_write_xive_lsi(ICSState *ics, int srcno)
->  {
-> -    ics_simple_resend_lsi(ics, srcno);
-> +    ics_resend_lsi(ics, srcno);
->  }
-> =20
->  void ics_simple_write_xive(ICSState *ics, int srcno, int server,
-> @@ -534,11 +510,11 @@ void ics_simple_write_xive(ICSState *ics, int src=
-no, int server,
->      }
->  }
-> =20
-> -static void ics_simple_reject(ICSState *ics, uint32_t nr)
-> +static void ics_reject(ICSState *ics, uint32_t nr)
->  {
->      ICSIRQState *irq =3D ics->irqs + nr - ics->offset;
-> =20
-> -    trace_xics_ics_simple_reject(nr, nr - ics->offset);
-> +    trace_xics_ics_reject(nr, nr - ics->offset);
->      if (irq->flags & XICS_FLAGS_IRQ_MSI) {
->          irq->status |=3D XICS_STATUS_REJECTED;
->      } else if (irq->flags & XICS_FLAGS_IRQ_LSI) {
-> @@ -546,26 +522,26 @@ static void ics_simple_reject(ICSState *ics, uint=
-32_t nr)
->      }
->  }
-> =20
-> -static void ics_simple_resend(ICSState *ics)
-> +void ics_resend(ICSState *ics)
->  {
+>      ICSState *ics =3D ICS_BASE(dev);
 >      int i;
-> =20
->      for (i =3D 0; i < ics->nr_irqs; i++) {
->          /* FIXME: filter by server#? */
->          if (ics->irqs[i].flags & XICS_FLAGS_IRQ_LSI) {
-> -            ics_simple_resend_lsi(ics, i);
-> +            ics_resend_lsi(ics, i);
->          } else {
-> -            ics_simple_resend_msi(ics, i);
-> +            ics_resend_msi(ics, i);
->          }
+> @@ -625,17 +570,31 @@ static void ics_base_reset(DeviceState *dev)
+>          ics_reset_irq(ics->irqs + i);
+>          ics->irqs[i].flags =3D flags[i];
 >      }
+> +
+> +    if (kvm_irqchip_in_kernel()) {
+> +        Error *local_err =3D NULL;
+> +
+> +        ics_set_kvm_state(ICS_BASE(dev), &local_err);
+> +        if (local_err) {
+> +            error_report_err(local_err);
+> +        }
+> +    }
+> +}
+> +
+> +static void ics_reset_handler(void *dev)
+> +{
+> +    ics_reset(dev);
 >  }
 > =20
-> -static void ics_simple_eoi(ICSState *ics, uint32_t nr)
-> +static void ics_eoi(ICSState *ics, uint32_t nr)
+> -static void ics_base_realize(DeviceState *dev, Error **errp)
+> +static void ics_realize(DeviceState *dev, Error **errp)
 >  {
->      int srcno =3D nr - ics->offset;
->      ICSIRQState *irq =3D ics->irqs + srcno;
+>      ICSState *ics =3D ICS_BASE(dev);
+> +    Error *local_err =3D NULL;
+>      Object *obj;
+> -    Error *err =3D NULL;
 > =20
-> -    trace_xics_ics_simple_eoi(nr);
-> +    trace_xics_ics_eoi(nr);
-> =20
->      if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
->          irq->status &=3D ~XICS_STATUS_SENT;
-> @@ -617,10 +593,6 @@ static void ics_simple_class_init(ObjectClass *kla=
-ss, void *data)
->                                      &isc->parent_realize);
->      device_class_set_parent_reset(dc, ics_simple_reset,
->                                    &isc->parent_reset);
-> -
-> -    isc->reject =3D ics_simple_reject;
-> -    isc->resend =3D ics_simple_resend;
-> -    isc->eoi =3D ics_simple_eoi;
+> -    obj =3D object_property_get_link(OBJECT(dev), ICS_PROP_XICS, &err)=
+;
+> +    obj =3D object_property_get_link(OBJECT(dev), ICS_PROP_XICS, &loca=
+l_err);
+>      if (!obj) {
+> -        error_propagate_prepend(errp, err,
+> +        error_propagate_prepend(errp, local_err,
+>                                  "required link '" ICS_PROP_XICS
+>                                  "' not found: ");
+>          return;
+> @@ -647,8 +606,22 @@ static void ics_base_realize(DeviceState *dev, Err=
+or **errp)
+>          return;
+>      }
+>      ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
+> +
+> +    qemu_register_reset(ics_reset_handler, ics);
+> +}
+> +
+> +static void ics_simple_class_init(ObjectClass *klass, void *data)
+> +{
 >  }
 > =20
->  static const TypeInfo ics_simple_info =3D {
+> +static const TypeInfo ics_simple_info =3D {
+> +    .name =3D TYPE_ICS_SIMPLE,
+> +    .parent =3D TYPE_ICS_BASE,
+> +    .instance_size =3D sizeof(ICSState),
+> +    .class_init =3D ics_simple_class_init,
+> +    .class_size =3D sizeof(ICSStateClass),
+> +};
+> +
+>  static void ics_base_instance_init(Object *obj)
+>  {
+>      ICSState *ics =3D ICS_BASE(obj);
+> @@ -725,9 +698,9 @@ static void ics_base_class_init(ObjectClass *klass,=
+ void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> =20
+> -    dc->realize =3D ics_base_realize;
+> +    dc->realize =3D ics_realize;
+>      dc->props =3D ics_base_properties;
+> -    dc->reset =3D ics_base_reset;
+> +    dc->reset =3D ics_reset;
+>      dc->vmsd =3D &vmstate_ics_base;
+>  }
+> =20
 > diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index 64a2c8862a..34d7985b7c 100644
+> index 34d7985b7c..0eb39c2561 100644
 > --- a/include/hw/ppc/xics.h
 > +++ b/include/hw/ppc/xics.h
-> @@ -106,10 +106,6 @@ struct ICSStateClass {
+> @@ -103,9 +103,6 @@ struct PnvICPState {
 > =20
->      DeviceRealize parent_realize;
->      DeviceReset parent_reset;
+>  struct ICSStateClass {
+>      DeviceClass parent_class;
 > -
-> -    void (*reject)(ICSState *s, uint32_t irq);
-> -    void (*resend)(ICSState *s);
-> -    void (*eoi)(ICSState *s, uint32_t irq);
+> -    DeviceRealize parent_realize;
+> -    DeviceReset parent_reset;
 >  };
 > =20
 >  struct ICSState {
