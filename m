@@ -6,52 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73574C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:50:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15168C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:50:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 486F420872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:50:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 486F420872
+	by mail.kernel.org (Postfix) with ESMTPS id DC78B20872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:50:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC78B20872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iClCh-00030T-Kt
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:50:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52414)
+	id 1iClDA-0003UL-Dk
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:50:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58764)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iCkCY-000320-Rp
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:45:57 -0400
+ (envelope-from <armbru@redhat.com>) id 1iCks1-0000Ec-9x
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iCkCX-0004sI-AI
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:45:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43174)
+ (envelope-from <armbru@redhat.com>) id 1iCkrw-0001Tx-O2
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41878)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iCkCX-0004rr-2J
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:45:53 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCkrv-0001Sf-SK
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:40 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 51C45300D20B;
- Tue, 24 Sep 2019 12:45:52 +0000 (UTC)
-Received: from dritchie.redhat.com (unknown [10.33.36.128])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5DEAA608C2;
- Tue, 24 Sep 2019 12:45:37 +0000 (UTC)
-From: Sergio Lopez <slp@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id A15633086211;
+ Tue, 24 Sep 2019 13:28:38 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C853D6012E;
+ Tue, 24 Sep 2019 13:28:37 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 9995411384DA; Tue, 24 Sep 2019 15:28:30 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 5/8] fw_cfg: add "modify" functions for all types
-Date: Tue, 24 Sep 2019 14:44:30 +0200
-Message-Id: <20190924124433.96810-6-slp@redhat.com>
-In-Reply-To: <20190924124433.96810-1-slp@redhat.com>
-References: <20190924124433.96810-1-slp@redhat.com>
+Subject: [PATCH 17/25] qapi: Move context-free checking to the proper place
+Date: Tue, 24 Sep 2019 15:28:22 +0200
+Message-Id: <20190924132830.15835-18-armbru@redhat.com>
+In-Reply-To: <20190924132830.15835-1-armbru@redhat.com>
+References: <20190924132830.15835-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 24 Sep 2019 12:45:52 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Tue, 24 Sep 2019 13:28:38 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -66,157 +69,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sergio Lopez <slp@redhat.com>, ehabkost@redhat.com, kvm@vger.kernel.org,
- mst@redhat.com, lersek@redhat.com, mtosatti@redhat.com, kraxel@redhat.com,
- pbonzini@redhat.com, imammedo@redhat.com, philmd@redhat.com, rth@twiddle.net
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This allows to alter the contents of an already added item.
+QAPISchemaCommand.check() and QAPISchemaEvent().check() check 'data'
+is present when 'boxed': true.  That's context-free.  Move to
+check_command() and check_event().
 
-Signed-off-by: Sergio Lopez <slp@redhat.com>
+Tweak the error message while there.
+
+check_exprs() & friends now check exactly what qapi-code-gen.txt calls
+the second layer of syntax.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/nvram/fw_cfg.c         | 29 +++++++++++++++++++++++++++
- include/hw/nvram/fw_cfg.h | 42 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 71 insertions(+)
+ scripts/qapi/common.py                  | 16 ++++++++--------
+ tests/qapi-schema/event-boxed-empty.err |  2 +-
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 7dc3ac378e..aef1727250 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -690,6 +690,15 @@ void fw_cfg_add_string(FWCfgState *s, uint16_t key, =
-const char *value)
-     fw_cfg_add_bytes(s, key, g_memdup(value, sz), sz);
- }
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index ac4c898e51..7577120f12 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -767,10 +767,12 @@ def check_type(value, info, source,
 =20
-+void fw_cfg_modify_string(FWCfgState *s, uint16_t key, const char *value=
-)
-+{
-+    size_t sz =3D strlen(value) + 1;
-+    char *old;
-+
-+    old =3D fw_cfg_modify_bytes_read(s, key, g_memdup(value, sz), sz);
-+    g_free(old);
-+}
-+
- void fw_cfg_add_i16(FWCfgState *s, uint16_t key, uint16_t value)
- {
-     uint16_t *copy;
-@@ -720,6 +729,16 @@ void fw_cfg_add_i32(FWCfgState *s, uint16_t key, uin=
-t32_t value)
-     fw_cfg_add_bytes(s, key, copy, sizeof(value));
- }
+ def check_command(expr, info):
+     name =3D expr['command']
++    args =3D expr.get('data')
+     boxed =3D expr.get('boxed', False)
 =20
-+void fw_cfg_modify_i32(FWCfgState *s, uint16_t key, uint32_t value)
-+{
-+    uint32_t *copy, *old;
-+
-+    copy =3D g_malloc(sizeof(value));
-+    *copy =3D cpu_to_le32(value);
-+    old =3D fw_cfg_modify_bytes_read(s, key, copy, sizeof(value));
-+    g_free(old);
-+}
-+
- void fw_cfg_add_i64(FWCfgState *s, uint16_t key, uint64_t value)
- {
-     uint64_t *copy;
-@@ -730,6 +749,16 @@ void fw_cfg_add_i64(FWCfgState *s, uint16_t key, uin=
-t64_t value)
-     fw_cfg_add_bytes(s, key, copy, sizeof(value));
- }
+-    check_type(expr.get('data'), info,
+-               "'data' for command '%s'" % name,
++    if boxed and args is None:
++        raise QAPISemError(info, "'boxed': true requires 'data'")
++    check_type(args, info, "'data' for command '%s'" % name,
+                allow_dict=3Dnot boxed)
+     check_type(expr.get('returns'), info,
+                "'returns' for command '%s'" % name,
+@@ -779,10 +781,12 @@ def check_command(expr, info):
 =20
-+void fw_cfg_modify_i64(FWCfgState *s, uint16_t key, uint64_t value)
-+{
-+    uint64_t *copy, *old;
-+
-+    copy =3D g_malloc(sizeof(value));
-+    *copy =3D cpu_to_le64(value);
-+    old =3D fw_cfg_modify_bytes_read(s, key, copy, sizeof(value));
-+    g_free(old);
-+}
-+
- void fw_cfg_set_order_override(FWCfgState *s, int order)
- {
-     assert(s->fw_cfg_order_override =3D=3D 0);
-diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-index 80e435d303..b5291eefad 100644
---- a/include/hw/nvram/fw_cfg.h
-+++ b/include/hw/nvram/fw_cfg.h
-@@ -98,6 +98,20 @@ void fw_cfg_add_bytes(FWCfgState *s, uint16_t key, voi=
-d *data, size_t len);
-  */
- void fw_cfg_add_string(FWCfgState *s, uint16_t key, const char *value);
+ def check_event(expr, info):
+     name =3D expr['event']
++    args =3D expr.get('data')
+     boxed =3D expr.get('boxed', False)
 =20
-+/**
-+ * fw_cfg_modify_string:
-+ * @s: fw_cfg device being modified
-+ * @key: selector key value for new fw_cfg item
-+ * @value: NUL-terminated ascii string
-+ *
-+ * Replace the fw_cfg item available by selecting the given key. The new
-+ * data will consist of a dynamically allocated copy of the provided str=
-ing,
-+ * including its NUL terminator. The data being replaced, assumed to hav=
-e
-+ * been dynamically allocated during an earlier call to either
-+ * fw_cfg_add_string() or fw_cfg_modify_string(), is freed before return=
-ing.
-+ */
-+void fw_cfg_modify_string(FWCfgState *s, uint16_t key, const char *value=
-);
-+
- /**
-  * fw_cfg_add_i16:
-  * @s: fw_cfg device being modified
-@@ -136,6 +150,20 @@ void fw_cfg_modify_i16(FWCfgState *s, uint16_t key, =
-uint16_t value);
-  */
- void fw_cfg_add_i32(FWCfgState *s, uint16_t key, uint32_t value);
+-    check_type(expr.get('data'), info,
+-               "'data' for event '%s'" % name,
++    if boxed and args is None:
++        raise QAPISemError(info, "'boxed': true requires 'data'")
++    check_type(args, info, "'data' for event '%s'" % name,
+                allow_dict=3Dnot boxed)
 =20
-+/**
-+ * fw_cfg_modify_i32:
-+ * @s: fw_cfg device being modified
-+ * @key: selector key value for new fw_cfg item
-+ * @value: 32-bit integer
-+ *
-+ * Replace the fw_cfg item available by selecting the given key. The new
-+ * data will consist of a dynamically allocated copy of the given 32-bit
-+ * value, converted to little-endian representation. The data being repl=
-aced,
-+ * assumed to have been dynamically allocated during an earlier call to
-+ * either fw_cfg_add_i32() or fw_cfg_modify_i32(), is freed before retur=
-ning.
-+ */
-+void fw_cfg_modify_i32(FWCfgState *s, uint16_t key, uint32_t value);
-+
- /**
-  * fw_cfg_add_i64:
-  * @s: fw_cfg device being modified
-@@ -148,6 +176,20 @@ void fw_cfg_add_i32(FWCfgState *s, uint16_t key, uin=
-t32_t value);
-  */
- void fw_cfg_add_i64(FWCfgState *s, uint16_t key, uint64_t value);
 =20
-+/**
-+ * fw_cfg_modify_i64:
-+ * @s: fw_cfg device being modified
-+ * @key: selector key value for new fw_cfg item
-+ * @value: 64-bit integer
-+ *
-+ * Replace the fw_cfg item available by selecting the given key. The new
-+ * data will consist of a dynamically allocated copy of the given 64-bit
-+ * value, converted to little-endian representation. The data being repl=
-aced,
-+ * assumed to have been dynamically allocated during an earlier call to
-+ * either fw_cfg_add_i64() or fw_cfg_modify_i64(), is freed before retur=
-ning.
-+ */
-+void fw_cfg_modify_i64(FWCfgState *s, uint16_t key, uint64_t value);
-+
- /**
-  * fw_cfg_add_file:
-  * @s: fw_cfg device being modified
+@@ -1691,8 +1695,6 @@ class QAPISchemaCommand(QAPISchemaEntity):
+                     self.info,
+                     "command's 'data' can take %s only with 'boxed': tru=
+e"
+                     % self.arg_type.describe())
+-        elif self.boxed:
+-            raise QAPISemError(self.info, "use of 'boxed' requires 'data=
+'")
+         if self._ret_type_name:
+             self.ret_type =3D schema.resolve_type(
+                 self._ret_type_name, self.info, "command's 'returns'")
+@@ -1740,8 +1742,6 @@ class QAPISchemaEvent(QAPISchemaEntity):
+                     self.info,
+                     "event's 'data' can take %s only with 'boxed': true"
+                     % self.arg_type.describe())
+-        elif self.boxed:
+-            raise QAPISemError(self.info, "use of 'boxed' requires 'data=
+'")
+=20
+     def visit(self, visitor):
+         QAPISchemaEntity.visit(self, visitor)
+diff --git a/tests/qapi-schema/event-boxed-empty.err b/tests/qapi-schema/=
+event-boxed-empty.err
+index 9c691b7d97..931c10b036 100644
+--- a/tests/qapi-schema/event-boxed-empty.err
++++ b/tests/qapi-schema/event-boxed-empty.err
+@@ -1,2 +1,2 @@
+ tests/qapi-schema/event-boxed-empty.json: In event 'FOO':
+-tests/qapi-schema/event-boxed-empty.json:2: use of 'boxed' requires 'dat=
+a'
++tests/qapi-schema/event-boxed-empty.json:2: 'boxed': true requires 'data=
+'
 --=20
 2.21.0
 
