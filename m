@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A911C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 07:39:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB294C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 07:41:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2BAB20640
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 07:39:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2BAB20640
+	by mail.kernel.org (Postfix) with ESMTPS id ADB7920872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 07:41:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADB7920872
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCfQ0-00006g-4t
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 03:39:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41240)
+	id 1iCfSA-0001Rg-Tz
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 03:41:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41464)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iCfP8-0007tk-Mk
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:38:36 -0400
+ (envelope-from <groug@kaod.org>) id 1iCfRH-0000uN-EZ
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:40:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iCfP5-0007QZ-Gk
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:38:34 -0400
-Received: from 5.mo68.mail-out.ovh.net ([46.105.62.179]:57301)
+ (envelope-from <groug@kaod.org>) id 1iCfRF-000083-RW
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:40:47 -0400
+Received: from 1.mo68.mail-out.ovh.net ([46.105.41.146]:50185)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iCfP5-0007Oj-7D
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:38:31 -0400
-Received: from player688.ha.ovh.net (unknown [10.109.160.5])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id BFDCE141860
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 09:38:28 +0200 (CEST)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iCfRF-00006z-Kx
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 03:40:45 -0400
+Received: from player788.ha.ovh.net (unknown [10.109.160.253])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id CE9DA1448F5
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 09:40:42 +0200 (CEST)
 Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
  [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player688.ha.ovh.net (Postfix) with ESMTPSA id DEF93A124FDD;
- Tue, 24 Sep 2019 07:38:23 +0000 (UTC)
-Date: Tue, 24 Sep 2019 09:38:22 +0200
+ by player788.ha.ovh.net (Postfix) with ESMTPSA id 67356A1E20BE;
+ Tue, 24 Sep 2019 07:40:38 +0000 (UTC)
+Date: Tue, 24 Sep 2019 09:40:37 +0200
 From: Greg Kurz <groug@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH 3/4] xics: Rename misleading ics_simple_*() functions
-Message-ID: <20190924093822.78c2037d@bahia.lan>
-In-Reply-To: <20190924045952.11412-4-david@gibson.dropbear.id.au>
+Subject: Re: [PATCH 4/4] xics: Merge TYPE_ICS_BASE and TYPE_ICS_SIMPLE classes
+Message-ID: <20190924094037.345df6ff@bahia.lan>
+In-Reply-To: <20190924045952.11412-5-david@gibson.dropbear.id.au>
 References: <20190924045952.11412-1-david@gibson.dropbear.id.au>
- <20190924045952.11412-4-david@gibson.dropbear.id.au>
+ <20190924045952.11412-5-david@gibson.dropbear.id.au>
 X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 14408141111332542950
+X-Ovh-Tracer-Id: 14445858755049593318
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdelgdduvdehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdelgdduvdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.62.179
+X-Received-From: 46.105.41.146
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,224 +73,238 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 24 Sep 2019 14:59:51 +1000
+On Tue, 24 Sep 2019 14:59:52 +1000
 David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> There are a number of ics_simple_*() functions that aren't actually
-> specific to TYPE_XICS_SIMPLE at all, and are equally valid on
-> TYPE_XICS_BASE.  Rename them to ics_*() accordingly.
+> TYPE_ICS_SIMPLE is the only subtype of TYPE_ICS_BASE that's ever
+> instantiated, and the only one we're ever likely to want.  The
+> existence of different classes is just a hang over from when we
+> (misguidedly) had separate subtypes for the KVM and non-KVM version of
+> the device.
+> 
+> So, collapse the two classes together into just TYPE_ICS.
 > 
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
 
 Reviewed-by: Greg Kurz <groug@kaod.org>
 
->  hw/intc/trace-events  |  6 +++---
->  hw/intc/xics.c        | 29 ++++++++++++++---------------
->  hw/intc/xics_spapr.c  | 12 ++++++------
->  hw/ppc/pnv_psi.c      |  4 ++--
->  hw/ppc/spapr_irq.c    |  2 +-
->  include/hw/ppc/xics.h |  6 +++---
->  6 files changed, 29 insertions(+), 30 deletions(-)
+>  hw/intc/xics.c        | 57 ++++++++++++++++---------------------------
+>  hw/ppc/pnv_psi.c      |  2 +-
+>  hw/ppc/spapr_irq.c    |  4 +--
+>  include/hw/ppc/xics.h | 17 ++-----------
+>  4 files changed, 26 insertions(+), 54 deletions(-)
 > 
-> diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-> index fdc716c2cc..527c3f76ca 100644
-> --- a/hw/intc/trace-events
-> +++ b/hw/intc/trace-events
-> @@ -66,10 +66,10 @@ xics_icp_accept(uint32_t old_xirr, uint32_t new_xirr) "icp_accept: XIRR 0x%"PRIx
->  xics_icp_eoi(int server, uint32_t xirr, uint32_t new_xirr) "icp_eoi: server %d given XIRR 0x%"PRIx32" new XIRR 0x%"PRIx32
->  xics_icp_irq(int server, int nr, uint8_t priority) "cpu %d trying to deliver irq 0x%"PRIx32" priority 0x%x"
->  xics_icp_raise(uint32_t xirr, uint8_t pending_priority) "raising IRQ new XIRR=0x%x new pending priority=0x%x"
-> -xics_ics_simple_set_irq_msi(int srcno, int nr) "set_irq_msi: srcno %d [irq 0x%x]"
-> +xics_ics_set_irq_msi(int srcno, int nr) "set_irq_msi: srcno %d [irq 0x%x]"
->  xics_masked_pending(void) "set_irq_msi: masked pending"
-> -xics_ics_simple_set_irq_lsi(int srcno, int nr) "set_irq_lsi: srcno %d [irq 0x%x]"
-> -xics_ics_simple_write_xive(int nr, int srcno, int server, uint8_t priority) "ics_write_xive: irq 0x%x [src %d] server 0x%x prio 0x%x"
-> +xics_ics_set_irq_lsi(int srcno, int nr) "set_irq_lsi: srcno %d [irq 0x%x]"
-> +xics_ics_write_xive(int nr, int srcno, int server, uint8_t priority) "ics_write_xive: irq 0x%x [src %d] server 0x%x prio 0x%x"
->  xics_ics_reject(int nr, int srcno) "reject irq 0x%x [src %d]"
->  xics_ics_eoi(int nr) "ics_eoi: irq 0x%x"
->  
 > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index db0e532bd9..9ae51bbc76 100644
+> index 9ae51bbc76..388dbba870 100644
 > --- a/hw/intc/xics.c
 > +++ b/hw/intc/xics.c
-> @@ -428,11 +428,11 @@ static void ics_resend_lsi(ICSState *ics, int srcno)
->      }
->  }
+> @@ -555,7 +555,7 @@ static void ics_reset_irq(ICSIRQState *irq)
 >  
-> -static void ics_simple_set_irq_msi(ICSState *ics, int srcno, int val)
-> +static void ics_set_irq_msi(ICSState *ics, int srcno, int val)
+>  static void ics_reset(DeviceState *dev)
 >  {
->      ICSIRQState *irq = ics->irqs + srcno;
+> -    ICSState *ics = ICS_BASE(dev);
+> +    ICSState *ics = ICS(dev);
+>      int i;
+>      uint8_t flags[ics->nr_irqs];
 >  
-> -    trace_xics_ics_simple_set_irq_msi(srcno, srcno + ics->offset);
-> +    trace_xics_ics_set_irq_msi(srcno, srcno + ics->offset);
+> @@ -573,7 +573,7 @@ static void ics_reset(DeviceState *dev)
+>      if (kvm_irqchip_in_kernel()) {
+>          Error *local_err = NULL;
 >  
->      if (val) {
->          if (irq->priority == 0xff) {
-> @@ -444,11 +444,11 @@ static void ics_simple_set_irq_msi(ICSState *ics, int srcno, int val)
->      }
->  }
+> -        ics_set_kvm_state(ICS_BASE(dev), &local_err);
+> +        ics_set_kvm_state(ICS(dev), &local_err);
+>          if (local_err) {
+>              error_report_err(local_err);
+>          }
+> @@ -587,7 +587,7 @@ static void ics_reset_handler(void *dev)
 >  
-> -static void ics_simple_set_irq_lsi(ICSState *ics, int srcno, int val)
-> +static void ics_set_irq_lsi(ICSState *ics, int srcno, int val)
+>  static void ics_realize(DeviceState *dev, Error **errp)
 >  {
->      ICSIRQState *irq = ics->irqs + srcno;
+> -    ICSState *ics = ICS_BASE(dev);
+> +    ICSState *ics = ICS(dev);
+>      Error *local_err = NULL;
+>      Object *obj;
 >  
-> -    trace_xics_ics_simple_set_irq_lsi(srcno, srcno + ics->offset);
-> +    trace_xics_ics_set_irq_lsi(srcno, srcno + ics->offset);
->      if (val) {
->          irq->status |= XICS_STATUS_ASSERTED;
->      } else {
-> @@ -457,7 +457,7 @@ static void ics_simple_set_irq_lsi(ICSState *ics, int srcno, int val)
->      ics_resend_lsi(ics, srcno);
+> @@ -609,26 +609,14 @@ static void ics_realize(DeviceState *dev, Error **errp)
+>      qemu_register_reset(ics_reset_handler, ics);
 >  }
 >  
-> -void ics_simple_set_irq(void *opaque, int srcno, int val)
-> +void ics_set_irq(void *opaque, int srcno, int val)
+> -static void ics_simple_class_init(ObjectClass *klass, void *data)
+> +static void ics_instance_init(Object *obj)
 >  {
->      ICSState *ics = (ICSState *)opaque;
+> -}
+> -
+> -static const TypeInfo ics_simple_info = {
+> -    .name = TYPE_ICS_SIMPLE,
+> -    .parent = TYPE_ICS_BASE,
+> -    .instance_size = sizeof(ICSState),
+> -    .class_init = ics_simple_class_init,
+> -    .class_size = sizeof(ICSStateClass),
+> -};
+> -
+> -static void ics_base_instance_init(Object *obj)
+> -{
+> -    ICSState *ics = ICS_BASE(obj);
+> +    ICSState *ics = ICS(obj);
 >  
-> @@ -467,13 +467,13 @@ void ics_simple_set_irq(void *opaque, int srcno, int val)
->      }
->  
->      if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
-> -        ics_simple_set_irq_lsi(ics, srcno, val);
-> +        ics_set_irq_lsi(ics, srcno, val);
->      } else {
-> -        ics_simple_set_irq_msi(ics, srcno, val);
-> +        ics_set_irq_msi(ics, srcno, val);
->      }
+>      ics->offset = XICS_IRQ_BASE;
 >  }
 >  
-> -static void ics_simple_write_xive_msi(ICSState *ics, int srcno)
-> +static void ics_write_xive_msi(ICSState *ics, int srcno)
+> -static int ics_base_pre_save(void *opaque)
+> +static int ics_pre_save(void *opaque)
 >  {
->      ICSIRQState *irq = ics->irqs + srcno;
+>      ICSState *ics = opaque;
 >  
-> @@ -486,13 +486,13 @@ static void ics_simple_write_xive_msi(ICSState *ics, int srcno)
->      icp_irq(ics, irq->server, srcno + ics->offset, irq->priority);
+> @@ -639,7 +627,7 @@ static int ics_base_pre_save(void *opaque)
+>      return 0;
 >  }
 >  
-> -static void ics_simple_write_xive_lsi(ICSState *ics, int srcno)
-> +static void ics_write_xive_lsi(ICSState *ics, int srcno)
+> -static int ics_base_post_load(void *opaque, int version_id)
+> +static int ics_post_load(void *opaque, int version_id)
 >  {
->      ics_resend_lsi(ics, srcno);
+>      ICSState *ics = opaque;
+>  
+> @@ -657,7 +645,7 @@ static int ics_base_post_load(void *opaque, int version_id)
+>      return 0;
 >  }
 >  
-> -void ics_simple_write_xive(ICSState *ics, int srcno, int server,
-> -                           uint8_t priority, uint8_t saved_priority)
-> +void ics_write_xive(ICSState *ics, int srcno, int server,
-> +                    uint8_t priority, uint8_t saved_priority)
+> -static const VMStateDescription vmstate_ics_base_irq = {
+> +static const VMStateDescription vmstate_ics_irq = {
+>      .name = "ics/irq",
+>      .version_id = 2,
+>      .minimum_version_id = 1,
+> @@ -671,46 +659,44 @@ static const VMStateDescription vmstate_ics_base_irq = {
+>      },
+>  };
+>  
+> -static const VMStateDescription vmstate_ics_base = {
+> +static const VMStateDescription vmstate_ics = {
+>      .name = "ics",
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+> -    .pre_save = ics_base_pre_save,
+> -    .post_load = ics_base_post_load,
+> +    .pre_save = ics_pre_save,
+> +    .post_load = ics_post_load,
+>      .fields = (VMStateField[]) {
+>          /* Sanity check */
+>          VMSTATE_UINT32_EQUAL(nr_irqs, ICSState, NULL),
+>  
+>          VMSTATE_STRUCT_VARRAY_POINTER_UINT32(irqs, ICSState, nr_irqs,
+> -                                             vmstate_ics_base_irq,
+> +                                             vmstate_ics_irq,
+>                                               ICSIRQState),
+>          VMSTATE_END_OF_LIST()
+>      },
+>  };
+>  
+> -static Property ics_base_properties[] = {
+> +static Property ics_properties[] = {
+>      DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> -static void ics_base_class_init(ObjectClass *klass, void *data)
+> +static void ics_class_init(ObjectClass *klass, void *data)
 >  {
->      ICSIRQState *irq = ics->irqs + srcno;
+>      DeviceClass *dc = DEVICE_CLASS(klass);
 >  
-> @@ -500,13 +500,12 @@ void ics_simple_write_xive(ICSState *ics, int srcno, int server,
->      irq->priority = priority;
->      irq->saved_priority = saved_priority;
->  
-> -    trace_xics_ics_simple_write_xive(ics->offset + srcno, srcno, server,
-> -                                     priority);
-> +    trace_xics_ics_write_xive(ics->offset + srcno, srcno, server, priority);
->  
->      if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
-> -        ics_simple_write_xive_lsi(ics, srcno);
-> +        ics_write_xive_lsi(ics, srcno);
->      } else {
-> -        ics_simple_write_xive_msi(ics, srcno);
-> +        ics_write_xive_msi(ics, srcno);
->      }
+>      dc->realize = ics_realize;
+> -    dc->props = ics_base_properties;
+> +    dc->props = ics_properties;
+>      dc->reset = ics_reset;
+> -    dc->vmsd = &vmstate_ics_base;
+> +    dc->vmsd = &vmstate_ics;
 >  }
 >  
-> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-> index 6577be0d92..3e9444813a 100644
-> --- a/hw/intc/xics_spapr.c
-> +++ b/hw/intc/xics_spapr.c
-> @@ -179,7 +179,7 @@ static void rtas_set_xive(PowerPCCPU *cpu, SpaprMachineState *spapr,
->      }
+> -static const TypeInfo ics_base_info = {
+> -    .name = TYPE_ICS_BASE,
+> +static const TypeInfo ics_info = {
+> +    .name = TYPE_ICS,
+>      .parent = TYPE_DEVICE,
+> -    .abstract = true,
+>      .instance_size = sizeof(ICSState),
+> -    .instance_init = ics_base_instance_init,
+> -    .class_init = ics_base_class_init,
+> -    .class_size = sizeof(ICSStateClass),
+> +    .instance_init = ics_instance_init,
+> +    .class_init = ics_class_init,
+>  };
 >  
->      srcno = nr - ics->offset;
-> -    ics_simple_write_xive(ics, srcno, server, priority, priority);
-> +    ics_write_xive(ics, srcno, server, priority, priority);
+>  static const TypeInfo xics_fabric_info = {
+> @@ -749,8 +735,7 @@ void ics_set_irq_type(ICSState *ics, int srcno, bool lsi)
 >  
->      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->  }
-> @@ -243,8 +243,8 @@ static void rtas_int_off(PowerPCCPU *cpu, SpaprMachineState *spapr,
->      }
->  
->      srcno = nr - ics->offset;
-> -    ics_simple_write_xive(ics, srcno, ics->irqs[srcno].server, 0xff,
-> -                          ics->irqs[srcno].priority);
-> +    ics_write_xive(ics, srcno, ics->irqs[srcno].server, 0xff,
-> +                   ics->irqs[srcno].priority);
->  
->      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->  }
-> @@ -276,9 +276,9 @@ static void rtas_int_on(PowerPCCPU *cpu, SpaprMachineState *spapr,
->      }
->  
->      srcno = nr - ics->offset;
-> -    ics_simple_write_xive(ics, srcno, ics->irqs[srcno].server,
-> -                          ics->irqs[srcno].saved_priority,
-> -                          ics->irqs[srcno].saved_priority);
-> +    ics_write_xive(ics, srcno, ics->irqs[srcno].server,
-> +                   ics->irqs[srcno].saved_priority,
-> +                   ics->irqs[srcno].saved_priority);
->  
->      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>  static void xics_register_types(void)
+>  {
+> -    type_register_static(&ics_simple_info);
+> -    type_register_static(&ics_base_info);
+> +    type_register_static(&ics_info);
+>      type_register_static(&icp_info);
+>      type_register_static(&xics_fabric_info);
 >  }
 > diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-> index 88ba8e7b9b..8ea81e9d8e 100644
+> index 8ea81e9d8e..a997f16bb4 100644
 > --- a/hw/ppc/pnv_psi.c
 > +++ b/hw/ppc/pnv_psi.c
-> @@ -311,7 +311,7 @@ static void pnv_psi_set_xivr(PnvPsi *psi, uint32_t reg, uint64_t val)
->       * do for now but a more accurate implementation would instead
->       * use a fixed server/prio and a remapper of the generated irq.
->       */
-> -    ics_simple_write_xive(ics, src, server, prio, prio);
-> +    ics_write_xive(ics, src, server, prio, prio);
+> @@ -469,7 +469,7 @@ static void pnv_psi_power8_instance_init(Object *obj)
+>      Pnv8Psi *psi8 = PNV8_PSI(obj);
+>  
+>      object_initialize_child(obj, "ics-psi",  &psi8->ics, sizeof(psi8->ics),
+> -                            TYPE_ICS_SIMPLE, &error_abort, NULL);
+> +                            TYPE_ICS, &error_abort, NULL);
 >  }
 >  
->  static uint64_t pnv_psi_reg_read(PnvPsi *psi, uint32_t offset, bool mmio)
-> @@ -514,7 +514,7 @@ static void pnv_psi_power8_realize(DeviceState *dev, Error **errp)
->          ics_set_irq_type(ics, i, true);
->      }
->  
-> -    psi->qirqs = qemu_allocate_irqs(ics_simple_set_irq, ics, ics->nr_irqs);
-> +    psi->qirqs = qemu_allocate_irqs(ics_set_irq, ics, ics->nr_irqs);
->  
->      /* XSCOM region for PSI registers */
->      pnv_xscom_region_init(&psi->xscom_regs, OBJECT(dev), &pnv_psi_xscom_ops,
+>  static const uint8_t irq_to_xivr[] = {
 > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index d8f46b6797..ac189c5796 100644
+> index ac189c5796..6c45d2a3c0 100644
 > --- a/hw/ppc/spapr_irq.c
 > +++ b/hw/ppc/spapr_irq.c
-> @@ -210,7 +210,7 @@ static void spapr_irq_set_irq_xics(void *opaque, int srcno, int val)
->  {
->      SpaprMachineState *spapr = opaque;
+> @@ -98,7 +98,7 @@ static void spapr_irq_init_xics(SpaprMachineState *spapr, int nr_irqs,
+>      Object *obj;
+>      Error *local_err = NULL;
 >  
-> -    ics_simple_set_irq(spapr->ics, srcno, val);
-> +    ics_set_irq(spapr->ics, srcno, val);
+> -    obj = object_new(TYPE_ICS_SIMPLE);
+> +    obj = object_new(TYPE_ICS);
+>      object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
+>      object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
+>                                     &error_fatal);
+> @@ -109,7 +109,7 @@ static void spapr_irq_init_xics(SpaprMachineState *spapr, int nr_irqs,
+>          return;
+>      }
+>  
+> -    spapr->ics = ICS_BASE(obj);
+> +    spapr->ics = ICS(obj);
+>  
+>      xics_spapr_init(spapr);
 >  }
->  
->  static void spapr_irq_reset_xics(SpaprMachineState *spapr, Error **errp)
 > diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index 0eb39c2561..92628e7cab 100644
+> index 92628e7cab..d8cf206a69 100644
 > --- a/include/hw/ppc/xics.h
 > +++ b/include/hw/ppc/xics.h
-> @@ -168,9 +168,9 @@ uint32_t icp_accept(ICPState *ss);
->  uint32_t icp_ipoll(ICPState *ss, uint32_t *mfrr);
->  void icp_eoi(ICPState *icp, uint32_t xirr);
+> @@ -89,21 +89,8 @@ struct PnvICPState {
+>      uint32_t links[3];
+>  };
 >  
-> -void ics_simple_write_xive(ICSState *ics, int nr, int server,
-> -                           uint8_t priority, uint8_t saved_priority);
-> -void ics_simple_set_irq(void *opaque, int srcno, int val);
-> +void ics_write_xive(ICSState *ics, int nr, int server,
-> +                    uint8_t priority, uint8_t saved_priority);
-> +void ics_set_irq(void *opaque, int srcno, int val);
+> -#define TYPE_ICS_BASE "ics-base"
+> -#define ICS_BASE(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS_BASE)
+> -
+> -/* Retain ics for sPAPR for migration from existing sPAPR guests */
+> -#define TYPE_ICS_SIMPLE "ics"
+> -#define ICS_SIMPLE(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS_SIMPLE)
+> -
+> -#define ICS_BASE_CLASS(klass) \
+> -     OBJECT_CLASS_CHECK(ICSStateClass, (klass), TYPE_ICS_BASE)
+> -#define ICS_BASE_GET_CLASS(obj) \
+> -     OBJECT_GET_CLASS(ICSStateClass, (obj), TYPE_ICS_BASE)
+> -
+> -struct ICSStateClass {
+> -    DeviceClass parent_class;
+> -};
+> +#define TYPE_ICS "ics"
+> +#define ICS(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS)
 >  
->  static inline bool ics_irq_free(ICSState *ics, uint32_t srcno)
->  {
+>  struct ICSState {
+>      /*< private >*/
 
 
