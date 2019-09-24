@@ -2,65 +2,65 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FEE6C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:55:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1571BC432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:01:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2043A207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:55:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2043A207FD
+	by mail.kernel.org (Postfix) with ESMTPS id DA5AB20872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 21:01:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA5AB20872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCrq7-0007jp-BQ
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:55:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53328)
+	id 1iCrvn-00025k-LM
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 17:01:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55148)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCrhY-0006hX-Uv
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:46:25 -0400
+ (envelope-from <armbru@redhat.com>) id 1iCru1-0001NU-B8
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:59:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCrhX-0006Jv-QQ
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:46:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45534)
+ (envelope-from <armbru@redhat.com>) id 1iCrtz-0003c1-RD
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:59:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60632)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCrhX-0006JN-LN
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:46:23 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCrtz-0003bm-Jp
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:59:15 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F0970109EFC3;
- Tue, 24 Sep 2019 20:46:22 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E8B938980F9;
+ Tue, 24 Sep 2019 20:59:14 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A4E865D9D5;
- Tue, 24 Sep 2019 20:46:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7D91260852;
+ Tue, 24 Sep 2019 20:59:10 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 35BCC113864E; Tue, 24 Sep 2019 22:46:18 +0200 (CEST)
+ id 10A9A113864E; Tue, 24 Sep 2019 22:59:09 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 20/25] qapi: Improve reporting of missing / unknown
- definition keys
+Subject: Re: [PATCH 21/25] qapi: Avoid redundant definition references in
+ error messages
 References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-21-armbru@redhat.com>
- <cda1aa80-5328-3cb8-002c-efaaf7933346@redhat.com>
-Date: Tue, 24 Sep 2019 22:46:18 +0200
-In-Reply-To: <cda1aa80-5328-3cb8-002c-efaaf7933346@redhat.com> (Eric Blake's
- message of "Tue, 24 Sep 2019 13:13:12 -0500")
-Message-ID: <87o8z98lt1.fsf@dusky.pond.sub.org>
+ <20190924132830.15835-22-armbru@redhat.com>
+ <1e6435a5-b059-ba0a-f881-8c7512560df1@redhat.com>
+Date: Tue, 24 Sep 2019 22:59:09 +0200
+In-Reply-To: <1e6435a5-b059-ba0a-f881-8c7512560df1@redhat.com> (Eric Blake's
+ message of "Tue, 24 Sep 2019 13:46:37 -0500")
+Message-ID: <87zhit76n6.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Tue, 24 Sep 2019 20:46:23 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.67]); Tue, 24 Sep 2019 20:59:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,32 +83,95 @@ Sender: "Qemu-devel"
 Eric Blake <eblake@redhat.com> writes:
 
 > On 9/24/19 8:28 AM, Markus Armbruster wrote:
->> Have check_exprs() call check_keys() later, so its error messages gain
->> an "in definition" line.
->> 
->> Both check_keys() and check_name_is_str() check the definition's name
->> is a string.  Since check_keys() now runs after check_name_is_str()
->> rather than before, its check is dead.  Bury it.  Checking values in
->> check_keys() is unclean anyway.
+>> Many error messages refer to the offending definition even though
+>> they're preceded by an "in definition" line.  Rephrase them.
+>
+> This is the cleanup promised earlier in the series.
+>
 >> 
 >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >> ---
+>>  scripts/qapi/common.py                        | 113 +++++++-----------
+>>  tests/qapi-schema/alternate-array.err         |   2 +-
 >
->> +++ b/scripts/qapi/common.py
->> @@ -905,8 +905,6 @@ def check_known_keys(value, info, source, required, optional):
+>>  def check_command(expr, info):
+>> -    name = expr['command']
+>>      args = expr.get('data')
+>>      boxed = expr.get('boxed', False)
 >>  
->>  def check_keys(expr, info, meta, required, optional=[]):
->>      name = expr[meta]
->> -    if not isinstance(name, str):
->> -        raise QAPISemError(info, "'%s' key must have a string value" % meta)
+>>      if boxed and args is None:
+>>          raise QAPISemError(info, "'boxed': true requires 'data'")
+>> -    check_type(args, info, "'data' for command '%s'" % name,
+>> -               allow_dict=not boxed)
+>> -    check_type(expr.get('returns'), info,
+>> -               "'returns' for command '%s'" % name,
+>> -               allow_array=True)
+>> +    check_type(expr.get('data'), info, "'data'", allow_dict=not boxed)
+>> +    check_type(expr.get('returns'), info, "'returns'", allow_array=True)
 >
-> Should this be replaced with an assert?  But I'm also okay just dropping
-> it, since our testsuite shows that we still flag the problems that this
-> message was originally used for.
+> Why are you repeating expr.get('dat') here instead of reusing args?  I
+> guess it adds consistency with the expr.get('returns') in the next line.
 
-I'd prefer not to assert, because as of this patch, check_keys() *only*
-checks keys, just like its name suggests.
+Don't remember, might have been an accident.  If I want consistency, I
+guess I should add rets = expr.get('returns').
 
+>>  
+>>  
+>>  def check_event(expr, info):
+>> -    name = expr['event']
+>>      args = expr.get('data')
+>>      boxed = expr.get('boxed', False)
+>>  
+>>      if boxed and args is None:
+>>          raise QAPISemError(info, "'boxed': true requires 'data'")
+>> -    check_type(args, info, "'data' for event '%s'" % name,
+>> -               allow_dict=not boxed)
+>> +    check_type(expr.get('data'), info, "'data'", allow_dict=not boxed)
+> Again, why not reuse args?
+>
+>
+>> +++ b/tests/qapi-schema/args-member-case.err
+>> @@ -1,2 +1,2 @@
+>>  tests/qapi-schema/args-member-case.json: In command 'no-way-this-will-get-whitelisted':
+>> -tests/qapi-schema/args-member-case.json:2: member of 'data' for command 'no-way-this-will-get-whitelisted' uses uppercase in name 'Arg'
+>> +tests/qapi-schema/args-member-case.json:2: 'data' member 'Arg' uses uppercase in name 'Arg'
+>
+> Better, but still feels redundant for calling out 'Arg' twice.  Maybe
+> you further clean this one later?
+
+check_type()'s error messages interpolate @source received from by
+caller.  Need to review all its messages and callers.
+
+>> +++ b/tests/qapi-schema/enum-member-case.err
+>> @@ -1,2 +1,2 @@
+>>  tests/qapi-schema/enum-member-case.json: In enum 'NoWayThisWillGetWhitelisted':
+>> -tests/qapi-schema/enum-member-case.json:4: member of enum 'NoWayThisWillGetWhitelisted' uses uppercase in name 'Value'
+>> +tests/qapi-schema/enum-member-case.json:4: 'data' member uses uppercase in name 'Value'
+>
+> Here's a similar error about uppercase that does not have the
+> redundancy, for comparison.
+>
+>
+>> +++ b/tests/qapi-schema/union-branch-case.err
+>> @@ -1,2 +1,2 @@
+>>  tests/qapi-schema/union-branch-case.json: In union 'Uni':
+>> -tests/qapi-schema/union-branch-case.json:2: member of union 'Uni' uses uppercase in name 'Branch'
+>> +tests/qapi-schema/union-branch-case.json:2: 'data' member 'Branch' uses uppercase in name 'Branch'
+>
+> Another related one.
+>
+>> +++ b/tests/qapi-schema/union-optional-branch.err
+>> @@ -1,2 +1,2 @@
+>>  tests/qapi-schema/union-optional-branch.json: In union 'Union':
+>> -tests/qapi-schema/union-optional-branch.json:2: member of union 'Union' uses invalid name '*a'
+>> +tests/qapi-schema/union-optional-branch.json:2: 'data' member '*a' uses invalid name '*a'
+>
+> Similar type of redundancy, but this time not related to uppercase.
+
+Same problem, different function: check_name_str().
+
+> Overall an improvement.
+>
 > Reviewed-by: Eric Blake <eblake@redhat.com>
 
 Thanks!
