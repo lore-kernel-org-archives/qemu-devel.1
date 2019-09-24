@@ -2,88 +2,96 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0F37C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 00:20:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2530C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 00:22:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A523720820
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 00:20:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A523720820
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7F70B20820
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 00:22:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n6s1MO+v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F70B20820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCYYh-0000dB-N1
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 20:19:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45491)
+	id 1iCYbT-0001mg-N2
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 20:22:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45649)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iCYY2-00008r-ED
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 20:19:19 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1iCYaV-0001ID-3z
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 20:21:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iCYY1-00027G-5o
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 20:19:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43558)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iCYY0-00025c-Vh
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 20:19:17 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1D578882EF
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 00:19:16 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id n6so20257wrm.20
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 17:19:16 -0700 (PDT)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1iCYaT-0003iT-Oq
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 20:21:50 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44607)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
+ id 1iCYaT-0003hn-Gs
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 20:21:49 -0400
+Received: by mail-wr1-x444.google.com with SMTP id i18so15801881wru.11
+ for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 17:21:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:subject:to:cc:references:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=sJdgx4ciKOmuKUEE9HKzQAogTH2GvjXcD8DcJEoYEDs=;
+ b=n6s1MO+vX/3Co30GoTEA1id800RHFkXVnV6xTqS1DjJMr3idfFo8ghOr5nuv06GsKP
+ 6TIg2Urn8DefUS66y1As1vLLJ9qarS1uxW3QM0XTAvbCmd5A3XA75YAZ2tiOiEe0ZghF
+ 0icHhakmvSlnxPBYixy3nJtgnjdGjhcULJobSP8V6Zmy3O2HMMT9wmdPDtw9hsUxPTbn
+ 0DOb3672fswQxipcgEko8Wp6SvYabjauLXVFloh27QtfM4nMRz8GBFBW/YMrNsOrQR2z
+ /fWhofsm9MRV8bMbuCtpVA8YyXzDt6uTSIs4CYI0STSQqo+/Omyu7Fnc73yZkoQlatbw
+ zUBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:subject:to:cc:references:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=J52WwaKRJjEmwAL0Sy80mf9xLpoSWAPq0RbzWPhKHEY=;
- b=WUzcjevfHnHCZSs8LzWi7X/khDnH2ptdsK9yRhq0Vnz+E9yH4Dtr3RqOuhaZnbNy4+
- q6owlEZBslwvDzk6yVxvfzoigyMgSQK4E/YNA/Ia+2Tl+80rOUpsyetpB0/MSLxhB/bR
- r0H4iGmwE7p7yyGiMf5uT5S6sUMb5pe9Ap38A3NFhYMClehM7ok1YHsUerimevpdvGOY
- YFt/DljiTCKwt3j8+53GdpaDmm9wmPtOTNP1sYNr9sPf+hk5hOL2niyw+sjqN/CLEFfU
- qzqr5yorjIlGoddFd3Y7RaQ/6IyfXPexljWxuJLAmXYK8U3fn0Q+z3IywC1az08RgaUp
- UXJw==
-X-Gm-Message-State: APjAAAWdvFkh9NgOhs6ab6Z9v4DQVjgXlCi007gwFMJMHD33dB8uLfqk
- ugKtSvqCl8YFOZJZTkJeAiEcWyuQmgxGbDsIohhZaT/hMb48s6R2wlNJJL/KCUbU8rasSadVn8X
- VGD6xrbPujDN5rpU=
-X-Received: by 2002:adf:e488:: with SMTP id i8mr7913wrm.20.1569284354599;
- Mon, 23 Sep 2019 17:19:14 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqz7s/PGZ3ki+4zn1vMF77frr4mP8PvccOkpPh/Moepsam4SgOinfJ6dZ/ANTRDr8Guttqi6Cg==
-X-Received: by 2002:adf:e488:: with SMTP id i8mr7900wrm.20.1569284354294;
- Mon, 23 Sep 2019 17:19:14 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36?
- ([2001:b07:6468:f312:9520:22e6:6416:5c36])
- by smtp.gmail.com with ESMTPSA id f8sm14457181wmb.37.2019.09.23.17.19.13
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 23 Sep 2019 17:19:13 -0700 (PDT)
-Subject: Re: Migration failure when running nested VMs
-To: Jintack Lim <incredible.tack@gmail.com>
-References: <CAHyh4xhYrUbK0aEJmKp3_kOJG2E+AQLMUjyf7_pXVJgbqgv5JA@mail.gmail.com>
- <20190923104245.GA2866@work-vm>
- <6fa1b7a6-52c8-fc98-c532-f2c0484d04b0@redhat.com>
- <CAHyh4xgwTpM5rQ1qrwfjtqjHLj_U4Fes2Qmch0g=84yNxBQuZA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <34912741-907f-a170-6b0a-93d423c7abee@redhat.com>
-Date: Tue, 24 Sep 2019 02:19:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ bh=sJdgx4ciKOmuKUEE9HKzQAogTH2GvjXcD8DcJEoYEDs=;
+ b=OQ36VJa7Z0hmILWa/0IqrCbcTlBRCAzSzld+5L/nnCFgFeb8LtrrP8hwTvDa43+nMl
+ IFvkIRL4lnvdhhmMoDETWBmuowPfbg/0C2BY9BDk2pYZSxynx5B84hqNFaepgZYI8afL
+ Syye9U6ooUZ9LgjzJrGTFCLqSQs5426qNxful4kSiU+KiqerYerM8AMUUSVFHbKtogTj
+ ia4SrPYJsFqAGHzVep/SK6b2LXl7T0r73LYe3466TKK1QVnAEvhAKhNYS3HOIUC0e0l/
+ EbzqSiQS/J9MdCiv8RW+0AAfvvSMuHvtc00ZAyhfxrwMto+1kkAhoAHcF4OslQKnWL+1
+ W8/Q==
+X-Gm-Message-State: APjAAAWyalRNdscqAcjUrdCkwxH+pQ45HUb/MtSUuHQBaGbbWOcfyrTV
+ RDoxJYu4ndI79rV7R6Tsf+q9QWBJ
+X-Google-Smtp-Source: APXvYqyIb1T2S9fR7NSYcTvf0lucKSbzARbZ1bht8LYyfJANqAde4tAdwexmfvs3x1zt/S8/OL6u2A==
+X-Received: by 2002:adf:bb8e:: with SMTP id q14mr13444wrg.74.1569284507747;
+ Mon, 23 Sep 2019 17:21:47 -0700 (PDT)
+Received: from ?IPv6:fd00:835b:d940:d4fc:1::d3?
+ (2a01-036c-0113-40af-0001-0000-0000-00d3.pool6.digikabel.hu.
+ [2a01:36c:113:40af:1::d3])
+ by smtp.gmail.com with ESMTPSA id o22sm46530wra.96.2019.09.23.17.21.46
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 23 Sep 2019 17:21:47 -0700 (PDT)
+From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
+X-Google-Original-From: =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=
+ <DirtY.iCE.hu@gmail.com>
+Subject: Re: [PATCH v4 15/24] audio: add mixing-engine option (documentation)
+To: Markus Armbruster <armbru@redhat.com>
+References: <cover.1568927990.git.DirtY.iCE.hu@gmail.com>
+ <68c4b4bd438e9cb5c97aed32ee31e3dabd96cbf6.1568927990.git.DirtY.iCE.hu@gmail.com>
+ <87sgonma7v.fsf@dusky.pond.sub.org>
+Message-ID: <4d24c95c-0e98-2646-0b1a-6c7b3afe0e90@gmail.com>
+Date: Tue, 24 Sep 2019 02:21:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <CAHyh4xgwTpM5rQ1qrwfjtqjHLj_U4Fes2Qmch0g=84yNxBQuZA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <87sgonma7v.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,39 +103,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- QEMU Devel Mailing List <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23/09/19 20:32, Jintack Lim wrote:
-> On Mon, Sep 23, 2019 at 4:48 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 23/09/19 12:42, Dr. David Alan Gilbert wrote:
->>>
->>> With those two clues, I guess maybe some dirty pages made by L2 are
->>> not transferred to the destination correctly, but I'm not really sure.
->>>
->>> 3) It happens on Intel(R) Xeon(R) Silver 4114 CPU, but it does not on
->>> Intel(R) Xeon(R) CPU E5-2630 v3 CPU.
->>
->> Hmm, try disabling pml (kvm_intel.pml=0).  This would be the main
->> difference, memory-management wise, between those two machines.
->>
+On 2019-09-23 15:08, Markus Armbruster wrote:
+> "Kővágó, Zoltán" <dirty.ice.hu@gmail.com> writes:
 > 
-> Thank you, Paolo.
+>> This will allow us to disable mixeng when we use a decent backend.
+>>
+>> Disabling mixeng have a few advantages:
+>> * we no longer convert the audio output from one format to another, when
+>>    the underlying audio system would just convert it to a third format.
+>>    We no longer convert, only the underlying system, when needed.
+>> * the underlying system probably has better resampling and sample format
+>>    converting methods anyway...
+>> * we may support formats that the mixeng currently does not support (S24
+>>    or float samples, more than two channels)
+>> * when using an audio server (like pulseaudio) different sound card
+>>    outputs will show up as separate streams, even if we use only one
+>>    backend
+>>
+>> Disadvantages:
+>> * audio capturing no longer works (wavcapture, and vnc audio extension)
+>> * some backends only support a single playback stream or very picky
+>>    about the audio format.  In this case we can't disable mixeng.
+>>
+>> However mixeng is not removed, only made optional, so this shouldn't be
+>> a big concern.
+>>
+>> Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
+>> ---
+>>
+>> Notes:
+>>      Changes from v1:
+>>      
+>>      * renamed mixeng to mixing-engine
+>>
+>>   qapi/audio.json | 5 +++++
+>>   qemu-options.hx | 6 ++++++
+>>   2 files changed, 11 insertions(+)
+>>
+>> diff --git a/qapi/audio.json b/qapi/audio.json
+>> index 9fefdf5186..0535eff794 100644
+>> --- a/qapi/audio.json
+>> +++ b/qapi/audio.json
+>> @@ -11,6 +11,10 @@
+>>   # General audio backend options that are used for both playback and
+>>   # recording.
+>>   #
+>> +# @mixing-engine: use QEMU's mixing engine to mix all streams inside QEMU. When
+>> +#                 set to off, fixed-settings must be also off. Not every backend
+>> +#                 compatible with the off setting (default on, since 4.2)
+>> +#
 > 
-> This makes migration work successfully over 20 times in a row on
-> Intel(R) Xeon(R) Silver 4114 CPU where migration failed almost always
-> without disabling pml.
+> Last sentence no verb.
 > 
-> I guess there's a problem in KVM pml code? I'm fine with disabling
-> pml. But if you have patches to fix the issue, I'm willing to test it
-> on the CPU.
+> Which backends are compatible?
 
-Yes, it's a known bug in the PML code (that I thought was not an issue
-for migration, but I was wrong).  I'll try to get you a patch this week.
+Actually that's a simplification, it depends on a few things.  When 
+mixeng is off, qemu will try to use the same format as the emulated 
+sound card, and if the backend doesn't support that format, it won't 
+work (no audio).  Also attaching multiple sound cards to the same 
+audiodev might not work, if the backend doesn't support multiple 
+playback streams.  If you use pulseaudio, it'll work without problems, 
+if you use alsa, it depends on your device.  If you use a hw: device 
+directly, you'll likely only be able to use one emulated sound card with 
+a few selected audio formats.  If you use dmix: (and plug), alsa will 
+handle the conversion and mixing, so it will work no matter what format 
+the emulated sound card uses.  With OSS the situation is probably 
+similar, it depends on the kernel/hw what works and what not.  wav and 
+spice certainly doesn't support multiple streams.  I'm not completely 
+sure about the other backends right now, but I think dsound and 
+coreaudio can handle the necessary sample format conversions and mixing.
 
-Paolo
+> What happens when you try the off setting with incompatible backends?
+See above.
+
+> 
+>>   # @fixed-settings: use fixed settings for host input/output. When off,
+>>   #                  frequency, channels and format must not be
+>>   #                  specified (default true)
+>> @@ -31,6 +35,7 @@
+>>   ##
+>>   { 'struct': 'AudiodevPerDirectionOptions',
+>>     'data': {
+>> +    '*mixing-engine':  'bool',
+>>       '*fixed-settings': 'bool',
+>>       '*frequency':      'uint32',
+>>       '*channels':       'uint32',
+>> diff --git a/qemu-options.hx b/qemu-options.hx
+>> index bbfd936d29..395427422a 100644
+>> --- a/qemu-options.hx
+>> +++ b/qemu-options.hx
+>> @@ -433,6 +433,7 @@ DEF("audiodev", HAS_ARG, QEMU_OPTION_audiodev,
+>>       "                specifies the audio backend to use\n"
+>>       "                id= identifier of the backend\n"
+>>       "                timer-period= timer period in microseconds\n"
+>> +    "                in|out.mixing-engine= use mixing engine to mix streams inside QEMU\n"
+>>       "                in|out.fixed-settings= use fixed settings for host audio\n"
+>>       "                in|out.frequency= frequency to use with fixed settings\n"
+>>       "                in|out.channels= number of channels to use with fixed settings\n"
+>> @@ -503,6 +504,11 @@ Identifies the audio backend.
+>>   Sets the timer @var{period} used by the audio subsystem in microseconds.
+>>   Default is 10000 (10 ms).
+>>   
+>> +@item in|out.mixing-engine=on|off
+>> +Use QEMU's mixing engine to mix all streams inside QEMU.  When off,
+>> +@var{fixed-settings} must be off too.  Not every backend is fully
+>> +compatible with the off setting.  Default is on.
+>> +
+>>   @item in|out.fixed-settings=on|off
+>>   Use fixed settings for host audio.  When off, it will change based on
+>>   how the guest opens the sound card.  In this case you must not specify
+
 
