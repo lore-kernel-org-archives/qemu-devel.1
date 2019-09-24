@@ -2,92 +2,74 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 991CBC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 17:33:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1B30C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 17:38:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74F4720872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 17:33:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74F4720872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 86D2D20872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 17:38:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86D2D20872
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCogv-0000wf-Af
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 13:33:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33484)
+	id 1iColO-0005KX-IQ
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 13:38:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41812)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iCnr2-0002LZ-KF
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 12:39:57 -0400
+ (envelope-from <bounces@canonical.com>) id 1iCoZI-0003Fj-Ch
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 13:25:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iCnqw-0003fW-Fl
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 12:39:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41430)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCnqw-0003ei-62
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 12:39:50 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E803A305D637;
- Tue, 24 Sep 2019 16:39:48 +0000 (UTC)
-Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 925A060A97;
- Tue, 24 Sep 2019 16:39:46 +0000 (UTC)
-Subject: Re: [PATCH 15/25] qapi: Inline check_name() into check_union()
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-16-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <8c59e0cf-df60-3694-c23b-897723452e20@redhat.com>
-Date: Tue, 24 Sep 2019 11:39:45 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <bounces@canonical.com>) id 1iCoZH-0003k8-9o
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 13:25:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42534)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iCoZH-0003jU-3I
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 13:25:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iCoZG-0007tu-3G
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 17:25:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 0B61B2E80CB
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 17:25:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190924132830.15835-16-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="boXkdcfwtzEazhVvZeoyfpbexh4KrPkJ0"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 24 Sep 2019 16:39:48 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 24 Sep 2019 17:16:48 -0000
+From: mustafa <1824704@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: drjs5x kraxel-redhat th-huth
+X-Launchpad-Bug-Reporter: mustafa (drjs5x)
+X-Launchpad-Bug-Modifier: mustafa (drjs5x)
+References: <155524844990.21262.8108456842078597088.malonedeb@chaenomeles.canonical.com>
+ <156931144539.27379.15557350803171086406.malone@soybean.canonical.com>
+Message-Id: <CAE5RSKKodFALvdJiWE4r7FG5__Qp0QxpHNEbcFeMisWW62PVew@mail.gmail.com>
+Subject: Re: [Bug 1824704] Re: -k tr not working after v20171217! turkish
+ keyboard dont working
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19048";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 241b284f2b0367121abf6dc4f8692a81f65ef089
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -96,68 +78,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Reply-To: Bug 1824704 <1824704@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---boXkdcfwtzEazhVvZeoyfpbexh4KrPkJ0
-Content-Type: multipart/mixed; boundary="ENVOwQAkNxPFm7EpuFJcoXJ9MSdGPugve";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <8c59e0cf-df60-3694-c23b-897723452e20@redhat.com>
-Subject: Re: [PATCH 15/25] qapi: Inline check_name() into check_union()
-References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-16-armbru@redhat.com>
-In-Reply-To: <20190924132830.15835-16-armbru@redhat.com>
+after v20171217 all versions.
 
---ENVOwQAkNxPFm7EpuFJcoXJ9MSdGPugve
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+-- =
 
-On 9/24/19 8:28 AM, Markus Armbruster wrote:
-> check_name() consists of check_name_is_str() and check_name_str().
-> check_union() relies on the latter to catch optional discriminators.
-> The next commit will replace that by a more straightforward check.
-> Inlining check_name() into check_union() now should make that easier
-> to review.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  scripts/qapi/common.py | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->=20
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1824704
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Title:
+  -k tr not working after v20171217! turkish keyboard dont working
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Status in QEMU:
+  Incomplete
 
+Bug description:
+  hi qemu
 
---ENVOwQAkNxPFm7EpuFJcoXJ9MSdGPugve--
+  -k tr not working after v20171217! turkish keyboard dont working
 
---boXkdcfwtzEazhVvZeoyfpbexh4KrPkJ0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  last working without proplem at v20171217!
 
------BEGIN PGP SIGNATURE-----
+  after this version  tr keyboard proplem.
+  freedos  , winpe  ,  linux images   all dont working tr  turkish keyboard.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KRtEACgkQp6FrSiUn
-Q2rE0QgAkJk62bK80ioqHCWu8ZPMtVdgAxSyF7YmTEWjAxLODAmJ4qbjJ/Z+cwrM
-OoTMh2C3rxX5CrVZd3BHm4nn/pe/+2nkXt3n5V79fV8bl+t0P14VNCshIxIH1oSb
-d9vRF95Zl5aueXsUCOEa+k8Hlhxr9EtElbQ+YhUtyMbI7EN/GsKyc92PAh0dOdZW
-h1vIG6KLn9h37lAXIY0jJrRTfYoL+WNw8zJILrrol3C2xYsD9ngIh4Z96wc3Jd9o
-bocp7a+Rhods0ZDta4rMMNpnygfnvaAX/3gKfs3Lvfesmhs214TEYIwbU5I88oWa
-m7X+2tuh42G86/VqwSdv8E95T25VGQ==
-=gN8u
------END PGP SIGNATURE-----
+  example   press key " =C3=A7 "  show " , "
+  example 2 press key " . "  show " =C3=A7 "
 
---boXkdcfwtzEazhVvZeoyfpbexh4KrPkJ0--
+  tr keyboard work  always "en-us" kbd.
+  :((((((((
+
+  please fix this critical bug.
+
+  Sincerely
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1824704/+subscriptions
 
