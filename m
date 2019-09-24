@@ -6,70 +6,74 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B102C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:47:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F05B7C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:47:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53ADE20872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:47:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53ADE20872
+	by mail.kernel.org (Postfix) with ESMTPS id C53CD20872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 05:47:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C53CD20872
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCdfU-0003oG-BW
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 01:47:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55592)
+	id 1iCdfm-0003qw-PD
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 01:47:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55605)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iCde2-0002uv-ES
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:45:52 -0400
+ (envelope-from <bounces@canonical.com>) id 1iCde5-0002v3-6v
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:45:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iCde0-0001Gs-45
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:45:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45306)
+ (envelope-from <bounces@canonical.com>) id 1iCde4-0001I2-0U
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:45:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45566)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iCddz-0001GC-HC
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:45:48 -0400
+ id 1iCde3-0001HZ-Hm
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 01:45:51 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iCddw-000309-CY
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 05:45:44 +0000
+ id 1iCde1-00034r-DR
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 05:45:49 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5DA1D2E80C8
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 05:45:44 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 392782E80E4
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 05:45:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Sep 2019 05:38:13 -0000
-From: Thomas Huth <1842916@bugs.launchpad.net>
+Date: Tue, 24 Sep 2019 05:37:15 -0000
+From: Thomas Huth <1842774@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=ubuntu-z-systems; status=Triaged; importance=High;
  assignee=frank.heimes@canonical.com; 
 X-Launchpad-Bug: distribution=ubuntu; sourcepackage=linux; component=main;
- status=New; importance=Undecided; assignee=skipper-screen-team; 
-X-Launchpad-Bug-Tags: architecture-s39064 bugnameltc-181316 severity-high
- targetmilestone-inin1804
+ status=In Progress; importance=High; assignee=canonical-kernel-team; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=linux;
+ component=main; status=In Progress; importance=High;
+ assignee=canonical-kernel-team; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=linux; 
+ component=main; status=In Progress; importance=High;
+ assignee=canonical-kernel-team; 
+X-Launchpad-Bug-Tags: architecture-s39064 bugnameltc-181268 severity-high
+ targetmilestone-inin1910
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bugproxy frank-heimes
+X-Launchpad-Bug-Commenters: andrew-cloke bugproxy frank-heimes th-huth
 X-Launchpad-Bug-Reporter: bugproxy (bugproxy)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-X-Launchpad-Bug-Duplicate: 1842774
-References: <156768308911.708.6152721761425216653.malonedeb@wampee.canonical.com>
-Message-Id: <156930349364.27379.3408697603133219841.launchpad@soybean.canonical.com>
-Subject: [Bug 1842916] Re: [18.04 FEAT] Enhanced Hardware Support - Finalize
- Naming
+References: <156764756485.6162.5365845259935486076.malonedeb@soybean.canonical.com>
+Message-Id: <156930343520.13411.17857665560777317112.malone@gac.canonical.com>
+Subject: [Bug 1842774] Re: Enhanced Hardware Support - Finalize Naming
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19048";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a292a28f454ed35bed871620c625a07be0f6981d
+X-Launchpad-Hash: 8e9f0dbc3973580b8f776f3694c28c1b13694fcc
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,13 +86,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1842916 <1842916@bugs.launchpad.net>
+Reply-To: Bug 1842774 <1842774@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-*** This bug is a duplicate of bug 1842774 ***
-    https://bugs.launchpad.net/bugs/1842774
+Patch a0e2251132995b9 is a kernel patch, thus this is certainly not
+something we need to track in the upstream QEMU bugtracker.
 
 ** No longer affects: qemu
 
@@ -96,19 +100,59 @@ Sender: "Qemu-devel"
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1842916
+https://bugs.launchpad.net/bugs/1842774
 
 Title:
-  [18.04 FEAT] Enhanced Hardware Support - Finalize Naming
+  Enhanced Hardware Support - Finalize Naming
 
 Status in Ubuntu on IBM z Systems:
   Triaged
 Status in linux package in Ubuntu:
-  New
+  In Progress
+Status in linux source package in Bionic:
+  In Progress
+Status in linux source package in Disco:
+  In Progress
 
 Bug description:
+  SRU Justification:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  [Impact]
+
+  * Add / activate support for IBM z15 and LinuxONE III systems
+
+  [Fix]
+
+  * a0e2251132995b962281aa80ab54a9288f9e0b6b a0e2251 "s390: add support
+  for IBM z15 machines"
+
+  [Test Case]
+
+  * check and verify cpuinfo - regression testing is possible by
+  Canonical/me
+
+  * functional testing is currently only doable by IBM
+
+  [Regression Potential]
+
+  * There is regression potential with having new code in and the flags
+  added/active
+
+  * but the code changes are pretty straight forward, just add config,
+  cases and defs
+
+  * and are not used on existing systems, just on the new generation
+  that is not yet out in the field
+
+  [Other Info]
+
+  * SRU of LP 1842916 merged with (this) LP 1842774
+
+  __________
+
   This feature request will provide the final naming of the next machine
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/ubuntu-z-systems/+bug/1842916/+subscriptions
+https://bugs.launchpad.net/ubuntu-z-systems/+bug/1842774/+subscriptions
 
