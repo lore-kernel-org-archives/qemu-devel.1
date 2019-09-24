@@ -2,50 +2,49 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17D68C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 19:54:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14546C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 19:55:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFC6D2146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 19:54:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFC6D2146E
+	by mail.kernel.org (Postfix) with ESMTPS id DF867217F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 19:55:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF867217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCqsw-0003gM-Kl
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 15:54:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36498)
+	id 1iCqub-0005iq-I7
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 15:55:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36686)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iCqqd-0001wt-6f
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 15:51:45 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCqsH-0003ey-Tg
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 15:53:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iCqqb-00010z-3z
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 15:51:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46532)
+ (envelope-from <eblake@redhat.com>) id 1iCqsG-0004DV-Lt
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 15:53:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47964)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iCqqW-0000zu-Q2; Tue, 24 Sep 2019 15:51:37 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCqsG-0004Aa-D5
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 15:53:24 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1B1F1A26687;
- Tue, 24 Sep 2019 19:51:36 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A3F3F46288;
+ Tue, 24 Sep 2019 19:53:23 +0000 (UTC)
 Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A9F3519C58;
- Tue, 24 Sep 2019 19:51:35 +0000 (UTC)
-Subject: Re: [PATCH 0/2] enhance iotest 223 coverage
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190924143522.22902-1-eblake@redhat.com>
- <8463a76e-74d7-7785-79f4-563cd78182a5@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5841219C58;
+ Tue, 24 Sep 2019 19:53:17 +0000 (UTC)
+Subject: Re: [PATCH 24/25] qapi: Improve reporting of redefinition
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190924132830.15835-1-armbru@redhat.com>
+ <20190924132830.15835-25-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -72,18 +71,18 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <473f7df2-9845-d90e-6dc9-0542ec2c3c76@redhat.com>
-Date: Tue, 24 Sep 2019 14:51:34 -0500
+Message-ID: <13635346-c92d-cb93-7fee-3a778fc0dc9c@redhat.com>
+Date: Tue, 24 Sep 2019 14:53:17 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <8463a76e-74d7-7785-79f4-563cd78182a5@virtuozzo.com>
+In-Reply-To: <20190924132830.15835-25-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="X59CdbfxiZxjiJtUWT5fFvjVfdRTa4ZEH"
+ boundary="H7sB0pe2n4D86TM8v0NvJwV7s3QcAjiu8"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Tue, 24 Sep 2019 19:51:36 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Tue, 24 Sep 2019 19:53:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,54 +96,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---X59CdbfxiZxjiJtUWT5fFvjVfdRTa4ZEH
-Content-Type: multipart/mixed; boundary="RcKB7nvaGwz7X72jadwk1PK9QqJGSHpio";
+--H7sB0pe2n4D86TM8v0NvJwV7s3QcAjiu8
+Content-Type: multipart/mixed; boundary="0OCkmYXJfzfJB8wNFBJNRCDgkx5sv68iQ";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "nsoffer@redhat.com" <nsoffer@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Message-ID: <473f7df2-9845-d90e-6dc9-0542ec2c3c76@redhat.com>
-Subject: Re: [PATCH 0/2] enhance iotest 223 coverage
-References: <20190924143522.22902-1-eblake@redhat.com>
- <8463a76e-74d7-7785-79f4-563cd78182a5@virtuozzo.com>
-In-Reply-To: <8463a76e-74d7-7785-79f4-563cd78182a5@virtuozzo.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+Message-ID: <13635346-c92d-cb93-7fee-3a778fc0dc9c@redhat.com>
+Subject: Re: [PATCH 24/25] qapi: Improve reporting of redefinition
+References: <20190924132830.15835-1-armbru@redhat.com>
+ <20190924132830.15835-25-armbru@redhat.com>
+In-Reply-To: <20190924132830.15835-25-armbru@redhat.com>
 
---RcKB7nvaGwz7X72jadwk1PK9QqJGSHpio
+--0OCkmYXJfzfJB8wNFBJNRCDgkx5sv68iQ
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 9/24/19 2:26 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 24.09.2019 17:35, Eric Blake wrote:
->> Commit 506902c6 dropped non-iothread coverage in order to test iothrea=
-d,
->> better is to run things twice.  In doing this, I found it easier to
->> edit the test when the log shows what commands were triggering various=
-
->> responses.
+On 9/24/19 8:28 AM, Markus Armbruster wrote:
+> Point to the previous definition, unless it's a built-in.
 >=20
-> Did you consider adding -iothread to tests/qemu-iotests/check instead, =
-to be
-> able to run any (or some) tests with or without iothread?
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
-I don't know how many of the existing iotests would benefit from the
-ability supply iothread as an option, nor how likely it is that someone
-would actually remember to run the testsuite twice to cover the use of
-that option.  I also don't know how hard it would be to retrofit the
-addition of optional iothread support into all the tests.  Rather, I
-addressed the more immediate concern of the fact that my recent addition
-to using iothread in 223 lost the previous ability of that test to cover
-non-iothread, and where this patch series now makes it cover both
-scenarios with a single iotests run.
+>          if other_ent:
+> +            if other_ent.info:
+> +                where =3D QAPIError(other_ent.info, None, "previous de=
+finition")
+> +                raise QAPISemError(
+> +                    ent.info,
+> +                    "'%s' is already defined\n%s" % (ent.name, where))=
+
+>              raise QAPISemError(
+>                  ent.info, "%s is already defined" % other_ent.describe=
+())
+
+Nice.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -152,24 +147,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---RcKB7nvaGwz7X72jadwk1PK9QqJGSHpio--
+--0OCkmYXJfzfJB8wNFBJNRCDgkx5sv68iQ--
 
---X59CdbfxiZxjiJtUWT5fFvjVfdRTa4ZEH
+--H7sB0pe2n4D86TM8v0NvJwV7s3QcAjiu8
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2Kc8YACgkQp6FrSiUn
-Q2pOBgf/XoZM+BYgmmQ25ueC8+FqBAhn7CyGsYUUphQn6ktoro8ROR48f4x+AI/C
-8zaEw+BxhSjMC6YD29FWImHxRiHGJ9jAh41UNUxzPbWDZ6XpKXKBH8qHrpFuN+0V
-Xg+Nmo6JkBiqnchravFYwBn724CDAgq9nCKW42/iBcxnhjvpjHiL67u2rEYXKz6/
-mc5B6PEz7OhktnZbtWgKtk2PnOUkik/93PhhU/a+drhV8yt3hZdQjDX5CY3f2y7h
-9824voK0YrxNl27cU50XfLVX50Z63FnCbNeGmc9MijGH1rbxFzSKbPPkIn2BwARM
-Ex16Htxj5l9qmuIXhZCHSwlPTWO+XA==
-=PkQN
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KdC0ACgkQp6FrSiUn
+Q2rb9QgAmY0oXggnxiAcGp3aqzYA4VXUXmSagaLuIU7F6sfgYSvAtEnL8jeVPmVX
+GYmrLAVLiX6+gHNVwkmFt4PS0BYkCBSnNulzvlEfjQcRhCWKgA56sI+bEJ2TckUB
+YnvTdpd6+E+yJ319+dwPiPua4WJCBoTpp6FLecaoandBE+3tbl9b1xDsRQybVZA4
+DJCJLqhZGcgZD1IHNx+9iySw7MTC3xwDhzWuwCG1JGRXRNoS2WLncrdkUf1mXDY7
+sWmX0zRSPIklo2FSq/fGZ/bSn7K1hpMBRrr3JL0+eUBJ0opXzEEv0laYJ9tPywIM
+C5dJ2Qn/Iff/t5990eFu0YrDJlnbzA==
+=vFXa
 -----END PGP SIGNATURE-----
 
---X59CdbfxiZxjiJtUWT5fFvjVfdRTa4ZEH--
+--H7sB0pe2n4D86TM8v0NvJwV7s3QcAjiu8--
 
