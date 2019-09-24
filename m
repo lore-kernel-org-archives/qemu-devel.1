@@ -2,66 +2,53 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A833BC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:36:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 771C0C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:36:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 788E92054F
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:36:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 788E92054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4934C2054F
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:36:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4934C2054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCrXe-0003v3-WE
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:36:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49412)
+	id 1iCrXi-0003zE-UH
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:36:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43991)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCrGe-0002K3-Hh
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:18:38 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCr8M-0000qt-Q2
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCrGc-0007Z2-G3
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:18:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39104)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iCr8L-0002zy-5Z
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:02 -0400
+Received: from relay.sw.ru ([185.231.240.75]:38106)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCrGc-0007Yl-B3
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:18:34 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A520930013A1;
- Tue, 24 Sep 2019 20:18:33 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ADC105B69A;
- Tue, 24 Sep 2019 20:18:30 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 12349113864E; Tue, 24 Sep 2019 22:18:29 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 01/25] qapi: Tighten QAPISchemaFOO.check() assertions
-References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-2-armbru@redhat.com>
- <d71d1b04-42dc-9d9b-d37d-53db2ec867b8@redhat.com>
-Date: Tue, 24 Sep 2019 22:18:29 +0200
-In-Reply-To: <d71d1b04-42dc-9d9b-d37d-53db2ec867b8@redhat.com> (Eric Blake's
- message of "Tue, 24 Sep 2019 09:39:31 -0500")
-Message-ID: <87k19xa1nu.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iCr8K-0002sh-Tk
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:10:01 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iCr89-0001Mk-Dx; Tue, 24 Sep 2019 23:09:49 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 14/25] USB: Fix error_append_hint usage
+Date: Tue, 24 Sep 2019 23:08:51 +0300
+Message-Id: <20190924200902.4703-15-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190924200902.4703-1-vsementsov@virtuozzo.com>
+References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Tue, 24 Sep 2019 20:18:33 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,58 +60,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
- mdroth@linux.vnet.ibm.com
+Cc: vsementsov@virtuozzo.com, Greg Kurz <groug@kaod.org>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+If we want append hint to errp, we must use ERRP_FUNCTION_BEGIN macro.
+Otherwise hint will not be appended in case of errp == &fatal_err
+(program will exit before error_append_hint() call). Fix such cases.
 
-> On 9/24/19 8:28 AM, Markus Armbruster wrote:
->> When we introduced the QAPISchema intermediate representation (commit
->> ac88219a6c7), we took a shortcut: we left check_exprs() & friends
->> alone instead of moving semantic checks into the
->> QAPISchemaFOO.check().  check_exprs() still checks and reports errors,
->> and the .check() assert check_exprs() did the job.  There are a few
->> gaps, though.
->> 
->> QAPISchemaArrayType.check() neglects to assert the element type is not
->> an array.  Add the assertion.
->> 
->> QAPISchemaObjectTypeVariants.check() neglects to assert the tag member
->> is not optional.  Add the assertion.
->> 
->> It neglects to assert the tag member is not conditional.  Add the
->> assertion.
->> 
->> It neglects to assert we actually have variants.  Add the assertion.
->> 
->> It asserts the variants are object types, but neglects to assert they
->> don't have variants.  Tighten the assertion.
->> 
->> QAPISchemaObjectTypeVariants.check_clash() has the same issue.
->> However, it can run only after .check().  Delete the assertion instead
->> of tightening it.
->> 
->> QAPISchemaAlternateType.check() neglects to assert the branch types
->> don't conflict.  Fixing that isn't trivial, so add just a TODO comment
->> for now.  It'll be resolved later in this series.
->
-> I'm guessing you found these by deleting check_exprs() and seeing what
-> failed due to inadequate .check()
+This commit (together with its neighbors) was generated by
 
-The first two or three I found by staring at the code.  The remainder I
-found when I moved checks from check_exprs() to .check() [PATCH 16]: any
-check that doesn't replace an assertion means the assertion was missing.
+git grep -l 'error_append_hint(errp' | while read f; do \
+spatch --sp-file scripts/coccinelle/fix-error_append_hint-usage.cocci \
+--in-place $f; done
 
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  scripts/qapi/common.py | 9 +++++++--
->>  1 file changed, 7 insertions(+), 2 deletions(-)
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+and then
 
-Thanks!
+./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+
+(auto-msg was a file with this commit message)
+
+Still, for backporting it may be more comfortable to use only the first
+command and then do one huge commit.
+
+Reported-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ hw/usb/ccid-card-emulated.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hw/usb/ccid-card-emulated.c b/hw/usb/ccid-card-emulated.c
+index 291e41db8a..9a2ea129dd 100644
+--- a/hw/usb/ccid-card-emulated.c
++++ b/hw/usb/ccid-card-emulated.c
+@@ -488,6 +488,7 @@ static uint32_t parse_enumeration(char *str,
+ 
+ static void emulated_realize(CCIDCardState *base, Error **errp)
+ {
++    ERRP_FUNCTION_BEGIN();
+     EmulatedState *card = EMULATED_CCID_CARD(base);
+     VCardEmulError ret;
+     const EnumTable *ptable;
+-- 
+2.21.0
+
 
