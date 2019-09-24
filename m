@@ -2,65 +2,75 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A35EC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:42:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61008C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:44:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D24142168B
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:42:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D24142168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 376252168B
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:44:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 376252168B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cloudbasesolutions.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCl5N-0003OK-Fe
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:42:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58691)
+	id 1iCl6q-0004xP-0b
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:44:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45452)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCkrw-000097-62
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:43 -0400
+ (envelope-from <bounces@canonical.com>) id 1iCjQ7-0006Yr-BD
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:55:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCkrt-0001RX-PB
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35794)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCkrt-0001Ql-8X
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:37 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 73DDB3D965;
- Tue, 24 Sep 2019 13:28:36 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3DF1E60C5E;
- Tue, 24 Sep 2019 13:28:36 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 7C55211385CB; Tue, 24 Sep 2019 15:28:30 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 10/25] qapi: Use check_name_str() where it suffices
-Date: Tue, 24 Sep 2019 15:28:15 +0200
-Message-Id: <20190924132830.15835-11-armbru@redhat.com>
-In-Reply-To: <20190924132830.15835-1-armbru@redhat.com>
-References: <20190924132830.15835-1-armbru@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1iCjQ2-00019x-MG
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:55:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56636)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iCjQ0-000192-8y
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 07:55:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iCjPx-0002pq-L6
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 11:55:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 99BA52E80CB
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 11:55:41 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Tue, 24 Sep 2019 13:28:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Tue, 24 Sep 2019 11:40:48 -0000
+From: Adrian Vladu <avladu@cloudbasesolutions.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: mingw32 msys windows
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: avladu
+X-Launchpad-Bug-Reporter: Adrian Vladu (avladu)
+X-Launchpad-Bug-Modifier: Adrian Vladu (avladu)
+References: <156932212305.13447.6077258015607645915.malonedeb@gac.canonical.com>
+Message-Id: <156932524866.26657.15632302261189242465.launchpad@soybean.canonical.com>
+Subject: [Bug 1845185] Re: Cannot build qemu utils (qemu-img.exe, qemu-edid.exe,
+ qemu-io.exe) statically with MSYS2 on Windows because intl and iconv
+ libs are not loaded
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19048";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 2bc4bf8ed26980f529072bd01b7f1d812c81739c
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-Received-From: 91.189.90.7
+X-Mailman-Approved-At: Tue, 24 Sep 2019 09:10:43 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -69,58 +79,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Reply-To: Bug 1845185 <1845185@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace check_name() by check_name_str() where the name is known to be
-a string.
+** Tags added: mingw32 msys windows
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- scripts/qapi/common.py | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+-- =
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index fdc4379eff..6c870da50b 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -815,8 +815,8 @@ def check_type(value, info, source,
-=20
-     # value is a dictionary, check that each member is okay
-     for (key, arg) in value.items():
--        check_name(key, info, "member of %s" % source,
--                   allow_optional=3DTrue, permit_upper=3Dpermit_upper)
-+        check_name_str(key, info, "member of %s" % source,
-+                       allow_optional=3DTrue, permit_upper=3Dpermit_uppe=
-r)
-         if c_name(key, False) =3D=3D 'u' or c_name(key, False).startswit=
-h('has_'):
-             raise QAPISemError(
-                 info, "member of %s uses reserved name '%s'" % (source, =
-key))
-@@ -919,8 +919,7 @@ def check_union(expr, info):
-         raise QAPISemError(info, "union '%s' has no branches" % name)
-=20
-     for (key, value) in members.items():
--        check_name(key, info, "member of union '%s'" % name)
--
-+        check_name_str(key, info, "member of union '%s'" % name)
-         check_known_keys(value, info,
-                          "member '%s' of union '%s'" % (key, name),
-                          ['type'], ['if'])
-@@ -950,7 +949,7 @@ def check_alternate(expr, info):
-         raise QAPISemError(info,
-                            "alternate '%s' cannot have empty 'data'" % n=
-ame)
-     for (key, value) in members.items():
--        check_name(key, info, "member of alternate '%s'" % name)
-+        check_name_str(key, info, "member of alternate '%s'" % name)
-         check_known_keys(value, info,
-                          "member '%s' of alternate '%s'" % (key, name),
-                          ['type'], ['if'])
---=20
-2.21.0
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1845185
 
+Title:
+  Cannot build qemu utils (qemu-img.exe, qemu-edid.exe, qemu-io.exe)
+  statically with MSYS2 on Windows because intl and iconv libs are not
+  loaded
+
+Status in QEMU:
+  New
+
+Bug description:
+  Using MSYS2 and mingw32 instructions from
+  https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2, I could not
+  statically build the qemu-utils using the latest qemu master branch.
+
+  Steps to reproduce the issue:
+  1. Install MSYS2 on a Windows 10 x64 box
+  2. Install required mingw64 toolchain: pacman -S base-devel mingw-w64-x86=
+_64-toolchain git python mingw-w64-x86_64-glib2 mingw64/mingw-w64-x86_64-gt=
+k3 mingw64/mingw-w64-x86_64-SDL2
+  3. clone qemu
+  4. Run configure for static build for the tools only
+  =C2=A0=C2=A0./configure --disable-user --disable-system --disable-docs --=
+enable-tools  --disable-guest-agent --disable-capstone --disable-sheepdog -=
+-enable-debug --static
+  =C2=A0=C2=A0# I had to remove sheepdog, capstone and guest agent because =
+other errors popped out, but let's not go in the rabbit hole.
+  5. Run 'make -j'. the following errors appeared, signaling that intl lib =
+is not loaded. If I add intl lib, iconv lib needs to be loaded too.
+
+  make: *** [/home/ader1990/qemu/rules.mak:124: qemu-img.exe] Error 1
+  make: *** Waiting for unfinished jobs....
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1522): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x154f): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x157e): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15ad): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15dc): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1622): more=
+ undefined references to `libintl_sprintf' follow
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x43): undefi=
+ned reference to `libintl_textdomain'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x52): undefi=
+ned reference to `libintl_gettext'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x203): undef=
+ined reference to `libintl_bindtextdomain'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x21e): undef=
+ined reference to `libintl_bind_textdomain_codeset'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x2c1): undef=
+ined reference to `libintl_dgettext'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x4e1): undef=
+ined reference to `libintl_dcgettext'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x53a): undef=
+ined reference to `libintl_dngettext'
+
+  Patch to fix the issue (added intl and iconv to the libs):
+
+  diff --git a/configure b/configure
+  index 30aad233d1..e2ab8ef026 100755
+  --- a/configure
+  +++ b/configure
+  @@ -920,7 +920,7 @@ if test "$mingw32" =3D "yes" ; then
+  =C2=A0=C2=A0=C2=A0DSOSUF=3D".dll"
+  =C2=A0=C2=A0=C2=A0# MinGW needs -mthreads for TLS and macro _MT.
+  =C2=A0=C2=A0=C2=A0QEMU_CFLAGS=3D"-mthreads $QEMU_CFLAGS"
+  -  LIBS=3D"-lwinmm -lws2_32 -liphlpapi $LIBS"
+  +  LIBS=3D"-lwinmm -lws2_32 -liphlpapi -lintl -liconv $LIBS"
+  =C2=A0=C2=A0=C2=A0write_c_skeleton;
+  =C2=A0=C2=A0=C2=A0if compile_prog "" "-liberty" ; then
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0LIBS=3D"-liberty $LIBS"
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1845185/+subscriptions
 
