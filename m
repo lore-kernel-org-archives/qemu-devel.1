@@ -2,88 +2,55 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89F62C432C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 15:42:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18A78C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 15:43:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B2F12146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 15:42:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B2F12146E
+	by mail.kernel.org (Postfix) with ESMTPS id DBEF92146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 15:43:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBEF92146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCmx6-0002EA-10
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 11:42:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40492)
+	id 1iCmy5-0003H3-Bm
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 11:43:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42780)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iClpr-0000Xw-2Y
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:30:36 -0400
+ (envelope-from <imammedo@redhat.com>) id 1iCm6m-0007qD-UG
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:48:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iClpq-0000tp-0m
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:30:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46188)
+ (envelope-from <imammedo@redhat.com>) id 1iCm6l-0003v7-C9
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:48:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:24829)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iClpm-0000hE-6R; Tue, 24 Sep 2019 10:30:30 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1iCm6l-0003ub-45; Tue, 24 Sep 2019 10:48:03 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7F4E0A26682;
- Tue, 24 Sep 2019 14:30:28 +0000 (UTC)
-Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C8F0F3D8E;
- Tue, 24 Sep 2019 14:30:27 +0000 (UTC)
-Subject: Re: [PULL 4/4] tests: Use iothreads during iotest 223
-To: Nir Soffer <nsoffer@redhat.com>
-References: <20190924123933.10607-1-eblake@redhat.com>
- <20190924123933.10607-5-eblake@redhat.com>
- <CAMRbyyuwaRPgO0G5Jj8_tFO+rGbMi_F0V3JuQR-0qU3BAEoEJQ@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <798c8885-6255-a3c2-bd85-5441262385b9@redhat.com>
-Date: Tue, 24 Sep 2019 09:30:26 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <CAMRbyyuwaRPgO0G5Jj8_tFO+rGbMi_F0V3JuQR-0qU3BAEoEJQ@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="MXYf4VYP4ysEhavpK18gQbBVLE1vhPWGq"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Tue, 24 Sep 2019 14:30:28 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 50FF33168BEB;
+ Tue, 24 Sep 2019 14:48:02 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3ED931001DCD;
+ Tue, 24 Sep 2019 14:47:54 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 0/4] s390: stop abusing
+ memory_region_allocate_system_memory()
+Date: Tue, 24 Sep 2019 10:47:47 -0400
+Message-Id: <20190924144751.24149-1-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Tue, 24 Sep 2019 14:48:02 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,84 +64,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com, peterx@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MXYf4VYP4ysEhavpK18gQbBVLE1vhPWGq
-Content-Type: multipart/mixed; boundary="UHfl3vqihAyzYbigFaGJ633Dp62as9L55";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Nir Soffer <nsoffer@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <798c8885-6255-a3c2-bd85-5441262385b9@redhat.com>
-Subject: Re: [PULL 4/4] tests: Use iothreads during iotest 223
-References: <20190924123933.10607-1-eblake@redhat.com>
- <20190924123933.10607-5-eblake@redhat.com>
- <CAMRbyyuwaRPgO0G5Jj8_tFO+rGbMi_F0V3JuQR-0qU3BAEoEJQ@mail.gmail.com>
-In-Reply-To: <CAMRbyyuwaRPgO0G5Jj8_tFO+rGbMi_F0V3JuQR-0qU3BAEoEJQ@mail.gmail.com>
-
---UHfl3vqihAyzYbigFaGJ633Dp62as9L55
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 9/24/19 8:49 AM, Nir Soffer wrote:
-> On Tue, Sep 24, 2019 at 4:18 PM Eric Blake <eblake@redhat.com> wrote:
->=20
->> Doing so catches the bugs we just fixed with NBD not properly using
->> correct contexts.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> Message-Id: <20190920220729.31801-1-eblake@redhat.com>
->> ---
->>  tests/qemu-iotests/223     | 6 ++++--
->>  tests/qemu-iotests/223.out | 1 +
->>  2 files changed, 5 insertions(+), 2 deletions(-)
-
->> -_launch_qemu 2> >(_filter_nbd)
->> +_launch_qemu -object iothread,id=3Dio0 2> >(_filter_nbd)
->>
->=20
-> But now we will not catch bugs in flows that do not use iothreads.
->=20
-> I think it will be better to run this test twice, one with iothreads, o=
-ne
-> without.
-
-Too late for this pull request, but I will propose that as a followup pat=
-ch.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Changelog:
+  since v6:
+    - include and rebase on top of
+       [PATCH 0/2] kvm: clear dirty bitmaps from all overlapping memslots
+        https://www.mail-archive.com/qemu-devel@nongnu.org/msg646200.html
+    - minor fixups suggested during v6 review
+    - more testing incl. hacked x86
+  since v5:
+    - [1/2] fix migration that wasn't starting and make sure that KVM part
+      is able to handle 1:n MemorySection:memslot arrangement
+  since v3:
+    - fix compilation issue
+    - advance HVA along with GPA in kvm_set_phys_mem()
+  since v2:
+    - break migration from old QEMU (since 2.12-4.1) for guest with >8TB RAM
+      and drop migratable aliases patch as was agreed during v2 review
+    - drop 4.2 machines patch as it's not prerequisite anymore
+  since v1:
+    - include 4.2 machines patch for adding compat RAM layout on top
+    - 2/4 add missing in v1 patch for splitting too big MemorySection on
+          several memslots
+    - 3/4 amend code path on alias destruction to ensure that RAMBlock is
+          cleaned properly
+    - 4/4 add compat machine code to keep old layout (migration-wise) for
+          4.1 and older machines 
 
 
---UHfl3vqihAyzYbigFaGJ633Dp62as9L55--
+While looking into unifying guest RAM allocation to use hostmem backends
+for initial RAM (especially when -mempath is used) and retiring
+memory_region_allocate_system_memory() API, leaving only single hostmem backend,
+I was inspecting how currently it is used by boards and it turns out several
+boards abuse it by calling the function several times (despite documented contract
+forbiding it).
 
---MXYf4VYP4ysEhavpK18gQbBVLE1vhPWGq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+s390 is one of such boards where KVM limitation on memslot size got propagated
+to board design and memory_region_allocate_system_memory() was abused to satisfy
+KVM requirement for max RAM chunk where memory region alias would suffice.
 
------BEGIN PGP SIGNATURE-----
+Unfortunately, memory_region_allocate_system_memory() usage created migration
+dependency where guest RAM is transferred in migration stream as several RAMBlocks
+if it's more than KVM_SLOT_MAX_BYTES. During v2 review it was agreed to ignore
+migration breakage (documenting it in release notes) and leaving only KVM fix.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KKIMACgkQp6FrSiUn
-Q2qlPAf7BNPT6rWOtreoiJkhQ7Qa6McH+WGSmVQPBMt7SqUhCHqxgH5klKVCtzSV
-Sn4HJNPmXFQvAlJG66R/nmonzyq0ZyMfGaS5xWFmuuQdCSzw9nd8oLNHpGsZxWFc
-JxfviDwshfEFeJF2IF0w47ZVjV9z5cd/r1qAkIQAN9mYkL7A/uBsSGVF+fRymSBm
-cmIb/lDvnk5LtefUWl9vJATjKVAMouj78Z4WKvIMzHpg06w71F/WU8kEkhmFLxXg
-7lu3QOkVAUZCn/SUZibw6Ui/5sz+l49vj9yujy6FPIrkihkOOgZnoVVDCmWXDtnP
-Qc2AaVYj6uXjquGuHBr9+n/2mKMigA==
-=tHLa
------END PGP SIGNATURE-----
+In order to replace these several RAM chunks with a single memdev and keep it
+working with KVM memslot size limit, the later was modified to deal with 
+memory section split on several KVMSlots and manual RAM splitting in s390
+was replace by single memory_region_allocate_system_memory() call.
 
---MXYf4VYP4ysEhavpK18gQbBVLE1vhPWGq--
+Tested:
+  * s390 with hacked KVM_SLOT_MAX_BYTES = 128Mb
+      - guest reboot cycle in ping-pong migration
+  * x86 with hacke max memslot = 128 and manual_dirty_log_protect enabled
+      - ping-pong migration with workload dirtying RAM around a split area
+
+
+
+Igor Mammedov (2):
+  kvm: split too big memory section on several memslots
+  s390: do not call memory_region_allocate_system_memory() multiple
+    times
+
+Paolo Bonzini (2):
+  kvm: extract kvm_log_clear_one_slot
+  kvm: clear dirty bitmaps from all overlapping memslots
+
+ include/sysemu/kvm_int.h   |   1 +
+ accel/kvm/kvm-all.c        | 238 +++++++++++++++++++++++--------------
+ hw/s390x/s390-virtio-ccw.c |  30 +----
+ target/s390x/kvm.c         |  11 ++
+ 4 files changed, 161 insertions(+), 119 deletions(-)
+
+-- 
+2.18.1
+
 
