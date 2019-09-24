@@ -2,65 +2,59 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 109C3C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BCCCC432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:26:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB7D820872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:23:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB7D820872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F3DA620872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:26:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3DA620872
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCnbB-0002jo-K7
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:23:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54470)
+	id 1iCndZ-0005UW-JW
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:26:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48407)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iCnAE-0001Xf-Oh
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:55:44 -0400
+ (envelope-from <guoheyi@huawei.com>) id 1iCmfF-0001Rg-6z
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:23:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iCnAC-0008RR-Ra
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:55:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43028)
+ (envelope-from <guoheyi@huawei.com>) id 1iCmfD-0006oQ-8S
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:23:40 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:46880 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>)
- id 1iCnAC-0008Pg-Lo; Tue, 24 Sep 2019 11:55:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F1C2118CB8FE;
- Tue, 24 Sep 2019 15:55:37 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-118.rdu2.redhat.com
- [10.10.120.118])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DEF98600C8;
- Tue, 24 Sep 2019 15:55:28 +0000 (UTC)
-Subject: Re: [PATCH] roms: Add a 'make help' target alias
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190920171159.18633-1-philmd@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <a0c746cb-c39b-32b4-3635-3e0c6cbd2b14@redhat.com>
-Date: Tue, 24 Sep 2019 17:55:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
+ id 1iCmf8-0006jm-7H; Tue, 24 Sep 2019 11:23:34 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 72028C8DBC18647CE88C;
+ Tue, 24 Sep 2019 23:23:27 +0800 (CST)
+Received: from linux-Bxxcye.huawei.com (10.175.104.222) by
+ DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
+ 14.3.439.0; Tue, 24 Sep 2019 23:23:19 +0800
+From: Heyi Guo <guoheyi@huawei.com>
+To: <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>,
+ <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>
+Subject: [RFC PATCH 08/12] arm/sdei: add support to register interrupt bind
+ notifier
+Date: Tue, 24 Sep 2019 23:21:47 +0800
+Message-ID: <1569338511-3572-9-git-send-email-guoheyi@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1569338511-3572-1-git-send-email-guoheyi@huawei.com>
+References: <1569338511-3572-1-git-send-email-guoheyi@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20190920171159.18633-1-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Tue, 24 Sep 2019 15:55:38 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Originating-IP: [10.175.104.222]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-Received-From: 45.249.212.35
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,46 +66,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, John Snow <jsnow@redhat.com>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>,
+ James Morse <james.morse@arm.com>, Heyi Guo <guoheyi@huawei.com>,
+ wanghaibin.wang@huawei.com, Dave Martin <Dave.Martin@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/20/19 19:11, Philippe Mathieu-Daud=C3=A9 wrote:
-> Various C projects provide a 'make help' target. Our root directory
-> does so. The roms/ directory lacks a such rule, but already displays
-> a help output when the default target is called.
-> Add a 'help' target aliased to the default one, to avoid:
->=20
->   $ make -C roms help
->   make: *** No rule to make target 'help'.  Stop.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  roms/Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/roms/Makefile b/roms/Makefile
-> index 6cf07d3b44..3ffd13cc7e 100644
-> --- a/roms/Makefile
-> +++ b/roms/Makefile
-> @@ -51,7 +51,7 @@ SEABIOS_EXTRAVERSION=3D"-prebuilt.qemu.org"
->  #
->  EDK2_EFIROM =3D edk2/BaseTools/Source/C/bin/EfiRom
-> =20
-> -default:
-> +default help:
->  	@echo "nothing is build by default"
->  	@echo "available build targets:"
->  	@echo "  bios               -- update bios.bin (seabios)"
->=20
+Other qemu modules related with the interrupt bind operation may want
+to be notified when guest requests to bind interrupt to sdei event, so
+we add register and unregister interfaces.
 
-How about we just print: "help yourself"?
+Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Dave Martin <Dave.Martin@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: James Morse <james.morse@arm.com>
+---
+ target/arm/sdei.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/sdei.h | 17 +++++++++++++++++
+ 2 files changed, 66 insertions(+)
 
-Just kidding. :P
+diff --git a/target/arm/sdei.c b/target/arm/sdei.c
+index 9ceb131..efdb681 100644
+--- a/target/arm/sdei.c
++++ b/target/arm/sdei.c
+@@ -45,6 +45,52 @@
+ 
+ static QemuSDEState *sde_state;
+ 
++typedef struct QemuSDEIBindNotifyEntry {
++    QTAILQ_ENTRY(QemuSDEIBindNotifyEntry) entry;
++    QemuSDEIBindNotify *func;
++    void *opaque;
++    int irq;
++} QemuSDEIBindNotifyEntry;
++
++static QTAILQ_HEAD(, QemuSDEIBindNotifyEntry) bind_notifiers =
++    QTAILQ_HEAD_INITIALIZER(bind_notifiers);
++
++void qemu_register_sdei_bind_notifier(QemuSDEIBindNotify *func,
++                                      void *opaque, int irq)
++{
++    QemuSDEIBindNotifyEntry *be = g_new0(QemuSDEIBindNotifyEntry, 1);
++
++    be->func = func;
++    be->opaque = opaque;
++    be->irq = irq;
++    QTAILQ_INSERT_TAIL(&bind_notifiers, be, entry);
++}
++
++void qemu_unregister_sdei_bind_notifier(QemuSDEIBindNotify *func,
++                                        void *opaque, int irq)
++{
++    QemuSDEIBindNotifyEntry *be;
++
++    QTAILQ_FOREACH(be, &bind_notifiers, entry) {
++        if (be->func == func && be->opaque == opaque && be->irq == irq) {
++            QTAILQ_REMOVE(&bind_notifiers, be, entry);
++            g_free(be);
++            return;
++        }
++    }
++}
++
++static void sdei_notify_bind(int irq, int32_t event, bool bind)
++{
++    QemuSDEIBindNotifyEntry *be, *nbe;
++
++    QTAILQ_FOREACH_SAFE(be, &bind_notifiers, entry, nbe) {
++        if (be->irq == irq) {
++            be->func(be->opaque, irq, event, bind);
++        }
++    }
++}
++
+ static void qemu_sde_prop_init(QemuSDEState *s)
+ {
+     QemuSDEProp *sde_props = s->sde_props_state;
+@@ -502,6 +548,7 @@ static int32_t sdei_alloc_event_num(QemuSDEState *s, bool is_critical,
+             sde_props[index].interrupt = intid;
+             sde_props[index].is_shared = is_shared;
+             sde_props[index].is_critical = is_critical;
++            sdei_notify_bind(intid, event, true);
+             override_qemu_irq(s, event, intid);
+             s->irq_map[intid] = event;
+             qemu_mutex_unlock(&sde_props[index].lock);
+@@ -522,6 +569,7 @@ static int32_t sdei_free_event_num_locked(QemuSDEState *s, QemuSDEProp *prop)
+         goto unlock_return;
+     }
+ 
++    sdei_notify_bind(prop->interrupt, prop->event_id, false);
+     restore_qemu_irq(s, prop->event_id, prop->interrupt);
+     s->irq_map[prop->interrupt] = SDEI_INVALID_EVENT_ID;
+     prop->event_id = SDEI_INVALID_EVENT_ID;
+@@ -1331,6 +1379,7 @@ static int qemu_sdei_post_load(void *opaque, int version_id)
+         int intid = sde_props[i].interrupt;
+         if (intid != SDEI_INVALID_INTERRUPT) {
+             s->irq_map[intid] = sde_props[i].event_id;
++            sdei_notify_bind(intid, sde_props[i].event_id, true);
+             override_qemu_irq(s, sde_props[i].event_id, intid);
+         }
+     }
+diff --git a/target/arm/sdei.h b/target/arm/sdei.h
+index a61e788..feaaf1a 100644
+--- a/target/arm/sdei.h
++++ b/target/arm/sdei.h
+@@ -38,4 +38,21 @@ void sdei_handle_request(CPUState *cs, struct kvm_run *run);
+  */
+ bool trigger_sdei_by_irq(int cpu, int irq);
+ 
++/*
++ * Notify callback prototype; the argument "bind" tells whether it is a bind
++ * operation or unbind one.
++ */
++typedef void QemuSDEIBindNotify(void *opaque, int irq,
++                                int32_t event, bool bind);
++/*
++ * Register a notify callback for a specific interrupt bind operation; the
++ * client be both notified by bind and unbind operation.
++ */
++void qemu_register_sdei_bind_notifier(QemuSDEIBindNotify *func,
++                                      void *opaque, int irq);
++/*
++ * Unregister a notify callback for a specific interrupt bind operation.
++ */
++void qemu_unregister_sdei_bind_notifier(QemuSDEIBindNotify *func,
++                                        void *opaque, int irq);
+ #endif
+-- 
+1.8.3.1
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Thanks!
-Laszlo
 
