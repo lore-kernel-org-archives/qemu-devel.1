@@ -2,87 +2,85 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 084DFC432C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 15:54:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A54CFC432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 15:55:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE0D1214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 15:54:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE0D1214AF
+	by mail.kernel.org (Postfix) with ESMTPS id 7A825214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 15:55:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A825214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCn9A-0007td-4w
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 11:54:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43274)
+	id 1iCn9X-0008Ux-5V
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 11:54:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45290)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iCmAM-0003q5-Lu
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:51:47 -0400
+ (envelope-from <philmd@redhat.com>) id 1iCmNn-0008PH-7K
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:05:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iCmAL-0006B3-4x
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:51:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50812)
+ (envelope-from <philmd@redhat.com>) id 1iCmNl-0005Nj-4b
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:05:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52056)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iCmAK-0006Ae-Sp
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:51:45 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iCmNk-0005NP-Ts
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:05:37 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DAF5285550;
- Tue, 24 Sep 2019 14:51:43 +0000 (UTC)
-Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 61C3619C6A;
- Tue, 24 Sep 2019 14:51:41 +0000 (UTC)
-Subject: Re: [PATCH 03/25] qapi: New QAPISourceInfo, replacing dict
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-4-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <4ff086cb-7c96-a25a-be19-d78af40afd9b@redhat.com>
-Date: Tue, 24 Sep 2019 09:51:40 -0500
+ by mx1.redhat.com (Postfix) with ESMTPS id 27AFD2D6A3F
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 15:05:36 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id k9so181935wmb.0
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 08:05:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Akw+NMEbOIq+0gkdjyK1hG8E93w0sSINVS7gM9l49t8=;
+ b=hgTtlM+Ga2SuWo0KFFSiFNKC5P4JZDJvX354bsmGbzlFA2A8qH0Ehrj7Mr2ulCi7nH
+ OIHnGxPYd41GL0NYkqPKUyYX0UR48fe2z7PCWTlf1Uf0YfeFE4I+n4LeETMh4Z9fYkW9
+ 7ydmNwyY0GBhalgXludjfHbmlqrGLitgyKRRZAtO7RirksXftmDv1FhKbD4lMEg4t0Dk
+ GDDBlg00YKA8+8Cb2drF61GRf3axOKfDTbQNfCaBuXG+1ah9ABqT38wtyj3H/VklgcKb
+ rdPDyaS/deIcpA84TOpo8XQDRPfMSDa3Fslkq5hNHRd4CqBN0yo6SJk7hoiZFIHkXtLu
+ 1gbg==
+X-Gm-Message-State: APjAAAUIKOkO4vA1OhLDNwkJPho5sROYVUr2VeD71dyjmsn6X33pIyHc
+ FyQt/6MlDBee05qFnwOzQSLc1aibe7JAt/DlAqNRJAoOmcQDeDoYlatRc86COod46/fUpklQBOx
+ Pr1xdWazaQKRgXFU=
+X-Received: by 2002:a7b:c8d6:: with SMTP id f22mr483015wml.173.1569337534656; 
+ Tue, 24 Sep 2019 08:05:34 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwwk9YsRGNGiJWfI0i1Hsm/h89TJu7mV6E+ek3sQ049b5FCLyOwBCWAUz+LEDOQ//YLdRQsVA==
+X-Received: by 2002:a7b:c8d6:: with SMTP id f22mr482986wml.173.1569337534451; 
+ Tue, 24 Sep 2019 08:05:34 -0700 (PDT)
+Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id b5sm325533wmj.18.2019.09.24.08.05.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 24 Sep 2019 08:05:33 -0700 (PDT)
+Subject: Re: [PATCH v3 3/6] docker: remove 'deprecated' image definitions
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20190923181140.7235-1-jsnow@redhat.com>
+ <20190923181140.7235-4-jsnow@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <c990f39e-5748-c6a3-b071-0d4f279d2a1c@redhat.com>
+Date: Tue, 24 Sep 2019 17:05:31 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190924132830.15835-4-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="I5bCauHbQtKkNrr0cfzlwzbtZp73jQNse"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Tue, 24 Sep 2019 14:51:43 +0000 (UTC)
+In-Reply-To: <20190923181140.7235-4-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,79 +94,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---I5bCauHbQtKkNrr0cfzlwzbtZp73jQNse
-Content-Type: multipart/mixed; boundary="qAlyguDQa4LijQYLxFKQOl7gNiXVu1Kof";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Message-ID: <4ff086cb-7c96-a25a-be19-d78af40afd9b@redhat.com>
-Subject: Re: [PATCH 03/25] qapi: New QAPISourceInfo, replacing dict
-References: <20190924132830.15835-1-armbru@redhat.com>
- <20190924132830.15835-4-armbru@redhat.com>
-In-Reply-To: <20190924132830.15835-4-armbru@redhat.com>
-
---qAlyguDQa4LijQYLxFKQOl7gNiXVu1Kof
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 9/24/19 8:28 AM, Markus Armbruster wrote:
-> We track source locations with a dict of the form
+On 9/23/19 8:11 PM, John Snow wrote:
+> There isn't a debian.dockerfile anymore,
+> so perform some ghost-busting.
 >=20
->     {'file': FNAME, 'line': LINENO, parent': PARENT}
-
-Missing ' on parent
-
->=20
-> where PARENT is None for the main file, and the include directive's
-> source location for included files.
->=20
-> This is servicable enough, but the next commit will add information,
-
-serviceable
-
-> and that's going to come out cleaner if we turn this into a class.  So
-> do that.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  scripts/qapi/common.py | 69 +++++++++++++++++++++++++-----------------=
-
->  1 file changed, 41 insertions(+), 28 deletions(-)
+>  tests/docker/Makefile.include | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
 >=20
-Reviewed-by: Eric Blake <eblake@redhat.com>
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.incl=
+ude
+> index b20a810016..983224ad96 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -4,11 +4,10 @@
+> =20
+>  DOCKER_SUFFIX :=3D .docker
+>  DOCKER_FILES_DIR :=3D $(SRC_PATH)/tests/docker/dockerfiles
+> -DOCKER_DEPRECATED_IMAGES :=3D debian
+>  # we don't run tests on intermediate images (used as base by another i=
+mage)
+> -DOCKER_PARTIAL_IMAGES :=3D debian debian9 debian10 debian-sid
+> +DOCKER_PARTIAL_IMAGES :=3D debian9 debian10 debian-sid
+>  DOCKER_PARTIAL_IMAGES +=3D debian9-mxe debian-ports debian-bootstrap
+> -DOCKER_IMAGES :=3D $(filter-out $(DOCKER_DEPRECATED_IMAGES),$(sort $(n=
+otdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker)))))
+> +DOCKER_IMAGES :=3D $(sort $(notdir $(basename $(wildcard $(DOCKER_FILE=
+S_DIR)/*.docker))))
+>  DOCKER_TARGETS :=3D $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
+>  # Use a global constant ccache directory to speed up repetitive builds
+>  DOCKER_CCACHE_DIR :=3D $$HOME/.cache/qemu-docker-ccache
+> @@ -159,7 +158,7 @@ docker-image-debian-powerpc-user-cross: docker-binf=
+mt-image-debian-powerpc-user
+>  DOCKER_USER_IMAGES +=3D debian-powerpc-user
+> =20
+>  # Expand all the pre-requistes for each docker image and test combinat=
+ion
+> -$(foreach i,$(filter-out $(DOCKER_PARTIAL_IMAGES),$(DOCKER_IMAGES) $(D=
+OCKER_DEPRECATED_IMAGES)), \
+> +$(foreach i,$(filter-out $(DOCKER_PARTIAL_IMAGES),$(DOCKER_IMAGES)), \
+>  	$(foreach t,$(DOCKER_TESTS) $(DOCKER_TOOLS), \
+>  		$(eval .PHONY: docker-$t@$i) \
+>  		$(eval docker-$t@$i: docker-image-$i docker-run-$t@$i) \
+>=20
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---qAlyguDQa4LijQYLxFKQOl7gNiXVu1Kof--
-
---I5bCauHbQtKkNrr0cfzlwzbtZp73jQNse
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2KLXwACgkQp6FrSiUn
-Q2q2FAgAqjxVMnmTtx4OrhAAr6BWrqvjEp4VpSzQLHUBJKm/xocFL58t7VZoFc9k
-2djyD0aj0fMy4J7XOK7a6TiaS4pkR1SQePS9+8Um/HEUp4Oy0AC3n+402+AAURYm
-TzueuteZm6B+QERtIYxgMOtFVtwJTAHa3Y2jeYARsdWw17zZK+kfYu0AQ3ipa6/D
-aE6Og4uc/Zb3jj28wPm1dGrs9skQDyagBbVLkVWZidgTQvHMa+rK7n1umGPwRmGz
-ZL+dFjC5aO71HY9RjSme37x/K06xeyQw4PIl/OtyKELqYvHYZgNVyNIucXrH946k
-bTFQH+nfuewb+TZDs3XrEpZDJfNogg==
-=InqA
------END PGP SIGNATURE-----
-
---I5bCauHbQtKkNrr0cfzlwzbtZp73jQNse--
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
