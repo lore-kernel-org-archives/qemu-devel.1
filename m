@@ -6,56 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06962C432C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:14:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D0FFC432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:17:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0B492146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:14:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0B492146E
+	by mail.kernel.org (Postfix) with ESMTPS id 26CD7214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:17:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26CD7214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCkeQ-0002RV-S0
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:14:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50549)
+	id 1iCkhP-0004Sh-2l
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:17:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51566)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCk0o-0001K4-1r
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:52 -0400
+ (envelope-from <eblake@redhat.com>) id 1iCk6b-0006AF-4B
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:39:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCk0j-0006wt-Al
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48548)
+ (envelope-from <eblake@redhat.com>) id 1iCk6Z-000207-VW
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:39:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42256)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCk0i-0006uZ-JA
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:33:41 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iCk6X-0001ww-Ar; Tue, 24 Sep 2019 08:39:41 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9E7D7317528C
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 12:33:39 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 483EA608C2;
- Tue, 24 Sep 2019 12:33:39 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id CA97A1136421; Tue, 24 Sep 2019 14:33:34 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id A06913A17F;
+ Tue, 24 Sep 2019 12:39:40 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-249.phx2.redhat.com [10.3.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3FB9F60C63;
+ Tue, 24 Sep 2019 12:39:40 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 21/37] tests/qapi-schema: Demonstrate misleading optional tag
- error
-Date: Tue, 24 Sep 2019 14:33:18 +0200
-Message-Id: <20190924123334.30645-22-armbru@redhat.com>
-In-Reply-To: <20190924123334.30645-1-armbru@redhat.com>
-References: <20190924123334.30645-1-armbru@redhat.com>
+Subject: [PULL 4/4] tests: Use iothreads during iotest 223
+Date: Tue, 24 Sep 2019 07:39:33 -0500
+Message-Id: <20190924123933.10607-5-eblake@redhat.com>
+In-Reply-To: <20190924123933.10607-1-eblake@redhat.com>
+References: <20190924123933.10607-1-eblake@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Tue, 24 Sep 2019 12:33:39 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Tue, 24 Sep 2019 12:39:40 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -70,127 +66,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Test flat-union-optional-discriminator declares its union tag as
-'*switch': 'Enum', and points to it with 'discriminator': '*switch'.
-This gets rejected as "discriminator of flat union 'MyUnion' uses
-invalid name '*switch'".  Correct; member 'discriminator' doesn't
-accept a '*' prefix.
+Doing so catches the bugs we just fixed with NBD not properly using
+correct contexts.
 
-However, this merely tests name validity checking, which we already
-cover elsewhere.  More interesting is testing the valid name 'switch'.
-This reports "discriminator 'switch' is not a member of base struct
-'Base'", which is misleading.
-
-Copy the existing 'discriminator': '*switch' test to
-flat-union-discriminator-bad-name, and rewrite its comment.  Change
-flat-union-optional-discriminator to test 'discriminator': 'switch',
-and mark it FIXME.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20190914153506.2151-4-armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20190920220729.31801-1-eblake@redhat.com>
 ---
- tests/Makefile.include                                |  1 +
- .../qapi-schema/flat-union-discriminator-bad-name.err |  1 +
- .../flat-union-discriminator-bad-name.exit            |  1 +
- .../flat-union-discriminator-bad-name.json            | 11 +++++++++++
- .../qapi-schema/flat-union-discriminator-bad-name.out |  0
- .../qapi-schema/flat-union-optional-discriminator.err |  2 +-
- .../flat-union-optional-discriminator.json            |  3 ++-
- 7 files changed, 17 insertions(+), 2 deletions(-)
- create mode 100644 tests/qapi-schema/flat-union-discriminator-bad-name.e=
-rr
- create mode 100644 tests/qapi-schema/flat-union-discriminator-bad-name.e=
-xit
- create mode 100644 tests/qapi-schema/flat-union-discriminator-bad-name.j=
-son
- create mode 100644 tests/qapi-schema/flat-union-discriminator-bad-name.o=
-ut
+ tests/qemu-iotests/223     | 6 ++++--
+ tests/qemu-iotests/223.out | 1 +
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 0c862dbc42..7553616069 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -388,6 +388,7 @@ qapi-schema +=3D flat-union-bad-discriminator.json
- qapi-schema +=3D flat-union-base-any.json
- qapi-schema +=3D flat-union-base-union.json
- qapi-schema +=3D flat-union-clash-member.json
-+qapi-schema +=3D flat-union-discriminator-bad-name.json
- qapi-schema +=3D flat-union-empty.json
- qapi-schema +=3D flat-union-inline.json
- qapi-schema +=3D flat-union-inline-invalid-dict.json
-diff --git a/tests/qapi-schema/flat-union-discriminator-bad-name.err b/te=
-sts/qapi-schema/flat-union-discriminator-bad-name.err
-new file mode 100644
-index 0000000000..7238d126ca
---- /dev/null
-+++ b/tests/qapi-schema/flat-union-discriminator-bad-name.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/flat-union-discriminator-bad-name.json:7: Discriminato=
-r of flat union 'MyUnion' does not allow optional name '*switch'
-diff --git a/tests/qapi-schema/flat-union-discriminator-bad-name.exit b/t=
-ests/qapi-schema/flat-union-discriminator-bad-name.exit
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/flat-union-discriminator-bad-name.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/flat-union-discriminator-bad-name.json b/t=
-ests/qapi-schema/flat-union-discriminator-bad-name.json
-new file mode 100644
-index 0000000000..66376084fc
---- /dev/null
-+++ b/tests/qapi-schema/flat-union-discriminator-bad-name.json
-@@ -0,0 +1,11 @@
-+# discriminator '*switch' isn't a member of base, 'switch' is
-+# reports "does not allow optional name", which is good enough
-+{ 'enum': 'Enum', 'data': [ 'one', 'two' ] }
-+{ 'struct': 'Base',
-+  'data': { '*switch': 'Enum' } }
-+{ 'struct': 'Branch', 'data': { 'name': 'str' } }
-+{ 'union': 'MyUnion',
-+  'base': 'Base',
-+  'discriminator': '*switch',
-+  'data': { 'one': 'Branch',
-+            'two': 'Branch' } }
-diff --git a/tests/qapi-schema/flat-union-discriminator-bad-name.out b/te=
-sts/qapi-schema/flat-union-discriminator-bad-name.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/flat-union-optional-discriminator.err b/te=
-sts/qapi-schema/flat-union-optional-discriminator.err
-index aaabedb3bd..8b4a4ba847 100644
---- a/tests/qapi-schema/flat-union-optional-discriminator.err
-+++ b/tests/qapi-schema/flat-union-optional-discriminator.err
-@@ -1 +1 @@
--tests/qapi-schema/flat-union-optional-discriminator.json:6: Discriminato=
-r of flat union 'MyUnion' does not allow optional name '*switch'
-+tests/qapi-schema/flat-union-optional-discriminator.json:7: Discriminato=
-r 'switch' is not a member of base struct 'Base'
-diff --git a/tests/qapi-schema/flat-union-optional-discriminator.json b/t=
-ests/qapi-schema/flat-union-optional-discriminator.json
-index 08a8f7ef8b..143ab23a0d 100644
---- a/tests/qapi-schema/flat-union-optional-discriminator.json
-+++ b/tests/qapi-schema/flat-union-optional-discriminator.json
-@@ -1,10 +1,11 @@
- # we require the discriminator to be non-optional
-+# FIXME reports "discriminator 'switch' is not a member of base struct '=
-Base'"
- { 'enum': 'Enum', 'data': [ 'one', 'two' ] }
- { 'struct': 'Base',
-   'data': { '*switch': 'Enum' } }
- { 'struct': 'Branch', 'data': { 'name': 'str' } }
- { 'union': 'MyUnion',
-   'base': 'Base',
--  'discriminator': '*switch',
-+  'discriminator': 'switch',
-   'data': { 'one': 'Branch',
-             'two': 'Branch' } }
+diff --git a/tests/qemu-iotests/223 b/tests/qemu-iotests/223
+index cc48e78ea7dc..2ba3d8124b4f 100755
+--- a/tests/qemu-iotests/223
++++ b/tests/qemu-iotests/223
+@@ -2,7 +2,7 @@
+ #
+ # Test reading dirty bitmap over NBD
+ #
+-# Copyright (C) 2018 Red Hat, Inc.
++# Copyright (C) 2018-2019 Red Hat, Inc.
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+@@ -109,7 +109,7 @@ echo
+ echo "=3D=3D=3D End dirty bitmaps, and start serving image over NBD =3D=3D=
+=3D"
+ echo
+
+-_launch_qemu 2> >(_filter_nbd)
++_launch_qemu -object iothread,id=3Dio0 2> >(_filter_nbd)
+
+ # Intentionally provoke some errors as well, to check error handling
+ silent=3D
+@@ -117,6 +117,8 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"qmp_capabili=
+ties"}' "return"
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"blockdev-add",
+   "arguments":{"driver":"qcow2", "node-name":"n",
+     "file":{"driver":"file", "filename":"'"$TEST_IMG"'"}}}' "return"
++_send_qemu_cmd $QEMU_HANDLE '{"execute":"x-blockdev-set-iothread",
++  "arguments":{"node-name":"n", "iothread":"io0"}}' "return"
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"block-dirty-bitmap-disable",
+   "arguments":{"node":"n", "name":"b"}}' "return"
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
+diff --git a/tests/qemu-iotests/223.out b/tests/qemu-iotests/223.out
+index 5d00398c11cb..23b34fcd202e 100644
+--- a/tests/qemu-iotests/223.out
++++ b/tests/qemu-iotests/223.out
+@@ -27,6 +27,7 @@ wrote 2097152/2097152 bytes at offset 2097152
+ {"return": {}}
+ {"return": {}}
+ {"return": {}}
++{"return": {}}
+ {"error": {"class": "GenericError", "desc": "NBD server not running"}}
+ {"return": {}}
+ {"error": {"class": "GenericError", "desc": "NBD server already running"=
+}}
 --=20
 2.21.0
 
