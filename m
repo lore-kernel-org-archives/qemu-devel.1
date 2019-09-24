@@ -2,62 +2,80 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB594C432C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:41:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 767E5C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:42:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C256920640
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:41:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C256920640
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 41D5A20640
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:42:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="Mt1L0BJ8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41D5A20640
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCm0d-0001n9-31
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 10:41:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58742)
+	id 1iCm0t-0001sY-Si
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 10:41:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39904)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCkrz-0000Cu-FT
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:50 -0400
+ (envelope-from <zhlb29@foxmail.com>) id 1iCllH-0003aG-8R
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:25:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCkrt-0001Rk-Qc
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33498)
+ (envelope-from <zhlb29@foxmail.com>) id 1iCll8-00069P-3V
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:25:42 -0400
+Received: from smtpbg515.qq.com ([203.205.250.53]:38435 helo=smtpbg.qq.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCkrt-0001Qv-Ab
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:37 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8925C116BB22;
- Tue, 24 Sep 2019 13:28:36 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2BC6219C6A;
- Tue, 24 Sep 2019 13:28:36 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 724F611385FD; Tue, 24 Sep 2019 15:28:30 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 07/25] qapi: Improve reporting of member name clashes
-Date: Tue, 24 Sep 2019 15:28:12 +0200
-Message-Id: <20190924132830.15835-8-armbru@redhat.com>
-In-Reply-To: <20190924132830.15835-1-armbru@redhat.com>
-References: <20190924132830.15835-1-armbru@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Tue, 24 Sep 2019 13:28:36 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+ (Exim 4.71) (envelope-from <zhlb29@foxmail.com>) id 1iCll6-00062e-JD
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 10:25:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+ s=s201512; t=1569335131;
+ bh=Cfr5PYtJn5Bfp4nsdpS2qrV4WaGK5oiw2LV9n73vTE8=;
+ h=From:To:Subject:Mime-Version:Date:Message-ID;
+ b=Mt1L0BJ8ctRkEnbgNTDi2xtF3S8x4QPY2JtYiwtFYTxX7LLKbhqtmxaJs26n8RUhg
+ 7Jap+iv890VfVZMpbg8FF32acSdRv7tUsUUnvuKT9Bq83W2OKHTfORO4OPUsez7Yfd
+ h+5iT2r9R6dE+hUpX7ItRGiq1KpZlOeqrBbWWryw=
+X-QQ-SSF: 00000000000000F000000000000000G
+X-HAS-ATTACH: no
+X-QQ-BUSINESS-ORIGIN: 2
+X-Originating-IP: 221.221.97.28
+In-Reply-To: <b4bc1f35-817d-79a0-df4d-07eaa2fdffe5@redhat.com>
+References: <tencent_28AAA62B694825C348B1DF49@qq.com>
+ <CAFEAcA8+bK0UyUWbXOiutyQZkCMSB_0Be7pJLKONSpA3CV9Pbw@mail.gmail.com>
+ <tencent_0084E0586ADE9B2D30176A53@qq.com>
+ <tencent_6A42D8651281588C41FEE751@qq.com>
+ <tencent_6DB0EBDC4C098868592B8A79@qq.com>
+ <b4bc1f35-817d-79a0-df4d-07eaa2fdffe5@redhat.com>
+X-QQ-STYLE: 
+X-QQ-mid: webenglish1t1569334484t569226
+From: "=?ISO-8859-1?B?TGlibyBaaG91?=" <zhlb29@foxmail.com>
+To: "=?ISO-8859-1?B?UGhpbGlwcGUgTWF0aGlldS1EYXVk?=" <philmd@redhat.com>,
+ "=?ISO-8859-1?B?UGV0ZXIgTWF5ZGVsbA==?=" <peter.maydell@linaro.org>
+Subject: Re: illegal hardware instruction during MIPS-I ELF linuxuseremulation
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: base64
+Date: Tue, 24 Sep 2019 22:14:44 +0800
+X-Priority: 3
+Message-ID: <tencent_27BC7EC25610890B701F563B@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+X-QQ-ReplyHash: 3007157609
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
+ id ; Tue, 24 Sep 2019 22:14:45 +0800 (CST)
+Feedback-ID: webenglish:foxmail.com:bgweb:bgweb4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 203.205.250.53
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,217 +87,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: =?ISO-8859-1?B?cWVtdS1kZXZlbA==?= <qemu-devel@nongnu.org>,
+ =?ISO-8859-1?B?QWxla3NhbmRhciBNYXJrb3ZpYw==?= <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We report name clashes like this:
-
-    struct-base-clash.json: In struct 'Sub':
-    struct-base-clash.json:5: 'name' (member of Sub) collides with 'name'=
- (member of Base)
-
-The "(member of Sub)" is redundant with "In struct 'Sub'".  Comes from
-QAPISchemaMember.describe().  Pass info to it, so it can detect the
-redundancy and avoid it.  Result:
-
-    struct-base-clash.json: In struct 'Sub':
-    struct-base-clash.json:5: member 'name' collides with member 'name' o=
-f type 'Base'
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- scripts/qapi/common.py                        | 35 ++++++++++++-------
- tests/qapi-schema/alternate-clash.err         |  2 +-
- tests/qapi-schema/args-name-clash.err         |  2 +-
- tests/qapi-schema/enum-clash-member.err       |  2 +-
- tests/qapi-schema/features-duplicate-name.err |  2 +-
- tests/qapi-schema/flat-union-bad-base.err     |  2 +-
- tests/qapi-schema/flat-union-clash-member.err |  2 +-
- tests/qapi-schema/struct-base-clash-deep.err  |  2 +-
- tests/qapi-schema/struct-base-clash.err       |  2 +-
- tests/qapi-schema/union-clash-branches.err    |  2 +-
- 10 files changed, 31 insertions(+), 22 deletions(-)
-
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 23f1c8eece..749490c517 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -1570,31 +1570,40 @@ class QAPISchemaMember(object):
-     def check_clash(self, info, seen):
-         cname =3D c_name(self.name)
-         if cname in seen:
--            raise QAPISemError(info, "%s collides with %s" %
--                               (self.describe(), seen[cname].describe())=
-)
-+            raise QAPISemError(
-+                info, "%s collides with %s"
-+                % (self.describe(info), seen[cname].describe(info)))
-         seen[cname] =3D self
-=20
--    def _pretty_defined_in(self):
-+    def describe(self, info):
-+        role =3D self.role
-         defined_in =3D self.defined_in
-+        assert defined_in
-+
-         if defined_in.startswith('q_obj_'):
-             # See QAPISchema._make_implicit_object_type() - reverse the
-             # mapping there to create a nice human-readable description
-             defined_in =3D defined_in[6:]
-             if defined_in.endswith('-arg'):
--                return '(parameter of %s)' % defined_in[:-4]
-+                # Implicit type created for a command's dict 'data'
-+                assert role =3D=3D 'member'
-+                role =3D 'parameter'
-             elif defined_in.endswith('-base'):
--                return '(base of %s)' % defined_in[:-5]
-+                # Implicit type created for a flat union's dict 'base'
-+                role =3D 'base ' + role
-             else:
-+                # Implicit type created for a simple union's branch
-                 assert defined_in.endswith('-wrapper')
-                 # Unreachable and not implemented
-                 assert False
--        if defined_in.endswith('Kind'):
-+        elif defined_in.endswith('Kind'):
-             # See QAPISchema._make_implicit_enum_type()
--            return '(branch of %s)' % defined_in[:-4]
--        return '(%s of %s)' % (self.role, defined_in)
--
--    def describe(self):
--        return "'%s' %s" % (self.name, self._pretty_defined_in())
-+            # Implicit enum created for simple union's branches
-+            assert role =3D=3D 'value'
-+            role =3D 'branch'
-+        elif defined_in !=3D info.defn_name:
-+            return "%s '%s' of type '%s'" % (role, self.name, defined_in=
-)
-+        return "%s '%s'" % (role, self.name)
-=20
-=20
- class QAPISchemaEnumMember(QAPISchemaMember):
-@@ -1866,7 +1875,7 @@ class QAPISchema(object):
-                 for v in values]
-=20
-     def _make_implicit_enum_type(self, name, info, ifcond, values):
--        # See also QAPISchemaObjectTypeMember._pretty_defined_in()
-+        # See also QAPISchemaObjectTypeMember.describe()
-         name =3D name + 'Kind'   # Use namespace reserved by add_name()
-         self._def_entity(QAPISchemaEnumType(
-             name, info, None, ifcond, self._make_enum_members(values), N=
-one))
-@@ -1882,7 +1891,7 @@ class QAPISchema(object):
-                                    role, members):
-         if not members:
-             return None
--        # See also QAPISchemaObjectTypeMember._pretty_defined_in()
-+        # See also QAPISchemaObjectTypeMember.describe()
-         name =3D 'q_obj_%s-%s' % (name, role)
-         typ =3D self.lookup_entity(name, QAPISchemaObjectType)
-         if typ:
-diff --git a/tests/qapi-schema/alternate-clash.err b/tests/qapi-schema/al=
-ternate-clash.err
-index 426ff6a7c4..73a52d69d1 100644
---- a/tests/qapi-schema/alternate-clash.err
-+++ b/tests/qapi-schema/alternate-clash.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/alternate-clash.json: In alternate 'Alt1':
--tests/qapi-schema/alternate-clash.json:7: 'a_b' (branch of Alt1) collide=
-s with 'a-b' (branch of Alt1)
-+tests/qapi-schema/alternate-clash.json:7: branch 'a_b' collides with bra=
-nch 'a-b'
-diff --git a/tests/qapi-schema/args-name-clash.err b/tests/qapi-schema/ar=
-gs-name-clash.err
-index eeb4e1b4dd..c5916a80fb 100644
---- a/tests/qapi-schema/args-name-clash.err
-+++ b/tests/qapi-schema/args-name-clash.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/args-name-clash.json: In command 'oops':
--tests/qapi-schema/args-name-clash.json:4: 'a_b' (parameter of oops) coll=
-ides with 'a-b' (parameter of oops)
-+tests/qapi-schema/args-name-clash.json:4: parameter 'a_b' collides with =
-parameter 'a-b'
-diff --git a/tests/qapi-schema/enum-clash-member.err b/tests/qapi-schema/=
-enum-clash-member.err
-index 26944f5e06..84e02db82c 100644
---- a/tests/qapi-schema/enum-clash-member.err
-+++ b/tests/qapi-schema/enum-clash-member.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/enum-clash-member.json: In enum 'MyEnum':
--tests/qapi-schema/enum-clash-member.json:2: 'one_two' (value of MyEnum) =
-collides with 'one-two' (value of MyEnum)
-+tests/qapi-schema/enum-clash-member.json:2: value 'one_two' collides wit=
-h value 'one-two'
-diff --git a/tests/qapi-schema/features-duplicate-name.err b/tests/qapi-s=
-chema/features-duplicate-name.err
-index 0ebec8e4b0..a99bbde737 100644
---- a/tests/qapi-schema/features-duplicate-name.err
-+++ b/tests/qapi-schema/features-duplicate-name.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/features-duplicate-name.json: In struct 'FeatureStruct=
-0':
--tests/qapi-schema/features-duplicate-name.json:1: 'foo' (feature of Feat=
-ureStruct0) collides with 'foo' (feature of FeatureStruct0)
-+tests/qapi-schema/features-duplicate-name.json:1: feature 'foo' collides=
- with feature 'foo'
-diff --git a/tests/qapi-schema/flat-union-bad-base.err b/tests/qapi-schem=
-a/flat-union-bad-base.err
-index ae8adc3947..5da7602c20 100644
---- a/tests/qapi-schema/flat-union-bad-base.err
-+++ b/tests/qapi-schema/flat-union-bad-base.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/flat-union-bad-base.json: In union 'TestUnion':
--tests/qapi-schema/flat-union-bad-base.json:8: 'string' (member of TestTy=
-peA) collides with 'string' (base of TestUnion)
-+tests/qapi-schema/flat-union-bad-base.json:8: member 'string' of type 'T=
-estTypeA' collides with base member 'string'
-diff --git a/tests/qapi-schema/flat-union-clash-member.err b/tests/qapi-s=
-chema/flat-union-clash-member.err
-index 48e939db19..40f10681f8 100644
---- a/tests/qapi-schema/flat-union-clash-member.err
-+++ b/tests/qapi-schema/flat-union-clash-member.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/flat-union-clash-member.json: In union 'TestUnion':
--tests/qapi-schema/flat-union-clash-member.json:11: 'name' (member of Bra=
-nch1) collides with 'name' (member of Base)
-+tests/qapi-schema/flat-union-clash-member.json:11: member 'name' of type=
- 'Branch1' collides with member 'name' of type 'Base'
-diff --git a/tests/qapi-schema/struct-base-clash-deep.err b/tests/qapi-sc=
-hema/struct-base-clash-deep.err
-index 53e9bb108e..2b12b3c07f 100644
---- a/tests/qapi-schema/struct-base-clash-deep.err
-+++ b/tests/qapi-schema/struct-base-clash-deep.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/struct-base-clash-deep.json: In struct 'Sub':
--tests/qapi-schema/struct-base-clash-deep.json:10: 'name' (member of Sub)=
- collides with 'name' (member of Base)
-+tests/qapi-schema/struct-base-clash-deep.json:10: member 'name' collides=
- with member 'name' of type 'Base'
-diff --git a/tests/qapi-schema/struct-base-clash.err b/tests/qapi-schema/=
-struct-base-clash.err
-index bf94eee8b3..8c3ee1c435 100644
---- a/tests/qapi-schema/struct-base-clash.err
-+++ b/tests/qapi-schema/struct-base-clash.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/struct-base-clash.json: In struct 'Sub':
--tests/qapi-schema/struct-base-clash.json:5: 'name' (member of Sub) colli=
-des with 'name' (member of Base)
-+tests/qapi-schema/struct-base-clash.json:5: member 'name' collides with =
-member 'name' of type 'Base'
-diff --git a/tests/qapi-schema/union-clash-branches.err b/tests/qapi-sche=
-ma/union-clash-branches.err
-index 145efebd9f..931399f076 100644
---- a/tests/qapi-schema/union-clash-branches.err
-+++ b/tests/qapi-schema/union-clash-branches.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/union-clash-branches.json: In union 'TestUnion':
--tests/qapi-schema/union-clash-branches.json:4: 'a_b' (branch of TestUnio=
-n) collides with 'a-b' (branch of TestUnion)
-+tests/qapi-schema/union-clash-branches.json:4: branch 'a_b' collides wit=
-h branch 'a-b'
---=20
-2.21.0
+PiA+IE1vcmUgdXBkYXRlcyBhYm91dCB0aGlzLiBJIGp1c3QgZGlzYXNzZW1ibGVkIHRoZSB1
+bnJlY29nbml6ZWQgaGV4IGJ5IGhhbmQsIGFuZCBmaWd1cmVkIG91dCB0aGF0IHRoZSBzdG9y
+ZSB3b3JkIGFuZCBsb2FkIHdvcmQgb3Bjb2RlcyBhcmUgbm90IHRoZSBzYW1lIGFzIHNwZWNp
+ZmllZCBpbiB0cmFuc2xhdGUuYy4gV2hpbGUgdGhlIHJlbWFpbmluZyBmaWVsZHMgb2YgdGhv
+c2UgdW5yZWNvZ25pemVkIGluc3RydWN0aW9ucyBkbyBtYXRjaCB3aXRoIHRoZSBzb3VyY2Ug
+YW5kIGRlc3RpbmF0aW9uIHJlZ2lzdGVycy4KCj4gV2hhdCBpcyB5b3VyIGNvbXBpbGVyL2Fz
+c2VtYmxlciB2ZXJzaW9ucyAob24gYm90aCBtYWNoaW5lcyB5b3UgdXNlZCk/CgpJIGRvbid0
+IGhhdmUgYWNjZXNzIHRvIHRoZSBtYWNoaW5lIGZvciBub3cgYW5kIEkgbWF5IG5vdCByZW1l
+bWJlciB0aGUgZXhhY3QgdmVyc2lvbiBudW1iZXJzLgoKVGhlIGNyb3NzIGNvbXBpbGVyIEkg
+dXNlZCBpcyBhIGN1c3RvbSBjb21waWxlciBiYXNlZCBvbiBnY2MgNC40LjAgKHZhZ3VlbHkg
+cmVtZW1iZXIpLiBJdCBnZW5lcmF0ZWQgTUlQUy1JIGNvZGUgdGhhdCBkaWRuJ3Qgd29yayBv
+biBRRU1VLiBTcGVjaWZpY2FsbHkgc29tZSBnZW5lcmF0ZWQgb3Bjb2RlcyBkaWRuJ3QgbWF0
+Y2ggdGhvc2UgaW4gdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmMuIEhvd2V2ZXIsIEkganVzdCBj
+aGVja2VkIFdpa2lwZWRpYSdzIE1JUFMtSSBvcGNvZGUgdGFibGUgYW5kIEkgdGhpbmsgUUVN
+VSBpbXBsZW1lbnRzIGl0IGNvcnJlY3RseS4gVGhlIHNpbmdsZSBhbmQgZG91YmxlIGZsb2F0
+aW5nIHBvaW50IG9wY29kZSBsb29rZWQgYSBsaXR0bGUgb2ZmIGZvciBtZSB0aG91Z2gsIGJ1
+dCBJIGRpZG4ndCB1c2UgRlAgb3BzIGluIG15IGNhc2UuCgpPbiBteSBvd24gUEMgSSB1c2Vk
+IG1pcHNlbC1saW51eC1nbnUtZ2NjIHZlcnNpb24gNy40LjAuIEl0IGp1c3Qgd29ya2VkIGZp
+bmUgb24gUUVNVS4=
 
 
