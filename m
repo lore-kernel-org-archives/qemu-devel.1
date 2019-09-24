@@ -2,63 +2,74 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB72C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:13:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61821C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:13:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51DC62146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:13:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51DC62146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0678A214AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 13:13:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0678A214AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cloudbasesolutions.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCkcz-0000ln-Lq
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:13:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51552)
+	id 1iCkd7-0000ws-5O
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 09:13:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38056)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iCk6a-00068o-3O
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:39:45 -0400
+ (envelope-from <bounces@canonical.com>) id 1iCiTx-0004p5-Bs
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 06:55:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iCk6Y-0001zY-OQ
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 08:39:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58918)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iCk6W-0001vh-3U; Tue, 24 Sep 2019 08:39:40 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6274930B2502;
- Tue, 24 Sep 2019 12:39:39 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-116-249.phx2.redhat.com [10.3.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 979BD60BFB;
- Tue, 24 Sep 2019 12:39:36 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 2/4] nbd/server: attach client channel to the export's
- AioContext
-Date: Tue, 24 Sep 2019 07:39:31 -0500
-Message-Id: <20190924123933.10607-3-eblake@redhat.com>
-In-Reply-To: <20190924123933.10607-1-eblake@redhat.com>
-References: <20190924123933.10607-1-eblake@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1iCiTt-00069O-NQ
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 06:55:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47222)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iCiTt-00068M-EX
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 06:55:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iCiTr-000555-TU
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 10:55:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id DD5662E806E
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 10:55:39 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Tue, 24 Sep 2019 12:39:39 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Tue, 24 Sep 2019 10:48:42 -0000
+From: Adrian Vladu <avladu@cloudbasesolutions.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: avladu
+X-Launchpad-Bug-Reporter: Adrian Vladu (avladu)
+X-Launchpad-Bug-Modifier: Adrian Vladu (avladu)
+Message-Id: <156932212305.13447.6077258015607645915.malonedeb@gac.canonical.com>
+Subject: [Bug 1845185] [NEW] Cannot build qemu utils (qemu-img.exe,
+ qemu-edid.exe,
+ qemu-io.exe) statically with MSYS2 on Windows because intl and iconv libs are
+ not loaded
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19048";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 19cc770427a9163f551e3c427de812fff3f6675b
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-Received-From: 91.189.90.7
+X-Mailman-Approved-At: Tue, 24 Sep 2019 09:10:43 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -67,55 +78,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:Network Block Dev..." <qemu-block@nongnu.org>,
- Sergio Lopez <slp@redhat.com>
+Reply-To: Bug 1845185 <1845185@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sergio Lopez <slp@redhat.com>
+Public bug reported:
 
-On creation, the export's AioContext is set to the same one as the
-BlockBackend, while the AioContext in the client QIOChannel is left
-untouched.
+Using MSYS2 and mingw32 instructions from
+https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2, I could not
+statically build the qemu-utils using the latest qemu master branch.
 
-As a result, when using data-plane, nbd_client_receive_next_request()
-schedules coroutines in the IOThread AioContext, while the client's
-QIOChannel is serviced from the main_loop, potentially triggering the
-assertion at qio_channel_restart_[read|write].
+Steps to reproduce the issue:
+1. Install MSYS2 on a Windows 10 x64 box
+2. Install required mingw64 toolchain: pacman -S base-devel mingw-w64-x86_6=
+4-toolchain git python mingw-w64-x86_64-glib2 mingw64/mingw-w64-x86_64-gtk3=
+ mingw64/mingw-w64-x86_64-SDL2
+3. clone qemu
+4. Run configure for static build for the tools only
+=C2=A0=C2=A0./configure --disable-user --disable-system --disable-docs --en=
+able-tools  --disable-guest-agent --disable-capstone --disable-sheepdog --e=
+nable-debug --static
+=C2=A0=C2=A0# I had to remove sheepdog, capstone and guest agent because ot=
+her errors popped out, but let's not go in the rabbit hole.
+5. Run 'make -j'. the following errors appeared, signaling that intl lib is=
+ not loaded. If I add intl lib, iconv lib needs to be loaded too.
 
-To fix this, as soon we have the export corresponding to the client,
-we call qio_channel_attach_aio_context() to attach the QIOChannel
-context to the export's AioContext. This matches with the logic at
-blk_aio_attached().
+make: *** [/home/ader1990/qemu/rules.mak:124: qemu-img.exe] Error 1
+make: *** Waiting for unfinished jobs....
+C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1522): undefi=
+ned reference to `libintl_sprintf'
+C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x154f): undefi=
+ned reference to `libintl_sprintf'
+C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x157e): undefi=
+ned reference to `libintl_sprintf'
+C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15ad): undefi=
+ned reference to `libintl_sprintf'
+C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15dc): undefi=
+ned reference to `libintl_sprintf'
+C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1622): more u=
+ndefined references to `libintl_sprintf' follow
+C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x43): undefine=
+d reference to `libintl_textdomain'
+C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x52): undefine=
+d reference to `libintl_gettext'
+C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x203): undefin=
+ed reference to `libintl_bindtextdomain'
+C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x21e): undefin=
+ed reference to `libintl_bind_textdomain_codeset'
+C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x2c1): undefin=
+ed reference to `libintl_dgettext'
+C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x4e1): undefin=
+ed reference to `libintl_dcgettext'
+C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x53a): undefin=
+ed reference to `libintl_dngettext'
 
-RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=3D1748253
-Signed-off-by: Sergio Lopez <slp@redhat.com>
-Message-Id: <20190912110032.26395-1-slp@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- nbd/server.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Patch to fix the issue (added intl and iconv to the libs):
 
-diff --git a/nbd/server.c b/nbd/server.c
-index 28c3c8be854c..31d624e146cb 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1297,6 +1297,11 @@ static coroutine_fn int nbd_negotiate(NBDClient *c=
-lient, Error **errp)
-         return ret;
-     }
+diff --git a/configure b/configure
+index 30aad233d1..e2ab8ef026 100755
+--- a/configure
++++ b/configure
+@@ -920,7 +920,7 @@ if test "$mingw32" =3D "yes" ; then
+=C2=A0=C2=A0=C2=A0DSOSUF=3D".dll"
+=C2=A0=C2=A0=C2=A0# MinGW needs -mthreads for TLS and macro _MT.
+=C2=A0=C2=A0=C2=A0QEMU_CFLAGS=3D"-mthreads $QEMU_CFLAGS"
+-  LIBS=3D"-lwinmm -lws2_32 -liphlpapi $LIBS"
++  LIBS=3D"-lwinmm -lws2_32 -liphlpapi -lintl -liconv $LIBS"
+=C2=A0=C2=A0=C2=A0write_c_skeleton;
+=C2=A0=C2=A0=C2=A0if compile_prog "" "-liberty" ; then
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0LIBS=3D"-liberty $LIBS"
 
-+    /* Attach the channel to the same AioContext as the export */
-+    if (client->exp && client->exp->ctx) {
-+        qio_channel_attach_aio_context(client->ioc, client->exp->ctx);
-+    }
-+
-     assert(!client->optlen);
-     trace_nbd_negotiate_success();
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
---=20
-2.21.0
+** Description changed:
 
+  Using MSYS2 and mingw32 instructions from
+  https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2, I could not
+  statically build the qemu-utils using the latest qemu master branch.
+  =
+
+  Steps to reproduce the issue:
+  1. Install MSYS2 on a Windows 10 x64 box
+  2. Install required mingw64 toolchain: pacman -S base-devel mingw-w64-x86=
+_64-toolchain git python mingw-w64-x86_64-glib2 mingw64/mingw-w64-x86_64-gt=
+k3 mingw64/mingw-w64-x86_64-SDL2
+  3. clone qemu
+  4. Run configure for static build for the tools only
+-   ./configure --disable-user --disable-system --disable-docs --enable-too=
+ls  --disable-guest-agent --disable-capstone --disable-sheepdog --enable-de=
+bug --static
+-   # I had to remove sheepdog, capstone and guest agent because other erro=
+rs popped out, but this not the purpose of this bug report
+- 5. Run 'make -j'. the following errors appeared, signaling that intl lib =
+is not loaded. If I add intl lib, iconv lib need to be loaded too.
++ =C2=A0=C2=A0./configure --disable-user --disable-system --disable-docs --=
+enable-tools  --disable-guest-agent --disable-capstone --disable-sheepdog -=
+-enable-debug --static
++ =C2=A0=C2=A0# I had to remove sheepdog, capstone and guest agent because =
+other errors popped out, but let's not go in the rabbit hole.
++ 5. Run 'make -j'. the following errors appeared, signaling that intl lib =
+is not loaded. If I add intl lib, iconv lib needs to be loaded too.
+  =
+
+  make: *** [/home/ader1990/qemu/rules.mak:124: qemu-img.exe] Error 1
+  make: *** Waiting for unfinished jobs....
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1522): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x154f): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x157e): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15ad): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15dc): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1622): more=
+ undefined references to `libintl_sprintf' follow
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x43): undefi=
+ned reference to `libintl_textdomain'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x52): undefi=
+ned reference to `libintl_gettext'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x203): undef=
+ined reference to `libintl_bindtextdomain'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x21e): undef=
+ined reference to `libintl_bind_textdomain_codeset'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x2c1): undef=
+ined reference to `libintl_dgettext'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x4e1): undef=
+ined reference to `libintl_dcgettext'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x53a): undef=
+ined reference to `libintl_dngettext'
+  =
+
+- =
+
+  Patch to fix the issue (added intl and iconv to the libs):
+  =
+
+  diff --git a/configure b/configure
+  index 30aad233d1..e2ab8ef026 100755
+  --- a/configure
+  +++ b/configure
+  @@ -920,7 +920,7 @@ if test "$mingw32" =3D "yes" ; then
+-    DSOSUF=3D".dll"
+-    # MinGW needs -mthreads for TLS and macro _MT.
+-    QEMU_CFLAGS=3D"-mthreads $QEMU_CFLAGS"
++ =C2=A0=C2=A0=C2=A0DSOSUF=3D".dll"
++ =C2=A0=C2=A0=C2=A0# MinGW needs -mthreads for TLS and macro _MT.
++ =C2=A0=C2=A0=C2=A0QEMU_CFLAGS=3D"-mthreads $QEMU_CFLAGS"
+  -  LIBS=3D"-lwinmm -lws2_32 -liphlpapi $LIBS"
+  +  LIBS=3D"-lwinmm -lws2_32 -liphlpapi -lintl -liconv $LIBS"
+-    write_c_skeleton;
+-    if compile_prog "" "-liberty" ; then
+-      LIBS=3D"-liberty $LIBS"
++ =C2=A0=C2=A0=C2=A0write_c_skeleton;
++ =C2=A0=C2=A0=C2=A0if compile_prog "" "-liberty" ; then
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0LIBS=3D"-liberty $LIBS"
+
+** Summary changed:
+
+- Cannot build qemu utils (qemu-img.exe, qemu-edid.exe, qemu-io.exe) static=
+ally with MSYS2 on Windows
++ Cannot build qemu utils (qemu-img.exe, qemu-edid.exe, qemu-io.exe) static=
+ally with MSYS2 on Windows because intl and iconv libs are not loaded
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1845185
+
+Title:
+  Cannot build qemu utils (qemu-img.exe, qemu-edid.exe, qemu-io.exe)
+  statically with MSYS2 on Windows because intl and iconv libs are not
+  loaded
+
+Status in QEMU:
+  New
+
+Bug description:
+  Using MSYS2 and mingw32 instructions from
+  https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2, I could not
+  statically build the qemu-utils using the latest qemu master branch.
+
+  Steps to reproduce the issue:
+  1. Install MSYS2 on a Windows 10 x64 box
+  2. Install required mingw64 toolchain: pacman -S base-devel mingw-w64-x86=
+_64-toolchain git python mingw-w64-x86_64-glib2 mingw64/mingw-w64-x86_64-gt=
+k3 mingw64/mingw-w64-x86_64-SDL2
+  3. clone qemu
+  4. Run configure for static build for the tools only
+  =C2=A0=C2=A0./configure --disable-user --disable-system --disable-docs --=
+enable-tools  --disable-guest-agent --disable-capstone --disable-sheepdog -=
+-enable-debug --static
+  =C2=A0=C2=A0# I had to remove sheepdog, capstone and guest agent because =
+other errors popped out, but let's not go in the rabbit hole.
+  5. Run 'make -j'. the following errors appeared, signaling that intl lib =
+is not loaded. If I add intl lib, iconv lib needs to be loaded too.
+
+  make: *** [/home/ader1990/qemu/rules.mak:124: qemu-img.exe] Error 1
+  make: *** Waiting for unfinished jobs....
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1522): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x154f): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x157e): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15ad): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15dc): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1622): more=
+ undefined references to `libintl_sprintf' follow
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x43): undefi=
+ned reference to `libintl_textdomain'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x52): undefi=
+ned reference to `libintl_gettext'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x203): undef=
+ined reference to `libintl_bindtextdomain'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x21e): undef=
+ined reference to `libintl_bind_textdomain_codeset'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x2c1): undef=
+ined reference to `libintl_dgettext'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x4e1): undef=
+ined reference to `libintl_dcgettext'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x53a): undef=
+ined reference to `libintl_dngettext'
+
+  Patch to fix the issue (added intl and iconv to the libs):
+
+  diff --git a/configure b/configure
+  index 30aad233d1..e2ab8ef026 100755
+  --- a/configure
+  +++ b/configure
+  @@ -920,7 +920,7 @@ if test "$mingw32" =3D "yes" ; then
+  =C2=A0=C2=A0=C2=A0DSOSUF=3D".dll"
+  =C2=A0=C2=A0=C2=A0# MinGW needs -mthreads for TLS and macro _MT.
+  =C2=A0=C2=A0=C2=A0QEMU_CFLAGS=3D"-mthreads $QEMU_CFLAGS"
+  -  LIBS=3D"-lwinmm -lws2_32 -liphlpapi $LIBS"
+  +  LIBS=3D"-lwinmm -lws2_32 -liphlpapi -lintl -liconv $LIBS"
+  =C2=A0=C2=A0=C2=A0write_c_skeleton;
+  =C2=A0=C2=A0=C2=A0if compile_prog "" "-liberty" ; then
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0LIBS=3D"-liberty $LIBS"
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1845185/+subscriptions
 
