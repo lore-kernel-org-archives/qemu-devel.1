@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E047C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 06:25:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3048C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 06:25:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E78EE20673
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 06:25:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E78EE20673
+	by mail.kernel.org (Postfix) with ESMTPS id BAD7520673
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 06:25:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAD7520673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCeGj-0000dy-Sy
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 02:25:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59319)
+	id 1iCeGm-0000gk-Fe
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 02:25:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59210)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1iCeBG-0003jn-Q7
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 02:20:14 -0400
+ (envelope-from <kraxel@redhat.com>) id 1iCeB8-0003ZY-DD
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 02:20:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1iCeBD-0000uu-SO
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 02:20:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59768)
+ (envelope-from <kraxel@redhat.com>) id 1iCeB6-0000rW-9U
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 02:20:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58334)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iCeBD-0000uc-IV
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 02:20:07 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iCeB5-0000qx-Sy
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 02:20:00 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D31A08BA2DA;
- Tue, 24 Sep 2019 06:20:06 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1E8CD308FBAC;
+ Tue, 24 Sep 2019 06:19:59 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-47.ams2.redhat.com
  [10.36.116.47])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D81B660925;
- Tue, 24 Sep 2019 06:19:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F0CC0600C8;
+ Tue, 24 Sep 2019 06:19:55 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 16B189C74; Tue, 24 Sep 2019 08:19:52 +0200 (CEST)
+ id AF2AB9C86; Tue, 24 Sep 2019 08:19:51 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/16] audio: unify input and output mixeng buffer management
-Date: Tue, 24 Sep 2019 08:19:49 +0200
-Message-Id: <20190924061951.27916-15-kraxel@redhat.com>
+Subject: [PULL 05/16] coreaudio: port to the new audio backend api
+Date: Tue, 24 Sep 2019 08:19:40 +0200
+Message-Id: <20190924061951.27916-6-kraxel@redhat.com>
 In-Reply-To: <20190924061951.27916-1-kraxel@redhat.com>
 References: <20190924061951.27916-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Tue, 24 Sep 2019 06:20:06 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Tue, 24 Sep 2019 06:19:59 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -77,531 +77,217 @@ Sender: "Qemu-devel"
 
 From: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.ice.hu@gmail.com>
 
-Usage notes: hw->samples became hw->{mix,conv}_buf->size, except before
-initialization (audio_pcm_hw_alloc_resources_*), hw->samples gives the
-initial size of the STSampleBuffer.  The next commit tries to fix this
-inconsistency.
-
 Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.com=
 >
-Message-id: a78caeb2eeb6348ecb45bb2c81709570ef8ac5b3.1568927990.git.DirtY=
+Message-id: 586a1e66de5cbc6c5234f9ae556d24befb6afada.1568927990.git.DirtY=
 .iCE.hu@gmail.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- audio/audio_int.h      |  12 ++--
- audio/audio_template.h |  19 +++----
- audio/audio.c          | 122 +++++++++++++++++++++--------------------
- audio/ossaudio.c       |   3 +-
- 4 files changed, 80 insertions(+), 76 deletions(-)
+ audio/coreaudio.c | 130 ++++++++++++++++++++++++----------------------
+ 1 file changed, 69 insertions(+), 61 deletions(-)
 
-diff --git a/audio/audio_int.h b/audio/audio_int.h
-index c76d7c39e84c..20021df9e8be 100644
---- a/audio/audio_int.h
-+++ b/audio/audio_int.h
-@@ -52,6 +52,11 @@ struct audio_pcm_info {
- typedef struct AudioState AudioState;
- typedef struct SWVoiceCap SWVoiceCap;
-=20
-+typedef struct STSampleBuffer {
-+    size_t pos, size;
-+    st_sample samples[];
-+} STSampleBuffer;
-+
- typedef struct HWVoiceOut {
-     AudioState *s;
-     int enabled;
-@@ -60,11 +65,9 @@ typedef struct HWVoiceOut {
-     struct audio_pcm_info info;
-=20
-     f_sample *clip;
--
+diff --git a/audio/coreaudio.c b/audio/coreaudio.c
+index d1be58b40aa8..5cde42f9826c 100644
+--- a/audio/coreaudio.c
++++ b/audio/coreaudio.c
+@@ -43,9 +43,6 @@ typedef struct coreaudioVoiceOut {
+     UInt32 audioDevicePropertyBufferFrameSize;
+     AudioStreamBasicDescription outputStreamBasicDescription;
+     AudioDeviceIOProcID ioprocid;
+-    size_t live;
+-    size_t decr;
 -    size_t rpos;
-     uint64_t ts_helper;
+ } coreaudioVoiceOut;
 =20
--    struct st_sample *mix_buf;
-+    STSampleBuffer *mix_buf;
-     void *buf_emul;
-     size_t pos_emul, pending_emul, size_emul;
-=20
-@@ -84,11 +87,10 @@ typedef struct HWVoiceIn {
-=20
-     t_sample *conv;
-=20
--    size_t wpos;
-     size_t total_samples_captured;
-     uint64_t ts_helper;
-=20
--    struct st_sample *conv_buf;
-+    STSampleBuffer *conv_buf;
-     void *buf_emul;
-     size_t pos_emul, pending_emul, size_emul;
-=20
-diff --git a/audio/audio_template.h b/audio/audio_template.h
-index ff4a173f1810..87c6d2d27102 100644
---- a/audio/audio_template.h
-+++ b/audio/audio_template.h
-@@ -76,16 +76,15 @@ static void glue (audio_pcm_hw_free_resources_, TYPE)=
- (HW *hw)
-     HWBUF =3D NULL;
+ #if MAC_OS_X_VERSION_MAX_ALLOWED >=3D MAC_OS_X_VERSION_10_6
+@@ -397,31 +394,29 @@ static int coreaudio_unlock (coreaudioVoiceOut *cor=
+e, const char *fn_name)
+     return 0;
  }
 =20
--static bool glue(audio_pcm_hw_alloc_resources_, TYPE)(HW *hw)
-+static void glue(audio_pcm_hw_alloc_resources_, TYPE)(HW *hw)
- {
--    HWBUF =3D audio_calloc(__func__, hw->samples, sizeof(struct st_sampl=
-e));
--    if (!HWBUF) {
--        dolog("Could not allocate " NAME " buffer (%zu samples)\n",
--              hw->samples);
--        return false;
-+    size_t samples =3D hw->samples;
-+    if (audio_bug(__func__, samples =3D=3D 0)) {
-+        dolog("Attempted to allocate empty buffer\n");
+-static size_t coreaudio_run_out(HWVoiceOut *hw, size_t live)
+-{
+-    size_t decr;
+-    coreaudioVoiceOut *core =3D (coreaudioVoiceOut *) hw;
+-
+-    if (coreaudio_lock (core, "coreaudio_run_out")) {
+-        return 0;
++#define COREAUDIO_WRAPPER_FUNC(name, ret_type, args_decl, args) \
++    static ret_type glue(coreaudio_, name)args_decl             \
++    {                                                           \
++        coreaudioVoiceOut *core =3D (coreaudioVoiceOut *) hw;     \
++        ret_type ret;                                           \
++                                                                \
++        if (coreaudio_lock(core, "coreaudio_" #name)) {         \
++            return 0;                                           \
++        }                                                       \
++                                                                \
++        ret =3D glue(audio_generic_, name)args;                   \
++                                                                \
++        coreaudio_unlock(core, "coreaudio_" #name);             \
++        return ret;                                             \
      }
-=20
--    return true;
-+    HWBUF =3D g_malloc0(sizeof(STSampleBuffer) + sizeof(st_sample) * sam=
-ples);
-+    HWBUF->size =3D samples;
- }
-=20
- static void glue (audio_pcm_sw_free_resources_, TYPE) (SW *sw)
-@@ -104,7 +103,7 @@ static int glue (audio_pcm_sw_alloc_resources_, TYPE)=
- (SW *sw)
- {
-     int samples;
-=20
--    samples =3D ((int64_t) sw->hw->samples << 32) / sw->ratio;
-+    samples =3D ((int64_t) sw->HWBUF->size << 32) / sw->ratio;
-=20
-     sw->buf =3D audio_calloc(__func__, samples, sizeof(struct st_sample)=
-);
-     if (!sw->buf) {
-@@ -280,9 +279,7 @@ static HW *glue(audio_pcm_hw_add_new_, TYPE)(AudioSta=
-te *s,
-         [hw->info.swap_endianness]
-         [audio_bits_to_index (hw->info.bits)];
-=20
--    if (!glue(audio_pcm_hw_alloc_resources_, TYPE)(hw)) {
--        goto err1;
+-
+-    if (core->decr > live) {
+-        ldebug ("core->decr %d live %d core->live %d\n",
+-                core->decr,
+-                live,
+-                core->live);
 -    }
-+    glue(audio_pcm_hw_alloc_resources_, TYPE)(hw);
+-
+-    decr =3D MIN (core->decr, live);
+-    core->decr -=3D decr;
+-
+-    core->live =3D live - decr;
+-    hw->rpos =3D core->rpos;
+-
+-    coreaudio_unlock (core, "coreaudio_run_out");
+-    return decr;
+-}
++COREAUDIO_WRAPPER_FUNC(get_buffer_out, void *, (HWVoiceOut *hw, size_t *=
+size),
++                       (hw, size))
++COREAUDIO_WRAPPER_FUNC(put_buffer_out_nowrite, size_t,
++                       (HWVoiceOut *hw, void *buf, size_t size),
++                       (hw, buf, size))
++COREAUDIO_WRAPPER_FUNC(write, size_t, (HWVoiceOut *hw, void *buf, size_t=
+ size),
++                       (hw, buf, size))
++#undef COREAUDIO_WRAPPER_FUNC
 =20
-     QLIST_INSERT_HEAD (&s->glue (hw_head_, TYPE), hw, entries);
-     glue (s->nb_hw_voices_, TYPE) -=3D 1;
-diff --git a/audio/audio.c b/audio/audio.c
-index 435bcf20c139..ba07fb77dd4f 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -544,8 +544,8 @@ static size_t audio_pcm_hw_find_min_in (HWVoiceIn *hw=
-)
- static size_t audio_pcm_hw_get_live_in(HWVoiceIn *hw)
+ /* callback to feed audiooutput buffer */
+ static OSStatus audioDeviceIOProc(
+@@ -433,19 +428,11 @@ static OSStatus audioDeviceIOProc(
+     const AudioTimeStamp* inOutputTime,
+     void* hwptr)
  {
-     size_t live =3D hw->total_samples_captured - audio_pcm_hw_find_min_i=
-n (hw);
--    if (audio_bug(__func__, live > hw->samples)) {
--        dolog("live=3D%zu hw->samples=3D%zu\n", live, hw->samples);
-+    if (audio_bug(__func__, live > hw->conv_buf->size)) {
-+        dolog("live=3D%zu hw->conv_buf->size=3D%zu\n", live, hw->conv_bu=
-f->size);
+-    UInt32 frame, frameCount;
+-    float *out =3D outOutputData->mBuffers[0].mData;
++    UInt32 frameCount, pending_frames;
++    void *out =3D outOutputData->mBuffers[0].mData;
+     HWVoiceOut *hw =3D hwptr;
+     coreaudioVoiceOut *core =3D (coreaudioVoiceOut *) hwptr;
+-    int rpos, live;
+-    struct st_sample *src;
+-#ifndef FLOAT_MIXENG
+-#ifdef RECIPROCAL
+-    const float scale =3D 1.f / UINT_MAX;
+-#else
+-    const float scale =3D UINT_MAX;
+-#endif
+-#endif
++    size_t len;
+=20
+     if (coreaudio_lock (core, "audioDeviceIOProc")) {
+         inInputTime =3D 0;
+@@ -453,42 +440,51 @@ static OSStatus audioDeviceIOProc(
+     }
+=20
+     frameCount =3D core->audioDevicePropertyBufferFrameSize;
+-    live =3D core->live;
++    pending_frames =3D hw->pending_emul >> hw->info.shift;
+=20
+     /* if there are not enough samples, set signal and return */
+-    if (live < frameCount) {
++    if (pending_frames < frameCount) {
+         inInputTime =3D 0;
+         coreaudio_unlock (core, "audioDeviceIOProc(empty)");
          return 0;
      }
-     return live;
-@@ -554,17 +554,17 @@ static size_t audio_pcm_hw_get_live_in(HWVoiceIn *h=
-w)
- static void audio_pcm_hw_clip_out(HWVoiceOut *hw, void *pcm_buf, size_t =
-len)
- {
-     size_t clipped =3D 0;
--    size_t pos =3D hw->rpos;
-+    size_t pos =3D hw->mix_buf->pos;
 =20
-     while (len) {
--        st_sample *src =3D hw->mix_buf + pos;
-+        st_sample *src =3D hw->mix_buf->samples + pos;
-         uint8_t *dst =3D advance(pcm_buf, clipped << hw->info.shift);
--        size_t samples_till_end_of_buf =3D hw->samples - pos;
-+        size_t samples_till_end_of_buf =3D hw->mix_buf->size - pos;
-         size_t samples_to_clip =3D MIN(len, samples_till_end_of_buf);
+-    rpos =3D core->rpos;
+-    src =3D hw->mix_buf + rpos;
++    len =3D frameCount << hw->info.shift;
++    while (len) {
++        size_t write_len;
++        ssize_t start =3D ((ssize_t) hw->pos_emul) - hw->pending_emul;
++        if (start < 0) {
++            start +=3D hw->size_emul;
++        }
++        assert(start >=3D 0 && start < hw->size_emul);
 =20
-         hw->clip(dst, src, samples_to_clip);
-=20
--        pos =3D (pos + samples_to_clip) % hw->samples;
-+        pos =3D (pos + samples_to_clip) % hw->mix_buf->size;
-         len -=3D samples_to_clip;
-         clipped +=3D samples_to_clip;
-     }
-@@ -579,17 +579,17 @@ static size_t audio_pcm_sw_get_rpos_in(SWVoiceIn *s=
-w)
-     ssize_t live =3D hw->total_samples_captured - sw->total_hw_samples_a=
-cquired;
-     ssize_t rpos;
-=20
--    if (audio_bug(__func__, live < 0 || live > hw->samples)) {
--        dolog("live=3D%zu hw->samples=3D%zu\n", live, hw->samples);
-+    if (audio_bug(__func__, live < 0 || live > hw->conv_buf->size)) {
-+        dolog("live=3D%zu hw->conv_buf->size=3D%zu\n", live, hw->conv_bu=
-f->size);
-         return 0;
+-    /* fill buffer */
+-    for (frame =3D 0; frame < frameCount; frame++) {
+-#ifdef FLOAT_MIXENG
+-        *out++ =3D src[frame].l; /* left channel */
+-        *out++ =3D src[frame].r; /* right channel */
+-#else
+-#ifdef RECIPROCAL
+-        *out++ =3D src[frame].l * scale; /* left channel */
+-        *out++ =3D src[frame].r * scale; /* right channel */
+-#else
+-        *out++ =3D src[frame].l / scale; /* left channel */
+-        *out++ =3D src[frame].r / scale; /* right channel */
+-#endif
+-#endif
++        write_len =3D MIN(MIN(hw->pending_emul, len),
++                        hw->size_emul - start);
++
++        memcpy(out, hw->buf_emul + start, write_len);
++        hw->pending_emul -=3D write_len;
++        len -=3D write_len;
++        out +=3D write_len;
      }
 =20
--    rpos =3D hw->wpos - live;
-+    rpos =3D hw->conv_buf->pos - live;
-     if (rpos >=3D 0) {
-         return rpos;
-     }
-     else {
--        return hw->samples + rpos;
-+        return hw->conv_buf->size + rpos;
-     }
+-    rpos =3D (rpos + frameCount) % hw->samples;
+-    core->decr +=3D frameCount;
+-    core->rpos =3D rpos;
+-
+     coreaudio_unlock (core, "audioDeviceIOProc");
+     return 0;
  }
 =20
-@@ -599,11 +599,11 @@ static size_t audio_pcm_sw_read(SWVoiceIn *sw, void=
- *buf, size_t size)
-     size_t samples, live, ret =3D 0, swlim, isamp, osamp, rpos, total =3D=
- 0;
-     struct st_sample *src, *dst =3D sw->buf;
-=20
--    rpos =3D audio_pcm_sw_get_rpos_in (sw) % hw->samples;
-+    rpos =3D audio_pcm_sw_get_rpos_in(sw) % hw->conv_buf->size;
-=20
-     live =3D hw->total_samples_captured - sw->total_hw_samples_acquired;
--    if (audio_bug(__func__, live > hw->samples)) {
--        dolog("live_in=3D%zu hw->samples=3D%zu\n", live, hw->samples);
-+    if (audio_bug(__func__, live > hw->conv_buf->size)) {
-+        dolog("live_in=3D%zu hw->conv_buf->size=3D%zu\n", live, hw->conv=
-_buf->size);
-         return 0;
-     }
-=20
-@@ -616,11 +616,11 @@ static size_t audio_pcm_sw_read(SWVoiceIn *sw, void=
- *buf, size_t size)
-     swlim =3D MIN (swlim, samples);
-=20
-     while (swlim) {
--        src =3D hw->conv_buf + rpos;
--        if (hw->wpos > rpos) {
--            isamp =3D hw->wpos - rpos;
-+        src =3D hw->conv_buf->samples + rpos;
-+        if (hw->conv_buf->pos > rpos) {
-+            isamp =3D hw->conv_buf->pos - rpos;
-         } else {
--            isamp =3D hw->samples - rpos;
-+            isamp =3D hw->conv_buf->size - rpos;
-         }
-=20
-         if (!isamp) {
-@@ -630,7 +630,7 @@ static size_t audio_pcm_sw_read(SWVoiceIn *sw, void *=
-buf, size_t size)
-=20
-         st_rate_flow (sw->rate, src, dst, &isamp, &osamp);
-         swlim -=3D osamp;
--        rpos =3D (rpos + isamp) % hw->samples;
-+        rpos =3D (rpos + isamp) % hw->conv_buf->size;
-         dst +=3D osamp;
-         ret +=3D osamp;
-         total +=3D isamp;
-@@ -678,8 +678,8 @@ static size_t audio_pcm_hw_get_live_out (HWVoiceOut *=
-hw, int *nb_live)
-     if (nb_live1) {
-         size_t live =3D smin;
-=20
--        if (audio_bug(__func__, live > hw->samples)) {
--            dolog("live=3D%zu hw->samples=3D%zu\n", live, hw->samples);
-+        if (audio_bug(__func__, live > hw->mix_buf->size)) {
-+            dolog("live=3D%zu hw->mix_buf->size=3D%zu\n", live, hw->mix_=
-buf->size);
-             return 0;
-         }
-         return live;
-@@ -699,11 +699,11 @@ static size_t audio_pcm_sw_write(SWVoiceOut *sw, vo=
-id *buf, size_t size)
-         return size;
-     }
-=20
--    hwsamples =3D sw->hw->samples;
-+    hwsamples =3D sw->hw->mix_buf->size;
-=20
-     live =3D sw->total_hw_samples_mixed;
-     if (audio_bug(__func__, live > hwsamples)) {
--        dolog("live=3D%zu hw->samples=3D%zu\n", live, hwsamples);
-+        dolog("live=3D%zu hw->mix_buf->size=3D%zu\n", live, hwsamples);
-         return 0;
-     }
-=20
-@@ -714,7 +714,7 @@ static size_t audio_pcm_sw_write(SWVoiceOut *sw, void=
- *buf, size_t size)
-         return 0;
-     }
-=20
--    wpos =3D (sw->hw->rpos + live) % hwsamples;
-+    wpos =3D (sw->hw->mix_buf->pos + live) % hwsamples;
-     samples =3D size >> sw->info.shift;
-=20
-     dead =3D hwsamples - live;
-@@ -740,7 +740,7 @@ static size_t audio_pcm_sw_write(SWVoiceOut *sw, void=
- *buf, size_t size)
-         st_rate_flow_mix (
-             sw->rate,
-             sw->buf + pos,
--            sw->hw->mix_buf + wpos,
-+            sw->hw->mix_buf->samples + wpos,
-             &isamp,
-             &osamp
-             );
-@@ -868,7 +868,7 @@ size_t AUD_read(SWVoiceIn *sw, void *buf, size_t size=
-)
-=20
- int AUD_get_buffer_size_out (SWVoiceOut *sw)
++static UInt32 coreaudio_get_flags(struct audio_pcm_info *info,
++                                  struct audsettings *as)
++{
++    UInt32 flags =3D info->sign ? kAudioFormatFlagIsSignedInteger : 0;
++    if (as->endianness) { /* 0 =3D little, 1 =3D big */
++        flags |=3D kAudioFormatFlagIsBigEndian;
++    }
++
++    if (flags =3D=3D 0) { /* must not be 0 */
++        flags =3D kAudioFormatFlagsAreAllClear;
++    }
++    return flags;
++}
++
+ static int coreaudio_init_out(HWVoiceOut *hw, struct audsettings *as,
+                               void *drv_opaque)
  {
--    return sw->hw->samples << sw->hw->info.shift;
-+    return sw->hw->mix_buf->size << sw->hw->info.shift;
- }
+@@ -576,6 +572,16 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct=
+ audsettings *as,
 =20
- void AUD_set_active_out (SWVoiceOut *sw, int on)
-@@ -969,8 +969,9 @@ static size_t audio_get_avail (SWVoiceIn *sw)
-     }
-=20
-     live =3D sw->hw->total_samples_captured - sw->total_hw_samples_acqui=
-red;
--    if (audio_bug(__func__, live > sw->hw->samples)) {
--        dolog("live=3D%zu sw->hw->samples=3D%zu\n", live, sw->hw->sample=
-s);
-+    if (audio_bug(__func__, live > sw->hw->conv_buf->size)) {
-+        dolog("live=3D%zu sw->hw->conv_buf->size=3D%zu\n", live,
-+              sw->hw->conv_buf->size);
-         return 0;
-     }
-=20
-@@ -993,12 +994,13 @@ static size_t audio_get_free(SWVoiceOut *sw)
-=20
-     live =3D sw->total_hw_samples_mixed;
-=20
--    if (audio_bug(__func__, live > sw->hw->samples)) {
--        dolog("live=3D%zu sw->hw->samples=3D%zu\n", live, sw->hw->sample=
-s);
-+    if (audio_bug(__func__, live > sw->hw->mix_buf->size)) {
-+        dolog("live=3D%zu sw->hw->mix_buf->size=3D%zu\n", live,
-+              sw->hw->mix_buf->size);
-         return 0;
-     }
-=20
--    dead =3D sw->hw->samples - live;
-+    dead =3D sw->hw->mix_buf->size - live;
-=20
- #ifdef DEBUG_OUT
-     dolog ("%s: get_free live %d dead %d ret %" PRId64 "\n",
-@@ -1023,12 +1025,12 @@ static void audio_capture_mix_and_clear(HWVoiceOu=
-t *hw, size_t rpos,
-=20
-             n =3D samples;
-             while (n) {
--                size_t till_end_of_hw =3D hw->samples - rpos2;
-+                size_t till_end_of_hw =3D hw->mix_buf->size - rpos2;
-                 size_t to_write =3D MIN(till_end_of_hw, n);
-                 size_t bytes =3D to_write << hw->info.shift;
-                 size_t written;
-=20
--                sw->buf =3D hw->mix_buf + rpos2;
-+                sw->buf =3D hw->mix_buf->samples + rpos2;
-                 written =3D audio_pcm_sw_write (sw, NULL, bytes);
-                 if (written - bytes) {
-                     dolog("Could not mix %zu bytes into a capture "
-@@ -1037,14 +1039,14 @@ static void audio_capture_mix_and_clear(HWVoiceOu=
-t *hw, size_t rpos,
-                     break;
-                 }
-                 n -=3D to_write;
--                rpos2 =3D (rpos2 + to_write) % hw->samples;
-+                rpos2 =3D (rpos2 + to_write) % hw->mix_buf->size;
-             }
-         }
-     }
-=20
--    n =3D MIN(samples, hw->samples - rpos);
--    mixeng_clear(hw->mix_buf + rpos, n);
--    mixeng_clear(hw->mix_buf, samples - n);
-+    n =3D MIN(samples, hw->mix_buf->size - rpos);
-+    mixeng_clear(hw->mix_buf->samples + rpos, n);
-+    mixeng_clear(hw->mix_buf->samples, samples - n);
- }
-=20
- static size_t audio_pcm_hw_run_out(HWVoiceOut *hw, size_t live)
-@@ -1056,7 +1058,7 @@ static size_t audio_pcm_hw_run_out(HWVoiceOut *hw, =
-size_t live)
-         void *buf =3D hw->pcm_ops->get_buffer_out(hw, &size);
-         if (!buf) {
-             /* retrying will likely won't help, drop everything. */
--            hw->rpos =3D (hw->rpos + live) % hw->samples;
-+            hw->mix_buf->pos =3D (hw->mix_buf->pos + live) % hw->mix_buf=
-->size;
-             return clipped + live;
-         }
-=20
-@@ -1067,7 +1069,7 @@ static size_t audio_pcm_hw_run_out(HWVoiceOut *hw, =
-size_t live)
-=20
-         live -=3D proc;
-         clipped +=3D proc;
--        hw->rpos =3D (hw->rpos + proc) % hw->samples;
-+        hw->mix_buf->pos =3D (hw->mix_buf->pos + proc) % hw->mix_buf->si=
-ze;
-=20
-         if (proc =3D=3D 0 || proc < decr) {
-             break;
-@@ -1091,8 +1093,8 @@ static void audio_run_out (AudioState *s)
-             live =3D 0;
-         }
-=20
--        if (audio_bug(__func__, live > hw->samples)) {
--            dolog ("live=3D%zu hw->samples=3D%zu\n", live, hw->samples);
-+        if (audio_bug(__func__, live > hw->mix_buf->size)) {
-+            dolog("live=3D%zu hw->mix_buf->size=3D%zu\n", live, hw->mix_=
-buf->size);
-             continue;
-         }
-=20
-@@ -1123,13 +1125,13 @@ static void audio_run_out (AudioState *s)
-             continue;
-         }
-=20
--        prev_rpos =3D hw->rpos;
-+        prev_rpos =3D hw->mix_buf->pos;
-         played =3D audio_pcm_hw_run_out(hw, live);
-         replay_audio_out(&played);
--        if (audio_bug(__func__, hw->rpos >=3D hw->samples)) {
--            dolog("hw->rpos=3D%zu hw->samples=3D%zu played=3D%zu\n",
--                  hw->rpos, hw->samples, played);
--            hw->rpos =3D 0;
-+        if (audio_bug(__func__, hw->mix_buf->pos >=3D hw->mix_buf->size)=
-) {
-+            dolog("hw->mix_buf->pos=3D%zu hw->mix_buf->size=3D%zu played=
-=3D%zu\n",
-+                  hw->mix_buf->pos, hw->mix_buf->size, played);
-+            hw->mix_buf->pos =3D 0;
-         }
-=20
- #ifdef DEBUG_OUT
-@@ -1186,6 +1188,7 @@ static void audio_run_out (AudioState *s)
- static size_t audio_pcm_hw_run_in(HWVoiceIn *hw, size_t samples)
- {
-     size_t conv =3D 0;
-+    STSampleBuffer *conv_buf =3D hw->conv_buf;
-=20
-     while (samples) {
-         size_t proc;
-@@ -1199,10 +1202,10 @@ static size_t audio_pcm_hw_run_in(HWVoiceIn *hw, =
-size_t samples)
-         }
-=20
-         proc =3D MIN(size >> hw->info.shift,
--                   hw->samples - hw->wpos);
-+                   conv_buf->size - conv_buf->pos);
-=20
--        hw->conv(hw->conv_buf + hw->wpos, buf, proc);
--        hw->wpos =3D (hw->wpos + proc) % hw->samples;
-+        hw->conv(conv_buf->samples + conv_buf->pos, buf, proc);
-+        conv_buf->pos =3D (conv_buf->pos + proc) % conv_buf->size;
-=20
-         samples -=3D proc;
-         conv +=3D proc;
-@@ -1222,9 +1225,10 @@ static void audio_run_in (AudioState *s)
-=20
-         if (replay_mode !=3D REPLAY_MODE_PLAY) {
-             captured =3D audio_pcm_hw_run_in(
--                hw, hw->samples - audio_pcm_hw_get_live_in(hw));
-+                hw, hw->conv_buf->size - audio_pcm_hw_get_live_in(hw));
-         }
--        replay_audio_in(&captured, hw->conv_buf, &hw->wpos, hw->samples)=
+     /* set Samplerate */
+     core->outputStreamBasicDescription.mSampleRate =3D (Float64) as->fre=
+q;
++    core->outputStreamBasicDescription.mFormatID =3D kAudioFormatLinearP=
+CM;
++    core->outputStreamBasicDescription.mFormatFlags =3D
++        coreaudio_get_flags(&hw->info, as);
++    core->outputStreamBasicDescription.mBytesPerPacket =3D
++        core->outputStreamBasicDescription.mBytesPerFrame =3D
++        hw->info.nchannels * hw->info.bits / 8;
++    core->outputStreamBasicDescription.mFramesPerPacket =3D 1;
++    core->outputStreamBasicDescription.mChannelsPerFrame =3D hw->info.nc=
+hannels;
++    core->outputStreamBasicDescription.mBitsPerChannel =3D hw->info.bits=
 ;
-+        replay_audio_in(&captured, hw->conv_buf->samples, &hw->conv_buf-=
->pos,
-+                        hw->conv_buf->size);
++
+     status =3D coreaudio_set_streamformat(core->outputDeviceID,
+                                         &core->outputStreamBasicDescript=
+ion);
+     if (status !=3D kAudioHardwareNoError) {
+@@ -686,7 +692,9 @@ static void coreaudio_audio_fini (void *opaque)
+ static struct audio_pcm_ops coreaudio_pcm_ops =3D {
+     .init_out =3D coreaudio_init_out,
+     .fini_out =3D coreaudio_fini_out,
+-    .run_out  =3D coreaudio_run_out,
++    .write    =3D coreaudio_write,
++    .get_buffer_out =3D coreaudio_get_buffer_out,
++    .put_buffer_out =3D coreaudio_put_buffer_out_nowrite,
+     .ctl_out  =3D coreaudio_ctl_out
+ };
 =20
-         min =3D audio_pcm_hw_find_min_in (hw);
-         hw->total_samples_captured +=3D captured - min;
-@@ -1255,14 +1259,14 @@ static void audio_run_capture (AudioState *s)
-         SWVoiceOut *sw;
-=20
-         captured =3D live =3D audio_pcm_hw_get_live_out (hw, NULL);
--        rpos =3D hw->rpos;
-+        rpos =3D hw->mix_buf->pos;
-         while (live) {
--            size_t left =3D hw->samples - rpos;
-+            size_t left =3D hw->mix_buf->size - rpos;
-             size_t to_capture =3D MIN(live, left);
-             struct st_sample *src;
-             struct capture_callback *cb;
-=20
--            src =3D hw->mix_buf + rpos;
-+            src =3D hw->mix_buf->samples + rpos;
-             hw->clip (cap->buf, src, to_capture);
-             mixeng_clear (src, to_capture);
-=20
-@@ -1270,10 +1274,10 @@ static void audio_run_capture (AudioState *s)
-                 cb->ops.capture (cb->opaque, cap->buf,
-                                  to_capture << hw->info.shift);
-             }
--            rpos =3D (rpos + to_capture) % hw->samples;
-+            rpos =3D (rpos + to_capture) % hw->mix_buf->size;
-             live -=3D to_capture;
-         }
--        hw->rpos =3D rpos;
-+        hw->mix_buf->pos =3D rpos;
-=20
-         for (sw =3D hw->sw_head.lh_first; sw; sw =3D sw->entries.le_next=
-) {
-             if (!sw->active && sw->empty) {
-@@ -1321,7 +1325,7 @@ void *audio_generic_get_buffer_in(HWVoiceIn *hw, si=
-ze_t *size)
-     ssize_t start;
-=20
-     if (unlikely(!hw->buf_emul)) {
--        size_t calc_size =3D hw->samples << hw->info.shift;
-+        size_t calc_size =3D hw->conv_buf->size << hw->info.shift;
-         hw->buf_emul =3D g_malloc(calc_size);
-         hw->size_emul =3D calc_size;
-         hw->pos_emul =3D hw->pending_emul =3D 0;
-@@ -1357,7 +1361,7 @@ void audio_generic_put_buffer_in(HWVoiceIn *hw, voi=
-d *buf, size_t size)
- void *audio_generic_get_buffer_out(HWVoiceOut *hw, size_t *size)
- {
-     if (unlikely(!hw->buf_emul)) {
--        size_t calc_size =3D hw->samples << hw->info.shift;
-+        size_t calc_size =3D hw->mix_buf->size << hw->info.shift;
-=20
-         hw->buf_emul =3D g_malloc(calc_size);
-         hw->size_emul =3D calc_size;
-@@ -1764,11 +1768,11 @@ CaptureVoiceOut *AUD_add_capture(
-=20
-         /* XXX find a more elegant way */
-         hw->samples =3D 4096 * 4;
--        hw->mix_buf =3D g_new0(struct st_sample, hw->samples);
-+        audio_pcm_hw_alloc_resources_out(hw);
-=20
-         audio_pcm_init_info (&hw->info, as);
-=20
--        cap->buf =3D g_malloc0_n(hw->samples, 1 << hw->info.shift);
-+        cap->buf =3D g_malloc0_n(hw->mix_buf->size, 1 << hw->info.shift)=
-;
-=20
-         hw->clip =3D mixeng_clip
-             [hw->info.nchannels =3D=3D 2]
-diff --git a/audio/ossaudio.c b/audio/ossaudio.c
-index 278251270691..76c082d5e2a5 100644
---- a/audio/ossaudio.c
-+++ b/audio/ossaudio.c
-@@ -585,7 +585,8 @@ static int oss_ctl_out (HWVoiceOut *hw, int cmd, ...)
-                 return 0;
-             }
-=20
--            audio_pcm_info_clear_buf(&hw->info, hw->buf_emul, hw->sample=
-s);
-+            audio_pcm_info_clear_buf(
-+                &hw->info, hw->buf_emul, hw->mix_buf->size);
-             trig =3D PCM_ENABLE_OUTPUT;
-             if (ioctl (oss->fd, SNDCTL_DSP_SETTRIGGER, &trig) < 0) {
-                 oss_logerr (
 --=20
 2.18.1
 
