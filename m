@@ -2,83 +2,63 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0345FC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 02:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09007C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 03:36:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC868207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 02:54:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC868207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CDC74206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 03:36:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDC74206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCaxr-0005r6-UC
-	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 22:54:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39541)
+	id 1iCbcV-0005H0-S0
+	for qemu-devel@archiver.kernel.org; Mon, 23 Sep 2019 23:36:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43731)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1iCaxC-0005PG-4D
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 22:53:27 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1iCbbM-0004eH-Si
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 23:34:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1iCaxA-0004KR-2v
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 22:53:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35368)
+ (envelope-from <tao3.xu@intel.com>) id 1iCbbL-0005V2-1Z
+ for qemu-devel@nongnu.org; Mon, 23 Sep 2019 23:34:56 -0400
+Received: from mga07.intel.com ([134.134.136.100]:58312)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iCax9-0004K5-UB
- for qemu-devel@nongnu.org; Mon, 23 Sep 2019 22:53:24 -0400
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EEF2C3DE31
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 02:53:20 +0000 (UTC)
-Received: by mail-pg1-f198.google.com with SMTP id t19so380962pgh.6
- for <qemu-devel@nongnu.org>; Mon, 23 Sep 2019 19:53:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=aYZJGBMRsRr7il1pIVfrB/JqrfrfnrG5W48drpGx8OU=;
- b=LmiN5dSIS+J3tTci+i5UxU0DOG2jiE5CYAKUIhs+LsuD+/hynNZyz+GmiavRPs4xWX
- 1loPLt+OAFYIlccJRVva/7Hy76NkhwoFkyvEuCwdKo3S+RC12gA/GjckXZy9a1drhSKe
- AyPxsROTM0TylLI38c15zHykKa/ISE4uGX9sg9OrpsUVnaLTkJPmO7Ga1eyxxirc1Iuf
- BhLP2EBe2knOEP8xSDsuUX+VQd7g1043Ky8j8iinj9NrV2zjGzschMOyQaSp2rb3gQJ/
- 85Xq8jfFWxyF56aJi1sl9AIkZswQ7RsPRckEHYAOAZfxMGEHUyqe20BqULMpTMwNflPS
- knvQ==
-X-Gm-Message-State: APjAAAVkIXSVBOgEwJ9RxN//6hlDEs/m7wF/oNPp9xVBYXS7/P6eiTZA
- jzJ3yOREK8FfGaXd9PFnPK3Ka3EsjlO7ZDB95y4IZ3le0Qij8VhHEo3HDvWa8S7Ry/tZaLnB+63
- qaiB8rZHogHJrsRM=
-X-Received: by 2002:a17:902:7585:: with SMTP id j5mr491502pll.19.1569293600450; 
- Mon, 23 Sep 2019 19:53:20 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxW59hlMvXP57MoV1tFaGXlYH+MLTAfGqI97gyjGUh5UTrqJ3AcbvwXPbs/AgO8RbyuCY+cpA==
-X-Received: by 2002:a17:902:7585:: with SMTP id j5mr491491pll.19.1569293600299; 
- Mon, 23 Sep 2019 19:53:20 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id k31sm184884pjb.14.2019.09.23.19.53.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Sep 2019 19:53:19 -0700 (PDT)
-Date: Tue, 24 Sep 2019 10:53:10 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 0/2] kvm: clear dirty bitmaps from all overlapping memslots
-Message-ID: <20190924025310.GE28074@xz-x1>
-References: <1568974882-7419-1-git-send-email-pbonzini@redhat.com>
- <20190920121951.GI12858@xz-x1> <20190920155851.7445cd2a@redhat.com>
- <20190923012946.GJ12858@xz-x1> <20190923181512.144e3b77@redhat.com>
- <ad751c10-69f5-8d20-5150-9750425a5f72@redhat.com>
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>)
+ id 1iCbbH-0005S5-8S; Mon, 23 Sep 2019 23:34:51 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+ by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 23 Sep 2019 20:34:42 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,542,1559545200"; d="scan'208";a="203276841"
+Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.93])
+ ([10.239.196.93])
+ by fmsmga001.fm.intel.com with ESMTP; 23 Sep 2019 20:34:40 -0700
+Subject: Re: [PATCH v2] numa: Introduce MachineClass::auto_enable_numa for
+ implicit NUMA node
+To: "ehabkost@redhat.com" <ehabkost@redhat.com>
+References: <20190905083238.1799-1-tao3.xu@intel.com>
+From: Tao Xu <tao3.xu@intel.com>
+Message-ID: <e84bd22f-fce4-ea39-38a0-0933ff30237b@intel.com>
+Date: Tue, 24 Sep 2019 11:34:40 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ad751c10-69f5-8d20-5150-9750425a5f72@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+In-Reply-To: <20190905083238.1799-1-tao3.xu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.100
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,28 +70,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org,
- dgilbert@redhat.com
+Cc: Igor Mammedov <imammedo@redhat.com>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 23, 2019 at 06:49:12PM +0200, Paolo Bonzini wrote:
-> On 23/09/19 18:15, Igor Mammedov wrote:
-> > Yep, commit message doesn't fit patch, how about following description:
-> > "
-> > Currently MemoryRegionSection has 1:1 mapping to KVMSlot.
-> > However next patch will allow splitting MemoryRegionSection into
-> > several KVMSlot-s, make sure that kvm_physical_log_slot_clear()
-> > is able to handle such 1:N mapping.
-> > "
+Hi Eduardo,
+
+How about this version of patch? Last month this patch is reverted from 
+pull request. And I submitted this version.
+
+Tao
+
+On 9/5/2019 4:32 PM, Xu, Tao3 wrote:
+> Add MachineClass::auto_enable_numa field. When it is true, a NUMA node
+> is expected to be created implicitly.
 > 
-> Yes, that's great.
+> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> ---
+> 
+> Note: Parameter -numa node,mem is deprecated too. So I set
+> "numa_info[0].node_mem = ram_size" instead of
+> "NumaNodeOptions node = { .mem = ram_size }".
+> 
+> Changes in v2:
+>      - Fix the qtest error, avoid using numa_auto_assign_ram.
+> ---
+>   hw/core/numa.c      | 10 ++++++++--
+>   hw/ppc/spapr.c      |  9 +--------
+>   include/hw/boards.h |  1 +
+>   3 files changed, 10 insertions(+), 10 deletions(-)
+> 
+> diff --git a/hw/core/numa.c b/hw/core/numa.c
+> index 4dfec5c95b..038c96d4ab 100644
+> --- a/hw/core/numa.c
+> +++ b/hw/core/numa.c
+> @@ -378,11 +378,17 @@ void numa_complete_configuration(MachineState *ms)
+>        *   guest tries to use it with that drivers.
+>        *
+>        * Enable NUMA implicitly by adding a new NUMA node automatically.
+> +     *
+> +     * Or if MachineClass::auto_enable_numa is true and no NUMA nodes,
+> +     * assume there is just one node with whole RAM.
+>        */
+> -    if (ms->ram_slots > 0 && ms->numa_state->num_nodes == 0 &&
+> -        mc->auto_enable_numa_with_memhp) {
+> +    if (ms->numa_state->num_nodes == 0 &&
+> +        ((ms->ram_slots > 0 &&
+> +        mc->auto_enable_numa_with_memhp) ||
+> +        mc->auto_enable_numa)) {
+>               NumaNodeOptions node = { };
+>               parse_numa_node(ms, &node, &error_abort);
+> +            numa_info[0].node_mem = ram_size;
+>       }
+>   
+>       assert(max_numa_nodeid <= MAX_NODES);
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 222a325056..f760e0f5d7 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -405,14 +405,6 @@ static int spapr_populate_memory(SpaprMachineState *spapr, void *fdt)
+>       hwaddr mem_start, node_size;
+>       int i, nb_nodes = machine->numa_state->num_nodes;
+>       NodeInfo *nodes = machine->numa_state->nodes;
+> -    NodeInfo ramnode;
+> -
+> -    /* No NUMA nodes, assume there is just one node with whole RAM */
+> -    if (!nb_nodes) {
+> -        nb_nodes = 1;
+> -        ramnode.node_mem = machine->ram_size;
+> -        nodes = &ramnode;
+> -    }
+>   
+>       for (i = 0, mem_start = 0; i < nb_nodes; ++i) {
+>           if (!nodes[i].node_mem) {
+> @@ -4477,6 +4469,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>        */
+>       mc->numa_mem_align_shift = 28;
+>       mc->numa_mem_supported = true;
+> +    mc->auto_enable_numa = true;
+>   
+>       smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
+>       smc->default_caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_ON;
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 2289536e48..481e69388e 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -221,6 +221,7 @@ struct MachineClass {
+>       bool smbus_no_migration_support;
+>       bool nvdimm_supported;
+>       bool numa_mem_supported;
+> +    bool auto_enable_numa;
+>   
+>       HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+>                                              DeviceState *dev);
+> 
 
-Please feel free to add my r-b directly on patch 2 with that amended.
-
-Thanks,
-
--- 
-Peter Xu
 
