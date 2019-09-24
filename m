@@ -2,62 +2,102 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8111CC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:55:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93110C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:59:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 564B021655
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:55:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 564B021655
+	by mail.kernel.org (Postfix) with ESMTPS id 5D027207FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 14:59:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KcPvb3OP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D027207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCmEI-0007RE-Mt
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 10:55:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58853)
+	id 1iCmHg-0002Sn-QT
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 10:59:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32916)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iCks5-0000Km-RE
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:53 -0400
+ (envelope-from <philmd@redhat.com>) id 1iCl5u-0004jZ-9z
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:43:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iCkrw-0001U8-Nb
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35814)
+ (envelope-from <philmd@redhat.com>) id 1iCl5t-0008I3-8g
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:43:06 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44443
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iCkrw-0001Sv-0Q
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:28:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C6A504FCC9;
- Tue, 24 Sep 2019 13:28:38 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F924600CC;
- Tue, 24 Sep 2019 13:28:36 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 6A28A11386A7; Tue, 24 Sep 2019 15:28:30 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 05/25] qapi: Clean up member name case checking
-Date: Tue, 24 Sep 2019 15:28:10 +0200
-Message-Id: <20190924132830.15835-6-armbru@redhat.com>
-In-Reply-To: <20190924132830.15835-1-armbru@redhat.com>
-References: <20190924132830.15835-1-armbru@redhat.com>
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iCl5s-0008H6-Th
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 09:43:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1569332584;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=IaAaaiBuNyFnRW+WwVtEeUZj2iRI/cjyZpL4KInS+/0=;
+ b=KcPvb3OPmbOymgPCYDsYHhc0oMlV6/gnSQ6n/Mgzng4Tz1SxAcL4nDESfmQ1lrEyF/2RQ2
+ 0KxUVqaiI1xAO6xCLckEqgeFnXVxkgCk559Jo4VQlG+yPH0k+zZxdJheygFOCkctI02YcO
+ 8wj3FbI77NlqwPqxFYlcfOxUTwK+63I=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-295-aLIDyS95Pby1Y-JtU5WS9g-1; Tue, 24 Sep 2019 09:43:02 -0400
+Received: by mail-wm1-f69.google.com with SMTP id c188so23198wmd.9
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 06:43:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=tCMYsjxij8sNqWPcrfwE0+Wh73+xKTJT1k8/sbZ8AXw=;
+ b=l44WN+lmunsYvuPWBtodQN3T/35O/uLaC0P7bLXlWjSAivnKCVO87Ub5nfFj+wHDvf
+ EvQH2ebunugBcoT2heA+vTkPAD5WyHpbuPUWtkFjLAUPZDBdAXVssNinmkhNK7zhF7Cs
+ WFdJoCwi6LflKoHhn46za/OeWthAfuXikGx4bdoPBWDEeqdULDCRO41QhHFVpNFmwIHL
+ H0CEQOfyIo/lqcLeisO1/fXElQTjozhqhb4ssloJQADJ8T1JWZb+RdH0Z/ChXV/F24bi
+ eO8uJ5EYSUpxX8dwekGGWO8IcKsF7Y7xLK/2wo8UOsEuZQngnxRkGJCxqO0NGmvw+d0V
+ /H7A==
+X-Gm-Message-State: APjAAAWJ9eNNbM4yEb0pd9Arf4qENAWEDiGnPJEmjyvK2j+++C4iFLv8
+ lGBEZI/ps3+HJIvXfjBkIqZ/8mDyF93ZNXXPaz9B8Gx40ZLIbMpTlkJ44ixtXEh2/M8xisLKlzt
+ /D5LB0fI2qpw8OMw=
+X-Received: by 2002:adf:e607:: with SMTP id p7mr2317969wrm.230.1569332581769; 
+ Tue, 24 Sep 2019 06:43:01 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx289zOYsfThGc6IR0e027sEhHxFDyhOEfIl9LBhoL9vO7kgdRqnjkTpzLlm1ZpcWU+kUA5NQ==
+X-Received: by 2002:adf:e607:: with SMTP id p7mr2317942wrm.230.1569332581581; 
+ Tue, 24 Sep 2019 06:43:01 -0700 (PDT)
+Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id d28sm3327375wrb.95.2019.09.24.06.43.00
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 24 Sep 2019 06:43:00 -0700 (PDT)
+Subject: Re: illegal hardware instruction during MIPS-I ELF linux useremulation
+To: Libo Zhou <zhlb29@foxmail.com>, Peter Maydell <peter.maydell@linaro.org>
+References: <tencent_28AAA62B694825C348B1DF49@qq.com>
+ <CAFEAcA8+bK0UyUWbXOiutyQZkCMSB_0Be7pJLKONSpA3CV9Pbw@mail.gmail.com>
+ <tencent_0084E0586ADE9B2D30176A53@qq.com>
+ <tencent_6A42D8651281588C41FEE751@qq.com>
+ <tencent_6DB0EBDC4C098868592B8A79@qq.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <b4bc1f35-817d-79a0-df4d-07eaa2fdffe5@redhat.com>
+Date: Tue, 24 Sep 2019 15:42:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Tue, 24 Sep 2019 13:28:38 +0000 (UTC)
+In-Reply-To: <tencent_6DB0EBDC4C098868592B8A79@qq.com>
+Content-Language: en-US
+X-MC-Unique: aLIDyS95Pby1Y-JtU5WS9g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,216 +109,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: qemu-devel <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QAPISchemaMember.check_clash() checks for member names that map to the
-same c_name().  Takes care of rejecting duplicate names.
+On 9/24/19 3:31 PM, Libo Zhou wrote:
+>>> I would start by using the QEMU gdbstub to connect a
+>>> MIPS-aware gdb. Then when the SIGILL arrives you can see
+>>> what instruction the guest program was trying to execute.
+>=20
+>> Just tried it and found something interesting.
+>> I connected gdb-multiarch to QEMU gdbstub. gdb-multiarch's architecture =
+was set to mips:3000 automatically (and Wikipedia says r3k uses MIPS-I).
+>=20
+>> When I did 'layout asm', and compared the instructions displayed against=
+ test.s generated by my mipsel-linux-unknown-gcc, they appeared to be a lit=
+tle bit different.
+>=20
+>> The 'store word' instruction in test.s is shown as a hex '0x7f......(don=
+'t remember the rest)';
+>> 'load word' is shown as '0x5f......';
+>> 'load immediate' is seen as 'addi';
+>> 'j' as 'jr';
+>=20
+>> When I single-stepped the instructions, the SIGILL was thrown immediatel=
+y after the first unrecognized 0x7f......, which is supposed to be a store =
+word (sw).
+>=20
+>> Hence, can I conclude that MIPS-I is not implemented in QEMU out of the =
+box? Or is it possible that my compiler doesn't implement MIPS-I correctly?
+>=20
+> More updates about this. I just disassembled the unrecognized hex by hand=
+, and figured out that the store word and load word opcodes are not the sam=
+e as specified in translate.c. While the remaining fields of those unrecogn=
+ized instructions do match with the source and destination registers.
 
-It also checks a naming rule: no uppercase in member names.  That's a
-rather odd place to do it.  Enforcing naming rules is
-check_name_str()'s job.
-
-qapi-code-gen.txt specifies the name case rule applies to the name as
-it appears in the schema.  check_clash() checks c_name(name) instead.
-No difference, as c_name() leaves alone case, but unclean.
-
-Move the name case check into check_name_str(), less the c_name().
-New argument @permit_upper suppresses it.  Pass permit_upper=3DTrue for
-definitions (which are not members), and when the member's owner is
-whitelisted with pragma name-case-whitelist.
-
-Bonus: name-case-whitelist now applies to a union's inline base, too.
-Update qapi/qapi-schema.json pragma to whitelist union CpuInfo instead
-of CpuInfo's implicit base type's name q_obj_CpuInfo-base.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- qapi/qapi-schema.json                    |  2 +-
- scripts/qapi/common.py                   | 25 +++++++++++++-----------
- tests/qapi-schema/args-member-case.err   |  2 +-
- tests/qapi-schema/args-member-case.json  |  2 +-
- tests/qapi-schema/enum-member-case.err   |  2 +-
- tests/qapi-schema/union-branch-case.err  |  4 ++--
- tests/qapi-schema/union-branch-case.json |  4 ++--
- 7 files changed, 22 insertions(+), 19 deletions(-)
-
-diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-index 920b03b0aa..9751b11f8f 100644
---- a/qapi/qapi-schema.json
-+++ b/qapi/qapi-schema.json
-@@ -71,7 +71,7 @@
-         'QapiErrorClass',           # all members, visible through error=
-s
-         'UuidInfo',                 # UUID, visible through query-uuid
-         'X86CPURegister32',         # all members, visible indirectly th=
-rough qom-get
--        'q_obj_CpuInfo-base'        # CPU, visible through query-cpu
-+        'CpuInfo'                   # CPU, visible through query-cpu
-     ] } }
-=20
- # Documentation generated with qapi-gen.py is in source order, with
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index f0e7d5ad34..ed4bff4479 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -704,8 +704,8 @@ valid_name =3D re.compile(r'^(__[a-zA-Z0-9.-]+_)?'
-                         '[a-zA-Z][a-zA-Z0-9_-]*$')
-=20
-=20
--def check_name(info, source, name, allow_optional=3DFalse,
--               enum_member=3DFalse):
-+def check_name(info, source, name,
-+               allow_optional=3DFalse, enum_member=3DFalse, permit_upper=
-=3DFalse):
-     global valid_name
-     membername =3D name
-=20
-@@ -725,11 +725,14 @@ def check_name(info, source, name, allow_optional=3D=
-False,
-     if not valid_name.match(membername) or \
-        c_name(membername, False).startswith('q_'):
-         raise QAPISemError(info, "%s uses invalid name '%s'" % (source, =
-name))
-+    if not permit_upper and name.lower() !=3D name:
-+        raise QAPISemError(
-+            info, "%s uses uppercase in name '%s'" % (source, name))
-=20
-=20
- def add_name(name, info, meta):
-     global all_names
--    check_name(info, "'%s'" % meta, name)
-+    check_name(info, "'%s'" % meta, name, permit_upper=3DTrue)
-     # FIXME should reject names that differ only in '_' vs. '.'
-     # vs. '-', because they're liable to clash in generated C.
-     if name in all_names:
-@@ -797,10 +800,12 @@ def check_type(info, source, value,
-         raise QAPISemError(info,
-                            "%s should be an object or type name" % sourc=
-e)
-=20
-+    permit_upper =3D allow_dict in name_case_whitelist
-+
-     # value is a dictionary, check that each member is okay
-     for (key, arg) in value.items():
-         check_name(info, "Member of %s" % source, key,
--                   allow_optional=3DTrue)
-+                   allow_optional=3DTrue, permit_upper=3Dpermit_upper)
-         if c_name(key, False) =3D=3D 'u' or c_name(key, False).startswit=
-h('has_'):
-             raise QAPISemError(info, "Member of %s uses reserved name '%=
-s'"
-                                % (source, key))
-@@ -870,7 +875,7 @@ def check_union(expr, info):
-     else:
-         # The object must have a string or dictionary 'base'.
-         check_type(info, "'base' for union '%s'" % name,
--                   base, allow_dict=3DTrue,
-+                   base, allow_dict=3Dname,
-                    allow_metas=3D['struct'])
-         if not base:
-             raise QAPISemError(info, "Flat union '%s' must have a base"
-@@ -982,13 +987,15 @@ def check_enum(expr, info):
-         raise QAPISemError(info,
-                            "Enum '%s' requires a string for 'prefix'" % =
-name)
-=20
-+    permit_upper =3D name in name_case_whitelist
-+
-     for member in members:
-         check_known_keys(info, "member of enum '%s'" % name, member,
-                          ['name'], ['if'])
-         check_if(member, info)
-         normalize_if(member)
-         check_name(info, "Member of enum '%s'" % name, member['name'],
--                   enum_member=3DTrue)
-+                   enum_member=3DTrue, permit_upper=3Dpermit_upper)
-=20
-=20
- def check_struct(expr, info):
-@@ -997,7 +1004,7 @@ def check_struct(expr, info):
-     features =3D expr.get('features')
-=20
-     check_type(info, "'data' for struct '%s'" % name, members,
--               allow_dict=3DTrue)
-+               allow_dict=3Dname)
-     check_type(info, "'base' for struct '%s'" % name, expr.get('base'),
-                allow_metas=3D['struct'])
-=20
-@@ -1555,10 +1562,6 @@ class QAPISchemaMember(object):
-=20
-     def check_clash(self, info, seen):
-         cname =3D c_name(self.name)
--        if (cname.lower() !=3D cname
--                and self.defined_in not in name_case_whitelist):
--            raise QAPISemError(info,
--                               "%s should not use uppercase" % self.desc=
-ribe())
-         if cname in seen:
-             raise QAPISemError(info, "%s collides with %s" %
-                                (self.describe(), seen[cname].describe())=
-)
-diff --git a/tests/qapi-schema/args-member-case.err b/tests/qapi-schema/a=
-rgs-member-case.err
-index 725ba16192..da183957b2 100644
---- a/tests/qapi-schema/args-member-case.err
-+++ b/tests/qapi-schema/args-member-case.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/args-member-case.json: In command 'no-way-this-will-ge=
-t-whitelisted':
--tests/qapi-schema/args-member-case.json:2: 'Arg' (parameter of no-way-th=
-is-will-get-whitelisted) should not use uppercase
-+tests/qapi-schema/args-member-case.json:2: Member of 'data' for command =
-'no-way-this-will-get-whitelisted' uses uppercase in name 'Arg'
-diff --git a/tests/qapi-schema/args-member-case.json b/tests/qapi-schema/=
-args-member-case.json
-index 93439bee8b..e27c603548 100644
---- a/tests/qapi-schema/args-member-case.json
-+++ b/tests/qapi-schema/args-member-case.json
-@@ -1,2 +1,2 @@
--# Member names should be 'lower-case' unless the struct/command is white=
-listed
-+# Member names should be 'lower-case' unless the struct is whitelisted
- { 'command': 'no-way-this-will-get-whitelisted', 'data': { 'Arg': 'int' =
-} }
-diff --git a/tests/qapi-schema/enum-member-case.err b/tests/qapi-schema/e=
-num-member-case.err
-index f6c872d3bf..8f2007c86f 100644
---- a/tests/qapi-schema/enum-member-case.err
-+++ b/tests/qapi-schema/enum-member-case.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/enum-member-case.json: In enum 'NoWayThisWillGetWhitel=
-isted':
--tests/qapi-schema/enum-member-case.json:4: 'Value' (value of NoWayThisWi=
-llGetWhitelisted) should not use uppercase
-+tests/qapi-schema/enum-member-case.json:4: Member of enum 'NoWayThisWill=
-GetWhitelisted' uses uppercase in name 'Value'
-diff --git a/tests/qapi-schema/union-branch-case.err b/tests/qapi-schema/=
-union-branch-case.err
-index 8e81a2d0b6..09313d7f83 100644
---- a/tests/qapi-schema/union-branch-case.err
-+++ b/tests/qapi-schema/union-branch-case.err
-@@ -1,2 +1,2 @@
--tests/qapi-schema/union-branch-case.json: In union 'NoWayThisWillGetWhit=
-elisted':
--tests/qapi-schema/union-branch-case.json:2: 'Branch' (branch of NoWayThi=
-sWillGetWhitelisted) should not use uppercase
-+tests/qapi-schema/union-branch-case.json: In union 'Uni':
-+tests/qapi-schema/union-branch-case.json:2: Member of union 'Uni' uses u=
-ppercase in name 'Branch'
-diff --git a/tests/qapi-schema/union-branch-case.json b/tests/qapi-schema=
-/union-branch-case.json
-index e6565dc3b3..b7894b75d6 100644
---- a/tests/qapi-schema/union-branch-case.json
-+++ b/tests/qapi-schema/union-branch-case.json
-@@ -1,2 +1,2 @@
--# Branch names should be 'lower-case' unless the union is whitelisted
--{ 'union': 'NoWayThisWillGetWhitelisted', 'data': { 'Branch': 'int' } }
-+# Branch names should be 'lower-case'
-+{ 'union': 'Uni', 'data': { 'Branch': 'int' } }
---=20
-2.21.0
+What is your compiler/assembler versions (on both machines you used)?
 
 
