@@ -2,58 +2,89 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB4BDC432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:40:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9D36C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:41:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FBCA20872
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:40:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FBCA20872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 72DA120872
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 16:41:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kGb2jcWz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72DA120872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCnrn-0002XE-AO
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:40:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59015)
+	id 1iCnsC-0002iF-HT
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 12:41:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51053)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <amorenoz@redhat.com>) id 1iCnYf-00005n-I0
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 12:20:58 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iCmuD-0007zP-2h
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:39:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <amorenoz@redhat.com>) id 1iCnYc-0007u5-Pk
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 12:20:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57400)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <amorenoz@redhat.com>) id 1iCnYc-0007s5-KL
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 12:20:54 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 316D2C049E36;
- Tue, 24 Sep 2019 16:20:52 +0000 (UTC)
-Received: from amorenoz.users.ipa.redhat.com (ovpn-117-80.ams2.redhat.com
- [10.36.117.80])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 330BA66A00;
- Tue, 24 Sep 2019 16:20:48 +0000 (UTC)
-From: Adrian Moreno <amorenoz@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3] vhost-user: save features if the char dev is closed
-Date: Tue, 24 Sep 2019 18:20:44 +0200
-Message-Id: <20190924162044.11414-1-amorenoz@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1iCmuA-00062n-BA
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:39:08 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38827)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iCmu8-00061u-Ir
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 11:39:06 -0400
+Received: by mail-wm1-x343.google.com with SMTP id 3so569144wmi.3
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 08:39:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=qclRRxXYeP+oEHUpWSgbBttIh6GIZkCeB7ty9HlkVEc=;
+ b=kGb2jcWztH1UW6soq/kMMeyhsU/4oWhGrovh4QKh0HCrqYnIz7ZnR17njbVHIJT6ZM
+ JLTV61affaMIhNKJn5Dkag98R2b3ZyQgiuRf+Il5uXj8NLMRjDkPVrkpYoEyNRt0h1WN
+ NKLCYMuZkkaabSzO4VIYOBtYekm+5a8jtdt6R0aqrGGQBwvo2vwQOcTewM1P6Daz0yJ0
+ kpNZjnU8Zsp+3fILRo4zkvMovixz7/gVMxTwedDm8ZqjNPx7BDZfewgTxdP3/VUBht20
+ rhaslLmk0GBYHMZiVWimjnk87jxV4W2dim5QE7mTDrhjNoT08CFeaaJpwA/0BqQl5w6s
+ LscA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=qclRRxXYeP+oEHUpWSgbBttIh6GIZkCeB7ty9HlkVEc=;
+ b=iJe8zMswGft3wpFVTvVrgv+2iB83flaQ+chgXhtURVjPEEG6KXL9Ya3+adh6rp0RP2
+ T878ieIaKX5bWtHmhngK77em+xDsgK9iYa+fyOZN9+v80xPA81E+zE/Y2dxJU23D9U3q
+ oiVhP3p7TCG/Cgl5HsgFb7OPbNQdOb4xbw4wT+8DwYokK4lKiOVZLCENntMFeT3SJDcE
+ VLDFhE35u3z/FPFedVtXBiuw8u80YNY3r2Lv0yLJSJXaf/EW8OdYUKm+kBBIKofvfNa/
+ x1jXAciMWjaz7KkQeydrq7VwAVih/Czn8tc7P9R/wqh9KCxtcs4W5viq6AxHoqD6yK/9
+ h7CA==
+X-Gm-Message-State: APjAAAUdEXoBenUX8TiBFM7hRmiZxA1Gh1F12H0f3xLMfGsG5NsvosMt
+ 2Z/BCZEQPYGTVo3jnq6LZH+cf4DAuZ5Eyg==
+X-Google-Smtp-Source: APXvYqy7ZSGtxyFuGxSISg9/X8mRsJyWWr0EGH1vzygtfFK8pmj3dICs1XqRz+Hni2LtjcI6iv6apQ==
+X-Received: by 2002:a1c:c78f:: with SMTP id x137mr813859wmf.42.1569339541820; 
+ Tue, 24 Sep 2019 08:39:01 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id u10sm478677wmm.0.2019.09.24.08.39.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 24 Sep 2019 08:39:00 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 541381FF87;
+ Tue, 24 Sep 2019 16:39:00 +0100 (BST)
+References: <20190923174942.12182-1-dgilbert@redhat.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: "Dr. David Alan Gilbert \(git\)" <dgilbert@redhat.com>
+Subject: Re: [PATCH] migration/postcopy: Recognise the recovery states as
+ 'in_postcopy'
+In-reply-to: <20190923174942.12182-1-dgilbert@redhat.com>
+Date: Tue, 24 Sep 2019 16:39:00 +0100
+Message-ID: <875zlhbt63.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Tue, 24 Sep 2019 16:20:52 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,45 +96,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ddstreet@canonical.com, jasowang@redhat.com,
- Adrian Moreno <amorenoz@redhat.com>, Pei Zhang <pezhang@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: thuth@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-That way the state can be correctly restored when the device is opened
-again. This might happen if the backend is restarted.
 
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1738768
-Reported-by: Pei Zhang <pezhang@redhat.com>
-Fixes: 6ab79a20af3a (do not call vhost_net_cleanup() on running net from =
-char user event)
-Cc: ddstreet@canonical.com
-Cc: Michael S. Tsirkin <mst@redhat.com>
+Dr. David Alan Gilbert (git) <dgilbert@redhat.com> writes:
 
-Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
----
- net/vhost-user.c | 4 ++++
- 1 file changed, 4 insertions(+)
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> Various parts of the migration code do different things when they're
+> in postcopy mode; prior to this patch this has been 'postcopy-active'.
+> This patch extends 'in_postcopy' to include 'postcopy-paused' and
+> 'postcopy-recover'.
+>
+> In particular, when you set the max-postcopy-bandwidth parameter, this
+> only affects the current migration fd if we're 'in_postcopy';
+> this leads to a race in the postcopy recovery test where it increases
+> the speed from 4k/sec to unlimited, but that increase can get ignored
+> if the change is made between the point at which the reconnection
+> happens and it transitions back to active.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-diff --git a/net/vhost-user.c b/net/vhost-user.c
-index 51921de443..014199d600 100644
---- a/net/vhost-user.c
-+++ b/net/vhost-user.c
-@@ -235,6 +235,10 @@ static void chr_closed_bh(void *opaque)
-=20
-     s =3D DO_UPCAST(NetVhostUserState, nc, ncs[0]);
-=20
-+    if (s->vhost_net) {
-+        s->acked_features =3D vhost_net_get_acked_features(s->vhost_net)=
-;
-+    }
-+
-     qmp_set_link(name, false, &err);
-=20
-     qemu_chr_fe_set_handlers(&s->chr, NULL, NULL, net_vhost_user_event,
---=20
-2.21.0
+In my xenial stress test I run 100 times and it never triggered the 180s
+timeout I set on my retry.py script:
 
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  migration/migration.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+>
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 01863a95f5..5f7e4d15e9 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1659,7 +1659,14 @@ bool migration_in_postcopy(void)
+>  {
+>      MigrationState *s =3D migrate_get_current();
+>
+> -    return (s->state =3D=3D MIGRATION_STATUS_POSTCOPY_ACTIVE);
+> +    switch (s->state) {
+> +    case MIGRATION_STATUS_POSTCOPY_ACTIVE:
+> +    case MIGRATION_STATUS_POSTCOPY_PAUSED:
+> +    case MIGRATION_STATUS_POSTCOPY_RECOVER:
+> +        return true;
+> +    default:
+> +        return false;
+> +    }
+>  }
+>
+>  bool migration_in_postcopy_after_devices(MigrationState *s)
+
+
+--
+Alex Benn=C3=A9e
 
