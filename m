@@ -2,72 +2,137 @@ Return-Path: <SRS0=+sEj=XT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19BD2C432C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:05:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3997C432C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:09:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2FE5207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:05:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2FE5207FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8528E207FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Sep 2019 20:09:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8528E207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCr4Q-0005HV-5A
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:05:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40937)
+	id 1iCr7X-0007pE-Mh
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 16:09:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43289)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1iCr3M-0004em-2K
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:04:53 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iCr63-0006a5-CL
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:07:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1iCr3K-0000WO-CH
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:04:51 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:39446)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1iCr3K-0000V0-3V
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:04:50 -0400
-Received: by mail-pl1-f196.google.com with SMTP id s17so1427374plp.6
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 13:04:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=/rSgQcrRsIlsdxJKOZJom9LnTWOg9fHERF3t38GzndI=;
- b=RxivST4S1nMRD9We4Hj/ihbjkT/xqGK54vIAyG2/wh/OIJnr73FYnQikgJlPHt1Mej
- 4qqYd/CkkxowaO55I6ftvU7WEd+14zkeIZ0ZXz1IZNxh+Ra0zNMozjwGE2KhQ8J43CBT
- O6koiQKctruS/0s3JiPDOdHqxD5sb2ROH4GZzylHsCYrl6QfpDx8sdKtSnT5hW7AGac/
- T+rZTciPfR/nhRs5JPsCmopGc6qvTRwOgS1QnTueLA4ATqXOFr2Ag/p0DPf4azVaocgq
- LU3l6MqikNhSVsShFBN1yWJZC8cn89Q9ALcGYMzEACvDnJlJM/HaqI67bSmcEj+Cl5KM
- RcDQ==
-X-Gm-Message-State: APjAAAUKqKFk45N0porjU0OEroLb2cEyz9SCtiPbcyJJg38H4IJqR+DA
- IWu46/7vyP6zmFaV9a0DmZovFA==
-X-Google-Smtp-Source: APXvYqzTWzT+/VxpflvcKQyYMNSWEXgmaY0QX0hoFv/RVz1Xb4cfn0PcA7n6tv9c06XRoqwRZip8QA==
-X-Received: by 2002:a17:902:56e:: with SMTP id
- 101mr4973233plf.90.1569355487301; 
- Tue, 24 Sep 2019 13:04:47 -0700 (PDT)
-Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id v44sm3533668pgn.17.2019.09.24.13.04.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 24 Sep 2019 13:04:46 -0700 (PDT)
-Date: Tue, 24 Sep 2019 13:04:46 -0700 (PDT)
-X-Google-Original-Date: Tue, 24 Sep 2019 13:04:44 PDT (-0700)
-Subject: Re: [Qemu-devel] [PATCH] atomic failures on qemu-system-riscv64
-In-Reply-To: <CAKmqyKP+HNfzh5kCKkGDtfr=pDRwcjL+dUQ79NZEk+jMZ3q=_Q@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: alistair23@gmail.com
-Message-ID: <mhng-a172dfe8-dd34-427f-89dd-ca65da3145fb@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ (envelope-from <jsnow@redhat.com>) id 1iCr61-00028e-Uf
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 16:07:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46486)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iCr5y-00027N-71; Tue, 24 Sep 2019 16:07:34 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DA18285550;
+ Tue, 24 Sep 2019 18:49:55 +0000 (UTC)
+Received: from [10.18.17.231] (dhcp-17-231.bos.redhat.com [10.18.17.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2871B5C21F;
+ Tue, 24 Sep 2019 18:49:48 +0000 (UTC)
+Subject: Re: [Qemu-block] [PATCH v6 0/8] Add Qemu to SeaBIOS LCHS interface
+To: Sam Eiderman <sameid@google.com>, qemu-devel@nongnu.org
+References: <20190827082427.64280-1-sameid@google.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <474297a9-f051-8068-ee62-21f09a6269eb@redhat.com>
+Date: Tue, 24 Sep 2019 14:49:48 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
+MIME-Version: 1.0
+In-Reply-To: <20190827082427.64280-1-sameid@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Tue, 24 Sep 2019 18:50:12 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.214.196
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,163 +144,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: me@carlosedp.com, qemu-riscv@nongnu.org, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, joel@sing.id.au,
- Alistair Francis <Alistair.Francis@wdc.com>, marco@decred.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, seabios@seabios.org,
+ kevin@koconnor.net, liran.alon@oracle.com, kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 24 Sep 2019 11:29:25 PDT (-0700), alistair23@gmail.com wrote:
-> On Mon, Jun 24, 2019 at 11:21 AM Joel Sing <joel@sing.id.au> wrote:
->>
->> On 19-06-17 16:52:44, Richard Henderson wrote:
->> > On 6/16/19 12:19 PM, Joel Sing wrote:
->> > > +    /*
->> > > +     * Clear the load reservation, since an SC must fail if there is
->> > > +     * an SC to any address, in between an LR and SC pair.
->> > > +     */
->> > > +    tcg_gen_movi_tl(load_res, 0);
->> > > +
->> > >      gen_set_label(l2);
->> >
->> > This clear needs to be moved down below label l2.
->> > Otherwise, with lr / sc / sc, the second sc could succeed in error.
->>
->> Indeed, thanks.
->>
->> > FWIW, other targets have used -1 as the "invalid" load reservation, since the
->> > architecture does not require address 0 to be unmapped.  This should be quite
->> > visible in M-mode with paging disabled and ram at offset 0.  Often, other
->> > targets require alignment for the lr/sc address, though I don't see that for riscv.
->>
->> I've switched to -1 as suggested. Regarding the alignment for reservations, the
->> specification does require this, although I do not recall seeing any enforcement
->> of this by qemu itself.
->>
->> New diff follows.
->>
->> From 8ef31a2ce8ef1cbeee92995a0b2994f480e9bb6d Mon Sep 17 00:00:00 2001
->> From: Joel Sing <joel@sing.id.au>
->> Date: Tue, 25 Jun 2019 02:44:24 +1000
->> Subject: [PATCH] Clear load reservations on qemu riscv target
->>
->> This prevents a load reservation from being placed in one context/process,
->> then being used in another, resulting in an SC succeeding incorrectly and
->> breaking atomics.
->>
->> Signed-off-by: Joel Sing <joel@sing.id.au>
->> ---
->>  target/riscv/cpu.c                      | 1 +
->>  target/riscv/cpu_helper.c               | 9 +++++++++
->>  target/riscv/insn_trans/trans_rva.inc.c | 8 +++++++-
->>  3 files changed, 17 insertions(+), 1 deletion(-)
->>
->> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
->> index d61bce6d55..e7c8bf48fc 100644
->> --- a/target/riscv/cpu.c
->> +++ b/target/riscv/cpu.c
->> @@ -281,6 +281,7 @@ static void riscv_cpu_reset(CPUState *cs)
->>      env->pc = env->resetvec;
->>  #endif
->>      cs->exception_index = EXCP_NONE;
->> +    env->load_res = -1;
->>      set_default_nan_mode(1, &env->fp_status);
->>  }
->>
->> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
->> index b17f169681..6a07b12e65 100644
->> --- a/target/riscv/cpu_helper.c
->> +++ b/target/riscv/cpu_helper.c
->> @@ -113,6 +113,15 @@ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv)
->>      }
->>      /* tlb_flush is unnecessary as mode is contained in mmu_idx */
->>      env->priv = newpriv;
->> +
->> +    /* Clear the load reservation - otherwise a reservation placed in one
->> +     * context/process can be used by another, resulting in an SC succeeding
->> +     * incorrectly. Version 2.2 of the ISA specification explicitly requires
->> +     * this behaviour, while later revisions say that the kernel "should" use
->> +     * an SC instruction to force the yielding of a load reservation on a
->> +     * preemptive context switch. As a result, do both.
->> +     */
->> +    env->load_res = -1;
->>  }
->>
->>  /* get_physical_address - get the physical address for this virtual address
->> diff --git a/target/riscv/insn_trans/trans_rva.inc.c b/target/riscv/insn_trans/trans_rva.inc.c
->> index f6dbbc065e..fadd88849e 100644
->> --- a/target/riscv/insn_trans/trans_rva.inc.c
->> +++ b/target/riscv/insn_trans/trans_rva.inc.c
->> @@ -61,7 +61,7 @@ static inline bool gen_sc(DisasContext *ctx, arg_atomic *a, TCGMemOp mop)
->>
->>      gen_set_label(l1);
->>      /*
->> -     * Address comparion failure.  However, we still need to
->> +     * Address comparison failure.  However, we still need to
->>       * provide the memory barrier implied by AQ/RL.
->>       */
->>      tcg_gen_mb(TCG_MO_ALL + a->aq * TCG_BAR_LDAQ + a->rl * TCG_BAR_STRL);
->> @@ -69,6 +69,12 @@ static inline bool gen_sc(DisasContext *ctx, arg_atomic *a, TCGMemOp mop)
->>      gen_set_gpr(a->rd, dat);
->>
->>      gen_set_label(l2);
->> +    /*
->> +     * Clear the load reservation, since an SC must fail if there is
->> +     * an SC to any address, in between an LR and SC pair.
->> +     */
->> +    tcg_gen_movi_tl(load_res, -1);
->> +
->>      tcg_temp_free(dat);
->>      tcg_temp_free(src1);
->>      tcg_temp_free(src2);
->> --
->
-> This patch causes boot failures when booting systemd built with musl on RV64.
->
-> It could possibly be a musl bug, but I wanted to throw that out here
-> first to see what people think.
+Nobody was making movement on this patch series, and in response to Max
+acking the whole series, I was just going to send a pull request for the
+whole thing and see who barked, because nobody likes or hates this
+series enough to offer any feedback.
 
-Looking at the musl port, I see at least one bug in their atomics jumping out 
-at me:
+Unfortunately, it's rotted on the vine a bit and has some conflicts with
+the testing infrastructure now:
 
-diff --git a/arch/riscv64/atomic_arch.h b/arch/riscv64/atomic_arch.h
-index c9765342..41ad4d04 100644
---- a/arch/riscv64/atomic_arch.h
-+++ b/arch/riscv64/atomic_arch.h
-@@ -14,7 +14,7 @@ static inline int a_cas(volatile int *p, int t, int s)
-                "       sc.w.aqrl %1, %4, (%2)\n"
-                "       bnez %1, 1b\n"
-                "1:"
--               : "=&r"(old), "=r"(tmp)
-+               : "=&r"(old), "=&r"(tmp)
-                : "r"(p), "r"(t), "r"(s)
-                : "memory");
-        return old;
-@@ -31,7 +31,7 @@ static inline void *a_cas_p(volatile void *p, void *t, void *s)
-                "       sc.d.aqrl %1, %4, (%2)\n"
-                "       bnez %1, 1b\n"
-                "1:"
--               : "=&r"(old), "=r"(tmp)
-+               : "=&r"(old), "=&r"(tmp)
-                : "r"(p), "r"(t), "r"(s)
-                : "memory");
-        return old;
+/home/jhuston/src/qemu.git/ide/tests/hd-geo-test.c: In function
+=E2=80=98test_override=E2=80=99:
+/home/jhuston/src/qemu.git/ide/tests/hd-geo-test.c:732:5: error:
+implicit declaration of function =E2=80=98qtest_start=E2=80=99
+[-Werror=3Dimplicit-function-declaration]
+  732 |     qtest_start(joined_args);
 
-It's a shot in the dark as to whether that'll fix your bug, but I could at 
-least see a mechanism for it: before we yielded load reservations on context 
-switches then that backwards branch would never be taken, so we wouldn't notice 
-if tmp was allocated into one of the same registers as the inputs.  Even if it 
-doesn't fix your issue it's still a bug so I'll send the patch out, just LMK so 
-I can indicate how important the issue is.
 
-This should manifest on hardware, but it looks like we managed to drop that SC 
-patch.  I'll go send the patch out now...
+You can jump right to the test by invoking it like this:
 
->
-> Alistair
->
->> 2.21.0
->>
->>
+> export QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64
+> make tests/hd-geo-test
+
+It looks like some definitions got moved out from under our feet, but
+hopefully it won't take long to rectify.
+
+--js
+
+On 8/27/19 4:24 AM, Sam Eiderman via Qemu-block wrote:
+> v1:
+>=20
+> Non-standard logical geometries break under QEMU.
+>=20
+> A virtual disk which contains an operating system which depends on
+> logical geometries (consistent values being reported from BIOS INT13
+> AH=3D08) will most likely break under QEMU/SeaBIOS if it has non-standa=
+rd
+> logical geometries - for example 56 SPT (sectors per track).
+> No matter what QEMU will guess - SeaBIOS, for large enough disks - will
+> use LBA translation, which will report 63 SPT instead.
+>=20
+> In addition we can not enforce SeaBIOS to rely on phyiscal geometries a=
+t
+> all. A virtio-blk-pci virtual disk with 255 phyiscal heads can not
+> report more than 16 physical heads when moved to an IDE controller, the
+> ATA spec allows a maximum of 16 heads - this is an artifact of
+> virtualization.
+>=20
+> By supplying the logical geometies directly we are able to support such
+> "exotic" disks.
+>=20
+> We will use fw_cfg to do just that.
+>=20
+> v2:
+>=20
+> Fix missing parenthesis check in
+>     "hd-geo-test: Add tests for lchs override"
+>=20
+> v3:
+>=20
+> * Rename fw_cfg key to "bios-geometry".
+> * Remove "extendible" interface.
+> * Add cpu_to_le32 fix as Laszlo suggested or big endian hosts
+> * Fix last qtest commit - automatic docker tester for some reason does =
+not have qemu-img set
+>=20
+> v4:
+>=20
+> * Change fw_cfg interface from mixed textual/binary to textual only
+>=20
+> v5:
+>=20
+> * Fix line > 80 chars in tests/hd-geo-test.c
+>=20
+> v6:
+>=20
+> * Small fixes for issues pointed by Max
+> * (&conf->conf)->lcyls to conf->conf.lcyls and so on
+> * Remove scsi_unrealize from everything other than scsi-hd
+> * Add proper include to sysemu.h
+> * scsi_device_unrealize() after scsi_device_purge_requests()
+>=20
+> Sam Eiderman (8):
+>   block: Refactor macros - fix tabbing
+>   block: Support providing LCHS from user
+>   bootdevice: Add interface to gather LCHS
+>   scsi: Propagate unrealize() callback to scsi-hd
+>   bootdevice: Gather LCHS from all relevant devices
+>   bootdevice: Refactor get_boot_devices_list
+>   bootdevice: FW_CFG interface for LCHS values
+>   hd-geo-test: Add tests for lchs override
+>=20
+>  bootdevice.c             | 148 ++++++++--
+>  hw/block/virtio-blk.c    |   6 +
+>  hw/ide/qdev.c            |   7 +-
+>  hw/nvram/fw_cfg.c        |  14 +-
+>  hw/scsi/scsi-bus.c       |  16 ++
+>  hw/scsi/scsi-disk.c      |  12 +
+>  include/hw/block/block.h |  22 +-
+>  include/hw/scsi/scsi.h   |   1 +
+>  include/sysemu/sysemu.h  |   4 +
+>  tests/Makefile.include   |   2 +-
+>  tests/hd-geo-test.c      | 582 +++++++++++++++++++++++++++++++++++++++
+>  11 files changed, 773 insertions(+), 41 deletions(-)
+>=20
 
