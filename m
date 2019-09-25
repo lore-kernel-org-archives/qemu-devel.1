@@ -2,82 +2,59 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D8DEC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 14:34:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBE25C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 14:39:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 062642146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 14:34:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 062642146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BE1E72146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 14:39:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE1E72146E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD8N6-00032j-4L
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 10:34:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51777)
+	id 1iD8Ry-0000Po-EM
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 10:39:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52212)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iD8JI-0000pB-Dk
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:30:29 -0400
+ (envelope-from <clg@kaod.org>) id 1iD8Lu-0003DY-8c
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:33:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iD8JH-00079j-Ca
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:30:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:64205)
+ (envelope-from <clg@kaod.org>) id 1iD8Lr-0000Ar-LF
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:33:08 -0400
+Received: from 2.mo179.mail-out.ovh.net ([178.33.250.45]:45222)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iD8JH-00079E-7D
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:30:27 -0400
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 642E63CA16
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 14:30:26 +0000 (UTC)
-Received: by mail-qt1-f199.google.com with SMTP id s14so6096517qtn.4
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 07:30:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=uAGWvwzL46HoQu7U/Lqqmx3jnRSuW2YUf+t36wOCjwQ=;
- b=tq2qUgLxaxFY7c1IGaqiUFfCa/iPmCsVLVR0RCleayEV++GmOG0sRngnYKlE7q1WWj
- oBe9picgKX8S1AjJ7aVrXviilBROCqHQUJkCMB8ZTKsP3hTaktESl86s7U3Y8Oo67lpx
- hvMYyPLQajpY/xhaxHdLCERtUgXKZ2xB4al76YT8GdckV28VohlahfxcC0EPbvWXMt10
- y5YHBXS0oiUUwhAtfzg23lFEQ45QBancJCHTOEUlQOJZ3ZgFD3+QnWyt+2MKV09dux1K
- /Xw00JdDTfqc77O7rPiOQVzPQDp0xhqaAaPgHGKM/VzRtO3utMSieCT5ce06i3aokBgd
- s2uQ==
-X-Gm-Message-State: APjAAAWO4CL6F+QtYMkHGSHOAwcz2lAUAEPZHU2i2ytoG9B/5BFA1nUc
- 4eSHWqjekZI0iwT8E5wrBFYpWGFvDhscp78OIozQghXzuTI5QYoSRjJDsj99cMnXAe8zKzj1865
- NY9WgXzmEFV8VIIk=
-X-Received: by 2002:ae9:eb93:: with SMTP id b141mr3937255qkg.36.1569421825129; 
- Wed, 25 Sep 2019 07:30:25 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy4U9gYng4oRZOTCoyWYgFdpd1/h0Zv3jm2GT3fYZ4puUPe5fRfi+jPDnWP7ZsXZJ4qsyA1wA==
-X-Received: by 2002:ae9:eb93:: with SMTP id b141mr3937230qkg.36.1569421824907; 
- Wed, 25 Sep 2019 07:30:24 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
- by smtp.gmail.com with ESMTPSA id c185sm3082503qkg.74.2019.09.25.07.30.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Sep 2019 07:30:24 -0700 (PDT)
-Date: Wed, 25 Sep 2019 10:30:20 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 3/3] vhost: Fix memory region section comparison
-Message-ID: <20190814175535.2023-4-dgilbert@redhat.com>
-References: <20190925142910.26529-1-mst@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iD8Lr-00009j-Ab
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:33:07 -0400
+Received: from player786.ha.ovh.net (unknown [10.108.57.53])
+ by mo179.mail-out.ovh.net (Postfix) with ESMTP id A2C50142DB9
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 16:33:04 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player786.ha.ovh.net (Postfix) with ESMTPSA id B216DA4D3A70;
+ Wed, 25 Sep 2019 14:32:56 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: [PATCH v2 00/23] aspeed: Add support for the AST2600 SoC
+Date: Wed, 25 Sep 2019 16:32:25 +0200
+Message-Id: <20190925143248.10000-1-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190925142910.26529-1-mst@redhat.com>
-X-Mailer: git-send-email 2.22.0.678.g13338e74b8
-X-Mutt-Fcc: =sent
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 8836062469594712849
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfedvgdejkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 178.33.250.45
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,51 +66,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-stable@nongnu.org
+Cc: Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190925143020.B9J6AcO-Qejkfhp4cS9ej138GeEC4B4NAzupWCgLtC0@z>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Hello,
 
-Using memcmp to compare structures wasn't safe,
-as I found out on ARM when I was getting falce miscompares.
+The series starts with a watchdog fix and a new model for the SDHCI
+controller. Follows the code for the AST2600 SoC.
 
-Use the helper function for comparing the MRSs.
+Most of the Aspeed models are reworked with an object class to
+introduce the AST2600 variant. A model for the AST2600 SoC and a
+simple AST2600 EVB machine is proposed at the end of the series. It
+can boot the OpenBMC firmware image which is currently used for HW
+bringup.
 
-Fixes: ade6d081fc33948e56e6 ("vhost: Regenerate region list from changed sections list")
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20190814175535.2023-4-dgilbert@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/virtio/vhost.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+Thanks,
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 34accdf615..2386b511f3 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -451,8 +451,13 @@ static void vhost_commit(MemoryListener *listener)
-         changed = true;
-     } else {
-         /* Same size, lets check the contents */
--        changed = n_old_sections && memcmp(dev->mem_sections, old_sections,
--                         n_old_sections * sizeof(old_sections[0])) != 0;
-+        for (int i = 0; i < n_old_sections; i++) {
-+            if (!MemoryRegionSection_eq(&old_sections[i],
-+                                        &dev->mem_sections[i])) {
-+                changed = true;
-+                break;
-+            }
-+        }
-     }
- 
-     trace_vhost_commit(dev->started, changed);
--- 
-MST
+C.
+
+Changes since v1:
+
+ - better SMC model, proof tested against Linux and Aspeed drivers
+   used on HW bringup
+ - new w25q512jv flash model for the AST2600 EVB
+ - removed the use of "cntfrq" property not yet merged
+ - tuned the HW strapping values of the AST2600 EVB
+
+Amithash Prasad (1):
+  aspeed/wdt: Check correct register for clock source
+
+C=C3=A9dric Le Goater (15):
+  aspeed/timer: Introduce an object class per SoC
+  aspeed/timer: Add support for control register 3
+  aspeed/timer: Add AST2600 support
+  aspeed/timer: Add support for IRQ status register on the AST2600
+  aspeed/sdmc: Introduce an object class per SoC
+  watchdog/aspeed: Introduce an object class per SoC
+  aspeed/smc: Introduce segment operations
+  aspeed/smc: Add AST2600 support
+  aspeed/i2c: Introduce an object class per SoC
+  aspeed/i2c: Add AST2600 support
+  aspeed: Introduce an object class per SoC
+  aspeed/soc: Add AST2600 support
+  m25p80: Add support for w25q512jv
+  aspeed: Add an AST2600 eval board
+  aspeed: add support for the Aspeed MII controller of the AST2600
+
+Eddie James (1):
+  hw/sd/aspeed_sdhci: New device
+
+Joel Stanley (5):
+  hw: aspeed_scu: Add AST2600 support
+  aspeed/sdmc: Add AST2600 support
+  hw: wdt_aspeed: Add AST2600 support
+  aspeed: Parameterise number of MACs
+  aspeed/soc: Add ASPEED Video stub
+
+Rashmica Gupta (1):
+  hw/gpio: Add in AST2600 specific implementation
+
+ include/hw/arm/aspeed.h          |   1 +
+ include/hw/arm/aspeed_soc.h      |  29 +-
+ include/hw/i2c/aspeed_i2c.h      |  20 +-
+ include/hw/misc/aspeed_scu.h     |   7 +-
+ include/hw/misc/aspeed_sdmc.h    |  20 +-
+ include/hw/net/ftgmac100.h       |  17 +
+ include/hw/sd/aspeed_sdhci.h     |  34 ++
+ include/hw/ssi/aspeed_smc.h      |   4 +
+ include/hw/timer/aspeed_timer.h  |  18 ++
+ include/hw/watchdog/wdt_aspeed.h |  19 +-
+ hw/arm/aspeed.c                  |  42 ++-
+ hw/arm/aspeed_ast2600.c          | 523 +++++++++++++++++++++++++++++++
+ hw/arm/aspeed_soc.c              | 199 +++++++-----
+ hw/block/m25p80.c                |   1 +
+ hw/gpio/aspeed_gpio.c            | 142 ++++++++-
+ hw/i2c/aspeed_i2c.c              | 106 ++++++-
+ hw/misc/aspeed_scu.c             | 194 +++++++++++-
+ hw/misc/aspeed_sdmc.c            | 250 +++++++++++----
+ hw/net/ftgmac100.c               | 162 ++++++++++
+ hw/sd/aspeed_sdhci.c             | 198 ++++++++++++
+ hw/ssi/aspeed_smc.c              | 177 +++++++++--
+ hw/timer/aspeed_timer.c          | 213 +++++++++++--
+ hw/watchdog/wdt_aspeed.c         | 153 +++++----
+ hw/arm/Makefile.objs             |   2 +-
+ hw/sd/Makefile.objs              |   1 +
+ 25 files changed, 2253 insertions(+), 279 deletions(-)
+ create mode 100644 include/hw/sd/aspeed_sdhci.h
+ create mode 100644 hw/arm/aspeed_ast2600.c
+ create mode 100644 hw/sd/aspeed_sdhci.c
+
+--=20
+2.21.0
 
 
