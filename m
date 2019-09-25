@@ -2,86 +2,62 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C22E3C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 08:42:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6005C4320D
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 08:42:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53337214DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 08:42:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53337214DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BE5F2214DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 08:42:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE5F2214DA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD2sS-0008Gi-Rg
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 04:42:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54868)
+	id 1iD2t0-0000RQ-Eo
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 04:42:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54952)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iD2qS-00073x-Oj
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:40:21 -0400
+ (envelope-from <groug@kaod.org>) id 1iD2rD-0007VD-En
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:41:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iD2qR-00041c-IN
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:40:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32838)
+ (envelope-from <groug@kaod.org>) id 1iD2rB-0004M1-Sb
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:41:07 -0400
+Received: from 2.mo173.mail-out.ovh.net ([178.33.251.49]:36442)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iD2qR-00041H-A8
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:40:19 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 05688796EB
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 08:40:18 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id q9so820977wmj.9
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 01:40:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version;
- bh=4bXVG8rG63RRdivHFVgYwdhQLE7BFDAw2IIkR800VUc=;
- b=aLGBYkaLf+eE4R8byzpfo4XNwQUfWNBIOSKsl+ZKRQ7adx8g8qKQTQ9MNomSdCSPfK
- SJgeQC+B7fhRZBiV6GbfZngyMAXIGZ0iWifIHDOTGUlqD+bR2qvn1fQYFBpI5+1+xfI+
- 6Z5EZns9RHn+h3UxDjSZOhK4AkZUHyWlqHH/9KNImz4ynEb1F6+IJwsoSKUl5AFWA0s+
- DnFRZsUDjmp2lCWYaZB8X8E3nQxBQ8F7aQ/2yazWoHyRAtTd7ZoULjczBF1nrItPee3L
- DBcNvYKJkrmc+AU+r5MHiARQNk4ZYUK2bD1gF46M+Ili0GPNvLqLHiQdrD9F+B9cwCPL
- n+Ow==
-X-Gm-Message-State: APjAAAXuOuQ5NHg8D3sn7nMLx6p7nEpIZcSDFDyEcbvSHzb99qWBDbDB
- BOqUG8SLblT9Afy1oV/hjCOctT09CEMEi0sTq8UNacgeF+RrHTJKXpk3nCmYLELoaPk83F0TIN4
- yXUMEKkab0ezpCAA=
-X-Received: by 2002:a5d:5592:: with SMTP id i18mr7787748wrv.316.1569400816771; 
- Wed, 25 Sep 2019 01:40:16 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy6InE01KCSIgG6LkFA8WJSjztS/3DwfUBnCsq0RGxy1GJ8STDnpt0XVvElcURKW6gqBLkh1g==
-X-Received: by 2002:a5d:5592:: with SMTP id i18mr7787718wrv.316.1569400816576; 
- Wed, 25 Sep 2019 01:40:16 -0700 (PDT)
-Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
- [95.120.215.139])
- by smtp.gmail.com with ESMTPSA id x16sm3664590wrl.32.2019.09.25.01.40.15
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Sep 2019 01:40:15 -0700 (PDT)
-References: <20190924124433.96810-1-slp@redhat.com>
- <20190924124433.96810-8-slp@redhat.com>
- <23a6e891-c3ba-3991-d627-433eb1fe156d@redhat.com> <87r245rkld.fsf@redhat.com>
- <317e53b1-d658-4b6b-c782-4b2a0dd091b2@redhat.com>
-User-agent: mu4e 1.2.0; emacs 26.2
-From: Sergio Lopez <slp@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v4 7/8] docs/microvm.txt: document the new microvm machine
- type
-In-reply-to: <317e53b1-d658-4b6b-c782-4b2a0dd091b2@redhat.com>
-Date: Wed, 25 Sep 2019 10:40:13 +0200
-Message-ID: <87ftkksr9u.fsf@redhat.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iD2rB-0004LI-Lr
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:41:05 -0400
+Received: from player779.ha.ovh.net (unknown [10.109.143.249])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id 623D011ABF3
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 10:41:03 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player779.ha.ovh.net (Postfix) with ESMTPSA id 6BC93A193D32;
+ Wed, 25 Sep 2019 08:40:52 +0000 (UTC)
+Date: Wed, 25 Sep 2019 10:40:50 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH 06/20] xics: Create sPAPR specific ICS subtype
+Message-ID: <20190925104050.072877f1@bahia.lan>
+In-Reply-To: <20190925064534.19155-7-david@gibson.dropbear.id.au>
+References: <20190925064534.19155-1-david@gibson.dropbear.id.au>
+ <20190925064534.19155-7-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 2890748012287531494
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfedvgddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 178.33.251.49
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,84 +69,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, kvm@vger.kernel.org, mst@redhat.com, lersek@redhat.com,
- mtosatti@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com,
- imammedo@redhat.com, philmd@redhat.com, rth@twiddle.net
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ clg@kaod.org,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+On Wed, 25 Sep 2019 16:45:20 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
+> We create a subtype of TYPE_ICS specifically for sPAPR.  For now all this
+> does is move the setup of the PAPR specific hcalls and RTAS calls to
+> the realize() function for this, rather than requiring the PAPR code to
+> explicitly call xics_spapr_init().  In future it will have some more
+> function.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+LGTM, but for extra safety I would also introduce a SpaprIcsState typedef
+and use it everywhere where we only expect this subtype. Especially in
+the definition of SpaprMachineState.
 
-> On 25/09/19 07:49, Sergio Lopez wrote:
->>>> +serving as a stepping stone
->>>> +for future projects aiming at improving boot times, reducing the
->>>> +attack surface and slimming down QEMU's footprint.
->>>
->>> "Microvm also establishes a baseline for benchmarking QEMU and operating
->>> systems, since it is optimized for both boot time and footprint".
->>=20
->> Well, I prefer my paragraph, but I'm good with either.
->
-> You're right my version sort of missed the point.  What about
-> s/benchmarking/benchmarking and optimizing/?
->
->>>> +The microvm machine type supports the following devices:
->>>> +
->>>> + - ISA bus
->>>> + - i8259 PIC
->>>> + - LAPIC (implicit if using KVM)
->>>> + - IOAPIC (defaults to kernel_irqchip_split =3D true)
->>>> + - i8254 PIT
->>>
->>> Do we need the PIT?  And perhaps the PIC even?
->>=20
->> We need the PIT for non-KVM accel (if present with KVM and
->> kernel_irqchip_split =3D off, it basically becomes a placeholder)
->
-> Why?
+>  hw/intc/xics_spapr.c        | 34 +++++++++++++++++++++++++++++++++-
+>  hw/ppc/spapr_irq.c          |  6 ++----
+>  include/hw/ppc/xics_spapr.h |  4 +++-
+>  3 files changed, 38 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> index 3e9444813a..e6dd004587 100644
+> --- a/hw/intc/xics_spapr.c
+> +++ b/hw/intc/xics_spapr.c
+> @@ -283,8 +283,18 @@ static void rtas_int_on(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>  }
+>  
+> -void xics_spapr_init(SpaprMachineState *spapr)
+> +static void ics_spapr_realize(DeviceState *dev, Error **errp)
+>  {
+> +    ICSState *ics = ICS_SPAPR(dev);
+> +    ICSStateClass *icsc = ICS_GET_CLASS(ics);
+> +    Error *local_err = NULL;
+> +
+> +    icsc->parent_realize(dev, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+>      spapr_rtas_register(RTAS_IBM_SET_XIVE, "ibm,set-xive", rtas_set_xive);
+>      spapr_rtas_register(RTAS_IBM_GET_XIVE, "ibm,get-xive", rtas_get_xive);
+>      spapr_rtas_register(RTAS_IBM_INT_OFF, "ibm,int-off", rtas_int_off);
+> @@ -319,3 +329,25 @@ void spapr_dt_xics(SpaprMachineState *spapr, uint32_t nr_servers, void *fdt,
+>      _FDT(fdt_setprop_cell(fdt, node, "linux,phandle", phandle));
+>      _FDT(fdt_setprop_cell(fdt, node, "phandle", phandle));
+>  }
+> +
+> +static void ics_spapr_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +    ICSStateClass *isc = ICS_CLASS(klass);
+> +
+> +    device_class_set_parent_realize(dc, ics_spapr_realize,
+> +                                    &isc->parent_realize);
+> +}
+> +
+> +static const TypeInfo ics_spapr_info = {
+> +    .name = TYPE_ICS_SPAPR,
+> +    .parent = TYPE_ICS,
+> +    .class_init = ics_spapr_class_init,
+> +};
+> +
+> +static void xics_spapr_register_types(void)
+> +{
+> +    type_register_static(&ics_spapr_info);
+> +}
+> +
+> +type_init(xics_spapr_register_types)
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 6c45d2a3c0..8c26fa2d1e 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -98,7 +98,7 @@ static void spapr_irq_init_xics(SpaprMachineState *spapr, int nr_irqs,
+>      Object *obj;
+>      Error *local_err = NULL;
+>  
+> -    obj = object_new(TYPE_ICS);
+> +    obj = object_new(TYPE_ICS_SPAPR);
+>      object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
+>      object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
+>                                     &error_fatal);
+> @@ -109,9 +109,7 @@ static void spapr_irq_init_xics(SpaprMachineState *spapr, int nr_irqs,
+>          return;
+>      }
+>  
+> -    spapr->ics = ICS(obj);
+> -
+> -    xics_spapr_init(spapr);
+> +    spapr->ics = ICS_SPAPR(obj);
+>  }
+>  
+>  static int spapr_irq_claim_xics(SpaprMachineState *spapr, int irq, bool lsi,
+> diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
+> index 5dabc9a138..691a6d00f7 100644
+> --- a/include/hw/ppc/xics_spapr.h
+> +++ b/include/hw/ppc/xics_spapr.h
+> @@ -31,11 +31,13 @@
+>  
+>  #define XICS_NODENAME "interrupt-controller"
+>  
+> +#define TYPE_ICS_SPAPR "ics-spapr"
+> +#define ICS_SPAPR(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS_SPAPR)
+> +
+>  void spapr_dt_xics(SpaprMachineState *spapr, uint32_t nr_servers, void *fdt,
+>                     uint32_t phandle);
+>  int xics_kvm_connect(SpaprMachineState *spapr, Error **errp);
+>  void xics_kvm_disconnect(SpaprMachineState *spapr, Error **errp);
+>  bool xics_kvm_has_broken_disconnect(SpaprMachineState *spapr);
+> -void xics_spapr_init(SpaprMachineState *spapr);
+>  
+>  #endif /* XICS_SPAPR_H */
 
-Perhaps I'm missing something. Is some other device supposed to be
-acting as a HW timer while running with TCG acceleration?
-
->> and the
->> PIC for both the PIT and the ISA serial port.
->
-> Can't the ISA serial port work with the IOAPIC?
-
-Hm... I'm not sure. I wanted to give it a try, but then noticed that
-multiple places in the code (like hw/intc/apic.c:560) do expect to have
-an ISA PIC present through the isa_pic global variable.
-
-I guess we should be able to work around this, but I'm not sure if it's
-really worth it. What do you think?
-
-Thanks,
-Sergio.
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2LJ+0ACgkQ9GknjS8M
-AjXcGA/+IYeN5JXsg5RjjhgQaQBE10F9NW4wT0FJkcXyzGlUk88RucLVjRw7mRP2
-G2wfE81DPRXoJDFPfXebHUOpgpfN/dT53VLi2K1xBUNOdQ3yT5oWr5W/c22eyCZ6
-6In5k+9WMKhT1HzDElhhlLK8A5u/soQHSJmFpNLQLWWmXuVjQ9wkfBNG5WsyfaOW
-NHGus2A6lv5bUkcAerVcQukHcBuTs/9+nsDC3pCfrizVv03UivK36wrhf6br5vxO
-9G+u/v5eFyn3fCQu1m8RFdRdQQ36Sze4HuB+79AM/Jin0mpVqpnTzn+cPd6mgypg
-YdEb5Qraj+baxsAC3/+si3byinX4yeJRWcLektI5pt3TrZaMu3MdAGhkIw+CZrf+
-6i2JMZCwdKJgdapESQz/O/nv/vEdWzHf9CZ35DfmtVMKzWXIE3MmFgVaLBpIi7Kb
-xNu6U0zJtZr7aMJL/m7ZC7RfN2BDXdAPsB4SCvoBtALCTc6Kcm8v3tKBDFHcAwCp
-/QGisQtJ2mMtrGtaVXNymumqPdBWygHVJ7O5vTGpghmAq2/zcTS1mAnx1whZwE1P
-ppyu+mGMsVNGEaW//UEQt84hUdCVdDGCC7luRPEh1R7KUBaIJjArhAcDv1hcx+K4
-86j0lSFsaPDxE1Qlj9LKdqPftzRIORZaN0t4619iOX3KY72xWQ4=
-=A1ya
------END PGP SIGNATURE-----
---=-=-=--
 
