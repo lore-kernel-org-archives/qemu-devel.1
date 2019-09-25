@@ -7,59 +7,60 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 382D1C432C1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 411CDC4320D
 	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 01:42:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2FC720874
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 01:42:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0EE0D214AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 01:42:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ZPdttV6z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2FC720874
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="l4lM9uDk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EE0D214AF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCwJo-0007NF-L3
+	id 1iCwJo-0007O9-P5
 	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 21:42:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37129)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iCwHb-0005TY-MO
+ (envelope-from <dgibson@ozlabs.org>) id 1iCwHb-0005TX-B5
  for qemu-devel@nongnu.org; Tue, 24 Sep 2019 21:39:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iCwHZ-0003I3-Sf
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 21:39:55 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:34579 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1iCwHZ-0003Hj-9l
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 21:39:54 -0400
+Received: from ozlabs.org ([203.11.71.1]:52845)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iCwHY-0003HC-Vk; Tue, 24 Sep 2019 21:39:53 -0400
+ id 1iCwHY-0003HD-Bs; Tue, 24 Sep 2019 21:39:53 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46dLMm5V4Fz9sP3; Wed, 25 Sep 2019 11:39:48 +1000 (AEST)
+ id 46dLMm68BJz9sNx; Wed, 25 Sep 2019 11:39:48 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1569375588;
- bh=vLIdMJoa28jg7ayQKBwl2iYEf8kLES4gg4S0wfVpObo=;
+ bh=6ucTAQTlosytJwaQeHMBqAi8zJTOK6PAHLrDKDIpGdI=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=ZPdttV6ziF0GISKp7Rt9d7d2mpl92F5757A3IWb+2Oy3YPmcd5n/XSs2qu4ST9BD7
- pkf/4/lqTGEmRg6UQuYxJVVX8xUw3J6IF/jK9zRr+pruZN13EHwWPh58HQoNplJrqk
- T+/1Ge9ip4MmhGs3tfSJQUSU3maz7eVTb0t3oBuw=
-Date: Wed, 25 Sep 2019 11:12:00 +1000
+ b=l4lM9uDkcWCZjsbfDafc6nFoCUiC5CqnYmOBbPY4vv8Z8rWZjwX2xwhPrOpg3D0ia
+ ewwTiWezDVS6ByJ8/Dz00Le/xkRpSWhfVegIka5QaVfKjhr+tcuVIxWZYl44JnFnIi
+ +wvg0oQkLxmY/4VQv3N34EvhjrVwLHbE//OQoKNA=
+Date: Wed, 25 Sep 2019 11:33:55 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Subject: Re: [PATCH v14 2/7] ppc: spapr: Introduce FWNMI capability
-Message-ID: <20190925011200.GF17405@umbus>
+Subject: Re: [PATCH v14 5/7] ppc: spapr: Handle "ibm, nmi-register" and "ibm, 
+ nmi-interlock" RTAS calls
+Message-ID: <20190925013355.GH17405@umbus>
 References: <156879398718.18368.17640174821710157715.stgit@aravinda>
- <156879433743.18368.1281417894007921022.stgit@aravinda>
+ <156879436343.18368.8562371485748853742.stgit@aravinda>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="HCdXmnRlPgeNBad2"
+ protocol="application/pgp-signature"; boundary="JI+G0+mN8WmwPnOn"
 Content-Disposition: inline
-In-Reply-To: <156879433743.18368.1281417894007921022.stgit@aravinda>
+In-Reply-To: <156879436343.18368.8562371485748853742.stgit@aravinda>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,221 +79,162 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---HCdXmnRlPgeNBad2
+--JI+G0+mN8WmwPnOn
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 18, 2019 at 01:42:17PM +0530, Aravinda Prasad wrote:
-> Introduce the KVM capability KVM_CAP_PPC_FWNMI so that
-> the KVM causes guest exit with NMI as exit reason
-> when it encounters a machine check exception on the
-> address belonging to a guest. Without this capability
-> enabled, KVM redirects machine check exceptions to
-> guest's 0x200 vector.
+On Wed, Sep 18, 2019 at 01:42:43PM +0530, Aravinda Prasad wrote:
+> This patch adds support in QEMU to handle "ibm,nmi-register"
+> and "ibm,nmi-interlock" RTAS calls.
 >=20
-> This patch also introduces fwnmi-mce capability to
-> deal with the case when a guest with the
-> KVM_CAP_PPC_FWNMI capability enabled is attempted
-> to migrate to a host that does not support this
-> capability.
+> The machine check notification address is saved when the
+> OS issues "ibm,nmi-register" RTAS call.
+>=20
+> This patch also handles the case when multiple processors
+> experience machine check at or about the same time by
+> handling "ibm,nmi-interlock" call. In such cases, as per
+> PAPR, subsequent processors serialize waiting for the first
+> processor to issue the "ibm,nmi-interlock" call. The second
+> processor that also received a machine check error waits
+> till the first processor is done reading the error log.
+> The first processor issues "ibm,nmi-interlock" call
+> when the error log is consumed.
 >=20
 > Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-
-Mostly ok, but there's one ugly problem.
-
 > ---
->  hw/ppc/spapr.c         |    1 +
->  hw/ppc/spapr_caps.c    |   29 +++++++++++++++++++++++++++++
->  include/hw/ppc/spapr.h |    4 +++-
->  target/ppc/kvm.c       |   26 ++++++++++++++++++++++++++
->  target/ppc/kvm_ppc.h   |   12 ++++++++++++
->  5 files changed, 71 insertions(+), 1 deletion(-)
+>  hw/ppc/spapr.c         |    9 ++++++++
+>  hw/ppc/spapr_rtas.c    |   57 ++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  include/hw/ppc/spapr.h |    5 +++-
+>  3 files changed, 70 insertions(+), 1 deletion(-)
 >=20
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index ea56499..8288e8b 100644
+> index 9f2e5d2..6992b32 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -4487,6 +4487,7 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
->      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =3D SPAPR_CAP_OFF;
->      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_CAP_ON;
->      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_OFF;
-> +    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] =3D SPAPR_CAP_OFF;
->      spapr_caps_add_properties(smc, &error_abort);
->      smc->irq =3D &spapr_irq_dual;
->      smc->dr_phb_enabled =3D true;
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index 481dfd2..c11ff87 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -496,6 +496,25 @@ static void cap_ccf_assist_apply(SpaprMachineState *=
-spapr, uint8_t val,
+> @@ -2941,6 +2941,15 @@ static void spapr_machine_init(MachineState *machi=
+ne)
+> =20
+>          /* Resize rtas blob to accommodate error log */
+>          spapr->rtas_size =3D RTAS_ERROR_LOG_MAX;
+> +
+> +        /* Set fwnmi capability in KVM */
+> +        if (kvmppc_set_fwnmi() < 0) {
+> +            error_report("Could not enable FWNMI capability");
+> +            exit(1);
+> +        }
+> +
+> +        /* Register ibm,nmi-register and ibm,nmi-interlock RTAS calls */
+> +        spapr_fwnmi_register();
+
+This setup only needs to happen if CAP_MCE_FWNMI is turned on, so it
+makes more sense in the .apply hooks for that rather than general
+machine_init, I think.
+
 >      }
+> =20
+>      spapr->rtas_blob =3D g_malloc(spapr->rtas_size);
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index d8fb8a8..b569538 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -400,6 +400,55 @@ static void rtas_get_power_level(PowerPCCPU *cpu, Sp=
+aprMachineState *spapr,
+>      rtas_st(rets, 1, 100);
 >  }
 > =20
-> +static void cap_fwnmi_mce_apply(SpaprMachineState *spapr, uint8_t val,
-> +                                Error **errp)
+> +static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
+> +                                  SpaprMachineState *spapr,
+> +                                  uint32_t token, uint32_t nargs,
+> +                                  target_ulong args,
+> +                                  uint32_t nret, target_ulong rets)
 > +{
-> +    if (!val) {
-> +        return; /* Disabled by default */
+> +    hwaddr rtas_addr =3D spapr_get_rtas_addr();
+> +
+> +    if (!rtas_addr) {
+> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
+> +        return;
 > +    }
 > +
-> +    if (tcg_enabled()) {
-> +        /*
-> +         * TCG support may not be correct in some conditions (e.g., in c=
-ase
-> +         * of software injected faults like duplicate SLBs).
-> +         */
-> +        warn_report("Firmware Assisted Non-Maskable Interrupts not suppo=
-rted in TCG");
-> +    } else if (kvm_enabled() && !kvmppc_has_cap_ppc_fwnmi()) {
-> +        error_setg(errp,
-> +"Firmware Assisted Non-Maskable Interrupts not supported by KVM, try cap=
--fwnmi-mce=3Doff");
+> +    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) =3D=3D SPAPR_CAP_OFF) {
+> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
+> +        return;
 > +    }
+> +
+> +    spapr->guest_machine_check_addr =3D rtas_ld(args, 1);
+> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
 > +}
 > +
->  SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
->      [SPAPR_CAP_HTM] =3D {
->          .name =3D "htm",
-> @@ -595,6 +614,15 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] =
-=3D {
->          .type =3D "bool",
->          .apply =3D cap_ccf_assist_apply,
->      },
-> +    [SPAPR_CAP_FWNMI_MCE] =3D {
-> +        .name =3D "fwnmi-mce",
-> +        .description =3D "Handle fwnmi machine check exceptions",
-> +        .index =3D SPAPR_CAP_FWNMI_MCE,
-> +        .get =3D spapr_cap_get_bool,
-> +        .set =3D spapr_cap_set_bool,
-> +        .type =3D "bool",
-> +        .apply =3D cap_fwnmi_mce_apply,
-> +    },
->  };
-> =20
->  static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
-> @@ -734,6 +762,7 @@ SPAPR_CAP_MIG_STATE(hpt_maxpagesize, SPAPR_CAP_HPT_MA=
-XPAGESIZE);
->  SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
->  SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
->  SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
-> +SPAPR_CAP_MIG_STATE(fwnmi, SPAPR_CAP_FWNMI_MCE);
-> =20
->  void spapr_caps_init(SpaprMachineState *spapr)
->  {
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 03111fd..66049ac 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -79,8 +79,10 @@ typedef enum {
->  #define SPAPR_CAP_LARGE_DECREMENTER     0x08
->  /* Count Cache Flush Assist HW Instruction */
->  #define SPAPR_CAP_CCF_ASSIST            0x09
-> +/* FWNMI machine check handling */
-> +#define SPAPR_CAP_FWNMI_MCE             0x0A
->  /* Num Caps */
-> -#define SPAPR_CAP_NUM                   (SPAPR_CAP_CCF_ASSIST + 1)
-> +#define SPAPR_CAP_NUM                   (SPAPR_CAP_FWNMI_MCE + 1)
-> =20
->  /*
->   * Capability Values
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 8c5b1f2..8b1ab78 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -85,6 +85,7 @@ static int cap_ppc_safe_indirect_branch;
->  static int cap_ppc_count_cache_flush_assist;
->  static int cap_ppc_nested_kvm_hv;
->  static int cap_large_decr;
-> +static int cap_ppc_fwnmi;
-> =20
->  static uint32_t debug_inst_opcode;
-> =20
-> @@ -2055,6 +2056,26 @@ void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mp=
-ic_proxy)
->      }
->  }
-> =20
-> +int kvmppc_set_fwnmi(void)
+> +static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+> +                                   SpaprMachineState *spapr,
+> +                                   uint32_t token, uint32_t nargs,
+> +                                   target_ulong args,
+> +                                   uint32_t nret, target_ulong rets)
 > +{
-> +    PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
-> +    CPUState *cs =3D CPU(cpu);
-> +    int ret;
+> +    if (spapr->guest_machine_check_addr =3D=3D -1) {
+> +        /* NMI register not called */
+> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+> +        return;
+> +    }
 > +
-> +    ret =3D kvm_vcpu_enable_cap(cs, KVM_CAP_PPC_FWNMI, 0);
-> +    if (ret) {
-> +        error_report("This KVM version does not support FWNMI");
-> +        return ret;
+> +    if (spapr->mc_status !=3D cpu->vcpu_id) {
+> +        /* The vCPU that hit the NMI should invoke "ibm,nmi-interlock" */
+> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+> +        return;
 > +    }
 > +
 > +    /*
-> +     * cap_ppc_fwnmi is set when FWNMI is available and enabled in KVM
-> +     * and not just when FWNMI is available in KVM
+> +     * vCPU issuing "ibm,nmi-interlock" is done with NMI handling,
+> +     * hence unset mc_status.
 > +     */
-> +    cap_ppc_fwnmi =3D 1;
-
-Using these cap globals is only slighly ugly when they can be
-initialized very early and thereafter remain constant.  However, since
-you're only setting this later (in fact *never* until several patches
-down the series, since kvmppc_set_fwnmi() isn't called), this makes it
-very ugly with this global set at an indeterminite time having effects
-on things the relative order of which is not at all obvious.
-
-I think it would make much more sense to eliminate the cap_ppc_fwnmi
-global, and instead attempt the enable_cap in cap_fwnmi_mce_apply,
-failing the apply if the enable_cap fails.
-
-> +    return ret;
+> +    spapr->mc_status =3D -1;
+> +    qemu_cond_signal(&spapr->mc_delivery_cond);
+> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
 > +}
 > +
->  int kvmppc_smt_threads(void)
->  {
->      return cap_ppc_smt ? cap_ppc_smt : 1;
-> @@ -2355,6 +2376,11 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
->      return cap_mmu_hash_v3;
+>  static struct rtas_call {
+>      const char *name;
+>      spapr_rtas_fn fn;
+> @@ -544,6 +593,14 @@ hwaddr spapr_get_rtas_addr(void)
+>      return (hwaddr)fdt32_to_cpu(*rtas_data);
 >  }
 > =20
-> +bool kvmppc_has_cap_ppc_fwnmi(void)
+> +void spapr_fwnmi_register(void)
 > +{
-> +    return cap_ppc_fwnmi;
+> +    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
+> +                        rtas_ibm_nmi_register);
+> +    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
+> +                        rtas_ibm_nmi_interlock);
 > +}
 > +
->  static bool kvmppc_power8_host(void)
+>  static void core_rtas_register_types(void)
 >  {
->      bool ret =3D false;
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index 98bd7d5..ce5c1f9 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -27,6 +27,8 @@ void kvmppc_enable_h_page_init(void);
->  void kvmppc_set_papr(PowerPCCPU *cpu);
->  int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
->  void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
-> +int kvmppc_set_fwnmi(void);
-> +bool kvmppc_has_cap_ppc_fwnmi(void);
->  int kvmppc_smt_threads(void);
->  void kvmppc_hint_smt_possible(Error **errp);
->  int kvmppc_set_smt_threads(int smt);
-> @@ -159,6 +161,16 @@ static inline void kvmppc_set_mpic_proxy(PowerPCCPU =
-*cpu, int mpic_proxy)
->  {
->  }
+>      spapr_rtas_register(RTAS_DISPLAY_CHARACTER, "display-character",
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index ffefde7..dada821 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -655,8 +655,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target=
+_ulong opcode,
+>  #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
+>  #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
+>  #define RTAS_IBM_SUSPEND_ME                     (RTAS_TOKEN_BASE + 0x2A)
+> +#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x2B)
+> +#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x2C)
 > =20
-> +static inline int kvmppc_set_fwnmi(void)
-> +{
-> +    return -1;
-> +}
-> +
-> +static inline bool kvmppc_has_cap_ppc_fwnmi(void)
-> +{
-> +    return false;
-> +}
-> +
->  static inline int kvmppc_smt_threads(void)
->  {
->      return 1;
+> -#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2B)
+> +#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2D)
+> =20
+>  /* RTAS ibm,get-system-parameter token values */
+>  #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
+> @@ -908,4 +910,5 @@ void spapr_check_pagesize(SpaprMachineState *spapr, h=
+waddr pagesize,
+> =20
+>  void spapr_set_all_lpcrs(target_ulong value, target_ulong mask);
+>  hwaddr spapr_get_rtas_addr(void);
+> +void spapr_fwnmi_register(void);
+>  #endif /* HW_SPAPR_H */
 >=20
 
 --=20
@@ -301,25 +243,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---HCdXmnRlPgeNBad2
+--JI+G0+mN8WmwPnOn
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2Kvt0ACgkQbDjKyiDZ
-s5Kb4Q//fctXuP2iNc7Pv//bzlEP1P8cTkblugna8DOF+cnLH9T1ovxFZz6jO9P7
-FjMbh7DxvFJKQlYE6VU97t54V+jC1vgtz4JRkCbBxKXeCivIheTUDYnbLyfOp6Ru
-pgYA/XD/jixzNY3g+nZ6LGcuyS8KRv2S6Jt0UHKeYXSc5NI2xMiWzUYe9hWJOCAx
-LLmZtwl6DVQJR6GjbcO7hWV9unuFJc1xjqqyMq5SW8/zt6JH1+5zjaqapuQk1D4s
-OWet5O7gy7APPJi75gwGKrguSBQ8SHGGkbX23jrbMbZ6BHVbkY11buKJtRSrxWYd
-yal9LUznQ9V/Y1Q2CNTchXD3TbY8kOOz8pl28w1v/8jbAYYTXfYwYLyZJUPMrfVq
-dcOB5Z14aKrZzXGkUUYi2m6SCtRqPjNj9dx4lMLSOy2HCZnPCfvAbqRjua0jTzpq
-I/56C6Sp0IEMWPhqGCXHOijwpOb+7GACE4rc7tbXe5BLzwQTFtC/kv53XrulzOpS
-Kdi1IRrXZgcLzLB1VRymGqA2/e9O6MA0aqIdguFlAShkN7CJr1Ps1ljOopm9l1cu
-Vh1Nw77+KizPoNQKEeAbF6S/WEF96ZOWd1RrinXoNhfLtmkOhGIRvhL92e60DppD
-Qu+AO3R/iLUclv8seim+1fOAlIxdoE4Gg/GI5nXlHPWkps/ClnM=
-=IFBW
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2KxAIACgkQbDjKyiDZ
+s5LjZQ//WpAuT3nTWV3Shj5QAwpLURln4sjsUqpXPT8pLfQBCX8XVqvhlp5sykJu
+klBdiECYlq/8eEGLa5AnxQdz30ebuTOlCtYTa3VSmxCKblo4KB+eA6rv749b6Sca
+hinKluk2xf4KgCJVvCVFYDktqvTC2nySypTR5XinsPHpKUQwYc46HyudeWsDeqvS
+Gz7Uuiak+YzST6Uv0JL9fCqJ2Y3ijEZ64C2QKdVLQxAKo9nrnmKWxCZ43ppaP1XX
+BZrDf0yiPdLG2ci3Pn0Tnv4iRopS3gx6Jocp0oWnlUwzDDI389+t8oRO0ic9GalG
+KYFY+IAwLFPMlDJmvN36P68DDAKXrLQu3lcs3M8sBNHHP3SsknN3Olgnlk3YHR1+
+6gtnv9Ub6rB/K1v0DEnFPmFFYyFRdOjZHJgBuOlcSS4bmhj/9xX6kKo9C4HstBP8
+xrCP4VS/6B1qyyvmO67f8ATNT2nTYWx0sg+ibcxg2nFyHF+ejj0gsr1t5zLXhGSz
+AQcP7QHl7A4keEXJPoMa6GMixaRnFRR/4ananB0jv4ubjTm1ZERO4gDZzPem1K9U
+lwAxmSTq+f9p52iKVeIrmWLi9NK3zN9ug/71edpymT4oh1JeIyku8AHoUQqjoAc+
+ah5QRWFtNNmTmYPLhDdzoEmQ2KDZY12sJ5TcEnjSI8JzTJUoAQ0=
+=vjTz
 -----END PGP SIGNATURE-----
 
---HCdXmnRlPgeNBad2--
+--JI+G0+mN8WmwPnOn--
 
