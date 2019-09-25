@@ -6,46 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B46C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:57:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B711C4360C
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:57:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F26382146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:57:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F26382146E
+	by mail.kernel.org (Postfix) with ESMTPS id D7D972146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:57:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7D972146E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD6r3-00032e-5K
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 08:57:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57889)
+	id 1iD6r4-00038N-BD
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 08:57:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57867)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gg-0001J9-Sq
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gf-0001IC-TF
  for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gd-0002GD-F9
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:30 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56120 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gd-0002GT-H8
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:29 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56122 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iD6gc-0002F4-Ut
+ id 1iD6gc-0002F9-WC
  for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:27 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id D6CB71A23D0;
+ by mail.rt-rk.com (Postfix) with ESMTP id E71F71A226C;
  Wed, 25 Sep 2019 14:46:21 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id A10271A23A9;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id B282F1A23A5;
  Wed, 25 Sep 2019 14:46:21 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 08/20] target/mips: msa: Split helpers for PCNT.<B|H|W|D>
-Date: Wed, 25 Sep 2019 14:46:00 +0200
-Message-Id: <1569415572-19635-9-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH v2 10/20] target/mips: msa: Unroll loops and demacro
+ <BMNZ|BMZ|BSEL>.V
+Date: Wed, 25 Sep 2019 14:46:02 +0200
+Message-Id: <1569415572-19635-11-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -73,240 +74,123 @@ Achieves clearer code and slightly better performance.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/helper.h     |   6 +-
- target/mips/msa_helper.c | 143 ++++++++++++++++++++++++-----------------------
- target/mips/translate.c  |  19 ++++++-
- 3 files changed, 95 insertions(+), 73 deletions(-)
+ target/mips/helper.h     |  7 +++---
+ target/mips/msa_helper.c | 63 ++++++++++++++++++++++++++++++------------------
+ 2 files changed, 43 insertions(+), 27 deletions(-)
 
 diff --git a/target/mips/helper.h b/target/mips/helper.h
-index d709083..18e4c7a 100644
+index 9349482..27544a1 100644
 --- a/target/mips/helper.h
 +++ b/target/mips/helper.h
-@@ -788,6 +788,11 @@ DEF_HELPER_3(msa_nlzc_h, void, env, i32, i32)
- DEF_HELPER_3(msa_nlzc_w, void, env, i32, i32)
- DEF_HELPER_3(msa_nlzc_d, void, env, i32, i32)
+@@ -803,6 +803,10 @@ DEF_HELPER_4(msa_binsr_h, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_binsr_w, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_binsr_d, void, env, i32, i32, i32)
  
-+DEF_HELPER_3(msa_pcnt_b, void, env, i32, i32)
-+DEF_HELPER_3(msa_pcnt_h, void, env, i32, i32)
-+DEF_HELPER_3(msa_pcnt_w, void, env, i32, i32)
-+DEF_HELPER_3(msa_pcnt_d, void, env, i32, i32)
++DEF_HELPER_4(msa_bmnz_v, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bmz_v, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bsel_v, void, env, i32, i32, i32)
 +
  
  DEF_HELPER_4(msa_andi_b, void, env, i32, i32, i32)
  DEF_HELPER_4(msa_ori_b, void, env, i32, i32, i32)
-@@ -946,7 +951,6 @@ DEF_HELPER_4(msa_bmnz_v, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_bmz_v, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_bsel_v, void, env, i32, i32, i32)
+@@ -957,9 +961,6 @@ DEF_HELPER_4(msa_and_v, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_or_v, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_nor_v, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_xor_v, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_bmnz_v, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_bmz_v, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_bsel_v, void, env, i32, i32, i32)
  DEF_HELPER_4(msa_fill_df, void, env, i32, i32, i32)
--DEF_HELPER_4(msa_pcnt_df, void, env, i32, i32, i32)
  
  DEF_HELPER_4(msa_copy_s_b, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_copy_s_h, void, env, i32, i32, i32)
 diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 8c27c1b..fe27efc 100644
+index 7c9da99..eda675a 100644
 --- a/target/mips/msa_helper.c
 +++ b/target/mips/msa_helper.c
-@@ -207,6 +207,80 @@ void helper_msa_nlzc_d(CPUMIPSState *env, uint32_t wd, uint32_t ws)
-     pwd->d[1]  = msa_nlzc_df(DF_DOUBLE, pws->d[1]);
+@@ -466,6 +466,42 @@ void helper_msa_binsr_d(CPUMIPSState *env,
+     pwd->d[1]  = msa_binsr_df(DF_DOUBLE, pwd->d[0],  pws->d[0], pwt->d[1]);
  }
  
-+static inline int64_t msa_pcnt_df(uint32_t df, int64_t arg)
-+{
-+    uint64_t x;
-+
-+    x = UNSIGNED(arg, df);
-+
-+    x = (x & 0x5555555555555555ULL) + ((x >>  1) & 0x5555555555555555ULL);
-+    x = (x & 0x3333333333333333ULL) + ((x >>  2) & 0x3333333333333333ULL);
-+    x = (x & 0x0F0F0F0F0F0F0F0FULL) + ((x >>  4) & 0x0F0F0F0F0F0F0F0FULL);
-+    x = (x & 0x00FF00FF00FF00FFULL) + ((x >>  8) & 0x00FF00FF00FF00FFULL);
-+    x = (x & 0x0000FFFF0000FFFFULL) + ((x >> 16) & 0x0000FFFF0000FFFFULL);
-+    x = (x & 0x00000000FFFFFFFFULL) + ((x >> 32));
-+
-+    return x;
-+}
-+
-+void helper_msa_pcnt_b(CPUMIPSState *env, uint32_t wd, uint32_t ws)
++void helper_msa_bmnz_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
 +{
 +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
 +    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
 +
-+    pwd->b[0]  = msa_pcnt_df(DF_BYTE, pws->b[0]);
-+    pwd->b[1]  = msa_pcnt_df(DF_BYTE, pws->b[1]);
-+    pwd->b[2]  = msa_pcnt_df(DF_BYTE, pws->b[2]);
-+    pwd->b[3]  = msa_pcnt_df(DF_BYTE, pws->b[3]);
-+    pwd->b[4]  = msa_pcnt_df(DF_BYTE, pws->b[4]);
-+    pwd->b[5]  = msa_pcnt_df(DF_BYTE, pws->b[5]);
-+    pwd->b[6]  = msa_pcnt_df(DF_BYTE, pws->b[6]);
-+    pwd->b[7]  = msa_pcnt_df(DF_BYTE, pws->b[7]);
-+    pwd->b[8]  = msa_pcnt_df(DF_BYTE, pws->b[8]);
-+    pwd->b[9]  = msa_pcnt_df(DF_BYTE, pws->b[9]);
-+    pwd->b[10] = msa_pcnt_df(DF_BYTE, pws->b[10]);
-+    pwd->b[11] = msa_pcnt_df(DF_BYTE, pws->b[11]);
-+    pwd->b[12] = msa_pcnt_df(DF_BYTE, pws->b[12]);
-+    pwd->b[13] = msa_pcnt_df(DF_BYTE, pws->b[13]);
-+    pwd->b[14] = msa_pcnt_df(DF_BYTE, pws->b[14]);
-+    pwd->b[15] = msa_pcnt_df(DF_BYTE, pws->b[15]);
++    pwd->d[0] = UNSIGNED(                                                     \
++        ((pwd->d[0] & (~pwt->d[0])) | (pws->d[0] & pwt->d[0])), DF_DOUBLE);
++    pwd->d[1] = UNSIGNED(                                                     \
++        ((pwd->d[1] & (~pwt->d[1])) | (pws->d[1] & pwt->d[1])), DF_DOUBLE);
 +}
 +
-+void helper_msa_pcnt_h(CPUMIPSState *env, uint32_t wd, uint32_t ws)
++void helper_msa_bmz_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
 +{
 +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
 +    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
 +
-+    pwd->h[0]  = msa_pcnt_df(DF_HALF, pws->h[0]);
-+    pwd->h[1]  = msa_pcnt_df(DF_HALF, pws->h[1]);
-+    pwd->h[2]  = msa_pcnt_df(DF_HALF, pws->h[2]);
-+    pwd->h[3]  = msa_pcnt_df(DF_HALF, pws->h[3]);
-+    pwd->h[4]  = msa_pcnt_df(DF_HALF, pws->h[4]);
-+    pwd->h[5]  = msa_pcnt_df(DF_HALF, pws->h[5]);
-+    pwd->h[6]  = msa_pcnt_df(DF_HALF, pws->h[6]);
-+    pwd->h[7]  = msa_pcnt_df(DF_HALF, pws->h[7]);
++    pwd->d[0] = UNSIGNED(                                                     \
++        ((pwd->d[0] & pwt->d[0]) | (pws->d[0] & (~pwt->d[0]))), DF_DOUBLE);
++    pwd->d[1] = UNSIGNED(                                                     \
++        ((pwd->d[1] & pwt->d[1]) | (pws->d[1] & (~pwt->d[1]))), DF_DOUBLE);
 +}
 +
-+void helper_msa_pcnt_w(CPUMIPSState *env, uint32_t wd, uint32_t ws)
++void helper_msa_bsel_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
 +{
 +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
 +    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
 +
-+    pwd->w[0]  = msa_pcnt_df(DF_WORD, pws->w[0]);
-+    pwd->w[1]  = msa_pcnt_df(DF_WORD, pws->w[1]);
-+    pwd->w[2]  = msa_pcnt_df(DF_WORD, pws->w[2]);
-+    pwd->w[3]  = msa_pcnt_df(DF_WORD, pws->w[3]);
-+}
-+
-+void helper_msa_pcnt_d(CPUMIPSState *env, uint32_t wd, uint32_t ws)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+
-+    pwd->d[0]  = msa_pcnt_df(DF_DOUBLE, pws->d[0]);
-+    pwd->d[1]  = msa_pcnt_df(DF_DOUBLE, pws->d[1]);
++    pwd->d[0] = UNSIGNED(                                                     \
++        (pws->d[0] & (~pwd->d[0])) | (pwt->d[0] & pwd->d[0]), DF_DOUBLE);
++    pwd->d[1] = UNSIGNED(                                                     \
++        (pws->d[1] & (~pwd->d[1])) | (pwt->d[1] & pwd->d[1]), DF_DOUBLE);
 +}
 +
  
  /*
-  * Bit Move
-@@ -2648,22 +2722,6 @@ void helper_msa_move_v(CPUMIPSState *env, uint32_t wd, uint32_t ws)
-     msa_move_v(pwd, pws);
+  * Bit Set
+@@ -946,6 +982,9 @@ MSA_FN_IMM8(bmzi_b, pwd->b[i],
+ MSA_FN_IMM8(bseli_b, pwd->b[i],
+         BIT_SELECT(pwd->b[i], pws->b[i], i8, DF_BYTE))
+ 
++#undef BIT_SELECT
++#undef BIT_MOVE_IF_ZERO
++#undef BIT_MOVE_IF_NOT_ZERO
+ #undef MSA_FN_IMM8
+ 
+ #define SHF_POS(i, imm) (((i) & 0xfc) + (((imm) >> (2 * ((i) & 0x03))) & 0x03))
+@@ -980,30 +1019,6 @@ void helper_msa_shf_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+     msa_move_v(pwd, pwx);
  }
  
--static inline int64_t msa_pcnt_df(uint32_t df, int64_t arg)
--{
--    uint64_t x;
--
--    x = UNSIGNED(arg, df);
--
--    x = (x & 0x5555555555555555ULL) + ((x >>  1) & 0x5555555555555555ULL);
--    x = (x & 0x3333333333333333ULL) + ((x >>  2) & 0x3333333333333333ULL);
--    x = (x & 0x0F0F0F0F0F0F0F0FULL) + ((x >>  4) & 0x0F0F0F0F0F0F0F0FULL);
--    x = (x & 0x00FF00FF00FF00FFULL) + ((x >>  8) & 0x00FF00FF00FF00FFULL);
--    x = (x & 0x0000FFFF0000FFFFULL) + ((x >> 16) & 0x0000FFFF0000FFFFULL);
--    x = (x & 0x00000000FFFFFFFFULL) + ((x >> 32));
--
--    return x;
--}
--
- void helper_msa_fill_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-                         uint32_t rs)
- {
-@@ -2696,59 +2754,6 @@ void helper_msa_fill_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-     }
- }
- 
--#define MSA_UNOP_DF(func) \
--void helper_msa_ ## func ## _df(CPUMIPSState *env, uint32_t df,         \
--                              uint32_t wd, uint32_t ws)                 \
+-#define MSA_FN_VECTOR(FUNC, DEST, OPERATION)                            \
+-void helper_msa_ ## FUNC(CPUMIPSState *env, uint32_t wd, uint32_t ws,   \
+-        uint32_t wt)                                                    \
 -{                                                                       \
 -    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);                          \
 -    wr_t *pws = &(env->active_fpu.fpr[ws].wr);                          \
--                                                                        \
--    switch (df) {                                                       \
--    case DF_BYTE:                                                       \
--        pwd->b[0]  = msa_ ## func ## _df(df, pws->b[0]);                \
--        pwd->b[1]  = msa_ ## func ## _df(df, pws->b[1]);                \
--        pwd->b[2]  = msa_ ## func ## _df(df, pws->b[2]);                \
--        pwd->b[3]  = msa_ ## func ## _df(df, pws->b[3]);                \
--        pwd->b[4]  = msa_ ## func ## _df(df, pws->b[4]);                \
--        pwd->b[5]  = msa_ ## func ## _df(df, pws->b[5]);                \
--        pwd->b[6]  = msa_ ## func ## _df(df, pws->b[6]);                \
--        pwd->b[7]  = msa_ ## func ## _df(df, pws->b[7]);                \
--        pwd->b[8]  = msa_ ## func ## _df(df, pws->b[8]);                \
--        pwd->b[9]  = msa_ ## func ## _df(df, pws->b[9]);                \
--        pwd->b[10] = msa_ ## func ## _df(df, pws->b[10]);               \
--        pwd->b[11] = msa_ ## func ## _df(df, pws->b[11]);               \
--        pwd->b[12] = msa_ ## func ## _df(df, pws->b[12]);               \
--        pwd->b[13] = msa_ ## func ## _df(df, pws->b[13]);               \
--        pwd->b[14] = msa_ ## func ## _df(df, pws->b[14]);               \
--        pwd->b[15] = msa_ ## func ## _df(df, pws->b[15]);               \
--        break;                                                          \
--    case DF_HALF:                                                       \
--        pwd->h[0] = msa_ ## func ## _df(df, pws->h[0]);                 \
--        pwd->h[1] = msa_ ## func ## _df(df, pws->h[1]);                 \
--        pwd->h[2] = msa_ ## func ## _df(df, pws->h[2]);                 \
--        pwd->h[3] = msa_ ## func ## _df(df, pws->h[3]);                 \
--        pwd->h[4] = msa_ ## func ## _df(df, pws->h[4]);                 \
--        pwd->h[5] = msa_ ## func ## _df(df, pws->h[5]);                 \
--        pwd->h[6] = msa_ ## func ## _df(df, pws->h[6]);                 \
--        pwd->h[7] = msa_ ## func ## _df(df, pws->h[7]);                 \
--        break;                                                          \
--    case DF_WORD:                                                       \
--        pwd->w[0] = msa_ ## func ## _df(df, pws->w[0]);                 \
--        pwd->w[1] = msa_ ## func ## _df(df, pws->w[1]);                 \
--        pwd->w[2] = msa_ ## func ## _df(df, pws->w[2]);                 \
--        pwd->w[3] = msa_ ## func ## _df(df, pws->w[3]);                 \
--        break;                                                          \
--    case DF_DOUBLE:                                                     \
--        pwd->d[0] = msa_ ## func ## _df(df, pws->d[0]);                 \
--        pwd->d[1] = msa_ ## func ## _df(df, pws->d[1]);                 \
--        break;                                                          \
--    default:                                                            \
--        assert(0);                                                      \
+-    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);                          \
+-    uint32_t i;                                                         \
+-    for (i = 0; i < DF_ELEMENTS(DF_DOUBLE); i++) {                      \
+-        DEST = OPERATION;                                               \
 -    }                                                                   \
 -}
 -
--MSA_UNOP_DF(pcnt)
--#undef MSA_UNOP_DF
- 
- #define FLOAT_ONE32 make_float32(0x3f8 << 20)
- #define FLOAT_ONE64 make_float64(0x3ffULL << 52)
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 6de4609..0d06ba9 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -28958,9 +28958,6 @@ static void gen_msa_2r(CPUMIPSState *env, DisasContext *ctx)
- #endif
-         gen_helper_msa_fill_df(cpu_env, tdf, twd, tws); /* trs */
-         break;
--    case OPC_PCNT_df:
--        gen_helper_msa_pcnt_df(cpu_env, tdf, twd, tws);
--        break;
-     case OPC_NLOC_df:
-         switch (df) {
-         case DF_BYTE:
-@@ -28993,6 +28990,22 @@ static void gen_msa_2r(CPUMIPSState *env, DisasContext *ctx)
-             break;
-         }
-         break;
-+    case OPC_PCNT_df:
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_helper_msa_pcnt_b(cpu_env, twd, tws);
-+            break;
-+        case DF_HALF:
-+            gen_helper_msa_pcnt_h(cpu_env, twd, tws);
-+            break;
-+        case DF_WORD:
-+            gen_helper_msa_pcnt_w(cpu_env, twd, tws);
-+            break;
-+        case DF_DOUBLE:
-+            gen_helper_msa_pcnt_d(cpu_env, twd, tws);
-+            break;
-+        }
-+        break;
-     default:
-         MIPS_INVAL("MSA instruction");
-         generate_exception_end(ctx, EXCP_RI);
+-MSA_FN_VECTOR(bmnz_v, pwd->d[i],
+-        BIT_MOVE_IF_NOT_ZERO(pwd->d[i], pws->d[i], pwt->d[i], DF_DOUBLE))
+-MSA_FN_VECTOR(bmz_v, pwd->d[i],
+-        BIT_MOVE_IF_ZERO(pwd->d[i], pws->d[i], pwt->d[i], DF_DOUBLE))
+-MSA_FN_VECTOR(bsel_v, pwd->d[i],
+-        BIT_SELECT(pwd->d[i], pws->d[i], pwt->d[i], DF_DOUBLE))
+-#undef BIT_MOVE_IF_NOT_ZERO
+-#undef BIT_MOVE_IF_ZERO
+-#undef BIT_SELECT
+-#undef MSA_FN_VECTOR
+-
+ void helper_msa_and_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
+ {
+     wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
 -- 
 2.7.4
 
