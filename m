@@ -2,72 +2,61 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C28EEC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 18:07:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C23E8C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 18:34:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99F6E21D7A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 18:07:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99F6E21D7A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 92FB121655
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 18:34:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92FB121655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDBgw-0005IY-Pe
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 14:07:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56462)
+	id 1iDC7u-0003ZO-9K
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 14:34:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36732)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iDBgD-0004sz-TF
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 14:06:22 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iDC5e-0001Kt-W1
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 14:32:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iDBgC-00058n-PZ
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 14:06:21 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40862)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iDBgC-00058L-K5
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 14:06:20 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iDBgB-0006Dq-7D
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 18:06:19 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 30CF92E80C9
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 18:06:19 +0000 (UTC)
+ (envelope-from <mreitz@redhat.com>) id 1iDC5d-0007Xl-Uu
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 14:32:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58028)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iDC5a-0007Qw-K1; Wed, 25 Sep 2019 14:32:34 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 53FF018C8931;
+ Wed, 25 Sep 2019 18:32:33 +0000 (UTC)
+Received: from localhost (unknown [10.40.205.132])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CE8E8608C2;
+ Wed, 25 Sep 2019 18:32:32 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH 0/3] iotests: Fix 125
+Date: Wed, 25 Sep 2019 20:32:28 +0200
+Message-Id: <20190925183231.11196-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Wed, 25 Sep 2019 18:32:33 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Sep 2019 17:51:14 -0000
-From: Paul Clarke <pc@us.ibm.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: ppc64 testcase
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 7-pc mark-cave-ayland philmd
-X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
-X-Launchpad-Bug-Modifier: Paul Clarke (7-pc)
-References: <156711057074.6835.13599471410604217618.malonedeb@soybean.canonical.com>
-Message-Id: <156943387416.13580.9092178339785906464.malone@gac.canonical.com>
-Subject: [Bug 1841990] Re: instruction 'denbcdq' misbehaving
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19048";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 3068c715f2047513dcd5df9891648595459b3bca
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,74 +65,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1841990 <1841990@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I'm still trying to track down a BE system.  Everything I have which is
-newer than POWER7 is LE, and POWER7 is not sufficient to run the test.
+Hi,
 
-The test suite that produced the problem is from https://github.com
-/open-power-sdk/pveclib.  The good news is that with your (v1) changes,
-275 tests no longer fail.  22 tests still fail, but I bet it is
-different issue(s).
+iotest 125 is very broken.  It uses qemu-img info=E2=80=99s =E2=80=9Cdisk=
+ size=E2=80=9D to
+determine an image=E2=80=99s on-disk size, but it does so in a wrong way:=
+ It
+just fetches the first number ([0-9]+), but that isn=E2=80=99t very usefu=
+l
+because qemu-img info emits human-readable values that include units and
+decimal points.
 
--- =
+We should ust stat -c %b instead.  That=E2=80=99s done in patch 3.
+Unfortunately, doing so exposed more problems.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1841990
+Patch 1 fixes a stupid bug in the test itself that we never noticed
+because of what patch 3 fixes.  (Pull patch 3 before patch 1 and you=E2=80=
+=99ll
+see.)
 
-Title:
-  instruction 'denbcdq' misbehaving
+The other thing is actually a bug in XFS.  Its fallocate()
+implementation rounds up the length independently of the offset, so if
+you try to fallocate an unaligned range, chances are that it might not
+allocate the last block your range touches.  Patch 2 detects that case
+and skips the test then.  (Pull patch 3 before patch 2 and you=E2=80=99ll=
+ see
+the test fail on XFS.)
 
-Status in QEMU:
-  New
 
-Bug description:
-  Instruction 'denbcdq' appears to have no effect.  Test case attached.
+Max Reitz (3):
+  iotests: Fix 125 for growth_mode =3D metadata
+  iotests: Disable 125 on broken XFS versions
+  iotests: Use stat -c %b in 125
 
-  On ppc64le native:
-  --
-  gcc -g -O -mcpu=3Dpower9 bcdcfsq.c test-denbcdq.c -o test-denbcdq
-  $ ./test-denbcdq
-  0x00000000000000000000000000000000
-  0x0000000000000000000000000000000c
-  0x22080000000000000000000000000000
-  $ ./test-denbcdq 1
-  0x00000000000000000000000000000001
-  0x0000000000000000000000000000001c
-  0x22080000000000000000000000000001
-  $ ./test-denbcdq $(seq 0 99)
-  0x00000000000000000000000000000064
-  0x0000000000000000000000000000100c
-  0x22080000000000000000000000000080
-  --
+ tests/qemu-iotests/125 | 45 +++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 42 insertions(+), 3 deletions(-)
 
-  With "qemu-ppc64le -cpu power9"
-  --
-  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq
-  0x00000000000000000000000000000000
-  0x0000000000000000000000000000000c
-  0x0000000000000000000000000000000c
-  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq 1
-  0x00000000000000000000000000000001
-  0x0000000000000000000000000000001c
-  0x0000000000000000000000000000001c
-  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq $(seq 100)
-  0x00000000000000000000000000000064
-  0x0000000000000000000000000000100c
-  0x0000000000000000000000000000100c
-  --
+--=20
+2.21.0
 
-  I started looking at the code, but I got confused rather quickly.
-  Could be related to endianness? I think denbcdq arrived on the scene
-  before little-endian was a big deal.  Maybe something to do with
-  utilizing implicit floating-point register pairs...  I don't think the
-  right data is getting to helper_denbcdq, which would point back to the
-  gen_fprp_ptr uses in dfp-impl.inc.c (GEN_DFP_T_FPR_I32_Rc).  (Maybe?)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1841990/+subscriptions
 
