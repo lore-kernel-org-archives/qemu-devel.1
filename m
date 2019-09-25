@@ -2,67 +2,76 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50715C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E643C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:57:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14E5F21D7A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:56:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14E5F21D7A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 096C021D7A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:57:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="YZuaLyr0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 096C021D7A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD9eJ-0004A6-0i
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 11:56:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33346)
+	id 1iD9fy-0006rh-4R
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 11:57:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36387)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iD9E0-00022C-Gj
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:29:06 -0400
+ (envelope-from <guoren@kernel.org>) id 1iD9V5-0003mh-FU
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:46:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iD9Dy-0000SE-06
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:29:03 -0400
-Resent-Date: Wed, 25 Sep 2019 11:29:03 -0400
-Resent-Message-Id: <E1iD9Dy-0000SE-06@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21419)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iD9Dx-0000Rv-OK
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:29:01 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1569425336; cv=none; d=zoho.com; s=zohoarc; 
- b=nyZThKpmjJiAJYo/zFvvKvdMS5Dnd1To65UjoiOrMWTmXVLuJn1O77fC6Nwdc8TIEmgRJ6i6rVtxjJR9xK0gJmV/fwZsuvHZcTm6UTsIeGgid51vYGe+VkFrEU89rc3JQC70xvk54F5Qu0jQjt6I7rGivSPidwwFuhmzhjFDBos=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1569425336;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=xUz5MvE/Cv3udJX1eKuwYcundaU+L7KfamBhQ5eRLkQ=; 
- b=WKfCNY1xZlFwYg7e92y/Fz+Jmu26m4W93ryLifeWjOGiNmC6d+Ngsq9VEejJ9cR81NUEd0vCR3IPAijf9zHdL3aDVbIebMGW7v7EAJNbZL2Q1TsbdRnddx8PfRez7jBOeB4sg6gDTxYo9GkLDXLygNNPGnvw9PzDiC9raMQ3Yj8=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1569425335242605.6383051010938;
- Wed, 25 Sep 2019 08:28:55 -0700 (PDT)
-Subject: Re: [PULL 00/37] QAPI patches for 2019-09-24
-In-Reply-To: <20190924123334.30645-1-armbru@redhat.com>
-Message-ID: <156942533424.5848.11565893264184378355@8230166b0665>
+ (envelope-from <guoren@kernel.org>) id 1iD9V3-0008Q7-7J
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:46:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56088)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <guoren@kernel.org>)
+ id 1iD9V3-0008Pq-16; Wed, 25 Sep 2019 11:46:41 -0400
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com
+ [209.85.128.45])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 7309321D7B;
+ Wed, 25 Sep 2019 15:46:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1569426399;
+ bh=kS7iHUZBpobHHkcL44QM2SKtkOCrqXA0YtmVeoaDbz8=;
+ h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+ b=YZuaLyr0gKuVE+nchojFLfvvZdxpN/BuNsCashVgn+4u1V7JP5Qa49Hxnmkn3AeI+
+ t1CSWuOi7qF/XZNzicpenUYnUN6/B9sY9svroIz8cDJjs1bEn1gec7vEUajXjk6i+z
+ ARNmK+9lDiPaQSfAa+qfJh6NSxjoDRX7mfWYu1Kw=
+Received: by mail-wm1-f45.google.com with SMTP id v17so5514794wml.4;
+ Wed, 25 Sep 2019 08:46:39 -0700 (PDT)
+X-Gm-Message-State: APjAAAU7iPNRh4bdQeoG9OaFLl1Oz4vVXul3l20GCHZM/s6FdXexLplS
+ uiGb855iJFDJ8dioOAYp6KTa/avyxqHWr0DlFn8=
+X-Google-Smtp-Source: APXvYqzQD79Gyu/CB5/9e35reTlojOx2xToFpO0LXgIdXHeIuvTepv5I9M0NzXlcv9175EnCT3+lutzLejICofJEBXo=
+X-Received: by 2002:a05:600c:1103:: with SMTP id
+ b3mr8724713wma.3.1569426397979; 
+ Wed, 25 Sep 2019 08:46:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: armbru@redhat.com
-Date: Wed, 25 Sep 2019 08:28:55 -0700 (PDT)
-X-ZohoMailClient: External
+References: <1569386895-8726-1-git-send-email-guoren@kernel.org>
+ <CAKmqyKMraotFmqMg7MrJC5C4SogGqSaVtHkVYTEgGWK9UnWb5g@mail.gmail.com>
+ <CAJF2gTR0o0s_p0H669BRZ86phLtpATwWczczWV8HWw1nc+doFA@mail.gmail.com>
+ <CANnJOVFkviip0g1tBHdL6n2B8pMAQxVBC83RTaF4PAE1t+aPew@mail.gmail.com>
+In-Reply-To: <CANnJOVFkviip0g1tBHdL6n2B8pMAQxVBC83RTaF4PAE1t+aPew@mail.gmail.com>
+From: Guo Ren <guoren@kernel.org>
+Date: Wed, 25 Sep 2019 23:46:26 +0800
+X-Gmail-Original-Message-ID: <CAJF2gTS=1uaQi7=CXg7f0eh2xb-HcG_sriMtU208VHXnJ4GTvA@mail.gmail.com>
+Message-ID: <CAJF2gTS=1uaQi7=CXg7f0eh2xb-HcG_sriMtU208VHXnJ4GTvA@mail.gmail.com>
+Subject: Re: [PATCH V3] target/riscv: Bugfix reserved bits in PTE for RV64
+To: Jonathan Behrens <fintelia@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.54
+X-Received-From: 198.145.29.99
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,186 +83,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <alistair.francis@wdc.com>, Guo Ren <ren_guo@c-sky.com>,
+ Alistair Francis <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkyNDEyMzMzNC4zMDY0
-NS0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTA5MjQxMjMzMzQuMzA2NDUt
-MS1hcm1icnVAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUFVMTCAwMC8zN10gUUFQSSBwYXRjaGVzIGZv
-ciAyMDE5LTA5LTI0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCBy
-ZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
-bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
-Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRj
-aGV3LzIwMTkwOTE4MTMwNjMzLjQ4NzItMS1zaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdl
-aS5jb20gLT4gcGF0Y2hldy8yMDE5MDkxODEzMDYzMy40ODcyLTEtc2hhbWVlcmFsaS5rb2xvdGh1
-bS50aG9kaUBodWF3ZWkuY29tCkF1dG8gcGFja2luZyB0aGUgcmVwb3NpdG9yeSBmb3Igb3B0aW11
-bSBwZXJmb3JtYW5jZS4gWW91IG1heSBhbHNvCnJ1biAiZ2l0IGdjIiBtYW51YWxseS4gU2VlICJn
-aXQgaGVscCBnYyIgZm9yIG1vcmUgaW5mb3JtYXRpb24uClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
-aCAndGVzdCcKZmNhNzk2NSBxYXBpOiBBc3NlcnQgLnZpc2l0KCkgYW5kIC5jaGVja19jbGFzaCgp
-IHJ1biBvbmx5IGFmdGVyIC5jaGVjaygpCjFkZWUzNmYgcWFwaTogRml4IGV4Y2Vzc2l2ZSBRQVBJ
-U2NoZW1hRW50aXR5LmNoZWNrKCkgcmVjdXJzaW9uCjY3Mjk2YjYgcWFwaTogRml4IHRvIC5jaGVj
-aygpIGVtcHR5IHN0cnVjdHMganVzdCBvbmNlCjVkZjdhYTQgcWFwaTogRGVsZXRlIHVzZWxlc3Mg
-Y2hlY2tfZXhwcnMoKSBjb2RlIGZvciBzaW1wbGUgdW5pb24ga2luZAo5YmZkNDQzIHFhcGk6IENs
-ZWFuIHVwIGFyb3VuZCBjaGVja19rbm93bl9rZXlzKCkKNmYzNmRlOCBxYXBpOiBTaW1wbGlmeSBj
-aGVja19rZXlzKCkKZjRmZGNjOCBxYXBpOiBOb3JtYWxpemUgJ2lmJyBpbiBjaGVja19leHBycygp
-LCBsaWtlIG90aGVyIHN1Z2FyCjg4NmY1YTkgcWFwaTogRml4IG1pc3NpbmcgJ2lmJyBjaGVja3Mg
-aW4gc3RydWN0LCB1bmlvbiwgYWx0ZXJuYXRlICdkYXRhJwoxNjQ2NDM1IHFhcGk6IFJlamVjdCBi
-bGFuayAnaWYnIGNvbmRpdGlvbnMgaW4gYWRkaXRpb24gdG8gZW1wdHkgb25lcwo0NmZiNzgyIHFh
-cGk6IEZpeCBicm9rZW4gZGlzY3JpbWluYXRvciBlcnJvciBtZXNzYWdlcwo2NmYzZTJmIHFhcGk6
-IFJlbW92ZSBudWxsIGZyb20gc2NoZW1hIGxhbmd1YWdlCjEwOWI0YjggcWFwaTogSW1wcm92ZSBy
-ZXBvcnRpbmcgb2YgbGV4aWNhbCBlcnJvcnMKNzgwZTQzYSBxYXBpOiBVc2UgcXVvdGVzIG1vcmUg
-Y29uc2lzdGVudGx5IGluIGZyb250ZW5kIGVycm9yIG1lc3NhZ2VzCjNiZWZjOGIgdGVzdHMvcWFw
-aS1zY2hlbWE6IERlbW9uc3RyYXRlIHN1Ym9wdGltYWwgbGV4aWNhbCBlcnJvcnMKOTNhNmU0NCB0
-ZXN0cy9xYXBpLXNjaGVtYTogRGVtb25zdHJhdGUgaW5zdWZmaWNpZW50ICdpZicgY2hlY2tpbmcK
-MWVkODcwOSB0ZXN0cy9xYXBpLXNjaGVtYTogRGVtb25zdHJhdGUgYnJva2VuIGRpc2NyaW1pbmF0
-b3IgZXJyb3JzCjliNTI1M2YgdGVzdHMvcWFwaS1zY2hlbWE6IERlbW9uc3RyYXRlIG1pc2xlYWRp
-bmcgb3B0aW9uYWwgdGFnIGVycm9yCmU0NzhjZGYgdGVzdHMvcWFwaS1zY2hlbWE6IERlbGV0ZSB0
-d28gcmVkdW5kYW50IHRlc3RzCmU0NDBmODYgdGVzdHMvcWFwaS1zY2hlbWE6IENvdmVyIHVua25v
-d24gcHJhZ21hCjQxMzkxYzUgcWFwaTogVHdlYWsgY29kZSB0byBtYXRjaCBkb2NzL2RldmVsL3Fh
-cGktY29kZS1nZW4udHh0CjhlMzVmZTEgZG9jcy9kZXZlbC9xYXBpLWNvZGUtZ2VuOiBJbXByb3Zl
-IFFBUEkgc2NoZW1hIGxhbmd1YWdlIGRvYwo4ODZiM2Q0IGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdl
-bjogUmV3cml0ZSBpbnRyb2R1Y3Rpb24gdG8gc2NoZW1hCmQxZTk2ZDggZG9jcy9kZXZlbC9xYXBp
-LWNvZGUtZ2VuOiBSZXdyaXRlIGNvbXBhdGliaWxpdHkgY29uc2lkZXJhdGlvbnMKZDU5NTljMiBk
-b2NzL2RldmVsL3FhcGktY29kZS1nZW46IFJlb3JkZXIgc2VjdGlvbnMgZm9yIHJlYWRhYmlsaXR5
-CjkxNWEzN2EgcWFwaTogQWRqdXN0IGZyb250ZW5kIGVycm9ycyB0byBzYXkgZW51bSB2YWx1ZSwg
-bm90IG1lbWJlcgo2NTM4ZmM5IHFhcGk6IFBlcm1pdCBvbWl0dGluZyBhbGwgZmxhdCB1bmlvbiBi
-cmFuY2hlcwo0MTc2ODNiIHFhcGk6IFBlcm1pdCBhbHRlcm5hdGVzIHdpdGgganVzdCBvbmUgYnJh
-bmNoCjM1ZDFhMWEgcWFwaTogUGVybWl0ICdib3hlZCcgd2l0aCBlbXB0eSB0eXBlCmFkNWEwMDIg
-cWFwaTogRHJvcCBzdXBwb3J0IGZvciBlc2NhcGUgc2VxdWVuY2VzIG90aGVyIHRoYW4gXFwKMzdl
-MjIxMCBxYXBpOiBSZXN0cmljdCBzdHJpbmdzIHRvIHByaW50YWJsZSBBU0NJSQplOTVjNjc3IHRl
-c3RzL3FhcGktc2NoZW1hOiBEZW1vbnN0cmF0ZSBiYWQgcmVwb3J0aW5nIG9mIGZ1bm55IGNoYXJh
-Y3RlcnMKMTcyZGFmZCBkb2NzL2RldmVsL3FhcGktY29kZS1nZW46IE1pbm9yIHNwZWNpZmljYXRp
-b24gZml4ZXMKYzMzOTI2ZCBxYXBpOiBEcm9wIHN1cHBvcnQgZm9yIGJveGVkIGFsdGVybmF0ZSBh
-cmd1bWVudHMKMjVmMjJmMyBxYXBpOiBEcm9wIGNoZWNrX3R5cGUoKSdzIHJlZHVuZGFudCBwYXJh
-bWV0ZXIgQGFsbG93X29wdGlvbmFsCjZhOTE0ZWMgc2NyaXB0cy9naXQub3JkZXJmaWxlOiBNYXRj
-aCBRQVBJIHNjaGVtYSBtb3JlIHByZWNpc2VseQowMTdiNjBlIG1ha2UgY2hlY2stdW5pdDogdXNl
-IGFmdGVyIGZyZWUgaW4gdGVzdC1vcHRzLXZpc2l0b3IKYTk3MTFiYSBxYXBpOiBNYWtlIHZpc2l0
-X25leHRfbGlzdCgpJ3MgY29tbWVudCBsZXNzIGNvbmZ1c2luZwoKPT09IE9VVFBVVCBCRUdJTiA9
-PT0KMS8zNyBDaGVja2luZyBjb21taXQgYTk3MTFiYTg3MjE4IChxYXBpOiBNYWtlIHZpc2l0X25l
-eHRfbGlzdCgpJ3MgY29tbWVudCBsZXNzIGNvbmZ1c2luZykKMi8zNyBDaGVja2luZyBjb21taXQg
-MDE3YjYwZWI1Y2I5IChtYWtlIGNoZWNrLXVuaXQ6IHVzZSBhZnRlciBmcmVlIGluIHRlc3Qtb3B0
-cy12aXNpdG9yKQozLzM3IENoZWNraW5nIGNvbW1pdCA2YTkxNGVjOTA1ZWIgKHNjcmlwdHMvZ2l0
-Lm9yZGVyZmlsZTogTWF0Y2ggUUFQSSBzY2hlbWEgbW9yZSBwcmVjaXNlbHkpCjQvMzcgQ2hlY2tp
-bmcgY29tbWl0IDI1ZjIyZjNhMGZhMSAocWFwaTogRHJvcCBjaGVja190eXBlKCkncyByZWR1bmRh
-bnQgcGFyYW1ldGVyIEBhbGxvd19vcHRpb25hbCkKNS8zNyBDaGVja2luZyBjb21taXQgYzMzOTI2
-ZDE0Yzc4IChxYXBpOiBEcm9wIHN1cHBvcnQgZm9yIGJveGVkIGFsdGVybmF0ZSBhcmd1bWVudHMp
-CjYvMzcgQ2hlY2tpbmcgY29tbWl0IDE3MmRhZmQyZDQwZCAoZG9jcy9kZXZlbC9xYXBpLWNvZGUt
-Z2VuOiBNaW5vciBzcGVjaWZpY2F0aW9uIGZpeGVzKQo3LzM3IENoZWNraW5nIGNvbW1pdCBlOTVj
-Njc3YWNkYjcgKHRlc3RzL3FhcGktc2NoZW1hOiBEZW1vbnN0cmF0ZSBiYWQgcmVwb3J0aW5nIG9m
-IGZ1bm55IGNoYXJhY3RlcnMpCjgvMzcgQ2hlY2tpbmcgY29tbWl0IDM3ZTIyMTAzYzUyNyAocWFw
-aTogUmVzdHJpY3Qgc3RyaW5ncyB0byBwcmludGFibGUgQVNDSUkpCldBUk5JTkc6IGFkZGVkLCBt
-b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
-IzExMDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogSW52YWxpZCBVVEYtOCwgcGF0Y2gg
-YW5kIGNvbW1pdCBtZXNzYWdlIHNob3VsZCBiZSBlbmNvZGVkIGluIFVURi04CiMxMjc6IEZJTEU6
-IHRlc3RzL3FhcGktc2NoZW1hL3N0cmluZy1jb2RlLXBvaW50LTEyNy5qc29uOjI6Cit7ICdjb21t
-YW5kJzogJ+KMpicgfQogICAgICAgICAgICAgICBeCgpFUlJPUjogSW52YWxpZCBVVEYtOCwgcGF0
-Y2ggYW5kIGNvbW1pdCBtZXNzYWdlIHNob3VsZCBiZSBlbmNvZGVkIGluIFVURi04CiMxNTM6IEZJ
-TEU6IHRlc3RzL3FhcGktc2NoZW1hL3N0cmluZy1jb2RlLXBvaW50LTMxLmpzb246MjoKK3sgJ2Nv
-bW1hbmQnOiAn4pCfJyB9CiAgICAgICAgICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywgMSB3YXJu
-aW5ncywgNzYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8zNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoKOS8zNyBDaGVja2luZyBjb21taXQgYWQ1YTAwMjBlODIwIChxYXBpOiBEcm9wIHN1cHBv
-cnQgZm9yIGVzY2FwZSBzZXF1ZW5jZXMgb3RoZXIgdGhhbiBcXCkKV0FSTklORzogYWRkZWQsIG1v
-dmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwoj
-NzU6IApkZWxldGVkIGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5n
-cywgNTMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOS8zNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoxMC8zNyBDaGVja2luZyBjb21taXQgMzVkMWExYTIwOTYzIChxYXBpOiBQZXJtaXQgJ2JveGVk
-JyB3aXRoIGVtcHR5IHR5cGUpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUo
-cyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzEzMTogCmRlbGV0ZWQgZmlsZSBt
-b2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMjkgbGluZXMgY2hlY2tl
-ZAoKUGF0Y2ggMTAvMzcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTEvMzcgQ2hlY2tpbmcg
-Y29tbWl0IDQxNzY4M2JhNDNmYSAocWFwaTogUGVybWl0IGFsdGVybmF0ZXMgd2l0aCBqdXN0IG9u
-ZSBicmFuY2gpCjEyLzM3IENoZWNraW5nIGNvbW1pdCA2NTM4ZmM5ZmE0MmIgKHFhcGk6IFBlcm1p
-dCBvbWl0dGluZyBhbGwgZmxhdCB1bmlvbiBicmFuY2hlcykKMTMvMzcgQ2hlY2tpbmcgY29tbWl0
-IDkxNWEzN2E0ZWVjZCAocWFwaTogQWRqdXN0IGZyb250ZW5kIGVycm9ycyB0byBzYXkgZW51bSB2
-YWx1ZSwgbm90IG1lbWJlcikKMTQvMzcgQ2hlY2tpbmcgY29tbWl0IGQ1OTU5YzI5MTkzZSAoZG9j
-cy9kZXZlbC9xYXBpLWNvZGUtZ2VuOiBSZW9yZGVyIHNlY3Rpb25zIGZvciByZWFkYWJpbGl0eSkK
-MTUvMzcgQ2hlY2tpbmcgY29tbWl0IGQxZTk2ZDgzYTk3ZiAoZG9jcy9kZXZlbC9xYXBpLWNvZGUt
-Z2VuOiBSZXdyaXRlIGNvbXBhdGliaWxpdHkgY29uc2lkZXJhdGlvbnMpCjE2LzM3IENoZWNraW5n
-IGNvbW1pdCA4ODZiM2Q0YTliNjkgKGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogUmV3cml0ZSBp
-bnRyb2R1Y3Rpb24gdG8gc2NoZW1hKQoxNy8zNyBDaGVja2luZyBjb21taXQgOGUzNWZlMTZiNzYx
-IChkb2NzL2RldmVsL3FhcGktY29kZS1nZW46IEltcHJvdmUgUUFQSSBzY2hlbWEgbGFuZ3VhZ2Ug
-ZG9jKQoxOC8zNyBDaGVja2luZyBjb21taXQgNDEzOTFjNTI3ZmZjIChxYXBpOiBUd2VhayBjb2Rl
-IHRvIG1hdGNoIGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbi50eHQpCjE5LzM3IENoZWNraW5nIGNv
-bW1pdCBlNDQwZjg2MjRlYmEgKHRlc3RzL3FhcGktc2NoZW1hOiBDb3ZlciB1bmtub3duIHByYWdt
-YSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJ
-TkVSUyBuZWVkIHVwZGF0aW5nPwojMjU6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAg
-ZXJyb3JzLCAxIHdhcm5pbmdzLCAxMCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxOS8zNyBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgoyMC8zNyBDaGVja2luZyBjb21taXQgZTQ3OGNkZjVmMzBmICh0
-ZXN0cy9xYXBpLXNjaGVtYTogRGVsZXRlIHR3byByZWR1bmRhbnQgdGVzdHMpCldBUk5JTkc6IGFk
-ZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRh
-dGluZz8KIzQxOiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
-d2FybmluZ3MsIDE4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIwLzM3IGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCjIxLzM3IENoZWNraW5nIGNvbW1pdCA5YjUyNTNmMWNjZTAgKHRlc3RzL3FhcGkt
-c2NoZW1hOiBEZW1vbnN0cmF0ZSBtaXNsZWFkaW5nIG9wdGlvbmFsIHRhZyBlcnJvcikKV0FSTklO
-RzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVk
-IHVwZGF0aW5nPwojNDE6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAx
-IHdhcm5pbmdzLCAzNCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyMS8zNyBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoyMi8zNyBDaGVja2luZyBjb21taXQgMWVkODcwOWNmZjZmICh0ZXN0cy9xYXBp
-LXNjaGVtYTogRGVtb25zdHJhdGUgYnJva2VuIGRpc2NyaW1pbmF0b3IgZXJyb3JzKQoyMy8zNyBD
-aGVja2luZyBjb21taXQgOTNhNmU0NDM0ZWU3ICh0ZXN0cy9xYXBpLXNjaGVtYTogRGVtb25zdHJh
-dGUgaW5zdWZmaWNpZW50ICdpZicgY2hlY2tpbmcpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
-ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzUzOiAKbmV3
-IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTIwIGxpbmVz
-IGNoZWNrZWQKClBhdGNoIDIzLzM3IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
-IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
-byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjI0LzM3IENo
-ZWNraW5nIGNvbW1pdCAzYmVmYzhiMDIxNTYgKHRlc3RzL3FhcGktc2NoZW1hOiBEZW1vbnN0cmF0
-ZSBzdWJvcHRpbWFsIGxleGljYWwgZXJyb3JzKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
-ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzODogCm5ldyBm
-aWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE0IGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDI0LzM3IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjI1LzM3IENoZWNr
-aW5nIGNvbW1pdCA3ODBlNDNhYzRhZTggKHFhcGk6IFVzZSBxdW90ZXMgbW9yZSBjb25zaXN0ZW50
-bHkgaW4gZnJvbnRlbmQgZXJyb3IgbWVzc2FnZXMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
-ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE2NDogCm5l
-dyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE0NiBsaW5l
-cyBjaGVja2VkCgpQYXRjaCAyNS8zNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyNi8zNyBD
-aGVja2luZyBjb21taXQgMTA5YjRiODlmMWYzIChxYXBpOiBJbXByb3ZlIHJlcG9ydGluZyBvZiBs
-ZXhpY2FsIGVycm9ycykKMjcvMzcgQ2hlY2tpbmcgY29tbWl0IDY2ZjNlMmZkZmVhOCAocWFwaTog
-UmVtb3ZlIG51bGwgZnJvbSBzY2hlbWEgbGFuZ3VhZ2UpCjI4LzM3IENoZWNraW5nIGNvbW1pdCA0
-NmZiNzgyN2U2NzAgKHFhcGk6IEZpeCBicm9rZW4gZGlzY3JpbWluYXRvciBlcnJvciBtZXNzYWdl
-cykKMjkvMzcgQ2hlY2tpbmcgY29tbWl0IDE2NDY0MzUyYmRiOCAocWFwaTogUmVqZWN0IGJsYW5r
-ICdpZicgY29uZGl0aW9ucyBpbiBhZGRpdGlvbiB0byBlbXB0eSBvbmVzKQozMC8zNyBDaGVja2lu
-ZyBjb21taXQgODg2ZjVhOWU5YTE1IChxYXBpOiBGaXggbWlzc2luZyAnaWYnIGNoZWNrcyBpbiBz
-dHJ1Y3QsIHVuaW9uLCBhbHRlcm5hdGUgJ2RhdGEnKQozMS8zNyBDaGVja2luZyBjb21taXQgZjRm
-ZGNjODUzYTQ4IChxYXBpOiBOb3JtYWxpemUgJ2lmJyBpbiBjaGVja19leHBycygpLCBsaWtlIG90
-aGVyIHN1Z2FyKQozMi8zNyBDaGVja2luZyBjb21taXQgNmYzNmRlOGMwN2VlIChxYXBpOiBTaW1w
-bGlmeSBjaGVja19rZXlzKCkpCjMzLzM3IENoZWNraW5nIGNvbW1pdCA5YmZkNDQzYmNiMGEgKHFh
-cGk6IENsZWFuIHVwIGFyb3VuZCBjaGVja19rbm93bl9rZXlzKCkpCjM0LzM3IENoZWNraW5nIGNv
-bW1pdCA1ZGY3YWE0N2E5YmEgKHFhcGk6IERlbGV0ZSB1c2VsZXNzIGNoZWNrX2V4cHJzKCkgY29k
-ZSBmb3Igc2ltcGxlIHVuaW9uIGtpbmQpCjM1LzM3IENoZWNraW5nIGNvbW1pdCA2NzI5NmI2ZTM3
-NzUgKHFhcGk6IEZpeCB0byAuY2hlY2soKSBlbXB0eSBzdHJ1Y3RzIGp1c3Qgb25jZSkKMzYvMzcg
-Q2hlY2tpbmcgY29tbWl0IDFkZWUzNmZmNmJmOCAocWFwaTogRml4IGV4Y2Vzc2l2ZSBRQVBJU2No
-ZW1hRW50aXR5LmNoZWNrKCkgcmVjdXJzaW9uKQozNy8zNyBDaGVja2luZyBjb21taXQgZmNhNzk2
-NWRjMWU2IChxYXBpOiBBc3NlcnQgLnZpc2l0KCkgYW5kIC5jaGVja19jbGFzaCgpIHJ1biBvbmx5
-IGFmdGVyIC5jaGVjaygpKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
-d2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
-dy5vcmcvbG9ncy8yMDE5MDkyNDEyMzMzNC4zMDY0NS0xLWFybWJydUByZWRoYXQuY29tL3Rlc3Rp
-bmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
-IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+I think your thoughts are wrong.
+The specification is very clear: these bits are not part of ppn, not
+part of the translation target address. The current code is against
+the riscv-privilege specification.
 
+On Wed, Sep 25, 2019 at 11:20 PM Jonathan Behrens <fintelia@gmail.com> wrot=
+e:
+>
+> Any code whose behavior is changed by this patch is wrong, so it doesn't =
+seem like it matters much whether this is merged or not. Personally I'd lea=
+n towards making sure that attempts to use PTEs with the reserved bit set w=
+ould always fault, rather than wrapping around to low memory and perhaps si=
+lently succeeding.
+>
+> Jonathan
+>
+> On Wed, Sep 25, 2019 at 8:29 AM Guo Ren <guoren@kernel.org> wrote:
+>>
+>> On Wed, Sep 25, 2019 at 1:19 PM Alistair Francis <alistair23@gmail.com> =
+wrote:
+>> >
+>> > On Tue, Sep 24, 2019 at 9:48 PM <guoren@kernel.org> wrote:
+>> > >
+>> > > From: Guo Ren <ren_guo@c-sky.com>
+>> > >
+>> > > Highest 10 bits of PTE are reserved in riscv-privileged, ref: [1], s=
+o we
+>> > > need to ignore them. They can not be a part of ppn.
+>> > >
+>> > > 1: The RISC-V Instruction Set Manual, Volume II: Privileged Architec=
+ture
+>> > >    4.4 Sv39: Page-Based 39-bit Virtual-Memory System
+>> > >    4.5 Sv48: Page-Based 48-bit Virtual-Memory System
+>> >
+>> > Hey,
+>> >
+>> > As I mentioned on patch 2 I don't think this is right. It isn't up to
+>> > HW to clear these bits, software should keep them clear.
+>>
+>> These bits are not part of ppn in spec, so we still need to ignore them =
+for ppn.
+>>
+>> The patch is reasonable.
+>>
+>> --
+>> Best Regards
+>>  Guo Ren
+>>
+>> ML: https://lore.kernel.org/linux-csky/
+>>
+
+
+--=20
+Best Regards
+ Guo Ren
+
+ML: https://lore.kernel.org/linux-csky/
 
