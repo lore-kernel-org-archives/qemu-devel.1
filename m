@@ -2,60 +2,84 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1A1FC4360C
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:43:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36170C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:44:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B3D421D79
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:43:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B3D421D79
+	by mail.kernel.org (Postfix) with ESMTPS id EA79B21D79
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:44:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA79B21D79
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD9Rx-0000PI-04
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 11:43:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59171)
+	id 1iD9TA-0001nY-Ka
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 11:44:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35693)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iD8xC-0002RV-SE
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:11:43 -0400
+ (envelope-from <philmd@redhat.com>) id 1iD9Pb-00078j-PF
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:41:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iD8xB-0007bi-Qw
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:11:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38496)
+ (envelope-from <philmd@redhat.com>) id 1iD9PY-0005E4-7X
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:41:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50288)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>)
- id 1iD8x7-0007ao-Bk; Wed, 25 Sep 2019 11:11:37 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iD9PX-0005Df-Q6
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:41:00 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 830A0C059B6F;
- Wed, 25 Sep 2019 15:11:36 +0000 (UTC)
-Received: from Igors-MacBook-Pro (ovpn-112-17.ams2.redhat.com [10.36.112.17])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7A4961001956;
- Wed, 25 Sep 2019 15:11:28 +0000 (UTC)
-Date: Wed, 25 Sep 2019 17:11:26 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH-for-4.2 v11 10/11] tests: Update ACPI tables list for
- upcoming arm/virt tests
-Message-ID: <20190925171126.6cd6b7e5@Igors-MacBook-Pro>
-In-Reply-To: <20190918130633.4872-11-shameerali.kolothum.thodi@huawei.com>
-References: <20190918130633.4872-1-shameerali.kolothum.thodi@huawei.com>
- <20190918130633.4872-11-shameerali.kolothum.thodi@huawei.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 64FE93C916
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 15:40:58 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id z205so2376273wmb.7
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 08:40:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=F2IsRsFzj5IUo9dtScEdvVuRBniwx1r8AHp/iFVtoKE=;
+ b=KEuH+ck8AHzjCGv8iNud/9qtjXBj1kQxKaA8oJBUN7KMG8G5+gcZ2JQ93RNpFclApx
+ 6KYYQio47ifOK0f4CZ1DecGWvQrLDRlHySsA1ussAFDqGQySzqyYZtkZXwCvgDut//41
+ 3iRoTPkYwfKOuA5c6fthDvyBL26wCk0823tCThAMSVgANu72l+DJVSnjUsuqcoPouYY/
+ 1XENz07x3qvHq9JWFnWqzCXAMy6x7gdvN9xs0CzNtfDYQp4GQojsgyBxUt/mlrSyHBpu
+ nvAPsDl54aUwGfBUEpAnkBa+UcP2rXLihGqN+iHFs2VndtGf/mwiqk4ARSV6sPlOjThL
+ WGig==
+X-Gm-Message-State: APjAAAVheUBWQ3KnP87RHf8xqnNsPZUYRb744ioiXvTh+EzgX4gWzGmn
+ 3d8N0rmDpSxZ/oR1BVZds5BRA2CXbplWhQtx7PQvGEgGcqk/vYMcMKOTUBCG6pPYDzqMnrMsyPx
+ l8ud4MqfdFIq/hZk=
+X-Received: by 2002:adf:c58b:: with SMTP id m11mr9622256wrg.252.1569426055117; 
+ Wed, 25 Sep 2019 08:40:55 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyzgb4SzDzR7Ocp4aDRqmOcSY9rle3XFtT1H2OM3/Kl9gRQnEUfAN0RQzF8AQrxJomNPtyRCQ==
+X-Received: by 2002:adf:c58b:: with SMTP id m11mr9622239wrg.252.1569426054727; 
+ Wed, 25 Sep 2019 08:40:54 -0700 (PDT)
+Received: from [10.201.33.84] ([195.166.127.210])
+ by smtp.gmail.com with ESMTPSA id u68sm8157181wmu.12.2019.09.25.08.40.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 25 Sep 2019 08:40:54 -0700 (PDT)
+Subject: Re: [PATCH v4 8/8] hw/i386: Introduce the microvm machine type
+To: Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
+References: <20190924124433.96810-1-slp@redhat.com>
+ <20190924124433.96810-9-slp@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <061b720c-2ef2-b270-f18b-b0619573862d@redhat.com>
+Date: Wed, 25 Sep 2019 17:40:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190924124433.96810-9-slp@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Wed, 25 Sep 2019 15:11:36 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -70,56 +94,766 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, shannon.zhaosl@gmail.com,
- ard.biesheuvel@linaro.org, qemu-devel@nongnu.org, xuwei5@hisilicon.com,
- linuxarm@huawei.com, eric.auger@redhat.com, qemu-arm@nongnu.org,
- mst@redhat.com, sebastien.boeuf@intel.com, lersek@redhat.com
+Cc: ehabkost@redhat.com, kvm@vger.kernel.org, mst@redhat.com,
+ mtosatti@redhat.com, kraxel@redhat.com, pbonzini@redhat.com,
+ imammedo@redhat.com, lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 18 Sep 2019 14:06:32 +0100
-Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
 
-> This is in preparation to add numamem and memhp tests to
-> arm/virt platform. The bios-tables-test-allowed-diff.h
-> is updated with a list of expected ACPI tables that needs to be
-> present in tests/data/acpi/virt folder.
+
+On 9/24/19 2:44 PM, Sergio Lopez wrote:
+> Microvm is a machine type inspired by both NEMU and Firecracker, and
+> constructed after the machine model implemented by the latter.
 > 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
+> It's main purpose is providing users a minimalist machine type free
+> from the burden of legacy compatibility, serving as a stepping stone
+> for future projects aiming at improving boot times, reducing the
+> attack surface and slimming down QEMU's footprint.
+> 
+> The microvm machine type supports the following devices:
+> 
+>  - ISA bus
+>  - i8259 PIC
+>  - LAPIC (implicit if using KVM)
+>  - IOAPIC (defaults to kernel_irqchip_split = true)
+>  - i8254 PIT
+>  - MC146818 RTC (optional)
+>  - kvmclock (if using KVM)
+>  - fw_cfg
+>  - One ISA serial port (optional)
+>  - Up to eight virtio-mmio devices (configured by the user)
+> 
+> It supports the following machine-specific options:
+> 
+> microvm.option-roms=bool (Set off to disable loading option ROMs)
+> microvm.isa-serial=bool (Set off to disable the instantiation an ISA serial port)
+> microvm.rtc=bool (Set off to disable the instantiation of an MC146818 RTC)
+> microvm.kernel-cmdline=bool (Set off to disable adding virtio-mmio devices to the kernel cmdline)
+> 
+> By default, microvm uses qboot as its BIOS, to obtain better boot
+> times, but it's also compatible with SeaBIOS.
+> 
+> As no current FW is able to boot from a block device using virtio-mmio
+> as its transport, a microvm-based VM needs to be run using a host-side
+> kernel and, optionally, an initrd image.
+> 
+> This is an example of instantiating a microvm VM with a virtio-mmio
+> based console:
+> 
+> qemu-system-x86_64 -M microvm
+>  -enable-kvm -cpu host -m 512m -smp 2 \
+>  -kernel vmlinux -append "console=hvc0 root=/dev/vda" \
+>  -nodefaults -no-user-config -nographic \
+>  -chardev stdio,id=virtiocon0,server \
+>  -device virtio-serial-device \
+>  -device virtconsole,chardev=virtiocon0 \
+>  -drive id=test,file=test.img,format=raw,if=none \
+>  -device virtio-blk-device,drive=test \
+>  -netdev tap,id=tap0,script=no,downscript=no \
+>  -device virtio-net-device,netdev=tap0
+> 
+> This is another example, this time using an ISA serial port, useful
+> for debugging purposes:
+> 
+> qemu-system-x86_64 -M microvm \
+>  -enable-kvm -cpu host -m 512m -smp 2 \
+>  -kernel vmlinux -append "earlyprintk=ttyS0 console=ttyS0 root=/dev/vda" \
+>  -nodefaults -no-user-config -nographic \
+>  -serial stdio \
+>  -drive id=test,file=test.img,format=raw,if=none \
+>  -device virtio-blk-device,drive=test \
+>  -netdev tap,id=tap0,script=no,downscript=no \
+>  -device virtio-net-device,netdev=tap0
+> 
+> Finally, in this example a microvm VM is instantiated without RTC,
+> without an ISA serial port and without loading the option ROMs,
+> obtaining the smallest configuration:
+> 
+> qemu-system-x86_64 -M microvm,rtc=off,isa-serial=off,option-roms=off \
+>  -enable-kvm -cpu host -m 512m -smp 2 \
+>  -kernel vmlinux -append "console=hvc0 root=/dev/vda" \
+>  -nodefaults -no-user-config -nographic \
+>  -chardev stdio,id=virtiocon0,server \
+>  -device virtio-serial-device \
+>  -device virtconsole,chardev=virtiocon0 \
+>  -drive id=test,file=test.img,format=raw,if=none \
+>  -device virtio-blk-device,drive=test \
+>  -netdev tap,id=tap0,script=no,downscript=no \
+>  -device virtio-net-device,netdev=tap0
+> 
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
 > ---
-> v10 --> v11
+>  default-configs/i386-softmmu.mak |   1 +
+>  hw/i386/Kconfig                  |   4 +
+>  hw/i386/Makefile.objs            |   1 +
+>  hw/i386/microvm.c                | 512 +++++++++++++++++++++++++++++++
+>  include/hw/i386/microvm.h        |  80 +++++
+>  5 files changed, 598 insertions(+)
+>  create mode 100644 hw/i386/microvm.c
+>  create mode 100644 include/hw/i386/microvm.h
 > 
-> As per Michael's suggestion updated bios-tables-test-allowed-diff.h
-> instead of adding expected files directly.
-> ---
->  tests/bios-tables-test-allowed-diff.h | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
-> 
-> diff --git a/tests/bios-tables-test-allowed-diff.h b/tests/bios-tables-test-allowed-diff.h
-> index 7b4adbc822..3776dd2f3d 100644
-> --- a/tests/bios-tables-test-allowed-diff.h
-> +++ b/tests/bios-tables-test-allowed-diff.h
-> @@ -1,2 +1,17 @@
->  /* List of comma-separated changed AML files to ignore */
->  "tests/data/acpi/virt/DSDT",
-> +"tests/data/acpi/virt/APIC.memhp",
-> +"tests/data/acpi/virt/APIC.numamem",
-> +"tests/data/acpi/virt/DSDT.memhp",
-> +"tests/data/acpi/virt/DSDT.numamem",
-> +"tests/data/acpi/virt/FACP.memhp",
-> +"tests/data/acpi/virt/FACP.numamem",
-> +"tests/data/acpi/virt/GTDT.memhp",
-> +"tests/data/acpi/virt/GTDT.numamem",
-> +"tests/data/acpi/virt/MCFG.memhp",
-> +"tests/data/acpi/virt/MCFG.numamem",
-> +"tests/data/acpi/virt/SLIT.memhp",
-> +"tests/data/acpi/virt/SPCR.memhp",
-> +"tests/data/acpi/virt/SPCR.numamem",
-> +"tests/data/acpi/virt/SRAT.memhp",
-> +"tests/data/acpi/virt/SRAT.numamem",
+> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+> index cd5ea391e8..c27cdd98e9 100644
+> --- a/default-configs/i386-softmmu.mak
+> +++ b/default-configs/i386-softmmu.mak
+> @@ -26,3 +26,4 @@ CONFIG_ISAPC=y
+>  CONFIG_I440FX=y
+>  CONFIG_Q35=y
+>  CONFIG_ACPI_PCI=y
+> +CONFIG_MICROVM=y
+> \ No newline at end of file
+> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+> index 6350438036..324e193dd8 100644
+> --- a/hw/i386/Kconfig
+> +++ b/hw/i386/Kconfig
+> @@ -88,6 +88,10 @@ config Q35
+>      select SMBIOS
+>      select FW_CFG_DMA
+>  
+> +config MICROVM
+> +    bool
+> +    select VIRTIO_MMIO
+> +
+>  config VTD
+>      bool
+>  
+> diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
+> index 5b4b3a672e..bb17d54567 100644
+> --- a/hw/i386/Makefile.objs
+> +++ b/hw/i386/Makefile.objs
+> @@ -6,6 +6,7 @@ obj-y += pc.o
+>  obj-y += e820.o
+>  obj-$(CONFIG_I440FX) += pc_piix.o
+>  obj-$(CONFIG_Q35) += pc_q35.o
+> +obj-$(CONFIG_MICROVM) += microvm.o
+>  obj-y += fw_cfg.o pc_sysfw.o
+>  obj-y += x86-iommu.o
+>  obj-$(CONFIG_VTD) += intel_iommu.o
+> diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+> new file mode 100644
+> index 0000000000..4b494a1b27
+> --- /dev/null
+> +++ b/hw/i386/microvm.c
+> @@ -0,0 +1,512 @@
+> +/*
+> + * Copyright (c) 2018 Intel Corporation
+> + * Copyright (c) 2019 Red Hat, Inc.
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License along with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+> +#include "qemu/cutils.h"
+> +#include "qemu/units.h"
+> +#include "qapi/error.h"
+> +#include "qapi/visitor.h"
+> +#include "sysemu/sysemu.h"
+> +#include "sysemu/cpus.h"
+> +#include "sysemu/numa.h"
+> +#include "sysemu/reset.h"
+> +
+> +#include "hw/loader.h"
+> +#include "hw/irq.h"
+> +#include "hw/nmi.h"
+> +#include "hw/kvm/clock.h"
+> +#include "hw/i386/microvm.h"
+> +#include "hw/i386/x86.h"
+> +#include "hw/i386/pc.h"
+> +#include "target/i386/cpu.h"
+> +#include "hw/timer/i8254.h"
+> +#include "hw/timer/mc146818rtc.h"
+> +#include "hw/char/serial.h"
+> +#include "hw/i386/topology.h"
+> +#include "hw/i386/e820.h"
+> +#include "hw/i386/fw_cfg.h"
+> +#include "hw/virtio/virtio-mmio.h"
+> +
+> +#include "cpu.h"
+> +#include "elf.h"
+> +#include "pvh.h"
+> +#include "kvm_i386.h"
+> +#include "hw/xen/start_info.h"
+> +
+> +#define MICROVM_BIOS_FILENAME "bios-microvm.bin"
+> +
+> +static void microvm_set_rtc(MicrovmMachineState *mms, ISADevice *s)
+> +{
+> +    X86MachineState *x86ms = X86_MACHINE(mms);
+> +    int val;
+> +
+> +    val = MIN(x86ms->below_4g_mem_size / KiB, 640);
+> +    rtc_set_memory(s, 0x15, val);
+> +    rtc_set_memory(s, 0x16, val >> 8);
+> +    /* extended memory (next 64MiB) */
+> +    if (x86ms->below_4g_mem_size > 1 * MiB) {
+> +        val = (x86ms->below_4g_mem_size - 1 * MiB) / KiB;
+> +    } else {
+> +        val = 0;
+> +    }
+> +    if (val > 65535) {
+> +        val = 65535;
+> +    }
+> +    rtc_set_memory(s, 0x17, val);
+> +    rtc_set_memory(s, 0x18, val >> 8);
+> +    rtc_set_memory(s, 0x30, val);
+> +    rtc_set_memory(s, 0x31, val >> 8);
+> +    /* memory between 16MiB and 4GiB */
+> +    if (x86ms->below_4g_mem_size > 16 * MiB) {
+> +        val = (x86ms->below_4g_mem_size - 16 * MiB) / (64 * KiB);
+> +    } else {
+> +        val = 0;
+> +    }
+> +    if (val > 65535) {
+> +        val = 65535;
+> +    }
+> +    rtc_set_memory(s, 0x34, val);
+> +    rtc_set_memory(s, 0x35, val >> 8);
+> +    /* memory above 4GiB */
+> +    val = x86ms->above_4g_mem_size / 65536;
+> +    rtc_set_memory(s, 0x5b, val);
+> +    rtc_set_memory(s, 0x5c, val >> 8);
+> +    rtc_set_memory(s, 0x5d, val >> 16);
+> +}
+> +
+> +static void microvm_devices_init(MicrovmMachineState *mms)
+> +{
+> +    X86MachineState *x86ms = X86_MACHINE(mms);
+> +    ISABus *isa_bus;
+> +    ISADevice *rtc_state;
+> +    GSIState *gsi_state;
+> +    qemu_irq *i8259;
+> +    int i;
+> +
+> +    gsi_state = g_malloc0(sizeof(*gsi_state));
+> +    x86ms->gsi = qemu_allocate_irqs(gsi_handler, gsi_state, GSI_NUM_PINS);
+> +
+> +    isa_bus = isa_bus_new(NULL, get_system_memory(), get_system_io(),
+> +                          &error_abort);
+> +    isa_bus_irqs(isa_bus, x86ms->gsi);
+> +
+> +    i8259 = i8259_init(isa_bus, pc_allocate_cpu_irq());
+> +
+> +    for (i = 0; i < ISA_NUM_IRQS; i++) {
+> +        gsi_state->i8259_irq[i] = i8259[i];
+> +    }
+> +
+> +    ioapic_init_gsi(gsi_state, "machine");
+> +
+> +    if (mms->rtc_enabled) {
+> +        rtc_state = mc146818_rtc_init(isa_bus, 2000, NULL);
+> +        microvm_set_rtc(mms, rtc_state);
+> +    }
+> +
 
+Maybe refactor that ...
+
+> +    if (kvm_pit_in_kernel()) {
+> +        kvm_pit_init(isa_bus, 0x40);
+> +    } else {
+> +        i8254_pit_init(isa_bus, 0x40, 0, NULL);
+> +    }
+
+... as a x86_pit_create() function?
+
+> +
+> +    kvmclock_create();
+> +
+> +    for (i = 0; i < VIRTIO_NUM_TRANSPORTS; i++) {
+> +        int nirq = VIRTIO_IRQ_BASE + i;
+> +        ISADevice *isadev = isa_create(isa_bus, TYPE_ISA_SERIAL);
+> +        qemu_irq mmio_irq;
+> +
+> +        isa_init_irq(isadev, &mmio_irq, nirq);
+> +        sysbus_create_simple("virtio-mmio",
+> +                             VIRTIO_MMIO_BASE + i * 512,
+> +                             x86ms->gsi[VIRTIO_IRQ_BASE + i]);
+> +    }
+> +
+> +    g_free(i8259);
+
+Not related to this patch, but i8259_init() API is not clear,
+it returns an allocated array of allocated qemu_irqs? Is it safe to copy
+them to gsi_state then free the array?
+
+> +
+> +    if (mms->isa_serial_enabled) {
+> +        serial_hds_isa_init(isa_bus, 0, 1);
+> +    }
+> +
+> +    if (bios_name == NULL) {
+> +        bios_name = MICROVM_BIOS_FILENAME;
+> +    }
+> +    x86_system_rom_init(get_system_memory(), true);
+> +}
+> +
+> +static void microvm_memory_init(MicrovmMachineState *mms)
+> +{
+> +    MachineState *machine = MACHINE(mms);
+> +    X86MachineState *x86ms = X86_MACHINE(mms);
+> +    MemoryRegion *ram, *ram_below_4g, *ram_above_4g;
+> +    MemoryRegion *system_memory = get_system_memory();
+> +    FWCfgState *fw_cfg;
+> +    ram_addr_t lowmem;
+> +    int i;
+> +
+> +    /*
+> +     * Check whether RAM fits below 4G (leaving 1/2 GByte for IO memory
+> +     * and 256 Mbytes for PCI Express Enhanced Configuration Access Mapping
+> +     * also known as MMCFG).
+> +     * If it doesn't, we need to split it in chunks below and above 4G.
+> +     * In any case, try to make sure that guest addresses aligned at
+> +     * 1G boundaries get mapped to host addresses aligned at 1G boundaries.
+> +     */
+> +    if (machine->ram_size >= 0xb0000000) {
+> +        lowmem = 0x80000000;
+> +    } else {
+> +        lowmem = 0xb0000000;
+> +    }
+> +
+> +    /*
+> +     * Handle the machine opt max-ram-below-4g.  It is basically doing
+> +     * min(qemu limit, user limit).
+> +     */
+> +    if (!x86ms->max_ram_below_4g) {
+> +        x86ms->max_ram_below_4g = 1ULL << 32; /* default: 4G */
+
+Please use '4 * GiB' with no comment.
+
+> +    }
+> +    if (lowmem > x86ms->max_ram_below_4g) {
+> +        lowmem = x86ms->max_ram_below_4g;
+> +        if (machine->ram_size - lowmem > lowmem &&
+> +            lowmem & (1 * GiB - 1)) {
+> +            warn_report("There is possibly poor performance as the ram size "
+> +                        " (0x%" PRIx64 ") is more then twice the size of"
+> +                        " max-ram-below-4g (%"PRIu64") and"
+> +                        " max-ram-below-4g is not a multiple of 1G.",
+> +                        (uint64_t)machine->ram_size, x86ms->max_ram_below_4g);
+> +        }
+> +    }
+> +
+> +    if (machine->ram_size > lowmem) {
+> +        x86ms->above_4g_mem_size = machine->ram_size - lowmem;
+> +        x86ms->below_4g_mem_size = lowmem;
+> +    } else {
+> +        x86ms->above_4g_mem_size = 0;
+> +        x86ms->below_4g_mem_size = machine->ram_size;
+> +    }
+> +
+> +    ram = g_malloc(sizeof(*ram));
+> +    memory_region_allocate_system_memory(ram, NULL, "microvm.ram",
+> +                                         machine->ram_size);
+> +
+> +    ram_below_4g = g_malloc(sizeof(*ram_below_4g));
+> +    memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", ram,
+> +                             0, x86ms->below_4g_mem_size);
+> +    memory_region_add_subregion(system_memory, 0, ram_below_4g);
+> +
+> +    e820_add_entry(0, x86ms->below_4g_mem_size, E820_RAM);
+> +
+> +    if (x86ms->above_4g_mem_size > 0) {
+> +        ram_above_4g = g_malloc(sizeof(*ram_above_4g));
+> +        memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g", ram,
+> +                                 x86ms->below_4g_mem_size,
+> +                                 x86ms->above_4g_mem_size);
+> +        memory_region_add_subregion(system_memory, 0x100000000ULL,
+> +                                    ram_above_4g);
+> +        e820_add_entry(0x100000000ULL, x86ms->above_4g_mem_size, E820_RAM);
+> +    }
+> +
+> +    fw_cfg = fw_cfg_init_io_dma(FW_CFG_IO_BASE, FW_CFG_IO_BASE + 4,
+> +                                &address_space_memory);
+> +
+> +    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, x86ms->boot_cpus);
+> +    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)x86ms->apic_id_limit);
+> +    fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)machine->ram_size);
+> +    fw_cfg_add_i32(fw_cfg, FW_CFG_IRQ0_OVERRIDE, kvm_allows_irq0_override());
+> +
+> +    rom_set_fw(fw_cfg);
+> +
+> +    e820_create_fw_entry(fw_cfg);
+> +
+> +    load_linux(x86ms, fw_cfg, 0, true, true);
+> +
+> +    if (mms->option_roms_enabled) {
+> +        for (i = 0; i < nb_option_roms; i++) {
+> +            rom_add_option(option_rom[i].name, option_rom[i].bootindex);
+> +        }
+> +    }
+> +
+> +    x86ms->fw_cfg = fw_cfg;
+> +    x86ms->ioapic_as = &address_space_memory;
+> +}
+> +
+> +static gchar *microvm_get_mmio_cmdline(gchar *name)
+> +{
+> +    gchar *cmdline;
+> +    gchar *separator;
+> +    long int index;
+> +    int ret;
+> +
+> +    separator = g_strrstr(name, ".");
+> +    if (!separator) {
+> +        return NULL;
+> +    }
+> +
+> +    if (qemu_strtol(separator + 1, NULL, 10, &index) != 0) {
+> +        return NULL;
+> +    }
+> +
+> +    cmdline = g_malloc0(VIRTIO_CMDLINE_MAXLEN);
+> +    ret = g_snprintf(cmdline, VIRTIO_CMDLINE_MAXLEN,
+> +                     " virtio_mmio.device=512@0x%lx:%ld",
+> +                     VIRTIO_MMIO_BASE + index * 512,
+> +                     VIRTIO_IRQ_BASE + index);
+> +    if (ret < 0 || ret >= VIRTIO_CMDLINE_MAXLEN) {
+> +        g_free(cmdline);
+> +        return NULL;
+> +    }
+> +
+> +    return cmdline;
+> +}
+> +
+> +static void microvm_fix_kernel_cmdline(MachineState *machine)
+> +{
+> +    X86MachineState *x86ms = X86_MACHINE(machine);
+> +    BusState *bus;
+> +    BusChild *kid;
+> +    char *cmdline;
+> +
+> +    /*
+> +     * Find MMIO transports with attached devices, and add them to the kernel
+> +     * command line.
+> +     *
+> +     * Yes, this is a hack, but one that heavily improves the UX without
+> +     * introducing any significant issues.
+> +     */
+> +    cmdline = g_strdup(machine->kernel_cmdline);
+> +    bus = sysbus_get_default();
+> +    QTAILQ_FOREACH(kid, &bus->children, sibling) {
+> +        DeviceState *dev = kid->child;
+> +        ObjectClass *class = object_get_class(OBJECT(dev));
+> +
+> +        if (class == object_class_by_name(TYPE_VIRTIO_MMIO)) {
+> +            VirtIOMMIOProxy *mmio = VIRTIO_MMIO(OBJECT(dev));
+> +            VirtioBusState *mmio_virtio_bus = &mmio->bus;
+> +            BusState *mmio_bus = &mmio_virtio_bus->parent_obj;
+> +
+> +            if (!QTAILQ_EMPTY(&mmio_bus->children)) {
+> +                gchar *mmio_cmdline = microvm_get_mmio_cmdline(mmio_bus->name);
+> +                if (mmio_cmdline) {
+> +                    char *newcmd = g_strjoin(NULL, cmdline, mmio_cmdline, NULL);
+> +                    g_free(mmio_cmdline);
+> +                    g_free(cmdline);
+> +                    cmdline = newcmd;
+> +                }
+> +            }
+> +        }
+> +    }
+> +
+> +    fw_cfg_modify_i32(x86ms->fw_cfg, FW_CFG_CMDLINE_SIZE, strlen(cmdline) + 1);
+> +    fw_cfg_modify_string(x86ms->fw_cfg, FW_CFG_CMDLINE_DATA, cmdline);
+> +}
+> +
+> +static void microvm_machine_state_init(MachineState *machine)
+> +{
+> +    MicrovmMachineState *mms = MICROVM_MACHINE(machine);
+> +    X86MachineState *x86ms = X86_MACHINE(machine);
+> +    Error *local_err = NULL;
+> +
+> +    if (machine->kernel_filename == NULL) {
+> +        error_report("missing kernel image file name, required by microvm");
+> +        exit(1);
+> +    }
+> +
+> +    microvm_memory_init(mms);
+> +
+> +    x86_cpus_init(x86ms, CPU_VERSION_LATEST);
+> +    if (local_err) {
+> +        error_report_err(local_err);
+> +        exit(1);
+> +    }
+> +
+> +    microvm_devices_init(mms);
+> +}
+> +
+> +static void microvm_machine_reset(MachineState *machine)
+> +{
+> +    MicrovmMachineState *mms = MICROVM_MACHINE(machine);
+> +    CPUState *cs;
+> +    X86CPU *cpu;
+> +
+> +    if (mms->kernel_cmdline_enabled && !mms->kernel_cmdline_fixed) {
+> +        microvm_fix_kernel_cmdline(machine);
+> +        mms->kernel_cmdline_fixed = true;
+> +    }
+> +
+> +    qemu_devices_reset();
+> +
+> +    CPU_FOREACH(cs) {
+> +        cpu = X86_CPU(cs);
+> +
+> +        if (cpu->apic_state) {
+> +            device_reset(cpu->apic_state);
+> +        }
+> +    }
+> +}
+> +
+> +static bool microvm_machine_get_rtc(Object *obj, Error **errp)
+> +{
+> +    MicrovmMachineState *mms = MICROVM_MACHINE(obj);
+> +
+> +    return mms->rtc_enabled;
+> +}
+> +
+> +static void microvm_machine_set_rtc(Object *obj, bool value, Error **errp)
+> +{
+> +    MicrovmMachineState *mms = MICROVM_MACHINE(obj);
+> +
+> +    mms->rtc_enabled = value;
+> +}
+> +
+> +static bool microvm_machine_get_isa_serial(Object *obj, Error **errp)
+> +{
+> +    MicrovmMachineState *mms = MICROVM_MACHINE(obj);
+> +
+> +    return mms->isa_serial_enabled;
+> +}
+> +
+> +static void microvm_machine_set_isa_serial(Object *obj, bool value,
+> +                                           Error **errp)
+> +{
+> +    MicrovmMachineState *mms = MICROVM_MACHINE(obj);
+> +
+> +    mms->isa_serial_enabled = value;
+> +}
+> +
+> +static bool microvm_machine_get_option_roms(Object *obj, Error **errp)
+> +{
+> +    MicrovmMachineState *mms = MICROVM_MACHINE(obj);
+> +
+> +    return mms->option_roms_enabled;
+> +}
+> +
+> +static void microvm_machine_set_option_roms(Object *obj, bool value,
+> +                                            Error **errp)
+> +{
+> +    MicrovmMachineState *mms = MICROVM_MACHINE(obj);
+> +
+> +    mms->option_roms_enabled = value;
+> +}
+> +
+> +static bool microvm_machine_get_kernel_cmdline(Object *obj, Error **errp)
+> +{
+> +    MicrovmMachineState *mms = MICROVM_MACHINE(obj);
+> +
+> +    return mms->kernel_cmdline_enabled;
+> +}
+> +
+> +static void microvm_machine_set_kernel_cmdline(Object *obj, bool value,
+> +                                               Error **errp)
+> +{
+> +    MicrovmMachineState *mms = MICROVM_MACHINE(obj);
+> +
+> +    mms->kernel_cmdline_enabled = value;
+> +}
+> +
+> +static void microvm_machine_initfn(Object *obj)
+> +{
+> +    MicrovmMachineState *mms = MICROVM_MACHINE(obj);
+> +
+> +    /* Configuration */
+> +    mms->rtc_enabled = true;
+> +    mms->isa_serial_enabled = true;
+> +    mms->option_roms_enabled = true;
+> +    mms->kernel_cmdline_enabled = true;
+> +
+> +    /* State */
+> +    mms->kernel_cmdline_fixed = false;
+> +}
+> +
+> +static void microvm_class_init(ObjectClass *oc, void *data)
+> +{
+> +    MachineClass *mc = MACHINE_CLASS(oc);
+> +    NMIClass *nc = NMI_CLASS(oc);
+> +
+> +    mc->init = microvm_machine_state_init;
+> +
+> +    mc->family = "microvm_i386";
+> +    mc->desc = "Microvm (i386)";
+> +    mc->units_per_default_bus = 1;
+> +    mc->no_floppy = 1;
+> +    machine_class_allow_dynamic_sysbus_dev(mc, "sysbus-debugcon");
+> +    machine_class_allow_dynamic_sysbus_dev(mc, "sysbus-debugexit");
+
+Aren't these common to X86?
+
+> +    mc->max_cpus = 288;
+> +    mc->has_hotpluggable_cpus = false;
+> +    mc->auto_enable_numa_with_memhp = false;
+> +    mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
+> +    mc->nvdimm_supported = false;
+> +
+> +    /* Avoid relying too much on kernel components */
+> +    mc->default_kernel_irqchip_split = true;
+> +
+> +    /* Machine class handlers */
+> +    mc->reset = microvm_machine_reset;
+> +
+> +    /* NMI handler */
+> +    nc->nmi_monitor_handler = x86_nmi;
+> +
+> +    object_class_property_add_bool(oc, MICROVM_MACHINE_RTC,
+> +                                   microvm_machine_get_rtc,
+> +                                   microvm_machine_set_rtc,
+> +                                   &error_abort);
+> +    object_class_property_set_description(oc, MICROVM_MACHINE_RTC,
+> +        "Set off to disable the instantiation of an MC146818 RTC",
+> +        &error_abort);
+> +
+> +    object_class_property_add_bool(oc, MICROVM_MACHINE_ISA_SERIAL,
+> +                                   microvm_machine_get_isa_serial,
+> +                                   microvm_machine_set_isa_serial,
+> +                                   &error_abort);
+> +    object_class_property_set_description(oc, MICROVM_MACHINE_ISA_SERIAL,
+> +        "Set off to disable the instantiation an ISA serial port",
+> +        &error_abort);
+> +
+> +    object_class_property_add_bool(oc, MICROVM_MACHINE_OPTION_ROMS,
+> +                                   microvm_machine_get_option_roms,
+> +                                   microvm_machine_set_option_roms,
+> +                                   &error_abort);
+> +    object_class_property_set_description(oc, MICROVM_MACHINE_OPTION_ROMS,
+> +        "Set off to disable loading option ROMs", &error_abort);
+> +
+> +    object_class_property_add_bool(oc, MICROVM_MACHINE_KERNEL_CMDLINE,
+> +                                   microvm_machine_get_kernel_cmdline,
+> +                                   microvm_machine_set_kernel_cmdline,
+> +                                   &error_abort);
+> +    object_class_property_set_description(oc, MICROVM_MACHINE_KERNEL_CMDLINE,
+> +        "Set off to disable adding virtio-mmio devices to the kernel cmdline",
+> +        &error_abort);
+> +}
+> +
+> +static const TypeInfo microvm_machine_info = {
+> +    .name          = TYPE_MICROVM_MACHINE,
+> +    .parent        = TYPE_X86_MACHINE,
+> +    .instance_size = sizeof(MicrovmMachineState),
+> +    .instance_init = microvm_machine_initfn,
+> +    .class_size    = sizeof(MicrovmMachineClass),
+> +    .class_init    = microvm_class_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +         { TYPE_NMI },
+
+Isn't this inherited from TYPE_X86_MACHINE?
+
+> +         { }
+> +    },
+> +};
+> +
+> +static void microvm_machine_init(void)
+> +{
+> +    type_register_static(&microvm_machine_info);
+> +}
+> +type_init(microvm_machine_init);
+> diff --git a/include/hw/i386/microvm.h b/include/hw/i386/microvm.h
+> new file mode 100644
+> index 0000000000..04c8caf886
+> --- /dev/null
+> +++ b/include/hw/i386/microvm.h
+> @@ -0,0 +1,80 @@
+> +/*
+> + * Copyright (c) 2018 Intel Corporation
+> + * Copyright (c) 2019 Red Hat, Inc.
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License along with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#ifndef HW_I386_MICROVM_H
+> +#define HW_I386_MICROVM_H
+> +
+> +#include "qemu-common.h"
+> +#include "exec/hwaddr.h"
+> +#include "qemu/notify.h"
+> +
+> +#include "hw/boards.h"
+> +#include "hw/i386/x86.h"
+> +
+> +/* Microvm memory layout */
+> +#define PVH_START_INFO        0x6000
+> +#define MEMMAP_START          0x7000
+> +#define MODLIST_START         0x7800
+> +#define BOOT_STACK_POINTER    0x8ff0
+> +#define PML4_START            0x9000
+> +#define PDPTE_START           0xa000
+> +#define PDE_START             0xb000
+> +#define KERNEL_CMDLINE_START  0x20000
+> +#define EBDA_START            0x9fc00
+> +#define HIMEM_START           0x100000
+> +
+> +/* Platform virtio definitions */
+> +#define VIRTIO_MMIO_BASE      0xc0000000
+> +#define VIRTIO_IRQ_BASE       5
+> +#define VIRTIO_NUM_TRANSPORTS 8
+> +#define VIRTIO_CMDLINE_MAXLEN 64
+> +
+> +/* Machine type options */
+> +#define MICROVM_MACHINE_RTC            "rtc"
+> +#define MICROVM_MACHINE_ISA_SERIAL     "isa-serial"
+> +#define MICROVM_MACHINE_OPTION_ROMS    "option-roms"
+> +#define MICROVM_MACHINE_KERNEL_CMDLINE "kernel-cmdline"
+> +
+> +typedef struct {
+> +    X86MachineClass parent;
+> +    HotplugHandler *(*orig_hotplug_handler)(MachineState *machine,
+> +                                           DeviceState *dev);
+> +} MicrovmMachineClass;
+> +
+> +typedef struct {
+> +    X86MachineState parent;
+> +
+> +    /* Machine type options */
+> +    bool rtc_enabled;
+> +    bool isa_serial_enabled;
+> +    bool option_roms_enabled;
+> +    bool kernel_cmdline_enabled;
+> +
+> +
+> +    /* Machine state */
+> +    bool kernel_cmdline_fixed;
+> +} MicrovmMachineState;
+> +
+> +#define TYPE_MICROVM_MACHINE   MACHINE_TYPE_NAME("microvm")
+> +#define MICROVM_MACHINE(obj) \
+> +    OBJECT_CHECK(MicrovmMachineState, (obj), TYPE_MICROVM_MACHINE)
+> +#define MICROVM_MACHINE_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(MicrovmMachineClass, obj, TYPE_MICROVM_MACHINE)
+> +#define MICROVM_MACHINE_CLASS(class) \
+> +    OBJECT_CLASS_CHECK(MicrovmMachineClass, class, TYPE_MICROVM_MACHINE)
+> +
+> +#endif
+> 
 
