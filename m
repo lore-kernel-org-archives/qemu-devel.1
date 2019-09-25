@@ -2,62 +2,61 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E7D7C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 14:43:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3D4EC432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 14:43:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E75C72146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 14:43:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E75C72146E
+	by mail.kernel.org (Postfix) with ESMTPS id A901D2146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 14:43:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A901D2146E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD8W2-0004YB-6O
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 10:43:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52272)
+	id 1iD8WK-0004n0-Tk
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 10:43:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52508)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iD8ME-0003Ir-RD
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:33:33 -0400
+ (envelope-from <clg@kaod.org>) id 1iD8Ml-0003qL-Uj
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:34:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iD8M8-0000LH-69
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:33:27 -0400
-Received: from 9.mo69.mail-out.ovh.net ([46.105.56.78]:59974)
+ (envelope-from <clg@kaod.org>) id 1iD8Mk-0000xF-8k
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:34:03 -0400
+Received: from 10.mo1.mail-out.ovh.net ([178.32.96.102]:41136)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iD8M6-0000J9-R9
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:33:23 -0400
-Received: from player786.ha.ovh.net (unknown [10.108.57.211])
- by mo69.mail-out.ovh.net (Postfix) with ESMTP id DD3F969CFA
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 16:33:19 +0200 (CEST)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iD8Mk-0000ud-2S
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:34:02 -0400
+Received: from player786.ha.ovh.net (unknown [10.108.57.38])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id 6EC9F191367
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 16:34:00 +0200 (CEST)
 Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
  (Authenticated sender: clg@kaod.org)
- by player786.ha.ovh.net (Postfix) with ESMTPSA id 6243AA4D3B8B;
- Wed, 25 Sep 2019 14:33:12 +0000 (UTC)
+ by player786.ha.ovh.net (Postfix) with ESMTPSA id DE10BA4D3E41;
+ Wed, 25 Sep 2019 14:33:53 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH v2 02/23] hw/sd/aspeed_sdhci: New device
-Date: Wed, 25 Sep 2019 16:32:27 +0200
-Message-Id: <20190925143248.10000-3-clg@kaod.org>
+Subject: [PATCH v2 08/23] aspeed/sdmc: Introduce an object class per SoC
+Date: Wed, 25 Sep 2019 16:32:33 +0200
+Message-Id: <20190925143248.10000-9-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190925143248.10000-1-clg@kaod.org>
 References: <20190925143248.10000-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 8840284596625967889
+X-Ovh-Tracer-Id: 8851825069469764369
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfedvgdejkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.56.78
+X-Received-From: 178.32.96.102
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,447 +68,313 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Eddie James <eajames@linux.ibm.com>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Joel Stanley <joel@jms.id.au>
+Cc: Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eddie James <eajames@linux.ibm.com>
+Use class handlers and class constants to differentiate the
+characteristics of the memory controller and remove the 'silicon_rev'
+property.
 
-The Aspeed SOCs have two SD/MMC controllers. Add a device that
-encapsulates both of these controllers and models the Aspeed-specific
-registers and behavior.
-
-Tested by reading from mmcblk0 in Linux:
-qemu-system-arm -machine romulus-bmc -nographic \
- -drive file=3Dflash-romulus,format=3Draw,if=3Dmtd \
- -device sd-card,drive=3Dsd0 -drive file=3D_tmp/kernel,format=3Draw,if=3D=
-sd,id=3Dsd0
-
-Signed-off-by: Eddie James <eajames@linux.ibm.com>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-[clg: - changed the controller MMIO window size to 0x1000
-      - moved the MMIO mapping of the SDHCI slots at the SoC level
-      - merged code to add SD drives on the SD buses at the machine level=
- ]
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Joel Stanley <joel@jms.id.au>
 ---
- include/hw/arm/aspeed_soc.h  |   3 +
- include/hw/sd/aspeed_sdhci.h |  34 ++++++
- hw/arm/aspeed.c              |  15 ++-
- hw/arm/aspeed_soc.c          |  23 ++++
- hw/sd/aspeed_sdhci.c         | 198 +++++++++++++++++++++++++++++++++++
- hw/sd/Makefile.objs          |   1 +
- 6 files changed, 273 insertions(+), 1 deletion(-)
- create mode 100644 include/hw/sd/aspeed_sdhci.h
- create mode 100644 hw/sd/aspeed_sdhci.c
+ include/hw/misc/aspeed_sdmc.h |  19 +++-
+ hw/arm/aspeed_soc.c           |   5 +-
+ hw/misc/aspeed_sdmc.c         | 168 +++++++++++++++++++++-------------
+ 3 files changed, 122 insertions(+), 70 deletions(-)
 
-diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
-index ab5052b12cb5..ba5bbb53e1a1 100644
---- a/include/hw/arm/aspeed_soc.h
-+++ b/include/hw/arm/aspeed_soc.h
-@@ -24,6 +24,7 @@
- #include "hw/net/ftgmac100.h"
- #include "target/arm/cpu.h"
- #include "hw/gpio/aspeed_gpio.h"
-+#include "hw/sd/aspeed_sdhci.h"
+diff --git a/include/hw/misc/aspeed_sdmc.h b/include/hw/misc/aspeed_sdmc.=
+h
+index b3c926acae90..81156320c497 100644
+--- a/include/hw/misc/aspeed_sdmc.h
++++ b/include/hw/misc/aspeed_sdmc.h
+@@ -13,6 +13,8 @@
 =20
- #define ASPEED_SPIS_NUM  2
- #define ASPEED_WDTS_NUM  3
-@@ -50,6 +51,7 @@ typedef struct AspeedSoCState {
-     AspeedWDTState wdt[ASPEED_WDTS_NUM];
-     FTGMAC100State ftgmac100[ASPEED_MACS_NUM];
-     AspeedGPIOState gpio;
-+    AspeedSDHCIState sdhci;
- } AspeedSoCState;
+ #define TYPE_ASPEED_SDMC "aspeed.sdmc"
+ #define ASPEED_SDMC(obj) OBJECT_CHECK(AspeedSDMCState, (obj), TYPE_ASPEE=
+D_SDMC)
++#define TYPE_ASPEED_2400_SDMC TYPE_ASPEED_SDMC "-ast2400"
++#define TYPE_ASPEED_2500_SDMC TYPE_ASPEED_SDMC "-ast2500"
 =20
- #define TYPE_ASPEED_SOC "aspeed-soc"
-@@ -93,6 +95,7 @@ enum {
-     ASPEED_SCU,
-     ASPEED_ADC,
-     ASPEED_SRAM,
-+    ASPEED_SDHCI,
-     ASPEED_GPIO,
-     ASPEED_RTC,
-     ASPEED_TIMER1,
-diff --git a/include/hw/sd/aspeed_sdhci.h b/include/hw/sd/aspeed_sdhci.h
-new file mode 100644
-index 000000000000..dfdab4379021
---- /dev/null
-+++ b/include/hw/sd/aspeed_sdhci.h
-@@ -0,0 +1,34 @@
-+/*
-+ * Aspeed SD Host Controller
-+ * Eddie James <eajames@linux.ibm.com>
-+ *
-+ * Copyright (C) 2019 IBM Corp
-+ * SPDX-License-Identifer: GPL-2.0-or-later
-+ */
-+
-+#ifndef ASPEED_SDHCI_H
-+#define ASPEED_SDHCI_H
-+
-+#include "hw/sd/sdhci.h"
-+
-+#define TYPE_ASPEED_SDHCI "aspeed.sdhci"
-+#define ASPEED_SDHCI(obj) OBJECT_CHECK(AspeedSDHCIState, (obj), \
-+                                       TYPE_ASPEED_SDHCI)
-+
-+#define ASPEED_SDHCI_CAPABILITIES 0x01E80080
-+#define ASPEED_SDHCI_NUM_SLOTS    2
-+#define ASPEED_SDHCI_NUM_REGS     (ASPEED_SDHCI_REG_SIZE / sizeof(uint32=
-_t))
-+#define ASPEED_SDHCI_REG_SIZE     0x100
-+
-+typedef struct AspeedSDHCIState {
-+    SysBusDevice parent;
-+
-+    SDHCIState slots[ASPEED_SDHCI_NUM_SLOTS];
-+
-+    MemoryRegion iomem;
-+    qemu_irq irq;
-+
-+    uint32_t regs[ASPEED_SDHCI_NUM_REGS];
-+} AspeedSDHCIState;
-+
-+#endif /* ASPEED_SDHCI_H */
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index aa72be309da4..30e280484262 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -170,6 +170,7 @@ static void aspeed_board_init(MachineState *machine,
-     AspeedSoCClass *sc;
-     DriveInfo *drive0 =3D drive_get(IF_MTD, 0, 0);
-     ram_addr_t max_ram_size;
-+    int i;
+ #define ASPEED_SDMC_NR_REGS (0x174 >> 2)
 =20
-     bmc =3D g_new0(AspeedBoardState, 1);
+@@ -24,12 +26,21 @@ typedef struct AspeedSDMCState {
+     MemoryRegion iomem;
 =20
-@@ -252,6 +253,19 @@ static void aspeed_board_init(MachineState *machine,
-         cfg->i2c_init(bmc);
-     }
+     uint32_t regs[ASPEED_SDMC_NR_REGS];
+-    uint32_t silicon_rev;
+-    uint32_t ram_bits;
+     uint64_t ram_size;
+     uint64_t max_ram_size;
+-    uint32_t fixed_conf;
+-
+ } AspeedSDMCState;
 =20
-+    for (i =3D 0; i < ARRAY_SIZE(bmc->soc.sdhci.slots); i++) {
-+        SDHCIState *sdhci =3D &bmc->soc.sdhci.slots[i];
-+        DriveInfo *dinfo =3D drive_get_next(IF_SD);
-+        BlockBackend *blk;
-+        DeviceState *card;
++#define ASPEED_SDMC_CLASS(klass) \
++     OBJECT_CLASS_CHECK(AspeedSDMCClass, (klass), TYPE_ASPEED_SDMC)
++#define ASPEED_SDMC_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(AspeedSDMCClass, (obj), TYPE_ASPEED_SDMC)
 +
-+        blk =3D dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
-+        card =3D qdev_create(qdev_get_child_bus(DEVICE(sdhci), "sd-bus")=
-,
-+                           TYPE_SD_CARD);
-+        qdev_prop_set_drive(card, "drive", blk, &error_fatal);
-+        object_property_set_bool(OBJECT(card), true, "realized", &error_=
-fatal);
-+    }
++typedef struct AspeedSDMCClass {
++    SysBusDeviceClass parent_class;
 +
-     arm_load_kernel(ARM_CPU(first_cpu), machine, &aspeed_board_binfo);
- }
-=20
-@@ -373,7 +387,6 @@ static void aspeed_machine_class_init(ObjectClass *oc=
-, void *data)
-     mc->desc =3D board->desc;
-     mc->init =3D aspeed_machine_init;
-     mc->max_cpus =3D ASPEED_CPUS_NUM;
--    mc->no_sdcard =3D 1;
-     mc->no_floppy =3D 1;
-     mc->no_cdrom =3D 1;
-     mc->no_parallel =3D 1;
++    uint64_t max_ram_size;
++    uint32_t (*compute_conf)(AspeedSDMCState *s, uint32_t data);
++    void (*write)(AspeedSDMCState *s, uint32_t reg, uint32_t data);
++} AspeedSDMCClass;
++
+ #endif /* ASPEED_SDMC_H */
 diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index cf1d0cf921ba..c3821a562733 100644
+index 26e03486f9b7..aaf18d3e42f1 100644
 --- a/hw/arm/aspeed_soc.c
 +++ b/hw/arm/aspeed_soc.c
-@@ -36,6 +36,7 @@ static const hwaddr aspeed_soc_ast2400_memmap[] =3D {
-     [ASPEED_XDMA]   =3D 0x1E6E7000,
-     [ASPEED_ADC]    =3D 0x1E6E9000,
-     [ASPEED_SRAM]   =3D 0x1E720000,
-+    [ASPEED_SDHCI]  =3D 0x1E740000,
-     [ASPEED_GPIO]   =3D 0x1E780000,
-     [ASPEED_RTC]    =3D 0x1E781000,
-     [ASPEED_TIMER1] =3D 0x1E782000,
-@@ -63,6 +64,7 @@ static const hwaddr aspeed_soc_ast2500_memmap[] =3D {
-     [ASPEED_XDMA]   =3D 0x1E6E7000,
-     [ASPEED_ADC]    =3D 0x1E6E9000,
-     [ASPEED_SRAM]   =3D 0x1E720000,
-+    [ASPEED_SDHCI]  =3D 0x1E740000,
-     [ASPEED_GPIO]   =3D 0x1E780000,
-     [ASPEED_RTC]    =3D 0x1E781000,
-     [ASPEED_TIMER1] =3D 0x1E782000,
-@@ -108,6 +110,7 @@ static const int aspeed_soc_ast2400_irqmap[] =3D {
-     [ASPEED_ETH1]   =3D 2,
-     [ASPEED_ETH2]   =3D 3,
-     [ASPEED_XDMA]   =3D 6,
-+    [ASPEED_SDHCI]  =3D 26,
+@@ -205,10 +205,9 @@ static void aspeed_soc_init(Object *obj)
+                               sizeof(s->spi[i]), typename);
+     }
+=20
++    snprintf(typename, sizeof(typename), "aspeed.sdmc-%s", socname);
+     sysbus_init_child_obj(obj, "sdmc", OBJECT(&s->sdmc), sizeof(s->sdmc)=
+,
+-                          TYPE_ASPEED_SDMC);
+-    qdev_prop_set_uint32(DEVICE(&s->sdmc), "silicon-rev",
+-                         sc->info->silicon_rev);
++                          typename);
+     object_property_add_alias(obj, "ram-size", OBJECT(&s->sdmc),
+                               "ram-size", &error_abort);
+     object_property_add_alias(obj, "max-ram-size", OBJECT(&s->sdmc),
+diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
+index cb13c63ec848..60c99e773488 100644
+--- a/hw/misc/aspeed_sdmc.c
++++ b/hw/misc/aspeed_sdmc.c
+@@ -110,6 +110,7 @@ static void aspeed_sdmc_write(void *opaque, hwaddr ad=
+dr, uint64_t data,
+                              unsigned int size)
+ {
+     AspeedSDMCState *s =3D ASPEED_SDMC(opaque);
++    AspeedSDMCClass *asc =3D ASPEED_SDMC_GET_CLASS(s);
+=20
+     addr >>=3D 2;
+=20
+@@ -130,41 +131,7 @@ static void aspeed_sdmc_write(void *opaque, hwaddr a=
+ddr, uint64_t data,
+         return;
+     }
+=20
+-    if (addr =3D=3D R_CONF) {
+-        /* Make sure readonly bits are kept */
+-        switch (s->silicon_rev) {
+-        case AST2400_A0_SILICON_REV:
+-        case AST2400_A1_SILICON_REV:
+-            data &=3D ~ASPEED_SDMC_READONLY_MASK;
+-            data |=3D s->fixed_conf;
+-            break;
+-        case AST2500_A0_SILICON_REV:
+-        case AST2500_A1_SILICON_REV:
+-            data &=3D ~ASPEED_SDMC_AST2500_READONLY_MASK;
+-            data |=3D s->fixed_conf;
+-            break;
+-        default:
+-            g_assert_not_reached();
+-        }
+-    }
+-    if (s->silicon_rev =3D=3D AST2500_A0_SILICON_REV ||
+-            s->silicon_rev =3D=3D AST2500_A1_SILICON_REV) {
+-        switch (addr) {
+-        case R_STATUS1:
+-            /* Will never return 'busy' */
+-            data &=3D ~PHY_BUSY_STATE;
+-            break;
+-        case R_ECC_TEST_CTRL:
+-            /* Always done, always happy */
+-            data |=3D ECC_TEST_FINISHED;
+-            data &=3D ~ECC_TEST_FAIL;
+-            break;
+-        default:
+-            break;
+-        }
+-    }
+-
+-    s->regs[addr] =3D data;
++    asc->write(s, addr, data);
+ }
+=20
+ static const MemoryRegionOps aspeed_sdmc_ops =3D {
+@@ -222,44 +189,21 @@ static int ast2500_rambits(AspeedSDMCState *s)
+ static void aspeed_sdmc_reset(DeviceState *dev)
+ {
+     AspeedSDMCState *s =3D ASPEED_SDMC(dev);
++    AspeedSDMCClass *asc =3D ASPEED_SDMC_GET_CLASS(s);
+=20
+     memset(s->regs, 0, sizeof(s->regs));
+=20
+     /* Set ram size bit and defaults values */
+-    s->regs[R_CONF] =3D s->fixed_conf;
++    s->regs[R_CONF] =3D asc->compute_conf(s, 0);
+ }
+=20
+ static void aspeed_sdmc_realize(DeviceState *dev, Error **errp)
+ {
+     SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+     AspeedSDMCState *s =3D ASPEED_SDMC(dev);
++    AspeedSDMCClass *asc =3D ASPEED_SDMC_GET_CLASS(s);
+=20
+-    if (!is_supported_silicon_rev(s->silicon_rev)) {
+-        error_setg(errp, "Unknown silicon revision: 0x%" PRIx32,
+-                s->silicon_rev);
+-        return;
+-    }
+-
+-    switch (s->silicon_rev) {
+-    case AST2400_A0_SILICON_REV:
+-    case AST2400_A1_SILICON_REV:
+-        s->ram_bits =3D ast2400_rambits(s);
+-        s->max_ram_size =3D 512 << 20;
+-        s->fixed_conf =3D ASPEED_SDMC_VGA_COMPAT |
+-            ASPEED_SDMC_DRAM_SIZE(s->ram_bits);
+-        break;
+-    case AST2500_A0_SILICON_REV:
+-    case AST2500_A1_SILICON_REV:
+-        s->ram_bits =3D ast2500_rambits(s);
+-        s->max_ram_size =3D 1024 << 20;
+-        s->fixed_conf =3D ASPEED_SDMC_HW_VERSION(1) |
+-            ASPEED_SDMC_VGA_APERTURE(ASPEED_SDMC_VGA_64MB) |
+-            ASPEED_SDMC_CACHE_INITIAL_DONE |
+-            ASPEED_SDMC_DRAM_SIZE(s->ram_bits);
+-        break;
+-    default:
+-        g_assert_not_reached();
+-    }
++    s->max_ram_size =3D asc->max_ram_size;
+=20
+     memory_region_init_io(&s->iomem, OBJECT(s), &aspeed_sdmc_ops, s,
+                           TYPE_ASPEED_SDMC, 0x1000);
+@@ -277,7 +221,6 @@ static const VMStateDescription vmstate_aspeed_sdmc =3D=
+ {
  };
 =20
- #define aspeed_soc_ast2500_irqmap aspeed_soc_ast2400_irqmap
-@@ -230,6 +233,15 @@ static void aspeed_soc_init(Object *obj)
-     snprintf(typename, sizeof(typename), "aspeed.gpio-%s", socname);
-     sysbus_init_child_obj(obj, "gpio", OBJECT(&s->gpio), sizeof(s->gpio)=
+ static Property aspeed_sdmc_properties[] =3D {
+-    DEFINE_PROP_UINT32("silicon-rev", AspeedSDMCState, silicon_rev, 0),
+     DEFINE_PROP_UINT64("ram-size", AspeedSDMCState, ram_size, 0),
+     DEFINE_PROP_UINT64("max-ram-size", AspeedSDMCState, max_ram_size, 0)=
 ,
-                           typename);
+     DEFINE_PROP_END_OF_LIST(),
+@@ -298,11 +241,110 @@ static const TypeInfo aspeed_sdmc_info =3D {
+     .parent =3D TYPE_SYS_BUS_DEVICE,
+     .instance_size =3D sizeof(AspeedSDMCState),
+     .class_init =3D aspeed_sdmc_class_init,
++    .class_size =3D sizeof(AspeedSDMCClass),
++    .abstract   =3D true,
++};
 +
-+    sysbus_init_child_obj(obj, "sdc", OBJECT(&s->sdhci), sizeof(s->sdhci=
-),
-+                          TYPE_ASPEED_SDHCI);
++static uint32_t aspeed_2400_sdmc_compute_conf(AspeedSDMCState *s, uint32=
+_t data)
++{
++    uint32_t fixed_conf =3D ASPEED_SDMC_VGA_COMPAT |
++        ASPEED_SDMC_DRAM_SIZE(ast2400_rambits(s));
 +
-+    /* Init sd card slot class here so that they're under the correct pa=
-rent */
-+    for (i =3D 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
-+        sysbus_init_child_obj(obj, "sdhci[*]", OBJECT(&s->sdhci.slots[i]=
-),
-+                              sizeof(s->sdhci.slots[i]), TYPE_SYSBUS_SDH=
-CI);
++    /* Make sure readonly bits are kept */
++    data &=3D ~ASPEED_SDMC_READONLY_MASK;
++
++    return data | fixed_conf;
++}
++
++static void aspeed_2400_sdmc_write(AspeedSDMCState *s, uint32_t reg,
++                                   uint32_t data)
++{
++    switch (reg) {
++    case R_CONF:
++        data =3D aspeed_2400_sdmc_compute_conf(s, data);
++        break;
++    default:
++        break;
 +    }
++
++    s->regs[reg] =3D data;
++}
++
++static void aspeed_2400_sdmc_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++    AspeedSDMCClass *asc =3D ASPEED_SDMC_CLASS(klass);
++
++    dc->desc =3D "ASPEED 2400 SDRAM Memory Controller";
++    asc->max_ram_size =3D 512 << 20;
++    asc->compute_conf =3D aspeed_2400_sdmc_compute_conf;
++    asc->write =3D aspeed_2400_sdmc_write;
++}
++
++static const TypeInfo aspeed_2400_sdmc_info =3D {
++    .name =3D TYPE_ASPEED_2400_SDMC,
++    .parent =3D TYPE_ASPEED_SDMC,
++    .class_init =3D aspeed_2400_sdmc_class_init,
++};
++
++static uint32_t aspeed_2500_sdmc_compute_conf(AspeedSDMCState *s, uint32=
+_t data)
++{
++    uint32_t fixed_conf =3D ASPEED_SDMC_HW_VERSION(1) |
++        ASPEED_SDMC_VGA_APERTURE(ASPEED_SDMC_VGA_64MB) |
++        ASPEED_SDMC_CACHE_INITIAL_DONE |
++        ASPEED_SDMC_DRAM_SIZE(ast2500_rambits(s));
++
++    /* Make sure readonly bits are kept */
++    data &=3D ~ASPEED_SDMC_AST2500_READONLY_MASK;
++
++    return data | fixed_conf;
++}
++
++static void aspeed_2500_sdmc_write(AspeedSDMCState *s, uint32_t reg,
++                                   uint32_t data)
++{
++    switch (reg) {
++    case R_CONF:
++        data =3D aspeed_2500_sdmc_compute_conf(s, data);
++        break;
++    case R_STATUS1:
++        /* Will never return 'busy' */
++        data &=3D ~PHY_BUSY_STATE;
++        break;
++    case R_ECC_TEST_CTRL:
++        /* Always done, always happy */
++        data |=3D ECC_TEST_FINISHED;
++        data &=3D ~ECC_TEST_FAIL;
++        break;
++    default:
++        break;
++    }
++
++    s->regs[reg] =3D data;
++}
++
++static void aspeed_2500_sdmc_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++    AspeedSDMCClass *asc =3D ASPEED_SDMC_CLASS(klass);
++
++    dc->desc =3D "ASPEED 2500 SDRAM Memory Controller";
++    asc->max_ram_size =3D 1024 << 20;
++    asc->compute_conf =3D aspeed_2500_sdmc_compute_conf;
++    asc->write =3D aspeed_2500_sdmc_write;
++}
++
++static const TypeInfo aspeed_2500_sdmc_info =3D {
++    .name =3D TYPE_ASPEED_2500_SDMC,
++    .parent =3D TYPE_ASPEED_SDMC,
++    .class_init =3D aspeed_2500_sdmc_class_init,
+ };
+=20
+ static void aspeed_sdmc_register_types(void)
+ {
+     type_register_static(&aspeed_sdmc_info);
++    type_register_static(&aspeed_2400_sdmc_info);
++    type_register_static(&aspeed_2500_sdmc_info);
  }
 =20
- static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-@@ -419,6 +431,17 @@ static void aspeed_soc_realize(DeviceState *dev, Err=
-or **errp)
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpio), 0, sc->info->memmap[ASPEED=
-_GPIO]);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->gpio), 0,
-                        aspeed_soc_get_irq(s, ASPEED_GPIO));
-+
-+    /* SDHCI */
-+    object_property_set_bool(OBJECT(&s->sdhci), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sdhci), 0,
-+                    sc->info->memmap[ASPEED_SDHCI]);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->sdhci), 0,
-+                       aspeed_soc_get_irq(s, ASPEED_SDHCI));
- }
- static Property aspeed_soc_properties[] =3D {
-     DEFINE_PROP_UINT32("num-cpus", AspeedSoCState, num_cpus, 0),
-diff --git a/hw/sd/aspeed_sdhci.c b/hw/sd/aspeed_sdhci.c
-new file mode 100644
-index 000000000000..cff3eb7dd21e
---- /dev/null
-+++ b/hw/sd/aspeed_sdhci.c
-@@ -0,0 +1,198 @@
-+/*
-+ * Aspeed SD Host Controller
-+ * Eddie James <eajames@linux.ibm.com>
-+ *
-+ * Copyright (C) 2019 IBM Corp
-+ * SPDX-License-Identifer: GPL-2.0-or-later
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qemu/error-report.h"
-+#include "hw/sd/aspeed_sdhci.h"
-+#include "qapi/error.h"
-+#include "hw/irq.h"
-+#include "migration/vmstate.h"
-+
-+#define ASPEED_SDHCI_INFO            0x00
-+#define  ASPEED_SDHCI_INFO_RESET     0x00030000
-+#define ASPEED_SDHCI_DEBOUNCE        0x04
-+#define  ASPEED_SDHCI_DEBOUNCE_RESET 0x00000005
-+#define ASPEED_SDHCI_BUS             0x08
-+#define ASPEED_SDHCI_SDIO_140        0x10
-+#define ASPEED_SDHCI_SDIO_148        0x18
-+#define ASPEED_SDHCI_SDIO_240        0x20
-+#define ASPEED_SDHCI_SDIO_248        0x28
-+#define ASPEED_SDHCI_WP_POL          0xec
-+#define ASPEED_SDHCI_CARD_DET        0xf0
-+#define ASPEED_SDHCI_IRQ_STAT        0xfc
-+
-+#define TO_REG(addr) ((addr) / sizeof(uint32_t))
-+
-+static uint64_t aspeed_sdhci_read(void *opaque, hwaddr addr, unsigned in=
-t size)
-+{
-+    uint32_t val =3D 0;
-+    AspeedSDHCIState *sdhci =3D opaque;
-+
-+    switch (addr) {
-+    case ASPEED_SDHCI_SDIO_140:
-+        val =3D (uint32_t)sdhci->slots[0].capareg;
-+        break;
-+    case ASPEED_SDHCI_SDIO_148:
-+        val =3D (uint32_t)sdhci->slots[0].maxcurr;
-+        break;
-+    case ASPEED_SDHCI_SDIO_240:
-+        val =3D (uint32_t)sdhci->slots[1].capareg;
-+        break;
-+    case ASPEED_SDHCI_SDIO_248:
-+        val =3D (uint32_t)sdhci->slots[1].maxcurr;
-+        break;
-+    default:
-+        if (addr < ASPEED_SDHCI_REG_SIZE) {
-+            val =3D sdhci->regs[TO_REG(addr)];
-+        } else {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "%s: Out-of-bounds read at 0x%" HWADDR_PRIx "\=
-n",
-+                          __func__, addr);
-+        }
-+    }
-+
-+    return (uint64_t)val;
-+}
-+
-+static void aspeed_sdhci_write(void *opaque, hwaddr addr, uint64_t val,
-+                               unsigned int size)
-+{
-+    AspeedSDHCIState *sdhci =3D opaque;
-+
-+    switch (addr) {
-+    case ASPEED_SDHCI_SDIO_140:
-+        sdhci->slots[0].capareg =3D (uint64_t)(uint32_t)val;
-+        break;
-+    case ASPEED_SDHCI_SDIO_148:
-+        sdhci->slots[0].maxcurr =3D (uint64_t)(uint32_t)val;
-+        break;
-+    case ASPEED_SDHCI_SDIO_240:
-+        sdhci->slots[1].capareg =3D (uint64_t)(uint32_t)val;
-+        break;
-+    case ASPEED_SDHCI_SDIO_248:
-+        sdhci->slots[1].maxcurr =3D (uint64_t)(uint32_t)val;
-+        break;
-+    default:
-+        if (addr < ASPEED_SDHCI_REG_SIZE) {
-+            sdhci->regs[TO_REG(addr)] =3D (uint32_t)val;
-+        } else {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "%s: Out-of-bounds write at 0x%" HWADDR_PRIx "=
-\n",
-+                          __func__, addr);
-+        }
-+    }
-+}
-+
-+static const MemoryRegionOps aspeed_sdhci_ops =3D {
-+    .read =3D aspeed_sdhci_read,
-+    .write =3D aspeed_sdhci_write,
-+    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .valid.min_access_size =3D 4,
-+    .valid.max_access_size =3D 4,
-+};
-+
-+static void aspeed_sdhci_set_irq(void *opaque, int n, int level)
-+{
-+    AspeedSDHCIState *sdhci =3D opaque;
-+
-+    if (level) {
-+        sdhci->regs[TO_REG(ASPEED_SDHCI_IRQ_STAT)] |=3D BIT(n);
-+
-+        qemu_irq_raise(sdhci->irq);
-+    } else {
-+        sdhci->regs[TO_REG(ASPEED_SDHCI_IRQ_STAT)] &=3D ~BIT(n);
-+
-+        qemu_irq_lower(sdhci->irq);
-+    }
-+}
-+
-+static void aspeed_sdhci_realize(DeviceState *dev, Error **errp)
-+{
-+    Error *err =3D NULL;
-+    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-+    AspeedSDHCIState *sdhci =3D ASPEED_SDHCI(dev);
-+
-+    /* Create input irqs for the slots */
-+    qdev_init_gpio_in_named_with_opaque(DEVICE(sbd), aspeed_sdhci_set_ir=
-q,
-+                                        sdhci, NULL, ASPEED_SDHCI_NUM_SL=
-OTS);
-+
-+    sysbus_init_irq(sbd, &sdhci->irq);
-+    memory_region_init_io(&sdhci->iomem, OBJECT(sdhci), &aspeed_sdhci_op=
-s,
-+                          sdhci, TYPE_ASPEED_SDHCI, 0x1000);
-+    sysbus_init_mmio(sbd, &sdhci->iomem);
-+
-+    for (int i =3D 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
-+        Object *sdhci_slot =3D OBJECT(&sdhci->slots[i]);
-+        SysBusDevice *sbd_slot =3D SYS_BUS_DEVICE(&sdhci->slots[i]);
-+
-+        object_property_set_int(sdhci_slot, 2, "sd-spec-version", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+
-+        object_property_set_uint(sdhci_slot, ASPEED_SDHCI_CAPABILITIES,
-+                                 "capareg", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+
-+        object_property_set_bool(sdhci_slot, true, "realized", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+
-+        sysbus_connect_irq(sbd_slot, 0, qdev_get_gpio_in(DEVICE(sbd), i)=
-);
-+        memory_region_add_subregion(&sdhci->iomem, (i + 1) * 0x100,
-+                                    &sdhci->slots[i].iomem);
-+    }
-+}
-+
-+static void aspeed_sdhci_reset(DeviceState *dev)
-+{
-+    AspeedSDHCIState *sdhci =3D ASPEED_SDHCI(dev);
-+
-+    memset(sdhci->regs, 0, ASPEED_SDHCI_REG_SIZE);
-+    sdhci->regs[TO_REG(ASPEED_SDHCI_INFO)] =3D ASPEED_SDHCI_INFO_RESET;
-+    sdhci->regs[TO_REG(ASPEED_SDHCI_DEBOUNCE)] =3D ASPEED_SDHCI_DEBOUNCE=
-_RESET;
-+}
-+
-+static const VMStateDescription vmstate_aspeed_sdhci =3D {
-+    .name =3D TYPE_ASPEED_SDHCI,
-+    .version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(regs, AspeedSDHCIState, ASPEED_SDHCI_NUM_RE=
-GS),
-+        VMSTATE_END_OF_LIST(),
-+    },
-+};
-+
-+static void aspeed_sdhci_class_init(ObjectClass *classp, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(classp);
-+
-+    dc->realize =3D aspeed_sdhci_realize;
-+    dc->reset =3D aspeed_sdhci_reset;
-+    dc->vmsd =3D &vmstate_aspeed_sdhci;
-+}
-+
-+static TypeInfo aspeed_sdhci_info =3D {
-+    .name          =3D TYPE_ASPEED_SDHCI,
-+    .parent        =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(AspeedSDHCIState),
-+    .class_init    =3D aspeed_sdhci_class_init,
-+};
-+
-+static void aspeed_sdhci_register_types(void)
-+{
-+    type_register_static(&aspeed_sdhci_info);
-+}
-+
-+type_init(aspeed_sdhci_register_types)
-diff --git a/hw/sd/Makefile.objs b/hw/sd/Makefile.objs
-index 06657279d183..a884c238dfb3 100644
---- a/hw/sd/Makefile.objs
-+++ b/hw/sd/Makefile.objs
-@@ -8,3 +8,4 @@ obj-$(CONFIG_MILKYMIST) +=3D milkymist-memcard.o
- obj-$(CONFIG_OMAP) +=3D omap_mmc.o
- obj-$(CONFIG_PXA2XX) +=3D pxa2xx_mmci.o
- obj-$(CONFIG_RASPI) +=3D bcm2835_sdhost.o
-+obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_sdhci.o
+ type_init(aspeed_sdmc_register_types);
 --=20
 2.21.0
 
