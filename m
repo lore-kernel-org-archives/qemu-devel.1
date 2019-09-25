@@ -2,91 +2,62 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC09FC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:37:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B991C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:39:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88987207E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:37:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TqWpHbXn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88987207E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5FA81207E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:39:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FA81207E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDBEI-0007UA-M7
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 13:37:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52073)
+	id 1iDBFq-0000Dc-Ij
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 13:39:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52104)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iDBDP-0006rB-Gp
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:36:36 -0400
+ (envelope-from <imammedo@redhat.com>) id 1iDBDc-0006y5-9U
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:36:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iDBDO-0007eX-A8
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:36:35 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:33100)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iDBDO-0007cY-1n
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:36:34 -0400
-Received: by mail-pg1-x543.google.com with SMTP id i30so251234pgl.0
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 10:36:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=8FtJ4kSv+fBASLFltN6A+y8E6bJ4Hebmn/tO3/QW1WE=;
- b=TqWpHbXngy4qjQViCRFv384tktV2GcdaN2Ig1LPTeGbj8Jqw0dnGXbiFTxlUGo5i+f
- Sk6qTXY5jlO9hp2+1PqUw3j0tQ7zfpd4uPvTBtHcUOzpFqfMga9vsGgfjlHCINDoQk9s
- +ZCO3csghBbE3XCjQPnvGa36GrPkIwUxbJu1QksINtvNgvhmZS84RxV4zl0vH+fikvo/
- wmIsnI2hHUP0hZIjzDWVf9XpoHcfozNVPsRCDwgP7qDXJzn6yrn7Rv/2Cmo3AbjiQaVW
- YM1fQilUm596iKhj8bAi+zTvSXiHx6ZpHi1W0aRAjtmlF4anT0R2OlAcXxXrCpZu3dqW
- llwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=8FtJ4kSv+fBASLFltN6A+y8E6bJ4Hebmn/tO3/QW1WE=;
- b=sK7uONSCxG9CPttwfX6Mg3vXOj8XJg7HePeiw2Yw/S439g3YHThMJr1YeoRrsEHAvZ
- ZAbcjZL7OvWfa2L+84B58UcMlNGla0HXbj+kaqjbn5dp5fsF5nqdY+GG1/fXaVwiBqgW
- xPKHlHEH0Wow555wNBishvRz4UJwu2HjTCccQavAqDaC6VT7LGLkopjXlrcsEgG3w3Oi
- gshyIM1FBin566DvFYbxuLDdP/jFsMYy/B5OCjZxi6RL6CF0CFimH4DKAeYD1NA6xb5w
- cL2PpKmq/mZDywcysz2ENCL4sqX2HKEjVsWlbb7oM5DZSPNZA8EPA4ldfv0EZyhV9Rc+
- XJeg==
-X-Gm-Message-State: APjAAAVXfmAf1Qn8pxES7BzgHjbXZ92EJaGdB6PEiQdHRRWhCEiQl/tj
- KjzL5lGS7Va/671wgodMuUjPMA==
-X-Google-Smtp-Source: APXvYqz6fRpyv0f6advnFNRoGePmKK4IDYY75PJIWXimw2mhQ2PtwQipC5aVUUT5eFk7sEle95hmPg==
-X-Received: by 2002:aa7:8edd:: with SMTP id b29mr10987739pfr.138.1569432992796; 
- Wed, 25 Sep 2019 10:36:32 -0700 (PDT)
-Received: from [172.20.32.216] ([12.206.46.61])
- by smtp.gmail.com with ESMTPSA id ep10sm11372530pjb.2.2019.09.25.10.36.31
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 25 Sep 2019 10:36:32 -0700 (PDT)
-Subject: Re: [PATCH v4 06/16] cputlb: Introduce TLB_BSWAP
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20190923230004.9231-1-richard.henderson@linaro.org>
- <20190923230004.9231-7-richard.henderson@linaro.org>
- <87zhita6w9.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <87a14f8a-62bf-2d0c-4e11-d23ac28d095f@linaro.org>
-Date: Wed, 25 Sep 2019 10:36:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <imammedo@redhat.com>) id 1iDBDb-0007l3-3g
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:36:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40558)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1iDBDY-0007jY-18; Wed, 25 Sep 2019 13:36:44 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AEBC518C8937;
+ Wed, 25 Sep 2019 17:36:42 +0000 (UTC)
+Received: from Igors-MacBook-Pro (ovpn-112-17.ams2.redhat.com [10.36.112.17])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0C5E71001B07;
+ Wed, 25 Sep 2019 17:36:31 +0000 (UTC)
+Date: Wed, 25 Sep 2019 19:36:28 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH-for-4.2 v11 11/11] tests: Add bios tests to arm/virt
+Message-ID: <20190925193628.2267cfb5@Igors-MacBook-Pro>
+In-Reply-To: <20190925112521-mutt-send-email-mst@kernel.org>
+References: <20190918130633.4872-1-shameerali.kolothum.thodi@huawei.com>
+ <20190918130633.4872-12-shameerali.kolothum.thodi@huawei.com>
+ <20190925112521-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <87zhita6w9.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Wed, 25 Sep 2019 17:36:43 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,35 +69,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
- david@redhat.com
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, ard.biesheuvel@linaro.org,
+ qemu-devel@nongnu.org, Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ linuxarm@huawei.com, shannon.zhaosl@gmail.com, qemu-arm@nongnu.org,
+ xuwei5@hisilicon.com, eric.auger@redhat.com, sebastien.boeuf@intel.com,
+ lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/24/19 11:25 AM, Alex Bennée wrote:
->> -
->> -            /* The backing page may or may not require I/O.  */
->> -            tlb_addr &= ~TLB_WATCHPOINT;
->> -            if ((tlb_addr & ~TARGET_PAGE_MASK) == 0) {
->> -                goto do_aligned_access;
->> -            }
->>          }
->>
->            /* We don't apply MO_BSWAP to op here because we want to
->             * ensure the compiler can always unfold and dead-code away
->             * the final load_memop in the fast path. If you try the
->             * you will find the assert will get you ;-)
->             */
+On Wed, 25 Sep 2019 11:26:04 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-I added
+> On Wed, Sep 18, 2019 at 02:06:33PM +0100, Shameer Kolothum wrote:
+> > This adds numamem and memhp tests for arm/virt platform.
+> > 
+> > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> > v10-->v11
+> > 
+> > Added Igor's R-by.
+> > 
+> > In order to avoid "make check" failure, the files listed in patch #10
+> > has to be added to tests/data/acpi/virt folder before this patch.
+> 
+> So you can just add empty stubs.
 
-+        /*
-+         * Keep these two load_memop separate to ensure that the compiler
-+         * is able to fold the entire function to a single instruction.
-+         * There is a build-time assert inside to remind you of this.  ;-)
-+         */
+Wouldn't IASL choke on such files?
 
+> 
+> > ---
+> >  tests/bios-tables-test.c | 49 ++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 49 insertions(+)
+> > 
+> > diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> > index 9b3d8b0d1b..6d9e2e41b0 100644
+> > --- a/tests/bios-tables-test.c
+> > +++ b/tests/bios-tables-test.c
+> > @@ -870,6 +870,53 @@ static void test_acpi_piix4_tcg_dimm_pxm(void)
+> >      test_acpi_tcg_dimm_pxm(MACHINE_PC);
+> >  }
+> >  
+> > +static void test_acpi_virt_tcg_memhp(void)
+> > +{
+> > +    test_data data = {
+> > +        .machine = "virt",
+> > +        .accel = "tcg",
+> > +        .uefi_fl1 = "pc-bios/edk2-aarch64-code.fd",
+> > +        .uefi_fl2 = "pc-bios/edk2-arm-vars.fd",
+> > +        .cd = "tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2",
+> > +        .ram_start = 0x40000000ULL,
+> > +        .scan_len = 256ULL * 1024 * 1024,
+> > +    };
+> > +
+> > +    data.variant = ".memhp";
+> > +    test_acpi_one(" -cpu cortex-a57"
+> > +                  " -m 256M,slots=3,maxmem=1G"
+> > +                  " -object memory-backend-ram,id=ram0,size=128M"
+> > +                  " -object memory-backend-ram,id=ram1,size=128M"
+> > +                  " -numa node,memdev=ram0 -numa node,memdev=ram1"
+> > +                  " -numa dist,src=0,dst=1,val=21",
+> > +                  &data);
+> > +
+> > +    free_test_data(&data);
+> > +
+> > +}
+> > +
+> > +static void test_acpi_virt_tcg_numamem(void)
+> > +{
+> > +    test_data data = {
+> > +        .machine = "virt",
+> > +        .accel = "tcg",
+> > +        .uefi_fl1 = "pc-bios/edk2-aarch64-code.fd",
+> > +        .uefi_fl2 = "pc-bios/edk2-arm-vars.fd",
+> > +        .cd = "tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2",
+> > +        .ram_start = 0x40000000ULL,
+> > +        .scan_len = 128ULL * 1024 * 1024,
+> > +    };
+> > +
+> > +    data.variant = ".numamem";
+> > +    test_acpi_one(" -cpu cortex-a57"
+> > +                  " -object memory-backend-ram,id=ram0,size=128M"
+> > +                  " -numa node,memdev=ram0",
+> > +                  &data);
+> > +
+> > +    free_test_data(&data);
+> > +
+> > +}
+> > +
+> >  static void test_acpi_virt_tcg(void)
+> >  {
+> >      test_data data = {
+> > @@ -916,6 +963,8 @@ int main(int argc, char *argv[])
+> >          qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm);
+> >      } else if (strcmp(arch, "aarch64") == 0) {
+> >          qtest_add_func("acpi/virt", test_acpi_virt_tcg);
+> > +        qtest_add_func("acpi/virt/numamem", test_acpi_virt_tcg_numamem);
+> > +        qtest_add_func("acpi/virt/memhp", test_acpi_virt_tcg_memhp);
+> >      }
+> >      ret = g_test_run();
+> >      boot_sector_cleanup(disk);
+> > -- 
+> > 2.17.1
+> > 
+> 
 
-r~
 
