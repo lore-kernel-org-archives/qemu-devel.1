@@ -2,84 +2,92 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A2C3C432C1
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 06:05:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14216C432C1
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 06:06:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1C2C217F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 06:05:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1C2C217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CB9AB205F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 06:06:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB9AB205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD0Qx-0007x0-Ed
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 02:05:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32790)
+	id 1iD0RF-0008C4-HZ
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 02:06:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60897)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iD0ON-0006E5-1I
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 02:03:12 -0400
+ (envelope-from <aravinda@linux.vnet.ibm.com>) id 1iD0NE-0005QT-NY
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 02:02:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iD0OL-0000PD-8T
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 02:03:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:5937)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iD0OK-0000OZ-EO
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 02:03:09 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 391543DFD7
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 06:03:06 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id a4so1736506wrg.8
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 23:03:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version;
- bh=kdVgmLDX3XC0MZB5e+D8RfcV20vQhEvu7mZJJoI2cYI=;
- b=MGeH4GB/wsO5PR9Mpr7pQ3FgoV081Hq70Bc/MVD0lcjsJrda2oghb5r13aZZa2rwhy
- NIUe/5v1a4yxjw1yZV+tK1sjt+i+u05yr6xzjJiCTDZKKKO3tUb2KaW/Zeg7YlDK8Lkf
- bD7iYp3E0lf/FqcEAyTKCLEyzIqNnoSKlThXXtnNX15nAadaAxUg/EnKYqLKN81sQKLi
- +D3xy/1SzVCd6THJ6Tg/AxXLE2X1Irt3A2/TdWGZGFj0LD5yz0mOMJbqhab5zXvecbt4
- H7gY9z15RtHP6j8k166f7L9tOP56tdKnTS/KzKuVyCd4WUdzXF3XQB/oMgOFzgflRo9e
- MU8Q==
-X-Gm-Message-State: APjAAAXP2PSFHu+GFmDsRo1w+HrzsojOZlbkht9Y6gPh38BE0YsK0Rro
- TyLNm3Vx7oezVru5J5wOBCB3BaASMCWMUU13U0STvtBLYwHjZOsCw0zRnKKei2SNHSulPvbYWQW
- sb/Cy+OBOCHS2Pdg=
-X-Received: by 2002:adf:bb0a:: with SMTP id r10mr7363894wrg.13.1569391383779; 
- Tue, 24 Sep 2019 23:03:03 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxAbYS6gsCDr+G2KEN9U5KqgyI7/w95sCF5bkYJb7ePUh//1XmHS3yIhfV+Ixnh55zlkdDEFg==
-X-Received: by 2002:adf:bb0a:: with SMTP id r10mr7363842wrg.13.1569391383453; 
- Tue, 24 Sep 2019 23:03:03 -0700 (PDT)
-Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
- [95.120.215.139])
- by smtp.gmail.com with ESMTPSA id v7sm4853071wru.87.2019.09.24.23.03.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 24 Sep 2019 23:03:02 -0700 (PDT)
-References: <20190924124433.96810-1-slp@redhat.com>
- <20190924124433.96810-2-slp@redhat.com>
- <1f1e944f-0076-6c96-3da0-ea196e2d21a1@redhat.com>
-User-agent: mu4e 1.2.0; emacs 26.2
-From: Sergio Lopez <slp@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v4 1/8] hw/i386: Factorize PVH related functions
-In-reply-to: <1f1e944f-0076-6c96-3da0-ea196e2d21a1@redhat.com>
-Date: Wed, 25 Sep 2019 08:03:00 +0200
-Message-ID: <87lfucsyjv.fsf@redhat.com>
+ (envelope-from <aravinda@linux.vnet.ibm.com>) id 1iD0NB-0008KV-Nj
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 02:02:00 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4550)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+ id 1iD0N0-0008FY-4h; Wed, 25 Sep 2019 02:01:46 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x8P5vPtu130936; Wed, 25 Sep 2019 02:01:36 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
+ [169.55.85.253])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2v82aerjf2-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 25 Sep 2019 02:01:35 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+ by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x8P5xpFO020486;
+ Wed, 25 Sep 2019 06:01:35 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
+ [9.57.198.27]) by ppma01wdc.us.ibm.com with ESMTP id 2v5bg7396p-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 25 Sep 2019 06:01:35 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com
+ [9.57.199.108])
+ by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x8P61XuN49545602
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 25 Sep 2019 06:01:33 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C32EFB2221;
+ Wed, 25 Sep 2019 06:01:33 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A8067B221C;
+ Wed, 25 Sep 2019 06:01:31 +0000 (GMT)
+Received: from [9.124.31.203] (unknown [9.124.31.203])
+ by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+ Wed, 25 Sep 2019 06:01:31 +0000 (GMT)
+Subject: Re: [PATCH v14 4/7] target/ppc: Build rtas error log upon an MCE
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <156879398718.18368.17640174821710157715.stgit@aravinda>
+ <156879435456.18368.1144480383769624512.stgit@aravinda>
+ <20190925013052.GG17405@umbus>
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Message-ID: <3282d800-46d5-d270-542c-bcf8bd937944@linux.vnet.ibm.com>
+Date: Wed, 25 Sep 2019 11:31:30 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.6.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+In-Reply-To: <20190925013052.GG17405@umbus>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-25_04:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909250061
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,384 +99,429 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, kvm@vger.kernel.org, mst@redhat.com,
- mtosatti@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com,
- pbonzini@redhat.com, imammedo@redhat.com, lersek@redhat.com, rth@twiddle.net
+Cc: aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org, paulus@ozlabs.org,
+ qemu-ppc@nongnu.org, ganeshgr@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
-
-> Hi Sergio,
->
-> On 9/24/19 2:44 PM, Sergio Lopez wrote:
->> Extract PVH related functions from pc.c, and put them in pvh.c, so
->> they can be shared with other components.
->>=20
->> Signed-off-by: Sergio Lopez <slp@redhat.com>
+On Wednesday 25 September 2019 07:00 AM, David Gibson wrote:
+> On Wed, Sep 18, 2019 at 01:42:34PM +0530, Aravinda Prasad wrote:
+>> Upon a machine check exception (MCE) in a guest address space,
+>> KVM causes a guest exit to enable QEMU to build and pass the
+>> error to the guest in the PAPR defined rtas error log format.
+>>
+>> This patch builds the rtas error log, copies it to the rtas_addr
+>> and then invokes the guest registered machine check handler. The
+>> handler in the guest takes suitable action(s) depending on the type
+>> and criticality of the error. For example, if an error is
+>> unrecoverable memory corruption in an application inside the
+>> guest, then the guest kernel sends a SIGBUS to the application.
+>> For recoverable errors, the guest performs recovery actions and
+>> logs the error.
+>>
+>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
 >> ---
->>  hw/i386/Makefile.objs |   1 +
->>  hw/i386/pc.c          | 120 +++++-------------------------------------
->>  hw/i386/pvh.c         | 113 +++++++++++++++++++++++++++++++++++++++
->>  hw/i386/pvh.h         |  10 ++++
->>  4 files changed, 136 insertions(+), 108 deletions(-)
->>  create mode 100644 hw/i386/pvh.c
->>  create mode 100644 hw/i386/pvh.h
->>=20
->> diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
->> index 5d9c9efd5f..c5f20bbd72 100644
->> --- a/hw/i386/Makefile.objs
->> +++ b/hw/i386/Makefile.objs
->> @@ -1,5 +1,6 @@
->>  obj-$(CONFIG_KVM) +=3D kvm/
->>  obj-y +=3D multiboot.o
->> +obj-y +=3D pvh.o
->>  obj-y +=3D pc.o
->>  obj-$(CONFIG_I440FX) +=3D pc_piix.o
->>  obj-$(CONFIG_Q35) +=3D pc_q35.o
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index bad866fe44..10e4ced0c6 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -42,6 +42,7 @@
->>  #include "elf.h"
->>  #include "migration/vmstate.h"
->>  #include "multiboot.h"
->> +#include "pvh.h"
->>  #include "hw/timer/mc146818rtc.h"
->>  #include "hw/dma/i8257.h"
->>  #include "hw/timer/i8254.h"
->> @@ -116,9 +117,6 @@ static struct e820_entry *e820_table;
->>  static unsigned e820_entries;
->>  struct hpet_fw_config hpet_cfg =3D {.count =3D UINT8_MAX};
->>=20=20
->> -/* Physical Address of PVH entry point read from kernel ELF NOTE */
->> -static size_t pvh_start_addr;
->> -
->>  GlobalProperty pc_compat_4_1[] =3D {};
->>  const size_t pc_compat_4_1_len =3D G_N_ELEMENTS(pc_compat_4_1);
->>=20=20
->> @@ -1076,109 +1074,6 @@ struct setup_data {
->>      uint8_t data[0];
->>  } __attribute__((packed));
->>=20=20
->> -
->> -/*
->> - * The entry point into the kernel for PVH boot is different from
->> - * the native entry point.  The PVH entry is defined by the x86/HVM
->> - * direct boot ABI and is available in an ELFNOTE in the kernel binary.
->> - *
->> - * This function is passed to load_elf() when it is called from
->> - * load_elfboot() which then additionally checks for an ELF Note of
->> - * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
->> - * parse the PVH entry address from the ELF Note.
->> - *
->> - * Due to trickery in elf_opts.h, load_elf() is actually available as
->> - * load_elf32() or load_elf64() and this routine needs to be able
->> - * to deal with being called as 32 or 64 bit.
->> - *
->> - * The address of the PVH entry point is saved to the 'pvh_start_addr'
->> - * global variable.  (although the entry point is 32-bit, the kernel
->> - * binary can be either 32-bit or 64-bit).
->> - */
->> -static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
->> -{
->> -    size_t *elf_note_data_addr;
->> -
->> -    /* Check if ELF Note header passed in is valid */
->> -    if (arg1 =3D=3D NULL) {
->> -        return 0;
->> -    }
->> -
->> -    if (is64) {
->> -        struct elf64_note *nhdr64 =3D (struct elf64_note *)arg1;
->> -        uint64_t nhdr_size64 =3D sizeof(struct elf64_note);
->> -        uint64_t phdr_align =3D *(uint64_t *)arg2;
->> -        uint64_t nhdr_namesz =3D nhdr64->n_namesz;
->> -
->> -        elf_note_data_addr =3D
->> -            ((void *)nhdr64) + nhdr_size64 +
->> -            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
->> -    } else {
->> -        struct elf32_note *nhdr32 =3D (struct elf32_note *)arg1;
->> -        uint32_t nhdr_size32 =3D sizeof(struct elf32_note);
->> -        uint32_t phdr_align =3D *(uint32_t *)arg2;
->> -        uint32_t nhdr_namesz =3D nhdr32->n_namesz;
->> -
->> -        elf_note_data_addr =3D
->> -            ((void *)nhdr32) + nhdr_size32 +
->> -            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
->> -    }
->> -
->> -    pvh_start_addr =3D *elf_note_data_addr;
->> -
->> -    return pvh_start_addr;
->> -}
->> -
->> -static bool load_elfboot(const char *kernel_filename,
->> -                   int kernel_file_size,
->> -                   uint8_t *header,
->> -                   size_t pvh_xen_start_addr,
->> -                   FWCfgState *fw_cfg)
->> -{
->> -    uint32_t flags =3D 0;
->> -    uint32_t mh_load_addr =3D 0;
->> -    uint32_t elf_kernel_size =3D 0;
->> -    uint64_t elf_entry;
->> -    uint64_t elf_low, elf_high;
->> -    int kernel_size;
->> -
->> -    if (ldl_p(header) !=3D 0x464c457f) {
->> -        return false; /* no elfboot */
->> -    }
->> -
->> -    bool elf_is64 =3D header[EI_CLASS] =3D=3D ELFCLASS64;
->> -    flags =3D elf_is64 ?
->> -        ((Elf64_Ehdr *)header)->e_flags : ((Elf32_Ehdr *)header)->e_fla=
-gs;
->> -
->> -    if (flags & 0x00010004) { /* LOAD_ELF_HEADER_HAS_ADDR */
->> -        error_report("elfboot unsupported flags =3D %x", flags);
->> -        exit(1);
->> -    }
->> -
->> -    uint64_t elf_note_type =3D XEN_ELFNOTE_PHYS32_ENTRY;
->> -    kernel_size =3D load_elf(kernel_filename, read_pvh_start_addr,
->> -                           NULL, &elf_note_type, &elf_entry,
->> -                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
->> -                           0, 0);
->> -
->> -    if (kernel_size < 0) {
->> -        error_report("Error while loading elf kernel");
->> -        exit(1);
->> -    }
->> -    mh_load_addr =3D elf_low;
->> -    elf_kernel_size =3D elf_high - elf_low;
->> -
->> -    if (pvh_start_addr =3D=3D 0) {
->> -        error_report("Error loading uncompressed kernel without PVH ELF=
- Note");
->> -        exit(1);
->> -    }
->> -    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
->> -    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
->> -    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
->> -
->> -    return true;
->> -}
->> -
->>  static void load_linux(PCMachineState *pcms,
->>                         FWCfgState *fw_cfg)
->>  {
->> @@ -1218,6 +1113,9 @@ static void load_linux(PCMachineState *pcms,
->>      if (ldl_p(header+0x202) =3D=3D 0x53726448) {
->>          protocol =3D lduw_p(header+0x206);
->>      } else {
->> +        size_t pvh_start_addr;
->> +        uint32_t mh_load_addr =3D 0;
->> +        uint32_t elf_kernel_size =3D 0;
->>          /*
->>           * This could be a multiboot kernel. If it is, let's stop treat=
-ing it
->>           * like a Linux kernel.
->> @@ -1235,10 +1133,16 @@ static void load_linux(PCMachineState *pcms,
->>           * If load_elfboot() is successful, populate the fw_cfg info.
->>           */
->>          if (pcmc->pvh_enabled &&
->> -            load_elfboot(kernel_filename, kernel_size,
->> -                         header, pvh_start_addr, fw_cfg)) {
->> +            pvh_load_elfboot(kernel_filename,
->> +                             &mh_load_addr, &elf_kernel_size)) {
->>              fclose(f);
->>=20=20
->> +            pvh_start_addr =3D pvh_get_start_addr();
+>>  hw/ppc/spapr.c         |   13 +++
+>>  hw/ppc/spapr_events.c  |  222 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>  hw/ppc/spapr_rtas.c    |   26 ++++++
+>>  include/hw/ppc/spapr.h |    6 +
+>>  target/ppc/kvm.c       |    4 +
+>>  5 files changed, 268 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 76ed988..9f2e5d2 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -2930,6 +2930,19 @@ static void spapr_machine_init(MachineState *machine)
+>>          error_report("Could not get size of LPAR rtas '%s'", filename);
+>>          exit(1);
+>>      }
 >> +
->> +            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
->> +            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
->> +            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
+>> +    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) == SPAPR_CAP_ON) {
+>> +        /*
+>> +         * Ensure that the rtas image size is less than RTAS_ERROR_LOG_OFFSET
+>> +         * or else the rtas image will be overwritten with the rtas error log
+>> +         * when a machine check exception is encountered.
+>> +         */
+>> +        g_assert(spapr->rtas_size < RTAS_ERROR_LOG_OFFSET);
 >> +
->>              fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
->>                  strlen(kernel_cmdline) + 1);
->>              fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdli=
-ne);
->> diff --git a/hw/i386/pvh.c b/hw/i386/pvh.c
->> new file mode 100644
->> index 0000000000..1c81727811
->> --- /dev/null
->> +++ b/hw/i386/pvh.c
->> @@ -0,0 +1,113 @@
->> +/*
->> + * PVH Boot Helper
->> + *
->> + * Copyright (C) 2019 Oracle
->> + * Copyright (C) 2019 Red Hat, Inc
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or l=
-ater.
->> + * See the COPYING file in the top-level directory.
->> + *
->> + */
+>> +        /* Resize rtas blob to accommodate error log */
+>> +        spapr->rtas_size = RTAS_ERROR_LOG_MAX;
+>> +    }
 >> +
->> +#include "qemu/osdep.h"
->> +#include "qemu/units.h"
->> +#include "qemu/error-report.h"
->> +#include "hw/loader.h"
->> +#include "cpu.h"
->> +#include "elf.h"
->> +#include "pvh.h"
+> 
+> I've recently merged into ppc-for-4.2 the change to have SLOF supply
+> the RTAS blob, rather than qemu.  So this code will need to be updated
+> accordingly.
+
+Sure. Will modify it to check if rtas_size is set to RTAS_ERROR_LOG_MAX
+instead of the assignment.
+
+> 
+>>      spapr->rtas_blob = g_malloc(spapr->rtas_size);
+>>      if (load_image_size(filename, spapr->rtas_blob, spapr->rtas_size) < 0) {
+>>          error_report("Could not load LPAR rtas '%s'", filename);
+>> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+>> index 0ce96b8..ecc3d68 100644
+>> --- a/hw/ppc/spapr_events.c
+>> +++ b/hw/ppc/spapr_events.c
+>> @@ -214,6 +214,106 @@ struct hp_extended_log {
+>>      struct rtas_event_log_v6_hp hp;
+>>  } QEMU_PACKED;
+>>  
+>> +struct rtas_event_log_v6_mc {
+>> +#define RTAS_LOG_V6_SECTION_ID_MC                   0x4D43 /* MC */
+>> +    struct rtas_event_log_v6_section_header hdr;
+>> +    uint32_t fru_id;
+>> +    uint32_t proc_id;
+>> +    uint8_t error_type;
+>> +#define RTAS_LOG_V6_MC_TYPE_UE                           0
+>> +#define RTAS_LOG_V6_MC_TYPE_SLB                          1
+>> +#define RTAS_LOG_V6_MC_TYPE_ERAT                         2
+>> +#define RTAS_LOG_V6_MC_TYPE_TLB                          4
+>> +#define RTAS_LOG_V6_MC_TYPE_D_CACHE                      5
+>> +#define RTAS_LOG_V6_MC_TYPE_I_CACHE                      7
+>> +    uint8_t sub_err_type;
+>> +#define RTAS_LOG_V6_MC_UE_INDETERMINATE                  0
+>> +#define RTAS_LOG_V6_MC_UE_IFETCH                         1
+>> +#define RTAS_LOG_V6_MC_UE_PAGE_TABLE_WALK_IFETCH         2
+>> +#define RTAS_LOG_V6_MC_UE_LOAD_STORE                     3
+>> +#define RTAS_LOG_V6_MC_UE_PAGE_TABLE_WALK_LOAD_STORE     4
+>> +#define RTAS_LOG_V6_MC_SLB_PARITY                        0
+>> +#define RTAS_LOG_V6_MC_SLB_MULTIHIT                      1
+>> +#define RTAS_LOG_V6_MC_SLB_INDETERMINATE                 2
+>> +#define RTAS_LOG_V6_MC_ERAT_PARITY                       1
+>> +#define RTAS_LOG_V6_MC_ERAT_MULTIHIT                     2
+>> +#define RTAS_LOG_V6_MC_ERAT_INDETERMINATE                3
+>> +#define RTAS_LOG_V6_MC_TLB_PARITY                        1
+>> +#define RTAS_LOG_V6_MC_TLB_MULTIHIT                      2
+>> +#define RTAS_LOG_V6_MC_TLB_INDETERMINATE                 3
+>> +    uint8_t reserved_1[6];
+>> +    uint64_t effective_address;
+>> +    uint64_t logical_address;
+>> +} QEMU_PACKED;
 >> +
->> +static size_t pvh_start_addr;
+>> +struct mc_extended_log {
+>> +    struct rtas_event_log_v6 v6hdr;
+>> +    struct rtas_event_log_v6_mc mc;
+>> +} QEMU_PACKED;
 >> +
->> +size_t pvh_get_start_addr(void)
+>> +struct MC_ierror_table {
+>> +    unsigned long srr1_mask;
+>> +    unsigned long srr1_value;
+>> +    bool nip_valid; /* nip is a valid indicator of faulting address */
+>> +    uint8_t error_type;
+>> +    uint8_t error_subtype;
+>> +    unsigned int initiator;
+>> +    unsigned int severity;
+>> +};
+>> +
+>> +static const struct MC_ierror_table mc_ierror_table[] = {
+>> +{ 0x00000000081c0000, 0x0000000000040000, true,
+>> +  RTAS_LOG_V6_MC_TYPE_UE, RTAS_LOG_V6_MC_UE_IFETCH,
+>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>> +{ 0x00000000081c0000, 0x0000000000080000, true,
+>> +  RTAS_LOG_V6_MC_TYPE_SLB, RTAS_LOG_V6_MC_SLB_PARITY,
+>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>> +{ 0x00000000081c0000, 0x00000000000c0000, true,
+>> +  RTAS_LOG_V6_MC_TYPE_SLB, RTAS_LOG_V6_MC_SLB_MULTIHIT,
+>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>> +{ 0x00000000081c0000, 0x0000000000100000, true,
+>> +  RTAS_LOG_V6_MC_TYPE_ERAT, RTAS_LOG_V6_MC_ERAT_MULTIHIT,
+>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>> +{ 0x00000000081c0000, 0x0000000000140000, true,
+>> +  RTAS_LOG_V6_MC_TYPE_TLB, RTAS_LOG_V6_MC_TLB_MULTIHIT,
+>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>> +{ 0x00000000081c0000, 0x0000000000180000, true,
+>> +  RTAS_LOG_V6_MC_TYPE_UE, RTAS_LOG_V6_MC_UE_PAGE_TABLE_WALK_IFETCH,
+>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>> +{ 0, 0, 0, 0, 0, 0 } };
+> 
+> For constant tables like this using ARRAY_SIZE() is preferred to
+> having sentinal records at the end.
+
+ok
+
+> 
+>> +
+>> +struct MC_derror_table {
+>> +    unsigned long dsisr_value;
+>> +    bool dar_valid; /* dar is a valid indicator of faulting address */
+>> +    uint8_t error_type;
+>> +    uint8_t error_subtype;
+>> +    unsigned int initiator;
+>> +    unsigned int severity;
+>> +};
+>> +
+>> +static const struct MC_derror_table mc_derror_table[] = {
+>> +{ 0x00008000, false,
+>> +  RTAS_LOG_V6_MC_TYPE_UE, RTAS_LOG_V6_MC_UE_LOAD_STORE,
+>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>> +{ 0x00004000, true,
+>> +  RTAS_LOG_V6_MC_TYPE_UE, RTAS_LOG_V6_MC_UE_PAGE_TABLE_WALK_LOAD_STORE,
+>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>> +{ 0x00000800, true,
+>> +  RTAS_LOG_V6_MC_TYPE_ERAT, RTAS_LOG_V6_MC_ERAT_MULTIHIT,
+>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>> +{ 0x00000400, true,
+>> +  RTAS_LOG_V6_MC_TYPE_TLB, RTAS_LOG_V6_MC_TLB_MULTIHIT,
+>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>> +{ 0x00000080, true,
+>> +  RTAS_LOG_V6_MC_TYPE_SLB, RTAS_LOG_V6_MC_SLB_MULTIHIT,  /* Before PARITY */
+>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>> +{ 0x00000100, true,
+>> +  RTAS_LOG_V6_MC_TYPE_SLB, RTAS_LOG_V6_MC_SLB_PARITY,
+>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>> +{ 0, false, 0, 0, 0, 0 } };
+>> +
+>> +#define SRR1_MC_LOADSTORE(srr1) ((srr1) & PPC_BIT(42))
+>> +
+>>  typedef enum EventClass {
+>>      EVENT_CLASS_INTERNAL_ERRORS     = 0,
+>>      EVENT_CLASS_EPOW                = 1,
+>> @@ -622,7 +722,125 @@ void spapr_hotplug_req_remove_by_count_indexed(SpaprDrcType drc_type,
+>>                              RTAS_LOG_V6_HP_ACTION_REMOVE, drc_type, &drc_id);
+>>  }
+>>  
+>> -void spapr_mce_req_event(PowerPCCPU *cpu)
+>> +static uint32_t spapr_mce_get_elog_type(PowerPCCPU *cpu, bool recovered,
+>> +                                        struct mc_extended_log *ext_elog)
 >> +{
->> +    return pvh_start_addr;
+>> +    int i;
+>> +    CPUPPCState *env = &cpu->env;
+>> +    uint32_t summary;
+>> +    uint64_t dsisr = env->spr[SPR_DSISR];
+>> +
+>> +    summary = RTAS_LOG_VERSION_6 | RTAS_LOG_OPTIONAL_PART_PRESENT;
+>> +    if (recovered) {
+>> +        summary |= RTAS_LOG_DISPOSITION_FULLY_RECOVERED;
+>> +    } else {
+>> +        summary |= RTAS_LOG_DISPOSITION_NOT_RECOVERED;
+>> +    }
+>> +
+>> +    if (SRR1_MC_LOADSTORE(env->spr[SPR_SRR1])) {
+>> +        for (i = 0; mc_derror_table[i].dsisr_value; i++) {
+>> +            if (!(dsisr & mc_derror_table[i].dsisr_value)) {
+>> +                continue;
+>> +            }
+>> +
+>> +            ext_elog->mc.error_type = mc_derror_table[i].error_type;
+>> +            ext_elog->mc.sub_err_type = mc_derror_table[i].error_subtype;
+>> +            if (mc_derror_table[i].dar_valid) {
+>> +                ext_elog->mc.effective_address = cpu_to_be64(env->spr[SPR_DAR]);
+>> +            }
+>> +
+>> +            summary |= mc_derror_table[i].initiator
+>> +                        | mc_derror_table[i].severity;
+>> +
+>> +            return summary;
+>> +        }
+>> +    } else {
+>> +        for (i = 0; mc_ierror_table[i].srr1_mask; i++) {
+>> +            if ((env->spr[SPR_SRR1] & mc_ierror_table[i].srr1_mask) !=
+>> +                    mc_ierror_table[i].srr1_value) {
+>> +                continue;
+>> +            }
+>> +
+>> +            ext_elog->mc.error_type = mc_ierror_table[i].error_type;
+>> +            ext_elog->mc.sub_err_type = mc_ierror_table[i].error_subtype;
+>> +            if (mc_ierror_table[i].nip_valid) {
+>> +                ext_elog->mc.effective_address = cpu_to_be64(env->nip);
+>> +            }
+>> +
+>> +            summary |= mc_ierror_table[i].initiator
+>> +                        | mc_ierror_table[i].severity;
+>> +
+>> +            return summary;
+>> +        }
+>> +    }
+>> +
+>> +    summary |= RTAS_LOG_INITIATOR_CPU;
+>> +    return summary;
 >> +}
 >> +
->> +/*
->> + * The entry point into the kernel for PVH boot is different from
->> + * the native entry point.  The PVH entry is defined by the x86/HVM
->> + * direct boot ABI and is available in an ELFNOTE in the kernel binary.
->> + *
->> + * This function is passed to load_elf() when it is called from
->> + * load_elfboot() which then additionally checks for an ELF Note of
->> + * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
->> + * parse the PVH entry address from the ELF Note.
->> + *
->> + * Due to trickery in elf_opts.h, load_elf() is actually available as
->> + * load_elf32() or load_elf64() and this routine needs to be able
->> + * to deal with being called as 32 or 64 bit.
->> + *
->> + * The address of the PVH entry point is saved to the 'pvh_start_addr'
->> + * global variable.  (although the entry point is 32-bit, the kernel
->> + * binary can be either 32-bit or 64-bit).
->> + */
->> +
->> +static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
+>> +static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
 >> +{
->> +    size_t *elf_note_data_addr;
+>> +    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+>> +    CPUState *cs = CPU(cpu);
+>> +    uint64_t rtas_addr;
+>> +    CPUPPCState *env = &cpu->env;
+>> +    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
+>> +    target_ulong msr = 0;
+>> +    struct rtas_error_log log;
+>> +    struct mc_extended_log *ext_elog;
+>> +    uint32_t summary;
 >> +
->> +    /* Check if ELF Note header passed in is valid */
->> +    if (arg1 =3D=3D NULL) {
+>> +    /*
+>> +     * Properly set bits in MSR before we invoke the handler.
+>> +     * SRR0/1, DAR and DSISR are properly set by KVM
+>> +     */
+>> +    if (!(*pcc->interrupts_big_endian)(cpu)) {
+>> +        msr |= (1ULL << MSR_LE);
+>> +    }
+>> +
+>> +    if (env->msr & (1ULL << MSR_SF)) {
+>> +        msr |= (1ULL << MSR_SF);
+>> +    }
+>> +
+>> +    msr |= (1ULL << MSR_ME);
+>> +
+>> +    ext_elog = g_malloc0(sizeof(*ext_elog));
+> 
+> g_new0() is preferred for this sort of thing.
+
+I feel g_malloc0() is used to allocate extended logs in other places in
+this file, so I think g_malloc0() should be fine. Please let me know.
+
+> 
+>> +    summary = spapr_mce_get_elog_type(cpu, recovered, ext_elog);
+>> +
+>> +    log.summary = cpu_to_be32(summary);
+>> +    log.extended_length = cpu_to_be32(sizeof(*ext_elog));
+>> +
+>> +    spapr_init_v6hdr(&ext_elog->v6hdr);
+>> +    ext_elog->mc.hdr.section_id = cpu_to_be16(RTAS_LOG_V6_SECTION_ID_MC);
+>> +    ext_elog->mc.hdr.section_length =
+>> +                    cpu_to_be16(sizeof(struct rtas_event_log_v6_mc));
+>> +    ext_elog->mc.hdr.section_version = 1;
+>> +
+>> +    /* get rtas addr from fdt */
+>> +    rtas_addr = spapr_get_rtas_addr();
+>> +    if (!rtas_addr) {
+>> +        /* Unable to fetch rtas_addr. Hence reset the guest */
+>> +        ppc_cpu_do_system_reset(cs);
+>> +        g_free(ext_elog);
+>> +        return;
+>> +    }
+>> +
+>> +    stq_be_phys(&address_space_memory, rtas_addr + RTAS_ERROR_LOG_OFFSET,
+>> +                env->gpr[3]);
+>> +    cpu_physical_memory_write(rtas_addr + RTAS_ERROR_LOG_OFFSET +
+>> +                              sizeof(env->gpr[3]), &log, sizeof(log));
+>> +    cpu_physical_memory_write(rtas_addr + RTAS_ERROR_LOG_OFFSET +
+>> +                              sizeof(env->gpr[3]) + sizeof(log), ext_elog,
+>> +                              sizeof(*ext_elog));
+>> +
+>> +    env->gpr[3] = rtas_addr + RTAS_ERROR_LOG_OFFSET;
+>> +    env->msr = msr;
+>> +    env->nip = spapr->guest_machine_check_addr;
+>> +
+>> +    g_free(ext_elog);
+>> +}
+>> +
+>> +void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+>>  {
+>>      SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+>>      CPUState *cs = CPU(cpu);
+>> @@ -656,6 +874,8 @@ void spapr_mce_req_event(PowerPCCPU *cpu)
+>>          }
+>>      }
+>>      spapr->mc_status = cpu->vcpu_id;
+>> +
+>> +    spapr_mce_dispatch_elog(cpu, recovered);
+>>  }
+>>  
+>>  static void check_exception(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+>> index bee3835..d8fb8a8 100644
+>> --- a/hw/ppc/spapr_rtas.c
+>> +++ b/hw/ppc/spapr_rtas.c
+>> @@ -518,6 +518,32 @@ void spapr_load_rtas(SpaprMachineState *spapr, void *fdt, hwaddr addr)
+>>      }
+>>  }
+>>  
+>> +hwaddr spapr_get_rtas_addr(void)
+>> +{
+>> +    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+>> +    int rtas_node;
+>> +    const fdt32_t *rtas_data;
+>> +    void *fdt = spapr->fdt_blob;
+>> +
+>> +    /* fetch rtas addr from fdt */
+>> +    rtas_node = fdt_path_offset(fdt, "/rtas");
+>> +    if (rtas_node < 0) {
 >> +        return 0;
 >> +    }
 >> +
->> +    if (is64) {
->> +        struct elf64_note *nhdr64 =3D (struct elf64_note *)arg1;
->> +        uint64_t nhdr_size64 =3D sizeof(struct elf64_note);
->> +        uint64_t phdr_align =3D *(uint64_t *)arg2;
->> +        uint64_t nhdr_namesz =3D nhdr64->n_namesz;
->> +
->> +        elf_note_data_addr =3D
->> +            ((void *)nhdr64) + nhdr_size64 +
->> +            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
->> +    } else {
->> +        struct elf32_note *nhdr32 =3D (struct elf32_note *)arg1;
->> +        uint32_t nhdr_size32 =3D sizeof(struct elf32_note);
->> +        uint32_t phdr_align =3D *(uint32_t *)arg2;
->> +        uint32_t nhdr_namesz =3D nhdr32->n_namesz;
->> +
->> +        elf_note_data_addr =3D
->> +            ((void *)nhdr32) + nhdr_size32 +
->> +            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
+>> +    rtas_data = fdt_getprop(fdt, rtas_node, "linux,rtas-base", NULL);
+> 
+> Hrm.  Does SLOF actually update the linux,rtas-base property when
+> instantiate-rtas is called?
+
+I think so as I get the updated rtas address when I read it from fdt.
+
+Regards,
+Aravinda
+
+> 
+>> +    if (!rtas_data) {
+>> +        return 0;
 >> +    }
 >> +
->> +    pvh_start_addr =3D *elf_note_data_addr;
->> +
->> +    return pvh_start_addr;
+>> +    /*
+>> +     * We assume that the OS called RTAS instantiate-rtas, but some other
+>> +     * OS might call RTAS instantiate-rtas-64 instead. This fine as of now
+>> +     * as SLOF only supports 32-bit variant.
+>> +     */
+>> +    return (hwaddr)fdt32_to_cpu(*rtas_data);
 >> +}
 >> +
->> +bool pvh_load_elfboot(const char *kernel_filename,
->> +                      uint32_t *mh_load_addr,
->> +                      uint32_t *elf_kernel_size)
->> +{
->> +    uint64_t elf_entry;
->> +    uint64_t elf_low, elf_high;
->> +    int kernel_size;
->> +    uint64_t elf_note_type =3D XEN_ELFNOTE_PHYS32_ENTRY;
+>>  static void core_rtas_register_types(void)
+>>  {
+>>      spapr_rtas_register(RTAS_DISPLAY_CHARACTER, "display-character",
+>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>> index 99a2966..ffefde7 100644
+>> --- a/include/hw/ppc/spapr.h
+>> +++ b/include/hw/ppc/spapr.h
+>> @@ -726,6 +726,9 @@ void spapr_load_rtas(SpaprMachineState *spapr, void *fdt, hwaddr addr);
+>>  
+>>  #define RTAS_ERROR_LOG_MAX      2048
+>>  
+>> +/* Offset from rtas-base where error log is placed */
+>> +#define RTAS_ERROR_LOG_OFFSET       0x30
 >> +
->> +    kernel_size =3D load_elf(kernel_filename, read_pvh_start_addr,
->> +                           NULL, &elf_note_type, &elf_entry,
->> +                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
->> +                           0, 0);
+>>  #define RTAS_EVENT_SCAN_RATE    1
+>>  
+>>  /* This helper should be used to encode interrupt specifiers when the related
+>> @@ -814,7 +817,7 @@ void spapr_clear_pending_events(SpaprMachineState *spapr);
+>>  int spapr_max_server_number(SpaprMachineState *spapr);
+>>  void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
+>>                        uint64_t pte0, uint64_t pte1);
+>> -void spapr_mce_req_event(PowerPCCPU *cpu);
+>> +void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered);
+>>  
+>>  /* DRC callbacks. */
+>>  void spapr_core_release(DeviceState *dev);
+>> @@ -904,4 +907,5 @@ void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
+>>  #define SPAPR_OV5_XIVE_BOTH     0x80 /* Only to advertise on the platform */
+>>  
+>>  void spapr_set_all_lpcrs(target_ulong value, target_ulong mask);
+>> +hwaddr spapr_get_rtas_addr(void);
+>>  #endif /* HW_SPAPR_H */
+>> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+>> index 1e2a4f1..e9aa95d 100644
+>> --- a/target/ppc/kvm.c
+>> +++ b/target/ppc/kvm.c
+>> @@ -2818,9 +2818,11 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
+>>  
+>>  int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run)
+>>  {
+>> +    bool recovered = run->flags & KVM_RUN_PPC_NMI_DISP_FULLY_RECOV;
 >> +
->> +    if (kernel_size < 0) {
->> +        error_report("Error while loading elf kernel");
->> +        return false;
->> +    }
->> +
->> +    if (pvh_start_addr =3D=3D 0) {
->> +        error_report("Error loading uncompressed kernel without PVH ELF=
- Note");
->> +        return false;
->> +    }
->> +
->> +    if (mh_load_addr) {
->> +        *mh_load_addr =3D elf_low;
->> +    }
->> +
->> +    if (elf_kernel_size) {
->> +        *elf_kernel_size =3D elf_high - elf_low;
->> +    }
->> +
->> +    return true;
->> +}
->> diff --git a/hw/i386/pvh.h b/hw/i386/pvh.h
->> new file mode 100644
->> index 0000000000..ada67ff6e8
->> --- /dev/null
->> +++ b/hw/i386/pvh.h
->> @@ -0,0 +1,10 @@
->
-> License missing.
+>>      cpu_synchronize_state(CPU(cpu));
+>>  
+>> -    spapr_mce_req_event(cpu);
+>> +    spapr_mce_req_event(cpu, recovered);
+>>  
+>>      return 0;
+>>  }
+>>
+> 
 
-I'm a bit confused about the policy for license blocks in headers, as
-some do have it, while others don't (i.e. multiboot.h and acpi-build.h).
-
->> +#ifndef HW_I386_PVH_H
->> +#define HW_I386_PVH_H
->> +
->> +size_t pvh_get_start_addr(void);
->> +
->> +bool pvh_load_elfboot(const char *kernel_filename,
->> +                      uint32_t *mh_load_addr,
->> +                      uint32_t *elf_kernel_size);
->
-> Can you document these functions?
-
-Sure.
-
-Thanks,
-Sergio.
-
->> +
->> +#endif
->>=20
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2LAxQACgkQ9GknjS8M
-AjX4WBAAq/BtbV9mUG9GH3Os6D1hVFI+gMv1DccKyutkUhjFrzBZNlFBeeQCyDIl
-z1YaEkAxPzaTKhNYNV+XXHQxqtXn5uq0lRu48oIbsamFCvn8SPXWVAocszJ1m5ix
-xQ8GSE/xm0u/MJ2XLhy9O+7I5UD4ze1xS0+z4hFrBdRteCzF+MjFflhCUR5Eot9d
-Nac6DOrnP9hSce09IDsP6yGdXwePt/O5FKDTW9wRnZ66VzeM6No0GtXRiYpl3gZr
-lXmV/Xwv74LRHTCQPreQVN0n08eRzAfVCpmXSFQ9HULOFr8iJoVSLQlbxvFBOXn5
-eUvErXPhmsYKgOIzgqScYq3AvGQ24mI3aEFiHwn3hHa5or75hZ+s4WGAQPVyBsiy
-dIlcP3r/psOasnUEXlo7T7FiqmG0bJUWZBPDz94ewV9/fEXVuYeLZPsTcd26/XIf
-46Ka+qKcGBbh0KYsdHpP/ok6mOOl27ug/SndpS6o83giSB8faiJjuHh+ZxCMQcxF
-95LlZW3jlOnHuXrH6sgVn4DzqPkZgD1KXcpFNwgMD/uyKCAh5esaZY8WU36usRxc
-EUFjpNF2OB1YeLUq9arJPTvXOTAZMk3W7aogxdthz+dY4RgPB7CXwX4i2hv+uthu
-MdWsVoV18fCu+6h1hG2/ydzyvLSstSE42EMKSx0tmPQSPr+QrE4=
-=ey5j
------END PGP SIGNATURE-----
---=-=-=--
+-- 
+Regards,
+Aravinda
 
