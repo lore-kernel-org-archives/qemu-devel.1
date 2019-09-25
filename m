@@ -2,57 +2,86 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45F10C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:33:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81874C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:34:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B1312146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:33:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B1312146E
+	by mail.kernel.org (Postfix) with ESMTPS id 341472146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:34:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 341472146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD7Pl-00064y-4Z
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 09:33:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58869)
+	id 1iD7Qv-0007Hd-4B
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 09:34:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33365)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iD6n4-0006gJ-0F
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:53:07 -0400
+ (envelope-from <eblake@redhat.com>) id 1iD7BM-0007MQ-LH
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 09:18:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iD6n2-0004CO-G9
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:53:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57816)
+ (envelope-from <eblake@redhat.com>) id 1iD7BL-0006RP-Ex
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 09:18:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58860)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iD6n2-0004C5-7x; Wed, 25 Sep 2019 08:53:04 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iD7BL-0006RA-6d
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 09:18:11 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5533E31752A4;
- Wed, 25 Sep 2019 12:53:03 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-117-14.ams2.redhat.com [10.36.117.14])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 85190600C8;
- Wed, 25 Sep 2019 12:53:01 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 7/7] s390x/mmu: Convert to non-recursive page table walk
-Date: Wed, 25 Sep 2019 14:52:36 +0200
-Message-Id: <20190925125236.4043-8-david@redhat.com>
-In-Reply-To: <20190925125236.4043-1-david@redhat.com>
-References: <20190925125236.4043-1-david@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 5542089AC6;
+ Wed, 25 Sep 2019 13:18:10 +0000 (UTC)
+Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0DBF060BF1;
+ Wed, 25 Sep 2019 13:18:09 +0000 (UTC)
+Subject: Re: [PULL 0/4] NBD patches for 2019-09-24
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+References: <20190924123933.10607-1-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <09a35255-8384-4606-3273-6b4daf3661a7@redhat.com>
+Date: Wed, 25 Sep 2019 08:18:09 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20190924123933.10607-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="xPGv0EFCKpEXkOO460gGt80wOda18rPdj"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Wed, 25 Sep 2019 12:53:03 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.26]); Wed, 25 Sep 2019 13:18:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -67,306 +96,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A non-recursive implementation allows to make better use of the
-branch predictor, avoids function calls, and makes the implementation of
-new features only for a subset of region table levels easier.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xPGv0EFCKpEXkOO460gGt80wOda18rPdj
+Content-Type: multipart/mixed; boundary="CkXYlAL50AbvdkNoketB7iv3GEMADFKy9";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <09a35255-8384-4606-3273-6b4daf3661a7@redhat.com>
+Subject: Re: [PULL 0/4] NBD patches for 2019-09-24
+References: <20190924123933.10607-1-eblake@redhat.com>
+In-Reply-To: <20190924123933.10607-1-eblake@redhat.com>
 
-We can now directly compare our implementation to the KVM gaccess
-implementation in arch/s390/kvm/gaccess.c:guest_translate().
+--CkXYlAL50AbvdkNoketB7iv3GEMADFKy9
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/mmu_helper.c | 212 ++++++++++++++++++++------------------
- 1 file changed, 112 insertions(+), 100 deletions(-)
+On 9/24/19 7:39 AM, Eric Blake wrote:
+> The following changes since commit 2f93a3ecdd3bb060bd04f698ccafe66efd98=
+563a:
+>=20
+>   Merge remote-tracking branch 'remotes/davidhildenbrand/tags/s390x-tcg=
+-2019-09-23' into staging (2019-09-23 15:44:52 +0100)
+>=20
+> are available in the Git repository at:
+>=20
+>   https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2019-09-24
+>=20
+> for you to fetch changes up to 506902c6fa80210b002e30ff33794bfc718b15c6=
+:
+>=20
+>   tests: Use iothreads during iotest 223 (2019-09-24 07:30:19 -0500)
+>=20
+> ----------------------------------------------------------------
+> nbd patches for 2019-09-05
+>=20
+> - Improved error message for plaintext client of encrypted server
+> - Fix various assertions when -object iothread is in use
+>=20
 
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index 9243f04312..3ef40a37a7 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -111,107 +111,16 @@ static inline int read_table_entry(hwaddr gaddr, u=
-int64_t *entry)
-     return 0;
- }
-=20
--/* Decode page table entry (normal 4KB page) */
--static int mmu_translate_pte(CPUS390XState *env, target_ulong vaddr,
--                             uint64_t asc, uint64_t pt_entry,
--                             target_ulong *raddr, int *flags, int rw, bo=
-ol exc)
--{
--    if (pt_entry & PAGE_ENTRY_I) {
--        return PGM_PAGE_TRANS;
--    }
--    if (pt_entry & PAGE_ENTRY_0) {
--        return PGM_TRANS_SPEC;
--    }
--    if (pt_entry & PAGE_ENTRY_P) {
--        *flags &=3D ~PAGE_WRITE;
--    }
--
--    *raddr =3D pt_entry & TARGET_PAGE_MASK;
--    return 0;
--}
--
--/* Decode segment table entry */
--static int mmu_translate_segment(CPUS390XState *env, target_ulong vaddr,
--                                 uint64_t asc, uint64_t st_entry,
--                                 target_ulong *raddr, int *flags, int rw=
-,
--                                 bool exc)
--{
--    uint64_t origin, offs, pt_entry;
--
--    if (st_entry & SEGMENT_ENTRY_P) {
--        *flags &=3D ~PAGE_WRITE;
--    }
--
--    if ((st_entry & SEGMENT_ENTRY_FC) && (env->cregs[0] & CR0_EDAT)) {
--        /* Decode EDAT1 segment frame absolute address (1MB page) */
--        *raddr =3D (st_entry & SEGMENT_ENTRY_SFAA) |
--                 (vaddr & ~SEGMENT_ENTRY_SFAA);
--        return 0;
--    }
--
--    /* Look up 4KB page entry */
--    origin =3D st_entry & SEGMENT_ENTRY_ORIGIN;
--    offs =3D VADDR_PAGE_TX(vaddr) * 8;
--    if (read_table_entry(origin + offs, &pt_entry)) {
--        return PGM_ADDRESSING;
--    }
--    return mmu_translate_pte(env, vaddr, asc, pt_entry, raddr, flags, rw=
-, exc);
--}
--
--/* Decode region table entries */
--static int mmu_translate_region(CPUS390XState *env, target_ulong vaddr,
--                                uint64_t asc, uint64_t entry, int level,
--                                target_ulong *raddr, int *flags, int rw,
--                                bool exc)
--{
--    uint64_t origin, offs, new_entry;
--    const int pchks[4] =3D {
--        PGM_SEGMENT_TRANS, PGM_REG_THIRD_TRANS,
--        PGM_REG_SEC_TRANS, PGM_REG_FIRST_TRANS
--    };
--
--    origin =3D entry & REGION_ENTRY_ORIGIN;
--    offs =3D (vaddr >> (17 + 11 * level / 4)) & 0x3ff8;
--
--    if (read_table_entry(origin + offs, &new_entry)) {
--        return PGM_ADDRESSING;
--    }
--
--    if (new_entry & REGION_ENTRY_I) {
--        return pchks[level / 4];
--    }
--
--    if ((new_entry & REGION_ENTRY_TT) !=3D level) {
--        return PGM_TRANS_SPEC;
--    }
--
--    if (level =3D=3D ASCE_TYPE_SEGMENT) {
--        return mmu_translate_segment(env, vaddr, asc, new_entry, raddr, =
-flags,
--                                     rw, exc);
--    }
--
--    /* Check region table offset and length */
--    offs =3D (vaddr >> (28 + 11 * (level - 4) / 4)) & 3;
--    if (offs < ((new_entry & REGION_ENTRY_TF) >> 6)
--        || offs > (new_entry & REGION_ENTRY_TL)) {
--        return pchks[level / 4 - 1];
--    }
--
--    if ((env->cregs[0] & CR0_EDAT) && (new_entry & REGION_ENTRY_P)) {
--        *flags &=3D ~PAGE_WRITE;
--    }
--
--    /* yet another region */
--    return mmu_translate_region(env, vaddr, asc, new_entry, level - 4,
--                                raddr, flags, rw, exc);
--}
--
- static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
-                               uint64_t asc, uint64_t asce, target_ulong =
-*raddr,
-                               int *flags, int rw, bool exc)
- {
-+    const bool edat1 =3D (env->cregs[0] & CR0_EDAT) &&
-+                       s390_has_feat(S390_FEAT_EDAT);
-     const int asce_tl =3D asce & ASCE_TABLE_LENGTH;
--    int level;
-+    const int asce_p =3D asce & ASCE_PRIVATE_SPACE;
-+    hwaddr gaddr =3D asce & ASCE_ORIGIN;
-+    uint64_t entry;
-=20
-     if (asce & ASCE_REAL_SPACE) {
-         /* direct mapping */
-@@ -219,12 +128,12 @@ static int mmu_translate_asce(CPUS390XState *env, t=
-arget_ulong vaddr,
-         return 0;
-     }
-=20
--    level =3D asce & ASCE_TYPE_MASK;
--    switch (level) {
-+    switch (asce & ASCE_TYPE_MASK) {
-     case ASCE_TYPE_REGION1:
-         if (VADDR_REGION1_TL(vaddr) > asce_tl) {
-             return PGM_REG_FIRST_TRANS;
-         }
-+        gaddr +=3D VADDR_REGION1_TX(vaddr) * 8;
-         break;
-     case ASCE_TYPE_REGION2:
-         if (VADDR_REGION1_TX(vaddr)) {
-@@ -233,6 +142,7 @@ static int mmu_translate_asce(CPUS390XState *env, tar=
-get_ulong vaddr,
-         if (VADDR_REGION2_TL(vaddr) > asce_tl) {
-             return PGM_REG_SEC_TRANS;
-         }
-+        gaddr +=3D VADDR_REGION2_TX(vaddr) * 8;
-         break;
-     case ASCE_TYPE_REGION3:
-         if (VADDR_REGION1_TX(vaddr) || VADDR_REGION2_TX(vaddr)) {
-@@ -241,6 +151,7 @@ static int mmu_translate_asce(CPUS390XState *env, tar=
-get_ulong vaddr,
-         if (VADDR_REGION3_TL(vaddr) > asce_tl) {
-             return PGM_REG_THIRD_TRANS;
-         }
-+        gaddr +=3D VADDR_REGION3_TX(vaddr) * 8;
-         break;
-     case ASCE_TYPE_SEGMENT:
-         if (VADDR_REGION1_TX(vaddr) || VADDR_REGION2_TX(vaddr) ||
-@@ -250,11 +161,112 @@ static int mmu_translate_asce(CPUS390XState *env, =
-target_ulong vaddr,
-         if (VADDR_SEGMENT_TL(vaddr) > asce_tl) {
-             return PGM_SEGMENT_TRANS;
-         }
-+        gaddr +=3D VADDR_SEGMENT_TX(vaddr) * 8;
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    switch (asce & ASCE_TYPE_MASK) {
-+    case ASCE_TYPE_REGION1:
-+        if (read_table_entry(gaddr, &entry)) {
-+            return PGM_ADDRESSING;
-+        }
-+        if (entry & REGION_ENTRY_I) {
-+            return PGM_REG_FIRST_TRANS;
-+        }
-+        if ((entry & REGION_ENTRY_TT) !=3D REGION_ENTRY_TT_REGION1) {
-+            return PGM_TRANS_SPEC;
-+        }
-+        if (VADDR_REGION2_TL(vaddr) < (entry & REGION_ENTRY_TF) >> 6 ||
-+            VADDR_REGION2_TL(vaddr) > (entry & REGION_ENTRY_TL)) {
-+            return PGM_REG_SEC_TRANS;
-+        }
-+        if (edat1 && (entry & REGION_ENTRY_P)) {
-+            *flags &=3D ~PAGE_WRITE;
-+        }
-+        gaddr =3D (entry & REGION_ENTRY_ORIGIN) + VADDR_REGION2_TX(vaddr=
-) * 8;
-+        /* fall through */
-+    case ASCE_TYPE_REGION2:
-+        if (read_table_entry(gaddr, &entry)) {
-+            return PGM_ADDRESSING;
-+        }
-+        if (entry & REGION_ENTRY_I) {
-+            return PGM_REG_SEC_TRANS;
-+        }
-+        if ((entry & REGION_ENTRY_TT) !=3D REGION_ENTRY_TT_REGION2) {
-+            return PGM_TRANS_SPEC;
-+        }
-+        if (VADDR_REGION3_TL(vaddr) < (entry & REGION_ENTRY_TF) >> 6 ||
-+            VADDR_REGION3_TL(vaddr) > (entry & REGION_ENTRY_TL)) {
-+            return PGM_REG_THIRD_TRANS;
-+        }
-+        if (edat1 && (entry & REGION_ENTRY_P)) {
-+            *flags &=3D ~PAGE_WRITE;
-+        }
-+        gaddr =3D (entry & REGION_ENTRY_ORIGIN) + VADDR_REGION3_TX(vaddr=
-) * 8;
-+        /* fall through */
-+    case ASCE_TYPE_REGION3:
-+        if (read_table_entry(gaddr, &entry)) {
-+            return PGM_ADDRESSING;
-+        }
-+        if (entry & REGION_ENTRY_I) {
-+            return PGM_REG_THIRD_TRANS;
-+        }
-+        if ((entry & REGION_ENTRY_TT) !=3D REGION_ENTRY_TT_REGION3) {
-+            return PGM_TRANS_SPEC;
-+        }
-+        if (edat1 && (entry & REGION_ENTRY_P)) {
-+            *flags &=3D ~PAGE_WRITE;
-+        }
-+        if (VADDR_SEGMENT_TL(vaddr) < (entry & REGION_ENTRY_TF) >> 6 ||
-+            VADDR_SEGMENT_TL(vaddr) > (entry & REGION_ENTRY_TL)) {
-+            return PGM_SEGMENT_TRANS;
-+        }
-+        gaddr =3D (entry & REGION_ENTRY_ORIGIN) + VADDR_SEGMENT_TX(vaddr=
-) * 8;
-+        /* fall through */
-+    case ASCE_TYPE_SEGMENT:
-+        if (read_table_entry(gaddr, &entry)) {
-+            return PGM_ADDRESSING;
-+        }
-+        if (entry & SEGMENT_ENTRY_I) {
-+            return PGM_SEGMENT_TRANS;
-+        }
-+        if ((entry & SEGMENT_ENTRY_TT) !=3D SEGMENT_ENTRY_TT_SEGMENT) {
-+            return PGM_TRANS_SPEC;
-+        }
-+        if ((entry & SEGMENT_ENTRY_CS) && asce_p) {
-+            return PGM_TRANS_SPEC;
-+        }
-+        if (entry & SEGMENT_ENTRY_P) {
-+            *flags &=3D ~PAGE_WRITE;
-+        }
-+        if (edat1 && (entry & SEGMENT_ENTRY_FC)) {
-+            *raddr =3D (entry & SEGMENT_ENTRY_SFAA) |
-+                     (vaddr & ~SEGMENT_ENTRY_SFAA);
-+            return 0;
-+        }
-+        gaddr =3D (entry & SEGMENT_ENTRY_ORIGIN) + VADDR_PAGE_TX(vaddr) =
-* 8;
-         break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    if (read_table_entry(gaddr, &entry)) {
-+        return PGM_ADDRESSING;
-+    }
-+    if (entry & PAGE_ENTRY_I) {
-+        return PGM_PAGE_TRANS;
-+    }
-+    if (entry & PAGE_ENTRY_0) {
-+        return PGM_TRANS_SPEC;
-+    }
-+    if (entry & PAGE_ENTRY_P) {
-+        *flags &=3D ~PAGE_WRITE;
-     }
-=20
--    return mmu_translate_region(env, vaddr, asc, asce, level, raddr, fla=
-gs, rw,
--                                exc);
-+    *raddr =3D entry & TARGET_PAGE_MASK;
-+    return 0;
- }
-=20
- static void mmu_handle_skey(target_ulong addr, int rw, int *flags)
+As this has not been merged yet, I'll post a v2 series adding one more
+patch fixing a Coverity error, since Vladimir pointed out I missed that.
+
+> ----------------------------------------------------------------
+> Eric Blake (3):
+>       nbd/client: Add hint when TLS is missing
+>       nbd: Grab aio context lock in more places
+>       tests: Use iothreads during iotest 223
+>=20
+> Sergio Lopez (1):
+>       nbd/server: attach client channel to the export's AioContext
+>=20
+>  include/block/nbd.h        |  1 +
+>  blockdev-nbd.c             | 14 ++++++++++++--
+>  nbd/client.c               |  1 +
+>  nbd/server.c               | 27 +++++++++++++++++++++++----
+>  tests/qemu-iotests/223     |  6 ++++--
+>  tests/qemu-iotests/223.out |  1 +
+>  tests/qemu-iotests/233.out |  2 ++
+>  7 files changed, 44 insertions(+), 8 deletions(-)
+>=20
+
 --=20
-2.21.0
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
+
+--CkXYlAL50AbvdkNoketB7iv3GEMADFKy9--
+
+--xPGv0EFCKpEXkOO460gGt80wOda18rPdj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl2LaREACgkQp6FrSiUn
+Q2o/Ogf/WmLBVgIWk0x06P0h7jbiY8aEsF52kRfoWC068nVnkY4goyQJpFeJaN7i
+Ybd8v64eUwQ47BokvNaexnpcqTqPHrR/md4ADwp2KbX5KKE/4Sn4XGnnmH7hPyX0
+sLaXKwDGcZGqaWpY1ylLJFEVVHlCp+WO6C3cSWNWnplNTLtEqvmII6nSyvsx4uBj
+/L0nQc7GZD8DZlHj8uxKQSNeYsX7riNJ3+qV/W4EnO3iFj+PVIxx/eIEz2AHVo3G
+xnUuyUEcdhIvwrIpO9V3oo3XecENiB+yL7mwcCvjIfMHosE8bs5P4gZNHZSlDlUl
+IrScjA+QtX7zocRmgryIQIhcYrFrKQ==
+=3brC
+-----END PGP SIGNATURE-----
+
+--xPGv0EFCKpEXkOO460gGt80wOda18rPdj--
 
