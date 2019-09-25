@@ -2,66 +2,63 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFADDC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 07:07:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90878C432C1
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 07:08:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B351421D7C
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 07:07:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B351421D7C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1660221D7C
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 07:08:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="YWwkeYfu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1660221D7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46191 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD1OZ-0001sG-LK
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 03:07:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40799)
+	id 1iD1PR-0002qm-9E
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 03:08:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38805)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iD1GZ-0004A4-Vo
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 02:59:13 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iD13p-0008MV-4x
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 02:46:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iD1GY-0002M1-QC
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 02:59:11 -0400
-Received: from 14.mo6.mail-out.ovh.net ([46.105.56.113]:48074)
+ (envelope-from <dgibson@ozlabs.org>) id 1iD13n-0003aN-3G
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 02:46:00 -0400
+Received: from ozlabs.org ([203.11.71.1]:58927)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iD1GY-0002LD-KG
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 02:59:10 -0400
-Received: from player779.ha.ovh.net (unknown [10.109.159.132])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id AB2AD1E1153
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 08:59:08 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player779.ha.ovh.net (Postfix) with ESMTPSA id D8EA8A1778E8;
- Wed, 25 Sep 2019 06:58:57 +0000 (UTC)
-Subject: Re: [PATCH 08/20] spapr: Replace spapr_vio_qirq() helper with
- spapr_vio_irq_pulse() helper
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iD13l-0003Vt-8G; Wed, 25 Sep 2019 02:45:58 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46dT8q3pKmz9sR5; Wed, 25 Sep 2019 16:45:46 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1569393947;
+ bh=qzWCECiW3SZYCp/MyCzF23lwrQKJGr9u6PHBmtIcAtg=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=YWwkeYfuOBJBlo0zBanX8iiPKp0U2ptGs7IshxsWWGEUkcvPvXUIIBqWTdrjlXJyL
+ uiJs1LVQo8xiOqog6tOJglCEduPQ5fG+4s91GHN3T6piXDewdyM5GTBXe/aKVBisoV
+ kx/YTAKDPQ8bAb5Bh4uWvxg0NTiwBzazVwdDDcEk=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: qemu-ppc@nongnu.org,
+	clg@kaod.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH 15/20] spapr: Handle freeing of multiple irqs in frontend only
+Date: Wed, 25 Sep 2019 16:45:29 +1000
+Message-Id: <20190925064534.19155-16-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190925064534.19155-1-david@gibson.dropbear.id.au>
 References: <20190925064534.19155-1-david@gibson.dropbear.id.au>
- <20190925064534.19155-9-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <fb4b950e-b0c3-3910-4964-836fb1f88301@kaod.org>
-Date: Wed, 25 Sep 2019 08:58:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190925064534.19155-9-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 1169810006418099160
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfedugdduudeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.56.113
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,122 +72,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
  groug@kaod.org, Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25/09/2019 08:45, David Gibson wrote:
-> Every caller of spapr_vio_qirq() immediately calls qemu_irq_pulse() wit=
-h
-> the result, so we might as well just fold that into the helper.
->=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+spapr_irq_free() can be used to free multiple irqs at once. That's useful
+for its callers, but there's no need to make the individual backend hooks
+handle this.  We can loop across the irqs in spapr_irq_free() itself and
+have the hooks just do one at time.
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr_irq.c         | 27 ++++++++++++---------------
+ include/hw/ppc/spapr_irq.h |  2 +-
+ 2 files changed, 13 insertions(+), 16 deletions(-)
 
-> ---
->  hw/char/spapr_vty.c        | 3 +--
->  hw/net/spapr_llan.c        | 3 +--
->  hw/ppc/spapr_vio.c         | 3 +--
->  include/hw/ppc/spapr_vio.h | 5 +++--
->  4 files changed, 6 insertions(+), 8 deletions(-)
->=20
-> diff --git a/hw/char/spapr_vty.c b/hw/char/spapr_vty.c
-> index 087c93e4fa..8f4d9fe472 100644
-> --- a/hw/char/spapr_vty.c
-> +++ b/hw/char/spapr_vty.c
-> @@ -5,7 +5,6 @@
->  #include "cpu.h"
->  #include "migration/vmstate.h"
->  #include "chardev/char-fe.h"
-> -#include "hw/irq.h"
->  #include "hw/ppc/spapr.h"
->  #include "hw/ppc/spapr_vio.h"
->  #include "hw/qdev-properties.h"
-> @@ -37,7 +36,7 @@ static void vty_receive(void *opaque, const uint8_t *=
-buf, int size)
-> =20
->      if ((dev->in =3D=3D dev->out) && size) {
->          /* toggle line to simulate edge interrupt */
-> -        qemu_irq_pulse(spapr_vio_qirq(&dev->sdev));
-> +        spapr_vio_irq_pulse(&dev->sdev);
->      }
->      for (i =3D 0; i < size; i++) {
->          if (dev->in - dev->out >=3D VTERM_BUFSIZE) {
-> diff --git a/hw/net/spapr_llan.c b/hw/net/spapr_llan.c
-> index 701e6e1514..3d96884d66 100644
-> --- a/hw/net/spapr_llan.c
-> +++ b/hw/net/spapr_llan.c
-> @@ -27,7 +27,6 @@
-> =20
->  #include "qemu/osdep.h"
->  #include "cpu.h"
-> -#include "hw/irq.h"
->  #include "qemu/log.h"
->  #include "qemu/module.h"
->  #include "net/net.h"
-> @@ -267,7 +266,7 @@ static ssize_t spapr_vlan_receive(NetClientState *n=
-c, const uint8_t *buf,
->      }
-> =20
->      if (sdev->signal_state & 1) {
-> -        qemu_irq_pulse(spapr_vio_qirq(sdev));
-> +        spapr_vio_irq_pulse(sdev);
->      }
-> =20
->      return size;
-> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-> index 0803649658..554de9930d 100644
-> --- a/hw/ppc/spapr_vio.c
-> +++ b/hw/ppc/spapr_vio.c
-> @@ -23,7 +23,6 @@
->  #include "qemu/error-report.h"
->  #include "qapi/error.h"
->  #include "qapi/visitor.h"
-> -#include "hw/irq.h"
->  #include "qemu/log.h"
->  #include "hw/loader.h"
->  #include "elf.h"
-> @@ -294,7 +293,7 @@ int spapr_vio_send_crq(SpaprVioDevice *dev, uint8_t=
- *crq)
->      dev->crq.qnext =3D (dev->crq.qnext + 16) % dev->crq.qsize;
-> =20
->      if (dev->signal_state & 1) {
-> -        qemu_irq_pulse(spapr_vio_qirq(dev));
-> +        spapr_vio_irq_pulse(dev);
->      }
-> =20
->      return 0;
-> diff --git a/include/hw/ppc/spapr_vio.h b/include/hw/ppc/spapr_vio.h
-> index 875be28cdd..72762ed16b 100644
-> --- a/include/hw/ppc/spapr_vio.h
-> +++ b/include/hw/ppc/spapr_vio.h
-> @@ -24,6 +24,7 @@
-> =20
->  #include "hw/ppc/spapr.h"
->  #include "sysemu/dma.h"
-> +#include "hw/irq.h"
-> =20
->  #define TYPE_VIO_SPAPR_DEVICE "vio-spapr-device"
->  #define VIO_SPAPR_DEVICE(obj) \
-> @@ -84,11 +85,11 @@ extern SpaprVioDevice *spapr_vio_find_by_reg(SpaprV=
-ioBus *bus, uint32_t reg);
->  void spapr_dt_vdevice(SpaprVioBus *bus, void *fdt);
->  extern gchar *spapr_vio_stdout_path(SpaprVioBus *bus);
-> =20
-> -static inline qemu_irq spapr_vio_qirq(SpaprVioDevice *dev)
-> +static inline void spapr_vio_irq_pulse(SpaprVioDevice *dev)
->  {
->      SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-> =20
-> -    return spapr_qirq(spapr, dev->irq);
-> +    qemu_irq_pulse(spapr_qirq(spapr, dev->irq));
->  }
-> =20
->  static inline bool spapr_vio_dma_valid(SpaprVioDevice *dev, uint64_t t=
-addr,
->=20
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index db6755f3ab..c40357a985 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -133,16 +133,13 @@ static int spapr_irq_claim_xics(SpaprMachineState *=
+spapr, int irq, bool lsi,
+     return 0;
+ }
+=20
+-static void spapr_irq_free_xics(SpaprMachineState *spapr, int irq, int n=
+um)
++static void spapr_irq_free_xics(SpaprMachineState *spapr, int irq)
+ {
+     ICSState *ics =3D spapr->ics;
+     uint32_t srcno =3D irq - ics->offset;
+-    int i;
+=20
+     if (ics_valid_irq(ics, irq)) {
+-        for (i =3D srcno; i < srcno + num; ++i) {
+-            memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
+-        }
++        memset(&ics->irqs[srcno], 0, sizeof(ICSIRQState));
+     }
+ }
+=20
+@@ -269,13 +266,9 @@ static int spapr_irq_claim_xive(SpaprMachineState *s=
+papr, int irq, bool lsi,
+     return 0;
+ }
+=20
+-static void spapr_irq_free_xive(SpaprMachineState *spapr, int irq, int n=
+um)
++static void spapr_irq_free_xive(SpaprMachineState *spapr, int irq)
+ {
+-    int i;
+-
+-    for (i =3D irq; i < irq + num; ++i) {
+-        spapr_xive_irq_free(spapr->xive, i);
+-    }
++    spapr_xive_irq_free(spapr->xive, irq);
+ }
+=20
+ static void spapr_irq_print_info_xive(SpaprMachineState *spapr,
+@@ -438,10 +431,10 @@ static int spapr_irq_claim_dual(SpaprMachineState *=
+spapr, int irq, bool lsi,
+     return ret;
+ }
+=20
+-static void spapr_irq_free_dual(SpaprMachineState *spapr, int irq, int n=
+um)
++static void spapr_irq_free_dual(SpaprMachineState *spapr, int irq)
+ {
+-    spapr_irq_xics.free(spapr, irq, num);
+-    spapr_irq_xive.free(spapr, irq, num);
++    spapr_irq_xics.free(spapr, irq);
++    spapr_irq_xive.free(spapr, irq);
+ }
+=20
+ static void spapr_irq_print_info_dual(SpaprMachineState *spapr, Monitor =
+*mon)
+@@ -640,7 +633,11 @@ int spapr_irq_claim(SpaprMachineState *spapr, int ir=
+q, bool lsi, Error **errp)
+=20
+ void spapr_irq_free(SpaprMachineState *spapr, int irq, int num)
+ {
+-    spapr->irq->free(spapr, irq, num);
++    int i;
++
++    for (i =3D irq; i < (irq + num); i++) {
++        spapr->irq->free(spapr, irq);
++    }
+ }
+=20
+ qemu_irq spapr_qirq(SpaprMachineState *spapr, int irq)
+diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+index 9b60378e28..ed88b4599a 100644
+--- a/include/hw/ppc/spapr_irq.h
++++ b/include/hw/ppc/spapr_irq.h
+@@ -43,7 +43,7 @@ typedef struct SpaprIrq {
+=20
+     void (*init)(SpaprMachineState *spapr, Error **errp);
+     int (*claim)(SpaprMachineState *spapr, int irq, bool lsi, Error **er=
+rp);
+-    void (*free)(SpaprMachineState *spapr, int irq, int num);
++    void (*free)(SpaprMachineState *spapr, int irq);
+     void (*print_info)(SpaprMachineState *spapr, Monitor *mon);
+     void (*dt_populate)(SpaprMachineState *spapr, uint32_t nr_servers,
+                         void *fdt, uint32_t phandle);
+--=20
+2.21.0
 
 
