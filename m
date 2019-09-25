@@ -2,67 +2,83 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 165AEC432C1
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 08:05:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EE24C432C1
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 08:11:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCAB220640
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 08:05:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCAB220640
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 33D8C2082F
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 08:11:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33D8C2082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD2JB-0004Lt-Na
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 04:05:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50323)
+	id 1iD2OS-0006rr-Bq
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 04:11:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51465)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iD2HW-0003NB-Mp
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:04:16 -0400
+ (envelope-from <slp@redhat.com>) id 1iD2Nj-0006Mp-CJ
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:10:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iD2HV-0001Pt-1H
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:04:14 -0400
-Resent-Date: Wed, 25 Sep 2019 04:04:14 -0400
-Resent-Message-Id: <E1iD2HV-0001Pt-1H@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21441)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iD2HU-0001PM-OP
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:04:12 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1569398625; cv=none; d=zoho.com; s=zohoarc; 
- b=nKykV1zZG56lA5r8KPIZH6QxX8lCtFmfQVVmPV1sFwULAtbTs06XzhaEHYDbO3V8I2G/pe13rIOoLnPfRYAKsMK/bpN7TWeKwPsMZz3WIc9b199sM8vNDWTXXEAfXiMSHWw3VU35TGZIfwJ+DKycrSkqBRdmIYJHTYNmtCS2SlA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1569398625;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=vKlgi/zFcaK9hy//vZ74VKwxQfCfoTuzNA6/qXTj9x8=; 
- b=ViXcRCLLW5yrUC9cmJA8dng6axeg5yHO/UsIBo/JkfkJmFEVo9vhqfLfCI3OvVEpA3nhZzEFdty14PqVzj85WmCAZ1dN/sylWyS5hsc3+P/VuIoRW/elzvqbFgghLWImME1ZdziFFDh7PyozE0dk+1DoPfMzLPjsS7EhnoJabUA=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1569398623230228.5422738312485;
- Wed, 25 Sep 2019 01:03:43 -0700 (PDT)
-Subject: Re: [PATCH 0/3] Acceptance tests: make better use of machine tags
-In-Reply-To: <20190924194501.9303-1-crosa@redhat.com>
-Message-ID: <156939862178.4188.8041394753771061389@8230166b0665>
+ (envelope-from <slp@redhat.com>) id 1iD2Ni-0004dW-Dn
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:10:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53722)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iD2Ni-0004d2-5L
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:10:38 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 15D2B81DE0
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 08:10:37 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id f63so1526529wma.7
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 01:10:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=sSedf1PSQ4+XVQg27whbHXC5BsZOA0msBaOP6O2nXYA=;
+ b=HqSgjF3cA3feO4L7OrmEXNCa/m8bYTBR+0s5Pg3cbHAMVULOKh5l1WJO22u9reA7/L
+ T8PuHv8eUlFk+iYGCQRg+OXAyqPPDYCpcLTvz6eX4NcrXSbDu47TYZa32QNpoJlRZRBq
+ kGT158+TerRv8uBLvKqDrAQHxjve0mTjawxGLS0x8SDC7HlLpLlrku3Z+lsIGWeMB9lO
+ jGnWNMdkdPSB4im0Og30ddUSm7ev+3VblnZUkO5IVb56JRaUAEOwOu3IihYM4ipUXsCa
+ BAtnn6nzz2pTbr9Hu+ACkb3qgKiSWTt/JvDhAD4QfTTvhOs5h19w12cKa7aQ9VtKEYpS
+ JkpA==
+X-Gm-Message-State: APjAAAVpJ9UEC6cHFLVvoazQoEUfHVF7Q+j/PaXX+CGCxHI6dLgCZ0D1
+ Rbwe7cI+RsrkWYh6HsBKRsMwq3Tm76VGXemXjEYiZNZSgSqf+zQI2qx6CASUSCWQV0wTJW0QfmT
+ +4yHzoYaM18ft3BY=
+X-Received: by 2002:a5d:4044:: with SMTP id w4mr8299103wrp.281.1569399035707; 
+ Wed, 25 Sep 2019 01:10:35 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyRVq+g1VfZMi0d6Wj/uqNnTxYdPTROhRi471HFmLSLWvA0bKAZQLSNyzFlC9+e4gKyKQ97bg==
+X-Received: by 2002:a5d:4044:: with SMTP id w4mr8299057wrp.281.1569399035412; 
+ Wed, 25 Sep 2019 01:10:35 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id d10sm2181806wma.42.2019.09.25.01.10.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 25 Sep 2019 01:10:34 -0700 (PDT)
+References: <20190924124433.96810-1-slp@redhat.com>
+ <c689e275-1a05-7d08-756b-0be914ed24ca@redhat.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v4 0/8] Introduce the microvm machine type
+In-reply-to: <c689e275-1a05-7d08-756b-0be914ed24ca@redhat.com>
+Date: Wed, 25 Sep 2019 10:10:32 +0200
+Message-ID: <87h850ssnb.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: crosa@redhat.com
-Date: Wed, 25 Sep 2019 01:03:43 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.54
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,83 +90,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, arikalo@wavecomp.com, qemu-devel@nongnu.org,
- wainersm@redhat.com, wrampazz@redhat.com, crosa@redhat.com, philmd@redhat.com,
- aurelien@aurel32.net
+Cc: Pankaj Gupta <pagupta@redhat.com>, ehabkost@redhat.com, kvm@vger.kernel.org,
+ mst@redhat.com, lersek@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
+ kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com, philmd@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkyNDE5NDUwMS45MzAz
-LTEtY3Jvc2FAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwOTI0MTk0NTAxLjkzMDMtMS1j
-cm9zYUByZWRoYXQuY29tClN1YmplY3Q6IFtQQVRDSCAwLzNdIEFjY2VwdGFuY2UgdGVzdHM6IG1h
-a2UgYmV0dGVyIHVzZSBvZiBtYWNoaW5lIHRhZ3MKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
-IyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFt
-Ci4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQ
-VCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmJhMGJhY2YgQWNjZXB0
-YW5jZSBUZXN0czogdXNlIGF2b2NhZG8gdGFncyBmb3IgbWFjaGluZSB0eXBlCjY4ZmY4YTkgQWNj
-ZXB0YW5jZSB0ZXN0czogaW50cm9kdWNlIHV0aWxpdHkgbWV0aG9kIGZvciB0YWdzIHVuaXF1ZSB2
-YWxzCmVhMGY2MmIgQWNjZXB0YW5jZSB0ZXN0IHg4Nl9jcHVfbW9kZWxfdmVyc2lvbnM6IHVzZSBk
-ZWZhdWx0IHZtCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzMgQ2hlY2tpbmcgY29tbWl0IGVhMGY2
-MmIxMzc3OSAoQWNjZXB0YW5jZSB0ZXN0IHg4Nl9jcHVfbW9kZWxfdmVyc2lvbnM6IHVzZSBkZWZh
-dWx0IHZtKQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzQ3OiBGSUxFOiB0ZXN0cy9h
-Y2NlcHRhbmNlL3g4Nl9jcHVfbW9kZWxfdmVyc2lvbnMucHk6MjQ4OgorICAgICAgICBzZWxmLnZt
-LmFkZF9hcmdzKCctY3B1JywgJ0Nhc2NhZGVsYWtlLVNlcnZlcix4LWZvcmNlLWZlYXR1cmVzPW9u
-LGNoZWNrPW9mZixlbmZvcmNlPW9mZicpCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMK
-IzYxOiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3g4Nl9jcHVfbW9kZWxfdmVyc2lvbnMucHk6MjU2
-OgorICAgICAgICBzZWxmLnZtLmFkZF9hcmdzKCctY3B1JywgJ0Nhc2NhZGVsYWtlLVNlcnZlcix4
-LWZvcmNlLWZlYXR1cmVzPW9uLGNoZWNrPW9mZixlbmZvcmNlPW9mZicpCgpFUlJPUjogbGluZSBv
-dmVyIDkwIGNoYXJhY3RlcnMKIzc2OiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3g4Nl9jcHVfbW9k
-ZWxfdmVyc2lvbnMucHk6MjY1OgorICAgICAgICBzZWxmLnZtLmFkZF9hcmdzKCctY3B1JywgJ0Nh
-c2NhZGVsYWtlLVNlcnZlcix4LWZvcmNlLWZlYXR1cmVzPW9uLGNoZWNrPW9mZixlbmZvcmNlPW9m
-ZiwrYXJjaC1jYXBhYmlsaXRpZXMnKQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM5
-MDogRklMRTogdGVzdHMvYWNjZXB0YW5jZS94ODZfY3B1X21vZGVsX3ZlcnNpb25zLnB5OjI3MzoK
-KyAgICAgICAgc2VsZi52bS5hZGRfYXJncygnLWNwdScsICdDYXNjYWRlbGFrZS1TZXJ2ZXIseC1m
-b3JjZS1mZWF0dXJlcz1vbixjaGVjaz1vZmYsZW5mb3JjZT1vZmYsLWFyY2gtY2FwYWJpbGl0aWVz
-JykKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTA1OiBGSUxFOiB0ZXN0cy9hY2Nl
-cHRhbmNlL3g4Nl9jcHVfbW9kZWxfdmVyc2lvbnMucHk6MjgyOgorICAgICAgICBzZWxmLnZtLmFk
-ZF9hcmdzKCctY3B1JywgJ0Nhc2NhZGVsYWtlLVNlcnZlci12MSx4LWZvcmNlLWZlYXR1cmVzPW9u
-LGNoZWNrPW9mZixlbmZvcmNlPW9mZicpCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMK
-IzEyMDogRklMRTogdGVzdHMvYWNjZXB0YW5jZS94ODZfY3B1X21vZGVsX3ZlcnNpb25zLnB5OjI5
-MDoKKyAgICAgICAgc2VsZi52bS5hZGRfYXJncygnLWNwdScsICdDYXNjYWRlbGFrZS1TZXJ2ZXIt
-djIseC1mb3JjZS1mZWF0dXJlcz1vbixjaGVjaz1vZmYsZW5mb3JjZT1vZmYnKQoKRVJST1I6IGxp
-bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMjM6IEZJTEU6IHRlc3RzL2FjY2VwdGFuY2UveDg2X2Nw
-dV9tb2RlbF92ZXJzaW9ucy5weToyOTM6CisgICAgICAgICAgICAgICAgICAgICAgICAncGMtaTQ0
-MGZ4LTQuMCArIENhc2NhZGVsYWtlLVNlcnZlci12MiBzaG91bGQgaGF2ZSBhcmNoLWNhcGFiaWxp
-dGllcycpCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEzNjogRklMRTogdGVzdHMv
-YWNjZXB0YW5jZS94ODZfY3B1X21vZGVsX3ZlcnNpb25zLnB5OjI5OToKKyAgICAgICAgc2VsZi52
-bS5hZGRfYXJncygnLWNwdScsICdDYXNjYWRlbGFrZS1TZXJ2ZXItdjEseC1mb3JjZS1mZWF0dXJl
-cz1vbixjaGVjaz1vZmYsZW5mb3JjZT1vZmYsK2FyY2gtY2FwYWJpbGl0aWVzJykKCkVSUk9SOiBs
-aW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTM5OiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3g4Nl9j
-cHVfbW9kZWxfdmVyc2lvbnMucHk6MzAyOgorICAgICAgICAgICAgICAgICAgICAgICAgJ3BjLWk0
-NDBmeC00LjAgKyBDYXNjYWRlbGFrZS1TZXJ2ZXItdjEsK2FyY2gtY2FwYWJpbGl0aWVzIHNob3Vs
-ZCBoYXZlIGFyY2gtY2FwYWJpbGl0aWVzJykKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVy
-cwojMTUwOiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3g4Nl9jcHVfbW9kZWxfdmVyc2lvbnMucHk6
-MzA3OgorICAgICAgICBzZWxmLnZtLmFkZF9hcmdzKCctY3B1JywgJ0Nhc2NhZGVsYWtlLVNlcnZl
-ci12Mix4LWZvcmNlLWZlYXR1cmVzPW9uLGNoZWNrPW9mZixlbmZvcmNlPW9mZiwtYXJjaC1jYXBh
-YmlsaXRpZXMnKQoKdG90YWw6IDEwIGVycm9ycywgMCB3YXJuaW5ncywgMTM0IGxpbmVzIGNoZWNr
-ZWQKClBhdGNoIDEvMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMi8zIENoZWNraW5nIGNv
-bW1pdCA2OGZmOGE5M2Y5Y2QgKEFjY2VwdGFuY2UgdGVzdHM6IGludHJvZHVjZSB1dGlsaXR5IG1l
-dGhvZCBmb3IgdGFncyB1bmlxdWUgdmFscykKMy8zIENoZWNraW5nIGNvbW1pdCBiYTBiYWNmM2Ew
-ZDcgKEFjY2VwdGFuY2UgVGVzdHM6IHVzZSBhdm9jYWRvIHRhZ3MgZm9yIG1hY2hpbmUgdHlwZSkK
-V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzYyOiBGSUxFOiB0ZXN0cy9hY2NlcHRh
-bmNlL2F2b2NhZG9fcWVtdS9fX2luaXRfXy5weTo3MzoKKyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIGRlZmF1bHQ9c2VsZi5fZ2V0X3VuaXF1ZV90YWdfdmFsKCdtYWNoaW5l
-JykpCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDM4NiBsaW5lcyBjaGVja2VkCgpQYXRj
-aCAzLzMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
-IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUg
-YXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA5MjQxOTQ1MDEuOTMwMy0xLWNyb3NhQHJl
-ZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5l
-cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
+
+David Hildenbrand <david@redhat.com> writes:
+
+> On 24.09.19 14:44, Sergio Lopez wrote:
+>> Microvm is a machine type inspired by both NEMU and Firecracker, and
+>> constructed after the machine model implemented by the latter.
+>>=20
+>> It's main purpose is providing users a minimalist machine type free
+>> from the burden of legacy compatibility, serving as a stepping stone
+>> for future projects aiming at improving boot times, reducing the
+>> attack surface and slimming down QEMU's footprint.
+>>=20
+>> The microvm machine type supports the following devices:
+>>=20
+>>  - ISA bus
+>>  - i8259 PIC
+>>  - LAPIC (implicit if using KVM)
+>>  - IOAPIC (defaults to kernel_irqchip_split =3D true)
+>>  - i8254 PIT
+>>  - MC146818 RTC (optional)
+>>  - kvmclock (if using KVM)
+>>  - fw_cfg
+>>  - One ISA serial port (optional)
+>>  - Up to eight virtio-mmio devices (configured by the user)
+>
+> So I assume also no ACPI (CPU/memory hotplug), correct?
+
+Correct.
+
+> @Pankaj, I think it would make sense to make virtio-pmem play with
+> virtio-mmio/microvm.
+
+That would be great. I'm also looking forward for virtio-mem (and an
+hypothetical virtio-cpu) to eventually gain hotplug capabilities in
+microvm.
+
+Thanks,
+Sergio.
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2LIPgACgkQ9GknjS8M
+AjWl+A/+PSvLIkJIXkisI+8HPInHsOhI7krvdkj88nvO3vWQbDvRZR4wjKpzJls+
+QuB7L+5sZh4afO4t0zOOZ54AcN91lSMUL3ovOFbN2zsS3yWO3H1BIgroEdD3Ho2g
+wePVPnB65l10c2X6zqvLZlE06amQ1rG2ooYHJmF6AHl7L6ouHjTqioFoe3itzfqc
+5t3xdJx43IpXY5Zng6S8mNGji7q1PX/tKqYdoOSqafMxN9s9HqX6t9F6/kbUkH9j
+Q+xKcSg5wSHAV000jokgfgJe21Z3/O329Zckb+Vdp8RqZZaR5p1tYThevyshqvLK
+K2QKsT8hxflVPtyXe326UGaRQd/n+Uq9d9BFj4M+imvMsYu6EkV9hXDOq5U9PRtN
+uwiCQj3OlHjzvad18+ZbnPnjfkPDFnYTzgdiQ8o99+a8AK1SbdVi8ePMmFy8tvBF
+szKMv7fzfOGYNJnmd0At1nWMon+0qQKW7v/Ee4qMN+Xg5900ycDhsyf1fMdCj/52
+DkQaFc5Bo94CjhDjQetZd/EHJKfqd4NKACCUNs7Hkubrlj7p+xkI+Oj8jtI96cWK
+ytI43gzylvznVvlH16E0BTiEhAduBY5PGkGBOqpAkjk2wLUmGK7BsFAzpjtMDxdH
+XSR81ecBqDHJXAA0JekepxcEK+S3ho6j2NJpJ2jvuXsKCl8UGiI=
+=DOyt
+-----END PGP SIGNATURE-----
+--=-=-=--
 
