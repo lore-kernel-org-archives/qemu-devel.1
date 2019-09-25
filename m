@@ -2,109 +2,115 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06B65C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 14:05:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A85FC432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 14:10:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF45D21D7C
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 14:05:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF45D21D7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CD18C21D7C
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 14:10:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=wavecomp.com header.i=@wavecomp.com header.b="eH4DYd4t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD18C21D7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD7vP-0003PN-VR
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 10:05:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47089)
+	id 1iD80J-0004m5-Vv
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 10:10:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47914)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iD7uc-0002rf-73
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:04:59 -0400
+ (envelope-from <arikalo@wavecomp.com>) id 1iD7zM-0004C2-OJ
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:09:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iD7ua-00018l-FN
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:04:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41006)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iD7LK-0002Yn-Hq; Wed, 25 Sep 2019 09:28:30 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 56094309BF06;
- Wed, 25 Sep 2019 13:28:29 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-109.ams2.redhat.com [10.36.116.109])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 04A5E60BF1;
- Wed, 25 Sep 2019 13:28:24 +0000 (UTC)
-Subject: Re: [PATCH v2 1/7] s390x/mmu: Drop debug logging from MMU code
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190925125236.4043-1-david@redhat.com>
- <20190925125236.4043-2-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <a04e04cb-db9d-f488-074f-a0a9cdfc132e@redhat.com>
-Date: Wed, 25 Sep 2019 15:28:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20190925125236.4043-2-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <arikalo@wavecomp.com>) id 1iD7zK-0003ou-Rc
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:09:52 -0400
+Received: from mail-eopbgr730106.outbound.protection.outlook.com
+ ([40.107.73.106]:12652 helo=NAM05-DM3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <arikalo@wavecomp.com>)
+ id 1iD7zK-0003nG-GZ
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:09:50 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bkClUlMQLhmq9Am/mQzFEFTA7HphwAs7zBWd5P5MX/BvjWMWPcqPrDKWSLT6XPez5e7y3ONcMr2YhxR+FiOprXkr6s0Rn2Zf2VAqYlV5IwgvyKFi1ipIruiInxTXQP2P5k4f9kS4AFTXxWyuBkUHFs8QHFlSixGXtujrMbNBLu3datv9J9u8Qc9RsWRwNmEzL+Y3kLdd7PIGeE4A7aZU0bOcrGt+uctiDTanmkE58RgSf3HO/ZPVBNjJ4wlMciqjxrfkcrSa4oBpA0sN+mtbX1wWQybYxli5PBz5vUaA4mVXcli9GBp4iuL3VJZnnB+cbZkgbF49lO3P1lDNNaZodA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ChcZMZpmH+UZiSbBjzgYRJ+HvLZ3w4+emycKdVUEYC4=;
+ b=bNAosAZf+afAsHA4yKCCPFrP8EtZyMQxw9nVhVNggOu6DUSV1onfM/YUj3BbdgrX4xPaUrvHbO/ZfFF7sK80n96oKV2oxdgqhgSr1RNQkkD6Dipm8hlzFc3E7bv1ADiXrJ8+008zCtWYOZp2fCVPnUoXgP8KPNavuK0a/6rS0gwLjF9buoM4n622cTskEVlAiV3S4RthHd8vFu0OShcUG57+RfR1BPEscqlLUPXUHiYZ+DZ5PFlSnH+zgW9uLY18iSUxh/2me8zyBCoQ1ysGHbx/TKq7Gu57Xr1M0VCtK8u7//TIWNOezSEzZmd3O/IVMlYZRWgjAwmvjHqKDZiCig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wavecomp.com; dmarc=pass action=none header.from=wavecomp.com;
+ dkim=pass header.d=wavecomp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wavecomp.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ChcZMZpmH+UZiSbBjzgYRJ+HvLZ3w4+emycKdVUEYC4=;
+ b=eH4DYd4tt8mIGqbad6LfLlLtfi4JE2acisDilcshX3Mu5nhjhFW0kU7mOWNOjl6nVL0CkQYPxf3cENBP1r9bUOIJMXHRbEcvUCTLAU3RB3Kc5V5Fi0DBqqL4kIB7sbhfOLMi1SMl87rH6VKAiANVU3VfCl97x/H+e/YEq4Ycxpc=
+Received: from MWHPR22MB1664.namprd22.prod.outlook.com (10.164.206.142) by
+ MWHPR22MB0126.namprd22.prod.outlook.com (10.168.249.10) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2284.21; Wed, 25 Sep 2019 14:09:46 +0000
+Received: from MWHPR22MB1664.namprd22.prod.outlook.com
+ ([fe80::715e:bc1f:6393:9b00]) by MWHPR22MB1664.namprd22.prod.outlook.com
+ ([fe80::715e:bc1f:6393:9b00%3]) with mapi id 15.20.2284.023; Wed, 25 Sep 2019
+ 14:09:46 +0000
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: Re: [EXTERNAL][PATCH v2 00/20] target/mips: Misc cleanups for
+ September/October 2019
+Thread-Topic: [EXTERNAL][PATCH v2 00/20] target/mips: Misc cleanups for
+ September/October 2019
+Thread-Index: AQHVc58+lebhCXHmDUiXkZWwejizLqc8bVEZ
+Date: Wed, 25 Sep 2019 14:09:46 +0000
+Message-ID: <MWHPR22MB16644605D91274DCB0F306B5D2870@MWHPR22MB1664.namprd22.prod.outlook.com>
+References: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Wed, 25 Sep 2019 13:28:29 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=arikalo@wavecomp.com; 
+x-originating-ip: [82.117.201.26]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ce4f7e77-159c-4bc2-6c57-08d741c20586
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:MWHPR22MB0126; 
+x-ms-traffictypediagnostic: MWHPR22MB0126:
+x-microsoft-antispam-prvs: <MWHPR22MB012643857AAF1EF3A37DADBDD2870@MWHPR22MB0126.namprd22.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:139;
+x-forefront-prvs: 01713B2841
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(346002)(366004)(136003)(396003)(39840400004)(376002)(189003)(199004)(478600001)(66946007)(14454004)(91956017)(55236004)(316002)(5660300002)(66066001)(25786009)(66446008)(66476007)(66556008)(64756008)(53546011)(7696005)(2501003)(6506007)(99286004)(8936002)(8676002)(76116006)(81166006)(81156014)(76176011)(19627405001)(2906002)(86362001)(55016002)(71190400001)(71200400001)(6436002)(105004)(9686003)(6246003)(54896002)(229853002)(26005)(186003)(102836004)(110136005)(256004)(52536014)(446003)(11346002)(486006)(6116002)(476003)(74316002)(7736002)(3846002)(33656002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:MWHPR22MB0126;
+ H:MWHPR22MB1664.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: DXW77b5bTov0IkW7mfIbRij7FetdFGIC7Yr3x069Q9jcTGh9b/ciMPxS7TIqQ0ATIXhFwhtb8nx9dZkAP/OM77J8AUpLbc5ikIwyvd5MNNEcE1YK+6MWrcpnPuqc+IFrPDd4Kpgj+kQ1QaINKXWnWo3Cd1SpUq95ORhPBhIau4EYBwsGUByviSDUMkCBaVq1THB8mAq5lVu8gx5LCLhN/yojcVheV6v0hK7QSaRf/MdBobwcQxB0LjfRaeulTRe+GD2pIiU0KZRqtkBpytnv4ZzU9y5ujRCND+9uqQFrHo6rF2MPlCqkf2TIwk3Ms0m3C5SI932bc6Kovk3rLHfyoOy0RZNQcA6DkYX8B34fA5lUz3ZNaJphq7RtXg4+n4X0CgYJsoiI0Dn8kpOTmeGarEVYY8C80WavVgftEVPPOZc=
+x-ms-exchange-transport-forked: True
+Content-Type: multipart/alternative;
+ boundary="_000_MWHPR22MB16644605D91274DCB0F306B5D2870MWHPR22MB1664namp_"
+MIME-Version: 1.0
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ce4f7e77-159c-4bc2-6c57-08d741c20586
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Sep 2019 14:09:46.7141 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: YrK6mywt4lIRUEguTrpLV6kUtKfuZJ7jczp0gaLl+hWh53cpLdz0j3lIsYK0j+m2WeRYXhesO2czgemtaUNfEg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR22MB0126
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.73.106
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,23 +122,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25/09/2019 14.52, David Hildenbrand wrote:
-> Let's get it out of the way to make some further refactorings easier.
-> Personally, I've never used these debug statements at all. And if I had
-> to debug issue, I used plain GDB instead (debug prints are just way too
-> much noise in the MMU). We might want to introduce tracing at some point
-> instead, so we can able selected events on demand.
+--_000_MWHPR22MB16644605D91274DCB0F306B5D2870MWHPR22MB1664namp_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-... and code that is disabled by default tends to bitrot anyway. Thus
-this sounds like a good idea to me.
+> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> Sent: Wednesday, September 25, 2019 2:45 PM
+> To: qemu-devel@nongnu.org <qemu-devel@nongnu.org>
+> Cc: Aleksandar Rikalo <arikalo@wavecomp.com>
+> Subject: [EXTERNAL][PATCH v2 00/20] target/mips: Misc cleanups for Septem=
+ber/October 2019
+>
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> Mostly cosmetic changes.
+>
+> Aleksandar Markovic (20):
+>   target/mips: Clean up helper.c
+>   target/mips: Clean up internal.h
+>   target/mips: Clean up kvm_mips.h
+>   target/mips: Clean up mips-defs.h
+>   target/mips: Clean up op_helper.c
+>   target/mips: Clean up translate.c
+>   target/mips: msa: Split helpers for <NLOC|NLZC>.<B|H|W|D>
+>   target/mips: msa: Split helpers for PCNT.<B|H|W|D>
+>   target/mips: msa: Split helpers for BINS<L|R>.<B|H|W|D>
+>   target/mips: msa: Unroll loops and demacro <BMNZ|BMZ|BSEL>.V
+>   target/mips: msa: Split helpers for B<CLR|NEG|SEL>.<B|H|W|D>
+>   target/mips: msa: Split helpers for AVE_<S|U>.<B|H|W|D>
+>   target/mips: msa: Split helpers for AVER_<S|U>.<B|H|W|D>
+>   target/mips: msa: Split helpers for CEQ.<B|H|W|D>
+>   target/mips: msa: Split helpers for CLE_<S|U>.<B|H|W|D>
+>   target/mips: msa: Split helpers for CLT_<S|U>.<B|H|W|D>
+>   target/mips: msa: Split helpers for DIV_<S|U>.<B|H|W|D>
+>   target/mips: msa: Split helpers for MOD_<S|U>.<B|H|W|D>
+>   target/mips: msa: Simplify and move helper for MOVE.V
+>   target/mips: msa: Move helpers for <AND|NOR|OR|XOR>.V
+>
+>  target/mips/helper.c     |  132 +--
+>  target/mips/helper.h     |  144 +++-
+>  target/mips/internal.h   |   60 +-
+>  target/mips/kvm_mips.h   |    2 +-
+>  target/mips/mips-defs.h  |   53 +-
+>  target/mips/msa_helper.c | 2115 ++++++++++++++++++++++++++++++++++++----=
+------
+>  target/mips/op_helper.c  |  913 +++++++++++++-------
+>  target/mips/translate.c  |  421 +++++++--
+>  8 files changed, 2888 insertions(+), 952 deletions(-)
+>
+> --
+> 2.7.4
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Make sure you run all our MSA regression unit tests before applying.
+Also, there are more than 80 characters lines in patches 12, 13, 15, 16, 17=
+ and 18.
+
+Otherwise:
+Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+
+
+--_000_MWHPR22MB16644605D91274DCB0F306B5D2870MWHPR22MB1664namp_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bo=
+ttom:0;} </style>
+</head>
+<body dir=3D"ltr">
+<span>&gt; From: Aleksandar Markovic &lt;aleksandar.markovic@rt-rk.com&gt;<=
+br>
+</span>
+<div>&gt; Sent: Wednesday, September 25, 2019 2:45 PM<br>
+</div>
+<div>&gt; To: qemu-devel@nongnu.org &lt;qemu-devel@nongnu.org&gt;<br>
+</div>
+<div>&gt; Cc: Aleksandar Rikalo &lt;arikalo@wavecomp.com&gt;<br>
+</div>
+<div>&gt; Subject: [EXTERNAL][PATCH v2 00/20] target/mips: Misc cleanups fo=
+r September/October 2019<br>
+</div>
+<div>&gt; &nbsp;<br>
+</div>
+<div>&gt; From: Aleksandar Markovic &lt;amarkovic@wavecomp.com&gt;<br>
+</div>
+<div>&gt; <br>
+</div>
+<div>&gt; Mostly cosmetic changes.<br>
+</div>
+<div>&gt; <br>
+</div>
+<div>&gt; Aleksandar Markovic (20):<br>
+</div>
+<div>&gt; &nbsp; target/mips: Clean up helper.c<br>
+</div>
+<div>&gt; &nbsp; target/mips: Clean up internal.h<br>
+</div>
+<div>&gt; &nbsp; target/mips: Clean up kvm_mips.h<br>
+</div>
+<div>&gt; &nbsp; target/mips: Clean up mips-defs.h<br>
+</div>
+<div>&gt; &nbsp; target/mips: Clean up op_helper.c<br>
+</div>
+<div>&gt; &nbsp; target/mips: Clean up translate.c<br>
+</div>
+<div>&gt; &nbsp; target/mips: msa: Split helpers for &lt;NLOC|NLZC&gt;.&lt;=
+B|H|W|D&gt;<br>
+</div>
+<div>&gt; &nbsp; target/mips: msa: Split helpers for PCNT.&lt;B|H|W|D&gt;<b=
+r>
+</div>
+<div>&gt; &nbsp; target/mips: msa: Split helpers for BINS&lt;L|R&gt;.&lt;B|=
+H|W|D&gt;<br>
+</div>
+<div>&gt; &nbsp; target/mips: msa: Unroll loops and demacro &lt;BMNZ|BMZ|BS=
+EL&gt;.V<br>
+</div>
+<div>&gt; &nbsp; target/mips: msa: Split helpers for B&lt;CLR|NEG|SEL&gt;.&=
+lt;B|H|W|D&gt;<br>
+</div>
+<div>&gt; &nbsp; target/mips: msa: Split helpers for AVE_&lt;S|U&gt;.&lt;B|=
+H|W|D&gt;<br>
+</div>
+<div>&gt; &nbsp; target/mips: msa: Split helpers for AVER_&lt;S|U&gt;.&lt;B=
+|H|W|D&gt;<br>
+</div>
+<div>&gt; &nbsp; target/mips: msa: Split helpers for CEQ.&lt;B|H|W|D&gt;<br=
+>
+</div>
+<div>&gt; &nbsp; target/mips: msa: Split helpers for CLE_&lt;S|U&gt;.&lt;B|=
+H|W|D&gt;<br>
+</div>
+<div>&gt; &nbsp; target/mips: msa: Split helpers for CLT_&lt;S|U&gt;.&lt;B|=
+H|W|D&gt;<br>
+</div>
+<div>&gt; &nbsp; target/mips: msa: Split helpers for DIV_&lt;S|U&gt;.&lt;B|=
+H|W|D&gt;<br>
+</div>
+<div>&gt; &nbsp; target/mips: msa: Split helpers for MOD_&lt;S|U&gt;.&lt;B|=
+H|W|D&gt;<br>
+</div>
+<div>&gt; &nbsp; target/mips: msa: Simplify and move helper for MOVE.V<br>
+</div>
+<div>&gt; &nbsp; target/mips: msa: Move helpers for &lt;AND|NOR|OR|XOR&gt;.=
+V<br>
+</div>
+<div>&gt; <br>
+</div>
+<div>&gt; &nbsp;target/mips/helper.c &nbsp; &nbsp; | &nbsp;132 &#43;--<br>
+</div>
+<div>&gt; &nbsp;target/mips/helper.h &nbsp; &nbsp; | &nbsp;144 &#43;&#43;&#=
+43;-<br>
+</div>
+<div>&gt; &nbsp;target/mips/internal.h &nbsp; | &nbsp; 60 &#43;-<br>
+</div>
+<div>&gt; &nbsp;target/mips/kvm_mips.h &nbsp; | &nbsp; &nbsp;2 &#43;-<br>
+</div>
+<div>&gt; &nbsp;target/mips/mips-defs.h &nbsp;| &nbsp; 53 &#43;-<br>
+</div>
+<div>&gt; &nbsp;target/mips/msa_helper.c | 2115 &#43;&#43;&#43;&#43;&#43;&#=
+43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#=
+43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#=
+43;----------<br>
+</div>
+<div>&gt; &nbsp;target/mips/op_helper.c &nbsp;| &nbsp;913 &#43;&#43;&#43;&#=
+43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;&#43;-------<br>
+</div>
+<div>&gt; &nbsp;target/mips/translate.c &nbsp;| &nbsp;421 &#43;&#43;&#43;&#=
+43;&#43;&#43;&#43;--<br>
+</div>
+<div>&gt; &nbsp;8 files changed, 2888 insertions(&#43;), 952 deletions(-)<b=
+r>
+</div>
+<div>&gt; <br>
+</div>
+<div>&gt; -- <br>
+</div>
+<div>&gt; 2.7.4<br>
+</div>
+<div><br>
+</div>
+<div>Make sure you run all our MSA regression unit tests before applying.<b=
+r>
+</div>
+<div>Also, there are more than 80 characters lines in patches 12, 13, 15, 1=
+6, 17 and 18.<br>
+</div>
+<div><br>
+</div>
+<div>Otherwise: <br>
+</div>
+<div>Reviewed-by: Aleksandar Rikalo &lt;arikalo@wavecomp.com&gt;<br>
+</div>
+<span></span><br>
+</body>
+</html>
+
+--_000_MWHPR22MB16644605D91274DCB0F306B5D2870MWHPR22MB1664namp_--
 
