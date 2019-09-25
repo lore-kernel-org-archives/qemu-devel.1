@@ -2,52 +2,93 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA24FC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:00:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97DEAC432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:03:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85581207E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:00:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85581207E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 659392146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:03:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dza7MnyV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 659392146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDAe4-0002GT-S5
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 13:00:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47252)
+	id 1iDAhI-0004DM-9U
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 13:03:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47680)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iDAcs-0001Yr-Ta
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:58:52 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iDAfH-0003Y3-Bq
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:01:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iDAcr-0007Uk-Ou
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:58:50 -0400
-Received: from relay.sw.ru ([185.231.240.75]:49928)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iDAcp-0007Tv-2N; Wed, 25 Sep 2019 12:58:47 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iDAcm-0007W3-3e; Wed, 25 Sep 2019 19:58:44 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH 16/15 v13] block/block-copy: fix block_copy
-Date: Wed, 25 Sep 2019 19:58:08 +0300
-Message-Id: <20190925165808.20950-1-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190920142056.12778-1-vsementsov@virtuozzo.com>
-References: <20190920142056.12778-1-vsementsov@virtuozzo.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1iDAfG-00007W-0f
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:01:18 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:34209)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iDAfF-000071-QV
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:01:17 -0400
+Received: by mail-pf1-x444.google.com with SMTP id b128so3914906pfa.1
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 10:01:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=J1JH6uMyxn8nQIR9PJxKTGU89vsVOKYDJiipmhqb9iY=;
+ b=dza7MnyV/c7UoRzGy6QgRXU9GFnQ5y11loM+kkJtmy5Ttc12gJvDgZtFbEBT6YPPhb
+ 3NV67OecmEa6YMT+sUMRk/pLIM0CESEIJJeJzMa0MItWfSEt8fjMR9NtWkzubdqjLnCk
+ 4/attZrjnGb2KReAyt0J6IoAIJe/FpQxV7g3iqYyKx/KHGnu5wonLVRR/vvRJ2zc1Z8y
+ j7rVJecQTknmHMnLNxQgHkT63e/ZlNCsqrr4fHeY7P6BR9C9fAWBncMDYH4YfkUAPd8l
+ aiyhj3bwSX9LpuGJ36urh8UjMBZ4ctzhifcSiosTzQqAOkSgI0wupIYNhTfkGti74RR8
+ fjoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=J1JH6uMyxn8nQIR9PJxKTGU89vsVOKYDJiipmhqb9iY=;
+ b=OmN3YGaCpWyI63YNck5B/vlauH9kMbUbjElNR8z/VIDW/QRkDj8RpIy0y1PIQNhrAU
+ EW5JYyC+HMHcZ51Gc3B5eNrjx4ZSCFQtUJic5vVEsSV47vuhIBxcoxg4bD1Z/wtMyFfT
+ 2iA2Vm8Vz3om/R2MOTnTwbcjEcueX0oDc/dzW/tr/lW01g7wVRqnxFCRkRV+eH62+/kE
+ 5iDF7lDDXyXgHjjvLHZm5sqZ9+H6LFItYQMABy/NZ1GMbxNga8CRzvbM7BJqHmbiGozD
+ x9wD6wJ6tYJZGPGxtTV29nxvB7Pdk9A4ryUz3Z8ziBvPPArOhHqllr7xegYjyF5y975r
+ kvaw==
+X-Gm-Message-State: APjAAAXZ1vVtRfdtZTmRCs0WN+Lq/v6VnND1CPjZKrWUWn36e5ajUVpc
+ Zy13S+E12g7TY9weqHTOOYLxYA==
+X-Google-Smtp-Source: APXvYqyBeS4/CdYVfo+dcj867tUvuchDHdTDTCzM22XJ8V7TeX1SLmgvYGU7QFay5TYjzvOJNYaExA==
+X-Received: by 2002:a65:67d4:: with SMTP id b20mr276898pgs.445.1569430875682; 
+ Wed, 25 Sep 2019 10:01:15 -0700 (PDT)
+Received: from [172.20.32.216] ([12.206.46.61])
+ by smtp.gmail.com with ESMTPSA id x9sm10339723pje.27.2019.09.25.10.01.12
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 25 Sep 2019 10:01:14 -0700 (PDT)
+Subject: Re: [PATCH v4 08/16] cputlb: Move ROM handling from I/O path to TLB
+ path
+To: David Hildenbrand <david@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>
+References: <20190923230004.9231-1-richard.henderson@linaro.org>
+ <20190923230004.9231-9-richard.henderson@linaro.org>
+ <87v9th9qnz.fsf@linaro.org> <080af734-eccb-16c9-2664-72dd26ff460c@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <762b5a49-2f94-a82e-f8bf-61080de592a2@linaro.org>
+Date: Wed, 25 Sep 2019 10:01:10 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
+In-Reply-To: <080af734-eccb-16c9-2664-72dd26ff460c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,104 +100,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com,
- qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-block_copy_reset_unallocated may yield, and during this yield someone
-may handle dirty bits which we are handling. Calling block_copy_with_*
-functions on non-dirty region will lead to copying updated data, which
-is wrong.
+On 9/24/19 11:59 PM, David Hildenbrand wrote:
+>>> +            if (section->readonly) {
+>>> +                tn.addr_write |= TLB_ROM;
+>>> +            } else if (cpu_physical_memory_is_clean(
+>>> +                        memory_region_get_ram_addr(section->mr) + xlat)) {
+>>> +                tn.addr_write |= TLB_NOTDIRTY;
+>>> +            }
+>>
+>> This reads a bit weird because we are saying romd isn't a ROM but
+>> something that identifies as RAM can be ROM rather than just a memory
+>> protected piece of RAM.
+>>
+> 
+> I proposed a bunch of alternatives as reply to v3 (e.g.,
+> TLB_DISCARD_WRITES), either Richard missed them or I missed his reply :)
 
-To be sure, that we call block_copy_with_* functions on dirty region,
-check dirty bitmap _after_ block_copy_reset_unallocated.
+Missed it, sorry.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
 
-Hi!
-
-Suddenly I understand that there is a bug in
-
-[PATCH v13 15/15] block/backup: use backup-top instead of write notifiers
-(queued at Max's https://git.xanclic.moe/XanClic/qemu/commits/branch/block)
-
-And here is a fix, which may be squashed to
-"block/backup: use backup-top instead of write notifiers" commit.
-
- block/block-copy.c | 31 +++++++++++++++++++++----------
- 1 file changed, 21 insertions(+), 10 deletions(-)
-
-diff --git a/block/block-copy.c b/block/block-copy.c
-index 55bc360d22..430b88124f 100644
---- a/block/block-copy.c
-+++ b/block/block-copy.c
-@@ -292,7 +292,7 @@ int coroutine_fn block_copy(BlockCopyState *s,
-     assert(QEMU_IS_ALIGNED(end, s->cluster_size));
- 
-     while (start < end) {
--        int64_t dirty_end;
-+        int64_t chunk_end = end, dirty_end;
- 
-         if (!bdrv_dirty_bitmap_get(s->copy_bitmap, start)) {
-             trace_block_copy_skip(s, start);
-@@ -300,12 +300,6 @@ int coroutine_fn block_copy(BlockCopyState *s,
-             continue; /* already copied */
-         }
- 
--        dirty_end = bdrv_dirty_bitmap_next_zero(s->copy_bitmap, start,
--                                                (end - start));
--        if (dirty_end < 0) {
--            dirty_end = end;
--        }
--
-         if (s->skip_unallocated) {
-             ret = block_copy_reset_unallocated(s, start, &status_bytes);
-             if (ret == 0) {
-@@ -313,20 +307,37 @@ int coroutine_fn block_copy(BlockCopyState *s,
-                 start += status_bytes;
-                 continue;
-             }
-+
-+            if (!bdrv_dirty_bitmap_get(s->copy_bitmap, start)) {
-+                /*
-+                 * Someone already handled this bit during yield in
-+                 * block_copy_reset_unallocated.
-+                 */
-+                trace_block_copy_skip(s, start);
-+                start += s->cluster_size;
-+                continue;
-+            }
-+
-             /* Clamp to known allocated region */
--            dirty_end = MIN(dirty_end, start + status_bytes);
-+            chunk_end = MIN(chunk_end, start + status_bytes);
-+        }
-+
-+        dirty_end = bdrv_dirty_bitmap_next_zero(s->copy_bitmap, start,
-+                                                chunk_end - start);
-+        if (dirty_end >= 0) {
-+            chunk_end = MIN(chunk_end, dirty_end);
-         }
- 
-         trace_block_copy_process(s, start);
- 
-         if (s->use_copy_range) {
--            ret = block_copy_with_offload(s, start, dirty_end);
-+            ret = block_copy_with_offload(s, start, chunk_end);
-             if (ret < 0) {
-                 s->use_copy_range = false;
-             }
-         }
-         if (!s->use_copy_range) {
--            ret = block_copy_with_bounce_buffer(s, start, dirty_end,
-+            ret = block_copy_with_bounce_buffer(s, start, chunk_end,
-                                                 error_is_read, &bounce_buffer);
-         }
-         if (ret < 0) {
--- 
-2.21.0
-
+r~
 
