@@ -2,79 +2,110 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 655DBC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:32:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BABAFC432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:37:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EB6D20673
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:32:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l8T7gBIF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EB6D20673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 84F8D20673
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:37:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84F8D20673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD6TB-0001Pr-A0
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 08:32:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55653)
+	id 1iD6Xe-0004HD-JU
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 08:37:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56466)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iD6Rs-0000qQ-Va
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:31:14 -0400
+ (envelope-from <thuth@redhat.com>) id 1iD6Wy-0003oL-0u
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:36:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iD6Rr-0004WD-Gt
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:31:12 -0400
-Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:37230)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iD6Rr-0004W0-Bn
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:31:11 -0400
-Received: by mail-oi1-x232.google.com with SMTP id i16so4720971oie.4
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 05:31:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=JD/G3xyu7ck667XKg07CJ2MCor9MMFPsSPUFz2++nd4=;
- b=l8T7gBIF6T6gDbN7Efpwk2MhPX8xBNoQaMs+Kx7yGh7BRbR3/ETxzZlek7HxAshiae
- iKYzCbrQkocw8W4eC7ynIjS1Hvflg8jgJ/kHvZ7tMKtHgOrezit0xpKDKGcRWCIBinkS
- eyfQY2/MZ9l/d2jr7Q9+1H2zlAOy5oKW6SBsvIOQKG6HWJGKci5o3IQIb6Kj57RQlDXu
- ZuMPQdCt/mICE7TPEkli8WVqsQPN3yO9vg+xy4a+qZxP4mXHHmFdnqWwOyhBJYR7ydv5
- BRan9rVlgN0ODIyu+spjx8dLdUDWtw6WzarGVPICzVy1FN3Jqn4JZI5+9L9cagKSEdFl
- x3rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=JD/G3xyu7ck667XKg07CJ2MCor9MMFPsSPUFz2++nd4=;
- b=jN6e1n1PpKwR+fk5HHtntgK40uJF92YZtp/DIBcJVb5Lg4s/2lrhfMUyxsNJOuriDc
- ndTHJYf2870//Ad6mKlQ3agqlZvLwN2yZEK4cmcaOqf7h4nCgO0q4LHFi+AqbvAjMKzs
- KX45T569rqsZdaYy3K/VXkRIqkBFtMSsI1C9xbt/ngNJ2VIzFh0C75LVHdPGCziKcdCe
- /jNad5yQ/EHPYyeUGNK1kXPHpEc18v4LKUSEuM1C+9Sz7tDnVYisWR9Kmh2cNg+PqMbN
- fIK1CpCB3nMJ3ZS3ewOiJbXz0wbQ4PUNW96m9g/tZ1hZrC6nBCeH+SNfYZAqwnYYauBm
- eKHg==
-X-Gm-Message-State: APjAAAXEv+HA6vJczd/uZfjnAVw8g+I1ZOMVTuBT0cHNZ3b5s/3nBFQJ
- B23rLEGmCmB8YkRjyHI7icZvbrEIzp/H6j9nzXkxcHySuQo=
-X-Google-Smtp-Source: APXvYqwBAjRHS/4aO/LZF0ot3ssMAJZDYhPggKfwmwAHh8NIK2B7omgoaBkf0xJo2bYXEpeqC8+iyo/RfszczFx5quk=
-X-Received: by 2002:aca:b48a:: with SMTP id d132mr4482949oif.98.1569414670073; 
- Wed, 25 Sep 2019 05:31:10 -0700 (PDT)
+ (envelope-from <thuth@redhat.com>) id 1iD6Wv-0005fi-Gc
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:36:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46998)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iD6Wv-0005fI-90
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:36:25 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 854DC309BDBB;
+ Wed, 25 Sep 2019 12:36:22 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-109.ams2.redhat.com [10.36.116.109])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E8C6860A9F;
+ Wed, 25 Sep 2019 12:36:15 +0000 (UTC)
+Subject: Re: [PATCH v3 16/33] podman: fix command invocation
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20190924210106.27117-1-alex.bennee@linaro.org>
+ <20190924210106.27117-17-alex.bennee@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <b2aa7538-a15f-0e51-5bf7-2906f509f767@redhat.com>
+Date: Wed, 25 Sep 2019 14:36:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <20190924113026.255634-1-anthony.perard@citrix.com>
-In-Reply-To: <20190924113026.255634-1-anthony.perard@citrix.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 25 Sep 2019 13:30:58 +0100
-Message-ID: <CAFEAcA8PXEHRV6Wbh2rSEGKACgNw3tT1TnD=y4eF1yYGzx7j5A@mail.gmail.com>
-Subject: Re: [PULL 0/7] xen queue 2019-09-24
-To: Anthony PERARD <anthony.perard@citrix.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::232
+In-Reply-To: <20190924210106.27117-17-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Wed, 25 Sep 2019 12:36:22 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,38 +117,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:X86" <xen-devel@lists.xenproject.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, jsnow@redhat.com,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, f4bug@amsat.org,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 24 Sep 2019 at 12:31, Anthony PERARD <anthony.perard@citrix.com> wrote:
->
-> The following changes since commit 2f93a3ecdd3bb060bd04f698ccafe66efd98563a:
->
->   Merge remote-tracking branch 'remotes/davidhildenbrand/tags/s390x-tcg-2019-09-23' into staging (2019-09-23 15:44:52 +0100)
->
-> are available in the Git repository at:
->
->   https://xenbits.xen.org/git-http/people/aperard/qemu-dm.git tags/pull-xen-20190924
->
-> for you to fetch changes up to 6bd6b955c0b2666263700d39db153ab43c5e0c9e:
->
->   xen-bus: only set the xen device frontend state if it is missing (2019-09-24 12:21:29 +0100)
->
-> ----------------------------------------------------------------
-> Xen queue
->
-> * Update of maintainer email address
-> * Fixes for xen-bus and xen-block
->
+On 24/09/2019 23.00, Alex Benn=C3=A9e wrote:
+> From: John Snow <jsnow@redhat.com>
+>=20
+> Oops; there's no argv here.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> Message-Id: <20190913193821.17756-1-jsnow@redhat.com>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Cleber Rosa <crosa@redhat.com>
+> Tested-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>  tests/docker/docker.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+> index 3112892fdf5..31d8adf836e 100755
+> --- a/tests/docker/docker.py
+> +++ b/tests/docker/docker.py
+> @@ -332,7 +332,7 @@ class Docker(object):
+>              cmd =3D [ "-u", str(uid) ] + cmd
+>              # podman requires a bit more fiddling
+>              if self._command[0] =3D=3D "podman":
+> -                argv.insert(0, '--userns=3Dkeep-id')
+> +                cmd.insert(0, '--userns=3Dkeep-id')
+> =20
+>          ret =3D self._do_check(["run", "--label",
+>                               "com.qemu.instance.uuid=3D" + label] + cm=
+d,
+>=20
 
+I ran into the same issue, too.
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
-
--- PMM
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
 
