@@ -2,60 +2,67 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A46BDC432C1
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 04:49:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A84DC432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 05:08:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66BB821A4A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 04:49:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="btfWax6X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66BB821A4A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id F0A2821D81
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 05:08:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0A2821D81
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCzEy-0005gM-I0
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 00:49:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53443)
+	id 1iCzXL-00028V-RX
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 01:08:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54996)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoren@kernel.org>) id 1iCzEE-0005Cs-W8
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 00:48:40 -0400
+ (envelope-from <kraxel@redhat.com>) id 1iCzVk-00016k-W3
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 01:06:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoren@kernel.org>) id 1iCzEB-0001lk-Uf
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 00:48:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36720)
+ (envelope-from <kraxel@redhat.com>) id 1iCzVh-0000C8-Ec
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 01:06:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34534)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <guoren@kernel.org>)
- id 1iCzEB-0001lN-Ob; Wed, 25 Sep 2019 00:48:35 -0400
-Received: from guoren-Inspiron-7460.lan (unknown [223.93.147.148])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iCzVh-0000Bn-8X
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 01:06:41 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7E6B021A4A;
- Wed, 25 Sep 2019 04:48:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1569386914;
- bh=GMapcb2WUHqhsll7OX2TGMlEII/fxxpk18SPz1OiNHQ=;
- h=From:To:Cc:Subject:Date:From;
- b=btfWax6XT8Qss02p583ulK8ekt0bfbP9xQn6wnma5yluT6oaT0Agr5n0xdURfPh1r
- BRqeyhZ78ASME5v1ZVHCF4l+5S4mCPJE/ZDSsLzj57LGgt808LU67C/KP6mwGB/qKM
- gGnaNWZyGy7qgRhftjQEV5m0oJCF/b2uEnYhGKeQ=
-From: guoren@kernel.org
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH V3] target/riscv: Bugfix reserved bits in PTE for RV64
-Date: Wed, 25 Sep 2019 12:48:15 +0800
-Message-Id: <1569386895-8726-1-git-send-email-guoren@kernel.org>
-X-Mailer: git-send-email 2.7.4
+ by mx1.redhat.com (Postfix) with ESMTPS id 4F842307D844;
+ Wed, 25 Sep 2019 05:06:39 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-47.ams2.redhat.com
+ [10.36.116.47])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 56A8160872;
+ Wed, 25 Sep 2019 05:06:31 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 535C617535; Wed, 25 Sep 2019 07:06:29 +0200 (CEST)
+Date: Wed, 25 Sep 2019 07:06:29 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Subject: Re: [PATCH v4 7/8] docs/microvm.txt: document the new microvm
+ machine type
+Message-ID: <20190925050629.lg5w6vvikxtgddy6@sirius.home.kraxel.org>
+References: <20190924124433.96810-1-slp@redhat.com>
+ <20190924124433.96810-8-slp@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190924124433.96810-8-slp@redhat.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Wed, 25 Sep 2019 05:06:39 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 198.145.29.99
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,69 +74,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, palmer@sifive.com, alistair.francis@wdc.com,
- Guo Ren <ren_guo@c-sky.com>
+Cc: ehabkost@redhat.com, kvm@vger.kernel.org, mst@redhat.com, lersek@redhat.com,
+ mtosatti@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com,
+ imammedo@redhat.com, philmd@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Guo Ren <ren_guo@c-sky.com>
+  Hi,
 
-Highest 10 bits of PTE are reserved in riscv-privileged, ref: [1], so we
-need to ignore them. They can not be a part of ppn.
+> +microvm.kernel-cmdline=bool (Set off to disable adding virtio-mmio devices to the kernel cmdline)
 
-1: The RISC-V Instruction Set Manual, Volume II: Privileged Architecture
-   4.4 Sv39: Page-Based 39-bit Virtual-Memory System
-   4.5 Sv48: Page-Based 48-bit Virtual-Memory System
+Hmm, is that the long-term plan?  IMO the virtio-mmio devices should be
+discoverable somehow.  ACPI, or device-tree, or fw_cfg, or ...
 
-Signed-off-by: Guo Ren <ren_guo@c-sky.com>
-Reviewed-by: Liu Zhiwei <zhiwei_liu@c-sky.com>
----
- target/riscv/cpu_bits.h   | 3 +++
- target/riscv/cpu_helper.c | 4 +++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
----
-Changelog V3:
- - Use UUL define for PTE_RESERVED.
- - Keep ppn >> PTE_PPN_SHIFT 
+> +As no current FW is able to boot from a block device using virtio-mmio
+> +as its transport,
 
-Changelog V2:
- - Bugfix pte destroyed cause boot fail
- - Change to AND with a mask instead of shifting both directions
+To fix that the firmware must be able to find the virtio-mmio devices.
 
-diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index e998348..cdc62a8 100644
---- a/target/riscv/cpu_bits.h
-+++ b/target/riscv/cpu_bits.h
-@@ -470,6 +470,9 @@
- #define PTE_D               0x080 /* Dirty */
- #define PTE_SOFT            0x300 /* Reserved for Software */
- 
-+/* Reserved highest 10 bits in PTE */
-+#define PTE_RESERVED        0xFFC0000000000000ULL
-+
- /* Page table PPN shift amount */
- #define PTE_PPN_SHIFT       10
- 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 87dd6a6..7e04ff5 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -258,10 +258,12 @@ restart:
-         }
- #if defined(TARGET_RISCV32)
-         target_ulong pte = ldl_phys(cs->as, pte_addr);
-+        hwaddr ppn = pte;
- #elif defined(TARGET_RISCV64)
-         target_ulong pte = ldq_phys(cs->as, pte_addr);
-+        hwaddr ppn = pte & ~PTE_RESERVED;
- #endif
--        hwaddr ppn = pte >> PTE_PPN_SHIFT;
-+        ppn = ppn >> PTE_PPN_SHIFT;
- 
-         if (!(pte & PTE_V)) {
-             /* Invalid PTE */
--- 
-2.7.4
+cheers,
+  Gerd
 
 
