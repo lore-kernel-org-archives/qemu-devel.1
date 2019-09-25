@@ -4,81 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C496DC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 22:36:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A103C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 22:36:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 939E02054F
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 22:36:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 939E02054F
+	by mail.kernel.org (Postfix) with ESMTPS id 3E94D2054F
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 22:36:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E94D2054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDFtK-0001vB-Pi
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 18:36:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36328)
+	id 1iDFtw-0002hJ-Ax
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 18:36:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36992)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iDFsW-0001Kp-5K
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 18:35:21 -0400
+ (envelope-from <philmd@redhat.com>) id 1iDFsy-0001oZ-Fv
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 18:35:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iDFsR-0003JU-3F
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 18:35:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59698)
+ (envelope-from <philmd@redhat.com>) id 1iDFsx-0004NE-Br
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 18:35:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35826)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iDFsQ-0003Ft-Oh
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 18:35:14 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iDFsx-0004L6-0Y
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 18:35:47 -0400
 Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
  [209.85.128.71])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 487015AFE3
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 22:35:13 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id n3so171883wmf.3
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 15:35:13 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id DA4203DE04
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 22:35:45 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id f63so118371wma.7
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 15:35:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Xu+VNSkP2OgmkqzyOJNDI/CixMUY/AGVgFqmKJoT6nQ=;
- b=RrZL1Up9ksWUWzobVgMD8/4kTjXhH4sRn770PGKYnOcTRQPgOelBg0k9d80pH2JJMb
- pKRW/OQ5P9zSZiZ4bVjtfX7WEAI/LsFnvn0/8LhK5H11F8cxXHuxsf47QEEpxPjPGz4+
- yz5EnwgoSXNIflhsccW6ZfoWu/YIwi4+4WOl8lZYNaqFXtvtgFlLCd59OJx7NnZ5fZ8a
- l/CoubeClQBixbjJ0hN/RjyCuVKcGwLP1jncCO3ikLTvDcXif/E0otrWzyPKAvCIzML0
- sxgJmkOfgxRzWKyu//8HotUHuMij2lIHodD+CdQgOfS5H7JH5WOGQCT1jxq4KqaC53+x
- GacA==
-X-Gm-Message-State: APjAAAWENI9pSyGZ9yGFYUVmgfayi+Oe3SG7m95ADKFV+IzjHO3QJyn6
- NPH0ugJx9n2y4v8zHALuRLBpYKCf9y3dGDVhmhbC8tGYdnAxMbZW4bZDhYNtak54OcyxCFn6edi
- yn5fNX9zCTlnFNMA=
-X-Received: by 2002:adf:dc4b:: with SMTP id m11mr435856wrj.269.1569450912081; 
- Wed, 25 Sep 2019 15:35:12 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwUF26LPwAvQbnrxdU0b1KR8ifj8ptD1r/CR70V/zuqS+Q48p3F3n1FlJg2mT2P4/+Z3qp61w==
-X-Received: by 2002:adf:dc4b:: with SMTP id m11mr435849wrj.269.1569450911897; 
- Wed, 25 Sep 2019 15:35:11 -0700 (PDT)
+ bh=IRNbb8cL/H9zfN2RjmBwa4adDIil1sm1HrdnexMh2pA=;
+ b=D9b3B4n+O/Y7p0xlmUeKqHCDOiqYd0AaUpXdPd0XyYi/kHZ5L51mlzSCapFHqmE5q1
+ 5xIUid/NDSlt4f1Si2XKRXFIxadat9Y1bqGqTPT0sefTli0SXMrEbcgcAtgkW7VEbIQx
+ WgSPEFgbWbjqxLKg5gY6Y+NzaqdbHLIqayOGiEscIe4RfAxnkXvYzG11ehWn6YQckfDa
+ CERVvhwZgqu9L0ZyLXesnfYZS4dUirXBq/GAs7M7Is/irOp+CJL683XZrJ0b9dIuxjgf
+ z48yCkNimQ1ZsJAK3OBljjZpqFKo5cwcEL3ya5Izu8UKSTHUNq7uvULQYZljC4Rc5rYb
+ vqSg==
+X-Gm-Message-State: APjAAAVQzfuGNTx9mEfRq4kxKKYxVPkmMfem7et6cvukn++Q4eVfCNZL
+ ZYsOxxYp/hKfAHhkKBXhffMkVuxX+9FnLEgTdnqRli0xoIzygR2Lf0r8UuYGeOCiK61lu6OcNBl
+ j2l6gWho35MdLtpA=
+X-Received: by 2002:a5d:6384:: with SMTP id p4mr430233wru.180.1569450944688;
+ Wed, 25 Sep 2019 15:35:44 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx2jbGUOXHEVU2vB8Gaz6RIFSmHeCKQuRKmJZ4ZuGStx4NYpF3OA/sreP7iNKNMgqA/qYc36A==
+X-Received: by 2002:a5d:6384:: with SMTP id p4mr430224wru.180.1569450944523;
+ Wed, 25 Sep 2019 15:35:44 -0700 (PDT)
 Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
  [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id q10sm1126456wrd.39.2019.09.25.15.35.11
+ by smtp.gmail.com with ESMTPSA id f17sm343469wru.29.2019.09.25.15.35.43
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 25 Sep 2019 15:35:11 -0700 (PDT)
-Subject: Re: [PATCH v3 03/33] target/alpha: Fix SWCR_TRAP_ENABLE_MASK
+ Wed, 25 Sep 2019 15:35:43 -0700 (PDT)
+Subject: Re: [PATCH v3 01/33] target/alpha: Use array for FPCR_DYN conversion
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
 References: <20190924210106.27117-1-alex.bennee@linaro.org>
- <20190924210106.27117-4-alex.bennee@linaro.org>
+ <20190924210106.27117-2-alex.bennee@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <5e214978-f456-3edf-f0be-e747f1ff008f@redhat.com>
-Date: Thu, 26 Sep 2019 00:35:10 +0200
+Message-ID: <0efac54b-e14c-03f0-1011-860f48aa9fdd@redhat.com>
+Date: Thu, 26 Sep 2019 00:35:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190924210106.27117-4-alex.bennee@linaro.org>
+In-Reply-To: <20190924210106.27117-2-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -105,82 +105,64 @@ Sender: "Qemu-devel"
 On 9/24/19 11:00 PM, Alex Benn=C3=A9e wrote:
 > From: Richard Henderson <richard.henderson@linaro.org>
 >=20
-> The CONFIG_USER_ONLY adjustment blindly mashed the swcr
-> exception enable bits into the fpcr exception disable bits.
->=20
-> However, fpcr_exc_enable has already converted the exception
-> disable bits into the exception status bits in order to make
-> it easier to mask status bits at runtime.
->=20
-> Instead, merge the swcr enable bits with the fpcr before we
-> convert to status bits.
+> This is a bit more straight-forward than using a switch statement.
+> No functional change.
 >=20
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Message-Id: <20190921043256.4575-4-richard.henderson@linaro.org>
+> Message-Id: <20190921043256.4575-2-richard.henderson@linaro.org>
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 > ---
->  target/alpha/helper.c | 23 ++++++++++++++---------
->  1 file changed, 14 insertions(+), 9 deletions(-)
+>  target/alpha/helper.c | 24 ++++++++----------------
+>  1 file changed, 8 insertions(+), 16 deletions(-)
 >=20
 > diff --git a/target/alpha/helper.c b/target/alpha/helper.c
-> index 10602fb3394..e21c488aa32 100644
+> index 19cda0a2db5..6c1703682e0 100644
 > --- a/target/alpha/helper.c
 > +++ b/target/alpha/helper.c
-> @@ -46,34 +46,39 @@ void cpu_alpha_store_fpcr(CPUAlphaState *env, uint6=
-4_t val)
+> @@ -36,6 +36,13 @@ uint64_t cpu_alpha_load_fpcr(CPUAlphaState *env)
+> =20
+>  void cpu_alpha_store_fpcr(CPUAlphaState *env, uint64_t val)
+>  {
+> +    static const uint8_t rm_map[] =3D {
+> +        [FPCR_DYN_NORMAL >> FPCR_DYN_SHIFT] =3D float_round_nearest_ev=
+en,
+> +        [FPCR_DYN_CHOPPED >> FPCR_DYN_SHIFT] =3D float_round_to_zero,
+> +        [FPCR_DYN_MINUS >> FPCR_DYN_SHIFT] =3D float_round_down,
+> +        [FPCR_DYN_PLUS >> FPCR_DYN_SHIFT] =3D float_round_up,
+> +    };
+> +
 >      uint32_t fpcr =3D val >> 32;
 >      uint32_t t =3D 0;
 > =20
-> +    /* Record the raw value before adjusting for linux-user.  */
-> +    env->fpcr =3D fpcr;
-> +
-> +#ifdef CONFIG_USER_ONLY
-> +    /*
-> +     * Override some of these bits with the contents of ENV->SWCR.
-> +     * In system mode, some of these would trap to the kernel, at
-> +     * which point the kernel's handler would emulate and apply
-> +     * the software exception mask.
-> +     */
-> +    uint32_t soft_fpcr =3D alpha_ieee_swcr_to_fpcr(env->swcr) >> 32;
-> +    fpcr |=3D soft_fpcr & FPCR_STATUS_MASK;
-> +#endif
-> +
->      t |=3D CONVERT_BIT(fpcr, FPCR_INED, FPCR_INE);
->      t |=3D CONVERT_BIT(fpcr, FPCR_UNFD, FPCR_UNF);
->      t |=3D CONVERT_BIT(fpcr, FPCR_OVFD, FPCR_OVF);
->      t |=3D CONVERT_BIT(fpcr, FPCR_DZED, FPCR_DZE);
->      t |=3D CONVERT_BIT(fpcr, FPCR_INVD, FPCR_INV);
-> =20
-> -    env->fpcr =3D fpcr;
+> @@ -48,22 +55,7 @@ void cpu_alpha_store_fpcr(CPUAlphaState *env, uint64=
+_t val)
+>      env->fpcr =3D fpcr;
 >      env->fpcr_exc_enable =3D ~t & FPCR_STATUS_MASK;
 > =20
->      env->fpcr_dyn_round =3D rm_map[(fpcr & FPCR_DYN_MASK) >> FPCR_DYN_=
+> -    switch (fpcr & FPCR_DYN_MASK) {
+> -    case FPCR_DYN_NORMAL:
+> -    default:
+> -        t =3D float_round_nearest_even;
+> -        break;
+> -    case FPCR_DYN_CHOPPED:
+> -        t =3D float_round_to_zero;
+> -        break;
+> -    case FPCR_DYN_MINUS:
+> -        t =3D float_round_down;
+> -        break;
+> -    case FPCR_DYN_PLUS:
+> -        t =3D float_round_up;
+> -        break;
+> -    }
+> -    env->fpcr_dyn_round =3D t;
+> +    env->fpcr_dyn_round =3D rm_map[(fpcr & FPCR_DYN_MASK) >> FPCR_DYN_=
 SHIFT];
 > =20
 >      env->fpcr_flush_to_zero =3D (fpcr & FPCR_UNFD) && (fpcr & FPCR_UND=
 Z);
 >      env->fp_status.flush_inputs_to_zero =3D (fpcr & FPCR_DNZ) !=3D 0;
-> -
->  #ifdef CONFIG_USER_ONLY
-> -    /*
-> -     * Override some of these bits with the contents of ENV->SWCR.
-> -     * In system mode, some of these would trap to the kernel, at
-> -     * which point the kernel's handler would emulate and apply
-> -     * the software exception mask.
-> -     */
->      if (env->swcr & SWCR_MAP_DMZ) {
->          env->fp_status.flush_inputs_to_zero =3D 1;
->      }
->      if (env->swcr & SWCR_MAP_UMZ) {
->          env->fpcr_flush_to_zero =3D 1;
->      }
-> -    env->fpcr_exc_enable &=3D ~(alpha_ieee_swcr_to_fpcr(env->swcr) >> =
-32);
->  #endif
->  }
-> =20
 >=20
 
