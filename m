@@ -2,88 +2,94 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B152CC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 19:03:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD879C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 19:05:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7932221D7A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 19:03:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 86EF421D7A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 19:05:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xrCPvpri"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7932221D7A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DEk02Nfy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86EF421D7A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDCZf-0002Xt-3n
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 15:03:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47276)
+	id 1iDCbb-0004wO-Dz
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 15:05:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53485)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iDCIq-00020L-0u
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 14:46:18 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iDCRq-0002nU-Pu
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 14:55:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iDCIm-0004Sl-F9
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 14:46:13 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:45561)
+ (envelope-from <richard.henderson@linaro.org>) id 1iDCRo-0004bX-Hy
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 14:55:34 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:45460)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iDCIm-0004Rc-98
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 14:46:12 -0400
-Received: by mail-pg1-x542.google.com with SMTP id 4so360227pgm.12
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 11:46:12 -0700 (PDT)
+ id 1iDCRm-0004Y5-Ho
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 14:55:30 -0400
+Received: by mail-pf1-x441.google.com with SMTP id y72so4153248pfb.12
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 11:55:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=60zIbLUAmUNSEgAQIKyqCRl8+f6RWn+eou5eyJkQXA8=;
- b=xrCPvprifaONXZagZ/fLiCRF0Tp5WX4YVEhS72UkFdTUxPK+uVjcB9kbg934woTf8+
- x1dUu7KyBEpkmeOuRycTGdgTIbKZg9ASP3so9ouWNqcb+NU5xCucBbnMqYTbqmo4rWQ5
- GuVB5vc4VeXsHaI/kLo5pKRnvfIOblOVZ/rtGxbPVZUrOvI9WGlCL2J0mtBhQcVtwo0J
- QRSPHhGbFO62lcBncVwXgnkBWQR3L2lfvKU0GMJtOg6X9mbeF5N8uo6xlTcUVSxFUKMS
- lrKeHsQSSR0akGKVKq2IW4sPcW9bXor6306M8bzd0IfIpfEQ2hGv2IqKn/nrfBLCoonr
- MqDQ==
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=pC+yy8U4yiitwpzuiF/dcwcXRdxCYf5tg+gT7SMoVII=;
+ b=DEk02NfyO5nwJKwPUj6zH99VPZ14wop2ApdTk4jqPg1KBneOd2D1shOHwyRZp0q5rJ
+ u8ZX+kfW++Dd1rX5UG5R9qeGKZs88XdkHqsA2pm13uOLoYDlQzmWC1QkLL/CvcIMM3am
+ zjFGnQogLKdkwguXyFw2+Qj1JOXD6nbIGdR0S1IXqgnIPhf6JISkg2n8cf7sWl0w5MeD
+ CZxikEnfrJjFAg1vw97+yLHPesw6R45cr6ofmvPW/qm1KqwFdQ4pTGE1PdzCaNU9LUXm
+ KYUB6aDrN67JnGV29zVZtqvsbF2elbBW1SBgKsRrDUe8gfzaDKhnNdHtuz8uI4Xhuns1
+ 1gzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=60zIbLUAmUNSEgAQIKyqCRl8+f6RWn+eou5eyJkQXA8=;
- b=LFd6ho3whf8NYlIoBy/Uh3D/x/6vZ7rKx1iGNe8EVnuVG6qYzAcOUg1bxfHqRGmhrD
- J42AJnhTLE2/6OyC5MtGoEQQETNzbb6XM4tk+xsSiPnUWtcnWD7XRzokQmNorrx3uBrh
- d6lLThbO33i/531dDUjc3htl8YPSBtSbF6fFmMVKHoBZP0TnvVWV7q2bpcPQSvVvap6W
- WHqYcNylOMtsr9BK1D/fe0u9/eETMik6y3gDydrwXMWQBshTwFiVxXXvcHd2Nln4EsIo
- LbNLOcZkz4rYzMENrDSYrp4QFRhLGjK5VzcFdJyVDKT+axgi+G95euSfjz14PW29SEXF
- 2BQA==
-X-Gm-Message-State: APjAAAUUUI1t6NmngSvTAGx+TsiKFIrlPyTEaLxWUrfuGdhcI7wDUYOj
- IwHg8SBRHAnwWNlkKYo3qr14cwbcxLk=
-X-Google-Smtp-Source: APXvYqyN1SicsiA4gerH6TsZ1iZ7ifhN/tw+1MJlS0lG7f1uZ1oa3M96NGEldG5pviFYH8fHLMsZ1w==
-X-Received: by 2002:a17:90b:946:: with SMTP id
- dw6mr8133586pjb.48.1569437170739; 
- Wed, 25 Sep 2019 11:46:10 -0700 (PDT)
-Received: from localhost.localdomain ([12.206.46.61])
- by smtp.gmail.com with ESMTPSA id l24sm6133229pff.151.2019.09.25.11.46.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Sep 2019 11:46:09 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=pC+yy8U4yiitwpzuiF/dcwcXRdxCYf5tg+gT7SMoVII=;
+ b=Z1Iv3e3FPQYq03+7KhvQWyAkzcUl0Kq5yqzFeM4xeFZItag1Y7Kn++IHEO4Maxr1UV
+ yz+BARuopPJp+/sQly5KtVUNs7D+CosVS+KtnUKDAQA3bqjmuSMPVmfK3+I6pRRdbEC5
+ 7oijR7Qu8sPQv+EDUV8qOlW4ZOzDSzt/hF4rRf4ubGf2GPghRDcXI0oTqsZnhi4pbThU
+ UXll2twEWFYYfVRQivL09eXdwfGb6k/ZmSTQVWd6mhBJpHSeUHPop2q3Vif1ZGagzsCU
+ wIWIXjiGn7byMvG+MIBt2n3L8B5Gk1j7aw/gx/e3a+ZzZEWYg/LjAh52C93gQ1UU2swI
+ Csbg==
+X-Gm-Message-State: APjAAAXhrUhsVqL7gjESiWuqlKBbGlT3E5Pk7rScqEmZ9bW2DZwm+ZEX
+ fRK+eAjOWqEx89FmU5A+GEXZ3A==
+X-Google-Smtp-Source: APXvYqyjiaAGhklxtB8PVF35M6fND91npAsAEOUpLKWAn3kvpA0sZ9rG/czkt1uUBKgkwIB7GHBqGA==
+X-Received: by 2002:a17:90a:310:: with SMTP id
+ 16mr8315200pje.100.1569437729090; 
+ Wed, 25 Sep 2019 11:55:29 -0700 (PDT)
+Received: from [172.20.32.216] ([12.206.46.61])
+ by smtp.gmail.com with ESMTPSA id m2sm322364pgc.19.2019.09.25.11.55.27
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 25 Sep 2019 11:55:28 -0700 (PDT)
+Subject: Re: [PATCH v3 15/33] tests/docker: reduce scary warnings by cleaning
+ up clean up
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20190924210106.27117-1-alex.bennee@linaro.org>
+ <20190924210106.27117-16-alex.bennee@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 14/16] cputlb: Remove tb_invalidate_phys_page_range
- is_cpu_write_access
-Date: Wed, 25 Sep 2019 11:45:46 -0700
-Message-Id: <20190925184548.30673-15-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190925184548.30673-1-richard.henderson@linaro.org>
-References: <20190925184548.30673-1-richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <629ccb70-f323-4474-2d34-94467630c598@linaro.org>
+Date: Wed, 25 Sep 2019 11:55:25 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20190924210106.27117-16-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,84 +101,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, jsnow@redhat.com,
+ f4bug@amsat.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-All callers pass false to this argument.  Remove it and pass the
-constant on to tb_invalidate_phys_page_range__locked.
+On 9/24/19 2:00 PM, Alex Bennée wrote:
+> There was in the clean-up code caused by attempting to inspect images
+> which finished before we got there. Clean up the clean up code by:
+> 
+>   - only track the one instance at a time
+>   - use --filter for docker ps instead of doing it by hand
+>   - just call docker rm -f to be done with it
+>   - use uuid.uuid4() for a random uid
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> 
+> ---
+> v2
+>   - drop the try/except approach and be smarter
+>   - use uuid4 as uuid1 can generate clashes in parallel builds
+> 
+> fixup! tests/docker: reduce scary warnings by cleaning up clean up
+> ---
+>  tests/docker/docker.py | 34 ++++++++++++++++------------------
+>  1 file changed, 16 insertions(+), 18 deletions(-)
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- accel/tcg/translate-all.h | 3 +--
- accel/tcg/translate-all.c | 6 ++----
- exec.c                    | 4 ++--
- 3 files changed, 5 insertions(+), 8 deletions(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/accel/tcg/translate-all.h b/accel/tcg/translate-all.h
-index 64f5fd9a05..31f2117188 100644
---- a/accel/tcg/translate-all.h
-+++ b/accel/tcg/translate-all.h
-@@ -28,8 +28,7 @@ struct page_collection *page_collection_lock(tb_page_addr_t start,
- void page_collection_unlock(struct page_collection *set);
- void tb_invalidate_phys_page_fast(struct page_collection *pages,
-                                   tb_page_addr_t start, int len);
--void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
--                                   int is_cpu_write_access);
-+void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end);
- void tb_check_watchpoint(CPUState *cpu);
- 
- #ifdef CONFIG_USER_ONLY
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 5d1e08b169..de4b697163 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1983,8 +1983,7 @@ tb_invalidate_phys_page_range__locked(struct page_collection *pages,
-  *
-  * Called with mmap_lock held for user-mode emulation
-  */
--void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
--                                   int is_cpu_write_access)
-+void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end)
- {
-     struct page_collection *pages;
-     PageDesc *p;
-@@ -1996,8 +1995,7 @@ void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
-         return;
-     }
-     pages = page_collection_lock(start, end);
--    tb_invalidate_phys_page_range__locked(pages, p, start, end,
--                                          is_cpu_write_access);
-+    tb_invalidate_phys_page_range__locked(pages, p, start, end, 0);
-     page_collection_unlock(pages);
- }
- 
-diff --git a/exec.c b/exec.c
-index 7d835b1a2b..b3df826039 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1012,7 +1012,7 @@ const char *parse_cpu_option(const char *cpu_option)
- void tb_invalidate_phys_addr(target_ulong addr)
- {
-     mmap_lock();
--    tb_invalidate_phys_page_range(addr, addr + 1, 0);
-+    tb_invalidate_phys_page_range(addr, addr + 1);
-     mmap_unlock();
- }
- 
-@@ -1039,7 +1039,7 @@ void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs attrs)
-         return;
-     }
-     ram_addr = memory_region_get_ram_addr(mr) + addr;
--    tb_invalidate_phys_page_range(ram_addr, ram_addr + 1, 0);
-+    tb_invalidate_phys_page_range(ram_addr, ram_addr + 1);
-     rcu_read_unlock();
- }
- 
--- 
-2.17.1
+
+r~
 
 
