@@ -2,59 +2,82 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2A5DC4320D
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 00:53:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D9CEC432C1
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 01:00:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAAD0214DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 00:53:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAAD0214DA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2951A20874
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 01:00:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O7NnVUbn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2951A20874
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCvYR-0007lF-QL
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 20:53:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58031)
+	id 1iCvfM-0001BS-Ae
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 21:00:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33806)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ren_guo@c-sky.com>) id 1iCv11-0004fw-RN
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 20:18:44 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iCveR-0000l0-06
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 20:59:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ren_guo@c-sky.com>) id 1iCv10-0001Xv-9g
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 20:18:43 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:39223)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ren_guo@c-sky.com>)
- id 1iCv0z-0001Vr-Uj; Tue, 24 Sep 2019 20:18:42 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.004950699|-1; CH=green;
- DM=CONTINUE|CONTINUE|true|0.639357-0.0099686-0.350674; FP=0|0|0|0|0|-1|-1|-1;
- HT=e02c03306; MF=ren_guo@c-sky.com; NM=1; PH=DS; RN=6; RT=6; SR=0;
- TI=SMTPD_---.Faz1EVd_1569370398; 
-Received: from it-c02z45m7lvcf.lan(mailfrom:ren_guo@c-sky.com
- fp:SMTPD_---.Faz1EVd_1569370398) by smtp.aliyun-inc.com(10.147.40.2);
- Wed, 25 Sep 2019 08:13:18 +0800
-Content-Type: text/plain;
-	charset=gb2312
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH V2] target/riscv: Bugfix reserved bits in PTE for RV64
-From: Guo Ren <ren_guo@c-sky.com>
-In-Reply-To: <CAKmqyKMzpTKBT+urX_7qFASqcAd4kkfJmf6LUk-0V=0LOuHLxw@mail.gmail.com>
-Date: Wed, 25 Sep 2019 08:13:17 +0800
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <8E7A78A5-5E6F-49A2-89BC-85D2506229C6@c-sky.com>
-References: <1569311902-12173-1-git-send-email-guoren@kernel.org>
- <CAKmqyKMzpTKBT+urX_7qFASqcAd4kkfJmf6LUk-0V=0LOuHLxw@mail.gmail.com>
-To: Alistair Francis <alistair23@gmail.com>
-X-Mailer: Apple Mail (2.3445.104.11)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
-X-Mailman-Approved-At: Tue, 24 Sep 2019 20:52:28 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iCveP-0001f8-U0
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 20:59:26 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:38515)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1iCveN-0001dw-Cv; Tue, 24 Sep 2019 20:59:23 -0400
+Received: by mail-lj1-x244.google.com with SMTP id b20so3788011ljj.5;
+ Tue, 24 Sep 2019 17:59:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Jb2Lqjsxv6Gso+EKst3C5mPas0pf5Rwsyo0+phyvWq4=;
+ b=O7NnVUbnXL12A2R5IhEYqcvn7EQgAhywzSm+Jo34uP9e/O3mz8d7Xdf0WCw93By9kT
+ WSZqeKWEwHY3YGhRXET4e3XuuRVy6R/u23InU8+fw1DTVSCRC7SQXe9EcgAwwIshyBXD
+ +lZK8QtNV1Q6EBsUBnCzRxE9+ZnPK45jafZ5n2jtoQe/WLOVW/p4WbgIZWEF2m+99CyF
+ MCUI6SDGkfp1NjbbWZelDnLHRY4pzpwCiki55AcRnumz99jr70gM94E9eM8xgmeXXZcf
+ D2SbAv5v6Sa1cAYkzqHIwVGOQxdCZ3FqwqpZ/qAwoBFqaLk6137IxAK/qSaf6EEt1LX3
+ Jh3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Jb2Lqjsxv6Gso+EKst3C5mPas0pf5Rwsyo0+phyvWq4=;
+ b=Sy8dai4rZiZhukP09R0ZqGwdLqbtvQGE8RtMd8SzcrIEnPfC/6I11ijm+a39vR69FZ
+ nOwGxREh4fdlSw5s6UQJRYU8v27v3W1jqYOywLb8kGdVuTsyS3BgIzLsOTj6/3boy/Vy
+ /cB+hBQi62bwuDByJbibcY1ahpnisTKwlrUnsfjNiLJub7bBm/2zX1Fvqb8LDrlZhcIX
+ XPW7oNbfbE1T/Pq7+kjibY9AOcP0Dafoh78Bq6729h6YiZsDrEIVvoQwZw4kxdYbNPgb
+ cL/cVtzcPBNN8Zbg9XVTg5ZnQVQOXRluFMldQeuOC3Q3nHU3eIO0dmiHJ8/Vu+JoR2z4
+ p3eQ==
+X-Gm-Message-State: APjAAAVINVCsAXLPwRJlsArkrJOtPiLQPY9naSP8IJL7RO7ZUxqUh8Sz
+ o2uk9c0Yt54UttwVd0luCLJIrj3E9l3pV7ZSoDo=
+X-Google-Smtp-Source: APXvYqxMf/VIzWRKWIZBUjpPWFwNt/wsHQU7KtsSB95xSMuSWVMX2vJerZYtYnZbFxBLnQ3Ur3AEd6Kgijkc60iY5vs=
+X-Received: by 2002:a2e:90d9:: with SMTP id o25mr3731285ljg.94.1569373161940; 
+ Tue, 24 Sep 2019 17:59:21 -0700 (PDT)
+MIME-Version: 1.0
+References: <cover.1568931866.git.alistair.francis@wdc.com>
+ <0a5c141a26fada6d93d06e996a2f24e1b269ec50.1568931866.git.alistair.francis@wdc.com>
+ <CAEUhbmVvDKQqQYE-riq=cvSrCe_NMoW_KDsLjh8CVHRUhJvk9A@mail.gmail.com>
+ <CAKmqyKOofA3U+8kjMkzQ0sNd1=uwJHq3c9eaLZdoNCb7=e-PAw@mail.gmail.com>
+ <CAFEAcA-uFPGf4BiDXH=Om3Df-xXrt7QwjzVF7E3kY4aMWMP4YQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA-uFPGf4BiDXH=Om3Df-xXrt7QwjzVF7E3kY4aMWMP4YQ@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 24 Sep 2019 17:54:39 -0700
+Message-ID: <CAKmqyKP3T79qVUXftO=0hmhYbD9MKccdvsAcs=_4CQFoNmfucw@mail.gmail.com>
+Subject: Re: [PATCH v1 5/6] riscv/virt: Add the PFlash CFI01 device
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,112 +90,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Alistair Francis <alistair.francis@wdc.com>,
- Palmer Dabbelt <palmer@sifive.com>, guoren@kernel.org,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, Sep 23, 2019 at 2:46 PM Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Fri, 20 Sep 2019 at 23:23, Alistair Francis <alistair23@gmail.com> wrote:
+> > On Thu, Sep 19, 2019 at 10:15 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+> > > I don't think we should mirror what is used on ARM virt board to
+> > > create 2 flash for sifive_u. For ARM virt, there are 2 flashes because
+> > > they need distinguish secure and non-secure. For sifive_u, only one is
+> > > enough.
+> >
+> > I went back and forward about 1 or 2. Two seems more usable as maybe
+> > someone wants to include two pflash files? The Xilinx machine also has
+> > two so I'm kind of used to 2, but I'm not really fussed.
+>
+> One of the reasons for having 2 on the Arm board (we do this
+> even if we're not supporting secure vs non-secure) is that
+> then you can use one for a fixed read-only BIOS image (backed
+> by a file on the host filesystem shared between all VMs), and
+> one backed by a read-write per-VM file providing permanent
+> storage for BIOS environment variables. Notably UEFI likes to
+> work this way, but the idea applies in theory to other
+> boot loader or BIOSes I guess.
 
-> =D4=DA 2019=C4=EA9=D4=C225=C8=D5=A3=AC=C9=CF=CE=E77:33=A3=ACAlistair =
-Francis <alistair23@gmail.com> =D0=B4=B5=C0=A3=BA
->=20
-> On Tue, Sep 24, 2019 at 12:58 AM <guoren@kernel.org> wrote:
->>=20
->> From: Guo Ren <ren_guo@c-sky.com>
->>=20
->> Highest 10 bits of PTE are reserved in riscv-privileged, ref: [1], so =
-we
->> need to ignore them. They can not be a part of ppn.
->>=20
->> 1: The RISC-V Instruction Set Manual, Volume II: Privileged =
-Architecture
->>   4.4 Sv39: Page-Based 39-bit Virtual-Memory System
->>   4.5 Sv48: Page-Based 48-bit Virtual-Memory System
->=20
-> Thanks for the patch!
->=20
-> The spec says "must be zeroed by software for forward compatibility"
-> so I don't think it's correct for QEMU to zero out the bits.
-QEMU don=A1=AFt zero out the bits, QEMU just ignore the bits for ppn.
+This seems like a good reason to have two and there isn't really a
+disadvantage so I have kept it with two.
 
->=20
-> Does this fix a bug you are seeing?
-Yes, because we try to reuse these bits as attributes.
+>
+> I would suggest also checking with Markus that your code
+> for instantiating the flash devices follows the current
+> recommendations so the backing storage can be configured
+> via -blockdev. (This is a fairly recent change from June or
+> so; current-in-master virt and sbsa boards provide an example
+> of doing the right thing, I think.)
 
->=20
->>=20
->> Changelog V2:
->> - Bugfix pte destroyed cause boot fail
->> - Change to AND with a mask instead of shifting both directions
->=20
-> The changelog shouldn't be in the commit, it should be kept under the
-> line line below.
-I just prefer to save them in commit.
+I have updated the code to more closely match the ARM virt machine, so
+I think I'm doing it correctly.
 
->=20
->>=20
->> Signed-off-by: Guo Ren <ren_guo@c-sky.com>
->> Reviewed-by: Liu Zhiwei <zhiwei_liu@c-sky.com>
->> ---
->=20
-> The change log should go here.
-OK, but git am we=A1=AFll lose them.
+Alistair
 
->=20
->> target/riscv/cpu_bits.h   | 3 +++
->> target/riscv/cpu_helper.c | 3 ++-
->> 2 files changed, 5 insertions(+), 1 deletion(-)
->>=20
->> diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
->> index e998348..ae8aa0f 100644
->> --- a/target/riscv/cpu_bits.h
->> +++ b/target/riscv/cpu_bits.h
->> @@ -470,6 +470,9 @@
->> #define PTE_D               0x080 /* Dirty */
->> #define PTE_SOFT            0x300 /* Reserved for Software */
->>=20
->> +/* Reserved highest 10 bits in PTE */
->> +#define PTE_RESERVED        ((target_ulong)0x3ff << 54)
->=20
-> I think it's just easier to define this as 0xFFC0000000000000ULL and
-> remove the cast.
-OK follow your rule, but I still prefer prior.
-
->=20
->> +
->> /* Page table PPN shift amount */
->> #define PTE_PPN_SHIFT       10
->>=20
->> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
->> index 87dd6a6..7a540cc 100644
->> --- a/target/riscv/cpu_helper.c
->> +++ b/target/riscv/cpu_helper.c
->> @@ -258,10 +258,11 @@ restart:
->>         }
->> #if defined(TARGET_RISCV32)
->>         target_ulong pte =3D ldl_phys(cs->as, pte_addr);
->> +        hwaddr ppn =3D pte >> PTE_PPN_SHIFT;
->> #elif defined(TARGET_RISCV64)
->>         target_ulong pte =3D ldq_phys(cs->as, pte_addr);
->> +        hwaddr ppn =3D (pte & ~PTE_RESERVED) >> PTE_PPN_SHIFT;
->> #endif
->> -        hwaddr ppn =3D pte >> PTE_PPN_SHIFT;
->=20
-> You don't have to move this shift
-En=A1=AD Do you want this: ?
-
-#if defined(TARGET_RISCV32)
-        target_ulong pte =3D ldl_phys(cs->as, pte_addr);
-+      hwaddr ppn =3D pte;
-#elif defined(TARGET_RISCV64)
-         target_ulong pte =3D ldq_phys(cs->as, pte_addr);
-+       hwaddr ppn =3D (pte & ~PTE_RESERVED);
-#endif
-+        ppn =3D ppn >> PTE_PPN_SHIFT;
-
-The pte couldn=A1=AFt be destroyed, just ppn ignore the RESERVED bits.
-
-
+>
+> thanks
+> -- PMM
 
