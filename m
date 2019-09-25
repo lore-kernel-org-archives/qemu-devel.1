@@ -2,61 +2,63 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B10E8C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:10:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90B45C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:12:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8345921D7B
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:10:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8345921D7B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 61CFF21D7B
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:12:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61CFF21D7B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD8wQ-000130-Sx
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 11:10:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53075)
+	id 1iD8y4-0002tc-7m
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 11:12:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57667)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iD8OO-0005er-4M
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:35:45 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iD8nr-0000re-IV
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:02:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iD8OM-0001tX-US
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:35:43 -0400
-Received: from 10.mo179.mail-out.ovh.net ([46.105.79.46]:56488)
+ (envelope-from <dgilbert@redhat.com>) id 1iD8nq-0004fW-D5
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:02:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59684)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iD8OM-0001sq-Nu
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:35:42 -0400
-Received: from player786.ha.ovh.net (unknown [10.109.146.82])
- by mo179.mail-out.ovh.net (Postfix) with ESMTP id 6726614325F
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 16:35:40 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player786.ha.ovh.net (Postfix) with ESMTPSA id D5334A4D4480;
- Wed, 25 Sep 2019 14:35:33 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH v2 23/23] aspeed/soc: Add ASPEED Video stub
-Date: Wed, 25 Sep 2019 16:32:48 +0200
-Message-Id: <20190925143248.10000-24-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190925143248.10000-1-clg@kaod.org>
-References: <20190925143248.10000-1-clg@kaod.org>
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iD8nq-0004f2-79
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:02:02 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6A98E3086208;
+ Wed, 25 Sep 2019 15:02:01 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-117-251.ams2.redhat.com
+ [10.36.117.251])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 18B865C220;
+ Wed, 25 Sep 2019 15:01:51 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com,
+ marcandre.lureau@redhat.com, richardw.yang@linux.intel.com,
+ alex.benee@linaro.org
+Subject: [PULL 5/9] migration/rdma: Don't moan about disconnects at the end
+Date: Wed, 25 Sep 2019 16:01:26 +0100
+Message-Id: <20190925150130.12303-6-dgilbert@redhat.com>
+In-Reply-To: <20190925150130.12303-1-dgilbert@redhat.com>
+References: <20190925150130.12303-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 8879972568535632657
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfedvgdejkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Wed, 25 Sep 2019 15:02:01 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.79.46
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,95 +70,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Joel Stanley <joel@jms.id.au>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Signed-off-by: Joel Stanley <joel@jms.id.au>
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+If we've already finished the migration or something has
+already gone wrong, don't moan about the migration stream disconnecting.
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20190913163507.1403-2-dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/hw/arm/aspeed_soc.h | 1 +
- hw/arm/aspeed_ast2600.c     | 5 +++++
- hw/arm/aspeed_soc.c         | 6 ++++++
- 3 files changed, 12 insertions(+)
+ migration/rdma.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
-index 43478f617879..cccb684a19bb 100644
---- a/include/hw/arm/aspeed_soc.h
-+++ b/include/hw/arm/aspeed_soc.h
-@@ -96,6 +96,7 @@ enum {
-     ASPEED_SDMC,
-     ASPEED_SCU,
-     ASPEED_ADC,
-+    ASPEED_VIDEO,
-     ASPEED_SRAM,
-     ASPEED_SDHCI,
-     ASPEED_GPIO,
-diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
-index af047463a355..931887ac681f 100644
---- a/hw/arm/aspeed_ast2600.c
-+++ b/hw/arm/aspeed_ast2600.c
-@@ -44,6 +44,7 @@ static const hwaddr aspeed_soc_ast2600_memmap[] =3D {
-     [ASPEED_SCU]       =3D 0x1E6E2000,
-     [ASPEED_XDMA]      =3D 0x1E6E7000,
-     [ASPEED_ADC]       =3D 0x1E6E9000,
-+    [ASPEED_VIDEO]     =3D 0x1E700000,
-     [ASPEED_SDHCI]     =3D 0x1E740000,
-     [ASPEED_GPIO]      =3D 0x1E780000,
-     [ASPEED_GPIO_1_8V] =3D 0x1E780800,
-@@ -236,6 +237,10 @@ static void aspeed_soc_ast2600_realize(DeviceState *=
-dev, Error **errp)
-     create_unimplemented_device("aspeed_soc.io", sc->memmap[ASPEED_IOMEM=
-],
-                                 ASPEED_SOC_IOMEM_SIZE);
+diff --git a/migration/rdma.c b/migration/rdma.c
+index 78e6b72bac..0fcf02f48e 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -3253,10 +3253,14 @@ static void rdma_cm_poll_handler(void *opaque)
 =20
-+    /* Video engine stub */
-+    create_unimplemented_device("aspeed.video", sc->memmap[ASPEED_VIDEO]=
-,
-+                                0x1000);
-+
-     if (s->num_cpus > sc->num_cpus) {
-         warn_report("%s: invalid number of CPUs %d, using default %d",
-                     sc->name, s->num_cpus, sc->num_cpus);
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index 6defb143acde..f4fe243458fd 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -34,6 +34,7 @@ static const hwaddr aspeed_soc_ast2400_memmap[] =3D {
-     [ASPEED_SDMC]   =3D 0x1E6E0000,
-     [ASPEED_SCU]    =3D 0x1E6E2000,
-     [ASPEED_XDMA]   =3D 0x1E6E7000,
-+    [ASPEED_VIDEO]  =3D 0x1E700000,
-     [ASPEED_ADC]    =3D 0x1E6E9000,
-     [ASPEED_SRAM]   =3D 0x1E720000,
-     [ASPEED_SDHCI]  =3D 0x1E740000,
-@@ -63,6 +64,7 @@ static const hwaddr aspeed_soc_ast2500_memmap[] =3D {
-     [ASPEED_SCU]    =3D 0x1E6E2000,
-     [ASPEED_XDMA]   =3D 0x1E6E7000,
-     [ASPEED_ADC]    =3D 0x1E6E9000,
-+    [ASPEED_VIDEO]  =3D 0x1E700000,
-     [ASPEED_SRAM]   =3D 0x1E720000,
-     [ASPEED_SDHCI]  =3D 0x1E740000,
-     [ASPEED_GPIO]   =3D 0x1E780000,
-@@ -231,6 +233,10 @@ static void aspeed_soc_realize(DeviceState *dev, Err=
-or **errp)
-     create_unimplemented_device("aspeed_soc.io", sc->memmap[ASPEED_IOMEM=
-],
-                                 ASPEED_SOC_IOMEM_SIZE);
+     if (cm_event->event =3D=3D RDMA_CM_EVENT_DISCONNECTED ||
+         cm_event->event =3D=3D RDMA_CM_EVENT_DEVICE_REMOVAL) {
+-        error_report("receive cm event, cm event is %d", cm_event->event=
+);
+-        rdma->error_state =3D -EPIPE;
+-        if (rdma->return_path) {
+-            rdma->return_path->error_state =3D -EPIPE;
++        if (!rdma->error_state &&
++            migration_incoming_get_current()->state !=3D
++              MIGRATION_STATUS_COMPLETED) {
++            error_report("receive cm event, cm event is %d", cm_event->e=
+vent);
++            rdma->error_state =3D -EPIPE;
++            if (rdma->return_path) {
++                rdma->return_path->error_state =3D -EPIPE;
++            }
+         }
 =20
-+    /* Video engine stub */
-+    create_unimplemented_device("aspeed.video", sc->memmap[ASPEED_VIDEO]=
-,
-+                                0x1000);
-+
-     if (s->num_cpus > sc->num_cpus) {
-         warn_report("%s: invalid number of CPUs %d, using default %d",
-                     sc->name, s->num_cpus, sc->num_cpus);
+         if (mis->migration_incoming_co) {
 --=20
 2.21.0
 
