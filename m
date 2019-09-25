@@ -2,73 +2,95 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 030C7C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 19:18:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF294C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 19:19:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C350220640
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 19:18:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C350220640
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 7755F21D7B
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 19:19:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TyfgXCOk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7755F21D7B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDCo9-0000gI-Pf
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 15:18:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39969)
+	id 1iDCpO-0001wv-4O
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 15:19:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55685)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iDClM-00073p-8c
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 15:15:46 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iDCV7-0006W8-VN
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 14:58:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iDClK-0007Z4-0I
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 15:15:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55956)
+ (envelope-from <richard.henderson@linaro.org>) id 1iDCV6-0007dM-DX
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 14:58:57 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:44328)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iDClH-0007XN-4z
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 15:15:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iDClF-0006lZ-9a
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 19:15:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 3B42E2E80CC
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 19:15:37 +0000 (UTC)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iDCV6-0007cU-8L
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 14:58:56 -0400
+Received: by mail-pg1-x543.google.com with SMTP id i14so167948pgt.11
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 11:58:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=YjMgfxpdQzFt3kH8mjBgEB/l6rkej8XnyzFMto1GxsM=;
+ b=TyfgXCOkHVkOufKML6Ig+BQLRLU39PHMmYI6Mb56Rfcl8i7rXMLgbRoC55ej7Ap8Xv
+ B9niGwfc7x8zgQ5PudPTPZ6LGdG3jP2714Wj7XyMLmrJYVkb6iAbDjbnnw1+G6lWVGhE
+ mOzwPA5jg1mi1FAQvcJLU2Ipws7H8fitphDqM87QR/9TV5cY+NNwvnN8GxDkgdlakK3T
+ RQgH1oZr775L6fV9bdj6Z1o4oIqferUx5LveUEcANoTSPTV0MNDIs+X6paj0jz5hYaXD
+ JyUQkFAdShc6AgGy5DKMkjmHCPxeD0EIM+Sx5berzycZQQhieRmD+fmZk1nMDeZ2w3I3
+ aDbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=YjMgfxpdQzFt3kH8mjBgEB/l6rkej8XnyzFMto1GxsM=;
+ b=nIrk+E8WMiMBPVzt3KAOwmsD9ri7CMbsDJu3hURZJRiWERbFO72fMLC2YYtJ66dU/5
+ 7RqqiTTT9+JokY6/erNqSWH9fY+Kjon63o5gwAXAGKnK5BqLiKmMWxw5uZ+F5/Q8tIbt
+ /boAxxusvPV1q1q8jEnF30pOdJmpzZZQcL6MGRjg4RVU8Oz3DaJy7oS/kmurrzeFPUaa
+ 6dSVuVWiIkbQXIdaZ51rhnRy3BxuFFMEn7I7pjTWUslvzsGXeTZ6iyNRMM2HENlS/aJe
+ G2NJiwF25MoY3tm0HoLpWKD+noDtpk0QnsLMvZXuzxn069HVjs6YyR6G8lScvAJr7bM3
+ j3Zw==
+X-Gm-Message-State: APjAAAV7R2MC32ZgvdzY3KmiR0QijMqFxCHLXCqOXokynx9cT2pfFY7y
+ P/Rsi9MGxmm/e9b4hHbCRzD3iQ==
+X-Google-Smtp-Source: APXvYqzq6U+do8pl8gsRXTgFUoZDD/g7Y2WnnTGsTaDZEJ/T7iWNUYLZNEmAUD2ODGfRJF884ddWLg==
+X-Received: by 2002:aa7:92d9:: with SMTP id k25mr18866pfa.155.1569437935323;
+ Wed, 25 Sep 2019 11:58:55 -0700 (PDT)
+Received: from [172.20.32.216] ([12.206.46.61])
+ by smtp.gmail.com with ESMTPSA id k15sm313026pgt.66.2019.09.25.11.58.54
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 25 Sep 2019 11:58:54 -0700 (PDT)
+Subject: Re: [PATCH v3 23/33] docs/devel: add "check-tcg" to testing.rst
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20190924210106.27117-1-alex.bennee@linaro.org>
+ <20190924210106.27117-24-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <e45424fa-d0d0-1457-ce44-8e382ec0b31e@linaro.org>
+Date: Wed, 25 Sep 2019 11:58:51 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Sep 2019 19:09:59 -0000
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: ppc64 testcase
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 7-pc mark-cave-ayland philmd
-X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
-X-Launchpad-Bug-Modifier: Mark Cave-Ayland (mark-cave-ayland)
-References: <156711057074.6835.13599471410604217618.malonedeb@soybean.canonical.com>
-Message-Id: <156943859931.425.1301371420457105353.malone@wampee.canonical.com>
-Subject: [Bug 1841990] Re: instruction 'denbcdq' misbehaving
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19048";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: bbd7007be3a2312bc4e7df5841e69ad124f30b9a
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+In-Reply-To: <20190924210106.27117-24-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,91 +99,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1841990 <1841990@bugs.launchpad.net>
+Cc: jsnow@redhat.com, f4bug@amsat.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-That certainly sounds like progress. Did you see the follow up email
-indicating the typo that I found in patch 6? It can be fixed by applying
-the following diff on top:
+On 9/24/19 2:00 PM, Alex Bennée wrote:
+> It was pointed out we haven't documented the check-tcg part of the
+> build system. Attempt to rectify that now.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  docs/devel/testing.rst | 62 ++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 62 insertions(+)
 
-diff --git a/target/ppc/dfp_helper.c b/target/ppc/dfp_helper.c
-index c2d335e928..b801acbedc 100644
---- a/target/ppc/dfp_helper.c
-+++ b/target/ppc/dfp_helper.c
-@@ -1054,7 +1054,7 @@ static inline void dfp_set_sign_64(ppc_vsr_t *t, uint=
-8_t sgn)
- static inline void dfp_set_sign_128(ppc_vsr_t *t, uint8_t sgn)
- {
-     t->VsrD(0) <<=3D 4;
--    t->VsrD(0) |=3D (t->VsrD(0) >> 60);
-+    t->VsrD(0) |=3D (t->VsrD(1) >> 60);
-     t->VsrD(1) <<=3D 4;
-     t->VsrD(1) |=3D (sgn & 0xF);
- }
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Does that help any more tests to pass? Also the changes to the FP
-register layout were made in QEMU 4.0 and so it seems to me that even if
-some tests fail, if the results between QEMU 3.1 and QEMU git master
-with the patchset applied are equivalent then we can assume that the
-patchset functionality is correct.
 
--- =
+r~
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1841990
-
-Title:
-  instruction 'denbcdq' misbehaving
-
-Status in QEMU:
-  New
-
-Bug description:
-  Instruction 'denbcdq' appears to have no effect.  Test case attached.
-
-  On ppc64le native:
-  --
-  gcc -g -O -mcpu=3Dpower9 bcdcfsq.c test-denbcdq.c -o test-denbcdq
-  $ ./test-denbcdq
-  0x00000000000000000000000000000000
-  0x0000000000000000000000000000000c
-  0x22080000000000000000000000000000
-  $ ./test-denbcdq 1
-  0x00000000000000000000000000000001
-  0x0000000000000000000000000000001c
-  0x22080000000000000000000000000001
-  $ ./test-denbcdq $(seq 0 99)
-  0x00000000000000000000000000000064
-  0x0000000000000000000000000000100c
-  0x22080000000000000000000000000080
-  --
-
-  With "qemu-ppc64le -cpu power9"
-  --
-  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq
-  0x00000000000000000000000000000000
-  0x0000000000000000000000000000000c
-  0x0000000000000000000000000000000c
-  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq 1
-  0x00000000000000000000000000000001
-  0x0000000000000000000000000000001c
-  0x0000000000000000000000000000001c
-  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq $(seq 100)
-  0x00000000000000000000000000000064
-  0x0000000000000000000000000000100c
-  0x0000000000000000000000000000100c
-  --
-
-  I started looking at the code, but I got confused rather quickly.
-  Could be related to endianness? I think denbcdq arrived on the scene
-  before little-endian was a big deal.  Maybe something to do with
-  utilizing implicit floating-point register pairs...  I don't think the
-  right data is getting to helper_denbcdq, which would point back to the
-  gen_fprp_ptr uses in dfp-impl.inc.c (GEN_DFP_T_FPR_I32_Rc).  (Maybe?)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1841990/+subscriptions
 
