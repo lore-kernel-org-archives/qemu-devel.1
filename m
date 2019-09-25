@@ -2,93 +2,94 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F16FC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3A7EC432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:12:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 393952146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:10:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q3AtsZkC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 393952146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 813AF2146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:12:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 813AF2146E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD9s4-0002Hj-KM
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 12:10:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38949)
+	id 1iD9u1-0004q9-KK
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 12:12:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40146)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iD9jj-0002d8-RP
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:01:53 -0400
+ (envelope-from <groug@kaod.org>) id 1iD9pV-0007cZ-ED
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:07:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iD9jh-0005cC-Ta
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:01:51 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40663)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iD9jh-0005bo-L9
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:01:49 -0400
-Received: by mail-wm1-x341.google.com with SMTP id b24so5549993wmj.5
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 09:01:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=gDm0a7DR+YHYGtadIwZtQJxiWkOTI/LNC2/7T5owi+w=;
- b=q3AtsZkCWtsc1CPH+NEmTh9S9wS/b7FModuXNLzBM/mLkNlDanF8XmoPyZBa6oiuJk
- kDXrUqfe96WD7FvvkQctapeeMMYhdZn86air24c1NjYjr8bL/aDc4Ju6+eUS9No+jC+M
- nVJcPPYDKPeLQ2fwPhfnL4hBmjlszpRCxt9yhq+FsCU60SrCRJ15BoHsUFmwYocR+csh
- xi87sIbmILpF9JI6mSztzOQzdDg9xdu3vZQTX2STqDUenIizoVdTWBy3yCeZ8IiaJtoy
- inx88STK4Sk2lCvtgtem0sHKpzgBFHVp4+TizB11UKh9ltzZszgoF2jkKe3GSQv4mfyX
- ZgrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=gDm0a7DR+YHYGtadIwZtQJxiWkOTI/LNC2/7T5owi+w=;
- b=Mtip+U4Z7eUrwPvzKQZHM+fpcTHLVTbr7DXtlMXwBc4rsrmCGnL8q9Jx78tCSo+1Gn
- Y4bWWaVcusnibj7+4FlTdPqEbStzp1s2S9Yr+fkdEQ8b8MQXQ4EacsBa5KhevHYaNDBs
- Tfup64fl6GwouFO3wJgYJGHpvDEsGSLSo4Ikckr1ll2lxoqpobou4veyY3x3hW30oW+j
- 9jBLOiq6jmU7IJPEWJcaRhq31BYVty+mZ9QNgmqatslSL65hArWmGfM8AQzg7nEDgPRT
- N7Z+ZAm0gsTjglVySQGxjG01YWDkHkXWLTYOvbDbJ66vUgODAGR/3bWrvtvTH4HLgmuz
- T6cg==
-X-Gm-Message-State: APjAAAVjQ1S9eFemNLu88vT6vDGa1AQugC+0SwDRSFr15frqeHK2I56N
- pIDGVdjjkrrrLPVxpocwRotGTg==
-X-Google-Smtp-Source: APXvYqxKRaL++Mm7gu7CxYfduOp4rUbVTyE4IjI+dOtRMrLYacH8tbJWfj4Sgkj7pNI1QEiiF0So/w==
-X-Received: by 2002:a7b:c252:: with SMTP id b18mr5104129wmj.68.1569427307452; 
- Wed, 25 Sep 2019 09:01:47 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id i5sm4181585wmd.21.2019.09.25.09.01.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Sep 2019 09:01:46 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B4B6D1FF87;
- Wed, 25 Sep 2019 17:01:45 +0100 (BST)
-References: <20190923230004.9231-1-richard.henderson@linaro.org>
- <20190923230004.9231-9-richard.henderson@linaro.org>
- <87v9th9qnz.fsf@linaro.org>
- <080af734-eccb-16c9-2664-72dd26ff460c@redhat.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v4 08/16] cputlb: Move ROM handling from I/O path to TLB
- path
-In-reply-to: <080af734-eccb-16c9-2664-72dd26ff460c@redhat.com>
-Date: Wed, 25 Sep 2019 17:01:45 +0100
-Message-ID: <87tv909xg6.fsf@linaro.org>
+ (envelope-from <groug@kaod.org>) id 1iD9pU-0007io-Cs
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:07:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38788
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iD9pU-0007iQ-7w
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:07:48 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x8PG7X3X132472
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 12:07:46 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2v8asb9v2u-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 12:07:46 -0400
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Wed, 25 Sep 2019 17:07:44 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 25 Sep 2019 17:07:41 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x8PG7eEY23396438
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 25 Sep 2019 16:07:40 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id AFB3DA404D;
+ Wed, 25 Sep 2019 16:07:40 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 796D1A4051;
+ Wed, 25 Sep 2019 16:07:40 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.186.179])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 25 Sep 2019 16:07:40 +0000 (GMT)
+Subject: [PATCH] spapr/irq: Fix migration of older machine types with XIVE
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>,
+ =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
+Date: Wed, 25 Sep 2019 18:07:40 +0200
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19092516-0016-0000-0000-000002B08883
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19092516-0017-0000-0000-000033115191
+Message-Id: <156942766014.1274533.10792048853177121231.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-25_07:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=809 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909250147
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,92 +101,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel@nongnu.org, stefanha@redhat.com
+Cc: qemu-ppc@nongnu.org, Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Recent patch "spapr/irq: Only claim VALID interrupts at the KVM level"
+broke migration of older machine types started with ic-mode=xive:
 
-David Hildenbrand <david@redhat.com> writes:
+qemu-system-ppc64: KVM_SET_DEVICE_ATTR failed: Group 3 attr 0x0000000000001300: Invalid argument
+qemu-system-ppc64: error while loading state for instance 0x0 of device 'spapr'
+qemu-system-ppc64: load of migration failed: Operation not permitted
 
-> On 25.09.19 02:16, Alex Benn=C3=A9e wrote:
->>
->> Richard Henderson <richard.henderson@linaro.org> writes:
->>
->>> It does not require going through the whole I/O path
->>> in order to discard a write.
->>>
->>> Reviewed-by: David Hildenbrand <david@redhat.com>
->>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->>> ---
->>>  include/exec/cpu-all.h    |  5 ++++-
->>>  include/exec/cpu-common.h |  1 -
->>>  accel/tcg/cputlb.c        | 35 +++++++++++++++++++--------------
->>>  exec.c                    | 41 +--------------------------------------
->>>  4 files changed, 25 insertions(+), 57 deletions(-)
->>>
->>> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
->>> index d148bded35..26547cd6dd 100644
->>> --- a/include/exec/cpu-all.h
->>> +++ b/include/exec/cpu-all.h
->> <snip>
->>> @@ -822,16 +821,17 @@ void tlb_set_page_with_attrs(CPUState *cpu, targe=
-t_ulong vaddr,
->>>
->>>      tn.addr_write =3D -1;
->>>      if (prot & PAGE_WRITE) {
->>> -        if ((memory_region_is_ram(section->mr) && section->readonly)
->>> -            || memory_region_is_romd(section->mr)) {
->>> -            /* Write access calls the I/O callback.  */
->>> -            tn.addr_write =3D address | TLB_MMIO;
->>> -        } else if (memory_region_is_ram(section->mr)
->>> -                   && cpu_physical_memory_is_clean(
->>> -                       memory_region_get_ram_addr(section->mr) + xlat)=
-) {
->>> -            tn.addr_write =3D address | TLB_NOTDIRTY;
->>> -        } else {
->>> -            tn.addr_write =3D address;
->>> +        tn.addr_write =3D address;
->>> +        if (memory_region_is_romd(section->mr)) {
->>> +            /* Use the MMIO path so that the device can switch states.=
- */
->>> +            tn.addr_write |=3D TLB_MMIO;
->>> +        } else if (memory_region_is_ram(section->mr)) {
->>> +            if (section->readonly) {
->>> +                tn.addr_write |=3D TLB_ROM;
->>> +            } else if (cpu_physical_memory_is_clean(
->>> +                        memory_region_get_ram_addr(section->mr) + xlat=
-)) {
->>> +                tn.addr_write |=3D TLB_NOTDIRTY;
->>> +            }
->>
->> This reads a bit weird because we are saying romd isn't a ROM but
->> something that identifies as RAM can be ROM rather than just a memory
->> protected piece of RAM.
->>
->
-> I proposed a bunch of alternatives as reply to v3 (e.g.,
-> TLB_DISCARD_WRITES), either Richard missed them or I missed his reply
-> :)
+This is because we should set the interrupt source in KVM at post load,
+since we no longer do it unconditionaly at reset time for all interrupts.
 
-That certainly passes the "does what it says on the tin" test.
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
 
->
->>>          }
->>>          if (prot & PAGE_WRITE_INV) {
->>>              tn.addr_write |=3D TLB_INVALID_MASK;
->>
->> So at the moment I don't see what the TLB_ROM flag gives us that setting
->> TLB_INVALID doesn't - either way we won't make the write to our
->> ram-not-ram-rom.
->
-> TLB_INVALID will trigger a new MMU translation on every access to fill
-> the TLB. TLB_ROM states that we have a valid entry, but that writes are
-> to be discarded.
+David,
 
-Ahh yes, I didn't notice it because it's hidden in he tlb_hit check.
+I guess you should probably fold this fix directly into Cedric's
+patch (currently SHA1 966d526cdfd9 in ppc-for-4.2) to avoid
+bisection breakage.
+---
+ hw/intc/spapr_xive_kvm.c |   11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
---
-Alex Benn=C3=A9e
+diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+index 71b88d7797bc..2006f96aece1 100644
+--- a/hw/intc/spapr_xive_kvm.c
++++ b/hw/intc/spapr_xive_kvm.c
+@@ -678,6 +678,17 @@ int kvmppc_xive_post_load(SpaprXive *xive, int version_id)
+             continue;
+         }
+ 
++        /*
++         * We can only restore the source config if the source has been
++         * previously set in KVM. Since we don't do that for all interrupts
++         * at reset time anymore, let's do it now.
++         */
++        kvmppc_xive_source_reset_one(&xive->source, i, &local_err);
++        if (local_err) {
++            error_report_err(local_err);
++            return -1;
++        }
++
+         kvmppc_xive_set_source_config(xive, i, &xive->eat[i], &local_err);
+         if (local_err) {
+             error_report_err(local_err);
+
 
