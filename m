@@ -2,60 +2,66 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9306FC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 09:22:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A14FDC432C1
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 09:22:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B6E320872
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 09:22:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="baWTvnVm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B6E320872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id 79AE920872
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 09:22:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79AE920872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD3VS-0000GC-9M
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 05:22:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60259)
+	id 1iD3Ve-0000Sk-JC
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 05:22:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60296)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoren@kernel.org>) id 1iD3UD-0007wB-1O
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 05:21:26 -0400
+ (envelope-from <armbru@redhat.com>) id 1iD3UP-00082C-8L
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 05:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoren@kernel.org>) id 1iD3UA-00081T-RO
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 05:21:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35098)
+ (envelope-from <armbru@redhat.com>) id 1iD3UN-00007F-Ch
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 05:21:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56634)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <guoren@kernel.org>)
- id 1iD3UA-0007x7-Ks; Wed, 25 Sep 2019 05:21:22 -0400
-Received: from guoren-Inspiron-7460.lan (unknown [223.93.147.148])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iD3UN-0008V5-6z
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 05:21:35 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 57C4120872;
- Wed, 25 Sep 2019 09:21:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1569403281;
- bh=9X+1qaGn2jZ4RES9gl1VpoYtTW7i6NX/n6O0GCRB2dU=;
- h=From:To:Cc:Subject:Date:From;
- b=baWTvnVmnTy+1Dt4oY/d6kBAdb1R7I2R+Q30znYxc6YxZ8oUIZW8OPF+z6wR9tcoI
- i3Y87A9NQOi3VmTlJOGn4ItHZOADce2ZBA6oBfs6iy3DhtWxFcGpniXrccY6eL4Wqw
- LENZGrQObHDDHcersAwdjoM4GwlHYoRUXU0dVENg=
-From: guoren@kernel.org
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH V4] target/riscv: Ignore reserved bits in PTE for RV64
-Date: Wed, 25 Sep 2019 17:21:02 +0800
-Message-Id: <1569403262-23523-1-git-send-email-guoren@kernel.org>
-X-Mailer: git-send-email 2.7.4
+ by mx1.redhat.com (Postfix) with ESMTPS id B4B3720EB;
+ Wed, 25 Sep 2019 09:21:33 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 63ACD5B69A;
+ Wed, 25 Sep 2019 09:21:31 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id E8CDC113864E; Wed, 25 Sep 2019 11:21:29 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: "Dr. David Alan Gilbert \(git\)" <dgilbert@redhat.com>
+Subject: Re: [PATCH] migration/postcopy: Recognise the recovery states as
+ 'in_postcopy'
+References: <20190923174942.12182-1-dgilbert@redhat.com>
+Date: Wed, 25 Sep 2019 11:21:29 +0200
+In-Reply-To: <20190923174942.12182-1-dgilbert@redhat.com> (David Alan
+ Gilbert's message of "Mon, 23 Sep 2019 18:49:42 +0100")
+Message-ID: <875zlgzq7a.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Wed, 25 Sep 2019 09:21:33 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 198.145.29.99
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,72 +73,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, palmer@sifive.com, alistair.francis@wdc.com,
- Guo Ren <ren_guo@c-sky.com>, bmeng.cn@gmail.com
+Cc: thuth@redhat.com, alex.bennee@linaro.org, qemu-devel@nongnu.org,
+ peterx@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Guo Ren <ren_guo@c-sky.com>
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
 
-Highest 10 bits of PTE are reserved in riscv-privileged, ref: [1], so we
-need to ignore them. They cannot be a part of ppn.
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> Various parts of the migration code do different things when they're
+> in postcopy mode; prior to this patch this has been 'postcopy-active'.
+> This patch extends 'in_postcopy' to include 'postcopy-paused' and
+> 'postcopy-recover'.
+>
+> In particular, when you set the max-postcopy-bandwidth parameter, this
+> only affects the current migration fd if we're 'in_postcopy';
+> this leads to a race in the postcopy recovery test where it increases
+> the speed from 4k/sec to unlimited, but that increase can get ignored
+> if the change is made between the point at which the reconnection
+> happens and it transitions back to active.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-1: The RISC-V Instruction Set Manual, Volume II: Privileged Architecture
-   4.4 Sv39: Page-Based 39-bit Virtual-Memory System
-   4.5 Sv48: Page-Based 48-bit Virtual-Memory System
+This seems to fix the intermittent hangs I observed and bisected to
+commit 8504ddeca0 "migration: Fix postcopy bw for recovery".
 
-Signed-off-by: Guo Ren <ren_guo@c-sky.com>
-Reviewed-by: Liu Zhiwei <zhiwei_liu@c-sky.com>
----
- target/riscv/cpu_bits.h   | 7 +++++++
- target/riscv/cpu_helper.c | 2 +-
- 2 files changed, 8 insertions(+), 1 deletion(-)
-
-Changelog V4:
- - Change title to Ignore not Bugfix
- - Use PTE_PPN_MASK for RV32 and RV64 
-
-Changelog V3:
- - Use UUL define for PTE_RESERVED
- - Keep ppn >> PTE_PPN_SHIFT
-
-Changelog V2:
- - Bugfix pte destroyed cause boot fail
- - Change to AND with a mask instead of shifting both directions
-
-diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index e998348..399c2c6 100644
---- a/target/riscv/cpu_bits.h
-+++ b/target/riscv/cpu_bits.h
-@@ -473,6 +473,13 @@
- /* Page table PPN shift amount */
- #define PTE_PPN_SHIFT       10
- 
-+/* Page table PPN mask */
-+#if defined(TARGET_RISCV32)
-+#define PTE_PPN_MASK        0xffffffffUL
-+#elif defined(TARGET_RISCV64)
-+#define PTE_PPN_MASK        0x3fffffffffffffULL
-+#endif
-+
- /* Leaf page shift amount */
- #define PGSHIFT             12
- 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 87dd6a6..9961b37 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -261,7 +261,7 @@ restart:
- #elif defined(TARGET_RISCV64)
-         target_ulong pte = ldq_phys(cs->as, pte_addr);
- #endif
--        hwaddr ppn = pte >> PTE_PPN_SHIFT;
-+        hwaddr ppn = (pte & PTE_PPN_MASK) >> PTE_PPN_SHIFT;
- 
-         if (!(pte & PTE_V)) {
-             /* Invalid PTE */
--- 
-2.7.4
-
+Tested-by: Markus Armbruster <armbru@redhat.com>
 
