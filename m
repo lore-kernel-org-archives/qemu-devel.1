@@ -2,93 +2,82 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2570C4360C
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 14:34:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D8DEC432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 14:34:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 917F621D7E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 14:34:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gGRsvirX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 917F621D7E
+	by mail.kernel.org (Postfix) with ESMTPS id 062642146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 14:34:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 062642146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD8N4-0002y3-Tt
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 10:34:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51694)
+	id 1iD8N6-00032j-4L
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 10:34:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51777)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iD8J4-0000Xt-DS
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:30:15 -0400
+ (envelope-from <mst@redhat.com>) id 1iD8JI-0000pB-Dk
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:30:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iD8J3-0006yR-A0
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:30:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44125
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1iD8JH-00079j-Ca
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:30:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:64205)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iD8J3-0006y0-1B
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:30:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1569421812;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=BsejPs8VR4bQ8vSDiQ1D+SsqmkY4XQ6nG+kn2dcwppo=;
- b=gGRsvirXC0/FDnQLIgBFuh5wuw7a7H+ZJO3tf8dFkCXhlAX+CvDugj6U44hj4aN53kv5Wd
- 4+mxGTQDiFYPqDmu7rpUW2qRgAgbSwfcv4i05aj4BEJvkbnoROZk5srP87pbK+52WVVtfK
- jbjBxqC5aHlEPC1dKIrv2GBtJgq0GX8=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-85-qX-DH7oZNgaOakxlrkycbQ-1; Wed, 25 Sep 2019 10:30:11 -0400
-Received: by mail-qk1-f197.google.com with SMTP id x186so6245388qke.13
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 07:30:11 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iD8JH-00079E-7D
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:30:27 -0400
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 642E63CA16
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 14:30:26 +0000 (UTC)
+Received: by mail-qt1-f199.google.com with SMTP id s14so6096517qtn.4
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 07:30:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
- :content-disposition;
- bh=S3oDpkzwFQW/6Qog9stiWy3NOJLymT7tgQynsFt0T0k=;
- b=HA4Pcn0Y2eij7S7bP1seffRjvl32mviptJ+GUaUja7vzl5RCPbeJyVS2MKOYXHFmRf
- S1Ln+UbojMcKv2zmMdob6jmUU4lnOW1RLkzR3xMItSZR/GpY6IIXPajSmfoW+6wxQBk0
- P4QTmaDTEgg7F99UkUva/6ktMjia/K7Td/IHoNDyo++17OZGMeijwPK69+BiIzkdX9sP
- DQDG+rnjK7HzWSK3U2lRzF3rCb0g4fS+89rSkk4wFgrIyA8YCTOAlcKMyqmLzv9SQWwa
- 0y1z0sUNv+ySQLxYYCcDGqPNyELzPgPcJwfluvQEOa8sg727THsKkAEBekG6PrSIVzwD
- Pe2g==
-X-Gm-Message-State: APjAAAWomgju3Do8WGqPNW092x27ji9FjPIPZoUl5AmAd1MCVMPnBQ2U
- EpObHdkrghIpqLFdKApo3vzlIqQcRMOGIqx1x/c/WsICw/n/76yDkBL36cLJM9ifML9TXNMY+5+
- 4Ku+WtuHQjwwjhQE=
-X-Received: by 2002:ac8:184:: with SMTP id x4mr9161640qtf.249.1569421810058;
- Wed, 25 Sep 2019 07:30:10 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzyQXBwBwzP3xoucmn13TBr7t3Tk+CzmN4FmCppaodvKVeZDVNhsDo/rUEN8wNOhbcKhx98QQ==
-X-Received: by 2002:ac8:184:: with SMTP id x4mr9161626qtf.249.1569421809884;
- Wed, 25 Sep 2019 07:30:09 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=uAGWvwzL46HoQu7U/Lqqmx3jnRSuW2YUf+t36wOCjwQ=;
+ b=tq2qUgLxaxFY7c1IGaqiUFfCa/iPmCsVLVR0RCleayEV++GmOG0sRngnYKlE7q1WWj
+ oBe9picgKX8S1AjJ7aVrXviilBROCqHQUJkCMB8ZTKsP3hTaktESl86s7U3Y8Oo67lpx
+ hvMYyPLQajpY/xhaxHdLCERtUgXKZ2xB4al76YT8GdckV28VohlahfxcC0EPbvWXMt10
+ y5YHBXS0oiUUwhAtfzg23lFEQ45QBancJCHTOEUlQOJZ3ZgFD3+QnWyt+2MKV09dux1K
+ /Xw00JdDTfqc77O7rPiOQVzPQDp0xhqaAaPgHGKM/VzRtO3utMSieCT5ce06i3aokBgd
+ s2uQ==
+X-Gm-Message-State: APjAAAWO4CL6F+QtYMkHGSHOAwcz2lAUAEPZHU2i2ytoG9B/5BFA1nUc
+ 4eSHWqjekZI0iwT8E5wrBFYpWGFvDhscp78OIozQghXzuTI5QYoSRjJDsj99cMnXAe8zKzj1865
+ NY9WgXzmEFV8VIIk=
+X-Received: by 2002:ae9:eb93:: with SMTP id b141mr3937255qkg.36.1569421825129; 
+ Wed, 25 Sep 2019 07:30:25 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy4U9gYng4oRZOTCoyWYgFdpd1/h0Zv3jm2GT3fYZ4puUPe5fRfi+jPDnWP7ZsXZJ4qsyA1wA==
+X-Received: by 2002:ae9:eb93:: with SMTP id b141mr3937230qkg.36.1569421824907; 
+ Wed, 25 Sep 2019 07:30:24 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
- by smtp.gmail.com with ESMTPSA id m136sm3164665qke.78.2019.09.25.07.30.07
+ by smtp.gmail.com with ESMTPSA id c185sm3082503qkg.74.2019.09.25.07.30.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Sep 2019 07:30:09 -0700 (PDT)
-Date: Wed, 25 Sep 2019 10:30:05 -0400
+ Wed, 25 Sep 2019 07:30:24 -0700 (PDT)
+Date: Wed, 25 Sep 2019 10:30:20 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 0/3] vhost: fixes
-Message-ID: <20190925142910.26529-1-mst@redhat.com>
+Subject: [PULL 3/3] vhost: Fix memory region section comparison
+Message-ID: <20190814175535.2023-4-dgilbert@redhat.com>
+References: <20190925142910.26529-1-mst@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+In-Reply-To: <20190925142910.26529-1-mst@redhat.com>
 X-Mailer: git-send-email 2.22.0.678.g13338e74b8
 X-Mutt-Fcc: =sent
-X-MC-Unique: qX-DH7oZNgaOakxlrkycbQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,42 +89,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20190925143020.B9J6AcO-Qejkfhp4cS9ej138GeEC4B4NAzupWCgLtC0@z>
 
-A very quiet cycle. Did I miss a bunch of patches? if so, let me know.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-The following changes since commit 240ab11fb72049d6373cbbec8d788f8e411a00bc=
-:
+Using memcmp to compare structures wasn't safe,
+as I found out on ARM when I was getting falce miscompares.
 
-  Merge remote-tracking branch 'remotes/aperard/tags/pull-xen-20190924' int=
-o staging (2019-09-24 15:36:31 +0100)
+Use the helper function for comparing the MRSs.
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-
-for you to fetch changes up to 3fc4a64cbaed2ddee4c60ddc06740b320e18ab82:
-
-  vhost: Fix memory region section comparison (2019-09-25 10:16:39 -0400)
-
-----------------------------------------------------------------
-vhost: fixes
-
-Misc fixes related to memory region handling.
-
+Fixes: ade6d081fc33948e56e6 ("vhost: Regenerate region list from changed sections list")
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20190814175535.2023-4-dgilbert@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/virtio/vhost.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-----------------------------------------------------------------
-Dr. David Alan Gilbert (3):
-      memory: Align MemoryRegionSections fields
-      memory: Provide an equality function for MemoryRegionSections
-      vhost: Fix memory region section comparison
-
- include/exec/memory.h | 14 +++++++++++++-
- hw/virtio/vhost.c     |  9 +++++++--
- 2 files changed, 20 insertions(+), 3 deletions(-)
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 34accdf615..2386b511f3 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -451,8 +451,13 @@ static void vhost_commit(MemoryListener *listener)
+         changed = true;
+     } else {
+         /* Same size, lets check the contents */
+-        changed = n_old_sections && memcmp(dev->mem_sections, old_sections,
+-                         n_old_sections * sizeof(old_sections[0])) != 0;
++        for (int i = 0; i < n_old_sections; i++) {
++            if (!MemoryRegionSection_eq(&old_sections[i],
++                                        &dev->mem_sections[i])) {
++                changed = true;
++                break;
++            }
++        }
+     }
+ 
+     trace_vhost_commit(dev->started, changed);
+-- 
+MST
 
 
