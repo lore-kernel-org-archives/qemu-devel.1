@@ -2,94 +2,92 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3A7EC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:12:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1C2BC4360D
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:16:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 813AF2146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:12:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 813AF2146E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8FCB421D80
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:16:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ipeHKTGd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FCB421D80
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD9u1-0004q9-KK
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 12:12:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40146)
+	id 1iD9y6-0007N2-FH
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 12:16:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41000)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iD9pV-0007cZ-ED
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:07:50 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iD9tj-00051A-Rt
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:12:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iD9pU-0007io-Cs
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:07:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38788
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iD9pU-0007iQ-7w
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:07:48 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8PG7X3X132472
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 12:07:46 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2v8asb9v2u-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 12:07:46 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Wed, 25 Sep 2019 17:07:44 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 25 Sep 2019 17:07:41 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x8PG7eEY23396438
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 25 Sep 2019 16:07:40 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id AFB3DA404D;
- Wed, 25 Sep 2019 16:07:40 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 796D1A4051;
- Wed, 25 Sep 2019 16:07:40 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.186.179])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 25 Sep 2019 16:07:40 +0000 (GMT)
-Subject: [PATCH] spapr/irq: Fix migration of older machine types with XIVE
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>,
- =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
-Date: Wed, 25 Sep 2019 18:07:40 +0200
-User-Agent: StGit/unknown-version
+ (envelope-from <alex.bennee@linaro.org>) id 1iD9ti-0000lY-2B
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:12:11 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40311)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iD9th-0000l7-Q7
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:12:10 -0400
+Received: by mail-wr1-x442.google.com with SMTP id l3so7629590wru.7
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 09:12:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=9iLeRBMimSs9vFLEpak/WeSOe7x8qLywP6xtQLKok5A=;
+ b=ipeHKTGdH1MR96uZvDacDyBv5KBKgXrv5XLTF+4U6ntaVXxtfR0quM8MRnoSlVeuNk
+ YIPB7tK0MHEyd1Ch/yx/y0Izqs9Y7A8WJgG1njiTnlBus5LXVYz7halM1o1YOCRs9f84
+ sGcL2oXsPVKy602F+NyUyvc9oe4AWK5R6KlPFFdZLGrH2jm9pY/cvAFKOuBXrhfmoZIl
+ l2STt8vN0mpf7qc+yP7zJPLdYjhgF43ulA2XHXivT6+Z30edYwzz70lyewmSoxpM2jyK
+ YKcbQyyX7YzUgNPCQY5S9XlzBJLbY+0sUHyxJ8iwyHCT8hgjoFGbmyb1Oo2/Zjy+sfUr
+ fBlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=9iLeRBMimSs9vFLEpak/WeSOe7x8qLywP6xtQLKok5A=;
+ b=sfjmX5My1Bybts3ldCbQSWIU9KKjbDthJr+JRv3Ko2qYkJ571trcV3n2rxHjdl0LDo
+ cVTqP5mf+o6ArlzINgfLCGDOVCutBUZK2cKerejx1Z6T0o+FfVpcHVuCABc7dWdoR4aS
+ dCHFXu2ObcggKWXMb836CsIRvYyo3c409x2vp6/zu8BA7Fjfg4S1rQZuy9wRoymXO4bi
+ ipiLG0Se6/NYTLwYL2veTh6ODiYawizccAJ9dxKkSdgULHBPm/CAlxVgKdbKf+OLIIHg
+ CAM4NWtzb1tYJLBlp18hAcpDfRdU0dIfKRRsOTlH3Vvkwz3967ApdUyH9tuye6CkWR5p
+ 2D9A==
+X-Gm-Message-State: APjAAAUwyedO5FHiH3bNeoDkMIQi2r6HzFMlB35PDE/PuR6+waXQe2Ht
+ 8EGGYi0kEy1sbnxS+yMwwMjQaw==
+X-Google-Smtp-Source: APXvYqxAUnFgpoofNB0CqhYOwywsxDCGsZzljR01HH0tc9dkPXRuYOcqaWmeOs7uTglVZGUcSJrYMQ==
+X-Received: by 2002:a05:6000:14c:: with SMTP id
+ r12mr10141046wrx.303.1569427927744; 
+ Wed, 25 Sep 2019 09:12:07 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id s10sm6485599wmf.48.2019.09.25.09.12.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 25 Sep 2019 09:12:06 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 37B0A1FF87;
+ Wed, 25 Sep 2019 17:12:06 +0100 (BST)
+References: <20190923230004.9231-1-richard.henderson@linaro.org>
+ <20190923230004.9231-11-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v4 10/16] cputlb: Partially inline
+ memory_region_section_get_iotlb
+In-reply-to: <20190923230004.9231-11-richard.henderson@linaro.org>
+Date: Wed, 25 Sep 2019 17:12:06 +0100
+Message-ID: <87r2449wyx.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19092516-0016-0000-0000-000002B08883
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19092516-0017-0000-0000-000033115191
-Message-Id: <156942766014.1274533.10792048853177121231.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-09-25_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=809 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909250147
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,55 +99,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
- qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Recent patch "spapr/irq: Only claim VALID interrupts at the KVM level"
-broke migration of older machine types started with ic-mode=xive:
 
-qemu-system-ppc64: KVM_SET_DEVICE_ATTR failed: Group 3 attr 0x0000000000001300: Invalid argument
-qemu-system-ppc64: error while loading state for instance 0x0 of device 'spapr'
-qemu-system-ppc64: load of migration failed: Operation not permitted
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-This is because we should set the interrupt source in KVM at post load,
-since we no longer do it unconditionaly at reset time for all interrupts.
+> There is only one caller, tlb_set_page_with_attrs.  We cannot
+> inline the entire function because the AddressSpaceDispatch
+> structure is private to exec.c, and cannot easily be moved to
+> include/exec/memory-internal.h.
+>
+> Compute is_ram and is_romd once within tlb_set_page_with_attrs.
+> Fold the number of tests against these predicates.  Compute
+> cpu_physical_memory_is_clean outside of the tlb lock region.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-David,
+> ---
+>  include/exec/exec-all.h |  6 +---
+>  accel/tcg/cputlb.c      | 68 ++++++++++++++++++++++++++---------------
+>  exec.c                  | 22 ++-----------
+>  3 files changed, 47 insertions(+), 49 deletions(-)
+>
+> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+> index 81b02eb2fe..49db07ba0b 100644
+> --- a/include/exec/exec-all.h
+> +++ b/include/exec/exec-all.h
+> @@ -509,11 +509,7 @@ address_space_translate_for_iotlb(CPUState *cpu, int=
+ asidx, hwaddr addr,
+>                                    hwaddr *xlat, hwaddr *plen,
+>                                    MemTxAttrs attrs, int *prot);
+>  hwaddr memory_region_section_get_iotlb(CPUState *cpu,
+> -                                       MemoryRegionSection *section,
+> -                                       target_ulong vaddr,
+> -                                       hwaddr paddr, hwaddr xlat,
+> -                                       int prot,
+> -                                       target_ulong *address);
+> +                                       MemoryRegionSection *section);
+>  #endif
+>
+>  /* vl.c */
+> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> index 05212ff244..05530a8b0c 100644
+> --- a/accel/tcg/cputlb.c
+> +++ b/accel/tcg/cputlb.c
+> @@ -704,13 +704,14 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_=
+ulong vaddr,
+>      MemoryRegionSection *section;
+>      unsigned int index;
+>      target_ulong address;
+> -    target_ulong code_address;
+> +    target_ulong write_address;
+>      uintptr_t addend;
+>      CPUTLBEntry *te, tn;
+>      hwaddr iotlb, xlat, sz, paddr_page;
+>      target_ulong vaddr_page;
+>      int asidx =3D cpu_asidx_from_attrs(cpu, attrs);
+>      int wp_flags;
+> +    bool is_ram, is_romd;
+>
+>      assert_cpu_is_self(cpu);
+>
+> @@ -739,18 +740,46 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_=
+ulong vaddr,
+>      if (attrs.byte_swap) {
+>          address |=3D TLB_BSWAP;
+>      }
+> -    if (!memory_region_is_ram(section->mr) &&
+> -        !memory_region_is_romd(section->mr)) {
+> -        /* IO memory case */
+> -        address |=3D TLB_MMIO;
+> -        addend =3D 0;
+> -    } else {
+> +
+> +    is_ram =3D memory_region_is_ram(section->mr);
+> +    is_romd =3D memory_region_is_romd(section->mr);
+> +
+> +    if (is_ram || is_romd) {
+> +        /* RAM and ROMD both have associated host memory. */
+>          addend =3D (uintptr_t)memory_region_get_ram_ptr(section->mr) + x=
+lat;
+> +    } else {
+> +        /* I/O does not; force the host address to NULL. */
+> +        addend =3D 0;
+> +    }
+> +
+> +    write_address =3D address;
+> +    if (is_ram) {
+> +        iotlb =3D memory_region_get_ram_addr(section->mr) + xlat;
+> +        /*
+> +         * Computing is_clean is expensive; avoid all that unless
+> +         * the page is actually writable.
+> +         */
+> +        if (prot & PAGE_WRITE) {
+> +            if (section->readonly) {
+> +                write_address |=3D TLB_ROM;
+> +            } else if (cpu_physical_memory_is_clean(iotlb)) {
+> +                write_address |=3D TLB_NOTDIRTY;
+> +            }
+> +        }
+> +    } else {
+> +        /* I/O or ROMD */
+> +        iotlb =3D memory_region_section_get_iotlb(cpu, section) + xlat;
+> +        /*
+> +         * Writes to romd devices must go through MMIO to enable write.
+> +         * Reads to romd devices go through the ram_ptr found above,
+> +         * but of course reads to I/O must go through MMIO.
+> +         */
+> +        write_address |=3D TLB_MMIO;
+> +        if (!is_romd) {
+> +            address =3D write_address;
+> +        }
+>      }
+>
+> -    code_address =3D address;
+> -    iotlb =3D memory_region_section_get_iotlb(cpu, section, vaddr_page,
+> -                                            paddr_page, xlat, prot, &add=
+ress);
+>      wp_flags =3D cpu_watchpoint_address_matches(cpu, vaddr_page,
+>                                                TARGET_PAGE_SIZE);
+>
+> @@ -790,8 +819,8 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ul=
+ong vaddr,
+>      /*
+>       * At this point iotlb contains a physical section number in the low=
+er
+>       * TARGET_PAGE_BITS, and either
+> -     *  + the ram_addr_t of the page base of the target RAM (if NOTDIRTY=
+ or ROM)
+> -     *  + the offset within section->mr of the page base (otherwise)
+> +     *  + the ram_addr_t of the page base of the target RAM (RAM)
+> +     *  + the offset within section->mr of the page base (I/O, ROMD)
+>       * We subtract the vaddr_page (which is page aligned and thus won't
+>       * disturb the low bits) to give an offset which can be added to the
+>       * (non-page-aligned) vaddr of the eventual memory access to get
+> @@ -814,25 +843,14 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_=
+ulong vaddr,
+>      }
+>
+>      if (prot & PAGE_EXEC) {
+> -        tn.addr_code =3D code_address;
+> +        tn.addr_code =3D address;
+>      } else {
+>          tn.addr_code =3D -1;
+>      }
+>
+>      tn.addr_write =3D -1;
+>      if (prot & PAGE_WRITE) {
+> -        tn.addr_write =3D address;
+> -        if (memory_region_is_romd(section->mr)) {
+> -            /* Use the MMIO path so that the device can switch states. */
+> -            tn.addr_write |=3D TLB_MMIO;
+> -        } else if (memory_region_is_ram(section->mr)) {
+> -            if (section->readonly) {
+> -                tn.addr_write |=3D TLB_ROM;
+> -            } else if (cpu_physical_memory_is_clean(
+> -                        memory_region_get_ram_addr(section->mr) + xlat))=
+ {
+> -                tn.addr_write |=3D TLB_NOTDIRTY;
+> -            }
+> -        }
+> +        tn.addr_write =3D write_address;
+>          if (prot & PAGE_WRITE_INV) {
+>              tn.addr_write |=3D TLB_INVALID_MASK;
+>          }
+> diff --git a/exec.c b/exec.c
+> index dc7001f115..961d7d6497 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1459,26 +1459,10 @@ bool cpu_physical_memory_snapshot_get_dirty(Dirty=
+BitmapSnapshot *snap,
+>
+>  /* Called from RCU critical section */
+>  hwaddr memory_region_section_get_iotlb(CPUState *cpu,
+> -                                       MemoryRegionSection *section,
+> -                                       target_ulong vaddr,
+> -                                       hwaddr paddr, hwaddr xlat,
+> -                                       int prot,
+> -                                       target_ulong *address)
+> +                                       MemoryRegionSection *section)
+>  {
+> -    hwaddr iotlb;
+> -
+> -    if (memory_region_is_ram(section->mr)) {
+> -        /* Normal RAM.  */
+> -        iotlb =3D memory_region_get_ram_addr(section->mr) + xlat;
+> -    } else {
+> -        AddressSpaceDispatch *d;
+> -
+> -        d =3D flatview_to_dispatch(section->fv);
+> -        iotlb =3D section - d->map.sections;
+> -        iotlb +=3D xlat;
+> -    }
+> -
+> -    return iotlb;
+> +    AddressSpaceDispatch *d =3D flatview_to_dispatch(section->fv);
+> +    return section - d->map.sections;
+>  }
+>  #endif /* defined(CONFIG_USER_ONLY) */
 
-I guess you should probably fold this fix directly into Cedric's
-patch (currently SHA1 966d526cdfd9 in ppc-for-4.2) to avoid
-bisection breakage.
----
- hw/intc/spapr_xive_kvm.c |   11 +++++++++++
- 1 file changed, 11 insertions(+)
 
-diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index 71b88d7797bc..2006f96aece1 100644
---- a/hw/intc/spapr_xive_kvm.c
-+++ b/hw/intc/spapr_xive_kvm.c
-@@ -678,6 +678,17 @@ int kvmppc_xive_post_load(SpaprXive *xive, int version_id)
-             continue;
-         }
- 
-+        /*
-+         * We can only restore the source config if the source has been
-+         * previously set in KVM. Since we don't do that for all interrupts
-+         * at reset time anymore, let's do it now.
-+         */
-+        kvmppc_xive_source_reset_one(&xive->source, i, &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+            return -1;
-+        }
-+
-         kvmppc_xive_set_source_config(xive, i, &xive->eat[i], &local_err);
-         if (local_err) {
-             error_report_err(local_err);
-
+--
+Alex Benn=C3=A9e
 
