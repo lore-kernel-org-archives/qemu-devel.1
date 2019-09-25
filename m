@@ -2,89 +2,90 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3643C432C1
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 00:18:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D6D1C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 00:19:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7561120872
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 00:18:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 351B220872
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 00:19:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mZMeoeSn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7561120872
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YlxCWLhE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 351B220872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCv1E-0004Yr-Am
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 20:18:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57914)
+	id 1iCv1O-0004hc-8T
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 20:19:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57827)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iCuzu-0003eZ-RR
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 20:17:36 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iCuyU-0002Ks-Hf
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 20:16:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iCuzt-0000pk-K5
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 20:17:34 -0400
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:53720)
+ (envelope-from <alex.bennee@linaro.org>) id 1iCuyS-0008HJ-BK
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 20:16:05 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35513)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iCuzt-0000pa-CA
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 20:17:33 -0400
-Received: by mail-wm1-x32b.google.com with SMTP id i16so2404559wmd.3
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 17:17:33 -0700 (PDT)
+ id 1iCuyS-0008H7-3a
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 20:16:04 -0400
+Received: by mail-wm1-x342.google.com with SMTP id y21so2221518wmi.0
+ for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 17:16:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=UWXODm6BuFnMzwN8yk+MOa3eu06k3cObvd4skljNWys=;
- b=mZMeoeSnF0b6h7yFy9mhE2+V655PPtPKCvPWk1hnNmyOHwPd+BegsW8W8R0caF5whs
- +N5g5qDXvCTOcEWPhjw5JzM4kC40uxQDbpFSWWMxbV3EvJVRtU9UXa6V1w4G7ev1+2Ok
- 4lNfSm1G26LE8ul3g4VqWtifSuwr/h8aBXeEki2nv6TmFA9mX1z7FwaAfOhwFHXozFRm
- YxMPmP966FhJX0pHD2gC+4F2orW6YVFQnVpg08YvwoRmvk+F/mw81pZ5ou/ZNbzyFxHL
- QZEyQwCdPmxML00V35P4ySXsiIvpdfjMcFaxREWZX+6U5NWPMkqGLlL2VJEDFI8nXIJz
- v+pg==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=0ODopj+No7wKifKkAPpUYP23m+jkzTaNVUbH4b2Bk5U=;
+ b=YlxCWLhEUgODUE5StXLN0sfwdZokgFpYk0nhd78oOo3c5cWTIYpfW1ur09o0FdmxSq
+ irndlgr9FKO6rb4TCWGe45SQu43Yz5YLGUv3NfuuDhDCQ32Mor6T6RCLgiKuWypzbTRL
+ 9p04rxoFn4T+9yiM9hjzSbcM41obmtCAWgZJhGuNZdJdFKRA8E6+MuCFx3yJSKUWv/C+
+ WkdW5Q7Z1Dm7JN5CD3O3a7jMRGFoLkYgJadmq7jrGWQM9iMaD9WYu+zMxtxAtkbpL8jb
+ IuiOEKbGOTkq7PPTem+f1O86NUSwGx/GRoosDsCzCcwqdGnowsteqHsdXvKHpTjVD7el
+ rPbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=UWXODm6BuFnMzwN8yk+MOa3eu06k3cObvd4skljNWys=;
- b=mppqDVV1cAHR6lvqod4cusx/wdRNS3HOfkpkaw6beiem84HDsd5Am1Om1KD/uHk155
- tqAwk1urVWlncWkO/2n62Py0OxuVoGrGNElYVVa8+Fat2gtB/wZu0f9RmT62UI5yRMcu
- hW/2EnGsYyqrU1ejVH3m7BFOt6C5LH3hqJ8uifcUCW64Sch5iF7AQrNEJFUAMUeQl5p0
- XI71ng2uSIP7WAGlbIKeModk7t1cZL9eNuUoImBbO1lpIa0tlf8OQ/laKgStjf1luM89
- ft9IsmNKkKqU3Tg/RI4k0Du5/whQOY4iP29DLClNasGc7I+516mtNULmkPTBqrN1QS4M
- 56fg==
-X-Gm-Message-State: APjAAAWK6yJVILCd2jd3ZHevnf2mQv2T8zf3zkW4rtfeUhV/BYs4xaKF
- yw7+wSUmTwEzJqD83LKIhnkJFp6ErfA1Xw==
-X-Google-Smtp-Source: APXvYqyNngUDM9McheyRedMPowJ0P2WqyplBJGWSX4d0J3ZcCZs21Qftl11iEv5Z8FYKljUlFzY1uQ==
-X-Received: by 2002:a7b:c92b:: with SMTP id h11mr2698665wml.10.1569360034125; 
- Tue, 24 Sep 2019 14:20:34 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=0ODopj+No7wKifKkAPpUYP23m+jkzTaNVUbH4b2Bk5U=;
+ b=WK5SYbRvKmIg3AnuruRSYiT7+ohEQFcjLddaj6Bg40FjxFoT7s+cB5UEkFXLeV7yQD
+ 3nXmqr9jQz0qRbH38NeDLMUE0vzunPMiW7rpjSV9sIbuskcbmCH8mbgZfvX9F/Hogn/1
+ wpZYgvazmqbx3pXEexSutHOhfg5XF+U4s56esVYA16gOOO0Ssp0S71kDI50Ow2ssh37x
+ gvkAzEu5I0jhGPg4hamnPJ4AHUKDoVUf06ZliWuV7S12bsCroZhMI2+YkbP4p+H7eWVZ
+ zloiBDMY+3RRD8Ivc5b0r18n0nwKRQ/XlvnCjlDvc7PoRk2dskF832P99IAA6hTd2xPF
+ oKdA==
+X-Gm-Message-State: APjAAAWCblEUMMon8uudjnl/HOrIg/fYLu51DsaNavBkGLco65i+GIx1
+ gh3kLBnRHVbDsCiQZlXv1n2GQA==
+X-Google-Smtp-Source: APXvYqxg8id2fn7BkNvzI3qxkCG2WaLjG1BBfuRsLvAjc87CFCJgIM9ecipoDqiEsE4e0FYUNWsZWQ==
+X-Received: by 2002:a1c:1fd3:: with SMTP id f202mr3571554wmf.18.1569370562398; 
+ Tue, 24 Sep 2019 17:16:02 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id k24sm4136223wmi.1.2019.09.24.14.20.32
+ by smtp.gmail.com with ESMTPSA id b15sm1918971wmb.28.2019.09.24.17.16.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 24 Sep 2019 14:20:33 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B41FE1FFB5;
- Tue, 24 Sep 2019 22:01:09 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v3 31/33] docker: remove unused debian-sid
-Date: Tue, 24 Sep 2019 22:01:04 +0100
-Message-Id: <20190924210106.27117-32-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190924210106.27117-1-alex.bennee@linaro.org>
-References: <20190924210106.27117-1-alex.bennee@linaro.org>
+ Tue, 24 Sep 2019 17:16:01 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id F16FB1FF87;
+ Wed, 25 Sep 2019 01:16:00 +0100 (BST)
+References: <20190923230004.9231-1-richard.henderson@linaro.org>
+ <20190923230004.9231-9-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v4 08/16] cputlb: Move ROM handling from I/O path to TLB
+ path
+In-reply-to: <20190923230004.9231-9-richard.henderson@linaro.org>
+Date: Wed, 25 Sep 2019 01:16:00 +0100
+Message-ID: <87v9th9qnz.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32b
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,83 +97,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, jsnow@redhat.com,
- f4bug@amsat.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: John Snow <jsnow@redhat.com>
 
-debian-sid is listed as a partial image, so we cannot run tests against it.
-Since it isn't used by any other testable image, remove it for now as it
-is prone to bitrot.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-Message-Id: <20190923181140.7235-6-jsnow@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/docker/Makefile.include              |  2 +-
- tests/docker/dockerfiles/debian-sid.docker | 35 ----------------------
- 2 files changed, 1 insertion(+), 36 deletions(-)
- delete mode 100644 tests/docker/dockerfiles/debian-sid.docker
+> It does not require going through the whole I/O path
+> in order to discard a write.
+>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  include/exec/cpu-all.h    |  5 ++++-
+>  include/exec/cpu-common.h |  1 -
+>  accel/tcg/cputlb.c        | 35 +++++++++++++++++++--------------
+>  exec.c                    | 41 +--------------------------------------
+>  4 files changed, 25 insertions(+), 57 deletions(-)
+>
+> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+> index d148bded35..26547cd6dd 100644
+> --- a/include/exec/cpu-all.h
+> +++ b/include/exec/cpu-all.h
+<snip>
+> @@ -822,16 +821,17 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_=
+ulong vaddr,
+>
+>      tn.addr_write =3D -1;
+>      if (prot & PAGE_WRITE) {
+> -        if ((memory_region_is_ram(section->mr) && section->readonly)
+> -            || memory_region_is_romd(section->mr)) {
+> -            /* Write access calls the I/O callback.  */
+> -            tn.addr_write =3D address | TLB_MMIO;
+> -        } else if (memory_region_is_ram(section->mr)
+> -                   && cpu_physical_memory_is_clean(
+> -                       memory_region_get_ram_addr(section->mr) + xlat)) {
+> -            tn.addr_write =3D address | TLB_NOTDIRTY;
+> -        } else {
+> -            tn.addr_write =3D address;
+> +        tn.addr_write =3D address;
+> +        if (memory_region_is_romd(section->mr)) {
+> +            /* Use the MMIO path so that the device can switch states. */
+> +            tn.addr_write |=3D TLB_MMIO;
+> +        } else if (memory_region_is_ram(section->mr)) {
+> +            if (section->readonly) {
+> +                tn.addr_write |=3D TLB_ROM;
+> +            } else if (cpu_physical_memory_is_clean(
+> +                        memory_region_get_ram_addr(section->mr) + xlat))=
+ {
+> +                tn.addr_write |=3D TLB_NOTDIRTY;
+> +            }
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 053c418d8cd..180e5439ef9 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -5,7 +5,7 @@
- DOCKER_SUFFIX := .docker
- DOCKER_FILES_DIR := $(SRC_PATH)/tests/docker/dockerfiles
- # we don't run tests on intermediate images (used as base by another image)
--DOCKER_PARTIAL_IMAGES := debian9 debian10 debian-sid
-+DOCKER_PARTIAL_IMAGES := debian9 debian10
- DOCKER_PARTIAL_IMAGES += debian9-mxe debian-bootstrap
- DOCKER_IMAGES := $(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker))))
- DOCKER_TARGETS := $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
-diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/dockerfiles/debian-sid.docker
-deleted file mode 100644
-index 2a1bcc33b24..00000000000
---- a/tests/docker/dockerfiles/debian-sid.docker
-+++ /dev/null
-@@ -1,35 +0,0 @@
--#
--# Debian Sid Base
--#
--# Currently we can build all our guests with cross-compilers in the
--# latest Debian release (Buster). However new compilers will first
--# arrive in Sid. However Sid is a rolling distro which may be broken
--# at any particular time. To try and mitigate this we use Debian's
--# snapshot archive which provides a "stable" view of what state Sid
--# was in.
--#
--
--# This must be earlier than the snapshot date we are aiming for
--FROM debian:sid-20190812-slim
--
-- # Use a snapshot known to work (see http://snapshot.debian.org/#Usage)
--ENV DEBIAN_SNAPSHOT_DATE "20190820"
--RUN sed -i "s%^deb \(https\?://\)deb.debian.org/debian/\? \(.*\)%deb [check-valid-until=no] \1snapshot.debian.org/archive/debian/${DEBIAN_SNAPSHOT_DATE} \2%" /etc/apt/sources.list
--
--# Duplicate deb line as deb-src
--RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
--
--# Install common build utilities
--RUN apt update && \
--    DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata && \
--    DEBIAN_FRONTEND=noninteractive eatmydata \
--    apt install -y --no-install-recommends \
--        bison \
--        build-essential \
--        ca-certificates \
--        flex \
--        git \
--        pkg-config \
--        psmisc \
--        python \
--        texinfo || { echo "Failed to build - see debian-sid.docker notes"; exit 1; }
--- 
-2.20.1
+This reads a bit weird because we are saying romd isn't a ROM but
+something that identifies as RAM can be ROM rather than just a memory
+protected piece of RAM.
 
+>          }
+>          if (prot & PAGE_WRITE_INV) {
+>              tn.addr_write |=3D TLB_INVALID_MASK;
+
+So at the moment I don't see what the TLB_ROM flag gives us that setting
+TLB_INVALID doesn't - either way we won't make the write to our
+ram-not-ram-rom.
+
+> @@ -904,7 +904,7 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBE=
+ntry *iotlbentry,
+>      mr =3D section->mr;
+>      mr_offset =3D (iotlbentry->addr & TARGET_PAGE_MASK) + addr;
+>      cpu->mem_io_pc =3D retaddr;
+> -    if (mr !=3D &io_mem_rom && mr !=3D &io_mem_notdirty && !cpu->can_do_=
+io) {
+> +    if (mr !=3D &io_mem_notdirty && !cpu->can_do_io) {
+>          cpu_io_recompile(cpu, retaddr);
+>      }
+>
+> @@ -945,7 +945,7 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntr=
+y *iotlbentry,
+>      section =3D iotlb_to_section(cpu, iotlbentry->addr, iotlbentry->attr=
+s);
+>      mr =3D section->mr;
+>      mr_offset =3D (iotlbentry->addr & TARGET_PAGE_MASK) + addr;
+> -    if (mr !=3D &io_mem_rom && mr !=3D &io_mem_notdirty && !cpu->can_do_=
+io) {
+> +    if (mr !=3D &io_mem_notdirty && !cpu->can_do_io) {
+>          cpu_io_recompile(cpu, retaddr);
+>      }
+>      cpu->mem_io_vaddr =3D addr;
+> @@ -1125,7 +1125,7 @@ void *probe_access(CPUArchState *env, target_ulong =
+addr, int size,
+>      }
+>
+>      /* Reject I/O access, or other required slow-path.  */
+> -    if (tlb_addr & (TLB_NOTDIRTY | TLB_MMIO | TLB_BSWAP)) {
+> +    if (tlb_addr & (TLB_NOTDIRTY | TLB_MMIO | TLB_BSWAP | TLB_ROM)) {
+>          return NULL;
+>      }
+>
+> @@ -1613,6 +1613,11 @@ store_helper(CPUArchState *env, target_ulong addr,=
+ uint64_t val,
+>              return;
+>          }
+>
+> +        /* Ignore writes to ROM.  */
+> +        if (unlikely(tlb_addr & TLB_ROM)) {
+> +            return;
+> +        }
+> +
+>          haddr =3D (void *)((uintptr_t)addr + entry->addend);
+>
+>          if (unlikely(need_swap)) {
+> diff --git a/exec.c b/exec.c
+> index 5f2587b621..ea8c0b18ac 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -88,7 +88,7 @@ static MemoryRegion *system_io;
+>  AddressSpace address_space_io;
+>  AddressSpace address_space_memory;
+>
+> -MemoryRegion io_mem_rom, io_mem_notdirty;
+> +MemoryRegion io_mem_notdirty;
+>  static MemoryRegion io_mem_unassigned;
+>  #endif
+>
+> @@ -192,7 +192,6 @@ typedef struct subpage_t {
+>
+>  #define PHYS_SECTION_UNASSIGNED 0
+>  #define PHYS_SECTION_NOTDIRTY 1
+> -#define PHYS_SECTION_ROM 2
+>
+>  static void io_mem_init(void);
+>  static void memory_map_init(void);
+> @@ -1475,8 +1474,6 @@ hwaddr memory_region_section_get_iotlb(CPUState *cp=
+u,
+>          iotlb =3D memory_region_get_ram_addr(section->mr) + xlat;
+>          if (!section->readonly) {
+>              iotlb |=3D PHYS_SECTION_NOTDIRTY;
+> -        } else {
+> -            iotlb |=3D PHYS_SECTION_ROM;
+>          }
+>      } else {
+>          AddressSpaceDispatch *d;
+> @@ -3002,38 +2999,6 @@ static uint16_t dummy_section(PhysPageMap *map, Fl=
+atView *fv, MemoryRegion *mr)
+>      return phys_section_add(map, &section);
+>  }
+>
+> -static void readonly_mem_write(void *opaque, hwaddr addr,
+> -                               uint64_t val, unsigned size)
+> -{
+> -    /* Ignore any write to ROM. */
+> -}
+> -
+> -static bool readonly_mem_accepts(void *opaque, hwaddr addr,
+> -                                 unsigned size, bool is_write,
+> -                                 MemTxAttrs attrs)
+> -{
+> -    return is_write;
+> -}
+> -
+> -/* This will only be used for writes, because reads are special cased
+> - * to directly access the underlying host ram.
+> - */
+> -static const MemoryRegionOps readonly_mem_ops =3D {
+> -    .write =3D readonly_mem_write,
+> -    .valid.accepts =3D readonly_mem_accepts,
+> -    .endianness =3D DEVICE_NATIVE_ENDIAN,
+> -    .valid =3D {
+> -        .min_access_size =3D 1,
+> -        .max_access_size =3D 8,
+> -        .unaligned =3D false,
+> -    },
+> -    .impl =3D {
+> -        .min_access_size =3D 1,
+> -        .max_access_size =3D 8,
+> -        .unaligned =3D false,
+> -    },
+> -};
+> -
+>  MemoryRegionSection *iotlb_to_section(CPUState *cpu,
+>                                        hwaddr index, MemTxAttrs attrs)
+>  {
+> @@ -3047,8 +3012,6 @@ MemoryRegionSection *iotlb_to_section(CPUState *cpu,
+>
+>  static void io_mem_init(void)
+>  {
+> -    memory_region_init_io(&io_mem_rom, NULL, &readonly_mem_ops,
+> -                          NULL, NULL, UINT64_MAX);
+>      memory_region_init_io(&io_mem_unassigned, NULL, &unassigned_mem_ops,=
+ NULL,
+>                            NULL, UINT64_MAX);
+>
+> @@ -3069,8 +3032,6 @@ AddressSpaceDispatch *address_space_dispatch_new(Fl=
+atView *fv)
+>      assert(n =3D=3D PHYS_SECTION_UNASSIGNED);
+>      n =3D dummy_section(&d->map, fv, &io_mem_notdirty);
+>      assert(n =3D=3D PHYS_SECTION_NOTDIRTY);
+> -    n =3D dummy_section(&d->map, fv, &io_mem_rom);
+> -    assert(n =3D=3D PHYS_SECTION_ROM);
+>
+>      d->phys_map  =3D (PhysPageEntry) { .ptr =3D PHYS_MAP_NODE_NIL, .skip=
+ =3D 1 };
+
+
+--
+Alex Benn=C3=A9e
 
