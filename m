@@ -2,87 +2,67 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5CEAC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 23:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03F79C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 23:33:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A23FB21D7B
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 23:33:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZNPbvppH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A23FB21D7B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id CDE5F21D7B
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 23:33:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDE5F21D7B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDGn2-0006tQ-P5
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 19:33:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38829)
+	id 1iDGnE-0007Ie-Tb
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 19:33:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39695)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iDGku-0005Xr-0M
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 19:31:33 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iDGlj-0006CH-Ev
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 19:32:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iDGkr-0002yC-3s
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 19:31:31 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:42388)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iDGkq-0002rY-Kx
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 19:31:28 -0400
-Received: by mail-wr1-f66.google.com with SMTP id n14so243520wrw.9
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 16:31:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=jSCFOhECRftmmvA+lheNZeXhhJgeT4gP4yCV2T0qHzQ=;
- b=ZNPbvppH91Y+CfZxkum0TG+w1r5IKnBH+RVVhl1vo/EwaQ8UEubuIZBmEVXfEhMXwp
- Lp6gEOUjWwUWNFrD9Jn47LZ3MP3Ug1fswk0pgS8UoScsIGuCcUwjL0POpkzxc/XE5uL5
- D2xmv8ipN8lyKe/gv+mlCDKcmrsApUuiaz2WgUH8t6hBdTRnrW6XpoyErLLRl3zp3ZbN
- mg6+gJNSPOsuh9Xfv601Bmoduv6UHYNbKS5p2PvKGba8AIybHhClwblg214fXQyODn0T
- DA4jEcu5Uq7LZK1NHo51s5SXyQlB7Zg/LYRV8SP8h39siQ3bKF8m4SGnL84vS7Vf13H9
- KQ0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=jSCFOhECRftmmvA+lheNZeXhhJgeT4gP4yCV2T0qHzQ=;
- b=ep8edSeQvXzxD/NPObnLF61V041zzxG20uMuRz+KL+lUdiQkiwVVCftmgsdFAmh1UX
- z6WvGB8RXMKokNCf9omqUEJRzdloOm49NHRdjtZexIu4puVXtRSvVEqmtkrKtI3NU9fu
- /tv+CbL8noE9dUWIyfxJrRhlkgC+g9nzvzrOzdvQDoJ5LJUlt+ivGQK2Q7rN9rSavMIz
- eUOWSezbY7ZZu50kBIy84J8g7RkJxwrMPA8okvJ95zJ5BQBPQPAlDV6pzkQk8zRfDvPy
- glSkgkwDwe2rhRZZWxF39jW55RSlM5bE6RoIZoKWohGPgXBNQ0MKJVggsWQp3N9pnfm5
- Ze+Q==
-X-Gm-Message-State: APjAAAURphkyU38OgeD0ege8+oE0lWGtHNYxfoVvwDFT+pRDG5qiw6GC
- gmHntOer0zjYot/35w/B/Ty8jg==
-X-Google-Smtp-Source: APXvYqxnBt1VFE+UIodNnJhN6MZLorcAkOoP9wvzAiN7iSdwTxye8EoiTX/N2btEZNoEpGACr3tQLA==
-X-Received: by 2002:adf:e6c4:: with SMTP id y4mr515758wrm.238.1569454223405;
- Wed, 25 Sep 2019 16:30:23 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id v8sm399828wra.79.2019.09.25.16.30.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Sep 2019 16:30:22 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 12F441FF87;
- Thu, 26 Sep 2019 00:30:22 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH] configure: deprecate 32 bit build hosts
-Date: Thu, 26 Sep 2019 00:30:13 +0100
-Message-Id: <20190925233013.6449-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <no-reply@patchew.org>) id 1iDGle-00041S-Ej
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 19:32:19 -0400
+Resent-Date: Wed, 25 Sep 2019 19:32:19 -0400
+Resent-Message-Id: <E1iDGle-00041S-Ej@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21558)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iDGld-0003wl-HG
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 19:32:17 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1569454321; cv=none; d=zoho.com; s=zohoarc; 
+ b=iSVAsN75EMNmhy8SeYqN77YLIe0GzuMsRz6G2XXJyfQswNnZdIRCVfB0K7LpvFmmnY7mXweBDoghjWLCMvdmECbY9zI9EVQmvFqsY6tFM0DnnxkKaGsSKNN+PNhCep1ByfZcj5zxEsVprv7O3BJ4rocWGNsDvAOl7MD8oUVb6Gs=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1569454321;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=ZVKy0RJCpm6oZWQ9L/LpDR4JLix2TjF9sE/PeLFLL6I=; 
+ b=V+4q1DZf2QQDngP14HpWd+hriuenHiOWRhZWTVODwkEJ7E+l38fzgIpvPM64whhY1Kt0UiiKCD9XVGPcTtfOjx2IR3BbeFgokOKuEo9Daeuo4M/RkDGRfsogjirI2fbeQ/NqeMd4ah/wPH4i6VpCm2XJapAYX5TWvFIJsCBcRHg=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1569454319623507.20554720743917;
+ Wed, 25 Sep 2019 16:31:59 -0700 (PDT)
+Subject: Re: [PATCH] docker: fix uid maping with podman
+In-Reply-To: <4b9204cc8ade1c965dc5412c53c6f7c5b4f019a2.1569413332.git.tgolembi@redhat.com>
+Message-ID: <156945431831.7374.10340030777705777822@8230166b0665>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: tgolembi@redhat.com
+Date: Wed, 25 Sep 2019 16:31:59 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.66
+X-Received-From: 136.143.188.55
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,103 +74,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
- qemu-discuss@nongnu.org, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- qemu-ppc@nongnnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, alex.bennee@linaro.org, tgolembi@redhat.com,
+ philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The 32 bit hosts are already a second class citizen especially with
-support for running 64 bit guests under TCG. We are also limited by
-testing as actual working 32 bit machines are getting quite rare in
-developers personal menageries. For TCG supporting newer types like
-Int128 is a lot harder with 32 bit calling conventions compared to
-their larger bit sized cousins. Fundamentally address space is the
-most useful thing for the translator to have even for a 32 bit guest a
-32 bit host is quite constrained.
-
-As far as I'm aware 32 bit KVM users are even less numerous. Even
-ILP32 doesn't make much sense given the address space QEMU needs to
-manage.
-
-Lets mark these machines as deprecated so we can have the wailing and
-gnashing of teeth now and look to actually dropping the support in a
-couple of cycles.
-
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>
----
- configure | 24 +++++++++++++-----------
- 1 file changed, 13 insertions(+), 11 deletions(-)
-
-diff --git a/configure b/configure
-index 542f6aea3f..776fd460b5 100755
---- a/configure
-+++ b/configure
-@@ -728,7 +728,7 @@ ARCH=
- # Normalise host CPU name and set ARCH.
- # Note that this case should only have supported host CPUs, not guests.
- case "$cpu" in
--  ppc|ppc64|s390|s390x|sparc64|x32|riscv32|riscv64)
-+  ppc64|s390|s390x|sparc64|riscv64)
-     supported_cpu="yes"
-   ;;
-   ppc64le)
-@@ -737,7 +737,6 @@ case "$cpu" in
-   ;;
-   i386|i486|i586|i686|i86pc|BePC)
-     cpu="i386"
--    supported_cpu="yes"
-   ;;
-   x86_64|amd64)
-     cpu="x86_64"
-@@ -745,19 +744,22 @@ case "$cpu" in
-   ;;
-   armv*b|armv*l|arm)
-     cpu="arm"
--    supported_cpu="yes"
-   ;;
-   aarch64)
-     cpu="aarch64"
-     supported_cpu="yes"
-   ;;
--  mips*)
-+  mips64*)
-     cpu="mips"
-     supported_cpu="yes"
-   ;;
-+  mips*)
-+    cpu="mips"
-+  ;;
-   sparc|sun4[cdmuv])
-     cpu="sparc"
--    supported_cpu="yes"
-+  ;;
-+  x32|riscv32)
-   ;;
-   *)
-     # This will result in either an error or falling back to TCI later
-@@ -6438,12 +6440,12 @@ if test "$supported_cpu" = "no"; then
-     echo "WARNING: SUPPORT FOR THIS HOST CPU WILL GO AWAY IN FUTURE RELEASES!"
-     echo
-     echo "CPU host architecture $cpu support is not currently maintained."
--    echo "The QEMU project intends to remove support for this host CPU in"
--    echo "a future release if nobody volunteers to maintain it and to"
--    echo "provide a build host for our continuous integration setup."
--    echo "configure has succeeded and you can continue to build, but"
--    echo "if you care about QEMU on this platform you should contact"
--    echo "us upstream at qemu-devel@nongnu.org."
-+    echo "The QEMU project intends to remove support for all 32 bit host"
-+    echo "CPUs in a future release. 64 bit hosts will need a volunteer"
-+    echo "to maintain it and to provide a build host for our continuous"
-+    echo "integration setup. configure has succeeded and you can continue"
-+    echo "to build, but if you care about QEMU on this platform you"
-+    echo "should contact us upstream at qemu-devel@nongnu.org."
- fi
- 
- if test "$supported_os" = "no"; then
--- 
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS80YjkyMDRjYzhhZGUxYzk2NWRj
+NTQxMmM1M2M2ZjdjNWI0ZjAxOWEyLjE1Njk0MTMzMzIuZ2l0LnRnb2xlbWJpQHJlZGhhdC5jb20v
+CgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBhc2FuIGJ1aWxkIHRlc3QuIFBsZWFzZSBm
+aW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBo
+YXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2Fs
+bHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4
+Nl82NAptYWtlIGRvY2tlci1pbWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9j
+a2VyLXRlc3QtZGVidWdAZmVkb3JhIFRBUkdFVF9MSVNUPXg4Nl82NC1zb2Z0bW11IEo9MTQgTkVU
+V09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgoKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxh
+YmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzRiOTIwNGNjOGFkZTFjOTY1ZGM1NDEyYzUz
+YzZmN2M1YjRmMDE5YTIuMTU2OTQxMzMzMi5naXQudGdvbGVtYmlAcmVkaGF0LmNvbS90ZXN0aW5n
+LmFzYW4vP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
+IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
+ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
 
