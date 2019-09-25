@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13304C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E94B0C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:53:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D750F2146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:53:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D750F2146E
+	by mail.kernel.org (Postfix) with ESMTPS id C17A22146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:53:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C17A22146E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD6nl-00074v-GH
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 08:53:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57827)
+	id 1iD6no-00079m-Nn
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 08:53:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57812)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gd-0001GR-QT
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gd-0001G9-JE
  for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gc-0002Eo-1W
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gb-0002ET-Ua
  for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:27 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56081 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:56097 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iD6gb-0002DE-Js
+ id 1iD6gb-0002DP-If
  for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:25 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 88C8F1A23B8;
+ by mail.rt-rk.com (Postfix) with ESMTP id A06B51A228A;
  Wed, 25 Sep 2019 14:46:21 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 60EDD1A2060;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 6DE911A23A5;
  Wed, 25 Sep 2019 14:46:21 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 02/20] target/mips: Clean up internal.h
-Date: Wed, 25 Sep 2019 14:45:54 +0200
-Message-Id: <1569415572-19635-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH v2 04/20] target/mips: Clean up mips-defs.h
+Date: Wed, 25 Sep 2019 14:45:56 +0200
+Message-Id: <1569415572-19635-5-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -73,121 +73,93 @@ Mostly fix errors and warnings reported by 'checkpatch.pl -f'.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/internal.h | 60 +++++++++++++++++++++++++++++++-------------------
- 1 file changed, 37 insertions(+), 23 deletions(-)
+ target/mips/mips-defs.h | 53 ++++++++++++++++++++++++++-----------------------
+ 1 file changed, 28 insertions(+), 25 deletions(-)
 
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index 685e8d6..3f435b5 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -1,4 +1,5 @@
--/* mips internal definitions and helpers
-+/*
-+ * MIPS internal definitions and helpers
-  *
-  * This work is licensed under the terms of the GNU GPL, version 2 or later.
-  * See the COPYING file in the top-level directory.
-@@ -9,8 +10,10 @@
+diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
+index bbf056a..938c0de 100644
+--- a/target/mips/mips-defs.h
++++ b/target/mips/mips-defs.h
+@@ -2,7 +2,7 @@
+ #define QEMU_MIPS_DEFS_H
  
- #include "fpu/softfloat-helpers.h"
+ /* If we want to use host float regs... */
+-//#define USE_HOST_FLOAT_REGS
++/* #define USE_HOST_FLOAT_REGS */
  
--/* MMU types, the first four entries have the same layout as the
--   CP0C0_MT field.  */
+ /* Real pages are variable size... */
+ #define MIPS_TLB_MAX 128
+@@ -57,43 +57,46 @@
+ #define ASE_MXU           0x0200000000000000ULL
+ 
+ /* MIPS CPU defines. */
+-#define		CPU_MIPS1	(ISA_MIPS1)
+-#define		CPU_MIPS2	(CPU_MIPS1 | ISA_MIPS2)
+-#define		CPU_MIPS3	(CPU_MIPS2 | ISA_MIPS3)
+-#define		CPU_MIPS4	(CPU_MIPS3 | ISA_MIPS4)
+-#define		CPU_VR54XX	(CPU_MIPS4 | INSN_VR54XX)
+-#define         CPU_R5900       (CPU_MIPS3 | INSN_R5900)
+-#define		CPU_LOONGSON2E  (CPU_MIPS3 | INSN_LOONGSON2E)
+-#define		CPU_LOONGSON2F  (CPU_MIPS3 | INSN_LOONGSON2F)
++#define CPU_MIPS1       (ISA_MIPS1)
++#define CPU_MIPS2       (CPU_MIPS1 | ISA_MIPS2)
++#define CPU_MIPS3       (CPU_MIPS2 | ISA_MIPS3)
++#define CPU_MIPS4       (CPU_MIPS3 | ISA_MIPS4)
++#define CPU_VR54XX      (CPU_MIPS4 | INSN_VR54XX)
++#define CPU_R5900       (CPU_MIPS3 | INSN_R5900)
++#define CPU_LOONGSON2E  (CPU_MIPS3 | INSN_LOONGSON2E)
++#define CPU_LOONGSON2F  (CPU_MIPS3 | INSN_LOONGSON2F)
+ 
+-#define		CPU_MIPS5	(CPU_MIPS4 | ISA_MIPS5)
++#define CPU_MIPS5       (CPU_MIPS4 | ISA_MIPS5)
+ 
+ /* MIPS Technologies "Release 1" */
+-#define		CPU_MIPS32	(CPU_MIPS2 | ISA_MIPS32)
+-#define		CPU_MIPS64	(CPU_MIPS5 | CPU_MIPS32 | ISA_MIPS64)
++#define CPU_MIPS32      (CPU_MIPS2 | ISA_MIPS32)
++#define CPU_MIPS64      (CPU_MIPS5 | CPU_MIPS32 | ISA_MIPS64)
+ 
+ /* MIPS Technologies "Release 2" */
+-#define		CPU_MIPS32R2	(CPU_MIPS32 | ISA_MIPS32R2)
+-#define		CPU_MIPS64R2	(CPU_MIPS64 | CPU_MIPS32R2 | ISA_MIPS64R2)
++#define CPU_MIPS32R2    (CPU_MIPS32 | ISA_MIPS32R2)
++#define CPU_MIPS64R2    (CPU_MIPS64 | CPU_MIPS32R2 | ISA_MIPS64R2)
+ 
+ /* MIPS Technologies "Release 3" */
+-#define CPU_MIPS32R3 (CPU_MIPS32R2 | ISA_MIPS32R3)
+-#define CPU_MIPS64R3 (CPU_MIPS64R2 | CPU_MIPS32R3 | ISA_MIPS64R3)
++#define CPU_MIPS32R3    (CPU_MIPS32R2 | ISA_MIPS32R3)
++#define CPU_MIPS64R3    (CPU_MIPS64R2 | CPU_MIPS32R3 | ISA_MIPS64R3)
+ 
+ /* MIPS Technologies "Release 5" */
+-#define CPU_MIPS32R5 (CPU_MIPS32R3 | ISA_MIPS32R5)
+-#define CPU_MIPS64R5 (CPU_MIPS64R3 | CPU_MIPS32R5 | ISA_MIPS64R5)
++#define CPU_MIPS32R5    (CPU_MIPS32R3 | ISA_MIPS32R5)
++#define CPU_MIPS64R5    (CPU_MIPS64R3 | CPU_MIPS32R5 | ISA_MIPS64R5)
+ 
+ /* MIPS Technologies "Release 6" */
+-#define CPU_MIPS32R6 (CPU_MIPS32R5 | ISA_MIPS32R6)
+-#define CPU_MIPS64R6 (CPU_MIPS64R5 | CPU_MIPS32R6 | ISA_MIPS64R6)
++#define CPU_MIPS32R6    (CPU_MIPS32R5 | ISA_MIPS32R6)
++#define CPU_MIPS64R6    (CPU_MIPS64R5 | CPU_MIPS32R6 | ISA_MIPS64R6)
+ 
+ /* Wave Computing: "nanoMIPS" */
+-#define CPU_NANOMIPS32 (CPU_MIPS32R6 | ISA_NANOMIPS32)
++#define CPU_NANOMIPS32  (CPU_MIPS32R6 | ISA_NANOMIPS32)
+ 
+-/* Strictly follow the architecture standard:
+-   - Disallow "special" instruction handling for PMON/SPIM.
+-   Note that we still maintain Count/Compare to match the host clock. */
+-//#define MIPS_STRICT_STANDARD 1
 +/*
-+ * MMU types, the first four entries have the same layout as the
-+ * CP0C0_MT field.
++ * Strictly follow the architecture standard:
++ * - Disallow "special" instruction handling for PMON/SPIM.
++ * Note that we still maintain Count/Compare to match the host clock.
++ *
++ * #define MIPS_STRICT_STANDARD 1
 + */
- enum mips_mmu_types {
-     MMU_TYPE_NONE,
-     MMU_TYPE_R4000,
-@@ -160,9 +163,11 @@ static inline bool cpu_mips_hw_interrupts_enabled(CPUMIPSState *env)
-         !(env->CP0_Status & (1 << CP0St_EXL)) &&
-         !(env->CP0_Status & (1 << CP0St_ERL)) &&
-         !(env->hflags & MIPS_HFLAG_DM) &&
--        /* Note that the TCStatus IXMT field is initialized to zero,
--           and only MT capable cores can set it to one. So we don't
--           need to check for MT capabilities here.  */
-+        /*
-+         * Note that the TCStatus IXMT field is initialized to zero,
-+         * and only MT capable cores can set it to one. So we don't
-+         * need to check for MT capabilities here.
-+         */
-         !(env->active_tc.CP0_TCStatus & (1 << CP0TCSt_IXMT));
- }
  
-@@ -177,14 +182,18 @@ static inline bool cpu_mips_hw_interrupts_pending(CPUMIPSState *env)
-     status = env->CP0_Status & CP0Ca_IP_mask;
- 
-     if (env->CP0_Config3 & (1 << CP0C3_VEIC)) {
--        /* A MIPS configured with a vectorizing external interrupt controller
--           will feed a vector into the Cause pending lines. The core treats
--           the status lines as a vector level, not as indiviual masks.  */
-+        /*
-+         * A MIPS configured with a vectorizing external interrupt controller
-+         * will feed a vector into the Cause pending lines. The core treats
-+         * the status lines as a vector level, not as indiviual masks.
-+         */
-         r = pending > status;
-     } else {
--        /* A MIPS configured with compatibility or VInt (Vectored Interrupts)
--           treats the pending lines as individual interrupt lines, the status
--           lines are individual masks.  */
-+        /*
-+         * A MIPS configured with compatibility or VInt (Vectored Interrupts)
-+         * treats the pending lines as individual interrupt lines, the status
-+         * lines are individual masks.
-+         */
-         r = (pending & status) != 0;
-     }
-     return r;
-@@ -275,12 +284,14 @@ static inline int mips_vpe_active(CPUMIPSState *env)
-         active = 0;
-     }
- 
--    /* Now verify that there are active thread contexts in the VPE.
--
--       This assumes the CPU model will internally reschedule threads
--       if the active one goes to sleep. If there are no threads available
--       the active one will be in a sleeping state, and we can turn off
--       the entire VPE.  */
-+    /*
-+     * Now verify that there are active thread contexts in the VPE.
-+     *
-+     * This assumes the CPU model will internally reschedule threads
-+     * if the active one goes to sleep. If there are no threads available
-+     * the active one will be in a sleeping state, and we can turn off
-+     * the entire VPE.
-+     */
-     if (!(env->active_tc.CP0_TCStatus & (1 << CP0TCSt_A))) {
-         /* TC is not activated.  */
-         active = 0;
-@@ -326,7 +337,8 @@ static inline void compute_hflags(CPUMIPSState *env)
-     if (!(env->CP0_Status & (1 << CP0St_EXL)) &&
-         !(env->CP0_Status & (1 << CP0St_ERL)) &&
-         !(env->hflags & MIPS_HFLAG_DM)) {
--        env->hflags |= (env->CP0_Status >> CP0St_KSU) & MIPS_HFLAG_KSU;
-+        env->hflags |= (env->CP0_Status >> CP0St_KSU) &
-+                       MIPS_HFLAG_KSU;
-     }
- #if defined(TARGET_MIPS64)
-     if ((env->insn_flags & ISA_MIPS3) &&
-@@ -403,10 +415,12 @@ static inline void compute_hflags(CPUMIPSState *env)
-             env->hflags |= MIPS_HFLAG_COP1X;
-         }
-     } else if (env->insn_flags & ISA_MIPS4) {
--        /* All supported MIPS IV CPUs use the XX (CU3) to enable
--           and disable the MIPS IV extensions to the MIPS III ISA.
--           Some other MIPS IV CPUs ignore the bit, so the check here
--           would be too restrictive for them.  */
-+        /*
-+         * All supported MIPS IV CPUs use the XX (CU3) to enable
-+         * and disable the MIPS IV extensions to the MIPS III ISA.
-+         * Some other MIPS IV CPUs ignore the bit, so the check here
-+         * would be too restrictive for them.
-+         */
-         if (env->CP0_Status & (1U << CP0St_CU3)) {
-             env->hflags |= MIPS_HFLAG_COP1X;
-         }
+ #endif /* QEMU_MIPS_DEFS_H */
 -- 
 2.7.4
 
